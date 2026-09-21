@@ -4,7 +4,7 @@ Official website and web serial for **Yara, Demon Hunter**, a dark fantasy story
 
 The project is initially published in **Portuguese and English**, with the possibility of adding more languages in the future.
 
-[⚔️ Yara, Demon Hunter](https://miguelzeph.github.io/yara-demon-hunter/)
+[⚔️ Yara, Demon Hunter](https://yara-demon-hunter.github.io)
 
 ## About the Project
 
