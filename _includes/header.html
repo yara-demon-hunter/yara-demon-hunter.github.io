@@ -1,0 +1,125 @@
+{% assign current_path = page.url %}
+
+{% if page.lang == "pt" %}
+
+    {% assign translated_path = current_path | replace_first: '/pt/', '/en/' %}
+
+    <header class="site-header">
+        <div class="site-header__inner">
+
+            <a class="site-brand" href="{{ '/pt/' | relative_url }}">
+                <span class="site-brand__title">Yara</span>
+                <span class="site-brand__subtitle">Caçadora de Demônios</span>
+            </a>
+
+            <nav class="site-nav">
+
+                <a
+                    class="{% if page.url == '/pt/' %}is-active{% endif %}"
+                    href="{{ '/pt/' | relative_url }}"
+                >
+                    Início
+                </a>
+
+                <a
+                    class="{% if page.url contains '/pt/chapters' %}is-active{% endif %}"
+                    href="{{ '/pt/chapters/' | relative_url }}"
+                >
+                    Capítulos
+                </a>
+
+                <a
+                    class="{% if page.url contains '/pt/characters' %}is-active{% endif %}"
+                    href="{{ '/pt/characters/' | relative_url }}"
+                >
+                    Personagens
+                </a>
+
+                <a
+                    class="{% if page.url contains '/pt/world' %}is-active{% endif %}"
+                    href="{{ '/pt/world/' | relative_url }}"
+                >
+                    Mundo
+                </a>
+
+                <a
+                    class="{% if page.url contains '/pt/about' %}is-active{% endif %}"
+                    href="{{ '/pt/about/' | relative_url }}"
+                >
+                    Sobre
+                </a>
+
+                <a
+                    class="language-link"
+                    href="{{ translated_path | relative_url }}"
+                >
+                    🇬🇧 EN
+                </a>
+
+            </nav>
+
+        </div>
+    </header>
+
+{% else %}
+
+    {% assign translated_path = current_path | replace_first: '/en/', '/pt/' %}
+
+    <header class="site-header">
+        <div class="site-header__inner">
+
+            <a class="site-brand" href="{{ '/en/' | relative_url }}">
+                <span class="site-brand__title">Yara</span>
+                <span class="site-brand__subtitle">Demon Hunter</span>
+            </a>
+
+            <nav class="site-nav">
+
+                <a
+                    class="{% if page.url == '/en/' %}is-active{% endif %}"
+                    href="{{ '/en/' | relative_url }}"
+                >
+                    Home
+                </a>
+
+                <a
+                    class="{% if page.url contains '/en/chapters' %}is-active{% endif %}"
+                    href="{{ '/en/chapters/' | relative_url }}"
+                >
+                    Chapters
+                </a>
+
+                <a
+                    class="{% if page.url contains '/en/characters' %}is-active{% endif %}"
+                    href="{{ '/en/characters/' | relative_url }}"
+                >
+                    Characters
+                </a>
+
+                <a
+                    class="{% if page.url contains '/en/world' %}is-active{% endif %}"
+                    href="{{ '/en/world/' | relative_url }}"
+                >
+                    World
+                </a>
+
+                <a
+                    class="{% if page.url contains '/en/about' %}is-active{% endif %}"
+                    href="{{ '/en/about/' | relative_url }}"
+                >
+                    About
+                </a>
+
+                <a
+                    class="language-link"
+                    href="{{ translated_path | relative_url }}"
+                >
+                    🇧🇷 PT
+                </a>
+
+            </nav>
+
+        </div>
+    </header>
+
+{% endif %}

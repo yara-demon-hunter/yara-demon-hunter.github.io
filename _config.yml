@@ -1,0 +1,16 @@
+title: "Yara, Demon Hunter"
+description: "Official website and web serial for Yara, Demon Hunter — a dark fantasy story released chapter by chapter."
+url: "https://yara-demon-hunter.github.io"
+baseurl: ""
+
+lang: "en"
+
+markdown: kramdown
+permalink: pretty
+
+exclude:
+  - vendor
+  - .bundle
+  - Gemfile
+  - Gemfile.lock
+  - README.md

@@ -1,0 +1,203 @@
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 800px) {
+
+    /* -------------------------------------
+       HEADER
+       ------------------------------------- */
+
+    .site-header__inner {
+        min-height: auto;
+
+        padding: 18px 20px;
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 18px;
+    }
+
+    .site-brand {
+        align-items: center;
+
+        text-align: center;
+    }
+
+    .site-nav {
+        justify-content: center;
+
+        flex-wrap: wrap;
+
+        gap: 8px 18px;
+    }
+
+    .site-nav a {
+        padding: 8px 0;
+    }
+
+    .site-nav a:not(.language-link)::after {
+        bottom: 2px;
+    }
+
+    .site-nav .language-link {
+        margin-left: 4px;
+    }
+
+
+    /* -------------------------------------
+       MAIN
+       ------------------------------------- */
+
+    main {
+        margin: 45px auto;
+
+        padding: 0 18px;
+    }
+
+
+    /* -------------------------------------
+       ROOT HERO
+       ------------------------------------- */
+
+    .hero {
+        align-items: flex-end;
+    }
+
+    .hero__image {
+        background-position: 60% center;
+    }
+
+    .hero__overlay {
+        background:
+            linear-gradient(
+                to bottom,
+                rgba(5, 6, 8, 0.15) 0%,
+                rgba(5, 6, 8, 0.35) 35%,
+                rgba(5, 6, 8, 0.94) 82%,
+                #08090b 100%
+            );
+    }
+
+    .hero__content {
+        width: 90%;
+
+        margin: 0 auto;
+
+        padding: 5rem 0 4rem;
+    }
+
+    .hero__eyebrow {
+        font-size: 0.65rem;
+
+        letter-spacing: 0.2em;
+    }
+
+    .hero__title {
+        font-size: clamp(4rem, 20vw, 6rem);
+    }
+
+    .hero__title span {
+        margin-top: 0.7rem;
+
+        font-size: 1rem;
+
+        letter-spacing: 0.22em;
+    }
+
+    .hero__tagline {
+        margin: 1.5rem 0 2rem;
+
+        font-size: 0.95rem;
+    }
+
+    .hero__languages {
+        flex-direction: column;
+    }
+
+    .hero__language {
+        width: 100%;
+    }
+
+
+    /* -------------------------------------
+       STORY HOME
+       ------------------------------------- */
+
+    .story-intro {
+        padding: 75px 15px 70px;
+    }
+
+    .story-intro__subtitle {
+        letter-spacing: 0.2em;
+    }
+
+    .story-intro__description {
+        font-size: 1rem;
+    }
+
+
+    /* -------------------------------------
+       HOME SECTIONS
+       ------------------------------------- */
+
+    .home-section {
+        padding: 60px 20px;
+    }
+
+
+    /* -------------------------------------
+       CHAPTER CARDS
+       ------------------------------------- */
+
+    .chapter-card {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 20px;
+
+        padding: 24px;
+    }
+
+    .chapter-card__link {
+        width: 100%;
+
+        box-sizing: border-box;
+
+        text-align: center;
+    }
+
+
+    /* -------------------------------------
+       READING
+       ------------------------------------- */
+
+    .chapter p,
+    .post p,
+    .page-content p,
+    .chapter-content p {
+        font-size: 1rem;
+    }
+
+    .chapter-navigation {
+        flex-direction: column;
+
+        text-align: center;
+    }
+
+    .chapter-image {
+        margin-bottom: 35px;
+    }
+
+
+    /* -------------------------------------
+       FOOTER
+       ------------------------------------- */
+
+    footer {
+        margin-top: 70px;
+    }
+}

@@ -1,0 +1,104 @@
+{% assign chapter_pages = site.pages
+    | where: "chapter_type", "chapter"
+    | where: "lang", page.lang
+    | where: "status", "published"
+    | sort: "chapter_number"
+%}
+
+{% assign current_index = nil %}
+
+{% for chapter in chapter_pages %}
+
+    {% if chapter.chapter_number == page.chapter_number %}
+        {% assign current_index = forloop.index0 %}
+    {% endif %}
+
+{% endfor %}
+
+<nav class="chapter-navigation">
+
+    {% if page.chapter_type == "prologue" %}
+
+        {% assign first_chapter = chapter_pages | first %}
+
+        {% if first_chapter %}
+
+            <a href="{{ first_chapter.url | relative_url }}">
+
+                {% if page.lang == "pt" %}
+                    Capítulo {{ first_chapter.chapter_number }} →
+                {% else %}
+                    Chapter {{ first_chapter.chapter_number }} →
+                {% endif %}
+
+            </a>
+
+        {% endif %}
+
+    {% elsif page.chapter_type == "chapter" %}
+
+        {% if current_index > 0 %}
+
+            {% assign previous_index = current_index | minus: 1 %}
+            {% assign previous_chapter = chapter_pages[previous_index] %}
+
+            <a href="{{ previous_chapter.url | relative_url }}">
+
+                {% if page.lang == "pt" %}
+                    ← Capítulo {{ previous_chapter.chapter_number }}
+                {% else %}
+                    ← Chapter {{ previous_chapter.chapter_number }}
+                {% endif %}
+
+            </a>
+
+        {% else %}
+
+            {% if page.lang == "pt" %}
+
+                <a href="{{ '/pt/chapters/prologue/' | relative_url }}">
+                    ← Prólogo
+                </a>
+
+            {% else %}
+
+                <a href="{{ '/en/chapters/prologue/' | relative_url }}">
+                    ← Prologue
+                </a>
+
+            {% endif %}
+
+        {% endif %}
+
+
+        <a href="{% if page.lang == 'pt' %}{{ '/pt/chapters/' | relative_url }}{% else %}{{ '/en/chapters/' | relative_url }}{% endif %}">
+
+            {% if page.lang == "pt" %}
+                Capítulos
+            {% else %}
+                Chapters
+            {% endif %}
+
+        </a>
+
+
+        {% assign next_index = current_index | plus: 1 %}
+        {% assign next_chapter = chapter_pages[next_index] %}
+
+        {% if next_chapter %}
+
+            <a href="{{ next_chapter.url | relative_url }}">
+
+                {% if page.lang == "pt" %}
+                    Capítulo {{ next_chapter.chapter_number }} →
+                {% else %}
+                    Chapter {{ next_chapter.chapter_number }} →
+                {% endif %}
+
+            </a>
+
+        {% endif %}
+
+    {% endif %}
+
+</nav>

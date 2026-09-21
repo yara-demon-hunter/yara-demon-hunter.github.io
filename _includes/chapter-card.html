@@ -1,0 +1,38 @@
+<article class="chapter-card">
+
+    <div class="chapter-card__content">
+
+        <span class="chapter-card__type">
+            {{ include.type }}
+        </span>
+
+        <h2 class="chapter-card__title">
+            {{ include.title }}
+        </h2>
+
+        {% if include.description %}
+            <p class="chapter-card__description">
+                {{ include.description }}
+            </p>
+        {% endif %}
+
+    </div>
+
+    {% if include.status == "published" %}
+
+        <a
+            class="chapter-card__link"
+            href="{{ include.url | relative_url }}"
+        >
+            {{ include.link_text }} →
+        </a>
+
+    {% else %}
+
+        <span class="chapter-card__link chapter-card__link--disabled">
+            {{ include.coming_soon_text }}
+        </span>
+
+    {% endif %}
+
+</article>

@@ -1,0 +1,190 @@
+/* =========================================
+   BASE
+   ========================================= */
+
+:root {
+    --bg: #0c0d0f;
+    --bg-soft: #121419;
+    --surface: #17191f;
+    --surface-hover: #1c1f26;
+
+    --text: #e8e5df;
+    --text-soft: #aaa8a3;
+    --text-muted: #77766f;
+
+    --accent: #b9a47a;
+    --accent-soft: #d2c29c;
+
+    --border: #292b31;
+    --border-light: #383a41;
+
+    --content-width: 900px;
+    --reading-width: 720px;
+}
+
+
+/* =========================================
+   RESET
+   ========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #171920 0%,
+            var(--bg) 45%
+        );
+
+    color: var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    line-height: 1.8;
+}
+
+
+/* =========================================
+   LINKS
+   ========================================= */
+
+a {
+    color: var(--accent-soft);
+
+    text-decoration: none;
+
+    transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+a:hover {
+    color: #fff;
+}
+
+
+/* =========================================
+   MAIN
+   ========================================= */
+
+main {
+    max-width: var(--content-width);
+
+    margin: 70px auto;
+
+    padding: 0 25px;
+}
+
+
+/* =========================================
+   TYPOGRAPHY
+   ========================================= */
+
+h1,
+h2,
+h3,
+h4 {
+    font-weight: normal;
+
+    line-height: 1.25;
+
+    color: #f1eee8;
+}
+
+h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+
+    letter-spacing: -0.02em;
+
+    margin-bottom: 15px;
+}
+
+h2 {
+    font-size: 2rem;
+
+    margin-top: 50px;
+
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+h3 {
+    font-size: 1.4rem;
+}
+
+p {
+    margin: 0 0 1.4rem;
+}
+
+
+/* =========================================
+   GENERIC CONTENT
+   ========================================= */
+
+.chapter,
+.post,
+.page-content {
+    max-width: var(--reading-width);
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.chapter p,
+.post p,
+.page-content p {
+    font-size: 1.08rem;
+
+    color: #d5d2cc;
+}
+
+
+/* =========================================
+   QUOTES
+   ========================================= */
+
+blockquote {
+    margin: 35px 0;
+
+    padding: 5px 25px;
+
+    border-left: 2px solid var(--accent);
+
+    color: var(--text-soft);
+
+    font-style: italic;
+}
+
+
+/* =========================================
+   FOOTER
+   ========================================= */
+
+footer {
+    margin-top: 100px;
+
+    padding: 35px 20px;
+
+    text-align: center;
+
+    background: #0a0b0d;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--text-muted);
+
+    font-size: 0.85rem;
+}

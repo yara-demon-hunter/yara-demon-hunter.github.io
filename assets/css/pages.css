@@ -1,0 +1,184 @@
+/* =========================================
+   GENERAL PAGES
+   ========================================= */
+
+
+/* =========================================
+   PAGE CONTAINER
+   ========================================= */
+
+.about-page {
+    max-width: var(--reading-width);
+
+    margin: 0 auto;
+}
+
+
+/* =========================================
+   PAGE HEADER
+   ========================================= */
+
+.about-header {
+    padding: 80px 20px 70px;
+
+    text-align: center;
+}
+
+.about-header h1 {
+    margin: 0;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(2.8rem, 7vw, 4.5rem);
+
+    font-weight: normal;
+
+    line-height: 1.05;
+
+    letter-spacing: -0.03em;
+
+    color: var(--text);
+}
+
+.about-lead {
+    max-width: 600px;
+
+    margin: 25px auto 0;
+
+    color: var(--text-soft);
+
+    font-size: 1.1rem;
+
+    line-height: 1.8;
+}
+
+
+/* =========================================
+   PAGE SECTIONS
+   ========================================= */
+
+.about-section {
+    padding: 65px 20px;
+
+    border-top: 1px solid var(--border);
+}
+
+.about-section h2 {
+    margin: 0 0 30px;
+
+    padding: 0;
+
+    border: none;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+
+    font-weight: normal;
+
+    line-height: 1.25;
+
+    color: #f1eee8;
+}
+
+.about-section p {
+    max-width: var(--reading-width);
+
+    margin-bottom: 1.5rem;
+
+    color: var(--text-soft);
+
+    font-size: 1.05rem;
+
+    line-height: 1.9;
+}
+
+.about-section p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================
+   EMPHASIS
+   ========================================= */
+
+.about-section strong {
+    color: var(--text);
+
+    font-weight: normal;
+}
+
+.about-section em {
+    color: var(--text);
+
+}
+
+
+/* =========================================
+   CONTACT
+   ========================================= */
+
+.about-contact {
+    padding-bottom: 80px;
+}
+
+.about-contact a {
+    color: var(--accent-soft);
+
+    border-bottom: 1px solid transparent;
+
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.about-contact a:hover {
+    color: #fff;
+
+    border-bottom-color: var(--accent);
+}
+
+
+/* =========================================
+   SUPPORT / KO-FI
+   ========================================= */
+
+.about-section .kofi-button {
+    margin-top: 25px;
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 800px) {
+
+    .about-header {
+        padding: 65px 15px 55px;
+    }
+
+    .about-lead {
+        font-size: 1rem;
+    }
+
+    .about-section {
+        padding: 50px 15px;
+    }
+
+    .about-section p {
+        font-size: 1rem;
+
+        line-height: 1.8;
+    }
+
+    .about-contact {
+        padding-bottom: 65px;
+    }
+}

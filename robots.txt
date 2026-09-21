@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://miguelzeph.github.io/yara-demon-hunter/sitemap.xml

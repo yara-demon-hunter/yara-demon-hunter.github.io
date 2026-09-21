@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="{% if page.lang == 'pt' %}pt-BR{% else %}en{% endif %}">
+<head>
+
+
+    <!-- Google Analytics G4 - Google tag (gtag.js) -->
+    {% include google-analytics.html %}
+
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ page.title }} | {{ site.title }}</title>
+
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+</head>
+
+<body>
+
+    {% unless page.url == "/" %}
+        {% include header.html %}
+    {% endunless %}
+
+    <main>
+
+        {{ content }}
+
+        {% if page.chapter_type %}
+            {% include chapter-navigation.html %}
+        {% endif %}
+
+    </main>
+
+    <footer>
+        {% include footer.html %}
+    </footer>
+
+</body>
+</html>
