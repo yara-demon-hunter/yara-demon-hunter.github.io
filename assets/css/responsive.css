@@ -209,6 +209,14 @@
         text-align: center;
     }
 
+    .book-card .chapter-card__link {
+        width: max-content;
+
+        align-self: flex-start;
+
+        text-align: left;
+    }
+
 
     /* -------------------------------------
        READING

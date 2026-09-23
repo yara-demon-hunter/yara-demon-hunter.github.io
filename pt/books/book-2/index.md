@@ -4,6 +4,7 @@ title: "Yara, Caçadora de Demônios: Apocalipse Espiritual"
 lang: pt
 book_id: book-2
 translation_id: book-2
+last_updated: 2026-09-23
 ---
 
 <section class="page-content">

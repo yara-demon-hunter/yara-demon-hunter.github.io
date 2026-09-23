@@ -1,0 +1,12 @@
+{% if page.last_updated %}
+    <p class="last-updated">
+        {% if page.lang == "pt" %}
+            Última atualização:
+        {% else %}
+            Last updated:
+        {% endif %}
+        <time datetime="{{ page.last_updated | date: '%Y-%m-%d' }}">
+            {{ page.last_updated | date: "%d/%m/%Y" }}
+        </time>
+    </p>
+{% endif %}

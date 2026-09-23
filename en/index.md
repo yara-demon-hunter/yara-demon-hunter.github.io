@@ -5,6 +5,7 @@ lang: en
 book_id: book-1
 translation_id: home
 translation: /pt/
+last_updated: 2026-09-23
 ---
 
 <section class="story-intro">

@@ -3,6 +3,7 @@ layout: default
 title: Livros
 lang: pt
 translation_id: books-index
+last_updated: 2026-09-23
 ---
 
 <section class="page-content">

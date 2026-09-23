@@ -5,6 +5,7 @@ lang: en
 book_id: book-1
 translation_id: book-1
 book_status: published
+last_updated: 2026-09-23
 ---
 
 <section class="page-content">

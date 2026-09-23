@@ -5,6 +5,7 @@ lang: pt
 book_id: book-1
 translation_id: book-1-chapters
 chapter_index: true
+last_updated: 2026-09-23
 ---
 
 # Capítulos

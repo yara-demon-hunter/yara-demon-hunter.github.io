@@ -4,6 +4,7 @@ title: Mundo
 lang: pt
 book_id: book-1
 translation_id: world
+last_updated: 2026-09-23
 ---
 
 # O Mundo

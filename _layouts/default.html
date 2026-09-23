@@ -35,6 +35,8 @@
 
         {{ content }}
 
+        {% include last-updated.html %}
+
         {% if page.chapter_type %}
             {% include chapter-navigation.html %}
         {% endif %}

@@ -207,6 +207,18 @@
         color 0.2s ease;
 }
 
+.book-card .chapter-card__link {
+    align-self: center;
+
+    width: max-content;
+
+    padding: 8px 12px;
+
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
 .chapter-card__link:hover {
     background: #252525;
 
@@ -223,6 +235,18 @@
     cursor: default;
 
     opacity: 0.7;
+}
+
+.last-updated {
+    max-width: var(--reading-width);
+
+    margin: 28px auto 0;
+
+    color: var(--text-muted);
+
+    font-family: system-ui, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
 }
 
 

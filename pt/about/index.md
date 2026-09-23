@@ -4,6 +4,7 @@ title: Sobre
 lang: pt
 book_id: book-1
 translation_id: about
+last_updated: 2026-09-23
 ---
 
 <div class="page-content about-page">
@@ -15,7 +16,7 @@ translation_id: about
         </p>
 
         <h1>
-            Yara, Caçadora de Demônios: O Despertar da Vingança
+            Yara, Caçadora de Demônios
         </h1>
 
         <p class="about-lead">
