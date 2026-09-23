@@ -13,6 +13,15 @@
 
     <title>{{ page.title }} | {{ site.title }}</title>
 
+    {% if page.redirect_to %}
+        <meta http-equiv="refresh" content="0; url={{ page.redirect_to | relative_url }}">
+        <link rel="canonical" href="{{ page.redirect_to | absolute_url }}">
+    {% else %}
+        <link rel="canonical" href="{{ page.url | absolute_url }}">
+    {% endif %}
+
+    {% include seo-links.html %}
+
     <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 </head>
 

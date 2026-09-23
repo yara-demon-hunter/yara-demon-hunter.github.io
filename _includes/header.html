@@ -1,8 +1,15 @@
-{% assign current_path = page.url %}
+{% assign translated_page = nil %}
+
+{% if page.translation_id %}
+    {% assign translation_pages = site.pages | where: "translation_id", page.translation_id %}
+    {% for candidate in translation_pages %}
+        {% if candidate.lang != page.lang %}
+            {% assign translated_page = candidate %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 {% if page.lang == "pt" %}
-
-    {% assign translated_path = current_path | replace_first: '/pt/', '/en/' %}
 
     <header class="site-header">
         <div class="site-header__inner">
@@ -22,10 +29,10 @@
                 </a>
 
                 <a
-                    class="{% if page.url contains '/pt/chapters' %}is-active{% endif %}"
-                    href="{{ '/pt/chapters/' | relative_url }}"
+                    class="{% if page.url contains '/pt/books' %}is-active{% endif %}"
+                    href="{{ '/pt/books/' | relative_url }}"
                 >
-                    Capítulos
+                    Livros
                 </a>
 
                 <a
@@ -49,12 +56,11 @@
                     Sobre
                 </a>
 
-                <a
-                    class="language-link"
-                    href="{{ translated_path | relative_url }}"
-                >
-                    🇬🇧 EN
-                </a>
+                {% if translated_page %}
+                    <a class="language-link" href="{{ translated_page.url | relative_url }}">
+                        🇬🇧 EN
+                    </a>
+                {% endif %}
 
             </nav>
 
@@ -62,8 +68,6 @@
     </header>
 
 {% else %}
-
-    {% assign translated_path = current_path | replace_first: '/en/', '/pt/' %}
 
     <header class="site-header">
         <div class="site-header__inner">
@@ -83,10 +87,10 @@
                 </a>
 
                 <a
-                    class="{% if page.url contains '/en/chapters' %}is-active{% endif %}"
-                    href="{{ '/en/chapters/' | relative_url }}"
+                    class="{% if page.url contains '/en/books' %}is-active{% endif %}"
+                    href="{{ '/en/books/' | relative_url }}"
                 >
-                    Chapters
+                    Books
                 </a>
 
                 <a
@@ -110,12 +114,11 @@
                     About
                 </a>
 
-                <a
-                    class="language-link"
-                    href="{{ translated_path | relative_url }}"
-                >
-                    🇧🇷 PT
-                </a>
+                {% if translated_page %}
+                    <a class="language-link" href="{{ translated_page.url | relative_url }}">
+                        🇧🇷 PT
+                    </a>
+                {% endif %}
 
             </nav>
 

@@ -2,12 +2,13 @@
 layout: default
 title: Yara
 lang: en
-translation: /pt/characters/yara/
+book_id: book-1
+translation_id: character-yara
 ---
 
 # Yara
 
-Yara is the protagonist of *Yara, Demon Hunter*.
+Yara is the protagonist of *Yara, Demon Hunter: The Awakening of Vengeance*.
 
 ## About Yara
 

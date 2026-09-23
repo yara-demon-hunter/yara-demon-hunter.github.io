@@ -2,14 +2,17 @@
 layout: default
 title: Chapters
 lang: en
-translation: /pt/chapters/
+book_id: book-1
+translation_id: book-1-chapters
+chapter_index: true
 ---
 
 # Chapters
 
-Follow the story of Yara, Demon Hunter.
+Follow the story of Yara, Demon Hunter: The Awakening of Vengeance.
 
 {% assign prologue = site.pages
+    | where: "book_id", page.book_id
     | where: "lang", page.lang
     | where: "chapter_type", "prologue"
     | first
@@ -22,6 +25,7 @@ Follow the story of Yara, Demon Hunter.
         type="Prologue"
         title=prologue.title
         description="Before the hunt begins."
+        image=prologue.image
         url=prologue.url
         status="published"
         link_text="Read"
@@ -30,6 +34,7 @@ Follow the story of Yara, Demon Hunter.
 
 
 {% assign chapters = site.pages
+    | where: "book_id", page.book_id
     | where: "lang", page.lang
     | where: "chapter_type", "chapter"
     | sort: "chapter_number"
@@ -40,6 +45,7 @@ Follow the story of Yara, Demon Hunter.
         type="Chapter"
         title=chapter.title
         description=chapter.description
+        image=chapter.image
         url=chapter.url
         status=chapter.status
         link_text="Read"

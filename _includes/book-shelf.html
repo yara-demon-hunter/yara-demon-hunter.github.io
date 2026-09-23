@@ -1,0 +1,59 @@
+<section class="book-shelf" aria-labelledby="book-shelf-title">
+
+    <div class="book-shelf__intro">
+        <p class="section-label">{{ include.eyebrow }}</p>
+        <h2 id="book-shelf-title">{{ include.title }}</h2>
+        <p>{{ include.description }}</p>
+    </div>
+
+    <div class="book-shelf__books">
+
+        {% for book_entry in site.data.books %}
+            {% assign book_id = book_entry[0] %}
+            {% assign book = book_entry[1] %}
+
+            <article class="book-shelf__book{% if book.status != 'published' %} book-shelf__book--upcoming{% endif %}">
+
+                <div class="book-shelf__cover-wrap">
+                    <img
+                        class="book-shelf__cover"
+                        src="{{ book.cover | relative_url }}"
+                        alt="{{ book.title[include.lang] }}"
+                    >
+
+                    {% if book.status != "published" %}
+                        <span class="book-shelf__badge">{{ include.upcoming_label }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="book-shelf__details">
+                    <p class="book-shelf__number">
+                        {{ include.book_label }} {{ book.number }}
+                    </p>
+
+                    <h3>{{ book.title[include.lang] }}</h3>
+
+                    <p class="book-shelf__subtitle">
+                        {{ book.subtitle[include.lang] }}
+                    </p>
+
+                    <p class="book-shelf__description">
+                        {{ book.description[include.lang] }}
+                    </p>
+
+                    <div class="book-shelf__links">
+                        <a href="{{ '/' | append: include.primary_lang | append: '/books/' | append: book.slug | append: '/' | relative_url }}">
+                            {{ include.primary_label }}
+                        </a>
+                        <a href="{{ '/' | append: include.secondary_lang | append: '/books/' | append: book.slug | append: '/' | relative_url }}">
+                            {{ include.secondary_label }}
+                        </a>
+                    </div>
+                </div>
+
+            </article>
+        {% endfor %}
+
+    </div>
+
+</section>

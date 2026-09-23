@@ -2,12 +2,13 @@
 layout: default
 title: Yara
 lang: pt
-translation: /en/characters/yara/
+book_id: book-1
+translation_id: character-yara
 ---
 
 # Yara
 
-Yara é a protagonista de *Yara, Caçadora de Demônios*.
+Yara é a protagonista de *Yara, Caçadora de Demônios: O Despertar da Vingança*.
 
 ## Sobre Yara
 

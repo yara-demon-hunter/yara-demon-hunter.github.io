@@ -2,6 +2,7 @@
 layout: legal
 title: Política de Privacidade
 lang: pt
+translation_id: privacy
 permalink: /pt/privacy/
 last_updated: 22 de setembro de 2026
 ---
@@ -10,7 +11,7 @@ last_updated: 22 de setembro de 2026
 
 **Última atualização: 22 de setembro de 2026**
 
-Yara, Demon Hunter ("nós", "nosso" ou "este site") respeita a sua privacidade.
+Yara, Demon Hunter: The Awakening of Vengeance ("nós", "nosso" ou "este site") respeita a sua privacidade.
 
 Esta Política de Privacidade explica quais informações podem ser coletadas quando você visita este site e como essas informações podem ser utilizadas.
 
@@ -106,6 +107,6 @@ Quando forem realizadas alterações, a data de atualização no início desta p
 
 ---
 
-**Yara, Demon Hunter**
+**Yara, Demon Hunter: The Awakening of Vengeance**
 
 Uma série de fantasia sombria para a web.

@@ -2,12 +2,13 @@
 layout: default
 title: Mundo
 lang: pt
-translation: /en/world/
+book_id: book-1
+translation_id: world
 ---
 
 # O Mundo
 
-Bem-vindo ao mundo de Yara, Caçadora de Demônios.
+Bem-vindo ao mundo de Yara, Caçadora de Demônios: O Despertar da Vingança.
 
 Este espaço será usado para apresentar o universo da história.
 

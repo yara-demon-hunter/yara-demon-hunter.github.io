@@ -2,7 +2,8 @@
 layout: default
 title: About
 lang: en
-translation: /pt/about/
+book_id: book-1
+translation_id: about
 ---
 
 <div class="page-content about-page">
@@ -14,7 +15,7 @@ translation: /pt/about/
         </p>
 
         <h1>
-            Yara, Demon Hunter
+            Yara, Demon Hunter: The Awakening of Vengeance
         </h1>
 
         <p class="about-lead">
@@ -31,7 +32,7 @@ translation: /pt/about/
         </h2>
 
         <p>
-            <strong>Yara, Demon Hunter</strong> is a dark fantasy story
+            <strong>Yara, Demon Hunter: The Awakening of Vengeance</strong> is a dark fantasy story
             written and released chapter by chapter.
         </p>
 
@@ -55,7 +56,7 @@ translation: /pt/about/
         </h2>
 
         <p>
-            This is the official home of <em>Yara, Demon Hunter</em>.
+            This is the official home of <em>Yara, Demon Hunter: The Awakening of Vengeance</em>.
         </p>
 
         <p>

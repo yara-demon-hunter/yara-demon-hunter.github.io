@@ -1,0 +1,12 @@
+{% if page.lang %}
+    <link rel="alternate" hreflang="{{ page.lang }}" href="{{ page.url | absolute_url }}">
+
+    {% if page.translation_id %}
+        {% assign translation_pages = site.pages | where: "translation_id", page.translation_id %}
+        {% for translated_page in translation_pages %}
+            {% if translated_page.lang != page.lang %}
+                <link rel="alternate" hreflang="{{ translated_page.lang }}" href="{{ translated_page.url | absolute_url }}">
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endif %}

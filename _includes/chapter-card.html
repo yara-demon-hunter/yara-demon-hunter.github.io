@@ -1,5 +1,15 @@
 <article class="chapter-card">
 
+    {% if include.image %}
+        <div class="chapter-card__image-wrap">
+            <img
+                class="chapter-card__image"
+                src="{{ include.image | relative_url }}"
+                alt="{{ include.title }}"
+            >
+        </div>
+    {% endif %}
+
     <div class="chapter-card__content">
 
         <span class="chapter-card__type">

@@ -2,14 +2,17 @@
 layout: default
 title: Capítulos
 lang: pt
-translation: /en/chapters/
+book_id: book-1
+translation_id: book-1-chapters
+chapter_index: true
 ---
 
 # Capítulos
 
-Acompanhe a história de Yara, Caçadora de Demônios.
+Acompanhe a história de Yara, Caçadora de Demônios: O Despertar da Vingança.
 
 {% assign prologue = site.pages
+    | where: "book_id", page.book_id
     | where: "lang", page.lang
     | where: "chapter_type", "prologue"
     | first
@@ -22,6 +25,7 @@ Acompanhe a história de Yara, Caçadora de Demônios.
         type="Prólogo"
         title=prologue.title
         description="Antes da caçada começar."
+        image=prologue.image
         url=prologue.url
         status="published"
         link_text="Ler"
@@ -30,6 +34,7 @@ Acompanhe a história de Yara, Caçadora de Demônios.
 
 
 {% assign chapters = site.pages
+    | where: "book_id", page.book_id
     | where: "lang", page.lang
     | where: "chapter_type", "chapter"
     | sort: "chapter_number"
@@ -40,6 +45,7 @@ Acompanhe a história de Yara, Caçadora de Demônios.
         type="Capítulo"
         title=chapter.title
         description=chapter.description
+        image=chapter.image
         url=chapter.url
         status=chapter.status
         link_text="Ler"

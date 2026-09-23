@@ -1,7 +1,10 @@
 ---
 layout: default
-title: Yara, Demon Hunter
+title: "Yara, Demon Hunter: The Awakening of Vengeance"
 lang: en
+book_id: book-1
+translation_id: home
+translation: /pt/
 ---
 
 <section class="story-intro">
@@ -17,7 +20,7 @@ lang: en
         </h1>
 
         <p class="story-intro__subtitle">
-            Demon Hunter
+            Demon Hunter: The Awakening of Vengeance
         </p>
 
         <div class="story-intro__divider"></div>
@@ -30,11 +33,37 @@ lang: en
 
         <a
             class="story-intro__button"
-            href="{{ '/en/chapters/001/' | relative_url }}"
+            href="{{ '/en/books/book-1/' | relative_url }}"
         >
             Start reading
         </a>
 
+    </div>
+
+</section>
+
+
+<section class="home-section home-section--books">
+
+    <p class="section-label">Books</p>
+
+    <h2>Yara, Demon Hunter</h2>
+
+    <div class="home-chapters">
+        {% include book-card.html
+            book_id="book-1"
+            lang="en"
+            status="published"
+            link_text="Read book"
+            coming_soon_text="Coming soon"
+        %}
+        {% include book-card.html
+            book_id="book-2"
+            lang="en"
+            status="under_construction"
+            link_text="Read book"
+            coming_soon_text="Coming soon"
+        %}
     </div>
 
 </section>
@@ -62,7 +91,7 @@ lang: en
 
 </section>
 
-
+<!-- 
 <section class="home-section home-section--chapters">
 
     <p class="section-label">
@@ -79,7 +108,7 @@ lang: en
             type="Chapter 1"
             title="Chapter 1"
             description="The first chapter of the story."
-            url="/en/chapters/001/"
+            url="/en/books/book-1/chapters/001/"
             link_text="Read"
         %}
 
@@ -87,10 +116,10 @@ lang: en
             type="Chapter 2"
             title="Chapter 2"
             description="This chapter is still in development."
-            url="/en/chapters/002/"
+            url="/en/books/book-1/chapters/002/"
             link_text="Coming soon"
         %}
 
     </div>
 
-</section>
+</section> -->

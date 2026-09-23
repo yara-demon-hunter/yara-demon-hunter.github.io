@@ -2,12 +2,13 @@
 layout: default
 title: World
 lang: en
-translation: /pt/world/
+book_id: book-1
+translation_id: world
 ---
 
 # The World
 
-Welcome to the world of Yara, Demon Hunter.
+Welcome to the world of Yara, Demon Hunter: The Awakening of Vengeance.
 
 This space will be used to introduce the story's universe.
 

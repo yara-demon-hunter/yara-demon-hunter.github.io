@@ -1,9 +1,13 @@
-title: "Yara, Demon Hunter"
+title: "Yara, Demon Hunter: The Awakening of Vengeance"
 description: "Official website and web serial for Yara, Demon Hunter — a dark fantasy story released chapter by chapter."
 url: "https://yara-demon-hunter.github.io"
 baseurl: ""
 
 lang: "en"
+
+collections:
+  legacy_redirects:
+    output: true
 
 markdown: kramdown
 permalink: pretty

@@ -2,7 +2,8 @@
 layout: default
 title: Yara
 lang: pt
-translation: /en/characters/
+book_id: book-1
+translation_id: characters-index
 ---
 
 ## Yara

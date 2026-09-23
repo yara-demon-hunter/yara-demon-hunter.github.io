@@ -1,4 +1,5 @@
 {% assign chapter_pages = site.pages
+    | where: "book_id", page.book_id
     | where: "chapter_type", "chapter"
     | where: "lang", page.lang
     | where: "status", "published"
@@ -14,6 +15,8 @@
     {% endif %}
 
 {% endfor %}
+
+{% if page.chapter_type == "prologue" or page.status == "published" %}
 
 <nav class="chapter-navigation">
 
@@ -54,16 +57,21 @@
 
         {% else %}
 
-            {% if page.lang == "pt" %}
+            {% assign prologue = site.pages
+                | where: "book_id", page.book_id
+                | where: "lang", page.lang
+                | where: "chapter_type", "prologue"
+                | first
+            %}
 
-                <a href="{{ '/pt/chapters/prologue/' | relative_url }}">
-                    ← Prólogo
-                </a>
+            {% if prologue %}
 
-            {% else %}
-
-                <a href="{{ '/en/chapters/prologue/' | relative_url }}">
-                    ← Prologue
+                <a href="{{ prologue.url | relative_url }}">
+                    {% if page.lang == "pt" %}
+                        ← Prólogo
+                    {% else %}
+                        ← Prologue
+                    {% endif %}
                 </a>
 
             {% endif %}
@@ -71,7 +79,15 @@
         {% endif %}
 
 
-        <a href="{% if page.lang == 'pt' %}{{ '/pt/chapters/' | relative_url }}{% else %}{{ '/en/chapters/' | relative_url }}{% endif %}">
+        {% assign chapters_index = site.pages
+            | where: "book_id", page.book_id
+            | where: "lang", page.lang
+            | where: "chapter_index", true
+            | first
+        %}
+
+        {% if chapters_index %}
+            <a href="{{ chapters_index.url | relative_url }}">
 
             {% if page.lang == "pt" %}
                 Capítulos
@@ -79,7 +95,8 @@
                 Chapters
             {% endif %}
 
-        </a>
+            </a>
+        {% endif %}
 
 
         {% assign next_index = current_index | plus: 1 %}
@@ -102,3 +119,5 @@
     {% endif %}
 
 </nav>
+
+{% endif %}

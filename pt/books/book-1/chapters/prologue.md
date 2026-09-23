@@ -2,7 +2,9 @@
 layout: chapter
 title: Prólogo
 lang: pt
-translation: /en/chapters/prologue/
+book_id: book-1
+chapter_id: prologue
+translation_id: book-1-prologue
 chapter_type: prologue
 image: /assets/images/common/chapters/00-prologue.jpeg
 ---

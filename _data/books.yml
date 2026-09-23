@@ -1,0 +1,31 @@
+book-1:
+  number: 1
+  title:
+    en: "Yara, Demon Hunter: The Awakening of Vengeance"
+    pt: "Yara, Caçadora de Demônios: O Despertar da Vingança"
+  subtitle:
+    en: "The Awakening of Vengeance"
+    pt: "O Despertar da Vingança"
+  description:
+    en: "The first book in the Yara, Demon Hunter series."
+    pt: "O primeiro livro da série Yara, Caçadora de Demônios."
+  slug: book-1
+  cover: /assets/images/cover_book_1.jpeg
+  default_language: en
+  status: published
+
+book-2:
+  number: 2
+  title:
+    en: "Yara, Demon Hunter: Spiritual Apocalypse"
+    pt: "Yara, Caçadora de Demônios: Apocalipse Espiritual"
+  subtitle:
+    en: "Spiritual Apocalypse"
+    pt: "Apocalipse Espiritual"
+  description:
+    en: "The second book is currently under construction."
+    pt: "O segundo livro ainda está em construção."
+  slug: book-2
+  cover: /assets/images/cover_book_2.jpeg
+  default_language: pt
+  status: under_construction

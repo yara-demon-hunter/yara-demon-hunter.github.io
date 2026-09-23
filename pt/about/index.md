@@ -2,7 +2,8 @@
 layout: default
 title: Sobre
 lang: pt
-translation: /en/about/
+book_id: book-1
+translation_id: about
 ---
 
 <div class="page-content about-page">
@@ -14,7 +15,7 @@ translation: /en/about/
         </p>
 
         <h1>
-            Yara, Caçadora de Demônios
+            Yara, Caçadora de Demônios: O Despertar da Vingança
         </h1>
 
         <p class="about-lead">
@@ -31,7 +32,7 @@ translation: /en/about/
         </h2>
 
         <p>
-            <strong>Yara, Caçadora de Demônios</strong> é uma história de
+            <strong>Yara, Caçadora de Demônios: O Despertar da Vingança</strong> é uma história de
             fantasia sombria construída e publicada capítulo a capítulo.
         </p>
 
@@ -55,7 +56,7 @@ translation: /en/about/
         </h2>
 
         <p>
-            Este é o espaço oficial de <em>Yara, Caçadora de Demônios</em>.
+            Este é o espaço oficial de <em>Yara, Caçadora de Demônios: O Despertar da Vingança</em>.
         </p>
 
         <p>

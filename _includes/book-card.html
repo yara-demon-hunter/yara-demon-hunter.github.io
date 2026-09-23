@@ -1,0 +1,44 @@
+{% assign book = site.data.books[include.book_id] %}
+
+<article class="chapter-card book-card">
+
+    <div class="book-card__cover-wrap">
+        <img
+            class="book-card__cover"
+            src="{{ book.cover | relative_url }}"
+            alt="{{ book.title[include.lang] }}"
+        >
+    </div>
+
+    <div class="chapter-card__content">
+
+        <span class="chapter-card__type">
+            {% if include.lang == "pt" %}Livro{% else %}Book{% endif %} {{ book.number }}
+        </span>
+
+        <h2 class="chapter-card__title">
+            {{ book.subtitle[include.lang] }}
+        </h2>
+
+        {% if book.description[include.lang] %}
+            <p class="chapter-card__description">
+                {{ book.description[include.lang] }}
+            </p>
+        {% endif %}
+
+    </div>
+
+    {% if book.status == "published" %}
+        <a
+            class="chapter-card__link"
+            href="{{ include.lang | prepend: '/' | append: '/books/' | append: book.slug | append: '/' | relative_url }}"
+        >
+            {{ include.link_text }} →
+        </a>
+    {% else %}
+        <span class="chapter-card__link chapter-card__link--disabled">
+            {{ include.coming_soon_text }}
+        </span>
+    {% endif %}
+
+</article>

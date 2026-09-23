@@ -1,10 +1,10 @@
-# Yara, Demon Hunter
+# Yara, Demon Hunter: The Awakening of Vengeance
 
-Official website and web serial for **Yara, Demon Hunter**, a dark fantasy story released chapter by chapter.
+Official website and web serial for **Yara, Demon Hunter: The Awakening of Vengeance**, a dark fantasy story released chapter by chapter.
 
 The project is initially published in **Portuguese and English**, with the possibility of adding more languages in the future.
 
-[⚔️ Yara, Demon Hunter](https://yara-demon-hunter.github.io)
+[⚔️ Yara, Demon Hunter: The Awakening of Vengeance](https://yara-demon-hunter.github.io)
 
 ## About the Project
 
@@ -53,6 +53,36 @@ The development environment is currently configured on:
 * Jekyll 4.x
 
 The project uses a **local Bundler installation path** so that project dependencies are not installed into the system Ruby directories.
+
+## Books, Languages and Translations
+
+Every book has a stable `book_id`. The current book uses:
+
+```text
+book-1
+```
+
+Chapter and book-related pages must include both `book_id` and `lang` in their front matter. Translated pages should also share a `translation_id` when they represent the same chapter or story page.
+
+The book catalog lives in [`_data/books.yml`](_data/books.yml). The source structure is organized as `language/books/book/chapters`, and chapter lists and chapter navigation filter by both `book_id` and `lang`, so chapters from future books will not be mixed with book 1.
+
+Canonical URLs use this pattern:
+
+```text
+/en/books/book-1/
+/en/books/book-1/chapters/001/
+/pt/books/book-1/
+/pt/books/book-1/chapters/001/
+```
+
+The previous chapter URLs are kept as redirects for backwards compatibility:
+
+```text
+/en/chapters/001/
+/pt/chapters/001/
+```
+
+When a new book is added, use a new identifier, for example `book-3`, add its metadata to [`_data/books.yml`](_data/books.yml), and create its pages under both language directories as translations become available. Do not reuse chapter identifiers across books without also setting the correct `book_id`.
 
 ---
 
@@ -357,16 +387,14 @@ for Portuguese and:
 
 for English.
 
-For example:
+The canonical structure is:
 
 ```text
-/pt/chapters/001/
-/en/chapters/001/
+/pt/books/book-1/chapters/001/
+/en/books/book-1/chapters/001/
 ```
 
-The corresponding chapters will link to each other.
-
-The website will eventually use language-specific metadata and `hreflang` tags to help search engines understand the relationship between translations.
+The corresponding chapters link to each other using `translation_id`, and generated pages include canonical and `hreflang` metadata when a translation exists.
 
 ---
 

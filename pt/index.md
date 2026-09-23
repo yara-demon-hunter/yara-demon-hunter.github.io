@@ -1,7 +1,10 @@
 ---
 layout: default
-title: Yara, Caçadora de Demônios
+title: "Yara, Caçadora de Demônios: O Despertar da Vingança"
 lang: pt
+book_id: book-1
+translation_id: home
+translation: /en/
 ---
 
 <section class="story-intro">
@@ -17,7 +20,7 @@ lang: pt
         </h1>
 
         <p class="story-intro__subtitle">
-            Caçadora de Demônios
+            Caçadora de Demônios: O Despertar da Vingança
         </p>
 
         <div class="story-intro__divider"></div>
@@ -30,11 +33,37 @@ lang: pt
 
         <a
             class="story-intro__button"
-            href="{{ '/pt/chapters/001/' | relative_url }}"
+            href="{{ '/pt/books/book-1/' | relative_url }}"
         >
             Começar a ler
         </a>
 
+    </div>
+
+</section>
+
+
+<section class="home-section home-section--books">
+
+    <p class="section-label">Livros</p>
+
+    <h2>Yara, Caçadora de Demônios</h2>
+
+    <div class="home-chapters">
+        {% include book-card.html
+            book_id="book-1"
+            lang="pt"
+            status="published"
+            link_text="Ler livro"
+            coming_soon_text="Em breve"
+        %}
+        {% include book-card.html
+            book_id="book-2"
+            lang="pt"
+            status="under_construction"
+            link_text="Ler livro"
+            coming_soon_text="Em breve"
+        %}
     </div>
 
 </section>
@@ -79,7 +108,7 @@ lang: pt
             type="Capítulo 1"
             title="Capítulo 1"
             description="O primeiro capítulo da história."
-            url="/pt/chapters/001/"
+            url="/pt/books/book-1/chapters/001/"
             link_text="Ler"
         %}
 
@@ -87,7 +116,7 @@ lang: pt
             type="Capítulo 2"
             title="Capítulo 2"
             description="Este capítulo ainda está em desenvolvimento."
-            url="/pt/chapters/002/"
+            url="/pt/books/book-1/chapters/002/"
             link_text="Em breve"
         %}
 
