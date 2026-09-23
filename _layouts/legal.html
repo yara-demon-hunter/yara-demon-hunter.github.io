@@ -1,0 +1,94 @@
+---
+layout: default
+---
+
+<link rel="stylesheet" href="{{ '/assets/css/legal.css' | relative_url }}">
+
+<main class="legal-page">
+
+    <div class="legal-container">
+
+        <header class="legal-header">
+            <span class="legal-eyebrow">YARA, DEMON HUNTER</span>
+
+            <h1>{{ page.title }}</h1>
+
+            <p class="legal-intro">
+                Information about privacy, data collection and the services
+                used by this website.
+            </p>
+
+            <div class="legal-updated">
+                Last updated: {{ page.last_updated | default: "September 22, 2026" }}
+            </div>
+        </header>
+
+        <div class="legal-layout">
+
+            <aside class="legal-sidebar">
+
+                <div class="legal-sidebar-title">
+                    On this page
+                </div>
+
+                <nav>
+                    <a href="#information-we-collect">
+                        Information We Collect
+                    </a>
+
+                    <a href="#google-analytics">
+                        Google Analytics
+                    </a>
+
+                    <a href="#google-adsense">
+                        Google AdSense
+                    </a>
+
+                    <a href="#kofi">
+                        Ko-fi
+                    </a>
+
+                    <a href="#cookies">
+                        Cookies
+                    </a>
+
+                    <a href="#third-party-services">
+                        Third-Party Services
+                    </a>
+
+                    <a href="#childrens-privacy">
+                        Children's Privacy
+                    </a>
+
+                    <a href="#changes">
+                        Changes
+                    </a>
+
+                    <a href="#contact">
+                        Contact
+                    </a>
+                </nav>
+
+            </aside>
+
+            <article class="legal-content">
+
+                <div class="legal-notice">
+                    <strong>In short</strong>
+                    <p>
+                        You can read <em>Yara, Demon Hunter</em> without
+                        creating an account or providing personal information.
+                        Some third-party services may collect technical
+                        information when you visit the website.
+                    </p>
+                </div>
+
+                {{ content }}
+
+            </article>
+
+        </div>
+
+    </div>
+
+</main>

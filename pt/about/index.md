@@ -119,7 +119,7 @@ translation: /en/about/
         </p>
 
         <p>
-            <a href="mailto:SEU_EMAIL_AQUI">
+            <a href="mailto:yarademonhunter@gmail.com">
                 yarademonhunter@gmail.com
             </a>
         </p>
