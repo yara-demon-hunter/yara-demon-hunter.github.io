@@ -29,6 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let pages = [];
     let currentPage = 0;
+    const continuousReading = window.matchMedia("(max-width: 600px)");
+    let previousReaderWidth = reader.clientWidth;
 
     /* =========================================
        CREATE PAGE
@@ -50,10 +52,11 @@ document.addEventListener("DOMContentLoaded", () => {
        ========================================= */
 
     function buildPages() {
+        const pageToRestore = currentPage;
+
         pagesContainer.innerHTML = "";
 
         pages = [];
-        currentPage = 0;
 
         let page = createPage();
 
@@ -82,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         pages = allPages;
+        currentPage = Math.min(pageToRestore, pages.length - 1);
 
         pages.forEach((page) => {
             page.classList.remove(
@@ -246,7 +250,25 @@ document.addEventListener("DOMContentLoaded", () => {
        INITIALIZE
        ========================================= */
 
-    buildPages();
+    function updateReadingMode() {
+        const useContinuousReading = continuousReading.matches;
+
+        reader.classList.toggle(
+            "book-reader--continuous",
+            useContinuousReading
+        );
+
+        if (useContinuousReading) {
+            return;
+        }
+
+        previousReaderWidth = reader.clientWidth;
+        buildPages();
+    }
+
+    updateReadingMode();
+
+    continuousReading.addEventListener("change", updateReadingMode);
 
     /* =========================================
        RESIZE
@@ -259,7 +281,13 @@ document.addEventListener("DOMContentLoaded", () => {
         clearTimeout(resizeTimer);
 
         resizeTimer = setTimeout(() => {
-            buildPages();
+            if (
+                !continuousReading.matches &&
+                reader.clientWidth !== previousReaderWidth
+            ) {
+                previousReaderWidth = reader.clientWidth;
+                buildPages();
+            }
         }, 250);
 
     });

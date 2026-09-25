@@ -152,6 +152,18 @@ opacity: 0.75;
 
 }
 
+.book-reader__hint--continuous {
+    display: none;
+}
+
+.book-reader--continuous .book-reader__hint--pages {
+    display: none;
+}
+
+.book-reader--continuous .book-reader__hint--continuous {
+    display: inline;
+}
+
 /* =========================================
 CONTROLS
 ========================================= */
@@ -238,6 +250,32 @@ ORIGINAL CONTENT
 display: none;
 }
 
+.book-reader--continuous .book-reader__book,
+.book-reader--continuous .book-reader__controls {
+    display: none;
+}
+
+.book-reader--continuous .book-reader__source {
+    display: block;
+
+    padding: 0 4px;
+
+    color: #ddd8ce;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 1.08rem;
+
+    line-height: 1.8;
+}
+
+.book-reader--continuous .book-reader__source p {
+    margin: 0 0 1.4rem;
+}
+
 /* =========================================
 MOBILE
 ========================================= */
@@ -307,6 +345,28 @@ MOBILE
     min-width: 55px;
 
     font-size: 0.7rem;
+}
+
+.book-reader--continuous .book-reader__hint {
+    margin: 0 0 14px;
+
+    font-size: 0.75rem;
+
+    letter-spacing: 0;
+
+    opacity: 0.7;
+}
+
+.book-reader--continuous .book-reader__source {
+    padding: 0;
+
+    font-size: 1.05rem;
+
+    line-height: 1.85;
+}
+
+.book-reader--continuous .book-reader__source p {
+    margin-bottom: 1.35rem;
 }
 
 
