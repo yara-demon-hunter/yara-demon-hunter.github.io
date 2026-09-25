@@ -40,7 +40,7 @@ last_updated: 2026-09-25
     {% include chapter-card.html
         type="Prólogo"
         title=prologue.title
-        description="Antes da caçada começar."
+        description=prologue.description
         image=prologue.image
         url=prologue.url
         status="published"

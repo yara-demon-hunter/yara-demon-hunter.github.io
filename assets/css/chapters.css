@@ -19,6 +19,24 @@
     color: #f1eee8;
 }
 
+.chapter-description {
+    max-width: 60ch;
+
+    margin: 0 auto 40px;
+
+    color: #c5c0b6;
+
+    text-align: center;
+}
+
+.chapter-description p {
+    margin: 0;
+
+    font-size: 1.05rem;
+
+    line-height: 1.8;
+}
+
 
 /* =========================================
    CHAPTER IMAGE

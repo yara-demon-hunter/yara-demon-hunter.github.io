@@ -46,7 +46,7 @@
 
     </header>
 
-
+    <!-- IMAGE -->
     {% if page.image %}
 
         <figure class="chapter-image">
@@ -57,6 +57,19 @@
             >
 
         </figure>
+
+    {% endif %}
+
+    <!-- DESCRIPTION -->
+    {% if page.description %}
+
+
+        <div class="chapter-description">
+            <h3>
+                Description
+            </h3>
+            <p>{{ page.description }}</p>
+        </div>
 
     {% endif %}
 

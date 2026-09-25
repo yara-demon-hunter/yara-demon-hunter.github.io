@@ -45,20 +45,5 @@ last_updated: 2026-09-23
         </div>
     </section>
 
-    <section class="book-chapters" aria-labelledby="book-chapters-title">
-        <h2 id="book-chapters-title">Capítulos</h2>
-
-        {% assign book_chapters = site.pages | where: "book_id", page.book_id | where: "lang", page.lang | where: "chapter_type", "chapter" | sort: "chapter_number" %}
-        {% assign prologue = site.pages | where: "book_id", page.book_id | where: "lang", page.lang | where: "chapter_type", "prologue" | first %}
-
-        <div class="chapter-list">
-            {% if prologue %}
-                {% include chapter-card.html type="Prólogo" title=prologue.title description="Antes da caçada começar." image=prologue.image url=prologue.url status="published" link_text="Ler" %}
-            {% endif %}
-            {% for chapter in book_chapters %}
-                {% include chapter-card.html type="Capítulo" title=chapter.title description=chapter.description image=chapter.image url=chapter.url status=chapter.status link_text="Ler" coming_soon_text="Em breve" %}
-            {% endfor %}
-        </div>
-    </section>
 
 </section>
