@@ -33,7 +33,7 @@ last_updated: 2026-09-23
         </h2>
 
         <p>
-            <strong>Yara, Caçadora de Demônios: O Despertar da Vingança</strong> é uma história de
+            <strong>Yara, Caçadora de Demônios</strong> é uma história de
             fantasia sombria construída e publicada capítulo a capítulo.
         </p>
 
@@ -57,7 +57,7 @@ last_updated: 2026-09-23
         </h2>
 
         <p>
-            Este é o espaço oficial de <em>Yara, Caçadora de Demônios: O Despertar da Vingança</em>.
+            Este é o espaço oficial de <em>Yara, Caçadora de Demônios</em>.
         </p>
 
         <p>

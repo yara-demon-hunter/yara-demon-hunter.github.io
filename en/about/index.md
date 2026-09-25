@@ -33,7 +33,7 @@ last_updated: 2026-09-23
         </h2>
 
         <p>
-            <strong>Yara, Demon Hunter: The Awakening of Vengeance</strong> is a dark fantasy story
+            <strong>Yara, Demon Hunter</strong> is a dark fantasy story
             written and released chapter by chapter.
         </p>
 
@@ -57,7 +57,7 @@ last_updated: 2026-09-23
         </h2>
 
         <p>
-            This is the official home of <em>Yara, Demon Hunter: The Awakening of Vengeance</em>.
+            This is the official home of <em>Yara, Demon Hunter</em>.
         </p>
 
         <p>

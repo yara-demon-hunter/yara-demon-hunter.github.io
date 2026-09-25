@@ -40,7 +40,7 @@ last_updated: 2026-09-25
     {% include chapter-card.html
         type="Prologue"
         title=prologue.title
-        description="Before the hunt begins."
+        description=prologue.description
         image=prologue.image
         url=prologue.url
         status="published"
