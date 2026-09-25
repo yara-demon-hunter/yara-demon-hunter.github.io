@@ -1,5 +1,5 @@
 {% if page.last_updated %}
-    <p class="last-updated">
+    <p class="last-updated{% if include.position == 'top' %} last-updated--top{% endif %}">
         {% if page.lang == "pt" %}
             Última atualização:
         {% else %}
