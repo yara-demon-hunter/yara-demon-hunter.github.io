@@ -74,77 +74,36 @@
     {% endif %}
 
 
-    <!-- BOOK READER - PAGES -->
+    <!-- BOOK READER -->
 
     <div class="book-reader">
 
-        <div class="book-reader__book">
+        <div
+            class="book-reader__book"
+            role="region"
+            tabindex="0"
+            aria-label="{% if page.lang == 'pt' %}Leitor do capítulo{% else %}Chapter reader{% endif %}"
+        >
 
-            <div class="book-reader__pages">
+            <div
+                class="book-reader__page-number"
+                data-language="{{ page.lang }}"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+            >
+                {% if page.lang == "pt" %}
+                    Página estimada 1 / 1
+                {% else %}
+                    Estimated page 1 / 1
+                {% endif %}
             </div>
 
-        </div>
+            <div class="book-reader__source">
 
+                {{ content }}
 
-        <!-- READER HINT -->
-
-        <p class="book-reader__hint">
-
-            {% if page.lang == "pt" %}
-
-                <span class="book-reader__hint--pages">Use ← → ou deslize para navegar</span>
-                <span class="book-reader__hint--continuous">Role para continuar lendo</span>
-
-            {% else %}
-
-                <span class="book-reader__hint--pages">Use ← → or swipe to navigate</span>
-                <span class="book-reader__hint--continuous">Scroll to keep reading</span>
-
-            {% endif %}
-
-        </p>
-
-
-        <!-- READER CONTROLS -->
-
-        <div class="book-reader__controls">
-
-            <button
-                class="book-reader__button book-reader__button--previous"
-                type="button"
-            >
-                {% if page.lang == "pt" %}
-                    ← Anterior
-                {% else %}
-                    ← Previous
-                {% endif %}
-            </button>
-
-
-            <span class="book-reader__counter">
-                1 / 1
-            </span>
-
-
-            <button
-                class="book-reader__button book-reader__button--next"
-                type="button"
-            >
-                {% if page.lang == "pt" %}
-                    Próxima →
-                {% else %}
-                    Next →
-                {% endif %}
-            </button>
-
-        </div>
-
-
-        <!-- ORIGINAL CONTENT -->
-
-        <div class="book-reader__source">
-
-            {{ content }}
+            </div>
 
         </div>
 
