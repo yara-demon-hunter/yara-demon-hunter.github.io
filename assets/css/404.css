@@ -1,0 +1,60 @@
+/* =========================================
+   404 PAGE
+   ========================================= */
+
+.error-page {
+    min-height: 70vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 4rem 1.5rem;
+
+    text-align: center;
+}
+
+.error-page__content {
+    max-width: 600px;
+}
+
+.error-page__code {
+    display: block;
+
+    font-size: 6rem;
+    font-weight: 700;
+    line-height: 1;
+
+    margin-bottom: 1rem;
+
+    opacity: 0.25;
+}
+
+.error-page h1 {
+    margin-bottom: 1rem;
+}
+
+.error-page p {
+    margin-bottom: 2rem;
+
+    color: var(--text-soft);
+}
+
+.error-page__button {
+    display: inline-block;
+
+    padding: 0.8rem 1.4rem;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    background: var(--surface);
+    color: var(--text);
+
+    transition: background 0.2s ease;
+}
+
+.error-page__button:hover {
+    background: var(--surface-hover);
+}
