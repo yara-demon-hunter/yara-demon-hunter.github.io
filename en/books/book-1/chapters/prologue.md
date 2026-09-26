@@ -7,7 +7,7 @@ chapter_id: prologue
 translation_id: book-1-prologue
 chapter_type: prologue
 description: "Danger lurks in the shadows of the graveyard. When a talented hunter confronts a creature capable of forging swords of pure spectral energy, the darkness lights up with their deadly clash."
-image: /assets/images/common/chapters/00-prologue.jpeg
+image: /assets/images/common/books/book-1/chapters/00-prologue.jpeg
 ---
 
 *This hunter is extremely talented...*

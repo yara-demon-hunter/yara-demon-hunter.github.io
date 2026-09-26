@@ -10,7 +10,7 @@ book-1:
     en: "The first book in the Yara, Demon Hunter series."
     pt: "O primeiro livro da série Yara, Caçadora de Demônios."
   slug: book-1
-  cover: /assets/images/cover_book_1.jpeg
+  cover: /assets/images/common/books/book-1/cover.jpeg
   default_language: en
   status: published
 
@@ -26,6 +26,6 @@ book-2:
     en: "The second book is currently under construction."
     pt: "O segundo livro ainda está em construção."
   slug: book-2
-  cover: /assets/images/cover_book_2.jpeg
+  cover: /assets/images/common/books/book-2/cover.jpeg
   default_language: pt
   status: under_construction

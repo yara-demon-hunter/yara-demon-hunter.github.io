@@ -342,9 +342,16 @@ yara-demon-hunter/
 │   ├── js/
 │   │   └── main.js
 │   └── images/
-│       ├── common/
-│       ├── pt/
-│       └── en/
+│       └── common/
+│           ├── books/
+│           │   ├── book-1/
+│           │   │   ├── cover.jpeg
+│           │   │   └── chapters/
+│           │   └── book-2/
+│           │       ├── cover.jpeg
+│           │       └── chapters/
+│           └── characters/
+│               └── yara/
 │
 ├── pt/
 │   ├── index.md

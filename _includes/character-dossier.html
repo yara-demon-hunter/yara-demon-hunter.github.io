@@ -1,0 +1,57 @@
+{% assign character = page.character %}
+<header class="character-hero">
+    <div class="character-hero__art">
+        {% if character.portrait %}
+            <img class="character-hero__portrait" src="{{ character.portrait | relative_url }}" alt="{{ character.portrait_alt }}">
+        {% else %}
+            <div class="character-hero__placeholder" aria-label="{% if page.lang == 'pt' %}Retrato ainda não publicado{% else %}Portrait not yet published{% endif %}">
+                <span class="character-hero__placeholder-mark">{{ character.name | slice: 0 }}</span>
+                <span>{% if page.lang == 'pt' %}Arquivo visual{% else %}Visual archive{% endif %}</span>
+                <small>{% if page.lang == 'pt' %}Retrato em preparação{% else %}Portrait in progress{% endif %}</small>
+            </div>
+        {% endif %}
+        <span class="character-hero__index">{{ character.archive_id }}</span>
+    </div>
+
+    <div class="character-hero__intro">
+        <p class="character-hero__eyebrow">{% if page.lang == 'pt' %}Arquivo de personagens{% else %}Character archive{% endif %} <span>/</span> {{ character.role }}</p>
+        <h1>{{ character.name }}</h1>
+        <p class="character-hero__summary">{{ character.summary }}</p>
+
+        <dl class="character-facts">
+            {% for fact in character.facts %}
+                <div class="character-facts__item">
+                    <dt>{{ fact.label }}</dt>
+                    <dd>{% if fact.sealed %}<span class="character-seal">{% if page.lang == 'pt' %}Selado{% else %}Sealed{% endif %}</span>{% else %}{{ fact.value }}{% endif %}</dd>
+                </div>
+            {% endfor %}
+        </dl>
+
+        <a class="character-hero__back" href="{{ '/' | append: page.lang | append: '/books/book-1/' | relative_url }}">{% if page.lang == 'pt' %}Explorar o livro{% else %}Explore the book{% endif %} <span aria-hidden="true">→</span></a>
+    </div>
+</header>
+
+<section class="character-gallery" aria-labelledby="character-gallery-title">
+    <div class="character-section-heading">
+        <p class="character-section-heading__label">{% if page.lang == 'pt' %}Registro visual{% else %}Visual record{% endif %}</p>
+        <h2 id="character-gallery-title">{% if page.lang == 'pt' %}Galeria{% else %}Gallery{% endif %}</h2>
+        <p>{% if page.lang == 'pt' %}Retratos, expressões, roupas e detalhes de referência.{% else %}Portraits, expressions, outfits, and reference details.{% endif %}</p>
+    </div>
+
+    {% if character.gallery and character.gallery.size > 0 %}
+        <div class="character-gallery__grid">
+            {% for image in character.gallery %}
+                <figure class="character-gallery__item character-gallery__item--{{ image.size | default: 'standard' }}">
+                    <img src="{{ image.src | relative_url }}" alt="{{ image.alt }}" loading="lazy">
+                    {% if image.caption %}<figcaption><span>{{ image.category }}</span>{{ image.caption }}</figcaption>{% endif %}
+                </figure>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="character-gallery__empty">
+            <span class="character-gallery__empty-index">01—06</span>
+            <p>{% if page.lang == 'pt' %}O espaço está pronto para retratos, poses, expressões, roupas, armas e detalhes.{% else %}Ready for portraits, poses, expressions, outfits, weapons, and details.{% endif %}</p>
+            <span>{% if page.lang == 'pt' %}Nenhuma arte publicada{% else %}No artwork published{% endif %}</span>
+        </div>
+    {% endif %}
+</section>

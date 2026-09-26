@@ -7,7 +7,7 @@ chapter_id: prologue
 translation_id: book-1-prologue
 chapter_type: prologue
 description: O perigo espreita nas sombras do cemitério. Quando um caçador talentoso confronta uma criatura capaz de moldar espadas de pura energia espectral, a escuridão se ilumina com o choque mortal.
-image: /assets/images/common/chapters/00-prologue.jpeg
+image: /assets/images/common/books/book-1/chapters/00-prologue.jpeg
 ---
 
 *Esse caçador é muito talentoso...*
