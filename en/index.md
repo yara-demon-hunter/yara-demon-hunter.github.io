@@ -1,11 +1,11 @@
 ---
 layout: default
-title: "Yara, Demon Hunter: The Awakening of Vengeance"
+title: "Yara, Demon Hunter"
 lang: en
-book_id: book-1
+book_id: book-0
 translation_id: home
 translation: /pt/
-last_updated: 2026-09-23
+last_updated: 2026-09-26
 ---
 
 <section class="story-intro">
@@ -21,20 +21,20 @@ last_updated: 2026-09-23
         </h1>
 
         <p class="story-intro__subtitle">
-            Demon Hunter: The Awakening of Vengeance
+            Demon Hunter
         </p>
 
         <div class="story-intro__divider"></div>
 
         <p class="story-intro__description">
             A young hunter.<br>
-            A world marked by demons.<br>
-            Secrets that should have remained buried.
+            A world scarred by demons.<br>
+            Secrets that should remain buried.
         </p>
 
         <a
             class="story-intro__button"
-            href="{{ '/en/books/book-1/' | relative_url }}"
+            href="{{ '/en/books/' | relative_url }}"
         >
             Start reading
         </a>
@@ -43,33 +43,58 @@ last_updated: 2026-09-23
 
 </section>
 
+<!-- SECTION 1: Origin / Emotional connection -->
+<section class="home-section">
 
-<section class="home-section home-section--books">
+    <p class="section-label">
+        More than a story
+    </p>
 
-    <p class="section-label">Books</p>
+    <h2>
+        A story that started small
+    </h2>
 
-    <h2>Yara, Demon Hunter</h2>
+    <p>
+        Some stories start with grand plans. Others simply begin.
+    </p>
 
-    <div class="home-chapters">
-        {% include book-card.html
-            book_id="book-1"
-            lang="en"
-            status="published"
-            link_text="Read book"
-            coming_soon_text="Coming soon"
-        %}
-        {% include book-card.html
-            book_id="book-2"
-            lang="en"
-            status="under_construction"
-            link_text="Read book"
-            coming_soon_text="Coming soon"
-        %}
-    </div>
+    <p>
+        Yara was born during an unexpected time: amid the pandemic, between 2020 and 2021, an idea began to take shape and, little by little, evolved from just a story into a universe.
+    </p>
+
+    <p>
+        Since then, Miguel Amaral has been slowly developing this world, creating characters, places, events, and stories that are still far from being completely told.
+    </p>
 
 </section>
 
+<!-- SECTION 2: Long-term vision and universe expansion -->
+<section class="home-section">
 
+    <p class="section-label">
+        What lies ahead
+    </p>
+
+    <h2>
+        A universe in the making
+    </h2>
+
+    <p>
+        The book you are about to read is just one part of this universe.
+        As the story progresses, new characters will be introduced, new mysteries will be uncovered, and different parts of this world will begin to connect.
+    </p>
+
+    <p>
+        Some stories might take place long before the events of Yara. Others may emerge after. Some might follow characters you don't even know yet. The goal is to build this universe gradually, allowing it to grow alongside its readers.
+    </p>
+
+    <p>
+        New books, characters, and stories are part of this project's future. And over time, this universe may step beyond the pages. New ways to explore the story are planned, including interactive experiences and, eventually, games set in this same world. None of this needs to happen all at once. This is a universe that will be built chapter by chapter, story by story.
+    </p>
+
+</section>
+
+<!-- SECTION 3: World Immersion and Final Call -->
 <section class="home-section">
 
     <p class="section-label">
@@ -77,13 +102,13 @@ last_updated: 2026-09-23
     </p>
 
     <h2>
-        Yara's World
+        The World of Yara
     </h2>
 
     <p>
         In a world where supernatural creatures walk among the living,
-        Yara has dedicated her life to hunting the demons that threaten
-        those who cannot face them.
+        Yara dedicates her life to hunting the demons that threaten those who
+        cannot defend themselves.
     </p>
 
     <p>
@@ -92,35 +117,22 @@ last_updated: 2026-09-23
 
 </section>
 
-<!-- 
-<section class="home-section home-section--chapters">
+<section class="home-section">
 
     <p class="section-label">
-        Follow the Story
+        You are here from the beginning
     </p>
 
     <h2>
-        Latest Chapters
+        Witness the birth of this universe
     </h2>
 
-    <div class="home-chapters">
+    <p>
+        Perhaps, in a few years, this will be just the first book of a much larger story. And you will be able to say you were here from the very beginning.
+    </p>
 
-        {% include chapter-card.html
-            type="Chapter 1"
-            title="Chapter 1"
-            description="The first chapter of the story."
-            url="/en/books/book-1/chapters/001/"
-            link_text="Read"
-        %}
+    <p>
+        Read, follow the upcoming stories, and discover, little by little, everything that lies behind the world of Yara.
+    </p>
 
-        {% include chapter-card.html
-            type="Chapter 2"
-            title="Chapter 2"
-            description="This chapter is still in development."
-            url="/en/books/book-1/chapters/002/"
-            link_text="Coming soon"
-        %}
-
-    </div>
-
-</section> -->
+</section>

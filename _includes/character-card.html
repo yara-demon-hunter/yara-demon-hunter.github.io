@@ -1,0 +1,19 @@
+{% assign profile_page = include.profile_page %}
+{% assign character = profile_page.character %}
+
+<article class="character-directory__entry">
+    <div class="character-directory__media">
+        {% if character.portrait %}
+            <img src="{{ character.portrait | relative_url }}" alt="{{ character.portrait_alt }}" loading="lazy">
+        {% else %}
+            <span class="character-directory__placeholder" aria-hidden="true">{{ character.name | slice: 0 }}</span>
+        {% endif %}
+        <span class="character-directory__name">{{ character.name }}</span>
+    </div>
+    <div class="character-directory__content">
+        <span class="character-directory__eyebrow">{{ character.role }}</span>
+        <h2>{{ character.name }}</h2>
+        <p>{{ character.summary }}</p>
+    </div>
+    <a class="character-directory__link" href="{{ profile_page.url | relative_url }}">{{ character.labels.dossier_link }} <span aria-hidden="true">→</span></a>
+</article>
