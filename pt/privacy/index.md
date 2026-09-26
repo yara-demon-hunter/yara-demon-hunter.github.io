@@ -5,13 +5,19 @@ lang: pt
 translation_id: privacy
 permalink: /pt/privacy/
 last_updated: 22 de setembro de 2026
+brand_label: YARA, CAÇADORA DE DEMÔNIOS
+intro: Informações sobre privacidade, coleta de dados e os serviços utilizados por este site.
+updated_label: Última atualização
+contents_label: Nesta página
+notice_title: Em resumo
+notice: Você pode ler Yara, Caçadora de Demônios sem criar uma conta ou fornecer informações pessoais. Alguns serviços de terceiros podem coletar informações técnicas durante sua visita.
 ---
 
 # Política de Privacidade
 
 **Última atualização: 22 de setembro de 2026**
 
-Yara, Demon Hunter: The Awakening of Vengeance ("nós", "nosso" ou "este site") respeita a sua privacidade.
+Yara, Caçadora de Demônios ("nós", "nosso" ou "este site") respeita a sua privacidade.
 
 Esta Política de Privacidade explica quais informações podem ser coletadas quando você visita este site e como essas informações podem ser utilizadas.
 
@@ -107,6 +113,6 @@ Quando forem realizadas alterações, a data de atualização no início desta p
 
 ---
 
-**Yara, Demon Hunter: The Awakening of Vengeance**
+**Yara, Caçadora de Demônios**
 
 Uma série de fantasia sombria para a web.

@@ -1,10 +1,10 @@
-# Yara, Demon Hunter: The Awakening of Vengeance
+# Yara, Demon Hunter
 
-Official website and web serial for **Yara, Demon Hunter: The Awakening of Vengeance**, a dark fantasy story released chapter by chapter.
+Official website and web serial for the **Yara, Demon Hunter** dark fantasy series, released chapter by chapter. Individual books use their own subtitles, such as **The Awakening of Vengeance** for Book 1.
 
 The project is initially published in **Portuguese and English**, with the possibility of adding more languages in the future.
 
-[⚔️ Yara, Demon Hunter: The Awakening of Vengeance](https://yara-demon-hunter.github.io)
+[⚔️ Yara, Demon Hunter](https://yara-demon-hunter.github.io)
 
 ## About the Project
 

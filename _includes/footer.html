@@ -4,7 +4,7 @@
 
         {% if page.lang == "pt" %}
 
-            <p>Yara, Caçadora de Demônios: O Despertar da Vingança</p>
+            <p>Yara, Caçadora de Demônios</p>
             <p>Uma história de fantasia sombria.</p>
 
             <p>
@@ -13,9 +13,15 @@
                 </a>
             </p>
 
+            <p>
+                <a href="{{ '/pt/copyright/' | relative_url }}">
+                    Direitos autorais e uso
+                </a>
+            </p>
+
         {% else %}
 
-            <p>Yara, Demon Hunter: The Awakening of Vengeance</p>
+            <p>Yara, Demon Hunter</p>
             <p>A dark fantasy story.</p>
 
             <p>
@@ -24,10 +30,21 @@
                 </a>
             </p>
 
+            <p>
+                <a href="{{ '/en/copyright/' | relative_url }}">
+                    Copyright and Usage
+                </a>
+            </p>
+
         {% endif %}
 
         <p class="site-footer__copyright">
-            © {{ site.time | date: "%Y" }} {{ site.title }}
+            © {{ site.time | date: "%Y" }} Miguel Angelo do Amaral Junior.
+            {% if page.lang == "pt" %}
+                Todos os direitos reservados.
+            {% else %}
+                All rights reserved.
+            {% endif %}
         </p>
 
     </div>

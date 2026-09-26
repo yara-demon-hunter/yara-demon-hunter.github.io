@@ -9,17 +9,16 @@ layout: default
     <div class="legal-container">
 
         <header class="legal-header">
-            <span class="legal-eyebrow">YARA, DEMON HUNTER: THE AWAKENING OF VENGEANCE</span>
+            <span class="legal-eyebrow">{{ page.brand_label }}</span>
 
             <h1>{{ page.title }}</h1>
 
             <p class="legal-intro">
-                Information about privacy, data collection and the services
-                used by this website.
+                {{ page.intro }}
             </p>
 
             <div class="legal-updated">
-                Last updated: {{ page.last_updated | default: "September 22, 2026" }}
+                {{ page.updated_label }}: {{ page.last_updated }}
             </div>
         </header>
 
@@ -27,46 +26,30 @@ layout: default
 
             <aside class="legal-sidebar">
 
-                <div class="legal-sidebar-title">
-                    On this page
-                </div>
+                <div class="legal-sidebar-title">{{ page.contents_label }}</div>
 
-                <nav>
-                    <a href="#information-we-collect">
-                        Information We Collect
-                    </a>
-
-                    <a href="#google-analytics">
-                        Google Analytics
-                    </a>
-
-                    <a href="#google-adsense">
-                        Google AdSense
-                    </a>
-
-                    <a href="#kofi">
-                        Ko-fi
-                    </a>
-
-                    <a href="#cookies">
-                        Cookies
-                    </a>
-
-                    <a href="#third-party-services">
-                        Third-Party Services
-                    </a>
-
-                    <a href="#childrens-privacy">
-                        Children's Privacy
-                    </a>
-
-                    <a href="#changes">
-                        Changes
-                    </a>
-
-                    <a href="#contact">
-                        Contact
-                    </a>
+                <nav aria-label="{{ page.contents_label }}">
+                    {% if page.lang == "pt" %}
+                        <a href="#information-we-collect">Informações que coletamos</a>
+                        <a href="#google-analytics">Google Analytics</a>
+                        <a href="#google-adsense">Google AdSense</a>
+                        <a href="#kofi">Ko-fi</a>
+                        <a href="#cookies">Cookies</a>
+                        <a href="#third-party-services">Serviços de terceiros</a>
+                        <a href="#childrens-privacy">Privacidade de crianças</a>
+                        <a href="#changes">Alterações</a>
+                        <a href="#contact">Contato</a>
+                    {% else %}
+                        <a href="#information-we-collect">Information we collect</a>
+                        <a href="#google-analytics">Google Analytics</a>
+                        <a href="#google-adsense">Google AdSense</a>
+                        <a href="#kofi">Ko-fi</a>
+                        <a href="#cookies">Cookies</a>
+                        <a href="#third-party-services">Third-party services</a>
+                        <a href="#childrens-privacy">Children's privacy</a>
+                        <a href="#changes">Changes</a>
+                        <a href="#contact">Contact</a>
+                    {% endif %}
                 </nav>
 
             </aside>
@@ -74,13 +57,8 @@ layout: default
             <article class="legal-content">
 
                 <div class="legal-notice">
-                    <strong>In short</strong>
-                    <p>
-                        You can read <em>Yara, Demon Hunter: The Awakening of Vengeance</em> without
-                        creating an account or providing personal information.
-                        Some third-party services may collect technical
-                        information when you visit the website.
-                    </p>
+                    <strong>{{ page.notice_title }}</strong>
+                    <p>{{ page.notice }}</p>
                 </div>
 
                 {{ content }}

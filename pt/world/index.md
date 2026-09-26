@@ -9,7 +9,7 @@ last_updated: 2026-09-23
 
 # O Mundo
 
-Bem-vindo ao mundo de Yara, Caçadora de Demônios: O Despertar da Vingança.
+Bem-vindo ao mundo de Yara, Caçadora de Demônios.
 
 Este espaço será usado para apresentar o universo da história.
 

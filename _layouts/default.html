@@ -11,7 +11,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ page.title }} | {{ site.title }}</title>
+    {% assign site_name = "Yara, Demon Hunter" %}
+    {% if page.lang == "pt" %}
+        {% assign site_name = "Yara, Caçadora de Demônios" %}
+    {% endif %}
+    <title>{% if page.title == site_name or page.title contains site_name %}{{ page.title }}{% else %}{{ page.title }} | {{ site_name }}{% endif %}</title>
 
     {% if page.redirect_to %}
         <meta http-equiv="refresh" content="0; url={{ page.redirect_to | relative_url }}">
@@ -23,6 +27,9 @@
     {% include seo-links.html %}
 
     <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+    {% if page.full_width %}
+        <link rel="stylesheet" href="{{ '/assets/css/legal.css' | relative_url }}">
+    {% endif %}
 </head>
 
 <body>
@@ -31,7 +38,7 @@
         {% include header.html %}
     {% endunless %}
 
-    <main>
+    <main{% if page.full_width %} class="main--full-width"{% endif %}>
 
         {% include last-updated.html position="top" %}
 

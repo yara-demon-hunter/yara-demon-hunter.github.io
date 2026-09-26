@@ -1,0 +1,34 @@
+---
+layout: default
+---
+
+<section class="legal-page">
+    <div class="legal-container">
+        <header class="legal-header">
+            <span class="legal-eyebrow">{{ page.brand_label }}</span>
+            <h1>{{ page.title }}</h1>
+            <p class="legal-intro">{{ page.intro }}</p>
+            <div class="legal-updated">{{ page.updated_label }}: {{ page.last_updated }}</div>
+        </header>
+
+        <div class="legal-layout">
+            <aside class="legal-sidebar">
+                <div class="legal-sidebar-title">{{ page.contents_label }}</div>
+                <nav aria-label="{{ page.contents_label }}">
+                    {% for section in page.sections %}
+                        <a href="#{{ section.id }}">{{ section.title }}</a>
+                    {% endfor %}
+                </nav>
+            </aside>
+
+            <article class="legal-content">
+                <div class="legal-notice">
+                    <strong>{{ page.notice_title }}</strong>
+                    <p>{{ page.notice }}</p>
+                </div>
+
+                {{ content }}
+            </article>
+        </div>
+    </div>
+</section>
