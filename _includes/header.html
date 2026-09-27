@@ -1,12 +1,7 @@
-{% assign translated_page = nil %}
+{% assign language_pages = nil %}
 
 {% if page.translation_id %}
-    {% assign translation_pages = site.pages | where: "translation_id", page.translation_id %}
-    {% for candidate in translation_pages %}
-        {% if candidate.lang != page.lang %}
-            {% assign translated_page = candidate %}
-        {% endif %}
-    {% endfor %}
+    {% assign language_pages = site.pages | where: "translation_id", page.translation_id %}
 {% endif %}
 
 {% if page.lang == "pt" %}
@@ -62,11 +57,7 @@
                     Sobre
                 </a>
 
-                {% if translated_page %}
-                    <a class="language-link" href="{{ translated_page.url | relative_url }}">
-                        🇬🇧 EN
-                    </a>
-                {% endif %}
+                {% include language-selector.html %}
 
             </nav>
 
@@ -126,11 +117,7 @@
                     About
                 </a>
 
-                {% if translated_page %}
-                    <a class="language-link" href="{{ translated_page.url | relative_url }}">
-                        🇧🇷 PT
-                    </a>
-                {% endif %}
+                {% include language-selector.html %}
 
             </nav>
 

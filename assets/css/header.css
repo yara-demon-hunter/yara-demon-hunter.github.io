@@ -118,7 +118,7 @@
    NAVIGATION UNDERLINE
    ========================================= */
 
-.site-nav a:not(.language-link)::after {
+.site-nav a:not(.language-link):not(.language-selector__option)::after {
     content: "";
 
     position: absolute;
@@ -136,7 +136,7 @@
     transition: width 0.2s ease;
 }
 
-.site-nav a:not(.language-link):hover::after {
+.site-nav a:not(.language-link):not(.language-selector__option):hover::after {
     width: 100%;
 }
 
@@ -150,34 +150,82 @@
 
 
 /* =========================================
-   LANGUAGE SWITCH
+   LANGUAGE SELECTOR
    ========================================= */
 
-.site-nav .language-link {
-    margin-left: 8px;
-
-    padding: 8px 12px;
-
-    border: 1px solid #444;
-
-    color: #ccc;
-
-    font-size: 0.72rem;
-
-    letter-spacing: 0.12em;
-
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease;
+.language-selector {
+    position: relative;
 }
 
-.site-nav .language-link:hover {
-    background: #222;
+.language-selector__toggle {
+    min-height: 36px;
+    padding: 7px 10px;
 
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    border: 1px solid #444;
+    background: transparent;
+    color: #ccc;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+}
+
+.language-selector__toggle:hover,
+.language-selector__toggle[aria-expanded="true"] {
     border-color: #666;
-
     color: #fff;
+}
+
+.language-selector__chevron {
+    width: 7px;
+    height: 7px;
+
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+}
+
+.language-selector__options {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 2;
+
+    min-width: 150px;
+    padding: 5px;
+
+    border: 1px solid #333;
+    background: #111;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+}
+
+.language-selector__options[hidden] {
+    display: none;
+}
+
+.site-nav .language-selector__option {
+    display: block;
+    padding: 10px 12px;
+
+    color: #bbb;
+    font-size: 0.78rem;
+    letter-spacing: normal;
+    text-decoration: none;
+    text-transform: none;
+}
+
+.site-nav .language-selector__option:hover,
+.site-nav .language-selector__option.is-current {
+    background: #1d1d1d;
+    color: #fff;
+}
+
+.site-nav .language-selector__option.is-current {
+    cursor: default;
 }
 
 .site-menu-toggle {
@@ -255,8 +303,15 @@
         display: none;
     }
 
-    .site-nav .language-link {
-        width: fit-content;
+    .language-selector {
+        align-self: flex-start;
         margin: 8px 0;
+    }
+
+    .language-selector__options {
+        position: static;
+        min-width: 0;
+        margin-top: 8px;
+        box-shadow: none;
     }
 }

@@ -1,0 +1,50 @@
+{% if language_pages.size > 1 %}
+    {% assign current_language_flag = "" %}
+    {% case page.lang %}
+        {% when "pt" %}{% assign current_language_flag = "🇧🇷" %}
+        {% when "en" %}{% assign current_language_flag = "🇬🇧" %}
+        {% when "es" %}{% assign current_language_flag = "🇪🇸" %}
+        {% when "fr" %}{% assign current_language_flag = "🇫🇷" %}
+        {% when "it" %}{% assign current_language_flag = "🇮🇹" %}
+    {% endcase %}
+
+    <div class="language-selector">
+        <button
+            class="language-selector__toggle"
+            type="button"
+            aria-label="{% if page.lang == 'pt' %}Selecionar idioma{% else %}Choose language{% endif %}"
+            aria-expanded="false"
+            aria-controls="language-options"
+        >
+            <span aria-hidden="true">{{ current_language_flag }}</span>
+            <span>{{ page.lang | upcase }}</span>
+            <span class="language-selector__chevron" aria-hidden="true"></span>
+        </button>
+
+        <div class="language-selector__options" id="language-options" hidden>
+            {% for language_page in language_pages %}
+                {% assign language_name = language_page.lang | upcase %}
+                {% assign language_flag = "" %}
+                {% case language_page.lang %}
+                    {% when "pt" %}{% assign language_name = "Português" %}{% assign language_flag = "🇧🇷" %}
+                    {% when "en" %}{% assign language_name = "English" %}{% assign language_flag = "🇬🇧" %}
+                    {% when "es" %}{% assign language_name = "Español" %}{% assign language_flag = "🇪🇸" %}
+                    {% when "fr" %}{% assign language_name = "Français" %}{% assign language_flag = "🇫🇷" %}
+                    {% when "it" %}{% assign language_name = "Italiano" %}{% assign language_flag = "🇮🇹" %}
+                {% endcase %}
+
+                {% if language_page.lang == page.lang %}
+                    <span class="language-selector__option is-current" aria-current="page">
+                        <span aria-hidden="true">{{ language_flag }}</span>
+                        {{ language_name }}
+                    </span>
+                {% else %}
+                    <a class="language-selector__option" href="{{ language_page.url | relative_url }}">
+                        <span aria-hidden="true">{{ language_flag }}</span>
+                        {{ language_name }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
