@@ -1,26 +1,25 @@
 ---
 layout: default
-title: Mundo
+title: Atlas do Mundo
 lang: pt
 book_id: book-1
 translation_id: world
-last_updated: 2026-09-23
+last_updated: 2026-09-27
 ---
 
-# O Mundo
+<section class="location-directory">
+	<header class="location-directory__header">
+		<p class="section-label">O mundo de Yara, Caçadora de Demônios</p>
+		<h1>Atlas do Mundo</h1>
+		<p>Explore os lugares que moldam o mundo de Yara, de vales habitados às terras selvagens além deles.</p>
+	</header>
 
-Bem-vindo ao mundo de Yara, Caçadora de Demônios.
-
-Este espaço será usado para apresentar o universo da história.
-
-## O universo
-
-Mais informações sobre o mundo serão adicionadas em breve.
-
-## Demônios
-
-Informações sobre os demônios e outras criaturas sobrenaturais serão adicionadas aqui.
-
-## Lugares
-
-Os principais lugares da história serão apresentados aqui.
+	<div class="location-directory__list">
+		{% assign location_pages = site.pages | where: "layout", "location" | where: "lang", page.lang %}
+		{% for location_page in location_pages %}
+			{% if location_page.location.directory %}
+				{% include location-card.html location_page=location_page %}
+			{% endif %}
+		{% endfor %}
+	</div>
+</section>

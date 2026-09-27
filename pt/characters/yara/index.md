@@ -25,7 +25,7 @@ character:
     gallery_description: Retratos, expressões, roupas e detalhes de referência.
     gallery_empty_description: O espaço está pronto para retratos, poses, expressões, roupas, armas e detalhes.
     gallery_empty_label: Nenhuma arte publicada
-    dossier_link: Abrir dossiê
+    dossier_link: Abrir perfil
   facts:
     - label: Conhecida como
       value: Caçadora de demônios
@@ -67,47 +67,3 @@ character:
       caption: Um rascunho da Yara entrando no modo demoníaco.
       size: standard
 ---
-<!-- 
-## Em poucas palavras
-
-Yara é a personagem central de *Yara, Caçadora de Demônios: O Despertar da Vingança*. Sua jornada abre as portas para um mundo moldado por forças sobrenaturais e perigos que ainda não são totalmente compreendidos.
-
-## Personalidade e motivações
-
-<details class="character-sealed">
-		<summary><span class="character-sealed__label"><small>Registro de personagem</small>Personalidade, valores e motivações</span><span class="character-sealed__state">Arquivo selado</span></summary>
-		<div class="character-sealed__body">
-				<p>Esta parte do arquivo de Yara ainda não foi publicada. Volte conforme a história avançar.</p>
-		</div>
-</details>
-
-## Combate e equipamentos
-
-<details class="character-sealed">
-		<summary><span class="character-sealed__label"><small>Registro de campo</small>Armas, habilidades e limitações</span><span class="character-sealed__state">Arquivo selado</span></summary>
-		<div class="character-sealed__body">
-				<p>Este registro de campo permanece selado. Mais detalhes serão revelados ao longo da história.</p>
-		</div>
-</details>
-
-## Relações
-
-<details class="character-sealed">
-		<summary><span class="character-sealed__label"><small>Conexões</small>Aliados, família, rivais e inimigos</span><span class="character-sealed__state">Arquivo selado</span></summary>
-		<div class="character-sealed__body">
-				<p>Este registro de relação ainda não foi publicado.</p>
-		</div>
-</details>
-
-## Registro da história
-
-<details class="character-sealed">
-		<summary><span class="character-sealed__label"><small>Linha do tempo</small>História e acontecimentos importantes</span><span class="character-sealed__state">Arquivo selado</span></summary>
-		<div class="character-sealed__body">
-				<p>Esta linha do tempo continua em construção. Os registros serão abertos conforme a história avançar.</p>
-		</div>
-</details>
-
-## Notas para futuras adaptações
-
-Mantenha nomes estáveis e referências visuais para roupas, armas, símbolos e objetos recorrentes. Esse material pode apoiar conceitos de jogo, briefings de arte e outras adaptações sem definir atributos de jogo antes da hora. -->

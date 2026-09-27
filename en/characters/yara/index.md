@@ -25,7 +25,7 @@ character:
     gallery_description: Portraits, expressions, outfits, and reference details.
     gallery_empty_description: The space is ready for portraits, poses, expressions, outfits, weapons, and details.
     gallery_empty_label: No published art
-    dossier_link: Open dossier
+    dossier_link: Open profile
   facts:
     - label: Known as
       value: Demon hunter

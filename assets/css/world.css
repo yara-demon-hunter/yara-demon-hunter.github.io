@@ -1,0 +1,331 @@
+.location-directory {
+    padding: 15px 0 50px;
+}
+
+.location-directory__header {
+    max-width: 690px;
+    margin-bottom: 38px;
+}
+
+.location-directory__header .section-label {
+    margin-bottom: 8px;
+    color: var(--accent-soft);
+    font-size: 0.74rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.location-directory__header h1 {
+    margin: 0 0 14px;
+}
+
+.location-directory__header > p:last-child {
+    max-width: 600px;
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 1.05rem;
+}
+
+.location-directory__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.location-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.location-card:hover {
+    border-color: var(--accent);
+    background: var(--surface-hover);
+    color: var(--text);
+}
+
+.location-card:focus-visible {
+    outline: 2px solid var(--accent-soft);
+    outline-offset: 3px;
+}
+
+.location-card__media {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: #151b1b;
+}
+
+.location-card__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.location-card:hover .location-card__media img {
+    transform: scale(1.025);
+}
+
+.location-card__placeholder,
+.location-hero__placeholder {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    background:
+        linear-gradient(145deg, transparent 49.7%, rgba(176, 205, 194, 0.08) 50%, transparent 50.3%),
+        linear-gradient(35deg, transparent 49.7%, rgba(176, 205, 194, 0.06) 50%, transparent 50.3%),
+        radial-gradient(ellipse at 50% 80%, #263433 0%, #171d1d 58%, #111416 100%);
+    color: var(--accent-soft);
+}
+
+.location-card__placeholder span,
+.location-hero__placeholder span {
+    display: grid;
+    width: 76px;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid rgba(210, 194, 156, 0.48);
+    border-radius: 50%;
+    font-size: 2.5rem;
+}
+
+.location-card__category {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: 4px 8px;
+    background: rgba(12, 13, 15, 0.82);
+    color: var(--accent-soft);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.location-card__content {
+    display: flex;
+    min-height: 190px;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 17px;
+}
+
+.location-card__content h2 {
+    margin: 0 0 2px;
+    padding: 0;
+    border: 0;
+    font-size: 1.28rem;
+    line-height: 1.35;
+}
+
+.location-card__alternate {
+    margin: 0 0 10px;
+    color: var(--accent-soft);
+    font-size: 0.83rem;
+}
+
+.location-card__summary {
+    margin: 0 0 18px;
+    color: var(--text-soft);
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+.location-card__link {
+    display: inline-flex;
+    gap: 9px;
+    align-items: center;
+    margin-top: auto;
+    color: var(--text);
+    font-size: 0.86rem;
+}
+
+.location-card__link span {
+    color: var(--accent-soft);
+}
+
+.location-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(30px, 6vw, 70px);
+    align-items: center;
+    padding: 15px 0 58px;
+}
+
+.location-hero__art {
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--border-light);
+    background: #151b1b;
+}
+
+.location-hero__portrait {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.location-hero__intro {
+    padding: 20px 0;
+}
+
+.location-hero__eyebrow {
+    margin: 0 0 12px;
+    color: var(--accent-soft);
+    font-size: 0.74rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.location-hero__intro h1 {
+    margin: 0 0 5px;
+    font-size: 3.2rem;
+}
+
+.location-hero__alternate {
+    margin: 0 0 16px;
+    color: var(--accent-soft);
+}
+
+.location-hero__summary {
+    max-width: 500px;
+    color: var(--text-soft);
+    font-size: 1.05rem;
+}
+
+.location-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 27px 0 24px;
+    border-top: 1px solid var(--border-light);
+}
+
+.location-facts__item {
+    min-width: 0;
+    padding: 12px 10px 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.location-facts__item dt {
+    margin-bottom: 3px;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.location-facts__item dd {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.92rem;
+}
+
+.location-hero__back {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--accent);
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.location-content {
+    max-width: var(--reading-width);
+    margin: 0 auto;
+    padding: 35px 0 60px;
+    border-top: 1px solid var(--border);
+}
+
+.location-content > h2 {
+    margin-top: 35px;
+}
+
+.location-content > h2:first-child {
+    margin-top: 0;
+}
+
+.location-content > p,
+.location-content li {
+    color: var(--text-soft);
+    font-size: 1.04rem;
+    line-height: 1.85;
+}
+
+@media (max-width: 800px) {
+    .location-directory__list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+    }
+
+    .location-card__content {
+        min-height: 205px;
+        padding: 14px;
+    }
+
+    .location-card__content h2 {
+        font-size: 1.12rem;
+    }
+
+    .location-hero {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding-top: 0;
+    }
+
+    .location-hero__art {
+        max-width: 520px;
+    }
+
+    .location-hero__intro {
+        padding: 0;
+    }
+
+    .location-content {
+        padding-top: 28px;
+    }
+}
+
+@media (max-width: 520px) {
+    .location-directory__list {
+        grid-template-columns: 1fr;
+    }
+
+    .location-card {
+        display: grid;
+        grid-template-columns: minmax(110px, 38%) minmax(0, 1fr);
+    }
+
+    .location-card__media {
+        aspect-ratio: 4 / 5;
+    }
+
+    .location-card__category {
+        right: 6px;
+        bottom: 6px;
+        padding: 3px 6px;
+        font-size: 0.6rem;
+    }
+
+    .location-card__content {
+        min-height: 0;
+        padding: 13px;
+    }
+
+    .location-card__summary {
+        font-size: 0.82rem;
+    }
+
+    .location-hero__intro h1 {
+        font-size: 2.4rem;
+    }
+}

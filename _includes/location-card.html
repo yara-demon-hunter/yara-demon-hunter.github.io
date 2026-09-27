@@ -1,0 +1,21 @@
+{% assign location_page = include.location_page %}
+{% assign location = location_page.location %}
+
+<a class="location-card" href="{{ location_page.url | relative_url }}">
+    <div class="location-card__media">
+        {% if location.portrait %}
+            <img src="{{ location.portrait | relative_url }}" alt="{{ location.portrait_alt | default: location.name }}" loading="lazy">
+        {% else %}
+            <div class="location-card__placeholder" aria-hidden="true">
+                <span>{{ location.name | slice: 0 }}</span>
+            </div>
+        {% endif %}
+        <span class="location-card__category">{{ location.category }}</span>
+    </div>
+    <div class="location-card__content">
+        <h2>{{ location.name }}</h2>
+        {% if location.alternate_name %}<p class="location-card__alternate">{{ location.alternate_name }}</p>{% endif %}
+        <p class="location-card__summary">{{ location.summary }}</p>
+        <span class="location-card__link">{{ location.labels.open }} <span aria-hidden="true">→</span></span>
+    </div>
+</a>
