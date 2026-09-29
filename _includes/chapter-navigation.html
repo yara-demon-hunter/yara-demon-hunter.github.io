@@ -18,7 +18,7 @@
 
 {% if page.chapter_type == "prologue" or page.status == "published" %}
 
-<nav class="chapter-navigation">
+<nav class="chapter-navigation" aria-label="{% if page.lang == 'pt' %}Navegação entre capítulos{% else %}Chapter navigation{% endif %}">
 
     {% if page.chapter_type == "prologue" %}
 

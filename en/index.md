@@ -2,6 +2,7 @@
 layout: default
 title: "Yara, Demon Hunter"
 lang: en
+description: "A young hunter, a world marked by demons, and secrets that should have stayed buried. Read the Yara, Demon Hunter web serial."
 book_id: book-0
 translation_id: home
 translation: /pt/

@@ -46,11 +46,20 @@ if (languageToggle && languageOptions) {
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
+        const languageWasOpen = languageToggle?.getAttribute("aria-expanded") === "true";
+        const menuWasOpen = menuToggle?.getAttribute("aria-expanded") === "true";
+
         closeLanguageOptions();
 
         if (menuToggle && siteNav) {
             siteNav.classList.remove("is-open");
             menuToggle.setAttribute("aria-expanded", "false");
+        }
+
+        if (languageWasOpen) {
+            languageToggle.focus();
+        } else if (menuWasOpen) {
+            menuToggle.focus();
         }
     }
 });

@@ -5,6 +5,7 @@ lang: pt
 book_id: book-1
 translation_id: book-1
 book_status: published
+description: "A busca de uma criatura por vingança chega a um vilarejo isolado, onde uma névoa viva devora as ruas todas as noites."
 last_updated: 2026-09-23
 ---
 

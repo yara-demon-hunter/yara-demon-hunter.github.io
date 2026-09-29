@@ -4,7 +4,9 @@ title: Política de Privacidade
 lang: pt
 translation_id: privacy
 permalink: /pt/privacy/
-last_updated: 22 de setembro de 2026
+last_updated: 2026-09-22
+full_width: true
+description: "Saiba quais informações este site e seus serviços de análise, publicidade e apoio podem coletar."
 brand_label: YARA, CAÇADORA DE DEMÔNIOS
 intro: Informações sobre privacidade, coleta de dados e os serviços utilizados por este site.
 updated_label: Última atualização
@@ -12,10 +14,6 @@ contents_label: Nesta página
 notice_title: Em resumo
 notice: Você pode ler Yara, Caçadora de Demônios sem criar uma conta ou fornecer informações pessoais. Alguns serviços de terceiros podem coletar informações técnicas durante sua visita.
 ---
-
-# Política de Privacidade
-
-**Última atualização: 22 de setembro de 2026**
 
 Yara, Caçadora de Demônios ("nós", "nosso" ou "este site") respeita a sua privacidade.
 

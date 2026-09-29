@@ -6,6 +6,8 @@
                 class="chapter-card__image"
                 src="{{ include.image | relative_url }}"
                 alt="{{ include.title }}"
+                loading="lazy"
+                decoding="async"
             >
         </div>
     {% endif %}

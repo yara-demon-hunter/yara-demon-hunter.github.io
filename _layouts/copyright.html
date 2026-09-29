@@ -8,7 +8,16 @@ layout: default
             <span class="legal-eyebrow">{{ page.brand_label }}</span>
             <h1>{{ page.title }}</h1>
             <p class="legal-intro">{{ page.intro }}</p>
-            <div class="legal-updated">{{ page.updated_label }}: {{ page.last_updated }}</div>
+            <div class="legal-updated">
+                {{ page.updated_label }}:
+                <time datetime="{{ page.last_updated | date: '%Y-%m-%d' }}">
+                    {% if page.lang == "pt" %}
+                        {{ page.last_updated | date: "%d/%m/%Y" }}
+                    {% else %}
+                        {{ page.last_updated | date: "%B %-d, %Y" }}
+                    {% endif %}
+                </time>
+            </div>
         </header>
 
         <div class="legal-layout">

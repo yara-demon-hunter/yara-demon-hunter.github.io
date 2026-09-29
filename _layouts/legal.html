@@ -2,9 +2,7 @@
 layout: default
 ---
 
-<link rel="stylesheet" href="{{ '/assets/css/legal.css' | relative_url }}">
-
-<main class="legal-page">
+<div class="legal-page">
 
     <div class="legal-container">
 
@@ -18,7 +16,14 @@ layout: default
             </p>
 
             <div class="legal-updated">
-                {{ page.updated_label }}: {{ page.last_updated }}
+                {{ page.updated_label }}:
+                <time datetime="{{ page.last_updated | date: '%Y-%m-%d' }}">
+                    {% if page.lang == "pt" %}
+                        {{ page.last_updated | date: "%d/%m/%Y" }}
+                    {% else %}
+                        {{ page.last_updated | date: "%B %-d, %Y" }}
+                    {% endif %}
+                </time>
             </div>
         </header>
 
@@ -69,4 +74,4 @@ layout: default
 
     </div>
 
-</main>
+</div>

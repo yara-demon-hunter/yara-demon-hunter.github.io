@@ -1,12 +1,24 @@
 {% if page.lang %}
-    <link rel="alternate" hreflang="{{ page.lang }}" href="{{ page.url | absolute_url }}">
+    {% assign current_hreflang = page.lang %}
+    {% if page.lang == "pt" %}{% assign current_hreflang = "pt-BR" %}{% endif %}
+    <link rel="alternate" hreflang="{{ current_hreflang }}" href="{{ page.url | absolute_url }}">
 
     {% if page.translation_id %}
         {% assign translation_pages = site.pages | where: "translation_id", page.translation_id %}
         {% for translated_page in translation_pages %}
             {% if translated_page.lang != page.lang %}
-                <link rel="alternate" hreflang="{{ translated_page.lang }}" href="{{ translated_page.url | absolute_url }}">
+                {% assign translated_hreflang = translated_page.lang %}
+                {% if translated_page.lang == "pt" %}{% assign translated_hreflang = "pt-BR" %}{% endif %}
+                <link rel="alternate" hreflang="{{ translated_hreflang }}" href="{{ translated_page.url | absolute_url }}">
             {% endif %}
         {% endfor %}
     {% endif %}
+
+    {% if page.translation_id == "home" %}
+        <link rel="alternate" hreflang="x-default" href="{{ '/' | absolute_url }}">
+    {% endif %}
+{% endif %}
+
+{% if page.url == "/" %}
+    <link rel="alternate" hreflang="x-default" href="{{ page.url | absolute_url }}">
 {% endif %}

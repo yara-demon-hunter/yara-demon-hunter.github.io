@@ -5,6 +5,10 @@ lang: pt
 book_id: book-2
 translation_id: book-2
 last_updated: 2026-09-23
+description: "O segundo livro da série Yara, Caçadora de Demônios está em desenvolvimento."
+og_image: /assets/images/common/books/book-2/cover.jpeg
+noindex: true
+sitemap: false
 ---
 
 <section class="page-content">

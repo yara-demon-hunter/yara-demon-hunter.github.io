@@ -7,6 +7,8 @@
             class="book-card__cover"
             src="{{ book.cover | relative_url }}"
             alt="{{ book.title[include.lang] }}"
+            loading="lazy"
+            decoding="async"
         >
     </div>
 

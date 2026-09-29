@@ -75,13 +75,6 @@ Canonical URLs use this pattern:
 /pt/books/book-1/chapters/001/
 ```
 
-The previous chapter URLs are kept as redirects for backwards compatibility:
-
-```text
-/en/chapters/001/
-/pt/chapters/001/
-```
-
 When a new book is added, use a new identifier, for example `book-3`, add its metadata to [`_data/books.yml`](_data/books.yml), and create its pages under both language directories as translations become available. Do not reuse chapter identifiers across books without also setting the correct `book_id`.
 
 ---

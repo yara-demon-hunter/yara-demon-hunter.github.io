@@ -5,6 +5,10 @@ lang: en
 book_id: book-2
 translation_id: book-2
 last_updated: 2026-09-23
+description: "The second book in the Yara, Demon Hunter series is in development."
+og_image: /assets/images/common/books/book-2/cover.jpeg
+noindex: true
+sitemap: false
 ---
 
 <section class="page-content">

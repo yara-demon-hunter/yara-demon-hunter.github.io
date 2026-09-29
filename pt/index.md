@@ -2,6 +2,7 @@
 layout: default
 title: "Yara, Caçadora de Demônios"
 lang: pt
+description: "Uma jovem caçadora, um mundo marcado por demônios e segredos que deveriam permanecer enterrados. Leia a série Yara, Caçadora de Demônios."
 book_id: book-0
 translation_id: home
 translation: /en/

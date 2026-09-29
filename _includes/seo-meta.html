@@ -1,0 +1,33 @@
+{% assign site_name = site.title %}
+{% if page.lang == "pt" %}
+    {% assign site_name = "Yara, Caçadora de Demônios" %}
+{% endif %}
+
+{% assign seo_title = page.title | default: site_name %}
+{% unless seo_title == site_name or seo_title contains site_name %}
+    {% assign seo_title = seo_title | append: " | " | append: site_name %}
+{% endunless %}
+
+{% assign seo_description = page.description | default: page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 %}
+{% assign seo_image = page.image | default: page.og_image | default: "/assets/images/common/books/book-1/cover.jpeg" %}
+
+<title>{{ seo_title | xml_escape }}</title>
+<meta name="description" content="{{ seo_description | xml_escape }}">
+{% if page.noindex %}
+    <meta name="robots" content="noindex, follow">
+{% endif %}
+
+<link rel="canonical" href="{{ page.url | absolute_url }}">
+<meta property="og:type" content="{% if page.chapter_type %}article{% else %}website{% endif %}">
+<meta property="og:title" content="{{ seo_title | xml_escape }}">
+<meta property="og:description" content="{{ seo_description | xml_escape }}">
+<meta property="og:url" content="{{ page.url | absolute_url }}">
+<meta property="og:site_name" content="{{ site_name | xml_escape }}">
+<meta property="og:locale" content="{% if page.lang == 'pt' %}pt_BR{% else %}en_US{% endif %}">
+<meta property="og:image" content="{{ seo_image | absolute_url }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ seo_title | xml_escape }}">
+<meta name="twitter:description" content="{{ seo_description | xml_escape }}">
+<meta name="twitter:image" content="{{ seo_image | absolute_url }}">
+
+{% include seo-links.html %}

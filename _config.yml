@@ -5,10 +5,6 @@ baseurl: ""
 
 lang: "en"
 
-collections:
-  legacy_redirects:
-    output: true
-
 markdown: kramdown
 permalink: pretty
 

@@ -4,7 +4,9 @@ title: Privacy Policy
 lang: en
 translation_id: privacy
 permalink: /en/privacy/
-last_updated: September 22, 2026
+last_updated: 2026-09-22
+full_width: true
+description: "Learn what information Yara, Demon Hunter and its analytics, advertising, and support services may collect."
 brand_label: YARA, DEMON HUNTER
 intro: Information about privacy, data collection, and the services used by this website.
 updated_label: Last updated
@@ -12,10 +14,6 @@ contents_label: On this page
 notice_title: In short
 notice: You can read Yara, Demon Hunter without creating an account or providing personal information. Some third-party services may collect technical information when you visit.
 ---
-
-# Privacy Policy
-
-**Last updated: September 22, 2026**
 
 Yara, Demon Hunter ("we", "us", or "this website") respects your privacy.
 
