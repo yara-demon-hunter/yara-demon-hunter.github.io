@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yara Demon Hunter: A Regra do Sino - Mini RPG</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/tailwind.config.js"></script>
+    <!-- Google Fonts: Cinzel & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/game.css">
+</head>
+<body class="game-shell min-h-screen flex flex-col items-center justify-between p-3 sm:p-6">
+
+    <header class="w-full max-w-4xl text-center mb-4">
+        <nav id="game-nav" class="flex items-center justify-between gap-3 mb-6 text-left" aria-label="Navegação do jogo" data-i18n-aria="gameNav">
+            <a id="game-home" href="/pt/" class="inline-flex items-center gap-2 rounded-lg border border-emerald-900/80 bg-black/30 px-3 py-2 text-xs font-medium text-emerald-200 transition hover:border-emerald-500 hover:text-white">
+                <span aria-hidden="true">←</span> <span data-i18n="backToSite">Voltar ao site</span>
+            </a>
+            <div class="flex items-center gap-3">
+                <span class="hidden text-right text-[10px] uppercase tracking-[0.18em] text-emerald-400/70 sm:block" data-i18n="gameLabel">Mini RPG · Floresta Sombria</span>
+                <div class="game-language" role="group" aria-label="Idioma do jogo" data-i18n-aria="languageLabel">
+                    <button type="button" data-game-language="pt" aria-label="Português">PT</button>
+                    <button type="button" data-game-language="en" aria-label="English">EN</button>
+                </div>
+            </div>
+        </nav>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-amber-500 tracking-wider drop-shadow-[0_2px_10px_rgba(245,158,11,0.3)]">
+            <span data-i18n="title">YARA: A REGRA DO SINO</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-emerald-400/80 tracking-widest uppercase mt-1" data-i18n="subtitle">Crônicas de Sobrevivência na Floresta Sombria</p>
+    </header>
+
+    <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+
+        <!-- Painel de Status do Personagem -->
+        <section class="bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl">
+            <div>
+                <div class="flex items-center justify-between border-b border-fantasy-border pb-3 mb-4">
+                    <div>
+                        <h2 id="hero-name" class="text-lg font-bold text-amber-400">Zeph</h2>
+                        <span class="text-xs bg-forest-800 text-emerald-300 px-2 py-0.5 rounded-full border border-forest-700"><span data-i18n="level">Nível</span> <span id="hero-level">1</span></span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-amber-400 font-semibold block"><span data-i18n="gold">Ouro:</span> <span id="hero-gold" class="text-white">15</span> 🪙</span>
+                        <span class="text-xs text-purple-400 font-semibold"><span data-i18n="experience">XP:</span> <span id="hero-xp" class="text-white">0</span>/<span id="hero-xp-max" class="text-white">30</span></span>
+                    </div>
+                </div>
+
+                <!-- Status Bars -->
+                <div class="space-y-3 mb-4">
+                    <!-- HP -->
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span class="text-red-400 flex items-center gap-1">❤️ HP</span>
+                            <span><span id="hero-hp">100</span> / <span id="hero-hp-max">100</span></span>
+                        </div>
+                        <div class="w-full bg-forest-950 rounded-full h-3.5 p-0.5 border border-fantasy-border">
+                            <div id="hero-hp-bar" class="bg-gradient-to-r from-red-600 to-red-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Foco / Estamina para Golpes Especiais -->
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span class="text-blue-400 flex items-center gap-1">⚡ <span data-i18n="focus">Foco (Estamina)</span></span>
+                            <span><span id="hero-foco">50</span> / <span id="hero-foco-max">50</span></span>
+                        </div>
+                        <div class="w-full bg-forest-950 rounded-full h-2.5 p-0.5 border border-fantasy-border">
+                            <div id="hero-foco-bar" class="bg-gradient-to-r from-blue-600 to-cyan-400 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Atributos -->
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
+                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                            <span class="text-gray-400 block mb-0.5">⚔️ <span data-i18n="attack">Ataque</span></span>
+                            <span id="hero-atk" class="font-bold text-amber-300 text-sm">14</span>
+                        </div>
+                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                            <span class="text-gray-400 block mb-0.5">🛡️ <span data-i18n="defense">Defesa</span></span>
+                            <span id="hero-def" class="font-bold text-blue-300 text-sm">6</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventário / Poções -->
+            <div class="bg-forest-950/80 rounded-xl p-3 border border-fantasy-border flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🧪</span>
+                    <div>
+                        <span class="text-xs text-gray-300 block font-medium" data-i18n="potions">Poções de Cura</span>
+                        <span class="text-xs text-emerald-400 font-bold"><span id="hero-potions">3</span> <span data-i18n="available">disponíveis</span></span>
+                    </div>
+                </div>
+                <button onclick="usePotion()" class="bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white text-xs font-semibold px-3 py-2 rounded-lg transition border border-emerald-500 shadow">
+                    <span data-i18n="drink">Beber</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Área Central de Jogo e Combate -->
+        <section class="md:col-span-2 bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl min-h-[380px]">
+            
+            <!-- Inimigo Ativo -->
+            <div id="encounter-card" class="hidden bg-forest-950/90 border border-red-900/50 rounded-xl p-3 mb-4 flex items-center justify-between transition-all">
+                <div class="flex items-center gap-3">
+                    <div id="monster-icon" class="text-3xl bg-red-950/50 p-2 rounded-lg border border-red-800/40">🐺</div>
+                    <div>
+                        <h3 id="monster-name" class="font-bold text-red-400 text-sm sm:text-base">Lobo Sombriço</h3>
+                        <p class="text-xs text-gray-400" data-i18n="danger">Perigo na Névoa</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs text-red-400 font-semibold mb-1">HP: <span id="monster-hp">40</span>/<span id="monster-hp-max">40</span></div>
+                    <div class="w-24 sm:w-32 bg-forest-950 rounded-full h-2.5 p-0.5 border border-red-900/40">
+                        <div id="monster-hp-bar" class="bg-gradient-to-r from-red-700 to-red-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banner de Exploração -->
+            <div id="exploration-banner" class="bg-forest-950/50 border border-forest-800 rounded-xl p-4 mb-4 text-center">
+                <p class="text-xs sm:text-sm text-emerald-300/90 font-medium" data-i18n="explorationIntro">🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?</p>
+            </div>
+
+            <!-- Log de Acontecimentos -->
+            <div id="rpg-log" class="rpg-scroll bg-forest-950/90 border border-fantasy-border rounded-xl p-3 h-44 sm:h-48 overflow-y-auto space-y-2 text-xs sm:text-sm mb-4 font-mono">
+                <div class="text-emerald-400/90 border-l-2 border-emerald-500 pl-2 py-0.5">
+                    <span data-i18n="openingLog">[Início] Zeph avança sozinho pela Floresta Sombria. Mantenha sua arma em punho.</span>
+                </div>
+            </div>
+
+            <!-- Controles de Ação -->
+            <div id="action-controls">
+                <!-- Ações de Exploração -->
+                <div id="controls-explore" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button onclick="exploreForest()" class="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl shadow-lg border border-emerald-500/50 flex items-center justify-center gap-2 transition text-sm">
+                        <span>🧭</span> <span data-i18n="explore">Explorar a Trilha na Névoa</span>
+                    </button>
+                    <button onclick="restAtCamp()" class="bg-forest-800 hover:bg-forest-700 active:scale-[0.98] text-emerald-200 font-semibold py-3 px-4 rounded-xl shadow border border-forest-700 flex items-center justify-center gap-2 transition text-sm">
+                        <span>⛺</span> <span data-i18n="camp">Acampar e Recuperar Fôlego</span>
+                    </button>
+                </div>
+
+                <!-- Novos Golpes e Ações de Combate -->
+                <div id="controls-combat" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button onclick="combatQuickAttack()" class="bg-stone-800 hover:bg-stone-700 active:scale-[0.98] text-amber-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-600 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span>🗡️</span> <span data-i18n="quickAttack">Ataque Rápido</span>
+                    </button>
+                    <button onclick="combatHeavyAttack()" class="bg-red-900/80 hover:bg-red-800 active:scale-[0.98] text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-red-600 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span>💥</span> <span data-i18n="heavyAttack">Estocada Pesada</span> <span class="text-[10px] text-red-200" data-i18n="focusCost">(15 Foco)</span>
+                    </button>
+                    <button onclick="combatDefend()" class="bg-blue-900/80 hover:bg-blue-800 active:scale-[0.98] text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-blue-600 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span>🛡️</span> <span data-i18n="defend">Postura Firme</span>
+                    </button>
+                    <button onclick="combatRun()" class="bg-stone-900 hover:bg-stone-800 active:scale-[0.98] text-stone-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-700 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span>🏃</span> <span data-i18n="run">Fugir na Névoa</span>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="w-full max-w-4xl text-center text-xs text-gray-500 pb-2">
+        <p data-i18n="footer">Yara Demon Hunter: A Vingança • Mini RPG Interativo de Navegador</p>
+    </footer>
+
+    <script src="js/game.js" defer></script>
+</body>
+</html>

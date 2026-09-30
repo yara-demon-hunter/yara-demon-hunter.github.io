@@ -1,0 +1,11 @@
+.rpg-scroll::-webkit-scrollbar {
+    width: 5px;
+}
+.rpg-scroll::-webkit-scrollbar-track {
+    background: #06140b;
+    border-radius: 4px;
+}
+.rpg-scroll::-webkit-scrollbar-thumb {
+    background: #274731;
+    border-radius: 4px;
+}

@@ -1,0 +1,49 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0c0d0f;
+    color: #e8e5df;
+}
+.game-shell {
+    background-image: radial-gradient(circle at top, #171920 0%, #0c0d0f 45%);
+}
+h1, h2, h3, .font-title {
+    font-family: 'Cinzel', serif;
+}
+.rpg-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.rpg-scroll::-webkit-scrollbar-track {
+    background: #121419;
+    border-radius: 4px;
+}
+.rpg-scroll::-webkit-scrollbar-thumb {
+    background: #383a41;
+    border-radius: 4px;
+}
+.game-language {
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid #383a41;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.35);
+}
+.game-language button {
+    min-width: 38px;
+    min-height: 34px;
+    border: 0;
+    background: transparent;
+    color: #aaa8a3;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.68rem;
+    font-weight: 700;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+.game-language button[aria-pressed="true"] {
+    background: #292b31;
+    color: #d2c29c;
+}
+.game-language button:focus-visible {
+    outline: 2px solid #d2c29c;
+    outline-offset: -2px;
+}
