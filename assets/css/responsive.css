@@ -80,31 +80,6 @@
 
 
     /* -------------------------------------
-       ROOT BOOK SHELF
-       ------------------------------------- */
-
-    .root-library {
-        padding: 0 18px 65px;
-    }
-
-    .book-shelf {
-        padding: 60px 0 15px;
-    }
-
-    .book-shelf__books {
-        grid-template-columns: 1fr;
-    }
-
-    .book-shelf__book {
-        grid-template-columns: minmax(125px, 34%) 1fr;
-    }
-
-    .book-shelf__cover-wrap {
-        min-height: 280px;
-    }
-
-
-    /* -------------------------------------
        STORY HOME
        ------------------------------------- */
 

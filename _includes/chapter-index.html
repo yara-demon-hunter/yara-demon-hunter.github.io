@@ -1,0 +1,61 @@
+{% assign book = site.data.books[page.book_id] %}
+{% assign copy = page.chapter_index_copy %}
+{% assign prologue = site.pages
+    | where: "book_id", page.book_id
+    | where: "lang", page.lang
+    | where: "chapter_type", "prologue"
+    | first
+%}
+
+<section class="chapter-index-hero" aria-labelledby="chapter-index-title">
+    <div class="chapter-index-hero__cover">
+        <img
+            src="{{ book.cover | relative_url }}"
+            alt="{{ copy.cover_prefix }} {{ book.title[page.lang] }}"
+        >
+    </div>
+
+    <div class="chapter-index-hero__content">
+        <p class="section-label">{{ copy.book_label }} {{ book.number }}</p>
+        <h1 id="chapter-index-title">{{ page.title }}</h1>
+        <p class="chapter-index-hero__book-title">{{ book.title[page.lang] }}</p>
+        <p class="chapter-index-hero__message">{{ copy.message }}</p>
+        {% if prologue %}
+            <a class="chapter-index-hero__link" href="{{ prologue.url | relative_url }}">{{ copy.start_label }}</a>
+        {% endif %}
+    </div>
+</section>
+
+<div class="chapter-list">
+{% if prologue %}
+    {% include chapter-card.html
+        type=copy.prologue_type
+        title=prologue.title
+        description=prologue.description
+        image=prologue.image
+        url=prologue.url
+        status="published"
+        link_text=copy.read_label
+    %}
+{% endif %}
+
+{% assign chapters = site.pages
+    | where: "book_id", page.book_id
+    | where: "lang", page.lang
+    | where: "chapter_type", "chapter"
+    | sort: "chapter_number"
+%}
+
+{% for chapter in chapters %}
+    {% include chapter-card.html
+        type=copy.chapter_type
+        title=chapter.title
+        description=chapter.description
+        image=chapter.image
+        url=chapter.url
+        status=chapter.status
+        link_text=copy.read_label
+        coming_soon_text=copy.coming_soon_label
+    %}
+{% endfor %}
+</div>

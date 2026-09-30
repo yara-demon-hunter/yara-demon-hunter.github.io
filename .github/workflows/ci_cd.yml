@@ -52,6 +52,10 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: true
 
+      # Validate book data and translated chapter index metadata.
+      - name: Validate content metadata
+        run: ruby script/validate_content.rb
+
       # Build the Jekyll site.
       # The generated static files are placed inside the _site directory.
       - name: Build Jekyll site
