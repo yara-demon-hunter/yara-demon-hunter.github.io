@@ -8,6 +8,8 @@ const translations = {
         documentTitle: "Yara: A Regra do Sino - Mini RPG",
         gameNav: "Navegação do jogo",
         languageLabel: "Idioma do jogo",
+        musicPlay: "Ativar música",
+        musicPause: "Pausar música",
         backToSite: "Voltar ao site",
         gameLabel: "Mini RPG · Floresta Sombria",
         title: "YARA: A REGRA DO SINO",
@@ -16,8 +18,20 @@ const translations = {
         gold: "Ouro:",
         experience: "XP:",
         focus: "Foco (Estamina)",
+        fury: "Fúria",
         attack: "Ataque",
         defense: "Defesa",
+        stun: "Stun",
+        hp: "HP",
+        attackShort: "ATQ",
+        defenseShort: "DEF",
+        parryShort: "PAR",
+        evasionShort: "ESQ",
+        parry: "Aparo",
+        evasion: "Esquiva",
+        journey: "Jornada",
+        discoveryChance: "Chance de descobrir a próxima área: {chance}%",
+        journeyComplete: "Todas as áreas foram descobertas.",
         potions: "Poções de Cura",
         available: "disponíveis",
         drink: "Beber",
@@ -26,40 +40,69 @@ const translations = {
         openingLog: "[Início] Zeph avança sozinho pela Floresta Sombria. Mantenha sua arma em punho.",
         explore: "Explorar a Trilha na Névoa",
         camp: "Acampar e Recuperar Fôlego",
+        campCost: "(50 Ouro)",
         quickAttack: "Ataque Rápido",
         heavyAttack: "Estocada Pesada",
+        criticalAttack: "Golpe Crítico",
+        criticalRequirement: "100 Fúria",
         focusCost: "(15 Foco)",
         defend: "Postura Firme",
+        parryBonus: "+5% (10 Foco)",
+        dodge: "Preparar Esquiva",
+        dodgeBonus: "+25% (15 Foco)",
+        restart: "Reiniciar jornada",
         run: "Fugir na Névoa",
         footer: "Yara Demon Hunter: A Vingança • Mini RPG Interativo de Navegador",
         injured: "Você está ferido demais! Descanse no acampamento.",
+        noGold: "Você precisa de 50 de ouro para descansar no acampamento.",
         goldFound: "Você vasculhou as margens e encontrou <span class=\"text-amber-300\">{amount} de ouro</span> esquecido na lama!",
+        potionFound: "🧪 Você encontrou uma poção de cura! Estoque: <span class=\"text-emerald-300\">{potions}/{capacity}</span>.",
         safeTrail: "✨ Você encontrou um rastro seguro e recuperou <span class=\"text-emerald-300\">{amount} HP</span> de fôlego.",
         denseMist: "A névoa densa dificulta a visão. Apenas o som do vento e das risadas ecoam ao longe.",
         monsterAppears: "⚠ Um perigo surgiu na escuridão: <span class=\"text-red-400 font-bold\">{monster}</span> bloqueia o caminho!",
         quickDamage: "Você desferiu um <span class=\"text-emerald-400 font-bold\">Ataque Rápido</span> causando {damage} de dano.",
         noFocus: "Você está sem foco para uma Estocada Pesada! Recupere-se.",
-        heavyDamage: "💥 Você executou uma <span class=\"text-amber-400 font-bold\">Estocada Pesada</span> com o machado causando {damage} de dano!",
-        defendMessage: "🛡️ Você adotou uma postura defensiva, blindando sua guarda e recuperando foco.",
+        heavyDamage: "🗡️ Você executou uma <span class=\"text-amber-400 font-bold\">Estocada Pesada</span> com o machado causando {damage} de dano!",
+        criticalDamage: "🗡️ Golpe Crítico! Zeph causou {damage} de dano!",
+        stunLanded: "✨ O inimigo foi atordoado e perdeu o contra-ataque!",
+        defendMessage: "⚔️ A chance de aparo aumentou em {amount}% e permanece até o fim da luta!",
+        noParryFocus: "Você precisa de 10 de Foco para preparar um aparo.",
+        parryMaxed: "A chance de aparo já está no limite de 65% nesta luta.",
+        heroParries: "⚔️ Zeph aparou o golpe! O dano caiu pela metade: {damage} de dano.",
+        monsterParries: "⚔️ {monster} aparou seu golpe! O dano causado caiu pela metade: {damage}.",
         monsterDamage: "O {monster} contra-atacou causando <span class=\"text-red-400 font-bold\">{damage} de dano</span>!",
         noPotions: "Você não tem poções restantes!",
         hpFull: "Seu HP já está no máximo!",
         potionHeal: "🧪 Você bebeu uma poção e recuperou <span class=\"text-emerald-400\">{amount} HP</span>.",
         potionOpening: "O monstro aproveitou o seu momento de distração!",
         alreadyRested: "Você já está com HP e Foco completos.",
-        rested: "⛺ Você descansou na segurança do acampamento. HP e Foco totalmente restaurados.",
+        rested: "⛺ Você gastou {cost} de ouro no acampamento. HP e Foco totalmente restaurados.",
         escaped: "💨 Você conseguiu escapar correndo pela névoa densa!",
         escapeFailed: "❌ A tentativa de fuga falhou! O {monster} cortou seu caminho.",
         victory: "🎉 Vitória! Você derrotou o <span class=\"text-amber-300 font-bold\">{monster}</span>!",
         rewards: "Recompensas: <span class=\"text-purple-300\">+{xp} XP</span> e <span class=\"text-amber-300\">+{gold} de Ouro</span>",
         defeat: "💀 Zeph caiu na Floresta Sombria...",
-        defeatHelp: "Use o botão de Descanso no Acampamento para recuperar o fôlego.",
-        levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Subiu de Nível!</span> Zeph alcançou o Nível {level}! Atributos aprimorados!"
+        defeatHelp: "A jornada de Zeph terminou na Floresta Sombria.",
+        gameOverTitle: "Fim da jornada",
+        levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Subiu de Nível!</span> Zeph alcançou o Nível {level}! Ataque, defesa, esquiva, aparo e stun aprimorados!",
+        monsterDodges: "💨 O {monster} desviou do seu golpe!",
+        heroDodges: "💨 Zeph desviou do ataque do {monster}!",
+        dodgeMessage: "💨 O bônus de esquiva aumentou em {amount}% e permanece até o fim da luta!",
+        noDodgeFocus: "Você precisa de 15 de Foco para preparar uma esquiva.",
+        evasionMaxed: "A chance de esquiva já está no limite de 95% nesta luta.",
+        regionArrival: "✨ Nova área descoberta: <span class=\"text-amber-300 font-bold\">{region}</span>.",
+        regions: [
+            { title: "Floresta Sombria", description: "🌲 O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos." },
+            { title: "O Portal das Cinzas", description: "🌀 Um portal pulsa entre as árvores. Do outro lado, algo respira junto com a névoa." },
+            { title: "Vilarejo em Ruínas", description: "🔥 O vilarejo foi invadido. Portas quebradas e marcas de batalha anunciam que os invasores ainda estão por perto." }
+        ]
     },
     en: {
         documentTitle: "Yara: The Bell's Rule - Mini RPG",
         gameNav: "Game navigation",
         languageLabel: "Game language",
+        musicPlay: "Play music",
+        musicPause: "Pause music",
         backToSite: "Back to website",
         gameLabel: "Mini RPG · Dark Forest",
         title: "YARA: THE BELL'S RULE",
@@ -68,8 +111,20 @@ const translations = {
         gold: "Gold:",
         experience: "XP:",
         focus: "Focus (Stamina)",
+        fury: "Fury",
         attack: "Attack",
         defense: "Defense",
+        stun: "Stun",
+        hp: "HP",
+        attackShort: "ATK",
+        defenseShort: "DEF",
+        parryShort: "PAR",
+        evasionShort: "EVA",
+        parry: "Parry",
+        evasion: "Evasion",
+        journey: "Journey",
+        discoveryChance: "Chance to discover the next area: {chance}%",
+        journeyComplete: "All areas have been discovered.",
         potions: "Healing Potions",
         available: "available",
         drink: "Drink",
@@ -78,35 +133,62 @@ const translations = {
         openingLog: "[Start] Zeph ventures alone into the Dark Forest. Keep your weapon ready.",
         explore: "Explore the Misty Trail",
         camp: "Rest and Recover",
+        campCost: "(50 Gold)",
         quickAttack: "Quick Attack",
         heavyAttack: "Heavy Strike",
+        criticalAttack: "Critical Strike",
+        criticalRequirement: "100 Fury",
         focusCost: "(15 Focus)",
         defend: "Brace for Impact",
+        parryBonus: "+5% (10 Focus)",
+        dodge: "Prepare to Dodge",
+        dodgeBonus: "+15% (15 Focus)",
+        restart: "Restart journey",
         run: "Flee into the Mist",
         footer: "Yara Demon Hunter: The Vengeance • Browser Mini RPG",
         injured: "You are too badly hurt. Rest at camp.",
+        noGold: "You need 50 gold to rest at camp.",
         goldFound: "You searched the riverbank and found <span class=\"text-amber-300\">{amount} gold</span> buried in the mud!",
+        potionFound: "🧪 You found a healing potion! Inventory: <span class=\"text-emerald-300\">{potions}/{capacity}</span>.",
         safeTrail: "✨ You found a safe trail and recovered <span class=\"text-emerald-300\">{amount} HP</span>.",
         denseMist: "The dense mist makes it hard to see. Only the wind and distant laughter answer.",
         monsterAppears: "⚠ A threat emerges from the dark: <span class=\"text-red-400 font-bold\">{monster}</span> blocks your path!",
         quickDamage: "You land a <span class=\"text-emerald-400 font-bold\">Quick Attack</span> for {damage} damage.",
         noFocus: "You do not have enough Focus for a Heavy Strike. Recover first.",
-        heavyDamage: "💥 Your <span class=\"text-amber-400 font-bold\">Heavy Strike</span> deals {damage} damage!",
-        defendMessage: "🛡️ You brace yourself, strengthening your guard and recovering Focus.",
+        heavyDamage: "🗡️ Your <span class=\"text-amber-400 font-bold\">Heavy Strike</span> deals {damage} damage!",
+        criticalDamage: "🗡️ Critical Strike! Zeph deals {damage} damage!",
+        stunLanded: "✨ The enemy is stunned and loses its counterattack!",
+        defendMessage: "⚔️ Parry chance increased by {amount}% and will last until the fight ends!",
+        noParryFocus: "You need 10 Focus to prepare a parry.",
+        parryMaxed: "Parry chance is already at the 65% limit for this fight.",
+        heroParries: "⚔️ Zeph parried the blow! Damage was halved to {damage}.",
+        monsterParries: "⚔️ {monster} parried your attack! Damage dealt was halved to {damage}.",
         monsterDamage: "The {monster} counterattacks for <span class=\"text-red-400 font-bold\">{damage} damage</span>!",
         noPotions: "You have no potions left!",
         hpFull: "Your HP is already full!",
         potionHeal: "🧪 You drink a potion and recover <span class=\"text-emerald-400\">{amount} HP</span>.",
         potionOpening: "The monster takes advantage of your distraction!",
         alreadyRested: "Your HP and Focus are already full.",
-        rested: "⛺ You rest safely at camp. HP and Focus are fully restored.",
+        rested: "⛺ You spent {cost} gold at camp. HP and Focus are fully restored.",
         escaped: "💨 You escape into the thick mist!",
         escapeFailed: "❌ You fail to escape! The {monster} cuts off your path.",
         victory: "🎉 Victory! You defeated <span class=\"text-amber-300 font-bold\">{monster}</span>!",
         rewards: "Rewards: <span class=\"text-purple-300\">+{xp} XP</span> and <span class=\"text-amber-300\">+{gold} Gold</span>",
         defeat: "💀 Zeph falls in the Dark Forest...",
-        defeatHelp: "Use Rest at Camp to recover your strength.",
-        levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Level Up!</span> Zeph reached Level {level}! Your stats improved!"
+        defeatHelp: "Zeph's journey ends in the Dark Forest.",
+        gameOverTitle: "Journey's End",
+        levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Level Up!</span> Zeph reached Level {level}! Attack, defense, evasion, parry, and stun improved!",
+        monsterDodges: "💨 The {monster} dodges your attack!",
+        heroDodges: "💨 Zeph dodges the {monster}'s attack!",
+        dodgeMessage: "💨 Evasion increased by {amount}% and will last until the fight ends!",
+        noDodgeFocus: "You need 15 Focus to prepare a dodge.",
+        evasionMaxed: "Evasion is already at the 65% limit for this fight.",
+        regionArrival: "✨ New area discovered: <span class=\"text-amber-300 font-bold\">{region}</span>.",
+        regions: [
+            { title: "Dark Forest", description: "🌲 The bell rang too late. The mist hides hungry beasts and ancient secrets." },
+            { title: "The Ashen Portal", description: "🌀 A portal pulses between the trees. Something on the other side breathes with the mist." },
+            { title: "The Ruined Village", description: "🔥 The village has been invaded. Broken doors and battle scars warn that the invaders are still nearby." }
+        ]
     }
 };
 
@@ -123,6 +205,9 @@ function applyLanguage() {
     document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
         element.setAttribute("aria-label", t(element.dataset.i18nAria));
     });
+    document.querySelectorAll("[data-i18n-title]").forEach((element) => {
+        element.title = t(element.dataset.i18nTitle);
+    });
     document.querySelector("#game-home").href = gameLanguage === "en" ? "/en/" : "/pt/";
     document.querySelectorAll("[data-game-language]").forEach((button) => {
         button.setAttribute("aria-pressed", String(button.dataset.gameLanguage === gameLanguage));
@@ -138,6 +223,42 @@ document.querySelectorAll("[data-game-language]").forEach((button) => {
     });
 });
 
+const gameMusic = document.getElementById('game-music');
+const musicToggle = document.getElementById('music-toggle');
+const musicIcon = document.getElementById('music-icon');
+
+function updateMusicButton(isPlaying) {
+    const label = t(isPlaying ? 'musicPause' : 'musicPlay');
+    musicIcon.innerText = isPlaying ? '🔊' : '🔇';
+    musicToggle.setAttribute('aria-label', label);
+    musicToggle.title = label;
+}
+
+function startGameMusic() {
+    gameMusic.play()
+        .then(() => updateMusicButton(true))
+        .catch(() => updateMusicButton(false));
+}
+
+musicToggle.addEventListener('click', () => {
+    if (gameMusic.paused) startGameMusic();
+    else gameMusic.pause();
+});
+
+gameMusic.addEventListener('play', () => updateMusicButton(true));
+gameMusic.addEventListener('pause', () => updateMusicButton(false));
+gameMusic.addEventListener('error', () => updateMusicButton(false));
+
+function startMusicAfterInteraction(event) {
+    if (event.target instanceof Element && event.target.closest('#music-toggle')) return;
+    startGameMusic();
+    document.removeEventListener('pointerdown', startMusicAfterInteraction);
+    document.removeEventListener('keydown', startMusicAfterInteraction);
+}
+
+document.addEventListener('pointerdown', startMusicAfterInteraction);
+document.addEventListener('keydown', startMusicAfterInteraction);
+
 const hero = {
     name: "Zeph",
     level: 1,
@@ -147,22 +268,47 @@ const hero = {
     maxFoco: 50,
     atk: 14,
     def: 6,
+    evasion: 8,
+    parry: 15,
+    stunChance: 5,
+    fury: 0,
+    maxFury: 100,
     gold: 15,
     xp: 0,
     maxXp: 30,
-    potions: 3,
-    defending: false
+    potions: 1,
+    maxPotions: 1,
+    evasionBonus: 0,
+    parryBonus: 0
 };
 
+const CAMP_COST = 50;
+const DODGE_COST = 15;
+const DODGE_BONUS = 15;
+const MAX_EVASION = 65;
+const PARRY_COST = 10;
+const PARRY_BONUS = 5;
+const MAX_PARRY = 65;
+const FURY_PER_DAMAGE = 1;
+const CRITICAL_DAMAGE_MULTIPLIER = 2;
+const CRITICAL_STUN_BONUS = 30;
+
 const monsterPool = [
-    { name: { pt: "Lobo Sombriço", en: "Shadow Wolf" }, icon: "🐺", minLevel: 1, hp: 35, atk: 12, def: 3, xpReward: 15, goldReward: 8 },
-    { name: { pt: "Espírito do Rio", en: "River Spirit" }, icon: "👻", minLevel: 1, hp: 45, atk: 14, def: 4, xpReward: 20, goldReward: 12 },
-    { name: { pt: "Bruxa de Feições Cadavéricas", en: "Corpse-faced Witch" }, icon: "🧙‍♀️", minLevel: 2, hp: 60, atk: 18, def: 6, xpReward: 30, goldReward: 20 },
-    { name: { pt: "Criatura Corrompida das Sombras", en: "Corrupted Shadow Creature" }, icon: "👤", minLevel: 3, hp: 90, atk: 22, def: 8, xpReward: 45, goldReward: 35 }
+    { region: 0, name: { pt: "Lobo Sombriço", en: "Shadow Wolf" }, icon: "🐺", hp: 35, atk: 12, def: 3, parry: 15, evasion: 8, xpReward: 15, goldReward: 8 },
+    { region: 0, name: { pt: "Espírito do Rio", en: "River Spirit" }, icon: "👻", hp: 45, atk: 14, def: 4, parry: 18, evasion: 12, xpReward: 20, goldReward: 12 },
+    { region: 0, name: { pt: "Bruxa de Feições Cadavéricas", en: "Corpse-faced Witch" }, icon: "🧙‍♀️", hp: 60, atk: 18, def: 6, parry: 22, evasion: 10, xpReward: 30, goldReward: 20 },
+    { region: 0, name: { pt: "Criatura Corrompida das Sombras", en: "Corrupted Shadow Creature" }, icon: "👤", hp: 90, atk: 22, def: 8, parry: 25, evasion: 15, xpReward: 45, goldReward: 35 },
+    { region: 1, name: { pt: "Guardião do Portal", en: "Portal Guardian" }, icon: "🗿", hp: 85, atk: 22, def: 10, parry: 28, evasion: 8, xpReward: 38, goldReward: 24 },
+    { region: 1, name: { pt: "Espectro das Cinzas", en: "Ash Wraith" }, icon: "🌫️", hp: 70, atk: 19, def: 7, parry: 30, evasion: 22, xpReward: 36, goldReward: 28 },
+    { region: 2, name: { pt: "Saqueador da Névoa", en: "Mist Marauder" }, icon: "🪓", hp: 105, atk: 26, def: 11, parry: 35, evasion: 12, xpReward: 50, goldReward: 38 },
+    { region: 2, name: { pt: "Cavaleiro Possuído", en: "Possessed Knight" }, icon: "⚔️", hp: 125, atk: 29, def: 14, parry: 40, evasion: 10, xpReward: 60, goldReward: 45 }
 ];
 
 let currentMonster = null;
 let inCombat = false;
+let currentRegion = 0;
+let discoveredRegions = [0];
+let gameOver = false;
 
 function updateUI() {
     document.getElementById('hero-name').innerText = hero.name;
@@ -174,9 +320,69 @@ function updateUI() {
     document.getElementById('hero-hp-max').innerText = hero.maxHp;
     document.getElementById('hero-foco').innerText = hero.foco;
     document.getElementById('hero-foco-max').innerText = hero.maxFoco;
+    document.getElementById('hero-fury').innerText = hero.fury;
+    document.getElementById('hero-fury-bar').style.width = Math.min(100, hero.fury / hero.maxFury * 100) + '%';
+    const furyReady = hero.fury >= hero.maxFury;
+    const quickAttackButton = document.getElementById('quick-attack-button');
+    quickAttackButton.classList.toggle('fury-ready', furyReady);
+    quickAttackButton.title = furyReady ? t('criticalRequirement') : '';
+    document.getElementById('quick-attack-label').innerText = t(furyReady ? 'criticalAttack' : 'quickAttack');
     document.getElementById('hero-atk').innerText = hero.atk;
     document.getElementById('hero-def').innerText = hero.def;
+    const evasionTotal = Math.min(MAX_EVASION, hero.evasion + hero.evasionBonus);
+    const evasionDisplay = document.getElementById('hero-evasion');
+    const evasionBonusDisplay = document.getElementById('hero-evasion-bonus');
+    document.getElementById('hero-evasion-base').innerText = hero.evasion + '%';
+    evasionBonusDisplay.innerText = ` +${hero.evasionBonus}% = ${evasionTotal}%`;
+    evasionBonusDisplay.classList.toggle('hidden', hero.evasionBonus === 0);
+    evasionDisplay.classList.toggle('text-sm', hero.evasionBonus === 0);
+    evasionDisplay.classList.toggle('text-[10px]', hero.evasionBonus > 0);
+    evasionDisplay.setAttribute('aria-label', hero.evasionBonus
+        ? `${hero.evasion}% + ${hero.evasionBonus}% = ${evasionTotal}%`
+        : `${hero.evasion}%`);
+    const parryTotal = Math.min(MAX_PARRY, hero.parry + hero.parryBonus);
+    const parryDisplay = document.getElementById('hero-parry');
+    const parryBonusDisplay = document.getElementById('hero-parry-bonus');
+    document.getElementById('hero-parry-base').innerText = hero.parry + '%';
+    parryBonusDisplay.innerText = ` +${hero.parryBonus}% = ${parryTotal}%`;
+    parryBonusDisplay.classList.toggle('hidden', hero.parryBonus === 0);
+    parryDisplay.setAttribute('aria-label', hero.parryBonus
+        ? `${hero.parry}% + ${hero.parryBonus}% = ${parryTotal}%`
+        : `${hero.parry}%`);
+    const stunBonus = hero.fury >= hero.maxFury ? CRITICAL_STUN_BONUS : 0;
+    const stunChanceTotal = Math.min(100, hero.stunChance + stunBonus);
+    const stunBonusDisplay = document.getElementById('hero-stun-bonus');
+    const stunDisplay = document.getElementById('hero-stun');
+    document.getElementById('hero-stun-base').innerText = hero.stunChance + '%';
+    stunBonusDisplay.innerText = ` +${stunBonus}% = ${stunChanceTotal}%`;
+    stunBonusDisplay.classList.toggle('hidden', stunBonus === 0);
+    stunDisplay.setAttribute('aria-label', stunBonus
+        ? `${hero.stunChance}% + ${stunBonus}% = ${stunChanceTotal}%`
+        : `${hero.stunChance}%`);
     document.getElementById('hero-potions').innerText = hero.potions;
+    document.getElementById('hero-potions-max').innerText = hero.maxPotions;
+    document.getElementById('exploration-title').innerText = translations[gameLanguage].regions[currentRegion].title;
+    document.getElementById('exploration-description').innerText = translations[gameLanguage].regions[currentRegion].description;
+
+    document.querySelectorAll('[data-region-stop]').forEach((stop) => {
+        const regionIndex = Number(stop.dataset.regionStop);
+        const isDiscovered = discoveredRegions.includes(regionIndex);
+        const isCurrent = regionIndex === currentRegion;
+        stop.querySelector('.region-stop-name').innerText = isDiscovered
+            ? translations[gameLanguage].regions[regionIndex].title
+            : '???';
+        stop.querySelector('.region-stop-marker').innerText = isCurrent ? '●' : isDiscovered ? '✓' : '?';
+        stop.classList.toggle('border-emerald-500/70', isCurrent);
+        stop.classList.toggle('bg-emerald-950/50', isCurrent);
+        stop.classList.toggle('text-emerald-200', isDiscovered);
+        stop.classList.toggle('text-gray-500', !isDiscovered);
+        if (isCurrent) stop.setAttribute('aria-current', 'step');
+        else stop.removeAttribute('aria-current');
+    });
+    const nextDiscoveryChance = getDiscoveryChance();
+    document.getElementById('discovery-chance').innerText = nextDiscoveryChance
+        ? t('discoveryChance', { chance: nextDiscoveryChance })
+        : t('journeyComplete');
 
     const hpPercent = Math.max(0, Math.min(100, (hero.hp / hero.maxHp) * 100));
     document.getElementById('hero-hp-bar').style.width = hpPercent + '%';
@@ -188,17 +394,34 @@ function updateUI() {
     const combatControls = document.getElementById('controls-combat');
     const encounterCard = document.getElementById('encounter-card');
     const explorationBanner = document.getElementById('exploration-banner');
+    const campButton = document.getElementById('camp-button');
+    const potionButton = document.getElementById('potion-button');
+    document.getElementById('dodge-button').disabled = evasionTotal >= MAX_EVASION;
+    document.getElementById('parry-button').disabled = parryTotal >= MAX_PARRY || hero.foco < PARRY_COST;
+    const restartButton = document.getElementById('restart-button');
+    campButton.disabled = inCombat || gameOver || hero.gold < CAMP_COST || (hero.hp >= hero.maxHp && hero.foco >= hero.maxFoco);
+    potionButton.disabled = gameOver;
 
-    if (inCombat) {
+    if (gameOver) {
+        exploreControls.classList.add('hidden');
+        combatControls.classList.add('hidden');
+        encounterCard.classList.add('hidden');
+        explorationBanner.classList.remove('hidden');
+        document.getElementById('exploration-title').innerText = t('gameOverTitle');
+        document.getElementById('exploration-description').innerText = t('defeatHelp');
+        restartButton.classList.remove('hidden');
+    } else if (inCombat) {
         exploreControls.classList.add('hidden');
         combatControls.classList.remove('hidden');
         encounterCard.classList.remove('hidden');
         explorationBanner.classList.add('hidden');
+        restartButton.classList.add('hidden');
     } else {
         exploreControls.classList.remove('hidden');
         combatControls.classList.add('hidden');
         encounterCard.classList.add('hidden');
         explorationBanner.classList.remove('hidden');
+        restartButton.classList.add('hidden');
     }
 }
 
@@ -223,8 +446,14 @@ function logMessage(message, type = 'normal') {
 }
 
 function exploreForest() {
+    if (inCombat || gameOver) return;
     if (hero.hp <= 0) {
             logMessage(t("injured"), "combat-monster");
+        return;
+    }
+
+    if (tryDiscoverRegion()) {
+        updateUI();
         return;
     }
 
@@ -242,13 +471,31 @@ function exploreForest() {
         hero.hp = Math.min(hero.maxHp, hero.hp + healAmount);
         logMessage(t("safeTrail", { amount: healAmount }), "special");
         updateUI();
+    } else if (hero.potions < hero.maxPotions) {
+        hero.potions++;
+        logMessage(t("potionFound", { potions: hero.potions, capacity: hero.maxPotions }), "loot");
+        updateUI();
     } else {
         logMessage(t("denseMist"));
     }
 }
 
+function getDiscoveryChance() {
+    if (currentRegion >= translations[gameLanguage].regions.length - 1) return 0;
+    return Math.min(45, 3 + (hero.level - 1) * 3 + currentRegion * 4);
+}
+
+function tryDiscoverRegion() {
+    if (Math.random() * 100 >= getDiscoveryChance()) return false;
+
+    currentRegion++;
+    discoveredRegions.push(currentRegion);
+    logMessage(t("regionArrival", { region: translations[gameLanguage].regions[currentRegion].title }), "discovery");
+    return true;
+}
+
 function spawnMonster() {
-    const availableMonsters = monsterPool.filter(m => m.minLevel <= hero.level + 1);
+    const availableMonsters = monsterPool.filter(m => m.region === currentRegion);
     const template = availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
     
     const scaleFactor = 1 + (hero.level - 1) * 0.2;
@@ -259,33 +506,64 @@ function spawnMonster() {
         maxHp: Math.floor(template.hp * scaleFactor),
         atk: Math.floor(template.atk * scaleFactor),
         def: Math.floor(template.def * scaleFactor),
+        parry: template.parry,
+        evasion: template.evasion,
         xpReward: Math.floor(template.xpReward * scaleFactor),
         goldReward: Math.floor(template.goldReward * scaleFactor)
     };
 
     inCombat = true;
-    hero.defending = false;
+    hero.parryBonus = 0;
 
     document.getElementById('monster-name').innerText = currentMonster.name;
     document.getElementById('monster-hp').innerText = currentMonster.hp;
     document.getElementById('monster-hp-max').innerText = currentMonster.maxHp;
     document.getElementById('monster-icon').innerText = currentMonster.icon;
     document.getElementById('monster-hp-bar').style.width = '100%';
+    document.getElementById('monster-atk').innerText = currentMonster.atk;
+    document.getElementById('monster-def').innerText = currentMonster.def;
+    document.getElementById('monster-parry').innerText = currentMonster.parry + '%';
+    document.getElementById('monster-evasion').innerText = currentMonster.evasion + '%';
 
     logMessage(t("monsterAppears", { monster: currentMonster.name }), "combat-monster");
     updateUI();
 }
 
+function applyMonsterParry(damage) {
+    if (Math.random() * 100 >= currentMonster.parry) return damage;
+
+    const reducedDamage = Math.max(1, Math.ceil(damage / 2));
+    logMessage(t('monsterParries', { monster: currentMonster.name, damage: reducedDamage }), 'special');
+    return reducedDamage;
+}
+
+function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0) {
+    damage = applyMonsterParry(damage);
+    currentMonster.hp = Math.max(0, currentMonster.hp - damage);
+    logMessage(t(messageKey, { damage }), "combat-hero");
+
+    const stunChance = Math.min(100, hero.stunChance + criticalStunBonus);
+    const stunned = currentMonster.hp > 0 && Math.random() * 100 < stunChance;
+    if (stunned) logMessage(t("stunLanded"), "special");
+    checkCombatProgress(stunned);
+}
+
 // NOVO GOLPE: Ataque Rápido (Mais preciso, dano moderado)
 function combatQuickAttack() {
     if (!inCombat || !currentMonster) return;
-    hero.defending = false;
+    if (hero.fury >= hero.maxFury) {
+        combatCriticalAttack();
+        return;
+    }
+
+    if (Math.random() * 100 < currentMonster.evasion) {
+        logMessage(t("monsterDodges", { monster: currentMonster.name }), "special");
+        checkCombatProgress();
+        return;
+    }
 
     let damage = Math.max(4, Math.floor(hero.atk * 0.8) - currentMonster.def + Math.floor(Math.random() * 4));
-    currentMonster.hp = Math.max(0, currentMonster.hp - damage);
-    
-    logMessage(t("quickDamage", { damage }), "combat-hero");
-    checkCombatProgress();
+    resolveHeroAttack(damage, "quickDamage");
 }
 
 // NOVO GOLPE: Estocada Pesada (Gasta Foco, dano alto)
@@ -296,34 +574,83 @@ function combatHeavyAttack() {
         return;
     }
     hero.foco -= 15;
-    hero.defending = false;
+
+    if (Math.random() * 100 < currentMonster.evasion) {
+        logMessage(t("monsterDodges", { monster: currentMonster.name }), "special");
+        checkCombatProgress();
+        return;
+    }
 
     let damage = Math.max(8, Math.floor(hero.atk * 1.5) - currentMonster.def + Math.floor(Math.random() * 6));
-    currentMonster.hp = Math.max(0, currentMonster.hp - damage);
-    
-    logMessage(t("heavyDamage", { damage }), "combat-hero");
-    checkCombatProgress();
+    resolveHeroAttack(damage, "heavyDamage");
+}
+
+function combatCriticalAttack() {
+    if (!inCombat || !currentMonster || hero.fury < hero.maxFury) return;
+
+    hero.fury = 0;
+    updateUI();
+    if (Math.random() * 100 < currentMonster.evasion) {
+        logMessage(t("monsterDodges", { monster: currentMonster.name }), "special");
+        checkCombatProgress();
+        return;
+    }
+
+    const damage = Math.max(8, Math.floor(hero.atk * CRITICAL_DAMAGE_MULTIPLIER) - currentMonster.def + Math.floor(Math.random() * 6));
+    resolveHeroAttack(damage, "criticalDamage", CRITICAL_STUN_BONUS);
 }
 
 // NOVO GOLPE: Postura Firme (Aumenta defesa e recupera foco)
 function combatDefend() {
     if (!inCombat || !currentMonster) return;
-    hero.defending = true;
-    hero.foco = Math.min(hero.maxFoco, hero.foco + 20);
-    logMessage(t("defendMessage"), "special");
-    
+    const bonusGained = Math.min(PARRY_BONUS, MAX_PARRY - hero.parry - hero.parryBonus);
+    if (bonusGained <= 0) {
+        logMessage(t('parryMaxed'));
+        return;
+    }
+    if (hero.foco < PARRY_COST) {
+        logMessage(t('noParryFocus'));
+        return;
+    }
+    hero.foco -= PARRY_COST;
+    hero.parryBonus += bonusGained;
+    logMessage(t('defendMessage', { amount: bonusGained }), 'special');
+
     setTimeout(() => {
         if (inCombat && currentMonster) monsterAttackTurn();
     }, 400);
     updateUI();
 }
 
-function checkCombatProgress() {
+function combatDodge() {
+    if (!inCombat || !currentMonster) return;
+    const bonusGained = Math.min(DODGE_BONUS, MAX_EVASION - hero.evasion - hero.evasionBonus);
+    if (bonusGained <= 0) {
+        logMessage(t("evasionMaxed"));
+        return;
+    }
+    if (hero.foco < DODGE_COST) {
+        logMessage(t("noDodgeFocus"));
+        return;
+    }
+    hero.foco -= DODGE_COST;
+    hero.defending = false;
+    hero.evasionBonus += bonusGained;
+    logMessage(t("dodgeMessage", { amount: bonusGained }), "special");
+
+    setTimeout(() => {
+        if (inCombat && currentMonster) monsterAttackTurn();
+    }, 400);
+    updateUI();
+}
+
+function checkCombatProgress(monsterStunned = false) {
     updateMonsterUI();
     if (currentMonster.hp <= 0) {
         endCombatVictory();
         return;
     }
+    if (monsterStunned) return;
     setTimeout(() => {
         if (inCombat && currentMonster) monsterAttackTurn();
     }, 500);
@@ -332,13 +659,26 @@ function checkCombatProgress() {
 function monsterAttackTurn() {
     if (!inCombat || !currentMonster) return;
 
-    let mitigation = hero.defending ? hero.def * 2 : hero.def;
-    let monsterDamage = Math.max(2, currentMonster.atk - mitigation + Math.floor(Math.random() * 4));
-    
-    hero.hp = Math.max(0, hero.hp - monsterDamage);
-    hero.defending = false; // reseta a postura
+    const evasionChance = Math.min(MAX_EVASION, hero.evasion + hero.evasionBonus);
+    const evaded = Math.random() * 100 < evasionChance;
+    if (evaded) {
+        hero.defending = false;
+        logMessage(t("heroDodges", { monster: currentMonster.name }), "special");
+        updateUI();
+        return;
+    }
 
-    logMessage(t("monsterDamage", { monster: currentMonster.name, damage: monsterDamage }), "combat-monster");
+    let monsterDamage = Math.max(2, currentMonster.atk - hero.def + Math.floor(Math.random() * 4));
+    const parryChance = Math.min(MAX_PARRY, hero.parry + hero.parryBonus);
+    const parried = Math.random() * 100 < parryChance;
+    if (parried) monsterDamage = Math.max(1, Math.ceil(monsterDamage / 2));
+
+    const damageTaken = Math.min(hero.hp, monsterDamage);
+    hero.hp = Math.max(0, hero.hp - damageTaken);
+    hero.fury = Math.min(hero.maxFury, hero.fury + damageTaken * FURY_PER_DAMAGE);
+    logMessage(parried
+        ? t('heroParries', { damage: damageTaken })
+        : t("monsterDamage", { monster: currentMonster.name, damage: damageTaken }), parried ? 'special' : 'combat-monster');
     updateUI();
 
     if (hero.hp <= 0) {
@@ -353,6 +693,7 @@ function updateMonsterUI() {
 }
 
 function usePotion() {
+    if (gameOver) return;
     if (hero.potions <= 0) {
         logMessage(t("noPotions"), "combat-monster");
         return;
@@ -377,14 +718,19 @@ function usePotion() {
 }
 
 function restAtCamp() {
-    if (inCombat) return;
+    if (inCombat || gameOver) return;
+    if (hero.gold < CAMP_COST) {
+        logMessage(t("noGold"));
+        return;
+    }
     if (hero.hp >= hero.maxHp && hero.foco >= hero.maxFoco) {
         logMessage(t("alreadyRested"));
         return;
     }
+    hero.gold -= CAMP_COST;
     hero.hp = hero.maxHp;
     hero.foco = hero.maxFoco;
-    logMessage(t("rested"), "discovery");
+    logMessage(t("rested", { cost: CAMP_COST }), "discovery");
     updateUI();
 }
 
@@ -393,6 +739,10 @@ function combatRun() {
     const success = Math.random() < 0.7;
     if (success) {
         logMessage(t("escaped"), "discovery");
+        hero.foco = hero.maxFoco;
+        hero.fury = 0;
+        hero.evasionBonus = 0;
+        hero.parryBonus = 0;
         inCombat = false;
         currentMonster = null;
         updateUI();
@@ -409,6 +759,9 @@ function endCombatVictory() {
     hero.gold += currentMonster.goldReward;
     hero.xp += currentMonster.xpReward;
     hero.foco = hero.maxFoco; // recarrega o foco
+    hero.fury = 0;
+    hero.evasionBonus = 0;
+    hero.parryBonus = 0;
 
     inCombat = false;
     currentMonster = null;
@@ -423,11 +776,19 @@ function endCombatDefeat() {
     inCombat = false;
     currentMonster = null;
     hero.hp = 0;
+    hero.fury = 0;
+    hero.evasionBonus = 0;
+    hero.parryBonus = 0;
+    gameOver = true;
     updateUI();
 }
 
+function restartGame() {
+    window.location.reload();
+}
+
 function checkLevelUp() {
-    if (hero.xp >= hero.maxXp) {
+    while (hero.xp >= hero.maxXp) {
         hero.level++;
         hero.xp -= hero.maxXp;
         hero.maxXp = Math.floor(hero.maxXp * 1.5);
@@ -436,8 +797,12 @@ function checkLevelUp() {
         hero.hp = hero.maxHp;
         hero.maxFoco += 15;
         hero.foco = hero.maxFoco;
+        hero.maxPotions = Math.min(5, hero.maxPotions + 1);
         hero.atk += 4;
         hero.def += 2;
+        hero.evasion = Math.min(40, hero.evasion + 2);
+        hero.parry = Math.min(MAX_PARRY, hero.parry + 2);
+        hero.stunChance = Math.min(100, hero.stunChance + 2);
 
         logMessage(t("levelUp", { level: hero.level }), "discovery");
     }
@@ -446,4 +811,5 @@ function checkLevelUp() {
 window.onload = function() {
     applyLanguage();
     updateUI();
+    startGameMusic();
 };

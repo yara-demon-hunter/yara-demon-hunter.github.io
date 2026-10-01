@@ -24,6 +24,9 @@
                     <button type="button" data-game-language="pt" aria-label="Português">PT</button>
                     <button type="button" data-game-language="en" aria-label="English">EN</button>
                 </div>
+                <button id="music-toggle" type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-900/80 bg-black/30 text-emerald-200 transition hover:border-emerald-500 hover:text-white" aria-label="Ativar música" data-i18n-aria="musicPlay" data-i18n-title="musicPlay" title="Ativar música">
+                    <span id="music-icon" aria-hidden="true">🔇</span>
+                </button>
             </div>
         </nav>
         <h1 class="text-3xl sm:text-5xl font-extrabold text-amber-500 tracking-wider drop-shadow-[0_2px_10px_rgba(245,158,11,0.3)]">
@@ -33,6 +36,22 @@
     </header>
 
     <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+
+        <nav class="md:col-span-3 border-b border-fantasy-border pb-3" aria-label="Jornada" data-i18n-aria="journey">
+            <h2 class="text-xs uppercase tracking-widest text-emerald-400/80 mb-2" data-i18n="journey">Jornada</h2>
+            <p id="discovery-chance" class="text-[11px] text-gray-400 mb-2">Chance de descobrir a próxima área: 8%</p>
+            <ol id="region-progress" class="grid grid-cols-3 gap-2">
+                <li data-region-stop="0" class="flex items-center gap-2 rounded-lg border border-emerald-500/70 bg-emerald-950/50 p-2 text-xs text-emerald-200" aria-current="step">
+                    <span class="region-stop-marker text-emerald-300">●</span><span class="region-stop-name">Floresta Sombria</span>
+                </li>
+                <li data-region-stop="1" class="flex items-center gap-2 rounded-lg border border-fantasy-border/50 p-2 text-xs text-gray-500">
+                    <span class="region-stop-marker">?</span><span class="region-stop-name">???</span>
+                </li>
+                <li data-region-stop="2" class="flex items-center gap-2 rounded-lg border border-fantasy-border/50 p-2 text-xs text-gray-500">
+                    <span class="region-stop-marker">?</span><span class="region-stop-name">???</span>
+                </li>
+            </ol>
+        </nav>
 
         <!-- Painel de Status do Personagem -->
         <section class="bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl">
@@ -72,15 +91,37 @@
                         </div>
                     </div>
 
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span class="text-orange-300 flex items-center gap-1">🔥 <span data-i18n="fury">Fúria</span></span>
+                            <span><span id="hero-fury">0</span>/100</span>
+                        </div>
+                        <div class="w-full bg-forest-950 rounded-full h-2.5 p-0.5 border border-fantasy-border">
+                            <div id="hero-fury-bar" class="bg-gradient-to-r from-orange-700 to-amber-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
                     <!-- Atributos -->
                     <div class="grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
                         <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <span class="text-gray-400 block mb-0.5">⚔️ <span data-i18n="attack">Ataque</span></span>
+                            <span class="text-gray-400 block mb-0.5">🗡️ <span data-i18n="attack">Ataque</span></span>
                             <span id="hero-atk" class="font-bold text-amber-300 text-sm">14</span>
                         </div>
                         <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
                             <span class="text-gray-400 block mb-0.5">🛡️ <span data-i18n="defense">Defesa</span></span>
                             <span id="hero-def" class="font-bold text-blue-300 text-sm">6</span>
+                        </div>
+                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                            <span class="text-gray-400 block mb-0.5">⚔️ <span data-i18n="parry">Aparo</span></span>
+                            <span id="hero-parry" class="font-bold text-sky-300 text-sm" aria-label="15%"><span id="hero-parry-base">15%</span><span id="hero-parry-bonus" class="hidden text-amber-300"> +5% = 20%</span></span>
+                        </div>
+                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                            <span class="text-gray-400 block mb-0.5">💨 <span data-i18n="evasion">Esquiva</span></span>
+                            <span id="hero-evasion" class="font-bold text-emerald-300 text-sm text-[10px]" aria-label="8%"><span id="hero-evasion-base">8%</span><span id="hero-evasion-bonus" class="hidden text-amber-300"> +15% = 33%</span></span>
+                        </div>
+                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                            <span class="text-gray-400 block mb-0.5">✨ <span data-i18n="stun">Stun</span></span>
+                            <span id="hero-stun" class="font-bold text-fuchsia-300 text-sm text-[10px]" aria-label="5%"><span id="hero-stun-base">5%</span><span id="hero-stun-bonus" class="hidden text-amber-300"> +30% = 35%</span></span>
                         </div>
                     </div>
                 </div>
@@ -92,10 +133,10 @@
                     <span class="text-2xl">🧪</span>
                     <div>
                         <span class="text-xs text-gray-300 block font-medium" data-i18n="potions">Poções de Cura</span>
-                        <span class="text-xs text-emerald-400 font-bold"><span id="hero-potions">3</span> <span data-i18n="available">disponíveis</span></span>
+                        <span class="text-xs text-emerald-400 font-bold"><span id="hero-potions">1</span>/<span id="hero-potions-max">1</span> <span data-i18n="available">disponíveis</span></span>
                     </div>
                 </div>
-                <button onclick="usePotion()" class="bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white text-xs font-semibold px-3 py-2 rounded-lg transition border border-emerald-500 shadow">
+                <button id="potion-button" onclick="usePotion()" class="bg-emerald-700 hover:bg-emerald-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 text-white text-xs font-semibold px-3 py-2 rounded-lg transition border border-emerald-500 shadow">
                     <span data-i18n="drink">Beber</span>
                 </button>
             </div>
@@ -105,25 +146,35 @@
         <section class="md:col-span-2 bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl min-h-[380px]">
             
             <!-- Inimigo Ativo -->
-            <div id="encounter-card" class="hidden bg-forest-950/90 border border-red-900/50 rounded-xl p-3 mb-4 flex items-center justify-between transition-all">
-                <div class="flex items-center gap-3">
-                    <div id="monster-icon" class="text-3xl bg-red-950/50 p-2 rounded-lg border border-red-800/40">🐺</div>
-                    <div>
-                        <h3 id="monster-name" class="font-bold text-red-400 text-sm sm:text-base">Lobo Sombriço</h3>
-                        <p class="text-xs text-gray-400" data-i18n="danger">Perigo na Névoa</p>
+            <div id="encounter-card" class="hidden bg-forest-950/90 border border-red-900/50 rounded-xl p-3 mb-4 transition-all">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div id="monster-icon" class="text-3xl bg-red-950/50 p-2 rounded-lg border border-red-800/40">🐺</div>
+                        <div>
+                            <h3 id="monster-name" class="font-bold text-red-400 text-sm sm:text-base">Lobo Sombriço</h3>
+                            <p class="text-xs text-gray-400" data-i18n="danger">Perigo na Névoa</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-red-400 font-semibold mb-1"><span data-i18n="hp">HP</span>: <span id="monster-hp">40</span>/<span id="monster-hp-max">40</span></div>
+                        <div class="w-24 sm:w-32 bg-forest-950 rounded-full h-2.5 p-0.5 border border-red-900/40">
+                            <div id="monster-hp-bar" class="bg-gradient-to-r from-red-700 to-red-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="text-right">
-                    <div class="text-xs text-red-400 font-semibold mb-1">HP: <span id="monster-hp">40</span>/<span id="monster-hp-max">40</span></div>
-                    <div class="w-24 sm:w-32 bg-forest-950 rounded-full h-2.5 p-0.5 border border-red-900/40">
-                        <div id="monster-hp-bar" class="bg-gradient-to-r from-red-700 to-red-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
-                    </div>
+                <div class="grid grid-cols-4 gap-2 mt-3 border-t border-fantasy-border/40 pt-2 text-center text-[11px]">
+                    <div><span class="block text-gray-500" data-i18n="attackShort">ATK</span><span id="monster-atk" class="text-red-200">12</span></div>
+                    <div><span class="block text-gray-500" data-i18n="defenseShort">DEF</span><span id="monster-def" class="text-blue-200">3</span></div>
+                    <div><span class="block text-gray-500" data-i18n="parryShort">PAR</span><span id="monster-parry" class="text-sky-200">15%</span></div>
+                    <div><span class="block text-gray-500" data-i18n="evasionShort">EVA</span><span id="monster-evasion" class="text-emerald-200">8%</span></div>
                 </div>
             </div>
 
             <!-- Banner de Exploração -->
             <div id="exploration-banner" class="bg-forest-950/50 border border-forest-800 rounded-xl p-4 mb-4 text-center">
-                <p class="text-xs sm:text-sm text-emerald-300/90 font-medium" data-i18n="explorationIntro">🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?</p>
+                <h3 id="exploration-title" class="text-sm sm:text-base text-amber-300 font-bold mb-1">Floresta Sombria</h3>
+                <p id="exploration-description" class="text-xs sm:text-sm text-emerald-300/90 font-medium" data-i18n="explorationIntro">🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?</p>
+                <button id="restart-button" onclick="restartGame()" class="hidden mt-3 bg-amber-600 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded-lg transition" data-i18n="restart">Reiniciar jornada</button>
             </div>
 
             <!-- Log de Acontecimentos -->
@@ -140,21 +191,24 @@
                     <button onclick="exploreForest()" class="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl shadow-lg border border-emerald-500/50 flex items-center justify-center gap-2 transition text-sm">
                         <span>🧭</span> <span data-i18n="explore">Explorar a Trilha na Névoa</span>
                     </button>
-                    <button onclick="restAtCamp()" class="bg-forest-800 hover:bg-forest-700 active:scale-[0.98] text-emerald-200 font-semibold py-3 px-4 rounded-xl shadow border border-forest-700 flex items-center justify-center gap-2 transition text-sm">
-                        <span>⛺</span> <span data-i18n="camp">Acampar e Recuperar Fôlego</span>
+                    <button id="camp-button" onclick="restAtCamp()" class="bg-forest-800 hover:bg-forest-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-emerald-200 font-semibold py-3 px-4 rounded-xl shadow border border-forest-700 flex items-center justify-center gap-2 transition text-sm">
+                        <span>⛺</span> <span data-i18n="camp">Acampar e Recuperar Fôlego</span> <span data-i18n="campCost">(50 Ouro)</span>
                     </button>
                 </div>
 
                 <!-- Novos Golpes e Ações de Combate -->
-                <div id="controls-combat" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <button onclick="combatQuickAttack()" class="bg-stone-800 hover:bg-stone-700 active:scale-[0.98] text-amber-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>🗡️</span> <span data-i18n="quickAttack">Ataque Rápido</span>
+                <div id="controls-combat" class="hidden grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <button id="quick-attack-button" onclick="combatQuickAttack()" class="bg-stone-800 hover:bg-stone-700 active:scale-[0.98] text-amber-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-600 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span id="quick-attack-icon">🗡️</span> <span id="quick-attack-label" data-i18n="quickAttack">Ataque Rápido</span>
                     </button>
                     <button onclick="combatHeavyAttack()" class="bg-red-900/80 hover:bg-red-800 active:scale-[0.98] text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-red-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>💥</span> <span data-i18n="heavyAttack">Estocada Pesada</span> <span class="text-[10px] text-red-200" data-i18n="focusCost">(15 Foco)</span>
+                        <span>🗡️</span> <span data-i18n="heavyAttack">Estocada Pesada</span> <span class="text-[10px] text-red-200" data-i18n="focusCost">(15 Foco)</span>
                     </button>
-                    <button onclick="combatDefend()" class="bg-blue-900/80 hover:bg-blue-800 active:scale-[0.98] text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-blue-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>🛡️</span> <span data-i18n="defend">Postura Firme</span>
+                    <button id="parry-button" onclick="combatDefend()" class="bg-blue-900/80 hover:bg-blue-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-blue-600 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span>⚔️</span> <span data-i18n="defend">Brace for Impact</span> <span class="text-[10px] text-blue-200" data-i18n="parryBonus">+5% (10 Foco)</span>
+                    </button>
+                    <button id="dodge-button" onclick="combatDodge()" class="bg-emerald-900/80 hover:bg-emerald-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-emerald-600 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span>💨</span> <span data-i18n="dodge">Preparar Esquiva</span> <span class="text-[10px] text-emerald-200" data-i18n="dodgeBonus">+15% (15 Foco)</span>
                     </button>
                     <button onclick="combatRun()" class="bg-stone-900 hover:bg-stone-800 active:scale-[0.98] text-stone-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-700 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span>🏃</span> <span data-i18n="run">Fugir na Névoa</span>
@@ -170,6 +224,7 @@
         <p data-i18n="footer">Yara Demon Hunter: A Vingança • Mini RPG Interativo de Navegador</p>
     </footer>
 
+    <audio id="game-music" src="audio/dark_fantasy_mini_game.mp3" autoplay loop preload="auto"></audio>
     <script src="js/game.js" defer></script>
 </body>
 </html>

@@ -9,6 +9,14 @@ body {
 h1, h2, h3, .font-title {
     font-family: 'Cinzel', serif;
 }
+#quick-attack-button.fury-ready {
+    background-color: #b45309;
+    border-color: #f59e0b;
+    color: #fff;
+}
+#quick-attack-button.fury-ready:hover {
+    background-color: #d97706;
+}
 .rpg-scroll::-webkit-scrollbar {
     width: 6px;
 }
