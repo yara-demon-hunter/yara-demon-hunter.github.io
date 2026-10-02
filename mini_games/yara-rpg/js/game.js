@@ -60,7 +60,7 @@ const translations = {
         safeTrail: "✨ Você encontrou um rastro seguro e recuperou <span class=\"text-emerald-300\">{amount} HP</span> de fôlego.",
         denseMist: "A névoa densa dificulta a visão. Apenas o som do vento e das risadas ecoam ao longe.",
         monsterAppears: "⚠ Um perigo surgiu na escuridão: <span class=\"text-red-400 font-bold\">{monster}</span> bloqueia o caminho!",
-        quickDamage: "Você desferiu um <span class=\"text-emerald-400 font-bold\">Ataque Rápido</span> causando {damage} de dano.",
+        quickDamage: "Você desferiu um <span class=\"text-emerald-400 font-bold\">Ataque Rápido</span> causando {damage} de dano e ganhou {fury} de Fúria.",
         noFocus: "Você está sem foco para uma Estocada Pesada! Recupere-se.",
         heavyDamage: "🗡️ Você executou uma <span class=\"text-amber-400 font-bold\">Estocada Pesada</span> com o machado causando {damage} de dano!",
         criticalDamage: "🗡️ Golpe Crítico! Zeph causou {damage} de dano!",
@@ -107,7 +107,8 @@ const translations = {
         regions: [
             { title: "Floresta Sombria", description: "🌲 O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos." },
             { title: "O Portal das Cinzas", description: "🌀 Um portal pulsa entre as árvores. Do outro lado, algo respira junto com a névoa." },
-            { title: "Vilarejo em Ruínas", description: "🔥 O vilarejo foi invadido. Portas quebradas e marcas de batalha anunciam que os invasores ainda estão por perto." }
+            { title: "Vilarejo em Ruínas", description: "🔥 O vilarejo foi invadido. Portas quebradas e marcas de batalha anunciam que os invasores ainda estão por perto." },
+            { title: "Castelo de Gudran", description: "🏰 As muralhas de Gudran guardam criaturas antigas e cavaleiros que não aceitam intrusos." }
         ]
     },
     en: {
@@ -166,7 +167,7 @@ const translations = {
         safeTrail: "✨ You found a safe trail and recovered <span class=\"text-emerald-300\">{amount} HP</span>.",
         denseMist: "The dense mist makes it hard to see. Only the wind and distant laughter answer.",
         monsterAppears: "⚠ A threat emerges from the dark: <span class=\"text-red-400 font-bold\">{monster}</span> blocks your path!",
-        quickDamage: "You land a <span class=\"text-emerald-400 font-bold\">Quick Attack</span> for {damage} damage.",
+        quickDamage: "You land a <span class=\"text-emerald-400 font-bold\">Quick Attack</span> for {damage} damage and gain {fury} Fury.",
         noFocus: "You do not have enough Focus for a Heavy Strike. Recover first.",
         heavyDamage: "🗡️ Your <span class=\"text-amber-400 font-bold\">Heavy Strike</span> deals {damage} damage!",
         criticalDamage: "🗡️ Critical Strike! Zeph deals {damage} damage!",
@@ -213,7 +214,8 @@ const translations = {
         regions: [
             { title: "Dark Forest", description: "🌲 The bell rang too late. The mist hides hungry beasts and ancient secrets." },
             { title: "The Ashen Portal", description: "🌀 A portal pulses between the trees. Something on the other side breathes with the mist." },
-            { title: "The Ruined Village", description: "🔥 The village has been invaded. Broken doors and battle scars warn that the invaders are still nearby." }
+            { title: "The Ruined Village", description: "🔥 The village has been invaded. Broken doors and battle scars warn that the invaders are still nearby." },
+            { title: "Gudran Castle", description: "🏰 Gudran's walls conceal ancient creatures and knights who suffer no intruders." }
         ]
     }
 };
@@ -252,6 +254,24 @@ document.querySelectorAll("[data-game-language]").forEach((button) => {
 const gameMusic = document.getElementById('game-music');
 const musicToggle = document.getElementById('music-toggle');
 const musicIcon = document.getElementById('music-icon');
+const SOUND_EFFECTS = Object.freeze({
+    dodge: new Audio('audio/sfx/dodge.mp3'),
+    parry: new Audio('audio/sfx/parry.mp3'),
+    basicAttack: new Audio('audio/sfx/basic-attack.mp3'),
+    specialAttack: new Audio('audio/sfx/special-attack.mp3'),
+    levelUp: new Audio('audio/sfx/level-up.mp3')
+});
+Object.values(SOUND_EFFECTS).forEach((sound) => {
+    sound.preload = 'none';
+});
+
+function playSound(effect) {
+    const sound = SOUND_EFFECTS[effect];
+    if (!sound) return;
+    sound.pause();
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+}
 
 function updateMusicButton(isPlaying) {
     const label = t(isPlaying ? 'musicPause' : 'musicPlay');
@@ -320,6 +340,7 @@ const FURY_PER_DAMAGE = 1;
 const FURY_PER_DODGE = 2;
 const CRITICAL_DAMAGE_MULTIPLIER = 2;
 const CRITICAL_STUN_BONUS = 30;
+const FURY_PER_BASIC_ATTACK_DAMAGE = 0.5;
 const UPGRADE_CONFIG = Object.freeze({
     atk: { stat: 'atk', amount: 5, nameKey: 'attack' },
     def: { stat: 'def', amount: 5, nameKey: 'defense' },
@@ -338,7 +359,10 @@ const monsterPool = [
     { region: 1, name: { pt: "Guardião do Portal", en: "Portal Guardian" }, icon: "🗿", hp: 85, atk: 22, def: 10, parry: 28, evasion: 8, xpReward: 38, goldReward: 24 },
     { region: 1, name: { pt: "Espectro das Cinzas", en: "Ash Wraith" }, icon: "🌫️", hp: 70, atk: 19, def: 7, parry: 30, evasion: 22, xpReward: 36, goldReward: 28 },
     { region: 2, name: { pt: "Saqueador da Névoa", en: "Mist Marauder" }, icon: "🪓", hp: 105, atk: 26, def: 11, parry: 35, evasion: 12, xpReward: 50, goldReward: 38 },
-    { region: 2, name: { pt: "Cavaleiro Possuído", en: "Possessed Knight" }, icon: "⚔️", hp: 125, atk: 29, def: 14, parry: 40, evasion: 10, xpReward: 60, goldReward: 45 }
+    { region: 2, name: { pt: "Cavaleiro Possuído", en: "Possessed Knight" }, icon: "⚔️", hp: 125, atk: 29, def: 14, parry: 40, evasion: 10, xpReward: 60, goldReward: 45 },
+    { region: 3, name: { pt: "Cavaleiro de Gudran", en: "Knight of Gudran" }, icon: "🛡️", hp: 175, atk: 38, def: 18, parry: 42, evasion: 12, xpReward: 75, goldReward: 55 },
+    { region: 3, name: { pt: "Sentinela das Catacumbas", en: "Catacomb Sentinel" }, icon: "💀", hp: 210, atk: 42, def: 21, parry: 45, evasion: 10, xpReward: 90, goldReward: 68 },
+    { region: 3, name: { pt: "Manticora de Pedra", en: "Stone Manticore" }, icon: "🦂", hp: 245, atk: 47, def: 24, parry: 38, evasion: 18, xpReward: 110, goldReward: 82 }
 ];
 
 let currentMonster = null;
@@ -592,10 +616,13 @@ function applyMonsterParry(damage) {
     return reducedDamage;
 }
 
-function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0) {
+function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0) {
     damage = applyMonsterParry(damage);
-    currentMonster.hp = Math.max(0, currentMonster.hp - damage);
-    logMessage(t(messageKey, { damage }), "combat-hero");
+    const damageDealt = Math.min(currentMonster.hp, damage);
+    currentMonster.hp -= damageDealt;
+    const furyGained = Math.min(hero.maxFury - hero.fury, Math.floor(damageDealt * furyMultiplier));
+    hero.fury += furyGained;
+    logMessage(t(messageKey, { damage: damageDealt, fury: furyGained }), "combat-hero");
 
     const stunChance = Math.min(100, hero.stunChance + criticalStunBonus);
     const stunned = currentMonster.hp > 0 && Math.random() * 100 < stunChance;
@@ -610,6 +637,7 @@ function combatQuickAttack() {
         combatCriticalAttack();
         return;
     }
+    playSound('basicAttack');
 
     if (Math.random() * 100 < currentMonster.evasion) {
         logMessage(t("monsterDodges", { monster: currentMonster.name }), "special");
@@ -618,7 +646,7 @@ function combatQuickAttack() {
     }
 
     let damage = Math.max(4, Math.floor(hero.atk * 0.8) - currentMonster.def + Math.floor(Math.random() * 4));
-    resolveHeroAttack(damage, "quickDamage");
+    resolveHeroAttack(damage, "quickDamage", 0, FURY_PER_BASIC_ATTACK_DAMAGE);
 }
 
 // NOVO GOLPE: Estocada Pesada (Gasta Foco, dano alto)
@@ -629,6 +657,7 @@ function combatHeavyAttack() {
         return;
     }
     hero.foco -= 15;
+    playSound('specialAttack');
 
     if (Math.random() * 100 < currentMonster.evasion) {
         logMessage(t("monsterDodges", { monster: currentMonster.name }), "special");
@@ -644,6 +673,7 @@ function combatCriticalAttack() {
     if (!inCombat || !currentMonster || hero.fury < hero.maxFury) return;
 
     hero.fury = 0;
+    playSound('specialAttack');
     updateUI();
     if (Math.random() * 100 < currentMonster.evasion) {
         logMessage(t("monsterDodges", { monster: currentMonster.name }), "special");
@@ -717,6 +747,7 @@ function monsterAttackTurn() {
     const evasionChance = Math.min(MAX_EVASION, hero.evasion + hero.evasionBonus);
     const evaded = Math.random() * 100 < evasionChance;
     if (evaded) {
+        playSound('dodge');
         hero.defending = false;
         const furyGained = Math.min(FURY_PER_DODGE, hero.maxFury - hero.fury);
         hero.fury += furyGained;
@@ -728,7 +759,10 @@ function monsterAttackTurn() {
     let monsterDamage = Math.max(2, currentMonster.atk - hero.def + Math.floor(Math.random() * 4));
     const parryChance = Math.min(MAX_PARRY, hero.parry + hero.parryBonus);
     const parried = Math.random() * 100 < parryChance;
-    if (parried) monsterDamage = Math.max(1, Math.ceil(monsterDamage / 2));
+    if (parried) {
+        playSound('parry');
+        monsterDamage = Math.max(1, Math.ceil(monsterDamage / 2));
+    }
 
     const damageTaken = Math.min(hero.hp, monsterDamage);
     hero.hp = Math.max(0, hero.hp - damageTaken);
@@ -923,6 +957,7 @@ function checkLevelUp() {
         hero.parry = Math.min(MAX_PARRY, hero.parry + 2);
         hero.stunChance = Math.min(100, hero.stunChance + 2);
 
+        playSound('levelUp');
         logMessage(t("levelUp", { level: hero.level }), "discovery");
     }
 }
