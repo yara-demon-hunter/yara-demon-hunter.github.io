@@ -35,7 +35,7 @@
         <p class="text-xs sm:text-sm text-emerald-400/80 tracking-widest uppercase mt-1" data-i18n="subtitle">Crônicas de Sobrevivência na Floresta Sombria</p>
     </header>
 
-    <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <main id="game-main" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
 
         <nav class="md:col-span-3 border-b border-fantasy-border pb-3" aria-label="Jornada" data-i18n-aria="journey">
             <h2 class="text-xs uppercase tracking-widest text-emerald-400/80 mb-2" data-i18n="journey">Jornada</h2>
@@ -54,7 +54,7 @@
         </nav>
 
         <!-- Painel de Status do Personagem -->
-        <section class="bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl">
+        <section id="hero-panel" class="bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl">
             <div>
                 <div class="flex items-center justify-between border-b border-fantasy-border pb-3 mb-4">
                     <div>
@@ -73,7 +73,7 @@
                     <div>
                         <div class="flex justify-between text-xs font-semibold mb-1">
                             <span class="text-red-400 flex items-center gap-1">❤️ HP</span>
-                            <span><span id="hero-hp">100</span> / <span id="hero-hp-max">100</span></span>
+                            <span class="flex items-center gap-2"><span><span id="hero-hp">100</span> / <span id="hero-hp-max">100</span></span><button type="button" data-upgrade="hp" onclick="purchaseUpgrade('hp')" class="skill-upgrade-button" aria-label="Melhorar HP" title="Melhorar por 100 ouro">+</button></span>
                         </div>
                         <div class="w-full bg-forest-950 rounded-full h-3.5 p-0.5 border border-fantasy-border">
                             <div id="hero-hp-bar" class="bg-gradient-to-r from-red-600 to-red-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
@@ -84,7 +84,7 @@
                     <div>
                         <div class="flex justify-between text-xs font-semibold mb-1">
                             <span class="text-blue-400 flex items-center gap-1">⚡ <span data-i18n="focus">Foco (Estamina)</span></span>
-                            <span><span id="hero-foco">50</span> / <span id="hero-foco-max">50</span></span>
+                            <span class="flex items-center gap-2"><span><span id="hero-foco">50</span> / <span id="hero-foco-max">50</span></span><button type="button" data-upgrade="foco" onclick="purchaseUpgrade('foco')" class="skill-upgrade-button" aria-label="Melhorar estamina" title="Melhorar por 100 ouro">+</button></span>
                         </div>
                         <div class="w-full bg-forest-950 rounded-full h-2.5 p-0.5 border border-fantasy-border">
                             <div id="hero-foco-bar" class="bg-gradient-to-r from-blue-600 to-cyan-400 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
@@ -104,23 +104,23 @@
                     <!-- Atributos -->
                     <div class="grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
                         <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <span class="text-gray-400 block mb-0.5">🗡️ <span data-i18n="attack">Ataque</span></span>
+                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🗡️ <span data-i18n="attack">Ataque</span><button type="button" data-upgrade="atk" onclick="purchaseUpgrade('atk')" class="skill-upgrade-button" aria-label="Melhorar ataque" title="Melhorar por 100 ouro">+</button></div>
                             <span id="hero-atk" class="font-bold text-amber-300 text-sm">14</span>
                         </div>
                         <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <span class="text-gray-400 block mb-0.5">🛡️ <span data-i18n="defense">Defesa</span></span>
+                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🛡️ <span data-i18n="defense">Defesa</span><button type="button" data-upgrade="def" onclick="purchaseUpgrade('def')" class="skill-upgrade-button" aria-label="Melhorar defesa" title="Melhorar por 100 ouro">+</button></div>
                             <span id="hero-def" class="font-bold text-blue-300 text-sm">6</span>
                         </div>
                         <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <span class="text-gray-400 block mb-0.5">⚔️ <span data-i18n="parry">Aparo</span></span>
+                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">⚔️ <span data-i18n="parry">Aparo</span><button type="button" data-upgrade="parry" onclick="purchaseUpgrade('parry')" class="skill-upgrade-button" aria-label="Melhorar aparo" title="Melhorar por 100 ouro">+</button></div>
                             <span id="hero-parry" class="font-bold text-sky-300 text-sm" aria-label="15%"><span id="hero-parry-base">15%</span><span id="hero-parry-bonus" class="hidden text-amber-300"> +5% = 20%</span></span>
                         </div>
                         <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <span class="text-gray-400 block mb-0.5">💨 <span data-i18n="evasion">Esquiva</span></span>
+                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">💨 <span data-i18n="evasion">Esquiva</span><button type="button" data-upgrade="evasion" onclick="purchaseUpgrade('evasion')" class="skill-upgrade-button" aria-label="Melhorar esquiva" title="Melhorar por 100 ouro">+</button></div>
                             <span id="hero-evasion" class="font-bold text-emerald-300 text-sm text-[10px]" aria-label="8%"><span id="hero-evasion-base">8%</span><span id="hero-evasion-bonus" class="hidden text-amber-300"> +15% = 33%</span></span>
                         </div>
                         <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <span class="text-gray-400 block mb-0.5">✨ <span data-i18n="stun">Stun</span></span>
+                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">✨ <span data-i18n="stun">Stun</span><button type="button" data-upgrade="stun" onclick="purchaseUpgrade('stun')" class="skill-upgrade-button" aria-label="Melhorar stun" title="Melhorar por 100 ouro">+</button></div>
                             <span id="hero-stun" class="font-bold text-fuchsia-300 text-sm text-[10px]" aria-label="5%"><span id="hero-stun-base">5%</span><span id="hero-stun-bonus" class="hidden text-amber-300"> +30% = 35%</span></span>
                         </div>
                     </div>
@@ -143,7 +143,7 @@
         </section>
 
         <!-- Área Central de Jogo e Combate -->
-        <section class="md:col-span-2 bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl min-h-[380px]">
+        <section id="game-panel" class="md:col-span-2 bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl min-h-[380px]">
             
             <!-- Inimigo Ativo -->
             <div id="encounter-card" class="hidden bg-forest-950/90 border border-red-900/50 rounded-xl p-3 mb-4 transition-all">
@@ -219,6 +219,24 @@
         </section>
 
     </main>
+
+    <dialog id="upgrade-dialog" class="upgrade-dialog" aria-labelledby="upgrade-dialog-title" aria-describedby="upgrade-dialog-question upgrade-dialog-effect">
+        <div class="upgrade-dialog-content">
+            <span class="upgrade-dialog-mark" aria-hidden="true">✦</span>
+            <p id="upgrade-dialog-title" class="upgrade-dialog-title" data-i18n="upgradeTitle">Aprimorar habilidade</p>
+            <h2 id="upgrade-dialog-skill" class="upgrade-dialog-skill"></h2>
+            <p id="upgrade-dialog-question" class="upgrade-dialog-question">Deseja confirmar esta melhoria?</p>
+            <p id="upgrade-dialog-effect" class="upgrade-dialog-effect"></p>
+            <div class="upgrade-dialog-details">
+                <p id="upgrade-dialog-cost"></p>
+                <p id="upgrade-dialog-balance"></p>
+            </div>
+            <div class="upgrade-dialog-actions">
+                <button id="upgrade-cancel" type="button" class="upgrade-dialog-cancel" data-i18n="upgradeCancel">Cancelar</button>
+                <button id="upgrade-confirm" type="button" class="upgrade-dialog-confirm" data-i18n="upgradeConfirm">Confirmar compra</button>
+            </div>
+        </div>
+    </dialog>
 
     <footer class="w-full max-w-4xl text-center text-xs text-gray-500 pb-2">
         <p data-i18n="footer">Yara Demon Hunter: A Vingança • Mini RPG Interativo de Navegador</p>

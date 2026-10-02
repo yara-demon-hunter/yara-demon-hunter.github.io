@@ -49,7 +49,7 @@ const translations = {
         defend: "Postura Firme",
         parryBonus: "+5% (10 Foco)",
         dodge: "Preparar Esquiva",
-        dodgeBonus: "+25% (15 Foco)",
+        dodgeBonus: "+15% (15 Foco)",
         restart: "Reiniciar jornada",
         run: "Fugir na Névoa",
         footer: "Yara Demon Hunter: A Vingança • Mini RPG Interativo de Navegador",
@@ -76,7 +76,7 @@ const translations = {
         potionHeal: "🧪 Você bebeu uma poção e recuperou <span class=\"text-emerald-400\">{amount} HP</span>.",
         potionOpening: "O monstro aproveitou o seu momento de distração!",
         alreadyRested: "Você já está com HP e Foco completos.",
-        rested: "⛺ Você gastou {cost} de ouro no acampamento. HP e Foco totalmente restaurados.",
+        rested: "⛺ Você gastou {cost} de ouro no acampamento e recuperou {hp} HP e {focus} de Foco.",
         escaped: "💨 Você conseguiu escapar correndo pela névoa densa!",
         escapeFailed: "❌ A tentativa de fuga falhou! O {monster} cortou seu caminho.",
         victory: "🎉 Vitória! Você derrotou o <span class=\"text-amber-300 font-bold\">{monster}</span>!",
@@ -86,10 +86,23 @@ const translations = {
         gameOverTitle: "Fim da jornada",
         levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Subiu de Nível!</span> Zeph alcançou o Nível {level}! Ataque, defesa, esquiva, aparo e stun aprimorados!",
         monsterDodges: "💨 O {monster} desviou do seu golpe!",
-        heroDodges: "💨 Zeph desviou do ataque do {monster}!",
+        heroDodges: "💨 Zeph desviou do ataque do {monster} e ganhou {amount} de Fúria!",
         dodgeMessage: "💨 O bônus de esquiva aumentou em {amount}% e permanece até o fim da luta!",
         noDodgeFocus: "Você precisa de 15 de Foco para preparar uma esquiva.",
-        evasionMaxed: "A chance de esquiva já está no limite de 95% nesta luta.",
+        evasionMaxed: "A chance de esquiva já está no limite de 65% nesta luta.",
+        upgradeAria: "Melhorar {skill} por {cost} de ouro",
+        hpUpgradeName: "HP máximo",
+        staminaUpgradeName: "estamina máxima",
+        upgradeSuccess: "✨ {skill} melhorado por {cost} de ouro!",
+        upgradeTitle: "Aprimorar habilidade",
+        upgradeQuestion: "Deseja confirmar esta melhoria?",
+        upgradeIncrease: "{skill} +{amount}{unit}",
+        upgradeHpBenefit: "HP máximo +{amount}; recupera {currentAmount} HP agora.",
+        upgradeStaminaBenefit: "Estamina máxima +{amount}; recupera {currentAmount} de Foco agora.",
+        upgradeCostLabel: "Custo: {cost} ouro",
+        upgradeBalanceLabel: "Ouro após a compra: {amount}",
+        upgradeCancel: "Cancelar",
+        upgradeConfirm: "Confirmar compra",
         regionArrival: "✨ Nova área descoberta: <span class=\"text-amber-300 font-bold\">{region}</span>.",
         regions: [
             { title: "Floresta Sombria", description: "🌲 O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos." },
@@ -169,7 +182,7 @@ const translations = {
         potionHeal: "🧪 You drink a potion and recover <span class=\"text-emerald-400\">{amount} HP</span>.",
         potionOpening: "The monster takes advantage of your distraction!",
         alreadyRested: "Your HP and Focus are already full.",
-        rested: "⛺ You spent {cost} gold at camp. HP and Focus are fully restored.",
+        rested: "⛺ You spent {cost} gold at camp and recovered {hp} HP and {focus} Focus.",
         escaped: "💨 You escape into the thick mist!",
         escapeFailed: "❌ You fail to escape! The {monster} cuts off your path.",
         victory: "🎉 Victory! You defeated <span class=\"text-amber-300 font-bold\">{monster}</span>!",
@@ -179,10 +192,23 @@ const translations = {
         gameOverTitle: "Journey's End",
         levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Level Up!</span> Zeph reached Level {level}! Attack, defense, evasion, parry, and stun improved!",
         monsterDodges: "💨 The {monster} dodges your attack!",
-        heroDodges: "💨 Zeph dodges the {monster}'s attack!",
+        heroDodges: "💨 Zeph dodges the {monster}'s attack and gains {amount} Fury!",
         dodgeMessage: "💨 Evasion increased by {amount}% and will last until the fight ends!",
         noDodgeFocus: "You need 15 Focus to prepare a dodge.",
         evasionMaxed: "Evasion is already at the 65% limit for this fight.",
+        upgradeAria: "Upgrade {skill} for {cost} gold",
+        hpUpgradeName: "maximum HP",
+        staminaUpgradeName: "maximum stamina",
+        upgradeSuccess: "✨ {skill} upgraded for {cost} gold!",
+        upgradeTitle: "Skill upgrade",
+        upgradeQuestion: "Confirm this improvement?",
+        upgradeIncrease: "{skill} +{amount}{unit}",
+        upgradeHpBenefit: "Maximum HP +{amount}; recover {currentAmount} HP now.",
+        upgradeStaminaBenefit: "Maximum stamina +{amount}; recover {currentAmount} Focus now.",
+        upgradeCostLabel: "Cost: {cost} gold",
+        upgradeBalanceLabel: "Gold after purchase: {amount}",
+        upgradeCancel: "Cancel",
+        upgradeConfirm: "Confirm purchase",
         regionArrival: "✨ New area discovered: <span class=\"text-amber-300 font-bold\">{region}</span>.",
         regions: [
             { title: "Dark Forest", description: "🌲 The bell rang too late. The mist hides hungry beasts and ancient secrets." },
@@ -283,6 +309,7 @@ const hero = {
 };
 
 const CAMP_COST = 50;
+const UPGRADE_COST = 100;
 const DODGE_COST = 15;
 const DODGE_BONUS = 15;
 const MAX_EVASION = 65;
@@ -290,8 +317,18 @@ const PARRY_COST = 10;
 const PARRY_BONUS = 5;
 const MAX_PARRY = 65;
 const FURY_PER_DAMAGE = 1;
+const FURY_PER_DODGE = 2;
 const CRITICAL_DAMAGE_MULTIPLIER = 2;
 const CRITICAL_STUN_BONUS = 30;
+const UPGRADE_CONFIG = Object.freeze({
+    atk: { stat: 'atk', amount: 5, nameKey: 'attack' },
+    def: { stat: 'def', amount: 5, nameKey: 'defense' },
+    parry: { stat: 'parry', amount: 5, max: MAX_PARRY, nameKey: 'parry', isPercentage: true },
+    evasion: { stat: 'evasion', amount: 5, max: MAX_EVASION, nameKey: 'evasion', isPercentage: true },
+    hp: { stat: 'maxHp', amount: 30, currentStat: 'hp', currentMaxStat: 'maxHp', currentAmount: 10, nameKey: 'hpUpgradeName', benefitKey: 'upgradeHpBenefit' },
+    foco: { stat: 'maxFoco', amount: 20, currentStat: 'foco', currentMaxStat: 'maxFoco', currentAmount: 10, nameKey: 'staminaUpgradeName', benefitKey: 'upgradeStaminaBenefit' },
+    stun: { stat: 'stunChance', amount: 1, max: 100, nameKey: 'stun', isPercentage: true }
+});
 
 const monsterPool = [
     { region: 0, name: { pt: "Lobo Sombriço", en: "Shadow Wolf" }, icon: "🐺", hp: 35, atk: 12, def: 3, parry: 15, evasion: 8, xpReward: 15, goldReward: 8 },
@@ -309,6 +346,17 @@ let inCombat = false;
 let currentRegion = 0;
 let discoveredRegions = [0];
 let gameOver = false;
+let pendingUpgrade = null;
+const upgradeDialog = document.getElementById('upgrade-dialog');
+
+document.getElementById('upgrade-cancel').addEventListener('click', () => {
+    pendingUpgrade = null;
+    upgradeDialog.close();
+});
+document.getElementById('upgrade-confirm').addEventListener('click', confirmUpgradePurchase);
+upgradeDialog.addEventListener('cancel', () => {
+    pendingUpgrade = null;
+});
 
 function updateUI() {
     document.getElementById('hero-name').innerText = hero.name;
@@ -396,6 +444,13 @@ function updateUI() {
     const explorationBanner = document.getElementById('exploration-banner');
     const campButton = document.getElementById('camp-button');
     const potionButton = document.getElementById('potion-button');
+    document.querySelectorAll('[data-upgrade]').forEach((button) => {
+        const upgrade = button.dataset.upgrade;
+        const skill = t(UPGRADE_CONFIG[upgrade].nameKey);
+        button.disabled = inCombat || gameOver || hero.gold < UPGRADE_COST || isUpgradeMaxed(upgrade);
+        button.setAttribute('aria-label', t('upgradeAria', { skill, cost: UPGRADE_COST }));
+        button.title = t('upgradeAria', { skill, cost: UPGRADE_COST });
+    });
     document.getElementById('dodge-button').disabled = evasionTotal >= MAX_EVASION;
     document.getElementById('parry-button').disabled = parryTotal >= MAX_PARRY || hero.foco < PARRY_COST;
     const restartButton = document.getElementById('restart-button');
@@ -663,7 +718,9 @@ function monsterAttackTurn() {
     const evaded = Math.random() * 100 < evasionChance;
     if (evaded) {
         hero.defending = false;
-        logMessage(t("heroDodges", { monster: currentMonster.name }), "special");
+        const furyGained = Math.min(FURY_PER_DODGE, hero.maxFury - hero.fury);
+        hero.fury += furyGained;
+        logMessage(t("heroDodges", { monster: currentMonster.name, amount: furyGained }), "special");
         updateUI();
         return;
     }
@@ -684,6 +741,66 @@ function monsterAttackTurn() {
     if (hero.hp <= 0) {
         endCombatDefeat();
     }
+}
+
+function isUpgradeMaxed(upgrade) {
+    const configuration = UPGRADE_CONFIG[upgrade];
+    return configuration?.max !== undefined && hero[configuration.stat] >= configuration.max;
+}
+
+function purchaseUpgrade(upgrade) {
+    const configuration = UPGRADE_CONFIG[upgrade];
+    if (!configuration || inCombat || gameOver || hero.gold < UPGRADE_COST || isUpgradeMaxed(upgrade)) return;
+
+    pendingUpgrade = upgrade;
+    const skill = t(configuration.nameKey);
+    const amount = configuration.max === undefined
+        ? configuration.amount
+        : Math.min(configuration.amount, configuration.max - hero[configuration.stat]);
+    const effect = configuration.benefitKey
+        ? t(configuration.benefitKey, { amount: configuration.amount, currentAmount: configuration.currentAmount })
+        : t('upgradeIncrease', {
+            skill,
+            amount,
+            unit: configuration.isPercentage ? '%' : ''
+        });
+    document.getElementById('upgrade-dialog-skill').innerText = skill;
+    document.getElementById('upgrade-dialog-effect').innerText = effect;
+    document.getElementById('upgrade-dialog-question').innerText = t('upgradeQuestion');
+    document.getElementById('upgrade-dialog-cost').innerText = t('upgradeCostLabel', { cost: UPGRADE_COST });
+    document.getElementById('upgrade-dialog-balance').innerText = t('upgradeBalanceLabel', { amount: hero.gold - UPGRADE_COST });
+    upgradeDialog.showModal();
+}
+
+function confirmUpgradePurchase() {
+    const upgrade = pendingUpgrade;
+    const configuration = UPGRADE_CONFIG[upgrade];
+    if (!configuration) return;
+    if (inCombat || gameOver || hero.gold < UPGRADE_COST || isUpgradeMaxed(upgrade)) {
+        pendingUpgrade = null;
+        upgradeDialog.close();
+        updateUI();
+        return;
+    }
+
+    const amount = configuration.max === undefined
+        ? configuration.amount
+        : Math.min(configuration.amount, configuration.max - hero[configuration.stat]);
+    hero.gold -= UPGRADE_COST;
+    hero[configuration.stat] = configuration.max === undefined
+        ? hero[configuration.stat] + amount
+        : Math.min(configuration.max, hero[configuration.stat] + amount);
+    if (configuration.currentStat) {
+        hero[configuration.currentStat] = Math.min(
+            hero[configuration.currentMaxStat],
+            hero[configuration.currentStat] + configuration.currentAmount
+        );
+    }
+    const skill = t(configuration.nameKey);
+    pendingUpgrade = null;
+    upgradeDialog.close();
+    logMessage(t('upgradeSuccess', { skill, cost: UPGRADE_COST }), 'special');
+    updateUI();
 }
 
 function updateMonsterUI() {
@@ -728,9 +845,11 @@ function restAtCamp() {
         return;
     }
     hero.gold -= CAMP_COST;
-    hero.hp = hero.maxHp;
-    hero.foco = hero.maxFoco;
-    logMessage(t("rested", { cost: CAMP_COST }), "discovery");
+    const hpRecovered = Math.min(50, hero.maxHp - hero.hp);
+    const focusRecovered = Math.min(25, hero.maxFoco - hero.foco);
+    hero.hp += hpRecovered;
+    hero.foco += focusRecovered;
+    logMessage(t("rested", { cost: CAMP_COST, hp: hpRecovered, focus: focusRecovered }), "discovery");
     updateUI();
 }
 
