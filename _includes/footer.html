@@ -1,5 +1,35 @@
 <footer class="site-footer">
 
+    <div class="site-music-player" id="site-music-player">
+        <span class="site-music-player__label">
+            <span class="site-music-player__note" aria-hidden="true">♫</span>
+            {% if page.lang == "pt" %}
+                <span>Trilha sonora</span>
+            {% else %}
+                <span>Soundtrack</span>
+            {% endif %}
+        </span>
+        <button
+            class="site-music-player__toggle"
+            id="site-music-toggle"
+            type="button"
+            aria-pressed="false"
+            {% if page.lang == "pt" %}
+                aria-label="Tocar trilha sonora" title="Tocar trilha sonora"
+            {% else %}
+                aria-label="Play soundtrack" title="Play soundtrack"
+            {% endif %}
+        >
+            <span id="site-music-icon" aria-hidden="true">▶</span>
+        </button>
+        <audio
+            id="site-music-audio"
+            src="{{ '/assets/audio/soundtrack_yara_dark_fantasy.mp3' | relative_url }}"
+            loop
+            preload="auto"
+        ></audio>
+    </div>
+
     <div class="site-footer__inner">
 
         {% if page.lang == "pt" %}
@@ -64,3 +94,5 @@
     </div>
 
 </footer>
+
+<script src="{{ '/assets/js/site-music.js' | relative_url }}" defer></script>

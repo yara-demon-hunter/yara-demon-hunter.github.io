@@ -1,0 +1,94 @@
+.site-music-player {
+    position: fixed;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 7px 8px 7px 15px;
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    background: rgba(18, 20, 25, 0.96);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    color: var(--text-soft);
+    backdrop-filter: blur(12px);
+}
+
+.site-music-player__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.site-music-player__note {
+    color: var(--accent-soft);
+    font-size: 1rem;
+}
+
+.site-music-player__toggle {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    background: var(--accent);
+    color: #15130f;
+    cursor: pointer;
+    font: inherit;
+    font-size: 1rem;
+    transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.site-music-player__toggle:hover {
+    transform: scale(1.04);
+    border-color: #dfc995;
+    background: #dfc995;
+}
+
+.site-music-player__toggle[aria-pressed="true"] {
+    background: #292b31;
+    border-color: #56575b;
+    color: #e8e5df;
+}
+
+.site-music-player__toggle:focus-visible {
+    outline: 2px solid var(--accent-soft);
+    outline-offset: 3px;
+}
+
+#site-music-audio {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .site-music-player {
+        right: max(12px, env(safe-area-inset-right));
+        bottom: max(12px, env(safe-area-inset-bottom));
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+    }
+
+    .site-music-player__label {
+        display: none;
+    }
+
+    .site-music-player__toggle {
+        width: 46px;
+        height: 46px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-music-player__toggle {
+        transition: none;
+    }
+}
