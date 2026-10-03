@@ -174,7 +174,7 @@ const translations = {
         monsterDamage: "The {monster} counterattacks for <span class=\"text-red-400 font-bold\">{damage} damage</span>!",
         noPotions: "You have no potions left!",
         hpFull: "Your HP is already full!",
-        potionHeal: "🧪 You drink a potion and recover <span class=\"text-emerald-400\">{amount} HP and {amount_foco} Foco</span>.",
+        potionHeal: "🧪 You drink a potion and recover <span class=\"text-emerald-400\">{amount} HP and {amount_foco} Focus</span>.",
         potionOpening: "The monster takes advantage of your distraction!",
         alreadyRested: "Your HP and Focus are already full.",
         rested: "⛺ You spent {cost} gold at camp and recovered {hp} HP and {focus} Focus.",
