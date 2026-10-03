@@ -914,7 +914,6 @@ function combatRun() {
     const success = Math.random() < GAME_RULES.combat.escapeSuccessChance;
     if (success) {
         logMessage(t("escaped"), "discovery");
-        hero.foco = hero.maxFoco;
         hero.fury = 0;
         hero.evasionBonus = 0;
         hero.parryBonus = 0;
@@ -933,7 +932,6 @@ function endCombatVictory() {
 
     hero.gold += currentMonster.goldReward;
     hero.xp += currentMonster.xpReward;
-    hero.foco = hero.maxFoco; // recarrega o foco
     hero.fury = 0;
     hero.evasionBonus = 0;
     hero.parryBonus = 0;
