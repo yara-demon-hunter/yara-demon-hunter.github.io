@@ -4,7 +4,7 @@ window.YaraRpgData.monsters = Object.freeze({
     minimumRolledAttribute: 1,
     variation: {
         minimum: 0.85,
-        maximum: 1.30
+        maximum: 1.40
     },
     byRegion: {
         "dark-forest": [
@@ -23,8 +23,8 @@ window.YaraRpgData.monsters = Object.freeze({
         ],
         "gudran-castle": [
             { name: { pt: "Cavaleiro de Gudran", en: "Knight of Gudran" }, icon: "🛡️", hp: 300, atk: 56, def: 11, parry: 38, evasion: 12, xpReward: 75, goldReward: 55 },
-            { name: { pt: "Sentinela das Catacumbas", en: "Catacomb Sentinel" }, icon: "💀", hp: 250, atk: 48, def: 20, parry: 40, evasion: 10, xpReward: 90, goldReward: 68 },
-            { name: { pt: "Manticora de Pedra", en: "Stone Manticore" }, icon: "🦂", hp: 155, atk: 30, def: 70, parry: 38, evasion: 16, xpReward: 110, goldReward: 82 }
+            { name: { pt: "Sentinela das Catacumbas", en: "Catacomb Sentinel" }, icon: "💀", hp: 450, atk: 30, def: 20, parry: 40, evasion: 20, xpReward: 90, goldReward: 68 },
+            { name: { pt: "Manticora de Pedra", en: "Stone Manticore" }, icon: "🦂", hp: 200, atk: 30, def: 70, parry: 38, evasion: 16, xpReward: 110, goldReward: 82 }
         ]
     }
 });
