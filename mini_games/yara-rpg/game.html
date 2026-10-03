@@ -105,28 +105,31 @@
                     </div>
 
                     <!-- Atributos -->
-                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
-                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🗡️ <span data-i18n="attack">Ataque</span><button type="button" data-upgrade="atk" onclick="purchaseUpgrade('atk')" class="skill-upgrade-button" aria-label="Melhorar ataque" title="Melhorar por 100 ouro">+</button></div>
-                            <span id="hero-atk" class="font-bold text-amber-300 text-sm">14</span>
+                    <details id="hero-attributes" class="hero-attributes">
+                        <summary data-i18n="attributes">Atributos do personagem</summary>
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
+                            <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                                <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🗡️ <span data-i18n="attack">Ataque</span><button type="button" data-upgrade="atk" onclick="purchaseUpgrade('atk')" class="skill-upgrade-button" aria-label="Melhorar ataque" title="Melhorar por 100 ouro">+</button></div>
+                                <span id="hero-atk" class="font-bold text-amber-300 text-sm">14</span>
+                            </div>
+                            <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                                <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🛡️ <span data-i18n="defense">Defesa</span><button type="button" data-upgrade="def" onclick="purchaseUpgrade('def')" class="skill-upgrade-button" aria-label="Melhorar defesa" title="Melhorar por 100 ouro">+</button></div>
+                                <span id="hero-def" class="font-bold text-blue-300 text-sm">6</span>
+                            </div>
+                            <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                                <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">⚔️ <span data-i18n="parry">Aparo</span><button type="button" data-upgrade="parry" onclick="purchaseUpgrade('parry')" class="skill-upgrade-button" aria-label="Melhorar aparo" title="Melhorar por 100 ouro">+</button></div>
+                                <span id="hero-parry" class="font-bold text-sky-300 text-sm" aria-label="15%"><span id="hero-parry-base">15%</span><span id="hero-parry-bonus" class="hidden text-amber-300"> +5% = 20%</span></span>
+                            </div>
+                            <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                                <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">💨 <span data-i18n="evasion">Esquiva</span><button type="button" data-upgrade="evasion" onclick="purchaseUpgrade('evasion')" class="skill-upgrade-button" aria-label="Melhorar esquiva" title="Melhorar por 100 ouro">+</button></div>
+                                <span id="hero-evasion" class="font-bold text-emerald-300 text-sm text-[10px]" aria-label="8%"><span id="hero-evasion-base">8%</span><span id="hero-evasion-bonus" class="hidden text-amber-300"> +15% = 33%</span></span>
+                            </div>
+                            <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
+                                <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">✨ <span data-i18n="stun">Stun</span><button type="button" data-upgrade="stun" onclick="purchaseUpgrade('stun')" class="skill-upgrade-button" aria-label="Melhorar stun" title="Melhorar por 100 ouro">+</button></div>
+                                <span id="hero-stun" class="font-bold text-fuchsia-300 text-sm text-[10px]" aria-label="5%"><span id="hero-stun-base">5%</span><span id="hero-stun-bonus" class="hidden text-amber-300"> +30% = 35%</span></span>
+                            </div>
                         </div>
-                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🛡️ <span data-i18n="defense">Defesa</span><button type="button" data-upgrade="def" onclick="purchaseUpgrade('def')" class="skill-upgrade-button" aria-label="Melhorar defesa" title="Melhorar por 100 ouro">+</button></div>
-                            <span id="hero-def" class="font-bold text-blue-300 text-sm">6</span>
-                        </div>
-                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">⚔️ <span data-i18n="parry">Aparo</span><button type="button" data-upgrade="parry" onclick="purchaseUpgrade('parry')" class="skill-upgrade-button" aria-label="Melhorar aparo" title="Melhorar por 100 ouro">+</button></div>
-                            <span id="hero-parry" class="font-bold text-sky-300 text-sm" aria-label="15%"><span id="hero-parry-base">15%</span><span id="hero-parry-bonus" class="hidden text-amber-300"> +5% = 20%</span></span>
-                        </div>
-                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">💨 <span data-i18n="evasion">Esquiva</span><button type="button" data-upgrade="evasion" onclick="purchaseUpgrade('evasion')" class="skill-upgrade-button" aria-label="Melhorar esquiva" title="Melhorar por 100 ouro">+</button></div>
-                            <span id="hero-evasion" class="font-bold text-emerald-300 text-sm text-[10px]" aria-label="8%"><span id="hero-evasion-base">8%</span><span id="hero-evasion-bonus" class="hidden text-amber-300"> +15% = 33%</span></span>
-                        </div>
-                        <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
-                            <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">✨ <span data-i18n="stun">Stun</span><button type="button" data-upgrade="stun" onclick="purchaseUpgrade('stun')" class="skill-upgrade-button" aria-label="Melhorar stun" title="Melhorar por 100 ouro">+</button></div>
-                            <span id="hero-stun" class="font-bold text-fuchsia-300 text-sm text-[10px]" aria-label="5%"><span id="hero-stun-base">5%</span><span id="hero-stun-bonus" class="hidden text-amber-300"> +30% = 35%</span></span>
-                        </div>
-                    </div>
+                    </details>
                 </div>
             </div>
 

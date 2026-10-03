@@ -21,6 +21,7 @@ const translations = {
         fury: "Fúria",
         attack: "Ataque",
         defense: "Defesa",
+        attributes: "Atributos do personagem",
         stun: "Stun",
         hp: "HP",
         attackShort: "ATQ",
@@ -122,6 +123,7 @@ const translations = {
         fury: "Fury",
         attack: "Attack",
         defense: "Defense",
+        attributes: "Character attributes",
         stun: "Stun",
         hp: "HP",
         attackShort: "ATK",
@@ -991,6 +993,8 @@ function checkLevelUp() {
         logMessage(t("levelUp", { level: hero.level }), "discovery");
     }
 }
+
+document.getElementById('hero-attributes').open = !window.matchMedia('(max-width: 640px)').matches;
 
 window.onload = function() {
     applyLanguage();

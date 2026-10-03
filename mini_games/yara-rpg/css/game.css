@@ -183,6 +183,11 @@ h1, h2, h3, .font-title {
     outline: 2px solid #d2c29c;
     outline-offset: -2px;
 }
+@media (min-width: 641px) {
+    .hero-attributes > summary {
+        display: none;
+    }
+}
 @media (max-width: 899px) {
     body.game-shell {
         justify-content: flex-start;
@@ -277,6 +282,155 @@ h1, h2, h3, .font-title {
         flex-direction: column;
         gap: 5px;
         align-items: center;
+    }
+}
+@media (max-width: 640px) {
+    body.game-shell {
+        gap: 6px;
+        padding: 8px 10px calc(250px + env(safe-area-inset-bottom));
+    }
+    header {
+        margin-bottom: 2px !important;
+    }
+    #game-nav {
+        margin-bottom: 0 !important;
+    }
+    header h1,
+    header > p {
+        display: none;
+    }
+    #game-main {
+        gap: 8px !important;
+        margin-bottom: 0 !important;
+    }
+    #hero-panel {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        order: 0;
+        flex: none;
+        padding: 10px !important;
+        border-radius: 14px;
+        background: rgba(23, 25, 31, 0.97);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(12px);
+    }
+    #hero-panel > div:first-child > div:first-child {
+        margin-bottom: 8px !important;
+        padding-bottom: 7px !important;
+    }
+    #hero-panel .space-y-3 {
+        margin-bottom: 8px !important;
+    }
+    #hero-panel .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 0.4rem !important;
+    }
+    #hero-panel .space-y-3 > div > .w-full {
+        height: 8px;
+    }
+    #hero-panel .space-y-3 > div:first-child > .w-full {
+        height: 10px;
+    }
+    .hero-attributes {
+        padding-top: 5px;
+        border-top: 1px solid rgba(41, 43, 49, 0.7);
+    }
+    .hero-attributes summary {
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        color: #a8a29e;
+        cursor: pointer;
+        font-size: 0.72rem;
+        font-weight: 600;
+        list-style: none;
+    }
+    .hero-attributes summary::-webkit-details-marker {
+        display: none;
+    }
+    .hero-attributes summary::after {
+        content: "+";
+        margin-left: auto;
+        color: #d2c29c;
+        font-size: 1rem;
+    }
+    .hero-attributes[open] summary::after {
+        content: "−";
+    }
+    #hero-panel > div:last-child {
+        padding: 7px 9px !important;
+    }
+    #hero-panel > div:last-child > div > span:first-child {
+        font-size: 1.25rem;
+    }
+    #potion-button {
+        min-height: 38px;
+        padding-inline: 14px !important;
+    }
+    #game-panel {
+        order: 1;
+        min-height: 0 !important;
+        padding: 10px !important;
+        border-radius: 14px;
+        backdrop-filter: none;
+    }
+    #game-main > nav[aria-label="Jornada"] {
+        order: 2;
+        padding-bottom: 8px;
+    }
+    #region-progress li {
+        justify-content: flex-start;
+        text-align: left;
+    }
+    #rpg-log {
+        height: 22vh !important;
+        min-height: 100px;
+        max-height: 170px;
+    }
+    #action-controls {
+        position: fixed;
+        z-index: 30;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        padding: 9px 10px calc(9px + env(safe-area-inset-bottom));
+        border-top: 1px solid rgba(92, 81, 55, 0.7);
+        background: rgba(12, 13, 15, 0.94);
+        box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(14px);
+    }
+    #action-controls:has(#controls-explore.hidden):has(#controls-combat.hidden) {
+        display: none;
+    }
+    #controls-explore {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    #controls-explore button {
+        min-height: 48px;
+        padding: 8px !important;
+        font-size: 0.72rem !important;
+    }
+    #controls-explore button:first-child,
+    #controls-explore button:last-child {
+        grid-column: 1 / -1;
+    }
+    #controls-combat {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    #controls-combat button {
+        min-height: 58px;
+        padding: 7px 5px !important;
+        font-size: 0.68rem !important;
+    }
+    #controls-combat button:last-child {
+        grid-column: 1 / -1;
+        min-height: 44px;
+    }
+    #controls-combat button span:last-child:not(:first-child) {
+        font-size: 0.58rem;
+    }
+    footer {
+        padding-bottom: 4px;
     }
 }
 @media (prefers-reduced-motion: reduce) {
