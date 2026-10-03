@@ -13,7 +13,9 @@ window.YaraRpgData.rules = Object.freeze({
             safeTrailThreshold: 90,
             foundGoldMinimum: 5,
             foundGoldRange: 10,
-            safeTrailRecovery: 30
+            safeTrailRecoveryHp: 30,
+            safeTrailRecoveryFoco: 15
+
         }
     },
     camp: {
@@ -62,7 +64,7 @@ window.YaraRpgData.rules = Object.freeze({
         xpRequirementMultiplier: 1.5
     },
     upgrades: {
-        goldCost: 100,
+        goldCost: 50,
         attributes: Object.freeze({
             atk: { stat: "atk", amount: 5, nameKey: "attack" },
             def: { stat: "def", amount: 5, nameKey: "defense" },

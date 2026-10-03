@@ -15,7 +15,7 @@ window.YaraRpgData.hero = Object.freeze({
         stunChance: 5,
         fury: 0,
         maxFury: 100,
-        gold: 15,
+        gold: 200,
         xp: 0,
         maxXp: 30
     },

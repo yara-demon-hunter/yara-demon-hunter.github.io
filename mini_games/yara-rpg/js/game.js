@@ -58,7 +58,7 @@ const translations = {
         noGold: "Você precisa de {cost} de ouro para descansar no acampamento.",
         goldFound: "Você vasculhou as margens e encontrou <span class=\"text-amber-300\">{amount} de ouro</span> esquecido na lama!",
         potionFound: "🧪 Você encontrou uma poção de cura! Estoque: <span class=\"text-emerald-300\">{potions}/{capacity}</span>.",
-        safeTrail: "✨ Você encontrou um rastro seguro e recuperou <span class=\"text-emerald-300\">{amount} HP</span> de fôlego.",
+        safeTrail: "✨ Você encontrou um rastro seguro e recuperou <span class=\"text-emerald-300\">{amount_hp} de HP and {amount_foco} de fôlego</span>.",
         denseMist: "A névoa densa dificulta a visão. Apenas o som do vento e das risadas ecoam ao longe.",
         monsterAppears: "⚠ Um perigo surgiu na escuridão: <span class=\"text-red-400 font-bold\">{monster}</span> bloqueia o caminho!",
         quickDamage: "Você desferiu um <span class=\"text-emerald-400 font-bold\">Ataque Rápido</span> causando {damage} de dano e ganhou {fury} de Fúria.",
@@ -160,7 +160,7 @@ const translations = {
         noGold: "You need {cost} gold to rest at camp.",
         goldFound: "You searched the riverbank and found <span class=\"text-amber-300\">{amount} gold</span> buried in the mud!",
         potionFound: "🧪 You found a healing potion! Inventory: <span class=\"text-emerald-300\">{potions}/{capacity}</span>.",
-        safeTrail: "✨ You found a safe trail and recovered <span class=\"text-emerald-300\">{amount} HP</span>.",
+        safeTrail: "✨ You found a safe trail and recovered <span class=\"text-emerald-300\">{amount_hp} HP and {amount_foco} Focus</span>.",
         denseMist: "The dense mist makes it hard to see. Only the wind and distant laughter answer.",
         monsterAppears: "⚠ A threat emerges from the dark: <span class=\"text-red-400 font-bold\">{monster}</span> blocks your path!",
         quickDamage: "You land a <span class=\"text-emerald-400 font-bold\">Quick Attack</span> for {damage} damage and gain {fury} Fury.",
@@ -530,9 +530,12 @@ function exploreForest() {
         logMessage(t("goldFound", { amount: goldFound }), "loot");
         updateUI();
     } else if (roll <= encounterRules.safeTrailThreshold) {
-        const healAmount = encounterRules.safeTrailRecovery;
-        hero.hp = Math.min(hero.maxHp, hero.hp + healAmount);
-        logMessage(t("safeTrail", { amount: healAmount }), "special");
+        const healAmountHp = encounterRules.safeTrailRecoveryHp;
+        const healAmountFoco = encounterRules.safeTrailRecoveryFoco;
+
+        hero.hp = Math.min(hero.maxHp, hero.hp + healAmountHp);
+        hero.foco = Math.min(hero.maxFoco, hero.foco + healAmountFoco);
+        logMessage(t("safeTrail", { amount_hp: healAmountHp, amount_foco: healAmountFoco }), "special");
         updateUI();
     } else if (hero.potions < hero.maxPotions) {
         hero.potions++;
