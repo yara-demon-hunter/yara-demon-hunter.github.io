@@ -5,6 +5,7 @@ window.YaraRpgData.items = Object.freeze({
         startingCount: 1,
         startingCapacity: 1,
         maxCapacity: 5,
-        healAmount: 45
+        healAmount: 45,
+        healFoco:20
     }
 });

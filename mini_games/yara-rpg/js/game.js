@@ -73,7 +73,7 @@ const translations = {
         monsterDamage: "O {monster} contra-atacou causando <span class=\"text-red-400 font-bold\">{damage} de dano</span>!",
         noPotions: "Você não tem poções restantes!",
         hpFull: "Seu HP já está no máximo!",
-        potionHeal: "🧪 Você bebeu uma poção e recuperou <span class=\"text-emerald-400\">{amount} HP</span>.",
+        potionHeal: "🧪 Você bebeu uma poção e recuperou <span class=\"text-emerald-400\">{amount_hp} HP and {amount_foco} Foco</span>.",
         potionOpening: "O monstro aproveitou o seu momento de distração!",
         alreadyRested: "Você já está com HP e Foco completos.",
         rested: "⛺ Você gastou {cost} de ouro no acampamento e recuperou {hp} HP e {focus} de Foco.",
@@ -174,7 +174,7 @@ const translations = {
         monsterDamage: "The {monster} counterattacks for <span class=\"text-red-400 font-bold\">{damage} damage</span>!",
         noPotions: "You have no potions left!",
         hpFull: "Your HP is already full!",
-        potionHeal: "🧪 You drink a potion and recover <span class=\"text-emerald-400\">{amount} HP</span>.",
+        potionHeal: "🧪 You drink a potion and recover <span class=\"text-emerald-400\">{amount} HP and {amount_foco} Foco</span>.",
         potionOpening: "The monster takes advantage of your distraction!",
         alreadyRested: "Your HP and Focus are already full.",
         rested: "⛺ You spent {cost} gold at camp and recovered {hp} HP and {focus} Focus.",
@@ -308,7 +308,8 @@ const hero = {
 const CAMP_COST = GAME_RULES.camp.goldCost;
 const CAMP_HP_RECOVERY = GAME_RULES.camp.hpRecovery;
 const CAMP_FOCO_RECOVERY = GAME_RULES.camp.focoRecovery;
-const POTION_HEAL_AMOUNT = ITEM_DATA.healingPotion.healAmount;
+const POTION_HEAL_AMOUNT_HP = ITEM_DATA.healingPotion.healAmount;
+const POTION_HEAL_AMOUNT_FOCO = ITEM_DATA.healingPotion.healFoco;
 const UPGRADE_COST = GAME_RULES.upgrades.goldCost;
 const DODGE_COST = GAME_RULES.combat.dodgeCost;
 const DODGE_BONUS = GAME_RULES.combat.dodgeBonus;
@@ -877,9 +878,11 @@ function usePotion() {
     }
 
     hero.potions--;
-    const heal = ITEM_DATA.healingPotion.healAmount;
+    const heal = POTION_HEAL_AMOUNT_HP;
     hero.hp = Math.min(hero.maxHp, hero.hp + heal);
-    logMessage(t("potionHeal", { amount: heal }), "discovery");
+    const foco = POTION_HEAL_AMOUNT_FOCO;
+    hero.foco = Math.min(hero.maxFoco, hero.foco + foco);
+    logMessage(t("potionHeal", { amount_hp: heal, amount_foco: foco}), "discovery");
     updateUI();
 
     if (inCombat) {
