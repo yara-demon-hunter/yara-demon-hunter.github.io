@@ -40,21 +40,21 @@ const translations = {
         openingLog: "[Início] Zeph avança sozinho pela Floresta Sombria. Mantenha sua arma em punho.",
         explore: "Explorar a Trilha na Névoa",
         camp: "Acampar e Recuperar Fôlego",
-        campCost: "(50 Ouro)",
+        campCost: "({cost} Ouro)",
         quickAttack: "Ataque Rápido",
         heavyAttack: "Estocada Pesada",
         criticalAttack: "Golpe Crítico",
         criticalRequirement: "100 Fúria",
-        focusCost: "(15 Foco)",
+        focusCost: "({cost} Foco)",
         defend: "Postura Firme",
-        parryBonus: "+5% (10 Foco)",
+        parryBonus: "+{bonus}% ({cost} Foco)",
         dodge: "Preparar Esquiva",
-        dodgeBonus: "+15% (15 Foco)",
+        dodgeBonus: "+{bonus}% ({cost} Foco)",
         restart: "Reiniciar jornada",
         run: "Fugir na Névoa",
         footer: "Yara Demon Hunter: A Vingança • Mini RPG Interativo de Navegador",
         injured: "Você está ferido demais! Descanse no acampamento.",
-        noGold: "Você precisa de 50 de ouro para descansar no acampamento.",
+        noGold: "Você precisa de {cost} de ouro para descansar no acampamento.",
         goldFound: "Você vasculhou as margens e encontrou <span class=\"text-amber-300\">{amount} de ouro</span> esquecido na lama!",
         potionFound: "🧪 Você encontrou uma poção de cura! Estoque: <span class=\"text-emerald-300\">{potions}/{capacity}</span>.",
         safeTrail: "✨ Você encontrou um rastro seguro e recuperou <span class=\"text-emerald-300\">{amount} HP</span> de fôlego.",
@@ -104,12 +104,6 @@ const translations = {
         upgradeCancel: "Cancelar",
         upgradeConfirm: "Confirmar compra",
         regionArrival: "✨ Nova área descoberta: <span class=\"text-amber-300 font-bold\">{region}</span>.",
-        regions: [
-            { title: "Floresta Sombria", description: "🌲 O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos." },
-            { title: "O Portal das Cinzas", description: "🌀 Um portal pulsa entre as árvores. Do outro lado, algo respira junto com a névoa." },
-            { title: "Vilarejo em Ruínas", description: "🔥 O vilarejo foi invadido. Portas quebradas e marcas de batalha anunciam que os invasores ainda estão por perto." },
-            { title: "Castelo de Gudran", description: "🏰 As muralhas de Gudran guardam criaturas antigas e cavaleiros que não aceitam intrusos." }
-        ]
     },
     en: {
         documentTitle: "Yara: The Bell's Rule - Mini RPG",
@@ -147,21 +141,21 @@ const translations = {
         openingLog: "[Start] Zeph ventures alone into the Dark Forest. Keep your weapon ready.",
         explore: "Explore the Misty Trail",
         camp: "Rest and Recover",
-        campCost: "(50 Gold)",
+        campCost: "({cost} Gold)",
         quickAttack: "Quick Attack",
         heavyAttack: "Heavy Strike",
         criticalAttack: "Critical Strike",
         criticalRequirement: "100 Fury",
-        focusCost: "(15 Focus)",
+        focusCost: "({cost} Focus)",
         defend: "Brace for Impact",
-        parryBonus: "+5% (10 Focus)",
+        parryBonus: "+{bonus}% ({cost} Focus)",
         dodge: "Prepare to Dodge",
-        dodgeBonus: "+15% (15 Focus)",
+        dodgeBonus: "+{bonus}% ({cost} Focus)",
         restart: "Restart journey",
         run: "Flee into the Mist",
         footer: "Yara Demon Hunter: The Vengeance • Browser Mini RPG",
         injured: "You are too badly hurt. Rest at camp.",
-        noGold: "You need 50 gold to rest at camp.",
+        noGold: "You need {cost} gold to rest at camp.",
         goldFound: "You searched the riverbank and found <span class=\"text-amber-300\">{amount} gold</span> buried in the mud!",
         potionFound: "🧪 You found a healing potion! Inventory: <span class=\"text-emerald-300\">{potions}/{capacity}</span>.",
         safeTrail: "✨ You found a safe trail and recovered <span class=\"text-emerald-300\">{amount} HP</span>.",
@@ -211,12 +205,6 @@ const translations = {
         upgradeCancel: "Cancel",
         upgradeConfirm: "Confirm purchase",
         regionArrival: "✨ New area discovered: <span class=\"text-amber-300 font-bold\">{region}</span>.",
-        regions: [
-            { title: "Dark Forest", description: "🌲 The bell rang too late. The mist hides hungry beasts and ancient secrets." },
-            { title: "The Ashen Portal", description: "🌀 A portal pulses between the trees. Something on the other side breathes with the mist." },
-            { title: "The Ruined Village", description: "🔥 The village has been invaded. Broken doors and battle scars warn that the invaders are still nearby." },
-            { title: "Gudran Castle", description: "🏰 Gudran's walls conceal ancient creatures and knights who suffer no intruders." }
-        ]
     }
 };
 
@@ -305,65 +293,35 @@ function startMusicAfterInteraction(event) {
 document.addEventListener('pointerdown', startMusicAfterInteraction);
 document.addEventListener('keydown', startMusicAfterInteraction);
 
+const GAME_DATA = window.YaraRpgData;
+const GAME_RULES = GAME_DATA.rules;
+const ITEM_DATA = GAME_DATA.items;
 const hero = {
-    name: "Zeph",
-    level: 1,
-    hp: 100,
-    maxHp: 100,
-    foco: 50,
-    maxFoco: 50,
-    atk: 14,
-    def: 6,
-    evasion: 8,
-    parry: 15,
-    stunChance: 5,
-    fury: 0,
-    maxFury: 100,
-    gold: 15,
-    xp: 0,
-    maxXp: 30,
-    potions: 1,
-    maxPotions: 1,
+    name: GAME_DATA.hero.name,
+    ...GAME_DATA.hero.initial,
+    potions: ITEM_DATA.healingPotion.startingCount,
+    maxPotions: ITEM_DATA.healingPotion.startingCapacity,
     evasionBonus: 0,
     parryBonus: 0
 };
 
-const CAMP_COST = 50;
-const UPGRADE_COST = 100;
-const DODGE_COST = 15;
-const DODGE_BONUS = 15;
-const MAX_EVASION = 65;
-const PARRY_COST = 10;
-const PARRY_BONUS = 5;
-const MAX_PARRY = 65;
-const FURY_PER_DAMAGE = 1;
-const FURY_PER_DODGE = 2;
-const CRITICAL_DAMAGE_MULTIPLIER = 2;
-const CRITICAL_STUN_BONUS = 30;
-const FURY_PER_BASIC_ATTACK_DAMAGE = 0.5;
-const UPGRADE_CONFIG = Object.freeze({
-    atk: { stat: 'atk', amount: 5, nameKey: 'attack' },
-    def: { stat: 'def', amount: 5, nameKey: 'defense' },
-    parry: { stat: 'parry', amount: 5, max: MAX_PARRY, nameKey: 'parry', isPercentage: true },
-    evasion: { stat: 'evasion', amount: 5, max: MAX_EVASION, nameKey: 'evasion', isPercentage: true },
-    hp: { stat: 'maxHp', amount: 30, currentStat: 'hp', currentMaxStat: 'maxHp', currentAmount: 10, nameKey: 'hpUpgradeName', benefitKey: 'upgradeHpBenefit' },
-    foco: { stat: 'maxFoco', amount: 20, currentStat: 'foco', currentMaxStat: 'maxFoco', currentAmount: 10, nameKey: 'staminaUpgradeName', benefitKey: 'upgradeStaminaBenefit' },
-    stun: { stat: 'stunChance', amount: 1, max: 100, nameKey: 'stun', isPercentage: true }
-});
-
-const monsterPool = [
-    { region: 0, name: { pt: "Lobo Sombriço", en: "Shadow Wolf" }, icon: "🐺", hp: 35, atk: 12, def: 3, parry: 15, evasion: 8, xpReward: 15, goldReward: 8 },
-    { region: 0, name: { pt: "Espírito do Rio", en: "River Spirit" }, icon: "👻", hp: 45, atk: 14, def: 4, parry: 18, evasion: 12, xpReward: 20, goldReward: 12 },
-    { region: 0, name: { pt: "Bruxa de Feições Cadavéricas", en: "Corpse-faced Witch" }, icon: "🧙‍♀️", hp: 60, atk: 18, def: 6, parry: 22, evasion: 10, xpReward: 30, goldReward: 20 },
-    { region: 0, name: { pt: "Criatura Corrompida das Sombras", en: "Corrupted Shadow Creature" }, icon: "👤", hp: 90, atk: 22, def: 8, parry: 25, evasion: 15, xpReward: 45, goldReward: 35 },
-    { region: 1, name: { pt: "Guardião do Portal", en: "Portal Guardian" }, icon: "🗿", hp: 85, atk: 22, def: 10, parry: 28, evasion: 8, xpReward: 38, goldReward: 24 },
-    { region: 1, name: { pt: "Espectro das Cinzas", en: "Ash Wraith" }, icon: "🌫️", hp: 70, atk: 19, def: 7, parry: 30, evasion: 22, xpReward: 36, goldReward: 28 },
-    { region: 2, name: { pt: "Saqueador da Névoa", en: "Mist Marauder" }, icon: "🪓", hp: 105, atk: 26, def: 11, parry: 35, evasion: 12, xpReward: 50, goldReward: 38 },
-    { region: 2, name: { pt: "Cavaleiro Possuído", en: "Possessed Knight" }, icon: "⚔️", hp: 125, atk: 29, def: 14, parry: 40, evasion: 10, xpReward: 60, goldReward: 45 },
-    { region: 3, name: { pt: "Cavaleiro de Gudran", en: "Knight of Gudran" }, icon: "🛡️", hp: 175, atk: 38, def: 18, parry: 42, evasion: 12, xpReward: 75, goldReward: 55 },
-    { region: 3, name: { pt: "Sentinela das Catacumbas", en: "Catacomb Sentinel" }, icon: "💀", hp: 210, atk: 42, def: 21, parry: 45, evasion: 10, xpReward: 90, goldReward: 68 },
-    { region: 3, name: { pt: "Manticora de Pedra", en: "Stone Manticore" }, icon: "🦂", hp: 245, atk: 47, def: 24, parry: 38, evasion: 18, xpReward: 110, goldReward: 82 }
-];
+const CAMP_COST = GAME_RULES.camp.goldCost;
+const CAMP_HP_RECOVERY = GAME_RULES.camp.hpRecovery;
+const CAMP_FOCO_RECOVERY = GAME_RULES.camp.focoRecovery;
+const POTION_HEAL_AMOUNT = ITEM_DATA.healingPotion.healAmount;
+const UPGRADE_COST = GAME_RULES.upgrades.goldCost;
+const DODGE_COST = GAME_RULES.combat.dodgeCost;
+const DODGE_BONUS = GAME_RULES.combat.dodgeBonus;
+const MAX_EVASION = GAME_RULES.combat.maxEvasion;
+const PARRY_COST = GAME_RULES.combat.parryCost;
+const PARRY_BONUS = GAME_RULES.combat.parryBonus;
+const MAX_PARRY = GAME_RULES.combat.maxParry;
+const FURY_PER_DAMAGE = GAME_RULES.combat.furyPerDamageTaken;
+const FURY_PER_DODGE = GAME_RULES.combat.furyPerDodge;
+const CRITICAL_DAMAGE_MULTIPLIER = GAME_RULES.combat.criticalDamageMultiplier;
+const CRITICAL_STUN_BONUS = GAME_RULES.combat.criticalStunBonus;
+const FURY_PER_BASIC_ATTACK_DAMAGE = GAME_RULES.combat.furyPerBasicAttackDamage;
+const UPGRADE_CONFIG = GAME_RULES.upgrades.attributes;
 
 let currentMonster = null;
 let inCombat = false;
@@ -393,7 +351,10 @@ function updateUI() {
     document.getElementById('hero-foco').innerText = hero.foco;
     document.getElementById('hero-foco-max').innerText = hero.maxFoco;
     document.getElementById('hero-fury').innerText = hero.fury;
-    document.getElementById('hero-fury-bar').style.width = Math.min(100, hero.fury / hero.maxFury * 100) + '%';
+    document.getElementById('hero-fury-bar').style.width = Math.min(
+        GAME_RULES.probabilityScale,
+        hero.fury / hero.maxFury * GAME_RULES.probabilityScale
+    ) + '%';
     const furyReady = hero.fury >= hero.maxFury;
     const quickAttackButton = document.getElementById('quick-attack-button');
     quickAttackButton.classList.toggle('fury-ready', furyReady);
@@ -422,7 +383,7 @@ function updateUI() {
         ? `${hero.parry}% + ${hero.parryBonus}% = ${parryTotal}%`
         : `${hero.parry}%`);
     const stunBonus = hero.fury >= hero.maxFury ? CRITICAL_STUN_BONUS : 0;
-    const stunChanceTotal = Math.min(100, hero.stunChance + stunBonus);
+    const stunChanceTotal = Math.min(GAME_RULES.probabilityScale, hero.stunChance + stunBonus);
     const stunBonusDisplay = document.getElementById('hero-stun-bonus');
     const stunDisplay = document.getElementById('hero-stun');
     document.getElementById('hero-stun-base').innerText = hero.stunChance + '%';
@@ -433,15 +394,16 @@ function updateUI() {
         : `${hero.stunChance}%`);
     document.getElementById('hero-potions').innerText = hero.potions;
     document.getElementById('hero-potions-max').innerText = hero.maxPotions;
-    document.getElementById('exploration-title').innerText = translations[gameLanguage].regions[currentRegion].title;
-    document.getElementById('exploration-description').innerText = translations[gameLanguage].regions[currentRegion].description;
+    const currentRegionData = GAME_DATA.regions[currentRegion];
+    document.getElementById('exploration-title').innerText = currentRegionData.title[gameLanguage];
+    document.getElementById('exploration-description').innerText = currentRegionData.description[gameLanguage];
 
     document.querySelectorAll('[data-region-stop]').forEach((stop) => {
         const regionIndex = Number(stop.dataset.regionStop);
         const isDiscovered = discoveredRegions.includes(regionIndex);
         const isCurrent = regionIndex === currentRegion;
         stop.querySelector('.region-stop-name').innerText = isDiscovered
-            ? translations[gameLanguage].regions[regionIndex].title
+            ? GAME_DATA.regions[regionIndex].title[gameLanguage]
             : '???';
         stop.querySelector('.region-stop-marker').innerText = isCurrent ? '●' : isDiscovered ? '✓' : '?';
         stop.classList.toggle('border-emerald-500/70', isCurrent);
@@ -456,10 +418,16 @@ function updateUI() {
         ? t('discoveryChance', { chance: nextDiscoveryChance })
         : t('journeyComplete');
 
-    const hpPercent = Math.max(0, Math.min(100, (hero.hp / hero.maxHp) * 100));
+    const hpPercent = Math.max(0, Math.min(
+        GAME_RULES.probabilityScale,
+        (hero.hp / hero.maxHp) * GAME_RULES.probabilityScale
+    ));
     document.getElementById('hero-hp-bar').style.width = hpPercent + '%';
 
-    const focoPercent = Math.max(0, Math.min(100, (hero.foco / hero.maxFoco) * 100));
+    const focoPercent = Math.max(0, Math.min(
+        GAME_RULES.probabilityScale,
+        (hero.foco / hero.maxFoco) * GAME_RULES.probabilityScale
+    ));
     document.getElementById('hero-foco-bar').style.width = focoPercent + '%';
 
     const exploreControls = document.getElementById('controls-explore');
@@ -468,6 +436,18 @@ function updateUI() {
     const explorationBanner = document.getElementById('exploration-banner');
     const campButton = document.getElementById('camp-button');
     const potionButton = document.getElementById('potion-button');
+    document.querySelector('[data-i18n="campCost"]').innerText = t('campCost', { cost: CAMP_COST });
+    document.querySelector('[data-i18n="focusCost"]').innerText = t('focusCost', {
+        cost: GAME_RULES.combat.heavyAttack.focoCost
+    });
+    document.querySelector('[data-i18n="parryBonus"]').innerText = t('parryBonus', {
+        bonus: PARRY_BONUS,
+        cost: PARRY_COST
+    });
+    document.querySelector('[data-i18n="dodgeBonus"]').innerText = t('dodgeBonus', {
+        bonus: DODGE_BONUS,
+        cost: DODGE_COST
+    });
     document.querySelectorAll('[data-upgrade]').forEach((button) => {
         const upgrade = button.dataset.upgrade;
         const skill = t(UPGRADE_CONFIG[upgrade].nameKey);
@@ -536,17 +516,18 @@ function exploreForest() {
         return;
     }
 
-    const roll = Math.floor(Math.random() * 100) + 1;
+    const encounterRules = GAME_RULES.exploration.encounters;
+    const roll = Math.floor(Math.random() * GAME_RULES.probabilityScale) + 1;
 
-    if (roll <= 50) {
+    if (roll <= encounterRules.monsterThreshold) {
         spawnMonster();
-    } else if (roll <= 75) {
-        const goldFound = Math.floor(Math.random() * 10) + 5;
+    } else if (roll <= encounterRules.goldThreshold) {
+        const goldFound = Math.floor(Math.random() * encounterRules.foundGoldRange) + encounterRules.foundGoldMinimum;
         hero.gold += goldFound;
         logMessage(t("goldFound", { amount: goldFound }), "loot");
         updateUI();
-    } else if (roll <= 90) {
-        const healAmount = 30;
+    } else if (roll <= encounterRules.safeTrailThreshold) {
+        const healAmount = encounterRules.safeTrailRecovery;
         hero.hp = Math.min(hero.maxHp, hero.hp + healAmount);
         logMessage(t("safeTrail", { amount: healAmount }), "special");
         updateUI();
@@ -560,35 +541,45 @@ function exploreForest() {
 }
 
 function getDiscoveryChance() {
-    if (currentRegion >= translations[gameLanguage].regions.length - 1) return 0;
-    return Math.min(45, 3 + (hero.level - 1) * 3 + currentRegion * 4);
+    const explorationRules = GAME_RULES.exploration;
+    if (currentRegion >= GAME_DATA.regions.length - 1) return 0;
+    return Math.min(
+        explorationRules.maxDiscoveryChance,
+        explorationRules.discoveryBaseChance
+            + (hero.level - 1) * explorationRules.discoveryChancePerLevel
+            + currentRegion * explorationRules.discoveryChancePerRegion
+    );
 }
 
 function tryDiscoverRegion() {
-    if (Math.random() * 100 >= getDiscoveryChance()) return false;
+    if (Math.random() * GAME_RULES.probabilityScale >= getDiscoveryChance()) return false;
 
     currentRegion++;
     discoveredRegions.push(currentRegion);
-    logMessage(t("regionArrival", { region: translations[gameLanguage].regions[currentRegion].title }), "discovery");
+    logMessage(t("regionArrival", { region: GAME_DATA.regions[currentRegion].title[gameLanguage] }), "discovery");
     return true;
 }
 
 function spawnMonster() {
-    const availableMonsters = monsterPool.filter(m => m.region === currentRegion);
-    const template = availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
-    
-    const scaleFactor = 1 + (hero.level - 1) * 0.2;
+    const regionId = GAME_DATA.regions[currentRegion].id;
+    const regionMonsters = GAME_DATA.monsters.byRegion[regionId];
+    const template = regionMonsters[Math.floor(Math.random() * regionMonsters.length)];
+    const variation = GAME_DATA.monsters.variation.minimum
+        + Math.random() * (GAME_DATA.monsters.variation.maximum - GAME_DATA.monsters.variation.minimum);
+    const vary = (value) => Math.max(GAME_DATA.monsters.minimumRolledAttribute, Math.round(value * variation));
+    const monsterHp = vary(template.hp);
+
     currentMonster = {
         name: template.name[gameLanguage],
         icon: template.icon,
-        hp: Math.floor(template.hp * scaleFactor),
-        maxHp: Math.floor(template.hp * scaleFactor),
-        atk: Math.floor(template.atk * scaleFactor),
-        def: Math.floor(template.def * scaleFactor),
-        parry: template.parry,
-        evasion: template.evasion,
-        xpReward: Math.floor(template.xpReward * scaleFactor),
-        goldReward: Math.floor(template.goldReward * scaleFactor)
+        hp: monsterHp,
+        maxHp: monsterHp,
+        atk: vary(template.atk),
+        def: vary(template.def),
+        parry: vary(template.parry),
+        evasion: vary(template.evasion),
+        xpReward: vary(template.xpReward),
+        goldReward: vary(template.goldReward)
     };
 
     inCombat = true;
@@ -609,9 +600,12 @@ function spawnMonster() {
 }
 
 function applyMonsterParry(damage) {
-    if (Math.random() * 100 >= currentMonster.parry) return damage;
+    if (Math.random() * GAME_RULES.probabilityScale >= currentMonster.parry) return damage;
 
-    const reducedDamage = Math.max(1, Math.ceil(damage / 2));
+    const reducedDamage = Math.max(
+        GAME_RULES.combat.minimumDamageAfterParry,
+        Math.ceil(damage * GAME_RULES.combat.monsterParryDamageMultiplier)
+    );
     logMessage(t('monsterParries', { monster: currentMonster.name, damage: reducedDamage }), 'special');
     return reducedDamage;
 }
@@ -624,8 +618,8 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     hero.fury += furyGained;
     logMessage(t(messageKey, { damage: damageDealt, fury: furyGained }), "combat-hero");
 
-    const stunChance = Math.min(100, hero.stunChance + criticalStunBonus);
-    const stunned = currentMonster.hp > 0 && Math.random() * 100 < stunChance;
+    const stunChance = Math.min(GAME_RULES.probabilityScale, hero.stunChance + criticalStunBonus);
+    const stunned = currentMonster.hp > 0 && Math.random() * GAME_RULES.probabilityScale < stunChance;
     if (stunned) logMessage(t("stunLanded"), "special");
     checkCombatProgress(stunned);
 }
@@ -639,33 +633,45 @@ function combatQuickAttack() {
     }
     playSound('basicAttack');
 
-    if (Math.random() * 100 < currentMonster.evasion) {
+    if (Math.random() * GAME_RULES.probabilityScale < currentMonster.evasion) {
         logMessage(t("monsterDodges", { monster: currentMonster.name }), "special");
         checkCombatProgress();
         return;
     }
 
-    let damage = Math.max(4, Math.floor(hero.atk * 0.8) - currentMonster.def + Math.floor(Math.random() * 4));
+    const attackRules = GAME_RULES.combat.quickAttack;
+    const damage = Math.max(
+        attackRules.minimumDamage,
+        Math.floor(hero.atk * attackRules.attackMultiplier)
+            - currentMonster.def
+            + Math.floor(Math.random() * attackRules.randomBonusRange)
+    );
     resolveHeroAttack(damage, "quickDamage", 0, FURY_PER_BASIC_ATTACK_DAMAGE);
 }
 
 // NOVO GOLPE: Estocada Pesada (Gasta Foco, dano alto)
 function combatHeavyAttack() {
     if (!inCombat || !currentMonster) return;
-    if (hero.foco < 15) {
+    const attackRules = GAME_RULES.combat.heavyAttack;
+    if (hero.foco < attackRules.focoCost) {
         logMessage(t("noFocus"));
         return;
     }
-    hero.foco -= 15;
+    hero.foco -= attackRules.focoCost;
     playSound('specialAttack');
 
-    if (Math.random() * 100 < currentMonster.evasion) {
+    if (Math.random() * GAME_RULES.probabilityScale < currentMonster.evasion) {
         logMessage(t("monsterDodges", { monster: currentMonster.name }), "special");
         checkCombatProgress();
         return;
     }
 
-    let damage = Math.max(8, Math.floor(hero.atk * 1.5) - currentMonster.def + Math.floor(Math.random() * 6));
+    const damage = Math.max(
+        attackRules.minimumDamage,
+        Math.floor(hero.atk * attackRules.attackMultiplier)
+            - currentMonster.def
+            + Math.floor(Math.random() * attackRules.randomBonusRange)
+    );
     resolveHeroAttack(damage, "heavyDamage");
 }
 
@@ -675,13 +681,19 @@ function combatCriticalAttack() {
     hero.fury = 0;
     playSound('specialAttack');
     updateUI();
-    if (Math.random() * 100 < currentMonster.evasion) {
+    if (Math.random() * GAME_RULES.probabilityScale < currentMonster.evasion) {
         logMessage(t("monsterDodges", { monster: currentMonster.name }), "special");
         checkCombatProgress();
         return;
     }
 
-    const damage = Math.max(8, Math.floor(hero.atk * CRITICAL_DAMAGE_MULTIPLIER) - currentMonster.def + Math.floor(Math.random() * 6));
+    const attackRules = GAME_RULES.combat.criticalAttack;
+    const damage = Math.max(
+        attackRules.minimumDamage,
+        Math.floor(hero.atk * CRITICAL_DAMAGE_MULTIPLIER)
+            - currentMonster.def
+            + Math.floor(Math.random() * attackRules.randomBonusRange)
+    );
     resolveHeroAttack(damage, "criticalDamage", CRITICAL_STUN_BONUS);
 }
 
@@ -703,7 +715,7 @@ function combatDefend() {
 
     setTimeout(() => {
         if (inCombat && currentMonster) monsterAttackTurn();
-    }, 400);
+    }, GAME_RULES.combat.actionDelayMs);
     updateUI();
 }
 
@@ -725,7 +737,7 @@ function combatDodge() {
 
     setTimeout(() => {
         if (inCombat && currentMonster) monsterAttackTurn();
-    }, 400);
+    }, GAME_RULES.combat.actionDelayMs);
     updateUI();
 }
 
@@ -738,14 +750,14 @@ function checkCombatProgress(monsterStunned = false) {
     if (monsterStunned) return;
     setTimeout(() => {
         if (inCombat && currentMonster) monsterAttackTurn();
-    }, 500);
+    }, GAME_RULES.combat.responseDelayMs);
 }
 
 function monsterAttackTurn() {
     if (!inCombat || !currentMonster) return;
 
     const evasionChance = Math.min(MAX_EVASION, hero.evasion + hero.evasionBonus);
-    const evaded = Math.random() * 100 < evasionChance;
+    const evaded = Math.random() * GAME_RULES.probabilityScale < evasionChance;
     if (evaded) {
         playSound('dodge');
         hero.defending = false;
@@ -756,12 +768,19 @@ function monsterAttackTurn() {
         return;
     }
 
-    let monsterDamage = Math.max(2, currentMonster.atk - hero.def + Math.floor(Math.random() * 4));
+    const attackRules = GAME_RULES.combat.monsterAttack;
+    let monsterDamage = Math.max(
+        attackRules.minimumDamage,
+        currentMonster.atk - hero.def + Math.floor(Math.random() * attackRules.randomBonusRange)
+    );
     const parryChance = Math.min(MAX_PARRY, hero.parry + hero.parryBonus);
-    const parried = Math.random() * 100 < parryChance;
+    const parried = Math.random() * GAME_RULES.probabilityScale < parryChance;
     if (parried) {
         playSound('parry');
-        monsterDamage = Math.max(1, Math.ceil(monsterDamage / 2));
+        monsterDamage = Math.max(
+            GAME_RULES.combat.minimumDamageAfterParry,
+            Math.ceil(monsterDamage * GAME_RULES.combat.monsterParryDamageMultiplier)
+        );
     }
 
     const damageTaken = Math.min(hero.hp, monsterDamage);
@@ -839,7 +858,10 @@ function confirmUpgradePurchase() {
 
 function updateMonsterUI() {
     document.getElementById('monster-hp').innerText = currentMonster.hp;
-    const hpPercent = Math.max(0, Math.min(100, (currentMonster.hp / currentMonster.maxHp) * 100));
+    const hpPercent = Math.max(0, Math.min(
+        GAME_RULES.probabilityScale,
+        (currentMonster.hp / currentMonster.maxHp) * GAME_RULES.probabilityScale
+    ));
     document.getElementById('monster-hp-bar').style.width = hpPercent + '%';
 }
 
@@ -855,7 +877,7 @@ function usePotion() {
     }
 
     hero.potions--;
-    const heal = 45;
+    const heal = ITEM_DATA.healingPotion.healAmount;
     hero.hp = Math.min(hero.maxHp, hero.hp + heal);
     logMessage(t("potionHeal", { amount: heal }), "discovery");
     updateUI();
@@ -864,14 +886,14 @@ function usePotion() {
         logMessage(t("potionOpening"));
         setTimeout(() => {
             if (inCombat && currentMonster) monsterAttackTurn();
-        }, 400);
+        }, GAME_RULES.combat.actionDelayMs);
     }
 }
 
 function restAtCamp() {
     if (inCombat || gameOver) return;
     if (hero.gold < CAMP_COST) {
-        logMessage(t("noGold"));
+        logMessage(t("noGold", { cost: CAMP_COST }));
         return;
     }
     if (hero.hp >= hero.maxHp && hero.foco >= hero.maxFoco) {
@@ -879,8 +901,8 @@ function restAtCamp() {
         return;
     }
     hero.gold -= CAMP_COST;
-    const hpRecovered = Math.min(50, hero.maxHp - hero.hp);
-    const focusRecovered = Math.min(25, hero.maxFoco - hero.foco);
+    const hpRecovered = Math.min(CAMP_HP_RECOVERY, hero.maxHp - hero.hp);
+    const focusRecovered = Math.min(CAMP_FOCO_RECOVERY, hero.maxFoco - hero.foco);
     hero.hp += hpRecovered;
     hero.foco += focusRecovered;
     logMessage(t("rested", { cost: CAMP_COST, hp: hpRecovered, focus: focusRecovered }), "discovery");
@@ -889,7 +911,7 @@ function restAtCamp() {
 
 function combatRun() {
     if (!inCombat) return;
-    const success = Math.random() < 0.7;
+    const success = Math.random() < GAME_RULES.combat.escapeSuccessChance;
     if (success) {
         logMessage(t("escaped"), "discovery");
         hero.foco = hero.maxFoco;
@@ -942,20 +964,27 @@ function restartGame() {
 
 function checkLevelUp() {
     while (hero.xp >= hero.maxXp) {
+        const growth = GAME_DATA.hero.levelUp;
         hero.level++;
         hero.xp -= hero.maxXp;
-        hero.maxXp = Math.floor(hero.maxXp * 1.5);
+        hero.maxXp = Math.floor(hero.maxXp * GAME_RULES.progression.xpRequirementMultiplier);
         
-        hero.maxHp += 25;
+        hero.maxHp += growth.maxHp;
         hero.hp = hero.maxHp;
-        hero.maxFoco += 15;
+        hero.maxFoco += growth.maxFoco;
         hero.foco = hero.maxFoco;
-        hero.maxPotions = Math.min(5, hero.maxPotions + 1);
-        hero.atk += 4;
-        hero.def += 2;
-        hero.evasion = Math.min(40, hero.evasion + 2);
-        hero.parry = Math.min(MAX_PARRY, hero.parry + 2);
-        hero.stunChance = Math.min(100, hero.stunChance + 2);
+        hero.maxPotions = Math.min(
+            ITEM_DATA.healingPotion.maxCapacity,
+            hero.maxPotions + growth.maxPotions
+        );
+        hero.atk += growth.atk;
+        hero.def += growth.def;
+        hero.evasion = Math.min(growth.evasionLimit, hero.evasion + growth.evasion);
+        hero.parry = Math.min(MAX_PARRY, hero.parry + growth.parry);
+        hero.stunChance = Math.min(
+            GAME_RULES.probabilityScale,
+            hero.stunChance + growth.stunChance
+        );
 
         playSound('levelUp');
         logMessage(t("levelUp", { level: hero.level }), "discovery");
