@@ -66,12 +66,12 @@ window.YaraRpgData.rules = Object.freeze({
     upgrades: {
         goldCost: 50,
         attributes: Object.freeze({
-            atk: { stat: "atk", amount: 5, nameKey: "attack" },
-            def: { stat: "def", amount: 5, nameKey: "defense" },
-            parry: { stat: "parry", amount: 5, max: 65, nameKey: "parry", isPercentage: true },
-            evasion: { stat: "evasion", amount: 5, max: 65, nameKey: "evasion", isPercentage: true },
-            hp: { stat: "maxHp", amount: 30, currentStat: "hp", currentMaxStat: "maxHp", currentAmount: 10, nameKey: "hpUpgradeName", benefitKey: "upgradeHpBenefit" },
-            foco: { stat: "maxFoco", amount: 20, currentStat: "foco", currentMaxStat: "maxFoco", currentAmount: 10, nameKey: "staminaUpgradeName", benefitKey: "upgradeStaminaBenefit" },
+            atk: { stat: "atk", amount: 2, nameKey: "attack" },
+            def: { stat: "def", amount: 2, nameKey: "defense" },
+            parry: { stat: "parry", amount: 3, max: 65, nameKey: "parry", isPercentage: true },
+            evasion: { stat: "evasion", amount: 3, max: 65, nameKey: "evasion", isPercentage: true },
+            hp: { stat: "maxHp", amount: 50, currentStat: "hp", currentMaxStat: "maxHp", currentAmount: 25, nameKey: "hpUpgradeName", benefitKey: "upgradeHpBenefit" },
+            foco: { stat: "maxFoco", amount: 25, currentStat: "foco", currentMaxStat: "maxFoco", currentAmount: 10, nameKey: "staminaUpgradeName", benefitKey: "upgradeStaminaBenefit" },
             stun: { stat: "stunChance", amount: 1, max: 100, nameKey: "stun", isPercentage: true }
         })
     }
