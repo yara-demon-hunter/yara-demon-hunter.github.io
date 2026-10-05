@@ -3,10 +3,10 @@ window.YaraRpgData = window.YaraRpgData || {};
 window.YaraRpgData.rules = Object.freeze({
     probabilityScale: 100,
     exploration: {
-        discoveryBaseChance: 3,
-        discoveryChancePerLevel: 3,
-        discoveryChancePerRegion: 4,
-        maxDiscoveryChance: 45,
+        discoveryBaseChance: 1,
+        discoveryChancePerLevel: 2,
+        discoveryChancePerRegion: 2,
+        maxDiscoveryChance: 25,
         encounters: {
             monsterThreshold: 50,
             goldThreshold: 75,
