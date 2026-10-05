@@ -287,7 +287,7 @@ h1, h2, h3, .font-title {
 @media (max-width: 640px) {
     body.game-shell {
         gap: 6px;
-        padding: 8px 10px calc(250px + env(safe-area-inset-bottom));
+        padding: 8px 10px calc(150px + env(safe-area-inset-bottom));
     }
     header {
         margin-bottom: 2px !important;
@@ -415,16 +415,24 @@ h1, h2, h3, .font-title {
         grid-column: 1 / -1;
     }
     #controls-combat {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 5px;
     }
     #controls-combat button {
-        min-height: 58px;
-        padding: 7px 5px !important;
-        font-size: 0.68rem !important;
+        grid-column: span 2;
+        min-height: 52px;
+        padding: 4px 3px !important;
+        border-radius: 9px;
+        font-size: 0.62rem !important;
+        line-height: 1.15;
+        gap: 2px;
+    }
+    #controls-combat button:nth-child(4) {
+        grid-column: 2 / span 2;
     }
     #controls-combat button:last-child {
-        grid-column: 1 / -1;
-        min-height: 44px;
+        grid-column: 4 / span 2;
+        min-height: 10px;
     }
     #controls-combat button span:last-child:not(:first-child) {
         font-size: 0.58rem;
