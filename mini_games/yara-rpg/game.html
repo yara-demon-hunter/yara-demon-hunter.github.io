@@ -232,7 +232,16 @@
             <p id="upgrade-dialog-title" class="upgrade-dialog-title" data-i18n="upgradeTitle">Aprimorar habilidade</p>
             <h2 id="upgrade-dialog-skill" class="upgrade-dialog-skill"></h2>
             <p id="upgrade-dialog-question" class="upgrade-dialog-question">Deseja confirmar esta melhoria?</p>
-            <p id="upgrade-dialog-effect" class="upgrade-dialog-effect"></p>
+            <div class="upgrade-quantity">
+                <label for="upgrade-quantity" data-i18n="upgradeQuantity">Quantidade de melhorias</label>
+                <div class="upgrade-quantity-controls">
+                    <button id="upgrade-quantity-decrease" type="button" data-i18n-aria="upgradeQuantityDecrease" aria-label="Diminuir quantidade">−</button>
+                    <input id="upgrade-quantity" type="number" min="1" step="1" value="1" inputmode="numeric" data-i18n-aria="upgradeQuantity" aria-label="Quantidade de melhorias">
+                    <button id="upgrade-quantity-increase" type="button" data-i18n-aria="upgradeQuantityIncrease" aria-label="Aumentar quantidade">+</button>
+                </div>
+                <p id="upgrade-quantity-maximum" aria-live="polite"></p>
+            </div>
+            <p id="upgrade-dialog-effect" class="upgrade-dialog-effect" aria-live="polite"></p>
             <div class="upgrade-dialog-details">
                 <p id="upgrade-dialog-cost"></p>
                 <p id="upgrade-dialog-balance"></p>

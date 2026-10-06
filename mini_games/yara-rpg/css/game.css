@@ -92,6 +92,58 @@ h1, h2, h3, .font-title {
     color: #c3c4bf;
     font-size: 0.9rem;
 }
+.upgrade-quantity {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    color: #c3c4bf;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+.upgrade-quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.upgrade-quantity-controls button {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid #806a39;
+    border-radius: 9px;
+    background: #30291b;
+    color: #fbbf24;
+    cursor: pointer;
+    font: inherit;
+    font-size: 1.25rem;
+}
+.upgrade-quantity-controls button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+.upgrade-quantity-controls input {
+    width: 68px;
+    height: 36px;
+    border: 1px solid #655633;
+    border-radius: 8px;
+    background: #121416;
+    color: #fff1c2;
+    font: inherit;
+    font-size: 1rem;
+    text-align: center;
+}
+.upgrade-quantity-controls button:focus-visible,
+.upgrade-quantity-controls input:focus-visible {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+}
+.upgrade-quantity p {
+    margin: 0;
+    color: #aeb2af;
+    font-size: 0.75rem;
+}
 .upgrade-dialog-effect {
     margin: 0;
     padding: 12px;
