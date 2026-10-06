@@ -28,7 +28,7 @@ As faixas caíram no chão.
 
 Sob elas, antigas marcas de queimaduras percorriam a pele em linhas irregulares.
 
-Então direcionou a mão para para o chão, como se sacasse uma espada.
+Então direcionou a mão para o chão, como se sacasse uma espada.
 
 Os dedos permaneceram estendidos e unidos, rígidos, enquanto o polegar se dobrava contra a palma.
 
@@ -38,9 +38,9 @@ Um formato de espada começou a se formar.
 
 Não havia metal.
 
-A espada era feita de energia espectral inquieta. Sua borda pareciam evaporar no ar, como chamas que nunca se apagavam, enquanto sombras percorriam seu interior.
+A espada era feita de energia espectral inquieta. Sua extremidade parecia evaporar no ar, como chamas que nunca se apagavam, enquanto sombras percorriam seu interior.
 
-Por um instante, rostos assustados surgiram em formato de chamas.
+Por um instante, rostos assustados surgiram em formato de chamas e se dispersavam no ar.
 
 Bocas abertas, olhos arregalados, como se gritassem por socorro.
 
