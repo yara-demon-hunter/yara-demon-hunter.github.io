@@ -12,6 +12,8 @@ Abra `/mini_games/yara-rpg/game.html`. A página também pode ser aberta diretam
 
 Os menus do site abrem o jogo no idioma da página (`?lang=pt` ou `?lang=en`). O seletor PT/EN no jogo também permite trocar o idioma; a troca reinicia a partida.
 
+A página do jogo usa o layout base do site, que centraliza a verificação do Bing, o Google Analytics 4 e o Google AdSense para todas as páginas.
+
 ## Estrutura
 
 - `game.html`: página completa e ponto de entrada do RPG.
@@ -19,7 +21,7 @@ Os menus do site abrem o jogo no idioma da página (`?lang=pt` ou `?lang=en`). O
 - `css/embedded-rpg.css`: estilos do fragmento HTML legado.
 - `js/game.js`: estado do personagem, exploração, combate e atualização da interface.
 - `js/tailwind.config.js`: cores customizadas usadas pelas classes Tailwind.
-- `components/yara-rpg.html`: fragmento antigo para incorporação; não é usado pela página completa.
+- `components/yara-rpg.html`: fragmento antigo para incorporação; não é usado pela página completa nem publicado como página.
 
 ## Estado do componente
 

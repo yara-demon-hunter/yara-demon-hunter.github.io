@@ -14,3 +14,4 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
+  - mini_games/yara-rpg/components/yara-rpg.html

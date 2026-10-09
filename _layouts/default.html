@@ -1,52 +1,61 @@
 <!DOCTYPE html>
-<html lang="{% if page.lang == 'pt' %}pt-BR{% else %}en{% endif %}">
+<html lang="{% if page.lang == 'pt' %}pt-BR{% else %}en{% endif %}"{% if page.game_page %} class="dark"{% endif %}>
 <head>
-
-
-    <!-- Google Analytics G4 - Google tag (gtag.js) -->
-    {% include google-analytics.html %}
-
-
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Importing Bing & Google tags -->
+    {% include head-resources.html %}
     {% include seo-meta.html %}
 
-    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-    {% if page.full_width %}
-        <link rel="stylesheet" href="{{ '/assets/css/legal.css' | relative_url }}">
+    {% if page.game_page %}
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="{{ '/mini_games/yara-rpg/js/tailwind.config.js' | relative_url }}"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ '/mini_games/yara-rpg/css/game.css' | relative_url }}">
+    {% else %}
+        <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+        {% if page.full_width %}
+            <link rel="stylesheet" href="{{ '/assets/css/legal.css' | relative_url }}">
+        {% endif %}
+        {% if page.chapter_type %}
+            <script src="{{ '/assets/js/book-reader.js' | relative_url }}" defer></script>
+        {% endif %}
     {% endif %}
 </head>
 
-    <body>
+<body{% if page.game_page %} class="game-shell min-h-screen flex flex-col items-center justify-between p-3 sm:p-6"{% endif %}>
 
-    <a class="skip-link" href="#main-content">
-        {% if page.lang == "pt" %}Pular para o conteúdo{% else %}Skip to content{% endif %}
-    </a>
+    {% unless page.game_page %}
+        <a class="skip-link" href="#main-content">
+            {% if page.lang == "pt" %}Pular para o conteúdo{% else %}Skip to content{% endif %}
+        </a>
 
-    {% unless page.url == "/" %}
-        {% include header.html %}
-    {% endunless %}
-
-    <main id="main-content"{% if page.full_width %} class="main--full-width"{% endif %}>
-
-        {{ content }}
-
-        {% unless page.layout == "legal" or page.layout == "copyright" %}
-            {% include last-updated.html %}
+        {% unless page.url == "/" %}
+            {% include header.html %}
         {% endunless %}
 
-        {% if page.chapter_type %}
-            {% include chapter-navigation.html %}
-        {% endif %}
+        <main id="main-content"{% if page.full_width %} class="main--full-width"{% endif %}>
 
-    </main>
+            {{ content }}
 
-    <footer>
+            {% unless page.layout == "legal" or page.layout == "copyright" %}
+                {% include last-updated.html %}
+            {% endunless %}
+
+            {% if page.chapter_type %}
+                {% include chapter-navigation.html %}
+            {% endif %}
+
+        </main>
+
         {% include footer.html %}
-    </footer>
+    {% else %}
+        {{ content }}
+    {% endunless %}
 
-    <script src="{{ '/assets/js/site-nav.js' | relative_url }}" defer></script>
+    {% unless page.game_page %}
+        <script src="{{ '/assets/js/site-nav.js' | relative_url }}" defer></script>
+    {% endunless %}
 </body>
 </html>

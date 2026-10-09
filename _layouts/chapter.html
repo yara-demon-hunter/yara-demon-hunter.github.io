@@ -1,42 +1,6 @@
-<!DOCTYPE html>
-
-<html lang="{% if page.lang == 'pt' %}pt-BR{% else %}en{% endif %}">
-
-<head>
-
-    <!-- Google Analytics G4 - Google tag (gtag.js) -->
-    {% include google-analytics.html %}
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    {% include seo-meta.html %}
-
-    <link
-        rel="stylesheet"
-        href="{{ '/assets/css/main.css' | relative_url }}"
-    >
-
-    <script
-        src="{{ '/assets/js/book-reader.js' | relative_url }}"
-        defer
-    ></script>
-
-    <script src="{{ '/assets/js/site-nav.js' | relative_url }}" defer></script>
-
-</head>
-
-<body>
-
-<a class="skip-link" href="#main-content">
-    {% if page.lang == "pt" %}Pular para o conteúdo{% else %}Skip to content{% endif %}
-</a>
-
-{% include header.html %}
-
-<main id="main-content">
-
+---
+layout: default
+---
 
 <article class="chapter">
 
@@ -113,14 +77,6 @@
 
 </article>
 
-{% include last-updated.html %}
-
-
-<!-- CHAPTER NAVIGATION -->
-
-{% include chapter-navigation.html %}
-
-
 <!-- SUPPORT -->
 
 <section class="chapter-support">
@@ -150,12 +106,3 @@
     {% include kofi-button.html %}
 
 </section>
-
-
-</main>
-
-{% include footer.html %}
-
-</body>
-
-</html>
