@@ -94,20 +94,11 @@ const translations = {
         upgradeAria: "Melhorar {skill} por {cost} de ouro",
         hpUpgradeName: "HP máximo",
         staminaUpgradeName: "estamina máxima",
-        upgradeSuccess: "✨ {skill} melhorado {amount}x por {cost} de ouro!",
-        upgradeTitle: "Aprimorar habilidade",
-        upgradeQuestion: "Deseja confirmar esta melhoria?",
-        upgradeQuantity: "Quantidade de melhorias",
-        upgradeQuantityDecrease: "Diminuir quantidade",
-        upgradeQuantityIncrease: "Aumentar quantidade",
-        upgradeMaximumLabel: "Máximo possível: {amount}",
-        upgradeIncrease: "{skill} +{amount}{unit}",
-        upgradeHpBenefit: "HP máximo +{amount}; recupera {currentAmount} HP agora.",
-        upgradeStaminaBenefit: "Estamina máxima +{amount}; recupera {currentAmount} de Foco agora.",
-        upgradeCostLabel: "Custo: {cost} ouro",
-        upgradeBalanceLabel: "Ouro após a compra: {amount}",
-        upgradeCancel: "Cancelar",
-        upgradeConfirm: "Confirmar compra",
+        upgradeChoicesLabel: "Opções de melhoria",
+        upgradeQuantityAria: "Melhorar {skill} {amount} vezes",
+        upgradeMax: "Máx",
+        upgradeSuccess: "✨ {skill}: +{amount}{unit} ({quantity}x). Ouro gasto: {cost}.",
+        upgradeRecovery: " Recuperou também +{amount} {stat}.",
         regionArrival: "✨ Nova área descoberta: <span class=\"text-amber-300 font-bold\">{region}</span>.",
     },
     en: {
@@ -200,20 +191,11 @@ const translations = {
         upgradeAria: "Upgrade {skill} for {cost} gold",
         hpUpgradeName: "maximum HP",
         staminaUpgradeName: "maximum stamina",
-        upgradeSuccess: "✨ {skill} improved {amount}x for {cost} gold!",
-        upgradeTitle: "Skill upgrade",
-        upgradeQuestion: "Confirm this improvement?",
-        upgradeQuantity: "Number of upgrades",
-        upgradeQuantityDecrease: "Decrease quantity",
-        upgradeQuantityIncrease: "Increase quantity",
-        upgradeMaximumLabel: "Maximum available: {amount}",
-        upgradeIncrease: "{skill} +{amount}{unit}",
-        upgradeHpBenefit: "Maximum HP +{amount}; recover {currentAmount} HP now.",
-        upgradeStaminaBenefit: "Maximum stamina +{amount}; recover {currentAmount} Focus now.",
-        upgradeCostLabel: "Cost: {cost} gold",
-        upgradeBalanceLabel: "Gold after purchase: {amount}",
-        upgradeCancel: "Cancel",
-        upgradeConfirm: "Confirm purchase",
+        upgradeChoicesLabel: "Upgrade options",
+        upgradeQuantityAria: "Upgrade {skill} {amount} times",
+        upgradeMax: "Max",
+        upgradeSuccess: "✨ {skill}: +{amount}{unit} ({quantity}x). Gold spent: {cost}.",
+        upgradeRecovery: " Also recovered +{amount} {stat}.",
         regionArrival: "✨ New area discovered: <span class=\"text-amber-300 font-bold\">{region}</span>.",
     }
 };
@@ -339,23 +321,20 @@ let inCombat = false;
 let currentRegion = 0;
 let discoveredRegions = [0];
 let gameOver = false;
-let pendingUpgrade = null;
-const upgradeDialog = document.getElementById('upgrade-dialog');
-const upgradeQuantityInput = document.getElementById('upgrade-quantity');
+let openUpgradeOptions = null;
 
-document.getElementById('upgrade-cancel').addEventListener('click', () => {
-    pendingUpgrade = null;
-    upgradeDialog.close();
+document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('[data-upgrade-control]')) return;
+    closeUpgradeOptions();
 });
-document.getElementById('upgrade-confirm').addEventListener('click', confirmUpgradePurchase);
-upgradeQuantityInput.addEventListener('input', updateUpgradePreview);
-document.getElementById('upgrade-quantity-decrease').addEventListener('click', () => changeUpgradeQuantity(-1));
-document.getElementById('upgrade-quantity-increase').addEventListener('click', () => changeUpgradeQuantity(1));
-upgradeDialog.addEventListener('cancel', () => {
-    pendingUpgrade = null;
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeUpgradeOptions();
 });
 
 function updateUI() {
+    if (inCombat || gameOver) openUpgradeOptions = null;
+
     document.getElementById('hero-name').innerText = hero.name;
     document.getElementById('hero-level').innerText = hero.level;
     document.getElementById('hero-gold').innerText = hero.gold;
@@ -466,9 +445,32 @@ function updateUI() {
     document.querySelectorAll('[data-upgrade]').forEach((button) => {
         const upgrade = button.dataset.upgrade;
         const skill = t(UPGRADE_CONFIG[upgrade].nameKey);
-        button.disabled = inCombat || gameOver || hero.gold < UPGRADE_COST || isUpgradeMaxed(upgrade);
+        const maximum = getMaxUpgradeQuantity(upgrade);
+        const disabled = inCombat || gameOver || maximum < 1 || isUpgradeMaxed(upgrade);
+        button.disabled = disabled;
         button.setAttribute('aria-label', t('upgradeAria', { skill, cost: UPGRADE_COST }));
         button.title = t('upgradeAria', { skill, cost: UPGRADE_COST });
+        button.setAttribute('aria-expanded', String(openUpgradeOptions === upgrade && !disabled));
+
+        const options = document.querySelector(`[data-upgrade-options="${upgrade}"]`);
+        options.hidden = openUpgradeOptions !== upgrade || disabled;
+        options.querySelectorAll('[data-upgrade-quantity]').forEach((option) => {
+            const quantity = option.dataset.upgradeQuantity === 'max'
+                ? maximum
+                : Number(option.dataset.upgradeQuantity);
+            option.disabled = quantity < 1 || quantity > maximum;
+            if (option.dataset.upgradeQuantity !== 'max') {
+                option.setAttribute('aria-label', t('upgradeQuantityAria', {
+                    skill,
+                    amount: quantity
+                }));
+            } else {
+                option.setAttribute('aria-label', t('upgradeQuantityAria', {
+                    skill,
+                    amount: maximum
+                }));
+            }
+        });
     });
     document.getElementById('dodge-button').disabled = evasionTotal >= MAX_EVASION;
     document.getElementById('parry-button').disabled = parryTotal >= MAX_PARRY || hero.foco < PARRY_COST;
@@ -830,87 +832,47 @@ function getMaxUpgradeQuantity(upgrade) {
     return Math.min(affordableQuantity, Math.ceil(remaining / configuration.amount));
 }
 
-function changeUpgradeQuantity(amount) {
-    const currentQuantity = Number(upgradeQuantityInput.value) || 1;
-    upgradeQuantityInput.value = currentQuantity + amount;
-    updateUpgradePreview();
-}
-
-function updateUpgradePreview() {
-    if (!pendingUpgrade) return;
-
-    const { key: upgrade } = pendingUpgrade;
-    const configuration = UPGRADE_CONFIG[upgrade];
-    const maximum = getMaxUpgradeQuantity(upgrade);
-    const requestedQuantity = Number(upgradeQuantityInput.value);
-    const quantity = Math.min(maximum, Math.max(1, Number.isFinite(requestedQuantity)
-        ? Math.floor(requestedQuantity)
-        : 1));
-    const amount = configuration.max === undefined
-        ? configuration.amount * quantity
-        : Math.min(configuration.amount * quantity, configuration.max - hero[configuration.stat]);
-    const totalCost = quantity * UPGRADE_COST;
-    const skill = t(configuration.nameKey);
-    const effect = configuration.benefitKey
-        ? t(configuration.benefitKey, {
-            amount,
-            currentAmount: Math.min(
-                configuration.currentAmount * quantity,
-                Math.max(0, hero[configuration.currentMaxStat] + amount - hero[configuration.currentStat])
-            )
-        })
-        : t('upgradeIncrease', {
-            skill,
-            amount,
-            unit: configuration.isPercentage ? '%' : ''
-        });
-
-    pendingUpgrade.quantity = quantity;
-    upgradeQuantityInput.min = 1;
-    upgradeQuantityInput.max = Math.max(1, maximum);
-    upgradeQuantityInput.value = quantity;
-    document.getElementById('upgrade-quantity-maximum').innerText = t('upgradeMaximumLabel', {
-        amount: maximum
+function closeUpgradeOptions() {
+    openUpgradeOptions = null;
+    document.querySelectorAll('[data-upgrade-options]').forEach((options) => {
+        options.hidden = true;
     });
-    document.getElementById('upgrade-quantity-decrease').disabled = quantity <= 1;
-    document.getElementById('upgrade-quantity-increase').disabled = quantity >= maximum;
-    document.getElementById('upgrade-dialog-effect').innerText = effect;
-    document.getElementById('upgrade-dialog-cost').innerText = t('upgradeCostLabel', { cost: totalCost });
-    document.getElementById('upgrade-dialog-balance').innerText = t('upgradeBalanceLabel', {
-        amount: hero.gold - totalCost
+    document.querySelectorAll('[data-upgrade]').forEach((button) => {
+        button.setAttribute('aria-expanded', 'false');
     });
 }
 
-function purchaseUpgrade(upgrade) {
+function toggleUpgradeOptions(upgrade) {
     const configuration = UPGRADE_CONFIG[upgrade];
     if (!configuration || inCombat || gameOver || getMaxUpgradeQuantity(upgrade) < 1 || isUpgradeMaxed(upgrade)) return;
 
-    pendingUpgrade = { key: upgrade, quantity: 1 };
-    const skill = t(configuration.nameKey);
-    document.getElementById('upgrade-dialog-skill').innerText = skill;
-    document.getElementById('upgrade-dialog-question').innerText = t('upgradeQuestion');
-    upgradeQuantityInput.value = 1;
-    updateUpgradePreview();
-    upgradeDialog.showModal();
+    openUpgradeOptions = openUpgradeOptions === upgrade ? null : upgrade;
+    updateUI();
 }
 
-function confirmUpgradePurchase() {
-    const upgrade = pendingUpgrade?.key;
+function purchaseUpgrade(upgrade, requestedQuantity) {
     const configuration = UPGRADE_CONFIG[upgrade];
     if (!configuration) return;
     const maxQuantity = getMaxUpgradeQuantity(upgrade);
-    const quantity = Math.min(pendingUpgrade.quantity, maxQuantity);
-    if (inCombat || gameOver || quantity < 1 || isUpgradeMaxed(upgrade)) {
-        pendingUpgrade = null;
-        upgradeDialog.close();
-        updateUI();
-        return;
-    }
+    const quantity = requestedQuantity === 'max'
+        ? maxQuantity
+        : Number(requestedQuantity);
+    if (
+        inCombat
+        || gameOver
+        || !Number.isInteger(quantity)
+        || quantity < 1
+        || quantity > maxQuantity
+        || isUpgradeMaxed(upgrade)
+    ) return;
 
     const amount = configuration.max === undefined
         ? configuration.amount * quantity
         : Math.min(configuration.amount * quantity, configuration.max - hero[configuration.stat]);
     const totalCost = quantity * UPGRADE_COST;
+    const previousCurrentValue = configuration.currentStat
+        ? hero[configuration.currentStat]
+        : 0;
     hero.gold -= totalCost;
     hero[configuration.stat] = configuration.max === undefined
         ? hero[configuration.stat] + amount
@@ -922,9 +884,23 @@ function confirmUpgradePurchase() {
         );
     }
     const skill = t(configuration.nameKey);
-    pendingUpgrade = null;
-    upgradeDialog.close();
-    logMessage(t('upgradeSuccess', { skill, amount: quantity, cost: totalCost }), 'special');
+    const recoveredAmount = configuration.currentStat
+        ? hero[configuration.currentStat] - previousCurrentValue
+        : 0;
+    const recoveryMessage = recoveredAmount > 0
+        ? t('upgradeRecovery', {
+            amount: recoveredAmount,
+            stat: t(configuration.currentStat === 'hp' ? 'hp' : 'focus')
+        })
+        : '';
+    closeUpgradeOptions();
+    logMessage(t('upgradeSuccess', {
+        skill,
+        amount,
+        unit: configuration.isPercentage ? '%' : '',
+        quantity,
+        cost: totalCost
+    }) + recoveryMessage, 'special');
     updateUI();
 }
 
