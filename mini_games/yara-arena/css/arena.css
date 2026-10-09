@@ -1,0 +1,693 @@
+.arena-shell {
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse at 50% -20%, rgba(94, 61, 36, 0.33), transparent 55%),
+        #101112;
+    color: #e9e3d8;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.arena-app {
+    width: min(100% - 32px, 1120px);
+    margin: 0 auto;
+    padding: 18px 0 36px;
+}
+
+.arena-topbar,
+.battle-topline,
+.arena-selection-status,
+.team-heading,
+.action-panel__heading,
+.battle-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.arena-back {
+    color: #d5c5a2;
+    font-size: 0.88rem;
+    text-decoration: none;
+}
+
+.arena-back:hover {
+    color: #f4d181;
+}
+
+.arena-language {
+    display: flex;
+    gap: 4px;
+}
+
+.arena-language button {
+    min-width: 38px;
+    min-height: 34px;
+    border: 1px solid #373531;
+    border-radius: 7px;
+    background: #1a1a19;
+    color: #bcb5a8;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.75rem;
+}
+
+.arena-language button[aria-pressed="true"] {
+    border-color: #a8884d;
+    color: #f4d181;
+}
+
+.arena-heading {
+    max-width: 720px;
+    margin: clamp(34px, 7vh, 72px) auto 34px;
+    text-align: center;
+}
+
+.arena-eyebrow {
+    margin: 0 0 8px;
+    color: #d4ae69;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+
+.arena-heading h1,
+.battle-topline h1 {
+    margin: 0;
+    color: #f2e7d2;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    line-height: 1.1;
+}
+
+.arena-heading > p:last-child {
+    color: #aaa59b;
+    line-height: 1.6;
+}
+
+.arena-selection-status {
+    max-width: 840px;
+    margin: 0 auto 12px;
+    color: #aaa59b;
+    font-size: 0.9rem;
+}
+
+.arena-selection-status strong {
+    color: #efd18d;
+    font-variant-numeric: tabular-nums;
+}
+
+.roster-grid {
+    display: grid;
+    max-width: 840px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0 auto;
+}
+
+.roster-card {
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+    padding: 0;
+    border: 1px solid #373531;
+    border-radius: 13px;
+    background: #1a1b1a;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.roster-card:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: #8f7545;
+}
+
+.roster-card[aria-pressed="true"] {
+    border-color: #e1b95f;
+    box-shadow: 0 0 0 1px #e1b95f, 0 0 24px rgba(225, 185, 95, 0.15);
+}
+
+.roster-card:disabled:not([aria-pressed="true"]) {
+    cursor: not-allowed;
+    opacity: 0.48;
+}
+
+.fighter-art {
+    display: grid;
+    height: 180px;
+    place-items: center;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 35%, rgba(157, 115, 67, 0.26), transparent 57%),
+        #131414;
+    color: #ddbd77;
+    font-size: 4rem;
+}
+
+.fighter-art img,
+.fighter-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 28%;
+}
+
+.roster-card__body {
+    padding: 12px;
+}
+
+.roster-card__body strong,
+.roster-card__body span {
+    display: block;
+}
+
+.roster-card__body strong {
+    color: #eee2cc;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1.08rem;
+}
+
+.roster-card__body span {
+    margin-top: 5px;
+    color: #aaa59b;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+.arena-primary-button,
+.arena-secondary-button {
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.arena-primary-button {
+    display: block;
+    min-width: 190px;
+    margin: 24px auto 0;
+    border: 1px solid #bd9853;
+    background: #47361e;
+    color: #f5d995;
+}
+
+.arena-primary-button:hover:not(:disabled) {
+    background: #5d4827;
+}
+
+.arena-primary-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.battle-topline {
+    margin: 30px 0 20px;
+}
+
+.battle-topline h1 {
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+}
+
+.turn-clock {
+    display: grid;
+    min-width: 92px;
+    justify-items: center;
+    padding: 8px 12px;
+    border: 1px solid #4b4332;
+    border-radius: 12px;
+    background: #1a1a18;
+    color: #d9bd7b;
+}
+
+.turn-clock span,
+.turn-clock small {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.turn-clock strong {
+    font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+}
+
+.turn-clock.is-urgent {
+    border-color: #9d4540;
+    color: #ff8d7d;
+}
+
+.battle-board {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 76px minmax(0, 1fr);
+    align-items: stretch;
+    gap: 14px;
+}
+
+.team-column {
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid #333330;
+    border-radius: 14px;
+    background: linear-gradient(150deg, #1b1c1a, #141515);
+}
+
+.team-column--player {
+    border-top: 2px solid #78957c;
+}
+
+.team-column--enemy {
+    border-top: 2px solid #a85851;
+}
+
+.team-heading {
+    justify-content: flex-start;
+    margin-bottom: 12px;
+}
+
+.team-side-mark {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid #514937;
+    border-radius: 50%;
+    color: #d9bd7b;
+    font-family: 'Cinzel', Georgia, serif;
+}
+
+.team-heading h2,
+.action-panel h2 {
+    margin: 0;
+    color: #eee2cc;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1rem;
+}
+
+.team-heading p {
+    margin: 3px 0 0;
+    color: #99958d;
+    font-size: 0.7rem;
+}
+
+.fighter-list {
+    display: grid;
+    gap: 10px;
+}
+
+.fighter-card {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 74px minmax(0, 1fr);
+    gap: 12px;
+    padding: 8px;
+    border: 1px solid #353431;
+    border-radius: 10px;
+    background: #111313;
+    color: inherit;
+    text-align: left;
+}
+
+button.fighter-card {
+    cursor: pointer;
+}
+
+button.fighter-card:hover:not(:disabled) {
+    border-color: #c69e54;
+}
+
+.fighter-card.is-active {
+    border-color: #e0b95f;
+    box-shadow: 0 0 0 1px rgba(224, 185, 95, 0.4);
+}
+
+.fighter-card.is-target {
+    border-color: #e27868;
+    box-shadow: 0 0 0 1px rgba(226, 120, 104, 0.4);
+    cursor: crosshair;
+}
+
+.fighter-card.is-defeated {
+    filter: grayscale(1);
+    opacity: 0.45;
+}
+
+.fighter-card.is-stunned::after {
+    grid-column: 1 / -1;
+    color: #dcbf75;
+    content: "✦ STUNNED";
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+}
+
+.fighter-card:disabled {
+    cursor: default;
+}
+
+.fighter-portrait {
+    display: grid;
+    width: 74px;
+    height: 82px;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 7px;
+    background: radial-gradient(circle, #493c2a, #171817 70%);
+    color: #e2c783;
+    font-size: 2.2rem;
+}
+
+.fighter-info {
+    min-width: 0;
+    align-self: center;
+}
+
+.fighter-info__name {
+    display: block;
+    overflow: hidden;
+    color: #eee2cc;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 0.9rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fighter-info__role {
+    display: block;
+    margin: 2px 0 8px;
+    color: #aaa59b;
+    font-size: 0.65rem;
+}
+
+.meter-row {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr) 48px;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+    color: #b5b0a7;
+    font-size: 0.62rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.meter {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #30302d;
+}
+
+.meter span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    transition: width 180ms ease;
+}
+
+.meter--hp span {
+    background: linear-gradient(90deg, #a8413d, #e56d56);
+}
+
+.meter--focus span {
+    background: linear-gradient(90deg, #397a8d, #73c8c5);
+}
+
+.fighter-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 7px;
+    color: #8e8a82;
+    font-size: 0.58rem;
+}
+
+.battle-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #a89260;
+}
+
+.battle-center__rune {
+    font-size: 1.2rem;
+}
+
+.battle-center__vs {
+    color: #e4c477;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1.4rem;
+}
+
+.battle-center__round {
+    writing-mode: vertical-rl;
+    color: #88847c;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+}
+
+.action-panel {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid #393732;
+    border-radius: 14px;
+    background: #171817;
+}
+
+.action-panel__heading {
+    margin-bottom: 12px;
+}
+
+.action-panel__heading .arena-eyebrow {
+    margin-bottom: 3px;
+}
+
+.active-fighter-label {
+    margin: 0;
+    color: #d9bd7b;
+    font-size: 0.75rem;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.move-button {
+    display: grid;
+    min-height: 82px;
+    justify-items: start;
+    gap: 3px;
+    padding: 10px;
+    border: 1px solid #403d35;
+    border-radius: 9px;
+    background: #20211e;
+    color: #eee2cc;
+    cursor: pointer;
+    text-align: left;
+}
+
+.move-button:hover:not(:disabled),
+.move-button.is-selected {
+    border-color: #b49353;
+    background: #30291e;
+}
+
+.move-button > span {
+    color: #dfbc6a;
+}
+
+.move-button strong {
+    font-size: 0.76rem;
+}
+
+.move-button small {
+    color: #a19c92;
+    font-size: 0.62rem;
+}
+
+.move-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.battle-prompt {
+    min-height: 1.4em;
+    margin: 10px 0;
+    color: #cdb87e;
+    font-size: 0.76rem;
+    text-align: center;
+}
+
+.battle-log {
+    display: grid;
+    max-height: 132px;
+    gap: 5px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #2f302d;
+    border-radius: 8px;
+    background: #101111;
+    color: #b5b0a7;
+    font-size: 0.7rem;
+    line-height: 1.45;
+}
+
+.battle-log p {
+    margin: 0;
+}
+
+.battle-log p:first-child {
+    color: #e4cf9b;
+}
+
+.battle-footer {
+    margin-top: 12px;
+    color: #88847c;
+    font-size: 0.64rem;
+}
+
+.arena-secondary-button {
+    min-height: 34px;
+    border: 1px solid #46443d;
+    background: #222320;
+    color: #c9c2b5;
+    font-size: 0.7rem;
+}
+
+.arena-secondary-button:hover {
+    border-color: #a8884d;
+    color: #f4d181;
+}
+
+.arena-app button:focus-visible {
+    outline: 2px solid #f4d181;
+    outline-offset: 2px;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 760px) {
+    .roster-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .fighter-art {
+        height: 150px;
+    }
+
+    .battle-board {
+        grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+        gap: 6px;
+    }
+
+    .team-column {
+        padding: 8px;
+    }
+
+    .team-heading {
+        gap: 7px;
+    }
+
+    .team-side-mark {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+
+    .team-heading h2 {
+        font-size: 0.76rem;
+    }
+
+    .team-heading p {
+        font-size: 0.58rem;
+    }
+
+    .fighter-card {
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 6px;
+        padding: 5px;
+    }
+
+    .fighter-portrait {
+        width: 48px;
+        height: 62px;
+        font-size: 1.6rem;
+    }
+
+    .fighter-info__name {
+        font-size: 0.68rem;
+    }
+
+    .fighter-info__role,
+    .fighter-stats {
+        font-size: 0.52rem;
+    }
+
+    .meter-row {
+        grid-template-columns: 16px minmax(0, 1fr);
+        font-size: 0.54rem;
+    }
+
+    .meter-row > span:last-child {
+        grid-column: 2;
+        margin-top: -4px;
+        text-align: right;
+    }
+
+    .battle-center {
+        gap: 6px;
+    }
+
+    .battle-center__rune {
+        font-size: 0.8rem;
+    }
+
+    .battle-center__vs {
+        font-size: 0.92rem;
+    }
+
+    .action-panel {
+        padding: 10px;
+    }
+
+    .action-buttons {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .move-button {
+        min-height: 68px;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 420px) {
+    .arena-app {
+        width: min(100% - 20px, 1120px);
+    }
+
+    .battle-topline {
+        gap: 8px;
+    }
+
+    .turn-clock {
+        min-width: 74px;
+        padding: 6px;
+    }
+
+    .team-heading {
+        align-items: flex-start;
+    }
+
+    .team-heading p {
+        max-width: 75px;
+    }
+}

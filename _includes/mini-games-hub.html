@@ -1,0 +1,54 @@
+<section class="mini-games-hub">
+    <header class="mini-games-hub__intro">
+        {% if page.lang == "pt" %}
+            <p class="section-label">Yara Demon Hunter</p>
+            <h1>Mini Games</h1>
+            <p>Escolha uma aventura e entre na Floresta Sombria.</p>
+        {% else %}
+            <p class="section-label">Yara Demon Hunter</p>
+            <h1>Mini Games</h1>
+            <p>Choose an adventure and enter the Dark Forest.</p>
+        {% endif %}
+    </header>
+
+    <div class="mini-games-hub__grid">
+        <article class="mini-game-card mini-game-card--rpg">
+            <div class="mini-game-card__art" role="img" aria-label="{% if page.lang == 'pt' %}Retrato de Yara{% else %}Portrait of Yara{% endif %}"></div>
+            <div class="mini-game-card__body">
+                {% if page.lang == "pt" %}
+                    <p class="mini-game-card__eyebrow">Jogo 1 · Solo</p>
+                    <h2>RPG: A Regra do Sino</h2>
+                    <p>Explore a floresta, enfrente criaturas e fortaleça Zeph neste RPG de sobrevivência.</p>
+                    <a class="mini-game-card__button" href="{{ '/mini_games/yara-rpg/game.html?lang=pt' | relative_url }}">Jogar RPG</a>
+                {% else %}
+                    <p class="mini-game-card__eyebrow">Game 1 · Single-player</p>
+                    <h2>RPG: The Bell's Rule</h2>
+                    <p>Explore the forest, fight creatures, and strengthen Zeph in this survival RPG.</p>
+                    <a class="mini-game-card__button" href="{{ '/mini_games/yara-rpg/game.html?lang=en' | relative_url }}">Play RPG</a>
+                {% endif %}
+            </div>
+        </article>
+
+        <article class="mini-game-card mini-game-card--arena">
+            <div class="mini-game-card__art" role="img" aria-label="{% if page.lang == 'pt' %}Arena de batalha da Floresta Sombria{% else %}Dark Forest battle arena{% endif %}"></div>
+            <div class="mini-game-card__body">
+                {% if page.lang == "pt" %}
+                    <p class="mini-game-card__eyebrow">Jogo 2 · Protótipo local</p>
+                    <h2>Arena da Floresta</h2>
+                    <p>Monte uma equipe de dois e enfrente a equipe rival em um duelo por turnos.</p>
+                    <a class="mini-game-card__button" href="{{ '/mini_games/yara-arena/?lang=pt' | relative_url }}">Entrar na arena</a>
+                {% else %}
+                    <p class="mini-game-card__eyebrow">Game 2 · Local prototype</p>
+                    <h2>Dark Forest Arena</h2>
+                    <p>Build a team of two and face a rival squad in a turn-based duel.</p>
+                    <a class="mini-game-card__button" href="{{ '/mini_games/yara-arena/?lang=en' | relative_url }}">Enter the arena</a>
+                {% endif %}
+            </div>
+        </article>
+    </div>
+
+    <nav class="mini-games-hub__language" aria-label="{% if page.lang == 'pt' %}Idioma{% else %}Language{% endif %}">
+        <a href="{{ '/pt/mini-games/' | relative_url }}"{% if page.lang == "pt" %} aria-current="page"{% endif %}>Português</a>
+        <a href="{{ '/en/mini-games/' | relative_url }}"{% if page.lang != "pt" %} aria-current="page"{% endif %}>English</a>
+    </nav>
+</section>

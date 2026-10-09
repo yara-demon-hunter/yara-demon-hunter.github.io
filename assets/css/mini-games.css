@@ -1,0 +1,128 @@
+.mini-games-hub {
+    width: min(100% - 40px, 1040px);
+    margin: 0 auto;
+    padding: clamp(42px, 7vw, 88px) 0;
+}
+
+.mini-games-hub__intro {
+    max-width: 660px;
+    margin-bottom: 36px;
+}
+
+.mini-games-hub__intro h1 {
+    margin: 8px 0;
+    color: #f3e8d0;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: clamp(2.3rem, 5vw, 4rem);
+}
+
+.mini-games-hub__intro > p:last-child {
+    color: #b7b2a8;
+    font-size: 1.08rem;
+}
+
+.mini-games-hub__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.mini-game-card {
+    overflow: hidden;
+    border: 1px solid rgba(195, 164, 102, 0.25);
+    border-radius: 18px;
+    background: linear-gradient(145deg, #1a1c1d, #111314);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.23);
+}
+
+.mini-game-card__art {
+    min-height: 245px;
+    background-color: #171819;
+    background-position: center 36%;
+    background-size: cover;
+}
+
+.mini-game-card--rpg .mini-game-card__art {
+    background-image: linear-gradient(0deg, rgba(15, 17, 17, 0.58), transparent 70%), url('/assets/images/common/characters/yara/yara_portrait.jpeg');
+}
+
+.mini-game-card--arena .mini-game-card__art {
+    background-image: linear-gradient(0deg, rgba(15, 17, 17, 0.5), rgba(15, 17, 17, 0.05)), url('/assets/images/common/characters/mysterious_creature/mysterious_creature.jpeg');
+}
+
+.mini-game-card__body {
+    padding: 24px;
+}
+
+.mini-game-card__eyebrow {
+    margin: 0 0 8px;
+    color: #d3ad60;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.mini-game-card__body h2 {
+    margin: 0 0 10px;
+    color: #f3e8d0;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+}
+
+.mini-game-card__body > p:not(.mini-game-card__eyebrow) {
+    min-height: 3.2em;
+    color: #b7b2a8;
+    line-height: 1.6;
+}
+
+.mini-game-card__button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 0 18px;
+    border: 1px solid #a78342;
+    border-radius: 9px;
+    background: #392d1b;
+    color: #f1d28e;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.mini-game-card__button:hover {
+    border-color: #e5bc67;
+    background: #51401f;
+}
+
+.mini-games-hub__language {
+    display: flex;
+    justify-content: flex-end;
+    gap: 18px;
+    margin-top: 26px;
+}
+
+.mini-games-hub__language a {
+    color: #b7b2a8;
+    text-decoration: none;
+}
+
+.mini-games-hub__language a[aria-current="page"] {
+    color: #e5bc67;
+}
+
+@media (max-width: 720px) {
+    .mini-games-hub {
+        width: min(100% - 28px, 560px);
+    }
+
+    .mini-games-hub__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mini-game-card__art {
+        min-height: 210px;
+    }
+}

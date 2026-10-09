@@ -1,0 +1,105 @@
+---
+layout: default
+title: "Dark Forest Arena"
+description: "Build a squad and fight a turn-based duel in the Dark Forest."
+lang: en
+game_page: true
+arena_game: true
+permalink: /mini_games/yara-arena/
+---
+
+<main id="arena-app" class="arena-app">
+    <header class="arena-topbar">
+        <a id="arena-back" class="arena-back" href="/en/mini-games/">← <span data-copy="back">All mini games</span></a>
+        <div class="arena-language" aria-label="Language">
+            <button type="button" data-language="pt">PT</button>
+            <button type="button" data-language="en">EN</button>
+        </div>
+    </header>
+
+    <section id="team-select" class="arena-screen">
+        <div class="arena-heading">
+            <p class="arena-eyebrow" data-copy="prototype">LOCAL PROTOTYPE · NO ONLINE PLAY YET</p>
+            <h1 data-copy="title">Dark Forest Arena</h1>
+            <p data-copy="intro">Choose two fighters. The remaining two will form the rival team.</p>
+        </div>
+
+        <div class="arena-selection-status">
+            <span data-copy="chooseTwo">Choose 2 fighters</span>
+            <strong><span id="selected-count">0</span> / 2</strong>
+        </div>
+        <div id="roster-grid" class="roster-grid"></div>
+        <button id="start-match" class="arena-primary-button" type="button" disabled data-copy="startMatch">Start duel</button>
+    </section>
+
+    <section id="battle-screen" class="arena-screen" hidden>
+        <div class="battle-topline">
+            <div>
+                <p class="arena-eyebrow" data-copy="battleLabel">DARK FOREST · LOCAL MATCH</p>
+                <h1 id="battle-title" data-copy="battleTitle">The bell has rung</h1>
+            </div>
+            <div class="turn-clock" role="timer" aria-live="off">
+                <span id="turn-label">YOUR TURN</span>
+                <strong id="turn-timer">20</strong>
+                <small data-copy="seconds">SECONDS</small>
+            </div>
+        </div>
+
+        <div class="battle-board">
+            <section class="team-column team-column--player" aria-labelledby="player-team-name">
+                <header class="team-heading">
+                    <span class="team-side-mark" aria-hidden="true">I</span>
+                    <div><h2 id="player-team-name" data-copy="yourTeam">Your team</h2><p data-copy="chooseFighter">Choose an active fighter</p></div>
+                </header>
+                <div id="player-team" class="fighter-list"></div>
+            </section>
+
+            <div class="battle-center">
+                <span class="battle-center__rune" aria-hidden="true">✦</span>
+                <span class="battle-center__vs">VS</span>
+                <span id="round-label" class="battle-center__round">ROUND 1</span>
+                <span class="battle-center__rune" aria-hidden="true">✦</span>
+            </div>
+
+            <section class="team-column team-column--enemy" aria-labelledby="enemy-team-name">
+                <header class="team-heading">
+                    <span class="team-side-mark" aria-hidden="true">II</span>
+                    <div><h2 id="enemy-team-name" data-copy="rivalTeam">Rival team</h2><p data-copy="chooseTarget">Choose a target</p></div>
+                </header>
+                <div id="enemy-team" class="fighter-list"></div>
+            </section>
+        </div>
+
+        <section class="action-panel" aria-labelledby="action-title">
+            <div class="action-panel__heading">
+                <div><p class="arena-eyebrow" data-copy="yourMove">YOUR MOVE</p><h2 id="action-title" data-copy="selectMove">Select a move</h2></div>
+                <p id="active-fighter-label" class="active-fighter-label"></p>
+            </div>
+            <div class="action-buttons">
+                <button type="button" class="move-button" data-move="quick">
+                    <span aria-hidden="true">⚔</span><strong data-copy="quickAttack">Quick strike</strong><small data-copy="quickAttackInfo">Reliable damage</small>
+                </button>
+                <button type="button" class="move-button" data-move="heavy">
+                    <span aria-hidden="true">✦</span><strong data-copy="heavyAttack">Heavy strike</strong><small data-copy="heavyAttackInfo">Costs 15 focus</small>
+                </button>
+                <button type="button" class="move-button" data-move="recover">
+                    <span aria-hidden="true">◈</span><strong data-copy="recover">Focus</strong><small data-copy="recoverInfo">Recover focus</small>
+                </button>
+                <button type="button" class="move-button" data-move="guard">
+                    <span aria-hidden="true">⬡</span><strong data-copy="guard">Guard</strong><small data-copy="guardInfo">Halve the next hit</small>
+                </button>
+            </div>
+            <p id="battle-prompt" class="battle-prompt" aria-live="polite">Choose a move to begin.</p>
+            <div id="battle-log" class="battle-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+            <div class="battle-footer">
+                <span data-copy="offlineNotice">Prototype: this match runs only in this browser.</span>
+                <button id="restart-match" class="arena-secondary-button" type="button" data-copy="newMatch">New match</button>
+            </div>
+        </section>
+    </section>
+</main>
+
+<script src="{{ '/mini_games/yara-rpg/js/data/hero.js' | relative_url }}" defer></script>
+<script src="{{ '/mini_games/yara-rpg/js/data/game-rules.js' | relative_url }}" defer></script>
+<script src="{{ '/mini_games/yara-rpg/js/data/monsters.js' | relative_url }}" defer></script>
+<script src="{{ '/mini_games/yara-arena/js/arena.js' | relative_url }}" defer></script>

@@ -50,7 +50,7 @@
                     Mundo
                 </a>
 
-                <a class="{% if page.url contains '/mini_games' %}is-active{% endif %}" href="{{ '/mini_games/yara-rpg/game.html' | relative_url }}?lang=pt">Mini Games</a>
+                <a class="{% if page.url contains '/mini_games' or page.url contains '/mini-games' %}is-active{% endif %}" href="{{ '/pt/mini-games/' | relative_url }}">Mini Games</a>
 
                 <a
                     class="{% if page.url contains '/pt/about' %}is-active{% endif %}"
@@ -112,7 +112,7 @@
                     World
                 </a>
 
-                <a class="{% if page.url contains '/mini_games' %}is-active{% endif %}" href="{{ '/mini_games/yara-rpg/game.html' | relative_url }}?lang=en">Mini Games</a>
+                <a class="{% if page.url contains '/mini_games' or page.url contains '/mini-games' %}is-active{% endif %}" href="{{ '/en/mini-games/' | relative_url }}">Mini Games</a>
 
                 <a
                     class="{% if page.url contains '/en/about' %}is-active{% endif %}"

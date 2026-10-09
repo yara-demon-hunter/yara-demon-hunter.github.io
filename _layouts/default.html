@@ -9,12 +9,19 @@
     {% include seo-meta.html %}
 
     {% if page.game_page %}
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="{{ '/mini_games/yara-rpg/js/tailwind.config.js' | relative_url }}"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="{{ '/mini_games/yara-rpg/css/game.css' | relative_url }}">
+        {% if page.arena_game %}
+            <link rel="stylesheet" href="{{ '/mini_games/yara-arena/css/arena.css' | relative_url }}">
+        {% else %}
+            <script src="https://cdn.tailwindcss.com"></script>
+            <script src="{{ '/mini_games/yara-rpg/js/tailwind.config.js' | relative_url }}"></script>
+            <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+            <link rel="stylesheet" href="{{ '/mini_games/yara-rpg/css/game.css' | relative_url }}">
+        {% endif %}
     {% else %}
         <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+        {% if page.mini_games_hub %}
+            <link rel="stylesheet" href="{{ '/assets/css/mini-games.css' | relative_url }}">
+        {% endif %}
         {% if page.full_width %}
             <link rel="stylesheet" href="{{ '/assets/css/legal.css' | relative_url }}">
         {% endif %}
@@ -24,7 +31,7 @@
     {% endif %}
 </head>
 
-<body{% if page.game_page %} class="game-shell min-h-screen flex flex-col items-center justify-between p-3 sm:p-6"{% endif %}>
+<body{% if page.arena_game %} class="arena-shell"{% elsif page.game_page %} class="game-shell min-h-screen flex flex-col items-center justify-between p-3 sm:p-6"{% endif %}>
 
     {% unless page.game_page %}
         <a class="skip-link" href="#main-content">
