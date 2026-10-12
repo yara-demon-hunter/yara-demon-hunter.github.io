@@ -37,14 +37,16 @@ const translations = {
         available: "disponíveis",
         mistPowers: "Poderes da Névoa",
         noMistPowers: "Nenhum poder encontrado.",
-        mistAccept: "Prosseguir com o espírito",
+        mistAccept: "Aceitar oferta",
         mistDecline: "Recusar e seguir",
-        mistContactAppears: "👻 {contact} surge entre as árvores e oferece um pacto.",
-        mistContactDeclined: "Zeph recusa o pacto. A presença desaparece na névoa.",
-        mistContactAccepted: "Zeph aceita o pacto de {contact}.",
+        mistContactAppears: "{icon} {contact} surge entre as árvores e faz uma oferta.",
+        mistContactDeclined: "Zeph recusa a oferta. A presença desaparece na névoa.",
+        mistContactAccepted: "Zeph aceita a oferta de {contact}.",
         mistSacrifice: "🩸 O espírito entrega {gold} de ouro, mas cobra {hp} HP de Zeph.",
+        witchQuestStarted: "A bruxa aponta o alvo da missão: <span class=\"text-red-400 font-bold\">{monster}</span>.",
+        witchDrinkAccepted: "🧪 Zeph bebe a mistura e fica com {hp} de HP. A bruxa entrega {gold} de ouro.",
         mistPowerGained: "✨ Novo poder desperto: <span class=\"text-cyan-300 font-bold\">{power}</span> — {description}.",
-        mistBossAppears: "⚔️ Um chefe antigo responde ao pacto: <span class=\"text-red-400 font-bold\">{monster}</span>!",
+        mistBossAppears: "⚔️ Uma força antiga se manifesta na névoa: <span class=\"text-red-400 font-bold\">{monster}</span>!",
         drink: "Beber",
         danger: "Perigo na Névoa",
         explorationIntro: "🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?",
@@ -144,14 +146,16 @@ const translations = {
         available: "available",
         mistPowers: "Mist Powers",
         noMistPowers: "No powers discovered yet.",
-        mistAccept: "Accept the spirit's pact",
+        mistAccept: "Accept the offer",
         mistDecline: "Refuse and move on",
-        mistContactAppears: "👻 {contact} appears between the trees and offers a pact.",
-        mistContactDeclined: "Zeph refuses the pact. The presence vanishes into the mist.",
-        mistContactAccepted: "Zeph accepts {contact}'s pact.",
+        mistContactAppears: "{icon} {contact} appears between the trees with an offer.",
+        mistContactDeclined: "Zeph refuses the offer. The presence vanishes into the mist.",
+        mistContactAccepted: "Zeph accepts {contact}'s offer.",
         mistSacrifice: "🩸 The spirit gives {gold} gold, but claims {hp} HP from Zeph.",
+        witchQuestStarted: "The witch points out the target of her quest: <span class=\"text-red-400 font-bold\">{monster}</span>.",
+        witchDrinkAccepted: "🧪 Zeph drinks the mixture and is left with {hp} HP. The witch hands over {gold} gold.",
         mistPowerGained: "✨ New power awakened: <span class=\"text-cyan-300 font-bold\">{power}</span> — {description}.",
-        mistBossAppears: "⚔️ An ancient boss answers the pact: <span class=\"text-red-400 font-bold\">{monster}</span>!",
+        mistBossAppears: "⚔️ An ancient force manifests in the mist: <span class=\"text-red-400 font-bold\">{monster}</span>!",
         drink: "Drink",
         danger: "Danger in the Mist",
         explorationIntro: "🌲 The bell rang too late. The mist hides the river spirit, dark secrets, and hungry beasts. What will you do?",
@@ -509,6 +513,7 @@ function updateUI() {
     const restartButton = document.getElementById('restart-button');
     mistContactCard.classList.toggle('hidden', !pendingMistContact || inCombat || gameOver);
     if (pendingMistContact) {
+        document.getElementById('mist-contact-icon').textContent = pendingMistContact.icon;
         document.getElementById('mist-contact-name').textContent = pendingMistContact.name[gameLanguage];
         document.getElementById('mist-contact-message').textContent = pendingMistContact.message[gameLanguage];
     }
@@ -592,7 +597,8 @@ function exploreForest() {
         if (pendingMistContact) {
             explorationsSinceMistContact = 0;
             logMessage(t('mistContactAppears', {
-                contact: pendingMistContact.name[gameLanguage]
+                contact: pendingMistContact.name[gameLanguage],
+                icon: pendingMistContact.icon
             }), 'special');
             updateUI();
             return;
@@ -710,6 +716,36 @@ function acceptMistContact() {
     const contact = pendingMistContact;
     pendingMistContact = null;
     logMessage(t('mistContactAccepted', { contact: contact.name[gameLanguage] }), 'special');
+
+    if (contact.onAccept?.type === 'boss') {
+        const missionBoss = MIST_CONTACT_DATA.bosses.find(
+            (boss) => boss.id === contact.onAccept.bossId
+        );
+        if (!missionBoss) {
+            throw new Error(`Mist contact "${contact.id}" references an unknown boss.`);
+        }
+        logMessage(t('witchQuestStarted', {
+            monster: missionBoss.name[gameLanguage]
+        }), 'special');
+        spawnMonster(missionBoss);
+        return;
+    }
+
+    if (contact.onAccept?.type === 'drink') {
+        const drinkOffer = contact.onAccept;
+        const hpAfterDrink = Math.max(
+            1,
+            Math.floor(hero.maxHp * drinkOffer.hpPercent / GAME_RULES.probabilityScale)
+        );
+        hero.hp = Math.min(hero.hp, hpAfterDrink);
+        hero.gold += drinkOffer.gold;
+        logMessage(t('witchDrinkAccepted', {
+            hp: hero.hp,
+            gold: drinkOffer.gold
+        }), 'loot');
+        updateUI();
+        return;
+    }
 
     const boss = MIST_CONTACT_SYSTEM.chooseBoss(MIST_CONTACT_DATA.bosses, hero.level);
     const power = MIST_CONTACT_SYSTEM.choosePower(

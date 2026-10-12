@@ -4,6 +4,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
     contacts: [
         {
             id: "river-spirit",
+            icon: "🌊",
             name: {
                 pt: "Espírito do Rio",
                 en: "River Spirit"
@@ -16,6 +17,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "lost-scout",
+            icon: "💀",
             name: {
                 pt: "Batedor Perdido",
                 en: "Lost Scout"
@@ -28,6 +30,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "bell-keeper",
+            icon: "🔔",
             name: {
                 pt: "Guardião do Sino",
                 en: "Bell Keeper"
@@ -37,9 +40,61 @@ window.YaraRpgData.mistContacts = Object.freeze({
                 en: "A bell rings from nowhere. A spectral keeper offers a pact: “Go on and prove you deserve to leave this place.”"
             },
             minLevel: 3
+        },
+        {
+            id: "witch-hunter",
+            icon: "🧙‍♀️",
+            name: {
+                pt: "Bruxa Caçadora",
+                en: "Hunter Witch"
+            },
+            message: {
+                pt: "Uma bruxa ergue o cajado: “Derrote o morto-vivo que ronda estas árvores e provarei que você merece minha ajuda.”",
+                en: "A witch raises her staff: “Defeat the undead stalking these woods, and I will prove you deserve my help.”"
+            },
+            minLevel: 3,
+            onAccept: {
+                type: "boss",
+                bossId: "undead-brute"
+            }
+        },
+        {
+            id: "old-witch",
+            icon: "👵",
+            name: {
+                pt: "Bruxa Velha",
+                en: "Old Witch"
+            },
+            message: {
+                pt: "Uma velha bruxa oferece uma bebida escura: “Beba tudo. Vai custar sua força, mas pagarei muito bem.”",
+                en: "An old witch offers a dark drink: “Drink it all. It will drain your strength, but I will pay you well.”"
+            },
+            minLevel: 1,
+            onAccept: {
+                type: "drink",
+                gold: 150,
+                hpPercent: 20
+            }
         }
     ],
     bosses: [
+        {
+            id: "undead-brute",
+            name: {
+                pt: "Brutamontes Morto-Vivo",
+                en: "Undead Brute"
+            },
+            icon: "💀",
+            minLevel: 3,
+            suggestedLevel: 4,
+            hp: 230,
+            atk: 32,
+            def: 15,
+            parry: 32,
+            evasion: 8,
+            xpReward: 95,
+            goldReward: 75
+        },
         {
             id: "death-soldier",
             name: {

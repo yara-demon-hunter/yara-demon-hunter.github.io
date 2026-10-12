@@ -28,7 +28,7 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 
 ## Contatos na névoa
 
-Durante a exploração, um espírito pode abordar Zeph. A chance começa baixa, aumenta com o nível e respeita um intervalo mínimo entre encontros. O jogador pode aceitar o pacto ou recusá-lo sem penalidade. Ao aceitar, o resultado é sorteado entre enfrentar um chefe, receber ouro em troca de HP ou despertar um poder permanente; resultados indisponíveis (como chefes abaixo do nível mínimo ou poderes já obtidos) são retirados do sorteio.
+Durante a exploração, um contato pode abordar Zeph. Cada contato tem um ícone próprio, e a chance de encontro começa baixa, aumenta com o nível e respeita um intervalo mínimo. O jogador pode aceitar a oferta ou recusá-la sem penalidade. Em geral, aceitar sorteia entre enfrentar um chefe, receber ouro em troca de HP ou despertar um poder permanente; a bruxa caçadora sempre inicia sua missão contra um morto-vivo forte, enquanto a bruxa velha troca uma bebida que reduz o HP para no máximo 20% do máximo por 150 de ouro.
 
 Para expandir o sistema, cadastre novos contatos, chefes ou poderes em `js/data/mist-contacts.js`. Ajuste frequência, intervalo, recompensas e pesos em `js/data/game-rules.js`. Os textos de interface ficam em português e inglês em `js/game.js`.
 
