@@ -36,6 +36,9 @@
         url=prologue.url
         status="published"
         link_text=copy.read_label
+        last_updated=prologue.last_updated
+        updated_label=copy.updated_label
+        lang=page.lang
     %}
 {% endif %}
 
@@ -56,6 +59,9 @@
         status=chapter.status
         link_text=copy.read_label
         coming_soon_text=copy.coming_soon_label
+        last_updated=chapter.last_updated
+        updated_label=copy.updated_label
+        lang=page.lang
     %}
 {% endfor %}
 </div>

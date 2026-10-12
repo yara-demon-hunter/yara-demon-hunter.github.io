@@ -168,18 +168,43 @@
     min-width: 0;
 }
 
+.chapter-card__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.65rem;
+}
+
 .chapter-card__type {
     display: block;
 
-    margin-bottom: 8px;
-
-    color: #777;
+    color: var(--accent-soft);
 
     font-size: 0.7rem;
 
     letter-spacing: 0.15em;
 
     text-transform: uppercase;
+}
+
+.chapter-card__updated {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.18rem 0.5rem;
+    border: 1px solid rgba(185, 164, 122, 0.28);
+    border-radius: 2px;
+    background: rgba(185, 164, 122, 0.08);
+    color: var(--text-muted);
+    font-family: system-ui, sans-serif;
+    font-size: 0.68rem;
+    line-height: 1.5;
+}
+
+.chapter-card__updated time {
+    color: var(--accent-soft);
+    font-variant-numeric: tabular-nums;
 }
 
 .chapter-card__title {

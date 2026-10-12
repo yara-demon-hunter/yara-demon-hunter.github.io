@@ -14,9 +14,11 @@
 
     <div class="chapter-card__content">
 
-        <span class="chapter-card__type">
-            {{ include.type }}
-        </span>
+        <div class="chapter-card__meta">
+            <span class="chapter-card__type">
+                {{ include.type }}
+            </span>
+        </div>
 
         <h2 class="chapter-card__title">
             {{ include.title }}
@@ -26,6 +28,19 @@
             <p class="chapter-card__description">
                 {{ include.description }}
             </p>
+        {% endif %}
+
+        {% if include.last_updated %}
+            <span class="chapter-card__updated">
+                {{ include.updated_label }}
+                <time datetime="{{ include.last_updated | date: '%Y-%m-%d' }}">
+                    {% if include.lang == "pt" %}
+                        {{ include.last_updated | date: "%d/%m/%Y" }}
+                    {% else %}
+                        {{ include.last_updated | date: "%B %-d, %Y" }}
+                    {% endif %}
+                </time>
+            </span>
         {% endif %}
 
     </div>

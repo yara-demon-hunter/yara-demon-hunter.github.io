@@ -8,13 +8,16 @@ translation_id: book-1-prologue
 chapter_type: prologue
 description: O perigo espreita nas sombras do cemitério. Quando um caçador talentoso confronta uma criatura capaz de moldar espadas de pura energia espectral, a escuridão se ilumina com o choque mortal.
 image: /assets/images/common/books/book-1/chapters/00-prologue.jpeg
+last_updated: 2026-10-12
 ---
+
+Muitos anos antes.
 
 *Esse caçador é muito talentoso...*
 
 A criatura desviou da lâmina por um triz.
 
-Diante dela estava um caçador envolto em uma capa escura, que se agitava a cada movimento. O capuz escondia parte de seu rosto, enquanto uma máscara cobria suas feições. Apenas os olhos permaneciam visíveis através das aberturas estreitas.
+Diante dele estava um caçador envolto em uma capa escura, que se agitava a cada movimento. O capuz escondia parte de seu rosto, enquanto uma máscara cobria suas feições. Apenas os olhos permaneciam visíveis através das aberturas estreitas.
 
 A espada passou diante de seu rosto, iluminando o cemitério com os símbolos gravados em sua extensão. Cada movimento deixava um breve rastro de luz azulada na escuridão.
 
@@ -68,11 +71,11 @@ A criatura bloqueou.
 
 Um corte baixo.
 
-Ela saltou para trás.
+A criatura saltou para trás.
 
 Outro golpe na altura do peito.
 
-Ela se desviou.
+Ele se desviou.
 
 A arma espiritual acompanhava cada movimento de seu braço, alongando-se e se deformando conforme a criatura atacava. A cada golpe, deixava no ar um rastro vermelho que demorava alguns segundos para desaparecer.
 
@@ -114,7 +117,7 @@ Sorriu a criatura.
 
 Essa é minha chance.
 
-Ela avançou.
+A criatura avançou.
 
 O caçador tentou erguer a espada novamente, mas seu braço falhou por um instante.
 
@@ -158,9 +161,9 @@ Sua mão agarrou o braço do caçador.
 
 — O quê...?
 
-Ela o puxou violentamente para perto.
+A criatura o puxou violentamente para perto.
 
-O caçador tentou golpeá-la novamente, mas já não havia espaço.
+O caçador tentou golpeá-lo novamente, mas já não havia espaço.
 
 Então a criatura abriu a boca.
 
@@ -172,7 +175,7 @@ E afundaram na carne, na região entre o pescoço e o ombro.
 
 O grito ecoou pelo cemitério.
 
-O caçador largou a espada por um instante e agarrou a criatura, tentando arrancá-la de seu corpo.
+O caçador largou a espada por um instante e agarrou a criatura, tentando arrancá-lo de seu corpo.
 
 A dor era diferente daquela causada pela lâmina.
 
@@ -210,7 +213,7 @@ Seu corpo bateu fortemente contra uma lápide.
 
 **CRASH!**
 
-Ela caiu no chão, rolou alguns metros e imediatamente levou a mão ao rosto.
+Ele caiu no chão, rolou alguns metros e imediatamente levou a mão ao rosto.
 
 Sua pele fumegava.
 
@@ -220,7 +223,7 @@ A criatura olhou para a própria mão.
 
 Partes dos dedos estavam queimadas.
 
-Ela ergueu os olhos lentamente para o caçador.
+Ele ergueu os olhos lentamente para o caçador.
 
 Ele agora estava com o rosto totalmente descoberto.
 
@@ -279,7 +282,7 @@ O braço da criatura ficou preso.
 
 A criatura ergueu os olhos.
 
-Acima dela, por trás do ombro da criatura negra, uma silhueta surgiu contra a escuridão.
+Acima dele, por trás do ombro da criatura negra, uma silhueta surgiu contra a escuridão.
 
 O jovem estava no alto.
 
@@ -299,7 +302,7 @@ Sem outra escolha, a criatura desfez a espada espectral.
 
 A energia desapareceu de sua mão.
 
-Livre, ele arrancou o braço de dentro da criatura no último instante.
+Livre, ele arrancou o braço de dentro da criatura negra no último instante.
 
 O corte passou longe de seu rosto.
 
@@ -323,7 +326,7 @@ Sangue.
 
 Muito sangue.
 
-Ela tocou o próprio rosto, sentindo o líquido quente escorrer entre os dedos.
+Ele tocou o próprio rosto, sentindo o líquido quente escorrer entre os dedos.
 
 Por alguns segundos, ficou de joelhos, gemendo de dor.
 
@@ -345,7 +348,7 @@ A criatura se levantou.
 
 E fugiu para dentro da escuridão.
 
-Atrás dela, o cemitério voltou a ficar em silêncio.
+Atrás dele, o cemitério voltou a ficar em silêncio.
 
 O jovem caçador tombou contra a pedra fria de um túmulo. Suas mãos tatearam o chão de terra até encontrarem uma frieza familiar. Puxando-a de volta, ele encaixou a máscara firmemente sobre o rosto.
 
@@ -360,6 +363,8 @@ Mas não era aquilo que mais o preocupava.
 Ele tocou a máscara...
 
 A criatura agora sabia sua identidade.
+
+A mordida não doía mais como antes. Mas algo havia ficado sob a pele, como uma brasa que não se apagava.
 
 E então, fechou os olhos.
 

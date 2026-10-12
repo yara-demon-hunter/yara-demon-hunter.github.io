@@ -16,6 +16,7 @@ chapter_index_copy:
   chapter_type: "Capítulo"
   read_label: "Ler"
   coming_soon_label: "Em breve"
+  updated_label: "Atualizado em"
 ---
 
 {% include chapter-index.html %}

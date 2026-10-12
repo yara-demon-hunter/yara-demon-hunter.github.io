@@ -8,143 +8,146 @@ translation_id: book-1-prologue
 chapter_type: prologue
 description: "Danger lurks in the shadows of the graveyard. When a talented hunter confronts a creature capable of forging swords of pure spectral energy, the darkness lights up with their deadly clash."
 image: /assets/images/common/books/book-1/chapters/00-prologue.jpeg
+last_updated: 2026-10-12
 ---
 
-*This hunter is extremely talented...*
+Many years before.
+
+*This hunter is very talented...*
 
 The creature dodged the blade by a hair's breadth.
 
-Before it stood a hunter cloaked in dark garments that fluttered with every movement. The hood concealed part of his face, while a mask covered his features. Only his eyes remained visible through the narrow slits.
+Before him stood a hunter wrapped in a dark cloak that billowed with every movement. The hood hid part of his face, while a mask concealed his features. Only his eyes remained visible through the narrow slits.
 
-The sword swept past its face, illuminating the graveyard with the symbols etched along its length. Each movement left a fleeting trail of bluish light in the darkness.
+The sword swept past his face, illuminating the graveyard with the symbols engraved along its length. Every movement left a brief trail of bluish light in the darkness.
 
 *He's dangerous. I'd better not play around...*
 
 — I've killed many hunters.
 
-Before surging forward, the creature reached for its own forearm and began to slowly unwrap the bandages covering it.
+Before lunging forward, the creature brought its hand to its own forearm and began slowly unwrapping the bandages covering it.
 
-The cloth strips fell to the ground.
+The strips fell to the ground.
 
-Beneath them, ancient burn marks traced irregular lines across its skin.
+Beneath them, old burn marks ran across the skin in irregular lines.
 
-It then pointed its hand toward the ground, as if drawing a sword.
+Then it directed its hand toward the ground, as if drawing a sword.
 
-Its fingers remained extended and joined, rigid, while the thumb folded against the palm.
+The fingers remained extended and joined, rigid, while the thumb folded against the palm.
 
-An irregular, reddish energy, resembling flames, descended from its forearm and extended to its fingertips.
+An irregular, reddish energy, like flames, descended from its forearm and extended to its fingers.
 
 The shape of a sword began to form.
 
 There was no metal.
 
-The sword was forged from restless spectral energy. Its edges seemed to evaporate into the air like flames that never extinguished, while shadows drifted through its core.
+The sword was made of restless spectral energy. Its edge seemed to evaporate into the air, like flames that never went out, while shadows coursed through its interior.
 
-For an instant, terrified faces emerged in the form of flames.
+For an instant, frightened faces appeared in the shape of flames and dispersed into the air.
 
-Mouths agape, eyes wide open, as if screaming for help.
+Open mouths, wide eyes, as if screaming for help.
 
 They looked like souls trying to escape.
 
-The creature gazed at it and offered a faint smile, as if enduring an ancient pain.
+The creature observed it and smiled slightly, as if bearing an ancient pain.
 
 It was a weapon capable of intimidating many.
 
 Perhaps not a hunter.
 
-Then it lunged forward.
+Then it charged.
 
-The two weapons collided.
+The two weapons clashed.
 
 **CLANG!**
 
-The impact showered red and blue sparks into the darkness.
+The impact scattered red and blue sparks through the darkness.
 
-The hunter stepped back, pivoted his body, and struck again.
+The hunter stepped back, spun his body, and attacked again.
 
 The creature blocked.
 
 **CLANG!**
 
-A low cut.
+A low slash.
 
-It leaped backward.
+The creature leaped back.
 
 Another strike at chest height.
 
-It sidestepped.
+He dodged.
 
-The spiritual weapon mirrored every movement of its arm, lengthening and warping as the creature attacked. With every blow, it left behind a red trail in the air that took a few seconds to fade.
+The spiritual weapon followed every movement of its arm, lengthening and deforming as the creature attacked. With each blow, it left a red trail in the air that took a few seconds to disappear.
 
-— But you are different, hunter.
+— But you're different, hunter.
 
-The hunter charged without hesitation.
+The hunter advanced without hesitation.
 
-The creature attempted a counterattack, but he parried the blow with a swift twist of his blade.
+The creature tried to counterattack, but he spun his sword and parried the blow.
 
 Then he raised his free hand.
 
-In a swift motion, the hunter reached beneath his garments and pulled out a small parchment.
+In a swift motion, the hunter slid his hand beneath his garments and pulled out a small scroll.
 
-The words written upon it began to glow.
+The words written on it began to glow.
 
 The creature recoiled.
 
 — No...
 
-The parchment dissolved into ashes.
+The scroll turned to ashes.
 
-The surrounding tombstones trembled.
+The surrounding tombstones shuddered.
 
-The earth beneath their feet began to shift.
+The earth beneath their feet began to move.
 
-The creature rushed forward before the ritual could finish.
+The creature lunged before the ritual could finish.
 
-Its blade ran through the hunter's shoulder.
+Its blade pierced the hunter's shoulder.
 
 He staggered.
 
-For a moment, it seemed he would collapse.
+For a moment, it looked like he would fall.
 
-Yet he remained standing.
+But he remained standing.
 
-*He's wounded!*
+He's wounded!
 
-The creature smirked.
+The creature smiled.
 
-*This is my chance.*
+This is my chance.
 
-It closed in.
+The creature moved in.
 
-The hunter tried to lift his sword once more, but his arm gave out for a fraction of a second.
+The hunter tried to raise his sword again, but his arm failed for a second.
 
-Agony shot through his wounded shoulder.
+Pain shot through his wounded shoulder.
 
-That was all it took.
+It was enough.
 
-The creature appeared right in front of him.
+The creature appeared before him.
 
 The two swords clashed.
 
-**CLANG!**
+CLANG!
 
-The impact echoed across the cemetery.
+The impact echoed through the graveyard.
 
-For a moment, both stood motionless, their blades locked against each other.
+For an instant, the two remained motionless, their blades locked against each other.
 
 Eye to eye.
 
-The hunter breathed with difficulty.
+The hunter was breathing heavily.
 
-The creature grinned.
+The creature smiled.
 
 Then the hunter noticed something strange.
 
-The creature's sword began to unravel.
+The creature's sword began to break apart.
 
-Not like a blade shattering.
+Not like a blade snapping.
 
-It was simply losing its form.
+It was simply losing its shape.
 
 Fragments of spectral energy dripped from the blade, evaporating into the air like smoke.
 
@@ -152,161 +155,161 @@ The hunter's eyes widened.
 
 The creature seized the moment.
 
-The spectral sword dissolved partially, freeing the creature's arm.
+The spectral sword partially dissolved, freeing the creature's arm.
 
-Its hand gripped the hunter's arm.
+Its hand grabbed the hunter's arm.
 
 — What...?
 
-It pulled him violently closer.
+The creature violently pulled him close.
 
-The hunter tried to strike again, but there was no longer any room.
+The hunter tried to strike him again, but there was no room left.
 
 Then the creature opened its mouth.
 
-Fangs bared.
+Fangs appeared.
 
-And sank into the flesh, right between his neck and shoulder.
+And sank into the flesh, in the region between the neck and the shoulder.
 
 — AAAAAH!
 
-The scream echoed through the cemetery.
+The scream echoed through the graveyard.
 
-The hunter dropped his sword for a moment and grabbed the creature, trying to tear it off his body.
+The hunter dropped his sword for an instant and grabbed the creature, trying to tear it away from his body.
 
-The pain was unlike anything caused by a blade.
+The pain was different from the one caused by the blade.
 
 Deeper.
 
 As if something were burning inside him.
 
-The creature clamped down harder.
+The creature tightened its bite.
 
 Then...
 
-A light flared beneath the young man's garments.
+A light appeared beneath the youth's garments.
 
 Faint at first.
 
-Barely noticeable.
+Almost imperceptible.
 
-The light intensified.
+The light grew stronger.
 
 A bluish glow began to pulse near the hunter's chest.
 
-The small pendant hidden beneath his clothes radiated a searing blue light.
+The small necklace hidden beneath the youth's clothes began to emit an intense bluish light.
 
 The creature tried to pull away.
 
 But it was too late.
 
-A wave of energy coursed through the young man's body.
+A wave of energy coursed through the youth's body.
 
 **FWOOSH!**
 
-At the exact instant of the shockwave that repelled the creature, its claws—sunk deep and clawing in desperation—hooked firmly into the edges of the mask concealing the hunter's face. With the brutal force of the light's impact, the monster was hurled backward, tearing the mask off by force as it flew.
+At the exact moment of the thrust repelling the creature, the creature's claws—embedded and groping in desperation—hooked firmly onto the edges of the mask hiding the hunter's face. With the brutal violence of the light's impact, the monster was hurled backward, taking the forcibly torn-off mask with it.
 
-Its body slammed heavily against a tombstone.
+Its body slammed hard against a tombstone.
 
 **CRASH!**
 
-It hit the ground, rolled a few meters, and immediately clapped a hand over its face.
+It hit the ground, rolled a few meters, and immediately brought its hand to its face.
 
 Its skin was smoking.
 
-— AAAAARGH!
+— AAAAAARGH!
 
-The creature looked down at its own hand.
+The creature looked at its own hand.
 
-Parts of its fingers were burned.
+Parts of the fingers were burned.
 
-It slowly raised its eyes back to the hunter.
+It slowly raised its eyes to the hunter.
 
-His face was now entirely exposed.
+His face was now completely uncovered.
 
-He was still standing, swaying on his feet.
+He remained standing, staggering.
 
 One hand pressed against the bite wound.
 
-The other clutched the pendant that still glowed beneath his clothes.
+The other held the necklace that was still glowing beneath his clothes.
 
 The creature's eyes widened slightly.
 
-Beneath the faint glow of the pendant stood no weathered veteran, but the youthful face of a prodigy whose talent defied logic.
+Beneath the necklace's faint light, there was no weathered veteran, but rather the youthful face of a prodigy whose talent defied logic.
 
-— Well, well... — the creature muttered, catching its breath and smiling with a mix of surprise and contempt.
+— Well, well... — murmured the creature, catching its breath and smiling with a mixture of surprise and contempt.
 
-— So you're just a young hunter. I must admit, you are a formidable opponent.
+— So you're a young hunter. I have to admit, you're a formidable opponent.
 
-The blue light kept pulsing.
+The bluish light continued to pulse.
 
 *I'd better stay alert. He has plenty of tricks.*
 
-The pendant's glow began to fade.
+The necklace's glow began to fade.
 
-The creature remained still, watching closely.
+The creature remained motionless, watching.
 
 Then it smiled.
 
-The young man tried to raise his sword again, but he was weak.
+The youth tried to lift his sword again, but he was weak.
 
-— It's a pity you won't live to enjoy the talent you possess, young hunter.
+— It's a pity you won't live to enjoy the talent you have, young hunter.
 
-The creature lunged to deliver the final blow.
+The creature moved in to deliver the final blow.
 
-The red energy stirred once again along its arm.
+The red energy stirred on its arm once more.
 
-The Soul Eater extended once more, its spectral form writhing like a live flame.
+The Soul Eater extended again, its spectral form writhing like a living flame.
 
-— This is your end!
+— This will be your end!
 
 *What?!*
 
-Something erupted from the ground.
+Something burst from the ground.
 
-A tall, gaunt, black creature with broad shoulders, no face, and a lumbering presence materialized between them, bound by chains around its arms and legs.
+A black, lean, tall, broad-shouldered, faceless, and sluggish-looking creature appeared between the two, with chains attached to its arms and legs.
 
-The spectral blade plunged straight through the dark entity's body.
+The spectral blade pierced the dark body and penetrated deep into the black creature.
 
-Yet it uttered no sound of pain, remaining impassive and showing no physical reaction to the impact.
+But it emitted no sound of pain, remaining impassive and showing no physical reaction to the impact.
 
 **CLANG!**
 
-The creature's arm was stuck.
+The creature's arm was trapped.
 
 *I can't pull it out.*
 
-The creature looked up.
+The creature raised its eyes.
 
-Above, just behind the black entity's shoulder, a silhouette emerged against the dark sky.
+Above it, behind the black creature's shoulder, a silhouette emerged against the darkness.
 
-The young hunter was airborne.
+The youth was up high.
 
-Leaping toward it, wielding his sword with both hands.
+He leaped toward it, holding the sword with both hands.
 
-He brought the blade down with all his strength, unleashing a powerful airborne slash.
+And brought the sword down with all his strength, delivering a powerful slash through the air.
 
-The creature tried to yank its arm free.
+The creature tried to pull its arm back.
 
 Nothing.
 
-It was pinned.
+It was trapped.
 
 The slash was coming.
 
-With no other choice, the creature dissipated the spectral sword.
+With no other choice, the creature dissolved the spectral sword.
 
 The energy vanished from its hand.
 
-Freed, it snatched its arm back out from inside the entity at the very last second.
+Free, it yanked its arm out from inside the black creature at the last second.
 
-The blade missed its face.
+The slash missed its face by a wide margin.
 
-*I'm faster.*
+*I am faster.*
 
 *But the enchantment...*
 
-The arc of enchanted blue air from the sword struck its face.
+The bluish, cutting air of the enchanted sword struck its face.
 
 A flash.
 
@@ -316,49 +319,51 @@ Darkness.
 
 The creature fell to its knees.
 
-Its hand went instantly to its face.
+Its hand immediately went to its face.
 
 Blood.
 
-So much blood.
+Lots of blood.
 
-It touched its own face, feeling the warm liquid stream through its fingers.
+It touched its own face, feeling the warm liquid trickle between its fingers.
 
-For a few seconds, it remained on its knees, groaning in agony.
+For a few seconds, it stayed on its knees, groaning in pain.
 
-Then it extended its fingers into the sword formation.
+Then it extended its fingers into the shape of a sword.
 
-Energy began to gather, attempting to take the form of the spectral blade.
+Energy began to gather, trying to take the form of the spectral sword.
 
-But before it could coalesce, the energy flickered...
+But before it could form, the energy flickered...
 
 and dissolved into the air.
 
-The creature stared at its hand in shock.
+The creature stared at its own hand in surprise.
 
-— You'll pay for this! — the creature snarled.
+— You'll pay for this! — growled the creature.
 
-*More than pain... I lost my way home.*
+*More than pain... I've lost my way home.*
 
 The creature stood up.
 
 And fled into the darkness.
 
-Behind it, silence returned to the cemetery.
+Behind it, the graveyard fell silent once more.
 
-The young hunter slumped against the cold stone of a tomb. His hands fumbled along the dirt ground until they met a familiar coldness. Pulling it back, he fitted the mask firmly over his face again.
+The young hunter collapsed against the cold stone of a tomb. His hands groped the dirt floor until they found a familiar coldness. Pulling it back, he fitted the mask firmly back over his face.
 
-— What took you so long, my friend? — he asked with a faint smile, referring to the dark creature he had just summoned.
+— What took you so long, friend? — he asked with a faint smile, referring to the black creature he had just summoned.
 
-Then he pressed his hand to his shoulder.
+Then, he brought his hand to his shoulder.
 
-The wound still burned where the fangs had sunk deep into his flesh, right between his neck and shoulder.
+The wound was still burning in the region between his neck and shoulder, where the fangs had sunk into his flesh.
 
 But that wasn't what worried him most.
 
-He touched his mask...
+He touched the mask...
 
 The creature now knew his identity.
+
+The bite didn't hurt like before. But something had remained beneath his skin, like an unextinguished ember.
 
 And then, he closed his eyes.
 

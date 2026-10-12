@@ -1,3 +1,14 @@
+- date: "2026-10-12"
+  title:
+    en: "Chapters update (book-1)"
+    pt: "Atualização dos capítulos (livro-1)"
+  summary:
+    en: "Updating prologue and chapters 1, 2, and 3 (after review)."
+    pt: "Atualizando prólogo e capítulos 1, 2 e 3 (após a revisão)"
+  url:
+    en: "/en/books/book-1/chapters/"
+    pt: "/pt/books/book-1/chapters/"
+
 - date: "2026-09-27"
   title:
     en: "Explore Gudran's Village"
