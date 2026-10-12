@@ -35,6 +35,16 @@ const translations = {
         journeyComplete: "Todas as áreas foram descobertas.",
         potions: "Poções de Cura",
         available: "disponíveis",
+        mistPowers: "Poderes da Névoa",
+        noMistPowers: "Nenhum poder encontrado.",
+        mistAccept: "Prosseguir com o espírito",
+        mistDecline: "Recusar e seguir",
+        mistContactAppears: "👻 {contact} surge entre as árvores e oferece um pacto.",
+        mistContactDeclined: "Zeph recusa o pacto. A presença desaparece na névoa.",
+        mistContactAccepted: "Zeph aceita o pacto de {contact}.",
+        mistSacrifice: "🩸 O espírito entrega {gold} de ouro, mas cobra {hp} HP de Zeph.",
+        mistPowerGained: "✨ Novo poder desperto: <span class=\"text-cyan-300 font-bold\">{power}</span> — {description}.",
+        mistBossAppears: "⚔️ Um chefe antigo responde ao pacto: <span class=\"text-red-400 font-bold\">{monster}</span>!",
         drink: "Beber",
         danger: "Perigo na Névoa",
         explorationIntro: "🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?",
@@ -132,6 +142,16 @@ const translations = {
         journeyComplete: "All areas have been discovered.",
         potions: "Healing Potions",
         available: "available",
+        mistPowers: "Mist Powers",
+        noMistPowers: "No powers discovered yet.",
+        mistAccept: "Accept the spirit's pact",
+        mistDecline: "Refuse and move on",
+        mistContactAppears: "👻 {contact} appears between the trees and offers a pact.",
+        mistContactDeclined: "Zeph refuses the pact. The presence vanishes into the mist.",
+        mistContactAccepted: "Zeph accepts {contact}'s pact.",
+        mistSacrifice: "🩸 The spirit gives {gold} gold, but claims {hp} HP from Zeph.",
+        mistPowerGained: "✨ New power awakened: <span class=\"text-cyan-300 font-bold\">{power}</span> — {description}.",
+        mistBossAppears: "⚔️ An ancient boss answers the pact: <span class=\"text-red-400 font-bold\">{monster}</span>!",
         drink: "Drink",
         danger: "Danger in the Mist",
         explorationIntro: "🌲 The bell rang too late. The mist hides the river spirit, dark secrets, and hungry beasts. What will you do?",
@@ -288,13 +308,16 @@ document.addEventListener('keydown', startMusicAfterInteraction);
 const GAME_DATA = window.YaraRpgData;
 const GAME_RULES = GAME_DATA.rules;
 const ITEM_DATA = GAME_DATA.items;
+const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
+const MIST_CONTACT_SYSTEM = window.YaraMistContactSystem;
 const hero = {
     name: GAME_DATA.hero.name,
     ...GAME_DATA.hero.initial,
     potions: ITEM_DATA.healingPotion.startingCount,
     maxPotions: ITEM_DATA.healingPotion.startingCapacity,
     evasionBonus: 0,
-    parryBonus: 0
+    parryBonus: 0,
+    mistPowers: []
 };
 
 const CAMP_COST = GAME_RULES.camp.goldCost;
@@ -322,6 +345,8 @@ let currentRegion = 0;
 let discoveredRegions = [0];
 let gameOver = false;
 let openUpgradeOptions = null;
+let pendingMistContact = null;
+let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
 
 document.addEventListener('click', (event) => {
     if (event.target instanceof Element && event.target.closest('[data-upgrade-control]')) return;
@@ -388,6 +413,12 @@ function updateUI() {
         : `${hero.stunChance}%`);
     document.getElementById('hero-potions').innerText = hero.potions;
     document.getElementById('hero-potions-max').innerText = hero.maxPotions;
+    const unlockedPowers = MIST_CONTACT_DATA.powers.filter((power) => hero.mistPowers.includes(power.id));
+    document.getElementById('mist-power-list').textContent = unlockedPowers.length
+        ? unlockedPowers.map((power) =>
+            `${power.name[gameLanguage]} (${power.description[gameLanguage]})`
+        ).join(' · ')
+        : t('noMistPowers');
     const currentRegionData = GAME_DATA.regions[currentRegion];
     document.getElementById('exploration-title').innerText = currentRegionData.title[gameLanguage];
     document.getElementById('exploration-description').innerText = currentRegionData.description[gameLanguage];
@@ -428,6 +459,7 @@ function updateUI() {
     const combatControls = document.getElementById('controls-combat');
     const encounterCard = document.getElementById('encounter-card');
     const explorationBanner = document.getElementById('exploration-banner');
+    const mistContactCard = document.getElementById('mist-contact-card');
     const campButton = document.getElementById('camp-button');
     const potionButton = document.getElementById('potion-button');
     document.querySelector('[data-i18n="campCost"]').innerText = t('campCost', { cost: CAMP_COST });
@@ -475,6 +507,11 @@ function updateUI() {
     document.getElementById('dodge-button').disabled = evasionTotal >= MAX_EVASION;
     document.getElementById('parry-button').disabled = parryTotal >= MAX_PARRY || hero.foco < PARRY_COST;
     const restartButton = document.getElementById('restart-button');
+    mistContactCard.classList.toggle('hidden', !pendingMistContact || inCombat || gameOver);
+    if (pendingMistContact) {
+        document.getElementById('mist-contact-name').textContent = pendingMistContact.name[gameLanguage];
+        document.getElementById('mist-contact-message').textContent = pendingMistContact.message[gameLanguage];
+    }
     campButton.disabled = inCombat || gameOver || hero.gold < CAMP_COST || (hero.hp >= hero.maxHp && hero.foco >= hero.maxFoco);
     potionButton.disabled = gameOver;
 
@@ -482,6 +519,7 @@ function updateUI() {
         exploreControls.classList.add('hidden');
         combatControls.classList.add('hidden');
         encounterCard.classList.add('hidden');
+        mistContactCard.classList.add('hidden');
         explorationBanner.classList.remove('hidden');
         document.getElementById('exploration-title').innerText = t('gameOverTitle');
         document.getElementById('exploration-description').innerText = t('defeatHelp');
@@ -490,12 +528,21 @@ function updateUI() {
         exploreControls.classList.add('hidden');
         combatControls.classList.remove('hidden');
         encounterCard.classList.remove('hidden');
+        mistContactCard.classList.add('hidden');
         explorationBanner.classList.add('hidden');
+        restartButton.classList.add('hidden');
+    } else if (pendingMistContact) {
+        exploreControls.classList.add('hidden');
+        combatControls.classList.add('hidden');
+        encounterCard.classList.add('hidden');
+        mistContactCard.classList.remove('hidden');
+        explorationBanner.classList.remove('hidden');
         restartButton.classList.add('hidden');
     } else {
         exploreControls.classList.remove('hidden');
         combatControls.classList.add('hidden');
         encounterCard.classList.add('hidden');
+        mistContactCard.classList.add('hidden');
         explorationBanner.classList.remove('hidden');
         restartButton.classList.add('hidden');
     }
@@ -522,15 +569,34 @@ function logMessage(message, type = 'normal') {
 }
 
 function exploreForest() {
-    if (inCombat || gameOver) return;
+    if (inCombat || gameOver || pendingMistContact) return;
     if (hero.hp <= 0) {
             logMessage(t("injured"), "combat-monster");
         return;
     }
 
+    explorationsSinceMistContact++;
     if (tryDiscoverRegion()) {
         updateUI();
         return;
+    }
+
+    const mistRules = GAME_RULES.mistContacts;
+    if (MIST_CONTACT_SYSTEM.shouldTrigger(
+        hero.level,
+        mistRules,
+        explorationsSinceMistContact,
+        GAME_RULES.probabilityScale
+    )) {
+        pendingMistContact = MIST_CONTACT_SYSTEM.chooseContact(MIST_CONTACT_DATA.contacts, hero.level);
+        if (pendingMistContact) {
+            explorationsSinceMistContact = 0;
+            logMessage(t('mistContactAppears', {
+                contact: pendingMistContact.name[gameLanguage]
+            }), 'special');
+            updateUI();
+            return;
+        }
     }
 
     const encounterRules = GAME_RULES.exploration.encounters;
@@ -580,18 +646,35 @@ function tryDiscoverRegion() {
     return true;
 }
 
-function spawnMonster() {
+function spawnMonster(templateOverride = null) {
     const regionId = GAME_DATA.regions[currentRegion].id;
     const regionMonsters = GAME_DATA.monsters.byRegion[regionId];
-    const template = regionMonsters[Math.floor(Math.random() * regionMonsters.length)];
-    const variation = GAME_DATA.monsters.variation.minimum
-        + Math.random() * (GAME_DATA.monsters.variation.maximum - GAME_DATA.monsters.variation.minimum);
-    const vary = (value) => Math.max(GAME_DATA.monsters.minimumRolledAttribute, Math.round(value * variation));
+    const template = templateOverride ?? regionMonsters[Math.floor(Math.random() * regionMonsters.length)];
+    const isMistBoss = Boolean(templateOverride);
+    const variationRules = isMistBoss
+        ? GAME_RULES.mistContacts.bossVariation
+        : GAME_DATA.monsters.variation;
+    const variation = variationRules.minimum
+        + Math.random() * (variationRules.maximum - variationRules.minimum);
+    const levelScale = isMistBoss
+        ? Math.max(
+            variationRules.minimumScale,
+            Math.min(
+                variationRules.maximumScale,
+                1 + (hero.level - template.suggestedLevel) * variationRules.levelScale
+            )
+        )
+        : 1;
+    const vary = (value) => Math.max(
+        GAME_DATA.monsters.minimumRolledAttribute,
+        Math.round(value * variation * levelScale)
+    );
     const monsterHp = vary(template.hp);
 
     currentMonster = {
         name: template.name[gameLanguage],
         icon: template.icon,
+        isMistBoss,
         hp: monsterHp,
         maxHp: monsterHp,
         atk: vary(template.atk),
@@ -615,7 +698,76 @@ function spawnMonster() {
     document.getElementById('monster-parry').innerText = currentMonster.parry + '%';
     document.getElementById('monster-evasion').innerText = currentMonster.evasion + '%';
 
-    logMessage(t("monsterAppears", { monster: currentMonster.name }), "combat-monster");
+    logMessage(t(isMistBoss ? "mistBossAppears" : "monsterAppears", {
+        monster: currentMonster.name
+    }), "combat-monster");
+    updateUI();
+}
+
+function acceptMistContact() {
+    if (!pendingMistContact || inCombat || gameOver) return;
+
+    const contact = pendingMistContact;
+    pendingMistContact = null;
+    logMessage(t('mistContactAccepted', { contact: contact.name[gameLanguage] }), 'special');
+
+    const boss = MIST_CONTACT_SYSTEM.chooseBoss(MIST_CONTACT_DATA.bosses, hero.level);
+    const power = MIST_CONTACT_SYSTEM.choosePower(
+        MIST_CONTACT_DATA.powers,
+        hero.mistPowers,
+        hero
+    );
+    const outcome = MIST_CONTACT_SYSTEM.chooseOutcome(
+        GAME_RULES.mistContacts.outcomes,
+        Boolean(boss),
+        Boolean(power)
+    );
+
+    if (outcome?.type === 'combat' && boss) {
+        spawnMonster(boss);
+        return;
+    }
+
+    if (outcome?.type === 'power' && power) {
+        const previousValue = hero[power.stat];
+        hero[power.stat] = power.max === undefined
+            ? previousValue + power.amount
+            : Math.min(power.max, previousValue + power.amount);
+        const amountGained = hero[power.stat] - previousValue;
+        if (power.currentStat) {
+            hero[power.currentStat] = Math.min(
+                hero.maxHp,
+                hero[power.currentStat] + amountGained
+            );
+        }
+        hero.mistPowers.push(power.id);
+        logMessage(t('mistPowerGained', {
+            power: power.name[gameLanguage],
+            description: power.description[gameLanguage]
+        }), 'special');
+        updateUI();
+        return;
+    }
+
+    const sacrificeRules = GAME_RULES.mistContacts.sacrifice;
+    const goldGained = sacrificeRules.goldMinimum
+        + Math.floor(Math.random() * sacrificeRules.goldRange);
+    const hpPercent = sacrificeRules.hpLossMinimum
+        + Math.floor(Math.random() * sacrificeRules.hpLossRange);
+    const hpLost = Math.min(
+        Math.max(0, hero.hp - 1),
+        Math.floor(hero.maxHp * hpPercent / GAME_RULES.probabilityScale)
+    );
+    hero.gold += goldGained;
+    hero.hp -= hpLost;
+    logMessage(t('mistSacrifice', { gold: goldGained, hp: hpLost }), 'loot');
+    updateUI();
+}
+
+function declineMistContact() {
+    if (!pendingMistContact || inCombat || gameOver) return;
+    pendingMistContact = null;
+    logMessage(t('mistContactDeclined'), 'normal');
     updateUI();
 }
 

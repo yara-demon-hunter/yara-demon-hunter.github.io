@@ -20,8 +20,17 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 - `css/game.css`: estilos próprios da página.
 - `css/embedded-rpg.css`: estilos do fragmento HTML legado.
 - `js/game.js`: estado do personagem, exploração, combate e atualização da interface.
+- `js/systems/mist-contacts.js`: regras reutilizáveis para sortear contatos, resultados, chefes e poderes da névoa.
+- `js/data/mist-contacts.js`: conteúdo editável dos espíritos, chefes especiais e poderes permanentes.
+- `js/data/game-rules.js`: balanceamento, incluindo chance crescente por nível, intervalo entre contatos e pesos dos resultados.
 - `js/tailwind.config.js`: cores customizadas usadas pelas classes Tailwind.
 - `components/yara-rpg.html`: fragmento antigo para incorporação; não é usado pela página completa nem publicado como página.
+
+## Contatos na névoa
+
+Durante a exploração, um espírito pode abordar Zeph. A chance começa baixa, aumenta com o nível e respeita um intervalo mínimo entre encontros. O jogador pode aceitar o pacto ou recusá-lo sem penalidade. Ao aceitar, o resultado é sorteado entre enfrentar um chefe, receber ouro em troca de HP ou despertar um poder permanente; resultados indisponíveis (como chefes abaixo do nível mínimo ou poderes já obtidos) são retirados do sorteio.
+
+Para expandir o sistema, cadastre novos contatos, chefes ou poderes em `js/data/mist-contacts.js`. Ajuste frequência, intervalo, recompensas e pesos em `js/data/game-rules.js`. Os textos de interface ficam em português e inglês em `js/game.js`.
 
 ## Estado do componente
 

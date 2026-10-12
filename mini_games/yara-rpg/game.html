@@ -140,6 +140,10 @@ permalink: /mini_games/yara-rpg/game.html
                     <span data-i18n="drink">Beber</span>
                 </button>
             </div>
+            <div class="mt-3 rounded-xl border border-purple-900/50 bg-purple-950/30 p-3">
+                <span class="block text-xs font-medium text-purple-200" data-i18n="mistPowers">Poderes da Névoa</span>
+                <p id="mist-power-list" class="mt-1 text-[11px] text-purple-100/80" data-i18n="noMistPowers">Nenhum poder encontrado.</p>
+            </div>
         </section>
 
         <!-- Área Central de Jogo e Combate -->
@@ -176,6 +180,20 @@ permalink: /mini_games/yara-rpg/game.html
                 <p id="exploration-description" class="text-xs sm:text-sm text-emerald-300/90 font-medium" data-i18n="explorationIntro">🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?</p>
                 <button id="restart-button" onclick="restartGame()" class="hidden mt-3 bg-amber-600 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded-lg transition" data-i18n="restart">Reiniciar jornada</button>
             </div>
+
+            <section id="mist-contact-card" class="hidden bg-purple-950/40 border border-purple-700/60 rounded-xl p-4 mb-4" aria-live="polite" aria-labelledby="mist-contact-name">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl" aria-hidden="true">👻</span>
+                    <div>
+                        <h3 id="mist-contact-name" class="text-sm sm:text-base text-purple-200 font-bold"></h3>
+                        <p id="mist-contact-message" class="mt-1 text-xs sm:text-sm text-purple-100/90"></p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+                    <button id="mist-contact-accept" type="button" onclick="acceptMistContact()" class="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-2.5 px-3 rounded-lg border border-purple-400/50 transition" data-i18n="mistAccept">Prosseguir com o espírito</button>
+                    <button id="mist-contact-decline" type="button" onclick="declineMistContact()" class="bg-forest-800 hover:bg-forest-700 text-emerald-100 font-semibold py-2.5 px-3 rounded-lg border border-forest-600 transition" data-i18n="mistDecline">Recusar e seguir</button>
+                </div>
+            </section>
 
             <!-- Log de Acontecimentos -->
             <div id="rpg-log" class="rpg-scroll bg-forest-950/90 border border-fantasy-border rounded-xl p-3 h-44 sm:h-48 overflow-y-auto space-y-2 text-xs sm:text-sm mb-4 font-mono">
@@ -230,4 +248,6 @@ permalink: /mini_games/yara-rpg/game.html
     <script src="js/data/regions.js" defer></script>
     <script src="js/data/monsters.js" defer></script>
     <script src="js/data/game-rules.js" defer></script>
+    <script src="js/data/mist-contacts.js" defer></script>
+    <script src="js/systems/mist-contacts.js" defer></script>
     <script src="js/game.js" defer></script>
