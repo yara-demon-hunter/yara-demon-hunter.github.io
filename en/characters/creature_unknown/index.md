@@ -10,7 +10,7 @@ sitemap: false
 character:
   name: The Mysterious Creature
   role: Antagonist
-  directory: false
+  directory: true
   book_url: /en/books/book-1/
   summary: An antagonistic creature whose identity, backstory, and motivations are still being revealed.
   portrait_alt: Portrait of the Mysterious Creature

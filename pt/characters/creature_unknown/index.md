@@ -10,7 +10,7 @@ sitemap: false
 character:
   name: A Criatura Misteriosa
   role: Antagonista
-  directory: false
+  directory: true
   book_url: /pt/books/book-1/
   summary: Uma criatura antagonista cuja identidade, história e motivações ainda estão sendo reveladas.
   portrait_alt: Retrato da Criatura Misteriosa
