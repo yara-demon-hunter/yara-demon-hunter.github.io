@@ -36,6 +36,10 @@
                     Livros
                 </a>
 
+                <a class="{% if page.url contains '/mini_games' or page.url contains '/mini-games' %}is-active{% endif %}" href="{{ '/pt/mini-games/' | relative_url }}">
+                    Mini Games
+                </a>
+
                 <a
                     class="{% if page.url contains '/pt/characters' %}is-active{% endif %}"
                     href="{{ '/pt/characters/' | relative_url }}"
@@ -50,7 +54,12 @@
                     Mundo
                 </a>
 
-                <a class="{% if page.url contains '/mini_games' or page.url contains '/mini-games' %}is-active{% endif %}" href="{{ '/pt/mini-games/' | relative_url }}">Mini Games</a>
+                <a
+                    class="{% if page.url contains '/pt/updates' %}is-active{% endif %}"
+                    href="{{ '/pt/updates/' | relative_url }}"
+                >
+                    Atualizações
+                </a>
 
                 <a
                     class="{% if page.url contains '/pt/about' %}is-active{% endif %}"
@@ -98,6 +107,10 @@
                     Books
                 </a>
 
+                <a class="{% if page.url contains '/mini_games' or page.url contains '/mini-games' %}is-active{% endif %}" href="{{ '/en/mini-games/' | relative_url }}">
+                    Mini Games
+                </a>
+
                 <a
                     class="{% if page.url contains '/en/characters' %}is-active{% endif %}"
                     href="{{ '/en/characters/' | relative_url }}"
@@ -112,7 +125,12 @@
                     World
                 </a>
 
-                <a class="{% if page.url contains '/mini_games' or page.url contains '/mini-games' %}is-active{% endif %}" href="{{ '/en/mini-games/' | relative_url }}">Mini Games</a>
+                <a
+                    class="{% if page.url contains '/en/updates' %}is-active{% endif %}"
+                    href="{{ '/en/updates/' | relative_url }}"
+                >
+                    Updates
+                </a>
 
                 <a
                     class="{% if page.url contains '/en/about' %}is-active{% endif %}"

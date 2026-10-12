@@ -1,0 +1,21 @@
+- date: "2026-09-27"
+  title:
+    en: "Explore Gudran's Village"
+    pt: "Explore o Vilarejo de Gudran"
+  summary:
+    en: "Visit the village at the edge of the forest and learn about its people, landmarks, and the rule of the bell."
+    pt: "Conheça o vilarejo à beira da floresta, seus moradores, seus lugares e a regra do sino."
+  url:
+    en: "/en/world/gudran_village/"
+    pt: "/pt/world/gudran_village/"
+
+- date: "2026-09-25"
+  title:
+    en: "Book One's chapters in one place"
+    pt: "Os capítulos do Livro Um em um só lugar"
+  summary:
+    en: "The reading guide brings together the prologue and the published chapters of The Awakening of Vengeance."
+    pt: "O guia de leitura reúne o prólogo e os capítulos publicados de O Despertar da Vingança."
+  url:
+    en: "/en/books/book-1/chapters/"
+    pt: "/pt/books/book-1/chapters/"

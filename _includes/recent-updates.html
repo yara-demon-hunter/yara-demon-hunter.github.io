@@ -1,0 +1,37 @@
+<aside class="recent-updates" aria-labelledby="recent-updates-title">
+    <header class="recent-updates__header">
+        {% if page.lang == "pt" %}
+            <p class="section-label">Diário do projeto</p>
+            <h2 id="recent-updates-title">Atualizações recentes</h2>
+        {% else %}
+            <p class="section-label">Project log</p>
+            <h2 id="recent-updates-title">Recent updates</h2>
+        {% endif %}
+    </header>
+
+    <ol class="recent-updates__list">
+        {% assign updates = site.data.updates | sort: "date" | reverse %}
+        {% for update in updates limit: 5 %}
+            <li class="recent-updates__item">
+                <time datetime="{{ update.date | date: '%Y-%m-%d' }}">
+                    {% if page.lang == "pt" %}
+                        {{ update.date | date: "%d/%m/%Y" }}
+                    {% else %}
+                        {{ update.date | date: "%B %-d, %Y" }}
+                    {% endif %}
+                </time>
+                <h3>
+                    <a href="{{ update.url[page.lang] | relative_url }}">
+                        {{ update.title[page.lang] }}
+                    </a>
+                </h3>
+                <p>{{ update.summary[page.lang] }}</p>
+            </li>
+        {% endfor %}
+    </ol>
+
+    <a class="recent-updates__archive-link" href="{% if page.lang == 'pt' %}{{ '/pt/updates/' | relative_url }}{% else %}{{ '/en/updates/' | relative_url }}{% endif %}">
+        {% if page.lang == "pt" %}Ver todas as atualizações{% else %}View all updates{% endif %}
+        <span aria-hidden="true">→</span>
+    </a>
+</aside>

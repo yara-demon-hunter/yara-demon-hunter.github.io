@@ -39,19 +39,25 @@
             {% include header.html %}
         {% endunless %}
 
-        <main id="main-content"{% if page.full_width %} class="main--full-width"{% endif %}>
+        <div class="site-content-layout">
+            <main id="main-content"{% if page.full_width %} class="main--full-width"{% endif %}>
 
-            {{ content }}
+                {{ content }}
 
-            {% unless page.layout == "legal" or page.layout == "copyright" %}
-                {% include last-updated.html %}
+                {% unless page.layout == "legal" or page.layout == "copyright" %}
+                    {% include last-updated.html %}
+                {% endunless %}
+
+                {% if page.chapter_type %}
+                    {% include chapter-navigation.html %}
+                {% endif %}
+
+            </main>
+
+            {% unless page.hide_recent_updates %}
+                {% include recent-updates.html %}
             {% endunless %}
-
-            {% if page.chapter_type %}
-                {% include chapter-navigation.html %}
-            {% endif %}
-
-        </main>
+        </div>
 
         {% include footer.html %}
     {% else %}
