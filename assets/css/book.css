@@ -107,30 +107,7 @@
 }
 
 .book-synopsis__text {
-    max-height: 220px;
-    overflow-y: auto;
-    padding-right: 0.75rem;
-    overscroll-behavior: contain;
-    scrollbar-color: var(--accent) var(--surface);
-    scrollbar-width: thin;
     text-align: left;
-}
-
-.book-synopsis__text:focus-visible {
-    outline: 1px solid var(--accent);
-    outline-offset: 4px;
-}
-
-.book-synopsis__text::-webkit-scrollbar {
-    width: 6px;
-}
-
-.book-synopsis__text::-webkit-scrollbar-track {
-    background: var(--surface);
-}
-
-.book-synopsis__text::-webkit-scrollbar-thumb {
-    background: var(--accent);
 }
 
 .book-chapters {

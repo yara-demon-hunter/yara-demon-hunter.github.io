@@ -33,7 +33,7 @@ last_updated: 2026-09-23
                 <p class="section-label">Sinopse</p>
                 <h2 id="book-synopsis-title">A vingança já está em movimento</h2>
 
-                <div class="book-synopsis__text" tabindex="0" aria-label="Texto da sinopse">
+                <div class="book-synopsis__text">
                     <p><strong>Há uma criatura vagando pelo mundo real.</strong> Algo foi tirado dela — e a dor dessa perda apodreceu em sua alma até se tornar uma sede implacável de vingança. Após décadas de busca, ela finalmente encontrou o que precisava para concretizar sua retaliação: um vilarejo isolado, cercado por uma floresta impenetrável, onde uma névoa viva devora as ruas todas as noites.</p>
 
                     <p>Ali, o silêncio virou lei. Os moradores aprenderam a fechar os olhos para o bizarro e a trancar suas portas antes que a névoa chegue — e, por gerações, isso bastou. Eles achavam que estavam a salvo.</p>

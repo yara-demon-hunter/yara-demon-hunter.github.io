@@ -10,14 +10,6 @@ BOOK READER
 
 .book-reader__book {
     width: 100%;
-    height: min(72vh, 760px);
-    min-height: 360px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-    scrollbar-color: #625e54 #24231f;
-    scrollbar-width: thin;
-
     background: #302e29;
     color: #e5e0d5;
     border: 1px solid #45423b;
@@ -26,45 +18,8 @@ BOOK READER
         0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
-.book-reader__book::-webkit-scrollbar {
-    width: 10px;
-}
-
-.book-reader__book::-webkit-scrollbar-track {
-    background: #24231f;
-}
-
-.book-reader__book::-webkit-scrollbar-thumb {
-    background: #625e54;
-    border: 3px solid #24231f;
-}
-
-.book-reader__book::-webkit-scrollbar-thumb:hover {
-    background: #817b6e;
-}
-
-.book-reader__book:focus-visible {
-    outline: 2px solid #aaa69e;
-    outline-offset: 4px;
-}
-
-.book-reader__page-number {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    padding: 13px 20px;
-
-    background: #24231f;
-    border-bottom: 1px solid #45423b;
-    color: #aaa69e;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 0.78rem;
-    text-align: right;
-    letter-spacing: 0.04em;
-}
-
 .book-reader__source {
-    padding: 36px clamp(22px, 6vw, 68px) 48px;
+    padding: 36px clamp(22px, 6vw, 68px);
 
     color: #ddd8ce;
     font-family: Georgia, "Times New Roman", serif;
@@ -82,18 +37,11 @@ BOOK READER
 
 @media (max-width: 600px) {
     .book-reader__book {
-        height: min(68svh, 680px);
-        min-height: 300px;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
     }
 
-    .book-reader__page-number {
-        padding: 12px 16px;
-        font-size: 0.74rem;
-    }
-
     .book-reader__source {
-        padding: 26px 22px 36px;
+        padding: 26px 22px;
         font-size: 1rem;
         line-height: 1.8;
     }

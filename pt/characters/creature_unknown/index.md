@@ -5,10 +5,12 @@ lang: pt
 book_id: book-1
 translation_id: character-creature-unknown
 last_updated: 2026-09-27
+noindex: true
+sitemap: false
 character:
   name: A Criatura Misteriosa
   role: Antagonista
-  directory: true
+  directory: false
   book_url: /pt/books/book-1/
   summary: Uma criatura antagonista cuja identidade, história e motivações ainda estão sendo reveladas.
   portrait_alt: Retrato da Criatura Misteriosa

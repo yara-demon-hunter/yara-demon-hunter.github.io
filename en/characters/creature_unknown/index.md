@@ -5,10 +5,12 @@ lang: en
 book_id: book-1
 translation_id: character-creature-unknown
 last_updated: 2026-09-27
+noindex: true
+sitemap: false
 character:
   name: The Mysterious Creature
   role: Antagonist
-  directory: true
+  directory: false
   book_url: /en/books/book-1/
   summary: An antagonistic creature whose identity, backstory, and motivations are still being revealed.
   portrait_alt: Portrait of the Mysterious Creature

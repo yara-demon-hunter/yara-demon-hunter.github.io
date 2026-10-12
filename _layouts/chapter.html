@@ -46,24 +46,7 @@ layout: default
 
         <div
             class="book-reader__book"
-            role="region"
-            tabindex="0"
-            aria-label="{% if page.lang == 'pt' %}Leitor do capítulo{% else %}Chapter reader{% endif %}"
         >
-
-            <div
-                class="book-reader__page-number"
-                data-language="{{ page.lang }}"
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-            >
-                {% if page.lang == "pt" %}
-                    Página estimada 1 / 1
-                {% else %}
-                    Estimated page 1 / 1
-                {% endif %}
-            </div>
 
             <div class="book-reader__source">
 
