@@ -231,40 +231,132 @@ h1, h2, h3, .font-title {
         display: none;
     }
     #game-main {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
         gap: 8px !important;
         margin-bottom: 0 !important;
     }
     #hero-panel {
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        order: 0;
-        flex: none;
-        padding: 10px !important;
+        display: contents;
+    }
+    .hero-vitals {
+        display: contents;
+    }
+    .hero-summary {
+        order: 1;
+        display: flex;
+        align-items: center;
+        margin: 0 !important;
+        padding: 8px 12px !important;
+        border: 1px solid rgba(92, 81, 55, 0.7);
         border-radius: 14px;
-        background: rgba(23, 25, 31, 0.97);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-        backdrop-filter: blur(12px);
+        background: rgba(23, 25, 31, 0.95);
     }
-    #hero-panel > div:first-child > div:first-child {
-        margin-bottom: 8px !important;
-        padding-bottom: 7px !important;
+    .hero-summary > div:first-child {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    #hero-panel .space-y-3 {
-        margin-bottom: 8px !important;
+    .hero-summary #hero-name {
+        font-size: 1rem;
     }
-    #hero-panel .space-y-3 > :not([hidden]) ~ :not([hidden]) {
-        margin-top: 0.4rem !important;
+    .hero-summary > div:first-child > span {
+        white-space: nowrap;
     }
-    #hero-panel .space-y-3 > div > .w-full {
-        height: 8px;
+    .hero-status-bars {
+        order: 2;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px !important;
+        margin: 0 !important;
     }
-    #hero-panel .space-y-3 > div:first-child > .w-full {
-        height: 10px;
+    .hero-status-bars > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 0 !important;
+    }
+    .hero-status-bars > div {
+        min-width: 0;
+        padding: 7px 8px;
+        border: 1px solid rgba(92, 81, 55, 0.45);
+        border-radius: 10px;
+        background: rgba(12, 13, 15, 0.72);
+    }
+    .hero-status-bars > div > div:first-child {
+        gap: 3px;
+        font-size: 0.62rem;
+        line-height: 1.2;
+    }
+    .hero-status-bars .skill-upgrade-button {
+        width: 23px;
+        height: 23px;
+    }
+    .hero-status-bars > div > .w-full {
+        height: 7px;
+    }
+    .hero-inventory {
+        order: 3;
+        margin: 0 !important;
+        padding: 6px 10px !important;
+        border-radius: 12px;
+        background: rgba(12, 13, 15, 0.82);
+    }
+    .hero-inventory > div > span:first-child {
+        font-size: 1.25rem;
+    }
+    #game-panel {
+        order: 4;
+        grid-column: 1 / -1;
+        min-width: 0;
+        backdrop-filter: none !important;
+    }
+    #hero-attributes {
+        order: 5;
+        padding: 0 10px 5px;
+        border: 1px solid rgba(92, 81, 55, 0.45);
+        border-radius: 12px;
+        background: rgba(23, 25, 31, 0.72);
+    }
+    .hero-mist-powers {
+        order: 6;
+        margin: 0 !important;
+        padding: 9px 10px !important;
+        border-radius: 12px;
+        background: rgba(23, 25, 31, 0.72);
+    }
+    #game-main > nav[aria-label="Jornada"] {
+        order: 0;
+        grid-column: 1 / -1;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(92, 81, 55, 0.55);
+    }
+    #game-main > nav[aria-label="Jornada"] > h2 {
+        margin-bottom: 4px !important;
+        font-size: 0.65rem;
+    }
+    #discovery-chance {
+        margin-bottom: 6px !important;
+        font-size: 0.62rem !important;
+    }
+    #region-progress {
+        display: flex !important;
+        gap: 6px !important;
+        overflow-x: auto;
+        padding-bottom: 3px;
+        scrollbar-width: none;
+    }
+    #region-progress::-webkit-scrollbar {
+        display: none;
+    }
+    #region-progress li {
+        flex: 0 0 auto;
+        min-width: 92px;
+        justify-content: center;
+        padding: 6px 8px !important;
+        text-align: center;
+        white-space: nowrap;
     }
     .hero-attributes {
-        padding-top: 5px;
-        border-top: 1px solid rgba(41, 43, 49, 0.7);
+        min-width: 0;
     }
     .hero-attributes summary {
         min-height: 32px;
@@ -288,35 +380,32 @@ h1, h2, h3, .font-title {
     .hero-attributes[open] summary::after {
         content: "−";
     }
-    #hero-panel > div:last-child {
-        padding: 7px 9px !important;
-    }
-    #hero-panel > div:last-child > div > span:first-child {
-        font-size: 1.25rem;
-    }
     #potion-button {
         min-height: 38px;
         padding-inline: 14px !important;
     }
-    #game-panel {
-        order: 1;
-        min-height: 0 !important;
-        padding: 10px !important;
-        border-radius: 14px;
-        backdrop-filter: none;
-    }
-    #game-main > nav[aria-label="Jornada"] {
-        order: 2;
-        padding-bottom: 8px;
-    }
-    #region-progress li {
-        justify-content: flex-start;
-        text-align: left;
-    }
     #rpg-log {
-        height: 22vh !important;
-        min-height: 100px;
-        max-height: 170px;
+        height: clamp(76px, 13vh, 112px) !important;
+        min-height: 76px;
+        max-height: 112px;
+        margin-bottom: 10px !important;
+        padding: 9px !important;
+    }
+    #encounter-card,
+    #exploration-banner,
+    #mist-contact-card {
+        margin-bottom: 10px !important;
+        padding: 10px !important;
+    }
+    #monster-icon {
+        padding: 6px !important;
+        font-size: 1.5rem !important;
+    }
+    #encounter-card > div > div:last-child {
+        min-width: 92px;
+    }
+    #encounter-card > div > div:last-child > div:last-child {
+        width: 100% !important;
     }
     #action-controls {
         position: fixed;
@@ -343,7 +432,11 @@ h1, h2, h3, .font-title {
     }
     #controls-explore button:first-child,
     #controls-explore button:last-child {
-        grid-column: 1 / -1;
+        grid-column: auto;
+        min-height: 58px;
+        padding: 6px !important;
+        font-size: 0.65rem !important;
+        line-height: 1.2;
     }
     #controls-combat {
         grid-template-columns: repeat(6, minmax(0, 1fr));
