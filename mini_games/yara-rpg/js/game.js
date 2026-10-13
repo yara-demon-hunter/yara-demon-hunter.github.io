@@ -23,8 +23,24 @@ const translations = {
         defense: "Defesa",
         attributes: "Atributos",
         equipment: "Equipamento",
+        equipmentSummary: "Equipamento, {count} de 7 equipados",
         inventory: "Mochila",
+        equipmentBagDescription: "Até 10 equipamentos guardados.",
+        bagCapacity: "{count}/10 espaços usados",
+        bagSlot: "Espaço {slot}",
+        emptyBagSlot: "Vazio",
+        openEquipmentBag: "Abrir mochila, {count} de 10 espaços usados",
+        closeBag: "Fechar mochila",
+        openBag: "Abrir mochila",
+        discard: "Descartar",
+        discardItemAria: "Descartar {item} da mochila",
+        itemDiscarded: "🗑️ {item} descartado.",
+        inventoryFull: "Mochila cheia (10/10). Libere um espaço antes de guardar outro equipamento.",
+        pendingEquipment: "Equipamento encontrado aguardando espaço: {item}.",
+        pendingEquipmentFullHelp: "A mochila está cheia. Descarte um item para liberar espaço; o item encontrado ficará aguardando.",
         emptySlot: "Vazio",
+        viewEquipmentDetails: "Ver propriedades de {item}",
+        closeItemDetails: "Fechar detalhes do equipamento",
         rightHand: "Mão direita",
         leftHand: "Mão esquerda",
         head: "Cabeça",
@@ -163,8 +179,24 @@ const translations = {
         defense: "Defense",
         attributes: "Stats",
         equipment: "Equipment",
+        equipmentSummary: "Equipment, {count} of 7 equipped",
         inventory: "Bag",
+        equipmentBagDescription: "Store up to 10 pieces of equipment.",
+        bagCapacity: "{count}/10 spaces used",
+        bagSlot: "Slot {slot}",
+        emptyBagSlot: "Empty",
+        openEquipmentBag: "Open bag, {count} of 10 spaces used",
+        closeBag: "Close bag",
+        openBag: "Open bag",
+        discard: "Discard",
+        discardItemAria: "Discard {item} from the bag",
+        itemDiscarded: "🗑️ {item} discarded.",
+        inventoryFull: "Bag full (10/10). Free a slot before storing another item.",
+        pendingEquipment: "Found equipment waiting for space: {item}.",
+        pendingEquipmentFullHelp: "The bag is full. Discard an item to free a slot; the found item will remain here.",
         emptySlot: "Empty",
+        viewEquipmentDetails: "View {item} properties",
+        closeItemDetails: "Close equipment details",
         rightHand: "Right hand",
         leftHand: "Left hand",
         head: "Head",
@@ -299,6 +331,7 @@ const EQUIPMENT_SLOTS = Object.freeze([
     { id: "boots", icon: "🥾" },
     { id: "accessory", icon: "💍" }
 ]);
+const EQUIPMENT_BAG_CAPACITY = 10;
 const EQUIPMENT_STAT_KEYS = Object.freeze({
     atk: "attackStat",
     def: "defenseStat",
@@ -455,6 +488,7 @@ let gameOver = false;
 let openUpgradeOptions = null;
 let pendingMistContact = null;
 let pendingEquipment = null;
+let selectedEquipmentDetails = null;
 let equipmentInstanceId = 0;
 let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
 
@@ -469,14 +503,46 @@ document.addEventListener('keydown', (event) => {
 
 document.getElementById('equip-new-item-button').addEventListener('click', equipPendingEquipment);
 document.getElementById('keep-current-item-button').addEventListener('click', keepPendingEquipment);
+document.getElementById('open-equipment-bag-button').addEventListener('click', openEquipmentBag);
+document.getElementById('open-bag-from-drop-button').addEventListener('click', openEquipmentBag);
+document.getElementById('close-equipment-bag-button').addEventListener('click', closeEquipmentBag);
+document.getElementById('close-equipment-item-button').addEventListener('click', closeEquipmentItemDetails);
+document.getElementById('equipment-item-equip-button').addEventListener('click', equipSelectedInventoryItem);
+document.getElementById('equipment-item-unequip-button').addEventListener('click', unequipSelectedEquipment);
+document.getElementById('equipment-item-discard-button').addEventListener('click', discardSelectedInventoryItem);
+document.getElementById('equipment-item-dialog').addEventListener('close', () => {
+    selectedEquipmentDetails = null;
+});
+document.getElementById('equipment-bag-dialog').addEventListener('cancel', (event) => {
+    if (isPendingDropBlocked()) {
+        event.preventDefault();
+        openEquipmentBag();
+    }
+});
 document.getElementById('item-drop-dialog').addEventListener('cancel', (event) => {
     event.preventDefault();
+    if (isPendingDropBlocked()) {
+        openEquipmentBag();
+        return;
+    }
     keepPendingEquipment();
 });
 
 function renderEquipment() {
     const slotsContainer = document.getElementById('equipment-slots');
+    const bagButton = document.getElementById('open-equipment-bag-button');
     slotsContainer.replaceChildren();
+    const equippedCount = Object.values(hero.equipment).filter(Boolean).length;
+    const equippedItemCount = document.getElementById('equipped-item-count');
+    equippedItemCount.textContent = `${equippedCount}/${EQUIPMENT_SLOTS.length}`;
+    document.getElementById('hero-equipment-toggle').setAttribute(
+        'aria-label',
+        t('equipmentSummary', { count: equippedCount })
+    );
+    const bagCount = hero.equipmentInventory.length;
+    const bagCountText = `${bagCount}/${EQUIPMENT_BAG_CAPACITY}`;
+    bagButton.querySelector('#equipment-bag-count').textContent = bagCountText;
+    bagButton.setAttribute('aria-label', t('openEquipmentBag', { count: bagCount }));
 
     EQUIPMENT_SLOTS.forEach(({ id, icon }) => {
         const item = hero.equipment[id];
@@ -485,36 +551,21 @@ function renderEquipment() {
         slot.setAttribute('role', 'group');
         slot.setAttribute('aria-label', `${t(id)}: ${item ? item.name[gameLanguage] : t('emptySlot')}`);
 
-        const label = document.createElement('span');
-        label.className = 'sr-only';
-        label.textContent = t(id);
-        slot.append(label);
-
         if (item) {
+            const itemButton = document.createElement('button');
+            itemButton.type = 'button';
+            itemButton.className = 'equipment-slot-item';
+            itemButton.setAttribute('aria-label', t('viewEquipmentDetails', {
+                item: item.name[gameLanguage]
+            }));
+
             const itemIcon = document.createElement('span');
             itemIcon.className = 'equipment-slot-icon text-amber-200';
             itemIcon.textContent = item.icon;
             itemIcon.setAttribute('aria-hidden', 'true');
-
-            const name = document.createElement('span');
-            name.className = 'equipment-slot-name font-semibold text-amber-200';
-            name.textContent = item.name[gameLanguage];
-
-            const bonus = document.createElement('span');
-            bonus.className = 'equipment-slot-bonus text-emerald-300';
-            bonus.textContent = getItemBonusText(item);
-
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'equipment-slot-unequip min-h-8 rounded-md border border-red-900/70 bg-red-950/50 px-2 text-[10px] font-semibold text-red-200 disabled:opacity-40';
-            button.textContent = t('unequip');
-            button.setAttribute('aria-label', t('unequipItemAria', {
-                item: item.name[gameLanguage],
-                slot: t(id)
-            }));
-            button.disabled = inCombat || gameOver || Boolean(pendingEquipment);
-            button.addEventListener('click', () => unequipItem(id));
-            slot.append(itemIcon, name, bonus, button);
+            itemButton.append(itemIcon);
+            itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'equipped', id));
+            slot.append(itemButton);
         } else {
             const placeholder = document.createElement('span');
             placeholder.className = 'equipment-slot-icon equipment-slot-placeholder';
@@ -526,41 +577,157 @@ function renderEquipment() {
         slotsContainer.append(slot);
     });
 
-    const inventorySection = document.getElementById('equipment-inventory');
+    bagButton.className = 'equipment-slot equipment-bag-button';
+    bagButton.setAttribute('aria-haspopup', 'dialog');
+    bagButton.setAttribute('aria-controls', 'equipment-bag-dialog');
+    slotsContainer.append(bagButton);
+
     const inventoryContainer = document.getElementById('equipment-inventory-list');
     inventoryContainer.replaceChildren();
-    inventorySection.hidden = hero.equipmentInventory.length === 0;
+    for (let index = 0; index < EQUIPMENT_BAG_CAPACITY; index++) {
+        const item = hero.equipmentInventory[index];
+        const slot = document.createElement('div');
+        slot.className = `equipment-bag-slot${item ? ' has-item' : ''}`;
+        slot.setAttribute('role', 'listitem');
+        slot.setAttribute('aria-label', item
+            ? `${t('bagSlot', { slot: index + 1 })}: ${item.name[gameLanguage]}`
+            : `${t('bagSlot', { slot: index + 1 })}: ${t('emptyBagSlot')}`);
 
-    hero.equipmentInventory.forEach((item) => {
-        const row = document.createElement('div');
-        row.className = 'flex items-center justify-between gap-2 rounded-lg border border-fantasy-border/50 bg-black/20 p-2';
+        const position = document.createElement('span');
+        position.className = 'equipment-bag-slot-number';
+        position.textContent = String(index + 1).padStart(2, '0');
 
-        const description = document.createElement('div');
-        description.className = 'min-w-0';
+        if (item) {
+            const itemButton = document.createElement('button');
+            itemButton.type = 'button';
+            itemButton.className = 'equipment-bag-item';
+            itemButton.setAttribute('aria-label', t('viewEquipmentDetails', {
+                item: item.name[gameLanguage]
+            }));
+            const itemIcon = document.createElement('span');
+            itemIcon.className = 'equipment-bag-item-icon';
+            itemIcon.textContent = item.icon;
+            itemIcon.setAttribute('aria-hidden', 'true');
+            itemButton.append(itemIcon);
+            itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'inventory'));
+            slot.append(position, itemButton);
+        } else {
+            const empty = document.createElement('span');
+            empty.className = 'equipment-bag-empty';
+            empty.textContent = t('emptyBagSlot');
+            slot.append(empty);
+        }
 
-        const name = document.createElement('span');
-        name.className = 'block truncate text-xs font-semibold text-amber-200';
-        name.textContent = `${item.icon} ${item.name[gameLanguage]}`;
+        inventoryContainer.append(slot);
+    }
 
-        const bonus = document.createElement('span');
-        bonus.className = 'block text-[10px] text-emerald-300';
-        bonus.textContent = `${t(item.slot)} · ${getItemBonusText(item)}`;
+    document.getElementById('equipment-bag-dialog-count').textContent = bagCountText;
+    document.getElementById('equipment-bag-dialog-count').setAttribute(
+        'aria-label',
+        t('bagCapacity', { count: bagCount })
+    );
+    const pendingLabel = document.getElementById('equipment-bag-pending-item');
+    pendingLabel.hidden = !isPendingDropBlocked();
+    if (!pendingLabel.hidden) {
+        pendingLabel.textContent = t('pendingEquipment', {
+            item: pendingEquipment.item.name[gameLanguage]
+        });
+    }
+}
 
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'min-h-9 shrink-0 rounded-md border border-emerald-700 bg-emerald-950/60 px-2 text-xs font-semibold text-emerald-100 disabled:opacity-40';
-        button.textContent = t('equip');
-        button.setAttribute('aria-label', t('equipItemAria', {
-            item: item.name[gameLanguage],
-            slot: t(item.slot)
-        }));
-        button.disabled = inCombat || gameOver || Boolean(pendingEquipment);
-        button.addEventListener('click', () => equipInventoryItem(item));
+function openEquipmentBag() {
+    const dropDialog = document.getElementById('item-drop-dialog');
+    if (dropDialog.open) dropDialog.close();
+    const bagDialog = document.getElementById('equipment-bag-dialog');
+    renderEquipment();
+    if (!bagDialog.open) bagDialog.showModal();
+}
 
-        description.append(name, bonus);
-        row.append(description, button);
-        inventoryContainer.append(row);
+function showEquipmentItemDetails(item, source, slot = null) {
+    selectedEquipmentDetails = { item, source, slot };
+    document.getElementById('equipment-item-icon').textContent = item.icon;
+    document.getElementById('equipment-item-title').textContent = item.name[gameLanguage];
+    document.getElementById('equipment-item-slot').textContent = t(item.slot);
+
+    const properties = document.getElementById('equipment-item-properties');
+    properties.replaceChildren();
+    Object.entries(item.stats).forEach(([stat, amount]) => {
+        const property = document.createElement('li');
+        property.textContent = t(
+            stat === 'evasion' || stat === 'parry'
+                ? 'equipmentPercentageBonus'
+                : 'equipmentBonus',
+            { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
+        );
+        properties.append(property);
     });
+
+    const isInventoryItem = source === 'inventory';
+    const equipButton = document.getElementById('equipment-item-equip-button');
+    const unequipButton = document.getElementById('equipment-item-unequip-button');
+    const discardButton = document.getElementById('equipment-item-discard-button');
+    equipButton.hidden = !isInventoryItem;
+    equipButton.disabled = inCombat || gameOver || Boolean(pendingEquipment);
+    equipButton.setAttribute('aria-label', t('equipItemAria', {
+        item: item.name[gameLanguage],
+        slot: t(item.slot)
+    }));
+    unequipButton.hidden = isInventoryItem;
+    unequipButton.disabled = inCombat || gameOver || Boolean(pendingEquipment)
+        || hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY;
+    unequipButton.setAttribute('aria-label', t('unequipItemAria', {
+        item: item.name[gameLanguage],
+        slot: t(item.slot)
+    }));
+    discardButton.hidden = !isInventoryItem;
+    discardButton.disabled = inCombat || gameOver;
+    discardButton.setAttribute('aria-label', t('discardItemAria', {
+        item: item.name[gameLanguage]
+    }));
+    document.getElementById('equipment-item-dialog').showModal();
+}
+
+function closeEquipmentItemDetails() {
+    const dialog = document.getElementById('equipment-item-dialog');
+    if (dialog.open) dialog.close();
+}
+
+function equipSelectedInventoryItem() {
+    const selection = selectedEquipmentDetails;
+    if (!selection || selection.source !== 'inventory') return;
+    closeEquipmentItemDetails();
+    equipInventoryItem(selection.item);
+}
+
+function unequipSelectedEquipment() {
+    const selection = selectedEquipmentDetails;
+    if (!selection || selection.source !== 'equipped') return;
+    closeEquipmentItemDetails();
+    unequipItem(selection.slot);
+}
+
+function discardSelectedInventoryItem() {
+    const selection = selectedEquipmentDetails;
+    if (!selection || selection.source !== 'inventory') return;
+    closeEquipmentItemDetails();
+    discardInventoryItem(selection.item);
+}
+
+function closeEquipmentBag() {
+    document.getElementById('equipment-bag-dialog').close();
+    if (isPendingDropBlocked()) showEquipmentChoice(pendingEquipment.item, false);
+}
+
+function discardInventoryItem(item) {
+    const inventoryIndex = hero.equipmentInventory.indexOf(item);
+    if (inventoryIndex === -1 || inCombat || gameOver) return;
+    hero.equipmentInventory.splice(inventoryIndex, 1);
+    logMessage(t('itemDiscarded', { item: item.name[gameLanguage] }), 'loot');
+    updateUI();
+    if (pendingEquipment && !pendingEquipment.fromInventory) {
+        document.getElementById('equipment-bag-dialog').close();
+        showEquipmentChoice(pendingEquipment.item, false);
+    }
 }
 
 function showEquipmentChoice(item, fromInventory) {
@@ -571,9 +738,25 @@ function showEquipmentChoice(item, fromInventory) {
         slot: t(item.slot),
         currentItem: `${currentItem.icon} ${currentItem.name[gameLanguage]}`
     });
+    const blockedByFullBag = isPendingDropBlocked();
+    document.getElementById('item-drop-choice-help').textContent = blockedByFullBag
+        ? t('pendingEquipmentFullHelp')
+        : t('itemDropChoiceHelp');
     document.getElementById('item-drop-bonuses').textContent = getItemBonusText(item);
+    document.getElementById('equip-new-item-button').disabled = blockedByFullBag;
+    document.getElementById('keep-current-item-button').disabled = blockedByFullBag;
+    document.getElementById('open-bag-from-drop-button').hidden = !blockedByFullBag;
     document.getElementById('item-drop-dialog').showModal();
     renderEquipment();
+}
+
+function isPendingDropBlocked() {
+    return Boolean(
+        pendingEquipment
+        && !pendingEquipment.fromInventory
+        && hero.equipment[pendingEquipment.item.slot]
+        && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY
+    );
 }
 
 function handleEquipmentDrop(item) {
@@ -608,13 +791,20 @@ function createEquipmentDrop() {
 }
 
 function equipItem(item, fromInventory) {
+    let inventoryIndex = -1;
     if (fromInventory) {
-        const inventoryIndex = hero.equipmentInventory.indexOf(item);
+        inventoryIndex = hero.equipmentInventory.indexOf(item);
         if (inventoryIndex === -1) return;
         hero.equipmentInventory.splice(inventoryIndex, 1);
     }
 
     const previousItem = hero.equipment[item.slot];
+    if (previousItem && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY) {
+        if (fromInventory) hero.equipmentInventory.splice(inventoryIndex, 0, item);
+        logMessage(t('inventoryFull'), 'loot');
+        updateUI();
+        return;
+    }
     if (previousItem) {
         hero.equipmentInventory.push(previousItem);
         logMessage(t('itemStored', { item: previousItem.name[gameLanguage] }), 'loot');
@@ -632,6 +822,7 @@ function equipItem(item, fromInventory) {
 function equipInventoryItem(item) {
     if (inCombat || gameOver || !hero.equipmentInventory.includes(item)) return;
     if (hero.equipment[item.slot]) {
+        document.getElementById('equipment-bag-dialog').close();
         showEquipmentChoice(item, true);
         return;
     }
@@ -642,6 +833,10 @@ function unequipItem(slot) {
     if (inCombat || gameOver || pendingEquipment) return;
     const item = hero.equipment[slot];
     if (!item) return;
+    if (hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY) {
+        logMessage(t('inventoryFull'), 'loot');
+        return;
+    }
     hero.equipment[slot] = null;
     hero.equipmentInventory.push(item);
     hero.hp = Math.min(hero.hp, getEffectiveStat('maxHp'));
@@ -651,7 +846,7 @@ function unequipItem(slot) {
 }
 
 function equipPendingEquipment() {
-    if (!pendingEquipment || inCombat || gameOver) return;
+    if (!pendingEquipment || inCombat || gameOver || isPendingDropBlocked()) return;
     const { item, fromInventory } = pendingEquipment;
     pendingEquipment = null;
     document.getElementById('item-drop-dialog').close();
@@ -660,6 +855,11 @@ function equipPendingEquipment() {
 
 function keepPendingEquipment() {
     if (!pendingEquipment) return;
+    if (!pendingEquipment.fromInventory
+        && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY) {
+        openEquipmentBag();
+        return;
+    }
     const { item, fromInventory } = pendingEquipment;
     pendingEquipment = null;
     document.getElementById('item-drop-dialog').close();
@@ -1582,8 +1782,6 @@ function checkLevelUp() {
         logMessage(t("levelUp", { level: hero.level }), "discovery");
     }
 }
-
-document.getElementById('hero-attributes').open = !window.matchMedia('(max-width: 640px)').matches;
 
 window.onload = function() {
     applyLanguage();

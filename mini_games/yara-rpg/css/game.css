@@ -9,7 +9,103 @@ body {
 h1, h2, h3, .font-title {
     font-family: 'Cinzel', serif;
 }
-#item-drop-dialog {
+.hero-equipment,
+.hero-attributes {
+    min-width: 0;
+    border: 1px solid rgba(92, 81, 55, 0.55);
+    border-radius: 12px;
+    background: rgba(23, 25, 31, 0.72);
+}
+.equipment-bag-button {
+    position: relative;
+    grid-area: bag;
+    min-width: 0;
+    width: 100%;
+    min-height: 2.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 0.35rem;
+    border: 1px solid rgba(92, 81, 55, 0.55);
+    border-radius: 0.5rem;
+    background: rgba(12, 13, 15, 0.72);
+    color: #fcd34d;
+    cursor: pointer;
+    text-align: center;
+}
+.equipment-bag-button:hover:not(:disabled) {
+    border-color: #d2a644;
+    background: #24241f;
+}
+.equipment-bag-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+.equipment-bag-button:focus-visible,
+.equipment-slot-item:focus-visible,
+.equipment-bag-item:focus-visible,
+.dialog-close-button:focus-visible,
+.equipment-bag-action:focus-visible {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+}
+.equipment-bag-button > span:first-child {
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+.equipment-bag-button > span:last-child {
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    color: #d2c29c;
+    font-size: 0.48rem;
+    line-height: 1;
+}
+.hero-equipment > summary,
+.hero-attributes > summary {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    color: #a8a29e;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 600;
+    list-style: none;
+}
+.hero-equipment > summary::-webkit-details-marker,
+.hero-attributes > summary::-webkit-details-marker {
+    display: none;
+}
+.hero-equipment > summary::after,
+.hero-attributes > summary::after {
+    content: "+";
+    margin-left: auto;
+    color: #d2c29c;
+    font-size: 1rem;
+}
+.hero-equipment[open] > summary::after,
+.hero-attributes[open] > summary::after {
+    content: "−";
+}
+.hero-equipment-content {
+    padding: 0 10px 10px;
+}
+.equipped-item-count {
+    padding: 2px 6px;
+    border: 1px solid rgba(92, 81, 55, 0.55);
+    border-radius: 999px;
+    color: #d2c29c;
+    font-size: 0.65rem;
+    line-height: 1.2;
+}
+.hero-attribute-stats {
+    margin: 0 10px 10px;
+}
+.item-drop-dialog {
     width: min(28rem, calc(100vw - 2rem));
     padding: 0;
     border: 1px solid rgba(180, 83, 9, 0.75);
@@ -18,12 +114,168 @@ h1, h2, h3, .font-title {
     color: #e8e5df;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
 }
-#item-drop-dialog::backdrop {
+.item-drop-dialog::backdrop {
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(4px);
 }
 .item-drop-content {
     padding: 1.25rem;
+}
+.equipment-bag-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.equipment-bag-heading > div {
+    min-width: 0;
+    flex: 1;
+}
+.dialog-close-button {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    border: 1px solid rgba(92, 81, 55, 0.7);
+    border-radius: 9px;
+    background: rgba(0, 0, 0, 0.25);
+    color: #d6d3d1;
+    cursor: pointer;
+    font-size: 1.35rem;
+    line-height: 1;
+}
+.equipment-bag-slots {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-height: min(60vh, 34rem);
+    margin-top: 1rem;
+    overflow-y: auto;
+    padding-right: 3px;
+}
+.equipment-bag-slot {
+    position: relative;
+    min-width: 0;
+    min-height: 58px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid rgba(92, 81, 55, 0.55);
+    border-radius: 11px;
+    background: rgba(12, 13, 15, 0.72);
+}
+.equipment-bag-slot:not(.has-item) {
+    min-height: 78px;
+    align-items: center;
+    justify-content: center;
+    border-style: dashed;
+    color: #77746e;
+}
+.equipment-bag-slot-number {
+    position: absolute;
+    top: 5px;
+    right: 7px;
+    color: #77746e;
+    font-size: 0.58rem;
+}
+.equipment-bag-item,
+.equipment-slot-item {
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+.equipment-bag-item:hover,
+.equipment-slot-item:hover {
+    filter: brightness(1.25);
+}
+.equipment-bag-action {
+    min-height: 32px;
+    min-width: 0;
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+.equipment-bag-equip {
+    border-color: #047857;
+    background: rgba(6, 78, 59, 0.6);
+    color: #d1fae5;
+}
+.equipment-bag-discard {
+    border-color: #7f1d1d;
+    background: rgba(69, 10, 10, 0.55);
+    color: #fecaca;
+}
+.equipment-bag-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+.equipment-bag-action[hidden] {
+    display: none;
+}
+.equipment-item-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.equipment-item-heading > span:first-child {
+    font-size: 1.8rem;
+}
+.equipment-item-heading h2 {
+    min-width: 0;
+    flex: 1;
+}
+.equipment-item-properties {
+    display: grid;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 0;
+    list-style: none;
+}
+.equipment-item-properties li {
+    padding: 8px 10px;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 8px;
+    background: rgba(6, 78, 59, 0.25);
+    color: #a7f3d0;
+    font-size: 0.82rem;
+}
+.equipment-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+}
+.equipment-item-actions .equipment-bag-action {
+    width: auto;
+    flex: 1 1 6rem;
+    padding: 7px 10px;
+    font-size: 0.75rem;
+}
+.equipment-bag-pending:not([hidden]) {
+    margin-top: 12px;
+    padding: 9px;
+    border: 1px solid rgba(180, 83, 9, 0.6);
+    border-radius: 9px;
+    background: rgba(120, 53, 15, 0.25);
+    color: #fde68a;
+    font-size: 0.75rem;
+}
+@media (min-width: 480px) {
+    .equipment-bag-slots {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 #equipment-slots {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -31,7 +283,7 @@ h1, h2, h3, .font-title {
         "accessory head ."
         "leftHand body rightHand"
         ". legs ."
-        ". boots .";
+        "bag boots .";
     width: min(100%, 17rem);
     margin-inline: auto;
     gap: 0.4rem;
@@ -59,23 +311,14 @@ h1, h2, h3, .font-title {
     font-size: 1.2rem;
     line-height: 1.2;
 }
+.equipment-bag-item-icon {
+    color: #fde68a;
+    font-size: 1.4rem;
+    line-height: 1.2;
+}
 .equipment-slot-placeholder {
     opacity: 0.45;
     filter: grayscale(1);
-}
-.equipment-slot-name {
-    max-width: 100%;
-    font-size: 0.6rem;
-    line-height: 1.1;
-    overflow-wrap: anywhere;
-}
-.equipment-slot-bonus {
-    font-size: 0.55rem;
-    line-height: 1.1;
-    overflow-wrap: anywhere;
-}
-.equipment-slot-unequip {
-    margin-top: 0.15rem;
 }
 #quick-attack-button.fury-ready {
     background-color: #b45309;
@@ -190,11 +433,6 @@ h1, h2, h3, .font-title {
     outline: 2px solid #d2c29c;
     outline-offset: -2px;
 }
-@media (min-width: 641px) {
-    .hero-attributes > summary {
-        display: none;
-    }
-}
 @media (max-width: 899px) {
     body.game-shell {
         justify-content: flex-start;
@@ -232,6 +470,21 @@ h1, h2, h3, .font-title {
     #hero-panel {
         order: 2;
         padding: 12px !important;
+    }
+    .hero-equipment,
+    .hero-attributes {
+        padding: 0 10px 5px;
+    }
+    .hero-equipment > summary,
+    .hero-attributes > summary {
+        min-height: 36px;
+        font-size: 0.72rem;
+    }
+    .hero-equipment-content {
+        padding: 0 0 7px;
+    }
+    .hero-attribute-stats {
+        margin: 0 0 7px;
     }
     #region-progress {
         gap: 5px !important;
@@ -362,18 +615,21 @@ h1, h2, h3, .font-title {
         height: 7px;
     }
     #game-panel {
-        order: 4;
+        order: 5;
         grid-column: 1 / -1;
         min-width: 0;
         backdrop-filter: none !important;
     }
-    #hero-attributes {
+    #hero-equipment {
         order: 2;
         grid-column: 1 / -1;
-        padding: 0 10px 5px;
-        border: 1px solid rgba(92, 81, 55, 0.45);
-        border-radius: 12px;
-        background: rgba(23, 25, 31, 0.72);
+    }
+    #hero-attributes {
+        order: 3;
+        grid-column: 1 / -1;
+    }
+    .hero-status-bars {
+        order: 4;
     }
     .hero-mist-powers {
         order: 6;
@@ -413,31 +669,6 @@ h1, h2, h3, .font-title {
         padding: 6px 8px !important;
         text-align: center;
         white-space: nowrap;
-    }
-    .hero-attributes {
-        min-width: 0;
-    }
-    .hero-attributes summary {
-        min-height: 32px;
-        display: flex;
-        align-items: center;
-        color: #a8a29e;
-        cursor: pointer;
-        font-size: 0.72rem;
-        font-weight: 600;
-        list-style: none;
-    }
-    .hero-attributes summary::-webkit-details-marker {
-        display: none;
-    }
-    .hero-attributes summary::after {
-        content: "+";
-        margin-left: auto;
-        color: #d2c29c;
-        font-size: 1rem;
-    }
-    .hero-attributes[open] summary::after {
-        content: "−";
     }
     #potion-button {
         min-width: 0;

@@ -99,16 +99,25 @@ permalink: /mini_games/yara-rpg/game.html
                     </div>
                 </div>
 
+                <details id="hero-equipment" class="hero-equipment">
+                    <summary id="hero-equipment-toggle">
+                        <span data-i18n="equipment">Equipamento</span>
+                        <span id="equipped-item-count" class="equipped-item-count" aria-hidden="true">0/7</span>
+                    </summary>
+                    <div class="hero-equipment-content">
+                        <div id="equipment-slots" class="grid grid-cols-2 gap-2 text-xs">
+                    <button id="open-equipment-bag-button" type="button" class="equipment-bag-button" aria-haspopup="dialog" aria-controls="equipment-bag-dialog" data-i18n-aria="openEquipmentBag">
+                        <span aria-hidden="true">🎒</span>
+                        <span id="equipment-bag-count">0/10</span>
+                    </button>
+                        </div>
+                    </div>
+                </details>
+
                 <!-- Atributos -->
                 <details id="hero-attributes" class="hero-attributes">
                         <summary data-i18n="attributes">Atributos</summary>
-                        <h3 class="mt-2 mb-2 text-xs font-semibold uppercase tracking-wide text-amber-200" data-i18n="equipment">Equipamento</h3>
-                        <div id="equipment-slots" class="grid grid-cols-2 gap-2 text-xs"></div>
-                        <section id="equipment-inventory" class="mt-3 hidden" aria-labelledby="equipment-inventory-title">
-                            <h3 id="equipment-inventory-title" class="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-200" data-i18n="inventory">Mochila</h3>
-                            <div id="equipment-inventory-list" class="space-y-2"></div>
-                        </section>
-                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
+                        <div class="hero-attribute-stats grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
                             <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
                                 <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🗡️ <span data-i18n="attack">Ataque</span><span class="skill-upgrade-control" data-upgrade-control="atk"><button type="button" data-upgrade="atk" onclick="toggleUpgradeOptions('atk')" class="skill-upgrade-button" aria-label="Melhorar ataque" aria-expanded="false" aria-controls="upgrade-options-atk" title="Melhorar por 100 ouro">+</button><span id="upgrade-options-atk" class="skill-upgrade-options" data-upgrade-options="atk" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('atk', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('atk', 'max')" data-i18n="upgradeMax">Máx</button></span></span></div>
                                 <span id="hero-atk" class="font-bold text-amber-300 text-sm">14</span>
@@ -236,6 +245,21 @@ permalink: /mini_games/yara-rpg/game.html
 
     </main>
 
+    <dialog id="equipment-bag-dialog" class="item-drop-dialog equipment-bag-dialog" aria-labelledby="equipment-bag-title" aria-describedby="equipment-bag-description">
+        <div class="item-drop-content">
+            <div class="equipment-bag-heading">
+                <div>
+                    <h2 id="equipment-bag-title" class="text-lg font-bold text-amber-300" data-i18n="inventory">Mochila</h2>
+                    <p id="equipment-bag-description" class="mt-1 text-xs text-gray-300" data-i18n="equipmentBagDescription">Até 10 equipamentos guardados.</p>
+                </div>
+                <span id="equipment-bag-dialog-count" class="equipped-item-count">0/10</span>
+                <button id="close-equipment-bag-button" type="button" class="dialog-close-button" data-i18n-aria="closeBag" aria-label="Fechar mochila">×</button>
+            </div>
+            <p id="equipment-bag-pending-item" class="equipment-bag-pending" hidden></p>
+            <div id="equipment-inventory-list" class="equipment-bag-slots" role="list"></div>
+        </div>
+    </dialog>
+
     <dialog id="item-drop-dialog" class="item-drop-dialog" aria-labelledby="item-drop-title" aria-describedby="item-drop-message item-drop-choice-help">
         <div class="item-drop-content">
             <h2 id="item-drop-title" class="text-lg font-bold text-amber-300" data-i18n="itemDropTitle">Equipamento encontrado</h2>
@@ -245,6 +269,24 @@ permalink: /mini_games/yara-rpg/game.html
             <div class="mt-4 grid grid-cols-2 gap-2">
                 <button id="equip-new-item-button" type="button" class="rounded-lg border border-amber-500 bg-amber-700 px-3 py-2 text-sm font-semibold text-white" data-i18n="equipNewItem">Equipar novo</button>
                 <button id="keep-current-item-button" type="button" class="rounded-lg border border-forest-600 bg-forest-800 px-3 py-2 text-sm font-semibold text-emerald-100" data-i18n="keepCurrentItem">Manter atual</button>
+                <button id="open-bag-from-drop-button" type="button" class="col-span-2 rounded-lg border border-emerald-700 bg-emerald-950/70 px-3 py-2 text-sm font-semibold text-emerald-100" data-i18n="openBag">Abrir mochila</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="equipment-item-dialog" class="item-drop-dialog equipment-item-dialog" aria-labelledby="equipment-item-title">
+        <div class="item-drop-content">
+            <div class="equipment-item-heading">
+                <span id="equipment-item-icon" aria-hidden="true"></span>
+                <h2 id="equipment-item-title" class="text-lg font-bold text-amber-300"></h2>
+                <button id="close-equipment-item-button" type="button" class="dialog-close-button" data-i18n-aria="closeItemDetails" aria-label="Fechar detalhes do equipamento">×</button>
+            </div>
+            <p id="equipment-item-slot" class="mt-1 text-xs text-gray-300"></p>
+            <ul id="equipment-item-properties" class="equipment-item-properties"></ul>
+            <div class="equipment-item-actions">
+                <button id="equipment-item-equip-button" type="button" class="equipment-bag-action equipment-bag-equip" data-i18n="equip">Equipar</button>
+                <button id="equipment-item-unequip-button" type="button" class="equipment-bag-action equipment-bag-discard" data-i18n="unequip">Desequipar</button>
+                <button id="equipment-item-discard-button" type="button" class="equipment-bag-action equipment-bag-discard" data-i18n="discard">Descartar</button>
             </div>
         </div>
     </dialog>
