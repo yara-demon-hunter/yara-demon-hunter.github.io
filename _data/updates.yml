@@ -30,3 +30,25 @@
   url:
     en: "/en/books/book-1/chapters/"
     pt: "/pt/books/book-1/chapters/"
+
+- date: "2026-10-13"
+  title:
+    en: "Release of chapter 4."
+    pt: "Lançamento do capítulo 4."
+  summary:
+    en: "The loggers return late with one worker missing, forcing the village to organize a dangerous rescue mission into the forbidden forest at nightfall."
+    pt: "Os lenhadores retornam com atraso e com um trabalhador a menos, forçando a aldeia a organizar uma perigosa missão de resgate na floresta proibida ao cair da noite."
+  url:
+    en: "/en/books/book-1/chapters/004/"
+    pt: "/pt/books/book-1/chapters/004/"
+
+- date: "2026-10-13"
+  title:
+    en: "Release of chapter 5."
+    pt: "Lançamento do capítulo 5."
+  summary:
+    en: "Zeph awakens captive in a sinister hut and witnesses a deadly betrayal between a witch and a hooded creature. While making a desperate escape, he triggers a chaotic accident that leaves the hut in ruins and his pursuer close behind."
+    pt: "Zeph acorda preso em um cativeiro sinistro e testemunha uma traição mortal entre uma bruxa e uma criatura encapuzada. Durante uma fuga desesperada, ele provoca um acidente caótico que destrói o local e deixa seu perseguidor na sua cola."
+  url:
+    en: "/en/books/book-1/chapters/005/"
+    pt: "/pt/books/book-1/chapters/005/"
