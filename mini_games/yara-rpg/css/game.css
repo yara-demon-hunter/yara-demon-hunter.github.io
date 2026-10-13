@@ -265,7 +265,7 @@ h1, h2, h3, .font-title {
         white-space: nowrap;
     }
     .hero-status-bars {
-        order: 2;
+        order: 3;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 6px !important;
@@ -293,16 +293,6 @@ h1, h2, h3, .font-title {
     .hero-status-bars > div > .w-full {
         height: 7px;
     }
-    .hero-inventory {
-        order: 3;
-        margin: 0 !important;
-        padding: 6px 10px !important;
-        border-radius: 12px;
-        background: rgba(12, 13, 15, 0.82);
-    }
-    .hero-inventory > div > span:first-child {
-        font-size: 1.25rem;
-    }
     #game-panel {
         order: 4;
         grid-column: 1 / -1;
@@ -310,7 +300,7 @@ h1, h2, h3, .font-title {
         backdrop-filter: none !important;
     }
     #hero-attributes {
-        order: 5;
+        order: 2;
         padding: 0 10px 5px;
         border: 1px solid rgba(92, 81, 55, 0.45);
         border-radius: 12px;
@@ -381,8 +371,10 @@ h1, h2, h3, .font-title {
         content: "−";
     }
     #potion-button {
-        min-height: 38px;
-        padding-inline: 14px !important;
+        min-width: 0;
+    }
+    .potion-count {
+        white-space: nowrap;
     }
     #rpg-log {
         height: clamp(76px, 13vh, 112px) !important;
@@ -423,20 +415,25 @@ h1, h2, h3, .font-title {
         display: none;
     }
     #controls-explore {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 5px;
     }
     #controls-explore button {
-        min-height: 48px;
-        padding: 8px !important;
-        font-size: 0.72rem !important;
-    }
-    #controls-explore button:first-child,
-    #controls-explore button:last-child {
-        grid-column: auto;
-        min-height: 58px;
-        padding: 6px !important;
+        min-width: 0;
+        min-height: 60px;
+        flex-direction: column;
+        gap: 2px;
+        padding: 6px 3px !important;
         font-size: 0.65rem !important;
-        line-height: 1.2;
+        line-height: 1.1;
+    }
+    #controls-explore button > span:first-child {
+        font-size: 1rem;
+    }
+    #controls-explore .potion-count,
+    #controls-explore [data-i18n="campCost"] {
+        font-size: 0.58rem;
+        line-height: 1;
     }
     #controls-combat {
         grid-template-columns: repeat(6, minmax(0, 1fr));

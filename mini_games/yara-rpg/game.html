@@ -101,7 +101,7 @@ permalink: /mini_games/yara-rpg/game.html
 
                 <!-- Atributos -->
                 <details id="hero-attributes" class="hero-attributes">
-                        <summary data-i18n="attributes">Atributos do personagem</summary>
+                        <summary data-i18n="attributes">Atributos</summary>
                         <div class="grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
                             <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
                                 <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🗡️ <span data-i18n="attack">Ataque</span><span class="skill-upgrade-control" data-upgrade-control="atk"><button type="button" data-upgrade="atk" onclick="toggleUpgradeOptions('atk')" class="skill-upgrade-button" aria-label="Melhorar ataque" aria-expanded="false" aria-controls="upgrade-options-atk" title="Melhorar por 100 ouro">+</button><span id="upgrade-options-atk" class="skill-upgrade-options" data-upgrade-options="atk" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('atk', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('atk', 'max')" data-i18n="upgradeMax">Máx</button></span></span></div>
@@ -127,19 +127,6 @@ permalink: /mini_games/yara-rpg/game.html
                 </details>
             </div>
 
-            <!-- Inventário / Poções -->
-            <div class="hero-inventory bg-forest-950/80 rounded-xl p-3 border border-fantasy-border flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">🧪</span>
-                    <div>
-                        <span class="text-xs text-gray-300 block font-medium" data-i18n="potions">Poções de Cura</span>
-                        <span class="text-xs text-emerald-400 font-bold"><span id="hero-potions">1</span>/<span id="hero-potions-max">1</span> <span data-i18n="available">disponíveis</span></span>
-                    </div>
-                </div>
-                <button id="potion-button" onclick="usePotion()" class="bg-emerald-700 hover:bg-emerald-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 text-white text-xs font-semibold px-3 py-2 rounded-lg transition border border-emerald-500 shadow">
-                    <span data-i18n="drink">Beber</span>
-                </button>
-            </div>
             <div class="hero-mist-powers mt-3 rounded-xl border border-purple-900/50 bg-purple-950/30 p-3">
                 <span class="block text-xs font-medium text-purple-200" data-i18n="mistPowers">Poderes da Névoa</span>
                 <p id="mist-power-list" class="mt-1 text-[11px] text-purple-100/80" data-i18n="noMistPowers">Nenhum poder encontrado.</p>
@@ -205,12 +192,17 @@ permalink: /mini_games/yara-rpg/game.html
             <!-- Controles de Ação -->
             <div id="action-controls">
                 <!-- Ações de Exploração -->
-                <div id="controls-explore" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <button onclick="exploreForest()" class="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl shadow-lg border border-emerald-500/50 flex items-center justify-center gap-2 transition text-sm">
-                        <span>🧭</span> <span data-i18n="explore">Explorar a Trilha na Névoa</span>
+                <div id="controls-explore" class="grid grid-cols-3 gap-2">
+                    <button onclick="exploreForest()" class="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 active:scale-[0.98] text-white font-semibold py-3 px-3 rounded-xl shadow-lg border border-emerald-500/50 flex items-center justify-center gap-2 transition text-sm">
+                        <span aria-hidden="true">🧭</span> <span data-i18n="explore">Explorar</span>
                     </button>
-                    <button id="camp-button" onclick="restAtCamp()" class="bg-forest-800 hover:bg-forest-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-emerald-200 font-semibold py-3 px-4 rounded-xl shadow border border-forest-700 flex items-center justify-center gap-2 transition text-sm">
-                        <span>⛺</span> <span data-i18n="camp">Acampar e Recuperar Fôlego</span> <span data-i18n="campCost">(50 Ouro)</span>
+                    <button id="potion-button" type="button" onclick="usePotion()" class="bg-teal-800 hover:bg-teal-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 text-teal-50 font-semibold py-3 px-2 rounded-xl shadow border border-teal-600 flex items-center justify-center gap-1.5 transition text-sm" data-i18n-aria="potionActionAria">
+                        <span aria-hidden="true">🧪</span>
+                        <span data-i18n="drink">Poção</span>
+                        <span class="potion-count text-xs text-teal-100"><span id="hero-potions">1</span>/<span id="hero-potions-max">1</span></span>
+                    </button>
+                    <button id="camp-button" onclick="restAtCamp()" class="bg-forest-800 hover:bg-forest-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-emerald-200 font-semibold py-3 px-3 rounded-xl shadow border border-forest-700 flex items-center justify-center gap-2 transition text-sm">
+                        <span aria-hidden="true">⛺</span> <span data-i18n="camp">Descansar</span> <span data-i18n="campCost">(🪙50)</span>
                     </button>
                 </div>
 
