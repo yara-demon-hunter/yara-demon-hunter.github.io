@@ -22,6 +22,36 @@ const translations = {
         attack: "Ataque",
         defense: "Defesa",
         attributes: "Atributos",
+        equipment: "Equipamento",
+        inventory: "Mochila",
+        emptySlot: "Vazio",
+        rightHand: "Mão direita",
+        leftHand: "Mão esquerda",
+        head: "Cabeça",
+        body: "Corpo",
+        legs: "Pernas",
+        boots: "Botas",
+        accessory: "Acessório",
+        equip: "Equipar",
+        unequip: "Desequipar",
+        itemFound: "✨ Item encontrado: <span class=\"text-amber-300 font-bold\">{item}</span> ({slot}).",
+        itemEquipped: "⚔️ {item} equipado em {slot}.",
+        itemStored: "🎒 {item} guardado na mochila.",
+        itemDropTitle: "Equipamento encontrado",
+        itemDropPrompt: "{item} ocupa o slot {slot}, atualmente usado por {currentItem}.",
+        itemDropChoiceHelp: "Equipar o novo guarda o atual na mochila; manter o atual guarda o item encontrado.",
+        equipNewItem: "Equipar novo",
+        keepCurrentItem: "Manter atual",
+        equipItemAria: "Equipar {item} em {slot}",
+        unequipItemAria: "Desequipar {item} de {slot}",
+        equipmentBonus: "+{amount} {stat}",
+        equipmentPercentageBonus: "+{amount}% {stat}",
+        attackStat: "Ataque",
+        defenseStat: "Defesa",
+        hpStat: "HP máximo",
+        focusStat: "Foco máximo",
+        evasionStat: "Esquiva",
+        parryStat: "Aparo",
         stun: "Stun",
         hp: "HP",
         attackShort: "ATQ",
@@ -87,7 +117,7 @@ const translations = {
         monsterDamage: "O {monster} contra-atacou causando <span class=\"text-red-400 font-bold\">{damage} de dano</span>!",
         noPotions: "Você não tem poções restantes!",
         hpFull: "Seu HP já está no máximo!",
-        potionHeal: "🧪 Você bebeu uma poção e recuperou <span class=\"text-emerald-400\">{amount_hp} HP and {amount_foco} Foco</span>.",
+        potionHeal: "🧪 Você bebeu uma poção e recuperou <span class=\"text-emerald-400\">{amount_hp} HP e {amount_foco} de Foco</span>.",
         potionOpening: "O monstro aproveitou o seu momento de distração!",
         alreadyRested: "Você já está com HP e Foco completos.",
         rested: "⛺ Você gastou {cost} de ouro no acampamento e recuperou {hp} HP e {focus} de Foco.",
@@ -132,6 +162,36 @@ const translations = {
         attack: "Attack",
         defense: "Defense",
         attributes: "Stats",
+        equipment: "Equipment",
+        inventory: "Bag",
+        emptySlot: "Empty",
+        rightHand: "Right hand",
+        leftHand: "Left hand",
+        head: "Head",
+        body: "Body",
+        legs: "Legs",
+        boots: "Boots",
+        accessory: "Accessory",
+        equip: "Equip",
+        unequip: "Unequip",
+        itemFound: "✨ Item found: <span class=\"text-amber-300 font-bold\">{item}</span> ({slot}).",
+        itemEquipped: "⚔️ {item} equipped in {slot}.",
+        itemStored: "🎒 {item} stored in your bag.",
+        itemDropTitle: "Equipment found",
+        itemDropPrompt: "{item} uses the {slot} slot, currently occupied by {currentItem}.",
+        itemDropChoiceHelp: "Equipping the new item moves the current one to your bag; keeping the current item stores the find.",
+        equipNewItem: "Equip new",
+        keepCurrentItem: "Keep current",
+        equipItemAria: "Equip {item} in {slot}",
+        unequipItemAria: "Unequip {item} from {slot}",
+        equipmentBonus: "+{amount} {stat}",
+        equipmentPercentageBonus: "+{amount}% {stat}",
+        attackStat: "Attack",
+        defenseStat: "Defense",
+        hpStat: "max HP",
+        focusStat: "max Focus",
+        evasionStat: "Evasion",
+        parryStat: "Parry",
         stun: "Stun",
         hp: "HP",
         attackShort: "ATK",
@@ -197,7 +257,7 @@ const translations = {
         monsterDamage: "The {monster} counterattacks for <span class=\"text-red-400 font-bold\">{damage} damage</span>!",
         noPotions: "You have no potions left!",
         hpFull: "Your HP is already full!",
-        potionHeal: "🧪 You drink a potion and recover <span class=\"text-emerald-400\">{amount} HP and {amount_foco} Focus</span>.",
+        potionHeal: "🧪 You drink a potion and recover <span class=\"text-emerald-400\">{amount_hp} HP and {amount_foco} Focus</span>.",
         potionOpening: "The monster takes advantage of your distraction!",
         alreadyRested: "Your HP and Focus are already full.",
         rested: "⛺ You spent {cost} gold at camp and recovered {hp} HP and {focus} Focus.",
@@ -228,6 +288,46 @@ const translations = {
 
 function t(key, values = {}) {
     return translations[gameLanguage][key].replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+}
+
+const EQUIPMENT_SLOTS = Object.freeze([
+    { id: "rightHand", icon: "🗡️" },
+    { id: "leftHand", icon: "🛡️" },
+    { id: "head", icon: "⛑️" },
+    { id: "body", icon: "🦺" },
+    { id: "legs", icon: "👖" },
+    { id: "boots", icon: "🥾" },
+    { id: "accessory", icon: "💍" }
+]);
+const EQUIPMENT_STAT_KEYS = Object.freeze({
+    atk: "attackStat",
+    def: "defenseStat",
+    maxHp: "hpStat",
+    maxFoco: "focusStat",
+    evasion: "evasionStat",
+    parry: "parryStat"
+});
+
+function getEquipmentBonus(stat) {
+    return Object.values(hero.equipment).reduce(
+        (total, item) => total + (item?.stats[stat] ?? 0),
+        0
+    );
+}
+
+function getEffectiveStat(stat) {
+    return hero[stat] + getEquipmentBonus(stat);
+}
+
+function getItemBonusText(item) {
+    return Object.entries(item.stats)
+        .map(([stat, amount]) => t(
+            stat === "evasion" || stat === "parry"
+                ? "equipmentPercentageBonus"
+                : "equipmentBonus",
+            { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
+        ))
+        .join(" · ");
 }
 
 function applyLanguage() {
@@ -323,12 +423,14 @@ const hero = {
     maxPotions: ITEM_DATA.healingPotion.startingCapacity,
     evasionBonus: 0,
     parryBonus: 0,
-    mistPowers: []
+    mistPowers: [],
+    equipment: Object.fromEntries(EQUIPMENT_SLOTS.map(({ id }) => [id, null])),
+    equipmentInventory: []
 };
 
 const CAMP_COST = GAME_RULES.camp.goldCost;
-const CAMP_HP_RECOVERY = GAME_RULES.camp.hpRecovery;
-const CAMP_FOCO_RECOVERY = GAME_RULES.camp.focoRecovery;
+const CAMP_HP_RECOVERY_PERCENT = GAME_RULES.camp.hpRecoveryPercent;
+const CAMP_FOCO_RECOVERY_PERCENT = GAME_RULES.camp.focoRecoveryPercent;
 const POTION_HEAL_AMOUNT_HP = ITEM_DATA.healingPotion.healAmount;
 const POTION_HEAL_AMOUNT_FOCO = ITEM_DATA.healingPotion.healFoco;
 const UPGRADE_COST = GAME_RULES.upgrades.goldCost;
@@ -352,6 +454,8 @@ let discoveredRegions = [0];
 let gameOver = false;
 let openUpgradeOptions = null;
 let pendingMistContact = null;
+let pendingEquipment = null;
+let equipmentInstanceId = 0;
 let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
 
 document.addEventListener('click', (event) => {
@@ -363,6 +467,209 @@ document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeUpgradeOptions();
 });
 
+document.getElementById('equip-new-item-button').addEventListener('click', equipPendingEquipment);
+document.getElementById('keep-current-item-button').addEventListener('click', keepPendingEquipment);
+document.getElementById('item-drop-dialog').addEventListener('cancel', (event) => {
+    event.preventDefault();
+    keepPendingEquipment();
+});
+
+function renderEquipment() {
+    const slotsContainer = document.getElementById('equipment-slots');
+    slotsContainer.replaceChildren();
+
+    EQUIPMENT_SLOTS.forEach(({ id, icon }) => {
+        const item = hero.equipment[id];
+        const slot = document.createElement('div');
+        slot.className = `equipment-slot equipment-slot-${id} rounded-lg border border-fantasy-border/50 bg-forest-950/60`;
+        slot.setAttribute('role', 'group');
+        slot.setAttribute('aria-label', `${t(id)}: ${item ? item.name[gameLanguage] : t('emptySlot')}`);
+
+        const label = document.createElement('span');
+        label.className = 'sr-only';
+        label.textContent = t(id);
+        slot.append(label);
+
+        if (item) {
+            const itemIcon = document.createElement('span');
+            itemIcon.className = 'equipment-slot-icon text-amber-200';
+            itemIcon.textContent = item.icon;
+            itemIcon.setAttribute('aria-hidden', 'true');
+
+            const name = document.createElement('span');
+            name.className = 'equipment-slot-name font-semibold text-amber-200';
+            name.textContent = item.name[gameLanguage];
+
+            const bonus = document.createElement('span');
+            bonus.className = 'equipment-slot-bonus text-emerald-300';
+            bonus.textContent = getItemBonusText(item);
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'equipment-slot-unequip min-h-8 rounded-md border border-red-900/70 bg-red-950/50 px-2 text-[10px] font-semibold text-red-200 disabled:opacity-40';
+            button.textContent = t('unequip');
+            button.setAttribute('aria-label', t('unequipItemAria', {
+                item: item.name[gameLanguage],
+                slot: t(id)
+            }));
+            button.disabled = inCombat || gameOver || Boolean(pendingEquipment);
+            button.addEventListener('click', () => unequipItem(id));
+            slot.append(itemIcon, name, bonus, button);
+        } else {
+            const placeholder = document.createElement('span');
+            placeholder.className = 'equipment-slot-icon equipment-slot-placeholder';
+            placeholder.textContent = icon;
+            placeholder.setAttribute('aria-hidden', 'true');
+            slot.append(placeholder);
+        }
+
+        slotsContainer.append(slot);
+    });
+
+    const inventorySection = document.getElementById('equipment-inventory');
+    const inventoryContainer = document.getElementById('equipment-inventory-list');
+    inventoryContainer.replaceChildren();
+    inventorySection.hidden = hero.equipmentInventory.length === 0;
+
+    hero.equipmentInventory.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between gap-2 rounded-lg border border-fantasy-border/50 bg-black/20 p-2';
+
+        const description = document.createElement('div');
+        description.className = 'min-w-0';
+
+        const name = document.createElement('span');
+        name.className = 'block truncate text-xs font-semibold text-amber-200';
+        name.textContent = `${item.icon} ${item.name[gameLanguage]}`;
+
+        const bonus = document.createElement('span');
+        bonus.className = 'block text-[10px] text-emerald-300';
+        bonus.textContent = `${t(item.slot)} · ${getItemBonusText(item)}`;
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'min-h-9 shrink-0 rounded-md border border-emerald-700 bg-emerald-950/60 px-2 text-xs font-semibold text-emerald-100 disabled:opacity-40';
+        button.textContent = t('equip');
+        button.setAttribute('aria-label', t('equipItemAria', {
+            item: item.name[gameLanguage],
+            slot: t(item.slot)
+        }));
+        button.disabled = inCombat || gameOver || Boolean(pendingEquipment);
+        button.addEventListener('click', () => equipInventoryItem(item));
+
+        description.append(name, bonus);
+        row.append(description, button);
+        inventoryContainer.append(row);
+    });
+}
+
+function showEquipmentChoice(item, fromInventory) {
+    pendingEquipment = { item, fromInventory };
+    const currentItem = hero.equipment[item.slot];
+    document.getElementById('item-drop-message').textContent = t('itemDropPrompt', {
+        item: item.name[gameLanguage],
+        slot: t(item.slot),
+        currentItem: `${currentItem.icon} ${currentItem.name[gameLanguage]}`
+    });
+    document.getElementById('item-drop-bonuses').textContent = getItemBonusText(item);
+    document.getElementById('item-drop-dialog').showModal();
+    renderEquipment();
+}
+
+function handleEquipmentDrop(item) {
+    logMessage(t('itemFound', {
+        item: item.name[gameLanguage],
+        slot: t(item.slot)
+    }), 'loot');
+    if (hero.equipment[item.slot]) {
+        showEquipmentChoice(item, false);
+        return;
+    }
+
+    equipItem(item, false);
+}
+
+function createEquipmentDrop() {
+    const equipment = ITEM_DATA.equipment;
+    if (Math.random() * GAME_RULES.probabilityScale >= GAME_RULES.loot.equipmentDropChance) {
+        return null;
+    }
+    if (equipment.length === 0) {
+        throw new Error('Equipment drop chance is configured, but no equipment items exist.');
+    }
+
+    const template = equipment[Math.floor(Math.random() * equipment.length)];
+    return {
+        ...template,
+        name: { ...template.name },
+        stats: { ...template.stats },
+        instanceId: ++equipmentInstanceId
+    };
+}
+
+function equipItem(item, fromInventory) {
+    if (fromInventory) {
+        const inventoryIndex = hero.equipmentInventory.indexOf(item);
+        if (inventoryIndex === -1) return;
+        hero.equipmentInventory.splice(inventoryIndex, 1);
+    }
+
+    const previousItem = hero.equipment[item.slot];
+    if (previousItem) {
+        hero.equipmentInventory.push(previousItem);
+        logMessage(t('itemStored', { item: previousItem.name[gameLanguage] }), 'loot');
+    }
+    hero.equipment[item.slot] = item;
+    hero.hp = Math.min(hero.hp, getEffectiveStat('maxHp'));
+    hero.foco = Math.min(hero.foco, getEffectiveStat('maxFoco'));
+    logMessage(t('itemEquipped', {
+        item: item.name[gameLanguage],
+        slot: t(item.slot)
+    }), 'special');
+    updateUI();
+}
+
+function equipInventoryItem(item) {
+    if (inCombat || gameOver || !hero.equipmentInventory.includes(item)) return;
+    if (hero.equipment[item.slot]) {
+        showEquipmentChoice(item, true);
+        return;
+    }
+    equipItem(item, true);
+}
+
+function unequipItem(slot) {
+    if (inCombat || gameOver || pendingEquipment) return;
+    const item = hero.equipment[slot];
+    if (!item) return;
+    hero.equipment[slot] = null;
+    hero.equipmentInventory.push(item);
+    hero.hp = Math.min(hero.hp, getEffectiveStat('maxHp'));
+    hero.foco = Math.min(hero.foco, getEffectiveStat('maxFoco'));
+    logMessage(t('itemStored', { item: item.name[gameLanguage] }), 'loot');
+    updateUI();
+}
+
+function equipPendingEquipment() {
+    if (!pendingEquipment || inCombat || gameOver) return;
+    const { item, fromInventory } = pendingEquipment;
+    pendingEquipment = null;
+    document.getElementById('item-drop-dialog').close();
+    equipItem(item, fromInventory);
+}
+
+function keepPendingEquipment() {
+    if (!pendingEquipment) return;
+    const { item, fromInventory } = pendingEquipment;
+    pendingEquipment = null;
+    document.getElementById('item-drop-dialog').close();
+    if (!fromInventory) {
+        hero.equipmentInventory.push(item);
+        logMessage(t('itemStored', { item: item.name[gameLanguage] }), 'loot');
+    }
+    updateUI();
+}
+
 function updateUI() {
     if (inCombat || gameOver) openUpgradeOptions = null;
 
@@ -372,9 +679,9 @@ function updateUI() {
     document.getElementById('hero-xp').innerText = hero.xp;
     document.getElementById('hero-xp-max').innerText = hero.maxXp;
     document.getElementById('hero-hp').innerText = hero.hp;
-    document.getElementById('hero-hp-max').innerText = hero.maxHp;
+    document.getElementById('hero-hp-max').innerText = getEffectiveStat('maxHp');
     document.getElementById('hero-foco').innerText = hero.foco;
-    document.getElementById('hero-foco-max').innerText = hero.maxFoco;
+    document.getElementById('hero-foco-max').innerText = getEffectiveStat('maxFoco');
     document.getElementById('hero-fury').innerText = hero.fury;
     document.getElementById('hero-fury-bar').style.width = Math.min(
         GAME_RULES.probabilityScale,
@@ -385,40 +692,47 @@ function updateUI() {
     quickAttackButton.classList.toggle('fury-ready', furyReady);
     quickAttackButton.title = furyReady ? t('criticalRequirement') : '';
     document.getElementById('quick-attack-label').innerText = t(furyReady ? 'criticalAttack' : 'quickAttack');
-    document.getElementById('hero-atk').innerText = hero.atk;
-    document.getElementById('hero-def').innerText = hero.def;
-    const evasionTotal = Math.min(MAX_EVASION, hero.evasion + hero.evasionBonus);
+    document.getElementById('hero-atk').innerText = getEffectiveStat('atk');
+    document.getElementById('hero-def').innerText = getEffectiveStat('def');
+    const effectiveEvasion = Math.min(MAX_EVASION, getEffectiveStat('evasion'));
+    const effectiveParry = Math.min(MAX_PARRY, getEffectiveStat('parry'));
+    const effectiveStunChance = Math.min(
+        GAME_RULES.probabilityScale,
+        getEffectiveStat('stunChance')
+    );
+    const evasionTotal = Math.min(MAX_EVASION, effectiveEvasion + hero.evasionBonus);
     const evasionDisplay = document.getElementById('hero-evasion');
     const evasionBonusDisplay = document.getElementById('hero-evasion-bonus');
-    document.getElementById('hero-evasion-base').innerText = hero.evasion + '%';
+    document.getElementById('hero-evasion-base').innerText = effectiveEvasion + '%';
     evasionBonusDisplay.innerText = ` +${hero.evasionBonus}% = ${evasionTotal}%`;
     evasionBonusDisplay.classList.toggle('hidden', hero.evasionBonus === 0);
     evasionDisplay.classList.toggle('text-sm', hero.evasionBonus === 0);
     evasionDisplay.classList.toggle('text-[10px]', hero.evasionBonus > 0);
     evasionDisplay.setAttribute('aria-label', hero.evasionBonus
-        ? `${hero.evasion}% + ${hero.evasionBonus}% = ${evasionTotal}%`
-        : `${hero.evasion}%`);
-    const parryTotal = Math.min(MAX_PARRY, hero.parry + hero.parryBonus);
+        ? `${effectiveEvasion}% + ${hero.evasionBonus}% = ${evasionTotal}%`
+        : `${effectiveEvasion}%`);
+    const parryTotal = Math.min(MAX_PARRY, effectiveParry + hero.parryBonus);
     const parryDisplay = document.getElementById('hero-parry');
     const parryBonusDisplay = document.getElementById('hero-parry-bonus');
-    document.getElementById('hero-parry-base').innerText = hero.parry + '%';
+    document.getElementById('hero-parry-base').innerText = effectiveParry + '%';
     parryBonusDisplay.innerText = ` +${hero.parryBonus}% = ${parryTotal}%`;
     parryBonusDisplay.classList.toggle('hidden', hero.parryBonus === 0);
     parryDisplay.setAttribute('aria-label', hero.parryBonus
-        ? `${hero.parry}% + ${hero.parryBonus}% = ${parryTotal}%`
-        : `${hero.parry}%`);
+        ? `${effectiveParry}% + ${hero.parryBonus}% = ${parryTotal}%`
+        : `${effectiveParry}%`);
     const stunBonus = hero.fury >= hero.maxFury ? CRITICAL_STUN_BONUS : 0;
-    const stunChanceTotal = Math.min(GAME_RULES.probabilityScale, hero.stunChance + stunBonus);
+    const stunChanceTotal = Math.min(GAME_RULES.probabilityScale, effectiveStunChance + stunBonus);
     const stunBonusDisplay = document.getElementById('hero-stun-bonus');
     const stunDisplay = document.getElementById('hero-stun');
-    document.getElementById('hero-stun-base').innerText = hero.stunChance + '%';
+    document.getElementById('hero-stun-base').innerText = effectiveStunChance + '%';
     stunBonusDisplay.innerText = ` +${stunBonus}% = ${stunChanceTotal}%`;
     stunBonusDisplay.classList.toggle('hidden', stunBonus === 0);
     stunDisplay.setAttribute('aria-label', stunBonus
-        ? `${hero.stunChance}% + ${stunBonus}% = ${stunChanceTotal}%`
-        : `${hero.stunChance}%`);
+        ? `${effectiveStunChance}% + ${stunBonus}% = ${stunChanceTotal}%`
+        : `${effectiveStunChance}%`);
     document.getElementById('hero-potions').innerText = hero.potions;
     document.getElementById('hero-potions-max').innerText = hero.maxPotions;
+    renderEquipment();
     const unlockedPowers = MIST_CONTACT_DATA.powers.filter((power) => hero.mistPowers.includes(power.id));
     document.getElementById('mist-power-list').textContent = unlockedPowers.length
         ? unlockedPowers.map((power) =>
@@ -451,13 +765,13 @@ function updateUI() {
 
     const hpPercent = Math.max(0, Math.min(
         GAME_RULES.probabilityScale,
-        (hero.hp / hero.maxHp) * GAME_RULES.probabilityScale
+        (hero.hp / getEffectiveStat('maxHp')) * GAME_RULES.probabilityScale
     ));
     document.getElementById('hero-hp-bar').style.width = hpPercent + '%';
 
     const focoPercent = Math.max(0, Math.min(
         GAME_RULES.probabilityScale,
-        (hero.foco / hero.maxFoco) * GAME_RULES.probabilityScale
+        (hero.foco / getEffectiveStat('maxFoco')) * GAME_RULES.probabilityScale
     ));
     document.getElementById('hero-foco-bar').style.width = focoPercent + '%';
 
@@ -519,7 +833,9 @@ function updateUI() {
         document.getElementById('mist-contact-name').textContent = pendingMistContact.name[gameLanguage];
         document.getElementById('mist-contact-message').textContent = pendingMistContact.message[gameLanguage];
     }
-    campButton.disabled = inCombat || gameOver || hero.gold < CAMP_COST || (hero.hp >= hero.maxHp && hero.foco >= hero.maxFoco);
+    campButton.disabled = inCombat || gameOver || hero.gold < CAMP_COST || (
+        hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco')
+    );
     potionButton.disabled = gameOver;
 
     if (gameOver) {
@@ -621,8 +937,8 @@ function exploreForest() {
         const healAmountHp = encounterRules.safeTrailRecoveryHp;
         const healAmountFoco = encounterRules.safeTrailRecoveryFoco;
 
-        hero.hp = Math.min(hero.maxHp, hero.hp + healAmountHp);
-        hero.foco = Math.min(hero.maxFoco, hero.foco + healAmountFoco);
+        hero.hp = Math.min(getEffectiveStat('maxHp'), hero.hp + healAmountHp);
+        hero.foco = Math.min(getEffectiveStat('maxFoco'), hero.foco + healAmountFoco);
         logMessage(t("safeTrail", { amount_hp: healAmountHp, amount_foco: healAmountFoco }), "special");
         updateUI();
     } else if (hero.potions < hero.maxPotions) {
@@ -737,7 +1053,7 @@ function acceptMistContact() {
         const drinkOffer = contact.onAccept;
         const hpAfterDrink = Math.max(
             1,
-            Math.floor(hero.maxHp * drinkOffer.hpPercent / GAME_RULES.probabilityScale)
+            Math.floor(getEffectiveStat('maxHp') * drinkOffer.hpPercent / GAME_RULES.probabilityScale)
         );
         hero.hp = Math.min(hero.hp, hpAfterDrink);
         hero.gold += drinkOffer.gold;
@@ -774,7 +1090,7 @@ function acceptMistContact() {
         const amountGained = hero[power.stat] - previousValue;
         if (power.currentStat) {
             hero[power.currentStat] = Math.min(
-                hero.maxHp,
+                getEffectiveStat('maxHp'),
                 hero[power.currentStat] + amountGained
             );
         }
@@ -794,7 +1110,7 @@ function acceptMistContact() {
         + Math.floor(Math.random() * sacrificeRules.hpLossRange);
     const hpLost = Math.min(
         Math.max(0, hero.hp - 1),
-        Math.floor(hero.maxHp * hpPercent / GAME_RULES.probabilityScale)
+        Math.floor(getEffectiveStat('maxHp') * hpPercent / GAME_RULES.probabilityScale)
     );
     hero.gold += goldGained;
     hero.hp -= hpLost;
@@ -828,7 +1144,10 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     hero.fury += furyGained;
     logMessage(t(messageKey, { damage: damageDealt, fury: furyGained }), "combat-hero");
 
-    const stunChance = Math.min(GAME_RULES.probabilityScale, hero.stunChance + criticalStunBonus);
+    const stunChance = Math.min(
+        GAME_RULES.probabilityScale,
+        Math.min(GAME_RULES.probabilityScale, getEffectiveStat('stunChance')) + criticalStunBonus
+    );
     const stunned = currentMonster.hp > 0 && Math.random() * GAME_RULES.probabilityScale < stunChance;
     if (stunned) logMessage(t("stunLanded"), "special");
     checkCombatProgress(stunned);
@@ -852,7 +1171,7 @@ function combatQuickAttack() {
     const attackRules = GAME_RULES.combat.quickAttack;
     const damage = Math.max(
         attackRules.minimumDamage,
-        Math.floor(hero.atk * attackRules.attackMultiplier)
+        Math.floor(getEffectiveStat('atk') * attackRules.attackMultiplier)
             - currentMonster.def
             + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
@@ -878,7 +1197,7 @@ function combatHeavyAttack() {
 
     const damage = Math.max(
         attackRules.minimumDamage,
-        Math.floor(hero.atk * attackRules.attackMultiplier)
+        Math.floor(getEffectiveStat('atk') * attackRules.attackMultiplier)
             - currentMonster.def
             + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
@@ -900,7 +1219,7 @@ function combatCriticalAttack() {
     const attackRules = GAME_RULES.combat.criticalAttack;
     const damage = Math.max(
         attackRules.minimumDamage,
-        Math.floor(hero.atk * CRITICAL_DAMAGE_MULTIPLIER)
+        Math.floor(getEffectiveStat('atk') * CRITICAL_DAMAGE_MULTIPLIER)
             - currentMonster.def
             + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
@@ -910,7 +1229,10 @@ function combatCriticalAttack() {
 // NOVO GOLPE: Postura Firme (Aumenta defesa e recupera foco)
 function combatDefend() {
     if (!inCombat || !currentMonster) return;
-    const bonusGained = Math.min(PARRY_BONUS, MAX_PARRY - hero.parry - hero.parryBonus);
+    const bonusGained = Math.min(
+        PARRY_BONUS,
+        MAX_PARRY - getEffectiveStat('parry') - hero.parryBonus
+    );
     if (bonusGained <= 0) {
         logMessage(t('parryMaxed'));
         return;
@@ -931,7 +1253,10 @@ function combatDefend() {
 
 function combatDodge() {
     if (!inCombat || !currentMonster) return;
-    const bonusGained = Math.min(DODGE_BONUS, MAX_EVASION - hero.evasion - hero.evasionBonus);
+    const bonusGained = Math.min(
+        DODGE_BONUS,
+        MAX_EVASION - getEffectiveStat('evasion') - hero.evasionBonus
+    );
     if (bonusGained <= 0) {
         logMessage(t("evasionMaxed"));
         return;
@@ -966,7 +1291,7 @@ function checkCombatProgress(monsterStunned = false) {
 function monsterAttackTurn() {
     if (!inCombat || !currentMonster) return;
 
-    const evasionChance = Math.min(MAX_EVASION, hero.evasion + hero.evasionBonus);
+    const evasionChance = Math.min(MAX_EVASION, getEffectiveStat('evasion') + hero.evasionBonus);
     const evaded = Math.random() * GAME_RULES.probabilityScale < evasionChance;
     if (evaded) {
         playSound('dodge');
@@ -981,9 +1306,9 @@ function monsterAttackTurn() {
     const attackRules = GAME_RULES.combat.monsterAttack;
     let monsterDamage = Math.max(
         attackRules.minimumDamage,
-        currentMonster.atk - hero.def + Math.floor(Math.random() * attackRules.randomBonusRange)
+        currentMonster.atk - getEffectiveStat('def') + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
-    const parryChance = Math.min(MAX_PARRY, hero.parry + hero.parryBonus);
+    const parryChance = Math.min(MAX_PARRY, getEffectiveStat('parry') + hero.parryBonus);
     const parried = Math.random() * GAME_RULES.probabilityScale < parryChance;
     if (parried) {
         playSound('parry');
@@ -1008,7 +1333,11 @@ function monsterAttackTurn() {
 
 function isUpgradeMaxed(upgrade) {
     const configuration = UPGRADE_CONFIG[upgrade];
-    return configuration?.max !== undefined && hero[configuration.stat] >= configuration.max;
+    if (configuration?.max === undefined) return false;
+    const currentValue = configuration.isPercentage
+        ? getEffectiveStat(configuration.stat)
+        : hero[configuration.stat];
+    return currentValue >= configuration.max;
 }
 
 function getMaxUpgradeQuantity(upgrade) {
@@ -1018,7 +1347,10 @@ function getMaxUpgradeQuantity(upgrade) {
     const affordableQuantity = Math.floor(hero.gold / UPGRADE_COST);
     if (configuration.max === undefined) return affordableQuantity;
 
-    const remaining = Math.max(0, configuration.max - hero[configuration.stat]);
+    const currentValue = configuration.isPercentage
+        ? getEffectiveStat(configuration.stat)
+        : hero[configuration.stat];
+    const remaining = Math.max(0, configuration.max - currentValue);
     return Math.min(affordableQuantity, Math.ceil(remaining / configuration.amount));
 }
 
@@ -1058,7 +1390,12 @@ function purchaseUpgrade(upgrade, requestedQuantity) {
 
     const amount = configuration.max === undefined
         ? configuration.amount * quantity
-        : Math.min(configuration.amount * quantity, configuration.max - hero[configuration.stat]);
+        : Math.min(
+            configuration.amount * quantity,
+            configuration.max - (configuration.isPercentage
+                ? getEffectiveStat(configuration.stat)
+                : hero[configuration.stat])
+        );
     const totalCost = quantity * UPGRADE_COST;
     const previousCurrentValue = configuration.currentStat
         ? hero[configuration.currentStat]
@@ -1109,17 +1446,22 @@ function usePotion() {
         logMessage(t("noPotions"), "combat-monster");
         return;
     }
-    if (hero.hp >= hero.maxHp) {
+    if (hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco')) {
         logMessage(t("hpFull"));
         return;
     }
 
     hero.potions--;
     const heal = POTION_HEAL_AMOUNT_HP;
-    hero.hp = Math.min(hero.maxHp, hero.hp + heal);
+    const hpRecovered = Math.min(heal, getEffectiveStat('maxHp') - hero.hp);
+    hero.hp += hpRecovered;
     const foco = POTION_HEAL_AMOUNT_FOCO;
-    hero.foco = Math.min(hero.maxFoco, hero.foco + foco);
-    logMessage(t("potionHeal", { amount_hp: heal, amount_foco: foco}), "discovery");
+    const focusRecovered = Math.min(foco, getEffectiveStat('maxFoco') - hero.foco);
+    hero.foco += focusRecovered;
+    logMessage(t("potionHeal", {
+        amount_hp: hpRecovered,
+        amount_foco: focusRecovered
+    }), "discovery");
     updateUI();
 
     if (inCombat) {
@@ -1136,13 +1478,23 @@ function restAtCamp() {
         logMessage(t("noGold", { cost: CAMP_COST }));
         return;
     }
-    if (hero.hp >= hero.maxHp && hero.foco >= hero.maxFoco) {
+    const maxHp = getEffectiveStat('maxHp');
+    const maxFoco = getEffectiveStat('maxFoco');
+    if (hero.hp >= maxHp && hero.foco >= maxFoco) {
         logMessage(t("alreadyRested"));
         return;
     }
     hero.gold -= CAMP_COST;
-    const hpRecovered = Math.min(CAMP_HP_RECOVERY, hero.maxHp - hero.hp);
-    const focusRecovered = Math.min(CAMP_FOCO_RECOVERY, hero.maxFoco - hero.foco);
+    const hpRecovery = Math.max(
+        1,
+        Math.floor(maxHp * CAMP_HP_RECOVERY_PERCENT / GAME_RULES.probabilityScale)
+    );
+    const focusRecovery = Math.max(
+        1,
+        Math.floor(maxFoco * CAMP_FOCO_RECOVERY_PERCENT / GAME_RULES.probabilityScale)
+    );
+    const hpRecovered = Math.min(hpRecovery, maxHp - hero.hp);
+    const focusRecovered = Math.min(focusRecovery, maxFoco - hero.foco);
     hero.hp += hpRecovered;
     hero.foco += focusRecovered;
     logMessage(t("rested", { cost: CAMP_COST, hp: hpRecovered, focus: focusRecovered }), "discovery");
@@ -1176,10 +1528,12 @@ function endCombatVictory() {
     hero.evasionBonus = 0;
     hero.parryBonus = 0;
 
+    const equipmentDrop = createEquipmentDrop();
     inCombat = false;
     currentMonster = null;
 
     checkLevelUp();
+    if (equipmentDrop) handleEquipmentDrop(equipmentDrop);
     updateUI();
 }
 
@@ -1208,9 +1562,9 @@ function checkLevelUp() {
         hero.maxXp = Math.floor(hero.maxXp * GAME_RULES.progression.xpRequirementMultiplier);
         
         hero.maxHp += growth.maxHp;
-        hero.hp = hero.maxHp;
+        hero.hp = getEffectiveStat('maxHp');
         hero.maxFoco += growth.maxFoco;
-        hero.foco = hero.maxFoco;
+        hero.foco = getEffectiveStat('maxFoco');
         hero.maxPotions = Math.min(
             ITEM_DATA.healingPotion.maxCapacity,
             hero.maxPotions + growth.maxPotions

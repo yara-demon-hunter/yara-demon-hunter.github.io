@@ -9,6 +9,74 @@ body {
 h1, h2, h3, .font-title {
     font-family: 'Cinzel', serif;
 }
+#item-drop-dialog {
+    width: min(28rem, calc(100vw - 2rem));
+    padding: 0;
+    border: 1px solid rgba(180, 83, 9, 0.75);
+    border-radius: 1rem;
+    background: #171920;
+    color: #e8e5df;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+}
+#item-drop-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+}
+.item-drop-content {
+    padding: 1.25rem;
+}
+#equipment-slots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas:
+        "accessory head ."
+        "leftHand body rightHand"
+        ". legs ."
+        ". boots .";
+    width: min(100%, 17rem);
+    margin-inline: auto;
+    gap: 0.4rem;
+}
+.equipment-slot {
+    min-width: 0;
+    min-height: 2.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.35rem;
+    text-align: center;
+    overflow: hidden;
+}
+.equipment-slot-rightHand { grid-area: rightHand; }
+.equipment-slot-leftHand { grid-area: leftHand; }
+.equipment-slot-head { grid-area: head; }
+.equipment-slot-body { grid-area: body; }
+.equipment-slot-legs { grid-area: legs; }
+.equipment-slot-boots { grid-area: boots; }
+.equipment-slot-accessory { grid-area: accessory; }
+.equipment-slot-icon {
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+.equipment-slot-placeholder {
+    opacity: 0.45;
+    filter: grayscale(1);
+}
+.equipment-slot-name {
+    max-width: 100%;
+    font-size: 0.6rem;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+.equipment-slot-bonus {
+    font-size: 0.55rem;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+.equipment-slot-unequip {
+    margin-top: 0.15rem;
+}
 #quick-attack-button.fury-ready {
     background-color: #b45309;
     border-color: #f59e0b;
@@ -301,6 +369,7 @@ h1, h2, h3, .font-title {
     }
     #hero-attributes {
         order: 2;
+        grid-column: 1 / -1;
         padding: 0 10px 5px;
         border: 1px solid rgba(92, 81, 55, 0.45);
         border-radius: 12px;

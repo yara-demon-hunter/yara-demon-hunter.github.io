@@ -43,8 +43,11 @@ window.YaraRpgData.rules = Object.freeze({
     },
     camp: {
         goldCost: 50,
-        hpRecovery: 50,
-        focoRecovery: 25
+        hpRecoveryPercent: 20,
+        focoRecoveryPercent: 20
+    },
+    loot: {
+        equipmentDropChance: 20
     },
     combat: {
         maxEvasion: 65,

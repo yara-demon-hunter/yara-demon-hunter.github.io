@@ -23,6 +23,7 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 - `js/systems/mist-contacts.js`: regras reutilizáveis para sortear contatos, resultados, chefes e poderes da névoa.
 - `js/data/mist-contacts.js`: conteúdo editável dos espíritos, chefes especiais e poderes permanentes.
 - `js/data/game-rules.js`: balanceamento, incluindo chance crescente por nível, intervalo entre contatos e pesos dos resultados.
+- `js/data/items.js`: poção de cura e catálogo de equipamentos e bônus de atributos.
 - `js/tailwind.config.js`: cores customizadas usadas pelas classes Tailwind.
 - `components/yara-rpg.html`: fragmento antigo para incorporação; não é usado pela página completa nem publicado como página.
 
@@ -31,6 +32,12 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 Durante a exploração, um contato pode abordar Zeph. Cada contato tem um ícone próprio, e a chance de encontro começa baixa, aumenta com o nível e respeita um intervalo mínimo. O jogador pode aceitar a oferta ou recusá-la sem penalidade. Em geral, aceitar sorteia entre enfrentar um chefe, receber ouro em troca de HP ou despertar um poder permanente; a bruxa caçadora sempre inicia sua missão contra um morto-vivo forte, enquanto a bruxa velha troca uma bebida que reduz o HP para no máximo 20% do máximo por 150 de ouro.
 
 Para expandir o sistema, cadastre novos contatos, chefes ou poderes em `js/data/mist-contacts.js`. Ajuste frequência, intervalo, recompensas e pesos em `js/data/game-rules.js`. Os textos de interface ficam em português e inglês em `js/game.js`.
+
+## Acampamento e equipamentos
+
+Descansar custa 50 de ouro e recupera 20% do HP e do foco máximos atuais, sem ultrapassar os limites. Monstros têm 20% de chance de deixar um equipamento. Os sete slots do personagem exibem o item equipado e seus bônus; ao encontrar um item para um slot ocupado, o jogador pode equipar o novo (guardando o anterior na mochila) ou manter o atual (guardando a descoberta). A mochila permite equipar ou desequipar itens fora de combate.
+
+Os itens e atributos que concedem ficam em `js/data/items.js`; chance de drop e recuperação do acampamento ficam em `js/data/game-rules.js`.
 
 ## Estado do componente
 

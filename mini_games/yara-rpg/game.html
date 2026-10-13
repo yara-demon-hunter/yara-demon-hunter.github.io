@@ -102,6 +102,12 @@ permalink: /mini_games/yara-rpg/game.html
                 <!-- Atributos -->
                 <details id="hero-attributes" class="hero-attributes">
                         <summary data-i18n="attributes">Atributos</summary>
+                        <h3 class="mt-2 mb-2 text-xs font-semibold uppercase tracking-wide text-amber-200" data-i18n="equipment">Equipamento</h3>
+                        <div id="equipment-slots" class="grid grid-cols-2 gap-2 text-xs"></div>
+                        <section id="equipment-inventory" class="mt-3 hidden" aria-labelledby="equipment-inventory-title">
+                            <h3 id="equipment-inventory-title" class="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-200" data-i18n="inventory">Mochila</h3>
+                            <div id="equipment-inventory-list" class="space-y-2"></div>
+                        </section>
                         <div class="grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
                             <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
                                 <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🗡️ <span data-i18n="attack">Ataque</span><span class="skill-upgrade-control" data-upgrade-control="atk"><button type="button" data-upgrade="atk" onclick="toggleUpgradeOptions('atk')" class="skill-upgrade-button" aria-label="Melhorar ataque" aria-expanded="false" aria-controls="upgrade-options-atk" title="Melhorar por 100 ouro">+</button><span id="upgrade-options-atk" class="skill-upgrade-options" data-upgrade-options="atk" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('atk', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('atk', 'max')" data-i18n="upgradeMax">Máx</button></span></span></div>
@@ -229,6 +235,19 @@ permalink: /mini_games/yara-rpg/game.html
         </section>
 
     </main>
+
+    <dialog id="item-drop-dialog" class="item-drop-dialog" aria-labelledby="item-drop-title" aria-describedby="item-drop-message item-drop-choice-help">
+        <div class="item-drop-content">
+            <h2 id="item-drop-title" class="text-lg font-bold text-amber-300" data-i18n="itemDropTitle">Equipamento encontrado</h2>
+            <p id="item-drop-message" class="mt-2 text-sm text-gray-200"></p>
+            <p id="item-drop-choice-help" class="mt-2 text-xs text-gray-300" data-i18n="itemDropChoiceHelp">Equipar o novo guarda o atual na mochila; manter o atual guarda o item encontrado.</p>
+            <p id="item-drop-bonuses" class="mt-2 text-xs text-emerald-200"></p>
+            <div class="mt-4 grid grid-cols-2 gap-2">
+                <button id="equip-new-item-button" type="button" class="rounded-lg border border-amber-500 bg-amber-700 px-3 py-2 text-sm font-semibold text-white" data-i18n="equipNewItem">Equipar novo</button>
+                <button id="keep-current-item-button" type="button" class="rounded-lg border border-forest-600 bg-forest-800 px-3 py-2 text-sm font-semibold text-emerald-100" data-i18n="keepCurrentItem">Manter atual</button>
+            </div>
+        </div>
+    </dialog>
 
     <footer class="w-full max-w-4xl text-center text-xs text-gray-500 pb-2">
         <p data-i18n="footer">Yara Demon Hunter: A Vingança • Mini RPG Interativo de Navegador</p>
