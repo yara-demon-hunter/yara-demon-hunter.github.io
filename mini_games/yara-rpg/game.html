@@ -29,7 +29,46 @@ permalink: /mini_games/yara-rpg/game.html
         <p class="text-xs sm:text-sm text-emerald-400/80 tracking-widest uppercase mt-1" data-i18n="subtitle">Crônicas de Sobrevivência na Floresta Sombria</p>
     </header>
 
-    <main id="game-main" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <section id="game-start-screen" class="game-start-screen" aria-label="Início do jogo" data-i18n-aria="startScreenLabel">
+        <div class="game-start-backdrop">
+            <div id="title-splash" class="title-splash">
+                <p class="start-kicker" data-i18n="startKicker">Uma aventura na névoa</p>
+                <h2 class="start-title" data-i18n="startTitle">A Regra do Sino</h2>
+                <p class="start-story" data-i18n="startStory">Quando o sino toca, a floresta desperta. Escolha quem vai enfrentar a névoa — e prepare-se para sobreviver.</p>
+                <button id="show-character-setup-button" type="button" class="start-primary-button">
+                    <span data-i18n="startPrompt">Clique para começar</span>
+                    <span aria-hidden="true">✦</span>
+                </button>
+                <p class="start-hint" data-i18n="startHint">Toque, clique ou pressione Enter</p>
+            </div>
+
+            <div id="character-setup" class="character-setup" hidden>
+                <div class="setup-heading">
+                    <p class="start-kicker" data-i18n="setupKicker">Prepare sua jornada</p>
+                    <h2 class="setup-title" data-i18n="setupTitle">Escolha quem entrará na névoa</h2>
+                    <p class="setup-description" data-i18n="setupDescription">Cada caçador tem uma força diferente. Depois, escolha três equipamentos para levar.</p>
+                </div>
+                <section class="setup-section" aria-labelledby="character-selection-title">
+                    <h3 id="character-selection-title" class="setup-section-title" data-i18n="selectCharacter">Personagem</h3>
+                    <div id="character-options" class="character-options" role="group" aria-label="Personagens" data-i18n-aria="selectCharacter"></div>
+                </section>
+                <section class="setup-section" aria-labelledby="equipment-selection-title">
+                    <div class="starter-equipment-heading">
+                        <h3 id="equipment-selection-title" class="setup-section-title" data-i18n="selectStarterEquipment">Escolha 3 equipamentos</h3>
+                        <span id="starter-equipment-count" class="starter-equipment-count">0/3</span>
+                    </div>
+                    <p class="setup-section-help" data-i18n="starterEquipmentHelp">Escolha equipamentos de espaços diferentes. Selecione novamente um espaço para trocar sua escolha.</p>
+                    <div id="starter-equipment-options" class="starter-equipment-options" role="group" aria-label="Equipamento inicial" data-i18n-aria="selectStarterEquipment"></div>
+                </section>
+                <div class="setup-actions">
+                    <button id="back-to-title-button" type="button" class="start-secondary-button" data-i18n="backToTitle">Voltar</button>
+                    <button id="begin-adventure-button" type="button" class="start-primary-button" disabled data-i18n="beginAdventure">Iniciar aventura</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main id="game-main" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-4" hidden>
 
         <nav class="md:col-span-3 border-b border-fantasy-border pb-3" aria-label="Jornada" data-i18n-aria="journey">
             <h2 class="text-xs uppercase tracking-widest text-emerald-400/80 mb-2" data-i18n="journey">Jornada</h2>
@@ -295,12 +334,14 @@ permalink: /mini_games/yara-rpg/game.html
         <p data-i18n="footer">Yara Demon Hunter: A Vingança • Mini RPG Interativo de Navegador</p>
     </footer>
 
-    <audio id="game-music" src="audio/dark_fantasy_mini_game.mp3" autoplay loop preload="auto"></audio>
+    <audio id="game-music" src="audio/dark_fantasy_mini_game.mp3" loop preload="none"></audio>
     <script src="js/data/hero.js" defer></script>
     <script src="js/data/items.js" defer></script>
+    <script src="js/data/characters.js" defer></script>
     <script src="js/data/regions.js" defer></script>
     <script src="js/data/monsters.js" defer></script>
     <script src="js/data/game-rules.js" defer></script>
     <script src="js/data/mist-contacts.js" defer></script>
+    <script src="js/systems/character-setup.js" defer></script>
     <script src="js/systems/mist-contacts.js" defer></script>
     <script src="js/game.js" defer></script>

@@ -14,6 +14,21 @@ const translations = {
         gameLabel: "Mini RPG · Floresta Sombria",
         title: "YARA: A REGRA DO SINO",
         subtitle: "Crônicas de Sobrevivência na Floresta Sombria",
+        startScreenLabel: "Tela de início do jogo",
+        startKicker: "Uma aventura na névoa",
+        startTitle: "A Regra do Sino",
+        startStory: "Quando o sino toca, a floresta desperta. Escolha quem vai enfrentar a névoa — e prepare-se para sobreviver.",
+        startPrompt: "Clique para começar",
+        startHint: "Toque, clique ou pressione Enter",
+        setupKicker: "Prepare sua jornada",
+        setupTitle: "Escolha quem entrará na névoa",
+        setupDescription: "Cada caçador tem uma força diferente. Depois, escolha três equipamentos para levar.",
+        selectCharacter: "Personagem",
+        selectStarterEquipment: "Escolha 3 equipamentos",
+        starterEquipmentHelp: "Escolha equipamentos de espaços diferentes. Selecione novamente um espaço para trocar sua escolha.",
+        characterSpecialty: "+{amount} {stat}",
+        backToTitle: "Voltar",
+        beginAdventure: "Iniciar aventura",
         level: "Nível",
         gold: "Ouro:",
         experience: "XP:",
@@ -86,18 +101,18 @@ const translations = {
         mistAccept: "Aceitar oferta",
         mistDecline: "Recusar e seguir",
         mistContactAppears: "{icon} {contact} surge entre as árvores e faz uma oferta.",
-        mistContactDeclined: "Zeph recusa a oferta. A presença desaparece na névoa.",
-        mistContactAccepted: "Zeph aceita a oferta de {contact}.",
-        mistSacrifice: "🩸 O espírito entrega {gold} de ouro, mas cobra {hp} HP de Zeph.",
+        mistContactDeclined: "Você recusa a oferta. A presença desaparece na névoa.",
+        mistContactAccepted: "Você aceita a oferta de {contact}.",
+        mistSacrifice: "🩸 O espírito entrega {gold} de ouro, mas cobra {hp} HP.",
         witchQuestStarted: "A bruxa aponta o alvo da missão: <span class=\"text-red-400 font-bold\">{monster}</span>.",
-        witchDrinkAccepted: "🧪 Zeph bebe a mistura e fica com {hp} de HP. A bruxa entrega {gold} de ouro.",
+        witchDrinkAccepted: "🧪 Você bebe a mistura e fica com {hp} de HP. A bruxa entrega {gold} de ouro.",
         mistPowerGained: "✨ Novo poder desperto: <span class=\"text-cyan-300 font-bold\">{power}</span> — {description}.",
         mistBossAppears: "⚔️ Uma força antiga se manifesta na névoa: <span class=\"text-red-400 font-bold\">{monster}</span>!",
         drink: "Poção",
         potionActionAria: "Usar poção de cura",
         danger: "Perigo na Névoa",
         explorationIntro: "🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?",
-        openingLog: "[Início] Zeph avança sozinho pela Floresta Sombria. Mantenha sua arma em punho.",
+        openingLog: "[Início] {hero} avança pela Floresta Sombria. Mantenha sua arma em punho.",
         explore: "Explorar",
         camp: "Descansar",
         campCost: "(🪙{cost})",
@@ -123,12 +138,12 @@ const translations = {
         quickDamage: "Você desferiu um <span class=\"text-emerald-400 font-bold\">Ataque Rápido</span> causando {damage} de dano e ganhou {fury} de Fúria.",
         noFocus: "Você está sem foco para uma Estocada Pesada! Recupere-se.",
         heavyDamage: "🗡️ Você executou uma <span class=\"text-amber-400 font-bold\">Estocada Pesada</span> com o machado causando {damage} de dano!",
-        criticalDamage: "🗡️ Golpe Crítico! Zeph causou {damage} de dano!",
+        criticalDamage: "🗡️ Golpe Crítico! Você causou {damage} de dano!",
         stunLanded: "✨ O inimigo foi atordoado e perdeu o contra-ataque!",
         defendMessage: "⚔️ A chance de aparo aumentou em {amount}% e permanece até o fim da luta!",
         noParryFocus: "Você precisa de 10 de Foco para preparar um aparo.",
         parryMaxed: "A chance de aparo já está no limite de 65% nesta luta.",
-        heroParries: "⚔️ Zeph aparou o golpe! O dano caiu pela metade: {damage} de dano.",
+        heroParries: "⚔️ Você aparou o golpe! O dano caiu pela metade: {damage} de dano.",
         monsterParries: "⚔️ {monster} aparou seu golpe! O dano causado caiu pela metade: {damage}.",
         monsterDamage: "O {monster} contra-atacou causando <span class=\"text-red-400 font-bold\">{damage} de dano</span>!",
         noPotions: "Você não tem poções restantes!",
@@ -141,12 +156,12 @@ const translations = {
         escapeFailed: "❌ A tentativa de fuga falhou! O {monster} cortou seu caminho.",
         victory: "🎉 Vitória! Você derrotou o <span class=\"text-amber-300 font-bold\">{monster}</span>!",
         rewards: "Recompensas: <span class=\"text-purple-300\">+{xp} XP</span> e <span class=\"text-amber-300\">+{gold} de Ouro</span>",
-        defeat: "💀 Zeph caiu na Floresta Sombria...",
-        defeatHelp: "A jornada de Zeph terminou na Floresta Sombria.",
+        defeat: "💀 Você caiu na Floresta Sombria...",
+        defeatHelp: "Sua jornada terminou na Floresta Sombria.",
         gameOverTitle: "Fim da jornada",
-        levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Subiu de Nível!</span> Zeph alcançou o Nível {level}! Ataque, defesa, esquiva, aparo e stun aprimorados!",
+        levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Subiu de Nível!</span> Você alcançou o Nível {level}! Ataque, defesa, esquiva, aparo e stun aprimorados!",
         monsterDodges: "💨 O {monster} desviou do seu golpe!",
-        heroDodges: "💨 Zeph desviou do ataque do {monster} e ganhou {amount} de Fúria!",
+        heroDodges: "💨 Você desviou do ataque do {monster} e ganhou {amount} de Fúria!",
         dodgeMessage: "💨 O bônus de esquiva aumentou em {amount}% e permanece até o fim da luta!",
         noDodgeFocus: "Você precisa de 15 de Foco para preparar uma esquiva.",
         evasionMaxed: "A chance de esquiva já está no limite de 65% nesta luta.",
@@ -170,6 +185,21 @@ const translations = {
         gameLabel: "Mini RPG · Dark Forest",
         title: "YARA: THE BELL'S RULE",
         subtitle: "Survival Tales from the Dark Forest",
+        startScreenLabel: "Game start screen",
+        startKicker: "An adventure in the mist",
+        startTitle: "The Bell's Rule",
+        startStory: "When the bell rings, the forest awakens. Choose who will face the mist — and prepare to survive.",
+        startPrompt: "Click to begin",
+        startHint: "Tap, click, or press Enter",
+        setupKicker: "Prepare for the journey",
+        setupTitle: "Choose who will enter the mist",
+        setupDescription: "Each hunter has a different strength. Then choose three pieces of equipment to take.",
+        selectCharacter: "Character",
+        selectStarterEquipment: "Choose 3 pieces of equipment",
+        starterEquipmentHelp: "Choose equipment for different slots. Select another item for a slot to replace your choice.",
+        characterSpecialty: "+{amount} {stat}",
+        backToTitle: "Back",
+        beginAdventure: "Begin adventure",
         level: "Level",
         gold: "Gold:",
         experience: "XP:",
@@ -242,18 +272,18 @@ const translations = {
         mistAccept: "Accept the offer",
         mistDecline: "Refuse and move on",
         mistContactAppears: "{icon} {contact} appears between the trees with an offer.",
-        mistContactDeclined: "Zeph refuses the offer. The presence vanishes into the mist.",
-        mistContactAccepted: "Zeph accepts {contact}'s offer.",
-        mistSacrifice: "🩸 The spirit gives {gold} gold, but claims {hp} HP from Zeph.",
+        mistContactDeclined: "You refuse the offer. The presence vanishes into the mist.",
+        mistContactAccepted: "You accept {contact}'s offer.",
+        mistSacrifice: "🩸 The spirit gives {gold} gold, but claims {hp} HP.",
         witchQuestStarted: "The witch points out the target of her quest: <span class=\"text-red-400 font-bold\">{monster}</span>.",
-        witchDrinkAccepted: "🧪 Zeph drinks the mixture and is left with {hp} HP. The witch hands over {gold} gold.",
+        witchDrinkAccepted: "🧪 You drink the mixture and are left with {hp} HP. The witch hands over {gold} gold.",
         mistPowerGained: "✨ New power awakened: <span class=\"text-cyan-300 font-bold\">{power}</span> — {description}.",
         mistBossAppears: "⚔️ An ancient force manifests in the mist: <span class=\"text-red-400 font-bold\">{monster}</span>!",
         drink: "Potion",
         potionActionAria: "Use healing potion",
         danger: "Danger in the Mist",
         explorationIntro: "🌲 The bell rang too late. The mist hides the river spirit, dark secrets, and hungry beasts. What will you do?",
-        openingLog: "[Start] Zeph ventures alone into the Dark Forest. Keep your weapon ready.",
+        openingLog: "[Start] {hero} ventures into the Dark Forest. Keep your weapon ready.",
         explore: "Explore",
         camp: "Rest",
         campCost: "(🪙{cost})",
@@ -279,12 +309,12 @@ const translations = {
         quickDamage: "You land a <span class=\"text-emerald-400 font-bold\">Quick Attack</span> for {damage} damage and gain {fury} Fury.",
         noFocus: "You do not have enough Focus for a Heavy Strike. Recover first.",
         heavyDamage: "🗡️ Your <span class=\"text-amber-400 font-bold\">Heavy Strike</span> deals {damage} damage!",
-        criticalDamage: "🗡️ Critical Strike! Zeph deals {damage} damage!",
+        criticalDamage: "🗡️ Critical Strike! You deal {damage} damage!",
         stunLanded: "✨ The enemy is stunned and loses its counterattack!",
         defendMessage: "⚔️ Parry chance increased by {amount}% and will last until the fight ends!",
         noParryFocus: "You need 10 Focus to prepare a parry.",
         parryMaxed: "Parry chance is already at the 65% limit for this fight.",
-        heroParries: "⚔️ Zeph parried the blow! Damage was halved to {damage}.",
+        heroParries: "⚔️ You parried the blow! Damage was halved to {damage}.",
         monsterParries: "⚔️ {monster} parried your attack! Damage dealt was halved to {damage}.",
         monsterDamage: "The {monster} counterattacks for <span class=\"text-red-400 font-bold\">{damage} damage</span>!",
         noPotions: "You have no potions left!",
@@ -297,12 +327,12 @@ const translations = {
         escapeFailed: "❌ You fail to escape! The {monster} cuts off your path.",
         victory: "🎉 Victory! You defeated <span class=\"text-amber-300 font-bold\">{monster}</span>!",
         rewards: "Rewards: <span class=\"text-purple-300\">+{xp} XP</span> and <span class=\"text-amber-300\">+{gold} Gold</span>",
-        defeat: "💀 Zeph falls in the Dark Forest...",
-        defeatHelp: "Zeph's journey ends in the Dark Forest.",
+        defeat: "💀 You fall in the Dark Forest...",
+        defeatHelp: "Your journey ends in the Dark Forest.",
         gameOverTitle: "Journey's End",
-        levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Level Up!</span> Zeph reached Level {level}! Attack, defense, evasion, parry, and stun improved!",
+        levelUp: "⭐ <span class=\"text-amber-400 font-bold uppercase\">Level Up!</span> You reached Level {level}! Attack, defense, evasion, parry, and stun improved!",
         monsterDodges: "💨 The {monster} dodges your attack!",
-        heroDodges: "💨 Zeph dodges the {monster}'s attack and gains {amount} Fury!",
+        heroDodges: "💨 You dodge the {monster}'s attack and gain {amount} Fury!",
         dodgeMessage: "💨 Evasion increased by {amount}% and will last until the fight ends!",
         noDodgeFocus: "You need 15 Focus to prepare a dodge.",
         evasionMaxed: "Evasion is already at the 65% limit for this fight.",
@@ -434,24 +464,15 @@ gameMusic.addEventListener('play', () => updateMusicButton(true));
 gameMusic.addEventListener('pause', () => updateMusicButton(false));
 gameMusic.addEventListener('error', () => updateMusicButton(false));
 
-function startMusicAfterInteraction(event) {
-    if (event.target instanceof Element && event.target.closest('#music-toggle')) return;
-    startGameMusic();
-    document.removeEventListener('pointerdown', startMusicAfterInteraction);
-    document.removeEventListener('keydown', startMusicAfterInteraction);
-}
-
-document.addEventListener('pointerdown', startMusicAfterInteraction);
-document.addEventListener('keydown', startMusicAfterInteraction);
-
 const GAME_DATA = window.YaraRpgData;
 const GAME_RULES = GAME_DATA.rules;
 const ITEM_DATA = GAME_DATA.items;
 const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
 const MIST_CONTACT_SYSTEM = window.YaraMistContactSystem;
+const DEFAULT_CHARACTER = GAME_DATA.characters[0];
 const hero = {
-    name: GAME_DATA.hero.name,
-    ...GAME_DATA.hero.initial,
+    name: DEFAULT_CHARACTER.name,
+    ...DEFAULT_CHARACTER.baseStats,
     potions: ITEM_DATA.healingPotion.startingCount,
     maxPotions: ITEM_DATA.healingPotion.startingCapacity,
     evasionBonus: 0,
@@ -1754,6 +1775,36 @@ function restartGame() {
     window.location.reload();
 }
 
+function startAdventure({ character, equipment }) {
+    Object.assign(hero, character.baseStats, {
+        name: character.name,
+        potions: ITEM_DATA.healingPotion.startingCount,
+        maxPotions: ITEM_DATA.healingPotion.startingCapacity,
+        evasionBonus: 0,
+        parryBonus: 0,
+        fury: 0,
+        mistPowers: [],
+        equipment: Object.fromEntries(EQUIPMENT_SLOTS.map(({ id }) => [id, null])),
+        equipmentInventory: []
+    });
+    Object.entries(character.specialty).forEach(([stat, amount]) => {
+        hero[stat] += amount;
+    });
+    equipment.forEach((item) => {
+        hero.equipment[item.slot] = item;
+    });
+    hero.hp = getEffectiveStat('maxHp');
+    hero.foco = getEffectiveStat('maxFoco');
+
+    document.querySelector('#rpg-log [data-i18n="openingLog"]').textContent =
+        t('openingLog', { hero: hero.name });
+    document.getElementById('game-main').hidden = false;
+    document.getElementById('game-start-screen').hidden = true;
+    document.body.classList.remove('game-start-active');
+    updateUI();
+    startGameMusic();
+}
+
 function checkLevelUp() {
     while (hero.xp >= hero.maxXp) {
         const growth = GAME_DATA.hero.levelUp;
@@ -1785,6 +1836,9 @@ function checkLevelUp() {
 
 window.onload = function() {
     applyLanguage();
-    updateUI();
-    startGameMusic();
+    window.YaraRpgCharacterSetup.initialize({
+        translate: t,
+        describeEquipment: getItemBonusText,
+        onStart: startAdventure
+    });
 };

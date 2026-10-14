@@ -12,6 +12,8 @@ Abra `/mini_games/yara-rpg/game.html`. A página também pode ser aberta diretam
 
 Os menus do site abrem o jogo no idioma da página (`?lang=pt` ou `?lang=en`). O seletor PT/EN no jogo também permite trocar o idioma; a troca reinicia a partida.
 
+Ao abrir o mini game, a tela de título aguarda um clique, toque ou Enter. Antes da aventura, escolha Zeph ou Oskar e três equipamentos iniciais, cada um de um espaço diferente. Zeph começa com mais HP máximo; Oskar começa com mais ataque. O botão de início só é habilitado depois das três escolhas.
+
 A página do jogo usa o layout base do site, que centraliza a verificação do Bing, o Google Analytics 4 e o Google AdSense para todas as páginas.
 
 ## Estrutura
@@ -21,7 +23,9 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 - `css/embedded-rpg.css`: estilos do fragmento HTML legado.
 - `js/game.js`: estado do personagem, exploração, combate e atualização da interface.
 - `js/systems/mist-contacts.js`: regras reutilizáveis para sortear contatos, resultados, chefes e poderes da névoa.
+- `js/systems/character-setup.js`: controla as telas de início, a seleção do personagem e o equipamento inicial.
 - `js/data/mist-contacts.js`: conteúdo editável dos espíritos, chefes especiais e poderes permanentes.
+- `js/data/characters.js`: personagens iniciais, descrições e especialidades.
 - `js/data/game-rules.js`: balanceamento, incluindo chance crescente por nível, intervalo entre contatos e pesos dos resultados.
 - `js/data/items.js`: poção de cura e catálogo de equipamentos e bônus de atributos.
 - `js/tailwind.config.js`: cores customizadas usadas pelas classes Tailwind.
@@ -38,6 +42,8 @@ Para expandir o sistema, cadastre novos contatos, chefes ou poderes em `js/data/
 Descansar custa 50 de ouro e recupera 20% do HP e do foco máximos atuais, sem ultrapassar os limites. Monstros têm 20% de chance de deixar um equipamento. Os sete slots do personagem exibem apenas o ícone do item; clique ou toque nele para ver nome, bônus e ações numa janela de detalhes. A mochila ocupa o próprio slot inferior do painel de equipamento; seus dez espaços também mostram apenas ícones e abrem os detalhes do item ao selecionar um. Ao encontrar um item para um slot ocupado, o jogador pode equipar o novo (guardando o anterior na mochila) ou manter o atual (guardando a descoberta). Equipamentos podem ser equipados ou descartados fora de combate. Se a mochila estiver cheia, a ação que guardaria outro equipamento é bloqueada, e o item encontrado permanece aguardando até que um espaço seja liberado. Os painéis de equipamento e atributos são independentes e podem ser recolhidos em desktop e mobile; ambos começam fechados para deixar mais espaço para a aventura.
 
 Os itens e atributos que concedem ficam em `js/data/items.js`; chance de drop e recuperação do acampamento ficam em `js/data/game-rules.js`.
+
+Para alterar personagens ou criar outro, edite `js/data/characters.js`. A tela de seleção e o limite de três itens ficam em `js/systems/character-setup.js`; textos localizados ficam em `js/game.js`.
 
 ## Estado do componente
 

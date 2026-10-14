@@ -1,24 +1,6 @@
 window.YaraRpgData = window.YaraRpgData || {};
 
 window.YaraRpgData.hero = Object.freeze({
-    name: "Zeph",
-    initial: {
-        level: 1,
-        hp: 100,
-        maxHp: 100,
-        foco: 50,
-        maxFoco: 50,
-        atk: 10,
-        def: 5,
-        evasion: 5,
-        parry: 10,
-        stunChance: 5,
-        fury: 0,
-        maxFury: 100,
-        gold: 200,
-        xp: 0,
-        maxXp: 30
-    },
     levelUp: {
         maxHp: 25,
         maxFoco: 15,
