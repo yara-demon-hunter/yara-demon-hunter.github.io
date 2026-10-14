@@ -6,7 +6,7 @@ window.YaraRpgData.rules = Object.freeze({
         discoveryBaseChance: 1,
         discoveryChancePerLevel: 1,
         discoveryChancePerRegion: 1,
-        maxDiscoveryChance: 20,
+        maxDiscoveryChance: 10,
         encounters: {
             monsterThreshold: 50,
             goldThreshold: 75,
@@ -50,6 +50,8 @@ window.YaraRpgData.rules = Object.freeze({
         equipmentDropChance: 20
     },
     combat: {
+        enemyTelegraphDamageMultiplier: 1.65,
+        telegraphEveryTurns: 3,
         quickAttack: {
             attackMultiplier: 0.8,
             minimumDamage: 4,

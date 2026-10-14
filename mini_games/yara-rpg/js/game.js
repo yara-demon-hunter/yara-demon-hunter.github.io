@@ -34,6 +34,26 @@ const translations = {
         skillLimitsSummary: "Limites — esquiva {evasion}%, aparo {parry}%",
         backToTitle: "Voltar",
         beginAdventure: "Iniciar aventura",
+        continueAdventure: "Continuar jornada salva",
+        storyEventKicker: "Escolha seu caminho",
+        enemyTelegraph: "⚠️ {monster} prepara um golpe devastador!",
+        finalBossChallenge: "O Guardião do Sino desperta para o confronto final!",
+        campaignVictoryTitle: "A Regra do Sino foi quebrada",
+        campaignVictoryDescription: "O Guardião cai, o sino silencia e a névoa começa a recuar. Por esta noite, a floresta está livre.",
+        campaignDefeatTitle: "A névoa venceu esta vez",
+        campaignDefeatDescription: "A floresta ainda guarda seu sino. Reúna forças e tente outra vez.",
+        eventLoot: "Você encontra provisões e {gold} moedas.",
+        eventHeal: "Você recupera {hp} HP e {focus} de Foco.",
+        eventGold: "A troca rende {gold} moedas, mas custa {hp} HP.",
+        eventPower: "O fragmento fortalece seu ataque em {amount}.",
+        eventBoss: "O Guardião do Sino desperta!",
+        eventRiverCrossing: "🌊 Você atravessa a correnteza e encontra {gold} moedas presas entre as pedras, mas perde {hp} HP.",
+        eventRiverbank: "🌿 Seguindo pela margem, você encontra uma trilha segura e recupera {hp} HP e {focus} de Foco.",
+        eventPotion: "🧪 Você encontra uma poção escondida. Poções: {potions}/{capacity}.",
+        eventPotionFull: "A cabana está vazia; sua mochila de poções já está cheia.",
+        eventPortalTreasure: "💰 Você cruza a ponte em ruínas e apanha {gold} moedas antes que ela desabe.",
+        eventScout: "👁️ Você observa os invasores sem ser visto e recupera {focus} de Foco antes de seguir.",
+        eventCastleCache: "🛡️ Você desarma as armadilhas e encontra {gold} moedas e uma poção.",
         level: "Nível",
         gold: "Ouro:",
         experience: "XP:",
@@ -211,6 +231,26 @@ const translations = {
         skillLimitsSummary: "Limits — evasion {evasion}%, parry {parry}%",
         backToTitle: "Back",
         beginAdventure: "Begin adventure",
+        continueAdventure: "Continue saved journey",
+        storyEventKicker: "Choose your path",
+        enemyTelegraph: "⚠️ {monster} is preparing a devastating strike!",
+        finalBossChallenge: "The Bell Keeper awakens for the final battle!",
+        campaignVictoryTitle: "The Bell's Rule is broken",
+        campaignVictoryDescription: "The Keeper falls, the bell falls silent, and the mist begins to retreat. For tonight, the forest is free.",
+        campaignDefeatTitle: "The mist won this time",
+        campaignDefeatDescription: "The forest still guards its bell. Gather your strength and try again.",
+        eventLoot: "You find supplies and {gold} coins.",
+        eventHeal: "You recover {hp} HP and {focus} Focus.",
+        eventGold: "The trade earns {gold} coins but costs {hp} HP.",
+        eventPower: "The shard strengthens your attack by {amount}.",
+        eventBoss: "The Bell Keeper awakens!",
+        eventRiverCrossing: "🌊 You cross the current and find {gold} coins caught between the stones, but lose {hp} HP.",
+        eventRiverbank: "🌿 Following the riverbank, you find a safe trail and recover {hp} HP and {focus} Focus.",
+        eventPotion: "🧪 You find a hidden potion. Potions: {potions}/{capacity}.",
+        eventPotionFull: "The cabin is empty; your potion pack is already full.",
+        eventPortalTreasure: "💰 You rush across the crumbling bridge and grab {gold} coins before it collapses.",
+        eventScout: "👁️ You watch the invaders unseen and recover {focus} Focus before moving on.",
+        eventCastleCache: "🛡️ You disarm the traps and find {gold} coins and a potion.",
         level: "Level",
         gold: "Gold:",
         experience: "XP:",
@@ -361,7 +401,71 @@ const translations = {
 };
 
 function t(key, values = {}) {
-    return translations[gameLanguage][key].replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+    return (translations[gameLanguage][key] ?? key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+}
+
+function saveGame() {
+    if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return;
+    const snapshot = {
+        version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)),
+        currentRegion, discoveredRegions, explorationsSinceMistContact, explorationCount,
+        storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
+        seenStoryEvents: [...seenStoryEvents],
+        pendingEquipment, equipmentInstanceId
+    };
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot)); } catch {}
+}
+
+function readSavedGame() {
+    try {
+        const snapshot = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+        if (!snapshot || snapshot.version !== 1 || !GAME_DATA.characters.some((character) => character.id === snapshot.characterId)) return null;
+        return snapshot;
+    } catch { return null; }
+}
+
+function loadSavedGame(snapshot = readSavedGame()) {
+    if (!snapshot) return false;
+    selectedCharacter = GAME_DATA.characters.find((character) => character.id === snapshot.characterId);
+    selectedCharacterProgression = selectedCharacter.levelUp;
+    Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
+    hero.equipment = { ...Object.fromEntries(EQUIPMENT_SLOTS.map(({ id }) => [id, null])), ...(snapshot.hero?.equipment || {}) };
+    hero.equipmentInventory = Array.isArray(snapshot.hero?.equipmentInventory) ? snapshot.hero.equipmentInventory : [];
+    currentRegion = Math.max(0, Math.min(GAME_DATA.regions.length - 1, Number(snapshot.currentRegion) || 0));
+    discoveredRegions = Array.isArray(snapshot.discoveredRegions) ? snapshot.discoveredRegions : [0];
+    explorationsSinceMistContact = Number(snapshot.explorationsSinceMistContact) || 0;
+    explorationCount = Number(snapshot.explorationCount) || 0;
+    equipmentInstanceId = Number(snapshot.equipmentInstanceId) || 0;
+    storyEventSeen.clear();
+    (snapshot.storyEventSeen || []).forEach((id) => storyEventSeen.add(id));
+    seenStoryEvents.clear();
+    (snapshot.seenStoryEvents || []).forEach((id) => seenStoryEvents.add(id));
+    pendingStoryEvent = snapshot.pendingStoryEvent || null;
+    if (pendingStoryEvent && !pendingStoryEvent.choices) pendingStoryEvent = GAME_DATA.regions[currentRegion].event?.[0] || null;
+    pendingMistContact = snapshot.pendingMistContact || null;
+    pendingEquipment = snapshot.pendingEquipment || null;
+    if (pendingEquipment?.item) pendingEquipment.item = hydrateItem(pendingEquipment.item);
+    inCombat = false;
+    currentMonster = null;
+    campaignComplete = false;
+    enemyTelegraphing = false;
+    gameOver = hero.hp <= 0;
+    document.getElementById('rpg-log').replaceChildren();
+    logMessage(t('openingLog', { hero: hero.name }), 'special');
+    document.getElementById('game-main').hidden = false;
+    document.getElementById('game-start-screen').hidden = true;
+    document.body.classList.remove('game-start-active');
+    updateUI(); saveGame(); startGameMusic();
+    return true;
+}
+
+function showContinueOption() {
+    document.getElementById('continue-adventure-button').hidden = !readSavedGame();
+}
+
+function hydrateItem(savedItem) {
+    const catalogItem = ITEM_DATA.equipment.find((item) => item.id === savedItem?.id);
+    return catalogItem ? { ...catalogItem, ...savedItem } : savedItem;
 }
 
 const EQUIPMENT_SLOTS = Object.freeze([
@@ -461,15 +565,34 @@ function updateMusicButton(isPlaying) {
     musicToggle.title = label;
 }
 
+function setCombatMusic(isCombat) {
+    if (!musicEnabled) return;
+    if (isCombat) gameMusic.dataset.combat = 'true';
+    else delete gameMusic.dataset.combat;
+}
+
 function startGameMusic() {
+    musicEnabled = true;
     gameMusic.play()
         .then(() => updateMusicButton(true))
         .catch(() => updateMusicButton(false));
 }
 
 musicToggle.addEventListener('click', () => {
-    if (gameMusic.paused) startGameMusic();
-    else gameMusic.pause();
+    if (gameMusic.paused) {
+        musicEnabled = true;
+        startGameMusic();
+    } else { musicEnabled = false; gameMusic.pause(); }
+});
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        gameMusic.pause();
+        return;
+    }
+    if (musicEnabled && document.getElementById('game-main').hidden === false) {
+        gameMusic.play().catch(() => {});
+    }
 });
 
 gameMusic.addEventListener('play', () => updateMusicButton(true));
@@ -522,6 +645,15 @@ let pendingEquipment = null;
 let selectedEquipmentDetails = null;
 let equipmentInstanceId = 0;
 let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
+let pendingStoryEvent = null;
+let explorationCount = 0;
+let campaignComplete = false;
+let enemyTurnCount = 0;
+let enemyTelegraphing = false;
+let musicEnabled = false;
+const SAVE_KEY = 'yara-rpg-save-v1';
+const storyEventSeen = new Set();
+const seenStoryEvents = new Set();
 
 document.addEventListener('click', (event) => {
     if (event.target instanceof Element && event.target.closest('[data-upgrade-control]')) return;
@@ -971,6 +1103,8 @@ function updateUI() {
         ).join(' · ')
         : t('noMistPowers');
     const currentRegionData = GAME_DATA.regions[currentRegion];
+    document.body.classList.remove(...GAME_DATA.regions.map((region) => `region-${region.id}`));
+    document.body.classList.add(`region-${currentRegionData.id}`);
     document.getElementById('exploration-title').innerText = currentRegionData.title[gameLanguage];
     document.getElementById('exploration-description').innerText = currentRegionData.description[gameLanguage];
 
@@ -1037,7 +1171,7 @@ function updateUI() {
             : { ...UPGRADE_CONFIG[upgrade], max: upgradeMax };
         const skill = t(UPGRADE_CONFIG[upgrade].nameKey);
         const maximum = getMaxUpgradeQuantity(upgrade, upgradeConfiguration);
-        const disabled = inCombat || gameOver || maximum < 1 || isUpgradeMaxed(upgrade, upgradeConfiguration);
+        const disabled = inCombat || gameOver || campaignComplete || maximum < 1 || isUpgradeMaxed(upgrade, upgradeConfiguration);
         button.disabled = disabled;
         button.setAttribute('aria-label', t('upgradeAria', { skill, cost: UPGRADE_COST }));
         button.title = t('upgradeAria', { skill, cost: UPGRADE_COST });
@@ -1070,26 +1204,40 @@ function updateUI() {
         || parryTotal >= selectedCharacter.skills.maxParry
         || hero.foco < selectedCharacter.skills.parry.focoCost;
     const restartButton = document.getElementById('restart-button');
-    mistContactCard.classList.toggle('hidden', !pendingMistContact || inCombat || gameOver);
+    mistContactCard.classList.toggle('hidden', !pendingMistContact || inCombat || gameOver || pendingStoryEvent);
+    const storyCard = document.getElementById('story-event-card');
+    storyCard.hidden = !pendingStoryEvent || inCombat || gameOver;
+    if (pendingStoryEvent) {
+        document.getElementById('story-event-title').textContent = pendingStoryEvent.title[gameLanguage];
+        document.getElementById('story-event-description').textContent = pendingStoryEvent.description[gameLanguage];
+        const choices = document.getElementById('story-event-choices');
+        choices.replaceChildren();
+        pendingStoryEvent.choices.forEach((choice, index) => {
+            const button = document.createElement('button');
+            button.type = 'button'; button.className = 'story-event-choice';
+            button.textContent = choice.label[gameLanguage];
+            button.addEventListener('click', () => resolveStoryEvent(index));
+            choices.append(button);
+        });
+    }
     if (pendingMistContact) {
         document.getElementById('mist-contact-icon').textContent = pendingMistContact.icon;
         document.getElementById('mist-contact-name').textContent = pendingMistContact.name[gameLanguage];
         document.getElementById('mist-contact-message').textContent = pendingMistContact.message[gameLanguage];
     }
-    campButton.disabled = inCombat || gameOver || hero.gold < CAMP_COST || (
+    campButton.disabled = inCombat || gameOver || campaignComplete || hero.gold < CAMP_COST || (
         hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco')
     );
-    potionButton.disabled = gameOver;
+    potionButton.disabled = gameOver || campaignComplete;
 
-    if (gameOver) {
-        exploreControls.classList.add('hidden');
-        combatControls.classList.add('hidden');
-        encounterCard.classList.add('hidden');
-        mistContactCard.classList.add('hidden');
-        explorationBanner.classList.remove('hidden');
-        document.getElementById('exploration-title').innerText = t('gameOverTitle');
-        document.getElementById('exploration-description').innerText = t('defeatHelp');
-        restartButton.classList.remove('hidden');
+    document.getElementById('campaign-ending-card').hidden = !campaignComplete && !gameOver;
+    if (campaignComplete || gameOver) {
+        exploreControls.classList.add('hidden'); combatControls.classList.add('hidden');
+        encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden'); storyCard.hidden = true;
+        explorationBanner.classList.add('hidden'); restartButton.classList.add('hidden');
+        document.getElementById('campaign-ending-title').textContent = t(campaignComplete ? 'campaignVictoryTitle' : 'campaignDefeatTitle');
+        document.getElementById('campaign-ending-description').textContent = t(campaignComplete ? 'campaignVictoryDescription' : 'campaignDefeatDescription');
+        document.getElementById('campaign-ending-card').querySelector('[data-i18n="restartCampaign"]').textContent = t('restart');
     } else if (inCombat) {
         exploreControls.classList.add('hidden');
         combatControls.classList.remove('hidden');
@@ -1097,6 +1245,10 @@ function updateUI() {
         mistContactCard.classList.add('hidden');
         explorationBanner.classList.add('hidden');
         restartButton.classList.add('hidden');
+    } else if (pendingStoryEvent) {
+        exploreControls.classList.add('hidden'); combatControls.classList.add('hidden');
+        encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden');
+        explorationBanner.classList.remove('hidden'); restartButton.classList.add('hidden');
     } else if (pendingMistContact) {
         exploreControls.classList.add('hidden');
         combatControls.classList.add('hidden');
@@ -1112,6 +1264,7 @@ function updateUI() {
         explorationBanner.classList.remove('hidden');
         restartButton.classList.add('hidden');
     }
+    saveGame();
 }
 
 function logMessage(message, type = 'normal') {
@@ -1135,14 +1288,28 @@ function logMessage(message, type = 'normal') {
 }
 
 function exploreForest() {
-    if (inCombat || gameOver || pendingMistContact) return;
+    if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent) return;
     if (hero.hp <= 0) {
             logMessage(t("injured"), "combat-monster");
         return;
     }
 
     explorationsSinceMistContact++;
+    explorationCount++;
     if (tryDiscoverRegion()) {
+        updateUI();
+        return;
+    }
+
+    const regionData = GAME_DATA.regions[currentRegion];
+    const regionEvents = Array.isArray(regionData.event) ? regionData.event : [regionData.event].filter(Boolean);
+    const unseenEvents = regionEvents.filter((event) =>
+        !seenStoryEvents.has(`${regionData.id}:${event.id || event.title.pt}`)
+    );
+    if (unseenEvents.length && explorationCount >= 2) {
+        pendingStoryEvent = unseenEvents[Math.floor(Math.random() * unseenEvents.length)];
+        storyEventSeen.add(regionData.id);
+        seenStoryEvents.add(`${regionData.id}:${pendingStoryEvent.id || pendingStoryEvent.title.pt}`);
         updateUI();
         return;
     }
@@ -1193,6 +1360,61 @@ function exploreForest() {
     }
 }
 
+function resolveStoryEvent(choiceIndex) {
+    if (!pendingStoryEvent || inCombat || gameOver || campaignComplete) return;
+    const choice = pendingStoryEvent.choices[choiceIndex];
+    if (!choice) return;
+    const effect = choice.effect;
+    pendingStoryEvent = null;
+    if (effect === 'loot') {
+        const gold = 35 + Math.floor(Math.random() * 26); hero.gold += gold;
+        logMessage(t('eventLoot', { gold }), 'loot');
+    } else if (effect === 'heal') {
+        const hp = Math.min(45, getEffectiveStat('maxHp') - hero.hp);
+        const focus = Math.min(20, getEffectiveStat('maxFoco') - hero.foco);
+        hero.hp += hp; hero.foco += focus;
+        logMessage(t('eventHeal', { hp, focus }), 'special');
+    } else if (effect === 'gold') {
+        const gold = 55; const hp = Math.min(12, Math.max(0, hero.hp - 1));
+        hero.gold += gold; hero.hp -= hp;
+        logMessage(t('eventGold', { gold, hp }), 'loot');
+    } else if (effect === 'power') {
+        hero.atk += 4; logMessage(t('eventPower', { amount: 4 }), 'special');
+    } else if (effect === 'river-crossing') {
+        const gold = 30 + Math.floor(Math.random() * 21);
+        const hp = Math.min(15, Math.max(0, hero.hp - 1));
+        hero.gold += gold; hero.hp -= hp;
+        logMessage(t('eventRiverCrossing', { gold, hp }), 'loot');
+    } else if (effect === 'riverbank') {
+        const hp = Math.min(20, getEffectiveStat('maxHp') - hero.hp);
+        const focus = Math.min(12, getEffectiveStat('maxFoco') - hero.foco);
+        hero.hp += hp; hero.foco += focus;
+        logMessage(t('eventRiverbank', { hp, focus }), 'special');
+    } else if (effect === 'potion') {
+        if (hero.potions < hero.maxPotions) {
+            hero.potions++;
+            logMessage(t('eventPotion', { potions: hero.potions, capacity: hero.maxPotions }), 'loot');
+        } else logMessage(t('eventPotionFull'), 'normal');
+    } else if (effect === 'portal-treasure') {
+        const gold = 65 + Math.floor(Math.random() * 36); hero.gold += gold;
+        logMessage(t('eventPortalTreasure', { gold }), 'loot');
+    } else if (effect === 'village-scout') {
+        const focus = Math.min(18, getEffectiveStat('maxFoco') - hero.foco);
+        hero.foco += focus; logMessage(t('eventScout', { focus }), 'special');
+    } else if (effect === 'castle-cache') {
+        const gold = 45;
+        hero.gold += gold;
+        if (hero.potions < hero.maxPotions) hero.potions++;
+        logMessage(t('eventCastleCache', { gold }), 'loot');
+    } else if (effect === 'combat') {
+        spawnMonster(); return;
+    } else if (effect === 'boss') {
+        const boss = MIST_CONTACT_DATA.bosses.find((entry) => entry.id === 'bell-keeper-final');
+        logMessage(t('eventBoss'), 'combat-monster'); spawnMonster(boss); return;
+    }
+    updateUI();
+}
+
 function getDiscoveryChance() {
     const explorationRules = GAME_RULES.exploration;
     if (currentRegion >= GAME_DATA.regions.length - 1) return 0;
@@ -1210,6 +1432,7 @@ function tryDiscoverRegion() {
     currentRegion++;
     discoveredRegions.push(currentRegion);
     logMessage(t("regionArrival", { region: GAME_DATA.regions[currentRegion].title[gameLanguage] }), "discovery");
+    explorationCount = 0;
     return true;
 }
 
@@ -1218,6 +1441,7 @@ function spawnMonster(templateOverride = null) {
     const regionMonsters = GAME_DATA.monsters.byRegion[regionId];
     const template = templateOverride ?? regionMonsters[Math.floor(Math.random() * regionMonsters.length)];
     const isMistBoss = Boolean(templateOverride);
+    const isFinalBoss = templateOverride?.id === 'bell-keeper-final';
     const variationRules = isMistBoss
         ? GAME_RULES.mistContacts.bossVariation
         : GAME_DATA.monsters.variation;
@@ -1249,10 +1473,14 @@ function spawnMonster(templateOverride = null) {
         parry: vary(template.parry),
         evasion: vary(template.evasion),
         xpReward: vary(template.xpReward),
-        goldReward: vary(template.goldReward)
+        goldReward: vary(template.goldReward),
+        id: template.id || null,
+        isFinalBoss,
+        isBoss: isMistBoss
     };
 
     inCombat = true;
+    enemyTurnCount = 0; enemyTelegraphing = false;
     parrySkillUsedThisCombat = false;
     dodgeSkillUsedThisCombat = false;
     hero.parryBonus = 0;
@@ -1271,6 +1499,16 @@ function spawnMonster(templateOverride = null) {
         monster: currentMonster.name
     }), "combat-monster");
     updateUI();
+    setCombatMusic(true);
+    if (currentRegion === GAME_DATA.regions.length - 1 && !storyEventSeen.has('final-boss-triggered')) {
+        storyEventSeen.add('final-boss-triggered');
+        setTimeout(() => {
+            if (inCombat && currentMonster && !currentMonster.isFinalBoss) {
+                const boss = MIST_CONTACT_DATA.bosses.find((entry) => entry.id === 'bell-keeper-final');
+                logMessage(t('finalBossChallenge'), 'combat-monster'); spawnMonster(boss);
+            }
+        }, 0);
+    }
 }
 
 function acceptMistContact() {
@@ -1382,6 +1620,7 @@ function applyMonsterParry(damage) {
 }
 
 function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0) {
+    enemyTelegraphing = false;
     damage = applyMonsterParry(damage);
     const damageDealt = Math.min(currentMonster.hp, damage);
     currentMonster.hp -= damageDealt;
@@ -1400,7 +1639,7 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
 
 // NOVO GOLPE: Ataque Rápido (Mais preciso, dano moderado)
 function combatQuickAttack() {
-    if (!inCombat || !currentMonster) return;
+    if (!inCombat || !currentMonster || campaignComplete) return;
     if (hero.fury >= hero.maxFury) {
         combatCriticalAttack();
         return;
@@ -1425,7 +1664,7 @@ function combatQuickAttack() {
 
 // NOVO GOLPE: Estocada Pesada (Gasta Foco, dano alto)
 function combatHeavyAttack() {
-    if (!inCombat || !currentMonster) return;
+    if (!inCombat || !currentMonster || campaignComplete) return;
     const attackRules = { ...GAME_RULES.combat.heavyAttack, ...selectedCharacter.skills.heavyAttack };
     if (hero.foco < attackRules.focoCost) {
         logMessage(t("noFocus"));
@@ -1450,7 +1689,7 @@ function combatHeavyAttack() {
 }
 
 function combatCriticalAttack() {
-    if (!inCombat || !currentMonster || hero.fury < hero.maxFury) return;
+    if (!inCombat || !currentMonster || campaignComplete || hero.fury < hero.maxFury) return;
     hero.fury = 0;
     playSound('specialAttack');
     updateUI();
@@ -1472,7 +1711,7 @@ function combatCriticalAttack() {
 
 // NOVO GOLPE: Postura Firme (Aumenta defesa e recupera foco)
 function combatDefend() {
-    if (!inCombat || !currentMonster) return;
+    if (!inCombat || !currentMonster || campaignComplete) return;
     const bonusGained = Math.min(
         selectedCharacter.skills.parry.bonus,
         selectedCharacter.skills.maxParry - getEffectiveStat('parry') - hero.parryBonus
@@ -1498,7 +1737,7 @@ function combatDefend() {
 }
 
 function combatDodge() {
-    if (!inCombat || !currentMonster) return;
+    if (!inCombat || !currentMonster || campaignComplete) return;
     const bonusGained = Math.min(
         selectedCharacter.skills.dodge.bonus,
         selectedCharacter.skills.maxEvasion - getEffectiveStat('evasion') - hero.evasionBonus
@@ -1541,6 +1780,9 @@ function checkCombatProgress(monsterStunned = false) {
 
 function monsterAttackTurn() {
     if (!inCombat || !currentMonster) return;
+    enemyTurnCount++;
+    const wasTelegraphing = enemyTelegraphing;
+    enemyTelegraphing = false;
 
     const evasionChance = Math.min(selectedCharacter.skills.maxEvasion, getEffectiveStat('evasion') + hero.evasionBonus);
     const evaded = Math.random() * GAME_RULES.probabilityScale < evasionChance;
@@ -1559,6 +1801,7 @@ function monsterAttackTurn() {
         attackRules.minimumDamage,
         currentMonster.atk - getEffectiveStat('def') + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
+    if (wasTelegraphing) monsterDamage = Math.floor(monsterDamage * GAME_RULES.combat.enemyTelegraphDamageMultiplier);
     const parryChance = Math.min(selectedCharacter.skills.maxParry, getEffectiveStat('parry') + hero.parryBonus);
     const parried = Math.random() * GAME_RULES.probabilityScale < parryChance;
     if (parried) {
@@ -1571,6 +1814,10 @@ function monsterAttackTurn() {
 
     const damageTaken = Math.min(hero.hp, monsterDamage);
     hero.hp = Math.max(0, hero.hp - damageTaken);
+    if (damageTaken) {
+        const panel = document.getElementById('game-panel');
+        panel.classList.remove('is-hit'); void panel.offsetWidth; panel.classList.add('is-hit');
+    }
     hero.fury = Math.min(hero.maxFury, hero.fury + damageTaken * FURY_PER_DAMAGE);
     logMessage(parried
         ? t('heroParries', { damage: damageTaken })
@@ -1579,7 +1826,13 @@ function monsterAttackTurn() {
 
     if (hero.hp <= 0) {
         endCombatDefeat();
+        return;
     }
+    if (enemyTurnCount % GAME_RULES.combat.telegraphEveryTurns === 0) {
+        enemyTelegraphing = true;
+        logMessage(t('enemyTelegraph', { monster: currentMonster.name }), 'combat-monster');
+    }
+    updateUI();
 }
 
 function isUpgradeMaxed(upgrade, overrideConfiguration = UPGRADE_CONFIG[upgrade]) {
@@ -1625,7 +1878,7 @@ function closeUpgradeOptions() {
 
 function toggleUpgradeOptions(upgrade) {
     const configuration = getUpgradeConfiguration(upgrade);
-    if (!configuration || inCombat || gameOver || getMaxUpgradeQuantity(upgrade, configuration) < 1 || isUpgradeMaxed(upgrade, configuration)) return;
+    if (!configuration || inCombat || gameOver || campaignComplete || getMaxUpgradeQuantity(upgrade, configuration) < 1 || isUpgradeMaxed(upgrade, configuration)) return;
 
     openUpgradeOptions = openUpgradeOptions === upgrade ? null : upgrade;
     updateUI();
@@ -1641,6 +1894,7 @@ function purchaseUpgrade(upgrade, requestedQuantity) {
     if (
         inCombat
         || gameOver
+        || campaignComplete
         || !Number.isInteger(quantity)
         || quantity < 1
         || quantity > maxQuantity
@@ -1700,7 +1954,7 @@ function updateMonsterUI() {
 }
 
 function usePotion() {
-    if (gameOver) return;
+    if (gameOver || campaignComplete) return;
     if (hero.potions <= 0) {
         logMessage(t("noPotions"), "combat-monster");
         return;
@@ -1732,7 +1986,7 @@ function usePotion() {
 }
 
 function restAtCamp() {
-    if (inCombat || gameOver) return;
+    if (inCombat || gameOver || campaignComplete) return;
     if (hero.gold < CAMP_COST) {
         logMessage(t("noGold", { cost: CAMP_COST }));
         return;
@@ -1761,7 +2015,7 @@ function restAtCamp() {
 }
 
 function combatRun() {
-    if (!inCombat) return;
+    if (!inCombat || campaignComplete) return;
     const success = Math.random() < GAME_RULES.combat.escapeSuccessChance;
     if (success) {
         logMessage(t("escaped"), "discovery");
@@ -1778,6 +2032,7 @@ function combatRun() {
 }
 
 function endCombatVictory() {
+    const defeatedFinalBoss = Boolean(currentMonster?.isFinalBoss);
     logMessage(t("victory", { monster: currentMonster.name }), "discovery");
     logMessage(t("rewards", { xp: currentMonster.xpReward, gold: currentMonster.goldReward }), "loot");
 
@@ -1793,6 +2048,12 @@ function endCombatVictory() {
 
     checkLevelUp();
     if (equipmentDrop) handleEquipmentDrop(equipmentDrop);
+    if (defeatedFinalBoss) {
+        campaignComplete = true;
+        gameOver = true;
+        try { localStorage.removeItem(SAVE_KEY); } catch {}
+        playSound('levelUp');
+    }
     updateUI();
 }
 
@@ -1806,16 +2067,27 @@ function endCombatDefeat() {
     hero.evasionBonus = 0;
     hero.parryBonus = 0;
     gameOver = true;
+    document.getElementById('campaign-ending-card').hidden = false;
+    document.getElementById('campaign-ending-title').textContent = t('campaignDefeatTitle');
+    document.getElementById('campaign-ending-description').textContent = t('campaignDefeatDescription');
+    document.getElementById('campaign-ending-card').querySelector('[data-i18n="restartCampaign"]').textContent = t('restart');
+    try { localStorage.removeItem(SAVE_KEY); } catch {}
     updateUI();
 }
 
 function restartGame() {
+    try { localStorage.removeItem(SAVE_KEY); } catch {}
     window.location.reload();
 }
 
 function startAdventure({ character, equipment }) {
     selectedCharacter = character;
     selectedCharacterProgression = character.levelUp;
+    currentRegion = 0; discoveredRegions = [0];
+    inCombat = false; currentMonster = null; gameOver = false; campaignComplete = false;
+    pendingMistContact = null; pendingEquipment = null; pendingStoryEvent = null;
+    storyEventSeen.clear(); seenStoryEvents.clear(); explorationCount = 0;
+    explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
     Object.assign(hero, character.baseStats, {
         name: character.name,
         potions: ITEM_DATA.healingPotion.startingCount,
@@ -1842,6 +2114,8 @@ function startAdventure({ character, equipment }) {
     document.getElementById('game-start-screen').hidden = true;
     document.body.classList.remove('game-start-active');
     updateUI();
+    saveGame();
+    showContinueOption();
     startGameMusic();
 }
 
@@ -1881,4 +2155,6 @@ window.onload = function() {
         describeEquipment: getItemBonusText,
         onStart: startAdventure
     });
+    showContinueOption();
+    document.getElementById('continue-adventure-button').addEventListener('click', () => loadSavedGame());
 };

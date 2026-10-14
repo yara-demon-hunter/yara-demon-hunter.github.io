@@ -128,6 +128,20 @@ window.YaraRpgData.mistContacts = Object.freeze({
             evasion: 16,
             xpReward: 180,
             goldReward: 140
+        },
+        {
+            id: "bell-keeper-final",
+            name: { pt: "Guardião do Sino", en: "Bell Keeper" },
+            icon: "🔔",
+            minLevel: 1,
+            suggestedLevel: 5,
+            hp: 340,
+            atk: 42,
+            def: 24,
+            parry: 28,
+            evasion: 8,
+            xpReward: 220,
+            goldReward: 180
         }
     ],
     powers: [

@@ -4,14 +4,14 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 
 - `characters.js`: atributos-base compartilhados, elenco selecionável, descrições, bônus de especialidade e ganhos por nível (ajuste `levelUp` individualmente em cada personagem).
 - `items.js`: poção de cura e catálogo de equipamentos que podem cair dos monstros.
-- `regions.js`: IDs, títulos e descrições das telas em português e inglês.
+- `regions.js`: IDs, títulos, descrições e eventos com escolhas por região em português e inglês. Cada região pode ter vários eventos; eles aparecem sem repetição até o conjunto se esgotar.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.
 - `mist-contacts.js`: contatos com ícones e ofertas próprias, chefes especiais e poderes permanentes dos encontros na névoa.
 - `game-rules.js`: custos de ações, limites, fúria, chances de exploração, pesos dos resultados e melhorias compradas.
 
 A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`. Para ajustar o ritmo, edite `mistContacts` em `game-rules.js`; para adicionar conteúdo, inclua contatos, chefes ou poderes em `mist-contacts.js`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos.
 
-A lógica da tela inicial e a seleção de três equipamentos ficam em `../systems/character-setup.js`. Os scripts de dados e sistemas precisam ser carregados antes de `game.js`, que inicia a aventura com as escolhas feitas.
+A lógica da tela inicial e a seleção de três equipamentos ficam em `../systems/character-setup.js`. Os eventos narrativos são declarados em cada região e executados por `resolveStoryEvent` em `game.js`. Os scripts de dados e sistemas precisam ser carregados antes de `game.js`, que inicia a aventura com as escolhas feitas.
 
 Equipamentos em `items.js` declaram um `id`, um slot listado em `game.js`, nomes em português e inglês e os bônus em `stats`. Use `starter: true` apenas nos equipamentos oferecidos na seleção inicial; todos os itens do catálogo podem cair dos monstros. A chance de drop e a recuperação percentual do acampamento são configuradas em `game-rules.js`.
 

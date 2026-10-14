@@ -18,14 +18,14 @@ window.YaraRpgData.monsters = Object.freeze({
             { name: { pt: "Espectro das Cinzas", en: "Ash Wraith" }, icon: "🌫️", hp: 95, atk: 19, def: 7, parry: 27, evasion: 18, xpReward: 42, goldReward: 28 }
         ],
         "ruined-village": [
-            { name: { pt: "Saqueador da Névoa", en: "Mist Marauder" }, icon: "🪓", hp: 185, atk: 31, def: 20, parry: 30, evasion: 12, xpReward: 50, goldReward: 38 },
-            { name: { pt: "Cavaleiro Possuído", en: "Possessed Knight" }, icon: "⚔️", hp: 250, atk: 44, def: 10, parry: 35, evasion: 10, xpReward: 60, goldReward: 45 }
+            { name: { pt: "Saqueador da Névoa", en: "Mist Marauder" }, icon: "🪓", hp: 185, atk: 28, def: 20, parry: 30, evasion: 12, xpReward: 80, goldReward: 75 },
+            { name: { pt: "Cavaleiro Possuído", en: "Possessed Knight" }, icon: "⚔️", hp: 250, atk: 32, def: 15, parry: 35, evasion: 10, xpReward: 70, goldReward: 85 }
         ],
         "gudran-castle": [
-            { name: { pt: "Cavaleiro de Gudran", en: "Knight of Gudran" }, icon: "🛡️", hp: 300, atk: 56, def: 30, parry: 38, evasion: 12, xpReward: 75, goldReward: 55 },
-            { name: { pt: "Sentinela das Catacumbas", en: "Catacomb Sentinel" }, icon: "💀", hp: 450, atk: 40, def: 20, parry: 40, evasion: 20, xpReward: 90, goldReward: 68 },
-            { name: { pt: "Manticora de Pedra", en: "Stone Manticore" }, icon: "🦂", hp: 250, atk: 30, def: 70, parry: 38, evasion: 16, xpReward: 110, goldReward: 82 },
-            { name: { pt: "Golem", en: "Golem" }, icon: "🗿", hp: 500, atk: 50, def: 20, parry: 24, evasion: 5, xpReward: 200, goldReward: 150 }
+            { name: { pt: "Cavaleiro de Gudran", en: "Knight of Gudran" }, icon: "🛡️", hp: 300, atk: 30, def: 30, parry: 38, evasion: 12, xpReward: 100, goldReward: 55 },
+            { name: { pt: "Sentinela das Catacumbas", en: "Catacomb Sentinel" }, icon: "💀", hp: 280, atk: 35, def: 20, parry: 20, evasion: 30, xpReward: 120, goldReward: 68 },
+            { name: { pt: "Manticora de Pedra", en: "Stone Manticore" }, icon: "🦂", hp: 120, atk: 30, def: 65, parry: 38, evasion: 16, xpReward: 150, goldReward: 100 },
+            { name: { pt: "Golem", en: "Golem" }, icon: "🗿", hp: 300, atk: 50, def: 20, parry: 24, evasion: 5, xpReward: 200, goldReward: 150 }
 
         ]
     }
