@@ -407,7 +407,7 @@ function t(key, values = {}) {
 function saveGame() {
     if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return;
     const snapshot = {
-        version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)),
+        version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)), inCombat,
         currentRegion, discoveredRegions, explorationsSinceMistContact, explorationCount,
         storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
         seenStoryEvents: [...seenStoryEvents],
@@ -445,13 +445,17 @@ function loadSavedGame(snapshot = readSavedGame()) {
     pendingMistContact = snapshot.pendingMistContact || null;
     pendingEquipment = snapshot.pendingEquipment || null;
     if (pendingEquipment?.item) pendingEquipment.item = hydrateItem(pendingEquipment.item);
+    const interruptedCombat = Boolean(snapshot.inCombat);
     inCombat = false;
     currentMonster = null;
+    combatActionLocked = false;
+    combatEncounterId++;
     campaignComplete = false;
     enemyTelegraphing = false;
     gameOver = hero.hp <= 0;
     document.getElementById('rpg-log').replaceChildren();
     logMessage(t('openingLog', { hero: hero.name }), 'special');
+    if (interruptedCombat && !gameOver) logMessage(t('denseMist'), 'normal');
     document.getElementById('game-main').hidden = false;
     document.getElementById('game-start-screen').hidden = true;
     document.body.classList.remove('game-start-active');
@@ -634,6 +638,8 @@ const UPGRADE_CONFIG = GAME_RULES.upgrades.attributes;
 
 let currentMonster = null;
 let inCombat = false;
+let combatActionLocked = false;
+let combatEncounterId = 0;
 let parrySkillUsedThisCombat = false;
 let dodgeSkillUsedThisCombat = false;
 let currentRegion = 0;
@@ -654,6 +660,7 @@ let musicEnabled = false;
 const SAVE_KEY = 'yara-rpg-save-v1';
 const storyEventSeen = new Set();
 const seenStoryEvents = new Set();
+const RPG_LOG_MAX_ENTRIES = 100;
 
 document.addEventListener('click', (event) => {
     if (event.target instanceof Element && event.target.closest('[data-upgrade-control]')) return;
@@ -1229,6 +1236,18 @@ function updateUI() {
         hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco')
     );
     potionButton.disabled = gameOver || campaignComplete;
+    document.querySelectorAll('#controls-combat button').forEach((button) => {
+        const disabledByGameState = (button.id === 'dodge-button' && (
+            dodgeSkillUsedThisCombat
+            || evasionTotal >= selectedCharacter.skills.maxEvasion
+            || hero.foco < selectedCharacter.skills.dodge.focoCost
+        )) || (button.id === 'parry-button' && (
+            parrySkillUsedThisCombat
+            || parryTotal >= selectedCharacter.skills.maxParry
+            || hero.foco < selectedCharacter.skills.parry.focoCost
+        ));
+        button.disabled = combatActionLocked || disabledByGameState;
+    });
 
     document.getElementById('campaign-ending-card').hidden = !campaignComplete && !gameOver;
     if (campaignComplete || gameOver) {
@@ -1281,9 +1300,16 @@ function logMessage(message, type = 'normal') {
 
     const div = document.createElement('div');
     div.className = `${colorClass} pl-2 py-0.5`;
-    div.innerHTML = `[${time}] ${message}`;
+    if (message.includes('<')) {
+        div.innerHTML = `[${time}] ${message}`;
+    } else {
+        div.textContent = `[${time}] ${message}`;
+    }
     
     logBox.appendChild(div);
+    while (logBox.children.length > RPG_LOG_MAX_ENTRIES) {
+        logBox.firstElementChild?.remove();
+    }
     logBox.scrollTop = logBox.scrollHeight;
 }
 
@@ -1480,6 +1506,9 @@ function spawnMonster(templateOverride = null) {
     };
 
     inCombat = true;
+    combatEncounterId++;
+    combatActionLocked = false;
+    document.getElementById('rpg-log').dataset.combat = 'true';
     enemyTurnCount = 0; enemyTelegraphing = false;
     parrySkillUsedThisCombat = false;
     dodgeSkillUsedThisCombat = false;
@@ -1502,12 +1531,11 @@ function spawnMonster(templateOverride = null) {
     setCombatMusic(true);
     if (currentRegion === GAME_DATA.regions.length - 1 && !storyEventSeen.has('final-boss-triggered')) {
         storyEventSeen.add('final-boss-triggered');
-        setTimeout(() => {
-            if (inCombat && currentMonster && !currentMonster.isFinalBoss) {
-                const boss = MIST_CONTACT_DATA.bosses.find((entry) => entry.id === 'bell-keeper-final');
-                logMessage(t('finalBossChallenge'), 'combat-monster'); spawnMonster(boss);
-            }
-        }, 0);
+        if (inCombat && currentMonster && !currentMonster.isFinalBoss) {
+            const boss = MIST_CONTACT_DATA.bosses.find((entry) => entry.id === 'bell-keeper-final');
+            logMessage(t('finalBossChallenge'), 'combat-monster');
+            spawnMonster(boss);
+        }
     }
 }
 
@@ -1620,8 +1648,12 @@ function applyMonsterParry(damage) {
 }
 
 function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0) {
+    if (!inCombat || !currentMonster) return;
+    combatActionLocked = true;
     enemyTelegraphing = false;
+    const encounterId = combatEncounterId;
     damage = applyMonsterParry(damage);
+    if (!inCombat || !currentMonster || encounterId !== combatEncounterId) return;
     const damageDealt = Math.min(currentMonster.hp, damage);
     currentMonster.hp -= damageDealt;
     const furyGained = Math.min(hero.maxFury - hero.fury, Math.floor(damageDealt * furyMultiplier));
@@ -1635,15 +1667,17 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     const stunned = currentMonster.hp > 0 && Math.random() * GAME_RULES.probabilityScale < stunChance;
     if (stunned) logMessage(t("stunLanded"), "special");
     checkCombatProgress(stunned);
+    updateUI();
 }
 
 // NOVO GOLPE: Ataque Rápido (Mais preciso, dano moderado)
 function combatQuickAttack() {
-    if (!inCombat || !currentMonster || campaignComplete) return;
+    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
     if (hero.fury >= hero.maxFury) {
         combatCriticalAttack();
         return;
     }
+    combatActionLocked = true;
     playSound('basicAttack');
 
     if (Math.random() * GAME_RULES.probabilityScale < currentMonster.evasion) {
@@ -1664,12 +1698,13 @@ function combatQuickAttack() {
 
 // NOVO GOLPE: Estocada Pesada (Gasta Foco, dano alto)
 function combatHeavyAttack() {
-    if (!inCombat || !currentMonster || campaignComplete) return;
+    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
     const attackRules = { ...GAME_RULES.combat.heavyAttack, ...selectedCharacter.skills.heavyAttack };
     if (hero.foco < attackRules.focoCost) {
         logMessage(t("noFocus"));
         return;
     }
+    combatActionLocked = true;
     hero.foco -= attackRules.focoCost;
     playSound('specialAttack');
 
@@ -1689,7 +1724,8 @@ function combatHeavyAttack() {
 }
 
 function combatCriticalAttack() {
-    if (!inCombat || !currentMonster || campaignComplete || hero.fury < hero.maxFury) return;
+    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked || hero.fury < hero.maxFury) return;
+    combatActionLocked = true;
     hero.fury = 0;
     playSound('specialAttack');
     updateUI();
@@ -1711,7 +1747,7 @@ function combatCriticalAttack() {
 
 // NOVO GOLPE: Postura Firme (Aumenta defesa e recupera foco)
 function combatDefend() {
-    if (!inCombat || !currentMonster || campaignComplete) return;
+    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
     const bonusGained = Math.min(
         selectedCharacter.skills.parry.bonus,
         selectedCharacter.skills.maxParry - getEffectiveStat('parry') - hero.parryBonus
@@ -1725,19 +1761,18 @@ function combatDefend() {
         return;
     }
     if (parrySkillUsedThisCombat) return;
+    combatActionLocked = true;
     parrySkillUsedThisCombat = true;
     hero.foco -= selectedCharacter.skills.parry.focoCost;
     hero.parryBonus += bonusGained;
     logMessage(t('defendMessage', { amount: bonusGained }), 'special');
 
-    setTimeout(() => {
-        if (inCombat && currentMonster) monsterAttackTurn();
-    }, GAME_RULES.combat.actionDelayMs);
+    monsterAttackTurn();
     updateUI();
 }
 
 function combatDodge() {
-    if (!inCombat || !currentMonster || campaignComplete) return;
+    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
     const bonusGained = Math.min(
         selectedCharacter.skills.dodge.bonus,
         selectedCharacter.skills.maxEvasion - getEffectiveStat('evasion') - hero.evasionBonus
@@ -1751,35 +1786,35 @@ function combatDodge() {
         return;
     }
     if (dodgeSkillUsedThisCombat) return;
+    combatActionLocked = true;
     dodgeSkillUsedThisCombat = true;
     hero.foco -= selectedCharacter.skills.dodge.focoCost;
     hero.defending = false;
     hero.evasionBonus += bonusGained;
     logMessage(t("dodgeMessage", { amount: bonusGained }), "special");
 
-    setTimeout(() => {
-        if (inCombat && currentMonster) monsterAttackTurn();
-    }, GAME_RULES.combat.actionDelayMs);
+    monsterAttackTurn();
     updateUI();
 }
 
 function checkCombatProgress(monsterStunned = false) {
+    if (!inCombat || !currentMonster) return;
     updateMonsterUI();
     if (currentMonster.hp <= 0) {
         endCombatVictory();
         return;
     }
     if (monsterStunned) {
+        combatActionLocked = false;
         updateUI();
         return;
     }
-    setTimeout(() => {
-        if (inCombat && currentMonster) monsterAttackTurn();
-    }, GAME_RULES.combat.responseDelayMs);
+    monsterAttackTurn();
 }
 
 function monsterAttackTurn() {
-    if (!inCombat || !currentMonster) return;
+    if (!inCombat || !currentMonster || !combatActionLocked) return;
+    const encounterId = combatEncounterId;
     enemyTurnCount++;
     const wasTelegraphing = enemyTelegraphing;
     enemyTelegraphing = false;
@@ -1792,6 +1827,8 @@ function monsterAttackTurn() {
         const furyGained = Math.min(FURY_PER_DODGE, hero.maxFury - hero.fury);
         hero.fury += furyGained;
         logMessage(t("heroDodges", { monster: currentMonster.name, amount: furyGained }), "special");
+        if (encounterId !== combatEncounterId || !inCombat) return;
+        combatActionLocked = false;
         updateUI();
         return;
     }
@@ -1822,6 +1859,7 @@ function monsterAttackTurn() {
     logMessage(parried
         ? t('heroParries', { damage: damageTaken })
         : t("monsterDamage", { monster: currentMonster.name, damage: damageTaken }), parried ? 'special' : 'combat-monster');
+    if (encounterId !== combatEncounterId || !inCombat) return;
     updateUI();
 
     if (hero.hp <= 0) {
@@ -1832,6 +1870,7 @@ function monsterAttackTurn() {
         enemyTelegraphing = true;
         logMessage(t('enemyTelegraph', { monster: currentMonster.name }), 'combat-monster');
     }
+    combatActionLocked = false;
     updateUI();
 }
 
@@ -1955,6 +1994,7 @@ function updateMonsterUI() {
 
 function usePotion() {
     if (gameOver || campaignComplete) return;
+    if (inCombat && combatActionLocked) return;
     if (hero.potions <= 0) {
         logMessage(t("noPotions"), "combat-monster");
         return;
@@ -1978,10 +2018,10 @@ function usePotion() {
     updateUI();
 
     if (inCombat) {
+        combatActionLocked = true;
         logMessage(t("potionOpening"));
-        setTimeout(() => {
-            if (inCombat && currentMonster) monsterAttackTurn();
-        }, GAME_RULES.combat.actionDelayMs);
+        monsterAttackTurn();
+        updateUI();
     }
 }
 
@@ -2015,7 +2055,8 @@ function restAtCamp() {
 }
 
 function combatRun() {
-    if (!inCombat || campaignComplete) return;
+    if (!inCombat || campaignComplete || combatActionLocked) return;
+    combatActionLocked = true;
     const success = Math.random() < GAME_RULES.combat.escapeSuccessChance;
     if (success) {
         logMessage(t("escaped"), "discovery");
@@ -2023,6 +2064,9 @@ function combatRun() {
         hero.evasionBonus = 0;
         hero.parryBonus = 0;
         inCombat = false;
+        combatEncounterId++;
+        combatActionLocked = false;
+        document.getElementById('rpg-log').dataset.combat = 'false';
         currentMonster = null;
         updateUI();
     } else {
@@ -2032,6 +2076,7 @@ function combatRun() {
 }
 
 function endCombatVictory() {
+    if (!inCombat || !currentMonster || currentMonster.hp > 0) return;
     const defeatedFinalBoss = Boolean(currentMonster?.isFinalBoss);
     logMessage(t("victory", { monster: currentMonster.name }), "discovery");
     logMessage(t("rewards", { xp: currentMonster.xpReward, gold: currentMonster.goldReward }), "loot");
@@ -2044,6 +2089,8 @@ function endCombatVictory() {
 
     const equipmentDrop = createEquipmentDrop();
     inCombat = false;
+    combatEncounterId++;
+    combatActionLocked = false;
     currentMonster = null;
 
     checkLevelUp();
@@ -2054,6 +2101,7 @@ function endCombatVictory() {
         try { localStorage.removeItem(SAVE_KEY); } catch {}
         playSound('levelUp');
     }
+    document.getElementById('rpg-log').dataset.combat = 'false';
     updateUI();
 }
 
@@ -2061,12 +2109,15 @@ function endCombatDefeat() {
     logMessage(t("defeat"), "combat-monster");
     logMessage(t("defeatHelp"), "special");
     inCombat = false;
+    combatEncounterId++;
+    combatActionLocked = false;
     currentMonster = null;
     hero.hp = 0;
     hero.fury = 0;
     hero.evasionBonus = 0;
     hero.parryBonus = 0;
     gameOver = true;
+    document.getElementById('rpg-log').dataset.combat = 'false';
     document.getElementById('campaign-ending-card').hidden = false;
     document.getElementById('campaign-ending-title').textContent = t('campaignDefeatTitle');
     document.getElementById('campaign-ending-description').textContent = t('campaignDefeatDescription');
@@ -2099,6 +2150,8 @@ function startAdventure({ character, equipment }) {
         equipment: Object.fromEntries(EQUIPMENT_SLOTS.map(({ id }) => [id, null])),
         equipmentInventory: []
     });
+    combatActionLocked = false;
+    combatEncounterId++;
     Object.entries(character.specialty).forEach(([stat, amount]) => {
         hero[stat] += amount;
     });
@@ -2110,6 +2163,8 @@ function startAdventure({ character, equipment }) {
 
     document.querySelector('#rpg-log [data-i18n="openingLog"]').textContent =
         t('openingLog', { hero: hero.name });
+    document.getElementById('rpg-log').replaceChildren();
+    logMessage(t('openingLog', { hero: hero.name }), 'special');
     document.getElementById('game-main').hidden = false;
     document.getElementById('game-start-screen').hidden = true;
     document.body.classList.remove('game-start-active');
