@@ -27,6 +27,11 @@ const translations = {
         selectStarterEquipment: "Escolha 3 equipamentos",
         starterEquipmentHelp: "Escolha equipamentos de espaços diferentes. Selecione novamente um espaço para trocar sua escolha.",
         characterSpecialty: "+{amount} {stat}",
+        levelUpSummary: "Por nível",
+        heavySkillSummary: "Estocada pesada: {cost} Foco, dano x{damage} ATQ",
+        parrySkillSummary: "Postura firme: {cost} Foco, +{bonus}% aparo",
+        dodgeSkillSummary: "Preparar esquiva: {cost} Foco, +{bonus}% esquiva",
+        skillLimitsSummary: "Limites — esquiva {evasion}%, aparo {parry}%",
         backToTitle: "Voltar",
         beginAdventure: "Iniciar aventura",
         level: "Nível",
@@ -84,6 +89,7 @@ const translations = {
         evasionStat: "Esquiva",
         parryStat: "Aparo",
         stun: "Stun",
+        potions: "Poções",
         hp: "HP",
         attackShort: "ATQ",
         defenseShort: "DEF",
@@ -141,8 +147,8 @@ const translations = {
         criticalDamage: "🗡️ Golpe Crítico! Você causou {damage} de dano!",
         stunLanded: "✨ O inimigo foi atordoado e perdeu o contra-ataque!",
         defendMessage: "⚔️ A chance de aparo aumentou em {amount}% e permanece até o fim da luta!",
-        noParryFocus: "Você precisa de 10 de Foco para preparar um aparo.",
-        parryMaxed: "A chance de aparo já está no limite de 65% nesta luta.",
+        noParryFocus: "Você precisa de {cost} de Foco para preparar um aparo.",
+        parryMaxed: "A chance de aparo já está no limite de {max}% nesta luta.",
         heroParries: "⚔️ Você aparou o golpe! O dano caiu pela metade: {damage} de dano.",
         monsterParries: "⚔️ {monster} aparou seu golpe! O dano causado caiu pela metade: {damage}.",
         monsterDamage: "O {monster} contra-atacou causando <span class=\"text-red-400 font-bold\">{damage} de dano</span>!",
@@ -163,8 +169,8 @@ const translations = {
         monsterDodges: "💨 O {monster} desviou do seu golpe!",
         heroDodges: "💨 Você desviou do ataque do {monster} e ganhou {amount} de Fúria!",
         dodgeMessage: "💨 O bônus de esquiva aumentou em {amount}% e permanece até o fim da luta!",
-        noDodgeFocus: "Você precisa de 15 de Foco para preparar uma esquiva.",
-        evasionMaxed: "A chance de esquiva já está no limite de 65% nesta luta.",
+        noDodgeFocus: "Você precisa de {cost} de Foco para preparar uma esquiva.",
+        evasionMaxed: "A chance de esquiva já está no limite de {max}% nesta luta.",
         upgradeAria: "Melhorar {skill} por {cost} de ouro",
         hpUpgradeName: "HP máximo",
         staminaUpgradeName: "estamina máxima",
@@ -198,6 +204,11 @@ const translations = {
         selectStarterEquipment: "Choose 3 pieces of equipment",
         starterEquipmentHelp: "Choose equipment for different slots. Select another item for a slot to replace your choice.",
         characterSpecialty: "+{amount} {stat}",
+        levelUpSummary: "Per level",
+        heavySkillSummary: "Heavy strike: {cost} Focus, x{damage} ATK damage",
+        parrySkillSummary: "Firm stance: {cost} Focus, +{bonus}% parry",
+        dodgeSkillSummary: "Prepare dodge: {cost} Focus, +{bonus}% evasion",
+        skillLimitsSummary: "Limits — evasion {evasion}%, parry {parry}%",
         backToTitle: "Back",
         beginAdventure: "Begin adventure",
         level: "Level",
@@ -255,6 +266,7 @@ const translations = {
         evasionStat: "Evasion",
         parryStat: "Parry",
         stun: "Stun",
+        potions: "Potions",
         hp: "HP",
         attackShort: "ATK",
         defenseShort: "DEF",
@@ -312,8 +324,8 @@ const translations = {
         criticalDamage: "🗡️ Critical Strike! You deal {damage} damage!",
         stunLanded: "✨ The enemy is stunned and loses its counterattack!",
         defendMessage: "⚔️ Parry chance increased by {amount}% and will last until the fight ends!",
-        noParryFocus: "You need 10 Focus to prepare a parry.",
-        parryMaxed: "Parry chance is already at the 65% limit for this fight.",
+        noParryFocus: "You need {cost} Focus to prepare a parry.",
+        parryMaxed: "Parry chance is already at the {max}% limit for this fight.",
         heroParries: "⚔️ You parried the blow! Damage was halved to {damage}.",
         monsterParries: "⚔️ {monster} parried your attack! Damage dealt was halved to {damage}.",
         monsterDamage: "The {monster} counterattacks for <span class=\"text-red-400 font-bold\">{damage} damage</span>!",
@@ -334,8 +346,8 @@ const translations = {
         monsterDodges: "💨 The {monster} dodges your attack!",
         heroDodges: "💨 You dodge the {monster}'s attack and gain {amount} Fury!",
         dodgeMessage: "💨 Evasion increased by {amount}% and will last until the fight ends!",
-        noDodgeFocus: "You need 15 Focus to prepare a dodge.",
-        evasionMaxed: "Evasion is already at the 65% limit for this fight.",
+        noDodgeFocus: "You need {cost} Focus to prepare a dodge.",
+        evasionMaxed: "Evasion is already at the {max}% limit for this fight.",
         upgradeAria: "Upgrade {skill} for {cost} gold",
         hpUpgradeName: "maximum HP",
         staminaUpgradeName: "maximum stamina",
@@ -468,7 +480,8 @@ const GAME_DATA = window.YaraRpgData;
 const GAME_RULES = GAME_DATA.rules;
 const ITEM_DATA = GAME_DATA.items;
 const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
-let selectedCharacterProgression = GAME_DATA.characters[0].levelUp;
+let selectedCharacter = GAME_DATA.characters[0];
+let selectedCharacterProgression = selectedCharacter.levelUp;
 const MIST_CONTACT_SYSTEM = window.YaraMistContactSystem;
 const DEFAULT_CHARACTER = GAME_DATA.characters[0];
 const hero = {
@@ -489,12 +502,6 @@ const CAMP_FOCO_RECOVERY_PERCENT = GAME_RULES.camp.focoRecoveryPercent;
 const POTION_HEAL_AMOUNT_HP = ITEM_DATA.healingPotion.healAmount;
 const POTION_HEAL_AMOUNT_FOCO = ITEM_DATA.healingPotion.healFoco;
 const UPGRADE_COST = GAME_RULES.upgrades.goldCost;
-const DODGE_COST = GAME_RULES.combat.dodgeCost;
-const DODGE_BONUS = GAME_RULES.combat.dodgeBonus;
-const MAX_EVASION = GAME_RULES.combat.maxEvasion;
-const PARRY_COST = GAME_RULES.combat.parryCost;
-const PARRY_BONUS = GAME_RULES.combat.parryBonus;
-const MAX_PARRY = GAME_RULES.combat.maxParry;
 const FURY_PER_DAMAGE = GAME_RULES.combat.furyPerDamageTaken;
 const FURY_PER_DODGE = GAME_RULES.combat.furyPerDodge;
 const CRITICAL_DAMAGE_MULTIPLIER = GAME_RULES.combat.criticalDamageMultiplier;
@@ -504,6 +511,8 @@ const UPGRADE_CONFIG = GAME_RULES.upgrades.attributes;
 
 let currentMonster = null;
 let inCombat = false;
+let parrySkillUsedThisCombat = false;
+let dodgeSkillUsedThisCombat = false;
 let currentRegion = 0;
 let discoveredRegions = [0];
 let gameOver = false;
@@ -916,13 +925,13 @@ function updateUI() {
     document.getElementById('quick-attack-label').innerText = t(furyReady ? 'criticalAttack' : 'quickAttack');
     document.getElementById('hero-atk').innerText = getEffectiveStat('atk');
     document.getElementById('hero-def').innerText = getEffectiveStat('def');
-    const effectiveEvasion = Math.min(MAX_EVASION, getEffectiveStat('evasion'));
-    const effectiveParry = Math.min(MAX_PARRY, getEffectiveStat('parry'));
+    const effectiveEvasion = Math.min(selectedCharacter.skills.maxEvasion, getEffectiveStat('evasion'));
+    const effectiveParry = Math.min(selectedCharacter.skills.maxParry, getEffectiveStat('parry'));
     const effectiveStunChance = Math.min(
         GAME_RULES.probabilityScale,
         getEffectiveStat('stunChance')
     );
-    const evasionTotal = Math.min(MAX_EVASION, effectiveEvasion + hero.evasionBonus);
+    const evasionTotal = Math.min(selectedCharacter.skills.maxEvasion, effectiveEvasion + hero.evasionBonus);
     const evasionDisplay = document.getElementById('hero-evasion');
     const evasionBonusDisplay = document.getElementById('hero-evasion-bonus');
     document.getElementById('hero-evasion-base').innerText = effectiveEvasion + '%';
@@ -933,7 +942,7 @@ function updateUI() {
     evasionDisplay.setAttribute('aria-label', hero.evasionBonus
         ? `${effectiveEvasion}% + ${hero.evasionBonus}% = ${evasionTotal}%`
         : `${effectiveEvasion}%`);
-    const parryTotal = Math.min(MAX_PARRY, effectiveParry + hero.parryBonus);
+    const parryTotal = Math.min(selectedCharacter.skills.maxParry, effectiveParry + hero.parryBonus);
     const parryDisplay = document.getElementById('hero-parry');
     const parryBonusDisplay = document.getElementById('hero-parry-bonus');
     document.getElementById('hero-parry-base').innerText = effectiveParry + '%';
@@ -1006,21 +1015,29 @@ function updateUI() {
     const potionButton = document.getElementById('potion-button');
     document.querySelector('[data-i18n="campCost"]').innerText = t('campCost', { cost: CAMP_COST });
     document.querySelector('[data-i18n="focusCost"]').innerText = t('focusCost', {
-        cost: GAME_RULES.combat.heavyAttack.focoCost
+        cost: selectedCharacter.skills.heavyAttack.focoCost
     });
     document.querySelector('[data-i18n="parryBonus"]').innerText = t('parryBonus', {
-        bonus: PARRY_BONUS,
-        cost: PARRY_COST
+        bonus: selectedCharacter.skills.parry.bonus,
+        cost: selectedCharacter.skills.parry.focoCost
     });
     document.querySelector('[data-i18n="dodgeBonus"]').innerText = t('dodgeBonus', {
-        bonus: DODGE_BONUS,
-        cost: DODGE_COST
+        bonus: selectedCharacter.skills.dodge.bonus,
+        cost: selectedCharacter.skills.dodge.focoCost
     });
     document.querySelectorAll('[data-upgrade]').forEach((button) => {
         const upgrade = button.dataset.upgrade;
+        const upgradeMax = upgrade === 'parry'
+            ? selectedCharacter.skills.maxParry
+            : upgrade === 'evasion'
+                ? selectedCharacter.skills.maxEvasion
+                : undefined;
+        const upgradeConfiguration = upgradeMax === undefined
+            ? UPGRADE_CONFIG[upgrade]
+            : { ...UPGRADE_CONFIG[upgrade], max: upgradeMax };
         const skill = t(UPGRADE_CONFIG[upgrade].nameKey);
-        const maximum = getMaxUpgradeQuantity(upgrade);
-        const disabled = inCombat || gameOver || maximum < 1 || isUpgradeMaxed(upgrade);
+        const maximum = getMaxUpgradeQuantity(upgrade, upgradeConfiguration);
+        const disabled = inCombat || gameOver || maximum < 1 || isUpgradeMaxed(upgrade, upgradeConfiguration);
         button.disabled = disabled;
         button.setAttribute('aria-label', t('upgradeAria', { skill, cost: UPGRADE_COST }));
         button.title = t('upgradeAria', { skill, cost: UPGRADE_COST });
@@ -1046,8 +1063,12 @@ function updateUI() {
             }
         });
     });
-    document.getElementById('dodge-button').disabled = evasionTotal >= MAX_EVASION;
-    document.getElementById('parry-button').disabled = parryTotal >= MAX_PARRY || hero.foco < PARRY_COST;
+    document.getElementById('dodge-button').disabled = dodgeSkillUsedThisCombat
+        || evasionTotal >= selectedCharacter.skills.maxEvasion
+        || hero.foco < selectedCharacter.skills.dodge.focoCost;
+    document.getElementById('parry-button').disabled = parrySkillUsedThisCombat
+        || parryTotal >= selectedCharacter.skills.maxParry
+        || hero.foco < selectedCharacter.skills.parry.focoCost;
     const restartButton = document.getElementById('restart-button');
     mistContactCard.classList.toggle('hidden', !pendingMistContact || inCombat || gameOver);
     if (pendingMistContact) {
@@ -1232,6 +1253,8 @@ function spawnMonster(templateOverride = null) {
     };
 
     inCombat = true;
+    parrySkillUsedThisCombat = false;
+    dodgeSkillUsedThisCombat = false;
     hero.parryBonus = 0;
 
     document.getElementById('monster-name').innerText = currentMonster.name;
@@ -1403,7 +1426,7 @@ function combatQuickAttack() {
 // NOVO GOLPE: Estocada Pesada (Gasta Foco, dano alto)
 function combatHeavyAttack() {
     if (!inCombat || !currentMonster) return;
-    const attackRules = GAME_RULES.combat.heavyAttack;
+    const attackRules = { ...GAME_RULES.combat.heavyAttack, ...selectedCharacter.skills.heavyAttack };
     if (hero.foco < attackRules.focoCost) {
         logMessage(t("noFocus"));
         return;
@@ -1428,7 +1451,6 @@ function combatHeavyAttack() {
 
 function combatCriticalAttack() {
     if (!inCombat || !currentMonster || hero.fury < hero.maxFury) return;
-
     hero.fury = 0;
     playSound('specialAttack');
     updateUI();
@@ -1452,18 +1474,20 @@ function combatCriticalAttack() {
 function combatDefend() {
     if (!inCombat || !currentMonster) return;
     const bonusGained = Math.min(
-        PARRY_BONUS,
-        MAX_PARRY - getEffectiveStat('parry') - hero.parryBonus
+        selectedCharacter.skills.parry.bonus,
+        selectedCharacter.skills.maxParry - getEffectiveStat('parry') - hero.parryBonus
     );
     if (bonusGained <= 0) {
-        logMessage(t('parryMaxed'));
+        logMessage(t('parryMaxed', { max: selectedCharacter.skills.maxParry }));
         return;
     }
-    if (hero.foco < PARRY_COST) {
-        logMessage(t('noParryFocus'));
+    if (hero.foco < selectedCharacter.skills.parry.focoCost) {
+        logMessage(t('noParryFocus', { cost: selectedCharacter.skills.parry.focoCost }));
         return;
     }
-    hero.foco -= PARRY_COST;
+    if (parrySkillUsedThisCombat) return;
+    parrySkillUsedThisCombat = true;
+    hero.foco -= selectedCharacter.skills.parry.focoCost;
     hero.parryBonus += bonusGained;
     logMessage(t('defendMessage', { amount: bonusGained }), 'special');
 
@@ -1476,18 +1500,20 @@ function combatDefend() {
 function combatDodge() {
     if (!inCombat || !currentMonster) return;
     const bonusGained = Math.min(
-        DODGE_BONUS,
-        MAX_EVASION - getEffectiveStat('evasion') - hero.evasionBonus
+        selectedCharacter.skills.dodge.bonus,
+        selectedCharacter.skills.maxEvasion - getEffectiveStat('evasion') - hero.evasionBonus
     );
     if (bonusGained <= 0) {
-        logMessage(t("evasionMaxed"));
+        logMessage(t("evasionMaxed", { max: selectedCharacter.skills.maxEvasion }));
         return;
     }
-    if (hero.foco < DODGE_COST) {
-        logMessage(t("noDodgeFocus"));
+    if (hero.foco < selectedCharacter.skills.dodge.focoCost) {
+        logMessage(t("noDodgeFocus", { cost: selectedCharacter.skills.dodge.focoCost }));
         return;
     }
-    hero.foco -= DODGE_COST;
+    if (dodgeSkillUsedThisCombat) return;
+    dodgeSkillUsedThisCombat = true;
+    hero.foco -= selectedCharacter.skills.dodge.focoCost;
     hero.defending = false;
     hero.evasionBonus += bonusGained;
     logMessage(t("dodgeMessage", { amount: bonusGained }), "special");
@@ -1504,7 +1530,10 @@ function checkCombatProgress(monsterStunned = false) {
         endCombatVictory();
         return;
     }
-    if (monsterStunned) return;
+    if (monsterStunned) {
+        updateUI();
+        return;
+    }
     setTimeout(() => {
         if (inCombat && currentMonster) monsterAttackTurn();
     }, GAME_RULES.combat.responseDelayMs);
@@ -1513,7 +1542,7 @@ function checkCombatProgress(monsterStunned = false) {
 function monsterAttackTurn() {
     if (!inCombat || !currentMonster) return;
 
-    const evasionChance = Math.min(MAX_EVASION, getEffectiveStat('evasion') + hero.evasionBonus);
+    const evasionChance = Math.min(selectedCharacter.skills.maxEvasion, getEffectiveStat('evasion') + hero.evasionBonus);
     const evaded = Math.random() * GAME_RULES.probabilityScale < evasionChance;
     if (evaded) {
         playSound('dodge');
@@ -1530,7 +1559,7 @@ function monsterAttackTurn() {
         attackRules.minimumDamage,
         currentMonster.atk - getEffectiveStat('def') + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
-    const parryChance = Math.min(MAX_PARRY, getEffectiveStat('parry') + hero.parryBonus);
+    const parryChance = Math.min(selectedCharacter.skills.maxParry, getEffectiveStat('parry') + hero.parryBonus);
     const parried = Math.random() * GAME_RULES.probabilityScale < parryChance;
     if (parried) {
         playSound('parry');
@@ -1553,8 +1582,8 @@ function monsterAttackTurn() {
     }
 }
 
-function isUpgradeMaxed(upgrade) {
-    const configuration = UPGRADE_CONFIG[upgrade];
+function isUpgradeMaxed(upgrade, overrideConfiguration = UPGRADE_CONFIG[upgrade]) {
+    const configuration = overrideConfiguration;
     if (configuration?.max === undefined) return false;
     const currentValue = configuration.isPercentage
         ? getEffectiveStat(configuration.stat)
@@ -1562,8 +1591,8 @@ function isUpgradeMaxed(upgrade) {
     return currentValue >= configuration.max;
 }
 
-function getMaxUpgradeQuantity(upgrade) {
-    const configuration = UPGRADE_CONFIG[upgrade];
+function getMaxUpgradeQuantity(upgrade, overrideConfiguration = UPGRADE_CONFIG[upgrade]) {
+    const configuration = overrideConfiguration;
     if (!configuration || UPGRADE_COST <= 0) return 0;
 
     const affordableQuantity = Math.floor(hero.gold / UPGRADE_COST);
@@ -1574,6 +1603,14 @@ function getMaxUpgradeQuantity(upgrade) {
         : hero[configuration.stat];
     const remaining = Math.max(0, configuration.max - currentValue);
     return Math.min(affordableQuantity, Math.ceil(remaining / configuration.amount));
+}
+
+function getUpgradeConfiguration(upgrade) {
+    const configuration = UPGRADE_CONFIG[upgrade];
+    if (!configuration) return null;
+    if (upgrade === 'parry') return { ...configuration, max: selectedCharacter.skills.maxParry };
+    if (upgrade === 'evasion') return { ...configuration, max: selectedCharacter.skills.maxEvasion };
+    return configuration;
 }
 
 function closeUpgradeOptions() {
@@ -1587,17 +1624,17 @@ function closeUpgradeOptions() {
 }
 
 function toggleUpgradeOptions(upgrade) {
-    const configuration = UPGRADE_CONFIG[upgrade];
-    if (!configuration || inCombat || gameOver || getMaxUpgradeQuantity(upgrade) < 1 || isUpgradeMaxed(upgrade)) return;
+    const configuration = getUpgradeConfiguration(upgrade);
+    if (!configuration || inCombat || gameOver || getMaxUpgradeQuantity(upgrade, configuration) < 1 || isUpgradeMaxed(upgrade, configuration)) return;
 
     openUpgradeOptions = openUpgradeOptions === upgrade ? null : upgrade;
     updateUI();
 }
 
 function purchaseUpgrade(upgrade, requestedQuantity) {
-    const configuration = UPGRADE_CONFIG[upgrade];
+    const configuration = getUpgradeConfiguration(upgrade);
     if (!configuration) return;
-    const maxQuantity = getMaxUpgradeQuantity(upgrade);
+    const maxQuantity = getMaxUpgradeQuantity(upgrade, configuration);
     const quantity = requestedQuantity === 'max'
         ? maxQuantity
         : Number(requestedQuantity);
@@ -1607,7 +1644,7 @@ function purchaseUpgrade(upgrade, requestedQuantity) {
         || !Number.isInteger(quantity)
         || quantity < 1
         || quantity > maxQuantity
-        || isUpgradeMaxed(upgrade)
+        || isUpgradeMaxed(upgrade, configuration)
     ) return;
 
     const amount = configuration.max === undefined
@@ -1777,6 +1814,7 @@ function restartGame() {
 }
 
 function startAdventure({ character, equipment }) {
+    selectedCharacter = character;
     selectedCharacterProgression = character.levelUp;
     Object.assign(hero, character.baseStats, {
         name: character.name,
@@ -1824,8 +1862,8 @@ function checkLevelUp() {
         );
         hero.atk += growth.atk;
         hero.def += growth.def;
-        hero.evasion = Math.min(growth.evasionLimit, hero.evasion + growth.evasion);
-        hero.parry = Math.min(MAX_PARRY, hero.parry + growth.parry);
+        hero.evasion = Math.min(selectedCharacter.skills.maxEvasion, hero.evasion + growth.evasion);
+        hero.parry = Math.min(selectedCharacter.skills.maxParry, hero.parry + growth.parry);
         hero.stunChance = Math.min(
             GAME_RULES.probabilityScale,
             hero.stunChance + growth.stunChance

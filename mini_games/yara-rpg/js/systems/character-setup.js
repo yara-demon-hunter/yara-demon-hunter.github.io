@@ -11,6 +11,16 @@ window.YaraRpgCharacterSetup = (() => {
         parry: "parryStat",
         stunChance: "stun"
     });
+    const LEVEL_UP_STAT_KEYS = Object.freeze({
+        maxHp: "hpStat",
+        maxFoco: "focusStat",
+        maxPotions: "potions",
+        atk: "attackStat",
+        def: "defenseStat",
+        evasion: "evasionStat",
+        parry: "parryStat",
+        stunChance: "stun"
+    });
     const PERCENTAGE_SPECIALTY_STATS = new Set(["evasion", "parry", "stunChance"]);
     const SELECTION_LIMIT = 3;
 
@@ -63,9 +73,43 @@ window.YaraRpgCharacterSetup = (() => {
 
             const progression = document.createElement("span");
             progression.className = "character-option-progression";
-            progression.textContent = character.progression[document.documentElement.lang.startsWith("en") ? "en" : "pt"];
+            progression.textContent = `${translate("levelUpSummary")}: ${Object.entries(character.levelUp)
+                .filter(([stat]) => stat !== "evasionLimit")
+                .map(([stat, amount]) => {
+                    const statKey = LEVEL_UP_STAT_KEYS[stat];
+                    if (!statKey) throw new Error(`Unknown level-up stat: ${stat}`);
+                    const formattedAmount = PERCENTAGE_SPECIALTY_STATS.has(stat)
+                        ? `${amount}%`
+                        : amount;
+                    return translate("characterSpecialty", {
+                        stat: translate(statKey),
+                        amount: formattedAmount
+                    });
+                })
+                .join(" · ")}`;
 
-            card.append(portrait, name, description, specialty, progression);
+            const skills = document.createElement("span");
+            skills.className = "character-option-skills";
+            skills.textContent = [
+                translate("heavySkillSummary", {
+                    cost: character.skills.heavyAttack.focoCost,
+                    damage: character.skills.heavyAttack.attackMultiplier
+                }),
+                translate("parrySkillSummary", {
+                    cost: character.skills.parry.focoCost,
+                    bonus: character.skills.parry.bonus
+                }),
+                translate("dodgeSkillSummary", {
+                    cost: character.skills.dodge.focoCost,
+                    bonus: character.skills.dodge.bonus
+                }),
+                translate("skillLimitsSummary", {
+                    evasion: character.skills.maxEvasion,
+                    parry: character.skills.maxParry
+                })
+            ].join(" · ");
+
+            card.append(portrait, name, description, specialty, progression, skills);
             card.addEventListener("click", () => {
                 selectedCharacterId = character.id;
                 renderCharacters();

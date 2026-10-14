@@ -200,6 +200,11 @@ body.game-start-active {
     font-size: 0.68rem;
     line-height: 1.4;
 }
+.character-option-skills {
+    color: #d2c9b6;
+    font-size: 0.68rem;
+    line-height: 1.5;
+}
 .starter-equipment-heading {
     display: flex;
     align-items: center;

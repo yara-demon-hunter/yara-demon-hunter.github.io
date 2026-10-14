@@ -28,12 +28,7 @@ window.YaraRpgData.characters = Object.freeze([
             pt: "Sobrevivente atento, acostumado a resistir aos perigos da floresta.",
             en: "A watchful survivor, used to enduring the forest's dangers."
         },
-        progression: {
-            pt: "Evolução: personalize os ganhos de HP, foco, ataque e defesa por nível.",
-            en: "Growth: customize HP, focus, attack, and defense gains per level."
-        },
         specialty: {
-            maxHp: 200,
             evasion: 10,
             maxFoco: 50,
             stunChance: 5
@@ -41,14 +36,20 @@ window.YaraRpgData.characters = Object.freeze([
         // Ajuste estes valores para definir como Zeph evolui a cada nível.
         levelUp: {
             maxHp: 15,
-            maxFoco: 30,
+            maxFoco: 15,
             maxPotions: 1,
             atk: 1,
             def: 1,
             evasion: 3,
-            evasionLimit: 40,
-            parry: 3,
+            parry: 1,
             stunChance: 2
+        },
+        skills: {
+            heavyAttack: { focoCost: 10, attackMultiplier: 1.5 },
+            parry: { focoCost: 15, bonus: 5 },
+            dodge: { focoCost: 5, bonus: 10 },
+            maxEvasion: 70,
+            maxParry: 45
         }
     },
     {
@@ -60,10 +61,6 @@ window.YaraRpgData.characters = Object.freeze([
             pt: "Caçador implacável que prefere encerrar uma luta com um golpe forte.",
             en: "A relentless hunter who prefers to end a fight with a powerful blow."
         },
-        progression: {
-            pt: "Evolução: personalize os ganhos de HP, foco, ataque e defesa por nível.",
-            en: "Growth: customize HP, focus, attack, and defense gains per level."
-        },
         specialty: {
             atk: 10,
             def: 5,
@@ -71,15 +68,21 @@ window.YaraRpgData.characters = Object.freeze([
         },
         // Ajuste estes valores para definir como Oskar evolui a cada nível.
         levelUp: {
-            maxHp: 30,
+            maxHp: 25,
             maxFoco: 5,
             maxPotions: 1,
-            atk: 3,
+            atk: 2,
             def: 2,
             evasion: 1,
-            evasionLimit: 40,
-            parry: 1,
+            parry: 2,
             stunChance: 1
+        },
+        skills: {
+            heavyAttack: { focoCost: 25, attackMultiplier: 1.7 },
+            parry: { focoCost: 10, bonus: 10 },
+            dodge: { focoCost: 30, bonus: 5 },
+            maxEvasion: 40,
+            maxParry: 60
         }
     }
 ]);
