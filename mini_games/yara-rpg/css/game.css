@@ -193,6 +193,13 @@ body.game-start-active {
     font-size: 0.72rem;
     font-weight: 700;
 }
+.character-option-progression {
+    padding-top: 0.35rem;
+    border-top: 1px solid rgba(92, 81, 55, 0.55);
+    color: #c7b992;
+    font-size: 0.68rem;
+    line-height: 1.4;
+}
 .starter-equipment-heading {
     display: flex;
     align-items: center;

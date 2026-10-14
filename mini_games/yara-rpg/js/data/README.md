@@ -2,8 +2,7 @@
 
 Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica que os usa fica em `../game.js`.
 
-- `hero.js`: ganhos de atributos por nível.
-- `characters.js`: atributos-base compartilhados, elenco selecionável, descrições e bônus de especialidade.
+- `characters.js`: atributos-base compartilhados, elenco selecionável, descrições, bônus de especialidade e ganhos por nível (ajuste `levelUp` individualmente em cada personagem).
 - `items.js`: poção de cura e catálogo de equipamentos que podem cair dos monstros.
 - `regions.js`: IDs, títulos e descrições das telas em português e inglês.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.
@@ -14,6 +13,6 @@ A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`. Para aj
 
 A lógica da tela inicial e a seleção de três equipamentos ficam em `../systems/character-setup.js`. Os scripts de dados e sistemas precisam ser carregados antes de `game.js`, que inicia a aventura com as escolhas feitas.
 
-Equipamentos em `items.js` declaram um `id`, um slot listado em `game.js`, nomes em português e inglês e os bônus em `stats`. A chance de drop e a recuperação percentual do acampamento são configuradas em `game-rules.js`.
+Equipamentos em `items.js` declaram um `id`, um slot listado em `game.js`, nomes em português e inglês e os bônus em `stats`. Use `starter: true` apenas nos equipamentos oferecidos na seleção inicial; todos os itens do catálogo podem cair dos monstros. A chance de drop e a recuperação percentual do acampamento são configuradas em `game-rules.js`.
 
 Os IDs em `regions.js` precisam corresponder às chaves de `monsters.byRegion` em `monsters.js`. Os scripts são carregados nessa ordem em `game.html`; mantenha `game.js` por último, pois ele consome os dados anteriores.

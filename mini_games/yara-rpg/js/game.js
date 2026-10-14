@@ -468,6 +468,7 @@ const GAME_DATA = window.YaraRpgData;
 const GAME_RULES = GAME_DATA.rules;
 const ITEM_DATA = GAME_DATA.items;
 const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
+let selectedCharacterProgression = GAME_DATA.characters[0].levelUp;
 const MIST_CONTACT_SYSTEM = window.YaraMistContactSystem;
 const DEFAULT_CHARACTER = GAME_DATA.characters[0];
 const hero = {
@@ -1776,6 +1777,7 @@ function restartGame() {
 }
 
 function startAdventure({ character, equipment }) {
+    selectedCharacterProgression = character.levelUp;
     Object.assign(hero, character.baseStats, {
         name: character.name,
         potions: ITEM_DATA.healingPotion.startingCount,
@@ -1807,7 +1809,7 @@ function startAdventure({ character, equipment }) {
 
 function checkLevelUp() {
     while (hero.xp >= hero.maxXp) {
-        const growth = GAME_DATA.hero.levelUp;
+        const growth = selectedCharacterProgression;
         hero.level++;
         hero.xp -= hero.maxXp;
         hero.maxXp = Math.floor(hero.maxXp * GAME_RULES.progression.xpRequirementMultiplier);

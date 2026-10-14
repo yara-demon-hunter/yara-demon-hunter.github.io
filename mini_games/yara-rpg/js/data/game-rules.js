@@ -90,7 +90,7 @@ window.YaraRpgData.rules = Object.freeze({
         xpRequirementMultiplier: 1.5
     },
     upgrades: {
-        goldCost: 50,
+        goldCost: 100,
         attributes: Object.freeze({
             atk: { stat: "atk", amount: 2, nameKey: "attack" },
             def: { stat: "def", amount: 2, nameKey: "defense" },

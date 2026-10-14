@@ -25,7 +25,7 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 - `js/systems/mist-contacts.js`: regras reutilizáveis para sortear contatos, resultados, chefes e poderes da névoa.
 - `js/systems/character-setup.js`: controla as telas de início, a seleção do personagem e o equipamento inicial.
 - `js/data/mist-contacts.js`: conteúdo editável dos espíritos, chefes especiais e poderes permanentes.
-- `js/data/characters.js`: personagens iniciais, descrições e especialidades.
+- `js/data/characters.js`: personagens iniciais, descrições, especialidades e evolução individual por nível.
 - `js/data/game-rules.js`: balanceamento, incluindo chance crescente por nível, intervalo entre contatos e pesos dos resultados.
 - `js/data/items.js`: poção de cura e catálogo de equipamentos e bônus de atributos.
 - `js/tailwind.config.js`: cores customizadas usadas pelas classes Tailwind.
@@ -43,7 +43,7 @@ Descansar custa 50 de ouro e recupera 20% do HP e do foco máximos atuais, sem u
 
 Os itens e atributos que concedem ficam em `js/data/items.js`; chance de drop e recuperação do acampamento ficam em `js/data/game-rules.js`.
 
-Para alterar personagens ou criar outro, edite `js/data/characters.js`. A tela de seleção e o limite de três itens ficam em `js/systems/character-setup.js`; textos localizados ficam em `js/game.js`.
+Para alterar personagens ou criar outro, edite `js/data/characters.js`. Cada personagem possui seu próprio bloco `levelUp`, com valores editáveis para os ganhos de cada nível. A tela de seleção e o limite de três itens ficam em `js/systems/character-setup.js`; textos localizados ficam em `js/game.js`.
 
 ## Estado do componente
 

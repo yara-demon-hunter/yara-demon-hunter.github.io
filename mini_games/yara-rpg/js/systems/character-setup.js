@@ -1,6 +1,6 @@
 window.YaraRpgCharacterSetup = (() => {
     const CHARACTER_DATA = window.YaraRpgData.characters;
-    const EQUIPMENT_DATA = window.YaraRpgData.items.equipment;
+    const EQUIPMENT_DATA = window.YaraRpgData.items.equipment.filter((item) => item.starter === true);
     const EQUIPMENT_BY_ID = new Map(EQUIPMENT_DATA.map((item) => [item.id, item]));
     const SPECIALTY_STAT_KEYS = Object.freeze({
         maxHp: "hpStat",
@@ -61,7 +61,11 @@ window.YaraRpgCharacterSetup = (() => {
                 })
                 .join(" · ");
 
-            card.append(portrait, name, description, specialty);
+            const progression = document.createElement("span");
+            progression.className = "character-option-progression";
+            progression.textContent = character.progression[document.documentElement.lang.startsWith("en") ? "en" : "pt"];
+
+            card.append(portrait, name, description, specialty, progression);
             card.addEventListener("click", () => {
                 selectedCharacterId = character.id;
                 renderCharacters();
