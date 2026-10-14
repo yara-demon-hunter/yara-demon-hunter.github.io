@@ -12,3 +12,6 @@ _site/
 
 # macOS system files
 .DS_Store
+
+# Ignore folder (all files inside it) for local documentation
+local_docs/
