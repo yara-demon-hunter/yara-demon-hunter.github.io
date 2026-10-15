@@ -1,0 +1,106 @@
+// Save snapshots, restore runs, and migrate saved equipment.
+// Classic browser script; state is initialized by game.js before user actions run.
+
+function saveGame() {
+    if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return;
+    const snapshot = {
+        version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)), inCombat,
+        currentRegion, discoveredRegions, explorationsSinceMistContact, explorationCount,
+        explorationsSinceStoryEvent,
+        storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
+        seenStoryEvents: [...seenStoryEvents],
+        pendingEquipment, equipmentInstanceId
+    };
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot)); } catch {}
+}
+
+function readSavedGame() {
+    try {
+        const snapshot = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+        if (!snapshot || snapshot.version !== 1 || !GAME_DATA.characters.some((character) => character.id === snapshot.characterId)) return null;
+        return snapshot;
+    } catch { return null; }
+}
+
+function loadSavedGame(snapshot = readSavedGame()) {
+    if (!snapshot) return false;
+    selectedCharacter = GAME_DATA.characters.find((character) => character.id === snapshot.characterId);
+    selectedCharacterProgression = selectedCharacter.levelUp;
+    Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
+    const savedEquipment = { ...(snapshot.hero?.equipment || {}) };
+    const legacyAccessory = savedEquipment.accessory;
+    if (legacyAccessory) {
+        const migratedSlot = legacyAccessory.id === 'river-charm' ? 'necklace'
+            : legacyAccessory.id === 'mist-ring' ? 'ring' : 'accessory';
+        savedEquipment[migratedSlot] = { ...legacyAccessory, slot: migratedSlot };
+        delete savedEquipment.accessory;
+    }
+    hero.equipment = Object.fromEntries(EQUIPMENT_SLOTS.map(({ id }) => [
+        id,
+        savedEquipment[id] ? hydrateItem(savedEquipment[id]) : null
+    ]));
+    hero.equipmentInventory = Array.isArray(snapshot.hero?.equipmentInventory)
+        ? snapshot.hero.equipmentInventory.map(hydrateItem) : [];
+    selectedInventoryItems.clear();
+    currentRegion = Math.max(0, Math.min(GAME_DATA.regions.length - 1, Number(snapshot.currentRegion) || 0));
+    discoveredRegions = Array.isArray(snapshot.discoveredRegions) ? snapshot.discoveredRegions : [0];
+    explorationsSinceMistContact = Number(snapshot.explorationsSinceMistContact) || 0;
+    explorationCount = Number(snapshot.explorationCount) || 0;
+    explorationsSinceStoryEvent = Number(snapshot.explorationsSinceStoryEvent) || 0;
+    equipmentInstanceId = Number(snapshot.equipmentInstanceId) || 0;
+    storyEventSeen.clear();
+    (snapshot.storyEventSeen || []).forEach((id) => storyEventSeen.add(id));
+    seenStoryEvents.clear();
+    (snapshot.seenStoryEvents || []).forEach((id) => seenStoryEvents.add(id));
+    pendingStoryEvent = snapshot.pendingStoryEvent || null;
+    if (pendingStoryEvent && !pendingStoryEvent.choices) pendingStoryEvent = GAME_DATA.regions[currentRegion].event?.[0] || null;
+    pendingMistContact = snapshot.pendingMistContact || null;
+    pendingEquipment = snapshot.pendingEquipment || null;
+    if (pendingEquipment?.item) pendingEquipment.item = hydrateItem(pendingEquipment.item);
+    const interruptedCombat = Boolean(snapshot.inCombat);
+    inCombat = false;
+    currentMonster = null;
+    combatActionLocked = false;
+    combatEncounterId++;
+    campaignComplete = false;
+    enemyTelegraphing = false;
+    gameOver = hero.hp <= 0;
+    document.getElementById('rpg-log').replaceChildren();
+    logMessage(t('openingLog', { hero: hero.name }), 'special');
+    if (interruptedCombat && !gameOver) logMessage(t('denseMist'), 'normal');
+    document.getElementById('game-main').hidden = false;
+    document.getElementById('game-start-screen').hidden = true;
+    document.body.classList.remove('game-start-active');
+    updateUI(); saveGame(); startGameMusic();
+    return true;
+}
+
+function showContinueOption() {
+    document.getElementById('continue-adventure-button').hidden = !readSavedGame();
+}
+
+function hydrateItem(savedItem) {
+    const catalogItem = ITEM_DATA.equipment.find((item) => item.id === savedItem?.id);
+    if (!catalogItem) return savedItem;
+    const savedRarity = GAME_RULES.loot.equipmentRarities.find((rarity) => rarity.id === savedItem.rarity)
+        || GAME_RULES.loot.equipmentRarities[0];
+    const isCurrentUpgradeFormat = savedItem.upgradeSystemVersion === 2;
+    const stats = isCurrentUpgradeFormat
+        ? { ...savedItem.stats }
+        : Object.fromEntries(Object.entries(catalogItem.stats).map(([stat, amount]) => [
+            stat,
+            amount + savedRarity.statBonus
+        ]));
+    return {
+        ...catalogItem,
+        ...savedItem,
+        stats,
+        slot: catalogItem.slot,
+        rarity: savedRarity.id,
+        upgradeLevel: isCurrentUpgradeFormat ? Math.min(
+            GAME_RULES.equipmentUpgrade.maxLevel,
+            Math.max(0, Number(savedItem.upgradeLevel) || 0)
+        ) : 0,
+        upgradeSystemVersion: 2
+    };
+}
