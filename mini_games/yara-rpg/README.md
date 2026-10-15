@@ -19,7 +19,13 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 ## Estrutura
 
 - `game.html`: página completa e ponto de entrada do RPG.
-- `css/game.css`: estilos próprios da página.
+- `css/main.css`: ponto de entrada dos estilos do jogo, importando os módulos CSS.
+- `css/base.css`: tema global, eventos narrativos e temas regionais.
+- `css/start-screen.css`: tela inicial, personagem e seleção de equipamento.
+- `css/equipment.css`: personagem, slots, mochila, itens e melhorias.
+- `css/interface.css`: controles gerais e idioma.
+- `css/responsive.css`: layout para tablets e celulares.
+- `css/game.css`: atalho de compatibilidade que importa `main.css`.
 - `css/embedded-rpg.css`: estilos do fragmento HTML legado.
 - `js/game.js`: estado do personagem, exploração, combate e atualização da interface.
 - `js/systems/mist-contacts.js`: regras reutilizáveis para sortear contatos, resultados, chefes e poderes da névoa.

@@ -1,0 +1,33 @@
+/* Tema global, eventos narrativos e variações visuais por região. */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0c0d0f;
+    color: #e8e5df;
+}
+.game-shell {
+    background-image: radial-gradient(circle at top, #171920 0%, #0c0d0f 45%);
+}
+.story-event-card,
+.campaign-ending-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(168, 129, 55, 0.7);
+    border-radius: 0.9rem;
+    background: linear-gradient(145deg, rgba(37, 34, 25, 0.96), rgba(15, 20, 18, 0.96));
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
+}
+.story-event-card[hidden],
+.campaign-ending-card[hidden] { display: none; }
+.story-event-kicker { color: #e5b956; font-size: .65rem; letter-spacing: .18em; text-transform: uppercase; }
+#story-event-title, #campaign-ending-title { margin-top: .3rem; color: #f3d78e; font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 700; }
+#story-event-description, #campaign-ending-description { margin-top: .45rem; color: #d0cec5; font-size: .82rem; line-height: 1.6; }
+.story-event-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .55rem; margin-top: .9rem; }
+.story-event-choice { padding: .65rem .75rem; border: 1px solid #53664f; border-radius: .65rem; background: #17271d; color: #e4f0d9; font: inherit; font-size: .78rem; font-weight: 700; cursor: pointer; }
+.story-event-choice:hover { border-color: #c9a650; background: #263a2b; }
+.ending-emblem { display: block; font-size: 2rem; animation: bell-glow 2s ease-in-out infinite alternate; }
+@keyframes bell-glow { from { filter: drop-shadow(0 0 2px #eabf55); transform: rotate(-5deg); } to { filter: drop-shadow(0 0 15px #f3cf72); transform: rotate(5deg); } }
+body.region-ashen-portal .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(118, 93, 70, .23), transparent 45%), linear-gradient(#171512, #0c0d0f 60%); }
+body.region-ruined-village .game-shell { background-image: radial-gradient(circle at 80% 30%, rgba(117, 47, 28, .22), transparent 42%), linear-gradient(#17110f, #0c0d0f 60%); }
+body.region-gudran-castle .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(55, 55, 86, .3), transparent 48%), linear-gradient(#11121b, #0c0d0f 65%); }
+#game-panel.is-hit { animation: panel-hit .26s ease-out; }
+@keyframes panel-hit { 0% { transform: translateX(0); } 30% { transform: translateX(-5px); } 65% { transform: translateX(4px); } 100% { transform: translateX(0); } }

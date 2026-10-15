@@ -1,0 +1,28 @@
+/* Controles gerais e detalhes de interface fora dos painéis principais. */
+.game-language {
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid #383a41;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.35);
+}
+.game-language button {
+    min-width: 38px;
+    min-height: 34px;
+    border: 0;
+    background: transparent;
+    color: #aaa8a3;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.68rem;
+    font-weight: 700;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+.game-language button[aria-pressed="true"] {
+    background: #292b31;
+    color: #d2c29c;
+}
+.game-language button:focus-visible {
+    outline: 2px solid #d2c29c;
+    outline-offset: -2px;
+}

@@ -1,0 +1,415 @@
+/* Painéis do personagem, equipamento, mochila, melhorias e itens. */
+.hero-equipment,
+.hero-attributes {
+    min-width: 0;
+    border: 1px solid rgba(92, 81, 55, 0.55);
+    border-radius: 12px;
+    background: rgba(23, 25, 31, 0.72);
+}
+.equipment-bag-button {
+    position: relative;
+    grid-area: bag;
+    min-width: 0;
+    width: 100%;
+    min-height: 2.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 0.35rem;
+    border: 1px solid rgba(92, 81, 55, 0.55);
+    border-radius: 0.5rem;
+    background: rgba(12, 13, 15, 0.72);
+    color: #fcd34d;
+    cursor: pointer;
+    text-align: center;
+}
+.equipment-bag-button:hover:not(:disabled) {
+    border-color: #d2a644;
+    background: #24241f;
+}
+.equipment-bag-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+.equipment-bag-button:focus-visible,
+.equipment-slot-item:focus-visible,
+.equipment-bag-item:focus-visible,
+.dialog-close-button:focus-visible,
+.equipment-bag-action:focus-visible {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+}
+.equipment-bag-button > span:first-child {
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+.equipment-bag-button > span:last-child {
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    color: #d2c29c;
+    font-size: 0.48rem;
+    line-height: 1;
+}
+.hero-equipment > summary,
+.hero-attributes > summary {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    color: #a8a29e;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 600;
+    list-style: none;
+}
+.hero-equipment > summary::-webkit-details-marker,
+.hero-attributes > summary::-webkit-details-marker {
+    display: none;
+}
+.hero-equipment > summary::after,
+.hero-attributes > summary::after {
+    content: "+";
+    margin-left: auto;
+    color: #d2c29c;
+    font-size: 1rem;
+}
+.hero-equipment[open] > summary::after,
+.hero-attributes[open] > summary::after {
+    content: "−";
+}
+.hero-equipment-content {
+    padding: 0 10px 10px;
+}
+.equipped-item-count {
+    padding: 2px 6px;
+    border: 1px solid rgba(92, 81, 55, 0.55);
+    border-radius: 999px;
+    color: #d2c29c;
+    font-size: 0.65rem;
+    line-height: 1.2;
+}
+.hero-attribute-stats {
+    margin: 0 10px 10px;
+}
+.item-drop-dialog {
+    width: min(28rem, calc(100vw - 2rem));
+    padding: 0;
+    border: 1px solid rgba(180, 83, 9, 0.75);
+    border-radius: 1rem;
+    background: #171920;
+    color: #e8e5df;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+}
+.item-drop-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+}
+.item-drop-content {
+    padding: 1.25rem;
+}
+.equipment-bag-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.equipment-bag-heading > div {
+    min-width: 0;
+    flex: 1;
+}
+.dialog-close-button {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    border: 1px solid rgba(92, 81, 55, 0.7);
+    border-radius: 9px;
+    background: rgba(0, 0, 0, 0.25);
+    color: #d6d3d1;
+    cursor: pointer;
+    font-size: 1.35rem;
+    line-height: 1;
+}
+.equipment-bag-slots {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-height: min(60vh, 34rem);
+    margin-top: 1rem;
+    overflow-y: auto;
+    padding-right: 3px;
+}
+.equipment-bag-slot {
+    position: relative;
+    min-width: 0;
+    min-height: 58px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid rgba(92, 81, 55, 0.55);
+    border-radius: 11px;
+    background: rgba(12, 13, 15, 0.72);
+}
+.equipment-bag-slot:not(.has-item) {
+    min-height: 78px;
+    align-items: center;
+    justify-content: center;
+    border-style: dashed;
+    color: #77746e;
+}
+.equipment-bag-slot-number {
+    position: absolute;
+    top: 5px;
+    right: 7px;
+    color: #77746e;
+    font-size: 0.58rem;
+}
+.equipment-bag-item,
+.equipment-slot-item {
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+.equipment-bag-item:hover,
+.equipment-slot-item:hover {
+    filter: brightness(1.25);
+}
+.equipment-bag-action {
+    min-height: 32px;
+    min-width: 0;
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+.equipment-bag-equip {
+    border-color: #047857;
+    background: rgba(6, 78, 59, 0.6);
+    color: #d1fae5;
+}
+.equipment-bag-discard {
+    border-color: #7f1d1d;
+    background: rgba(69, 10, 10, 0.55);
+    color: #fecaca;
+}
+.equipment-bag-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+.equipment-bag-action[hidden] {
+    display: none;
+}
+.equipment-item-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.equipment-item-heading > span:first-child {
+    font-size: 1.8rem;
+}
+.equipment-item-heading h2 {
+    min-width: 0;
+    flex: 1;
+}
+.equipment-item-properties {
+    display: grid;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 0;
+    list-style: none;
+}
+.equipment-item-properties li {
+    padding: 8px 10px;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 8px;
+    background: rgba(6, 78, 59, 0.25);
+    color: #a7f3d0;
+    font-size: 0.82rem;
+}
+.equipment-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+}
+.equipment-item-actions .equipment-bag-action {
+    width: auto;
+    flex: 1 1 6rem;
+    padding: 7px 10px;
+    font-size: 0.75rem;
+}
+.equipment-bag-pending:not([hidden]) {
+    margin-top: 12px;
+    padding: 9px;
+    border: 1px solid rgba(180, 83, 9, 0.6);
+    border-radius: 9px;
+    background: rgba(120, 53, 15, 0.25);
+    color: #fde68a;
+    font-size: 0.75rem;
+}
+@media (min-width: 480px) {
+    .equipment-bag-slots {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+#equipment-slots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas:
+        "necklace head bag"
+        "leftHand body rightHand"
+        "accessory legs ring"
+        "pet boots potion";
+    width: min(100%, 17rem);
+    margin-inline: auto;
+    gap: 0.4rem;
+}
+.equipment-slot {
+    min-width: 0;
+    min-height: 2.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.35rem;
+    text-align: center;
+    overflow: hidden;
+}
+.equipment-slot-rightHand { grid-area: rightHand; }
+.equipment-slot-leftHand { grid-area: leftHand; }
+.equipment-slot-head { grid-area: head; }
+.equipment-slot-body { grid-area: body; }
+.equipment-slot-legs { grid-area: legs; }
+.equipment-slot-boots { grid-area: boots; }
+.equipment-slot-necklace { grid-area: necklace; }
+.equipment-slot-ring { grid-area: ring; }
+.equipment-slot-accessory { grid-area: accessory; }
+.equipment-slot-pet { grid-area: pet; }
+.equipment-slot-potion {
+    grid-area: potion;
+    border-color: rgba(13, 148, 136, 0.65);
+    background: rgba(19, 78, 74, 0.75);
+    color: #ccfbf1;
+    font-size: 0.65rem;
+}
+.equipment-slot-potion:hover:not(:disabled) {
+    background: rgba(15, 118, 110, 0.9);
+}
+.equipment-slot-potion:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+.equipment-slot-icon {
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+.equipment-bag-item-icon {
+    color: #fde68a;
+    font-size: 1.4rem;
+    line-height: 1.2;
+}
+.equipment-slot-placeholder {
+    opacity: 0.45;
+    filter: grayscale(1);
+}
+#quick-attack-button.fury-ready {
+    background-color: #b45309;
+    border-color: #f59e0b;
+    color: #fff;
+}
+#quick-attack-button.fury-ready:hover {
+    background-color: #d97706;
+}
+.skill-upgrade-button {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #8a6d37;
+    border-radius: 50%;
+    background: #27251f;
+    color: #fbbf24;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+.skill-upgrade-button:hover:not(:disabled) {
+    background: #51401d;
+}
+.skill-upgrade-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+}
+.skill-upgrade-button:focus-visible {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+}
+.skill-upgrade-control {
+    position: relative;
+    display: inline-flex;
+}
+.skill-upgrade-options {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    right: 0;
+    display: flex;
+    gap: 4px;
+    padding: 5px;
+    border: 1px solid #655633;
+    border-radius: 9px;
+    background: #171816;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+}
+.skill-upgrade-options[hidden] {
+    display: none;
+}
+.skill-upgrade-options button {
+    min-width: 34px;
+    min-height: 30px;
+    padding: 4px 6px;
+    border: 1px solid #806a39;
+    border-radius: 6px;
+    background: #30291b;
+    color: #fbbf24;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+.skill-upgrade-options button:hover:not(:disabled) {
+    background: #51401d;
+}
+.skill-upgrade-options button:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+}
+.skill-upgrade-options button:focus-visible {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+}
+.rpg-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.rpg-scroll::-webkit-scrollbar-track {
+    background: #121419;
+    border-radius: 4px;
+}
+.rpg-scroll::-webkit-scrollbar-thumb {
+    background: #383a41;
+    border-radius: 4px;
+}

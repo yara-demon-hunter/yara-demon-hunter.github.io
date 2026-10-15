@@ -1,0 +1,6 @@
+/* Ponto de entrada dos estilos do mini RPG. A ordem preserva a cascata. */
+@import url("./base.css");
+@import url("./start-screen.css");
+@import url("./equipment.css");
+@import url("./interface.css");
+@import url("./responsive.css");
