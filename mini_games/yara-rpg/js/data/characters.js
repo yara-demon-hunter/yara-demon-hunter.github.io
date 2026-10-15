@@ -1,5 +1,8 @@
 window.YaraRpgData = window.YaraRpgData || {};
 
+// BASE_CHARACTER_STATS define os valores iniciais de um novo jogo.
+// skillPoints vem de progression.startingSkillPoints (3) — não edite aqui.
+// Se quiser mudar o inicial, altere só em js/data/progression-rules.js → progression.startingSkillPoints
 const BASE_CHARACTER_STATS = Object.freeze({
     level: 1,
     hp: 100,
@@ -14,6 +17,8 @@ const BASE_CHARACTER_STATS = Object.freeze({
     fury: 0,
     maxFury: 100,
     gold: 200,
+    // fallback: se progression-rules.js não carregou ainda, começa com 3
+    skillPoints: (window.YaraRpgData?.rules?.progression?.startingSkillPoints ?? 3),
     xp: 0,
     maxXp: 30
 });

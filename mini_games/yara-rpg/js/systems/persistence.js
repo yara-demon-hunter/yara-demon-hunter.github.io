@@ -27,6 +27,8 @@ function loadSavedGame(snapshot = readSavedGame()) {
     selectedCharacter = GAME_DATA.characters.find((character) => character.id === snapshot.characterId);
     selectedCharacterProgression = selectedCharacter.levelUp;
     Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
+    // Migração: saves antigos não têm skillPoints
+    hero.skillPoints = Number(snapshot.hero?.skillPoints ?? DEFAULT_CHARACTER.baseStats.skillPoints ?? 0) || 0;
     const savedEquipment = { ...(snapshot.hero?.equipment || {}) };
     const legacyAccessory = savedEquipment.accessory;
     if (legacyAccessory) {

@@ -53,7 +53,13 @@ const CAMP_HP_RECOVERY_PERCENT   = GAME_RULES.camp.hpRecoveryPercent;
 const CAMP_FOCO_RECOVERY_PERCENT = GAME_RULES.camp.focoRecoveryPercent;
 const POTION_HEAL_AMOUNT_HP      = ITEM_DATA.healingPotion.healAmount;
 const POTION_HEAL_AMOUNT_FOCO    = ITEM_DATA.healingPotion.healFoco;
-const UPGRADE_COST               = GAME_RULES.upgrades.goldCost;
+const UPGRADE_COST               = GAME_RULES.upgrades.goldCost; // legado (não usado)
+const UPGRADE_COST_PER_POINT     = GAME_RULES.upgrades.costPerPoint ?? 1;
+// ── Pontos de Habilidade: controle central em js/data/progression-rules.js ──
+//    startingSkillPoints = com quantos PH/SP o herói começa (você pediu 3)
+//    skillPointsPerLevel = quantos ganha por level up
+const STARTING_SKILL_POINTS      = GAME_RULES.progression.startingSkillPoints ?? 3;
+const SKILL_POINTS_PER_LEVEL     = GAME_RULES.progression.skillPointsPerLevel ?? 3;
 const UPGRADE_CONFIG             = GAME_RULES.upgrades.attributes;
 const FURY_PER_DAMAGE            = GAME_RULES.combat.furyPerDamageTaken;
 const FURY_PER_DODGE             = GAME_RULES.combat.furyPerDodge;
@@ -72,6 +78,8 @@ let selectedCharacterProgression = selectedCharacter.levelUp;
 const hero = {
     name: DEFAULT_CHARACTER.name,
     ...DEFAULT_CHARACTER.baseStats,
+    // Garante que o inicial reflita STARTING_SKILL_POINTS mesmo se baseStats vier cacheado
+    skillPoints: STARTING_SKILL_POINTS,
     potions: ITEM_DATA.healingPotion.startingCount,
     maxPotions: ITEM_DATA.healingPotion.startingCapacity,
     evasionBonus: 0,
@@ -148,6 +156,8 @@ function startAdventure({ character, equipment }) {
 
     Object.assign(hero, character.baseStats, {
         name: character.name,
+        // Inicial de PH vem do controle central — use STARTING_SKILL_POINTS
+        skillPoints: STARTING_SKILL_POINTS,
         potions: ITEM_DATA.healingPotion.startingCount,
         maxPotions: ITEM_DATA.healingPotion.startingCapacity,
         evasionBonus: 0,
@@ -197,8 +207,11 @@ function checkLevelUp() {
         hero.parry = Math.min(selectedCharacter.skills.maxParry, hero.parry + growth.parry);
         hero.stunChance = Math.min(GAME_RULES.probabilityScale, hero.stunChance + growth.stunChance);
 
+        hero.skillPoints = (Number(hero.skillPoints) || 0) + SKILL_POINTS_PER_LEVEL;
+
         playSound("levelUp");
         logMessage(t("levelUp", { level: hero.level }), "discovery");
+        logMessage(t("skillPointsGained", { amount: SKILL_POINTS_PER_LEVEL, total: hero.skillPoints }), "special");
     }
 }
 

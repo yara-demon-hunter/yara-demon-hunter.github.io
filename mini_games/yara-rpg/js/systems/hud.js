@@ -7,6 +7,18 @@ function updateUI() {
     document.getElementById('hero-name').innerText = hero.name;
     document.getElementById('hero-level').innerText = hero.level;
     document.getElementById('hero-gold').innerText = hero.gold;
+    // Pontos de Habilidade (verde) — fica à esquerda do ouro
+    const sp = Number(hero.skillPoints) || 0;
+    const spEl = document.getElementById('hero-skill-points');
+    if (spEl) {
+        spEl.innerText = sp;
+        const spBadge = document.getElementById('hero-skill-points-badge');
+        if (spBadge) {
+            spBadge.classList.toggle('has-points', sp > 0);
+            spBadge.classList.toggle('no-points', sp === 0);
+            spBadge.setAttribute('aria-label', t('skillPointsAria', { count: sp }));
+        }
+    }
     document.getElementById('hero-xp').innerText = hero.xp;
     document.getElementById('hero-xp-max').innerText = hero.maxXp;
     document.getElementById('hero-hp').innerText = hero.hp;
@@ -158,8 +170,10 @@ function updateUI() {
         const maximum = getMaxUpgradeQuantity(upgrade, upgradeConfiguration);
         const disabled = inCombat || gameOver || campaignComplete || maximum < 1 || isUpgradeMaxed(upgrade, upgradeConfiguration);
         button.disabled = disabled;
-        button.setAttribute('aria-label', t('upgradeAria', { skill, cost: UPGRADE_COST }));
-        button.title = t('upgradeAria', { skill, cost: UPGRADE_COST });
+        button.setAttribute('aria-label', t('upgradeAriaPoints', { skill, cost: UPGRADE_COST_PER_POINT }));
+        button.title = t('upgradeAriaPoints', { skill, cost: UPGRADE_COST_PER_POINT });
+        // Pinta o botão de verde quando tem pontos disponíveis
+        button.classList.toggle('has-skill-points', !disabled);
         button.setAttribute('aria-expanded', String(openUpgradeOptions === upgrade && !disabled));
 
         const options = document.querySelector(`[data-upgrade-options="${upgrade}"]`);

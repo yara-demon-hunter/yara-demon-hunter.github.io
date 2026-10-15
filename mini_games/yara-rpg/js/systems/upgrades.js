@@ -1,5 +1,6 @@
 // Upgrade purchase rules and upgrade menu controls.
 // Loaded before combat.js and game.js.
+// Agora os upgrades custam Pontos de Habilidade (skillPoints) - 1 ponto por nível de atributo.
 
 function isUpgradeMaxed(upgrade, overrideConfiguration = UPGRADE_CONFIG[upgrade]) {
     const configuration = overrideConfiguration;
@@ -12,16 +13,16 @@ function isUpgradeMaxed(upgrade, overrideConfiguration = UPGRADE_CONFIG[upgrade]
 
 function getMaxUpgradeQuantity(upgrade, overrideConfiguration = UPGRADE_CONFIG[upgrade]) {
     const configuration = overrideConfiguration;
-    if (!configuration || UPGRADE_COST <= 0) return 0;
+    if (!configuration || UPGRADE_COST_PER_POINT <= 0) return 0;
 
-    const affordableQuantity = Math.floor(hero.gold / UPGRADE_COST);
-    if (configuration.max === undefined) return affordableQuantity;
+    const availablePoints = Math.floor((Number(hero.skillPoints) || 0) / UPGRADE_COST_PER_POINT);
+    if (configuration.max === undefined) return availablePoints;
 
     const currentValue = configuration.isPercentage
         ? getEffectiveStat(configuration.stat)
         : hero[configuration.stat];
     const remaining = Math.max(0, configuration.max - currentValue);
-    return Math.min(affordableQuantity, Math.ceil(remaining / configuration.amount));
+    return Math.min(availablePoints, Math.ceil(remaining / configuration.amount));
 }
 
 function getUpgradeConfiguration(upgrade) {
@@ -75,11 +76,11 @@ function purchaseUpgrade(upgrade, requestedQuantity) {
                 ? getEffectiveStat(configuration.stat)
                 : hero[configuration.stat])
         );
-    const totalCost = quantity * UPGRADE_COST;
+    const totalCost = quantity * UPGRADE_COST_PER_POINT;
     const previousCurrentValue = configuration.currentStat
         ? hero[configuration.currentStat]
         : 0;
-    hero.gold -= totalCost;
+    hero.skillPoints = Math.max(0, (Number(hero.skillPoints) || 0) - totalCost);
     hero[configuration.stat] = configuration.max === undefined
         ? hero[configuration.stat] + amount
         : Math.min(configuration.max, hero[configuration.stat] + amount);
@@ -100,7 +101,7 @@ function purchaseUpgrade(upgrade, requestedQuantity) {
         })
         : '';
     closeUpgradeOptions();
-    logMessage(t('upgradeSuccess', {
+    logMessage(t('upgradeSuccessPoints', {
         skill,
         amount,
         unit: configuration.isPercentage ? '%' : '',
