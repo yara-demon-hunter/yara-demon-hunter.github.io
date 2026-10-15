@@ -140,7 +140,18 @@ window.YaraRpgCharacterSetup = (() => {
             const icon = document.createElement("span");
             icon.className = "starter-equipment-icon";
             icon.setAttribute("aria-hidden", "true");
-            icon.textContent = item.icon;
+            if (item.image) {
+                const image = document.createElement("img");
+                image.src = new URL(`../../${item.image}`, document.querySelector('script[src*="/systems/character-setup.js"]')?.src || window.location.href).href;
+                image.alt = "";
+                image.className = "equipment-icon-image";
+                image.addEventListener("error", () => {
+                    icon.textContent = item.icon;
+                }, { once: true });
+                icon.append(image);
+            } else {
+                icon.textContent = item.icon;
+            }
 
             const details = document.createElement("span");
             details.className = "starter-equipment-details";

@@ -30,6 +30,23 @@ document.getElementById('item-drop-dialog').addEventListener('cancel', (event) =
     keepPendingEquipment();
 });
 
+function setEquipmentIcon(element, item) {
+    element.replaceChildren();
+    if (item.image) {
+        const image = document.createElement('img');
+        image.src = new URL(`../../${item.image}`, document.querySelector('script[src*="/systems/equipment-ui.js"]')?.src || window.location.href).href;
+        image.alt = '';
+        image.className = 'equipment-icon-image';
+        image.setAttribute('aria-hidden', 'true');
+        image.addEventListener('error', () => {
+            element.textContent = item.icon;
+        }, { once: true });
+        element.append(image);
+        return;
+    }
+    element.textContent = item.icon;
+}
+
 function renderEquipment() {
     const slotsContainer = document.getElementById('equipment-slots');
     const bagButton = document.getElementById('open-equipment-bag-button');
@@ -74,7 +91,7 @@ function renderEquipment() {
 
             const itemIcon = document.createElement('span');
             itemIcon.className = `equipment-slot-icon ${getEquipmentRarityClass(item)}`;
-            itemIcon.textContent = item.icon;
+            setEquipmentIcon(itemIcon, item);
             itemIcon.setAttribute('aria-hidden', 'true');
             itemButton.append(itemIcon);
             itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'equipped', id));
@@ -139,7 +156,7 @@ function renderEquipment() {
             }));
             const itemIcon = document.createElement('span');
             itemIcon.className = `equipment-bag-item-icon ${getEquipmentRarityClass(item)}`;
-            itemIcon.textContent = item.icon;
+            setEquipmentIcon(itemIcon, item);
             itemIcon.setAttribute('aria-hidden', 'true');
             itemButton.append(itemIcon);
             itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'inventory'));
@@ -188,7 +205,7 @@ function showEquipmentItemDetails(item, source, slot = null) {
 }
 
 function renderEquipmentItemDetails(item, source, slot = null) {
-    document.getElementById('equipment-item-icon').textContent = item.icon;
+    setEquipmentIcon(document.getElementById('equipment-item-icon'), item);
     const itemTitle = document.getElementById('equipment-item-title');
     itemTitle.textContent = getEquipmentDisplayName(item);
     itemTitle.className = `text-lg font-bold ${getEquipmentRarityClass(item)}`;
@@ -343,14 +360,14 @@ function showEquipmentChoice(item, fromInventory) {
     pendingEquipment = { item, fromInventory };
     const currentItem = hero.equipment[item.slot];
     document.getElementById('item-drop-message').textContent = t('itemDropPrompt');
-    document.getElementById('item-drop-new-icon').textContent = item.icon;
+    setEquipmentIcon(document.getElementById('item-drop-new-icon'), item);
     const newItemName = document.getElementById('item-drop-new-name');
     newItemName.textContent = getEquipmentDisplayName(item);
     newItemName.className = `equipment-comparison-name ${getEquipmentRarityClass(item)}`;
     const newItemSlot = document.getElementById('item-drop-new-slot');
     newItemSlot.textContent = `${getEquipmentRarity(item).name[gameLanguage]} · ${t(item.slot)}`;
     newItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(item)}`;
-    document.getElementById('item-drop-current-icon').textContent = currentItem.icon;
+    setEquipmentIcon(document.getElementById('item-drop-current-icon'), currentItem);
     const currentItemName = document.getElementById('item-drop-current-name');
     currentItemName.textContent = getEquipmentDisplayName(currentItem);
     currentItemName.className = `equipment-comparison-name ${getEquipmentRarityClass(currentItem)}`;
