@@ -47,9 +47,17 @@ window.YaraRpgData.rules = Object.freeze({
         focoRecoveryPercent: 20
     },
     loot: {
-        equipmentDropChance: 20,
+        equipmentDropChance: 100,
         animalEventGoldMinimum: 25,
-        animalEventGoldRange: 26
+        animalEventGoldRange: 26,
+        rarityStatBonusPerLevel: 1,
+        equipmentRarities: [
+            { id: "common", upgradeLevel: 0, chance: 55, name: { pt: "Comum", en: "Common" } },
+            { id: "uncommon", upgradeLevel: 1, chance: 25, name: { pt: "Incomum", en: "Uncommon" } },
+            { id: "rare", upgradeLevel: 2, chance: 13, name: { pt: "Raro", en: "Rare" } },
+            { id: "epic", upgradeLevel: 3, chance: 5, name: { pt: "Épico", en: "Epic" } },
+            { id: "legendary", upgradeLevel: 4, chance: 2, name: { pt: "Lendário", en: "Legendary" } }
+        ]
     },
     combat: {
         enemyTelegraphDamageMultiplier: 1.65,

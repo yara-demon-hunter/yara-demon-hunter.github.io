@@ -215,6 +215,45 @@
     border-radius: 11px;
     background: rgba(12, 13, 15, 0.72);
 }
+.equipment-rarity-common { color: #d1d5db; }
+.equipment-rarity-uncommon { color: #4ade80; }
+.equipment-rarity-rare { color: #60a5fa; }
+.equipment-rarity-epic { color: #c084fc; }
+.equipment-rarity-legendary { color: #fb923c; }
+.equipment-bag-slot.equipment-rarity-common,
+.equipment-slot.equipment-rarity-common { border-color: rgba(156, 163, 175, 0.55); }
+.equipment-bag-slot.equipment-rarity-uncommon,
+.equipment-slot.equipment-rarity-uncommon { border-color: rgba(74, 222, 128, 0.65); }
+.equipment-bag-slot.equipment-rarity-rare,
+.equipment-slot.equipment-rarity-rare { border-color: rgba(96, 165, 250, 0.75); }
+.equipment-bag-slot.equipment-rarity-epic,
+.equipment-slot.equipment-rarity-epic { border-color: rgba(192, 132, 252, 0.8); }
+.equipment-bag-slot.equipment-rarity-legendary,
+.equipment-slot.equipment-rarity-legendary { border-color: rgba(251, 146, 60, 0.85); }
+.equipment-rarity-badge {
+    position: absolute;
+    right: 6px;
+    bottom: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    line-height: 1;
+    pointer-events: none;
+}
+.equipment-comparison-name.equipment-rarity-common,
+.equipment-comparison-slot.equipment-rarity-common,
+#equipment-item-title.equipment-rarity-common { color: #d1d5db; }
+.equipment-comparison-name.equipment-rarity-uncommon,
+.equipment-comparison-slot.equipment-rarity-uncommon,
+#equipment-item-title.equipment-rarity-uncommon { color: #4ade80; }
+.equipment-comparison-name.equipment-rarity-rare,
+.equipment-comparison-slot.equipment-rarity-rare,
+#equipment-item-title.equipment-rarity-rare { color: #60a5fa; }
+.equipment-comparison-name.equipment-rarity-epic,
+.equipment-comparison-slot.equipment-rarity-epic,
+#equipment-item-title.equipment-rarity-epic { color: #c084fc; }
+.equipment-comparison-name.equipment-rarity-legendary,
+.equipment-comparison-slot.equipment-rarity-legendary,
+#equipment-item-title.equipment-rarity-legendary { color: #fb923c; }
 .equipment-bag-slot:not(.has-item) {
     min-height: 78px;
     align-items: center;
@@ -382,6 +421,7 @@
     gap: 0.4rem;
 }
 .equipment-slot {
+    position: relative;
     min-width: 0;
     min-height: 2.75rem;
     display: flex;
@@ -429,6 +469,15 @@
 .equipment-slot-placeholder {
     opacity: 0.45;
     filter: grayscale(1);
+}
+.equipment-slot-rarity-badge {
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    font-size: 0.6rem;
+    font-weight: 800;
+    line-height: 1;
+    pointer-events: none;
 }
 #quick-attack-button.fury-ready {
     background-color: #b45309;

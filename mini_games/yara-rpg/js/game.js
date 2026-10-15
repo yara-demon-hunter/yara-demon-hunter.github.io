@@ -505,7 +505,13 @@ function showContinueOption() {
 function hydrateItem(savedItem) {
     const catalogItem = ITEM_DATA.equipment.find((item) => item.id === savedItem?.id);
     if (!catalogItem) return savedItem;
-    return { ...catalogItem, ...savedItem, slot: catalogItem.slot };
+    return {
+        ...catalogItem,
+        ...savedItem,
+        slot: catalogItem.slot,
+        rarity: savedItem.rarity || 'common',
+        upgradeLevel: Number(savedItem.upgradeLevel) || 0
+    };
 }
 
 const EQUIPMENT_SLOTS = Object.freeze([
@@ -530,6 +536,47 @@ const EQUIPMENT_STAT_KEYS = Object.freeze({
     parry: "parryStat",
     stunChance: "stun"
 });
+
+function getEquipmentDisplayName(item) {
+    const level = Number(item.upgradeLevel) || 0;
+    return `${level > 0 ? `+${level} ` : ''}${item.name[gameLanguage]}`;
+}
+
+function getEquipmentRarityClass(item) {
+    return `equipment-rarity-${getEquipmentRarity(item).id}`;
+}
+
+function getEquipmentRarity(item) {
+    const rarities = GAME_RULES.loot.equipmentRarities;
+    return rarities.find((entry) => entry.id === item.rarity) || rarities[0];
+}
+
+function createEquipmentInstance(template, rarity = GAME_RULES.loot.equipmentRarities[0]) {
+    const upgradeLevel = rarity.upgradeLevel;
+    const statBonus = upgradeLevel * GAME_RULES.loot.rarityStatBonusPerLevel;
+    const stats = Object.fromEntries(Object.entries(template.stats).map(([stat, amount]) => [
+        stat,
+        amount + statBonus
+    ]));
+    return {
+        ...template,
+        name: { ...template.name },
+        stats,
+        rarity: rarity.id,
+        upgradeLevel,
+        instanceId: ++equipmentInstanceId
+    };
+}
+
+function rollEquipmentRarity() {
+    const rarities = GAME_RULES.loot.equipmentRarities;
+    const totalChance = rarities.reduce((total, rarity) => total + rarity.chance, 0);
+    let remainingRoll = Math.random() * totalChance;
+    return rarities.find((rarity) => {
+        remainingRoll -= rarity.chance;
+        return remainingRoll < 0;
+    }) || rarities[0];
+}
 
 function getEquipmentBonus(stat) {
     return Object.values(hero.equipment).reduce(
@@ -763,23 +810,28 @@ function renderEquipment() {
         const slot = document.createElement('div');
         slot.className = `equipment-slot equipment-slot-${id} rounded-lg border border-fantasy-border/50 bg-forest-950/60`;
         slot.setAttribute('role', 'group');
-        slot.setAttribute('aria-label', `${t(id)}: ${item ? item.name[gameLanguage] : t('emptySlot')}`);
+        slot.setAttribute('aria-label', `${t(id)}: ${item ? getEquipmentDisplayName(item) : t('emptySlot')}`);
+        if (item) slot.classList.add(getEquipmentRarityClass(item));
 
         if (item) {
             const itemButton = document.createElement('button');
             itemButton.type = 'button';
             itemButton.className = 'equipment-slot-item';
             itemButton.setAttribute('aria-label', t('viewEquipmentDetails', {
-                item: item.name[gameLanguage]
+                item: getEquipmentDisplayName(item)
             }));
 
             const itemIcon = document.createElement('span');
-            itemIcon.className = 'equipment-slot-icon text-amber-200';
+            itemIcon.className = `equipment-slot-icon ${getEquipmentRarityClass(item)}`;
             itemIcon.textContent = item.icon;
             itemIcon.setAttribute('aria-hidden', 'true');
             itemButton.append(itemIcon);
             itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'equipped', id));
-            slot.append(itemButton);
+            const rarityBadge = document.createElement('span');
+            rarityBadge.className = `equipment-slot-rarity-badge ${getEquipmentRarityClass(item)}`;
+            rarityBadge.textContent = item.upgradeLevel > 0 ? `+${item.upgradeLevel}` : '•';
+            rarityBadge.setAttribute('aria-hidden', 'true');
+            slot.append(itemButton, rarityBadge);
         } else {
             const placeholder = document.createElement('span');
             placeholder.className = 'equipment-slot-icon equipment-slot-placeholder';
@@ -802,10 +854,10 @@ function renderEquipment() {
     for (let index = 0; index < EQUIPMENT_BAG_CAPACITY; index++) {
         const item = hero.equipmentInventory[index];
         const slot = document.createElement('div');
-        slot.className = `equipment-bag-slot${item ? ' has-item' : ''}`;
+        slot.className = `equipment-bag-slot${item ? ` has-item ${getEquipmentRarityClass(item)}` : ''}`;
         slot.setAttribute('role', 'listitem');
         slot.setAttribute('aria-label', item
-            ? `${t('bagSlot', { slot: index + 1 })}: ${item.name[gameLanguage]}`
+            ? `${t('bagSlot', { slot: index + 1 })}: ${getEquipmentDisplayName(item)}`
             : `${t('bagSlot', { slot: index + 1 })}: ${t('emptyBagSlot')}`);
 
         const position = document.createElement('span');
@@ -819,7 +871,7 @@ function renderEquipment() {
             selectItem.checked = selectedInventoryItems.has(item);
             selectItem.disabled = inCombat || gameOver;
             selectItem.setAttribute('aria-label', t('selectInventoryItem', {
-                item: item.name[gameLanguage]
+                item: getEquipmentDisplayName(item)
             }));
             selectItem.addEventListener('change', () => {
                 if (selectItem.checked) selectedInventoryItems.add(item);
@@ -831,15 +883,19 @@ function renderEquipment() {
             itemButton.type = 'button';
             itemButton.className = 'equipment-bag-item';
             itemButton.setAttribute('aria-label', t('viewEquipmentDetails', {
-                item: item.name[gameLanguage]
+                item: getEquipmentDisplayName(item)
             }));
             const itemIcon = document.createElement('span');
-            itemIcon.className = 'equipment-bag-item-icon';
+            itemIcon.className = `equipment-bag-item-icon ${getEquipmentRarityClass(item)}`;
             itemIcon.textContent = item.icon;
             itemIcon.setAttribute('aria-hidden', 'true');
             itemButton.append(itemIcon);
             itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'inventory'));
-            slot.append(position, selectItem, itemButton);
+            const rarityBadge = document.createElement('span');
+            rarityBadge.className = `equipment-rarity-badge ${getEquipmentRarityClass(item)}`;
+            rarityBadge.textContent = item.upgradeLevel > 0 ? `+${item.upgradeLevel}` : '•';
+            rarityBadge.setAttribute('aria-hidden', 'true');
+            slot.append(position, selectItem, itemButton, rarityBadge);
         } else {
             const empty = document.createElement('span');
             empty.className = 'equipment-bag-empty';
@@ -860,7 +916,7 @@ function renderEquipment() {
     pendingLabel.hidden = !isPendingDropBlocked();
     if (!pendingLabel.hidden) {
         pendingLabel.textContent = t('pendingEquipment', {
-            item: pendingEquipment.item.name[gameLanguage]
+            item: getEquipmentDisplayName(pendingEquipment.item)
         });
     }
 }
@@ -876,8 +932,13 @@ function openEquipmentBag() {
 function showEquipmentItemDetails(item, source, slot = null) {
     selectedEquipmentDetails = { item, source, slot };
     document.getElementById('equipment-item-icon').textContent = item.icon;
-    document.getElementById('equipment-item-title').textContent = item.name[gameLanguage];
-    document.getElementById('equipment-item-slot').textContent = t(item.slot);
+    const itemTitle = document.getElementById('equipment-item-title');
+    itemTitle.textContent = getEquipmentDisplayName(item);
+    itemTitle.className = `text-lg font-bold ${getEquipmentRarityClass(item)}`;
+    const rarity = getEquipmentRarity(item);
+    const itemSlot = document.getElementById('equipment-item-slot');
+    itemSlot.textContent = `${rarity.name[gameLanguage]} · ${t(item.slot)}`;
+    itemSlot.className = `mt-1 text-xs ${getEquipmentRarityClass(item)}`;
 
     const properties = document.getElementById('equipment-item-properties');
     properties.replaceChildren();
@@ -899,20 +960,20 @@ function showEquipmentItemDetails(item, source, slot = null) {
     equipButton.hidden = !isInventoryItem;
     equipButton.disabled = inCombat || gameOver || Boolean(pendingEquipment);
     equipButton.setAttribute('aria-label', t('equipItemAria', {
-        item: item.name[gameLanguage],
+        item: getEquipmentDisplayName(item),
         slot: t(item.slot)
     }));
     unequipButton.hidden = isInventoryItem;
     unequipButton.disabled = inCombat || gameOver || Boolean(pendingEquipment)
         || hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY;
     unequipButton.setAttribute('aria-label', t('unequipItemAria', {
-        item: item.name[gameLanguage],
+        item: getEquipmentDisplayName(item),
         slot: t(item.slot)
     }));
     discardButton.hidden = !isInventoryItem;
     discardButton.disabled = inCombat || gameOver;
     discardButton.setAttribute('aria-label', t('discardItemAria', {
-        item: item.name[gameLanguage]
+        item: getEquipmentDisplayName(item)
     }));
     document.getElementById('equipment-item-dialog').showModal();
 }
@@ -953,7 +1014,7 @@ function discardInventoryItem(item) {
     if (inventoryIndex === -1 || inCombat || gameOver) return;
     hero.equipmentInventory.splice(inventoryIndex, 1);
     selectedInventoryItems.delete(item);
-    logMessage(t('itemDiscarded', { item: item.name[gameLanguage] }), 'loot');
+    logMessage(t('itemDiscarded', { item: getEquipmentDisplayName(item) }), 'loot');
     updateUI();
     if (pendingEquipment && !pendingEquipment.fromInventory) {
         document.getElementById('equipment-bag-dialog').close();
@@ -996,11 +1057,19 @@ function showEquipmentChoice(item, fromInventory) {
     const currentItem = hero.equipment[item.slot];
     document.getElementById('item-drop-message').textContent = t('itemDropPrompt');
     document.getElementById('item-drop-new-icon').textContent = item.icon;
-    document.getElementById('item-drop-new-name').textContent = item.name[gameLanguage];
-    document.getElementById('item-drop-new-slot').textContent = t(item.slot);
+    const newItemName = document.getElementById('item-drop-new-name');
+    newItemName.textContent = getEquipmentDisplayName(item);
+    newItemName.className = `equipment-comparison-name ${getEquipmentRarityClass(item)}`;
+    const newItemSlot = document.getElementById('item-drop-new-slot');
+    newItemSlot.textContent = `${getEquipmentRarity(item).name[gameLanguage]} · ${t(item.slot)}`;
+    newItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(item)}`;
     document.getElementById('item-drop-current-icon').textContent = currentItem.icon;
-    document.getElementById('item-drop-current-name').textContent = currentItem.name[gameLanguage];
-    document.getElementById('item-drop-current-slot').textContent = t(currentItem.slot);
+    const currentItemName = document.getElementById('item-drop-current-name');
+    currentItemName.textContent = getEquipmentDisplayName(currentItem);
+    currentItemName.className = `equipment-comparison-name ${getEquipmentRarityClass(currentItem)}`;
+    const currentItemSlot = document.getElementById('item-drop-current-slot');
+    currentItemSlot.textContent = `${getEquipmentRarity(currentItem).name[gameLanguage]} · ${t(currentItem.slot)}`;
+    currentItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(currentItem)}`;
     renderEquipmentBonuses(document.getElementById('item-drop-new-bonuses'), item);
     renderEquipmentBonuses(document.getElementById('item-drop-current-bonuses'), currentItem);
     const blockedByFullBag = isPendingDropBlocked();
@@ -1047,7 +1116,7 @@ function isPendingDropBlocked() {
 
 function handleEquipmentDrop(item) {
     logMessage(t('itemFound', {
-        item: item.name[gameLanguage],
+        item: getEquipmentDisplayName(item),
         slot: t(item.slot)
     }), 'loot');
     if (hero.equipment[item.slot]) {
@@ -1068,12 +1137,7 @@ function createEquipmentDrop() {
     }
 
     const template = equipment[Math.floor(Math.random() * equipment.length)];
-    return {
-        ...template,
-        name: { ...template.name },
-        stats: { ...template.stats },
-        instanceId: ++equipmentInstanceId
-    };
+    return createEquipmentInstance(template, rollEquipmentRarity());
 }
 
 function equipItem(item, fromInventory) {
@@ -1094,13 +1158,13 @@ function equipItem(item, fromInventory) {
     }
     if (previousItem) {
         hero.equipmentInventory.push(previousItem);
-        logMessage(t('itemStored', { item: previousItem.name[gameLanguage] }), 'loot');
+        logMessage(t('itemStored', { item: getEquipmentDisplayName(previousItem) }), 'loot');
     }
     hero.equipment[item.slot] = item;
     hero.hp = Math.min(hero.hp, getEffectiveStat('maxHp'));
     hero.foco = Math.min(hero.foco, getEffectiveStat('maxFoco'));
     logMessage(t('itemEquipped', {
-        item: item.name[gameLanguage],
+        item: getEquipmentDisplayName(item),
         slot: t(item.slot)
     }), 'special');
     updateUI();
@@ -1128,7 +1192,7 @@ function unequipItem(slot) {
     hero.equipmentInventory.push(item);
     hero.hp = Math.min(hero.hp, getEffectiveStat('maxHp'));
     hero.foco = Math.min(hero.foco, getEffectiveStat('maxFoco'));
-    logMessage(t('itemStored', { item: item.name[gameLanguage] }), 'loot');
+    logMessage(t('itemStored', { item: getEquipmentDisplayName(item) }), 'loot');
     updateUI();
 }
 
@@ -1152,7 +1216,7 @@ function keepPendingEquipment() {
     document.getElementById('item-drop-dialog').close();
     if (!fromInventory) {
         hero.equipmentInventory.push(item);
-        logMessage(t('itemStored', { item: item.name[gameLanguage] }), 'loot');
+        logMessage(t('itemStored', { item: getEquipmentDisplayName(item) }), 'loot');
     }
     updateUI();
 }
@@ -1541,12 +1605,7 @@ function resolveStoryEvent(choiceIndex) {
             logMessage(t('denseMist'));
         } else {
             logMessage(t('eventAnimalPet', { animal: petTemplate.name[gameLanguage] }), 'special');
-            handleEquipmentDrop({
-                ...petTemplate,
-                name: { ...petTemplate.name },
-                stats: { ...petTemplate.stats },
-                instanceId: ++equipmentInstanceId
-            });
+            handleEquipmentDrop(createEquipmentInstance(petTemplate, rollEquipmentRarity()));
         }
     } else if (effect === 'loot') {
         const gold = 35 + Math.floor(Math.random() * 26); hero.gold += gold;
