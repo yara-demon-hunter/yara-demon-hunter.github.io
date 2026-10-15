@@ -12,11 +12,11 @@ const BASE_CHARACTER_STATS = Object.freeze({
     atk: 10,
     def: 5,
     evasion: 5,
-    parry: 10,
+    parry: 5,
     stunChance: 5,
     fury: 0,
     maxFury: 100,
-    gold: 200,
+    gold: 100,
     // fallback: se progression-rules.js não carregou ainda, começa com 3
     skillPoints: (window.YaraRpgData?.rules?.progression?.startingSkillPoints ?? 3),
     xp: 0,
@@ -67,9 +67,9 @@ window.YaraRpgData.characters = Object.freeze([
             en: "A relentless hunter who prefers to end a fight with a powerful blow."
         },
         specialty: {
-            atk: 10,
-            def: 5,
-            parry: 15
+            atk: 5,
+            def: 2,
+            parry: 10
         },
         // Ajuste estes valores para definir como Oskar evolui a cada nível.
         levelUp: {

@@ -3,7 +3,7 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
     progression: {
         xpRequirementMultiplier: 1.5,
         startingSkillPoints: 3,
-        skillPointsPerLevel: 3
+        skillPointsPerLevel: 1
     },
     upgrades: {
         // Legado: goldCost mantido apenas para referência; upgrades agora custam skillPoints.
