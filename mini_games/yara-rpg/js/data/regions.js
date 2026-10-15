@@ -139,11 +139,11 @@ window.YaraRpgData.regions = Object.freeze([
         },
         event: [
             {
-                title: { pt: "O sino sob as muralhas", en: "The bell beneath the walls" },
-                description: { pt: "O sino está preso às raízes de uma criatura de pedra. O último confronto se aproxima.", en: "The bell is bound to the roots of a stone creature. The final clash is near." },
+                title: { pt: "O guardião de pedra", en: "The stone guardian" },
+                description: { pt: "Uma criatura de pedra protege a passagem. Você pode recuperar as forças antes de avançar ou enfrentá-la agora.", en: "A stone creature guards the passage. You can recover your strength before moving on or face it now." },
                 choices: [
                     { label: { pt: "Preparar-se (+HP e foco)", en: "Prepare (+HP and focus)" }, effect: "heal" },
-                    { label: { pt: "Desafiar o Guardião", en: "Challenge the Keeper" }, effect: "boss" }
+                    { label: { pt: "Enfrentar a criatura", en: "Face the creature" }, effect: "combat" }
                 ]
             },
             {

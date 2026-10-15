@@ -37,16 +37,14 @@ const translations = {
         continueAdventure: "Continuar jornada salva",
         storyEventKicker: "Escolha seu caminho",
         enemyTelegraph: "⚠️ {monster} prepara um golpe devastador!",
-        finalBossChallenge: "O Guardião do Sino desperta para o confronto final!",
-        campaignVictoryTitle: "A Regra do Sino foi quebrada",
-        campaignVictoryDescription: "O Guardião cai, o sino silencia e a névoa começa a recuar. Por esta noite, a floresta está livre.",
+        campaignVictoryTitle: "Jornada concluída",
+        campaignVictoryDescription: "Você superou os desafios da floresta. A jornada termina aqui — por enquanto.",
         campaignDefeatTitle: "A névoa venceu esta vez",
         campaignDefeatDescription: "A floresta ainda guarda seu sino. Reúna forças e tente outra vez.",
         eventLoot: "Você encontra provisões e {gold} moedas.",
         eventHeal: "Você recupera {hp} HP e {focus} de Foco.",
         eventGold: "A troca rende {gold} moedas, mas custa {hp} HP.",
         eventPower: "O fragmento fortalece seu ataque em {amount}.",
-        eventBoss: "O Guardião do Sino desperta!",
         eventRiverCrossing: "🌊 Você atravessa a correnteza e encontra {gold} moedas presas entre as pedras, mas perde {hp} HP.",
         eventRiverbank: "🌿 Seguindo pela margem, você encontra uma trilha segura e recupera {hp} HP e {focus} de Foco.",
         eventPotion: "🧪 Você encontra uma poção escondida. Poções: {potions}/{capacity}.",
@@ -246,16 +244,14 @@ const translations = {
         continueAdventure: "Continue saved journey",
         storyEventKicker: "Choose your path",
         enemyTelegraph: "⚠️ {monster} is preparing a devastating strike!",
-        finalBossChallenge: "The Bell Keeper awakens for the final battle!",
-        campaignVictoryTitle: "The Bell's Rule is broken",
-        campaignVictoryDescription: "The Keeper falls, the bell falls silent, and the mist begins to retreat. For tonight, the forest is free.",
+        campaignVictoryTitle: "Journey complete",
+        campaignVictoryDescription: "You have overcome the forest's challenges. The journey ends here — for now.",
         campaignDefeatTitle: "The mist won this time",
         campaignDefeatDescription: "The forest still guards its bell. Gather your strength and try again.",
         eventLoot: "You find supplies and {gold} coins.",
         eventHeal: "You recover {hp} HP and {focus} Focus.",
         eventGold: "The trade earns {gold} coins but costs {hp} HP.",
         eventPower: "The shard strengthens your attack by {amount}.",
-        eventBoss: "The Bell Keeper awakens!",
         eventRiverCrossing: "🌊 You cross the current and find {gold} coins caught between the stones, but lose {hp} HP.",
         eventRiverbank: "🌿 Following the riverbank, you find a safe trail and recover {hp} HP and {focus} Focus.",
         eventPotion: "🧪 You find a hidden potion. Potions: {potions}/{capacity}.",
@@ -1577,9 +1573,6 @@ function resolveStoryEvent(choiceIndex) {
         logMessage(t('eventCastleCache', { gold }), 'loot');
     } else if (effect === 'combat') {
         spawnMonster(); return;
-    } else if (effect === 'boss') {
-        const boss = MIST_CONTACT_DATA.bosses.find((entry) => entry.id === 'bell-keeper-final');
-        logMessage(t('eventBoss'), 'combat-monster'); spawnMonster(boss); return;
     }
     updateUI();
 }
@@ -1610,7 +1603,6 @@ function spawnMonster(templateOverride = null) {
     const regionMonsters = GAME_DATA.monsters.byRegion[regionId];
     const template = templateOverride ?? regionMonsters[Math.floor(Math.random() * regionMonsters.length)];
     const isMistBoss = Boolean(templateOverride);
-    const isFinalBoss = templateOverride?.id === 'bell-keeper-final';
     const variationRules = isMistBoss
         ? GAME_RULES.mistContacts.bossVariation
         : GAME_DATA.monsters.variation;
@@ -1644,7 +1636,6 @@ function spawnMonster(templateOverride = null) {
         xpReward: vary(template.xpReward),
         goldReward: vary(template.goldReward),
         id: template.id || null,
-        isFinalBoss,
         isBoss: isMistBoss
     };
 
@@ -1672,14 +1663,6 @@ function spawnMonster(templateOverride = null) {
     }), "combat-monster");
     updateUI();
     setCombatMusic(true);
-    if (currentRegion === GAME_DATA.regions.length - 1 && !storyEventSeen.has('final-boss-triggered')) {
-        storyEventSeen.add('final-boss-triggered');
-        if (inCombat && currentMonster && !currentMonster.isFinalBoss) {
-            const boss = MIST_CONTACT_DATA.bosses.find((entry) => entry.id === 'bell-keeper-final');
-            logMessage(t('finalBossChallenge'), 'combat-monster');
-            spawnMonster(boss);
-        }
-    }
 }
 
 function acceptMistContact() {
@@ -2220,7 +2203,6 @@ function combatRun() {
 
 function endCombatVictory() {
     if (!inCombat || !currentMonster || currentMonster.hp > 0) return;
-    const defeatedFinalBoss = Boolean(currentMonster?.isFinalBoss);
     logMessage(t("victory", { monster: currentMonster.name }), "discovery");
     logMessage(t("rewards", { xp: currentMonster.xpReward, gold: currentMonster.goldReward }), "loot");
 
@@ -2238,12 +2220,6 @@ function endCombatVictory() {
 
     checkLevelUp();
     if (equipmentDrop) handleEquipmentDrop(equipmentDrop);
-    if (defeatedFinalBoss) {
-        campaignComplete = true;
-        gameOver = true;
-        try { localStorage.removeItem(SAVE_KEY); } catch {}
-        playSound('levelUp');
-    }
     document.getElementById('rpg-log').dataset.combat = 'false';
     updateUI();
 }
