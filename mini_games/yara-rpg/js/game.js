@@ -75,6 +75,10 @@ const translations = {
         discard: "Descartar",
         discardItemAria: "Descartar {item} da mochila",
         itemDiscarded: "🗑️ {item} descartado.",
+        itemsDiscarded: "🗑️ {count} itens descartados da mochila.",
+        selectedItemsCount: "{count} selecionados",
+        discardSelectedItems: "Descartar selecionados",
+        selectInventoryItem: "Selecionar {item} para descartar",
         inventoryFull: "Mochila cheia (10/10). Libere um espaço antes de guardar outro equipamento.",
         pendingEquipment: "Equipamento encontrado aguardando espaço: {item}.",
         pendingEquipmentFullHelp: "A mochila está cheia. Descarte um item para liberar espaço; o item encontrado ficará aguardando.",
@@ -278,6 +282,10 @@ const translations = {
         discard: "Discard",
         discardItemAria: "Discard {item} from the bag",
         itemDiscarded: "🗑️ {item} discarded.",
+        itemsDiscarded: "🗑️ {count} items discarded from your bag.",
+        selectedItemsCount: "{count} selected",
+        discardSelectedItems: "Discard selected",
+        selectInventoryItem: "Select {item} to discard",
         inventoryFull: "Bag full (10/10). Free a slot before storing another item.",
         pendingEquipment: "Found equipment waiting for space: {item}.",
         pendingEquipmentFullHelp: "The bag is full. Discard an item to free a slot; the found item will remain here.",
@@ -455,6 +463,7 @@ function loadSavedGame(snapshot = readSavedGame()) {
     ]));
     hero.equipmentInventory = Array.isArray(snapshot.hero?.equipmentInventory)
         ? snapshot.hero.equipmentInventory.map(hydrateItem) : [];
+    selectedInventoryItems.clear();
     currentRegion = Math.max(0, Math.min(GAME_DATA.regions.length - 1, Number(snapshot.currentRegion) || 0));
     discoveredRegions = Array.isArray(snapshot.discoveredRegions) ? snapshot.discoveredRegions : [0];
     explorationsSinceMistContact = Number(snapshot.explorationsSinceMistContact) || 0;
@@ -678,6 +687,7 @@ let openUpgradeOptions = null;
 let pendingMistContact = null;
 let pendingEquipment = null;
 let selectedEquipmentDetails = null;
+const selectedInventoryItems = new Set();
 let equipmentInstanceId = 0;
 let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
 let pendingStoryEvent = null;
@@ -705,6 +715,7 @@ document.getElementById('keep-current-item-button').addEventListener('click', ke
 document.getElementById('open-equipment-bag-button').addEventListener('click', openEquipmentBag);
 document.getElementById('open-bag-from-drop-button').addEventListener('click', openEquipmentBag);
 document.getElementById('close-equipment-bag-button').addEventListener('click', closeEquipmentBag);
+document.getElementById('discard-selected-items-button').addEventListener('click', discardSelectedInventoryItems);
 document.getElementById('close-equipment-item-button').addEventListener('click', closeEquipmentItemDetails);
 document.getElementById('equipment-item-equip-button').addEventListener('click', equipSelectedInventoryItem);
 document.getElementById('equipment-item-unequip-button').addEventListener('click', unequipSelectedEquipment);
@@ -799,6 +810,20 @@ function renderEquipment() {
         position.textContent = String(index + 1).padStart(2, '0');
 
         if (item) {
+            const selectItem = document.createElement('input');
+            selectItem.type = 'checkbox';
+            selectItem.className = 'equipment-bag-select';
+            selectItem.checked = selectedInventoryItems.has(item);
+            selectItem.disabled = inCombat || gameOver;
+            selectItem.setAttribute('aria-label', t('selectInventoryItem', {
+                item: item.name[gameLanguage]
+            }));
+            selectItem.addEventListener('change', () => {
+                if (selectItem.checked) selectedInventoryItems.add(item);
+                else selectedInventoryItems.delete(item);
+                updateBulkDiscardControls();
+            });
+
             const itemButton = document.createElement('button');
             itemButton.type = 'button';
             itemButton.className = 'equipment-bag-item';
@@ -811,7 +836,7 @@ function renderEquipment() {
             itemIcon.setAttribute('aria-hidden', 'true');
             itemButton.append(itemIcon);
             itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'inventory'));
-            slot.append(position, itemButton);
+            slot.append(position, selectItem, itemButton);
         } else {
             const empty = document.createElement('span');
             empty.className = 'equipment-bag-empty';
@@ -827,6 +852,7 @@ function renderEquipment() {
         'aria-label',
         t('bagCapacity', { count: bagCount })
     );
+    updateBulkDiscardControls();
     const pendingLabel = document.getElementById('equipment-bag-pending-item');
     pendingLabel.hidden = !isPendingDropBlocked();
     if (!pendingLabel.hidden) {
@@ -923,9 +949,40 @@ function discardInventoryItem(item) {
     const inventoryIndex = hero.equipmentInventory.indexOf(item);
     if (inventoryIndex === -1 || inCombat || gameOver) return;
     hero.equipmentInventory.splice(inventoryIndex, 1);
+    selectedInventoryItems.delete(item);
     logMessage(t('itemDiscarded', { item: item.name[gameLanguage] }), 'loot');
     updateUI();
     if (pendingEquipment && !pendingEquipment.fromInventory) {
+        document.getElementById('equipment-bag-dialog').close();
+        showEquipmentChoice(pendingEquipment.item, false);
+    }
+}
+
+function updateBulkDiscardControls() {
+    const selectedCount = [...selectedInventoryItems]
+        .filter((item) => hero.equipmentInventory.includes(item)).length;
+    document.getElementById('equipment-bag-selected-count').textContent =
+        t('selectedItemsCount', { count: selectedCount });
+    const discardButton = document.getElementById('discard-selected-items-button');
+    discardButton.textContent = t('discardSelectedItems');
+    discardButton.disabled = selectedCount === 0 || inCombat || gameOver;
+}
+
+function discardSelectedInventoryItems() {
+    if (inCombat || gameOver) return;
+    const selectedItems = hero.equipmentInventory.filter((item) => selectedInventoryItems.has(item));
+    if (!selectedItems.length) {
+        selectedInventoryItems.clear();
+        updateBulkDiscardControls();
+        return;
+    }
+    const hasWaitingDrop = Boolean(pendingEquipment && !pendingEquipment.fromInventory);
+    hero.equipmentInventory = hero.equipmentInventory.filter((item) => !selectedInventoryItems.has(item));
+    selectedInventoryItems.clear();
+    logMessage(t('itemsDiscarded', { count: selectedItems.length }), 'loot');
+    updateUI();
+
+    if (hasWaitingDrop && !isPendingDropBlocked()) {
         document.getElementById('equipment-bag-dialog').close();
         showEquipmentChoice(pendingEquipment.item, false);
     }
@@ -1022,6 +1079,7 @@ function equipItem(item, fromInventory) {
         inventoryIndex = hero.equipmentInventory.indexOf(item);
         if (inventoryIndex === -1) return;
         hero.equipmentInventory.splice(inventoryIndex, 1);
+        selectedInventoryItems.delete(item);
     }
 
     const previousItem = hero.equipment[item.slot];
@@ -2198,6 +2256,7 @@ function startAdventure({ character, equipment }) {
     currentRegion = 0; discoveredRegions = [0];
     inCombat = false; currentMonster = null; gameOver = false; campaignComplete = false;
     pendingMistContact = null; pendingEquipment = null; pendingStoryEvent = null;
+    selectedInventoryItems.clear();
     storyEventSeen.clear(); seenStoryEvents.clear(); explorationCount = 0;
     explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
     Object.assign(hero, character.baseStats, {

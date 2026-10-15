@@ -225,9 +225,51 @@
 .equipment-bag-slot-number {
     position: absolute;
     top: 5px;
-    right: 7px;
+    left: 7px;
     color: #77746e;
     font-size: 0.58rem;
+}
+.equipment-bag-select {
+    position: absolute;
+    z-index: 2;
+    top: 5px;
+    right: 6px;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    appearance: none;
+    border: 1px solid #66666b;
+    border-radius: 4px;
+    background: #292a2e;
+    cursor: pointer;
+}
+.equipment-bag-select:checked {
+    border-color: #a8883c;
+    background-color: #9a772e;
+    background-image: linear-gradient(45deg, transparent 44%, #f1e7cb 44%, #f1e7cb 56%, transparent 56%), linear-gradient(-45deg, transparent 42%, #f1e7cb 42%, #f1e7cb 54%, transparent 54%);
+}
+.equipment-bag-select:focus-visible {
+    outline: 2px solid #b9a46f;
+    outline-offset: 2px;
+}
+.equipment-bag-select:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+.equipment-bag-bulk-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+.equipment-bag-selected-count {
+    color: #c9c5bb;
+    font-size: 0.72rem;
+}
+.equipment-bag-bulk-actions .equipment-bag-action {
+    width: auto;
+    padding-inline: 0.75rem;
 }
 .equipment-bag-item,
 .equipment-slot-item {
