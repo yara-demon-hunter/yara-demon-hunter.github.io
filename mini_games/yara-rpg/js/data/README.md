@@ -6,11 +6,12 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `items.js`: poção de cura e catálogo de equipamentos que podem cair dos monstros.
 - `regions.js`: IDs, títulos, descrições e eventos com escolhas por região em português e inglês. Cada região pode ter vários eventos; eles aparecem sem repetição até o conjunto se esgotar.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.
-- `mist-contacts.js`: contatos com ícones e ofertas próprias, chefes especiais e poderes permanentes dos encontros na névoa.
+- `special-monsters.js`: atributos, nível mínimo e recompensas dos chefes e monstros especiais usados em eventos.
+- `mist-contacts.js`: contatos com ícones e ofertas próprias, além dos poderes permanentes dos encontros na névoa. Missões podem referenciar monstros por `bossId`.
 - `game-rules.js`: custos de ações, limites, fúria, chances de exploração, pesos dos resultados e melhorias compradas.
 - `setup-config.js`: quantidade de equipamentos iniciais escolhidos antes da aventura; ajuste `starterEquipmentCount` para mudar o limite.
 
-A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`. Para ajustar o ritmo, edite `mistContacts` em `game-rules.js`; para adicionar conteúdo, inclua contatos, chefes ou poderes em `mist-contacts.js`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos.
+A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`. Para ajustar o ritmo, edite `mistContacts` em `game-rules.js`; adicione contatos e poderes em `mist-contacts.js` e chefes em `special-monsters.js`. Contatos que iniciam uma missão podem apontar para o `id` de um chefe por `bossId`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos.
 
 A lógica da tela inicial e a seleção dos equipamentos ficam em `../systems/character-setup.js`. O limite de escolhas vem de `setup-config.js`. Os eventos narrativos são declarados em cada região e executados por `resolveStoryEvent` em `game.js`. Os scripts de dados e sistemas precisam ser carregados antes de `game.js`, que inicia a aventura com as escolhas feitas.
 

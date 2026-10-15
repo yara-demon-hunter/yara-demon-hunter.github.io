@@ -645,6 +645,7 @@ const GAME_DATA = window.YaraRpgData;
 const GAME_RULES = GAME_DATA.rules;
 const ITEM_DATA = GAME_DATA.items;
 const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
+const SPECIAL_MONSTERS = GAME_DATA.specialMonsters;
 let selectedCharacter = GAME_DATA.characters[0];
 let selectedCharacterProgression = selectedCharacter.levelUp;
 const MIST_CONTACT_SYSTEM = window.YaraMistContactSystem;
@@ -1673,7 +1674,7 @@ function acceptMistContact() {
     logMessage(t('mistContactAccepted', { contact: contact.name[gameLanguage] }), 'special');
 
     if (contact.onAccept?.type === 'boss') {
-        const missionBoss = MIST_CONTACT_DATA.bosses.find(
+        const missionBoss = SPECIAL_MONSTERS.find(
             (boss) => boss.id === contact.onAccept.bossId
         );
         if (!missionBoss) {
@@ -1702,7 +1703,7 @@ function acceptMistContact() {
         return;
     }
 
-    const boss = MIST_CONTACT_SYSTEM.chooseBoss(MIST_CONTACT_DATA.bosses, hero.level);
+    const boss = MIST_CONTACT_SYSTEM.chooseBoss(SPECIAL_MONSTERS, hero.level);
     const power = MIST_CONTACT_SYSTEM.choosePower(
         MIST_CONTACT_DATA.powers,
         hero.mistPowers,
