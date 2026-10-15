@@ -95,6 +95,7 @@ window.YaraRpgTranslations.en = {
         unequip: "Unequip",
         upgradeEquipmentButton: "Upgrade +{level} · {cost} 🪙",
         upgradeEquipmentMaxed: "Max level +{level}",
+        equipmentUpgradeAvailable: "Upgrade available",
         equipmentUpgradePurchased: "🔧 {item} upgraded to +{level} for {cost} gold.",
         abyssalChallengeAccepted: "⚔️ You accept the challenge. The Abyssal Herald advances to crush anyone who dares face it!",
         abyssalChallengeRetreat: "You withdraw from the rift and decide to prepare before facing the Herald.",

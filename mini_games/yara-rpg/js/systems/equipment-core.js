@@ -38,6 +38,21 @@ function getEquipmentUpgradeCost(item) {
     return Math.round(rules.baseCost * rules.costMultiplier ** level);
 }
 
+function canAffordEquipmentUpgrade(item) {
+    if (!item) return false;
+    const cost = getEquipmentUpgradeCost(item);
+    return cost !== null && (Number(hero.gold) || 0) >= cost;
+}
+
+function hasAffordableEquipmentUpgrade() {
+    try {
+        if (Object.values(hero.equipment).some((entry) => canAffordEquipmentUpgrade(entry))) return true;
+        return hero.equipmentInventory.some((entry) => canAffordEquipmentUpgrade(entry));
+    } catch {
+        return false;
+    }
+}
+
 function rollEquipmentRarity(allowedRarityIds = null) {
     const finalRegionIndex = GAME_DATA.regions.length - 1;
     const isFinalRegion = currentRegion === finalRegionIndex;

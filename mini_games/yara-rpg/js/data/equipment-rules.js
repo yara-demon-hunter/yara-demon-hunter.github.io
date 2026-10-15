@@ -2,18 +2,18 @@
 window.YaraRpgData = window.YaraRpgData || {};
 window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
     loot: {
-        equipmentDropChance: 35,
+        equipmentDropChance: 100,
         animalEventGoldMinimum: 25,
         animalEventGoldRange: 26,
         equipmentRarities: [
-            { id: "common", statBonus: 0, chance: 45, name: { pt: "Comum", en: "Common" } },
-            { id: "uncommon", statBonus: 1, chance: 30, name: { pt: "Incomum", en: "Uncommon" } },
-            { id: "rare", statBonus: 2, chance: 14, name: { pt: "Raro", en: "Rare" } },
-            { id: "super-rare", statBonus: 3, chance: 7, name: { pt: "Super Raro", en: "Super Rare" } },
-            { id: "epic", statBonus: 4, chance: 3, name: { pt: "Épico", en: "Epic" } },
-            { id: "legendary", statBonus: 5, chance: 0.8, name: { pt: "Lendário", en: "Legendary" } },
-            { id: "demon", statBonus: 6, chance: 0.18, name: { pt: "Demoníaco", en: "Demonic" } },
-            { id: "god", statBonus: 7, chance: 0.02, name: { pt: "Divino", en: "Divine" } }
+            { id: "common", statBonus: 0, chance: 38, name: { pt: "Comum", en: "Common" } },
+            { id: "uncommon", statBonus: 1, chance: 25, name: { pt: "Incomum", en: "Uncommon" } },
+            { id: "rare", statBonus: 2, chance: 11, name: { pt: "Raro", en: "Rare" } },
+            { id: "super-rare", statBonus: 3, chance: 9, name: { pt: "Super Raro", en: "Super Rare" } },
+            { id: "epic", statBonus: 4, chance: 7, name: { pt: "Épico", en: "Epic" } },
+            { id: "legendary", statBonus: 5, chance: 5, name: { pt: "Lendário", en: "Legendary" } },
+            { id: "demon", statBonus: 6, chance: 3.5, name: { pt: "Demoníaco", en: "Demonic" } },
+            { id: "god", statBonus: 7, chance: 1.5, name: { pt: "Divino", en: "Divine" } }
         ],
         finalRegionOnlyRarities: ["demon", "god"]
     },

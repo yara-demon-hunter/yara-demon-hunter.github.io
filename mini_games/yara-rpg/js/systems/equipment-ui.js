@@ -45,15 +45,21 @@ function renderEquipment() {
     const bagCount = hero.equipmentInventory.length;
     const bagCountText = `${bagCount}/${EQUIPMENT_BAG_CAPACITY}`;
     bagButton.querySelector('#equipment-bag-count').textContent = bagCountText;
+    const affordableSlots = new Set(EQUIPMENT_SLOTS
+        .filter(({ id }) => canAffordEquipmentUpgrade(hero.equipment[id]))
+        .map(({ id }) => id));
+    const affordableInventoryUpgrade = hero.equipmentInventory.some(canAffordEquipmentUpgrade);
+    bagButton.classList.toggle('equipment-upgrade-available', affordableInventoryUpgrade);
     bagButton.setAttribute('aria-label', t('openEquipmentBag', {
         count: bagCount,
         capacity: EQUIPMENT_BAG_CAPACITY
-    }));
+    }) + (affordableInventoryUpgrade ? ` · ${t('equipmentUpgradeAvailable')}` : ''));
 
     EQUIPMENT_SLOTS.forEach(({ id, icon }) => {
         const item = hero.equipment[id];
         const slot = document.createElement('div');
         slot.className = `equipment-slot equipment-slot-${id} rounded-lg border border-fantasy-border/50 bg-forest-950/60`;
+        slot.classList.toggle('equipment-upgrade-available', affordableSlots.has(id));
         slot.setAttribute('role', 'group');
         slot.setAttribute('aria-label', `${t(id)}: ${item ? getEquipmentDisplayName(item) : t('emptySlot')}`);
         if (item) slot.classList.add(getEquipmentRarityClass(item));
