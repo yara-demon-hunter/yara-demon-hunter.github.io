@@ -32,6 +32,15 @@ window.YaraRpgData.regions = Object.freeze([
                     { label: { pt: "Procurar suprimentos", en: "Search for supplies" }, effect: "potion" },
                     { label: { pt: "Investigar o porão", en: "Investigate the cellar" }, effect: "combat" }
                 ]
+            },
+            {
+                id: "animal-in-the-brush",
+                title: { pt: "Um ruído no mato", en: "A sound in the brush" },
+                description: { pt: "Você ouve um farfalhar entre os arbustos. Parece haver um animal assustado escondido ali.", en: "You hear rustling in the brush. A frightened animal seems to be hiding there." },
+                choices: [
+                    { label: { pt: "Atacar o mato (+ouro)", en: "Strike the brush (+gold)" }, effect: "animal-event-gold" },
+                    { label: { pt: "Verificar com cuidado (pet)", en: "Investigate carefully (pet)" }, effect: "animal-event-pet" }
+                ]
             }
         ]
     },
@@ -65,6 +74,15 @@ window.YaraRpgData.regions = Object.freeze([
                 choices: [
                     { label: { pt: "Responder ao chamado", en: "Answer the call" }, effect: "combat" },
                     { label: { pt: "Apagar as runas (+ouro)", en: "Erase the runes (+gold)" }, effect: "gold" }
+                ]
+            },
+            {
+                id: "animal-by-the-portal",
+                title: { pt: "Ruído perto do portal", en: "A sound near the portal" },
+                description: { pt: "Um ruído vem de trás de uma pedra coberta de cinzas. Um animal pequeno parece preso entre as raízes, perto do portal.", en: "A sound comes from behind an ash-covered stone. A small animal seems trapped among the roots near the portal." },
+                choices: [
+                    { label: { pt: "Atacar o esconderijo (+ouro)", en: "Strike the hiding place (+gold)" }, effect: "animal-event-gold" },
+                    { label: { pt: "Verificar e ajudar (pet)", en: "Investigate and help (pet)" }, effect: "animal-event-pet" }
                 ]
             }
         ]
@@ -100,6 +118,15 @@ window.YaraRpgData.regions = Object.freeze([
                     { label: { pt: "Seguir o mapa (+ouro)", en: "Follow the map (+gold)" }, effect: "loot" },
                     { label: { pt: "Observar os invasores", en: "Watch the invaders" }, effect: "village-scout" }
                 ]
+            },
+            {
+                id: "animal-under-the-rubble",
+                title: { pt: "Ruído sob os escombros", en: "A sound beneath the rubble" },
+                description: { pt: "Um ruído ecoa entre as casas destruídas. Um animal está escondido sob uma viga caída e parece precisar de ajuda.", en: "A sound echoes among the ruined houses. An animal is hiding beneath a fallen beam and seems to need help." },
+                choices: [
+                    { label: { pt: "Atacar os escombros (+ouro)", en: "Strike the rubble (+gold)" }, effect: "animal-event-gold" },
+                    { label: { pt: "Afastar a viga e ajudar (pet)", en: "Move the beam and help (pet)" }, effect: "animal-event-pet" }
+                ]
             }
         ]
     },
@@ -133,6 +160,15 @@ window.YaraRpgData.regions = Object.freeze([
                 choices: [
                     { label: { pt: "Fazer o juramento (+ATQ)", en: "Take the oath (+ATK)" }, effect: "power" },
                     { label: { pt: "Recusar o pacto", en: "Refuse the pact" }, effect: "gold" }
+                ]
+            },
+            {
+                id: "animal-in-the-tower",
+                title: { pt: "Um ruído na torre", en: "A sound in the tower" },
+                description: { pt: "Um ruído vem das vigas acima do salão. Um animal se debate preso entre os estandartes rasgados.", en: "A sound comes from the rafters above the hall. An animal is tangled in the torn banners." },
+                choices: [
+                    { label: { pt: "Atacar as vigas (+ouro)", en: "Strike the rafters (+gold)" }, effect: "animal-event-gold" },
+                    { label: { pt: "Soltar o animal (pet)", en: "Free the animal (pet)" }, effect: "animal-event-pet" }
                 ]
             }
         ]

@@ -31,6 +31,7 @@ window.YaraRpgData.items = Object.freeze({
         { id: "mist-wolf", slot: "pet", icon: "🐺", name: { pt: "Lobo da Névoa", en: "Mist Wolf" }, stats: { atk: 3, evasion: 3 } },
         { id: "watchful-eagle", slot: "pet", icon: "🦅", name: { pt: "Águia Vigilante", en: "Watchful Eagle" }, stats: { evasion: 4, parry: 2, stunChance: 1 } },
         { id: "shadow-cat", slot: "pet", icon: "🐈", name: { pt: "Gato Sombrio", en: "Shadow Cat" }, stats: { evasion: 3, stunChance: 1 }, starter: true },
-        { id: "mist-horse", slot: "pet", icon: "🐎", name: { pt: "Cavalo da Névoa", en: "Mist Horse" }, stats: { maxHp: 50, maxFoco: 15, evasion: 4 } }
+        { id: "mist-horse", slot: "pet", icon: "🐎", name: { pt: "Cavalo da Névoa", en: "Mist Horse" }, stats: { maxHp: 50, maxFoco: 15, evasion: 4 } },
+        { id: "mist-raven", slot: "pet", icon: "🐦‍⬛", name: { pt: "Corvo da Névoa", en: "Mist Raven" }, stats: { evasion: 3, parry: 2, stunChance: 2 } }
     ])
 });

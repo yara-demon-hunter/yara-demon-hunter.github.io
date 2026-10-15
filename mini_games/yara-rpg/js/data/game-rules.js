@@ -47,7 +47,9 @@ window.YaraRpgData.rules = Object.freeze({
         focoRecoveryPercent: 20
     },
     loot: {
-        equipmentDropChance: 20
+        equipmentDropChance: 20,
+        animalEventGoldMinimum: 25,
+        animalEventGoldRange: 26
     },
     combat: {
         enemyTelegraphDamageMultiplier: 1.65,

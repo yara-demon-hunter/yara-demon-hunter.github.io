@@ -54,6 +54,8 @@ const translations = {
         eventPortalTreasure: "💰 Você cruza a ponte em ruínas e apanha {gold} moedas antes que ela desabe.",
         eventScout: "👁️ Você observa os invasores sem ser visto e recupera {focus} de Foco antes de seguir.",
         eventCastleCache: "🛡️ Você desarma as armadilhas e encontra {gold} moedas e uma poção.",
+        eventAnimalGold: "🌫️ Você ataca o esconderijo e encontra {gold} moedas entre os pertences deixados pelo animal.",
+        eventAnimalPet: "🐾 Você se aproxima com cuidado e conquista a confiança de {animal}. Ele passa a acompanhar sua jornada.",
         level: "Nível",
         gold: "Ouro:",
         experience: "XP:",
@@ -261,6 +263,8 @@ const translations = {
         eventPortalTreasure: "💰 You rush across the crumbling bridge and grab {gold} coins before it collapses.",
         eventScout: "👁️ You watch the invaders unseen and recover {focus} Focus before moving on.",
         eventCastleCache: "🛡️ You disarm the traps and find {gold} coins and a potion.",
+        eventAnimalGold: "🌫️ You strike the hiding place and find {gold} coins among the animal's abandoned belongings.",
+        eventAnimalPet: "🐾 You approach carefully and earn {animal}'s trust. It joins your journey.",
         level: "Level",
         gold: "Gold:",
         experience: "XP:",
@@ -1511,7 +1515,27 @@ function resolveStoryEvent(choiceIndex) {
     if (!choice) return;
     const effect = choice.effect;
     pendingStoryEvent = null;
-    if (effect === 'loot') {
+    if (effect === 'animal-event-gold') {
+        const lootRules = GAME_RULES.loot;
+        const gold = lootRules.animalEventGoldMinimum
+            + Math.floor(Math.random() * lootRules.animalEventGoldRange);
+        hero.gold += gold;
+        logMessage(t('eventAnimalGold', { gold }), 'loot');
+    } else if (effect === 'animal-event-pet') {
+        const pets = ITEM_DATA.equipment.filter((item) => item.slot === 'pet');
+        const petTemplate = pets[Math.floor(Math.random() * pets.length)];
+        if (!petTemplate) {
+            logMessage(t('denseMist'));
+        } else {
+            logMessage(t('eventAnimalPet', { animal: petTemplate.name[gameLanguage] }), 'special');
+            handleEquipmentDrop({
+                ...petTemplate,
+                name: { ...petTemplate.name },
+                stats: { ...petTemplate.stats },
+                instanceId: ++equipmentInstanceId
+            });
+        }
+    } else if (effect === 'loot') {
         const gold = 35 + Math.floor(Math.random() * 26); hero.gold += gold;
         logMessage(t('eventLoot', { gold }), 'loot');
     } else if (effect === 'heal') {
