@@ -197,13 +197,6 @@
     .hero-status-bars {
         order: 4;
     }
-    .hero-mist-powers {
-        order: 6;
-        margin: 0 !important;
-        padding: 9px 10px !important;
-        border-radius: 12px;
-        background: rgba(23, 25, 31, 0.72);
-    }
     #game-main > nav[aria-label="Jornada"] {
         order: 0;
         grid-column: 1 / -1;

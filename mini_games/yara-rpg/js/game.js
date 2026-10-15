@@ -134,6 +134,7 @@ const translations = {
         available: "disponíveis",
         mistPowers: "Poderes da Névoa",
         noMistPowers: "Nenhum poder encontrado.",
+        passiveSkill: "Passivas",
         mistAccept: "Aceitar oferta",
         mistDecline: "Recusar e seguir",
         mistContactAppears: "{icon} {contact} surge entre as árvores e faz uma oferta.",
@@ -341,6 +342,7 @@ const translations = {
         available: "available",
         mistPowers: "Mist Powers",
         noMistPowers: "No powers discovered yet.",
+        passiveSkill: "Passive skills",
         mistAccept: "Accept the offer",
         mistDecline: "Refuse and move on",
         mistContactAppears: "{icon} {contact} appears between the trees with an offer.",
@@ -1223,11 +1225,25 @@ function updateUI() {
     });
     renderEquipment();
     const unlockedPowers = MIST_CONTACT_DATA.powers.filter((power) => hero.mistPowers.includes(power.id));
-    document.getElementById('mist-power-list').textContent = unlockedPowers.length
-        ? unlockedPowers.map((power) =>
-            `${power.name[gameLanguage]} (${power.description[gameLanguage]})`
-        ).join(' · ')
-        : t('noMistPowers');
+    const mistPowerList = document.getElementById('mist-power-list');
+    mistPowerList.replaceChildren();
+    if (!unlockedPowers.length) {
+        const emptyState = document.createElement('li');
+        emptyState.textContent = t('noMistPowers');
+        mistPowerList.append(emptyState);
+    } else {
+        unlockedPowers.forEach((power) => {
+            const entry = document.createElement('li');
+            const name = document.createElement('strong');
+            const description = document.createElement('span');
+            name.className = 'text-purple-100';
+            name.textContent = power.name[gameLanguage];
+            description.className = 'ml-1 text-purple-200/70';
+            description.textContent = `— ${power.description[gameLanguage]}`;
+            entry.append(name, description);
+            mistPowerList.append(entry);
+        });
+    }
     const currentRegionData = GAME_DATA.regions[currentRegion];
     document.body.classList.remove(...GAME_DATA.regions.map((region) => `region-${region.id}`));
     document.body.classList.add(`region-${currentRegionData.id}`);
