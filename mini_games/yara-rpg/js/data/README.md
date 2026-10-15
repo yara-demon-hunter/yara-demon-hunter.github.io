@@ -13,6 +13,6 @@ A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`. Para aj
 
 A lógica da tela inicial e a seleção de três equipamentos ficam em `../systems/character-setup.js`. Os eventos narrativos são declarados em cada região e executados por `resolveStoryEvent` em `game.js`. Os scripts de dados e sistemas precisam ser carregados antes de `game.js`, que inicia a aventura com as escolhas feitas.
 
-Equipamentos em `items.js` declaram um `id`, um slot listado em `game.js`, nomes em português e inglês e os bônus em `stats`. Use `stunChance` para bônus percentuais de chance de atordoamento e `starter: true` para oferecer um item na seleção inicial; todos os itens do catálogo podem cair dos monstros. A chance de drop e a recuperação percentual do acampamento são configuradas em `game-rules.js`.
+Equipamentos em `items.js` declaram um `id`, um slot listado em `game.js` (`rightHand`, `leftHand`, `head`, `body`, `legs`, `boots`, `necklace`, `ring` ou `accessory`), nomes em português e inglês e os bônus em `stats`. Use `stunChance` para bônus percentuais de chance de atordoamento e `starter: true` para oferecer um item na seleção inicial; todos os itens do catálogo podem cair dos monstros. A chance de drop e a recuperação percentual do acampamento são configuradas em `game-rules.js`.
 
 Os IDs em `regions.js` precisam corresponder às chaves de `monsters.byRegion` em `monsters.js`. Os scripts são carregados nessa ordem em `game.html`; mantenha `game.js` por último, pois ele consome os dados anteriores.

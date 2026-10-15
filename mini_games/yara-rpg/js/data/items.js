@@ -22,10 +22,10 @@ window.YaraRpgData.items = Object.freeze({
         { id: "trail-trousers", slot: "legs", icon: "👖", name: { pt: "Calças de Trilha", en: "Trail Trousers" }, stats: { def: 1, maxHp: 30 } },
         { id: "swift-boots", slot: "boots", icon: "🥾", name: { pt: "Botas Ligeiras", en: "Swift Boots" }, stats: { evasion: 7 }, starter: true },
         { id: "iron-boots", slot: "boots", icon: "👢", name: { pt: "Botas de Ferro", en: "Iron Boots" }, stats: { def: 3, evasion: 2 } },
-        { id: "river-charm", slot: "accessory", icon: "📿", name: { pt: "Amuleto do Rio", en: "River Charm" }, stats: { maxFoco: 30, parry: 5 }, starter: true },
-        { id: "mist-ring", slot: "accessory", icon: "💍", name: { pt: "Anel da Névoa", en: "Mist Ring" }, stats: { atk: 1, evasion: 2 }, starter: true },
+        { id: "river-charm", slot: "necklace", icon: "📿", name: { pt: "Amuleto do Rio", en: "River Charm" }, stats: { maxFoco: 30, parry: 5 }, starter: true },
+        { id: "mist-ring", slot: "ring", icon: "💍", name: { pt: "Anel da Névoa", en: "Mist Ring" }, stats: { atk: 1, evasion: 2 }, starter: true },
         { id: "stunning-blade", slot: "rightHand", icon: "⚡", name: { pt: "Lâmina Trovejante", en: "Thunderous Blade" }, stats: { atk: 3, stunChance: 4 } },
         { id: "rune-of-impact", slot: "accessory", icon: "🔮", name: { pt: "Runa do Impacto", en: "Impact Rune" }, stats: { stunChance: 3 }, starter: true },
-        { id: "storm-circlet", slot: "head", icon: "🌩️", name: { pt: "Diadema da Tempestade", en: "Storm Circlet" }, stats: { def: 2, stunChance: 2 } }
+        { id: "storm-circlet", slot: "accessory", icon: "🌩️", name: { pt: "Diadema da Tempestade", en: "Storm Circlet" }, stats: { def: 2, stunChance: 2 } }
     ])
 });

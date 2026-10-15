@@ -622,10 +622,10 @@ h1, h2, h3, .font-title {
 #equipment-slots {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-areas:
-        "accessory head ."
+        "necklace head bag"
         "leftHand body rightHand"
-        ". legs ."
-        "bag boots .";
+        "accessory legs ring"
+        ". boots potion";
     width: min(100%, 17rem);
     margin-inline: auto;
     gap: 0.4rem;
@@ -648,7 +648,23 @@ h1, h2, h3, .font-title {
 .equipment-slot-body { grid-area: body; }
 .equipment-slot-legs { grid-area: legs; }
 .equipment-slot-boots { grid-area: boots; }
+.equipment-slot-necklace { grid-area: necklace; }
+.equipment-slot-ring { grid-area: ring; }
 .equipment-slot-accessory { grid-area: accessory; }
+.equipment-slot-potion {
+    grid-area: potion;
+    border-color: rgba(13, 148, 136, 0.65);
+    background: rgba(19, 78, 74, 0.75);
+    color: #ccfbf1;
+    font-size: 0.65rem;
+}
+.equipment-slot-potion:hover:not(:disabled) {
+    background: rgba(15, 118, 110, 0.9);
+}
+.equipment-slot-potion:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
 .equipment-slot-icon {
     font-size: 1.2rem;
     line-height: 1.2;
@@ -1057,7 +1073,7 @@ h1, h2, h3, .font-title {
         display: none;
     }
     #controls-explore {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 5px;
     }
     #controls-explore button {
@@ -1089,13 +1105,6 @@ h1, h2, h3, .font-title {
         font-size: 0.62rem !important;
         line-height: 1.15;
         gap: 2px;
-    }
-    #controls-combat button:nth-child(4) {
-        grid-column: 2 / span 2;
-    }
-    #controls-combat button:last-child {
-        grid-column: 4 / span 2;
-        min-height: 10px;
     }
     #controls-combat button span:last-child:not(:first-child) {
         font-size: 0.58rem;

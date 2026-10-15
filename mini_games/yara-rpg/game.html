@@ -142,10 +142,15 @@ permalink: /mini_games/yara-rpg/game.html
                 <details id="hero-equipment" class="hero-equipment">
                     <summary id="hero-equipment-toggle">
                         <span data-i18n="equipment">Equipamento</span>
-                        <span id="equipped-item-count" class="equipped-item-count" aria-hidden="true">0/7</span>
+                        <span id="equipped-item-count" class="equipped-item-count" aria-hidden="true">0/9</span>
                     </summary>
                     <div class="hero-equipment-content">
                         <div id="equipment-slots" class="grid grid-cols-2 gap-2 text-xs">
+                    <button id="potion-button" type="button" onclick="usePotion()" class="potion-action-button equipment-slot equipment-slot-potion rounded-lg border border-fantasy-border/50 bg-forest-950/60" data-i18n-aria="potionActionAria">
+                        <span aria-hidden="true">🧪</span>
+                        <span data-i18n="drink">Poção</span>
+                        <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
+                    </button>
                     <button id="open-equipment-bag-button" type="button" class="equipment-bag-button" aria-haspopup="dialog" aria-controls="equipment-bag-dialog" data-i18n-aria="openEquipmentBag">
                         <span aria-hidden="true">🎒</span>
                         <span id="equipment-bag-count">0/10</span>
@@ -261,14 +266,9 @@ permalink: /mini_games/yara-rpg/game.html
             <!-- Controles de Ação -->
             <div id="action-controls">
                 <!-- Ações de Exploração -->
-                <div id="controls-explore" class="grid grid-cols-3 gap-2">
+                <div id="controls-explore" class="grid grid-cols-2 gap-2">
                     <button onclick="exploreForest()" class="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 active:scale-[0.98] text-white font-semibold py-3 px-3 rounded-xl shadow-lg border border-emerald-500/50 flex items-center justify-center gap-2 transition text-sm">
                         <span aria-hidden="true">🧭</span> <span data-i18n="explore">Explorar</span>
-                    </button>
-                    <button id="potion-button" type="button" onclick="usePotion()" class="bg-teal-800 hover:bg-teal-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 text-teal-50 font-semibold py-3 px-2 rounded-xl shadow border border-teal-600 flex items-center justify-center gap-1.5 transition text-sm" data-i18n-aria="potionActionAria">
-                        <span aria-hidden="true">🧪</span>
-                        <span data-i18n="drink">Poção</span>
-                        <span class="potion-count text-xs text-teal-100"><span id="hero-potions">1</span>/<span id="hero-potions-max">1</span></span>
                     </button>
                     <button id="camp-button" onclick="restAtCamp()" class="bg-forest-800 hover:bg-forest-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-emerald-200 font-semibold py-3 px-3 rounded-xl shadow border border-forest-700 flex items-center justify-center gap-2 transition text-sm">
                         <span aria-hidden="true">⛺</span> <span data-i18n="camp">Descansar</span> <span data-i18n="campCost">(🪙50)</span>
@@ -291,6 +291,10 @@ permalink: /mini_games/yara-rpg/game.html
                     </button>
                     <button onclick="combatRun()" class="bg-stone-900 hover:bg-stone-800 active:scale-[0.98] text-stone-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-700 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span>🏃</span> <span data-i18n="run">Fugir na Névoa</span>
+                    </button>
+                    <button id="potion-combat-button" type="button" onclick="usePotion()" class="potion-action-button bg-teal-800 hover:bg-teal-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-teal-50 font-semibold py-2.5 px-2 rounded-xl shadow border border-teal-600 flex flex-col items-center justify-center gap-1 transition text-xs" data-i18n-aria="potionActionAria">
+                        <span aria-hidden="true">🧪</span> <span data-i18n="drink">Poção</span>
+                        <span class="potion-count text-[10px] text-teal-100"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
                     </button>
                 </div>
             </div>

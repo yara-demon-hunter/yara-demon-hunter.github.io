@@ -63,7 +63,7 @@ const translations = {
         defense: "Defesa",
         attributes: "Atributos",
         equipment: "Equipamento",
-        equipmentSummary: "Equipamento, {count} de 7 equipados",
+        equipmentSummary: "Equipamento, {count} de 9 equipados",
         inventory: "Mochila",
         equipmentBagDescription: "Até 10 equipamentos guardados.",
         bagCapacity: "{count}/10 espaços usados",
@@ -87,6 +87,8 @@ const translations = {
         body: "Corpo",
         legs: "Pernas",
         boots: "Botas",
+        necklace: "Colar",
+        ring: "Anel",
         accessory: "Acessório",
         equip: "Equipar",
         unequip: "Desequipar",
@@ -260,7 +262,7 @@ const translations = {
         defense: "Defense",
         attributes: "Stats",
         equipment: "Equipment",
-        equipmentSummary: "Equipment, {count} of 7 equipped",
+        equipmentSummary: "Equipment, {count} of 9 equipped",
         inventory: "Bag",
         equipmentBagDescription: "Store up to 10 pieces of equipment.",
         bagCapacity: "{count}/10 spaces used",
@@ -284,6 +286,8 @@ const translations = {
         body: "Body",
         legs: "Legs",
         boots: "Boots",
+        necklace: "Necklace",
+        ring: "Ring",
         accessory: "Accessory",
         equip: "Equip",
         unequip: "Unequip",
@@ -429,8 +433,20 @@ function loadSavedGame(snapshot = readSavedGame()) {
     selectedCharacter = GAME_DATA.characters.find((character) => character.id === snapshot.characterId);
     selectedCharacterProgression = selectedCharacter.levelUp;
     Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
-    hero.equipment = { ...Object.fromEntries(EQUIPMENT_SLOTS.map(({ id }) => [id, null])), ...(snapshot.hero?.equipment || {}) };
-    hero.equipmentInventory = Array.isArray(snapshot.hero?.equipmentInventory) ? snapshot.hero.equipmentInventory : [];
+    const savedEquipment = { ...(snapshot.hero?.equipment || {}) };
+    const legacyAccessory = savedEquipment.accessory;
+    if (legacyAccessory) {
+        const migratedSlot = legacyAccessory.id === 'river-charm' ? 'necklace'
+            : legacyAccessory.id === 'mist-ring' ? 'ring' : 'accessory';
+        savedEquipment[migratedSlot] = { ...legacyAccessory, slot: migratedSlot };
+        delete savedEquipment.accessory;
+    }
+    hero.equipment = Object.fromEntries(EQUIPMENT_SLOTS.map(({ id }) => [
+        id,
+        savedEquipment[id] ? hydrateItem(savedEquipment[id]) : null
+    ]));
+    hero.equipmentInventory = Array.isArray(snapshot.hero?.equipmentInventory)
+        ? snapshot.hero.equipmentInventory.map(hydrateItem) : [];
     currentRegion = Math.max(0, Math.min(GAME_DATA.regions.length - 1, Number(snapshot.currentRegion) || 0));
     discoveredRegions = Array.isArray(snapshot.discoveredRegions) ? snapshot.discoveredRegions : [0];
     explorationsSinceMistContact = Number(snapshot.explorationsSinceMistContact) || 0;
@@ -469,7 +485,8 @@ function showContinueOption() {
 
 function hydrateItem(savedItem) {
     const catalogItem = ITEM_DATA.equipment.find((item) => item.id === savedItem?.id);
-    return catalogItem ? { ...catalogItem, ...savedItem } : savedItem;
+    if (!catalogItem) return savedItem;
+    return { ...catalogItem, ...savedItem, slot: catalogItem.slot };
 }
 
 const EQUIPMENT_SLOTS = Object.freeze([
@@ -479,7 +496,9 @@ const EQUIPMENT_SLOTS = Object.freeze([
     { id: "body", icon: "🦺" },
     { id: "legs", icon: "👖" },
     { id: "boots", icon: "🥾" },
-    { id: "accessory", icon: "💍" }
+    { id: "necklace", icon: "📿" },
+    { id: "ring", icon: "💍" },
+    { id: "accessory", icon: "🔮" }
 ]);
 const EQUIPMENT_BAG_CAPACITY = 10;
 const EQUIPMENT_STAT_KEYS = Object.freeze({
@@ -702,6 +721,7 @@ document.getElementById('item-drop-dialog').addEventListener('cancel', (event) =
 function renderEquipment() {
     const slotsContainer = document.getElementById('equipment-slots');
     const bagButton = document.getElementById('open-equipment-bag-button');
+    const potionButton = document.getElementById('potion-button');
     slotsContainer.replaceChildren();
     const equippedCount = Object.values(hero.equipment).filter(Boolean).length;
     const equippedItemCount = document.getElementById('equipped-item-count');
@@ -752,6 +772,7 @@ function renderEquipment() {
     bagButton.setAttribute('aria-haspopup', 'dialog');
     bagButton.setAttribute('aria-controls', 'equipment-bag-dialog');
     slotsContainer.append(bagButton);
+    slotsContainer.append(potionButton);
 
     const inventoryContainer = document.getElementById('equipment-inventory-list');
     inventoryContainer.replaceChildren();
@@ -1101,8 +1122,12 @@ function updateUI() {
     stunDisplay.setAttribute('aria-label', stunBonus
         ? `${effectiveStunChance}% + ${stunBonus}% = ${stunChanceTotal}%`
         : `${effectiveStunChance}%`);
-    document.getElementById('hero-potions').innerText = hero.potions;
-    document.getElementById('hero-potions-max').innerText = hero.maxPotions;
+    document.querySelectorAll('.hero-potions-count').forEach((element) => {
+        element.textContent = hero.potions;
+    });
+    document.querySelectorAll('.hero-potions-max').forEach((element) => {
+        element.textContent = hero.maxPotions;
+    });
     renderEquipment();
     const unlockedPowers = MIST_CONTACT_DATA.powers.filter((power) => hero.mistPowers.includes(power.id));
     document.getElementById('mist-power-list').textContent = unlockedPowers.length
@@ -1154,7 +1179,6 @@ function updateUI() {
     const explorationBanner = document.getElementById('exploration-banner');
     const mistContactCard = document.getElementById('mist-contact-card');
     const campButton = document.getElementById('camp-button');
-    const potionButton = document.getElementById('potion-button');
     document.querySelector('[data-i18n="campCost"]').innerText = t('campCost', { cost: CAMP_COST });
     document.querySelector('[data-i18n="focusCost"]').innerText = t('focusCost', {
         cost: selectedCharacter.skills.heavyAttack.focoCost
@@ -1236,7 +1260,9 @@ function updateUI() {
     campButton.disabled = inCombat || gameOver || campaignComplete || hero.gold < CAMP_COST || (
         hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco')
     );
-    potionButton.disabled = gameOver || campaignComplete;
+    document.querySelectorAll('.potion-action-button').forEach((button) => {
+        button.disabled = gameOver || campaignComplete || combatActionLocked;
+    });
     document.querySelectorAll('#controls-combat button').forEach((button) => {
         const disabledByGameState = (button.id === 'dodge-button' && (
             dodgeSkillUsedThisCombat
