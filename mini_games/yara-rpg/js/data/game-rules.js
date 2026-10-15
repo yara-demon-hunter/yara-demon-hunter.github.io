@@ -50,14 +50,23 @@ window.YaraRpgData.rules = Object.freeze({
         equipmentDropChance: 100,
         animalEventGoldMinimum: 25,
         animalEventGoldRange: 26,
-        rarityStatBonusPerLevel: 1,
         equipmentRarities: [
-            { id: "common", upgradeLevel: 0, chance: 55, name: { pt: "Comum", en: "Common" } },
-            { id: "uncommon", upgradeLevel: 1, chance: 25, name: { pt: "Incomum", en: "Uncommon" } },
-            { id: "rare", upgradeLevel: 2, chance: 13, name: { pt: "Raro", en: "Rare" } },
-            { id: "epic", upgradeLevel: 3, chance: 5, name: { pt: "Épico", en: "Epic" } },
-            { id: "legendary", upgradeLevel: 4, chance: 2, name: { pt: "Lendário", en: "Legendary" } }
-        ]
+            { id: "common", statBonus: 0, chance: 45, name: { pt: "Comum", en: "Common" } },
+            { id: "uncommon", statBonus: 1, chance: 30, name: { pt: "Incomum", en: "Uncommon" } },
+            { id: "rare", statBonus: 2, chance: 14, name: { pt: "Raro", en: "Rare" } },
+            { id: "super-rare", statBonus: 3, chance: 7, name: { pt: "Super Raro", en: "Super Rare" } },
+            { id: "epic", statBonus: 4, chance: 3, name: { pt: "Épico", en: "Epic" } },
+            { id: "legendary", statBonus: 5, chance: 0.8, name: { pt: "Lendário", en: "Legendary" } },
+            { id: "demon", statBonus: 6, chance: 0.18, name: { pt: "Demoníaco", en: "Demonic" } },
+            { id: "god", statBonus: 7, chance: 0.02, name: { pt: "Divino", en: "Divine" } }
+        ],
+        finalRegionOnlyRarities: ["demon", "god"]
+    },
+    equipmentUpgrade: {
+        maxLevel: 9,
+        baseCost: 50,
+        costMultiplier: 1.4,
+        statBonusPerLevel: 1
     },
     combat: {
         enemyTelegraphDamageMultiplier: 1.65,

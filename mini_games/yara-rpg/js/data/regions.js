@@ -41,6 +41,15 @@ window.YaraRpgData.regions = Object.freeze([
                     { label: { pt: "Atacar o mato (+ouro)", en: "Strike the brush (+gold)" }, effect: "animal-event-gold" },
                     { label: { pt: "Verificar com cuidado (pet)", en: "Investigate carefully (pet)" }, effect: "animal-event-pet" }
                 ]
+            },
+            {
+                id: "abyssal-challenge-forest",
+                title: { pt: "O desafio da fenda", en: "The Rift Challenge" },
+                description: { pt: "Uma fenda se abre sob uma árvore antiga. O Arauto do Abismo surge e bloqueia a trilha. A presença dele é esmagadora; dizem que monstros assim guardam equipamentos Épicos ou Lendários.", en: "A rift opens beneath an ancient tree. The Abyssal Herald emerges and blocks the trail. Its presence is overwhelming; creatures like this are said to guard Epic or Legendary gear." },
+                choices: [
+                    { label: { pt: "Enfrentar o Arauto (alto risco)", en: "Face the Herald (high risk)" }, effect: "abyssal-challenge" },
+                    { label: { pt: "Recuar e se preparar", en: "Withdraw and prepare" }, effect: "abyssal-challenge-retreat" }
+                ]
             }
         ]
     },
@@ -83,6 +92,15 @@ window.YaraRpgData.regions = Object.freeze([
                 choices: [
                     { label: { pt: "Atacar o esconderijo (+ouro)", en: "Strike the hiding place (+gold)" }, effect: "animal-event-gold" },
                     { label: { pt: "Verificar e ajudar (pet)", en: "Investigate and help (pet)" }, effect: "animal-event-pet" }
+                ]
+            },
+            {
+                id: "abyssal-challenge-portal",
+                title: { pt: "O desafio da fenda", en: "The Rift Challenge" },
+                description: { pt: "Uma ruptura pulsa ao lado do portal. O Arauto do Abismo atravessa a fenda e desafia você. Só caçadores preparados devem aceitar; a criatura guarda equipamentos Épicos ou Lendários.", en: "A rupture pulses beside the portal. The Abyssal Herald steps through and challenges you. Only prepared hunters should accept; the creature guards Epic or Legendary gear." },
+                choices: [
+                    { label: { pt: "Enfrentar o Arauto (alto risco)", en: "Face the Herald (high risk)" }, effect: "abyssal-challenge" },
+                    { label: { pt: "Recuar e se preparar", en: "Withdraw and prepare" }, effect: "abyssal-challenge-retreat" }
                 ]
             }
         ]
@@ -127,6 +145,15 @@ window.YaraRpgData.regions = Object.freeze([
                     { label: { pt: "Atacar os escombros (+ouro)", en: "Strike the rubble (+gold)" }, effect: "animal-event-gold" },
                     { label: { pt: "Afastar a viga e ajudar (pet)", en: "Move the beam and help (pet)" }, effect: "animal-event-pet" }
                 ]
+            },
+            {
+                id: "abyssal-challenge-village",
+                title: { pt: "O desafio da fenda", en: "The Rift Challenge" },
+                description: { pt: "As ruínas tremem e uma fenda negra se abre na praça. O Arauto do Abismo aparece entre os escombros; sua armadura parece impenetrável. Dizem que ele carrega equipamentos Épicos ou Lendários.", en: "The ruins shake as a black rift opens in the square. The Abyssal Herald rises from the rubble, its armor nearly impenetrable. It is said to carry Epic or Legendary gear." },
+                choices: [
+                    { label: { pt: "Enfrentar o Arauto (alto risco)", en: "Face the Herald (high risk)" }, effect: "abyssal-challenge" },
+                    { label: { pt: "Recuar e se preparar", en: "Withdraw and prepare" }, effect: "abyssal-challenge-retreat" }
+                ]
             }
         ]
     },
@@ -169,6 +196,15 @@ window.YaraRpgData.regions = Object.freeze([
                 choices: [
                     { label: { pt: "Atacar as vigas (+ouro)", en: "Strike the rafters (+gold)" }, effect: "animal-event-gold" },
                     { label: { pt: "Soltar o animal (pet)", en: "Free the animal (pet)" }, effect: "animal-event-pet" }
+                ]
+            },
+            {
+                id: "abyssal-challenge-castle",
+                title: { pt: "O último desafio", en: "The Final Challenge" },
+                description: { pt: "No coração do castelo, a fenda se escancara e o Arauto do Abismo revela sua forma completa. É uma luta quase suicida, mas sua recompensa pode ser um equipamento Demoníaco ou Divino.", en: "At the heart of the castle, the rift tears open and the Abyssal Herald reveals its true form. The fight may be nearly suicidal, but its reward could be Demon or Divine gear." },
+                choices: [
+                    { label: { pt: "Desafiar o Arauto (risco extremo)", en: "Challenge the Herald (extreme risk)" }, effect: "abyssal-challenge" },
+                    { label: { pt: "Recuar do desafio", en: "Withdraw from the challenge" }, effect: "abyssal-challenge-retreat" }
                 ]
             }
         ]

@@ -97,6 +97,12 @@ const translations = {
         pet: "Companheiro",
         equip: "Equipar",
         unequip: "Desequipar",
+        upgradeEquipmentButton: "Aprimorar +{level} · {cost} 🪙",
+        upgradeEquipmentMaxed: "Nível máximo +{level}",
+        equipmentUpgradePurchased: "🔧 {item} aprimorado para +{level} por {cost} moedas.",
+        abyssalChallengeAccepted: "⚔️ Você aceita o desafio. O Arauto do Abismo avança para esmagar quem ousar enfrentá-lo!",
+        abyssalChallengeRetreat: "Você recua da fenda e decide se preparar melhor antes de encarar o Arauto.",
+        abyssalChallengeReward: "🏆 O Arauto caiu! Entre seus restos há um equipamento {rarity}.",
         itemFound: "✨ Item encontrado: <span class=\"text-amber-300 font-bold\">{item}</span> ({slot}).",
         itemEquipped: "⚔️ {item} equipado em {slot}.",
         itemStored: "🎒 {item} guardado na mochila.",
@@ -305,6 +311,12 @@ const translations = {
         pet: "Companion",
         equip: "Equip",
         unequip: "Unequip",
+        upgradeEquipmentButton: "Upgrade +{level} · {cost} 🪙",
+        upgradeEquipmentMaxed: "Max level +{level}",
+        equipmentUpgradePurchased: "🔧 {item} upgraded to +{level} for {cost} gold.",
+        abyssalChallengeAccepted: "⚔️ You accept the challenge. The Abyssal Herald advances to crush anyone who dares face it!",
+        abyssalChallengeRetreat: "You withdraw from the rift and decide to prepare before facing the Herald.",
+        abyssalChallengeReward: "🏆 The Herald has fallen! Its remains hold {rarity} equipment.",
         itemFound: "✨ Item found: <span class=\"text-amber-300 font-bold\">{item}</span> ({slot}).",
         itemEquipped: "⚔️ {item} equipped in {slot}.",
         itemStored: "🎒 {item} stored in your bag.",
@@ -505,12 +517,26 @@ function showContinueOption() {
 function hydrateItem(savedItem) {
     const catalogItem = ITEM_DATA.equipment.find((item) => item.id === savedItem?.id);
     if (!catalogItem) return savedItem;
+    const savedRarity = GAME_RULES.loot.equipmentRarities.find((rarity) => rarity.id === savedItem.rarity)
+        || GAME_RULES.loot.equipmentRarities[0];
+    const isCurrentUpgradeFormat = savedItem.upgradeSystemVersion === 2;
+    const stats = isCurrentUpgradeFormat
+        ? { ...savedItem.stats }
+        : Object.fromEntries(Object.entries(catalogItem.stats).map(([stat, amount]) => [
+            stat,
+            amount + savedRarity.statBonus
+        ]));
     return {
         ...catalogItem,
         ...savedItem,
+        stats,
         slot: catalogItem.slot,
-        rarity: savedItem.rarity || 'common',
-        upgradeLevel: Number(savedItem.upgradeLevel) || 0
+        rarity: savedRarity.id,
+        upgradeLevel: isCurrentUpgradeFormat ? Math.min(
+            GAME_RULES.equipmentUpgrade.maxLevel,
+            Math.max(0, Number(savedItem.upgradeLevel) || 0)
+        ) : 0,
+        upgradeSystemVersion: 2
     };
 }
 
@@ -539,7 +565,7 @@ const EQUIPMENT_STAT_KEYS = Object.freeze({
 
 function getEquipmentDisplayName(item) {
     const level = Number(item.upgradeLevel) || 0;
-    return `${level > 0 ? `+${level} ` : ''}${item.name[gameLanguage]}`;
+    return `+${level} ${item.name[gameLanguage]}`;
 }
 
 function getEquipmentRarityClass(item) {
@@ -552,8 +578,7 @@ function getEquipmentRarity(item) {
 }
 
 function createEquipmentInstance(template, rarity = GAME_RULES.loot.equipmentRarities[0]) {
-    const upgradeLevel = rarity.upgradeLevel;
-    const statBonus = upgradeLevel * GAME_RULES.loot.rarityStatBonusPerLevel;
+    const statBonus = rarity.statBonus;
     const stats = Object.fromEntries(Object.entries(template.stats).map(([stat, amount]) => [
         stat,
         amount + statBonus
@@ -563,19 +588,41 @@ function createEquipmentInstance(template, rarity = GAME_RULES.loot.equipmentRar
         name: { ...template.name },
         stats,
         rarity: rarity.id,
-        upgradeLevel,
+        upgradeLevel: 0,
+        upgradeSystemVersion: 2,
         instanceId: ++equipmentInstanceId
     };
 }
 
-function rollEquipmentRarity() {
-    const rarities = GAME_RULES.loot.equipmentRarities;
+function getEquipmentUpgradeCost(item) {
+    const rules = GAME_RULES.equipmentUpgrade;
+    const level = Number(item.upgradeLevel) || 0;
+    if (level >= rules.maxLevel) return null;
+    return Math.round(rules.baseCost * rules.costMultiplier ** level);
+}
+
+function rollEquipmentRarity(allowedRarityIds = null) {
+    const finalRegionIndex = GAME_DATA.regions.length - 1;
+    const isFinalRegion = currentRegion === finalRegionIndex;
+    const finalRegionOnly = GAME_RULES.loot.finalRegionOnlyRarities || [];
+    const rarities = GAME_RULES.loot.equipmentRarities.filter((rarity) =>
+        (!allowedRarityIds || allowedRarityIds.includes(rarity.id))
+        && (isFinalRegion || !finalRegionOnly.includes(rarity.id))
+    );
+    if (rarities.length === 0) return GAME_RULES.loot.equipmentRarities[0];
     const totalChance = rarities.reduce((total, rarity) => total + rarity.chance, 0);
     let remainingRoll = Math.random() * totalChance;
     return rarities.find((rarity) => {
         remainingRoll -= rarity.chance;
         return remainingRoll < 0;
     }) || rarities[0];
+}
+
+function createChallengeEquipmentDrop(allowedRarityIds) {
+    const equipment = ITEM_DATA.equipment;
+    if (equipment.length === 0) return null;
+    const template = equipment[Math.floor(Math.random() * equipment.length)];
+    return createEquipmentInstance(template, rollEquipmentRarity(allowedRarityIds));
 }
 
 function getEquipmentBonus(stat) {
@@ -770,6 +817,7 @@ document.getElementById('close-equipment-item-button').addEventListener('click',
 document.getElementById('equipment-item-equip-button').addEventListener('click', equipSelectedInventoryItem);
 document.getElementById('equipment-item-unequip-button').addEventListener('click', unequipSelectedEquipment);
 document.getElementById('equipment-item-discard-button').addEventListener('click', discardSelectedInventoryItem);
+document.getElementById('equipment-item-upgrade-button').addEventListener('click', upgradeSelectedEquipment);
 document.getElementById('equipment-item-dialog').addEventListener('close', () => {
     selectedEquipmentDetails = null;
 });
@@ -829,7 +877,7 @@ function renderEquipment() {
             itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'equipped', id));
             const rarityBadge = document.createElement('span');
             rarityBadge.className = `equipment-slot-rarity-badge ${getEquipmentRarityClass(item)}`;
-            rarityBadge.textContent = item.upgradeLevel > 0 ? `+${item.upgradeLevel}` : '•';
+            rarityBadge.textContent = `+${Number(item.upgradeLevel) || 0}`;
             rarityBadge.setAttribute('aria-hidden', 'true');
             slot.append(itemButton, rarityBadge);
         } else {
@@ -893,7 +941,7 @@ function renderEquipment() {
             itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'inventory'));
             const rarityBadge = document.createElement('span');
             rarityBadge.className = `equipment-rarity-badge ${getEquipmentRarityClass(item)}`;
-            rarityBadge.textContent = item.upgradeLevel > 0 ? `+${item.upgradeLevel}` : '•';
+            rarityBadge.textContent = `+${Number(item.upgradeLevel) || 0}`;
             rarityBadge.setAttribute('aria-hidden', 'true');
             slot.append(position, selectItem, itemButton, rarityBadge);
         } else {
@@ -931,6 +979,11 @@ function openEquipmentBag() {
 
 function showEquipmentItemDetails(item, source, slot = null) {
     selectedEquipmentDetails = { item, source, slot };
+    renderEquipmentItemDetails(item, source, slot);
+    document.getElementById('equipment-item-dialog').showModal();
+}
+
+function renderEquipmentItemDetails(item, source, slot = null) {
     document.getElementById('equipment-item-icon').textContent = item.icon;
     const itemTitle = document.getElementById('equipment-item-title');
     itemTitle.textContent = getEquipmentDisplayName(item);
@@ -954,6 +1007,13 @@ function showEquipmentItemDetails(item, source, slot = null) {
     });
 
     const isInventoryItem = source === 'inventory';
+    const upgradeButton = document.getElementById('equipment-item-upgrade-button');
+    const upgradeCost = getEquipmentUpgradeCost(item);
+    upgradeButton.textContent = upgradeCost === null
+        ? t('upgradeEquipmentMaxed', { level: Number(item.upgradeLevel) || 0 })
+        : t('upgradeEquipmentButton', { level: (Number(item.upgradeLevel) || 0) + 1, cost: upgradeCost });
+    upgradeButton.disabled = inCombat || gameOver || Boolean(pendingEquipment)
+        || upgradeCost === null || hero.gold < upgradeCost;
     const equipButton = document.getElementById('equipment-item-equip-button');
     const unequipButton = document.getElementById('equipment-item-unequip-button');
     const discardButton = document.getElementById('equipment-item-discard-button');
@@ -975,7 +1035,30 @@ function showEquipmentItemDetails(item, source, slot = null) {
     discardButton.setAttribute('aria-label', t('discardItemAria', {
         item: getEquipmentDisplayName(item)
     }));
-    document.getElementById('equipment-item-dialog').showModal();
+}
+
+function upgradeSelectedEquipment() {
+    const selection = selectedEquipmentDetails;
+    if (!selection || inCombat || gameOver || pendingEquipment) return;
+    const { item, source, slot } = selection;
+    if (source === 'inventory' && !hero.equipmentInventory.includes(item)) return;
+    if (source === 'equipped' && hero.equipment[slot] !== item) return;
+
+    const cost = getEquipmentUpgradeCost(item);
+    if (cost === null || hero.gold < cost) return;
+    hero.gold -= cost;
+    item.upgradeLevel = (Number(item.upgradeLevel) || 0) + 1;
+    item.upgradeSystemVersion = 2;
+    Object.keys(item.stats).forEach((stat) => {
+        item.stats[stat] += GAME_RULES.equipmentUpgrade.statBonusPerLevel;
+    });
+    logMessage(t('equipmentUpgradePurchased', {
+        item: getEquipmentDisplayName(item),
+        level: item.upgradeLevel,
+        cost
+    }), 'special');
+    updateUI();
+    renderEquipmentItemDetails(item, source, slot);
 }
 
 function closeEquipmentItemDetails() {
@@ -1588,11 +1671,30 @@ function exploreForest() {
 
 function resolveStoryEvent(choiceIndex) {
     if (!pendingStoryEvent || inCombat || gameOver || campaignComplete) return;
-    const choice = pendingStoryEvent.choices[choiceIndex];
+    const event = pendingStoryEvent;
+    const choice = event.choices[choiceIndex];
     if (!choice) return;
     const effect = choice.effect;
+    const eventSeenKey = `${GAME_DATA.regions[currentRegion].id}:${event.id || event.title.pt}`;
     pendingStoryEvent = null;
-    if (effect === 'animal-event-gold') {
+    if (effect === 'abyssal-challenge') {
+        const boss = SPECIAL_MONSTERS.find((monster) => monster.id === 'abyssal-herald');
+        if (!boss) {
+            logMessage(t('denseMist'));
+            updateUI();
+            return;
+        }
+        const finalRegionIndex = GAME_DATA.regions.length - 1;
+        const challengeRewardRarities = currentRegion === finalRegionIndex
+            ? ['demon', 'god']
+            : ['epic', 'legendary'];
+        logMessage(t('abyssalChallengeAccepted'), 'combat-monster');
+        spawnMonster({ ...boss, challengeRewardRarities });
+        return;
+    } else if (effect === 'abyssal-challenge-retreat') {
+        seenStoryEvents.delete(eventSeenKey);
+        logMessage(t('abyssalChallengeRetreat'), 'special');
+    } else if (effect === 'animal-event-gold') {
         const lootRules = GAME_RULES.loot;
         const gold = lootRules.animalEventGoldMinimum
             + Math.floor(Math.random() * lootRules.animalEventGoldRange);
@@ -1712,7 +1814,8 @@ function spawnMonster(templateOverride = null) {
         xpReward: vary(template.xpReward),
         goldReward: vary(template.goldReward),
         id: template.id || null,
-        isBoss: isMistBoss
+        isBoss: isMistBoss,
+        challengeRewardRarities: template.challengeRewardRarities || null
     };
 
     inCombat = true;
@@ -2279,6 +2382,7 @@ function combatRun() {
 
 function endCombatVictory() {
     if (!inCombat || !currentMonster || currentMonster.hp > 0) return;
+    const challengeRewardRarities = currentMonster.challengeRewardRarities;
     logMessage(t("victory", { monster: currentMonster.name }), "discovery");
     logMessage(t("rewards", { xp: currentMonster.xpReward, gold: currentMonster.goldReward }), "loot");
 
@@ -2288,14 +2392,23 @@ function endCombatVictory() {
     hero.evasionBonus = 0;
     hero.parryBonus = 0;
 
-    const equipmentDrop = createEquipmentDrop();
+    const equipmentDrop = challengeRewardRarities
+        ? createChallengeEquipmentDrop(challengeRewardRarities)
+        : createEquipmentDrop();
     inCombat = false;
     combatEncounterId++;
     combatActionLocked = false;
     currentMonster = null;
 
     checkLevelUp();
-    if (equipmentDrop) handleEquipmentDrop(equipmentDrop);
+    if (equipmentDrop) {
+        if (challengeRewardRarities) {
+            logMessage(t('abyssalChallengeReward', {
+                rarity: getEquipmentRarity(equipmentDrop).name[gameLanguage]
+            }), 'loot');
+        }
+        handleEquipmentDrop(equipmentDrop);
+    }
     document.getElementById('rpg-log').dataset.combat = 'false';
     updateUI();
 }

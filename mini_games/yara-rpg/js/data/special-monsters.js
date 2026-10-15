@@ -42,5 +42,19 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         evasion: 16,
         xpReward: 180,
         goldReward: 140
+    },
+    {
+        id: "abyssal-herald",
+        name: { pt: "Arauto do Abismo", en: "Abyssal Herald" },
+        icon: "👹",
+        minLevel: 1,
+        suggestedLevel: 8,
+        hp: 760,
+        atk: 72,
+        def: 40,
+        parry: 42,
+        evasion: 18,
+        xpReward: 360,
+        goldReward: 400
     }
 ]);
