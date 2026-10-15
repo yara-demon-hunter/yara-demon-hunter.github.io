@@ -68,6 +68,9 @@ window.YaraRpgData.rules = Object.freeze({
         costMultiplier: 1.4,
         statBonusPerLevel: 1
     },
+    inventory: {
+        equipmentBagCapacity: 9
+    },
     combat: {
         enemyTelegraphDamageMultiplier: 1.65,
         telegraphEveryTurns: 3,

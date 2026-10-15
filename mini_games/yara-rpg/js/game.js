@@ -65,11 +65,11 @@ const translations = {
         equipment: "Equipamento",
         equipmentSummary: "Equipamento, {count} de 10 equipados",
         inventory: "Mochila",
-        equipmentBagDescription: "Até 10 equipamentos guardados.",
-        bagCapacity: "{count}/10 espaços usados",
+        equipmentBagDescription: "Até 9 equipamentos guardados.",
+        bagCapacity: "{count}/{capacity} espaços usados",
         bagSlot: "Espaço {slot}",
         emptyBagSlot: "Vazio",
-        openEquipmentBag: "Abrir mochila, {count} de 10 espaços usados",
+        openEquipmentBag: "Abrir mochila, {count} de {capacity} espaços usados",
         closeBag: "Fechar mochila",
         openBag: "Abrir mochila",
         discard: "Descartar",
@@ -79,7 +79,7 @@ const translations = {
         selectedItemsCount: "{count} selecionados",
         discardSelectedItems: "Descartar selecionados",
         selectInventoryItem: "Selecionar {item} para descartar",
-        inventoryFull: "Mochila cheia (10/10). Libere um espaço antes de guardar outro equipamento.",
+        inventoryFull: "Mochila cheia ({capacity}/{capacity}). Libere um espaço antes de guardar outro equipamento.",
         pendingEquipment: "Equipamento encontrado aguardando espaço: {item}.",
         pendingEquipmentFullHelp: "A mochila está cheia. Descarte um item para liberar espaço; o item encontrado ficará aguardando.",
         emptySlot: "Vazio",
@@ -279,11 +279,11 @@ const translations = {
         equipment: "Equipment",
         equipmentSummary: "Equipment, {count} of 10 equipped",
         inventory: "Bag",
-        equipmentBagDescription: "Store up to 10 pieces of equipment.",
-        bagCapacity: "{count}/10 spaces used",
+        equipmentBagDescription: "Store up to 9 pieces of equipment.",
+        bagCapacity: "{count}/{capacity} spaces used",
         bagSlot: "Slot {slot}",
         emptyBagSlot: "Empty",
-        openEquipmentBag: "Open bag, {count} of 10 spaces used",
+        openEquipmentBag: "Open bag, {count} of {capacity} spaces used",
         closeBag: "Close bag",
         openBag: "Open bag",
         discard: "Discard",
@@ -293,7 +293,7 @@ const translations = {
         selectedItemsCount: "{count} selected",
         discardSelectedItems: "Discard selected",
         selectInventoryItem: "Select {item} to discard",
-        inventoryFull: "Bag full (10/10). Free a slot before storing another item.",
+        inventoryFull: "Bag full ({capacity}/{capacity}). Free a slot before storing another item.",
         pendingEquipment: "Found equipment waiting for space: {item}.",
         pendingEquipmentFullHelp: "The bag is full. Discard an item to free a slot; the found item will remain here.",
         emptySlot: "Empty",
@@ -552,7 +552,6 @@ const EQUIPMENT_SLOTS = Object.freeze([
     { id: "accessory", icon: "🔮" },
     { id: "pet", icon: "🐾" }
 ]);
-const EQUIPMENT_BAG_CAPACITY = 10;
 const EQUIPMENT_STAT_KEYS = Object.freeze({
     atk: "attackStat",
     def: "defenseStat",
@@ -739,6 +738,7 @@ gameMusic.addEventListener('error', () => updateMusicButton(false));
 
 const GAME_DATA = window.YaraRpgData;
 const GAME_RULES = GAME_DATA.rules;
+const EQUIPMENT_BAG_CAPACITY = GAME_RULES.inventory.equipmentBagCapacity;
 const ITEM_DATA = GAME_DATA.items;
 const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
 const SPECIAL_MONSTERS = GAME_DATA.specialMonsters;
@@ -851,7 +851,10 @@ function renderEquipment() {
     const bagCount = hero.equipmentInventory.length;
     const bagCountText = `${bagCount}/${EQUIPMENT_BAG_CAPACITY}`;
     bagButton.querySelector('#equipment-bag-count').textContent = bagCountText;
-    bagButton.setAttribute('aria-label', t('openEquipmentBag', { count: bagCount }));
+    bagButton.setAttribute('aria-label', t('openEquipmentBag', {
+        count: bagCount,
+        capacity: EQUIPMENT_BAG_CAPACITY
+    }));
 
     EQUIPMENT_SLOTS.forEach(({ id, icon }) => {
         const item = hero.equipment[id];
@@ -899,7 +902,8 @@ function renderEquipment() {
 
     const inventoryContainer = document.getElementById('equipment-inventory-list');
     inventoryContainer.replaceChildren();
-    for (let index = 0; index < EQUIPMENT_BAG_CAPACITY; index++) {
+    const visibleBagSlots = Math.max(EQUIPMENT_BAG_CAPACITY, hero.equipmentInventory.length);
+    for (let index = 0; index < visibleBagSlots; index++) {
         const item = hero.equipmentInventory[index];
         const slot = document.createElement('div');
         slot.className = `equipment-bag-slot${item ? ` has-item ${getEquipmentRarityClass(item)}` : ''}`;
@@ -957,7 +961,7 @@ function renderEquipment() {
     document.getElementById('equipment-bag-dialog-count').textContent = bagCountText;
     document.getElementById('equipment-bag-dialog-count').setAttribute(
         'aria-label',
-        t('bagCapacity', { count: bagCount })
+        t('bagCapacity', { count: bagCount, capacity: EQUIPMENT_BAG_CAPACITY })
     );
     updateBulkDiscardControls();
     const pendingLabel = document.getElementById('equipment-bag-pending-item');
@@ -1235,7 +1239,7 @@ function equipItem(item, fromInventory) {
     const previousItem = hero.equipment[item.slot];
     if (previousItem && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY) {
         if (fromInventory) hero.equipmentInventory.splice(inventoryIndex, 0, item);
-        logMessage(t('inventoryFull'), 'loot');
+        logMessage(t('inventoryFull', { capacity: EQUIPMENT_BAG_CAPACITY }), 'loot');
         updateUI();
         return;
     }
@@ -1268,7 +1272,7 @@ function unequipItem(slot) {
     const item = hero.equipment[slot];
     if (!item) return;
     if (hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY) {
-        logMessage(t('inventoryFull'), 'loot');
+        logMessage(t('inventoryFull', { capacity: EQUIPMENT_BAG_CAPACITY }), 'loot');
         return;
     }
     hero.equipment[slot] = null;
