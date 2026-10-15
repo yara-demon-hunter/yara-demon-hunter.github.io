@@ -78,9 +78,9 @@ window.YaraRpgData.characters = Object.freeze([
             maxPotions: 1,
             atk: 2,
             def: 2,
-            evasion: 1,
+            evasion: 0,
             parry: 2,
-            stunChance: 1
+            stunChance: 0
         },
         skills: {
             heavyAttack: { focoCost: 25, attackMultiplier: 1.7 },
