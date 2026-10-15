@@ -63,7 +63,7 @@ const translations = {
         defense: "Defesa",
         attributes: "Atributos",
         equipment: "Equipamento",
-        equipmentSummary: "Equipamento, {count} de 9 equipados",
+        equipmentSummary: "Equipamento, {count} de 10 equipados",
         inventory: "Mochila",
         equipmentBagDescription: "Até 10 equipamentos guardados.",
         bagCapacity: "{count}/10 espaços usados",
@@ -90,6 +90,7 @@ const translations = {
         necklace: "Colar",
         ring: "Anel",
         accessory: "Acessório",
+        pet: "Companheiro",
         equip: "Equipar",
         unequip: "Desequipar",
         itemFound: "✨ Item encontrado: <span class=\"text-amber-300 font-bold\">{item}</span> ({slot}).",
@@ -262,7 +263,7 @@ const translations = {
         defense: "Defense",
         attributes: "Stats",
         equipment: "Equipment",
-        equipmentSummary: "Equipment, {count} of 9 equipped",
+        equipmentSummary: "Equipment, {count} of 10 equipped",
         inventory: "Bag",
         equipmentBagDescription: "Store up to 10 pieces of equipment.",
         bagCapacity: "{count}/10 spaces used",
@@ -289,6 +290,7 @@ const translations = {
         necklace: "Necklace",
         ring: "Ring",
         accessory: "Accessory",
+        pet: "Companion",
         equip: "Equip",
         unequip: "Unequip",
         itemFound: "✨ Item found: <span class=\"text-amber-300 font-bold\">{item}</span> ({slot}).",
@@ -498,7 +500,8 @@ const EQUIPMENT_SLOTS = Object.freeze([
     { id: "boots", icon: "🥾" },
     { id: "necklace", icon: "📿" },
     { id: "ring", icon: "💍" },
-    { id: "accessory", icon: "🔮" }
+    { id: "accessory", icon: "🔮" },
+    { id: "pet", icon: "🐾" }
 ]);
 const EQUIPMENT_BAG_CAPACITY = 10;
 const EQUIPMENT_STAT_KEYS = Object.freeze({

@@ -625,7 +625,7 @@ h1, h2, h3, .font-title {
         "necklace head bag"
         "leftHand body rightHand"
         "accessory legs ring"
-        ". boots potion";
+        "pet boots potion";
     width: min(100%, 17rem);
     margin-inline: auto;
     gap: 0.4rem;
@@ -651,6 +651,7 @@ h1, h2, h3, .font-title {
 .equipment-slot-necklace { grid-area: necklace; }
 .equipment-slot-ring { grid-area: ring; }
 .equipment-slot-accessory { grid-area: accessory; }
+.equipment-slot-pet { grid-area: pet; }
 .equipment-slot-potion {
     grid-area: potion;
     border-color: rgba(13, 148, 136, 0.65);
