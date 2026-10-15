@@ -23,14 +23,14 @@ window.YaraRpgData.items = Object.freeze({
         { id: "swift-boots", slot: "boots", icon: "🥾", name: { pt: "Botas Ligeiras", en: "Swift Boots" }, stats: { evasion: 7 }, starter: true },
         { id: "iron-boots", slot: "boots", icon: "👢", name: { pt: "Botas de Ferro", en: "Iron Boots" }, stats: { def: 3, evasion: 2 } },
         { id: "river-charm", slot: "necklace", icon: "📿", name: { pt: "Amuleto do Rio", en: "River Charm" }, stats: { maxFoco: 30, parry: 5 }, starter: true },
-        { id: "mist-ring", slot: "ring", icon: "💍", name: { pt: "Anel da Névoa", en: "Mist Ring" }, stats: { atk: 1, evasion: 2 }, starter: true },
+        { id: "mist-ring", slot: "ring", icon: "💍", name: { pt: "Anel da Névoa", en: "Mist Ring" }, stats: { atk: 2, evasion: 2 }, starter: true },
         { id: "stunning-blade", slot: "rightHand", icon: "⚡", name: { pt: "Lâmina Trovejante", en: "Thunderous Blade" }, stats: { atk: 3, stunChance: 4 } },
         { id: "rune-of-impact", slot: "accessory", icon: "🔮", name: { pt: "Runa do Impacto", en: "Impact Rune" }, stats: { stunChance: 3 }, starter: true },
         { id: "storm-circlet", slot: "accessory", icon: "🌩️", name: { pt: "Diadema da Tempestade", en: "Storm Circlet" }, stats: { def: 2, stunChance: 2 } },
-        { id: "forest-dog", slot: "pet", icon: "🐕", name: { pt: "Cão da Trilha", en: "Trail Hound" }, stats: { atk: 1, evasion: 2 }, starter: true },
+        { id: "forest-dog", slot: "pet", icon: "🐕", name: { pt: "Cão da Trilha", en: "Trail Hound" }, stats: { atk: 1, evasion: 2, parry: 1 }, starter: true },
         { id: "mist-wolf", slot: "pet", icon: "🐺", name: { pt: "Lobo da Névoa", en: "Mist Wolf" }, stats: { atk: 3, evasion: 3 } },
         { id: "watchful-eagle", slot: "pet", icon: "🦅", name: { pt: "Águia Vigilante", en: "Watchful Eagle" }, stats: { evasion: 4, parry: 2, stunChance: 1 } },
         { id: "shadow-cat", slot: "pet", icon: "🐈", name: { pt: "Gato Sombrio", en: "Shadow Cat" }, stats: { evasion: 3, stunChance: 1 }, starter: true },
-        { id: "mist-horse", slot: "pet", icon: "🐎", name: { pt: "Cavalo da Névoa", en: "Mist Horse" }, stats: { maxHp: 35, maxFoco: 15, evasion: 4 } }
+        { id: "mist-horse", slot: "pet", icon: "🐎", name: { pt: "Cavalo da Névoa", en: "Mist Horse" }, stats: { maxHp: 50, maxFoco: 15, evasion: 4 } }
     ])
 });

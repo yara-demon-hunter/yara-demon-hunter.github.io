@@ -97,8 +97,11 @@ const translations = {
         itemEquipped: "⚔️ {item} equipado em {slot}.",
         itemStored: "🎒 {item} guardado na mochila.",
         itemDropTitle: "Equipamento encontrado",
-        itemDropPrompt: "{item} ocupa o slot {slot}, atualmente usado por {currentItem}.",
+        itemDropPrompt: "Compare os dois equipamentos e escolha qual quer usar.",
         itemDropChoiceHelp: "Equipar o novo guarda o atual na mochila; manter o atual guarda o item encontrado.",
+        newEquipmentLabel: "Encontrado",
+        equippedEquipmentLabel: "Equipado",
+        noEquipmentBonuses: "Sem bônus de atributos",
         equipNewItem: "Equipar novo",
         keepCurrentItem: "Manter atual",
         equipItemAria: "Equipar {item} em {slot}",
@@ -297,8 +300,11 @@ const translations = {
         itemEquipped: "⚔️ {item} equipped in {slot}.",
         itemStored: "🎒 {item} stored in your bag.",
         itemDropTitle: "Equipment found",
-        itemDropPrompt: "{item} uses the {slot} slot, currently occupied by {currentItem}.",
+        itemDropPrompt: "Compare both pieces of equipment and choose which one to use.",
         itemDropChoiceHelp: "Equipping the new item moves the current one to your bag; keeping the current item stores the find.",
+        newEquipmentLabel: "Found",
+        equippedEquipmentLabel: "Equipped",
+        noEquipmentBonuses: "No stat bonuses",
         equipNewItem: "Equip new",
         keepCurrentItem: "Keep current",
         equipItemAria: "Equip {item} in {slot}",
@@ -928,21 +934,46 @@ function discardInventoryItem(item) {
 function showEquipmentChoice(item, fromInventory) {
     pendingEquipment = { item, fromInventory };
     const currentItem = hero.equipment[item.slot];
-    document.getElementById('item-drop-message').textContent = t('itemDropPrompt', {
-        item: item.name[gameLanguage],
-        slot: t(item.slot),
-        currentItem: `${currentItem.icon} ${currentItem.name[gameLanguage]}`
-    });
+    document.getElementById('item-drop-message').textContent = t('itemDropPrompt');
+    document.getElementById('item-drop-new-icon').textContent = item.icon;
+    document.getElementById('item-drop-new-name').textContent = item.name[gameLanguage];
+    document.getElementById('item-drop-new-slot').textContent = t(item.slot);
+    document.getElementById('item-drop-current-icon').textContent = currentItem.icon;
+    document.getElementById('item-drop-current-name').textContent = currentItem.name[gameLanguage];
+    document.getElementById('item-drop-current-slot').textContent = t(currentItem.slot);
+    renderEquipmentBonuses(document.getElementById('item-drop-new-bonuses'), item);
+    renderEquipmentBonuses(document.getElementById('item-drop-current-bonuses'), currentItem);
     const blockedByFullBag = isPendingDropBlocked();
     document.getElementById('item-drop-choice-help').textContent = blockedByFullBag
         ? t('pendingEquipmentFullHelp')
         : t('itemDropChoiceHelp');
-    document.getElementById('item-drop-bonuses').textContent = getItemBonusText(item);
     document.getElementById('equip-new-item-button').disabled = blockedByFullBag;
     document.getElementById('keep-current-item-button').disabled = blockedByFullBag;
     document.getElementById('open-bag-from-drop-button').hidden = !blockedByFullBag;
     document.getElementById('item-drop-dialog').showModal();
     renderEquipment();
+}
+
+function renderEquipmentBonuses(container, item) {
+    container.replaceChildren();
+    const bonuses = Object.entries(item.stats);
+    if (!bonuses.length) {
+        const empty = document.createElement('li');
+        empty.textContent = t('noEquipmentBonuses');
+        container.append(empty);
+        return;
+    }
+
+    bonuses.forEach(([stat, amount]) => {
+        const bonus = document.createElement('li');
+        bonus.textContent = t(
+            stat === 'evasion' || stat === 'parry' || stat === 'stunChance'
+                ? 'equipmentPercentageBonus'
+                : 'equipmentBonus',
+            { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
+        );
+        container.append(bonus);
+    });
 }
 
 function isPendingDropBlocked() {

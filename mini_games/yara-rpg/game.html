@@ -319,7 +319,23 @@ permalink: /mini_games/yara-rpg/game.html
             <h2 id="item-drop-title" class="text-lg font-bold text-amber-300" data-i18n="itemDropTitle">Equipamento encontrado</h2>
             <p id="item-drop-message" class="mt-2 text-sm text-gray-200"></p>
             <p id="item-drop-choice-help" class="mt-2 text-xs text-gray-300" data-i18n="itemDropChoiceHelp">Equipar o novo guarda o atual na mochila; manter o atual guarda o item encontrado.</p>
-            <p id="item-drop-bonuses" class="mt-2 text-xs text-emerald-200"></p>
+            <div class="equipment-comparison" role="group" aria-labelledby="item-drop-title">
+                <section class="equipment-comparison-card equipment-comparison-new" aria-labelledby="item-drop-new-name">
+                    <span class="equipment-comparison-label" data-i18n="newEquipmentLabel">Encontrado</span>
+                    <span id="item-drop-new-icon" class="equipment-comparison-icon" aria-hidden="true"></span>
+                    <h3 id="item-drop-new-name" class="equipment-comparison-name"></h3>
+                    <p id="item-drop-new-slot" class="equipment-comparison-slot"></p>
+                    <ul id="item-drop-new-bonuses" class="equipment-comparison-bonuses"></ul>
+                </section>
+                <span class="equipment-comparison-arrow" aria-hidden="true">→</span>
+                <section class="equipment-comparison-card equipment-comparison-current" aria-labelledby="item-drop-current-name">
+                    <span class="equipment-comparison-label" data-i18n="equippedEquipmentLabel">Equipado</span>
+                    <span id="item-drop-current-icon" class="equipment-comparison-icon" aria-hidden="true"></span>
+                    <h3 id="item-drop-current-name" class="equipment-comparison-name"></h3>
+                    <p id="item-drop-current-slot" class="equipment-comparison-slot"></p>
+                    <ul id="item-drop-current-bonuses" class="equipment-comparison-bonuses"></ul>
+                </section>
+            </div>
             <div class="mt-4 grid grid-cols-2 gap-2">
                 <button id="equip-new-item-button" type="button" class="rounded-lg border border-amber-500 bg-amber-700 px-3 py-2 text-sm font-semibold text-white" data-i18n="equipNewItem">Equipar novo</button>
                 <button id="keep-current-item-button" type="button" class="rounded-lg border border-forest-600 bg-forest-800 px-3 py-2 text-sm font-semibold text-emerald-100" data-i18n="keepCurrentItem">Manter atual</button>
