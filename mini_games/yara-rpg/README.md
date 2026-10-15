@@ -27,7 +27,10 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 - `css/responsive.css`: layout para tablets e celulares.
 - `css/game.css`: atalho de compatibilidade que importa `main.css`.
 - `css/embedded-rpg.css`: estilos do fragmento HTML legado.
-- `js/game.js`: estado do personagem, exploração, combate e atualização da interface.
+- `js/game.js`: estado global, salvamento, equipamentos, atualização da interface e inicialização.
+- `js/systems/i18n.js`: textos em português e inglês, idioma selecionado e função de tradução `t`.
+- `js/systems/exploration.js`: exploração, descoberta de regiões, eventos narrativos, surgimento de monstros e contatos da névoa.
+- `js/systems/combat.js`: ações de combate, turnos dos inimigos, melhorias, recompensas e finais da jornada.
 - `js/systems/mist-contacts.js`: regras reutilizáveis para sortear contatos, resultados, chefes e poderes da névoa.
 - `js/systems/character-setup.js`: controla as telas de início, a seleção do personagem e o equipamento inicial.
 - `js/data/setup-config.js`: configura a quantidade de equipamentos iniciais que o jogador pode escolher.
@@ -42,7 +45,7 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 
 Durante a exploração, um contato pode abordar Zeph. Cada contato tem um ícone próprio, e a chance de encontro começa baixa, aumenta com o nível e respeita um intervalo mínimo. O jogador pode aceitar a oferta ou recusá-la sem penalidade. Em geral, aceitar sorteia entre enfrentar um chefe, receber ouro em troca de HP ou despertar um poder permanente; a bruxa caçadora sempre inicia sua missão contra um morto-vivo forte, enquanto a bruxa velha troca uma bebida que reduz o HP para no máximo 20% do máximo por 150 de ouro.
 
-Para expandir o sistema, cadastre novos contatos, chefes ou poderes em `js/data/mist-contacts.js`. Ajuste frequência, intervalo, recompensas e pesos em `js/data/game-rules.js`. Os textos de interface ficam em português e inglês em `js/game.js`.
+Para expandir o sistema, cadastre novos contatos, chefes ou poderes em `js/data/mist-contacts.js`. Ajuste frequência, intervalo, recompensas e pesos em `js/data/game-rules.js`. Os textos de interface ficam em português e inglês em `js/systems/i18n.js`.
 
 ## Acampamento e equipamentos
 
@@ -50,7 +53,17 @@ Descansar custa 50 de ouro e recupera 20% do HP e do foco máximos atuais, sem u
 
 Os itens e atributos que concedem ficam em `js/data/items.js`; chance de drop e recuperação do acampamento ficam em `js/data/game-rules.js`.
 
-Para alterar personagens ou criar outro, edite `js/data/characters.js`. Cada personagem possui seu próprio bloco `levelUp`, com valores editáveis para os ganhos de cada nível. A tela de seleção e o limite de três itens ficam em `js/systems/character-setup.js`; textos localizados ficam em `js/game.js`.
+Para alterar personagens ou criar outro, edite `js/data/characters.js`. Cada personagem possui seu próprio bloco `levelUp`, com valores editáveis para os ganhos de cada nível. A tela de seleção e o limite de três itens ficam em `js/systems/character-setup.js`; textos localizados ficam em `js/systems/i18n.js`.
+
+## Mapa rápido do código
+
+- Texto, idioma, rótulos ou tradução: `js/systems/i18n.js`.
+- Exploração, eventos e contatos da névoa: `js/systems/exploration.js` e `js/data/`.
+- Golpes, turnos, poções, descanso, melhorias e recompensas: `js/systems/combat.js`.
+- Mochila, equipamento, salvamento, estado global e desenho dos painéis: `js/game.js`.
+- Tela inicial e escolhas de personagem/equipamento inicial: `js/systems/character-setup.js`.
+
+Os sistemas são scripts clássicos que compartilham o estado global do navegador; `game.html` define a ordem de carregamento e `game.js` deve permanecer por último.
 
 ## Estado do componente
 
@@ -58,4 +71,4 @@ O fragmento em `components/` ainda não é autônomo: não contém todos os camp
 
 ## Avaliacao tecnica
 
-A página completa já oferece um ciclo jogável de exploração, combate, descanso, itens e progressão. A separação em arquivos facilita a manutenção, mas o JavaScript ainda reúne toda a lógica e a interface num único arquivo e depende de handlers `onclick` no HTML. O Tailwind via CDN é adequado para prototipagem, mas deve ser compilado localmente antes de uma publicação de produção.
+A página completa já oferece um ciclo jogável de exploração, combate, descanso, itens e progressão. A lógica agora fica dividida por responsabilidade em scripts de sistema, enquanto `game.js` mantém estado, interface, equipamentos e inicialização; os controles ainda usam handlers `onclick` no HTML. O Tailwind via CDN é adequado para prototipagem, mas deve ser compilado localmente antes de uma publicação de produção.
