@@ -488,7 +488,8 @@ const EQUIPMENT_STAT_KEYS = Object.freeze({
     maxHp: "hpStat",
     maxFoco: "focusStat",
     evasion: "evasionStat",
-    parry: "parryStat"
+    parry: "parryStat",
+    stunChance: "stun"
 });
 
 function getEquipmentBonus(stat) {
@@ -505,7 +506,7 @@ function getEffectiveStat(stat) {
 function getItemBonusText(item) {
     return Object.entries(item.stats)
         .map(([stat, amount]) => t(
-            stat === "evasion" || stat === "parry"
+            stat === "evasion" || stat === "parry" || stat === "stunChance"
                 ? "equipmentPercentageBonus"
                 : "equipmentBonus",
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
@@ -824,7 +825,7 @@ function showEquipmentItemDetails(item, source, slot = null) {
     Object.entries(item.stats).forEach(([stat, amount]) => {
         const property = document.createElement('li');
         property.textContent = t(
-            stat === 'evasion' || stat === 'parry'
+            stat === 'evasion' || stat === 'parry' || stat === 'stunChance'
                 ? 'equipmentPercentageBonus'
                 : 'equipmentBonus',
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }

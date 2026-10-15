@@ -13,7 +13,7 @@ window.YaraRpgData.items = Object.freeze({
         { id: "hunter-axe", slot: "rightHand", icon: "🪓", name: { pt: "Machado do Caçador", en: "Hunter's Axe" }, stats: { atk: 8 }, starter: true },
         { id: "mist-dagger", slot: "rightHand", icon: "🔪", name: { pt: "Faca da Névoa", en: "Mist Dagger" }, stats: { atk: 1, evasion: 6 }, starter: true },
         { id: "wooden-shield", slot: "leftHand", icon: "🛡️", name: { pt: "Escudo de Madeira", en: "Wooden Shield" }, stats: { def: 2, parry: 5 }, starter: true },
-        { id: "iron-shield", slot: "leftHand", icon: "🛡️", name: { pt: "Escudo de Ferro", en: "Iron Shield" }, stats: { def: 5, maxHp: 30 } },
+        { id: "iron-shield", slot: "leftHand", icon: "🛡️", name: { pt: "Escudo de Ferro", en: "Iron Shield" }, stats: { def: 5, maxHp: 30 }, starter: true },
         { id: "leather-cap", slot: "head", icon: "⛑️", name: { pt: "Capuz de Couro", en: "Leather Hood" }, stats: { def: 1, evasion: 3 }, starter: true },
         { id: "iron-helm", slot: "head", icon: "🪖", name: { pt: "Elmo de Ferro", en: "Iron Helm" }, stats: { def: 4, maxHp: 40 } , starter: true },
         { id: "leather-armor", slot: "body", icon: "🦺", name: { pt: "Armadura de Couro", en: "Leather Armor" }, stats: { def: 2, maxHp: 50 }, starter: true },
@@ -25,7 +25,7 @@ window.YaraRpgData.items = Object.freeze({
         { id: "river-charm", slot: "accessory", icon: "📿", name: { pt: "Amuleto do Rio", en: "River Charm" }, stats: { maxFoco: 30, parry: 5 }, starter: true },
         { id: "mist-ring", slot: "accessory", icon: "💍", name: { pt: "Anel da Névoa", en: "Mist Ring" }, stats: { atk: 1, evasion: 2 }, starter: true },
         { id: "stunning-blade", slot: "rightHand", icon: "⚡", name: { pt: "Lâmina Trovejante", en: "Thunderous Blade" }, stats: { atk: 3, stunChance: 4 } },
-        { id: "rune-of-impact", slot: "accessory", icon: "🔮", name: { pt: "Runa do Impacto", en: "Impact Rune" }, stats: { stunChance: 3 } },
+        { id: "rune-of-impact", slot: "accessory", icon: "🔮", name: { pt: "Runa do Impacto", en: "Impact Rune" }, stats: { stunChance: 3 }, starter: true },
         { id: "storm-circlet", slot: "head", icon: "🌩️", name: { pt: "Diadema da Tempestade", en: "Storm Circlet" }, stats: { def: 2, stunChance: 2 } }
     ])
 });
