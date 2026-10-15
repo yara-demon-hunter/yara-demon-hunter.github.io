@@ -2,21 +2,6 @@ window.YaraRpgData = window.YaraRpgData || {};
 
 window.YaraRpgData.rules = Object.freeze({
     probabilityScale: 100,
-    exploration: {
-        discoveryBaseChance: 1,
-        discoveryChancePerLevel: 1,
-        discoveryChancePerRegion: 1,
-        maxDiscoveryChance: 10,
-        encounters: {
-            monsterThreshold: 50,
-            goldThreshold: 75,
-            safeTrailThreshold: 90,
-            foundGoldMinimum: 5,
-            foundGoldRange: 10,
-            safeTrailRecoveryHp: 30,
-            safeTrailRecoveryFoco: 15
-        }
-    },
     mistContacts: {
         baseChance: 3,
         chancePerLevel: 2,

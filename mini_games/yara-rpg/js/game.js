@@ -176,6 +176,14 @@ const translations = {
         goldFound: "Você vasculhou as margens e encontrou <span class=\"text-amber-300\">{amount} de ouro</span> esquecido na lama!",
         potionFound: "🧪 Você encontrou uma poção de cura! Estoque: <span class=\"text-emerald-300\">{potions}/{capacity}</span>.",
         safeTrail: "✨ Você encontrou um rastro seguro e recuperou <span class=\"text-emerald-300\">{amount_hp} de HP and {amount_foco} de fôlego</span>.",
+        explorationTrap: "🪤 Uma armadilha escondida causou {damage} de dano, mas você conseguiu escapar.",
+        explorationFocus: "✨ Você encontra um fragmento de névoa e recupera {focus} de Foco.",
+        explorationSupplies: "🎒 Você encontra suprimentos: +{gold} de ouro e recupera {hp} de HP.",
+        monsterFateTitle: "O {monster} ainda está vivo",
+        monsterFateDescription: "Você pode dar o golpe final e receber as recompensas normais, ou poupá-lo para ouvir uma informação. Se poupar, recebe metade do ouro, mas nenhum XP nem equipamento.",
+        monsterFateFinish: "Dar o golpe final (+XP e recompensas)",
+        monsterFateSpare: "Poupar e ouvir (+metade do ouro, sem XP)",
+        monsterSpared: "🕊️ Você poupou {monster}, recebeu {gold} de ouro e ouviu: “{clue}”",
         denseMist: "A névoa densa dificulta a visão. Apenas o som do vento e das risadas ecoam ao longe.",
         monsterAppears: "⚠ Um perigo surgiu na escuridão: <span class=\"text-red-400 font-bold\">{monster}</span> bloqueia o caminho!",
         quickDamage: "Você desferiu um <span class=\"text-emerald-400 font-bold\">Ataque Rápido</span> causando {damage} de dano e ganhou {fury} de Fúria.",
@@ -390,6 +398,14 @@ const translations = {
         goldFound: "You searched the riverbank and found <span class=\"text-amber-300\">{amount} gold</span> buried in the mud!",
         potionFound: "🧪 You found a healing potion! Inventory: <span class=\"text-emerald-300\">{potions}/{capacity}</span>.",
         safeTrail: "✨ You found a safe trail and recovered <span class=\"text-emerald-300\">{amount_hp} HP and {amount_foco} Focus</span>.",
+        explorationTrap: "🪤 A hidden trap deals {damage} damage, but you escape.",
+        explorationFocus: "✨ You find a shard of mist and recover {focus} Focus.",
+        explorationSupplies: "🎒 You find supplies: +{gold} gold and recover {hp} HP.",
+        monsterFateTitle: "The {monster} is still alive",
+        monsterFateDescription: "You can finish it and claim the normal rewards, or spare it to hear some information. Sparing it grants half the gold, but no XP or equipment.",
+        monsterFateFinish: "Deliver the final blow (+XP and rewards)",
+        monsterFateSpare: "Spare it and listen (+half gold, no XP)",
+        monsterSpared: "🕊️ You spared {monster}, received {gold} gold, and heard: “{clue}”",
         denseMist: "The dense mist makes it hard to see. Only the wind and distant laughter answer.",
         monsterAppears: "⚠ A threat emerges from the dark: <span class=\"text-red-400 font-bold\">{monster}</span> blocks your path!",
         quickDamage: "You land a <span class=\"text-emerald-400 font-bold\">Quick Attack</span> for {damage} damage and gain {fury} Fury.",
@@ -434,8 +450,12 @@ const translations = {
     }
 };
 
+function translateForLanguage(language, key, values = {}) {
+    return (translations[language][key] ?? key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+}
+
 function t(key, values = {}) {
-    return (translations[gameLanguage][key] ?? key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+    return translateForLanguage(gameLanguage, key, values);
 }
 
 function saveGame() {
@@ -443,6 +463,7 @@ function saveGame() {
     const snapshot = {
         version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)), inCombat,
         currentRegion, discoveredRegions, explorationsSinceMistContact, explorationCount,
+        explorationsSinceStoryEvent,
         storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
         seenStoryEvents: [...seenStoryEvents],
         pendingEquipment, equipmentInstanceId
@@ -482,6 +503,7 @@ function loadSavedGame(snapshot = readSavedGame()) {
     discoveredRegions = Array.isArray(snapshot.discoveredRegions) ? snapshot.discoveredRegions : [0];
     explorationsSinceMistContact = Number(snapshot.explorationsSinceMistContact) || 0;
     explorationCount = Number(snapshot.explorationCount) || 0;
+    explorationsSinceStoryEvent = Number(snapshot.explorationsSinceStoryEvent) || 0;
     equipmentInstanceId = Number(snapshot.equipmentInstanceId) || 0;
     storyEventSeen.clear();
     (snapshot.storyEventSeen || []).forEach((id) => storyEventSeen.add(id));
@@ -738,6 +760,7 @@ gameMusic.addEventListener('error', () => updateMusicButton(false));
 
 const GAME_DATA = window.YaraRpgData;
 const GAME_RULES = GAME_DATA.rules;
+const EXPLORATION_RULES = GAME_DATA.exploration;
 const EQUIPMENT_BAG_CAPACITY = GAME_RULES.inventory.equipmentBagCapacity;
 const ITEM_DATA = GAME_DATA.items;
 const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
@@ -789,6 +812,7 @@ let equipmentInstanceId = 0;
 let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
 let pendingStoryEvent = null;
 let explorationCount = 0;
+let explorationsSinceStoryEvent = 0;
 let campaignComplete = false;
 let enemyTurnCount = 0;
 let enemyTelegraphing = false;
@@ -1609,6 +1633,7 @@ function exploreForest() {
 
     explorationsSinceMistContact++;
     explorationCount++;
+    explorationsSinceStoryEvent++;
     if (tryDiscoverRegion()) {
         updateUI();
         return;
@@ -1619,10 +1644,13 @@ function exploreForest() {
     const unseenEvents = regionEvents.filter((event) =>
         !seenStoryEvents.has(`${regionData.id}:${event.id || event.title.pt}`)
     );
-    if (unseenEvents.length && explorationCount >= 2) {
+    if (unseenEvents.length
+        && explorationsSinceStoryEvent >= EXPLORATION_RULES.storyEvents.cooldownExplorations
+        && Math.random() * GAME_RULES.probabilityScale < EXPLORATION_RULES.storyEvents.chance) {
         pendingStoryEvent = unseenEvents[Math.floor(Math.random() * unseenEvents.length)];
         storyEventSeen.add(regionData.id);
         seenStoryEvents.add(`${regionData.id}:${pendingStoryEvent.id || pendingStoryEvent.title.pt}`);
+        explorationsSinceStoryEvent = 0;
         updateUI();
         return;
     }
@@ -1646,31 +1674,67 @@ function exploreForest() {
         }
     }
 
-    const encounterRules = GAME_RULES.exploration.encounters;
-    const roll = Math.floor(Math.random() * GAME_RULES.probabilityScale) + 1;
-
-    if (roll <= encounterRules.monsterThreshold) {
+    const outcome = chooseExplorationOutcome();
+    if (outcome === 'monster') {
         spawnMonster();
-    } else if (roll <= encounterRules.goldThreshold) {
-        const goldFound = Math.floor(Math.random() * encounterRules.foundGoldRange) + encounterRules.foundGoldMinimum;
-        hero.gold += goldFound;
-        logMessage(t("goldFound", { amount: goldFound }), "loot");
-        updateUI();
-    } else if (roll <= encounterRules.safeTrailThreshold) {
-        const healAmountHp = encounterRules.safeTrailRecoveryHp;
-        const healAmountFoco = encounterRules.safeTrailRecoveryFoco;
-
-        hero.hp = Math.min(getEffectiveStat('maxHp'), hero.hp + healAmountHp);
-        hero.foco = Math.min(getEffectiveStat('maxFoco'), hero.foco + healAmountFoco);
-        logMessage(t("safeTrail", { amount_hp: healAmountHp, amount_foco: healAmountFoco }), "special");
-        updateUI();
-    } else if (hero.potions < hero.maxPotions) {
-        hero.potions++;
-        logMessage(t("potionFound", { potions: hero.potions, capacity: hero.maxPotions }), "loot");
-        updateUI();
-    } else {
-        logMessage(t("denseMist"));
+        return;
     }
+    if (outcome === 'gold') {
+        const rules = EXPLORATION_RULES.gold;
+        const amount = rules.minimum + Math.floor(Math.random() * rules.range);
+        hero.gold += amount;
+        logMessage(t('goldFound', { amount }), 'loot');
+    } else if (outcome === 'safeTrail') {
+        const hp = Math.min(EXPLORATION_RULES.safeTrail.hp, getEffectiveStat('maxHp') - hero.hp);
+        const focus = Math.min(EXPLORATION_RULES.safeTrail.focus, getEffectiveStat('maxFoco') - hero.foco);
+        hero.hp += hp;
+        hero.foco += focus;
+        logMessage(t('safeTrail', { amount_hp: hp, amount_foco: focus }), 'special');
+    } else if (outcome === 'potion') {
+        hero.potions++;
+        logMessage(t('potionFound', { potions: hero.potions, capacity: hero.maxPotions }), 'loot');
+    } else if (outcome === 'trap') {
+        const rules = EXPLORATION_RULES.trap;
+        const rolledDamage = rules.damageMinimum + Math.floor(Math.random() * rules.damageRange);
+        const damage = Math.min(rolledDamage, Math.max(0, hero.hp - 1));
+        hero.hp -= damage;
+        logMessage(t('explorationTrap', { damage }), 'combat-monster');
+    } else if (outcome === 'focus') {
+        const rules = EXPLORATION_RULES.focusFind;
+        const foundFocus = rules.minimum + Math.floor(Math.random() * rules.range);
+        const focus = Math.min(foundFocus, getEffectiveStat('maxFoco') - hero.foco);
+        hero.foco += focus;
+        logMessage(t('explorationFocus', { focus }), 'special');
+    } else if (outcome === 'supplies') {
+        const rules = EXPLORATION_RULES.supplies;
+        const gold = rules.goldMinimum + Math.floor(Math.random() * rules.goldRange);
+        const hp = Math.min(rules.hpRecovery, getEffectiveStat('maxHp') - hero.hp);
+        hero.gold += gold;
+        hero.hp += hp;
+        logMessage(t('explorationSupplies', { gold, hp }), 'loot');
+    } else {
+        logMessage(t('denseMist'));
+    }
+    updateUI();
+}
+
+function chooseExplorationOutcome() {
+    const availableOutcomes = EXPLORATION_RULES.outcomes.filter((outcome) => {
+        if (outcome.type === 'potion') return hero.potions < hero.maxPotions;
+        if (outcome.type === 'focus') return hero.foco < getEffectiveStat('maxFoco');
+        if (outcome.type === 'safeTrail') {
+            return hero.hp < getEffectiveStat('maxHp') || hero.foco < getEffectiveStat('maxFoco');
+        }
+        return true;
+    });
+    const totalWeight = availableOutcomes.reduce((total, outcome) => total + outcome.weight, 0);
+    if (totalWeight <= 0) return null;
+    let roll = Math.random() * totalWeight;
+    for (const outcome of availableOutcomes) {
+        roll -= outcome.weight;
+        if (roll < 0) return outcome.type;
+    }
+    return availableOutcomes[availableOutcomes.length - 1]?.type ?? null;
 }
 
 function resolveStoryEvent(choiceIndex) {
@@ -1681,7 +1745,26 @@ function resolveStoryEvent(choiceIndex) {
     const effect = choice.effect;
     const eventSeenKey = `${GAME_DATA.regions[currentRegion].id}:${event.id || event.title.pt}`;
     pendingStoryEvent = null;
-    if (effect === 'abyssal-challenge') {
+    if (effect === 'monster-final-blow') {
+        awardCombatVictory(event.monster);
+        return;
+    } else if (effect === 'monster-spared') {
+        const monster = event.monster;
+        const rules = EXPLORATION_RULES.sparedMonster;
+        const gold = Math.floor(monster.goldReward * rules.goldPercent / GAME_RULES.probabilityScale);
+        const regionId = GAME_DATA.regions[currentRegion].id;
+        const clues = rules.clues[regionId] || [];
+        const clue = clues.length
+            ? clues[Math.floor(Math.random() * clues.length)][gameLanguage]
+            : t('denseMist');
+        hero.gold += gold;
+        hero.fury = 0;
+        hero.evasionBonus = 0;
+        hero.parryBonus = 0;
+        logMessage(t('monsterSpared', { monster: monster.name, gold, clue }), 'special');
+        updateUI();
+        return;
+    } else if (effect === 'abyssal-challenge') {
         const boss = SPECIAL_MONSTERS.find((monster) => monster.id === 'abyssal-herald');
         if (!boss) {
             logMessage(t('denseMist'));
@@ -1760,13 +1843,13 @@ function resolveStoryEvent(choiceIndex) {
 }
 
 function getDiscoveryChance() {
-    const explorationRules = GAME_RULES.exploration;
+    const explorationRules = EXPLORATION_RULES.discovery;
     if (currentRegion >= GAME_DATA.regions.length - 1) return 0;
     return Math.min(
-        explorationRules.maxDiscoveryChance,
-        explorationRules.discoveryBaseChance
-            + (hero.level - 1) * explorationRules.discoveryChancePerLevel
-            + currentRegion * explorationRules.discoveryChancePerRegion
+        explorationRules.maximumChance,
+        explorationRules.baseChance
+            + (hero.level - 1) * explorationRules.chancePerLevel
+            + currentRegion * explorationRules.chancePerRegion
     );
 }
 
@@ -1775,6 +1858,7 @@ function tryDiscoverRegion() {
 
     currentRegion++;
     discoveredRegions.push(currentRegion);
+    explorationsSinceStoryEvent = 0;
     logMessage(t("regionArrival", { region: GAME_DATA.regions[currentRegion].title[gameLanguage] }), "discovery");
     explorationCount = 0;
     return true;
@@ -2386,12 +2470,65 @@ function combatRun() {
 
 function endCombatVictory() {
     if (!inCombat || !currentMonster || currentMonster.hp > 0) return;
-    const challengeRewardRarities = currentMonster.challengeRewardRarities;
-    logMessage(t("victory", { monster: currentMonster.name }), "discovery");
-    logMessage(t("rewards", { xp: currentMonster.xpReward, gold: currentMonster.goldReward }), "loot");
+    const defeatedMonster = { ...currentMonster };
+    const mercyChance = EXPLORATION_RULES.sparedMonster.chance;
+    if (!defeatedMonster.isBoss
+        && Math.random() * GAME_RULES.probabilityScale < mercyChance) {
+        inCombat = false;
+        combatEncounterId++;
+        combatActionLocked = false;
+        currentMonster = null;
+        hero.fury = 0;
+        hero.evasionBonus = 0;
+        hero.parryBonus = 0;
+        pendingStoryEvent = createMonsterFateEvent(defeatedMonster);
+        document.getElementById('rpg-log').dataset.combat = 'false';
+        updateUI();
+        return;
+    }
+    awardCombatVictory(defeatedMonster);
+}
 
-    hero.gold += currentMonster.goldReward;
-    hero.xp += currentMonster.xpReward;
+function createMonsterFateEvent(monster) {
+    const values = { monster: monster.name };
+    return {
+        id: `monster-fate-${monster.id || 'creature'}`,
+        monsterFate: true,
+        monster,
+        title: {
+            pt: translateForLanguage('pt', 'monsterFateTitle', values),
+            en: translateForLanguage('en', 'monsterFateTitle', values)
+        },
+        description: {
+            pt: translateForLanguage('pt', 'monsterFateDescription', values),
+            en: translateForLanguage('en', 'monsterFateDescription', values)
+        },
+        choices: [
+            {
+                label: {
+                    pt: translateForLanguage('pt', 'monsterFateFinish'),
+                    en: translateForLanguage('en', 'monsterFateFinish')
+                },
+                effect: 'monster-final-blow'
+            },
+            {
+                label: {
+                    pt: translateForLanguage('pt', 'monsterFateSpare'),
+                    en: translateForLanguage('en', 'monsterFateSpare')
+                },
+                effect: 'monster-spared'
+            }
+        ]
+    };
+}
+
+function awardCombatVictory(monster) {
+    const challengeRewardRarities = monster.challengeRewardRarities;
+    logMessage(t("victory", { monster: monster.name }), "discovery");
+    logMessage(t("rewards", { xp: monster.xpReward, gold: monster.goldReward }), "loot");
+
+    hero.gold += monster.goldReward;
+    hero.xp += monster.xpReward;
     hero.fury = 0;
     hero.evasionBonus = 0;
     hero.parryBonus = 0;
@@ -2451,6 +2588,7 @@ function startAdventure({ character, equipment }) {
     pendingMistContact = null; pendingEquipment = null; pendingStoryEvent = null;
     selectedInventoryItems.clear();
     storyEventSeen.clear(); seenStoryEvents.clear(); explorationCount = 0;
+    explorationsSinceStoryEvent = 0;
     explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
     Object.assign(hero, character.baseStats, {
         name: character.name,
