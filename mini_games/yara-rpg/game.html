@@ -47,7 +47,7 @@ permalink: /mini_games/yara-rpg/game.html
                 <div class="setup-heading">
                     <p class="start-kicker" data-i18n="setupKicker">Prepare sua jornada</p>
                     <h2 class="setup-title" data-i18n="setupTitle">Escolha quem entrará na névoa</h2>
-                    <p class="setup-description" data-i18n="setupDescription">Cada caçador tem uma força diferente. Depois, escolha três equipamentos para levar.</p>
+                    <p class="setup-description" data-i18n="setupDescription">Cada caçador tem uma força diferente. Depois, escolha os equipamentos iniciais para levar.</p>
                 </div>
                 <section class="setup-section" aria-labelledby="character-selection-title">
                     <h3 id="character-selection-title" class="setup-section-title" data-i18n="selectCharacter">Personagem</h3>
@@ -55,8 +55,8 @@ permalink: /mini_games/yara-rpg/game.html
                 </section>
                 <section class="setup-section" aria-labelledby="equipment-selection-title">
                     <div class="starter-equipment-heading">
-                        <h3 id="equipment-selection-title" class="setup-section-title" data-i18n="selectStarterEquipment">Escolha 3 equipamentos</h3>
-                        <span id="starter-equipment-count" class="starter-equipment-count">0/3</span>
+                        <h3 id="equipment-selection-title" class="setup-section-title" data-i18n="selectStarterEquipment">Equipamentos iniciais</h3>
+                        <span id="starter-equipment-count" class="starter-equipment-count">0</span>
                     </div>
                     <p class="setup-section-help" data-i18n="starterEquipmentHelp">Escolha equipamentos de espaços diferentes. Selecione novamente um espaço para trocar sua escolha.</p>
                     <div id="starter-equipment-options" class="starter-equipment-options" role="group" aria-label="Equipamento inicial" data-i18n-aria="selectStarterEquipment"></div>
@@ -292,10 +292,6 @@ permalink: /mini_games/yara-rpg/game.html
                     <button onclick="combatRun()" class="bg-stone-900 hover:bg-stone-800 active:scale-[0.98] text-stone-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-700 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span>🏃</span> <span data-i18n="run">Fugir na Névoa</span>
                     </button>
-                    <button id="potion-combat-button" type="button" onclick="usePotion()" class="potion-action-button bg-teal-800 hover:bg-teal-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-teal-50 font-semibold py-2.5 px-2 rounded-xl shadow border border-teal-600 flex flex-col items-center justify-center gap-1 transition text-xs" data-i18n-aria="potionActionAria">
-                        <span aria-hidden="true">🧪</span> <span data-i18n="drink">Poção</span>
-                        <span class="potion-count text-[10px] text-teal-100"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
-                    </button>
                 </div>
             </div>
 
@@ -359,6 +355,7 @@ permalink: /mini_games/yara-rpg/game.html
     <script src="js/data/regions.js" defer></script>
     <script src="js/data/monsters.js" defer></script>
     <script src="js/data/game-rules.js" defer></script>
+    <script src="js/data/setup-config.js" defer></script>
     <script src="js/data/mist-contacts.js" defer></script>
     <script src="js/systems/character-setup.js" defer></script>
     <script src="js/systems/mist-contacts.js" defer></script>

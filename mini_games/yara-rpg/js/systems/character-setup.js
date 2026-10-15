@@ -2,6 +2,7 @@ window.YaraRpgCharacterSetup = (() => {
     const CHARACTER_DATA = window.YaraRpgData.characters;
     const EQUIPMENT_DATA = window.YaraRpgData.items.equipment.filter((item) => item.starter === true);
     const EQUIPMENT_BY_ID = new Map(EQUIPMENT_DATA.map((item) => [item.id, item]));
+    const SELECTION_LIMIT = window.YaraRpgData.setup.starterEquipmentCount;
     const SPECIALTY_STAT_KEYS = Object.freeze({
         maxHp: "hpStat",
         maxFoco: "focusStat",
@@ -22,8 +23,6 @@ window.YaraRpgCharacterSetup = (() => {
         stunChance: "stun"
     });
     const PERCENTAGE_SPECIALTY_STATS = new Set(["evasion", "parry", "stunChance"]);
-    const SELECTION_LIMIT = 3;
-
     let selectedCharacterId = CHARACTER_DATA[0].id;
     let selectedEquipmentIds = [];
     let translate = (key) => key;
@@ -165,8 +164,11 @@ window.YaraRpgCharacterSetup = (() => {
             container.append(card);
         });
 
+        const selectionTitle = translate("selectStarterEquipment", { count: SELECTION_LIMIT });
+        document.getElementById("equipment-selection-title").textContent = selectionTitle;
         document.getElementById("starter-equipment-count").textContent =
             `${selectedEquipmentIds.length}/${SELECTION_LIMIT}`;
+        document.getElementById("starter-equipment-options").setAttribute("aria-label", selectionTitle);
         document.getElementById("begin-adventure-button").disabled =
             selectedEquipmentIds.length !== SELECTION_LIMIT;
     }
@@ -214,6 +216,10 @@ window.YaraRpgCharacterSetup = (() => {
     }
 
     function initialize(options) {
+        const availableStarterSlots = new Set(EQUIPMENT_DATA.map((item) => item.slot)).size;
+        if (!Number.isInteger(SELECTION_LIMIT) || SELECTION_LIMIT < 1 || SELECTION_LIMIT > availableStarterSlots) {
+            throw new Error(`Starter equipment count must be between 1 and ${availableStarterSlots}.`);
+        }
         translate = options.translate;
         describeEquipment = options.describeEquipment;
         onStart = options.onStart;

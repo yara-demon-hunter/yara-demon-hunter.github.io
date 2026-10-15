@@ -12,7 +12,7 @@ Abra `/mini_games/yara-rpg/game.html`. A página também pode ser aberta diretam
 
 Os menus do site abrem o jogo no idioma da página (`?lang=pt` ou `?lang=en`). O seletor PT/EN no jogo também permite trocar o idioma; a troca reinicia a partida.
 
-Ao abrir o mini game, a tela de título aguarda um clique, toque ou Enter. Antes da aventura, escolha Zeph ou Oskar e três equipamentos iniciais, cada um de um espaço diferente. Zeph começa com mais HP máximo; Oskar começa com mais ataque. O botão de início só é habilitado depois das três escolhas.
+Ao abrir o mini game, a tela de título aguarda um clique, toque ou Enter. Antes da aventura, escolha Zeph ou Oskar e os equipamentos iniciais, cada um de um espaço diferente. Zeph começa com mais HP máximo; Oskar começa com mais ataque. A quantidade de equipamentos iniciais fica em `js/data/setup-config.js`, na variável `starterEquipmentCount`; contador, instruções e botão de início acompanham esse valor automaticamente.
 
 A página do jogo usa o layout base do site, que centraliza a verificação do Bing, o Google Analytics 4 e o Google AdSense para todas as páginas.
 
@@ -30,6 +30,7 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 - `js/game.js`: estado do personagem, exploração, combate e atualização da interface.
 - `js/systems/mist-contacts.js`: regras reutilizáveis para sortear contatos, resultados, chefes e poderes da névoa.
 - `js/systems/character-setup.js`: controla as telas de início, a seleção do personagem e o equipamento inicial.
+- `js/data/setup-config.js`: configura a quantidade de equipamentos iniciais que o jogador pode escolher.
 - `js/data/mist-contacts.js`: conteúdo editável dos espíritos, chefes especiais e poderes permanentes.
 - `js/data/characters.js`: personagens iniciais, descrições, especialidades e evolução individual por nível.
 - `js/data/game-rules.js`: balanceamento, incluindo chance crescente por nível, intervalo entre contatos e pesos dos resultados.
