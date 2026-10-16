@@ -203,9 +203,11 @@ function updateUI() {
         || parryTotal >= selectedCharacter.skills.maxParry
         || hero.foco < selectedCharacter.skills.parry.focoCost;
     const restartButton = document.getElementById('restart-button');
-    mistContactCard.classList.toggle('hidden', !pendingMistContact || inCombat || gameOver || pendingStoryEvent);
+    const chestCard = document.getElementById('chest-event-card');
+    chestCard.hidden = !pendingChest || inCombat || gameOver || campaignComplete;
+    mistContactCard.classList.toggle('hidden', !pendingMistContact || inCombat || gameOver || pendingStoryEvent || pendingChest);
     const storyCard = document.getElementById('story-event-card');
-    storyCard.hidden = !pendingStoryEvent || inCombat || gameOver;
+    storyCard.hidden = !pendingStoryEvent || inCombat || gameOver || pendingChest;
     if (pendingStoryEvent) {
         document.getElementById('story-event-title').textContent = pendingStoryEvent.title[gameLanguage];
         document.getElementById('story-event-description').textContent = pendingStoryEvent.description[gameLanguage];
@@ -246,7 +248,7 @@ function updateUI() {
     document.getElementById('campaign-ending-card').hidden = !campaignComplete && !gameOver;
     if (campaignComplete || gameOver) {
         exploreControls.classList.add('hidden'); combatControls.classList.add('hidden');
-        encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden'); storyCard.hidden = true;
+        encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden'); storyCard.hidden = true; chestCard.hidden = true;
         explorationBanner.classList.add('hidden'); restartButton.classList.add('hidden');
         document.getElementById('campaign-ending-title').textContent = t(campaignComplete ? 'campaignVictoryTitle' : 'campaignDefeatTitle');
         document.getElementById('campaign-ending-description').textContent = t(campaignComplete ? 'campaignVictoryDescription' : 'campaignDefeatDescription');
@@ -256,17 +258,26 @@ function updateUI() {
         combatControls.classList.remove('hidden');
         encounterCard.classList.remove('hidden');
         mistContactCard.classList.add('hidden');
+        chestCard.hidden = true;
         explorationBanner.classList.add('hidden');
         restartButton.classList.add('hidden');
     } else if (pendingStoryEvent) {
         exploreControls.classList.add('hidden'); combatControls.classList.add('hidden');
         encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden');
+        chestCard.hidden = true;
+        explorationBanner.classList.remove('hidden'); restartButton.classList.add('hidden');
+    } else if (pendingChest) {
+        exploreControls.classList.add('hidden'); combatControls.classList.add('hidden');
+        encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden');
+        storyCard.hidden = true;
+        chestCard.hidden = false;
         explorationBanner.classList.remove('hidden'); restartButton.classList.add('hidden');
     } else if (pendingMistContact) {
         exploreControls.classList.add('hidden');
         combatControls.classList.add('hidden');
         encounterCard.classList.add('hidden');
         mistContactCard.classList.remove('hidden');
+        chestCard.hidden = true;
         explorationBanner.classList.remove('hidden');
         restartButton.classList.add('hidden');
     } else {
@@ -274,6 +285,7 @@ function updateUI() {
         combatControls.classList.add('hidden');
         encounterCard.classList.add('hidden');
         mistContactCard.classList.add('hidden');
+        chestCard.hidden = true;
         explorationBanner.classList.remove('hidden');
         restartButton.classList.add('hidden');
     }

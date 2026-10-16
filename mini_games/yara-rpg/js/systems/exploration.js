@@ -2,7 +2,7 @@
 // Loaded as a classic script before game.js; shares the RPG global state.
 
 function exploreForest() {
-    if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent) return;
+    if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
     if (hero.hp <= 0) {
             logMessage(t("injured"), "combat-monster");
         return;
@@ -89,9 +89,31 @@ function exploreForest() {
         hero.gold += gold;
         hero.hp += hp;
         logMessage(t('explorationSupplies', { gold, hp }), 'loot');
+    } else if (outcome === 'chest') {
+        pendingChest = true;
+        logMessage(t('chestFoundLog'), 'discovery');
     } else {
         logMessage(t('denseMist'));
     }
+    updateUI();
+}
+
+function openFoundChest() {
+    if (!pendingChest || inCombat || gameOver || campaignComplete) return;
+
+    pendingChest = false;
+    const rules = EXPLORATION_RULES.chest;
+    if (Math.random() * GAME_RULES.probabilityScale < rules.itemChance) {
+        const item = createChestEquipmentDrop();
+        if (!item) throw new Error('Chest item chance is configured, but no equipment items exist.');
+        logMessage(t('chestItemFound', {
+            rarity: getEquipmentRarity(item).name[gameLanguage]
+        }), 'loot');
+        handleEquipmentDrop(item);
+        return;
+    }
+
+    logMessage(t('chestEmpty'), 'normal');
     updateUI();
 }
 

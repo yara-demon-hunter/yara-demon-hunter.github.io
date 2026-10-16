@@ -15,14 +15,19 @@ window.YaraRpgData.exploration = Object.freeze({
         cooldownExplorations: 3
     },
     outcomes: Object.freeze([
-        { type: "monster", weight: 42 },
-        { type: "gold", weight: 20 },
+        { type: "monster", weight: 40 },
+        { type: "gold", weight: 19 },
         { type: "safeTrail", weight: 13 },
         { type: "potion", weight: 8 },
         { type: "trap", weight: 6 },
         { type: "focus", weight: 6 },
-        { type: "supplies", weight: 5 }
+        { type: "supplies", weight: 5 },
+        { type: "chest", weight: 3 }
     ]),
+    chest: {
+        itemChance: 70,
+        rarityIds: ["epic", "legendary", "demon", "god"]
+    },
     gold: { minimum: 5, range: 10 },
     safeTrail: { hp: 30, focus: 15 },
     trap: { damageMinimum: 8, damageRange: 8 },

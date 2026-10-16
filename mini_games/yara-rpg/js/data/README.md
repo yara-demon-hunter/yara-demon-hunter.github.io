@@ -10,10 +10,10 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `mist-contacts.js`: contatos com ícones e ofertas próprias, além dos poderes permanentes dos encontros na névoa. Missões podem referenciar monstros por `bossId`.
 - `special-monsters.js`: atributos, requisitos e recompensas dos chefes e monstros especiais.
 - `world-rules.js`: escala de probabilidade, frequência/resultados dos contatos e custos/recuperação do acampamento.
-- `equipment-rules.js`: chance de drop, raridades, limite da mochila e aprimoramentos.
+- `equipment-rules.js`: chance de drop, raridades, chances especiais de raridade para itens de baús, limite da mochila e aprimoramentos.
 - `combat-rules.js`: dano, custos, defesa, fuga e tempos dos turnos.
 - `progression-rules.js`: multiplicador de XP e melhorias compradas.
-- `exploration-rules.js`: chance de descobrir áreas e eventos, intervalo entre eventos narrativos, pesos dos resultados de exploração, recompensas e chance de poupar um monstro derrotado.
+- `exploration-rules.js`: chance de descobrir áreas e eventos, intervalo entre eventos narrativos, pesos dos resultados de exploração, recompensas, chance de obter item ao abrir baú e chance de poupar um monstro derrotado.
 - `setup-config.js`: quantidade de equipamentos iniciais escolhidos antes da aventura; ajuste `starterEquipmentCount` para mudar o limite.
 
 A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`; os encontros durante a exploração são tratados em `../systems/exploration.js`. Para ajustar o ritmo, edite `mistContacts` em `world-rules.js`; adicione contatos e poderes em `mist-contacts.js` e chefes em `special-monsters.js`. Contatos que iniciam uma missão podem apontar para o `id` de um chefe por `bossId`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos.

@@ -254,6 +254,16 @@ permalink: /mini_games/yara-rpg/game.html
                 <div id="story-event-choices" class="story-event-choices"></div>
             </section>
 
+            <section id="chest-event-card" class="story-event-card chest-event-card" hidden aria-live="polite" aria-labelledby="chest-event-title">
+                <p class="story-event-kicker" data-i18n="chestEventKicker">Tesouro na Névoa</p>
+                <img src="images/chest.png" class="chest-event-image" alt="" aria-hidden="true">
+                <h3 id="chest-event-title" data-i18n="chestEventTitle">Baú encontrado</h3>
+                <p id="chest-event-description" data-i18n="chestEventDescription">Um baú antigo repousa entre as árvores. Abra-o para descobrir o que há dentro.</p>
+                <div class="story-event-choices">
+                    <button type="button" class="story-event-choice" onclick="openFoundChest()" data-i18n="openChest">Abrir baú</button>
+                </div>
+            </section>
+
             <section id="campaign-ending-card" class="campaign-ending-card" hidden aria-live="polite" aria-labelledby="campaign-ending-title">
                 <span class="ending-emblem" aria-hidden="true">🔔</span>
                 <h2 id="campaign-ending-title"></h2>

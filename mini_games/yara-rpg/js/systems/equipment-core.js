@@ -53,28 +53,38 @@ function hasAffordableEquipmentUpgrade() {
     }
 }
 
-function rollEquipmentRarity(allowedRarityIds = null) {
+function rollEquipmentRarity(allowedRarityIds = null, chanceOverrides = null, allowRegionExclusive = false) {
     const finalRegionIndex = GAME_DATA.regions.length - 1;
     const isFinalRegion = currentRegion === finalRegionIndex;
     const finalRegionOnly = GAME_RULES.loot.finalRegionOnlyRarities || [];
     const rarities = GAME_RULES.loot.equipmentRarities.filter((rarity) =>
         (!allowedRarityIds || allowedRarityIds.includes(rarity.id))
-        && (isFinalRegion || !finalRegionOnly.includes(rarity.id))
+        && (allowRegionExclusive || isFinalRegion || !finalRegionOnly.includes(rarity.id))
     );
     if (rarities.length === 0) return GAME_RULES.loot.equipmentRarities[0];
-    const totalChance = rarities.reduce((total, rarity) => total + rarity.chance, 0);
+    const getChance = (rarity) => chanceOverrides?.[rarity.id] ?? rarity.chance;
+    const totalChance = rarities.reduce((total, rarity) => total + getChance(rarity), 0);
     let remainingRoll = Math.random() * totalChance;
     return rarities.find((rarity) => {
-        remainingRoll -= rarity.chance;
+        remainingRoll -= getChance(rarity);
         return remainingRoll < 0;
     }) || rarities[0];
 }
 
-function createChallengeEquipmentDrop(allowedRarityIds) {
+function createEquipmentInstanceDrop(rarity) {
     const equipment = ITEM_DATA.equipment;
     if (equipment.length === 0) return null;
     const template = equipment[Math.floor(Math.random() * equipment.length)];
-    return createEquipmentInstance(template, rollEquipmentRarity(allowedRarityIds));
+    return createEquipmentInstance(template, rarity);
+}
+
+function createChallengeEquipmentDrop(allowedRarityIds) {
+    return createEquipmentInstanceDrop(rollEquipmentRarity(allowedRarityIds));
+}
+
+function createChestEquipmentDrop() {
+    const chances = GAME_RULES.loot.chestRarityChances;
+    return createEquipmentInstanceDrop(rollEquipmentRarity(Object.keys(chances), chances, true));
 }
 
 function getEquipmentBonus(stat) {

@@ -107,6 +107,7 @@ let explorationsSinceStoryEvent = 0;
 let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
 let pendingStoryEvent = null;
 let pendingMistContact = null;
+let pendingChest = false;
 let pendingEquipment = null;
 let campaignComplete = false;
 let gameOver = false;
@@ -137,6 +138,7 @@ function startAdventure({ character, equipment }) {
     gameOver = false;
     campaignComplete = false;
     pendingMistContact = null;
+    pendingChest = false;
     pendingEquipment = null;
     pendingStoryEvent = null;
     selectedInventoryItems.clear();

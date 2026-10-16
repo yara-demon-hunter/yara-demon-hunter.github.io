@@ -18,6 +18,7 @@ body {
 }
 .story-event-card[hidden],
 .campaign-ending-card[hidden] { display: none; }
+.chest-event-image { display: block; width: min(100%, 10rem); max-height: 8rem; object-fit: contain; margin: .65rem auto; }
 .story-event-kicker { color: #e5b956; font-size: .65rem; letter-spacing: .18em; text-transform: uppercase; }
 #story-event-title, #campaign-ending-title { margin-top: .3rem; color: #f3d78e; font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 700; }
 #story-event-description, #campaign-ending-description { margin-top: .45rem; color: #d0cec5; font-size: .82rem; line-height: 1.6; }

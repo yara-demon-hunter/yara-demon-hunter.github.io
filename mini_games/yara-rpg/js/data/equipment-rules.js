@@ -15,6 +15,12 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
             { id: "demon", statBonus: 6, chance: 3.5, name: { pt: "Demoníaco", en: "Demonic" } },
             { id: "god", statBonus: 7, chance: 1.5, name: { pt: "Divino", en: "Divine" } }
         ],
+        chestRarityChances: {
+            epic: 40,
+            legendary: 30,
+            demon: 20,
+            god: 10
+        },
         finalRegionOnlyRarities: ["demon", "god"]
     },
     equipmentUpgrade: {

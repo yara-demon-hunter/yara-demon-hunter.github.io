@@ -8,7 +8,7 @@ function saveGame() {
         currentRegion, discoveredRegions, explorationsSinceMistContact, explorationCount,
         explorationsSinceStoryEvent,
         storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
-        seenStoryEvents: [...seenStoryEvents],
+        seenStoryEvents: [...seenStoryEvents], pendingChest,
         pendingEquipment, equipmentInstanceId
     };
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot)); } catch {}
@@ -57,6 +57,7 @@ function loadSavedGame(snapshot = readSavedGame()) {
     pendingStoryEvent = snapshot.pendingStoryEvent || null;
     if (pendingStoryEvent && !pendingStoryEvent.choices) pendingStoryEvent = GAME_DATA.regions[currentRegion].event?.[0] || null;
     pendingMistContact = snapshot.pendingMistContact || null;
+    pendingChest = Boolean(snapshot.pendingChest);
     pendingEquipment = snapshot.pendingEquipment || null;
     if (pendingEquipment?.item) pendingEquipment.item = hydrateItem(pendingEquipment.item);
     const interruptedCombat = Boolean(snapshot.inCombat);
