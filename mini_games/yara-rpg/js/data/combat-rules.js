@@ -29,7 +29,7 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
         actionDelayMs: 400,
         responseDelayMs: 500,
         furyPerDamageTaken: 1,
-        furyPerDodge: 2,
+        furyPerDodge: 5,
         furyPerBasicAttackDamage: 0.5,
         criticalDamageMultiplier: 2,
         criticalStunBonus: 30
