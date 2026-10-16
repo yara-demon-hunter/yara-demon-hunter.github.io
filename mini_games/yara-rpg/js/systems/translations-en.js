@@ -229,5 +229,9 @@ window.YaraRpgTranslations.en = {
         upgradeSuccessPoints: "✨ {skill}: +{amount}{unit} ({quantity}x). Points spent: {cost}.",
         upgradeRecovery: " Also recovered +{amount} {stat}.",
         regionArrival: "✨ New area discovered: <span class=\"text-amber-300 font-bold\">{region}</span>.",
+        regionArrivalKicker: "New region discovered",
+        regionArrivalClose: "Close region introduction",
+        previousRegion: "Previous region",
+        nextRegion: "Next region",
 
 };

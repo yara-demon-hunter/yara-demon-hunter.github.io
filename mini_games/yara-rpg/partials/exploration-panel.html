@@ -27,8 +27,14 @@
 
             <!-- Banner de Exploração -->
             <div id="exploration-banner" class="bg-forest-950/50 border border-forest-800 rounded-xl p-4 mb-4 text-center">
-                <h3 id="exploration-title" class="text-sm sm:text-base text-amber-300 font-bold mb-1">Floresta Sombria</h3>
-                <p id="exploration-description" class="text-xs sm:text-sm text-emerald-300/90 font-medium" data-i18n="explorationIntro">🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?</p>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <button id="previous-region-button" type="button" onclick="navigateRegion(-1)" class="region-nav-button" aria-label="Região anterior" title="Região anterior">‹</button>
+                    <div class="min-w-0 flex-1">
+                        <h3 id="exploration-title" class="text-sm sm:text-base text-amber-300 font-bold mb-1">Floresta Sombria</h3>
+                        <p id="exploration-description" class="text-xs sm:text-sm text-emerald-300/90 font-medium" data-i18n="explorationIntro">🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?</p>
+                    </div>
+                    <button id="next-region-button" type="button" onclick="navigateRegion(1)" class="region-nav-button" aria-label="Próxima região" title="Próxima região">›</button>
+                </div>
                 <p id="discovery-chance" class="mt-2 text-[11px] text-gray-400">Chance de descobrir a próxima área: 8%</p>
                 <button id="restart-button" onclick="restartGame()" class="hidden mt-3 bg-amber-600 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded-lg transition" data-i18n="restart">Reiniciar jornada</button>
             </div>

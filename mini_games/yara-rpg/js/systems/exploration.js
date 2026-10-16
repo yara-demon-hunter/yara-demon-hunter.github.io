@@ -1,6 +1,8 @@
 // Exploration, regional discovery, story events, monster spawning, and mist contacts.
 // Loaded as a classic script before game.js; shares the RPG global state.
 
+let regionArrivalTimeout = null;
+
 function exploreForest() {
     if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
     if (hero.hp <= 0) {
@@ -13,6 +15,7 @@ function exploreForest() {
     explorationsSinceStoryEvent++;
     if (tryDiscoverRegion()) {
         updateUI();
+        showRegionArrival(GAME_DATA.regions[currentRegion]);
         return;
     }
 
@@ -243,7 +246,10 @@ function resolveStoryEvent(choiceIndex) {
 
 function getDiscoveryChance() {
     const explorationRules = EXPLORATION_RULES.discovery;
-    if (currentRegion >= GAME_DATA.regions.length - 1) return 0;
+    if (
+        currentRegion >= GAME_DATA.regions.length - 1
+        || discoveredRegions.includes(currentRegion + 1)
+    ) return 0;
     return Math.min(
         explorationRules.maximumChance,
         explorationRules.baseChance
@@ -261,6 +267,41 @@ function tryDiscoverRegion() {
     logMessage(t("regionArrival", { region: GAME_DATA.regions[currentRegion].title[gameLanguage] }), "discovery");
     explorationCount = 0;
     return true;
+}
+
+function showRegionArrival(regionData) {
+    const transition = document.getElementById('region-arrival-transition');
+    document.getElementById('region-arrival-scene').dataset.region = regionData.id;
+    document.getElementById('region-arrival-icon').textContent = regionData.sceneIcon;
+    document.getElementById('region-arrival-kicker').textContent = t('regionArrivalKicker');
+    document.getElementById('region-arrival-title').textContent = regionData.title[gameLanguage];
+    document.getElementById('region-arrival-description').textContent = regionData.description[gameLanguage];
+    const closeButton = document.getElementById('region-arrival-close');
+    closeButton.setAttribute('aria-label', t('regionArrivalClose'));
+    transition.hidden = false;
+
+    if (regionArrivalTimeout !== null) clearTimeout(regionArrivalTimeout);
+    regionArrivalTimeout = window.setTimeout(dismissRegionArrival, 5000);
+}
+
+function dismissRegionArrival() {
+    if (regionArrivalTimeout !== null) clearTimeout(regionArrivalTimeout);
+    regionArrivalTimeout = null;
+    document.getElementById('region-arrival-transition').hidden = true;
+}
+
+function navigateRegion(direction) {
+    if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
+    if (direction !== -1 && direction !== 1) {
+        throw new Error(`Invalid region navigation direction: ${direction}`);
+    }
+
+    const targetRegion = currentRegion + direction;
+    if (!discoveredRegions.includes(targetRegion)) return;
+
+    currentRegion = targetRegion;
+    updateUI();
+    showRegionArrival(GAME_DATA.regions[currentRegion]);
 }
 
 function spawnMonster(templateOverride = null) {

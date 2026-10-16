@@ -30,5 +30,125 @@ body {
 body.region-ashen-portal .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(118, 93, 70, .23), transparent 45%), linear-gradient(#171512, #0c0d0f 60%); }
 body.region-ruined-village .game-shell { background-image: radial-gradient(circle at 80% 30%, rgba(117, 47, 28, .22), transparent 42%), linear-gradient(#17110f, #0c0d0f 60%); }
 body.region-gudran-castle .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(55, 55, 86, .3), transparent 48%), linear-gradient(#11121b, #0c0d0f 65%); }
-#game-panel.is-hit { animation: panel-hit .26s ease-out; }
-@keyframes panel-hit { 0% { transform: translateX(0); } 30% { transform: translateX(-5px); } 65% { transform: translateX(4px); } 100% { transform: translateX(0); } }
+.region-nav-button {
+    display: grid;
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border: 1px solid rgba(214, 178, 102, .45);
+    border-radius: .7rem;
+    background: rgba(12, 21, 17, .8);
+    color: #f3d78e;
+    font: inherit;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+.region-nav-button:hover:not(:disabled) { border-color: #e5b956; background: rgba(43, 57, 40, .95); }
+.region-nav-button:disabled { cursor: not-allowed; opacity: .3; }
+.region-arrival-transition[hidden] { display: none; }
+.region-arrival-transition {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(5, 8, 7, .82);
+    backdrop-filter: blur(6px);
+    animation: region-arrival-fade-in .35s ease-out both;
+}
+.region-arrival-scene {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1.2fr;
+    align-items: stretch;
+    width: min(100%, 42rem);
+    min-height: 19rem;
+    overflow: hidden;
+    border: 1px solid rgba(214, 178, 102, .75);
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #17211d, #111313 70%);
+    box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, .65), 0 0 2rem rgba(214, 178, 102, .12);
+    animation: region-arrival-reveal .55s cubic-bezier(.2, .8, .2, 1) both;
+}
+.region-arrival-art {
+    display: grid;
+    place-items: center;
+    min-height: 100%;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 78%, rgba(47, 92, 61, .72), transparent 55%), linear-gradient(160deg, #273c35, #101615 75%);
+}
+.region-arrival-art span {
+    font-size: clamp(5rem, 17vw, 9rem);
+    filter: drop-shadow(0 1rem 1.3rem rgba(0, 0, 0, .7));
+}
+.region-arrival-scene[data-region="ashen-portal"] .region-arrival-art {
+    background: radial-gradient(ellipse at 50% 50%, rgba(164, 106, 64, .7), transparent 38%), linear-gradient(145deg, #30261e, #121416 72%);
+}
+.region-arrival-scene[data-region="ruined-village"] .region-arrival-art {
+    background: radial-gradient(ellipse at 50% 72%, rgba(174, 71, 36, .72), transparent 48%), linear-gradient(145deg, #39231d, #141313 74%);
+}
+.region-arrival-scene[data-region="gudran-castle"] .region-arrival-art {
+    background: radial-gradient(ellipse at 50% 65%, rgba(89, 87, 144, .62), transparent 48%), linear-gradient(145deg, #25283b, #111317 74%);
+}
+.region-arrival-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2.25rem 2rem;
+}
+.region-arrival-kicker {
+    color: #e5b956;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+}
+#region-arrival-title {
+    margin-top: .6rem;
+    color: #f3d78e;
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.45rem, 5vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.15;
+}
+#region-arrival-description {
+    margin-top: .85rem;
+    color: #d0cec5;
+    font-size: .9rem;
+    line-height: 1.65;
+}
+.region-arrival-close {
+    position: absolute;
+    top: .65rem;
+    right: .7rem;
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border: 1px solid rgba(232, 229, 223, .35);
+    border-radius: 999px;
+    background: rgba(9, 12, 11, .7);
+    color: #f4eee2;
+    font: inherit;
+    font-size: 1.45rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.region-arrival-close:hover { background: rgba(214, 178, 102, .25); }
+@keyframes region-arrival-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes region-arrival-reveal { from { opacity: 0; transform: translateY(.8rem) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 560px) {
+    .region-arrival-scene { grid-template-columns: 1fr; min-height: 0; }
+    .region-arrival-art { min-height: 9rem; }
+    .region-arrival-art span { font-size: 6rem; }
+    .region-arrival-copy { padding: 1.25rem 1.25rem 1.5rem; }
+    #region-arrival-description { margin-top: .5rem; font-size: .82rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .region-arrival-transition,
+    .region-arrival-scene { animation: none; }
+}

@@ -185,6 +185,7 @@ function startAdventure({ character, equipment }) {
     document.getElementById("character-setup").hidden = true;
 
     updateUI();
+    showRegionArrival(GAME_DATA.regions[currentRegion]);
     saveGame();
     showContinueOption();
     startGameMusic();

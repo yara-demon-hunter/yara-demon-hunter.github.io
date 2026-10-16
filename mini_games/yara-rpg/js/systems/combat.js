@@ -216,10 +216,6 @@ function monsterAttackTurn() {
 
     const damageTaken = Math.min(hero.hp, monsterDamage);
     hero.hp = Math.max(0, hero.hp - damageTaken);
-    if (damageTaken) {
-        const panel = document.getElementById('game-panel');
-        panel.classList.remove('is-hit'); void panel.offsetWidth; panel.classList.add('is-hit');
-    }
     hero.fury = Math.min(hero.maxFury, hero.fury + damageTaken * FURY_PER_DAMAGE);
     logMessage(parried
         ? t('heroParries', { damage: damageTaken })
@@ -238,4 +234,3 @@ function monsterAttackTurn() {
     combatActionLocked = false;
     updateUI();
 }
-

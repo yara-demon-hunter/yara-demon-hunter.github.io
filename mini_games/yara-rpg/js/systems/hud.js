@@ -110,9 +110,21 @@ function updateUI() {
     document.body.classList.add(`region-${currentRegionData.id}`);
     document.getElementById('exploration-title').innerText = currentRegionData.title[gameLanguage];
     document.getElementById('exploration-description').innerText = currentRegionData.description[gameLanguage];
+    const regionNavigationBlocked = inCombat || gameOver || campaignComplete
+        || pendingMistContact || pendingStoryEvent || pendingChest;
+    const previousRegionButton = document.getElementById('previous-region-button');
+    const nextRegionButton = document.getElementById('next-region-button');
+    previousRegionButton.disabled = regionNavigationBlocked || !discoveredRegions.includes(currentRegion - 1);
+    nextRegionButton.disabled = regionNavigationBlocked || !discoveredRegions.includes(currentRegion + 1);
+    previousRegionButton.setAttribute('aria-label', t('previousRegion'));
+    previousRegionButton.title = t('previousRegion');
+    nextRegionButton.setAttribute('aria-label', t('nextRegion'));
+    nextRegionButton.title = t('nextRegion');
 
+    const discoveryChanceDisplay = document.getElementById('discovery-chance');
+    discoveryChanceDisplay.hidden = discoveredRegions.includes(currentRegion + 1);
     const nextDiscoveryChance = getDiscoveryChance();
-    document.getElementById('discovery-chance').innerText = nextDiscoveryChance
+    discoveryChanceDisplay.innerText = nextDiscoveryChance
         ? t('discoveryChance', { chance: nextDiscoveryChance })
         : t('journeyComplete');
 

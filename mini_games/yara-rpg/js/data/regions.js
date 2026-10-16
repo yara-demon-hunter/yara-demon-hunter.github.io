@@ -3,6 +3,7 @@ window.YaraRpgData = window.YaraRpgData || {};
 window.YaraRpgData.regions = Object.freeze([
     {
         id: "dark-forest",
+        sceneIcon: "🌲",
         title: { pt: "Floresta Sombria", en: "Dark Forest" },
         description: {
             pt: "🌲 O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos.",
@@ -55,6 +56,7 @@ window.YaraRpgData.regions = Object.freeze([
     },
     {
         id: "ashen-portal",
+        sceneIcon: "🌀",
         title: { pt: "O Portal das Cinzas", en: "The Ashen Portal" },
         description: {
             pt: "🌀 Um portal pulsa entre as árvores. Do outro lado, algo respira junto com a névoa.",
@@ -107,6 +109,7 @@ window.YaraRpgData.regions = Object.freeze([
     },
     {
         id: "ruined-village",
+        sceneIcon: "🔥",
         title: { pt: "Vilarejo em Ruínas", en: "The Ruined Village" },
         description: {
             pt: "🔥 O vilarejo foi invadido. Portas quebradas e marcas de batalha anunciam que os invasores ainda estão por perto.",
@@ -159,6 +162,7 @@ window.YaraRpgData.regions = Object.freeze([
     },
     {
         id: "gudran-castle",
+        sceneIcon: "🏰",
         title: { pt: "Castelo de Gudran", en: "Gudran Castle" },
         description: {
             pt: "🏰 As muralhas de Gudran guardam criaturas antigas e cavaleiros que não aceitam intrusos.",
