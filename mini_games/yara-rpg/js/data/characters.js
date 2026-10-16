@@ -27,6 +27,7 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "zeph",
         name: "Zeph",
+        image: "images/characters/zeph.png",
         icon: "🌿",
         baseStats: BASE_CHARACTER_STATS,
         description: {
@@ -60,6 +61,7 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "oskar",
         name: "Oskar",
+        image: "images/characters/oskar.png",
         icon: "🪓",
         baseStats: BASE_CHARACTER_STATS,
         description: {

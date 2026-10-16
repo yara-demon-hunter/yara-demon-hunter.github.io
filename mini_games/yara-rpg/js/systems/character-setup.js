@@ -44,7 +44,18 @@ window.YaraRpgCharacterSetup = (() => {
             const portrait = document.createElement("span");
             portrait.className = "character-option-icon";
             portrait.setAttribute("aria-hidden", "true");
-            portrait.textContent = character.icon;
+            if (character.image) {
+                const image = document.createElement("img");
+                image.src = new URL(`../../${character.image}`, document.querySelector('script[src*="/systems/character-setup.js"]')?.src || window.location.href).href;
+                image.alt = "";
+                image.loading = "lazy";
+                image.addEventListener("error", () => {
+                    portrait.replaceChildren(document.createTextNode(character.icon));
+                }, { once: true });
+                portrait.append(image);
+            } else {
+                portrait.textContent = character.icon;
+            }
 
             const name = document.createElement("span");
             name.className = "character-option-name";
