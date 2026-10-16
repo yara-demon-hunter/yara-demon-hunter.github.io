@@ -4,7 +4,7 @@
                 <div class="hero-summary flex items-center justify-between border-b border-fantasy-border pb-3 mb-4">
                     <div>
                         <div class="hero-identity">
-                            <img id="hero-portrait" class="hero-portrait" src="/mini_games/yara-rpg/images/characters/zeph.png" alt="" aria-hidden="true">
+                            <span id="hero-portrait-anchor" class="hero-portrait-anchor"><img id="hero-portrait" class="hero-portrait" src="/mini_games/yara-rpg/images/characters/zeph.png" alt="" aria-hidden="true"></span>
                             <h2 id="hero-name" class="text-lg font-bold text-amber-400">Zeph</h2>
                         </div>
                         <span class="text-xs bg-forest-800 text-emerald-300 px-2 py-0.5 rounded-full border border-forest-700"><span data-i18n="level">Nível</span> <span id="hero-level">1</span></span>
@@ -37,7 +37,7 @@
                             <span class="text-blue-400 flex items-center gap-1">⚡ <span data-i18n="focus">Foco (Estamina)</span></span>
                             <span class="flex items-center gap-2"><span><span id="hero-foco">50</span> / <span id="hero-foco-max">50</span></span><span class="skill-upgrade-control" data-upgrade-control="foco"><button type="button" data-upgrade="foco" onclick="toggleUpgradeOptions('foco')" class="skill-upgrade-button" aria-label="Melhorar estamina (1 ponto)" aria-expanded="false" aria-controls="upgrade-options-foco" title="Melhorar por 1 ponto de habilidade">+</button><span id="upgrade-options-foco" class="skill-upgrade-options" data-upgrade-options="foco" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('foco', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('foco', 'max')" data-i18n="upgradeMax">Máx</button></span></span></span>
                         </div>
-                        <div class="w-full bg-forest-950 rounded-full h-2.5 p-0.5 border border-fantasy-border">
+                        <div id="hero-focus-anchor" class="relative w-full bg-forest-950 rounded-full h-2.5 p-0.5 border border-fantasy-border overflow-visible">
                             <div id="hero-foco-bar" class="bg-gradient-to-r from-blue-600 to-cyan-400 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
                         </div>
                     </div>

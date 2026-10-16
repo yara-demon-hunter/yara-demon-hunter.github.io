@@ -544,6 +544,17 @@
     height: 3rem;
     object-fit: contain;
 }
+#monster-icon,
+.hero-portrait-anchor {
+    position: relative;
+    overflow: visible;
+}
+.hero-portrait-anchor {
+    display: block;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: 0 0 2.5rem;
+}
 .mist-contact-icon-image {
     display: block;
     width: 6rem;

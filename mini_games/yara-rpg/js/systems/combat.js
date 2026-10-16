@@ -1,6 +1,18 @@
 // Combat actions, enemy turns, upgrades, rewards, and journey endings.
 // Loaded as a classic script before game.js; shares the RPG global state.
 
+function showFloatingDamage(targetId, damage, targetType) {
+    const target = document.getElementById(targetId);
+    if (!target || damage <= 0) return;
+
+    const damageNumber = document.createElement('span');
+    damageNumber.className = `floating-damage floating-damage-${targetType}`;
+    damageNumber.textContent = `−${damage}`;
+    damageNumber.setAttribute('aria-hidden', 'true');
+    target.append(damageNumber);
+    window.setTimeout(() => damageNumber.remove(), 950);
+}
+
 function applyMonsterParry(damage) {
     if (Math.random() * GAME_RULES.probabilityScale >= currentMonster.parry) return damage;
 
@@ -21,6 +33,7 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     if (!inCombat || !currentMonster || encounterId !== combatEncounterId) return;
     const damageDealt = Math.min(currentMonster.hp, damage);
     currentMonster.hp -= damageDealt;
+    showFloatingDamage('monster-icon', damageDealt, 'monster');
     const furyGained = Math.min(hero.maxFury - hero.fury, Math.floor(damageDealt * furyMultiplier));
     hero.fury += furyGained;
     logMessage(t(messageKey, { damage: damageDealt, fury: furyGained }), "combat-hero");
@@ -71,6 +84,7 @@ function combatHeavyAttack() {
     }
     combatActionLocked = true;
     hero.foco -= attackRules.focoCost;
+    showFloatingDamage('hero-focus-anchor', attackRules.focoCost, 'focus');
     playSound('specialAttack');
 
     if (Math.random() * GAME_RULES.probabilityScale < currentMonster.evasion) {
@@ -129,6 +143,7 @@ function combatDefend() {
     combatActionLocked = true;
     parrySkillUsedThisCombat = true;
     hero.foco -= selectedCharacter.skills.parry.focoCost;
+    showFloatingDamage('hero-focus-anchor', selectedCharacter.skills.parry.focoCost, 'focus');
     hero.parryBonus += bonusGained;
     logMessage(t('defendMessage', { amount: bonusGained }), 'special');
 
@@ -154,6 +169,7 @@ function combatDodge() {
     combatActionLocked = true;
     dodgeSkillUsedThisCombat = true;
     hero.foco -= selectedCharacter.skills.dodge.focoCost;
+    showFloatingDamage('hero-focus-anchor', selectedCharacter.skills.dodge.focoCost, 'focus');
     hero.defending = false;
     hero.evasionBonus += bonusGained;
     logMessage(t("dodgeMessage", { amount: bonusGained }), "special");
@@ -216,6 +232,7 @@ function monsterAttackTurn() {
 
     const damageTaken = Math.min(hero.hp, monsterDamage);
     hero.hp = Math.max(0, hero.hp - damageTaken);
+    showFloatingDamage('hero-portrait-anchor', damageTaken, 'hero');
     hero.fury = Math.min(hero.maxFury, hero.fury + damageTaken * FURY_PER_DAMAGE);
     logMessage(parried
         ? t('heroParries', { damage: damageTaken })
