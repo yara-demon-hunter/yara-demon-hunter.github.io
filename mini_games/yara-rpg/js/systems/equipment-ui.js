@@ -75,7 +75,7 @@ function renderEquipment() {
         capacity: EQUIPMENT_BAG_CAPACITY
     }) + (affordableInventoryUpgrade ? ` · ${t('equipmentUpgradeAvailable')}` : ''));
 
-    EQUIPMENT_SLOTS.forEach(({ id, icon }) => {
+    EQUIPMENT_SLOTS.forEach(({ id, icon, image }) => {
         const item = hero.equipment[id];
         const slot = document.createElement('div');
         slot.className = `equipment-slot equipment-slot-${id} rounded-lg border border-fantasy-border/50 bg-forest-950/60`;
@@ -106,7 +106,7 @@ function renderEquipment() {
         } else {
             const placeholder = document.createElement('span');
             placeholder.className = 'equipment-slot-icon equipment-slot-placeholder';
-            placeholder.textContent = icon;
+            setEquipmentIcon(placeholder, { icon, image });
             placeholder.setAttribute('aria-hidden', 'true');
             slot.append(placeholder);
         }
