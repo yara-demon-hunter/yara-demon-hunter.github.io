@@ -23,7 +23,7 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 - `game.html`: página completa e ponto de entrada do RPG.
 - `css/main.css`: ponto de entrada dos estilos do jogo, importando os módulos CSS.
 - `css/base.css`: tema global, eventos narrativos e temas regionais.
-- `css/start-screen.css`: tela inicial, personagem e seleção de equipamento.
+- `css/start-screen.css`: seleção inicial de personagem e equipamentos.
 - `css/equipment.css`: personagem, slots, mochila, itens e melhorias.
 - `css/interface.css`: controles gerais e idioma.
 - `css/responsive.css`: layout para tablets e celulares.
@@ -42,7 +42,7 @@ A página do jogo usa o layout base do site, que centraliza a verificação do B
 - `js/systems/combat.js`: ataques do jogador e turnos dos inimigos.
 - `js/systems/combat-outcomes.js`: poções, acampamento, fuga, recompensas e finais do combate.
 - `js/systems/mist-contacts.js`: regras reutilizáveis para sortear contatos, resultados, chefes e poderes da névoa.
-- `js/systems/character-setup.js`: controla as telas de início, a seleção do personagem e o equipamento inicial.
+- `js/systems/character-setup.js`: controla a seleção inicial do personagem e do equipamento.
 - `js/data/setup-config.js`: configura a quantidade de equipamentos iniciais que o jogador pode escolher.
 - `js/data/mist-contacts.js`: conteúdo editável dos espíritos, chefes especiais e poderes permanentes.
 - `js/data/characters.js`: personagens iniciais, descrições, especialidades e evolução individual por nível.
@@ -83,7 +83,7 @@ Para alterar personagens ou criar outro, edite `js/data/characters.js`. Cada per
 - Música/efeitos: `js/systems/audio.js`.
 - Painéis e mensagens: `js/systems/hud.js`.
 - Estado inicial, nova jornada e evolução de nível: `js/game.js`.
-- Tela inicial e escolhas de personagem/equipamento inicial: `js/systems/character-setup.js`.
+- Escolhas iniciais de personagem/equipamento: `js/systems/character-setup.js`.
 
 Para mudanças pontuais, use este mapa e abra apenas o sistema indicado e, quando necessário, seu arquivo de dados. O estado compartilhado usa scripts clássicos: `game.html` define a ordem de carregamento e `game.js` deve permanecer por último.
 

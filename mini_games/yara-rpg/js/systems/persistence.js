@@ -72,8 +72,7 @@ function loadSavedGame(snapshot = readSavedGame()) {
     logMessage(t('openingLog', { hero: hero.name }), 'special');
     if (interruptedCombat && !gameOver) logMessage(t('denseMist'), 'normal');
     document.getElementById('game-main').hidden = false;
-    document.getElementById('game-start-screen').hidden = true;
-    document.body.classList.remove('game-start-active');
+    document.getElementById('character-setup').hidden = true;
     updateUI(); saveGame(); startGameMusic();
     return true;
 }

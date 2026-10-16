@@ -34,12 +34,15 @@ window.YaraRpgCharacterSetup = (() => {
         container.replaceChildren();
 
         CHARACTER_DATA.forEach((character) => {
-            const card = document.createElement("button");
+            const card = document.createElement("div");
             const selected = character.id === selectedCharacterId;
-            card.type = "button";
             card.className = `character-option${selected ? " is-selected" : ""}`;
-            card.dataset.characterId = character.id;
-            card.setAttribute("aria-pressed", String(selected));
+
+            const selectButton = document.createElement("button");
+            selectButton.type = "button";
+            selectButton.className = "character-option-select";
+            selectButton.dataset.characterId = character.id;
+            selectButton.setAttribute("aria-pressed", String(selected));
 
             const portrait = document.createElement("span");
             portrait.className = "character-option-icon";
@@ -81,7 +84,7 @@ window.YaraRpgCharacterSetup = (() => {
                 })
                 .join(" · ");
 
-            const progression = document.createElement("span");
+            const progression = document.createElement("p");
             progression.className = "character-option-progression";
             progression.textContent = `${translate("levelUpSummary")}: ${Object.entries(character.levelUp)
                 .filter(([stat]) => stat !== "evasionLimit")
@@ -98,7 +101,7 @@ window.YaraRpgCharacterSetup = (() => {
                 })
                 .join(" · ")}`;
 
-            const skills = document.createElement("span");
+            const skills = document.createElement("p");
             skills.className = "character-option-skills";
             skills.textContent = [
                 translate("heavySkillSummary", {
@@ -119,12 +122,19 @@ window.YaraRpgCharacterSetup = (() => {
                 })
             ].join(" · ");
 
-            card.append(portrait, name, description, specialty, progression, skills);
-            card.addEventListener("click", () => {
+            const extraInfo = document.createElement("details");
+            extraInfo.className = "character-option-extra";
+            const extraInfoSummary = document.createElement("summary");
+            extraInfoSummary.textContent = translate("characterExtraInfo");
+            extraInfo.append(extraInfoSummary, progression, skills);
+
+            selectButton.append(portrait, name, description, specialty);
+            selectButton.addEventListener("click", () => {
                 selectedCharacterId = character.id;
                 renderCharacters();
                 container.querySelector(`[data-character-id="${character.id}"]`).focus();
             });
+            card.append(selectButton, extraInfo);
             container.append(card);
         });
     }
@@ -212,19 +222,6 @@ window.YaraRpgCharacterSetup = (() => {
         renderEquipment();
     }
 
-    function showSetup() {
-        document.getElementById("title-splash").hidden = true;
-        document.getElementById("character-setup").hidden = false;
-        document.getElementById("character-options")
-            .querySelector(`[data-character-id="${selectedCharacterId}"]`)?.focus();
-    }
-
-    function showTitle() {
-        document.getElementById("character-setup").hidden = true;
-        document.getElementById("title-splash").hidden = false;
-        document.getElementById("show-character-setup-button").focus();
-    }
-
     function beginAdventure() {
         if (selectedEquipmentIds.length !== SELECTION_LIMIT) return;
         const equipment = selectedEquipmentIds.map((id) => {
@@ -245,21 +242,6 @@ window.YaraRpgCharacterSetup = (() => {
         translate = options.translate;
         describeEquipment = options.describeEquipment;
         onStart = options.onStart;
-        document.body.classList.add("game-start-active");
-
-        document.getElementById("show-character-setup-button").addEventListener("click", showSetup);
-        document.getElementById("title-splash").addEventListener("click", (event) => {
-            if (!event.target.closest("button")) showSetup();
-        });
-        document.addEventListener("keydown", (event) => {
-            if (document.getElementById("title-splash").hidden) return;
-            if (event.target instanceof Element && event.target.closest("button, a, input, select, textarea")) return;
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                showSetup();
-            }
-        });
-        document.getElementById("back-to-title-button").addEventListener("click", showTitle);
         document.getElementById("begin-adventure-button").addEventListener("click", beginAdventure);
         renderCharacters();
         renderEquipment();

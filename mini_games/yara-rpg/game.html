@@ -26,46 +26,26 @@ permalink: /mini_games/yara-rpg/game.html
         <h1 class="text-3xl sm:text-5xl font-extrabold text-amber-500 tracking-wider drop-shadow-[0_2px_10px_rgba(245,158,11,0.3)]">
             <span data-i18n="title">YARA, DEMON HUNTER: PERDIDOS NA NÉVOA</span>
         </h1>
-        <p class="text-xs sm:text-sm text-emerald-400/80 tracking-widest uppercase mt-1" data-i18n="subtitle">Crônicas de Sobrevivência na Floresta Sombria</p>
     </header>
 
-    <section id="game-start-screen" class="game-start-screen" aria-label="Início do jogo" data-i18n-aria="startScreenLabel">
-        <div class="game-start-backdrop">
-            <div id="title-splash" class="title-splash">
-                <p class="start-kicker" data-i18n="startKicker">Uma aventura na névoa</p>
-                <h2 class="start-title" data-i18n="startTitle">Perdidos na Névoa</h2>
-                <p class="start-story" data-i18n="startStory">Quando o sino toca, a floresta desperta. Escolha quem vai enfrentar a névoa — e prepare-se para sobreviver.</p>
-                <button id="show-character-setup-button" type="button" class="start-primary-button">
-                    <span data-i18n="startPrompt">Clique para começar</span>
-                    <span aria-hidden="true">✦</span>
-                </button>
-                <button id="continue-adventure-button" type="button" class="start-secondary-button" hidden data-i18n="continueAdventure">Continuar jornada salva</button>
-                <p class="start-hint" data-i18n="startHint">Toque, clique ou pressione Enter</p>
+    <section id="character-setup" class="character-setup" aria-labelledby="setup-title">
+        <div class="setup-heading">
+            <p class="start-kicker" data-i18n="setupKicker">Prepare sua jornada</p>
+        </div>
+        <section class="setup-section" aria-labelledby="character-selection-title">
+            <h3 id="character-selection-title" class="setup-section-title" data-i18n="selectCharacter">Personagem</h3>
+            <div id="character-options" class="character-options" role="group" aria-label="Personagens" data-i18n-aria="selectCharacter"></div>
+        </section>
+        <section class="setup-section" aria-labelledby="equipment-selection-title">
+            <div class="starter-equipment-heading">
+                <h3 id="equipment-selection-title" class="setup-section-title" data-i18n="selectStarterEquipment">Equipamentos iniciais</h3>
+                <span id="starter-equipment-count" class="starter-equipment-count">0</span>
             </div>
-
-            <div id="character-setup" class="character-setup" hidden>
-                <div class="setup-heading">
-                    <p class="start-kicker" data-i18n="setupKicker">Prepare sua jornada</p>
-                    <h2 class="setup-title" data-i18n="setupTitle">Escolha quem entrará na névoa</h2>
-                    <p class="setup-description" data-i18n="setupDescription">Cada caçador tem uma força diferente. Depois, escolha os equipamentos iniciais para levar.</p>
-                </div>
-                <section class="setup-section" aria-labelledby="character-selection-title">
-                    <h3 id="character-selection-title" class="setup-section-title" data-i18n="selectCharacter">Personagem</h3>
-                    <div id="character-options" class="character-options" role="group" aria-label="Personagens" data-i18n-aria="selectCharacter"></div>
-                </section>
-                <section class="setup-section" aria-labelledby="equipment-selection-title">
-                    <div class="starter-equipment-heading">
-                        <h3 id="equipment-selection-title" class="setup-section-title" data-i18n="selectStarterEquipment">Equipamentos iniciais</h3>
-                        <span id="starter-equipment-count" class="starter-equipment-count">0</span>
-                    </div>
-                    <p class="setup-section-help" data-i18n="starterEquipmentHelp">Escolha equipamentos de espaços diferentes. Selecione novamente um espaço para trocar sua escolha.</p>
-                    <div id="starter-equipment-options" class="starter-equipment-options" role="group" aria-label="Equipamento inicial" data-i18n-aria="selectStarterEquipment"></div>
-                </section>
-                <div class="setup-actions">
-                    <button id="back-to-title-button" type="button" class="start-secondary-button" data-i18n="backToTitle">Voltar</button>
-                    <button id="begin-adventure-button" type="button" class="start-primary-button" disabled data-i18n="beginAdventure">Iniciar aventura</button>
-                </div>
-            </div>
+            <div id="starter-equipment-options" class="starter-equipment-options" role="group" aria-label="Equipamento inicial" data-i18n-aria="selectStarterEquipment"></div>
+        </section>
+        <div class="setup-actions">
+            <button id="continue-adventure-button" type="button" class="start-secondary-button" hidden data-i18n="continueAdventure">Continuar jornada salva</button>
+            <button id="begin-adventure-button" type="button" class="start-primary-button" disabled data-i18n="beginAdventure">Iniciar aventura</button>
         </div>
     </section>
 

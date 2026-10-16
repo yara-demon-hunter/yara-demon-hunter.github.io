@@ -182,8 +182,7 @@ function startAdventure({ character, equipment }) {
     logMessage(t("openingLog", { hero: hero.name }), "special");
 
     document.getElementById("game-main").hidden = false;
-    document.getElementById("game-start-screen").hidden = true;
-    document.body.classList.remove("game-start-active");
+    document.getElementById("character-setup").hidden = true;
 
     updateUI();
     saveGame();
