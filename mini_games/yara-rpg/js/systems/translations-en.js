@@ -1,18 +1,18 @@
 // English interface strings.
 window.YaraRpgTranslations = window.YaraRpgTranslations || {};
 window.YaraRpgTranslations.en = {
-        documentTitle: "Yara: The Bell's Rule - Mini RPG",
+        documentTitle: "Yara, Demon Hunter: Lost in the Mist - Mini RPG",
         gameNav: "Game navigation",
         languageLabel: "Game language",
         musicPlay: "Play music",
         musicPause: "Pause music",
         backToSite: "Back to website",
         gameLabel: "Mini RPG · Dark Forest",
-        title: "YARA: THE BELL'S RULE",
+        title: "YARA, Demon Hunter: Lost in the Mist",
         subtitle: "Survival Tales from the Dark Forest",
         startScreenLabel: "Game start screen",
         startKicker: "An adventure in the mist",
-        startTitle: "The Bell's Rule",
+        startTitle: "Lost in the Mist",
         startStory: "When the bell rings, the forest awakens. Choose who will face the mist — and prepare to survive.",
         startPrompt: "Click to begin",
         startHint: "Tap, click, or press Enter",

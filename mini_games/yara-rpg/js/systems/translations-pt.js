@@ -1,18 +1,18 @@
 // Portuguese interface strings.
 window.YaraRpgTranslations = window.YaraRpgTranslations || {};
 window.YaraRpgTranslations.pt = {
-        documentTitle: "Yara: A Regra do Sino - Mini RPG",
+        documentTitle: "Yara, Demon Hunter: Perdidos na Névoa - Mini RPG",
         gameNav: "Navegação do jogo",
         languageLabel: "Idioma do jogo",
         musicPlay: "Ativar música",
         musicPause: "Pausar música",
         backToSite: "Voltar ao site",
         gameLabel: "Mini RPG · Floresta Sombria",
-        title: "YARA: A REGRA DO SINO",
+        title: "YARA, Demon Hunter: Perdidos na Névoa",
         subtitle: "Crônicas de Sobrevivência na Floresta Sombria",
         startScreenLabel: "Tela de início do jogo",
         startKicker: "Uma aventura na névoa",
-        startTitle: "A Regra do Sino",
+        startTitle: "Perdidos na Névoa",
         startStory: "Quando o sino toca, a floresta desperta. Escolha quem vai enfrentar a névoa — e prepare-se para sobreviver.",
         startPrompt: "Clique para começar",
         startHint: "Toque, clique ou pressione Enter",
