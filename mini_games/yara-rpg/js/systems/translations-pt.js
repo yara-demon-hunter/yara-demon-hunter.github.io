@@ -161,7 +161,7 @@ window.YaraRpgTranslations.pt = {
         dodgeBonus: "+{bonus}% ({cost} Foco)",
         restart: "Reiniciar jornada",
         run: "Fugir na Névoa",
-        footer: "Yara Demon Hunter: A Vingança • Mini RPG Interativo de Navegador",
+        footer: "Yara, Demon Hunter: Perdidos na Névoa • Mini RPG Interativo de Navegador",
         injured: "Você está ferido demais! Descanse no acampamento.",
         noGold: "Você precisa de {cost} de ouro para descansar no acampamento.",
         goldFound: "Você vasculhou as margens e encontrou <span class=\"text-amber-300\">{amount} de ouro</span> esquecido na lama!",

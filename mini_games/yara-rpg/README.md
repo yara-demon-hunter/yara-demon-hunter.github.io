@@ -14,13 +14,14 @@ Abra `/mini_games/yara-rpg/game.html`. A página também pode ser aberta diretam
 
 Os menus do site abrem o jogo no idioma da página (`?lang=pt` ou `?lang=en`). O seletor PT/EN no jogo também permite trocar o idioma; a troca reinicia a partida.
 
-Ao abrir o mini game, a tela de título aguarda um clique, toque ou Enter. Antes da aventura, escolha Zeph ou Oskar e os equipamentos iniciais, cada um de um espaço diferente. Zeph começa com mais HP máximo; Oskar começa com mais ataque. A quantidade de equipamentos iniciais fica em `js/data/setup-config.js`, na variável `starterEquipmentCount`; contador, instruções e botão de início acompanham esse valor automaticamente.
+Ao abrir o mini game, escolha um personagem e os equipamentos iniciais, cada um de um espaço diferente. Zeph começa com mais HP máximo; Oskar começa com mais ataque. A quantidade de equipamentos iniciais fica em `js/data/setup-config.js`, na variável `starterEquipmentCount`; contador e botão de início acompanham esse valor automaticamente.
 
 A página do jogo usa o layout base do site, que centraliza a verificação do Bing, o Google Analytics 4 e o Google AdSense para todas as páginas.
 
 ## Estrutura
 
-- `game.html`: página completa e ponto de entrada do RPG.
+- `game.html`: front matter e composição dos fragmentos HTML do RPG.
+- `partials/`: fragmentos HTML internos, compostos com `include_relative` para manter o RPG independente de `_includes` do site.
 - `css/main.css`: ponto de entrada dos estilos do jogo, importando os módulos CSS.
 - `css/base.css`: tema global, eventos narrativos e temas regionais.
 - `css/start-screen.css`: seleção inicial de personagem e equipamentos.

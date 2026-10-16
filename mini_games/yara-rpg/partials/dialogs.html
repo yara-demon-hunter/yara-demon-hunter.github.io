@@ -1,0 +1,66 @@
+<dialog id="equipment-bag-dialog" class="item-drop-dialog equipment-bag-dialog" aria-labelledby="equipment-bag-title" aria-describedby="equipment-bag-description">
+        <div class="item-drop-content">
+            <div class="equipment-bag-heading">
+                <div>
+                    <h2 id="equipment-bag-title" class="text-lg font-bold text-amber-300" data-i18n="inventory">Mochila</h2>
+                    <p id="equipment-bag-description" class="mt-1 text-xs text-gray-300" data-i18n="equipmentBagDescription">Até 9 equipamentos guardados.</p>
+                </div>
+                <span id="equipment-bag-dialog-count" class="equipped-item-count">0/9</span>
+                <button id="close-equipment-bag-button" type="button" class="dialog-close-button" data-i18n-aria="closeBag" aria-label="Fechar mochila">×</button>
+            </div>
+            <p id="equipment-bag-pending-item" class="equipment-bag-pending" hidden></p>
+            <div class="equipment-bag-bulk-actions">
+                <span id="equipment-bag-selected-count" class="equipment-bag-selected-count">0 selecionados</span>
+                <button id="discard-selected-items-button" type="button" class="equipment-bag-action equipment-bag-discard" data-i18n="discardSelectedItems" disabled>Descartar selecionados</button>
+            </div>
+            <div id="equipment-inventory-list" class="equipment-bag-slots" role="list"></div>
+        </div>
+    </dialog>
+
+    <dialog id="item-drop-dialog" class="item-drop-dialog" aria-labelledby="item-drop-title" aria-describedby="item-drop-message item-drop-choice-help">
+        <div class="item-drop-content">
+            <h2 id="item-drop-title" class="text-lg font-bold text-amber-300" data-i18n="itemDropTitle">Equipamento encontrado</h2>
+            <p id="item-drop-message" class="mt-2 text-sm text-gray-200"></p>
+            <p id="item-drop-choice-help" class="mt-2 text-xs text-gray-300" data-i18n="itemDropChoiceHelp">Equipar o novo guarda o atual na mochila; manter o atual guarda o item encontrado.</p>
+            <div class="equipment-comparison" role="group" aria-labelledby="item-drop-title">
+                <section class="equipment-comparison-card equipment-comparison-new" aria-labelledby="item-drop-new-name">
+                    <span class="equipment-comparison-label" data-i18n="newEquipmentLabel">Encontrado</span>
+                    <span id="item-drop-new-icon" class="equipment-comparison-icon" aria-hidden="true"></span>
+                    <h3 id="item-drop-new-name" class="equipment-comparison-name"></h3>
+                    <p id="item-drop-new-slot" class="equipment-comparison-slot"></p>
+                    <ul id="item-drop-new-bonuses" class="equipment-comparison-bonuses"></ul>
+                </section>
+                <span class="equipment-comparison-arrow" aria-hidden="true">→</span>
+                <section class="equipment-comparison-card equipment-comparison-current" aria-labelledby="item-drop-current-name">
+                    <span class="equipment-comparison-label" data-i18n="equippedEquipmentLabel">Equipado</span>
+                    <span id="item-drop-current-icon" class="equipment-comparison-icon" aria-hidden="true"></span>
+                    <h3 id="item-drop-current-name" class="equipment-comparison-name"></h3>
+                    <p id="item-drop-current-slot" class="equipment-comparison-slot"></p>
+                    <ul id="item-drop-current-bonuses" class="equipment-comparison-bonuses"></ul>
+                </section>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-2">
+                <button id="equip-new-item-button" type="button" class="rounded-lg border border-amber-500 bg-amber-700 px-3 py-2 text-sm font-semibold text-white" data-i18n="equipNewItem">Equipar novo</button>
+                <button id="keep-current-item-button" type="button" class="rounded-lg border border-forest-600 bg-forest-800 px-3 py-2 text-sm font-semibold text-emerald-100" data-i18n="keepCurrentItem">Manter atual</button>
+                <button id="open-bag-from-drop-button" type="button" class="col-span-2 rounded-lg border border-emerald-700 bg-emerald-950/70 px-3 py-2 text-sm font-semibold text-emerald-100" data-i18n="openBag">Abrir mochila</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="equipment-item-dialog" class="item-drop-dialog equipment-item-dialog" aria-labelledby="equipment-item-title">
+        <div class="item-drop-content">
+            <div class="equipment-item-heading">
+                <span id="equipment-item-icon" aria-hidden="true"></span>
+                <h2 id="equipment-item-title" class="text-lg font-bold text-amber-300"></h2>
+                <button id="close-equipment-item-button" type="button" class="dialog-close-button" data-i18n-aria="closeItemDetails" aria-label="Fechar detalhes do equipamento">×</button>
+            </div>
+            <p id="equipment-item-slot" class="mt-1 text-xs text-gray-300"></p>
+            <ul id="equipment-item-properties" class="equipment-item-properties"></ul>
+            <div class="equipment-item-actions">
+                <button id="equipment-item-upgrade-button" type="button" class="equipment-bag-action equipment-bag-upgrade"></button>
+                <button id="equipment-item-equip-button" type="button" class="equipment-bag-action equipment-bag-equip" data-i18n="equip">Equipar</button>
+                <button id="equipment-item-unequip-button" type="button" class="equipment-bag-action equipment-bag-discard" data-i18n="unequip">Desequipar</button>
+                <button id="equipment-item-discard-button" type="button" class="equipment-bag-action equipment-bag-discard" data-i18n="discard">Descartar</button>
+            </div>
+        </div>
+    </dialog>

@@ -161,7 +161,7 @@ window.YaraRpgTranslations.en = {
         dodgeBonus: "+{bonus}% ({cost} Focus)",
         restart: "Restart journey",
         run: "Flee into the Mist",
-        footer: "Yara Demon Hunter: The Vengeance • Browser Mini RPG",
+        footer: "Yara, Demon Hunter: Lost in the Mist • Browser Mini RPG",
         injured: "You are too badly hurt. Rest at camp.",
         noGold: "You need {cost} gold to rest at camp.",
         goldFound: "You searched the riverbank and found <span class=\"text-amber-300\">{amount} gold</span> buried in the mud!",
