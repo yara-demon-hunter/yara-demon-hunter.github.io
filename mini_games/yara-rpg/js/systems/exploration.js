@@ -332,6 +332,7 @@ function spawnMonster(templateOverride = null) {
     currentMonster = {
         name: template.name[gameLanguage],
         icon: template.icon,
+        image: template.image || null,
         isMistBoss,
         hp: monsterHp,
         maxHp: monsterHp,
@@ -358,7 +359,21 @@ function spawnMonster(templateOverride = null) {
     document.getElementById('monster-name').innerText = currentMonster.name;
     document.getElementById('monster-hp').innerText = currentMonster.hp;
     document.getElementById('monster-hp-max').innerText = currentMonster.maxHp;
-    document.getElementById('monster-icon').innerText = currentMonster.icon;
+    const monsterIcon = document.getElementById('monster-icon');
+    monsterIcon.replaceChildren();
+    if (currentMonster.image) {
+        const image = document.createElement('img');
+        image.src = new URL(`../../${currentMonster.image}`, document.querySelector('script[src*="/systems/exploration.js"]')?.src || window.location.href).href;
+        image.alt = '';
+        image.className = 'monster-icon-image';
+        image.setAttribute('aria-hidden', 'true');
+        image.addEventListener('error', () => {
+            monsterIcon.textContent = currentMonster?.icon || '';
+        }, { once: true });
+        monsterIcon.append(image);
+    } else {
+        monsterIcon.textContent = currentMonster.icon;
+    }
     document.getElementById('monster-hp-bar').style.width = '100%';
     document.getElementById('monster-atk').innerText = currentMonster.atk;
     document.getElementById('monster-def').innerText = currentMonster.def;

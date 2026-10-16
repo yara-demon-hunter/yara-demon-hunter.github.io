@@ -22,10 +22,10 @@ window.YaraRpgData.monsters = Object.freeze({
             { name: { pt: "Cavaleiro Possuído", en: "Possessed Knight" }, icon: "⚔️", hp: 250, atk: 32, def: 15, parry: 35, evasion: 10, xpReward: 70, goldReward: 85 }
         ],
         "gudran-castle": [
-            { name: { pt: "Cavaleiro de Gudran", en: "Knight of Gudran" }, icon: "🛡️", hp: 300, atk: 30, def: 30, parry: 38, evasion: 12, xpReward: 100, goldReward: 55 },
+            { name: { pt: "Cavaleiro de Gudran", en: "Knight of Gudran" }, icon: "🛡️", image: "images/monsters/gudran-soldier.png", hp: 300, atk: 30, def: 30, parry: 38, evasion: 12, xpReward: 100, goldReward: 55 },
             { name: { pt: "Sentinela das Catacumbas", en: "Catacomb Sentinel" }, icon: "💀", hp: 280, atk: 35, def: 20, parry: 20, evasion: 30, xpReward: 120, goldReward: 68 },
             { name: { pt: "Manticora de Pedra", en: "Stone Manticore" }, icon: "🦂", hp: 120, atk: 30, def: 65, parry: 38, evasion: 16, xpReward: 150, goldReward: 100 },
-            { name: { pt: "Golem", en: "Golem" }, icon: "🗿", hp: 300, atk: 50, def: 20, parry: 24, evasion: 5, xpReward: 200, goldReward: 150 }
+            { name: { pt: "Golem", en: "Golem" }, icon: "🗿", image: "images/characters/golem.png", hp: 300, atk: 50, def: 20, parry: 24, evasion: 5, xpReward: 200, goldReward: 150 }
 
         ]
     }

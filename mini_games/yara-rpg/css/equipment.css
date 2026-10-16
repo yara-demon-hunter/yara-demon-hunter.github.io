@@ -538,6 +538,12 @@
     height: 100%;
     object-fit: contain;
 }
+.monster-icon-image {
+    display: block;
+    width: 3rem;
+    height: 3rem;
+    object-fit: contain;
+}
 .equipment-bag-item-icon {
     width: 2.25rem;
     height: 2.25rem;
