@@ -40,10 +40,10 @@ window.YaraRpgData.exploration = Object.freeze({
             "dark-forest": [
                 { pt: "O monstro sussurra que as feras evitam a margem norte do rio.", en: "The monster whispers that beasts avoid the river's northern bank." }
             ],
-            "ashen-portal": [
-                { pt: "O monstro revela que o portal enfraquece depois de uma explosão de cinzas.", en: "The monster reveals that the portal weakens after a burst of ash." }
+            "river-crossing": [
+                { pt: "O monstro revela que uma trilha pela margem norte leva à aldeia das tochas azuladas.", en: "The monster reveals that a trail along the northern bank leads to the village of blue torches." }
             ],
-            "ruined-village": [
+            "blue-torch-village": [
                 { pt: "O monstro conta que os invasores escondem suprimentos perto da torre de vigia.", en: "The monster says the invaders hide supplies near the watchtower." }
             ],
             "gudran-castle": [

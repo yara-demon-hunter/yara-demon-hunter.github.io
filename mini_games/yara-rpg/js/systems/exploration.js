@@ -183,6 +183,18 @@ function resolveStoryEvent(choiceIndex) {
     } else if (effect === 'abyssal-challenge-retreat') {
         seenStoryEvents.delete(eventSeenKey);
         logMessage(t('abyssalChallengeRetreat'), 'special');
+    } else if (effect === 'brutos-challenge') {
+        const brutos = SPECIAL_MONSTERS.find((monster) => monster.id === 'brutos');
+        if (!brutos) {
+            logMessage(t('denseMist'));
+            updateUI();
+            return;
+        }
+        spawnMonster(brutos);
+        return;
+    } else if (effect === 'brutos-challenge-retreat') {
+        seenStoryEvents.delete(eventSeenKey);
+        logMessage(t('abyssalChallengeRetreat'), 'special');
     } else if (effect === 'animal-event-gold') {
         const lootRules = GAME_RULES.loot;
         const gold = lootRules.animalEventGoldMinimum

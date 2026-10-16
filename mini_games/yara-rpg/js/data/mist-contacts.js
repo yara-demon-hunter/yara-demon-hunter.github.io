@@ -5,6 +5,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         {
             id: "river-spirit",
             icon: "🌊",
+            image: "images/mist_contacts/river-spirit.png",
             name: {
                 pt: "Espírito do Rio",
                 en: "River Spirit"
@@ -55,7 +56,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
             minLevel: 3,
             onAccept: {
                 type: "boss",
-                bossId: "undead-brute"
+                bossId: "undead"
             }
         },
         {

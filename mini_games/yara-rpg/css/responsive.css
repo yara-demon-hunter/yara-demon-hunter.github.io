@@ -216,10 +216,8 @@
         font-size: 0.5rem !important;
     }
     #encounter-card > div > div:last-child {
-        min-width: 92px;
-    }
-    #encounter-card > div > div:last-child > div:last-child {
-        width: 100% !important;
+        gap: 6px !important;
+        padding-left: 6px !important;
     }
     #action-controls {
         position: fixed;

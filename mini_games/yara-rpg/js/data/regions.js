@@ -4,7 +4,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "dark-forest",
         sceneIcon: "🌲",
-        title: { pt: "Floresta Sombria", en: "Dark Forest" },
+        title: { pt: "Floresta da Névoa", en: "Misty Forest" },
         description: {
             pt: "🌲 O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos.",
             en: "🌲 The bell rang too late. The mist hides hungry beasts and ancient secrets."
@@ -55,51 +55,51 @@ window.YaraRpgData.regions = Object.freeze([
         ]
     },
     {
-        id: "ashen-portal",
-        sceneIcon: "🌀",
-        title: { pt: "O Portal das Cinzas", en: "The Ashen Portal" },
+        id: "river-crossing",
+        sceneIcon: "🌊",
+        title: { pt: "Travessia do Rio", en: "River Crossing" },
         description: {
-            pt: "🌀 Um portal pulsa entre as árvores. Do outro lado, algo respira junto com a névoa.",
-            en: "🌀 A portal pulses between the trees. Something on the other side breathes with the mist."
+            pt: "🌊 A correnteza corta a floresta. Atravesse o rio e encontre o caminho para o outro lado, onde a névoa ainda esconde perigos.",
+            en: "🌊 The current cuts through the forest. Cross the river to reach the far side, where the mist still hides danger."
         },
         event: [
             {
-                title: { pt: "O portal enfraquecido", en: "The faltering portal" },
-                description: { pt: "As cinzas formam runas ao redor do portal. Você pode selar uma fenda ou arrancar um fragmento de poder.", en: "Ash forms runes around the portal. You can seal a crack or take a shard of power." },
+                title: { pt: "A correnteza traiçoeira", en: "The treacherous current" },
+                description: { pt: "A água sobe e a ponte improvisada range sob seus pés. Você pode se recuperar antes de seguir ou avançar em busca de uma passagem segura.", en: "The water rises and the makeshift bridge creaks beneath your feet. You can recover before continuing or press on to find a safe passage." },
                 choices: [
-                    { label: { pt: "Selar a fenda (+HP)", en: "Seal the crack (+HP)" }, effect: "heal" },
-                    { label: { pt: "Tomar o fragmento (+ATQ)", en: "Take the shard (+ATK)" }, effect: "power" }
+                    { label: { pt: "Descansar à margem (+HP)", en: "Rest by the river (+HP)" }, effect: "heal" },
+                    { label: { pt: "Procurar uma passagem (+ouro)", en: "Search for a crossing (+gold)" }, effect: "gold" }
                 ]
             },
             {
-                title: { pt: "A ponte de cinzas", en: "The ash bridge" },
-                description: { pt: "Uma ponte instável atravessa o abismo do portal. Uma passagem rápida promete tesouros, mas as pedras estão cedendo.", en: "A crumbling bridge spans the portal's abyss. A shortcut promises treasure, but the stones are giving way." },
+                title: { pt: "A ponte de troncos", en: "The log bridge" },
+                description: { pt: "Troncos caídos formam uma ponte estreita sobre a correnteza. Há algo preso entre as pedras do outro lado.", en: "Fallen logs form a narrow bridge over the current. Something is caught among the stones on the far bank." },
                 choices: [
-                    { label: { pt: "Correr pela ponte", en: "Rush across the bridge" }, effect: "portal-treasure" },
-                    { label: { pt: "Descer com cuidado", en: "Climb down carefully" }, effect: "heal" }
+                    { label: { pt: "Atravessar e recolher (+ouro)", en: "Cross and collect (+gold)" }, effect: "gold" },
+                    { label: { pt: "Atravessar com cuidado (+HP)", en: "Cross carefully (+HP)" }, effect: "heal" }
                 ]
             },
             {
-                title: { pt: "Ecos do outro lado", en: "Echoes from beyond" },
-                description: { pt: "Uma voz familiar chama do portal. Você pode responder ao chamado ou cobrir as runas com cinzas.", en: "A familiar voice calls from the portal. You can answer it or smother the runes with ash." },
+                title: { pt: "Sinais na outra margem", en: "Signs on the far bank" },
+                description: { pt: "Pegadas recentes seguem pela margem oposta em direção a uma aldeia. Um vulto se move entre as árvores próximas.", en: "Fresh tracks lead along the far bank toward a village. A figure moves among the nearby trees." },
                 choices: [
-                    { label: { pt: "Responder ao chamado", en: "Answer the call" }, effect: "combat" },
-                    { label: { pt: "Apagar as runas (+ouro)", en: "Erase the runes (+gold)" }, effect: "gold" }
+                    { label: { pt: "Seguir as pegadas", en: "Follow the tracks" }, effect: "combat" },
+                    { label: { pt: "Vasculhar a margem (+ouro)", en: "Search the riverbank (+gold)" }, effect: "gold" }
                 ]
             },
             {
                 id: "animal-by-the-portal",
-                title: { pt: "Ruído perto do portal", en: "A sound near the portal" },
-                description: { pt: "Um ruído vem de trás de uma pedra coberta de cinzas. Um animal pequeno parece preso entre as raízes, perto do portal.", en: "A sound comes from behind an ash-covered stone. A small animal seems trapped among the roots near the portal." },
+                title: { pt: "Um ruído entre as pedras", en: "A sound among the stones" },
+                description: { pt: "Um animal pequeno está preso entre as pedras da margem e parece precisar de ajuda.", en: "A small animal is trapped among the riverbank stones and seems to need help." },
                 choices: [
                     { label: { pt: "Atacar o esconderijo (+ouro)", en: "Strike the hiding place (+gold)" }, effect: "animal-event-gold" },
                     { label: { pt: "Verificar e ajudar (pet)", en: "Investigate and help (pet)" }, effect: "animal-event-pet" }
                 ]
             },
             {
-                id: "abyssal-challenge-portal",
+                id: "abyssal-challenge-river",
                 title: { pt: "O desafio da fenda", en: "The Rift Challenge" },
-                description: { pt: "Uma ruptura pulsa ao lado do portal. O Arauto do Abismo atravessa a fenda e desafia você. Só caçadores preparados devem aceitar; a criatura guarda equipamentos Épicos ou Lendários.", en: "A rupture pulses beside the portal. The Abyssal Herald steps through and challenges you. Only prepared hunters should accept; the creature guards Epic or Legendary gear." },
+                description: { pt: "Uma ruptura se abre sobre a correnteza. O Arauto do Abismo atravessa a fenda e desafia você. Só caçadores preparados devem aceitar; a criatura guarda equipamentos Épicos ou Lendários.", en: "A rupture opens above the current. The Abyssal Herald steps through and challenges you. Only prepared hunters should accept; the creature guards Epic or Legendary gear." },
                 choices: [
                     { label: { pt: "Enfrentar o Arauto (alto risco)", en: "Face the Herald (high risk)" }, effect: "abyssal-challenge" },
                     { label: { pt: "Recuar e se preparar", en: "Withdraw and prepare" }, effect: "abyssal-challenge-retreat" }
@@ -108,12 +108,12 @@ window.YaraRpgData.regions = Object.freeze([
         ]
     },
     {
-        id: "ruined-village",
-        sceneIcon: "🔥",
-        title: { pt: "Vilarejo em Ruínas", en: "The Ruined Village" },
+        id: "blue-torch-village",
+        sceneIcon: "🕯️",
+        title: { pt: "Aldeia das Tochas Azuladas", en: "Village of Blue Torches" },
         description: {
-            pt: "🔥 O vilarejo foi invadido. Portas quebradas e marcas de batalha anunciam que os invasores ainda estão por perto.",
-            en: "🔥 The village has been invaded. Broken doors and battle scars warn that the invaders are still nearby."
+            pt: "🕯️ Tochas de chama azulada iluminam as casas da aldeia. As ruas estão quietas demais, e sinais de invasores ainda marcam as paredes.",
+            en: "🕯️ Blue-flamed torches light the village homes. The streets are too quiet, and signs of invaders still mark the walls."
         },
         event: [
             {
@@ -150,7 +150,7 @@ window.YaraRpgData.regions = Object.freeze([
                 ]
             },
             {
-                id: "abyssal-challenge-village",
+                id: "abyssal-challenge-blue-village",
                 title: { pt: "O desafio da fenda", en: "The Rift Challenge" },
                 description: { pt: "As ruínas tremem e uma fenda negra se abre na praça. O Arauto do Abismo aparece entre os escombros; sua armadura parece impenetrável. Dizem que ele carrega equipamentos Épicos ou Lendários.", en: "The ruins shake as a black rift opens in the square. The Abyssal Herald rises from the rubble, its armor nearly impenetrable. It is said to carry Epic or Legendary gear." },
                 choices: [
@@ -191,6 +191,15 @@ window.YaraRpgData.regions = Object.freeze([
                 choices: [
                     { label: { pt: "Fazer o juramento (+ATQ)", en: "Take the oath (+ATK)" }, effect: "power" },
                     { label: { pt: "Recusar o pacto", en: "Refuse the pact" }, effect: "gold" }
+                ]
+            },
+            {
+                id: "brutos-challenge",
+                title: { pt: "O campeão do castelo", en: "The castle champion" },
+                description: { pt: "Passos pesados ecoam no salão. Brutos, o Capitão de Gudran, bloqueia o caminho até o coração do castelo. Você pode enfrentá-lo ou recuar para se preparar.", en: "Heavy footsteps echo through the hall. Brutos, Gudran's Captain, blocks the path to the heart of the castle. You can face him or retreat and prepare." },
+                choices: [
+                    { label: { pt: "Enfrentar Brutos", en: "Face Brutos" }, effect: "brutos-challenge" },
+                    { label: { pt: "Recuar e se preparar", en: "Retreat and prepare" }, effect: "brutos-challenge-retreat" }
                 ]
             },
             {

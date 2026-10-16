@@ -27,8 +27,8 @@ body {
 .story-event-choice:hover { border-color: #c9a650; background: #263a2b; }
 .ending-emblem { display: block; font-size: 2rem; animation: bell-glow 2s ease-in-out infinite alternate; }
 @keyframes bell-glow { from { filter: drop-shadow(0 0 2px #eabf55); transform: rotate(-5deg); } to { filter: drop-shadow(0 0 15px #f3cf72); transform: rotate(5deg); } }
-body.region-ashen-portal .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(118, 93, 70, .23), transparent 45%), linear-gradient(#171512, #0c0d0f 60%); }
-body.region-ruined-village .game-shell { background-image: radial-gradient(circle at 80% 30%, rgba(117, 47, 28, .22), transparent 42%), linear-gradient(#17110f, #0c0d0f 60%); }
+body.region-river-crossing .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(46, 109, 132, .24), transparent 45%), linear-gradient(#10171a, #0c0d0f 60%); }
+body.region-blue-torch-village .game-shell { background-image: radial-gradient(circle at 80% 30%, rgba(44, 93, 150, .24), transparent 42%), linear-gradient(#11141b, #0c0d0f 60%); }
 body.region-gudran-castle .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(55, 55, 86, .3), transparent 48%), linear-gradient(#11121b, #0c0d0f 65%); }
 .region-nav-button {
     display: grid;
@@ -85,11 +85,11 @@ body.region-gudran-castle .game-shell { background-image: radial-gradient(circle
     font-size: clamp(5rem, 17vw, 9rem);
     filter: drop-shadow(0 1rem 1.3rem rgba(0, 0, 0, .7));
 }
-.region-arrival-scene[data-region="ashen-portal"] .region-arrival-art {
-    background: radial-gradient(ellipse at 50% 50%, rgba(164, 106, 64, .7), transparent 38%), linear-gradient(145deg, #30261e, #121416 72%);
+.region-arrival-scene[data-region="river-crossing"] .region-arrival-art {
+    background: radial-gradient(ellipse at 50% 80%, rgba(67, 153, 190, .42), transparent 38%), linear-gradient(165deg, transparent 42%, rgba(30, 94, 124, .42) 43%, rgba(67, 153, 190, .3) 55%, transparent 56%);
 }
-.region-arrival-scene[data-region="ruined-village"] .region-arrival-art {
-    background: radial-gradient(ellipse at 50% 72%, rgba(174, 71, 36, .72), transparent 48%), linear-gradient(145deg, #39231d, #141313 74%);
+.region-arrival-scene[data-region="blue-torch-village"] .region-arrival-art {
+    background: radial-gradient(circle at 30% 57%, rgba(83, 170, 255, .42), transparent 8%), radial-gradient(circle at 70% 53%, rgba(83, 170, 255, .36), transparent 9%), radial-gradient(circle at 50% 74%, rgba(30, 52, 82, .55), transparent 45%);
 }
 .region-arrival-scene[data-region="gudran-castle"] .region-arrival-art {
     background: radial-gradient(ellipse at 50% 65%, rgba(89, 87, 144, .62), transparent 48%), linear-gradient(145deg, #25283b, #111317 74%);

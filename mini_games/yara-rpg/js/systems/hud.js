@@ -224,7 +224,21 @@ function updateUI() {
         });
     }
     if (pendingMistContact) {
-        document.getElementById('mist-contact-icon').textContent = pendingMistContact.icon;
+        const contactIcon = document.getElementById('mist-contact-icon');
+        contactIcon.replaceChildren();
+        if (pendingMistContact.image) {
+            const image = document.createElement('img');
+            image.src = new URL(`../../${pendingMistContact.image}`, document.querySelector('script[src*="/systems/hud.js"]')?.src || window.location.href).href;
+            image.alt = '';
+            image.className = 'mist-contact-icon-image';
+            image.setAttribute('aria-hidden', 'true');
+            image.addEventListener('error', () => {
+                contactIcon.textContent = pendingMistContact?.icon || '';
+            }, { once: true });
+            contactIcon.append(image);
+        } else {
+            contactIcon.textContent = pendingMistContact.icon;
+        }
         document.getElementById('mist-contact-name').textContent = pendingMistContact.name[gameLanguage];
         document.getElementById('mist-contact-message').textContent = pendingMistContact.message[gameLanguage];
     }

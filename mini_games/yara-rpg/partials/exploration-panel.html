@@ -2,26 +2,25 @@
             
             <!-- Inimigo Ativo -->
             <div id="encounter-card" class="hidden bg-forest-950/90 border border-red-900/50 rounded-xl p-3 mb-4 transition-all">
-                <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="flex min-w-0 flex-1 items-center gap-3">
                         <div id="monster-icon" class="flex shrink-0 items-center justify-center text-3xl bg-red-950/50 p-1 rounded-lg border border-red-800/40">🐺</div>
-                        <div>
+                        <div class="min-w-0 flex-1">
                             <h3 id="monster-name" class="font-bold text-red-400 text-sm sm:text-base">Lobo Sombriço</h3>
-                            <p class="text-xs text-gray-400" data-i18n="danger">Perigo na Névoa</p>
+                            <div class="mt-1 flex items-center gap-2">
+                                <div class="shrink-0 text-[10px] text-red-400 font-semibold"><span data-i18n="hp">HP</span>: <span id="monster-hp">40</span>/<span id="monster-hp-max">40</span></div>
+                                <div class="min-w-0 flex-1 bg-forest-950 rounded-full h-2 p-0.5 border border-red-900/40">
+                                    <div id="monster-hp-bar" class="bg-gradient-to-r from-red-700 to-red-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <div class="text-xs text-red-400 font-semibold mb-1"><span data-i18n="hp">HP</span>: <span id="monster-hp">40</span>/<span id="monster-hp-max">40</span></div>
-                        <div class="w-24 sm:w-32 bg-forest-950 rounded-full h-2.5 p-0.5 border border-red-900/40">
-                            <div id="monster-hp-bar" class="bg-gradient-to-r from-red-700 to-red-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
-                        </div>
+                    <div class="grid shrink-0 grid-cols-4 gap-2 border-l border-fantasy-border/40 pl-3 text-center text-[10px] sm:text-[11px]">
+                        <div><span class="block text-gray-500" data-i18n="attackShort">ATK</span><span id="monster-atk" class="text-red-200">12</span></div>
+                        <div><span class="block text-gray-500" data-i18n="defenseShort">DEF</span><span id="monster-def" class="text-blue-200">3</span></div>
+                        <div><span class="block text-gray-500" data-i18n="parryShort">PAR</span><span id="monster-parry" class="text-sky-200">15%</span></div>
+                        <div><span class="block text-gray-500" data-i18n="evasionShort">EVA</span><span id="monster-evasion" class="text-emerald-200">8%</span></div>
                     </div>
-                </div>
-                <div class="grid grid-cols-4 gap-2 mt-3 border-t border-fantasy-border/40 pt-2 text-center text-[11px]">
-                    <div><span class="block text-gray-500" data-i18n="attackShort">ATK</span><span id="monster-atk" class="text-red-200">12</span></div>
-                    <div><span class="block text-gray-500" data-i18n="defenseShort">DEF</span><span id="monster-def" class="text-blue-200">3</span></div>
-                    <div><span class="block text-gray-500" data-i18n="parryShort">PAR</span><span id="monster-parry" class="text-sky-200">15%</span></div>
-                    <div><span class="block text-gray-500" data-i18n="evasionShort">EVA</span><span id="monster-evasion" class="text-emerald-200">8%</span></div>
                 </div>
             </div>
 
