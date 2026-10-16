@@ -141,7 +141,14 @@ body.game-start-active {
 .character-option {
     min-width: 0;
     display: grid;
-    justify-items: start;
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    grid-template-areas:
+        "portrait name"
+        "description description"
+        "specialty specialty"
+        "progression progression"
+        "skills skills";
+    align-items: center;
     gap: 0.35rem;
     padding: 0.9rem;
     border: 1px solid rgba(92, 81, 55, 0.72);
@@ -167,14 +174,35 @@ body.game-start-active {
     opacity: 0.42;
 }
 .character-option-icon {
+    grid-area: portrait;
     display: block;
-    width: 100%;
-    height: clamp(8rem, 24vw, 13rem);
+    width: 3.25rem;
+    height: 3.25rem;
     overflow: hidden;
     border: 1px solid rgba(225, 174, 67, 0.32);
     border-radius: 0.65rem;
     background: rgba(0, 0, 0, 0.35);
     font-size: 1.6rem;
+}
+.character-option-icon:has(img) {
+    width: 3rem;
+    height: 3rem;
+}
+.hero-identity {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.hero-portrait {
+    display: block;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: 0 0 2.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(225, 174, 67, 0.5);
+    border-radius: 0.3rem;
+    object-fit: cover;
+    object-position: center 28%;
 }
 .character-option-icon img {
     width: 100%;
@@ -183,23 +211,27 @@ body.game-start-active {
     object-position: center 28%;
 }
 .character-option-name {
+    grid-area: name;
     color: #f6cb6b;
     font-family: 'Cinzel', serif;
     font-size: 1.05rem;
     font-weight: 700;
 }
 .character-option-description {
+    grid-area: description;
     min-height: 2.5em;
     color: #b9b6ae;
     font-size: 0.72rem;
     line-height: 1.45;
 }
 .character-option-specialty {
+    grid-area: specialty;
     color: #86d6ad;
     font-size: 0.72rem;
     font-weight: 700;
 }
 .character-option-progression {
+    grid-area: progression;
     padding-top: 0.35rem;
     border-top: 1px solid rgba(92, 81, 55, 0.55);
     color: #c7b992;
@@ -207,6 +239,7 @@ body.game-start-active {
     line-height: 1.4;
 }
 .character-option-skills {
+    grid-area: skills;
     color: #d2c9b6;
     font-size: 0.68rem;
     line-height: 1.5;

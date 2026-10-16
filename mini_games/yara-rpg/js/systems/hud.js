@@ -5,6 +5,11 @@ function updateUI() {
     if (inCombat || gameOver) openUpgradeOptions = null;
 
     document.getElementById('hero-name').innerText = hero.name;
+    const heroPortrait = document.getElementById('hero-portrait');
+    const characterImage = selectedCharacter?.image;
+    if (heroPortrait && characterImage) {
+        heroPortrait.src = new URL(`../../${characterImage}`, document.querySelector('script[src*="/systems/hud.js"]')?.src || window.location.href).href;
+    }
     document.getElementById('hero-level').innerText = hero.level;
     document.getElementById('hero-gold').innerText = hero.gold;
     // Pontos de Habilidade (verde) — fica à esquerda do ouro
