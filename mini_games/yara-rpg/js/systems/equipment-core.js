@@ -114,12 +114,7 @@ function handleEquipmentDrop(item) {
         item: getEquipmentDisplayName(item),
         slot: t(item.slot)
     }), 'loot');
-    if (hero.equipment[item.slot]) {
-        showEquipmentChoice(item, false);
-        return;
-    }
-
-    equipItem(item, false);
+    showEquipmentChoice(item, false);
 }
 
 function createEquipmentDrop() {

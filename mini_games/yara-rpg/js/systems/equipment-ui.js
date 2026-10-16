@@ -19,6 +19,9 @@ document.getElementById('equipment-bag-dialog').addEventListener('cancel', (even
     if (isPendingDropBlocked()) {
         event.preventDefault();
         openEquipmentBag();
+    } else if (pendingEquipment && !pendingEquipment.fromInventory) {
+        event.preventDefault();
+        closeEquipmentBag();
     }
 });
 document.getElementById('item-drop-dialog').addEventListener('cancel', (event) => {
@@ -182,7 +185,7 @@ function renderEquipment() {
     );
     updateBulkDiscardControls();
     const pendingLabel = document.getElementById('equipment-bag-pending-item');
-    pendingLabel.hidden = !isPendingDropBlocked();
+    pendingLabel.hidden = !pendingEquipment || pendingEquipment.fromInventory;
     if (!pendingLabel.hidden) {
         pendingLabel.textContent = t('pendingEquipment', {
             item: getEquipmentDisplayName(pendingEquipment.item)
@@ -310,7 +313,9 @@ function discardSelectedInventoryItem() {
 
 function closeEquipmentBag() {
     document.getElementById('equipment-bag-dialog').close();
-    if (isPendingDropBlocked()) showEquipmentChoice(pendingEquipment.item, false);
+    if (pendingEquipment && !pendingEquipment.fromInventory) {
+        showEquipmentChoice(pendingEquipment.item, false);
+    }
 }
 
 function discardInventoryItem(item) {
@@ -359,7 +364,9 @@ function discardSelectedInventoryItems() {
 function showEquipmentChoice(item, fromInventory) {
     pendingEquipment = { item, fromInventory };
     const currentItem = hero.equipment[item.slot];
-    document.getElementById('item-drop-message').textContent = t('itemDropPrompt');
+    document.getElementById('item-drop-message').textContent = t(
+        currentItem ? 'itemDropPrompt' : 'itemDropPromptNoCurrent'
+    );
     setEquipmentIcon(document.getElementById('item-drop-new-icon'), item);
     const newItemName = document.getElementById('item-drop-new-name');
     newItemName.textContent = getEquipmentDisplayName(item);
@@ -367,22 +374,38 @@ function showEquipmentChoice(item, fromInventory) {
     const newItemSlot = document.getElementById('item-drop-new-slot');
     newItemSlot.textContent = `${getEquipmentRarity(item).name[gameLanguage]} · ${t(item.slot)}`;
     newItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(item)}`;
-    setEquipmentIcon(document.getElementById('item-drop-current-icon'), currentItem);
-    const currentItemName = document.getElementById('item-drop-current-name');
-    currentItemName.textContent = getEquipmentDisplayName(currentItem);
-    currentItemName.className = `equipment-comparison-name ${getEquipmentRarityClass(currentItem)}`;
-    const currentItemSlot = document.getElementById('item-drop-current-slot');
-    currentItemSlot.textContent = `${getEquipmentRarity(currentItem).name[gameLanguage]} · ${t(currentItem.slot)}`;
-    currentItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(currentItem)}`;
+    const comparison = document.querySelector('.equipment-comparison');
+    const currentCard = document.querySelector('.equipment-comparison-current');
+    const comparisonArrow = document.querySelector('.equipment-comparison-arrow');
+    comparison.classList.toggle('equipment-comparison-single', !currentItem);
+    currentCard.hidden = !currentItem;
+    comparisonArrow.hidden = !currentItem;
+    if (currentItem) {
+        setEquipmentIcon(document.getElementById('item-drop-current-icon'), currentItem);
+        const currentItemName = document.getElementById('item-drop-current-name');
+        currentItemName.textContent = getEquipmentDisplayName(currentItem);
+        currentItemName.className = `equipment-comparison-name ${getEquipmentRarityClass(currentItem)}`;
+        const currentItemSlot = document.getElementById('item-drop-current-slot');
+        currentItemSlot.textContent = `${getEquipmentRarity(currentItem).name[gameLanguage]} · ${t(currentItem.slot)}`;
+        currentItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(currentItem)}`;
+        renderEquipmentBonuses(document.getElementById('item-drop-current-bonuses'), currentItem);
+    }
     renderEquipmentBonuses(document.getElementById('item-drop-new-bonuses'), item);
-    renderEquipmentBonuses(document.getElementById('item-drop-current-bonuses'), currentItem);
     const blockedByFullBag = isPendingDropBlocked();
-    document.getElementById('item-drop-choice-help').textContent = blockedByFullBag
+    const blockedByStorageCapacity = !fromInventory
+        && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY;
+    document.getElementById('item-drop-choice-help').textContent = blockedByStorageCapacity
         ? t('pendingEquipmentFullHelp')
-        : t('itemDropChoiceHelp');
+        : t(currentItem ? 'itemDropChoiceHelp' : 'itemDropChoiceHelpNoCurrent');
+    document.getElementById('equip-new-item-button').textContent = t(
+        currentItem ? 'equipNewItem' : 'equipFoundItem'
+    );
+    document.getElementById('keep-current-item-button').textContent = t(
+        currentItem ? 'keepCurrentItem' : 'storeFoundItem'
+    );
     document.getElementById('equip-new-item-button').disabled = blockedByFullBag;
-    document.getElementById('keep-current-item-button').disabled = blockedByFullBag;
-    document.getElementById('open-bag-from-drop-button').hidden = !blockedByFullBag;
+    document.getElementById('keep-current-item-button').disabled = blockedByStorageCapacity;
+    document.getElementById('open-bag-from-drop-button').hidden = !blockedByStorageCapacity;
     document.getElementById('item-drop-dialog').showModal();
     renderEquipment();
 }
