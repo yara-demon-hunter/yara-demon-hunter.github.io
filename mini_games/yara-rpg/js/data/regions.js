@@ -3,11 +3,12 @@ window.YaraRpgData = window.YaraRpgData || {};
 window.YaraRpgData.regions = Object.freeze([
     {
         id: "dark-forest",
-        sceneIcon: "🌲",
+        sceneIcon: "",
+        sceneImage: "images/regions/dark-forest.png",
         title: { pt: "Floresta da Névoa", en: "Misty Forest" },
         description: {
-            pt: "🌲 O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos.",
-            en: "🌲 The bell rang too late. The mist hides hungry beasts and ancient secrets."
+            pt: "O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos.",
+            en: "The bell rang too late. The mist hides hungry beasts and ancient secrets."
         },
         event: [
             {

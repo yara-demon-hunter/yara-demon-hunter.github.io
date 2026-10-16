@@ -30,6 +30,12 @@ body {
 body.region-river-crossing .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(46, 109, 132, .24), transparent 45%), linear-gradient(#10171a, #0c0d0f 60%); }
 body.region-blue-torch-village .game-shell { background-image: radial-gradient(circle at 80% 30%, rgba(44, 93, 150, .24), transparent 42%), linear-gradient(#11141b, #0c0d0f 60%); }
 body.region-gudran-castle .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(55, 55, 86, .3), transparent 48%), linear-gradient(#11121b, #0c0d0f 65%); }
+body.region-dark-forest #exploration-banner {
+    background-image: linear-gradient(90deg, rgba(8, 16, 12, .91), rgba(8, 16, 12, .72) 58%, rgba(8, 16, 12, .84)), url("../images/regions/dark-forest.png");
+    background-position: center 46%;
+    background-size: cover;
+    border-color: rgba(65, 97, 93, 0.7);
+}
 .region-nav-button {
     display: grid;
     flex: 0 0 2.5rem;
@@ -84,6 +90,12 @@ body.region-gudran-castle .game-shell { background-image: radial-gradient(circle
 .region-arrival-art span {
     font-size: clamp(5rem, 17vw, 9rem);
     filter: drop-shadow(0 1rem 1.3rem rgba(0, 0, 0, .7));
+}
+.region-arrival-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 .region-arrival-scene[data-region="river-crossing"] .region-arrival-art {
     background: radial-gradient(ellipse at 50% 80%, rgba(67, 153, 190, .42), transparent 38%), linear-gradient(165deg, transparent 42%, rgba(30, 94, 124, .42) 43%, rgba(67, 153, 190, .3) 55%, transparent 56%);

@@ -19,6 +19,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         {
             id: "lost-scout",
             icon: "💀",
+            image: "images/mist_contacts/lost-scout.png",
             name: {
                 pt: "Batedor Perdido",
                 en: "Lost Scout"
@@ -32,6 +33,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         {
             id: "bell-keeper",
             icon: "🔔",
+            image: "images/mist_contacts/bell-keeper.png",
             name: {
                 pt: "Guardião do Sino",
                 en: "Bell Keeper"
@@ -45,6 +47,8 @@ window.YaraRpgData.mistContacts = Object.freeze({
         {
             id: "witch-hunter",
             icon: "🧙‍♀️",
+            image: "images/mist_contacts/witch-hunter.png",
+
             name: {
                 pt: "Bruxa Caçadora",
                 en: "Hunter Witch"
@@ -62,6 +66,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         {
             id: "old-witch",
             icon: "👵",
+            image: "images/mist_contacts/old-witch.png",
             name: {
                 pt: "Bruxa Velha",
                 en: "Old Witch"

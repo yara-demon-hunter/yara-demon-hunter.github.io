@@ -284,7 +284,21 @@ function tryDiscoverRegion() {
 function showRegionArrival(regionData) {
     const transition = document.getElementById('region-arrival-transition');
     document.getElementById('region-arrival-scene').dataset.region = regionData.id;
-    document.getElementById('region-arrival-icon').textContent = regionData.sceneIcon;
+    const regionArt = document.getElementById('region-arrival-icon');
+    regionArt.replaceChildren();
+    if (regionData.sceneImage) {
+        const image = document.createElement('img');
+        image.src = new URL(`../../${regionData.sceneImage}`, document.querySelector('script[src*="/systems/exploration.js"]')?.src || window.location.href).href;
+        image.alt = '';
+        image.className = 'region-arrival-image';
+        image.setAttribute('aria-hidden', 'true');
+        image.addEventListener('error', () => {
+            regionArt.textContent = regionData.sceneIcon || '';
+        }, { once: true });
+        regionArt.append(image);
+    } else {
+        regionArt.textContent = regionData.sceneIcon || '';
+    }
     document.getElementById('region-arrival-kicker').textContent = t('regionArrivalKicker');
     document.getElementById('region-arrival-title').textContent = regionData.title[gameLanguage];
     document.getElementById('region-arrival-description').textContent = regionData.description[gameLanguage];
