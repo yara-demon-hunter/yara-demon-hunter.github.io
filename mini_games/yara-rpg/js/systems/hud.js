@@ -111,21 +111,6 @@ function updateUI() {
     document.getElementById('exploration-title').innerText = currentRegionData.title[gameLanguage];
     document.getElementById('exploration-description').innerText = currentRegionData.description[gameLanguage];
 
-    document.querySelectorAll('[data-region-stop]').forEach((stop) => {
-        const regionIndex = Number(stop.dataset.regionStop);
-        const isDiscovered = discoveredRegions.includes(regionIndex);
-        const isCurrent = regionIndex === currentRegion;
-        stop.querySelector('.region-stop-name').innerText = isDiscovered
-            ? GAME_DATA.regions[regionIndex].title[gameLanguage]
-            : '???';
-        stop.querySelector('.region-stop-marker').innerText = isCurrent ? '●' : isDiscovered ? '✓' : '?';
-        stop.classList.toggle('border-emerald-500/70', isCurrent);
-        stop.classList.toggle('bg-emerald-950/50', isCurrent);
-        stop.classList.toggle('text-emerald-200', isDiscovered);
-        stop.classList.toggle('text-gray-500', !isDiscovered);
-        if (isCurrent) stop.setAttribute('aria-current', 'step');
-        else stop.removeAttribute('aria-current');
-    });
     const nextDiscoveryChance = getDiscoveryChance();
     document.getElementById('discovery-chance').innerText = nextDiscoveryChance
         ? t('discoveryChance', { chance: nextDiscoveryChance })

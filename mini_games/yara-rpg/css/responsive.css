@@ -52,25 +52,6 @@
     .hero-attribute-stats {
         margin: 0 0 7px;
     }
-    #region-progress {
-        gap: 5px !important;
-    }
-    #region-progress li {
-        min-width: 0;
-        justify-content: center;
-        gap: 4px;
-        padding: 7px 4px;
-        font-size: 0.68rem;
-        text-align: center;
-    }
-    .region-stop-marker {
-        flex: 0 0 auto;
-    }
-    .region-stop-name {
-        min-width: 0;
-        overflow-wrap: anywhere;
-        line-height: 1.25;
-    }
     #hero-panel .space-y-3 > :not([hidden]) ~ :not([hidden]) {
         margin-top: 0.55rem !important;
     }
@@ -207,37 +188,9 @@
     .hero-status-bars {
         order: 4;
     }
-    #game-main > nav[aria-label="Jornada"] {
-        order: 0;
-        grid-column: 1 / -1;
-        padding-bottom: 6px;
-        border-bottom: 1px solid rgba(92, 81, 55, 0.55);
-    }
-    #game-main > nav[aria-label="Jornada"] > h2 {
-        margin-bottom: 4px !important;
-        font-size: 0.65rem;
-    }
     #discovery-chance {
         margin-bottom: 6px !important;
         font-size: 0.62rem !important;
-    }
-    #region-progress {
-        display: flex !important;
-        gap: 6px !important;
-        overflow-x: auto;
-        padding-bottom: 3px;
-        scrollbar-width: none;
-    }
-    #region-progress::-webkit-scrollbar {
-        display: none;
-    }
-    #region-progress li {
-        flex: 0 0 auto;
-        min-width: 92px;
-        justify-content: center;
-        padding: 6px 8px !important;
-        text-align: center;
-        white-space: nowrap;
     }
     #potion-button {
         min-width: 0;
