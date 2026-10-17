@@ -18,6 +18,39 @@ body {
 }
 .story-event-card[hidden],
 .campaign-ending-card[hidden] { display: none; }
+.campaign-ending-defeat {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    border-color: rgba(185, 28, 28, 0.8);
+    background:
+        radial-gradient(ellipse at 50% 20%, rgba(127, 29, 29, 0.34), transparent 58%),
+        linear-gradient(145deg, rgba(35, 18, 22, 0.98), rgba(12, 12, 16, 0.98));
+    box-shadow: 0 0 2rem rgba(127, 29, 29, 0.22), 0 12px 34px rgba(0, 0, 0, 0.5);
+    animation: defeat-card-reveal 0.8s ease-out both;
+}
+.campaign-defeat-image {
+    display: block;
+    width: min(72vw, 14rem);
+    max-height: 13rem;
+    object-fit: contain;
+    margin: 0 auto 0.5rem;
+    filter: drop-shadow(0 0 0.7rem rgba(220, 38, 38, 0.55));
+    transform-origin: center 70%;
+    animation: death-image-emerge 1.8s cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+.campaign-defeat-image[hidden] { display: none; }
+.campaign-ending-defeat #campaign-ending-title { color: #fca5a5; }
+.campaign-ending-defeat .ending-emblem { display: none; }
+@keyframes defeat-card-reveal {
+    0% { opacity: 0; transform: translateY(1rem) scale(0.96); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes death-image-emerge {
+    0% { opacity: 0; transform: translateY(1.5rem) scale(0.78); filter: drop-shadow(0 0 0 rgba(220, 38, 38, 0)); }
+    55% { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: drop-shadow(0 0 1rem rgba(220, 38, 38, 0.8)); }
+}
 .chest-event-image { display: block; width: min(100%, 10rem); max-height: 8rem; object-fit: contain; margin: .65rem auto; }
 .story-event-kicker { color: #e5b956; font-size: .65rem; letter-spacing: .18em; text-transform: uppercase; }
 #story-event-title, #campaign-ending-title { margin-top: .3rem; color: #f3d78e; font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 700; }

@@ -13,7 +13,8 @@ const SOUND_EFFECTS = Object.freeze({
     levelUp: new Audio('audio/sfx/level-up.mp3'),
     chestDiscovery: new Audio('audio/sfx/chest_discovery_dark_fantasy.mp3'),
     monsterDefeated: new Audio('audio/sfx/monster_defeated_dark_fantasy.mp3'),
-    regionDiscovered: new Audio('audio/sfx/new_region_discovered_dark_fantasy.mp3')
+    regionDiscovered: new Audio('audio/sfx/new_region_discovered_dark_fantasy.mp3'),
+    deathLaugh: new Audio('audio/sfx/risada_diabolica.mp3')
 });
 Object.values(SOUND_EFFECTS).forEach((sound) => {
     sound.preload = 'none';

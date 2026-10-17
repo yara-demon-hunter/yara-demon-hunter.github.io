@@ -193,6 +193,7 @@ function awardCombatVictory(monster) {
 
 function endCombatDefeat() {
     if (currentMonster?.isBoss) setBossMusic(false);
+    playSound('deathLaugh');
     logMessage(t("defeat"), "combat-monster");
     logMessage(t("defeatHelp"), "special");
     inCombat = false;
@@ -205,7 +206,10 @@ function endCombatDefeat() {
     hero.parryBonus = 0;
     gameOver = true;
     document.getElementById('rpg-log').dataset.combat = 'false';
-    document.getElementById('campaign-ending-card').hidden = false;
+    const endingCard = document.getElementById('campaign-ending-card');
+    endingCard.classList.add('campaign-ending-defeat');
+    endingCard.querySelector('#campaign-defeat-image').hidden = false;
+    endingCard.hidden = false;
     document.getElementById('campaign-ending-title').textContent = t('campaignDefeatTitle');
     document.getElementById('campaign-ending-description').textContent = t('campaignDefeatDescription');
     document.getElementById('campaign-ending-card').querySelector('[data-i18n="restartCampaign"]').textContent = t('restart');
