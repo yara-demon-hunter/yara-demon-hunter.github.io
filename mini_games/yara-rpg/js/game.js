@@ -216,6 +216,12 @@ function checkLevelUp() {
 
         hero.skillPoints = (Number(hero.skillPoints) || 0) + SKILL_POINTS_PER_LEVEL;
 
+        const portraitAnchor = document.getElementById('hero-portrait-anchor');
+        portraitAnchor.classList.remove('level-up-effect');
+        void portraitAnchor.offsetWidth;
+        portraitAnchor.classList.add('level-up-effect');
+        window.setTimeout(() => portraitAnchor.classList.remove('level-up-effect'), 2400);
+
         playSound("levelUp");
         window.logMessage(t("levelUp", { level: hero.level }), "discovery");
         window.logMessage(t("skillPointsGained", { amount: SKILL_POINTS_PER_LEVEL, total: hero.skillPoints }), "special");
