@@ -21,8 +21,8 @@ window.YaraRpgData.exploration = Object.freeze({
         { type: "potion", weight: 8 },
         { type: "trap", weight: 6 },
         { type: "focus", weight: 6 },
-        { type: "supplies", weight: 5 },
-        { type: "chest", weight: 3 }
+        { type: "supplies", weight: 6 },
+        { type: "chest", weight: 2 }
     ]),
     chest: {
         itemChance: 70,
@@ -36,7 +36,7 @@ window.YaraRpgData.exploration = Object.freeze({
     sparedMonster: {
         chance: 8,
         goldPercent: 50,
-        treasureChanceBonus: 20,
+        treasureChanceBonus: 10,
         treasureOrStrikeChance: 50,
         strikeMultiplier: 2,
         clues: {

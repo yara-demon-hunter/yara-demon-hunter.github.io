@@ -5,6 +5,7 @@ document.getElementById('equip-new-item-button').addEventListener('click', equip
 document.getElementById('keep-current-item-button').addEventListener('click', keepPendingEquipment);
 document.getElementById('open-equipment-bag-button').addEventListener('click', openEquipmentBag);
 document.getElementById('open-bag-from-drop-button').addEventListener('click', openEquipmentBag);
+document.getElementById('discard-pending-item-button').addEventListener('click', discardPendingEquipment);
 document.getElementById('close-equipment-bag-button').addEventListener('click', closeEquipmentBag);
 document.getElementById('discard-selected-items-button').addEventListener('click', discardSelectedInventoryItems);
 document.getElementById('close-equipment-item-button').addEventListener('click', closeEquipmentItemDetails);
@@ -471,6 +472,9 @@ function showEquipmentChoice(item, fromInventory) {
         : blockedByStorageCapacity;
     document.getElementById('keep-current-item-button').hidden = !fromInventory && blockedByStorageCapacity;
     document.getElementById('open-bag-from-drop-button').hidden = fromInventory || !blockedByStorageCapacity;
+    const discardPendingButton = document.getElementById('discard-pending-item-button');
+    discardPendingButton.hidden = fromInventory || !blockedByStorageCapacity;
+    discardPendingButton.textContent = t('discardPendingItem');
     document.getElementById('item-drop-dialog').showModal();
     renderEquipment();
 }
@@ -562,4 +566,13 @@ function keepPendingEquipment() {
     }
     updateUI();
     if (fromInventory) openEquipmentBag();
+}
+
+function discardPendingEquipment() {
+    if (!pendingEquipment || pendingEquipment.fromInventory || inCombat || gameOver) return;
+    const { item } = pendingEquipment;
+    pendingEquipment = null;
+    document.getElementById('item-drop-dialog').close();
+    logMessage(t('itemDiscarded', { item: getEquipmentDisplayName(item) }), 'loot');
+    updateUI();
 }

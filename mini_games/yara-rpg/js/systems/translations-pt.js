@@ -70,6 +70,7 @@ window.YaraRpgTranslations.pt = {
         openBag: "Abrir mochila",
         discard: "Descartar",
         discardItemAria: "Descartar {item} da mochila",
+        discardPendingItem: "Descartar item encontrado",
         itemDiscarded: "🗑️ {item} descartado.",
         itemsDiscarded: "🗑️ {count} itens descartados da mochila.",
         selectedItemsCount: "{count} selecionados",

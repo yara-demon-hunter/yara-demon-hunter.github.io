@@ -70,6 +70,7 @@ window.YaraRpgTranslations.en = {
         openBag: "Open bag",
         discard: "Discard",
         discardItemAria: "Discard {item} from the bag",
+        discardPendingItem: "Discard found item",
         itemDiscarded: "🗑️ {item} discarded.",
         itemsDiscarded: "🗑️ {count} items discarded from your bag.",
         selectedItemsCount: "{count} selected",
