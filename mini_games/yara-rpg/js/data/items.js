@@ -35,5 +35,9 @@ window.YaraRpgData.items = Object.freeze({
         { id: "iron-greaves", slot: "legs", icon: "🦵", image: "images/items/iron-leggings.png", name: { pt: "Grevas de Ferro", en: "Iron Greaves" }, stats: { def: 3, maxFoco: 10 }, starter: false },
         { id: "iron-helm", slot: "head", icon: "🪖", image: "images/items/iron-helmet.png", name: { pt: "Elmo de Ferro", en: "Iron Helm" }, stats: { def: 3, maxHp: 10 } , starter: false },
         { id: "watchful-eagle", slot: "pet", icon: "🦅", image: "images/items/watchful-eagle.png", name: { pt: "Águia Vigilante", en: "Watchful Eagle" }, stats: { evasion: 1, parry: 1, stunChance: 2 }, starter: false },
+        { id: "double-headed-axe", slot: "rightHand", icon: "🪓", image: "images/items/double-headed-axe.png", name: { pt: "Machado de Duas Lâminas", en: "Double Headed Axe" }, stats: { atk: 8, parry: 2 }, starter: false },
+        { id: "mist-ring", slot: "ring", icon: "💍", image: "images/items/mist-ring.png", name: { pt: "Anel da Névoa", en: "Mist Ring" }, stats: { atk: 1, evasion: 5, stunChance: 1 }, starter: false },
+        { id: "lumen-necklace", slot: "necklace", icon: "📿", image: "images/items/lumen-necklace.png",name: { pt: "Colar Reluzente", en: "Lumen Necklace" }, stats: { def: 1, parry: 3, stunChance: 2 }, starter: false },
+
     ])
 });
