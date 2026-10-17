@@ -39,8 +39,8 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     logMessage(t(messageKey, { damage: damageDealt, fury: furyGained }), "combat-hero");
 
     const stunChance = Math.min(
-        GAME_RULES.probabilityScale,
-        Math.min(GAME_RULES.probabilityScale, getEffectiveStat('stunChance')) + criticalStunBonus
+        selectedCharacter.skills.maxStunChance,
+        Math.min(selectedCharacter.skills.maxStunChance, getEffectiveStat('stunChance')) + criticalStunBonus
     );
     const stunned = currentMonster.hp > 0 && Math.random() * GAME_RULES.probabilityScale < stunChance;
     if (stunned) logMessage(t("stunLanded"), "special");

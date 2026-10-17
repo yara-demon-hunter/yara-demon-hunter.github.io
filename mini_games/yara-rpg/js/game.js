@@ -209,7 +209,7 @@ function checkLevelUp() {
         hero.def += growth.def;
         hero.evasion = Math.min(selectedCharacter.skills.maxEvasion, hero.evasion + growth.evasion);
         hero.parry = Math.min(selectedCharacter.skills.maxParry, hero.parry + growth.parry);
-        hero.stunChance = Math.min(GAME_RULES.probabilityScale, hero.stunChance + growth.stunChance);
+        hero.stunChance = Math.min(selectedCharacter.skills.maxStunChance, hero.stunChance + growth.stunChance);
 
         hero.skillPoints = (Number(hero.skillPoints) || 0) + SKILL_POINTS_PER_LEVEL;
 

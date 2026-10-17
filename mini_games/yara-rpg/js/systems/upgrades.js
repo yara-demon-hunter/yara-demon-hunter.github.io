@@ -30,6 +30,7 @@ function getUpgradeConfiguration(upgrade) {
     if (!configuration) return null;
     if (upgrade === 'parry') return { ...configuration, max: selectedCharacter.skills.maxParry };
     if (upgrade === 'evasion') return { ...configuration, max: selectedCharacter.skills.maxEvasion };
+    if (upgrade === 'stun') return { ...configuration, max: selectedCharacter.skills.maxStunChance };
     return configuration;
 }
 

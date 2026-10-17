@@ -45,7 +45,7 @@ function updateUI() {
     const effectiveEvasion = Math.min(selectedCharacter.skills.maxEvasion, getEffectiveStat('evasion'));
     const effectiveParry = Math.min(selectedCharacter.skills.maxParry, getEffectiveStat('parry'));
     const effectiveStunChance = Math.min(
-        GAME_RULES.probabilityScale,
+        selectedCharacter.skills.maxStunChance,
         getEffectiveStat('stunChance')
     );
     const evasionTotal = Math.min(selectedCharacter.skills.maxEvasion, effectiveEvasion + hero.evasionBonus);
@@ -69,7 +69,7 @@ function updateUI() {
         ? `${effectiveParry}% + ${hero.parryBonus}% = ${parryTotal}%`
         : `${effectiveParry}%`);
     const stunBonus = hero.fury >= hero.maxFury ? CRITICAL_STUN_BONUS : 0;
-    const stunChanceTotal = Math.min(GAME_RULES.probabilityScale, effectiveStunChance + stunBonus);
+    const stunChanceTotal = Math.min(selectedCharacter.skills.maxStunChance, effectiveStunChance + stunBonus);
     const stunBonusDisplay = document.getElementById('hero-stun-bonus');
     const stunDisplay = document.getElementById('hero-stun');
     document.getElementById('hero-stun-base').innerText = effectiveStunChance + '%';
@@ -169,7 +169,9 @@ function updateUI() {
             ? selectedCharacter.skills.maxParry
             : upgrade === 'evasion'
                 ? selectedCharacter.skills.maxEvasion
-                : undefined;
+                : upgrade === 'stun'
+                    ? selectedCharacter.skills.maxStunChance
+                    : undefined;
         const upgradeConfiguration = upgradeMax === undefined
             ? UPGRADE_CONFIG[upgrade]
             : { ...UPGRADE_CONFIG[upgrade], max: upgradeMax };
