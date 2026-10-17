@@ -182,7 +182,7 @@ function startAdventure({ character, equipment }) {
     hero.foco = getEffectiveStat("maxFoco");
 
     document.getElementById("rpg-log").replaceChildren();
-    logMessage(t("openingLog", { hero: hero.name }), "special");
+    window.logMessage(t("openingLog", { hero: hero.name }), "special");
 
     document.getElementById("game-main").hidden = false;
     document.getElementById("character-setup").hidden = true;
@@ -215,8 +215,8 @@ function checkLevelUp() {
         hero.skillPoints = (Number(hero.skillPoints) || 0) + SKILL_POINTS_PER_LEVEL;
 
         playSound("levelUp");
-        logMessage(t("levelUp", { level: hero.level }), "discovery");
-        logMessage(t("skillPointsGained", { amount: SKILL_POINTS_PER_LEVEL, total: hero.skillPoints }), "special");
+        window.logMessage(t("levelUp", { level: hero.level }), "discovery");
+        window.logMessage(t("skillPointsGained", { amount: SKILL_POINTS_PER_LEVEL, total: hero.skillPoints }), "special");
     }
 }
 

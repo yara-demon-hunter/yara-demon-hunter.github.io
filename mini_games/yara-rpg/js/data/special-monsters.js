@@ -2,21 +2,6 @@ window.YaraRpgData = window.YaraRpgData || {};
 
 window.YaraRpgData.specialMonsters = Object.freeze([
     {
-        id: "undead",
-        name: { pt: "Morto-Vivo", en: "Undead" },
-        icon: "💀",
-        image: "images/special_monsters/undead.png",
-        minLevel: 3,
-        suggestedLevel: 4,
-        hp: 230,
-        atk: 32,
-        def: 15,
-        parry: 32,
-        evasion: 8,
-        xpReward: 95,
-        goldReward: 75
-    },
-    {
         id: "death",
         name: { pt: "Morte", en: "Death" },
         icon: "💀",
@@ -29,7 +14,24 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         parry: 30,
         evasion: 12,
         xpReward: 65,
-        goldReward: 48
+        goldReward: 48,
+        challengeRewardRarities: ["rare", "super-rare"]
+    },
+    {
+        id: "undead",
+        name: { pt: "Morto-Vivo", en: "Undead" },
+        icon: "💀",
+        image: "images/special_monsters/undead.png",
+        minLevel: 3,
+        suggestedLevel: 4,
+        hp: 230,
+        atk: 32,
+        def: 15,
+        parry: 32,
+        evasion: 8,
+        xpReward: 95,
+        goldReward: 75,
+        challengeRewardRarities: ["super-rare", "epic"]
     },
     {
         id: "mist-dragon",
@@ -38,28 +40,30 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         image: "images/special_monsters/mist-dragon.png",
         minLevel: 5,
         suggestedLevel: 6,
-        hp: 300,
+        hp: 270,
         atk: 46,
         def: 20,
         parry: 35,
         evasion: 16,
         xpReward: 180,
-        goldReward: 140
+        goldReward: 140,
+        challengeRewardRarities: ["epic", "legendary"]
     },
     {
         id: "abyssal-demon",
         name: { pt: "Demônio do Abismo", en: "Abyssal Demon" },
         icon: "👹",
         image: "images/special_monsters/abyssal-demon.png",
-        minLevel: 1,
+        minLevel: 5,
         suggestedLevel: 8,
-        hp: 500,
+        hp: 350,
         atk: 50,
         def: 20,
         parry: 42,
         evasion: 18,
         xpReward: 360,
-        goldReward: 400
+        goldReward: 400,
+        challengeRewardRarities: ["legendary", "demon"]
     },
     {
         id: "brutos",
@@ -68,13 +72,14 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         image: "images/special_monsters/brutos.png",
         minLevel: 5,
         suggestedLevel: 9,
-        hp: 750,
-        atk: 58,
-        def: 32,
+        hp: 650,
+        atk: 55,
+        def: 30,
         parry: 38,
         evasion: 10,
         xpReward: 280,
-        goldReward: 240
+        goldReward: 240,
+        challengeRewardRarities: ["demon", "god"]
     },
     {
         id: "gudran",
@@ -82,11 +87,11 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         icon: "👑",
         minLevel: 8,
         suggestedLevel: 10,
-        hp: 1200,
-        atk: 68,
-        def: 38,
+        hp: 1700,
+        atk: 62,
+        def: 36,
         parry: 45,
-        evasion: 14,
+        evasion: 20,
         xpReward: 600,
         goldReward: 600,
         isFinalBoss: true,

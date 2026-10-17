@@ -165,7 +165,6 @@ function updateUI() {
     const exploreControls = document.getElementById('controls-explore');
     const combatControls = document.getElementById('controls-combat');
     const encounterCard = document.getElementById('encounter-card');
-    const explorationBanner = document.getElementById('exploration-banner');
     const mistContactCard = document.getElementById('mist-contact-card');
     const campButton = document.getElementById('camp-button');
     document.querySelector('[data-i18n="campCost"]').innerText = t('campCost', { cost: CAMP_COST });
