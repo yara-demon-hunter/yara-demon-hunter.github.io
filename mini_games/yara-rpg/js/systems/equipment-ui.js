@@ -274,7 +274,8 @@ function upgradeSelectedEquipment() {
     item.upgradeLevel = (Number(item.upgradeLevel) || 0) + 1;
     item.upgradeSystemVersion = 2;
     Object.keys(item.stats).forEach((stat) => {
-        item.stats[stat] += GAME_RULES.equipmentUpgrade.statBonusPerLevel;
+        const statBonuses = GAME_RULES.equipmentUpgrade.statBonusPerLevel;
+        item.stats[stat] += statBonuses[stat] ?? 0.5;
     });
     logMessage(t('equipmentUpgradePurchased', {
         item: getEquipmentDisplayName(item),

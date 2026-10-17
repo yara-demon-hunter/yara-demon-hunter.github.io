@@ -27,7 +27,15 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
         maxLevel: 9,
         baseCost: 50,
         costMultiplier: 1.4,
-        statBonusPerLevel: 1
+        statBonusPerLevel: {
+            atk: 0.5,
+            def: 0.5,
+            evasion: 0.5,
+            parry: 0.5,
+            stunChance: 0.5,
+            maxHp: 5,
+            maxFoco: 5
+        }
     },
     inventory: {
         equipmentBagCapacity: 9
