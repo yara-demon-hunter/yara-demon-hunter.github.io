@@ -1,7 +1,8 @@
 <!-- Painel de Status do Personagem -->
         <section id="hero-panel" class="bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xl">
             <div class="hero-vitals">
-                <div class="hero-summary flex items-center justify-between border-b border-fantasy-border pb-3 mb-4">
+                <div class="hero-summary border-b border-fantasy-border pb-3 mb-4">
+                    <div class="hero-summary-heading flex items-center justify-between">
                     <div>
                         <div class="hero-identity">
                             <span id="hero-portrait-anchor" class="hero-portrait-anchor"><img id="hero-portrait" class="hero-portrait" src="/mini_games/yara-rpg/images/characters/zeph.png" alt="" aria-hidden="true"></span>
@@ -16,7 +17,7 @@
                         <span class="text-xs text-purple-400 font-semibold"><span data-i18n="experience">XP:</span> <span id="hero-xp" class="text-white">0</span>/<span id="hero-xp-max" class="text-white">30</span></span>
                         <span id="hero-skill-points-badge" class="skill-points-badge no-points inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] leading-none" aria-label="0 pontos de habilidade"><span aria-hidden="true">✦</span><span id="hero-skill-points" class="font-bold">0</span><span data-i18n="skillPointsShort" class="uppercase tracking-wide">PH</span></span>
                     </div>
-                </div>
+                    </div>
 
                 <!-- Status Bars -->
                 <div class="hero-status-bars space-y-3 mb-4">
@@ -34,7 +35,7 @@
                     <!-- Foco / Estamina para Golpes Especiais -->
                     <div>
                         <div class="flex justify-between text-xs font-semibold mb-1">
-                            <span class="text-blue-400 flex items-center gap-1">⚡ <span data-i18n="focus">Foco (Estamina)</span></span>
+                            <span class="text-blue-400 flex items-center gap-1">⚡ <span data-i18n="focusShort">Foco</span></span>
                             <span class="flex items-center gap-2"><span><span id="hero-foco">50</span> / <span id="hero-foco-max">50</span></span><span class="skill-upgrade-control" data-upgrade-control="foco"><button type="button" data-upgrade="foco" onclick="toggleUpgradeOptions('foco')" class="skill-upgrade-button" aria-label="Melhorar estamina (1 ponto)" aria-expanded="false" aria-controls="upgrade-options-foco" title="Melhorar por 1 ponto de habilidade">+</button><span id="upgrade-options-foco" class="skill-upgrade-options" data-upgrade-options="foco" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('foco', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('foco', 'max')" data-i18n="upgradeMax">Máx</button></span></span></span>
                         </div>
                         <div id="hero-focus-anchor" class="relative w-full bg-forest-950 rounded-full h-2.5 p-0.5 border border-fantasy-border overflow-visible">
@@ -51,6 +52,7 @@
                             <div id="hero-fury-bar" class="bg-gradient-to-r from-orange-700 to-amber-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
                         </div>
                     </div>
+                </div>
                 </div>
 
                 <details id="hero-equipment" class="hero-equipment">

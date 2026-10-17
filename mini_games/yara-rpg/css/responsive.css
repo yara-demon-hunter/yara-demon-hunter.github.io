@@ -78,8 +78,8 @@
         font-size: 0.82rem !important;
     }
     #controls-combat button {
-        min-height: 62px;
-        padding: 8px 6px !important;
+        min-height: 48px;
+        padding: 4px 3px !important;
         font-size: 0.7rem !important;
     }
 }
@@ -112,15 +112,18 @@
         display: contents;
     }
     .hero-summary {
-        order: 1;
+        order: 3;
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
         margin: 0 !important;
         padding: 8px 12px !important;
         border: 1px solid rgba(92, 81, 55, 0.7);
         border-radius: 14px;
         background: rgba(23, 25, 31, 0.95);
     }
+    .hero-summary-heading { width: 100%; }
     .hero-summary > div:first-child {
         display: flex;
         align-items: center;
@@ -143,33 +146,39 @@
         white-space: nowrap;
     }
     .hero-status-bars {
-        order: 2;
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 6px !important;
+        display: flex;
+        flex-direction: column;
+        gap: 7px !important;
+        width: 100%;
         margin: 0 !important;
     }
     .hero-status-bars > :not([hidden]) ~ :not([hidden]) {
         margin-top: 0 !important;
     }
     .hero-status-bars > div {
+        display: grid;
+        grid-template-columns: minmax(7.5rem, 42%) minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
         min-width: 0;
-        padding: 7px 8px;
-        border: 1px solid rgba(92, 81, 55, 0.45);
-        border-radius: 10px;
-        background: rgba(12, 13, 15, 0.72);
+        padding: 0;
     }
     .hero-status-bars > div > div:first-child {
-        gap: 3px;
-        font-size: 0.62rem;
-        line-height: 1.2;
+        gap: 4px;
+        min-width: 0;
+        margin: 0 !important;
+        font-size: 0.6rem;
+        line-height: 1.1;
     }
     .hero-status-bars .skill-upgrade-button {
         width: 23px;
         height: 23px;
     }
+    .hero-status-bars > div > [id$="-anchor"],
     .hero-status-bars > div > .w-full {
-        height: 7px;
+        width: 100%;
+        height: 10px;
+        min-width: 0;
     }
     #game-panel {
         order: 5;
@@ -178,11 +187,11 @@
         backdrop-filter: none !important;
     }
     #hero-equipment {
-        order: 2;
+        order: 1;
         grid-column: 1 / -1;
     }
     #hero-attributes {
-        order: 3;
+        order: 2;
         grid-column: 1 / -1;
     }
     #discovery-chance {
@@ -254,20 +263,23 @@
         line-height: 1;
     }
     #controls-combat {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 5px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 3px;
     }
     #controls-combat button {
-        grid-column: span 2;
-        min-height: 52px;
-        padding: 4px 3px !important;
-        border-radius: 9px;
-        font-size: 0.62rem !important;
-        line-height: 1.15;
+        min-width: 0;
+        min-height: 48px;
+        padding: 2px 1px !important;
+        border-radius: 7px;
+        font-size: 0.54rem !important;
+        line-height: 1.05;
         gap: 2px;
     }
+    #controls-combat button > span:first-child { font-size: 0.9rem; line-height: 1; }
+    #controls-combat button span:not(:first-child) { overflow-wrap: anywhere; }
     #controls-combat button span:last-child:not(:first-child) {
-        font-size: 0.58rem;
+        font-size: 0.43rem;
+        line-height: 1;
     }
     footer {
         padding-bottom: 4px;
