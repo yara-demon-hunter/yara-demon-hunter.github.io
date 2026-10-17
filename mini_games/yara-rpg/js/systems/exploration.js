@@ -95,6 +95,7 @@ function exploreForest() {
     } else if (outcome === 'chest') {
         pendingChest = true;
         hero.chestChanceBonus = 0;
+        playSound('chestDiscovery');
         logMessage(t('chestFoundLog'), 'discovery');
     } else {
         logMessage(t('denseMist'));
@@ -318,6 +319,7 @@ function tryDiscoverRegion() {
 
     currentRegion++;
     discoveredRegions.push(currentRegion);
+    playSound('regionDiscovered');
     explorationsSinceStoryEvent = 0;
     logMessage(t("regionArrival", { region: GAME_DATA.regions[currentRegion].title[gameLanguage] }), "discovery");
     explorationCount = 0;
@@ -481,7 +483,7 @@ function spawnMonster(templateOverride = null) {
         monster: currentMonster.name
     }), "combat-monster");
     updateUI();
-    setCombatMusic(true);
+    setBossMusic(currentMonster.isBoss);
 }
 
 function acceptMistContact() {

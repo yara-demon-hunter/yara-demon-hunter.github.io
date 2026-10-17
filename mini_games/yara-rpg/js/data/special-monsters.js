@@ -85,6 +85,7 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         id: "gudran",
         name: { pt: "Gudran, Senhor do Castelo", en: "Gudran, Lord of the Castle" },
         icon: "👑",
+        image: "images/special_monsters/gudran.png",
         minLevel: 8,
         suggestedLevel: 10,
         hp: 1500,

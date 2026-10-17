@@ -81,6 +81,7 @@ function combatRun() {
     combatActionLocked = true;
     const success = Math.random() < GAME_RULES.combat.escapeSuccessChance;
     if (success) {
+        setBossMusic(false);
         logMessage(t("escaped"), "discovery");
         hero.fury = 0;
         hero.evasionBonus = 0;
@@ -100,6 +101,8 @@ function combatRun() {
 function endCombatVictory() {
     if (!inCombat || !currentMonster || currentMonster.hp > 0) return;
     const defeatedMonster = { ...currentMonster };
+    playSound('monsterDefeated');
+    if (defeatedMonster.isBoss) setBossMusic(false);
     const mercyChance = EXPLORATION_RULES.sparedMonster.chance;
     if (!defeatedMonster.isBoss
         && Math.random() * GAME_RULES.probabilityScale < mercyChance) {
@@ -189,6 +192,7 @@ function awardCombatVictory(monster) {
 }
 
 function endCombatDefeat() {
+    if (currentMonster?.isBoss) setBossMusic(false);
     logMessage(t("defeat"), "combat-monster");
     logMessage(t("defeatHelp"), "special");
     inCombat = false;

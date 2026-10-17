@@ -2,6 +2,7 @@
 // Classic browser script; state is initialized by game.js before user actions run.
 
 const gameMusic = document.getElementById('game-music');
+const normalMusicSource = gameMusic.getAttribute('src');
 const musicToggle = document.getElementById('music-toggle');
 const musicIcon = document.getElementById('music-icon');
 const SOUND_EFFECTS = Object.freeze({
@@ -9,7 +10,10 @@ const SOUND_EFFECTS = Object.freeze({
     parry: new Audio('audio/sfx/parry.mp3'),
     basicAttack: new Audio('audio/sfx/basic-attack.mp3'),
     specialAttack: new Audio('audio/sfx/special-attack.mp3'),
-    levelUp: new Audio('audio/sfx/level-up.mp3')
+    levelUp: new Audio('audio/sfx/level-up.mp3'),
+    chestDiscovery: new Audio('audio/sfx/chest_discovery_dark_fantasy.mp3'),
+    monsterDefeated: new Audio('audio/sfx/monster_defeated_dark_fantasy.mp3'),
+    regionDiscovered: new Audio('audio/sfx/new_region_discovered_dark_fantasy.mp3')
 });
 Object.values(SOUND_EFFECTS).forEach((sound) => {
     sound.preload = 'none';
@@ -30,10 +34,15 @@ function updateMusicButton(isPlaying) {
     musicToggle.title = label;
 }
 
-function setCombatMusic(isCombat) {
-    if (!musicEnabled) return;
-    if (isCombat) gameMusic.dataset.combat = 'true';
-    else delete gameMusic.dataset.combat;
+function setBossMusic(isBoss) {
+    const nextSource = isBoss ? 'audio/sfx/boss_song.mp3' : normalMusicSource;
+    if (gameMusic.getAttribute('src') === nextSource) return;
+    gameMusic.pause();
+    gameMusic.setAttribute('src', nextSource);
+    gameMusic.load();
+    if (musicEnabled && !document.hidden) {
+        gameMusic.play().catch(() => updateMusicButton(false));
+    }
 }
 
 function startGameMusic() {
