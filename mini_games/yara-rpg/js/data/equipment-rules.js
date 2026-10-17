@@ -39,6 +39,6 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
         }
     },
     inventory: {
-        equipmentBagCapacity: 9
+        equipmentBagCapacity: 12
     }
 });

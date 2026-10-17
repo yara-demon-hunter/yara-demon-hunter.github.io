@@ -61,7 +61,7 @@ window.YaraRpgTranslations.pt = {
         equipment: "Equipamento",
         equipmentSummary: "Equipamento, {count} de 10 equipados",
         inventory: "Mochila",
-        equipmentBagDescription: "Até 9 equipamentos guardados.",
+        equipmentBagDescription: "Até 12 equipamentos guardados.",
         bagCapacity: "{count}/{capacity} espaços usados",
         bagSlot: "Espaço {slot}",
         emptyBagSlot: "Vazio",

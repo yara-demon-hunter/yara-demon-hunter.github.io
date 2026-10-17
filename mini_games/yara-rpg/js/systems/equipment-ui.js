@@ -452,7 +452,7 @@ function showEquipmentChoice(item, fromInventory) {
         renderEquipmentBonuses(document.getElementById('item-drop-current-bonuses'), currentItem);
     }
     renderEquipmentBonuses(document.getElementById('item-drop-new-bonuses'), item, currentItem, true);
-    const blockedByFullBag = isPendingDropBlocked();
+    const blockedByFullBag = !fromInventory && isPendingDropBlocked();
     const blockedByStorageCapacity = !fromInventory
         && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY;
     document.getElementById('item-drop-choice-help').textContent = fromInventory
@@ -465,10 +465,11 @@ function showEquipmentChoice(item, fromInventory) {
         ? 'cancelComparison'
         : currentItem ? 'keepCurrentItem' : 'storeFoundItem');
     document.getElementById('equip-new-item-button').disabled = blockedByFullBag;
+    document.getElementById('equip-new-item-button').hidden = blockedByFullBag;
     document.getElementById('keep-current-item-button').disabled = fromInventory
         ? false
         : blockedByStorageCapacity;
-    document.getElementById('keep-current-item-button').hidden = false;
+    document.getElementById('keep-current-item-button').hidden = fromInventory || blockedByStorageCapacity;
     document.getElementById('open-bag-from-drop-button').hidden = fromInventory || !blockedByStorageCapacity;
     document.getElementById('item-drop-dialog').showModal();
     renderEquipment();
@@ -534,6 +535,12 @@ function isPendingDropBlocked() {
 function equipPendingEquipment() {
     if (!pendingEquipment || inCombat || gameOver || isPendingDropBlocked()) return;
     const { item, fromInventory } = pendingEquipment;
+    if (fromInventory && !hero.equipmentInventory.includes(item)) {
+        pendingEquipment = null;
+        document.getElementById('item-drop-dialog').close();
+        updateUI();
+        return;
+    }
     pendingEquipment = null;
     document.getElementById('item-drop-dialog').close();
     equipItem(item, fromInventory);
@@ -554,4 +561,5 @@ function keepPendingEquipment() {
         logMessage(t('itemStored', { item: getEquipmentDisplayName(item) }), 'loot');
     }
     updateUI();
+    if (fromInventory) openEquipmentBag();
 }
