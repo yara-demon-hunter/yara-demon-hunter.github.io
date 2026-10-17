@@ -10,8 +10,8 @@
 
 // ---------- 1) Domínio: Equipamento ----------
 const EQUIPMENT_SLOTS = Object.freeze([
-    { id: "rightHand", icon: "🗡️" },
-    { id: "leftHand",  icon: "🛡️" },
+    { id: "mainHand", icon: "🗡️" },
+    { id: "offHand",  icon: "🛡️" },
     { id: "head",      icon: "⛑️", image: "images/items/leather-cap.png" },
     { id: "body",      icon: "🦺", image: "images/items/leather-armor.png" },
     { id: "legs",      icon: "👖", image: "images/items/trail-trousers.png" },

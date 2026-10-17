@@ -203,29 +203,66 @@ window.YaraRpgCharacterSetup = (() => {
     }
 
     function toggleEquipment(item) {
-        const sameSlotIndex = selectedEquipmentIds.findIndex((id) =>
-            EQUIPMENT_BY_ID.get(id).slot === item.slot
-        );
         const selectedIndex = selectedEquipmentIds.indexOf(item.id);
         if (selectedIndex !== -1) {
             selectedEquipmentIds.splice(selectedIndex, 1);
         } else {
-            if (sameSlotIndex !== -1) {
-                selectedEquipmentIds[sameSlotIndex] = item.id;
-            } else if (selectedEquipmentIds.length < SELECTION_LIMIT) {
-                selectedEquipmentIds.push(item.id);
+            const conflictingIds = selectedEquipmentIds.filter((id) =>
+                starterEquipmentConflicts(item, EQUIPMENT_BY_ID.get(id))
+            );
+            if (conflictingIds.length) {
+                selectedEquipmentIds = selectedEquipmentIds.filter((id) => !conflictingIds.includes(id));
+            }
+            if (selectedEquipmentIds.length < SELECTION_LIMIT) {
+                const candidateIds = [...selectedEquipmentIds, item.id];
+                const candidateItems = candidateIds.map((id) => EQUIPMENT_BY_ID.get(id));
+                if (getStarterEquipmentSlots(candidateItems)) selectedEquipmentIds = candidateIds;
             }
         }
         renderEquipment();
     }
 
+    function starterEquipmentConflicts(first, second) {
+        if (first.slot === second.slot) {
+            const bothOneHandedWeapons = first.itemType === "weapon"
+                && second.itemType === "weapon"
+                && first.handUsage !== "two-handed"
+                && second.handUsage !== "two-handed";
+            if (bothOneHandedWeapons && first.slot === "mainHand") return false;
+            return true;
+        }
+        return (first.slot === "mainHand" && first.handUsage === "two-handed" && second.slot === "offHand")
+            || (second.slot === "mainHand" && second.handUsage === "two-handed" && first.slot === "offHand");
+    }
+
+    function getStarterEquipmentSlots(items) {
+        const occupiedSlots = new Set();
+        const assignments = [];
+        for (const item of items) {
+            let slot = item.slot;
+            if (item.itemType === "weapon" && item.handUsage !== "two-handed" && occupiedSlots.has(slot)) {
+                slot = slot === "mainHand" ? "offHand" : "mainHand";
+            }
+            const requiredSlots = item.handUsage === "two-handed" ? ["mainHand", "offHand"] : [slot];
+            if (requiredSlots.some((requiredSlot) => occupiedSlots.has(requiredSlot))) return null;
+            requiredSlots.forEach((requiredSlot) => occupiedSlots.add(requiredSlot));
+            assignments.push({ item, slot });
+        }
+        return assignments;
+    }
+
     function beginAdventure() {
         if (selectedEquipmentIds.length !== SELECTION_LIMIT) return;
-        const equipment = selectedEquipmentIds.map((id) => {
+        const selectedItems = selectedEquipmentIds.map((id) => {
             const item = EQUIPMENT_BY_ID.get(id);
             if (!item) throw new Error(`Unknown starter equipment: ${id}`);
             return item;
         });
+        const equipmentSlots = getStarterEquipmentSlots(selectedItems);
+        if (!equipmentSlots) return;
+        const equipment = equipmentSlots.map(({ item, slot }) =>
+            slot === item.slot ? item : { ...item, slot }
+        );
         const character = CHARACTER_DATA.find(({ id }) => id === selectedCharacterId);
         if (!character) throw new Error(`Unknown starting character: ${selectedCharacterId}`);
         onStart({ character, equipment });

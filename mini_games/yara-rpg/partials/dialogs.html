@@ -31,17 +31,20 @@
                     <ul id="item-drop-new-bonuses" class="equipment-comparison-bonuses"></ul>
                 </section>
                 <span class="equipment-comparison-arrow" aria-hidden="true">→</span>
-                <section class="equipment-comparison-card equipment-comparison-current" aria-labelledby="item-drop-current-name">
-                    <span class="equipment-comparison-label" data-i18n="equippedEquipmentLabel">Equipado</span>
-                    <span id="item-drop-current-icon" class="equipment-comparison-icon" aria-hidden="true"></span>
-                    <h3 id="item-drop-current-name" class="equipment-comparison-name"></h3>
-                    <p id="item-drop-current-slot" class="equipment-comparison-slot"></p>
-                    <ul id="item-drop-current-bonuses" class="equipment-comparison-bonuses"></ul>
-                </section>
+                <div class="equipment-comparison-current-group">
+                    <section class="equipment-comparison-card equipment-comparison-current" aria-labelledby="item-drop-current-name">
+                        <span class="equipment-comparison-label" data-i18n="equippedEquipmentLabel">Equipado</span>
+                        <span id="item-drop-current-icon" class="equipment-comparison-icon" aria-hidden="true"></span>
+                        <h3 id="item-drop-current-name" class="equipment-comparison-name"></h3>
+                        <p id="item-drop-current-slot" class="equipment-comparison-slot"></p>
+                        <ul id="item-drop-current-bonuses" class="equipment-comparison-bonuses"></ul>
+                    </section>
+                </div>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-2">
                 <button id="equip-new-item-button" type="button" class="rounded-lg border border-amber-500 bg-amber-700 px-3 py-2 text-sm font-semibold text-white" data-i18n="equipNewItem">Equipar novo</button>
                 <button id="keep-current-item-button" type="button" class="rounded-lg border border-forest-600 bg-forest-800 px-3 py-2 text-sm font-semibold text-emerald-100" data-i18n="keepCurrentItem">Manter atual</button>
+                <button id="equip-other-hand-from-drop-button" type="button" class="col-span-2 justify-self-center rounded-lg border border-amber-500/80 bg-amber-950/80 px-4 py-2 text-sm font-semibold text-amber-100 hover:bg-amber-900/90"></button>
                 <button id="open-bag-from-drop-button" type="button" class="col-span-2 justify-self-center rounded-lg border border-red-500/80 bg-red-950/80 px-4 py-2 text-sm font-semibold text-red-100 hover:bg-red-900/90" data-i18n="openBag">Abrir mochila</button>
                 <button id="discard-pending-item-button" type="button" class="col-span-2 justify-self-center rounded-lg border border-red-500/80 bg-red-950/80 px-4 py-2 text-sm font-semibold text-red-100 hover:bg-red-900/90" data-i18n="discard">Descartar item encontrado</button>
             </div>
@@ -60,6 +63,7 @@
             <div class="equipment-item-actions">
                 <button id="equipment-item-upgrade-button" type="button" class="equipment-bag-action equipment-bag-upgrade"></button>
                 <button id="equipment-item-equip-button" type="button" class="equipment-bag-action equipment-bag-equip" data-i18n="equip">Equipar</button>
+                <button id="equipment-item-equip-other-hand-button" type="button" class="equipment-bag-action equipment-bag-equip"></button>
                 <button id="equipment-item-unequip-button" type="button" class="equipment-bag-action equipment-bag-discard" data-i18n="unequip">Desequipar</button>
                 <button id="equipment-item-discard-button" type="button" class="equipment-bag-action equipment-bag-discard" data-i18n="discard">Descartar</button>
             </div>

@@ -151,6 +151,17 @@
     margin-top: 1rem;
 }
 .equipment-comparison-single { grid-template-columns: minmax(0, 1fr); }
+.equipment-comparison-multiple { grid-template-columns: minmax(0, 0.8fr) auto minmax(0, 1.6fr); }
+.equipment-comparison-current-group {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: 0.5rem;
+}
+.equipment-comparison-multiple .equipment-comparison-current-group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+}
 .equipment-comparison-card {
     min-width: 0;
     display: flex;
@@ -513,7 +524,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-areas:
         "necklace head bag"
-        "leftHand body rightHand"
+        "mainHand body offHand"
         "accessory legs ring"
         "pet boots potion";
     width: min(100%, 17rem);
@@ -532,8 +543,8 @@
     padding: 0.35rem;
     text-align: center;
 }
-.equipment-slot-rightHand { grid-area: rightHand; }
-.equipment-slot-leftHand { grid-area: leftHand; }
+.equipment-slot-mainHand { grid-area: mainHand; }
+.equipment-slot-offHand { grid-area: offHand; }
 .equipment-slot-head { grid-area: head; }
 .equipment-slot-body { grid-area: body; }
 .equipment-slot-legs { grid-area: legs; }

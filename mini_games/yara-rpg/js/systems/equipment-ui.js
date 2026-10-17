@@ -3,6 +3,7 @@
 
 document.getElementById('equip-new-item-button').addEventListener('click', equipPendingEquipment);
 document.getElementById('keep-current-item-button').addEventListener('click', keepPendingEquipment);
+document.getElementById('equip-other-hand-from-drop-button').addEventListener('click', equipPendingInOtherHand);
 document.getElementById('open-equipment-bag-button').addEventListener('click', openEquipmentBag);
 document.getElementById('open-bag-from-drop-button').addEventListener('click', openEquipmentBag);
 document.getElementById('discard-pending-item-button').addEventListener('click', discardPendingEquipment);
@@ -10,6 +11,7 @@ document.getElementById('close-equipment-bag-button').addEventListener('click', 
 document.getElementById('discard-selected-items-button').addEventListener('click', discardSelectedInventoryItems);
 document.getElementById('close-equipment-item-button').addEventListener('click', closeEquipmentItemDetails);
 document.getElementById('equipment-item-equip-button').addEventListener('click', equipSelectedInventoryItem);
+document.getElementById('equipment-item-equip-other-hand-button').addEventListener('click', equipSelectedInventoryItemInOtherHand);
 document.getElementById('equipment-item-unequip-button').addEventListener('click', unequipSelectedEquipment);
 document.getElementById('equipment-item-discard-button').addEventListener('click', discardSelectedInventoryItem);
 document.getElementById('equipment-item-upgrade-button').addEventListener('click', upgradeSelectedEquipment);
@@ -239,7 +241,7 @@ function renderEquipmentItemDetails(item, source, slot = null) {
     itemTitle.className = `text-lg font-bold ${getEquipmentRarityClass(item)}`;
     const rarity = getEquipmentRarity(item);
     const itemSlot = document.getElementById('equipment-item-slot');
-    itemSlot.textContent = `${rarity.name[gameLanguage]} · ${t(item.slot)}`;
+    itemSlot.textContent = `${rarity.name[gameLanguage]} · ${getEquipmentSlotLabel(item)}`;
     itemSlot.className = `mt-1 text-xs ${getEquipmentRarityClass(item)}`;
 
     const properties = document.getElementById('equipment-item-properties');
@@ -293,20 +295,29 @@ function renderEquipmentItemDetails(item, source, slot = null) {
     upgradeButton.disabled = inCombat || gameOver || Boolean(pendingEquipment)
         || upgradeCost === null || hero.gold < upgradeCost;
     const equipButton = document.getElementById('equipment-item-equip-button');
+    const equipOtherHandButton = document.getElementById('equipment-item-equip-other-hand-button');
     const unequipButton = document.getElementById('equipment-item-unequip-button');
     const discardButton = document.getElementById('equipment-item-discard-button');
     equipButton.hidden = !isInventoryItem;
     equipButton.disabled = inCombat || gameOver || Boolean(pendingEquipment);
     equipButton.setAttribute('aria-label', t('equipItemAria', {
         item: getEquipmentDisplayName(item),
-        slot: t(item.slot)
+        slot: getEquipmentSlotLabel(item)
     }));
+    const canSwitchHand = isInventoryItem
+        && ['mainHand', 'offHand'].includes(item.slot)
+        && item.itemType !== 'shield'
+        && item.handUsage !== 'two-handed';
+    const otherHandSlot = item.slot === 'mainHand' ? 'offHand' : 'mainHand';
+    equipOtherHandButton.hidden = !canSwitchHand;
+    equipOtherHandButton.textContent = t(otherHandSlot === 'offHand' ? 'equipOffHand' : 'equipMainHand');
+    equipOtherHandButton.disabled = inCombat || gameOver || Boolean(pendingEquipment);
     unequipButton.hidden = isInventoryItem;
     unequipButton.disabled = inCombat || gameOver || Boolean(pendingEquipment)
         || hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY;
     unequipButton.setAttribute('aria-label', t('unequipItemAria', {
         item: getEquipmentDisplayName(item),
-        slot: t(item.slot)
+        slot: getEquipmentSlotLabel(item)
     }));
     discardButton.hidden = !isInventoryItem;
     discardButton.disabled = inCombat || gameOver;
@@ -351,6 +362,14 @@ function equipSelectedInventoryItem() {
     if (!selection || selection.source !== 'inventory') return;
     closeEquipmentItemDetails();
     equipInventoryItem(selection.item);
+}
+
+function equipSelectedInventoryItemInOtherHand() {
+    const selection = selectedEquipmentDetails;
+    if (!selection || selection.source !== 'inventory') return;
+    const targetSlot = selection.item.slot === 'mainHand' ? 'offHand' : 'mainHand';
+    closeEquipmentItemDetails();
+    equipInventoryItem(selection.item, targetSlot);
 }
 
 function unequipSelectedEquipment() {
@@ -417,9 +436,12 @@ function discardSelectedInventoryItems() {
     }
 }
 
-function showEquipmentChoice(item, fromInventory) {
-    pendingEquipment = { item, fromInventory };
-    const currentItem = hero.equipment[item.slot];
+function showEquipmentChoice(item, fromInventory, targetSlot = item.slot) {
+    pendingEquipment = { item, fromInventory, targetSlot };
+    const candidate = targetSlot === item.slot ? item : { ...item, slot: targetSlot };
+    const conflicts = getEquipmentConflicts(candidate);
+    const currentItems = conflicts.map(({ item: equippedItem }) => equippedItem);
+    const currentItem = currentItems[0] || null;
     document.getElementById('item-drop-title').textContent = t(
         fromInventory ? 'compareEquipmentTitle' : 'itemDropTitle'
     );
@@ -434,33 +456,64 @@ function showEquipmentChoice(item, fromInventory) {
         fromInventory ? 'comparisonCandidateLabel' : 'newEquipmentLabel'
     );
     const newItemSlot = document.getElementById('item-drop-new-slot');
-    newItemSlot.textContent = `${getEquipmentRarity(item).name[gameLanguage]} · ${t(item.slot)}`;
+    newItemSlot.textContent = `${getEquipmentRarity(item).name[gameLanguage]} · ${getEquipmentSlotLabel(candidate)}`;
     newItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(item)}`;
     const comparison = document.querySelector('.equipment-comparison');
     const currentCard = document.querySelector('.equipment-comparison-current');
     const comparisonArrow = document.querySelector('.equipment-comparison-arrow');
     comparison.classList.toggle('equipment-comparison-single', !currentItem);
+    comparison.classList.toggle('equipment-comparison-multiple', currentItems.length > 1);
     currentCard.hidden = !currentItem;
     comparisonArrow.hidden = !currentItem;
+    const currentGroup = document.querySelector('.equipment-comparison-current-group');
+    currentGroup.querySelectorAll('.equipment-comparison-current-extra').forEach((card) => card.remove());
     if (currentItem) {
-        setEquipmentIcon(document.getElementById('item-drop-current-icon'), currentItem);
-        const currentItemName = document.getElementById('item-drop-current-name');
-        currentItemName.textContent = getEquipmentDisplayName(currentItem);
-        currentItemName.className = `equipment-comparison-name ${getEquipmentRarityClass(currentItem)}`;
-        const currentItemSlot = document.getElementById('item-drop-current-slot');
-        currentItemSlot.textContent = `${getEquipmentRarity(currentItem).name[gameLanguage]} · ${t(currentItem.slot)}`;
-        currentItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(currentItem)}`;
-        renderEquipmentBonuses(document.getElementById('item-drop-current-bonuses'), currentItem);
+        const cards = [currentCard];
+        currentItems.slice(1).forEach(() => {
+            const extraCard = currentCard.cloneNode(true);
+            extraCard.classList.add('equipment-comparison-current-extra');
+            extraCard.removeAttribute('aria-labelledby');
+            extraCard.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+            currentGroup.append(extraCard);
+            cards.push(extraCard);
+        });
+        currentItems.forEach((equippedItem, index) => {
+            const card = cards[index];
+            setEquipmentIcon(card.querySelector('.equipment-comparison-icon'), equippedItem);
+            const name = card.querySelector('.equipment-comparison-name');
+            name.textContent = getEquipmentDisplayName(equippedItem);
+            name.className = `equipment-comparison-name ${getEquipmentRarityClass(equippedItem)}`;
+            const slot = card.querySelector('.equipment-comparison-slot');
+            slot.textContent = `${getEquipmentRarity(equippedItem).name[gameLanguage]} · ${getEquipmentSlotLabel(equippedItem)}`;
+            slot.className = `equipment-comparison-slot ${getEquipmentRarityClass(equippedItem)}`;
+            renderEquipmentBonuses(card.querySelector('.equipment-comparison-bonuses'), equippedItem);
+        });
     }
-    renderEquipmentBonuses(document.getElementById('item-drop-new-bonuses'), item, currentItem, true);
-    const blockedByFullBag = !fromInventory && isPendingDropBlocked();
+    const currentTotals = currentItems.reduce((totals, equippedItem) => {
+        Object.entries(equippedItem.stats || {}).forEach(([stat, amount]) => {
+            totals[stat] = (totals[stat] || 0) + (Number(amount) || 0);
+        });
+        return totals;
+    }, {});
+    renderEquipmentBonuses(
+        document.getElementById('item-drop-new-bonuses'),
+        candidate,
+        currentItem ? { stats: currentTotals } : null,
+        true
+    );
+    const blockedByFullBag = isPendingDropBlocked();
     const blockedByStorageCapacity = !fromInventory
         && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY;
-    document.getElementById('item-drop-choice-help').textContent = fromInventory
-        ? ''
-        : blockedByStorageCapacity
-            ? t('pendingEquipmentFullHelp')
+    const choiceHelp = blockedByFullBag
+        ? t('pendingEquipmentFullHelp')
+        : conflicts.length > 1
+            ? t('itemDropChoiceHelpMultiple', {
+                items: conflicts.map(({ item: conflictItem }) => getEquipmentDisplayName(conflictItem)).join(', ')
+            })
             : t(currentItem ? 'itemDropChoiceHelp' : 'itemDropChoiceHelpNoCurrent');
+    document.getElementById('item-drop-choice-help').textContent = fromInventory
+        ? conflicts.length > 1 ? choiceHelp : ''
+        : choiceHelp;
     document.getElementById('equip-new-item-button').textContent = t(currentItem ? 'equipNewItem' : 'equipFoundItem');
     document.getElementById('keep-current-item-button').textContent = t(fromInventory
         ? 'cancelComparison'
@@ -471,9 +524,15 @@ function showEquipmentChoice(item, fromInventory) {
         ? false
         : blockedByStorageCapacity;
     document.getElementById('keep-current-item-button').hidden = !fromInventory && blockedByStorageCapacity;
-    document.getElementById('open-bag-from-drop-button').hidden = fromInventory || !blockedByStorageCapacity;
+    const otherHandButton = document.getElementById('equip-other-hand-from-drop-button');
+    const canEquipInOtherHand = item.itemType === 'weapon' && item.handUsage !== 'two-handed';
+    otherHandButton.hidden = !canEquipInOtherHand;
+    otherHandButton.textContent = t(targetSlot === 'mainHand' ? 'equipOffHand' : 'equipMainHand');
+    otherHandButton.disabled = inCombat || gameOver;
+    document.getElementById('open-bag-from-drop-button').hidden = fromInventory
+        || (!blockedByFullBag && !blockedByStorageCapacity);
     const discardPendingButton = document.getElementById('discard-pending-item-button');
-    discardPendingButton.hidden = fromInventory || !blockedByStorageCapacity;
+    discardPendingButton.hidden = fromInventory || (!blockedByFullBag && !blockedByStorageCapacity);
     discardPendingButton.textContent = t('discardPendingItem');
     document.getElementById('item-drop-dialog').showModal();
     renderEquipment();
@@ -527,18 +586,18 @@ function renderEquipmentBonuses(container, item, currentItem = null, compare = f
 }
 
 function isPendingDropBlocked() {
-    return Boolean(
-        pendingEquipment
-        && !pendingEquipment.fromInventory
-        && hero.equipment[pendingEquipment.item.slot]
-        && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY
-    );
+    if (!pendingEquipment) return false;
+    const inventoryAfterEquip = hero.equipmentInventory.length - (pendingEquipment.fromInventory ? 1 : 0);
+    const candidate = pendingEquipment.targetSlot === pendingEquipment.item.slot
+        ? pendingEquipment.item
+        : { ...pendingEquipment.item, slot: pendingEquipment.targetSlot };
+    return inventoryAfterEquip + getEquipmentConflicts(candidate).length > EQUIPMENT_BAG_CAPACITY;
 }
 
 
 function equipPendingEquipment() {
     if (!pendingEquipment || inCombat || gameOver || isPendingDropBlocked()) return;
-    const { item, fromInventory } = pendingEquipment;
+    const { item, fromInventory, targetSlot = item.slot } = pendingEquipment;
     if (fromInventory && !hero.equipmentInventory.includes(item)) {
         pendingEquipment = null;
         document.getElementById('item-drop-dialog').close();
@@ -547,7 +606,7 @@ function equipPendingEquipment() {
     }
     pendingEquipment = null;
     document.getElementById('item-drop-dialog').close();
-    equipItem(item, fromInventory);
+    equipItem(item, fromInventory, targetSlot);
 }
 
 function keepPendingEquipment() {
@@ -566,6 +625,15 @@ function keepPendingEquipment() {
     }
     updateUI();
     if (fromInventory) openEquipmentBag();
+}
+
+function equipPendingInOtherHand() {
+    if (!pendingEquipment || pendingEquipment.item.itemType !== 'weapon'
+        || pendingEquipment.item.handUsage === 'two-handed') return;
+    const { item, fromInventory, targetSlot = item.slot } = pendingEquipment;
+    const otherHandSlot = targetSlot === 'mainHand' ? 'offHand' : 'mainHand';
+    document.getElementById('item-drop-dialog').close();
+    showEquipmentChoice(item, fromInventory, otherHandSlot);
 }
 
 function discardPendingEquipment() {

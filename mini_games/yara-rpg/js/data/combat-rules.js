@@ -2,6 +2,7 @@
 window.YaraRpgData = window.YaraRpgData || {};
 window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
     combat: {
+        dualWieldDamageMultiplier: 0.35,
         enemyTelegraphDamageMultiplier: 1.65,
         telegraphEveryTurns: 3,
         quickAttack: {

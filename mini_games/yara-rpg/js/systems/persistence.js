@@ -33,6 +33,14 @@ function loadSavedGame(snapshot = readSavedGame()) {
         ? EXPLORATION_RULES.sparedMonster.treasureChanceBonus
         : 0;
     const savedEquipment = { ...(snapshot.hero?.equipment || {}) };
+    if (!savedEquipment.mainHand && savedEquipment.rightHand) {
+        savedEquipment.mainHand = savedEquipment.rightHand;
+    }
+    if (!savedEquipment.offHand && savedEquipment.leftHand) {
+        savedEquipment.offHand = savedEquipment.leftHand;
+    }
+    delete savedEquipment.rightHand;
+    delete savedEquipment.leftHand;
     const legacyAccessory = savedEquipment.accessory;
     if (legacyAccessory) {
         const migratedSlot = legacyAccessory.id === 'river-charm' ? 'necklace'
@@ -42,10 +50,15 @@ function loadSavedGame(snapshot = readSavedGame()) {
     }
     hero.equipment = Object.fromEntries(EQUIPMENT_SLOTS.map(({ id }) => [
         id,
-        savedEquipment[id] ? hydrateItem(savedEquipment[id]) : null
+        savedEquipment[id] ? hydrateItem(savedEquipment[id], id) : null
     ]));
     hero.equipmentInventory = Array.isArray(snapshot.hero?.equipmentInventory)
         ? snapshot.hero.equipmentInventory.map(hydrateItem) : [];
+    if (hero.equipment.mainHand?.handUsage === 'two-handed' && hero.equipment.offHand) {
+        // Saves from before hand usage was enforced could contain a two-handed weapon and an off-hand item.
+        hero.equipmentInventory.push(hero.equipment.offHand);
+        hero.equipment.offHand = null;
+    }
     selectedInventoryItems.clear();
     currentRegion = Math.max(0, Math.min(GAME_DATA.regions.length - 1, Number(snapshot.currentRegion) || 0));
     discoveredRegions = Array.isArray(snapshot.discoveredRegions) ? snapshot.discoveredRegions : [0];
@@ -90,7 +103,7 @@ function showContinueOption() {
     document.getElementById('continue-adventure-button').hidden = !readSavedGame();
 }
 
-function hydrateItem(savedItem) {
+function hydrateItem(savedItem, slotOverride = null) {
     const catalogItem = ITEM_DATA.equipment.find((item) => item.id === savedItem?.id);
     if (!catalogItem) return savedItem;
     const savedRarity = GAME_RULES.loot.equipmentRarities.find((rarity) => rarity.id === savedItem.rarity)
@@ -115,7 +128,7 @@ function hydrateItem(savedItem) {
         ...catalogItem,
         ...savedItem,
         stats,
-        slot: catalogItem.slot,
+        slot: slotOverride || catalogItem.slot,
         rarity: savedRarity.id,
         upgradeLevel: savedVersion >= 2 ? Math.min(
             GAME_RULES.equipmentUpgrade.maxLevel,

@@ -24,7 +24,36 @@ function applyMonsterParry(damage) {
     return reducedDamage;
 }
 
-function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0) {
+function isDualWieldingWeapons() {
+    const mainHand = hero.equipment.mainHand;
+    const offHand = hero.equipment.offHand;
+    return mainHand?.itemType === 'weapon'
+        && offHand?.itemType === 'weapon'
+        && mainHand.handUsage !== 'two-handed'
+        && offHand.handUsage !== 'two-handed';
+}
+
+function getMainHandAttackStat() {
+    const offHandWeaponBonus = isDualWieldingWeapons()
+        ? Number(hero.equipment.offHand.stats.atk) || 0
+        : 0;
+    return getEffectiveStat('atk') - offHandWeaponBonus;
+}
+
+function getOffHandAttackDamage(attackMultiplier, randomBonusRange, minimumDamage) {
+    if (!isDualWieldingWeapons()) return 0;
+    const multiplier = GAME_RULES.combat.dualWieldDamageMultiplier;
+    const mainHandWeaponBonus = Number(hero.equipment.mainHand.stats.atk) || 0;
+    const offHandAttackStat = getEffectiveStat('atk') - mainHandWeaponBonus;
+    return Math.max(
+        Math.ceil(minimumDamage * multiplier),
+        Math.floor(offHandAttackStat * attackMultiplier * multiplier)
+            - currentMonster.def
+            + Math.floor(Math.random() * randomBonusRange * multiplier)
+    );
+}
+
+function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0, offHandDamage = 0) {
     if (!inCombat || !currentMonster) return;
     combatActionLocked = true;
     enemyTelegraphing = false;
@@ -34,9 +63,25 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     const damageDealt = Math.min(currentMonster.hp, damage);
     currentMonster.hp -= damageDealt;
     showFloatingDamage('monster-icon', damageDealt, 'monster');
-    const furyGained = Math.min(getEffectiveFuryThreshold() - hero.fury, Math.floor(damageDealt * furyMultiplier));
+    let offHandDamageDealt = 0;
+    if (offHandDamage > 0 && currentMonster.hp > 0) {
+        const reducedOffHandDamage = applyMonsterParry(offHandDamage);
+        offHandDamageDealt = Math.min(currentMonster.hp, reducedOffHandDamage);
+        currentMonster.hp -= offHandDamageDealt;
+        showFloatingDamage('monster-icon', offHandDamageDealt, 'monster');
+    }
+    const totalDamageDealt = damageDealt + offHandDamageDealt;
+    const furyGained = Math.min(getEffectiveFuryThreshold() - hero.fury, Math.floor(totalDamageDealt * furyMultiplier));
     hero.fury += furyGained;
-    logMessage(t(messageKey, { damage: damageDealt, fury: furyGained }), "combat-hero");
+    if (offHandDamageDealt > 0) {
+        logMessage(t(furyMultiplier > 0 ? 'dualWieldQuickDamage' : 'dualWieldDamage', {
+            damage: damageDealt,
+            offhandDamage: offHandDamageDealt,
+            fury: furyGained
+        }), "combat-hero");
+    } else {
+        logMessage(t(messageKey, { damage: damageDealt, fury: furyGained }), "combat-hero");
+    }
 
     const stunChance = Math.min(
         selectedCharacter.skills.maxStunChance,
@@ -67,11 +112,16 @@ function combatQuickAttack() {
     const attackRules = GAME_RULES.combat.quickAttack;
     const damage = Math.max(
         attackRules.minimumDamage,
-        Math.floor(getEffectiveStat('atk') * attackRules.attackMultiplier)
+        Math.floor(getMainHandAttackStat() * attackRules.attackMultiplier)
             - currentMonster.def
             + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
-    resolveHeroAttack(damage, "quickDamage", 0, FURY_PER_BASIC_ATTACK_DAMAGE);
+    const offHandDamage = getOffHandAttackDamage(
+        attackRules.attackMultiplier,
+        attackRules.randomBonusRange,
+        attackRules.minimumDamage
+    );
+    resolveHeroAttack(damage, "quickDamage", 0, FURY_PER_BASIC_ATTACK_DAMAGE, offHandDamage);
 }
 
 // NOVO GOLPE: Estocada Pesada (Gasta Foco, dano alto)
@@ -95,11 +145,16 @@ function combatHeavyAttack() {
 
     const damage = Math.max(
         attackRules.minimumDamage,
-        Math.floor(getEffectiveStat('atk') * attackRules.attackMultiplier)
+        Math.floor(getMainHandAttackStat() * attackRules.attackMultiplier)
             - currentMonster.def
             + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
-    resolveHeroAttack(damage, "heavyDamage");
+    const offHandDamage = getOffHandAttackDamage(
+        attackRules.attackMultiplier,
+        attackRules.randomBonusRange,
+        attackRules.minimumDamage
+    );
+    resolveHeroAttack(damage, "heavyDamage", 0, 0, offHandDamage);
 }
 
 function combatCriticalAttack() {
@@ -117,11 +172,16 @@ function combatCriticalAttack() {
     const attackRules = GAME_RULES.combat.criticalAttack;
     const damage = Math.max(
         attackRules.minimumDamage,
-        Math.floor(getEffectiveStat('atk') * CRITICAL_DAMAGE_MULTIPLIER)
+        Math.floor(getMainHandAttackStat() * CRITICAL_DAMAGE_MULTIPLIER)
             - currentMonster.def
             + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
-    resolveHeroAttack(damage, "criticalDamage", CRITICAL_STUN_BONUS);
+    const offHandDamage = getOffHandAttackDamage(
+        CRITICAL_DAMAGE_MULTIPLIER,
+        attackRules.randomBonusRange,
+        attackRules.minimumDamage
+    );
+    resolveHeroAttack(damage, "criticalDamage", CRITICAL_STUN_BONUS, 0, offHandDamage);
 }
 
 // NOVO GOLPE: Postura Firme (Aumenta defesa e recupera foco)
