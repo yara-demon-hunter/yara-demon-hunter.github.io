@@ -211,7 +211,7 @@ function resolveStoryEvent(choiceIndex) {
         updateUI();
         return;
     } else if (effect === 'abyssal-challenge') {
-        const boss = SPECIAL_MONSTERS.find((monster) => monster.id === 'abyssal-herald');
+        const boss = SPECIAL_MONSTERS.find((monster) => monster.id === 'abyssal-demon');
         if (!boss) {
             logMessage(t('denseMist'));
             updateUI();

@@ -57,7 +57,7 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         minLevel: 5,
         suggestedLevel: 8,
         hp: 350,
-        atk: 50,
+        atk: 45,
         def: 20,
         parry: 42,
         evasion: 18,
