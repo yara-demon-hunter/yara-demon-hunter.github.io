@@ -43,17 +43,23 @@
     background-color: rgba(120, 82, 18, 0.24);
     box-shadow: 0 0 12px rgba(251, 191, 36, 0.38), inset 0 0 8px rgba(251, 191, 36, 0.12);
 }
-.equipment-slot.equipment-upgrade-available::after,
-.equipment-bag-button.equipment-upgrade-available::after {
-    content: "";
+.equipment-upgrade-trigger {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #fbbf24;
-    box-shadow: 0 0 6px rgba(251, 191, 36, 0.6);
+    z-index: 3;
+    top: 3px;
+    right: 3px;
+    width: 19px;
+    height: 19px;
+    border-color: #d29a28;
+    background: linear-gradient(135deg, #493512, #2b2417);
+    color: #ffd76a;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.28);
+    font-size: 15px;
+}
+.equipment-upgrade-trigger:hover:not(:disabled) {
+    border-color: #fbbf24;
+    background: #765516;
+    color: #fff3c4;
 }
 .equipment-bag-button:disabled {
     cursor: not-allowed;
@@ -323,14 +329,16 @@
 .equipment-bag-select {
     position: absolute;
     z-index: 2;
-    top: 5px;
-    right: 6px;
+    top: auto;
+    right: auto;
+    bottom: 5px;
+    left: 6px;
     width: 18px;
     height: 18px;
     margin: 0;
     appearance: none;
-    border: 1px solid #66666b;
-    border-radius: 4px;
+    border: 1px solid #a8883c;
+    border-radius: 50%;
     background: #292a2e;
     cursor: pointer;
 }

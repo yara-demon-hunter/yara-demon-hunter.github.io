@@ -71,6 +71,7 @@ window.YaraRpgTranslations.pt = {
         pendingEquipmentFullHelp: "A mochila está cheia. Descarte um item para liberar espaço; o item encontrado ficará aguardando.",
         emptySlot: "Vazio",
         viewEquipmentDetails: "Ver propriedades de {item}",
+        upgradeEquipmentAria: "Aprimorar {item}",
         closeItemDetails: "Fechar detalhes do equipamento",
         rightHand: "Mão direita",
         leftHand: "Mão esquerda",

@@ -50,6 +50,22 @@ function setEquipmentIcon(element, item) {
     element.textContent = item.icon;
 }
 
+function createEquipmentUpgradeTrigger(item, source, slot = null) {
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'skill-upgrade-button equipment-upgrade-trigger';
+    trigger.textContent = '+';
+    trigger.setAttribute('aria-label', t('upgradeEquipmentAria', {
+        item: getEquipmentDisplayName(item)
+    }));
+    trigger.title = t('equipmentUpgradeAvailable');
+    trigger.addEventListener('click', (event) => {
+        event.stopPropagation();
+        showEquipmentItemDetails(item, source, slot);
+    });
+    return trigger;
+}
+
 function renderEquipment() {
     const slotsContainer = document.getElementById('equipment-slots');
     const bagButton = document.getElementById('open-equipment-bag-button');
@@ -103,6 +119,7 @@ function renderEquipment() {
             rarityBadge.textContent = `+${Number(item.upgradeLevel) || 0}`;
             rarityBadge.setAttribute('aria-hidden', 'true');
             slot.append(itemButton, rarityBadge);
+            if (affordableSlots.has(id)) slot.append(createEquipmentUpgradeTrigger(item, 'equipped', id));
         } else {
             const placeholder = document.createElement('span');
             placeholder.className = 'equipment-slot-icon equipment-slot-placeholder';
@@ -115,6 +132,7 @@ function renderEquipment() {
     });
 
     bagButton.className = 'equipment-slot equipment-bag-button';
+    bagButton.classList.toggle('equipment-upgrade-available', affordableInventoryUpgrade);
     bagButton.setAttribute('aria-haspopup', 'dialog');
     bagButton.setAttribute('aria-controls', 'equipment-bag-dialog');
     slotsContainer.append(bagButton);
@@ -168,6 +186,9 @@ function renderEquipment() {
             rarityBadge.textContent = `+${Number(item.upgradeLevel) || 0}`;
             rarityBadge.setAttribute('aria-hidden', 'true');
             slot.append(position, selectItem, itemButton, rarityBadge);
+            if (canAffordEquipmentUpgrade(item)) {
+                slot.append(createEquipmentUpgradeTrigger(item, 'inventory'));
+            }
         } else {
             const empty = document.createElement('span');
             empty.className = 'equipment-bag-empty';

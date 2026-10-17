@@ -71,6 +71,7 @@ window.YaraRpgTranslations.en = {
         pendingEquipmentFullHelp: "The bag is full. Discard an item to free a slot; the found item will remain here.",
         emptySlot: "Empty",
         viewEquipmentDetails: "View {item} properties",
+        upgradeEquipmentAria: "Upgrade {item}",
         closeItemDetails: "Close equipment details",
         rightHand: "Right hand",
         leftHand: "Left hand",
