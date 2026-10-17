@@ -207,6 +207,13 @@
     font-size: 0.65rem;
     line-height: 1.3;
 }
+.equipment-comparison-bonuses li {
+    padding: 0.2rem 0.35rem;
+    border-radius: 0.3rem;
+}
+.equipment-comparison-bonuses li.equipment-comparison-stat-better { color: #86efac; }
+.equipment-comparison-bonuses li.equipment-comparison-stat-worse { color: #fca5a5; }
+.equipment-comparison-bonuses li.equipment-comparison-stat-equal { color: #cbd5e1; }
 .equipment-comparison-arrow {
     align-self: center;
     color: #d6b45b;
@@ -456,6 +463,25 @@
     background: rgba(6, 78, 59, 0.25);
     color: #a7f3d0;
     font-size: 0.82rem;
+}
+.equipment-item-properties li.equipment-comparison-stat-better {
+    border-color: rgba(34, 197, 94, 0.45);
+    background: rgba(20, 83, 45, 0.3);
+    color: #86efac;
+}
+.equipment-item-properties li.equipment-comparison-stat-worse {
+    border-color: rgba(239, 68, 68, 0.45);
+    background: rgba(127, 29, 29, 0.28);
+    color: #fca5a5;
+}
+.equipment-item-properties li.equipment-comparison-stat-equal {
+    border-color: rgba(148, 163, 184, 0.25);
+    background: rgba(51, 65, 85, 0.2);
+    color: #cbd5e1;
+}
+.equipment-comparison-delta {
+    float: right;
+    font-weight: 700;
 }
 .equipment-item-actions {
     display: flex;

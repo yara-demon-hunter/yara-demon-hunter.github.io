@@ -180,7 +180,10 @@ function renderEquipment() {
             setEquipmentIcon(itemIcon, item);
             itemIcon.setAttribute('aria-hidden', 'true');
             itemButton.append(itemIcon);
-            itemButton.addEventListener('click', () => showEquipmentItemDetails(item, 'inventory'));
+            itemButton.addEventListener('click', () => {
+                document.getElementById('equipment-bag-dialog').close();
+                showEquipmentChoice(item, true);
+            });
             const rarityBadge = document.createElement('span');
             rarityBadge.className = `equipment-rarity-badge ${getEquipmentRarityClass(item)}`;
             rarityBadge.textContent = `+${Number(item.upgradeLevel) || 0}`;
@@ -240,7 +243,18 @@ function renderEquipmentItemDetails(item, source, slot = null) {
 
     const properties = document.getElementById('equipment-item-properties');
     properties.replaceChildren();
-    Object.entries(item.stats).forEach(([stat, amount]) => {
+    const currentItem = hero.equipment[item.slot];
+    const comparedStats = new Set([
+        ...Object.keys(item.stats || {}),
+        ...Object.keys(currentItem?.stats || {})
+    ]);
+    [...comparedStats].forEach((stat) => {
+        const amount = Number(item.stats?.[stat]) || 0;
+        const currentAmount = Number(currentItem?.stats?.[stat]) || 0;
+        const difference = amount - currentAmount;
+        const isMaxFury = stat === 'maxFury';
+        const isBetter = isMaxFury ? difference < 0 : difference > 0;
+        const isWorse = isMaxFury ? difference > 0 : difference < 0;
         const property = document.createElement('li');
         property.textContent = t(
             amount < 0
@@ -252,6 +266,20 @@ function renderEquipmentItemDetails(item, source, slot = null) {
                     : 'equipmentBonus'),
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
         );
+        if (source === 'inventory' && currentItem) {
+            property.classList.add('equipment-comparison-stat');
+            property.classList.add(isBetter
+                ? 'equipment-comparison-stat-better'
+                : isWorse
+                    ? 'equipment-comparison-stat-worse'
+                    : 'equipment-comparison-stat-equal');
+            if (difference !== 0) {
+                const delta = document.createElement('span');
+                delta.className = 'equipment-comparison-delta';
+                delta.textContent = `${difference > 0 ? '+' : ''}${difference}`;
+                property.append(' ', delta);
+            }
+        }
         properties.append(property);
     });
 
@@ -391,13 +419,19 @@ function discardSelectedInventoryItems() {
 function showEquipmentChoice(item, fromInventory) {
     pendingEquipment = { item, fromInventory };
     const currentItem = hero.equipment[item.slot];
-    document.getElementById('item-drop-message').textContent = t(
-        currentItem ? 'itemDropPrompt' : 'itemDropPromptNoCurrent'
+    document.getElementById('item-drop-title').textContent = t(
+        fromInventory ? 'compareEquipmentTitle' : 'itemDropTitle'
     );
+    document.getElementById('item-drop-message').textContent = fromInventory
+        ? t('itemDropPrompt')
+        : t(currentItem ? 'itemDropPrompt' : 'itemDropPromptNoCurrent');
     setEquipmentIcon(document.getElementById('item-drop-new-icon'), item);
     const newItemName = document.getElementById('item-drop-new-name');
     newItemName.textContent = getEquipmentDisplayName(item);
     newItemName.className = `equipment-comparison-name ${getEquipmentRarityClass(item)}`;
+    document.querySelector('.equipment-comparison-new .equipment-comparison-label').textContent = t(
+        fromInventory ? 'comparisonCandidateLabel' : 'newEquipmentLabel'
+    );
     const newItemSlot = document.getElementById('item-drop-new-slot');
     newItemSlot.textContent = `${getEquipmentRarity(item).name[gameLanguage]} · ${t(item.slot)}`;
     newItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(item)}`;
@@ -417,29 +451,35 @@ function showEquipmentChoice(item, fromInventory) {
         currentItemSlot.className = `equipment-comparison-slot ${getEquipmentRarityClass(currentItem)}`;
         renderEquipmentBonuses(document.getElementById('item-drop-current-bonuses'), currentItem);
     }
-    renderEquipmentBonuses(document.getElementById('item-drop-new-bonuses'), item);
+    renderEquipmentBonuses(document.getElementById('item-drop-new-bonuses'), item, currentItem, true);
     const blockedByFullBag = isPendingDropBlocked();
     const blockedByStorageCapacity = !fromInventory
         && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY;
-    document.getElementById('item-drop-choice-help').textContent = blockedByStorageCapacity
-        ? t('pendingEquipmentFullHelp')
-        : t(currentItem ? 'itemDropChoiceHelp' : 'itemDropChoiceHelpNoCurrent');
-    document.getElementById('equip-new-item-button').textContent = t(
-        currentItem ? 'equipNewItem' : 'equipFoundItem'
-    );
-    document.getElementById('keep-current-item-button').textContent = t(
-        currentItem ? 'keepCurrentItem' : 'storeFoundItem'
-    );
+    document.getElementById('item-drop-choice-help').textContent = fromInventory
+        ? ''
+        : blockedByStorageCapacity
+            ? t('pendingEquipmentFullHelp')
+            : t(currentItem ? 'itemDropChoiceHelp' : 'itemDropChoiceHelpNoCurrent');
+    document.getElementById('equip-new-item-button').textContent = t(currentItem ? 'equipNewItem' : 'equipFoundItem');
+    document.getElementById('keep-current-item-button').textContent = t(fromInventory
+        ? 'cancelComparison'
+        : currentItem ? 'keepCurrentItem' : 'storeFoundItem');
     document.getElementById('equip-new-item-button').disabled = blockedByFullBag;
-    document.getElementById('keep-current-item-button').disabled = blockedByStorageCapacity;
-    document.getElementById('open-bag-from-drop-button').hidden = !blockedByStorageCapacity;
+    document.getElementById('keep-current-item-button').disabled = fromInventory
+        ? false
+        : blockedByStorageCapacity;
+    document.getElementById('keep-current-item-button').hidden = false;
+    document.getElementById('open-bag-from-drop-button').hidden = fromInventory || !blockedByStorageCapacity;
     document.getElementById('item-drop-dialog').showModal();
     renderEquipment();
 }
 
-function renderEquipmentBonuses(container, item) {
+function renderEquipmentBonuses(container, item, currentItem = null, compare = false) {
     container.replaceChildren();
-    const bonuses = Object.entries(item.stats);
+    const statKeys = compare
+        ? new Set([...Object.keys(item.stats || {}), ...Object.keys(currentItem?.stats || {})])
+        : Object.keys(item.stats || {});
+    const bonuses = [...statKeys].map((stat) => [stat, Number(item.stats?.[stat]) || 0]);
     if (!bonuses.length) {
         const empty = document.createElement('li');
         empty.textContent = t('noEquipmentBonuses');
@@ -448,7 +488,19 @@ function renderEquipmentBonuses(container, item) {
     }
 
     bonuses.forEach(([stat, amount]) => {
+        const currentAmount = Number(currentItem?.stats?.[stat]) || 0;
+        const difference = amount - currentAmount;
+        const isMaxFury = stat === 'maxFury';
+        const isBetter = isMaxFury ? difference < 0 : difference > 0;
+        const isWorse = isMaxFury ? difference > 0 : difference < 0;
         const bonus = document.createElement('li');
+        if (compare) {
+            bonus.classList.add(isBetter
+                ? 'equipment-comparison-stat-better'
+                : isWorse
+                    ? 'equipment-comparison-stat-worse'
+                    : 'equipment-comparison-stat-equal');
+        }
         bonus.textContent = t(
             amount < 0
                 ? (stat === 'evasion' || stat === 'parry' || stat === 'stunChance' || stat === 'maxFury'
@@ -459,6 +511,12 @@ function renderEquipmentBonuses(container, item) {
                     : 'equipmentBonus'),
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
         );
+        if (compare && difference !== 0) {
+            const delta = document.createElement('span');
+            delta.className = 'equipment-comparison-delta';
+            delta.textContent = `${difference > 0 ? '+' : ''}${difference}`;
+            bonus.append(' ', delta);
+        }
         container.append(bonus);
     });
 }
