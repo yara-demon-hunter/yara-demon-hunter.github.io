@@ -113,6 +113,7 @@ let pendingChest = false;
 let pendingEquipment = null;
 let campaignComplete = false;
 let gameOver = false;
+let finalBossChallengeAccepted = false;
 
 // UI / diálogos
 let openUpgradeOptions = null;
@@ -139,6 +140,7 @@ function startAdventure({ character, equipment }) {
     currentMonster = null;
     gameOver = false;
     campaignComplete = false;
+    finalBossChallengeAccepted = false;
     pendingMistContact = null;
     pendingChest = false;
     pendingEquipment = null;

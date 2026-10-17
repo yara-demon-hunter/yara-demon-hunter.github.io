@@ -34,7 +34,7 @@ window.YaraMistContactSystem = Object.freeze({
     },
 
     chooseBoss(bosses, level) {
-        const availableBosses = bosses.filter((boss) => level >= boss.minLevel);
+        const availableBosses = bosses.filter((boss) => !boss.isFinalBoss && level >= boss.minLevel);
         if (availableBosses.length === 0) return null;
         return availableBosses[Math.floor(Math.random() * availableBosses.length)];
     },

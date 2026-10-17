@@ -389,11 +389,17 @@ function resolveFinalBossGate(shouldProceed) {
         updateUI();
         return;
     }
+    finalBossChallengeAccepted = true;
     logMessage(t('finalBossAppears'), 'combat-monster');
     spawnMonster(gudran);
 }
 
 function spawnMonster(templateOverride = null) {
+    if (templateOverride?.isFinalBoss
+        && (!finalBossChallengeAccepted || currentRegion !== GAME_DATA.regions.length - 1)) {
+        logMessage(t('denseMist'));
+        return;
+    }
     const regionId = GAME_DATA.regions[currentRegion].id;
     const regionMonsters = GAME_DATA.monsters.byRegion[regionId];
     const template = templateOverride ?? regionMonsters[Math.floor(Math.random() * regionMonsters.length)];
