@@ -229,6 +229,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "gudran-throne",
         sceneIcon: "👑",
+        sceneImage: "images/regions/gudran-throne.png",
         title: { pt: "Câmara do Trono", en: "Throne Chamber" },
         description: {
             pt: "Além das portas do castelo, Gudran aguarda no coração de seu domínio. A névoa parece prender a respiração.",
