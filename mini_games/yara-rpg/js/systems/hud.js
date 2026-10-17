@@ -31,14 +31,16 @@ function updateUI() {
     document.getElementById('hero-foco').innerText = hero.foco;
     document.getElementById('hero-foco-max').innerText = getEffectiveStat('maxFoco');
     document.getElementById('hero-fury').innerText = hero.fury;
+    const furyThreshold = getEffectiveFuryThreshold();
+    document.getElementById('hero-fury-max').innerText = furyThreshold;
     document.getElementById('hero-fury-bar').style.width = Math.min(
         GAME_RULES.probabilityScale,
-        hero.fury / hero.maxFury * GAME_RULES.probabilityScale
+        hero.fury / furyThreshold * GAME_RULES.probabilityScale
     ) + '%';
-    const furyReady = hero.fury >= hero.maxFury;
+    const furyReady = hero.fury >= furyThreshold;
     const quickAttackButton = document.getElementById('quick-attack-button');
     quickAttackButton.classList.toggle('fury-ready', furyReady);
-    quickAttackButton.title = furyReady ? t('criticalRequirement') : '';
+    quickAttackButton.title = furyReady ? t('criticalRequirement', { amount: furyThreshold }) : '';
     document.getElementById('quick-attack-label').innerText = t(furyReady ? 'criticalAttack' : 'quickAttack');
     document.getElementById('hero-atk').innerText = getEffectiveStat('atk');
     document.getElementById('hero-def').innerText = getEffectiveStat('def');
@@ -68,7 +70,7 @@ function updateUI() {
     parryDisplay.setAttribute('aria-label', hero.parryBonus
         ? `${effectiveParry}% + ${hero.parryBonus}% = ${parryTotal}%`
         : `${effectiveParry}%`);
-    const stunBonus = hero.fury >= hero.maxFury ? CRITICAL_STUN_BONUS : 0;
+    const stunBonus = hero.fury >= furyThreshold ? CRITICAL_STUN_BONUS : 0;
     const stunChanceTotal = Math.min(selectedCharacter.skills.maxStunChance, effectiveStunChance + stunBonus);
     const stunBonusDisplay = document.getElementById('hero-stun-bonus');
     const stunDisplay = document.getElementById('hero-stun');
@@ -165,16 +167,7 @@ function updateUI() {
     });
     document.querySelectorAll('[data-upgrade]').forEach((button) => {
         const upgrade = button.dataset.upgrade;
-        const upgradeMax = upgrade === 'parry'
-            ? selectedCharacter.skills.maxParry
-            : upgrade === 'evasion'
-                ? selectedCharacter.skills.maxEvasion
-                : upgrade === 'stun'
-                    ? selectedCharacter.skills.maxStunChance
-                    : undefined;
-        const upgradeConfiguration = upgradeMax === undefined
-            ? UPGRADE_CONFIG[upgrade]
-            : { ...UPGRADE_CONFIG[upgrade], max: upgradeMax };
+        const upgradeConfiguration = getUpgradeConfiguration(upgrade);
         const skill = t(UPGRADE_CONFIG[upgrade].nameKey);
         const maximum = getMaxUpgradeQuantity(upgrade, upgradeConfiguration);
         const disabled = inCombat || gameOver || campaignComplete || maximum < 1 || isUpgradeMaxed(upgrade, upgradeConfiguration);

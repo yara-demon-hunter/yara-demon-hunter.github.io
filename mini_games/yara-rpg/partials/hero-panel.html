@@ -46,7 +46,7 @@
                     <div>
                         <div class="flex justify-between text-xs font-semibold mb-1">
                             <span class="text-orange-300 flex items-center gap-1">🔥 <span data-i18n="fury">Fúria</span></span>
-                            <span><span id="hero-fury">0</span>/100</span>
+                            <span class="flex items-center gap-2"><span><span id="hero-fury">0</span>/<span id="hero-fury-max">100</span></span><span class="skill-upgrade-control" data-upgrade-control="fury"><button type="button" data-upgrade="fury" onclick="toggleUpgradeOptions('fury')" class="skill-upgrade-button" aria-label="Melhorar limite de Fúria (1 ponto)" aria-expanded="false" aria-controls="upgrade-options-fury" title="Melhorar por 1 ponto de habilidade">+</button><span id="upgrade-options-fury" class="skill-upgrade-options" data-upgrade-options="fury" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('fury', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('fury', 'max')" data-i18n="upgradeMax">Máx</button></span></span></span>
                         </div>
                         <div class="w-full bg-forest-950 rounded-full h-2.5 p-0.5 border border-fantasy-border">
                             <div id="hero-fury-bar" class="bg-gradient-to-r from-orange-700 to-amber-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>

@@ -56,7 +56,8 @@ window.YaraRpgData.characters = Object.freeze([
             dodge: { focoCost: 5, bonus: 10 },
             maxEvasion: 70,
             maxParry: 45,
-            maxStunChance: 55
+            maxStunChance: 55,
+            minFuryThreshold: 60
         }
     },
     {
@@ -91,7 +92,8 @@ window.YaraRpgData.characters = Object.freeze([
             dodge: { focoCost: 30, bonus: 5 },
             maxEvasion: 40,
             maxParry: 60,
-            maxStunChance: 30
+            maxStunChance: 30,
+            minFuryThreshold: 75
         }
     }
 ]);

@@ -30,6 +30,7 @@ const EQUIPMENT_STAT_KEYS = Object.freeze({
     evasion: "evasionStat",
     parry: "parryStat",
     stunChance: "stun",
+    maxFury: "fury",
 });
 
 function createEmptyEquipmentMap() {

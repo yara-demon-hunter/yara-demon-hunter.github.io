@@ -33,6 +33,7 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
             evasion: 0.5,
             parry: 0.5,
             stunChance: 0.5,
+            maxFury: -1,
             maxHp: 5,
             maxFoco: 5
         }

@@ -18,7 +18,7 @@ function createEquipmentInstance(template, rarity = GAME_RULES.loot.equipmentRar
     const statBonus = rarity.statBonus;
     const stats = Object.fromEntries(Object.entries(template.stats).map(([stat, amount]) => [
         stat,
-        amount + statBonus
+        amount < 0 ? amount - statBonus : amount + statBonus
     ]));
     return {
         ...template,
@@ -98,12 +98,20 @@ function getEffectiveStat(stat) {
     return hero[stat] + getEquipmentBonus(stat);
 }
 
+function getEffectiveFuryThreshold() {
+    return Math.max(selectedCharacter?.skills?.minFuryThreshold ?? 1, getEffectiveStat('maxFury'));
+}
+
 function getItemBonusText(item) {
     return Object.entries(item.stats)
         .map(([stat, amount]) => t(
-            stat === "evasion" || stat === "parry" || stat === "stunChance"
-                ? "equipmentPercentageBonus"
-                : "equipmentBonus",
+            amount < 0
+                ? (stat === "evasion" || stat === "parry" || stat === "stunChance" || stat === "maxFury"
+                    ? "equipmentPercentagePenalty"
+                    : "equipmentPenalty")
+                : (stat === "evasion" || stat === "parry" || stat === "stunChance"
+                    ? "equipmentPercentageBonus"
+                    : "equipmentBonus"),
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
         ))
         .join(" · ");
@@ -153,6 +161,7 @@ function equipItem(item, fromInventory) {
     hero.equipment[item.slot] = item;
     hero.hp = Math.min(hero.hp, getEffectiveStat('maxHp'));
     hero.foco = Math.min(hero.foco, getEffectiveStat('maxFoco'));
+    hero.fury = Math.min(hero.fury, getEffectiveFuryThreshold());
     logMessage(t('itemEquipped', {
         item: getEquipmentDisplayName(item),
         slot: t(item.slot)
@@ -182,6 +191,7 @@ function unequipItem(slot) {
     hero.equipmentInventory.push(item);
     hero.hp = Math.min(hero.hp, getEffectiveStat('maxHp'));
     hero.foco = Math.min(hero.foco, getEffectiveStat('maxFoco'));
+    hero.fury = Math.min(hero.fury, getEffectiveFuryThreshold());
     logMessage(t('itemStored', { item: getEquipmentDisplayName(item) }), 'loot');
     updateUI();
 }

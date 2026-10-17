@@ -34,5 +34,6 @@ window.YaraRpgData.items = Object.freeze({
         { id: "raven", slot: "pet", icon: "🐦‍⬛", image: "images/items/raven.png", name: { pt: "Corvo", en: "Raven" }, stats: { evasion: 2, stunChance: 2 }, starter: true  },
         { id: "demonic-flute", slot: "accessory", icon: "🪈", image: "images/items/demonic-flute.png", name: { pt: "Flauta Demoníaca", en: "Demonic Flute" }, stats: { atk: 1, stunChance: 3 }, starter: true },
         { id: "rune-of-impact", slot: "accessory", icon: "🔮", image: "images/items/rune-of-impact.png", name: { pt: "Runa do Impacto", en: "Impact Rune" }, stats: { maxFoco: 20 ,stunChance: 2 }, starter: true },
+        { id: "fury-seal", slot: "accessory", icon: "🩸", name: { pt: "Selo da Fúria", en: "Fury Seal" }, stats: { maxFury: -10 }, starter: true },
     ])
 });

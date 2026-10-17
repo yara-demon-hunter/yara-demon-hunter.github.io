@@ -4,10 +4,11 @@
 
 function isUpgradeMaxed(upgrade, overrideConfiguration = UPGRADE_CONFIG[upgrade]) {
     const configuration = overrideConfiguration;
-    if (configuration?.max === undefined) return false;
-    const currentValue = configuration.isPercentage
+    if (configuration?.max === undefined && configuration?.min === undefined) return false;
+    const currentValue = configuration.isPercentage || configuration.useEffectiveValue
         ? getEffectiveStat(configuration.stat)
         : hero[configuration.stat];
+    if (configuration.min !== undefined) return currentValue <= configuration.min;
     return currentValue >= configuration.max;
 }
 
@@ -16,11 +17,15 @@ function getMaxUpgradeQuantity(upgrade, overrideConfiguration = UPGRADE_CONFIG[u
     if (!configuration || UPGRADE_COST_PER_POINT <= 0) return 0;
 
     const availablePoints = Math.floor((Number(hero.skillPoints) || 0) / UPGRADE_COST_PER_POINT);
-    if (configuration.max === undefined) return availablePoints;
+    if (configuration.max === undefined && configuration.min === undefined) return availablePoints;
 
-    const currentValue = configuration.isPercentage
+    const currentValue = configuration.isPercentage || configuration.useEffectiveValue
         ? getEffectiveStat(configuration.stat)
         : hero[configuration.stat];
+    if (configuration.min !== undefined) {
+        const remaining = Math.max(0, currentValue - configuration.min);
+        return Math.min(availablePoints, Math.ceil(remaining / Math.abs(configuration.amount)));
+    }
     const remaining = Math.max(0, configuration.max - currentValue);
     return Math.min(availablePoints, Math.ceil(remaining / configuration.amount));
 }
@@ -31,6 +36,7 @@ function getUpgradeConfiguration(upgrade) {
     if (upgrade === 'parry') return { ...configuration, max: selectedCharacter.skills.maxParry };
     if (upgrade === 'evasion') return { ...configuration, max: selectedCharacter.skills.maxEvasion };
     if (upgrade === 'stun') return { ...configuration, max: selectedCharacter.skills.maxStunChance };
+    if (upgrade === 'fury') return { ...configuration, min: selectedCharacter.skills.minFuryThreshold };
     return configuration;
 }
 
@@ -69,22 +75,28 @@ function purchaseUpgrade(upgrade, requestedQuantity) {
         || isUpgradeMaxed(upgrade, configuration)
     ) return;
 
-    const amount = configuration.max === undefined
-        ? configuration.amount * quantity
-        : Math.min(
-            configuration.amount * quantity,
-            configuration.max - (configuration.isPercentage
-                ? getEffectiveStat(configuration.stat)
-                : hero[configuration.stat])
-        );
+    const currentValue = configuration.isPercentage || configuration.useEffectiveValue
+        ? getEffectiveStat(configuration.stat)
+        : hero[configuration.stat];
+    const amount = configuration.min !== undefined
+        ? -Math.min(Math.abs(configuration.amount) * quantity, currentValue - configuration.min)
+        : configuration.max === undefined
+            ? configuration.amount * quantity
+            : Math.min(
+                configuration.amount * quantity,
+                configuration.max - currentValue
+            );
     const totalCost = quantity * UPGRADE_COST_PER_POINT;
     const previousCurrentValue = configuration.currentStat
         ? hero[configuration.currentStat]
         : 0;
     hero.skillPoints = Math.max(0, (Number(hero.skillPoints) || 0) - totalCost);
-    hero[configuration.stat] = configuration.max === undefined
+    hero[configuration.stat] = configuration.min !== undefined
         ? hero[configuration.stat] + amount
-        : Math.min(configuration.max, hero[configuration.stat] + amount);
+        : configuration.max === undefined
+            ? hero[configuration.stat] + amount
+            : Math.min(configuration.max, hero[configuration.stat] + amount);
+    if (configuration.stat === 'maxFury') hero.fury = Math.min(hero.fury, getEffectiveFuryThreshold());
     if (configuration.currentStat) {
         hero[configuration.currentStat] = Math.min(
             hero[configuration.currentMaxStat],
@@ -104,7 +116,8 @@ function purchaseUpgrade(upgrade, requestedQuantity) {
     closeUpgradeOptions();
     logMessage(t('upgradeSuccessPoints', {
         skill,
-        amount,
+        sign: amount < 0 ? '−' : '+',
+        amount: Math.abs(amount),
         unit: configuration.isPercentage ? '%' : '',
         quantity,
         cost: totalCost

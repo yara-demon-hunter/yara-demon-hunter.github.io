@@ -222,9 +222,13 @@ function renderEquipmentItemDetails(item, source, slot = null) {
     Object.entries(item.stats).forEach(([stat, amount]) => {
         const property = document.createElement('li');
         property.textContent = t(
-            stat === 'evasion' || stat === 'parry' || stat === 'stunChance'
-                ? 'equipmentPercentageBonus'
-                : 'equipmentBonus',
+            amount < 0
+                ? (stat === 'evasion' || stat === 'parry' || stat === 'stunChance' || stat === 'maxFury'
+                    ? 'equipmentPercentagePenalty'
+                    : 'equipmentPenalty')
+                : (stat === 'evasion' || stat === 'parry' || stat === 'stunChance'
+                    ? 'equipmentPercentageBonus'
+                    : 'equipmentBonus'),
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
         );
         properties.append(property);
@@ -277,6 +281,7 @@ function upgradeSelectedEquipment() {
         const statBonuses = GAME_RULES.equipmentUpgrade.statBonusPerLevel;
         item.stats[stat] += statBonuses[stat] ?? 0.5;
     });
+    hero.fury = Math.min(hero.fury, getEffectiveFuryThreshold());
     logMessage(t('equipmentUpgradePurchased', {
         item: getEquipmentDisplayName(item),
         level: item.upgradeLevel,
@@ -424,9 +429,13 @@ function renderEquipmentBonuses(container, item) {
     bonuses.forEach(([stat, amount]) => {
         const bonus = document.createElement('li');
         bonus.textContent = t(
-            stat === 'evasion' || stat === 'parry' || stat === 'stunChance'
-                ? 'equipmentPercentageBonus'
-                : 'equipmentBonus',
+            amount < 0
+                ? (stat === 'evasion' || stat === 'parry' || stat === 'stunChance' || stat === 'maxFury'
+                    ? 'equipmentPercentagePenalty'
+                    : 'equipmentPenalty')
+                : (stat === 'evasion' || stat === 'parry' || stat === 'stunChance'
+                    ? 'equipmentPercentageBonus'
+                    : 'equipmentBonus'),
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
         );
         container.append(bonus);

@@ -34,7 +34,7 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     const damageDealt = Math.min(currentMonster.hp, damage);
     currentMonster.hp -= damageDealt;
     showFloatingDamage('monster-icon', damageDealt, 'monster');
-    const furyGained = Math.min(hero.maxFury - hero.fury, Math.floor(damageDealt * furyMultiplier));
+    const furyGained = Math.min(getEffectiveFuryThreshold() - hero.fury, Math.floor(damageDealt * furyMultiplier));
     hero.fury += furyGained;
     logMessage(t(messageKey, { damage: damageDealt, fury: furyGained }), "combat-hero");
 
@@ -51,7 +51,7 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
 // NOVO GOLPE: Ataque Rápido (Mais preciso, dano moderado)
 function combatQuickAttack() {
     if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
-    if (hero.fury >= hero.maxFury) {
+    if (hero.fury >= getEffectiveFuryThreshold()) {
         combatCriticalAttack();
         return;
     }
@@ -103,7 +103,7 @@ function combatHeavyAttack() {
 }
 
 function combatCriticalAttack() {
-    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked || hero.fury < hero.maxFury) return;
+    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked || hero.fury < getEffectiveFuryThreshold()) return;
     combatActionLocked = true;
     hero.fury = 0;
     playSound('specialAttack');
@@ -205,7 +205,7 @@ function monsterAttackTurn() {
     if (evaded) {
         playSound('dodge');
         hero.defending = false;
-        const furyGained = Math.min(FURY_PER_DODGE, hero.maxFury - hero.fury);
+        const furyGained = Math.min(FURY_PER_DODGE, getEffectiveFuryThreshold() - hero.fury);
         hero.fury += furyGained;
         logMessage(t("heroDodges", { monster: currentMonster.name, amount: furyGained }), "special");
         if (encounterId !== combatEncounterId || !inCombat) return;
@@ -233,7 +233,7 @@ function monsterAttackTurn() {
     const damageTaken = Math.min(hero.hp, monsterDamage);
     hero.hp = Math.max(0, hero.hp - damageTaken);
     showFloatingDamage('hero-hp-anchor', damageTaken, 'hero');
-    hero.fury = Math.min(hero.maxFury, hero.fury + damageTaken * FURY_PER_DAMAGE);
+    hero.fury = Math.min(getEffectiveFuryThreshold(), hero.fury + damageTaken * FURY_PER_DAMAGE);
     logMessage(parried
         ? t('heroParries', { damage: damageTaken })
         : t("monsterDamage", { monster: currentMonster.name, damage: damageTaken }), parried ? 'special' : 'combat-monster');
