@@ -127,6 +127,11 @@ function updateUI() {
     discoveryChanceDisplay.innerText = nextDiscoveryChance
         ? t('discoveryChance', { chance: nextDiscoveryChance })
         : t('journeyComplete');
+    const treasureChanceBonusDisplay = document.getElementById('treasure-chance-bonus');
+    treasureChanceBonusDisplay.hidden = hero.chestChanceBonus <= 0;
+    treasureChanceBonusDisplay.innerText = hero.chestChanceBonus > 0
+        ? t('treasureChanceBonus', { chance: hero.chestChanceBonus })
+        : '';
 
     const hpPercent = Math.max(0, Math.min(
         GAME_RULES.probabilityScale,

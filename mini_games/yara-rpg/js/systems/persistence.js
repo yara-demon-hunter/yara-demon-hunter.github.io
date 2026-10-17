@@ -29,6 +29,9 @@ function loadSavedGame(snapshot = readSavedGame()) {
     Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
     // Migração: saves antigos não têm skillPoints
     hero.skillPoints = Number(snapshot.hero?.skillPoints ?? DEFAULT_CHARACTER.baseStats.skillPoints ?? 0) || 0;
+    hero.chestChanceBonus = snapshot.hero?.chestChanceBonus === EXPLORATION_RULES.sparedMonster.treasureChanceBonus
+        ? EXPLORATION_RULES.sparedMonster.treasureChanceBonus
+        : 0;
     const savedEquipment = { ...(snapshot.hero?.equipment || {}) };
     const legacyAccessory = savedEquipment.accessory;
     if (legacyAccessory) {

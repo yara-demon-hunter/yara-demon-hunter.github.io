@@ -36,18 +36,21 @@ window.YaraRpgData.exploration = Object.freeze({
     sparedMonster: {
         chance: 8,
         goldPercent: 50,
+        treasureChanceBonus: 20,
+        treasureOrStrikeChance: 50,
+        strikeMultiplier: 2,
         clues: {
             "dark-forest": [
-                { pt: "O monstro sussurra que as feras evitam a margem norte do rio.", en: "The monster whispers that beasts avoid the river's northern bank." }
+                { pt: "O monstro sussurra que um baú foi enterrado sob as raízes antigas.", en: "The monster whispers that a chest was buried beneath the old roots." }
             ],
-            "river-crossing": [
-                { pt: "O monstro revela que uma trilha pela margem norte leva à aldeia das tochas azuladas.", en: "The monster reveals that a trail along the northern bank leads to the village of blue torches." }
+            "ashen-portal": [
+                { pt: "O monstro diz que as cinzas revelam um baú quando o portal enfraquece.", en: "The monster says the ash reveals a chest when the portal weakens." }
             ],
-            "blue-torch-village": [
-                { pt: "O monstro conta que os invasores escondem suprimentos perto da torre de vigia.", en: "The monster says the invaders hide supplies near the watchtower." }
+            "ruined-village": [
+                { pt: "O monstro conta que há um baú escondido sob os escombros da torre de vigia.", en: "The monster says a chest is hidden beneath the watchtower rubble." }
             ],
             "gudran-castle": [
-                { pt: "O monstro revela que as armadilhas do castelo protegem um arsenal antigo.", en: "The monster reveals that the castle traps guard an old armory." }
+                { pt: "O monstro revela que os antigos guardas esconderam um baú atrás do arsenal.", en: "The monster reveals that the old guards hid a chest behind the armory." }
             ]
         }
     }

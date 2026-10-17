@@ -94,6 +94,7 @@ function exploreForest() {
         logMessage(t('explorationSupplies', { gold, hp }), 'loot');
     } else if (outcome === 'chest') {
         pendingChest = true;
+        hero.chestChanceBonus = 0;
         logMessage(t('chestFoundLog'), 'discovery');
     } else {
         logMessage(t('denseMist'));
@@ -131,6 +132,28 @@ function chooseExplorationOutcome() {
     });
     const totalWeight = availableOutcomes.reduce((total, outcome) => total + outcome.weight, 0);
     if (totalWeight <= 0) return null;
+
+    const chestOutcome = availableOutcomes.find((outcome) => outcome.type === 'chest');
+    const otherOutcomes = availableOutcomes.filter((outcome) => outcome.type !== 'chest');
+    if (chestOutcome && hero.chestChanceBonus > 0) {
+        const baseChestChance = chestOutcome.weight / totalWeight * GAME_RULES.probabilityScale;
+        const boostedChestChance = Math.min(
+            GAME_RULES.probabilityScale,
+            baseChestChance + hero.chestChanceBonus
+        );
+        if (Math.random() * GAME_RULES.probabilityScale < boostedChestChance) {
+            return chestOutcome.type;
+        }
+        const otherWeight = otherOutcomes.reduce((total, outcome) => total + outcome.weight, 0);
+        if (otherWeight <= 0) return chestOutcome.type;
+        let otherRoll = Math.random() * otherWeight;
+        for (const outcome of otherOutcomes) {
+            otherRoll -= outcome.weight;
+            if (otherRoll < 0) return outcome.type;
+        }
+        return otherOutcomes[otherOutcomes.length - 1]?.type ?? null;
+    }
+
     let roll = Math.random() * totalWeight;
     for (const outcome of availableOutcomes) {
         roll -= outcome.weight;
@@ -154,16 +177,36 @@ function resolveStoryEvent(choiceIndex) {
         const monster = event.monster;
         const rules = EXPLORATION_RULES.sparedMonster;
         const gold = Math.floor(monster.goldReward * rules.goldPercent / GAME_RULES.probabilityScale);
-        const regionId = GAME_DATA.regions[currentRegion].id;
-        const clues = rules.clues[regionId] || [];
-        const clue = clues.length
-            ? clues[Math.floor(Math.random() * clues.length)][gameLanguage]
-            : t('denseMist');
         hero.gold += gold;
         hero.fury = 0;
         hero.evasionBonus = 0;
         hero.parryBonus = 0;
-        logMessage(t('monsterSpared', { monster: monster.name, gold, clue }), 'special');
+        if (Math.random() * GAME_RULES.probabilityScale < rules.treasureOrStrikeChance) {
+            const regionId = GAME_DATA.regions[currentRegion].id;
+            const clues = rules.clues[regionId] || [];
+            const clue = clues.length
+                ? clues[Math.floor(Math.random() * clues.length)][gameLanguage]
+                : t('denseMist');
+            hero.chestChanceBonus = rules.treasureChanceBonus;
+            logMessage(t('monsterSparedTreasure', {
+                monster: monster.name,
+                gold,
+                clue,
+                chance: rules.treasureChanceBonus
+            }), 'special');
+        } else {
+            const rolledDamage = Math.max(
+                GAME_RULES.combat.monsterAttack.minimumDamage,
+                monster.atk * rules.strikeMultiplier - getEffectiveStat('def')
+            );
+            const damage = Math.min(rolledDamage, Math.max(0, hero.hp - 1));
+            hero.hp -= damage;
+            logMessage(t('monsterSparedStrike', {
+                monster: monster.name,
+                gold,
+                damage
+            }), 'combat-monster');
+        }
         updateUI();
         return;
     } else if (effect === 'abyssal-challenge') {
