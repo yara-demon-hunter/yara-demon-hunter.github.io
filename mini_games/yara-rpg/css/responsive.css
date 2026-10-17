@@ -143,7 +143,7 @@
         white-space: nowrap;
     }
     .hero-status-bars {
-        order: 3;
+        order: 2;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 6px !important;
@@ -185,9 +185,6 @@
         order: 3;
         grid-column: 1 / -1;
     }
-    .hero-status-bars {
-        order: 4;
-    }
     #discovery-chance {
         margin-bottom: 6px !important;
         font-size: 0.62rem !important;
@@ -215,6 +212,7 @@
         /* padding: 0px !important; */
         font-size: 0.5rem !important;
     }
+    #monster-name { font-size: clamp(.52rem, 2.2vw, .68rem); line-height: 1.1; }
     #encounter-card > div > div:last-child {
         gap: 6px !important;
         padding-left: 6px !important;

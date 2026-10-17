@@ -26,7 +26,7 @@
                             <span class="text-red-400 flex items-center gap-1">❤️ HP</span>
                             <span class="flex items-center gap-2"><span><span id="hero-hp">100</span> / <span id="hero-hp-max">100</span></span><span class="skill-upgrade-control" data-upgrade-control="hp"><button type="button" data-upgrade="hp" onclick="toggleUpgradeOptions('hp')" class="skill-upgrade-button" aria-label="Melhorar HP (1 ponto)" aria-expanded="false" aria-controls="upgrade-options-hp" title="Melhorar por 1 ponto de habilidade">+</button><span id="upgrade-options-hp" class="skill-upgrade-options" data-upgrade-options="hp" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('hp', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('hp', 'max')" data-i18n="upgradeMax">Máx</button></span></span></span>
                         </div>
-                        <div class="w-full bg-forest-950 rounded-full h-3.5 p-0.5 border border-fantasy-border">
+                        <div id="hero-hp-anchor" class="relative w-full bg-forest-950 rounded-full h-3.5 p-0.5 border border-fantasy-border overflow-visible">
                             <div id="hero-hp-bar" class="bg-gradient-to-r from-red-600 to-red-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
                         </div>
                     </div>

@@ -232,7 +232,7 @@ function monsterAttackTurn() {
 
     const damageTaken = Math.min(hero.hp, monsterDamage);
     hero.hp = Math.max(0, hero.hp - damageTaken);
-    showFloatingDamage('hero-portrait-anchor', damageTaken, 'hero');
+    showFloatingDamage('hero-hp-anchor', damageTaken, 'hero');
     hero.fury = Math.min(hero.maxFury, hero.fury + damageTaken * FURY_PER_DAMAGE);
     logMessage(parried
         ? t('heroParries', { damage: damageTaken })

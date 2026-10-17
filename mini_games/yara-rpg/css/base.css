@@ -36,16 +36,17 @@ body {
     line-height: 1;
     white-space: nowrap;
     text-shadow: 0 2px 5px rgba(0, 0, 0, .95), 0 0 8px currentColor;
-    animation: floating-damage-rise .9s ease-out forwards;
+    animation: floating-damage-rise .55s ease-out forwards;
 }
 .floating-damage-monster { color: #ff3b3b; }
-.floating-damage-hero { color: #fb923c; }
+.floating-damage-hero { color: #ff3b3b; }
 .floating-damage-focus { color: #38bdf8; }
 @keyframes floating-damage-rise {
-    0% { opacity: 0; transform: translate(-50%, 0) scale(.75); }
-    15% { opacity: 1; transform: translate(-50%, -.35rem) scale(1.1); }
-    100% { opacity: 0; transform: translate(-50%, -2.8rem) scale(1); }
+    0% { opacity: 0; transform: translate(-50%, 0) scale(.8); }
+    12% { opacity: 1; transform: translate(-50%, -.15rem) scale(1.05); }
+    100% { opacity: 0; transform: translate(-50%, -1.35rem) scale(1); }
 }
+#monster-name { font-size: clamp(.68rem, 2.1vw, .78rem); line-height: 1.15; overflow-wrap: anywhere; }
 .ending-emblem { display: block; font-size: 2rem; animation: bell-glow 2s ease-in-out infinite alternate; }
 @keyframes bell-glow { from { filter: drop-shadow(0 0 2px #eabf55); transform: rotate(-5deg); } to { filter: drop-shadow(0 0 15px #f3cf72); transform: rotate(5deg); } }
 body.region-river-crossing .game-shell { background-image: radial-gradient(circle at 50% 20%, rgba(46, 109, 132, .24), transparent 45%), linear-gradient(#10171a, #0c0d0f 60%); }
