@@ -469,7 +469,7 @@ function showEquipmentChoice(item, fromInventory) {
     document.getElementById('keep-current-item-button').disabled = fromInventory
         ? false
         : blockedByStorageCapacity;
-    document.getElementById('keep-current-item-button').hidden = fromInventory || blockedByStorageCapacity;
+    document.getElementById('keep-current-item-button').hidden = !fromInventory && blockedByStorageCapacity;
     document.getElementById('open-bag-from-drop-button').hidden = fromInventory || !blockedByStorageCapacity;
     document.getElementById('item-drop-dialog').showModal();
     renderEquipment();
