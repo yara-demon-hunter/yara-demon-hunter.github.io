@@ -89,23 +89,32 @@ function hydrateItem(savedItem) {
     if (!catalogItem) return savedItem;
     const savedRarity = GAME_RULES.loot.equipmentRarities.find((rarity) => rarity.id === savedItem.rarity)
         || GAME_RULES.loot.equipmentRarities[0];
-    const isCurrentUpgradeFormat = savedItem.upgradeSystemVersion === 2;
-    const stats = isCurrentUpgradeFormat
+    const savedVersion = Number(savedItem.upgradeSystemVersion) || 0;
+    const stats = savedVersion >= 2
         ? { ...savedItem.stats }
         : Object.fromEntries(Object.entries(catalogItem.stats).map(([stat, amount]) => [
             stat,
-            amount + savedRarity.statBonus
+            amount + (amount < 0 ? -1 : 1) * getEquipmentRarityStatBonus(stat, savedRarity)
         ]));
+    if (savedVersion === 2) {
+        Object.keys(stats).forEach((stat) => {
+            if (stat === 'maxHp' || stat === 'maxFoco') {
+                stats[stat] += getEquipmentRarityStatBonus(stat, savedRarity) - savedRarity.statBonus;
+            } else if (stat === 'maxFury') {
+                stats[stat] -= getEquipmentRarityStatBonus(stat, savedRarity) - savedRarity.statBonus;
+            }
+        });
+    }
     return {
         ...catalogItem,
         ...savedItem,
         stats,
         slot: catalogItem.slot,
         rarity: savedRarity.id,
-        upgradeLevel: isCurrentUpgradeFormat ? Math.min(
+        upgradeLevel: savedVersion >= 2 ? Math.min(
             GAME_RULES.equipmentUpgrade.maxLevel,
             Math.max(0, Number(savedItem.upgradeLevel) || 0)
         ) : 0,
-        upgradeSystemVersion: 2
+        upgradeSystemVersion: 3
     };
 }

@@ -325,7 +325,7 @@ function upgradeSelectedEquipment() {
     if (cost === null || hero.gold < cost) return;
     hero.gold -= cost;
     item.upgradeLevel = (Number(item.upgradeLevel) || 0) + 1;
-    item.upgradeSystemVersion = 2;
+    item.upgradeSystemVersion = 3;
     Object.keys(item.stats).forEach((stat) => {
         const statBonuses = GAME_RULES.equipmentUpgrade.statBonusPerLevel;
         item.stats[stat] += statBonuses[stat] ?? 0.5;

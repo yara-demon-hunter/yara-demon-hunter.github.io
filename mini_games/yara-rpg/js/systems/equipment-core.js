@@ -14,11 +14,17 @@ function getEquipmentRarity(item) {
     return rarities.find((entry) => entry.id === item.rarity) || rarities[0];
 }
 
+function getEquipmentRarityStatBonus(stat, rarity) {
+    const scale = stat === 'maxHp' || stat === 'maxFoco' || stat === 'maxFury' ? 5 : 1;
+    return (Number(rarity?.statBonus) || 0) * scale;
+}
+
 function createEquipmentInstance(template, rarity = GAME_RULES.loot.equipmentRarities[0]) {
-    const statBonus = rarity.statBonus;
     const stats = Object.fromEntries(Object.entries(template.stats).map(([stat, amount]) => [
         stat,
-        amount < 0 ? amount - statBonus : amount + statBonus
+        amount < 0
+            ? amount - getEquipmentRarityStatBonus(stat, rarity)
+            : amount + getEquipmentRarityStatBonus(stat, rarity)
     ]));
     return {
         ...template,
@@ -26,7 +32,7 @@ function createEquipmentInstance(template, rarity = GAME_RULES.loot.equipmentRar
         stats,
         rarity: rarity.id,
         upgradeLevel: 0,
-        upgradeSystemVersion: 2,
+        upgradeSystemVersion: 3,
         instanceId: ++equipmentInstanceId
     };
 }
