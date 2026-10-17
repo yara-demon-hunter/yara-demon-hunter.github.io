@@ -142,7 +142,9 @@ function updateUI() {
     const nextDiscoveryChance = getDiscoveryChance();
     discoveryChanceDisplay.innerText = nextDiscoveryChance
         ? t('discoveryChance', { chance: nextDiscoveryChance })
-        : t('journeyComplete');
+        : currentRegion >= GAME_DATA.regions.length - 1
+            ? t('journeyComplete')
+            : t('discoveryRequiresLevel');
     const treasureChanceBonusDisplay = document.getElementById('treasure-chance-bonus');
     treasureChanceBonusDisplay.hidden = hero.chestChanceBonus <= 0;
     treasureChanceBonusDisplay.innerText = hero.chestChanceBonus > 0

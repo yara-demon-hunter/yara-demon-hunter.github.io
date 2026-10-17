@@ -302,14 +302,17 @@ function resolveStoryEvent(choiceIndex) {
 
 function getDiscoveryChance() {
     const explorationRules = EXPLORATION_RULES.discovery;
+    const currentRegionId = GAME_DATA.regions[currentRegion].id;
+    const levelsGainedHere = hero.level - (regionEntryLevels[currentRegionId] ?? hero.level);
     if (
         currentRegion >= GAME_DATA.regions.length - 1
         || discoveredRegions.includes(currentRegion + 1)
+        || levelsGainedHere <= 0
     ) return 0;
     return Math.min(
         explorationRules.maximumChance,
         explorationRules.baseChance
-            + (hero.level - 1) * explorationRules.chancePerLevel
+            + levelsGainedHere * explorationRules.chancePerLevel
             + currentRegion * explorationRules.chancePerRegion
     );
 }
@@ -319,6 +322,7 @@ function tryDiscoverRegion() {
 
     currentRegion++;
     discoveredRegions.push(currentRegion);
+    regionEntryLevels[GAME_DATA.regions[currentRegion].id] = hero.level;
     playSound('regionDiscovered');
     explorationsSinceStoryEvent = 0;
     logMessage(t("regionArrival", { region: GAME_DATA.regions[currentRegion].title[gameLanguage] }), "discovery");

@@ -104,6 +104,7 @@ let enemyTelegraphing = false;
 // Exploração / campanha
 let currentRegion = 0;
 let discoveredRegions = [0];
+let regionEntryLevels = {};
 let explorationCount = 0;
 let explorationsSinceStoryEvent = 0;
 let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
@@ -136,6 +137,7 @@ function startAdventure({ character, equipment }) {
     // Reset de campanha
     currentRegion = 0;
     discoveredRegions = [0];
+    regionEntryLevels = {};
     inCombat = false;
     currentMonster = null;
     gameOver = false;
@@ -174,6 +176,7 @@ function startAdventure({ character, equipment }) {
         equipment: createEmptyEquipmentMap(),
         equipmentInventory: [],
     });
+    regionEntryLevels[GAME_DATA.regions[0].id] = hero.level;
 
     Object.entries(character.specialty).forEach(([stat, amount]) => {
         hero[stat] += amount;

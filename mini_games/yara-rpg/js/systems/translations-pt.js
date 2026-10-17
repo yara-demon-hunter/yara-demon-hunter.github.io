@@ -142,6 +142,7 @@ window.YaraRpgTranslations.pt = {
         evasion: "Esquiva",
         journey: "Jornada",
         discoveryChance: "Chance de descobrir a próxima área: {chance}%",
+        discoveryRequiresLevel: "Suba de nível nesta área para encontrar a próxima.",
         journeyComplete: "Todas as áreas foram descobertas.",
         potions: "Poções de Cura",
         available: "disponíveis",

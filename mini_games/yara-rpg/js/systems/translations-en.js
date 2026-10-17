@@ -142,6 +142,7 @@ window.YaraRpgTranslations.en = {
         evasion: "Evasion",
         journey: "Journey",
         discoveryChance: "Chance to discover the next area: {chance}%",
+        discoveryRequiresLevel: "Level up in this area to find the next one.",
         journeyComplete: "All areas have been discovered.",
         potions: "Healing Potions",
         available: "available",
