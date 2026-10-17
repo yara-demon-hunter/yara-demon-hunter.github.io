@@ -75,5 +75,22 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         evasion: 10,
         xpReward: 280,
         goldReward: 240
+    },
+    {
+        id: "gudran",
+        name: { pt: "Gudran, Senhor do Castelo", en: "Gudran, Lord of the Castle" },
+        icon: "👑",
+        minLevel: 8,
+        suggestedLevel: 10,
+        hp: 1200,
+        atk: 68,
+        def: 38,
+        parry: 45,
+        evasion: 14,
+        xpReward: 600,
+        goldReward: 600,
+        isFinalBoss: true,
+        isUnescapable: true,
+        challengeRewardRarities: ["demon", "god"]
     }
 ]);

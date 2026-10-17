@@ -25,6 +25,11 @@ body {
 .story-event-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .55rem; margin-top: .9rem; }
 .story-event-choice { padding: .65rem .75rem; border: 1px solid #53664f; border-radius: .65rem; background: #17271d; color: #e4f0d9; font: inherit; font-size: .78rem; font-weight: 700; cursor: pointer; }
 .story-event-choice:hover { border-color: #c9a650; background: #263a2b; }
+.final-boss-gate { text-align: center; border-color: rgba(194, 72, 56, .8); background: radial-gradient(ellipse at 50% 0%, rgba(112, 35, 31, .34), transparent 62%), linear-gradient(145deg, rgba(37, 25, 25, .98), rgba(15, 16, 18, .98)); }
+.final-boss-gate .ending-emblem { margin-bottom: .35rem; }
+.final-boss-gate .story-event-choices { max-width: 30rem; margin-right: auto; margin-left: auto; }
+.final-boss-proceed { border-color: #9e3d32; background: #5b211e; color: #ffe6d8; }
+.final-boss-proceed:hover { border-color: #ef8a63; background: #7a2c25; }
 .floating-damage {
     position: absolute;
     z-index: 20;
@@ -57,6 +62,24 @@ body.region-dark-forest #exploration-banner {
     background-position: center 46%;
     background-size: cover;
     border-color: rgba(65, 97, 93, 0.7);
+}
+body.region-river-crossing #exploration-banner {
+    background-image: linear-gradient(90deg, rgba(8, 16, 12, .91), rgba(8, 16, 12, .72) 58%, rgba(8, 16, 12, .84)), url("../images/regions/river-crossing.png");
+    background-position: center 52%;
+    background-size: cover;
+    border-color: rgba(76, 142, 164, 0.7);
+}
+body.region-blue-torch-village #exploration-banner {
+    background-image: linear-gradient(90deg, rgba(8, 12, 20, .91), rgba(8, 12, 20, .72) 58%, rgba(8, 12, 20, .84)), url("../images/regions/blue-torch-village.png");
+    background-position: center 52%;
+    background-size: cover;
+    border-color: rgba(83, 121, 181, 0.7);
+}
+body.region-gudran-castle #exploration-banner {
+    background-image: linear-gradient(90deg, rgba(11, 10, 18, .92), rgba(11, 10, 18, .74) 58%, rgba(11, 10, 18, .86)), url("../images/regions/gudran-castle.png");
+    background-position: center 52%;
+    background-size: cover;
+    border-color: rgba(104, 99, 147, 0.7);
 }
 .region-nav-button {
     display: grid;

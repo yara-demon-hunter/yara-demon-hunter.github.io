@@ -108,12 +108,27 @@ function updateUI() {
         });
     }
     const currentRegionData = GAME_DATA.regions[currentRegion];
+    const finalBossGateActive = currentRegion === GAME_DATA.regions.length - 1
+        && !inCombat && !gameOver && !campaignComplete
+        && !pendingMistContact && !pendingStoryEvent && !pendingChest;
     document.body.classList.remove(...GAME_DATA.regions.map((region) => `region-${region.id}`));
     document.body.classList.add(`region-${currentRegionData.id}`);
+    const explorationBanner = document.getElementById('exploration-banner');
     document.getElementById('exploration-title').innerText = currentRegionData.title[gameLanguage];
     document.getElementById('exploration-description').innerText = currentRegionData.description[gameLanguage];
+    if (explorationBanner) {
+        const hudScriptUrl = document.querySelector('script[src*="/systems/hud.js"]')?.src || window.location.href;
+        const regionImageUrl = currentRegionData.sceneImage
+            ? new URL('../../' + currentRegionData.sceneImage, hudScriptUrl).href
+            : '';
+        explorationBanner.style.backgroundImage = currentRegionData.sceneImage
+            ? `linear-gradient(90deg, rgba(8, 16, 12, .91), rgba(8, 16, 12, .72) 58%, rgba(8, 16, 12, .84)), url("${regionImageUrl}")`
+            : '';
+        explorationBanner.style.backgroundPosition = 'center 52%';
+        explorationBanner.style.backgroundSize = currentRegionData.sceneImage ? 'cover' : '';
+    }
     const regionNavigationBlocked = inCombat || gameOver || campaignComplete
-        || pendingMistContact || pendingStoryEvent || pendingChest;
+        || pendingMistContact || pendingStoryEvent || pendingChest || finalBossGateActive;
     const previousRegionButton = document.getElementById('previous-region-button');
     const nextRegionButton = document.getElementById('next-region-button');
     previousRegionButton.disabled = regionNavigationBlocked || !discoveredRegions.includes(currentRegion - 1);
@@ -204,6 +219,10 @@ function updateUI() {
     document.getElementById('parry-button').disabled = parrySkillUsedThisCombat
         || parryTotal >= selectedCharacter.skills.maxParry
         || hero.foco < selectedCharacter.skills.parry.focoCost;
+    const runButton = document.getElementById('run-button');
+    if (runButton) {
+        runButton.title = currentMonster?.isUnescapable ? t('finalBossNoEscape') : '';
+    }
     const restartButton = document.getElementById('restart-button');
     const chestCard = document.getElementById('chest-event-card');
     chestCard.hidden = !pendingChest || inCombat || gameOver || campaignComplete;
@@ -257,11 +276,13 @@ function updateUI() {
             parrySkillUsedThisCombat
             || parryTotal >= selectedCharacter.skills.maxParry
             || hero.foco < selectedCharacter.skills.parry.focoCost
-        ));
+        )) || (button.id === 'run-button' && currentMonster?.isUnescapable);
         button.disabled = combatActionLocked || disabledByGameState;
     });
 
     document.getElementById('campaign-ending-card').hidden = !campaignComplete && !gameOver;
+    const finalBossGateCard = document.getElementById('final-boss-gate');
+    finalBossGateCard.hidden = true;
     if (campaignComplete || gameOver) {
         exploreControls.classList.add('hidden'); combatControls.classList.add('hidden');
         encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden'); storyCard.hidden = true; chestCard.hidden = true;
@@ -296,6 +317,12 @@ function updateUI() {
         chestCard.hidden = true;
         explorationBanner.classList.remove('hidden');
         restartButton.classList.add('hidden');
+    } else if (finalBossGateActive) {
+        exploreControls.classList.add('hidden'); combatControls.classList.add('hidden');
+        encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden');
+        storyCard.hidden = true; chestCard.hidden = true;
+        explorationBanner.classList.add('hidden'); restartButton.classList.add('hidden');
+        finalBossGateCard.hidden = false;
     } else {
         exploreControls.classList.remove('hidden');
         combatControls.classList.add('hidden');
@@ -308,7 +335,7 @@ function updateUI() {
     saveGame();
 }
 
-function logMessage(message, type = 'normal') {
+window.logMessage = function logMessage(message, type = 'normal') {
     const logBox = document.getElementById('rpg-log');
     const locale = gameLanguage === "en" ? "en-US" : "pt-BR";
     const time = new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -333,4 +360,4 @@ function logMessage(message, type = 'normal') {
         logBox.firstElementChild?.remove();
     }
     logBox.scrollTop = logBox.scrollHeight;
-}
+};

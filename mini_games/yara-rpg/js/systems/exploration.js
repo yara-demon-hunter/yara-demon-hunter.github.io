@@ -216,8 +216,8 @@ function resolveStoryEvent(choiceIndex) {
             updateUI();
             return;
         }
-        const finalRegionIndex = GAME_DATA.regions.length - 1;
-        const challengeRewardRarities = currentRegion === finalRegionIndex
+        const endgameRegionIndex = GAME_DATA.regions.findIndex((region) => region.id === 'gudran-castle');
+        const challengeRewardRarities = currentRegion >= endgameRegionIndex
             ? ['demon', 'god']
             : ['epic', 'legendary'];
         logMessage(t('abyssalChallengeAccepted'), 'combat-monster');
@@ -373,6 +373,26 @@ function navigateRegion(direction) {
     showRegionArrival(GAME_DATA.regions[currentRegion]);
 }
 
+function resolveFinalBossGate(shouldProceed) {
+    if (currentRegion !== GAME_DATA.regions.length - 1 || inCombat || gameOver || campaignComplete) return;
+    if (!shouldProceed) {
+        currentRegion = Math.max(0, currentRegion - 1);
+        logMessage(t('finalBossReturnMessage'), 'special');
+        updateUI();
+        showRegionArrival(GAME_DATA.regions[currentRegion]);
+        return;
+    }
+
+    const gudran = SPECIAL_MONSTERS.find((monster) => monster.id === 'gudran');
+    if (!gudran) {
+        logMessage(t('denseMist'));
+        updateUI();
+        return;
+    }
+    logMessage(t('finalBossAppears'), 'combat-monster');
+    spawnMonster(gudran);
+}
+
 function spawnMonster(templateOverride = null) {
     const regionId = GAME_DATA.regions[currentRegion].id;
     const regionMonsters = GAME_DATA.monsters.byRegion[regionId];
@@ -413,6 +433,8 @@ function spawnMonster(templateOverride = null) {
         goldReward: vary(template.goldReward),
         id: template.id || null,
         isBoss: isMistBoss,
+        isFinalBoss: Boolean(template.isFinalBoss),
+        isUnescapable: Boolean(template.isUnescapable),
         challengeRewardRarities: template.challengeRewardRarities || null
     };
 

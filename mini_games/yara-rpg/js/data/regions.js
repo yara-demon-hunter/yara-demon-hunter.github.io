@@ -58,6 +58,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "river-crossing",
         sceneIcon: "🌊",
+        sceneImage: "images/regions/river-crossing.png",
         title: { pt: "Travessia do Rio", en: "River Crossing" },
         description: {
             pt: "🌊 A correnteza corta a floresta. Atravesse o rio e encontre o caminho para o outro lado, onde a névoa ainda esconde perigos.",
@@ -111,6 +112,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "blue-torch-village",
         sceneIcon: "🕯️",
+        sceneImage: "images/regions/blue-torch-village.png",
         title: { pt: "Aldeia das Tochas Azuladas", en: "Village of Blue Torches" },
         description: {
             pt: "🕯️ Tochas de chama azulada iluminam as casas da aldeia. As ruas estão quietas demais, e sinais de invasores ainda marcam as paredes.",
@@ -164,6 +166,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "gudran-castle",
         sceneIcon: "🏰",
+        sceneImage: "images/regions/gudran-castle.png",
         title: { pt: "Castelo de Gudran", en: "Gudran Castle" },
         description: {
             pt: "🏰 As muralhas de Gudran guardam criaturas antigas e cavaleiros que não aceitam intrusos.",
@@ -222,5 +225,15 @@ window.YaraRpgData.regions = Object.freeze([
                 ]
             }
         ]
+    },
+    {
+        id: "gudran-throne",
+        sceneIcon: "👑",
+        title: { pt: "Câmara do Trono", en: "Throne Chamber" },
+        description: {
+            pt: "Além das portas do castelo, Gudran aguarda no coração de seu domínio. A névoa parece prender a respiração.",
+            en: "Beyond the castle doors, Gudran waits at the heart of his domain. Even the mist seems to hold its breath."
+        },
+        event: []
     }
 ]);

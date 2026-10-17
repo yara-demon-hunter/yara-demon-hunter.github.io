@@ -54,8 +54,8 @@ function hasAffordableEquipmentUpgrade() {
 }
 
 function rollEquipmentRarity(allowedRarityIds = null, chanceOverrides = null, allowRegionExclusive = false) {
-    const finalRegionIndex = GAME_DATA.regions.length - 1;
-    const isFinalRegion = currentRegion === finalRegionIndex;
+    const endgameRegionIndex = GAME_DATA.regions.findIndex((region) => region.id === 'gudran-castle');
+    const isFinalRegion = currentRegion >= endgameRegionIndex;
     const finalRegionOnly = GAME_RULES.loot.finalRegionOnlyRarities || [];
     const rarities = GAME_RULES.loot.equipmentRarities.filter((rarity) =>
         (!allowedRarityIds || allowedRarityIds.includes(rarity.id))

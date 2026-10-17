@@ -4,7 +4,7 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
     probabilityScale: 100,
     mistContacts: {
         baseChance: 3,
-        chancePerLevel: 2,
+        chancePerLevel: 1,
         maxChance: 25,
         cooldownExplorations: 3,
         outcomes: [

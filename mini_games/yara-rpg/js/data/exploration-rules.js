@@ -5,10 +5,10 @@ window.YaraRpgData = window.YaraRpgData || {};
 // Unavailable healing/potion outcomes are removed and their weight is redistributed.
 window.YaraRpgData.exploration = Object.freeze({
     discovery: {
-        baseChance: 1,
-        chancePerLevel: 1,
+        baseChance: 100,
+        chancePerLevel: 50,
         chancePerRegion: 1,
-        maximumChance: 10
+        maximumChance: 100
     },
     storyEvents: {
         chance: 20,

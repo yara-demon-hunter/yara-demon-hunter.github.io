@@ -39,6 +39,17 @@
                 <button id="restart-button" onclick="restartGame()" class="hidden mt-3 bg-amber-600 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded-lg transition" data-i18n="restart">Reiniciar jornada</button>
             </div>
 
+            <section id="final-boss-gate" class="campaign-ending-card final-boss-gate" hidden aria-live="polite" aria-labelledby="final-boss-gate-title">
+                <span class="ending-emblem" aria-hidden="true">👑</span>
+                <p class="story-event-kicker" data-i18n="finalBossGateKicker">O confronto final</p>
+                <h2 id="final-boss-gate-title" data-i18n="finalBossGateTitle">Gudran espera por você</h2>
+                <p id="final-boss-gate-description" data-i18n="finalBossGateDescription"></p>
+                <div class="story-event-choices">
+                    <button type="button" class="story-event-choice final-boss-proceed" onclick="resolveFinalBossGate(true)" data-i18n="finalBossProceed"></button>
+                    <button type="button" class="story-event-choice" onclick="resolveFinalBossGate(false)" data-i18n="finalBossPrepare"></button>
+                </div>
+            </section>
+
             <section id="mist-contact-card" class="hidden bg-purple-950/40 border border-purple-700/60 rounded-xl p-4 mb-4" aria-live="polite" aria-labelledby="mist-contact-name">
                 <div class="flex items-start gap-3">
                     <span id="mist-contact-icon" class="text-3xl" aria-hidden="true">🌊</span>
@@ -110,7 +121,7 @@
                     <button id="dodge-button" onclick="combatDodge()" class="bg-emerald-900/80 hover:bg-emerald-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-emerald-600 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span>💨</span> <span data-i18n="dodge">Preparar Esquiva</span> <span class="text-[10px] text-emerald-200" data-i18n="dodgeBonus">+15% (15 Foco)</span>
                     </button>
-                    <button onclick="combatRun()" class="bg-stone-900 hover:bg-stone-800 active:scale-[0.98] text-stone-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-700 flex flex-col items-center justify-center gap-1 transition text-xs">
+                    <button id="run-button" onclick="combatRun()" class="bg-stone-900 hover:bg-stone-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-stone-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-700 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span>🏃</span> <span data-i18n="run">Fugir na Névoa</span>
                     </button>
                 </div>

@@ -74,6 +74,10 @@ function restAtCamp() {
 
 function combatRun() {
     if (!inCombat || campaignComplete || combatActionLocked) return;
+    if (currentMonster?.isUnescapable) {
+        logMessage(t('finalBossNoEscape'), 'combat-monster');
+        return;
+    }
     combatActionLocked = true;
     const success = Math.random() < GAME_RULES.combat.escapeSuccessChance;
     if (success) {
@@ -167,6 +171,11 @@ function awardCombatVictory(monster) {
     currentMonster = null;
 
     checkLevelUp();
+    if (monster.isFinalBoss) {
+        campaignComplete = true;
+        logMessage(t('finalBossVictory'), 'discovery');
+        try { localStorage.removeItem(SAVE_KEY); } catch {}
+    }
     if (equipmentDrop) {
         if (challengeRewardRarities) {
             logMessage(t('abyssalChallengeReward', {
