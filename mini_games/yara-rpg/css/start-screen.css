@@ -121,7 +121,11 @@
 }
 .starter-equipment-option:disabled {
     cursor: not-allowed;
-    opacity: 0.42;
+    border-color: rgba(55, 55, 55, 0.75);
+    background: rgba(12, 13, 15, 0.9);
+    color: #777;
+    filter: grayscale(1);
+    opacity: 0.3;
 }
 .character-option-icon {
     grid-area: portrait;

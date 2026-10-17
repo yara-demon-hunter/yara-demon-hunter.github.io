@@ -146,15 +146,12 @@ window.YaraRpgCharacterSetup = (() => {
         EQUIPMENT_DATA.forEach((item) => {
             const selectedIndex = selectedEquipmentIds.indexOf(item.id);
             const selected = selectedIndex !== -1;
-            const replacesSameSlot = selectedEquipmentIds.some((id) =>
-                EQUIPMENT_BY_ID.get(id).slot === item.slot
-            );
             const card = document.createElement("button");
             card.type = "button";
             card.className = `starter-equipment-option${selected ? " is-selected" : ""}`;
             card.disabled = !selected
-                && selectedEquipmentIds.length >= SELECTION_LIMIT
-                && !replacesSameSlot;
+                && selectedEquipmentIds.length >= SELECTION_LIMIT;
+            card.classList.toggle("is-unavailable", card.disabled);
             card.setAttribute("aria-pressed", String(selected));
             card.setAttribute("aria-label", `${item.name[document.documentElement.lang.startsWith("en") ? "en" : "pt"]}: ${describeEquipment(item)}`);
 
