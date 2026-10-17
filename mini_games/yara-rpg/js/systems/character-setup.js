@@ -49,7 +49,7 @@ window.YaraRpgCharacterSetup = (() => {
             portrait.setAttribute("aria-hidden", "true");
             if (character.image) {
                 const image = document.createElement("img");
-                image.src = new URL(`../../${character.image}`, document.querySelector('script[src*="/systems/character-setup.js"]')?.src || window.location.href).href;
+                image.src = character.image;
                 image.alt = "";
                 image.loading = "lazy";
                 image.addEventListener("error", () => {
@@ -160,7 +160,7 @@ window.YaraRpgCharacterSetup = (() => {
             icon.setAttribute("aria-hidden", "true");
             if (item.image) {
                 const image = document.createElement("img");
-                image.src = new URL(`../../${item.image}`, document.querySelector('script[src*="/systems/character-setup.js"]')?.src || window.location.href).href;
+                image.src = item.image;
                 image.alt = "";
                 image.className = "equipment-icon-image";
                 image.addEventListener("error", () => {

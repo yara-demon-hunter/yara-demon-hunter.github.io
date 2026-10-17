@@ -333,7 +333,7 @@ function showRegionArrival(regionData) {
     regionArt.replaceChildren();
     if (regionData.sceneImage) {
         const image = document.createElement('img');
-        image.src = new URL(`../../${regionData.sceneImage}`, document.querySelector('script[src*="/systems/exploration.js"]')?.src || window.location.href).href;
+        image.src = regionData.sceneImage;
         image.alt = '';
         image.className = 'region-arrival-image';
         image.setAttribute('aria-hidden', 'true');
@@ -462,7 +462,7 @@ function spawnMonster(templateOverride = null) {
     monsterIcon.replaceChildren();
     if (currentMonster.image) {
         const image = document.createElement('img');
-        image.src = new URL(`../../${currentMonster.image}`, document.querySelector('script[src*="/systems/exploration.js"]')?.src || window.location.href).href;
+        image.src = currentMonster.image;
         image.alt = '';
         image.className = 'monster-icon-image';
         image.setAttribute('aria-hidden', 'true');

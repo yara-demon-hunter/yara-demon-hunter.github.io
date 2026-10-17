@@ -26,7 +26,7 @@ function applyLanguage() {
     document.querySelectorAll("[data-i18n-title]").forEach((element) => {
         element.title = t(element.dataset.i18nTitle);
     });
-    document.querySelector("#game-home").href = gameLanguage === "en" ? "/en/" : "/pt/";
+    document.querySelector("#game-home").href = gameLanguage === "en" ? "../../en/" : "../../pt/";
     document.querySelectorAll("[data-game-language]").forEach((button) => {
         button.setAttribute("aria-pressed", String(button.dataset.gameLanguage === gameLanguage));
     });

@@ -37,7 +37,7 @@ function setEquipmentIcon(element, item) {
     element.replaceChildren();
     if (item.image) {
         const image = document.createElement('img');
-        image.src = new URL(`../../${item.image}`, document.querySelector('script[src*="/systems/equipment-ui.js"]')?.src || window.location.href).href;
+        image.src = item.image;
         image.alt = '';
         image.className = 'equipment-icon-image';
         image.setAttribute('aria-hidden', 'true');

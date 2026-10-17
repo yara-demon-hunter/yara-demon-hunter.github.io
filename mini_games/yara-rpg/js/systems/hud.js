@@ -8,7 +8,7 @@ function updateUI() {
     const heroPortrait = document.getElementById('hero-portrait');
     const characterImage = selectedCharacter?.image;
     if (heroPortrait && characterImage) {
-        heroPortrait.src = new URL(`../../${characterImage}`, document.querySelector('script[src*="/systems/hud.js"]')?.src || window.location.href).href;
+        heroPortrait.src = characterImage;
     }
     document.getElementById('hero-level').innerText = hero.level;
     document.getElementById('hero-gold').innerText = hero.gold;
@@ -117,9 +117,8 @@ function updateUI() {
     document.getElementById('exploration-title').innerText = currentRegionData.title[gameLanguage];
     document.getElementById('exploration-description').innerText = currentRegionData.description[gameLanguage];
     if (explorationBanner) {
-        const hudScriptUrl = document.querySelector('script[src*="/systems/hud.js"]')?.src || window.location.href;
         const regionImageUrl = currentRegionData.sceneImage
-            ? new URL('../../' + currentRegionData.sceneImage, hudScriptUrl).href
+            ? currentRegionData.sceneImage
             : '';
         explorationBanner.style.backgroundImage = currentRegionData.sceneImage
             ? `linear-gradient(90deg, rgba(8, 16, 12, .91), rgba(8, 16, 12, .72) 58%, rgba(8, 16, 12, .84)), url("${regionImageUrl}")`
@@ -246,7 +245,7 @@ function updateUI() {
         contactIcon.replaceChildren();
         if (pendingMistContact.image) {
             const image = document.createElement('img');
-            image.src = new URL(`../../${pendingMistContact.image}`, document.querySelector('script[src*="/systems/hud.js"]')?.src || window.location.href).href;
+            image.src = pendingMistContact.image;
             image.alt = '';
             image.className = 'mist-contact-icon-image';
             image.setAttribute('aria-hidden', 'true');
