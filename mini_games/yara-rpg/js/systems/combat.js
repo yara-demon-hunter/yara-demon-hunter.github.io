@@ -86,8 +86,8 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     }
 
     const stunChance = Math.min(
-        selectedCharacter.skills.maxStunChance,
-        Math.min(selectedCharacter.skills.maxStunChance, getEffectiveStat('stunChance')) + criticalStunBonus
+        selectedCharacter.limits.maxStunChance,
+        Math.min(selectedCharacter.limits.maxStunChance, getEffectiveStat('stunChance')) + criticalStunBonus
     );
     const stunned = currentMonster.hp > 0 && Math.random() * GAME_RULES.probabilityScale < stunChance;
     if (stunned) logMessage(t("stunLanded"), "special");
@@ -191,10 +191,10 @@ function combatDefend() {
     if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
     const bonusGained = Math.min(
         selectedCharacter.skills.parry.bonus,
-        selectedCharacter.skills.maxParry - getEffectiveStat('parry') - hero.parryBonus
+        selectedCharacter.limits.maxParry - getEffectiveStat('parry') - hero.parryBonus
     );
     if (bonusGained <= 0) {
-        logMessage(t('parryMaxed', { max: selectedCharacter.skills.maxParry }));
+        logMessage(t('parryMaxed', { max: selectedCharacter.limits.maxParry }));
         return;
     }
     if (hero.foco < selectedCharacter.skills.parry.focoCost) {
@@ -217,10 +217,10 @@ function combatDodge() {
     if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
     const bonusGained = Math.min(
         selectedCharacter.skills.dodge.bonus,
-        selectedCharacter.skills.maxEvasion - getEffectiveStat('evasion') - hero.evasionBonus
+        selectedCharacter.limits.maxEvasion - getEffectiveStat('evasion') - hero.evasionBonus
     );
     if (bonusGained <= 0) {
-        logMessage(t("evasionMaxed", { max: selectedCharacter.skills.maxEvasion }));
+        logMessage(t("evasionMaxed", { max: selectedCharacter.limits.maxEvasion }));
         return;
     }
     if (hero.foco < selectedCharacter.skills.dodge.focoCost) {
@@ -262,7 +262,7 @@ function monsterAttackTurn() {
     const wasTelegraphing = enemyTelegraphing;
     enemyTelegraphing = false;
 
-    const evasionChance = Math.min(selectedCharacter.skills.maxEvasion, getEffectiveStat('evasion') + hero.evasionBonus);
+    const evasionChance = Math.min(selectedCharacter.limits.maxEvasion, getEffectiveStat('evasion') + hero.evasionBonus);
     const evaded = Math.random() * GAME_RULES.probabilityScale < evasionChance;
     if (evaded) {
         playSound('dodge');
@@ -282,7 +282,7 @@ function monsterAttackTurn() {
         currentMonster.atk - getEffectiveStat('def') + Math.floor(Math.random() * attackRules.randomBonusRange)
     );
     if (wasTelegraphing) monsterDamage = Math.floor(monsterDamage * GAME_RULES.combat.enemyTelegraphDamageMultiplier);
-    const parryChance = Math.min(selectedCharacter.skills.maxParry, getEffectiveStat('parry') + hero.parryBonus);
+    const parryChance = Math.min(selectedCharacter.limits.maxParry, getEffectiveStat('parry') + hero.parryBonus);
     const parried = Math.random() * GAME_RULES.probabilityScale < parryChance;
     if (parried) {
         playSound('parry');

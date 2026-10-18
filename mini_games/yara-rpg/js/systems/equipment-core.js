@@ -124,7 +124,7 @@ function getEffectiveStat(stat) {
 }
 
 function getEffectiveFuryThreshold() {
-    return Math.max(selectedCharacter?.skills?.minFuryThreshold ?? 1, getEffectiveStat('maxFury'));
+    return Math.max(selectedCharacter?.limits?.minFuryThreshold ?? 1, getEffectiveStat('maxFury'));
 }
 
 function getItemBonusText(item) {

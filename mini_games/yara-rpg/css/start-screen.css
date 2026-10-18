@@ -180,6 +180,7 @@
 }
 .character-option-specialty {
     grid-area: specialty;
+    margin: 0;
     color: #86d6ad;
     font-size: 0.68rem;
     font-weight: 700;
@@ -196,6 +197,11 @@
     color: #d2c9b6;
     font-size: 0.68rem;
     line-height: 1.5;
+}
+.character-option-limits {
+    color: #a8c8dc;
+    font-size: 0.68rem;
+    line-height: 1.4;
 }
 .character-option-extra {
     margin: 0 0.9rem 0.8rem;
@@ -217,7 +223,13 @@
     margin: 0.55rem 0 0;
     border-top: 0;
 }
+.character-option-extra[open] .character-option-specialty {
+    margin: 0.55rem 0 0;
+}
 .character-option-extra[open] .character-option-skills {
+    margin: 0.35rem 0 0;
+}
+.character-option-extra[open] .character-option-limits {
     margin: 0.35rem 0 0;
 }
 .starter-equipment-heading {

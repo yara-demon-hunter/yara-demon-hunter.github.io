@@ -34,13 +34,13 @@ window.YaraRpgData.characters = Object.freeze([
             pt: "Sobrevivente atento, acostumado a resistir aos perigos da floresta.",
             en: "A watchful survivor, used to enduring the forest's dangers."
         },
-        specialty: {
+        basicStats: {
             evasion: 5,
             maxFoco: 30,
             stunChance: 2
         },
-        // Ajuste estes valores para definir como Zeph evolui a cada nível.
-        levelUp: {
+        // Each levelup
+        progression: {
             maxHp: 15,
             maxFoco: 15,
             maxPotions: 1,
@@ -53,7 +53,9 @@ window.YaraRpgData.characters = Object.freeze([
         skills: {
             heavyAttack: { focoCost: 10, attackMultiplier: 1.5 },
             parry: { focoCost: 15, bonus: 5 },
-            dodge: { focoCost: 5, bonus: 10 },
+            dodge: { focoCost: 5, bonus: 10 }
+        },
+        limits: {
             maxEvasion: 70,
             maxParry: 45,
             maxStunChance: 40,
@@ -70,13 +72,12 @@ window.YaraRpgData.characters = Object.freeze([
             pt: "Caçador implacável que prefere encerrar uma luta com um golpe forte.",
             en: "A relentless hunter who prefers to end a fight with a powerful blow."
         },
-        specialty: {
+        basicStats: {
             atk: 4,
             def: 2,
             parry: 5
         },
-        // Ajuste estes valores para definir como Oskar evolui a cada nível.
-        levelUp: {
+        progression: {
             maxHp: 25,
             maxFoco: 5,
             maxPotions: 1,
@@ -89,7 +90,9 @@ window.YaraRpgData.characters = Object.freeze([
         skills: {
             heavyAttack: { focoCost: 25, attackMultiplier: 1.7 },
             parry: { focoCost: 10, bonus: 10 },
-            dodge: { focoCost: 30, bonus: 5 },
+            dodge: { focoCost: 30, bonus: 5 }
+        },
+        limits: {
             maxEvasion: 40,
             maxParry: 65,
             maxStunChance: 30,
@@ -106,12 +109,12 @@ window.YaraRpgData.characters = Object.freeze([
             pt: "Caçadora de demônios mestiça, dividida entre sua natureza humana e o poder demoníaco.",
             en: "A half-demon hunter, caught between her human nature and demonic power."
         },
-        specialty: {
+        basicStats: {
             evasion: 5,
             parry: 2,
             stunChance:2
         },
-        levelUp: {
+        progression: {
             maxHp: 10,
             maxFoco: 10,
             maxPotions: 1,
@@ -122,9 +125,11 @@ window.YaraRpgData.characters = Object.freeze([
             stunChance: 2
         },
         skills: {
-            heavyAttack: { focoCost: 15, attackMultiplier: 1.6 },
-            parry: { focoCost: 15, bonus: 8 },
-            dodge: { focoCost: 10, bonus: 8 },
+            heavyAttack: { focoCost: 15, attackMultiplier: 2.0 },
+            parry: { focoCost: 10, bonus: 5 },
+            dodge: { focoCost: 10, bonus: 5 }
+        },
+        limits: {
             maxEvasion: 65,
             maxParry: 65,
             maxStunChance: 45,

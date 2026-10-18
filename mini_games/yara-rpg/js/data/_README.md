@@ -2,7 +2,7 @@
 
 Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica fica nos sistemas em `../systems/` e na integração/interface em `../game.js`.
 
-- `characters.js`: atributos-base compartilhados, elenco selecionável, descrições, bônus de especialidade e ganhos por nível (ajuste `levelUp` individualmente em cada personagem).
+- `characters.js`: atributos-base compartilhados e dados de cada personagem. Cada personagem separa `basicStats` (bônus iniciais somados aos atributos compartilhados), `progression` (ganhos por nível), `skills` (ações especiais) e `limits` (tetos de esquiva, aparo e stun, além do limiar mínimo de fúria).
 - `items.js`: poção de cura e catálogo de equipamentos que podem cair dos monstros.
 - `regions.js`: IDs, títulos, descrições e eventos com escolhas por região em português e inglês. Cada região pode ter vários eventos; eles aparecem sem repetição até o conjunto se esgotar.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.

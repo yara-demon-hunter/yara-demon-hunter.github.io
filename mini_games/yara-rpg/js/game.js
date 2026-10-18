@@ -74,7 +74,7 @@ const RPG_LOG_MAX_ENTRIES = 100;
 
 const DEFAULT_CHARACTER = GAME_DATA.characters[0];
 let selectedCharacter = DEFAULT_CHARACTER;
-let selectedCharacterProgression = selectedCharacter.levelUp;
+let selectedCharacterProgression = selectedCharacter.progression;
 
 const hero = {
     name: DEFAULT_CHARACTER.name,
@@ -132,7 +132,7 @@ let musicEnabled = false;
 // ---------- 4) Fluxo principal ----------
 function startAdventure({ character, equipment }) {
     selectedCharacter = character;
-    selectedCharacterProgression = character.levelUp;
+    selectedCharacterProgression = character.progression;
 
     // Reset de campanha
     currentRegion = 0;
@@ -178,7 +178,7 @@ function startAdventure({ character, equipment }) {
     });
     regionEntryLevels[GAME_DATA.regions[0].id] = hero.level;
 
-    Object.entries(character.specialty).forEach(([stat, amount]) => {
+    Object.entries(character.basicStats).forEach(([stat, amount]) => {
         hero[stat] += amount;
     });
     equipment.forEach((item) => { hero.equipment[item.slot] = item; });
@@ -213,9 +213,9 @@ function checkLevelUp() {
         hero.maxPotions = Math.min(ITEM_DATA.healingPotion.maxCapacity, hero.maxPotions + growth.maxPotions);
         hero.atk += growth.atk;
         hero.def += growth.def;
-        hero.evasion = Math.min(selectedCharacter.skills.maxEvasion, hero.evasion + growth.evasion);
-        hero.parry = Math.min(selectedCharacter.skills.maxParry, hero.parry + growth.parry);
-        hero.stunChance = Math.min(selectedCharacter.skills.maxStunChance, hero.stunChance + growth.stunChance);
+        hero.evasion = Math.min(selectedCharacter.limits.maxEvasion, hero.evasion + growth.evasion);
+        hero.parry = Math.min(selectedCharacter.limits.maxParry, hero.parry + growth.parry);
+        hero.stunChance = Math.min(selectedCharacter.limits.maxStunChance, hero.stunChance + growth.stunChance);
 
         hero.skillPoints = (Number(hero.skillPoints) || 0) + SKILL_POINTS_PER_LEVEL;
 

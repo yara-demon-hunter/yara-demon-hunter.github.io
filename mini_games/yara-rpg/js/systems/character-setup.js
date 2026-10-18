@@ -3,7 +3,7 @@ window.YaraRpgCharacterSetup = (() => {
     const EQUIPMENT_DATA = window.YaraRpgData.items.equipment.filter((item) => item.starter === true);
     const EQUIPMENT_BY_ID = new Map(EQUIPMENT_DATA.map((item) => [item.id, item]));
     const SELECTION_LIMIT = window.YaraRpgData.setup.starterEquipmentCount;
-    const SPECIALTY_STAT_KEYS = Object.freeze({
+    const BASIC_STAT_KEYS = Object.freeze({
         maxHp: "hpStat",
         maxFoco: "focusStat",
         atk: "attackStat",
@@ -12,7 +12,7 @@ window.YaraRpgCharacterSetup = (() => {
         parry: "parryStat",
         stunChance: "stun"
     });
-    const LEVEL_UP_STAT_KEYS = Object.freeze({
+    const PROGRESSION_STAT_KEYS = Object.freeze({
         maxHp: "hpStat",
         maxFoco: "focusStat",
         maxPotions: "potions",
@@ -68,12 +68,12 @@ window.YaraRpgCharacterSetup = (() => {
             description.className = "character-option-description";
             description.textContent = character.description[document.documentElement.lang.startsWith("en") ? "en" : "pt"];
 
-            const specialty = document.createElement("span");
-            specialty.className = "character-option-specialty";
-            specialty.textContent = Object.entries(character.specialty)
+            const basicStats = document.createElement("p");
+            basicStats.className = "character-option-specialty";
+            basicStats.textContent = `${translate("basicStatsSummary")}: ${Object.entries(character.basicStats)
                 .map(([stat, amount]) => {
-                    const statKey = SPECIALTY_STAT_KEYS[stat];
-                    if (!statKey) throw new Error(`Unknown character specialty stat: ${stat}`);
+                    const statKey = BASIC_STAT_KEYS[stat];
+                    if (!statKey) throw new Error(`Unknown character basic stat: ${stat}`);
                     const formattedAmount = PERCENTAGE_SPECIALTY_STATS.has(stat)
                         ? `${amount}%`
                         : amount;
@@ -82,14 +82,14 @@ window.YaraRpgCharacterSetup = (() => {
                         amount: formattedAmount
                     });
                 })
-                .join(" · ");
+                .join(" · ")}`;
 
             const progression = document.createElement("p");
             progression.className = "character-option-progression";
-            progression.textContent = `${translate("levelUpSummary")}: ${Object.entries(character.levelUp)
+            progression.textContent = `${translate("progressionSummary")}: ${Object.entries(character.progression)
                 .filter(([stat]) => stat !== "evasionLimit")
                 .map(([stat, amount]) => {
-                    const statKey = LEVEL_UP_STAT_KEYS[stat];
+                    const statKey = PROGRESSION_STAT_KEYS[stat];
                     if (!statKey) throw new Error(`Unknown level-up stat: ${stat}`);
                     const formattedAmount = PERCENTAGE_SPECIALTY_STATS.has(stat)
                         ? `${amount}%`
@@ -103,7 +103,7 @@ window.YaraRpgCharacterSetup = (() => {
 
             const skills = document.createElement("p");
             skills.className = "character-option-skills";
-            skills.textContent = [
+            skills.textContent = `${translate("skillsSummary")}: ${[
                 translate("heavySkillSummary", {
                     cost: character.skills.heavyAttack.focoCost,
                     damage: character.skills.heavyAttack.attackMultiplier
@@ -116,19 +116,24 @@ window.YaraRpgCharacterSetup = (() => {
                     cost: character.skills.dodge.focoCost,
                     bonus: character.skills.dodge.bonus
                 }),
-                translate("skillLimitsSummary", {
-                    evasion: character.skills.maxEvasion,
-                    parry: character.skills.maxParry
-                })
-            ].join(" · ");
+            ].join(" · ")}`;
+
+            const limits = document.createElement("p");
+            limits.className = "character-option-limits";
+            limits.textContent = translate("skillLimitsSummary", {
+                evasion: character.limits.maxEvasion,
+                parry: character.limits.maxParry,
+                stun: character.limits.maxStunChance,
+                fury: character.limits.minFuryThreshold
+            });
 
             const extraInfo = document.createElement("details");
             extraInfo.className = "character-option-extra";
             const extraInfoSummary = document.createElement("summary");
             extraInfoSummary.textContent = translate("characterExtraInfo");
-            extraInfo.append(extraInfoSummary, progression, skills);
+            extraInfo.append(extraInfoSummary, basicStats, progression, skills, limits);
 
-            selectButton.append(portrait, name, description, specialty);
+            selectButton.append(portrait, name, description, basicStats.cloneNode(true));
             selectButton.addEventListener("click", () => {
                 selectedCharacterId = character.id;
                 renderCharacters();

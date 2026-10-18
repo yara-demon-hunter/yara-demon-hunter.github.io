@@ -33,10 +33,10 @@ function getMaxUpgradeQuantity(upgrade, overrideConfiguration = UPGRADE_CONFIG[u
 function getUpgradeConfiguration(upgrade) {
     const configuration = UPGRADE_CONFIG[upgrade];
     if (!configuration) return null;
-    if (upgrade === 'parry') return { ...configuration, max: selectedCharacter.skills.maxParry };
-    if (upgrade === 'evasion') return { ...configuration, max: selectedCharacter.skills.maxEvasion };
-    if (upgrade === 'stun') return { ...configuration, max: selectedCharacter.skills.maxStunChance };
-    if (upgrade === 'fury') return { ...configuration, min: selectedCharacter.skills.minFuryThreshold };
+    if (upgrade === 'parry') return { ...configuration, max: selectedCharacter.limits.maxParry };
+    if (upgrade === 'evasion') return { ...configuration, max: selectedCharacter.limits.maxEvasion };
+    if (upgrade === 'stun') return { ...configuration, max: selectedCharacter.limits.maxStunChance };
+    if (upgrade === 'fury') return { ...configuration, min: selectedCharacter.limits.minFuryThreshold };
     return configuration;
 }
 

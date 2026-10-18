@@ -44,13 +44,13 @@ function updateUI() {
     document.getElementById('quick-attack-label').innerText = t(furyReady ? 'criticalAttack' : 'quickAttack');
     document.getElementById('hero-atk').innerText = getEffectiveStat('atk');
     document.getElementById('hero-def').innerText = getEffectiveStat('def');
-    const effectiveEvasion = Math.min(selectedCharacter.skills.maxEvasion, getEffectiveStat('evasion'));
-    const effectiveParry = Math.min(selectedCharacter.skills.maxParry, getEffectiveStat('parry'));
+    const effectiveEvasion = Math.min(selectedCharacter.limits.maxEvasion, getEffectiveStat('evasion'));
+    const effectiveParry = Math.min(selectedCharacter.limits.maxParry, getEffectiveStat('parry'));
     const effectiveStunChance = Math.min(
-        selectedCharacter.skills.maxStunChance,
+        selectedCharacter.limits.maxStunChance,
         getEffectiveStat('stunChance')
     );
-    const evasionTotal = Math.min(selectedCharacter.skills.maxEvasion, effectiveEvasion + hero.evasionBonus);
+    const evasionTotal = Math.min(selectedCharacter.limits.maxEvasion, effectiveEvasion + hero.evasionBonus);
     const evasionDisplay = document.getElementById('hero-evasion');
     const evasionBonusDisplay = document.getElementById('hero-evasion-bonus');
     document.getElementById('hero-evasion-base').innerText = effectiveEvasion + '%';
@@ -61,7 +61,7 @@ function updateUI() {
     evasionDisplay.setAttribute('aria-label', hero.evasionBonus
         ? `${effectiveEvasion}% + ${hero.evasionBonus}% = ${evasionTotal}%`
         : `${effectiveEvasion}%`);
-    const parryTotal = Math.min(selectedCharacter.skills.maxParry, effectiveParry + hero.parryBonus);
+    const parryTotal = Math.min(selectedCharacter.limits.maxParry, effectiveParry + hero.parryBonus);
     const parryDisplay = document.getElementById('hero-parry');
     const parryBonusDisplay = document.getElementById('hero-parry-bonus');
     document.getElementById('hero-parry-base').innerText = effectiveParry + '%';
@@ -71,7 +71,7 @@ function updateUI() {
         ? `${effectiveParry}% + ${hero.parryBonus}% = ${parryTotal}%`
         : `${effectiveParry}%`);
     const stunBonus = hero.fury >= furyThreshold ? CRITICAL_STUN_BONUS : 0;
-    const stunChanceTotal = Math.min(selectedCharacter.skills.maxStunChance, effectiveStunChance + stunBonus);
+    const stunChanceTotal = Math.min(selectedCharacter.limits.maxStunChance, effectiveStunChance + stunBonus);
     const stunBonusDisplay = document.getElementById('hero-stun-bonus');
     const stunDisplay = document.getElementById('hero-stun');
     document.getElementById('hero-stun-base').innerText = effectiveStunChance + '%';
@@ -214,10 +214,10 @@ function updateUI() {
         });
     });
     document.getElementById('dodge-button').disabled = dodgeSkillUsedThisCombat
-        || evasionTotal >= selectedCharacter.skills.maxEvasion
+        || evasionTotal >= selectedCharacter.limits.maxEvasion
         || hero.foco < selectedCharacter.skills.dodge.focoCost;
     document.getElementById('parry-button').disabled = parrySkillUsedThisCombat
-        || parryTotal >= selectedCharacter.skills.maxParry
+        || parryTotal >= selectedCharacter.limits.maxParry
         || hero.foco < selectedCharacter.skills.parry.focoCost;
     const runButton = document.getElementById('run-button');
     if (runButton) {
@@ -270,11 +270,11 @@ function updateUI() {
     document.querySelectorAll('#controls-combat button').forEach((button) => {
         const disabledByGameState = (button.id === 'dodge-button' && (
             dodgeSkillUsedThisCombat
-            || evasionTotal >= selectedCharacter.skills.maxEvasion
+            || evasionTotal >= selectedCharacter.limits.maxEvasion
             || hero.foco < selectedCharacter.skills.dodge.focoCost
         )) || (button.id === 'parry-button' && (
             parrySkillUsedThisCombat
-            || parryTotal >= selectedCharacter.skills.maxParry
+            || parryTotal >= selectedCharacter.limits.maxParry
             || hero.foco < selectedCharacter.skills.parry.focoCost
         )) || (button.id === 'run-button' && currentMonster?.isUnescapable);
         button.disabled = combatActionLocked || disabledByGameState;

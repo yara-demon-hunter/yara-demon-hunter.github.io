@@ -25,7 +25,7 @@ function readSavedGame() {
 function loadSavedGame(snapshot = readSavedGame()) {
     if (!snapshot) return false;
     selectedCharacter = GAME_DATA.characters.find((character) => character.id === snapshot.characterId);
-    selectedCharacterProgression = selectedCharacter.levelUp;
+    selectedCharacterProgression = selectedCharacter.progression;
     Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
     // Migração: saves antigos não têm skillPoints
     hero.skillPoints = Number(snapshot.hero?.skillPoints ?? DEFAULT_CHARACTER.baseStats.skillPoints ?? 0) || 0;
