@@ -1,7 +1,7 @@
 // Combat actions, enemy turns, upgrades, rewards, and journey endings.
 // Loaded as a classic script before game.js; shares the RPG global state.
 
-function showFloatingDamage(targetId, damage, targetType) {
+function showFloatingDamage(targetId, damage, targetType, delayMs = 0, verticalOffset = 0) {
     const target = document.getElementById(targetId);
     if (!target || damage <= 0) return;
 
@@ -9,8 +9,10 @@ function showFloatingDamage(targetId, damage, targetType) {
     damageNumber.className = `floating-damage floating-damage-${targetType}`;
     damageNumber.textContent = `−${damage}`;
     damageNumber.setAttribute('aria-hidden', 'true');
+    damageNumber.style.animationDelay = `${delayMs}ms`;
+    damageNumber.style.setProperty('--floating-damage-offset', `${verticalOffset}rem`);
     target.append(damageNumber);
-    window.setTimeout(() => damageNumber.remove(), 950);
+    window.setTimeout(() => damageNumber.remove(), 1800 + delayMs);
 }
 
 function applyMonsterParry(damage) {
@@ -68,7 +70,7 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
         const reducedOffHandDamage = applyMonsterParry(offHandDamage);
         offHandDamageDealt = Math.min(currentMonster.hp, reducedOffHandDamage);
         currentMonster.hp -= offHandDamageDealt;
-        showFloatingDamage('monster-icon', offHandDamageDealt, 'monster');
+        showFloatingDamage('monster-icon', offHandDamageDealt, 'monster', 240, 0.75);
     }
     const totalDamageDealt = damageDealt + offHandDamageDealt;
     const furyGained = Math.min(getEffectiveFuryThreshold() - hero.fury, Math.floor(totalDamageDealt * furyMultiplier));

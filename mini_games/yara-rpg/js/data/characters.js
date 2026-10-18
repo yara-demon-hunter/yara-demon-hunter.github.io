@@ -35,9 +35,9 @@ window.YaraRpgData.characters = Object.freeze([
             en: "A watchful survivor, used to enduring the forest's dangers."
         },
         specialty: {
-            evasion: 10,
-            maxFoco: 50,
-            stunChance: 5
+            evasion: 5,
+            maxFoco: 30,
+            stunChance: 2
         },
         // Ajuste estes valores para definir como Zeph evolui a cada nível.
         levelUp: {
@@ -56,7 +56,7 @@ window.YaraRpgData.characters = Object.freeze([
             dodge: { focoCost: 5, bonus: 10 },
             maxEvasion: 70,
             maxParry: 45,
-            maxStunChance: 55,
+            maxStunChance: 40,
             minFuryThreshold: 50
         }
     },
@@ -71,9 +71,9 @@ window.YaraRpgData.characters = Object.freeze([
             en: "A relentless hunter who prefers to end a fight with a powerful blow."
         },
         specialty: {
-            atk: 5,
+            atk: 4,
             def: 2,
-            parry: 10
+            parry: 5
         },
         // Ajuste estes valores para definir como Oskar evolui a cada nível.
         levelUp: {
@@ -94,6 +94,41 @@ window.YaraRpgData.characters = Object.freeze([
             maxParry: 65,
             maxStunChance: 30,
             minFuryThreshold: 60
+        }
+    },
+    {
+        id: "yara",
+        name: "Yara",
+        image: "images/characters/yara.png",
+        icon: "🗡️",
+        baseStats: BASE_CHARACTER_STATS,
+        description: {
+            pt: "Caçadora de demônios mestiça, dividida entre sua natureza humana e o poder demoníaco.",
+            en: "A half-demon hunter, caught between her human nature and demonic power."
+        },
+        specialty: {
+            evasion: 5,
+            parry: 2,
+            stunChance:2
+        },
+        levelUp: {
+            maxHp: 10,
+            maxFoco: 10,
+            maxPotions: 1,
+            atk: 0,
+            def: 0,
+            evasion: 2,
+            parry: 2,
+            stunChance: 2
+        },
+        skills: {
+            heavyAttack: { focoCost: 15, attackMultiplier: 1.6 },
+            parry: { focoCost: 15, bonus: 8 },
+            dodge: { focoCost: 10, bonus: 8 },
+            maxEvasion: 65,
+            maxParry: 65,
+            maxStunChance: 45,
+            minFuryThreshold: 40
         }
     }
 ]);
