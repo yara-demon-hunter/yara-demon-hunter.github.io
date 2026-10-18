@@ -80,9 +80,6 @@ window.YaraRpgCharacterSetup = (() => {
             description.className = "character-option-description";
             description.textContent = character.description[document.documentElement.lang.startsWith("en") ? "en" : "pt"];
 
-            const basicStatsSection = createDetailsSection("basicStatsSummary", "character-option-basic-stats");
-            appendStatList(basicStatsSection, character.basicStats, BASIC_STAT_KEYS);
-
             const progression = createDetailsSection("progressionSummary", "character-option-progression");
             appendStatList(progression, character.progression, PROGRESSION_STAT_KEYS);
 
@@ -136,7 +133,7 @@ window.YaraRpgCharacterSetup = (() => {
             extraInfo.className = "character-option-extra";
             const extraInfoSummary = document.createElement("summary");
             extraInfoSummary.textContent = translate("characterExtraInfo");
-            extraInfo.append(extraInfoSummary, basicStatsSection, progression, skills, limits);
+            extraInfo.append(extraInfoSummary, progression, skills, limits);
 
             selectButton.append(portrait, name, description, basicStatsSummary);
             selectButton.addEventListener("click", () => {

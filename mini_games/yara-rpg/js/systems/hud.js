@@ -169,17 +169,32 @@ function updateUI() {
     const mistContactCard = document.getElementById('mist-contact-card');
     const campButton = document.getElementById('camp-button');
     document.querySelector('[data-i18n="campCost"]').innerText = t('campCost', { cost: CAMP_COST });
-    document.querySelector('[data-i18n="focusCost"]').innerText = t('focusCost', {
-        cost: selectedCharacter.skills.heavyAttack.focoCost
-    });
-    document.querySelector('[data-i18n="parryBonus"]').innerText = t('parryBonus', {
-        bonus: selectedCharacter.skills.parry.bonus,
-        cost: selectedCharacter.skills.parry.focoCost
-    });
-    document.querySelector('[data-i18n="dodgeBonus"]').innerText = t('dodgeBonus', {
-        bonus: selectedCharacter.skills.dodge.bonus,
-        cost: selectedCharacter.skills.dodge.focoCost
-    });
+    const heavyAttackSkill = selectedCharacter.skills.heavyAttack;
+    const parrySkill = selectedCharacter.skills.parry;
+    const dodgeSkill = selectedCharacter.skills.dodge;
+    const heavyAttackButton = document.querySelector('[data-i18n="focusCost"]').closest('button');
+    const parryButton = document.getElementById('parry-button');
+    const dodgeButton = document.getElementById('dodge-button');
+    heavyAttackButton.hidden = !heavyAttackSkill;
+    parryButton.hidden = !parrySkill;
+    dodgeButton.hidden = !dodgeSkill;
+    if (heavyAttackSkill) {
+        document.querySelector('[data-i18n="focusCost"]').innerText = t('focusCost', {
+            cost: heavyAttackSkill.focoCost
+        });
+    }
+    if (parrySkill) {
+        document.querySelector('[data-i18n="parryBonus"]').innerText = t('parryBonus', {
+            bonus: parrySkill.bonus,
+            cost: parrySkill.focoCost
+        });
+    }
+    if (dodgeSkill) {
+        document.querySelector('[data-i18n="dodgeBonus"]').innerText = t('dodgeBonus', {
+            bonus: dodgeSkill.bonus,
+            cost: dodgeSkill.focoCost
+        });
+    }
     document.querySelectorAll('[data-upgrade]').forEach((button) => {
         const upgrade = button.dataset.upgrade;
         const upgradeConfiguration = getUpgradeConfiguration(upgrade);
@@ -213,12 +228,12 @@ function updateUI() {
             }
         });
     });
-    document.getElementById('dodge-button').disabled = dodgeSkillUsedThisCombat
+    dodgeButton.disabled = !dodgeSkill || dodgeSkillUsedThisCombat
         || evasionTotal >= selectedCharacter.limits.maxEvasion
-        || hero.foco < selectedCharacter.skills.dodge.focoCost;
-    document.getElementById('parry-button').disabled = parrySkillUsedThisCombat
+        || hero.foco < (dodgeSkill?.focoCost ?? 0);
+    parryButton.disabled = !parrySkill || parrySkillUsedThisCombat
         || parryTotal >= selectedCharacter.limits.maxParry
-        || hero.foco < selectedCharacter.skills.parry.focoCost;
+        || hero.foco < (parrySkill?.focoCost ?? 0);
     const runButton = document.getElementById('run-button');
     if (runButton) {
         runButton.title = currentMonster?.isUnescapable ? t('finalBossNoEscape') : '';
@@ -269,13 +284,17 @@ function updateUI() {
     });
     document.querySelectorAll('#controls-combat button').forEach((button) => {
         const disabledByGameState = (button.id === 'dodge-button' && (
+            !selectedCharacter.skills.dodge
+            ||
             dodgeSkillUsedThisCombat
             || evasionTotal >= selectedCharacter.limits.maxEvasion
-            || hero.foco < selectedCharacter.skills.dodge.focoCost
+            || hero.foco < (selectedCharacter.skills.dodge?.focoCost ?? 0)
         )) || (button.id === 'parry-button' && (
+            !selectedCharacter.skills.parry
+            ||
             parrySkillUsedThisCombat
             || parryTotal >= selectedCharacter.limits.maxParry
-            || hero.foco < selectedCharacter.skills.parry.focoCost
+            || hero.foco < (selectedCharacter.skills.parry?.focoCost ?? 0)
         )) || (button.id === 'run-button' && currentMonster?.isUnescapable);
         button.disabled = combatActionLocked || disabledByGameState;
     });

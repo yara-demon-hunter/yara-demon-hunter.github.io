@@ -128,7 +128,7 @@ function combatQuickAttack() {
 
 // NOVO GOLPE: Estocada Pesada (Gasta Foco, dano alto)
 function combatHeavyAttack() {
-    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
+    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked || !selectedCharacter.skills.heavyAttack) return;
     const attackRules = { ...GAME_RULES.combat.heavyAttack, ...selectedCharacter.skills.heavyAttack };
     if (hero.foco < attackRules.focoCost) {
         logMessage(t("noFocus"));
@@ -188,7 +188,7 @@ function combatCriticalAttack() {
 
 // NOVO GOLPE: Postura Firme (Aumenta defesa e recupera foco)
 function combatDefend() {
-    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
+    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked || !selectedCharacter.skills.parry) return;
     const bonusGained = Math.min(
         selectedCharacter.skills.parry.bonus,
         selectedCharacter.limits.maxParry - getEffectiveStat('parry') - hero.parryBonus
@@ -214,7 +214,7 @@ function combatDefend() {
 }
 
 function combatDodge() {
-    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked) return;
+    if (!inCombat || !currentMonster || campaignComplete || combatActionLocked || !selectedCharacter.skills.dodge) return;
     const bonusGained = Math.min(
         selectedCharacter.skills.dodge.bonus,
         selectedCharacter.limits.maxEvasion - getEffectiveStat('evasion') - hero.evasionBonus

@@ -52,7 +52,6 @@ window.YaraRpgData.characters = Object.freeze([
         },
         skills: {
             heavyAttack: { focoCost: 10, attackMultiplier: 1.5 },
-            parry: { focoCost: 15, bonus: 5 },
             dodge: { focoCost: 5, bonus: 10 }
         },
         limits: {
@@ -90,8 +89,7 @@ window.YaraRpgData.characters = Object.freeze([
         },
         skills: {
             heavyAttack: { focoCost: 25, attackMultiplier: 1.7 },
-            parry: { focoCost: 10, bonus: 10 },
-            dodge: { focoCost: 30, bonus: 5 }
+            parry: { focoCost: 10, bonus: 10 }
         },
         limits: {
             maxEvasion: 40,
