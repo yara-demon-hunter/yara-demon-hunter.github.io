@@ -1,27 +1,9 @@
 // Combat actions, enemy turns, upgrades, rewards, and journey endings.
 // Loaded as a classic script before game.js; shares the RPG global state.
 
-const COMBAT_TURN_TIMING = {
-    enemyResponseDelay: 300,
-    actionRecoveryDelay: 250
-};
-
 function queueMonsterAttackTurn() {
     if (!inCombat || !currentMonster || !combatActionLocked) return;
-    const encounterId = combatEncounterId;
-    updateUI();
-    window.setTimeout(() => {
-        if (encounterId !== combatEncounterId || !inCombat || !combatActionLocked) return;
-        monsterAttackTurn();
-    }, COMBAT_TURN_TIMING.enemyResponseDelay);
-}
-
-function queueCombatActionUnlock(encounterId) {
-    window.setTimeout(() => {
-        if (encounterId !== combatEncounterId || !inCombat) return;
-        combatActionLocked = false;
-        updateUI();
-    }, COMBAT_TURN_TIMING.actionRecoveryDelay);
+    monsterAttackTurn();
 }
 
 function showFloatingDamage(targetId, damage, targetType, delayMs = 0, verticalOffset = 0) {
@@ -356,8 +338,8 @@ function checkCombatProgress(monsterStunned = false) {
         return;
     }
     if (monsterStunned) {
+        combatActionLocked = false;
         updateUI();
-        queueCombatActionUnlock(combatEncounterId);
         return;
     }
     queueMonsterAttackTurn();
@@ -379,7 +361,8 @@ function monsterAttackTurn() {
         hero.fury += furyGained;
         logMessage(t("heroDodges", { monster: currentMonster.name, amount: furyGained }), "special");
         if (encounterId !== combatEncounterId || !inCombat) return;
-        queueCombatActionUnlock(encounterId);
+        combatActionLocked = false;
+        updateUI();
         return;
     }
 
@@ -417,5 +400,6 @@ function monsterAttackTurn() {
         enemyTelegraphing = true;
         logMessage(t('enemyTelegraph', { monster: currentMonster.name }), 'combat-monster');
     }
-    queueCombatActionUnlock(encounterId);
+    combatActionLocked = false;
+    updateUI();
 }

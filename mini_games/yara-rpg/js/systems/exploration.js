@@ -465,7 +465,7 @@ function spawnMonster(templateOverride = null) {
     const monsterIcon = document.getElementById('monster-icon');
     const encounterCard = document.getElementById('encounter-card');
     encounterCard.classList.remove('monster-defeat-transition');
-    encounterCard.classList.toggle('mist-contact-monster', currentMonster.isMistBoss);
+    encounterCard.classList.remove('mist-contact-monster');
     clearMonsterStunEffect();
     monsterIcon.classList.remove('critical-impact');
     monsterIcon.style.removeProperty('filter');
