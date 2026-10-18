@@ -86,6 +86,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
     powers: [
         {
             id: "mist-blade",
+            icon: "🗡️",
             name: {
                 pt: "Lâmina da Névoa",
                 en: "Mist Blade"
@@ -99,6 +100,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "iron-heart",
+            icon: "❤️",
             name: {
                 pt: "Coração de Ferro",
                 en: "Iron Heart"
@@ -113,6 +115,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "stone-skin",
+            icon: "🪨",
             name: {
                 pt: "Pele de Pedra",
                 en: "Stone Skin"
@@ -126,6 +129,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "swift-step",
+            icon: "💨",
             name: {
                 pt: "Passo Veloz",
                 en: "Swift Step"
@@ -140,6 +144,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "spectral-parry",
+            icon: "🛡️",
             name: {
                 pt: "Aparo Espectral",
                 en: "Spectral Parry"

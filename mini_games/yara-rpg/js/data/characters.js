@@ -36,6 +36,13 @@ window.YaraRpgData.characters = Object.freeze([
             pt: "Sobrevivente atento, acostumado a resistir aos perigos da floresta.",
             en: "A watchful survivor, used to enduring the forest's dangers."
         },
+        passive: {
+            id: "zeph-inner-reserve",
+            icon: "🔷",
+            name: { pt: "Reserva interior", en: "Inner Reserve" },
+            description: { pt: "+15% de Foco máximo.", en: "+15% maximum Focus." },
+            statBonusPercent: { maxFoco: 15 }
+        },
         basicStats: {
             evasion: 5,
             maxFoco: 30,
@@ -76,6 +83,13 @@ window.YaraRpgData.characters = Object.freeze([
             pt: "Caçador implacável que prefere encerrar uma luta com um golpe forte.",
             en: "A relentless hunter who prefers to end a fight with a powerful blow."
         },
+        passive: {
+            id: "oskar-predator-strength",
+            icon: "💪",
+            name: { pt: "Força predadora", en: "Predator Strength" },
+            description: { pt: "+5% de Ataque total.", en: "+5% total Attack." },
+            statBonusPercent: { atk: 5 }
+        },
         basicStats: {
             atk: 4,
             def: 2,
@@ -114,6 +128,13 @@ window.YaraRpgData.characters = Object.freeze([
         description: {
             pt: "Caçadora de demônios mestiça, dividida entre sua natureza humana e o poder demoníaco.",
             en: "A half-demon hunter, caught between her human nature and demonic power."
+        },
+        passive: {
+            id: "yara-evasive-fury",
+            icon: "🌪️",
+            name: { pt: "Fúria evasiva", en: "Evasive Fury" },
+            description: { pt: "+5 de Fúria cada vez que esquiva de um ataque.", en: "+5 Fury each time she evades an attack." },
+            furyPerDodgeBonus: 5
         },
         basicStats: {
             evasion: 5,

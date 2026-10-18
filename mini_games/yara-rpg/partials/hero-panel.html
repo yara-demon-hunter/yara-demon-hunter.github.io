@@ -104,13 +104,12 @@
                                 <span id="hero-critical-chance" class="font-bold text-amber-300 text-sm">30%</span>
                             </div>
                         </div>
-                        <div class="hero-mist-powers mt-3 rounded-lg border border-purple-900/50 bg-purple-950/30 p-3">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-xs font-medium text-purple-200" data-i18n="mistPowers">Poderes da Névoa</span>
-                                <span class="text-[10px] uppercase tracking-wide text-purple-300/70" data-i18n="passiveSkill">Passivas</span>
-                            </div>
-                            <ul id="mist-power-list" class="mt-1 space-y-1 text-[11px] text-purple-100/80" aria-live="polite"></ul>
-                        </div>
+                        <section class="mist-passives-section" aria-labelledby="mist-passives-heading">
+                            <h3 id="mist-passives-heading" class="mist-passives-heading" data-i18n="passiveSkill">Passivas</h3>
+                            <div class="mist-passives-divider" aria-hidden="true"></div>
+                            <p id="mist-powers-empty" class="mist-powers-empty" data-i18n="noMistPowers">Você não tem poderes passivos.</p>
+                            <div id="mist-power-icons" class="mist-power-icons" role="group" data-i18n-aria="passiveSkill" aria-label="Passivas"></div>
+                        </section>
                 </details>
             </div>
         </section>

@@ -87,25 +87,25 @@ function updateUI() {
     });
     renderEquipment();
     const unlockedPowers = MIST_CONTACT_DATA.powers.filter((power) => hero.mistPowers.includes(power.id));
-    const mistPowerList = document.getElementById('mist-power-list');
-    mistPowerList.replaceChildren();
-    if (!unlockedPowers.length) {
-        const emptyState = document.createElement('li');
-        emptyState.textContent = t('noMistPowers');
-        mistPowerList.append(emptyState);
-    } else {
-        unlockedPowers.forEach((power) => {
-            const entry = document.createElement('li');
-            const name = document.createElement('strong');
-            const description = document.createElement('span');
-            name.className = 'text-purple-100';
-            name.textContent = power.name[gameLanguage];
-            description.className = 'ml-1 text-purple-200/70';
-            description.textContent = `— ${power.description[gameLanguage]}`;
-            entry.append(name, description);
-            mistPowerList.append(entry);
-        });
-    }
+    const passiveSkills = [selectedCharacter.passive, ...unlockedPowers].filter(Boolean);
+    const mistPowerIcons = document.getElementById('mist-power-icons');
+    const mistPowersEmpty = document.getElementById('mist-powers-empty');
+    mistPowerIcons.replaceChildren();
+    mistPowersEmpty.hidden = passiveSkills.length > 0;
+    passiveSkills.forEach((power) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'mist-power-icon-button';
+        button.textContent = power.icon || '✧';
+        button.setAttribute('aria-label', t('passiveButtonAria', {
+            name: power.name[gameLanguage],
+            description: power.description[gameLanguage]
+        }));
+        button.title = `${power.name[gameLanguage]} — ${power.description[gameLanguage]}`;
+        button.setAttribute('aria-haspopup', 'dialog');
+        button.addEventListener('click', () => showPassiveDetails(power.id));
+        mistPowerIcons.append(button);
+    });
     const currentRegionData = GAME_DATA.regions[currentRegion];
     const finalBossGateActive = currentRegion === GAME_DATA.regions.length - 1
         && !inCombat && !gameOver && !campaignComplete
@@ -391,6 +391,27 @@ function openRegionObjectives() {
 
 function closeRegionObjectives() {
     const dialog = document.getElementById('region-objectives-dialog');
+    if (dialog.open) dialog.close();
+}
+
+function showPassiveDetails(passiveId) {
+    const characterPassive = selectedCharacter.passive?.id === passiveId
+        ? selectedCharacter.passive
+        : null;
+    const mistPower = MIST_CONTACT_DATA.powers.find((entry) =>
+        entry.id === passiveId && hero.mistPowers.includes(entry.id)
+    );
+    const power = characterPassive || mistPower;
+    if (!power) return;
+    document.getElementById('passive-detail-title').textContent = power.name[gameLanguage];
+    document.getElementById('passive-detail-icon').textContent = power.icon || '✧';
+    document.getElementById('passive-detail-description').textContent = power.description[gameLanguage];
+    const dialog = document.getElementById('passive-detail-dialog');
+    if (!dialog.open) dialog.showModal();
+}
+
+function closePassiveDetails() {
+    const dialog = document.getElementById('passive-detail-dialog');
     if (dialog.open) dialog.close();
 }
 

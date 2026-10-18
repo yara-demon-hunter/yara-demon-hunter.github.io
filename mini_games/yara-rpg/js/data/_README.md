@@ -2,7 +2,7 @@
 
 Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica fica nos sistemas em `../systems/` e na integração/interface em `../game.js`.
 
-- `characters.js`: atributos-base compartilhados e dados de cada personagem. Cada personagem separa `basicStats` (bônus iniciais somados aos atributos compartilhados), `progression` (ganhos por nível), `skills` (ações especiais) e `limits` (tetos de esquiva, aparo e stun, além do limiar mínimo de fúria).
+- `characters.js`: atributos-base compartilhados e dados de cada personagem. Cada personagem separa `basicStats` (bônus iniciais somados aos atributos compartilhados), `progression` (ganhos por nível), `skills` (ações especiais), `passive` (passiva permanente com ícone, nome e descrição) e `limits` (tetos de esquiva, aparo e stun, além do limiar mínimo de fúria). Passivas percentuais usam `statBonusPercent`; efeitos acionados em combate declaram seu bônus, como `furyPerDodgeBonus`.
 - `items.js`: poção de cura e catálogo de equipamentos que podem cair dos monstros.
 - `regions.js`: IDs, títulos, descrições e eventos com escolhas por região em português e inglês. Cada região pode ter vários eventos; eles aparecem sem repetição até o conjunto se esgotar.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.
@@ -23,3 +23,135 @@ A lógica da tela inicial e a seleção dos equipamentos ficam em `../systems/ch
 Equipamentos em `items.js` declaram um `id`, um slot (`mainHand`, `offHand`, `head`, `body`, `legs`, `boots`, `necklace`, `ring`, `accessory` ou `pet`), nomes em português e inglês e os bônus em `stats`. Armas de uma mão usam `handUsage: "one-handed"` e podem ser movidas para a outra mão pelo detalhe do item na mochila. Armas de duas mãos usam `handUsage: "two-handed"`; equipá-las guarda o item da mão secundária na mochila. Assim é possível empunhar duas armas de uma mão ou uma arma de duas mãos. Use `itemType: "shield"` para identificar escudos e `starter: true` para oferecer um item na seleção inicial; todos os itens do catálogo podem cair dos monstros. A chance de drop, a capacidade da mochila, a distribuição das raridades, as raridades exclusivas da última região e as regras de aprimoramento até +9 ficam em `equipment-rules.js`; a lógica fica em `../systems/equipment-core.js` e a interface em `../systems/equipment-ui.js`.
 
 Os IDs em `regions.js` precisam corresponder às chaves de `monsters.byRegion` em `monsters.js`. Os arquivos de regras são partes de `YaraRpgData.rules` e devem carregar antes dos sistemas. A ordem de todos os scripts está declarada em `game.html`; mantenha `game.js` por último.
+
+## Fluxo ao clicar em Explorar
+
+O botão chama `exploreForest()` em `../systems/exploration.js`. A ordem abaixo importa: o primeiro evento que disparar encerra essa exploração e impede os passos seguintes.
+
+```text
+Explorar
+├─ Herói morto, em combate, ou com uma escolha/evento pendente?
+│  └─ Sim: não inicia outra exploração
+└─ Não
+   ├─ 1. Evento narrativo da região
+   │  ├─ Só considera eventos ainda não vistos
+   │  ├─ Precisa ter passado o intervalo de 3 explorações desde o último evento
+   │  ├─ Chance configurada: 20%
+   │  └─ Disparou: escolhe aleatoriamente um evento ainda não visto e mostra suas opções
+   ├─ 2. Contato da névoa (só se não disparou evento narrativo)
+   │  ├─ Precisa ter passado o intervalo de 3 explorações desde o último contato
+   │  ├─ Chance = mínimo entre 25% e (3% + 1% por nível acima do nível 1)
+   │  ├─ Disparou: escolhe aleatoriamente um contato elegível para o nível
+   │  └─ Aceitar pode iniciar uma luta, oferecer uma bebida, poder ou sacrifício
+   └─ 3. Resultado aleatório da exploração (só se nenhum evento anterior disparou)
+      ├─ Monstro: 40%
+      ├─ Ouro: 19%
+      ├─ Trilha segura: 13% (HP/foco; removida se ambos estiverem cheios)
+      ├─ Poção: 8% (removida se já estiver no limite)
+      ├─ Armadilha: 6%
+      ├─ Foco: 6% (removido se estiver no limite)
+      ├─ Suprimentos: 6% (ouro e recuperação de HP)
+      └─ Baú: 2% → ao abrir, 70% de chance de equipamento; caso contrário, vazio
+```
+
+Os pesos do resultado aleatório totalizam 100% quando todas as opções estão disponíveis. Poção, foco e trilha segura são removidos quando não podem ajudar; os pesos restantes são então normalizados. Portanto, as porcentagens efetivas podem mudar conforme HP, foco e poções atuais. Um rumor de tesouro soma 10 pontos percentuais à chance calculada de baú; se o baú não sair, o resultado é sorteado entre os demais resultados.
+
+### Eventos narrativos por região
+
+Quando a rolagem narrativa dispara, um evento ainda não visto é escolhido sem pesos (todos têm chance igual entre os disponíveis). Cada escolha abaixo é feita pelo jogador; as opções não têm porcentagens próprias.
+
+- **Floresta da Névoa:** Pegadas sob a chuva (saquear ou lutar); Travessia do rio (arriscar e ganhar ouro ou recuperar HP/foco); Cabana abandonada (poção ou luta); ruído no mato (ouro ou equipamento de pet); desafio da fenda (lutar contra o Arauto do Abismo ou recuar).
+- **Travessia do Rio:** Correnteza traiçoeira (recuperar HP ou buscar ouro); Ponte de troncos (ouro ou HP); Sinais na outra margem (luta ou ouro); ruído entre as pedras (ouro ou equipamento de pet); desafio da fenda (Arauto ou recuo).
+- **Aldeia das Tochas Azuladas:** Abrigo dos sobreviventes (recuperação ou ouro); Carroça tombada (ouro ou luta); Torre do vigia (ouro ou foco); ruído sob os escombros (ouro ou equipamento de pet); desafio da fenda (Arauto ou recuo).
+- **Castelo de Gudran:** Guardião de pedra (recuperar HP/foco ou luta); Arsenal esquecido (45 de ouro e uma poção se houver espaço, ou luta); Juramento dos guardas (+4 ataque ou 55 de ouro com perda de até 12 HP); campeão do castelo (Brutos ou recuo); ruído na torre (ouro ou equipamento de pet); último desafio (Arauto ou recuo).
+- **Câmara do Trono:** não possui eventos narrativos aleatórios; é a etapa do confronto final.
+
+Os desafios da fenda e Brutos são eventos encadeados: escolher enfrentar inicia uma batalha especial; recuar encerra o evento sem a batalha e permite que ele volte a aparecer em outra exploração. O evento de animal também tem resultado adicional: escolher ajudar gera um equipamento de pet com raridade sorteada normalmente (se não houver modelo elegível, não há pet).
+
+### Ramificações depois de encontrar um monstro
+
+```text
+Encontrou monstro (resultado de 40%, ou escolha de evento/contato)
+├─ Fugir: 70% de sucesso; chefes finais não podem ser evitados
+└─ Vencer
+   ├─ Chefe: vitória e recompensa; equipamento de raridade da lista do chefe é garantido
+   └─ Monstro comum
+      ├─ 90%: vitória normal, XP/ouro e 40% de chance de equipamento
+      └─ 10%: surge a decisão entre golpe final ou poupar
+         ├─ Golpe final: recebe recompensas normais, incluindo XP e sorteio de equipamento
+         └─ Poupar: recebe metade do ouro-base e nenhum XP; sorteia 1 resultado:
+            ├─ 20%: ataca e foge, causando dano
+            ├─ 20%: dá pista de baú; +10 pontos percentuais até encontrar um
+            ├─ 20%: agradece e foge; recupera até 20% do HP e foco máximos
+            ├─ 20%: dá equipamento de raridade normal para um slot vazio
+            └─ 20%: dá ouro bônus
+```
+
+O teste de 10% é feito depois de derrotar um monstro comum; chefes não oferecem a decisão de poupar. Se o inventário de equipamento já tiver algo em todos os slots, o resultado de item do monstro poupado vira ouro bônus. A raridade do drop normal usa as chances comuns da tabela de equipamentos; raridades Demoníaca e Divina ficam indisponíveis antes do Castelo de Gudran. Os cinco resultados de poupar têm pesos iguais de 20%.
+
+### Monstros que podem aparecer
+
+O encontro comum escolhe aleatoriamente um dos três monstros cadastrados para a região. Os atributos do modelo variam entre 70% e 160% por encontro. O nível não muda a chance de encontrar monstro (40% antes das redistribuições descritas acima).
+
+| Região | Monstros comuns |
+| --- | --- |
+| Floresta da Névoa | Lobo Sombriço, Demônio do Rio, Bruxa |
+| Travessia do Rio | Demônio do Rio, Golem do Rio, Criatura das Sombras |
+| Aldeia das Tochas Azuladas | Saqueador da Névoa, Cavaleiro Possuído, Cavaleiro sem Cabeça |
+| Castelo de Gudran | Soldado de Gudran, Criatura Corrompida, Golem |
+
+Monstros especiais têm gatilhos próprios, não fazem parte do sorteio comum de 40%:
+
+- **Morte:** pode ser escolhido como chefe de contato a partir do nível 2.
+- **Morto-Vivo:** pode ser escolhido por contato a partir do nível 3; a Bruxa Caçadora também o convoca ao aceitar sua oferta.
+- **Dragão da Névoa:** pode ser escolhido como chefe de contato a partir do nível 5.
+- **Demônio do Abismo:** pode ser escolhido como chefe de contato a partir do nível 5 ou enfrentado pelos eventos do desafio da fenda.
+- **Brutos:** pode ser escolhido como chefe de contato a partir do nível 7 ou enfrentado pelo evento “O campeão do castelo”.
+- **Gudran:** chefe final, acessado pelo portão da Câmara do Trono depois de aceitar o confronto; não aparece no botão Explorar e não permite fuga.
+
+Ao vencer chefes especiais, um equipamento é garantido. A raridade usa a lista definida para aquele chefe/desafio e também respeita a regra de raridades exclusivas da região; se a lista ficar sem raridades válidas, o sorteio retorna ao item Comum. No desafio da fenda, a recompensa é Épica/Lendária antes do Castelo de Gudran e Demoníaca/Divina a partir dele.
+
+### Baús, ouro e equipamentos
+
+- Exploração pode encontrar baú com peso-base de 2% (sujeito à redistribuição de pesos). Abrir o baú dá equipamento em 70% dos casos; nos outros 30%, está vazio.
+- A raridade de item de baú é sorteada entre Épico 40%, Lendário 30%, Demoníaco 20% e Divino 10%. O sorteio de baú permite Demoníaco/Divino em qualquer região.
+- Um monstro comum derrotado tem 40% de chance de equipamento. A distribuição padrão é: Comum 38%, Incomum 25%, Raro 11%, Super Raro 9%, Épico 7%, Lendário 5%, Demoníaco 3,5%, Divino 1,5%; antes do Castelo, Demoníaco/Divino são removidos e as demais chances são normalizadas.
+- Ouro encontrado diretamente na exploração: 5–14. Suprimentos: 10–20 de ouro e até 12 HP. Armadilha: 8–15 de dano, sem reduzir HP abaixo de 1. Trilha segura recupera até 30 HP e 15 foco; poção dá +1; foco encontrado dá 12–24.
+- Quantias acima são valores configurados antes de quaisquer regras de progressão ou limites do personagem.
+
+### Ramificações de contato da névoa
+
+A chance de aparecer é calculada após o intervalo de 3 explorações: nível 1 = 3%, nível 2 = 4%, aumentando 1 ponto percentual por nível até o limite de 25%. O contato é escolhido aleatoriamente entre os que permitem o nível atual. O jogador pode aceitar ou recusar; recusar não sorteia recompensa. Ao aceitar:
+
+- **Espírito do Rio:** disponível desde o nível 1; usa os resultados genéricos.
+- **Batedor Perdido:** disponível desde o nível 2; usa os resultados genéricos.
+- **Espectro:** disponível desde o nível 3; usa os resultados genéricos.
+- **Bruxa Caçadora:** inicia a luta contra o morto-vivo indicado.
+- **Bruxa Velha:** oferece 150 de ouro; ao aceitar, HP atual cai para no máximo 20% do HP máximo.
+- **Demais contatos:** sorteiam entre resultados disponíveis: combate 45%, sacrifício 30% ou poder 25%. Se não houver chefe elegível, combate é removido; se não houver poder elegível, poder é removido; os pesos disponíveis são normalizados.
+
+No resultado genérico **combate**, escolhe-se aleatoriamente um chefe especial elegível ao nível (entre Morte, Morto-Vivo, Dragão da Névoa, Demônio do Abismo e Brutos). As chances de chefe são iguais entre os elegíveis; Gudran não entra nessa seleção. No resultado **sacrifício**, recebe-se 25–50 de ouro e perde-se 10–20% do HP máximo (sem cair abaixo de 1 HP). No resultado **poder**, uma habilidade ainda não obtida é escolhida aleatoriamente entre as disponíveis: +3 ataque; +25 HP máximo e recupera 25 HP; +2 defesa; +3% esquiva; ou +3% aparo. Cada contato pode ser aceito ou recusado; recusar não dá recompensa.
+
+Os valores e conteúdo ficam em `world-rules.js` e `mist-contacts.js`; as probabilidades e efeitos de exploração ficam em `exploration-rules.js`.
+
+### Depois de completar os objetivos
+
+As quatro regiões de exploração têm cinco tarefas cada, incluindo metas cumulativas de explorações sem interrupção e monstros derrotados. Ao cumprir todas, a próxima região é descoberta. A Câmara do Trono não tem rolagem narrativa nem aparece no sorteio de monstros comuns: ao chegar nela, o jogador escolhe se enfrenta Gudran. Aceitar inicia o chefe final; Gudran não pode ser poupado nem evitado por fuga. Derrotá-lo encerra a campanha.
+
+### Outros desfechos da exploração e da luta
+
+- Se o jogador estiver com HP 0 ou houver uma decisão pendente (evento, contato ou baú), o botão Explorar não inicia outra rolagem.
+- A exploração pode causar dano por armadilha, mas esse dano não reduz o HP abaixo de 1.
+- Uma luta termina em vitória, fuga ou derrota do herói. Fugir tem 70% de sucesso; se falhar, o monstro ataca. Gudran impede a fuga.
+- A vitória concede XP e ouro configurados no monstro. A variação de atributos também varia os valores de XP/ouro rolados no início do encontro.
+- Após ganhar XP, pode ocorrer subida de nível: os atributos e pontos de habilidade seguem a progressão do personagem.
+- Se o herói chegar a 0 HP, a jornada termina em derrota e o save da campanha é apagado.
+- Camp, navegação de regiões e subida de nível são sistemas paralelos: descanso e mudança de região têm ações próprias, não são resultados aleatórios do botão Explorar.
+
+### O que as porcentagens significam
+
+- **40% monstro** e os demais pesos são a rolagem final de exploração, somente se evento narrativo e contato da névoa não aparecerem naquele clique.
+- **20% evento narrativo** é testado antes do contato da névoa, depois do intervalo; portanto, se disparar, o contato e a rolagem de exploração não são testados naquele clique.
+- A chance de contato da névoa também é uma rolagem separada, testada depois do evento narrativo e antes do resultado de exploração.
+- **10% spare** é testado apenas depois da vitória contra monstro comum; se aparecer, o jogador decide entre golpe final e poupar. As cinco consequências de poupar são então sorteadas com 20% cada.
+- As chances de recompensa (baú, drop de monstro, raridade) são novas rolagens dentro do resultado que as habilita; não são pontos percentuais da chance principal de explorar.

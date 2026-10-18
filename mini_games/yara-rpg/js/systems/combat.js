@@ -44,14 +44,16 @@ function getMainHandAttackStat() {
     const offHandWeaponBonus = isDualWieldingWeapons()
         ? Number(hero.equipment.offHand.stats.atk) || 0
         : 0;
-    return getEffectiveStat('atk') - offHandWeaponBonus;
+    const attackPassiveMultiplier = 1 + (Number(selectedCharacter.passive?.statBonusPercent?.atk) || 0) / 100;
+    return getEffectiveStat('atk') - offHandWeaponBonus * attackPassiveMultiplier;
 }
 
 function getOffHandAttackDamage(attackMultiplier, randomBonusRange, minimumDamage, isCritical = false) {
     if (!isDualWieldingWeapons()) return 0;
     const multiplier = GAME_RULES.combat.dualWieldDamageMultiplier;
     const mainHandWeaponBonus = Number(hero.equipment.mainHand.stats.atk) || 0;
-    const offHandAttackStat = getEffectiveStat('atk') - mainHandWeaponBonus;
+    const attackPassiveMultiplier = 1 + (Number(selectedCharacter.passive?.statBonusPercent?.atk) || 0) / 100;
+    const offHandAttackStat = getEffectiveStat('atk') - mainHandWeaponBonus * attackPassiveMultiplier;
     return calculateAttackDamage(
         offHandAttackStat * multiplier,
         attackMultiplier,
@@ -357,7 +359,8 @@ function monsterAttackTurn() {
     if (evaded) {
         playSound('dodge');
         hero.defending = false;
-        const furyGained = Math.min(FURY_PER_DODGE, getEffectiveFuryThreshold() - hero.fury);
+        const dodgeFuryBonus = Number(selectedCharacter.passive?.furyPerDodgeBonus) || 0;
+        const furyGained = Math.min(FURY_PER_DODGE + dodgeFuryBonus, getEffectiveFuryThreshold() - hero.fury);
         hero.fury += furyGained;
         logMessage(t("heroDodges", { monster: currentMonster.name, amount: furyGained }), "special");
         if (encounterId !== combatEncounterId || !inCombat) return;

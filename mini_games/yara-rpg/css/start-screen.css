@@ -105,7 +105,8 @@
     grid-template-areas:
         "portrait name"
         "description description"
-        "specialty specialty";
+        "specialty specialty"
+        "passive passive";
     align-items: center;
     gap: 0.3rem 0.6rem;
     padding: 0.7rem;
@@ -182,6 +183,14 @@
     grid-area: specialty;
     margin: 0;
     color: #86d6ad;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+.character-option-passive {
+    grid-area: passive;
+    margin: 0;
+    color: #c4a5f4;
     font-size: 0.68rem;
     font-weight: 700;
     line-height: 1.35;

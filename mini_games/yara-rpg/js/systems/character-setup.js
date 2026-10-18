@@ -133,13 +133,23 @@ window.YaraRpgCharacterSetup = (() => {
                 })
                 .join(" · ");
 
+            const passiveSummary = document.createElement("p");
+            passiveSummary.className = "character-option-passive";
+            if (character.passive) {
+                const language = document.documentElement.lang.startsWith("en") ? "en" : "pt";
+                const passiveLabel = translateForLanguage(language, language === "en" ? "Passive" : "Passiva");
+                const passiveName = translateForLanguage(language, character.passive.name[language]);
+                const passiveDescription = translateForLanguage(language, character.passive.description[language]);
+                passiveSummary.textContent = `${passiveLabel}: ${character.passive.icon} ${passiveName} — ${passiveDescription}`;
+            }
+
             const extraInfo = document.createElement("details");
             extraInfo.className = "character-option-extra";
             const extraInfoSummary = document.createElement("summary");
             extraInfoSummary.textContent = translate("characterExtraInfo");
             extraInfo.append(extraInfoSummary, progression, skills, limits);
 
-            selectButton.append(portrait, name, description, basicStatsSummary);
+            selectButton.append(portrait, name, description, basicStatsSummary, passiveSummary);
             selectButton.addEventListener("click", () => {
                 selectedCharacterId = character.id;
                 renderCharacters();

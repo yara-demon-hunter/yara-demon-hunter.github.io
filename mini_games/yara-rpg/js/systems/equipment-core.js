@@ -123,7 +123,9 @@ function getEquipmentBonus(stat) {
 }
 
 function getEffectiveStat(stat) {
-    return hero[stat] + getEquipmentBonus(stat);
+    const total = hero[stat] + getEquipmentBonus(stat);
+    const bonusPercent = Number(selectedCharacter?.passive?.statBonusPercent?.[stat]) || 0;
+    return bonusPercent ? Math.round(total * (1 + bonusPercent / 100)) : total;
 }
 
 function getEffectiveFuryThreshold() {

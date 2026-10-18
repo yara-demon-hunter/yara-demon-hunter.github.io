@@ -13,6 +13,21 @@
     </div>
 </dialog>
 
+<dialog id="passive-detail-dialog" class="item-drop-dialog passive-detail-dialog" aria-labelledby="passive-detail-title" aria-describedby="passive-detail-description">
+    <div class="item-drop-content">
+        <div class="equipment-bag-heading">
+            <div>
+                <h2 id="passive-detail-title" class="text-lg font-bold text-emerald-200"></h2>
+            </div>
+            <button type="button" class="dialog-close-button" onclick="closePassiveDetails()" data-i18n-aria="closePassiveDetails" aria-label="Fechar passiva">×</button>
+        </div>
+        <div class="passive-detail">
+            <span id="passive-detail-icon" class="passive-detail-icon" aria-hidden="true"></span>
+            <p id="passive-detail-description" class="passive-detail-description"></p>
+        </div>
+    </div>
+</dialog>
+
 <dialog id="equipment-bag-dialog" class="item-drop-dialog equipment-bag-dialog" aria-labelledby="equipment-bag-title" aria-describedby="equipment-bag-description">
         <div class="item-drop-content">
             <div class="equipment-bag-heading">
