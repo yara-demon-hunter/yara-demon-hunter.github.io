@@ -4,7 +4,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "dark-forest",
         sceneIcon: "",
-        sceneImage: "images/regions/dark-forest.png",
+        sceneImage: "images/regions/dark-forest.webp",
         title: { pt: "Floresta da Névoa", en: "Misty Forest" },
         description: {
             pt: "O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos.",
@@ -58,7 +58,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "river-crossing",
         sceneIcon: "🌊",
-        sceneImage: "images/regions/river-crossing.png",
+        sceneImage: "images/regions/river-crossing.webp",
         title: { pt: "Travessia do Rio", en: "River Crossing" },
         description: {
             pt: "🌊 A correnteza corta a floresta. Atravesse o rio e encontre o caminho para o outro lado, onde a névoa ainda esconde perigos.",
@@ -112,7 +112,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "blue-torch-village",
         sceneIcon: "🕯️",
-        sceneImage: "images/regions/blue-torch-village.png",
+        sceneImage: "images/regions/blue-torch-village.webp",
         title: { pt: "Aldeia das Tochas Azuladas", en: "Village of Blue Torches" },
         description: {
             pt: "🕯️ Tochas de chama azulada iluminam as casas da aldeia. As ruas estão quietas demais, e sinais de invasores ainda marcam as paredes.",
@@ -166,7 +166,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "gudran-castle",
         sceneIcon: "🏰",
-        sceneImage: "images/regions/gudran-castle.png",
+        sceneImage: "images/regions/gudran-castle.webp",
         title: { pt: "Castelo de Gudran", en: "Gudran Castle" },
         description: {
             pt: "🏰 As muralhas de Gudran guardam criaturas antigas e cavaleiros que não aceitam intrusos.",
@@ -229,7 +229,7 @@ window.YaraRpgData.regions = Object.freeze([
     {
         id: "gudran-throne",
         sceneIcon: "👑",
-        sceneImage: "images/regions/gudran-throne.png",
+        sceneImage: "images/regions/gudran-throne.webp",
         title: { pt: "Câmara do Trono", en: "Throne Chamber" },
         description: {
             pt: "Além das portas do castelo, Gudran aguarda no coração de seu domínio. A névoa parece prender a respiração.",

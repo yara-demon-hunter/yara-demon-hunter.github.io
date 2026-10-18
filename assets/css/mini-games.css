@@ -43,7 +43,7 @@
 }
 
 .mini-game-card--rpg .mini-game-card__art {
-    background-image: linear-gradient(0deg, rgba(15, 17, 17, 0.58), transparent 70%), url('../../mini_games/yara-rpg/images/cover.jpeg');
+    background-image: linear-gradient(0deg, rgba(15, 17, 17, 0.58), transparent 70%), url('../../mini_games/yara-rpg/images/cover.webp');
 }
 
 .mini-game-card--arena .mini-game-card__art {
