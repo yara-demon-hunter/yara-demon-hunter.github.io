@@ -90,7 +90,7 @@ const hero = {
     evasionBonus: 0,
     parryBonus: 0,
     chestChanceBonus: 0,
-    mistPowers: [],
+    passiveSkills: [],
     equipment: createEmptyEquipmentMap(),
     equipmentInventory: [],
 };
@@ -178,7 +178,7 @@ function startAdventure({ character, equipment }) {
         parryBonus: 0,
         chestChanceBonus: 0,
         fury: 0,
-        mistPowers: [],
+        passiveSkills: [],
         equipment: createEmptyEquipmentMap(),
         equipmentInventory: [],
     });

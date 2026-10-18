@@ -316,13 +316,13 @@
     font-size: 1.35rem;
     line-height: 1;
 }
-.mist-passives-section { margin: .7rem 10px .2rem; }
-.mist-passives-heading { color: #d1d8d1; font-size: .68rem; font-weight: 700; }
-.mist-passives-divider { height: 1px; margin: .3rem 0 .45rem; background: linear-gradient(90deg, rgba(143, 163, 146, .55), rgba(143, 163, 146, 0)); }
-.mist-powers-empty { margin: 0; color: #8e9990; font-size: .65rem; }
-.mist-powers-empty[hidden] { display: none; }
-.mist-power-icons { display: flex; flex-wrap: wrap; gap: .35rem; }
-.mist-power-icon-button {
+.passive-skills-section { margin: .7rem 10px .2rem; }
+.passive-skills-heading { color: #d1d8d1; font-size: .68rem; font-weight: 700; }
+.passive-skills-divider { height: 1px; margin: .3rem 0 .45rem; background: linear-gradient(90deg, rgba(143, 163, 146, .55), rgba(143, 163, 146, 0)); }
+.passive-skills-empty { margin: 0; color: #8e9990; font-size: .65rem; }
+.passive-skills-empty[hidden] { display: none; }
+.passive-skill-icons { display: flex; flex-wrap: wrap; gap: .35rem; }
+.passive-skill-icon-button {
     display: grid;
     width: 2rem;
     height: 2rem;
@@ -335,8 +335,8 @@
     cursor: pointer;
     transition: border-color .16s ease, background .16s ease, transform .16s ease;
 }
-.mist-power-icon-button:hover,
-.mist-power-icon-button:focus-visible {
+.passive-skill-icon-button:hover,
+.passive-skill-icon-button:focus-visible {
     transform: translateY(-1px);
     border-color: rgba(160, 205, 170, .8);
     background: rgba(32, 63, 43, .95);

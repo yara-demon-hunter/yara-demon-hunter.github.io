@@ -685,15 +685,15 @@ function acceptMistContact() {
     }
 
     const boss = MIST_CONTACT_SYSTEM.chooseBoss(SPECIAL_MONSTERS, hero.level);
-    const power = MIST_CONTACT_SYSTEM.choosePower(
-        MIST_CONTACT_DATA.powers,
-        hero.mistPowers,
+    const passiveSkill = MIST_CONTACT_SYSTEM.choosePassiveSkill(
+        MIST_CONTACT_DATA.passiveSkills,
+        hero.passiveSkills,
         hero
     );
     const outcome = MIST_CONTACT_SYSTEM.chooseOutcome(
         GAME_RULES.mistContacts.outcomes,
         Boolean(boss),
-        Boolean(power)
+        Boolean(passiveSkill)
     );
 
     if (outcome?.type === 'combat' && boss) {
@@ -702,22 +702,27 @@ function acceptMistContact() {
         return;
     }
 
-    if (outcome?.type === 'power' && power) {
-        const previousValue = hero[power.stat];
-        hero[power.stat] = power.max === undefined
-            ? previousValue + power.amount
-            : Math.min(power.max, previousValue + power.amount);
-        const amountGained = hero[power.stat] - previousValue;
-        if (power.currentStat) {
-            hero[power.currentStat] = Math.min(
-                getEffectiveStat('maxHp'),
-                hero[power.currentStat] + amountGained
-            );
+    if (outcome?.type === 'passive-skill' && passiveSkill) {
+        const previousValue = hero[passiveSkill.stat];
+        hero[passiveSkill.stat] = passiveSkill.max === undefined
+            ? previousValue + passiveSkill.amount
+            : Math.min(passiveSkill.max, previousValue + passiveSkill.amount);
+        const amountGained = hero[passiveSkill.stat] - previousValue;
+        if (passiveSkill.currentStat) {
+            const currentStatMax = passiveSkill.currentStat === 'hp' ? 'maxHp'
+                : passiveSkill.currentStat === 'foco' ? 'maxFoco'
+                    : null;
+            if (currentStatMax) {
+                hero[passiveSkill.currentStat] = Math.min(
+                    getEffectiveStat(currentStatMax),
+                    hero[passiveSkill.currentStat] + amountGained
+                );
+            }
         }
-        hero.mistPowers.push(power.id);
-        logMessage(t('mistPowerGained', {
-            power: power.name[gameLanguage],
-            description: power.description[gameLanguage]
+        hero.passiveSkills.push(passiveSkill.id);
+        logMessage(t('passiveSkillGained', {
+            skill: passiveSkill.name[gameLanguage],
+            description: passiveSkill.description[gameLanguage]
         }), 'special');
         completeRegionObjective('story');
         updateUI();

@@ -10,7 +10,7 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
         outcomes: [
             { type: "combat", weight: 45 },
             { type: "sacrifice", weight: 30 },
-            { type: "power", weight: 25 }
+            { type: "passive-skill", weight: 25 }
         ],
         sacrifice: {
             goldMinimum: 25,

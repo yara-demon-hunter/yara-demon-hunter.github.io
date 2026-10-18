@@ -7,7 +7,7 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `regions.js`: IDs, títulos, descrições e eventos com escolhas por região em português e inglês. Cada região pode ter vários eventos; eles aparecem sem repetição até o conjunto se esgotar.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.
 - `special-monsters.js`: atributos, nível mínimo e recompensas dos chefes e monstros especiais usados em eventos.
-- `mist-contacts.js`: contatos com ícones e ofertas próprias, além dos poderes permanentes dos encontros na névoa. Missões podem referenciar monstros por `bossId`.
+- `mist-contacts.js`: contatos com ícones e ofertas próprias, além das skills passivas permanentes obtidas nos encontros da névoa. O catálogo fica em `passiveSkills`; cada skill tem ID, ícone, nome/descrição em PT/EN, atributo (`stat`), bônus (`amount`) e, se também recuperar recurso, o campo `currentStat` (`hp` ou `foco`). Missões podem referenciar monstros por `bossId`.
 - `special-monsters.js`: atributos, requisitos e recompensas dos chefes e monstros especiais.
 - `world-rules.js`: escala de probabilidade, frequência/resultados dos contatos e custos/recuperação do acampamento.
 - `equipment-rules.js`: chance de drop, raridades e chances especiais para itens de baús, limite da mochila e aprimoramentos.
@@ -16,7 +16,7 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `exploration-rules.js`: chance de descobrir áreas e eventos, intervalo entre eventos narrativos, pesos dos resultados de exploração, recompensas, chance de obter item ao abrir baú e chance de poupar um monstro derrotado.
 - `setup-config.js`: quantidade de equipamentos iniciais escolhidos antes da aventura; ajuste `starterEquipmentCount` para mudar o limite.
 
-A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`; os encontros durante a exploração são tratados em `../systems/exploration.js`. Para ajustar o ritmo, edite `mistContacts` em `world-rules.js`; adicione contatos e poderes em `mist-contacts.js` e chefes em `special-monsters.js`. Contatos que iniciam uma missão podem apontar para o `id` de um chefe por `bossId`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos. Todos os monstros usam o mesmo banner e a mesma interface de status durante o combate.
+A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`; os encontros durante a exploração são tratados em `../systems/exploration.js`. Para ajustar o ritmo, edite `mistContacts` em `world-rules.js`; adicione contatos e skills passivas em `mist-contacts.js` e chefes em `special-monsters.js`. Contatos que iniciam uma missão podem apontar para o `id` de um chefe por `bossId`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos. Todos os monstros usam o mesmo banner e a mesma interface de status durante o combate.
 
 A lógica da tela inicial e a seleção dos equipamentos ficam em `../systems/character-setup.js`. O limite de escolhas vem de `setup-config.js`. Os eventos narrativos são declarados em cada região e executados por `resolveStoryEvent` em `../systems/exploration.js`. Os textos PT/EN ficam em `../systems/translations-pt.js` e `../systems/translations-en.js`. Os scripts de dados e sistemas precisam ser carregados antes de `game.js`, que inicia a aventura com as escolhas feitas.
 
@@ -42,7 +42,7 @@ Explorar
    │  ├─ Precisa ter passado o intervalo de 3 explorações desde o último contato
    │  ├─ Chance = mínimo entre 25% e (3% + 1% por nível acima do nível 1)
    │  ├─ Disparou: escolhe aleatoriamente um contato elegível para o nível
-   │  └─ Aceitar pode iniciar uma luta, oferecer uma bebida, poder ou sacrifício
+   │  └─ Aceitar pode iniciar uma luta, oferecer uma bebida, skill passiva ou sacrifício
    └─ 3. Resultado aleatório da exploração (só se nenhum evento anterior disparou)
       ├─ Monstro: 40%
       ├─ Ouro: 19%
@@ -121,6 +121,8 @@ Ao vencer chefes especiais, um equipamento é garantido. A raridade usa a lista 
 
 ### Ramificações de contato da névoa
 
+P.S. Cada contato pode ser aceito ou recusado; recusar não dá recompensa
+
 A chance de aparecer é calculada após o intervalo de 3 explorações: nível 1 = 3%, nível 2 = 4%, aumentando 1 ponto percentual por nível até o limite de 25%. O contato é escolhido aleatoriamente entre os que permitem o nível atual. O jogador pode aceitar ou recusar; recusar não sorteia recompensa. Ao aceitar:
 
 - **Espírito do Rio:** disponível desde o nível 1; usa os resultados genéricos.
@@ -128,9 +130,20 @@ A chance de aparecer é calculada após o intervalo de 3 explorações: nível 1
 - **Espectro:** disponível desde o nível 3; usa os resultados genéricos.
 - **Bruxa Caçadora:** inicia a luta contra o morto-vivo indicado.
 - **Bruxa Velha:** oferece 150 de ouro; ao aceitar, HP atual cai para no máximo 20% do HP máximo.
-- **Demais contatos:** sorteiam entre resultados disponíveis: combate 45%, sacrifício 30% ou poder 25%. Se não houver chefe elegível, combate é removido; se não houver poder elegível, poder é removido; os pesos disponíveis são normalizados.
+- **Demais contatos:** sorteiam entre resultados disponíveis: combate 45%, sacrifício 30% ou skill passiva 25%. Se não houver chefe elegível, combate é removido; se não houver skill passiva elegível, essa opção é removida; os pesos disponíveis são normalizados.
 
-No resultado genérico **combate**, escolhe-se aleatoriamente um chefe especial elegível ao nível (entre Morte, Morto-Vivo, Dragão da Névoa, Demônio do Abismo e Brutos). As chances de chefe são iguais entre os elegíveis; Gudran não entra nessa seleção. No resultado **sacrifício**, recebe-se 25–50 de ouro e perde-se 10–20% do HP máximo (sem cair abaixo de 1 HP). No resultado **poder**, uma habilidade ainda não obtida é escolhida aleatoriamente entre as disponíveis: +3 ataque; +25 HP máximo e recupera 25 HP; +2 defesa; +3% esquiva; ou +3% aparo. Cada contato pode ser aceito ou recusado; recusar não dá recompensa.
+No resultado genérico **combate** (45%), escolhe-se aleatoriamente um chefe especial elegível ao nível (entre Morte, Morto-Vivo, Dragão da Névoa, Demônio do Abismo e Brutos). As chances de chefe são iguais entre os elegíveis; Gudran não entra nessa seleção. No resultado **sacrifício** (30%), recebe-se 25–50 de ouro e perde-se 10–20% do HP máximo (sem cair abaixo de 1 HP). No resultado **skill passiva** (25%), uma skill ainda não obtida é escolhida aleatoriamente entre as disponíveis. Ela é permanente, aparece na seção **Skills passivas** do bloco de atributos e seu ícone abre a descrição:
+
+- **Lâmina da Névoa:** +3 de Ataque.
+- **Reservatório Vital:** +100 de HP máximo e recupera até 100 HP.
+- **Reserva Profunda:** +100 de Foco máximo e recupera até 100 Foco.
+- **Choque Elétrico:** +5 pontos percentuais de chance de atordoar o monstro.
+- **Mira Certeira:** +5 pontos percentuais de chance de acerto crítico.
+- **Pele de Pedra:** +2 de Defesa.
+- **Passo Veloz:** +3% de Esquiva.
+- **Aparo Espectral:** +3% de Aparo.
+
+O HP/Foco recuperado não ultrapassa o novo máximo efetivo. Stun e crítico continuam respeitando os limites configurados para cada personagem. Skills que já foram obtidas não entram novamente no sorteio. Saves existentes com a lista antiga `hero.mistPowers` são migrados para `hero.passiveSkills` ao carregar.
 
 Os valores e conteúdo ficam em `world-rules.js` e `mist-contacts.js`; as probabilidades e efeitos de exploração ficam em `exploration-rules.js`.
 

@@ -17,10 +17,10 @@ window.YaraMistContactSystem = Object.freeze({
         return availableContacts[Math.floor(Math.random() * availableContacts.length)];
     },
 
-    chooseOutcome(outcomes, hasAvailableBoss, hasAvailablePower) {
+    chooseOutcome(outcomes, hasAvailableBoss, hasAvailablePassiveSkill) {
         const availableOutcomes = outcomes.filter((outcome) =>
             (outcome.type !== "combat" || hasAvailableBoss)
-            && (outcome.type !== "power" || hasAvailablePower)
+            && (outcome.type !== "passive-skill" || hasAvailablePassiveSkill)
         );
         const totalWeight = availableOutcomes.reduce((total, outcome) => total + outcome.weight, 0);
         if (totalWeight <= 0) return null;
@@ -39,12 +39,12 @@ window.YaraMistContactSystem = Object.freeze({
         return availableBosses[Math.floor(Math.random() * availableBosses.length)];
     },
 
-    choosePower(powers, unlockedPowerIds, hero) {
-        const availablePowers = powers.filter((power) =>
-            !unlockedPowerIds.includes(power.id)
-            && (power.max === undefined || hero[power.stat] < power.max)
+    choosePassiveSkill(passiveSkills, unlockedPassiveSkillIds, hero) {
+        const availableSkills = passiveSkills.filter((skill) =>
+            !unlockedPassiveSkillIds.includes(skill.id)
+            && (skill.max === undefined || hero[skill.stat] < skill.max)
         );
-        if (availablePowers.length === 0) return null;
-        return availablePowers[Math.floor(Math.random() * availablePowers.length)];
+        if (availableSkills.length === 0) return null;
+        return availableSkills[Math.floor(Math.random() * availableSkills.length)];
     }
 });

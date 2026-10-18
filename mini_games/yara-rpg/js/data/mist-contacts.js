@@ -83,7 +83,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
             }
         }
     ],
-    powers: [
+    passiveSkills: [
         {
             id: "mist-blade",
             icon: "🗡️",
@@ -99,19 +99,50 @@ window.YaraRpgData.mistContacts = Object.freeze({
             amount: 3
         },
         {
-            id: "iron-heart",
+            id: "vital-reservoir",
             icon: "❤️",
-            name: {
-                pt: "Coração de Ferro",
-                en: "Iron Heart"
-            },
+            name: { pt: "Reservatório Vital", en: "Vital Reservoir" },
             description: {
-                pt: "+25 de HP máximo e recupera 25 HP",
-                en: "+25 maximum HP and restores 25 HP"
+                pt: "+100 de HP máximo e recupera 100 HP",
+                en: "+100 maximum HP and restores 100 HP"
             },
             stat: "maxHp",
-            amount: 25,
+            amount: 100,
             currentStat: "hp"
+        },
+        {
+            id: "deep-reserve",
+            icon: "💚",
+            name: { pt: "Reserva Profunda", en: "Deep Reserve" },
+            description: {
+                pt: "+100 de Foco máximo e recupera 100 Foco",
+                en: "+100 maximum Focus and restores 100 Focus"
+            },
+            stat: "maxFoco",
+            amount: 100,
+            currentStat: "foco"
+        },
+        {
+            id: "electric-shock",
+            icon: "⚡",
+            name: { pt: "Choque Elétrico", en: "Electric Shock" },
+            description: {
+                pt: "+5% de chance de atordoar o monstro.",
+                en: "+5% chance to stun the monster."
+            },
+            stat: "stunChance",
+            amount: 5
+        },
+        {
+            id: "sure-aim",
+            icon: "🎯",
+            name: { pt: "Mira Certeira", en: "Sure Aim" },
+            description: {
+                pt: "+5% de chance de acerto crítico.",
+                en: "+5% critical hit chance."
+            },
+            stat: "criticalChance",
+            amount: 5
         },
         {
             id: "stone-skin",

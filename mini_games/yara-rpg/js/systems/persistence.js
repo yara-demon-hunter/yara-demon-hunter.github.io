@@ -27,6 +27,10 @@ function loadSavedGame(snapshot = readSavedGame()) {
     selectedCharacter = GAME_DATA.characters.find((character) => character.id === snapshot.characterId);
     selectedCharacterProgression = selectedCharacter.progression;
     Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
+    hero.passiveSkills = Array.isArray(snapshot.hero?.passiveSkills)
+        ? snapshot.hero.passiveSkills
+        : Array.isArray(snapshot.hero?.mistPowers) ? snapshot.hero.mistPowers : [];
+    delete hero.mistPowers;
     if (snapshot.hero?.criticalChance === undefined) {
         hero.criticalChance = DEFAULT_CHARACTER.baseStats.criticalChance
             + (Number(selectedCharacter.basicStats.criticalChance) || 0);
