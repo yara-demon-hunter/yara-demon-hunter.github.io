@@ -7,7 +7,9 @@ if (gameLanguage !== "en" && gameLanguage !== "pt") {
 }
 
 function translateForLanguage(language, key, values = {}) {
-    return (window.YaraRpgTranslations[language][key] ?? key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+    const translation = window.YaraRpgTranslations[language]?.[key];
+    const template = typeof translation === "string" ? translation : key;
+    return template.replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
 }
 
 function t(key, values = {}) {

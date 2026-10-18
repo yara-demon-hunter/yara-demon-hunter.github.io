@@ -159,7 +159,7 @@
     gap: 0.5rem;
 }
 .equipment-comparison-multiple .equipment-comparison-current-group {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.35rem;
 }
 .equipment-comparison-card {
@@ -583,6 +583,53 @@
 @media (min-width: 480px) {
     .equipment-bag-slots {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+@media (max-width: 479px) {
+    .item-drop-content {
+        padding: 0.85rem;
+    }
+    .equipment-comparison {
+        gap: 0.35rem;
+        margin-top: 0.65rem;
+    }
+    .equipment-comparison-multiple {
+        grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1.1fr);
+    }
+    .equipment-comparison-multiple .equipment-comparison-current-group {
+        gap: 0.3rem;
+    }
+    .equipment-comparison-card {
+        padding: 0.5rem 0.35rem;
+        border-radius: 0.6rem;
+    }
+    .equipment-comparison-label {
+        font-size: 0.55rem;
+        letter-spacing: 0.04em;
+    }
+    .equipment-comparison-icon {
+        width: 2.75rem;
+        height: 2.75rem;
+        margin-top: 0.15rem;
+        font-size: 1.5rem;
+    }
+    .equipment-comparison-name {
+        margin-top: 0.15rem;
+        font-size: 0.68rem;
+        line-height: 1.2;
+    }
+    .equipment-comparison-slot {
+        font-size: 0.56rem;
+        line-height: 1.2;
+    }
+    .equipment-comparison-bonuses {
+        gap: 0.1rem;
+        margin-top: 0.3rem;
+        font-size: 0.58rem;
+        line-height: 1.2;
+    }
+    .equipment-comparison-bonuses li {
+        padding: 0.1rem 0.2rem;
     }
 }
 #equipment-slots {
