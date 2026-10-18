@@ -33,14 +33,14 @@ window.YaraRpgData.mistContacts = Object.freeze({
         {
             id: "bell-keeper",
             icon: "🔔",
-            image: "images/mist_contacts/bell-keeper.webp",
+            image: "images/mist_contacts/specter.webp",
             name: {
-                pt: "Guardião do Sino",
-                en: "Bell Keeper"
+                pt: "Espectro",
+                en: "Specter"
             },
             message: {
-                pt: "O som de um sino ecoa sem origem. Um guardião espectral oferece um pacto: “Prossiga e prove que merece sair daqui.”",
-                en: "A bell rings from nowhere. A spectral keeper offers a pact: “Go on and prove you deserve to leave this place.”"
+                pt: "O som de um sino ecoa sem origem. Um espectro oferece um pacto: “Prossiga e prove que merece sair daqui.”",
+                en: "A bell rings from nowhere. A specter offers a pact: “Go on and prove you deserve to leave this place.”"
             },
             minLevel: 3
         },
