@@ -53,7 +53,7 @@ function closeUpgradeOptions() {
 
 function toggleUpgradeOptions(upgrade) {
     const configuration = getUpgradeConfiguration(upgrade);
-    if (!configuration || inCombat || gameOver || campaignComplete || getMaxUpgradeQuantity(upgrade, configuration) < 1 || isUpgradeMaxed(upgrade, configuration)) return;
+    if (!configuration || gameOver || campaignComplete || getMaxUpgradeQuantity(upgrade, configuration) < 1 || isUpgradeMaxed(upgrade, configuration)) return;
 
     openUpgradeOptions = openUpgradeOptions === upgrade ? null : upgrade;
     updateUI();
@@ -67,8 +67,7 @@ function purchaseUpgrade(upgrade, requestedQuantity) {
         ? maxQuantity
         : Number(requestedQuantity);
     if (
-        inCombat
-        || gameOver
+        gameOver
         || campaignComplete
         || !Number.isInteger(quantity)
         || quantity < 1

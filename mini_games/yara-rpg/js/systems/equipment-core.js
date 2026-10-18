@@ -210,7 +210,7 @@ function equipItem(item, fromInventory, targetSlot = item.slot) {
 }
 
 function equipInventoryItem(item, targetSlot = item.slot) {
-    if (inCombat || gameOver || !hero.equipmentInventory.includes(item)) return;
+    if (gameOver || campaignComplete || !hero.equipmentInventory.includes(item)) return;
     const candidate = targetSlot === item.slot ? item : { ...item, slot: targetSlot };
     if (getEquipmentConflicts(candidate).length) {
         document.getElementById('equipment-bag-dialog').close();
@@ -221,7 +221,7 @@ function equipInventoryItem(item, targetSlot = item.slot) {
 }
 
 function unequipItem(slot) {
-    if (inCombat || gameOver || pendingEquipment) return;
+    if (gameOver || campaignComplete || pendingEquipment) return;
     const item = hero.equipment[slot];
     if (!item) return;
     if (hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY) {

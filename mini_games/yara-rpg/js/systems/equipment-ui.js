@@ -162,7 +162,7 @@ function renderEquipment() {
             selectItem.type = 'checkbox';
             selectItem.className = 'equipment-bag-select';
             selectItem.checked = selectedInventoryItems.has(item);
-            selectItem.disabled = inCombat || gameOver;
+            selectItem.disabled = gameOver;
             selectItem.setAttribute('aria-label', t('selectInventoryItem', {
                 item: getEquipmentDisplayName(item)
             }));
@@ -292,14 +292,14 @@ function renderEquipmentItemDetails(item, source, slot = null) {
     upgradeButton.textContent = upgradeCost === null
         ? t('upgradeEquipmentMaxed', { level: Number(item.upgradeLevel) || 0 })
         : t('upgradeEquipmentButton', { level: (Number(item.upgradeLevel) || 0) + 1, cost: upgradeCost });
-    upgradeButton.disabled = inCombat || gameOver || Boolean(pendingEquipment)
+    upgradeButton.disabled = gameOver || Boolean(pendingEquipment)
         || upgradeCost === null || hero.gold < upgradeCost;
     const equipButton = document.getElementById('equipment-item-equip-button');
     const equipOtherHandButton = document.getElementById('equipment-item-equip-other-hand-button');
     const unequipButton = document.getElementById('equipment-item-unequip-button');
     const discardButton = document.getElementById('equipment-item-discard-button');
     equipButton.hidden = !isInventoryItem;
-    equipButton.disabled = inCombat || gameOver || Boolean(pendingEquipment);
+    equipButton.disabled = gameOver || Boolean(pendingEquipment);
     equipButton.setAttribute('aria-label', t('equipItemAria', {
         item: getEquipmentDisplayName(item),
         slot: getEquipmentSlotLabel(item)
@@ -311,9 +311,9 @@ function renderEquipmentItemDetails(item, source, slot = null) {
     const otherHandSlot = item.slot === 'mainHand' ? 'offHand' : 'mainHand';
     equipOtherHandButton.hidden = !canSwitchHand;
     equipOtherHandButton.textContent = t(otherHandSlot === 'offHand' ? 'equipOffHand' : 'equipMainHand');
-    equipOtherHandButton.disabled = inCombat || gameOver || Boolean(pendingEquipment);
+    equipOtherHandButton.disabled = gameOver || Boolean(pendingEquipment);
     unequipButton.hidden = isInventoryItem;
-    unequipButton.disabled = inCombat || gameOver || Boolean(pendingEquipment)
+    unequipButton.disabled = gameOver || Boolean(pendingEquipment)
         || hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY;
     unequipButton.setAttribute('aria-label', t('unequipItemAria', {
         item: getEquipmentDisplayName(item),
@@ -328,7 +328,7 @@ function renderEquipmentItemDetails(item, source, slot = null) {
 
 function upgradeSelectedEquipment() {
     const selection = selectedEquipmentDetails;
-    if (!selection || inCombat || gameOver || pendingEquipment) return;
+    if (!selection || gameOver || campaignComplete || pendingEquipment) return;
     const { item, source, slot } = selection;
     if (source === 'inventory' && !hero.equipmentInventory.includes(item)) return;
     if (source === 'equipped' && hero.equipment[slot] !== item) return;
@@ -395,7 +395,7 @@ function closeEquipmentBag() {
 
 function discardInventoryItem(item) {
     const inventoryIndex = hero.equipmentInventory.indexOf(item);
-    if (inventoryIndex === -1 || inCombat || gameOver) return;
+    if (inventoryIndex === -1 || gameOver || campaignComplete) return;
     hero.equipmentInventory.splice(inventoryIndex, 1);
     selectedInventoryItems.delete(item);
     logMessage(t('itemDiscarded', { item: getEquipmentDisplayName(item) }), 'loot');
@@ -532,7 +532,7 @@ function showEquipmentChoice(item, fromInventory, targetSlot = item.slot) {
     const canEquipInOtherHand = item.itemType === 'weapon' && item.handUsage !== 'two-handed';
     otherHandButton.hidden = !canEquipInOtherHand;
     otherHandButton.textContent = t(targetSlot === 'mainHand' ? 'equipOffHand' : 'equipMainHand');
-    otherHandButton.disabled = inCombat || gameOver;
+    otherHandButton.disabled = gameOver;
     document.getElementById('open-bag-from-drop-button').hidden = fromInventory
         || (!blockedByFullBag && !blockedByStorageCapacity);
     const discardPendingButton = document.getElementById('discard-pending-item-button');
@@ -600,7 +600,7 @@ function isPendingDropBlocked() {
 
 
 function equipPendingEquipment() {
-    if (!pendingEquipment || inCombat || gameOver || isPendingDropBlocked()) return;
+    if (!pendingEquipment || gameOver || campaignComplete || isPendingDropBlocked()) return;
     const { item, fromInventory, targetSlot = item.slot } = pendingEquipment;
     if (fromInventory && !hero.equipmentInventory.includes(item)) {
         pendingEquipment = null;

@@ -2,8 +2,6 @@
 // Classic browser script; state is initialized by game.js before user actions run.
 
 function updateUI() {
-    if (inCombat || gameOver) openUpgradeOptions = null;
-
     document.getElementById('hero-name').innerText = hero.name;
     const heroPortrait = document.getElementById('hero-portrait');
     const characterImage = selectedCharacter?.image;
@@ -204,7 +202,7 @@ function updateUI() {
         const upgradeConfiguration = getUpgradeConfiguration(upgrade);
         const skill = t(UPGRADE_CONFIG[upgrade].nameKey);
         const maximum = getMaxUpgradeQuantity(upgrade, upgradeConfiguration);
-        const disabled = inCombat || gameOver || campaignComplete || maximum < 1 || isUpgradeMaxed(upgrade, upgradeConfiguration);
+        const disabled = gameOver || campaignComplete || maximum < 1 || isUpgradeMaxed(upgrade, upgradeConfiguration);
         button.disabled = disabled;
         button.setAttribute('aria-label', t('upgradeAriaPoints', { skill, cost: UPGRADE_COST_PER_POINT }));
         button.title = t('upgradeAriaPoints', { skill, cost: UPGRADE_COST_PER_POINT });
@@ -371,16 +369,20 @@ function openRegionObjectives() {
     });
     const list = document.getElementById('region-objectives-list');
     list.replaceChildren();
-    objectives.tasks.forEach((task) => {
+    getRegionObjectiveRequirements(region).forEach((task) => {
         const item = document.createElement('li');
-        const completed = isRegionObjectiveComplete(task.id) || discoveredRegions.includes(currentRegion + 1);
+        const completed = getRegionObjectiveTaskProgress(task) >= task.required
+            || discoveredRegions.includes(currentRegion + 1);
         item.className = completed ? 'region-objective-complete' : 'region-objective-pending';
         const mark = document.createElement('span');
         mark.className = 'region-objective-check';
         mark.textContent = completed ? '✓' : '○';
         mark.setAttribute('aria-hidden', 'true');
         const label = document.createElement('span');
-        label.textContent = task.title[gameLanguage];
+        const progress = Math.min(task.required, getRegionObjectiveTaskProgress(task));
+        label.textContent = task.id === 'exploration'
+            ? `${task.title[gameLanguage]} (${progress}/${task.required})`
+            : task.title[gameLanguage];
         item.append(mark, label);
         list.append(item);
     });

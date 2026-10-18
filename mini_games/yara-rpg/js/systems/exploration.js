@@ -348,14 +348,46 @@ function getRegionObjectiveProgress(regionIndex = currentRegion) {
     const region = GAME_DATA.regions[regionIndex];
     if (!region) return 0;
     if (discoveredRegions.includes(regionIndex + 1)) {
-        return region.objectives.tasks.length;
+        return getRegionObjectiveRequirements(region).length;
     }
-    return region.objectives.tasks.filter((task) => isRegionObjectiveComplete(task.id, regionIndex)).length;
+    return getRegionObjectiveRequirements(region).filter((task) =>
+        getRegionObjectiveTaskProgress(task, regionIndex) >= task.required
+    ).length;
 }
 
 function isRegionObjectiveComplete(objectiveId, regionIndex = currentRegion) {
-    const regionId = GAME_DATA.regions[regionIndex]?.id;
-    return Boolean(regionId && completedRegionObjectives[regionId]?.includes(objectiveId));
+    const region = GAME_DATA.regions[regionIndex];
+    if (!region) return false;
+    const task = region.objectives.tasks.find((objective) => objective.id === objectiveId);
+    if (!task) return false;
+    if (objectiveId === 'exploration') {
+        return getCompletedUninterruptedExplorations(region.id) >= getObjectiveRequirement(task);
+    }
+    const completedIds = completedRegionObjectives[region.id]?.completedIds
+        || completedRegionObjectives[region.id];
+    return Array.isArray(completedIds) && completedIds.includes(objectiveId);
+}
+
+function getRegionObjectiveRequirements(region) {
+    return region.objectives.tasks.map((task) => ({
+        ...task,
+        required: getObjectiveRequirement(task)
+    }));
+}
+
+function getObjectiveRequirement(task) {
+    return Math.max(1, Number(task.required) || 1);
+}
+
+function getCompletedUninterruptedExplorations(regionId) {
+    return Math.max(0, Number(completedRegionObjectives[regionId]?.explorationCount) || 0);
+}
+
+function getRegionObjectiveTaskProgress(task, regionIndex = currentRegion) {
+    const region = GAME_DATA.regions[regionIndex];
+    if (!region) return 0;
+    if (task.id === 'exploration') return getCompletedUninterruptedExplorations(region.id);
+    return Number(isRegionObjectiveComplete(task.id, regionIndex));
 }
 
 function completeRegionObjective(objectiveId, deferRegionUnlock = false) {
@@ -365,7 +397,28 @@ function completeRegionObjective(objectiveId, deferRegionUnlock = false) {
 function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
     if (currentRegion >= GAME_DATA.regions.length - 1 || discoveredRegions.includes(currentRegion + 1)) return;
     const region = GAME_DATA.regions[currentRegion];
-    const completedIds = completedRegionObjectives[region.id] || (completedRegionObjectives[region.id] = []);
+    let regionProgress = completedRegionObjectives[region.id];
+    if (!regionProgress) {
+        regionProgress = { completedIds: [], explorationCount: 0 };
+        completedRegionObjectives[region.id] = regionProgress;
+    }
+    // Migrate progress from saves created before cumulative exploration objectives.
+    const completedIds = Array.isArray(regionProgress) ? regionProgress : regionProgress.completedIds;
+    if (Array.isArray(regionProgress)) {
+        regionProgress = { completedIds, explorationCount: 0 };
+        completedRegionObjectives[region.id] = regionProgress;
+    }
+    const explorationTask = region.objectives.tasks.find((task) => task.id === 'exploration');
+    if (objectiveIds.includes('exploration') && explorationTask) {
+        const required = getObjectiveRequirement(explorationTask);
+        const previousCount = getCompletedUninterruptedExplorations(region.id);
+        if (previousCount < required) {
+            regionProgress.explorationCount = previousCount + 1;
+        updateUI();
+        if (previousCount + 1 >= required) showRegionObjectiveToast([explorationTask]);
+        }
+        objectiveIds = objectiveIds.filter((id) => id !== 'exploration');
+    }
     const newlyCompleted = objectiveIds
         .map((id) => region.objectives.tasks.find((task) => task.id === id))
         .filter((task) => task && !completedIds.includes(task.id));
@@ -373,7 +426,10 @@ function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
         completedIds.push(...newlyCompleted.map((task) => task.id));
         showRegionObjectiveToast(newlyCompleted);
     }
-    if (deferRegionUnlock || completedIds.length < region.objectives.tasks.length) return;
+    const allTasksComplete = getRegionObjectiveRequirements(region).every((task) =>
+        getRegionObjectiveTaskProgress(task) >= task.required
+    );
+    if (deferRegionUnlock || !allTasksComplete) return;
 
     currentRegion++;
     if (!discoveredRegions.includes(currentRegion)) discoveredRegions.push(currentRegion);

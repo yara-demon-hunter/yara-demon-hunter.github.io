@@ -14,7 +14,7 @@ window.YaraRpgData.regions = Object.freeze([
             title: { pt: "Abra caminho pela névoa", en: "Cut a path through the mist" },
             description: { pt: "Conclua as tarefas para encontrar uma saída da floresta.", en: "Complete the tasks to find a way out of the forest." },
             tasks: [
-                { id: "exploration", title: { pt: "Conclua uma exploração", en: "Complete an exploration" } },
+                { id: "exploration", required: 1, title: { pt: "Conclua explorações sem interrupção (1 vez)", en: "Complete uninterrupted explorations (1 time)" } },
                 { id: "story", title: { pt: "Resolva um evento ou aceite um contato da névoa", en: "Resolve a story event or accept a mist contact" } },
                 { id: "combat", title: { pt: "Vença uma luta ou escape", en: "Win a fight or escape" } },
                 { id: "chest", title: { pt: "Encontre e abra um baú", en: "Find and open a chest" } }
@@ -78,7 +78,7 @@ window.YaraRpgData.regions = Object.freeze([
             title: { pt: "Encontre uma travessia segura", en: "Find a safe crossing" },
             description: { pt: "Conclua as tarefas para atravessar o rio e seguir viagem.", en: "Complete the tasks to cross the river and continue your journey." },
             tasks: [
-                { id: "exploration", title: { pt: "Conclua uma exploração", en: "Complete an exploration" } },
+                { id: "exploration", required: 4, title: { pt: "Conclua explorações sem interrupção (4 vezes)", en: "Complete uninterrupted explorations (4 times)" } },
                 { id: "story", title: { pt: "Resolva um evento ou aceite um contato da névoa", en: "Resolve a story event or accept a mist contact" } },
                 { id: "combat", title: { pt: "Vença uma luta ou escape", en: "Win a fight or escape" } },
                 { id: "chest", title: { pt: "Encontre e abra um baú", en: "Find and open a chest" } }
@@ -142,7 +142,7 @@ window.YaraRpgData.regions = Object.freeze([
             title: { pt: "Investigue a aldeia", en: "Investigate the village" },
             description: { pt: "Conclua as tarefas para descobrir o que aconteceu com a aldeia.", en: "Complete the tasks to uncover what happened to the village." },
             tasks: [
-                { id: "exploration", title: { pt: "Conclua uma exploração", en: "Complete an exploration" } },
+                { id: "exploration", required: 7, title: { pt: "Conclua explorações sem interrupção (7 vezes)", en: "Complete uninterrupted explorations (7 times)" } },
                 { id: "story", title: { pt: "Resolva um evento ou aceite um contato da névoa", en: "Resolve a story event or accept a mist contact" } },
                 { id: "combat", title: { pt: "Vença uma luta ou escape", en: "Win a fight or escape" } },
                 { id: "chest", title: { pt: "Encontre e abra um baú", en: "Find and open a chest" } }
@@ -206,7 +206,7 @@ window.YaraRpgData.regions = Object.freeze([
             title: { pt: "Conquiste o castelo", en: "Conquer the castle" },
             description: { pt: "Conclua as tarefas para abrir caminho até a câmara do trono.", en: "Complete the tasks to reach the throne chamber." },
             tasks: [
-                { id: "exploration", title: { pt: "Conclua uma exploração", en: "Complete an exploration" } },
+                { id: "exploration", required: 10, title: { pt: "Conclua explorações sem interrupção (10 vezes)", en: "Complete uninterrupted explorations (10 times)" } },
                 { id: "story", title: { pt: "Resolva um evento ou aceite um contato da névoa", en: "Resolve a story event or accept a mist contact" } },
                 { id: "combat", title: { pt: "Vença uma luta ou escape", en: "Win a fight or escape" } },
                 { id: "chest", title: { pt: "Encontre e abra um baú", en: "Find and open a chest" } }

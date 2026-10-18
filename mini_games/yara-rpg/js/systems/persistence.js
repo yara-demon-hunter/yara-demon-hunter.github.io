@@ -76,7 +76,16 @@ function loadSavedGame(snapshot = readSavedGame()) {
             hero.level
         ]).filter(([regionId]) => regionId));
     completedRegionObjectives = snapshot.completedRegionObjectives && typeof snapshot.completedRegionObjectives === 'object'
-        ? Object.fromEntries(Object.entries(snapshot.completedRegionObjectives).filter(([, ids]) => Array.isArray(ids)))
+        ? Object.fromEntries(Object.entries(snapshot.completedRegionObjectives).filter(([, progress]) =>
+            Array.isArray(progress)
+            || (progress && typeof progress === 'object' && Array.isArray(progress.completedIds))
+        ).map(([regionId, progress]) => [regionId, Array.isArray(progress)
+            ? { completedIds: progress, explorationCount: 0 }
+            : {
+                completedIds: progress.completedIds,
+                explorationCount: Math.max(0, Number(progress.explorationCount) || 0)
+            }
+        ]))
         : {};
     explorationsSinceMistContact = Number(snapshot.explorationsSinceMistContact) || 0;
     explorationCount = Number(snapshot.explorationCount) || 0;

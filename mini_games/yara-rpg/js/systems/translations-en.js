@@ -160,7 +160,7 @@ window.YaraRpgTranslations.en = {
         journey: "Journey",
         regionProgressLabel: "Region progress",
         regionObjectivesButton: "View objectives",
-        regionObjectivesProgress: "Progress: {current} of {required} tasks",
+        regionObjectivesProgress: "Progress: {current} of {required} steps",
         regionObjectiveCompleted: "Objective completed",
         regionObjectivesCompleted: "Objectives completed",
         closeObjectives: "Close objectives",
