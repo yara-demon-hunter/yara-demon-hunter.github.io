@@ -6,13 +6,13 @@ function queueMonsterAttackTurn() {
     monsterAttackTurn();
 }
 
-function showFloatingDamage(targetId, damage, targetType, delayMs = 0, verticalOffset = 0) {
+function showFloatingDamage(targetId, damage, targetType, delayMs = 0, verticalOffset = 0, sign = '−') {
     const target = document.getElementById(targetId);
     if (!target || damage <= 0) return;
 
     const damageNumber = document.createElement('span');
     damageNumber.className = `floating-damage floating-damage-${targetType}`;
-    damageNumber.textContent = `−${damage}`;
+    damageNumber.textContent = `${sign}${damage}`;
     damageNumber.setAttribute('aria-hidden', 'true');
     damageNumber.style.animationDelay = `${delayMs}ms`;
     damageNumber.style.setProperty('--floating-damage-offset', `${verticalOffset}rem`);
@@ -137,6 +137,7 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     const totalDamageDealt = damageDealt + offHandDamageDealt;
     const furyGained = Math.min(getEffectiveFuryThreshold() - hero.fury, Math.floor(totalDamageDealt * furyMultiplier));
     hero.fury += furyGained;
+    if (furyGained > 0) showFloatingDamage('hero-fury-anchor', furyGained, 'fury', 0, 0, '+');
     if (isCritical) {
         logMessage(t('criticalDamage', {
             damage: totalDamageDealt,
@@ -362,6 +363,7 @@ function monsterAttackTurn() {
         const dodgeFuryBonus = Number(selectedCharacter.passive?.furyPerDodgeBonus) || 0;
         const furyGained = Math.min(FURY_PER_DODGE + dodgeFuryBonus, getEffectiveFuryThreshold() - hero.fury);
         hero.fury += furyGained;
+        if (furyGained > 0) showFloatingDamage('hero-fury-anchor', furyGained, 'fury', 0, 0, '+');
         logMessage(t("heroDodges", { monster: currentMonster.name, amount: furyGained }), "special");
         if (encounterId !== combatEncounterId || !inCombat) return;
         combatActionLocked = false;
@@ -388,7 +390,10 @@ function monsterAttackTurn() {
     const damageTaken = Math.min(hero.hp, monsterDamage);
     hero.hp = Math.max(0, hero.hp - damageTaken);
     showFloatingDamage('hero-hp-anchor', damageTaken, 'hero');
+    const furyBeforeHit = hero.fury;
     hero.fury = Math.min(getEffectiveFuryThreshold(), hero.fury + damageTaken * FURY_PER_DAMAGE);
+    const furyGained = hero.fury - furyBeforeHit;
+    if (furyGained > 0) showFloatingDamage('hero-fury-anchor', furyGained, 'fury', 0, 0, '+');
     logMessage(parried
         ? t('heroParries', { damage: damageTaken })
         : t("monsterDamage", { monster: currentMonster.name, damage: damageTaken }), parried ? 'special' : 'combat-monster');

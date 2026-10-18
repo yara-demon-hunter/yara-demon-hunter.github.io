@@ -107,6 +107,23 @@ body {
 }
 .floating-damage-hero { color: #ff3b3b; }
 .floating-damage-focus { color: #38bdf8; }
+.floating-damage-fury {
+    color: #fb923c;
+    text-shadow: 0 0 5px #ffedd5, 0 0 14px #f97316, 0 2px 5px rgba(0, 0, 0, .98);
+}
+#hero-fury-bar.fury-bar-ready {
+    background: linear-gradient(90deg, #f97316, #fef08a, #fb923c, #fff7ed, #f97316);
+    background-size: 240% 100%;
+    box-shadow: 0 0 6px rgba(251, 146, 60, .95), 0 0 15px rgba(249, 115, 22, .75);
+    animation: fury-bar-awaken 1.15s ease-in-out infinite, fury-bar-flow 2s linear infinite;
+}
+@keyframes fury-bar-awaken {
+    0%, 100% { filter: brightness(1.05) saturate(1.15); }
+    50% { filter: brightness(1.8) saturate(1.5); }
+}
+@keyframes fury-bar-flow {
+    to { background-position: 240% 0; }
+}
 #monster-icon.critical-impact {
     animation: critical-impact-shake 550ms ease-out;
     filter: brightness(1.8) drop-shadow(0 0 14px rgba(255, 184, 46, .95));
@@ -151,6 +168,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
     #encounter-card.monster-defeat-transition { animation-duration: 350ms; }
     #monster-icon.monster-stunned::before { animation: none; transform: translateY(-.4rem); }
+    #hero-fury-bar.fury-bar-ready { animation: none; filter: brightness(1.4); }
 }
 @keyframes critical-damage-burst {
     0% { opacity: 0; transform: translate(-50%, var(--floating-damage-offset)) scale(.45) rotate(-8deg); }

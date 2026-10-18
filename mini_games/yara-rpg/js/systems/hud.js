@@ -36,6 +36,7 @@ function updateUI() {
         hero.fury / furyThreshold * GAME_RULES.probabilityScale
     ) + '%';
     const furyReady = hero.fury >= furyThreshold;
+    document.getElementById('hero-fury-bar').classList.toggle('fury-bar-ready', furyReady);
     const quickAttackButton = document.getElementById('quick-attack-button');
     quickAttackButton.classList.toggle('fury-ready', furyReady);
     quickAttackButton.title = furyReady ? t('criticalRequirement', { amount: furyThreshold }) : '';
