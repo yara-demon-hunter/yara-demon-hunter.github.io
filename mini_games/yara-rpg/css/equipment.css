@@ -697,8 +697,8 @@
 }
 .monster-icon-image {
     display: block;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3rem;
+    height: 3rem;
     object-fit: contain;
 }
 #monster-icon,

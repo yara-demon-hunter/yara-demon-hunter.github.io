@@ -34,10 +34,18 @@ window.YaraRpgData.exploration = Object.freeze({
     focusFind: { minimum: 12, range: 13 },
     supplies: { goldMinimum: 10, goldRange: 11, hpRecovery: 12 },
     sparedMonster: {
-        chance: 8,
+        chance: 10,
         goldPercent: 50,
         treasureChanceBonus: 10,
-        treasureOrStrikeChance: 50,
+        outcomeWeights: {
+            strike: 20,
+            treasure: 20,
+            recovery: 20,
+            missingSlotItem: 20,
+            bonusGold: 20
+        },
+        recoveryPercent: 20,
+        bonusGoldPercent: 50,
         strikeMultiplier: 2,
         clues: {
             "dark-forest": [

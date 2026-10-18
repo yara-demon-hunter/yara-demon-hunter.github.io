@@ -182,7 +182,12 @@ function resolveStoryEvent(choiceIndex) {
         hero.fury = 0;
         hero.evasionBonus = 0;
         hero.parryBonus = 0;
-        if (Math.random() * GAME_RULES.probabilityScale < rules.treasureOrStrikeChance) {
+        const outcomes = Object.entries(rules.outcomeWeights);
+        const totalWeight = outcomes.reduce((total, [, weight]) => total + weight, 0);
+        let outcomeRoll = Math.random() * totalWeight;
+        const outcome = outcomes.find(([, weight]) => (outcomeRoll -= weight) < 0)?.[0] || 'strike';
+
+        if (outcome === 'treasure') {
             const regionId = GAME_DATA.regions[currentRegion].id;
             const clues = rules.clues[regionId] || [];
             const clue = clues.length
@@ -195,7 +200,7 @@ function resolveStoryEvent(choiceIndex) {
                 clue,
                 chance: rules.treasureChanceBonus
             }), 'special');
-        } else {
+        } else if (outcome === 'strike') {
             const rolledDamage = Math.max(
                 GAME_RULES.combat.monsterAttack.minimumDamage,
                 monster.atk * rules.strikeMultiplier - getEffectiveStat('def')
@@ -207,6 +212,43 @@ function resolveStoryEvent(choiceIndex) {
                 gold,
                 damage
             }), 'combat-monster');
+        } else if (outcome === 'recovery') {
+            const hpRecovered = Math.min(
+                Math.ceil(getEffectiveStat('maxHp') * rules.recoveryPercent / GAME_RULES.probabilityScale),
+                Math.max(0, getEffectiveStat('maxHp') - hero.hp)
+            );
+            const focoRecovered = Math.min(
+                Math.ceil(getEffectiveStat('maxFoco') * rules.recoveryPercent / GAME_RULES.probabilityScale),
+                Math.max(0, getEffectiveStat('maxFoco') - hero.foco)
+            );
+            hero.hp += hpRecovered;
+            hero.foco += focoRecovered;
+            logMessage(t('monsterSparedRecovery', {
+                monster: monster.name,
+                hp: hpRecovered,
+                foco: focoRecovered
+            }), 'loot');
+        } else if (outcome === 'missingSlotItem') {
+            const emptySlots = Object.keys(hero.equipment).filter((slot) => !hero.equipment[slot]);
+            const equipment = ITEM_DATA.equipment.filter((item) => emptySlots.includes(item.slot));
+            if (equipment.length) {
+                const template = equipment[Math.floor(Math.random() * equipment.length)];
+                const item = createEquipmentInstance(template, rollEquipmentRarity());
+                hero.equipment[item.slot] = item;
+                logMessage(t('monsterSparedItem', {
+                    monster: monster.name,
+                    item: item.name[gameLanguage],
+                    rarity: getEquipmentRarity(item).name[gameLanguage]
+                }), 'loot');
+            } else {
+                const bonusGold = Math.floor(monster.goldReward * rules.bonusGoldPercent / GAME_RULES.probabilityScale);
+                hero.gold += bonusGold;
+                logMessage(t('monsterSparedBonusGold', { monster: monster.name, gold: bonusGold }), 'loot');
+            }
+        } else if (outcome === 'bonusGold') {
+            const bonusGold = Math.floor(monster.goldReward * rules.bonusGoldPercent / GAME_RULES.probabilityScale);
+            hero.gold += bonusGold;
+            logMessage(t('monsterSparedBonusGold', { monster: monster.name, gold: bonusGold }), 'loot');
         }
         updateUI();
         return;

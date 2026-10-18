@@ -218,8 +218,7 @@
         padding: 10px !important;
     }
     #monster-icon {
-        /* padding: 0px !important; */
-        font-size: 0.5rem !important;
+        font-size: 2rem !important;
     }
     #monster-name { font-size: clamp(.52rem, 2.2vw, .68rem); line-height: 1.1; }
     #encounter-card > div > div:last-child {
