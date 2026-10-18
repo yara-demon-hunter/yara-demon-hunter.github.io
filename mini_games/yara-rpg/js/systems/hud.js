@@ -371,8 +371,7 @@ function openRegionObjectives() {
     list.replaceChildren();
     getRegionObjectiveRequirements(region).forEach((task) => {
         const item = document.createElement('li');
-        const completed = getRegionObjectiveTaskProgress(task) >= task.required
-            || discoveredRegions.includes(currentRegion + 1);
+        const completed = getRegionObjectiveTaskProgress(task) >= task.required;
         item.className = completed ? 'region-objective-complete' : 'region-objective-pending';
         const mark = document.createElement('span');
         mark.className = 'region-objective-check';
