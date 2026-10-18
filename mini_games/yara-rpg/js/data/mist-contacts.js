@@ -31,7 +31,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
             minLevel: 2
         },
         {
-            id: "bell-keeper",
+            id: "specter",
             icon: "🔔",
             image: "images/mist_contacts/specter.webp",
             name: {

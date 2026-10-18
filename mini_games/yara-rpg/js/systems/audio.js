@@ -2,7 +2,8 @@
 // Classic browser script; state is initialized by game.js before user actions run.
 
 const gameMusic = document.getElementById('game-music');
-const normalMusicSource = gameMusic.getAttribute('src');
+const gameMusicSource = gameMusic.querySelector('source');
+const normalMusicSource = gameMusicSource.getAttribute('src');
 const musicToggle = document.getElementById('music-toggle');
 const musicIcon = document.getElementById('music-icon');
 const SOUND_EFFECTS = Object.freeze({
@@ -40,25 +41,53 @@ function updateMusicButton(isPlaying) {
 }
 
 function setBossMusic(isBoss) {
-    const nextSource = isBoss ? 'audio/sfx/boss_song.mp3' : normalMusicSource;
-    if (gameMusic.getAttribute('src') === nextSource) return;
+    const nextSource = isBoss ? 'audio/sfx/boss_song.mpga' : normalMusicSource;
+    if (gameMusicSource.getAttribute('src') === nextSource) return;
     gameMusic.pause();
-    gameMusic.setAttribute('src', nextSource);
+    gameMusicSource.setAttribute('src', nextSource);
     gameMusic.load();
     if (musicEnabled && !document.hidden) {
-        gameMusic.play().catch(() => updateMusicButton(false));
+        playBackgroundMusic();
     }
+}
+
+function playBackgroundMusic() {
+    gameMusic.muted = false;
+    gameMusic.volume = 1;
+    let playback;
+    try {
+        playback = gameMusic.play();
+    } catch (error) {
+        handleMusicPlaybackError(error);
+        return Promise.resolve(false);
+    }
+    if (!playback) {
+        updateMusicButton(true);
+        return Promise.resolve(true);
+    }
+    return playback
+        .then(() => {
+            musicEnabled = true;
+            updateMusicButton(true);
+            return true;
+        })
+        .catch(handleMusicPlaybackError);
+}
+
+function handleMusicPlaybackError(error) {
+    musicEnabled = false;
+    updateMusicButton(false);
+    console.error('Não foi possível iniciar a música de fundo:', gameMusic.currentSrc, error);
+    return false;
 }
 
 function startGameMusic() {
     musicEnabled = true;
-    gameMusic.play()
-        .then(() => updateMusicButton(true))
-        .catch(() => updateMusicButton(false));
+    return playBackgroundMusic();
 }
 
 musicToggle.addEventListener('click', () => {
-    if (gameMusic.paused) {
+    if (!musicEnabled || gameMusic.paused) {
         musicEnabled = true;
         startGameMusic();
     } else { musicEnabled = false; gameMusic.pause(); }
@@ -70,10 +99,13 @@ document.addEventListener('visibilitychange', () => {
         return;
     }
     if (musicEnabled && document.getElementById('game-main').hidden === false) {
-        gameMusic.play().catch(() => {});
+        playBackgroundMusic();
     }
 });
 
 gameMusic.addEventListener('play', () => updateMusicButton(true));
 gameMusic.addEventListener('pause', () => updateMusicButton(false));
-gameMusic.addEventListener('error', () => updateMusicButton(false));
+gameMusic.addEventListener('error', () => {
+    musicEnabled = false;
+    updateMusicButton(false);
+});
