@@ -15,7 +15,7 @@ window.YaraRpgCharacterSetup = (() => {
     const PROGRESSION_STAT_KEYS = Object.freeze({
         maxHp: "hpStat",
         maxFoco: "focusStat",
-        maxPotions: "potions",
+        maxPotions: "potionCapacity",
         atk: "attackStat",
         def: "defenseStat",
         evasion: "evasionStat",
@@ -23,6 +23,18 @@ window.YaraRpgCharacterSetup = (() => {
         stunChance: "stun"
     });
     const PERCENTAGE_SPECIALTY_STATS = new Set(["evasion", "parry", "stunChance"]);
+    const SKILL_PRESENTATION = Object.freeze({
+        heavyAttack: { name: "heavyAttackName", description: "heavySkillDetails" },
+        parry: { name: "parrySkillName", description: "parrySkillDetails" },
+        dodge: { name: "dodgeSkillName", description: "dodgeSkillDetails" }
+    });
+    const LIMIT_PRESENTATION = Object.freeze({
+        maxEvasion: { name: "evasionStat", suffix: "%" },
+        maxParry: { name: "parryStat", suffix: "%" },
+        maxStunChance: { name: "stun", suffix: "%" },
+        minFuryThreshold: { name: "minimumFury", suffix: "" },
+        maxPotions: { name: "maximumPotions", suffix: "" }
+    });
     let selectedCharacterId = CHARACTER_DATA[0].id;
     let selectedEquipmentIds = [];
     let translate = (key) => key;
@@ -68,72 +80,65 @@ window.YaraRpgCharacterSetup = (() => {
             description.className = "character-option-description";
             description.textContent = character.description[document.documentElement.lang.startsWith("en") ? "en" : "pt"];
 
-            const basicStats = document.createElement("p");
-            basicStats.className = "character-option-specialty";
-            basicStats.textContent = `${translate("basicStatsSummary")}: ${Object.entries(character.basicStats)
+            const basicStatsSection = createDetailsSection("basicStatsSummary", "character-option-basic-stats");
+            appendStatList(basicStatsSection, character.basicStats, BASIC_STAT_KEYS);
+
+            const progression = createDetailsSection("progressionSummary", "character-option-progression");
+            appendStatList(progression, character.progression, PROGRESSION_STAT_KEYS);
+
+            const skills = createDetailsSection("skillsSummary", "character-option-skills");
+            const skillsList = document.createElement("ul");
+            skillsList.className = "character-details-list character-skills-list";
+            Object.entries(character.skills).forEach(([skill, values]) => {
+                const presentation = SKILL_PRESENTATION[skill];
+                if (!presentation) throw new Error(`Unknown character skill: ${skill}`);
+                const item = document.createElement("li");
+                const name = document.createElement("strong");
+                name.textContent = translate(presentation.name);
+                const description = document.createElement("span");
+                description.textContent = translate(presentation.description, values);
+                item.append(name, description);
+                skillsList.append(item);
+            });
+            skills.append(skillsList);
+
+            const limits = createDetailsSection("limitsSummary", "character-option-limits");
+            const limitsList = document.createElement("ul");
+            limitsList.className = "character-details-list character-limits-list";
+            Object.entries(character.limits).forEach(([limit, amount]) => {
+                const presentation = LIMIT_PRESENTATION[limit];
+                if (!presentation) throw new Error(`Unknown character limit: ${limit}`);
+                const item = document.createElement("li");
+                const name = document.createElement("strong");
+                name.textContent = translate(presentation.name);
+                const value = document.createElement("span");
+                value.textContent = `${amount}${presentation.suffix}`;
+                item.append(name, value);
+                limitsList.append(item);
+            });
+            limits.append(limitsList);
+
+            const basicStatsSummary = document.createElement("p");
+            basicStatsSummary.className = "character-option-specialty";
+            basicStatsSummary.textContent = Object.entries(character.basicStats)
                 .map(([stat, amount]) => {
                     const statKey = BASIC_STAT_KEYS[stat];
                     if (!statKey) throw new Error(`Unknown character basic stat: ${stat}`);
-                    const formattedAmount = PERCENTAGE_SPECIALTY_STATS.has(stat)
-                        ? `${amount}%`
-                        : amount;
+                    const formattedAmount = PERCENTAGE_SPECIALTY_STATS.has(stat) ? `${amount}%` : amount;
                     return translate("characterSpecialty", {
                         stat: translate(statKey),
                         amount: formattedAmount
                     });
                 })
-                .join(" · ")}`;
-
-            const progression = document.createElement("p");
-            progression.className = "character-option-progression";
-            progression.textContent = `${translate("progressionSummary")}: ${Object.entries(character.progression)
-                .filter(([stat]) => stat !== "evasionLimit")
-                .map(([stat, amount]) => {
-                    const statKey = PROGRESSION_STAT_KEYS[stat];
-                    if (!statKey) throw new Error(`Unknown level-up stat: ${stat}`);
-                    const formattedAmount = PERCENTAGE_SPECIALTY_STATS.has(stat)
-                        ? `${amount}%`
-                        : amount;
-                    return translate("characterSpecialty", {
-                        stat: translate(statKey),
-                        amount: formattedAmount
-                    });
-                })
-                .join(" · ")}`;
-
-            const skills = document.createElement("p");
-            skills.className = "character-option-skills";
-            skills.textContent = `${translate("skillsSummary")}: ${[
-                translate("heavySkillSummary", {
-                    cost: character.skills.heavyAttack.focoCost,
-                    damage: character.skills.heavyAttack.attackMultiplier
-                }),
-                translate("parrySkillSummary", {
-                    cost: character.skills.parry.focoCost,
-                    bonus: character.skills.parry.bonus
-                }),
-                translate("dodgeSkillSummary", {
-                    cost: character.skills.dodge.focoCost,
-                    bonus: character.skills.dodge.bonus
-                }),
-            ].join(" · ")}`;
-
-            const limits = document.createElement("p");
-            limits.className = "character-option-limits";
-            limits.textContent = translate("skillLimitsSummary", {
-                evasion: character.limits.maxEvasion,
-                parry: character.limits.maxParry,
-                stun: character.limits.maxStunChance,
-                fury: character.limits.minFuryThreshold
-            });
+                .join(" · ");
 
             const extraInfo = document.createElement("details");
             extraInfo.className = "character-option-extra";
             const extraInfoSummary = document.createElement("summary");
             extraInfoSummary.textContent = translate("characterExtraInfo");
-            extraInfo.append(extraInfoSummary, basicStats, progression, skills, limits);
+            extraInfo.append(extraInfoSummary, basicStatsSection, progression, skills, limits);
 
-            selectButton.append(portrait, name, description, basicStats.cloneNode(true));
+            selectButton.append(portrait, name, description, basicStatsSummary);
             selectButton.addEventListener("click", () => {
                 selectedCharacterId = character.id;
                 renderCharacters();
@@ -142,6 +147,35 @@ window.YaraRpgCharacterSetup = (() => {
             card.append(selectButton, extraInfo);
             container.append(card);
         });
+    }
+
+    function createDetailsSection(titleKey, className) {
+        const section = document.createElement("section");
+        section.className = `character-details-section ${className}`;
+        const title = document.createElement("h4");
+        title.className = "character-details-title";
+        title.textContent = translate(titleKey);
+        section.append(title);
+        return section;
+    }
+
+    function appendStatList(section, stats, statKeys) {
+        const list = document.createElement("ul");
+        list.className = "character-details-list";
+        Object.entries(stats).filter(([, amount]) => amount !== 0).forEach(([stat, amount]) => {
+            const statKey = statKeys[stat];
+            if (!statKey) throw new Error(`Unknown character stat: ${stat}`);
+            const formattedAmount = PERCENTAGE_SPECIALTY_STATS.has(stat)
+                ? `${amount}%`
+                : amount;
+            const item = document.createElement("li");
+            item.textContent = translate("characterSpecialty", {
+                stat: translate(statKey),
+                amount: formattedAmount
+            });
+            list.append(item);
+        });
+        section.append(list);
     }
 
     function renderEquipment() {

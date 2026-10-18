@@ -59,7 +59,8 @@ window.YaraRpgData.characters = Object.freeze([
             maxEvasion: 70,
             maxParry: 45,
             maxStunChance: 40,
-            minFuryThreshold: 50
+            minFuryThreshold: 50,
+            maxPotions: 10
         }
     },
     {
@@ -96,7 +97,8 @@ window.YaraRpgData.characters = Object.freeze([
             maxEvasion: 40,
             maxParry: 65,
             maxStunChance: 30,
-            minFuryThreshold: 60
+            minFuryThreshold: 60,
+            maxPotions: 5
         }
     },
     {
@@ -133,7 +135,8 @@ window.YaraRpgData.characters = Object.freeze([
             maxEvasion: 65,
             maxParry: 65,
             maxStunChance: 45,
-            minFuryThreshold: 40
+            minFuryThreshold: 40,
+            maxPotions: 10
         }
     }
 ]);

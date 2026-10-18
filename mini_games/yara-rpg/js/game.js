@@ -210,7 +210,7 @@ function checkLevelUp() {
         hero.hp = getEffectiveStat("maxHp");
         hero.maxFoco += growth.maxFoco;
         hero.foco = getEffectiveStat("maxFoco");
-        hero.maxPotions = Math.min(ITEM_DATA.healingPotion.maxCapacity, hero.maxPotions + growth.maxPotions);
+        hero.maxPotions = Math.min(selectedCharacter.limits.maxPotions, hero.maxPotions + growth.maxPotions);
         hero.atk += growth.atk;
         hero.def += growth.def;
         hero.evasion = Math.min(selectedCharacter.limits.maxEvasion, hero.evasion + growth.evasion);
