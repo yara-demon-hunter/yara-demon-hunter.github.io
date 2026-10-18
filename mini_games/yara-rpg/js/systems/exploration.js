@@ -2,6 +2,8 @@
 // Loaded as a classic script before game.js; shares the RPG global state.
 
 let regionArrivalTimeout = null;
+let regionObjectiveToastTimeout = null;
+const regionObjectiveToastQueue = [];
 
 function exploreForest() {
     if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
@@ -11,13 +13,7 @@ function exploreForest() {
     }
 
     explorationsSinceMistContact++;
-    explorationCount++;
     explorationsSinceStoryEvent++;
-    if (tryDiscoverRegion()) {
-        updateUI();
-        showRegionArrival(GAME_DATA.regions[currentRegion]);
-        return;
-    }
 
     const regionData = GAME_DATA.regions[currentRegion];
     const regionEvents = Array.isArray(regionData.event) ? regionData.event : [regionData.event].filter(Boolean);
@@ -97,9 +93,12 @@ function exploreForest() {
         hero.chestChanceBonus = 0;
         playSound('chestDiscovery');
         logMessage(t('chestFoundLog'), 'discovery');
+        updateUI();
+        return;
     } else {
         logMessage(t('denseMist'));
     }
+    completeRegionObjective('exploration');
     updateUI();
 }
 
@@ -115,10 +114,10 @@ function openFoundChest() {
             rarity: getEquipmentRarity(item).name[gameLanguage]
         }), 'loot');
         handleEquipmentDrop(item);
-        return;
+    } else {
+        logMessage(t('chestEmpty'), 'normal');
     }
-
-    logMessage(t('chestEmpty'), 'normal');
+    completeRegionObjective('chest');
     updateUI();
 }
 
@@ -171,6 +170,7 @@ function resolveStoryEvent(choiceIndex) {
     const effect = choice.effect;
     const eventSeenKey = `${GAME_DATA.regions[currentRegion].id}:${event.id || event.title.pt}`;
     pendingStoryEvent = null;
+    completeRegionObjective('story', true);
     if (effect === 'monster-final-blow') {
         awardCombatVictory(event.monster);
         return;
@@ -250,6 +250,7 @@ function resolveStoryEvent(choiceIndex) {
             hero.gold += bonusGold;
             logMessage(t('monsterSparedBonusGold', { monster: monster.name, gold: bonusGold }), 'loot');
         }
+        completeRegionObjective('story');
         updateUI();
         return;
     } else if (effect === 'abyssal-challenge') {
@@ -339,37 +340,77 @@ function resolveStoryEvent(choiceIndex) {
     } else if (effect === 'combat') {
         spawnMonster(); return;
     }
+    completeRegionObjective('story');
     updateUI();
 }
 
-function getDiscoveryChance() {
-    const explorationRules = EXPLORATION_RULES.discovery;
-    const currentRegionId = GAME_DATA.regions[currentRegion].id;
-    const levelsGainedHere = hero.level - (regionEntryLevels[currentRegionId] ?? hero.level);
-    if (
-        currentRegion >= GAME_DATA.regions.length - 1
-        || discoveredRegions.includes(currentRegion + 1)
-        || levelsGainedHere <= 0
-    ) return 0;
-    return Math.min(
-        explorationRules.maximumChance,
-        explorationRules.baseChance
-            + levelsGainedHere * explorationRules.chancePerLevel
-            + currentRegion * explorationRules.chancePerRegion
-    );
+function getRegionObjectiveProgress(regionIndex = currentRegion) {
+    const region = GAME_DATA.regions[regionIndex];
+    if (!region) return 0;
+    if (discoveredRegions.includes(regionIndex + 1)) {
+        return region.objectives.tasks.length;
+    }
+    return region.objectives.tasks.filter((task) => isRegionObjectiveComplete(task.id, regionIndex)).length;
 }
 
-function tryDiscoverRegion() {
-    if (Math.random() * GAME_RULES.probabilityScale >= getDiscoveryChance()) return false;
+function isRegionObjectiveComplete(objectiveId, regionIndex = currentRegion) {
+    const regionId = GAME_DATA.regions[regionIndex]?.id;
+    return Boolean(regionId && completedRegionObjectives[regionId]?.includes(objectiveId));
+}
+
+function completeRegionObjective(objectiveId, deferRegionUnlock = false) {
+    completeRegionObjectives([objectiveId], deferRegionUnlock);
+}
+
+function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
+    if (currentRegion >= GAME_DATA.regions.length - 1 || discoveredRegions.includes(currentRegion + 1)) return;
+    const region = GAME_DATA.regions[currentRegion];
+    const completedIds = completedRegionObjectives[region.id] || (completedRegionObjectives[region.id] = []);
+    const newlyCompleted = objectiveIds
+        .map((id) => region.objectives.tasks.find((task) => task.id === id))
+        .filter((task) => task && !completedIds.includes(task.id));
+    if (newlyCompleted.length > 0) {
+        completedIds.push(...newlyCompleted.map((task) => task.id));
+        showRegionObjectiveToast(newlyCompleted);
+    }
+    if (deferRegionUnlock || completedIds.length < region.objectives.tasks.length) return;
 
     currentRegion++;
-    discoveredRegions.push(currentRegion);
+    if (!discoveredRegions.includes(currentRegion)) discoveredRegions.push(currentRegion);
     regionEntryLevels[GAME_DATA.regions[currentRegion].id] = hero.level;
     playSound('regionDiscovered');
     explorationsSinceStoryEvent = 0;
     logMessage(t("regionArrival", { region: GAME_DATA.regions[currentRegion].title[gameLanguage] }), "discovery");
     explorationCount = 0;
-    return true;
+    showRegionArrival(GAME_DATA.regions[currentRegion]);
+    updateUI();
+}
+
+function showRegionObjectiveToast(tasks) {
+    regionObjectiveToastQueue.push(tasks);
+    if (regionObjectiveToastTimeout === null) showNextRegionObjectiveToast();
+}
+
+function showNextRegionObjectiveToast() {
+    const tasks = regionObjectiveToastQueue.shift();
+    if (!tasks) {
+        regionObjectiveToastTimeout = null;
+        return;
+    }
+    const toast = document.getElementById('region-objective-toast');
+    const heading = t(tasks.length === 1 ? 'regionObjectiveCompleted' : 'regionObjectivesCompleted');
+    const taskNames = tasks.map((task) => `✓ ${task.title[gameLanguage]}`).join('\n');
+    toast.textContent = `${heading}\n${taskNames}`;
+    toast.hidden = false;
+    toast.classList.remove('region-objective-toast-visible');
+    void toast.offsetWidth;
+    toast.classList.add('region-objective-toast-visible');
+    regionObjectiveToastTimeout = window.setTimeout(() => {
+        toast.classList.remove('region-objective-toast-visible');
+        toast.hidden = true;
+        regionObjectiveToastTimeout = null;
+        showNextRegionObjectiveToast();
+    }, 2800);
 }
 
 function showRegionArrival(regionData) {
@@ -546,6 +587,7 @@ function acceptMistContact() {
     logMessage(t('mistContactAccepted', { contact: contact.name[gameLanguage] }), 'special');
 
     if (contact.onAccept?.type === 'boss') {
+        completeRegionObjective('story', true);
         const missionBoss = SPECIAL_MONSTERS.find(
             (boss) => boss.id === contact.onAccept.bossId
         );
@@ -571,6 +613,7 @@ function acceptMistContact() {
             hp: hero.hp,
             gold: drinkOffer.gold
         }), 'loot');
+        completeRegionObjective('story');
         updateUI();
         return;
     }
@@ -588,6 +631,7 @@ function acceptMistContact() {
     );
 
     if (outcome?.type === 'combat' && boss) {
+        completeRegionObjective('story', true);
         spawnMonster(boss);
         return;
     }
@@ -609,6 +653,7 @@ function acceptMistContact() {
             power: power.name[gameLanguage],
             description: power.description[gameLanguage]
         }), 'special');
+        completeRegionObjective('story');
         updateUI();
         return;
     }
@@ -625,6 +670,7 @@ function acceptMistContact() {
     hero.gold += goldGained;
     hero.hp -= hpLost;
     logMessage(t('mistSacrifice', { gold: goldGained, hp: hpLost }), 'loot');
+    completeRegionObjective('story');
     updateUI();
 }
 

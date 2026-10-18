@@ -91,6 +91,7 @@ function combatRun() {
         combatActionLocked = false;
         document.getElementById('rpg-log').dataset.combat = 'false';
         currentMonster = null;
+        completeRegionObjective('combat');
         updateUI();
     } else {
         logMessage(t("escapeFailed", { monster: currentMonster.name }), "combat-monster");
@@ -115,6 +116,7 @@ async function endCombatVictory() {
         hero.fury = 0;
         hero.evasionBonus = 0;
         hero.parryBonus = 0;
+        completeRegionObjective('combat', true);
         pendingStoryEvent = createMonsterFateEvent(defeatedMonster);
         document.getElementById('rpg-log').dataset.combat = 'false';
         updateUI();
@@ -204,8 +206,9 @@ function awardCombatVictory(monster) {
         }
         handleEquipmentDrop(equipmentDrop);
     }
+    completeRegionObjective('combat');
     document.getElementById('rpg-log').dataset.combat = 'false';
-    updateUI();
+    if (!campaignComplete) updateUI();
 }
 
 function endCombatDefeat() {

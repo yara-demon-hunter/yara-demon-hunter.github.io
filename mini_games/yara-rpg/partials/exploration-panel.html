@@ -34,7 +34,18 @@
                     </div>
                     <button id="next-region-button" type="button" onclick="navigateRegion(1)" class="region-nav-button" aria-label="Próxima região" title="Próxima região">›</button>
                 </div>
-                <p id="discovery-chance" class="mt-2 text-[11px] text-gray-400">Chance de descobrir a próxima área: 8%</p>
+                <div id="region-progress" class="region-progress" role="group" aria-labelledby="region-progress-label">
+                    <div class="region-progress-heading">
+                        <span id="region-progress-label" data-i18n="regionProgressLabel">Progresso da região</span>
+                        <span id="region-progress-count">0/8</span>
+                    </div>
+                    <div class="region-progress-controls">
+                        <div id="region-progress-track" class="region-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0" aria-labelledby="region-progress-label">
+                            <div id="region-progress-bar" class="region-progress-bar"></div>
+                        </div>
+                        <button type="button" class="region-objectives-button" onclick="openRegionObjectives()" data-i18n="regionObjectivesButton">Ver objetivos</button>
+                    </div>
+                </div>
                 <p id="treasure-chance-bonus" class="mt-1 text-[11px] text-amber-200" hidden></p>
                 <button id="restart-button" onclick="restartGame()" class="hidden mt-3 bg-amber-600 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded-lg transition" data-i18n="restart">Reiniciar jornada</button>
             </div>

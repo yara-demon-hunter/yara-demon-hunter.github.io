@@ -138,14 +138,17 @@ function updateUI() {
     nextRegionButton.setAttribute('aria-label', t('nextRegion'));
     nextRegionButton.title = t('nextRegion');
 
-    const discoveryChanceDisplay = document.getElementById('discovery-chance');
-    discoveryChanceDisplay.hidden = discoveredRegions.includes(currentRegion + 1);
-    const nextDiscoveryChance = getDiscoveryChance();
-    discoveryChanceDisplay.innerText = nextDiscoveryChance
-        ? t('discoveryChance', { chance: nextDiscoveryChance })
-        : currentRegion >= GAME_DATA.regions.length - 1
-            ? t('journeyComplete')
-            : t('discoveryRequiresLevel');
+    const regionProgress = document.getElementById('region-progress');
+    const regionProgressTrack = document.getElementById('region-progress-track');
+    const objectivesRequired = currentRegionData.objectives.tasks.length;
+    const objectiveProgress = getRegionObjectiveProgress();
+    regionProgress.hidden = objectivesRequired <= 0;
+    document.getElementById('region-progress-count').innerText = `${objectiveProgress}/${objectivesRequired}`;
+    document.getElementById('region-progress-bar').style.width = objectivesRequired > 0
+        ? `${objectiveProgress / objectivesRequired * 100}%`
+        : '0%';
+    regionProgressTrack.setAttribute('aria-valuemax', String(objectivesRequired));
+    regionProgressTrack.setAttribute('aria-valuenow', String(objectiveProgress));
     const treasureChanceBonusDisplay = document.getElementById('treasure-chance-bonus');
     treasureChanceBonusDisplay.hidden = hero.chestChanceBonus <= 0;
     treasureChanceBonusDisplay.innerText = hero.chestChanceBonus > 0
@@ -353,6 +356,40 @@ function updateUI() {
         restartButton.classList.add('hidden');
     }
     saveGame();
+}
+
+function openRegionObjectives() {
+    const region = GAME_DATA.regions[currentRegion];
+    const objectives = region.objectives;
+    const dialog = document.getElementById('region-objectives-dialog');
+    document.getElementById('region-objectives-title').textContent = objectives.title[gameLanguage];
+    document.getElementById('region-objectives-description').textContent = objectives.description[gameLanguage];
+    const objectiveCount = getRegionObjectiveProgress();
+    document.getElementById('region-objectives-progress').textContent = t('regionObjectivesProgress', {
+        current: objectiveCount,
+        required: objectives.tasks.length
+    });
+    const list = document.getElementById('region-objectives-list');
+    list.replaceChildren();
+    objectives.tasks.forEach((task) => {
+        const item = document.createElement('li');
+        const completed = isRegionObjectiveComplete(task.id) || discoveredRegions.includes(currentRegion + 1);
+        item.className = completed ? 'region-objective-complete' : 'region-objective-pending';
+        const mark = document.createElement('span');
+        mark.className = 'region-objective-check';
+        mark.textContent = completed ? '✓' : '○';
+        mark.setAttribute('aria-hidden', 'true');
+        const label = document.createElement('span');
+        label.textContent = task.title[gameLanguage];
+        item.append(mark, label);
+        list.append(item);
+    });
+    if (!dialog.open) dialog.showModal();
+}
+
+function closeRegionObjectives() {
+    const dialog = document.getElementById('region-objectives-dialog');
+    if (dialog.open) dialog.close();
 }
 
 window.logMessage = function logMessage(message, type = 'normal') {

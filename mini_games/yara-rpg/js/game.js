@@ -110,6 +110,7 @@ let currentRegion = 0;
 let discoveredRegions = [0];
 let regionEntryLevels = {};
 let explorationCount = 0;
+let completedRegionObjectives = {};
 let explorationsSinceStoryEvent = 0;
 let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
 let pendingStoryEvent = null;
@@ -155,6 +156,7 @@ function startAdventure({ character, equipment }) {
     storyEventSeen.clear();
     seenStoryEvents.clear();
     explorationCount = 0;
+    completedRegionObjectives = {};
     explorationsSinceStoryEvent = 0;
     explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
     combatActionLocked = false;

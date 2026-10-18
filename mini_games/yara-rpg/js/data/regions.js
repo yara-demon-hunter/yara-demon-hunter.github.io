@@ -10,6 +10,16 @@ window.YaraRpgData.regions = Object.freeze([
             pt: "O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos.",
             en: "The bell rang too late. The mist hides hungry beasts and ancient secrets."
         },
+        objectives: {
+            title: { pt: "Abra caminho pela névoa", en: "Cut a path through the mist" },
+            description: { pt: "Conclua as tarefas para encontrar uma saída da floresta.", en: "Complete the tasks to find a way out of the forest." },
+            tasks: [
+                { id: "exploration", title: { pt: "Conclua uma exploração", en: "Complete an exploration" } },
+                { id: "story", title: { pt: "Resolva um evento ou aceite um contato da névoa", en: "Resolve a story event or accept a mist contact" } },
+                { id: "combat", title: { pt: "Vença uma luta ou escape", en: "Win a fight or escape" } },
+                { id: "chest", title: { pt: "Encontre e abra um baú", en: "Find and open a chest" } }
+            ]
+        },
         event: [
             {
                 title: { pt: "Pegadas sob a chuva", en: "Footprints in the rain" },
@@ -63,6 +73,16 @@ window.YaraRpgData.regions = Object.freeze([
         description: {
             pt: "🌊 A correnteza corta a floresta. Atravesse o rio e encontre o caminho para o outro lado, onde a névoa ainda esconde perigos.",
             en: "🌊 The current cuts through the forest. Cross the river to reach the far side, where the mist still hides danger."
+        },
+        objectives: {
+            title: { pt: "Encontre uma travessia segura", en: "Find a safe crossing" },
+            description: { pt: "Conclua as tarefas para atravessar o rio e seguir viagem.", en: "Complete the tasks to cross the river and continue your journey." },
+            tasks: [
+                { id: "exploration", title: { pt: "Conclua uma exploração", en: "Complete an exploration" } },
+                { id: "story", title: { pt: "Resolva um evento ou aceite um contato da névoa", en: "Resolve a story event or accept a mist contact" } },
+                { id: "combat", title: { pt: "Vença uma luta ou escape", en: "Win a fight or escape" } },
+                { id: "chest", title: { pt: "Encontre e abra um baú", en: "Find and open a chest" } }
+            ]
         },
         event: [
             {
@@ -118,6 +138,16 @@ window.YaraRpgData.regions = Object.freeze([
             pt: "🕯️ Tochas de chama azulada iluminam as casas da aldeia. As ruas estão quietas demais, e sinais de invasores ainda marcam as paredes.",
             en: "🕯️ Blue-flamed torches light the village homes. The streets are too quiet, and signs of invaders still mark the walls."
         },
+        objectives: {
+            title: { pt: "Investigue a aldeia", en: "Investigate the village" },
+            description: { pt: "Conclua as tarefas para descobrir o que aconteceu com a aldeia.", en: "Complete the tasks to uncover what happened to the village." },
+            tasks: [
+                { id: "exploration", title: { pt: "Conclua uma exploração", en: "Complete an exploration" } },
+                { id: "story", title: { pt: "Resolva um evento ou aceite um contato da névoa", en: "Resolve a story event or accept a mist contact" } },
+                { id: "combat", title: { pt: "Vença uma luta ou escape", en: "Win a fight or escape" } },
+                { id: "chest", title: { pt: "Encontre e abra um baú", en: "Find and open a chest" } }
+            ]
+        },
         event: [
             {
                 title: { pt: "O abrigo dos sobreviventes", en: "The survivors' shelter" },
@@ -171,6 +201,16 @@ window.YaraRpgData.regions = Object.freeze([
         description: {
             pt: "🏰 As muralhas de Gudran guardam criaturas antigas e cavaleiros que não aceitam intrusos.",
             en: "🏰 Gudran's walls conceal ancient creatures and knights who suffer no intruders."
+        },
+        objectives: {
+            title: { pt: "Conquiste o castelo", en: "Conquer the castle" },
+            description: { pt: "Conclua as tarefas para abrir caminho até a câmara do trono.", en: "Complete the tasks to reach the throne chamber." },
+            tasks: [
+                { id: "exploration", title: { pt: "Conclua uma exploração", en: "Complete an exploration" } },
+                { id: "story", title: { pt: "Resolva um evento ou aceite um contato da névoa", en: "Resolve a story event or accept a mist contact" } },
+                { id: "combat", title: { pt: "Vença uma luta ou escape", en: "Win a fight or escape" } },
+                { id: "chest", title: { pt: "Encontre e abra um baú", en: "Find and open a chest" } }
+            ]
         },
         event: [
             {
@@ -234,6 +274,11 @@ window.YaraRpgData.regions = Object.freeze([
         description: {
             pt: "Além das portas do castelo, Gudran aguarda no coração de seu domínio. A névoa parece prender a respiração.",
             en: "Beyond the castle doors, Gudran waits at the heart of his domain. Even the mist seems to hold its breath."
+        },
+        objectives: {
+            title: { pt: "Enfrente Gudran", en: "Face Gudran" },
+            description: { pt: "Você chegou à etapa final da jornada.", en: "You have reached the final stage of the journey." },
+            tasks: []
         },
         event: []
     }

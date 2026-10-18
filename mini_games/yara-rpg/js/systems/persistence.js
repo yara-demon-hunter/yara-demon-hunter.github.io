@@ -5,7 +5,7 @@ function saveGame() {
     if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return;
     const snapshot = {
         version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)), inCombat,
-        currentRegion, discoveredRegions, regionEntryLevels, explorationsSinceMistContact, explorationCount,
+        currentRegion, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
         explorationsSinceStoryEvent,
         storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
         seenStoryEvents: [...seenStoryEvents], pendingChest,
@@ -75,6 +75,9 @@ function loadSavedGame(snapshot = readSavedGame()) {
             GAME_DATA.regions[regionIndex]?.id,
             hero.level
         ]).filter(([regionId]) => regionId));
+    completedRegionObjectives = snapshot.completedRegionObjectives && typeof snapshot.completedRegionObjectives === 'object'
+        ? Object.fromEntries(Object.entries(snapshot.completedRegionObjectives).filter(([, ids]) => Array.isArray(ids)))
+        : {};
     explorationsSinceMistContact = Number(snapshot.explorationsSinceMistContact) || 0;
     explorationCount = Number(snapshot.explorationCount) || 0;
     explorationsSinceStoryEvent = Number(snapshot.explorationsSinceStoryEvent) || 0;

@@ -1,3 +1,18 @@
+<dialog id="region-objectives-dialog" class="item-drop-dialog region-objectives-dialog" aria-labelledby="region-objectives-title" aria-describedby="region-objectives-description">
+    <div class="item-drop-content">
+        <div class="equipment-bag-heading">
+            <div>
+                <h2 id="region-objectives-title" class="text-lg font-bold text-amber-300"></h2>
+                <p id="region-objectives-description" class="mt-1 text-xs text-gray-300"></p>
+            </div>
+            <button type="button" class="dialog-close-button" onclick="closeRegionObjectives()" data-i18n-aria="closeObjectives" aria-label="Fechar objetivos">×</button>
+        </div>
+        <p id="region-objectives-progress" class="region-objectives-progress"></p>
+        <ul id="region-objectives-list" class="region-objectives-list"></ul>
+        <button type="button" class="story-event-choice region-objectives-close" onclick="closeRegionObjectives()" data-i18n="closeObjectives">Fechar</button>
+    </div>
+</dialog>
+
 <dialog id="equipment-bag-dialog" class="item-drop-dialog equipment-bag-dialog" aria-labelledby="equipment-bag-title" aria-describedby="equipment-bag-description">
         <div class="item-drop-content">
             <div class="equipment-bag-heading">

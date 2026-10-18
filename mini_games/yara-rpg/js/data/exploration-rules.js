@@ -4,12 +4,6 @@ window.YaraRpgData = window.YaraRpgData || {};
 // Story events are checked separately; outcome weights below total 100.
 // Unavailable healing/potion outcomes are removed and their weight is redistributed.
 window.YaraRpgData.exploration = Object.freeze({
-    discovery: {
-        baseChance: 1,
-        chancePerLevel: 2,
-        chancePerRegion: 1,
-        maximumChance: 10
-    },
     storyEvents: {
         chance: 20,
         cooldownExplorations: 3
