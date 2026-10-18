@@ -41,12 +41,12 @@
                     </section>
                 </div>
             </div>
-            <div class="mt-4 grid grid-cols-2 gap-2">
-                <button id="equip-new-item-button" type="button" class="rounded-lg border border-amber-500 bg-amber-700 px-3 py-2 text-sm font-semibold text-white" data-i18n="equipNewItem">Equipar novo</button>
-                <button id="keep-current-item-button" type="button" class="rounded-lg border border-forest-600 bg-forest-800 px-3 py-2 text-sm font-semibold text-emerald-100" data-i18n="keepCurrentItem">Manter atual</button>
-                <button id="equip-other-hand-from-drop-button" type="button" class="col-span-2 justify-self-center rounded-lg border border-amber-500/80 bg-amber-950/80 px-4 py-2 text-sm font-semibold text-amber-100 hover:bg-amber-900/90"></button>
-                <button id="open-bag-from-drop-button" type="button" class="col-span-2 justify-self-center rounded-lg border border-red-500/80 bg-red-950/80 px-4 py-2 text-sm font-semibold text-red-100 hover:bg-red-900/90" data-i18n="openBag">Abrir mochila</button>
-                <button id="discard-pending-item-button" type="button" class="col-span-2 justify-self-center rounded-lg border border-red-500/80 bg-red-950/80 px-4 py-2 text-sm font-semibold text-red-100 hover:bg-red-900/90" data-i18n="discard">Descartar item encontrado</button>
+            <div id="item-drop-actions" class="item-drop-actions">
+                <button id="equip-new-item-button" type="button" class="item-drop-action item-drop-action-primary" data-i18n="equipNewItem">Equipar novo</button>
+                <button id="keep-current-item-button" type="button" class="item-drop-action item-drop-action-secondary" data-i18n="keepCurrentItem">Manter atual</button>
+                <button id="equip-other-hand-from-drop-button" type="button" class="item-drop-action item-drop-action-alternative"></button>
+                <button id="open-bag-from-drop-button" type="button" class="item-drop-action item-drop-action-open-bag" data-i18n="openBag">Abrir mochila</button>
+                <button id="discard-pending-item-button" type="button" class="item-drop-action item-drop-action-discard" data-i18n="discard">Descartar item encontrado</button>
             </div>
         </div>
     </dialog>

@@ -504,6 +504,10 @@ function showEquipmentChoice(item, fromInventory, targetSlot = item.slot) {
     const blockedByFullBag = isPendingDropBlocked();
     const blockedByStorageCapacity = !fromInventory
         && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY;
+    document.getElementById('item-drop-actions').classList.toggle(
+        'item-drop-actions-blocked',
+        blockedByFullBag || blockedByStorageCapacity
+    );
     const choiceHelp = blockedByFullBag
         ? t('pendingEquipmentFullHelp')
         : conflicts.length > 1

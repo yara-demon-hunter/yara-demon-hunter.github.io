@@ -230,6 +230,71 @@
     color: #d6b45b;
     font-size: 1.35rem;
 }
+.item-drop-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin-top: 1rem;
+}
+.item-drop-action {
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid transparent;
+    border-radius: 0.65rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    overflow-wrap: anywhere;
+    transition: background-color 150ms ease, border-color 150ms ease;
+}
+.item-drop-action-primary {
+    border-color: #d97706;
+    background: #92400e;
+    color: #fff;
+}
+.item-drop-action-primary:hover:not(:disabled) { background: #b45309; }
+.item-drop-action-secondary {
+    border-color: #047857;
+    background: #064e3b;
+    color: #d1fae5;
+}
+.item-drop-action-secondary:hover:not(:disabled) { background: #065f46; }
+.item-drop-action-alternative {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    border-color: rgba(217, 170, 65, 0.65);
+    background: rgba(69, 45, 12, 0.75);
+    color: #fde68a;
+}
+.item-drop-action-alternative:hover:not(:disabled) { background: rgba(120, 83, 20, 0.8); }
+.item-drop-action-open-bag {
+    border-color: rgba(180, 83, 9, 0.75);
+    background: rgba(120, 53, 15, 0.55);
+    color: #ffedd5;
+}
+.item-drop-action-open-bag:hover:not(:disabled) { background: rgba(154, 52, 18, 0.75); }
+.item-drop-action-discard {
+    min-height: 2.5rem;
+    border-color: rgba(127, 29, 29, 0.8);
+    background: rgba(69, 10, 10, 0.55);
+    color: #fecaca;
+    font-size: 0.8rem;
+}
+.item-drop-action-discard:hover:not(:disabled) { background: rgba(127, 29, 29, 0.7); }
+.item-drop-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+.item-drop-action:focus-visible {
+    outline: 2px solid #fcd34d;
+    outline-offset: 2px;
+}
+.item-drop-actions-blocked .item-drop-action-alternative {
+    grid-column: 1 / -1;
+}
+.item-drop-action[hidden] { display: none; }
 .equipment-bag-heading {
     display: flex;
     align-items: center;
