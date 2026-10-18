@@ -187,6 +187,7 @@ function awardCombatVictory(monster) {
     const equipmentDrop = challengeRewardRarities
         ? createChallengeEquipmentDrop(challengeRewardRarities)
         : createEquipmentDrop();
+    completeRegionObjective('monsters');
     inCombat = false;
     combatEncounterId++;
     combatActionLocked = false;

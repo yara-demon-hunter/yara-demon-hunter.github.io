@@ -380,7 +380,7 @@ function openRegionObjectives() {
         mark.setAttribute('aria-hidden', 'true');
         const label = document.createElement('span');
         const progress = Math.min(task.required, getRegionObjectiveTaskProgress(task));
-        label.textContent = task.id === 'exploration'
+        label.textContent = ['exploration', 'monsters'].includes(task.id)
             ? `${task.title[gameLanguage]} (${progress}/${task.required})`
             : task.title[gameLanguage];
         item.append(mark, label);

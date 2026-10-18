@@ -80,10 +80,11 @@ function loadSavedGame(snapshot = readSavedGame()) {
             Array.isArray(progress)
             || (progress && typeof progress === 'object' && Array.isArray(progress.completedIds))
         ).map(([regionId, progress]) => [regionId, Array.isArray(progress)
-            ? { completedIds: progress, explorationCount: 0 }
+            ? { completedIds: progress, explorationCount: 0, monsterCount: 0 }
             : {
                 completedIds: progress.completedIds,
-                explorationCount: Math.max(0, Number(progress.explorationCount) || 0)
+                explorationCount: Math.max(0, Number(progress.explorationCount) || 0),
+                monsterCount: Math.max(0, Number(progress.monsterCount) || 0)
             }
         ]))
         : {};

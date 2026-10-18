@@ -363,6 +363,9 @@ function isRegionObjectiveComplete(objectiveId, regionIndex = currentRegion) {
     if (objectiveId === 'exploration') {
         return getCompletedUninterruptedExplorations(region.id) >= getObjectiveRequirement(task);
     }
+    if (objectiveId === 'monsters') {
+        return getDefeatedMonsters(region.id) >= getObjectiveRequirement(task);
+    }
     const completedIds = completedRegionObjectives[region.id]?.completedIds
         || completedRegionObjectives[region.id];
     return Array.isArray(completedIds) && completedIds.includes(objectiveId);
@@ -383,10 +386,15 @@ function getCompletedUninterruptedExplorations(regionId) {
     return Math.max(0, Number(completedRegionObjectives[regionId]?.explorationCount) || 0);
 }
 
+function getDefeatedMonsters(regionId) {
+    return Math.max(0, Number(completedRegionObjectives[regionId]?.monsterCount) || 0);
+}
+
 function getRegionObjectiveTaskProgress(task, regionIndex = currentRegion) {
     const region = GAME_DATA.regions[regionIndex];
     if (!region) return 0;
     if (task.id === 'exploration') return getCompletedUninterruptedExplorations(region.id);
+    if (task.id === 'monsters') return getDefeatedMonsters(region.id);
     return Number(isRegionObjectiveComplete(task.id, regionIndex));
 }
 
@@ -399,25 +407,27 @@ function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
     const region = GAME_DATA.regions[currentRegion];
     let regionProgress = completedRegionObjectives[region.id];
     if (!regionProgress) {
-        regionProgress = { completedIds: [], explorationCount: 0 };
+        regionProgress = { completedIds: [], explorationCount: 0, monsterCount: 0 };
         completedRegionObjectives[region.id] = regionProgress;
     }
     // Migrate progress from saves created before cumulative exploration objectives.
     const completedIds = Array.isArray(regionProgress) ? regionProgress : regionProgress.completedIds;
     if (Array.isArray(regionProgress)) {
-        regionProgress = { completedIds, explorationCount: 0 };
+        regionProgress = { completedIds, explorationCount: 0, monsterCount: 0 };
         completedRegionObjectives[region.id] = regionProgress;
     }
-    const explorationTask = region.objectives.tasks.find((task) => task.id === 'exploration');
-    if (objectiveIds.includes('exploration') && explorationTask) {
-        const required = getObjectiveRequirement(explorationTask);
-        const previousCount = getCompletedUninterruptedExplorations(region.id);
-        if (previousCount < required) {
-            regionProgress.explorationCount = previousCount + 1;
-        updateUI();
-        if (previousCount + 1 >= required) showRegionObjectiveToast([explorationTask]);
+    for (const [objectiveId, progressKey] of [['exploration', 'explorationCount'], ['monsters', 'monsterCount']]) {
+        const objectiveTask = region.objectives.tasks.find((task) => task.id === objectiveId);
+        if (objectiveIds.includes(objectiveId) && objectiveTask) {
+            const required = getObjectiveRequirement(objectiveTask);
+            const previousCount = Math.max(0, Number(regionProgress[progressKey]) || 0);
+            if (previousCount < required) {
+                regionProgress[progressKey] = previousCount + 1;
+                updateUI();
+                if (previousCount + 1 >= required) showRegionObjectiveToast([objectiveTask]);
+            }
+            objectiveIds = objectiveIds.filter((id) => id !== objectiveId);
         }
-        objectiveIds = objectiveIds.filter((id) => id !== 'exploration');
     }
     const newlyCompleted = objectiveIds
         .map((id) => region.objectives.tasks.find((task) => task.id === id))
