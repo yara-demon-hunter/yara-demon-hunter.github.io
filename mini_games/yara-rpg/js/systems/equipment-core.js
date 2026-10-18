@@ -15,9 +15,12 @@ function getEquipmentRarity(item) {
 }
 
 function getEquipmentSlotLabel(item) {
-    return item.handUsage === 'two-handed'
-        ? `${t(item.slot)} · ${t('twoHanded')}`
-        : t(item.slot);
+    const slot = typeof item?.slot === 'string' && item.slot
+        ? item.slot
+        : 'unknownEquipmentSlot';
+    return item?.handUsage === 'two-handed'
+        ? `${t(slot)} · ${t('twoHanded')}`
+        : t(slot);
 }
 
 function getEquipmentConflicts(item) {

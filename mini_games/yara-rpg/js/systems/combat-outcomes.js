@@ -38,7 +38,7 @@ function usePotion() {
     if (inCombat) {
         combatActionLocked = true;
         logMessage(t("potionOpening"));
-        monsterAttackTurn();
+        queueMonsterAttackTurn();
         updateUI();
     }
 }
@@ -94,7 +94,7 @@ function combatRun() {
         updateUI();
     } else {
         logMessage(t("escapeFailed", { monster: currentMonster.name }), "combat-monster");
-        monsterAttackTurn();
+        queueMonsterAttackTurn();
     }
 }
 

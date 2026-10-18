@@ -464,6 +464,7 @@ function spawnMonster(templateOverride = null) {
     document.getElementById('monster-hp-max').innerText = currentMonster.maxHp;
     const monsterIcon = document.getElementById('monster-icon');
     document.getElementById('encounter-card').classList.remove('monster-defeat-transition');
+    clearMonsterStunEffect();
     monsterIcon.classList.remove('critical-impact');
     monsterIcon.style.removeProperty('filter');
     monsterIcon.replaceChildren();

@@ -105,6 +105,7 @@ window.YaraRpgTranslations.pt = {
         ring: "Anel",
         accessory: "Acessório",
         pet: "Companheiro",
+        unknownEquipmentSlot: "Slot desconhecido",
         equip: "Equipar",
         unequip: "Desequipar",
         upgradeEquipmentButton: "Aprimorar +{level} · {cost} 🪙",
