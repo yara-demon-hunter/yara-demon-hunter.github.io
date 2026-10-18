@@ -30,8 +30,13 @@ const EQUIPMENT_STAT_KEYS = Object.freeze({
     evasion: "evasionStat",
     parry: "parryStat",
     stunChance: "stun",
+    criticalChance: "criticalChance",
+    criticalDamage: "criticalDamageStat",
     maxFury: "fury",
 });
+const PERCENTAGE_EQUIPMENT_STATS = new Set([
+    "evasion", "parry", "stunChance", "criticalChance", "criticalDamage", "maxFury"
+]);
 
 function createEmptyEquipmentMap() {
     return Object.fromEntries(EQUIPMENT_SLOTS.map(s => [s.id, null]));
@@ -65,7 +70,6 @@ const UPGRADE_CONFIG             = GAME_RULES.upgrades.attributes;
 const FURY_PER_DAMAGE            = GAME_RULES.combat.furyPerDamageTaken;
 const FURY_PER_DODGE             = GAME_RULES.combat.furyPerDodge;
 const FURY_PER_BASIC_ATTACK_DAMAGE = GAME_RULES.combat.furyPerBasicAttackDamage;
-const CRITICAL_DAMAGE_MULTIPLIER = GAME_RULES.combat.criticalDamageMultiplier;
 const CRITICAL_STUN_BONUS        = GAME_RULES.combat.criticalStunBonus;
 
 // ---------- 3) Estado global ----------
@@ -216,6 +220,10 @@ function checkLevelUp() {
         hero.evasion = Math.min(selectedCharacter.limits.maxEvasion, hero.evasion + growth.evasion);
         hero.parry = Math.min(selectedCharacter.limits.maxParry, hero.parry + growth.parry);
         hero.stunChance = Math.min(selectedCharacter.limits.maxStunChance, hero.stunChance + growth.stunChance);
+        hero.criticalChance = Math.min(
+            selectedCharacter.limits.maxCriticalChance,
+            hero.criticalChance + (Number(growth.criticalChance) || 0)
+        );
 
         hero.skillPoints = (Number(hero.skillPoints) || 0) + SKILL_POINTS_PER_LEVEL;
 

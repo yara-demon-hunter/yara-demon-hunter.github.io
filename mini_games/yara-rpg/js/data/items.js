@@ -8,10 +8,10 @@ window.YaraRpgData.items = Object.freeze({
         healFoco:20
     },
     equipment: Object.freeze([
-        { id: "iron-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🗡️", image: "images/items/iron-sword.webp", name: { pt: "Espada de Ferro", en: "Iron Sword" }, stats: { atk: 2, def: 1, evasion: 1 }, starter: true },
-        { id: "hunter-axe", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🪓", image: "images/items/hunter-axe.webp", name: { pt: "Machado do Caçador", en: "Hunter's Axe" }, stats: { atk: 3, parry: 1 }, starter: true },
-        { id: "hunter-bow", slot: "mainHand", handUsage: "two-handed", itemType: "weapon", icon: "🏹", image: "images/items/hunter-bow.webp", name: { pt: "Arco e Flecha", en: "Bow and Arrows" }, stats: { atk: 3, evasion: 2, stunChance: 1, maxFury: -5 }, starter: true },
-        { id: "hunter-dagger", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🔪", image: "images/items/hunter-dagger.webp", name: { pt: "Faca do Caçador", en: "Hunter's Dagger" }, stats: { atk: 1, evasion: 3 }, starter: true },
+        { id: "iron-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🗡️", image: "images/items/iron-sword.webp", name: { pt: "Espada de Ferro", en: "Iron Sword" }, stats: { atk: 3, def: 1, evasion: 2 }, starter: true },
+        { id: "hunter-axe", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🪓", image: "images/items/hunter-axe.webp", name: { pt: "Machado do Caçador", en: "Hunter's Axe" }, stats: { atk: 5, parry: 1, criticalChance: 1 }, starter: true },
+        { id: "hunter-bow", slot: "mainHand", handUsage: "two-handed", itemType: "weapon", icon: "🏹", image: "images/items/hunter-bow.webp", name: { pt: "Arco e Flecha", en: "Bow and Arrows" }, stats: { atk: 1, evasion: 2, stunChance: 1, maxFury: -5 }, starter: true },
+        { id: "hunter-dagger", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🔪", image: "images/items/hunter-dagger.webp", name: { pt: "Faca do Caçador", en: "Hunter's Dagger" }, stats: { atk: 1, evasion: 4, criticalChance: 3 }, starter: true },
         { id: "wooden-shield", slot: "offHand", itemType: "shield", icon: "🛡️", image: "images/items/wooden-shield.webp", name: { pt: "Escudo de Madeira", en: "Wooden Shield" }, stats: { def: 5, parry: 5 }, starter: true },
         { id: "leather-cap", slot: "head", icon: "⛑️", image: "images/items/leather-cap.webp", name: { pt: "Capuz de Couro", en: "Leather Hood" }, stats: { def: 1, evasion: 3 }, starter: true },
         { id: "leather-armor", slot: "body", icon: "🦺", image: "images/items/leather-armor.webp", name: { pt: "Armadura de Couro", en: "Leather Armor" }, stats: { def: 1, maxHp: 30 }, starter: true },
@@ -23,7 +23,7 @@ window.YaraRpgData.items = Object.freeze({
         { id: "forest-dog", slot: "pet", icon: "🐕", image: "images/items/forest-dog.webp", name: { pt: "Cão da Trilha", en: "Trail Hound" }, stats: { atk: 1, evasion: 2, parry: 1 }, starter: true },
         { id: "shadow-cat", slot: "pet", icon: "🐈", image: "images/items/shadow-cat.webp", name: { pt: "Gato Sombrio", en: "Shadow Cat" }, stats: { evasion: 3, stunChance: 1 }, starter: true },
         { id: "wild-horse", slot: "pet", icon: "🐎", image: "images/items/wild-horse.webp", name: { pt: "Cavalo Selvagem", en: "Wild Horse" }, stats: { maxHp: 20, maxFoco: 10, evasion: 1 }, starter: true },
-        { id: "fury-seal", slot: "accessory", icon: "🩸", name: { pt: "Selo da Fúria", en: "Fury Seal" }, stats: { maxFury: -10 }, starter: true },
+        { id: "fury-seal", slot: "accessory", icon: "🩸", name: { pt: "Selo da Fúria", en: "Fury Seal" }, stats: { maxFury: -10, criticalChance: 5 }, starter: true },
         // Starter False below
         { id: "raven", slot: "pet", icon: "🐦‍⬛", image: "images/items/raven.webp", name: { pt: "Corvo", en: "Raven" }, stats: { evasion: 2, stunChance: 2 }, starter: false  },
         { id: "demonic-flute", slot: "accessory", icon: "🪈", image: "images/items/demonic-flute.webp", name: { pt: "Flauta Demoníaca", en: "Demonic Flute" }, stats: { atk: 1, stunChance: 3 }, starter: false },
@@ -35,7 +35,7 @@ window.YaraRpgData.items = Object.freeze({
         { id: "iron-greaves", slot: "legs", icon: "🦵", image: "images/items/iron-leggings.webp", name: { pt: "Grevas de Ferro", en: "Iron Greaves" }, stats: { def: 3, maxFoco: 10 }, starter: false },
         { id: "iron-helm", slot: "head", icon: "🪖", image: "images/items/iron-helmet.webp", name: { pt: "Elmo de Ferro", en: "Iron Helm" }, stats: { def: 3, maxHp: 10 } , starter: false },
         { id: "watchful-eagle", slot: "pet", icon: "🦅", image: "images/items/watchful-eagle.webp", name: { pt: "Águia Vigilante", en: "Watchful Eagle" }, stats: { evasion: 1, parry: 1, stunChance: 2 }, starter: false },
-        { id: "double-headed-axe", slot: "mainHand", handUsage: "two-handed", itemType: "weapon", icon: "🪓", image: "images/items/double-headed-axe.webp", name: { pt: "Machado de Duas Lâminas", en: "Double Headed Axe" }, stats: { atk: 9, parry: 2 }, starter: false },
+        { id: "double-headed-axe", slot: "mainHand", handUsage: "two-handed", itemType: "weapon", icon: "🪓", image: "images/items/double-headed-axe.webp", name: { pt: "Machado de Duas Lâminas", en: "Double Headed Axe" }, stats: { atk: 9, parry: 3, criticalChance: 5 }, starter: false },
         { id: "mist-ring", slot: "ring", icon: "💍", image: "images/items/mist-ring.webp", name: { pt: "Anel da Névoa", en: "Mist Ring" }, stats: { atk: 1, evasion: 5, stunChance: 1 }, starter: false },
         { id: "lumen-necklace", slot: "necklace", icon: "📿", image: "images/items/lumen-necklace.webp",name: { pt: "Colar Reluzente", en: "Lumen Necklace" }, stats: { def: 1, parry: 3, stunChance: 2 }, starter: false },
 

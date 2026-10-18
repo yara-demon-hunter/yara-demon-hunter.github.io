@@ -27,6 +27,13 @@ function loadSavedGame(snapshot = readSavedGame()) {
     selectedCharacter = GAME_DATA.characters.find((character) => character.id === snapshot.characterId);
     selectedCharacterProgression = selectedCharacter.progression;
     Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
+    if (snapshot.hero?.criticalChance === undefined) {
+        hero.criticalChance = DEFAULT_CHARACTER.baseStats.criticalChance
+            + (Number(selectedCharacter.basicStats.criticalChance) || 0);
+    }
+    if (snapshot.hero?.criticalDamage === undefined) {
+        hero.criticalDamage = DEFAULT_CHARACTER.baseStats.criticalDamage;
+    }
     // Migração: saves antigos não têm skillPoints
     hero.skillPoints = Number(snapshot.hero?.skillPoints ?? DEFAULT_CHARACTER.baseStats.skillPoints ?? 0) || 0;
     hero.chestChanceBonus = snapshot.hero?.chestChanceBonus === EXPLORATION_RULES.sparedMonster.treasureChanceBonus

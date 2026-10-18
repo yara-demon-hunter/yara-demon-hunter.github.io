@@ -27,12 +27,12 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
         monsterParryDamageMultiplier: 0.5,
         minimumDamageAfterParry: 1,
         escapeSuccessChance: 0.7,
+        criticalDefenseIgnoreFraction: 0.5,
         actionDelayMs: 400,
         responseDelayMs: 500,
         furyPerDamageTaken: 1,
         furyPerDodge: 5,
         furyPerBasicAttackDamage: 0.5,
-        criticalDamageMultiplier: 2,
         criticalStunBonus: 30
     }
 });

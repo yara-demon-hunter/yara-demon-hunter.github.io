@@ -16,6 +16,8 @@ const BASE_CHARACTER_STATS = Object.freeze({
     stunChance: 5,
     fury: 0,
     maxFury: 100,
+    criticalChance: 5,
+    criticalDamage: 200,// piercing 50% of enemy defense
     gold: 100,
     // fallback: se progression-rules.js não carregou ainda, começa com 3
     skillPoints: (window.YaraRpgData?.rules?.progression?.startingSkillPoints ?? 3),
@@ -37,18 +39,19 @@ window.YaraRpgData.characters = Object.freeze([
         basicStats: {
             evasion: 5,
             maxFoco: 30,
-            stunChance: 2
+            stunChance: 2,
         },
         // Each levelup
         progression: {
-            maxHp: 15,
+            maxHp: 20,
             maxFoco: 15,
             maxPotions: 1,
             atk: 0,
             def: 0,
             evasion: 2,
             parry: 0,
-            stunChance: 1
+            stunChance: 1,
+            criticalChance: 1
         },
         skills: {
             heavyAttack: { focoCost: 10, attackMultiplier: 1.5 },
@@ -59,7 +62,8 @@ window.YaraRpgData.characters = Object.freeze([
             maxParry: 45,
             maxStunChance: 40,
             minFuryThreshold: 50,
-            maxPotions: 10
+            maxPotions: 10,
+            maxCriticalChance: 30
         }
     },
     {
@@ -75,7 +79,7 @@ window.YaraRpgData.characters = Object.freeze([
         basicStats: {
             atk: 4,
             def: 2,
-            parry: 5
+            parry: 5,
         },
         progression: {
             maxHp: 25,
@@ -85,7 +89,8 @@ window.YaraRpgData.characters = Object.freeze([
             def: 1,
             evasion: 0,
             parry: 1,
-            stunChance: 0
+            stunChance: 0,
+            criticalChance: 0
         },
         skills: {
             heavyAttack: { focoCost: 25, attackMultiplier: 1.7 },
@@ -96,7 +101,8 @@ window.YaraRpgData.characters = Object.freeze([
             maxParry: 65,
             maxStunChance: 30,
             minFuryThreshold: 60,
-            maxPotions: 5
+            maxPotions: 5,
+            maxCriticalChance: 35
         }
     },
     {
@@ -112,7 +118,8 @@ window.YaraRpgData.characters = Object.freeze([
         basicStats: {
             evasion: 5,
             parry: 2,
-            stunChance:2
+            stunChance:2,
+            criticalChance: 10
         },
         progression: {
             maxHp: 10,
@@ -120,9 +127,10 @@ window.YaraRpgData.characters = Object.freeze([
             maxPotions: 1,
             atk: 0,
             def: 0,
-            evasion: 2,
-            parry: 2,
-            stunChance: 2
+            evasion: 1,
+            parry: 1,
+            stunChance: 2,
+            criticalChance: 0
         },
         skills: {
             heavyAttack: { focoCost: 15, attackMultiplier: 2.0 },
@@ -134,7 +142,8 @@ window.YaraRpgData.characters = Object.freeze([
             maxParry: 65,
             maxStunChance: 45,
             minFuryThreshold: 40,
-            maxPotions: 10
+            maxPotions: 10,
+            maxCriticalChance: 35
         }
     }
 ]);

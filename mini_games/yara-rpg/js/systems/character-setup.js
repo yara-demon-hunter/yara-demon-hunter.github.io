@@ -10,19 +10,22 @@ window.YaraRpgCharacterSetup = (() => {
         def: "defenseStat",
         evasion: "evasionStat",
         parry: "parryStat",
-        stunChance: "stun"
+        stunChance: "stun",
+        criticalChance: "criticalChance",
+        criticalDamage: "criticalDamageStat"
     });
     const PROGRESSION_STAT_KEYS = Object.freeze({
         maxHp: "hpStat",
         maxFoco: "focusStat",
         maxPotions: "potionCapacity",
+        criticalChance: "criticalChance",
         atk: "attackStat",
         def: "defenseStat",
         evasion: "evasionStat",
         parry: "parryStat",
         stunChance: "stun"
     });
-    const PERCENTAGE_SPECIALTY_STATS = new Set(["evasion", "parry", "stunChance"]);
+    const PERCENTAGE_SPECIALTY_STATS = new Set(["evasion", "parry", "stunChance", "criticalChance", "criticalDamage"]);
     const SKILL_PRESENTATION = Object.freeze({
         heavyAttack: { name: "heavyAttackName", description: "heavySkillDetails" },
         parry: { name: "parrySkillName", description: "parrySkillDetails" },
@@ -33,7 +36,8 @@ window.YaraRpgCharacterSetup = (() => {
         maxParry: { name: "parryStat", suffix: "%" },
         maxStunChance: { name: "stun", suffix: "%" },
         minFuryThreshold: { name: "minimumFury", suffix: "" },
-        maxPotions: { name: "maximumPotions", suffix: "" }
+        maxPotions: { name: "maximumPotions", suffix: "" },
+        maxCriticalChance: { name: "maximumCriticalChance", suffix: "%" }
     });
     let selectedCharacterId = CHARACTER_DATA[0].id;
     let selectedEquipmentIds = [];

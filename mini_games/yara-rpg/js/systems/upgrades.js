@@ -36,6 +36,7 @@ function getUpgradeConfiguration(upgrade) {
     if (upgrade === 'parry') return { ...configuration, max: selectedCharacter.limits.maxParry };
     if (upgrade === 'evasion') return { ...configuration, max: selectedCharacter.limits.maxEvasion };
     if (upgrade === 'stun') return { ...configuration, max: selectedCharacter.limits.maxStunChance };
+    if (upgrade === 'criticalChance') return { ...configuration, max: selectedCharacter.limits.maxCriticalChance };
     if (upgrade === 'fury') return { ...configuration, min: selectedCharacter.limits.minFuryThreshold };
     return configuration;
 }

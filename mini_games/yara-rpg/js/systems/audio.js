@@ -9,6 +9,8 @@ const SOUND_EFFECTS = Object.freeze({
     dodge: new Audio('audio/sfx/dodge.mp3'),
     parry: new Audio('audio/sfx/parry.mp3'),
     basicAttack: new Audio('audio/sfx/basic-attack.mp3'),
+    // Placeholder path for the critical hit sound currently being created.
+    criticalHit: new Audio('audio/sfx/critical-hit.mp3'),
     specialAttack: new Audio('audio/sfx/special-attack.mp3'),
     levelUp: new Audio('audio/sfx/level-up.mp3'),
     chestDiscovery: new Audio('audio/sfx/chest_discovery_dark_fantasy.mp3'),

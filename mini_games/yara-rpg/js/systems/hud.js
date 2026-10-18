@@ -80,6 +80,7 @@ function updateUI() {
     stunDisplay.setAttribute('aria-label', stunBonus
         ? `${effectiveStunChance}% + ${stunBonus}% = ${stunChanceTotal}%`
         : `${effectiveStunChance}%`);
+    document.getElementById('hero-critical-chance').textContent = `${getEffectiveCriticalChance()}%`;
     document.querySelectorAll('.hero-potions-count').forEach((element) => {
         element.textContent = hero.potions;
     });

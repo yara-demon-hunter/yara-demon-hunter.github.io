@@ -261,10 +261,10 @@ function renderEquipmentItemDetails(item, source, slot = null) {
         const property = document.createElement('li');
         property.textContent = t(
             amount < 0
-                ? (stat === 'evasion' || stat === 'parry' || stat === 'stunChance' || stat === 'maxFury'
+                ? (PERCENTAGE_EQUIPMENT_STATS.has(stat)
                     ? 'equipmentPercentagePenalty'
                     : 'equipmentPenalty')
-                : (stat === 'evasion' || stat === 'parry' || stat === 'stunChance'
+                : (PERCENTAGE_EQUIPMENT_STATS.has(stat)
                     ? 'equipmentPercentageBonus'
                     : 'equipmentBonus'),
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
@@ -571,10 +571,10 @@ function renderEquipmentBonuses(container, item, currentItem = null, compare = f
         }
         bonus.textContent = t(
             amount < 0
-                ? (stat === 'evasion' || stat === 'parry' || stat === 'stunChance' || stat === 'maxFury'
+                ? (PERCENTAGE_EQUIPMENT_STATS.has(stat)
                     ? 'equipmentPercentagePenalty'
                     : 'equipmentPenalty')
-                : (stat === 'evasion' || stat === 'parry' || stat === 'stunChance'
+                : (PERCENTAGE_EQUIPMENT_STATS.has(stat)
                     ? 'equipmentPercentageBonus'
                     : 'equipmentBonus'),
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }

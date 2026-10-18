@@ -14,6 +14,7 @@ window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
             def: { stat: "def", amount: 0.5, nameKey: "defense" },
             parry: { stat: "parry", amount: 0.5, nameKey: "parry", isPercentage: true },
             evasion: { stat: "evasion", amount: 0.5, nameKey: "evasion", isPercentage: true },
+            criticalChance: { stat: "criticalChance", amount: 0.5, nameKey: "criticalChance", isPercentage: true },
             hp: { stat: "maxHp", amount: 10, currentStat: "hp", currentMaxStat: "maxHp", currentAmount: 10, nameKey: "hpUpgradeName", benefitKey: "upgradeHpBenefit" },
             foco: { stat: "maxFoco", amount: 10, currentStat: "foco", currentMaxStat: "maxFoco", currentAmount: 10, nameKey: "staminaUpgradeName", benefitKey: "upgradeStaminaBenefit" },
             stun: { stat: "stunChance", amount: 0.5, nameKey: "stun", isPercentage: true },

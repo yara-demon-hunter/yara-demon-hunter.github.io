@@ -127,14 +127,24 @@ function getEffectiveFuryThreshold() {
     return Math.max(selectedCharacter?.limits?.minFuryThreshold ?? 1, getEffectiveStat('maxFury'));
 }
 
+function getEffectiveCriticalChance() {
+    const configuredLimit = Number(selectedCharacter?.limits?.maxCriticalChance);
+    const characterLimit = Number.isFinite(configuredLimit) ? configuredLimit : 100;
+    return Math.max(0, Math.min(100, characterLimit, getEffectiveStat('criticalChance')));
+}
+
+function getEffectiveCriticalDamage() {
+    return Math.max(0, getEffectiveStat('criticalDamage'));
+}
+
 function getItemBonusText(item) {
     return Object.entries(item.stats)
         .map(([stat, amount]) => t(
             amount < 0
-                ? (stat === "evasion" || stat === "parry" || stat === "stunChance" || stat === "maxFury"
+                ? (PERCENTAGE_EQUIPMENT_STATS.has(stat)
                     ? "equipmentPercentagePenalty"
                     : "equipmentPenalty")
-                : (stat === "evasion" || stat === "parry" || stat === "stunChance"
+                : (PERCENTAGE_EQUIPMENT_STATS.has(stat)
                     ? "equipmentPercentageBonus"
                     : "equipmentBonus"),
             { amount, stat: t(EQUIPMENT_STAT_KEYS[stat]) }
