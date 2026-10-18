@@ -463,6 +463,8 @@ function spawnMonster(templateOverride = null) {
     document.getElementById('monster-hp').innerText = currentMonster.hp;
     document.getElementById('monster-hp-max').innerText = currentMonster.maxHp;
     const monsterIcon = document.getElementById('monster-icon');
+    monsterIcon.classList.remove('critical-impact');
+    monsterIcon.style.removeProperty('filter');
     monsterIcon.replaceChildren();
     if (currentMonster.image) {
         const image = document.createElement('img');

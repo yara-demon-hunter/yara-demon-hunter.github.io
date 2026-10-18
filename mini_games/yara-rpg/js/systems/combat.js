@@ -76,13 +76,19 @@ function rollCriticalHit() {
     return Math.random() * GAME_RULES.probabilityScale < getEffectiveCriticalChance();
 }
 
+let criticalImpactTimeout = null;
+
 function playCriticalImpact() {
     const target = document.getElementById('monster-icon');
     if (!target) return;
+    window.clearTimeout(criticalImpactTimeout);
     target.classList.remove('critical-impact');
     void target.offsetWidth;
     target.classList.add('critical-impact');
     target.addEventListener('animationend', () => target.classList.remove('critical-impact'), { once: true });
+    criticalImpactTimeout = window.setTimeout(() => {
+        target.classList.remove('critical-impact');
+    }, 500);
 }
 
 function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0, offHandDamage = 0, isCritical = false) {

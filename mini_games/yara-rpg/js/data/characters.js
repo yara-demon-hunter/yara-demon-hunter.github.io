@@ -55,7 +55,7 @@ window.YaraRpgData.characters = Object.freeze([
         },
         skills: {
             heavyAttack: { focoCost: 10, attackMultiplier: 1.5 },
-            dodge: { focoCost: 5, bonus: 10 }
+            dodge: { focoCost: 5, bonus: 15 }
         },
         limits: {
             maxEvasion: 70,
@@ -93,8 +93,8 @@ window.YaraRpgData.characters = Object.freeze([
             criticalChance: 0
         },
         skills: {
-            heavyAttack: { focoCost: 25, attackMultiplier: 1.7 },
-            parry: { focoCost: 10, bonus: 10 }
+            heavyAttack: { focoCost: 25, attackMultiplier: 1.8 },
+            parry: { focoCost: 10, bonus: 15 }
         },
         limits: {
             maxEvasion: 40,
@@ -119,7 +119,6 @@ window.YaraRpgData.characters = Object.freeze([
             evasion: 5,
             parry: 2,
             stunChance:2,
-            criticalChance: 10
         },
         progression: {
             maxHp: 10,
@@ -134,8 +133,8 @@ window.YaraRpgData.characters = Object.freeze([
         },
         skills: {
             heavyAttack: { focoCost: 15, attackMultiplier: 2.0 },
-            parry: { focoCost: 10, bonus: 5 },
-            dodge: { focoCost: 10, bonus: 5 }
+            parry: { focoCost: 10, bonus: 10 },
+            dodge: { focoCost: 10, bonus: 10 }
         },
         limits: {
             maxEvasion: 65,
