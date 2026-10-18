@@ -25,10 +25,14 @@ function getEquipmentSlotLabel(item) {
 
 function getEquipmentConflicts(item) {
     const conflictingSlots = new Set([item.slot]);
-    if (item.slot === 'mainHand' && item.handUsage === 'two-handed') {
+    const isTwoHandedWeapon = item.itemType === 'weapon' && item.handUsage === 'two-handed';
+    if (item.slot === 'mainHand' && isTwoHandedWeapon) {
         conflictingSlots.add('offHand');
     }
-    if (item.slot === 'offHand' && hero.equipment.mainHand?.handUsage === 'two-handed') {
+    if (item.slot === 'offHand'
+        && isTwoHandedWeapon
+        && hero.equipment.mainHand?.itemType === 'weapon'
+        && hero.equipment.mainHand.handUsage === 'two-handed') {
         conflictingSlots.add('mainHand');
     }
     return [...conflictingSlots]
