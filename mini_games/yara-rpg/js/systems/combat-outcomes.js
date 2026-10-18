@@ -98,10 +98,12 @@ function combatRun() {
     }
 }
 
-function endCombatVictory() {
+async function endCombatVictory() {
     if (!inCombat || !currentMonster || currentMonster.hp > 0) return;
     const defeatedMonster = { ...currentMonster };
     playSound('monsterDefeated');
+    await animateMonsterDefeat();
+    if (!inCombat || currentMonster?.id !== defeatedMonster.id) return;
     if (defeatedMonster.isBoss) setBossMusic(false);
     const mercyChance = EXPLORATION_RULES.sparedMonster.chance;
     if (!defeatedMonster.isBoss
@@ -119,6 +121,21 @@ function endCombatVictory() {
         return;
     }
     awardCombatVictory(defeatedMonster);
+}
+
+function animateMonsterDefeat() {
+    const encounterCard = document.getElementById('encounter-card');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const duration = reducedMotion ? 80 : 620;
+    encounterCard.classList.remove('monster-defeat-transition');
+    void encounterCard.offsetWidth;
+    encounterCard.classList.add('monster-defeat-transition');
+    return new Promise((resolve) => {
+        window.setTimeout(() => {
+            encounterCard.classList.remove('monster-defeat-transition');
+            resolve();
+        }, duration);
+    });
 }
 
 function createMonsterFateEvent(monster) {
