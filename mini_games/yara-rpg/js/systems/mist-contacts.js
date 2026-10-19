@@ -11,12 +11,13 @@ window.YaraMistContactSystem = Object.freeze({
         return Math.random() * probabilityScale < this.getEncounterChance(level, rules);
     },
 
-    chooseContact(contacts, level, hero, pactCatalog) {
+    chooseContact(contacts, level, hero, pactCatalog, seenContactIds = []) {
         const availablePactIds = pactCatalog
             .filter((pact) => !hero.monsterPacts.includes(pact.id))
             .map((pact) => pact.id);
         const availableContacts = contacts.filter((contact) =>
             level >= contact.minLevel
+            && (!contact.oncePerGame || !seenContactIds.includes(contact.id))
             && (contact.onAccept?.type !== "pact" || availablePactIds.length > 0)
         );
         if (availableContacts.length === 0) return null;

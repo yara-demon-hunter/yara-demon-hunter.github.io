@@ -150,6 +150,10 @@ function updateUI() {
     regionProgressTrack.setAttribute('aria-valuemax', String(objectivesRequired));
     regionProgressTrack.setAttribute('aria-valuenow', String(objectiveProgress));
     const treasureChanceBonusDisplay = document.getElementById('treasure-chance-bonus');
+    const spiritWorldButton = document.getElementById('spirit-world-button');
+    spiritWorldButton.hidden = !hero.spiritWorldUnlocked;
+    spiritWorldButton.setAttribute('aria-label', t('enterSpiritWorld'));
+    spiritWorldButton.title = t('enterSpiritWorld');
     treasureChanceBonusDisplay.hidden = hero.chestChanceBonus <= 0;
     treasureChanceBonusDisplay.innerText = hero.chestChanceBonus > 0
         ? t('treasureChanceBonus', { chance: hero.chestChanceBonus })
@@ -279,6 +283,9 @@ function updateUI() {
         }
         document.getElementById('mist-contact-name').textContent = pendingMistContact.name[gameLanguage];
         document.getElementById('mist-contact-message').textContent = pendingMistContact.message[gameLanguage];
+        document.getElementById('mist-contact-accept').textContent = t(
+            pendingMistContact.onAccept?.type === 'spirit-surgery' ? 'acceptSpiritSurgery' : 'mistAccept'
+        );
     }
     campButton.disabled = inCombat || gameOver || campaignComplete || hero.gold < CAMP_COST || (
         hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco')

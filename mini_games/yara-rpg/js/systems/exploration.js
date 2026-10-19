@@ -43,9 +43,11 @@ function exploreForest() {
             MIST_CONTACT_DATA.contacts,
             hero.level,
             hero,
-            MIST_CONTACT_DATA.pacts
+            MIST_CONTACT_DATA.pacts,
+            [...seenMistContacts]
         );
         if (pendingMistContact) {
+            if (pendingMistContact.oncePerGame) seenMistContacts.add(pendingMistContact.id);
             explorationsSinceMistContact = 0;
             logMessage(t('mistContactAppears', {
                 contact: pendingMistContact.name[gameLanguage],
@@ -206,6 +208,16 @@ function dismissFoundMap() {
     foundMapToastTimeout = null;
     toast.classList.remove('found-map-toast-visible');
     toast.hidden = true;
+}
+
+function openSpiritWorld() {
+    if (!hero.spiritWorldUnlocked) return;
+    document.getElementById('spirit-world-dialog').showModal();
+}
+
+function closeSpiritWorld() {
+    const dialog = document.getElementById('spirit-world-dialog');
+    if (dialog.open) dialog.close();
 }
 
 function resolveStoryEvent(choiceIndex) {
@@ -702,9 +714,20 @@ function spawnMonster(templateOverride = null) {
     setBossMusic(currentMonster.isBoss);
 }
 
-function receiveSpiritSurgery(amount) {
+function receiveSpiritPurificationPoint(amount) {
     hero.skillPoints = (Number(hero.skillPoints) || 0) + amount;
-    logMessage(t('spiritSurgeryReceived', { amount }), 'special');
+    logMessage(t('spiritPurificationPointReceived', { amount }), 'special');
+    completeRegionObjective('story');
+    updateUI();
+}
+
+function performSpiritEyeSurgery() {
+    hero.hp = 1;
+    hero.gold = 0;
+    hero.foco = 0;
+    hero.spiritWorldUnlocked = true;
+    logMessage(t('spiritEyeSurgeryAccepted'), 'special');
+    logMessage(t('spiritWorldUnlocked'), 'discovery');
     completeRegionObjective('story');
     updateUI();
 }
@@ -770,8 +793,13 @@ function acceptMistContact() {
     pendingMistContact = null;
     logMessage(t('mistContactAccepted', { contact: contact.name[gameLanguage] }), 'special');
 
+    if (contact.onAccept?.type === 'spirit-surgery') {
+        performSpiritEyeSurgery();
+        return;
+    }
+
     if (contact.onAccept?.type === 'skill-point') {
-        receiveSpiritSurgery(contact.onAccept.amount);
+        receiveSpiritPurificationPoint(contact.onAccept.amount);
         return;
     }
 

@@ -8,7 +8,7 @@ function saveGame() {
         currentRegion, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
         explorationsSinceStoryEvent,
         storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
-        seenStoryEvents: [...seenStoryEvents], pendingChest,
+        seenStoryEvents: [...seenStoryEvents], seenMistContacts: [...seenMistContacts], pendingChest,
         foundMapsByRegion,
         pendingEquipment, equipmentInstanceId
     };
@@ -110,6 +110,8 @@ function loadSavedGame(snapshot = readSavedGame()) {
     (snapshot.storyEventSeen || []).forEach((id) => storyEventSeen.add(id));
     seenStoryEvents.clear();
     (snapshot.seenStoryEvents || []).forEach((id) => seenStoryEvents.add(id));
+    seenMistContacts.clear();
+    (snapshot.seenMistContacts || []).forEach((id) => seenMistContacts.add(id));
     pendingStoryEvent = snapshot.pendingStoryEvent || null;
     if (pendingStoryEvent && !pendingStoryEvent.choices) pendingStoryEvent = GAME_DATA.regions[currentRegion].event?.[0] || null;
     pendingMistContact = snapshot.pendingMistContact || null;

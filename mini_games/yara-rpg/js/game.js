@@ -92,6 +92,7 @@ const hero = {
     chestChanceBonus: 0,
     passiveSkills: [],
     monsterPacts: [],
+    spiritWorldUnlocked: false,
     equipment: createEmptyEquipmentMap(),
     equipmentInventory: [],
 };
@@ -117,6 +118,7 @@ let explorationsSinceStoryEvent = 0;
 let explorationsSinceMistContact = GAME_RULES.mistContacts.cooldownExplorations;
 let pendingStoryEvent = null;
 let pendingMistContact = null;
+const seenMistContacts = new Set();
 let pendingChest = false;
 let pendingEquipment = null;
 let campaignComplete = false;
@@ -151,6 +153,7 @@ function startAdventure({ character, equipment }) {
     campaignComplete = false;
     finalBossChallengeAccepted = false;
     pendingMistContact = null;
+    seenMistContacts.clear();
     pendingChest = false;
     pendingEquipment = null;
     pendingStoryEvent = null;
@@ -182,6 +185,7 @@ function startAdventure({ character, equipment }) {
         fury: 0,
         passiveSkills: [],
         monsterPacts: [],
+        spiritWorldUnlocked: false,
         equipment: createEmptyEquipmentMap(),
         equipmentInventory: [],
     });

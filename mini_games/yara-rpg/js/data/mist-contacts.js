@@ -96,10 +96,24 @@ window.YaraRpgData.mistContacts = Object.freeze({
         {
             id: "spirit-surgeon",
             icon: "🧙‍♂️",
+            image: "images/mist_contacts/spirit-surgeon.webp",
             name: { pt: "Cirurgião Espiritual", en: "Spirit Surgeon" },
             message: {
-                pt: "O cirurgião toca sua testa e purifica sua alma. Você sente que pode aperfeiçoar uma habilidade: recebe 1 Ponto de Habilidade para distribuir.",
-                en: "The surgeon touches your forehead and purifies your soul. You feel able to improve a skill: gain 1 Skill Point to spend."
+                pt: "O cirurgião propõe implantar um olho espiritual em sua testa. Você ficará com 1 HP, perderá todo o ouro e ficará sem Foco, mas poderá atravessar para um mundo espiritual secreto. Aceitar é arriscado e irreversível.",
+                en: "The surgeon offers to implant a spiritual eye in your forehead. You will be left with 1 HP, lose all your gold, and have no Focus, but you will be able to cross into a secret spirit world. Accepting is risky and irreversible."
+            },
+            minLevel: 1,
+            oncePerGame: true,
+            onAccept: { type: "spirit-surgery" }
+        },
+        {
+            id: "spirit-purifier",
+            icon: "✨",
+            image: "images/mist_contacts/spirit-purifier.webp",
+            name: { pt: "Espírito Purificador", en: "Purifying Spirit" },
+            message: {
+                pt: "Um espírito toca sua testa e purifica sua alma. Você sente que pode aperfeiçoar uma habilidade: recebe 1 Ponto de Habilidade para distribuir.",
+                en: "A spirit touches your forehead and purifies your soul. You feel able to improve a skill: gain 1 Skill Point to spend."
             },
             minLevel: 1,
             onAccept: { type: "skill-point", amount: 1 }

@@ -77,6 +77,18 @@ body {
 .region-objective-toast[hidden] { display: none; }
 .region-objective-toast { position: fixed; z-index: 120; top: max(1rem, env(safe-area-inset-top)); left: 50%; width: min(calc(100vw - 2rem), 26rem); padding: .8rem 1rem; transform: translate(-50%, -1rem); border: 1px solid rgba(121, 201, 107, .8); border-radius: .8rem; background: linear-gradient(140deg, rgba(25, 55, 34, .98), rgba(15, 24, 19, .98)); box-shadow: 0 .75rem 2rem rgba(0, 0, 0, .48), 0 0 1.2rem rgba(121, 201, 107, .18); color: #e7f5df; font-size: .78rem; font-weight: 700; line-height: 1.55; text-align: center; white-space: pre-line; opacity: 0; pointer-events: none; }
 .region-objective-toast-visible { animation: region-objective-toast-in .24s ease-out forwards; }
+ .spirit-world-arrow[hidden] { display: none; }
+ .spirit-world-arrow { position: fixed; z-index: 115; top: 50%; right: max(.75rem, env(safe-area-inset-right)); display: grid; place-items: center; width: 3.25rem; height: 3.25rem; transform: translateY(-50%); border: 1px solid rgba(216, 180, 254, .8); border-radius: 50%; background: linear-gradient(145deg, #6b21a8, #3b1763); box-shadow: 0 0 1rem rgba(168, 85, 247, .45), 0 .5rem 1.5rem rgba(0,0,0,.45); color: #fff; font-size: 2rem; font-weight: 800; line-height: 1; transition: filter .18s ease, scale .18s ease; }
+ .spirit-world-arrow:hover { filter: brightness(1.2); scale: 1.08; }
+ .spirit-world-dialog { width: min(92vw, 44rem); max-width: none; max-height: 88vh; padding: 0; overflow: auto; border: 1px solid rgba(168, 116, 218, .75); border-radius: 1rem; background: #101016; color: #f2eafa; box-shadow: 0 1rem 4rem rgba(0,0,0,.7); }
+ .spirit-world-dialog::backdrop { background: rgba(5, 5, 10, .82); backdrop-filter: blur(5px); }
+ .spirit-world-screen { padding: clamp(1.25rem, 5vw, 2rem); text-align: center; }
+ .spirit-world-screen h2 { margin: .25rem 0 1.25rem; color: #e9d5ff; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800; }
+ .spirit-world-placeholder { margin: .8rem 0; padding: 1.25rem; min-height: 7rem; border: 1px dashed rgba(196, 162, 226, .45); border-radius: .8rem; background: rgba(75, 42, 97, .2); }
+ .spirit-world-placeholder h3 { margin: 0 0 .4rem; color: #d8b4fe; font-weight: 700; }
+ .spirit-world-placeholder p { margin: 0; color: #c4b5d0; font-size: .9rem; }
+ .spirit-world-secret-placeholder { border-color: rgba(201, 177, 124, .45); background: rgba(79, 65, 39, .18); }
+ .spirit-world-secret-placeholder h3 { color: #e7ce9b; }
  .found-map-toast[hidden] { display: none; }
  .found-map-toast { position: fixed; z-index: 125; inset: 0; display: grid; place-items: center; padding: 1rem; background: rgba(5, 8, 7, .78); opacity: 0; }
  .found-map-toast-visible { animation: region-arrival-fade-in .2s ease-out forwards; }
