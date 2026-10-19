@@ -108,15 +108,16 @@ function updateUI() {
         button.addEventListener('click', () => showPassiveDetails(skill.id));
         passiveSkillIcons.append(button);
     });
-    const currentRegionData = isInSpiritWorld ? GAME_DATA.spiritWorld : GAME_DATA.regions[currentRegion];
-    const finalBossGateActive = !isInSpiritWorld && currentRegion === GAME_DATA.regions.length - 1
+    const currentRegionData = GAME_DATA.regions[currentRegion];
+    const finalBossGateActive = !isInSpiritWorld && GAME_DATA.regions[currentRegion].id === 'gudran-throne'
         && !inCombat && !gameOver && !campaignComplete
         && !pendingMistContact && !pendingStoryEvent && !pendingChest;
-    document.body.classList.remove(...[...GAME_DATA.regions, GAME_DATA.spiritWorld].map((region) => `region-${region.id}`));
+    document.body.classList.remove(...GAME_DATA.regions.map((region) => `region-${region.id}`));
     document.body.classList.add(`region-${currentRegionData.id}`);
     const explorationBanner = document.getElementById('exploration-banner');
     document.getElementById('exploration-title').innerText = currentRegionData.title[gameLanguage];
     document.getElementById('exploration-description').innerText = currentRegionData.description[gameLanguage];
+    explorationBanner.classList.toggle('spirit-world-active', isInSpiritWorld);
     if (explorationBanner) {
         const regionImageUrl = currentRegionData.sceneImage
             ? currentRegionData.sceneImage
@@ -131,8 +132,8 @@ function updateUI() {
         || pendingMistContact || pendingStoryEvent || pendingChest || finalBossGateActive;
     const previousRegionButton = document.getElementById('previous-region-button');
     const nextRegionButton = document.getElementById('next-region-button');
-    previousRegionButton.hidden = isInSpiritWorld;
-    nextRegionButton.hidden = isInSpiritWorld;
+    previousRegionButton.hidden = false;
+    nextRegionButton.hidden = false;
     previousRegionButton.disabled = isInSpiritWorld || regionNavigationBlocked || !discoveredRegions.includes(currentRegion - 1);
     nextRegionButton.disabled = isInSpiritWorld || regionNavigationBlocked || !discoveredRegions.includes(currentRegion + 1);
     previousRegionButton.setAttribute('aria-label', t('previousRegion'));
@@ -144,7 +145,7 @@ function updateUI() {
     const regionProgressTrack = document.getElementById('region-progress-track');
     const objectivesRequired = currentRegionData.objectives.tasks.length;
     const objectiveProgress = getRegionObjectiveProgress();
-    regionProgress.hidden = objectivesRequired <= 0 || isInSpiritWorld;
+    regionProgress.hidden = objectivesRequired <= 0;
     document.getElementById('region-progress-count').innerText = `${objectiveProgress}/${objectivesRequired}`;
     document.getElementById('region-progress-bar').style.width = objectivesRequired > 0
         ? `${objectiveProgress / objectivesRequired * 100}%`
@@ -154,11 +155,12 @@ function updateUI() {
     const treasureChanceBonusDisplay = document.getElementById('treasure-chance-bonus');
     const spiritWorldButton = document.getElementById('spirit-world-button');
     spiritWorldButton.hidden = !hero.spiritWorldUnlocked;
+    spiritWorldButton.disabled = inCombat || gameOver || campaignComplete;
     const spiritWorldButtonLabel = t(isInSpiritWorld ? 'returnToPhysicalWorld' : 'enterSpiritWorld');
     spiritWorldButton.setAttribute('aria-label', spiritWorldButtonLabel);
     spiritWorldButton.title = spiritWorldButtonLabel;
     explorationBanner.classList.toggle('has-spirit-world-access', hero.spiritWorldUnlocked);
-    treasureChanceBonusDisplay.hidden = isInSpiritWorld || hero.chestChanceBonus <= 0;
+    treasureChanceBonusDisplay.hidden = hero.chestChanceBonus <= 0;
     treasureChanceBonusDisplay.innerText = hero.chestChanceBonus > 0
         ? t('treasureChanceBonus', { chance: hero.chestChanceBonus })
         : '';
@@ -252,9 +254,7 @@ function updateUI() {
     }
     const restartButton = document.getElementById('restart-button');
     const chestCard = document.getElementById('chest-event-card');
-    const spiritWorldContent = document.getElementById('spirit-world-content');
-    spiritWorldContent.hidden = !isInSpiritWorld;
-    document.getElementById('rpg-log').hidden = isInSpiritWorld;
+    document.getElementById('rpg-log').hidden = false;
     chestCard.hidden = !pendingChest || inCombat || gameOver || campaignComplete;
     mistContactCard.classList.toggle('hidden', !pendingMistContact || inCombat || gameOver || pendingStoryEvent || pendingChest);
     const storyCard = document.getElementById('story-event-card');
@@ -336,7 +336,7 @@ function updateUI() {
         explorationBanner.classList.add('hidden');
         restartButton.classList.add('hidden');
     } else if (isInSpiritWorld) {
-        exploreControls.classList.add('hidden'); combatControls.classList.add('hidden');
+        exploreControls.classList.remove('hidden'); combatControls.classList.add('hidden');
         encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden');
         storyCard.hidden = true; chestCard.hidden = true;
         explorationBanner.classList.remove('hidden'); restartButton.classList.add('hidden');

@@ -5,7 +5,7 @@ function saveGame() {
     if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return;
     const snapshot = {
         version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)), inCombat,
-        currentRegion, isInSpiritWorld, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
+        currentRegion, isInSpiritWorld, spiritWorldReturnRegionId, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
         explorationsSinceStoryEvent,
         storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
         seenStoryEvents: [...seenStoryEvents], seenMistContacts: [...seenMistContacts], pendingChest,
@@ -79,7 +79,24 @@ function loadSavedGame(snapshot = readSavedGame()) {
     }
     selectedInventoryItems.clear();
     currentRegion = Math.max(0, Math.min(GAME_DATA.regions.length - 1, Number(snapshot.currentRegion) || 0));
-    isInSpiritWorld = Boolean(snapshot.isInSpiritWorld && hero.spiritWorldUnlocked);
+    spiritWorldReturnRegionId = snapshot.spiritWorldReturnRegionId
+        || (Number.isInteger(snapshot.spiritWorldReturnRegion)
+            ? GAME_DATA.regions[snapshot.spiritWorldReturnRegion]?.id
+            : null);
+    if (snapshot.isInSpiritWorld && hero.spiritWorldUnlocked) {
+        const spiritWorldIndex = GAME_DATA.regions.findIndex((region) => region.id === GAME_DATA.spiritWorld.id);
+        if (spiritWorldIndex >= 0) {
+            spiritWorldReturnRegionId ||= GAME_DATA.regions[
+                Math.max(0, Math.min(spiritWorldIndex - 1, Number(snapshot.currentRegion) || 0))
+            ]?.id;
+            currentRegion = spiritWorldIndex;
+        }
+    }
+    if (!GAME_DATA.regions.some((region) => region.id === spiritWorldReturnRegionId)) {
+        spiritWorldReturnRegionId = GAME_DATA.regions.find((region) => region.id !== GAME_DATA.spiritWorld.id)?.id || null;
+    }
+    isInSpiritWorld = GAME_DATA.regions[currentRegion]?.id === GAME_DATA.spiritWorld.id
+        && Boolean(hero.spiritWorldUnlocked);
     discoveredRegions = Array.isArray(snapshot.discoveredRegions) ? snapshot.discoveredRegions : [0];
     regionEntryLevels = snapshot.regionEntryLevels && typeof snapshot.regionEntryLevels === 'object'
         ? snapshot.regionEntryLevels

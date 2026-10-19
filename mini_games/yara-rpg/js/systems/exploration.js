@@ -7,7 +7,7 @@ const regionObjectiveToastQueue = [];
 let foundMapToastTimeout = null;
 
 function exploreForest() {
-    if (isInSpiritWorld || inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
+    if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
     if (hero.hp <= 0) {
             logMessage(t("injured"), "combat-monster");
         return;
@@ -211,11 +211,23 @@ function dismissFoundMap() {
 }
 
 function toggleSpiritWorld() {
-    if (!hero.spiritWorldUnlocked || inCombat || gameOver || campaignComplete
-        || pendingMistContact || pendingStoryEvent || pendingChest) return;
-    isInSpiritWorld = !isInSpiritWorld;
+    if (!hero.spiritWorldUnlocked || inCombat || gameOver || campaignComplete) return;
+    if (isInSpiritWorld) {
+        const returnRegionIndex = GAME_DATA.regions.findIndex((region) => region.id === spiritWorldReturnRegionId);
+        if (returnRegionIndex < 0 || returnRegionIndex === currentRegion) return;
+        currentRegion = returnRegionIndex;
+        isInSpiritWorld = false;
+    } else {
+        const spiritWorldIndex = GAME_DATA.regions.findIndex((region) => region.id === GAME_DATA.spiritWorld.id);
+        if (spiritWorldIndex < 0) return;
+        spiritWorldReturnRegionId = GAME_DATA.regions[currentRegion].id;
+        if (!discoveredRegions.includes(spiritWorldIndex)) discoveredRegions.push(spiritWorldIndex);
+        regionEntryLevels[GAME_DATA.spiritWorld.id] = regionEntryLevels[GAME_DATA.spiritWorld.id] || hero.level;
+        currentRegion = spiritWorldIndex;
+        isInSpiritWorld = true;
+    }
     updateUI();
-    showRegionArrival(isInSpiritWorld ? GAME_DATA.spiritWorld : GAME_DATA.regions[currentRegion]);
+    showRegionArrival(GAME_DATA.regions[currentRegion]);
 }
 
 function resolveStoryEvent(choiceIndex) {
@@ -459,8 +471,8 @@ function completeRegionObjective(objectiveId, deferRegionUnlock = false) {
 }
 
 function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
-    if (isInSpiritWorld) return;
-    if (currentRegion >= GAME_DATA.regions.length - 1 || discoveredRegions.includes(currentRegion + 1)) return;
+    const finalBossRegionIndex = GAME_DATA.regions.findIndex((region) => region.id === 'gudran-throne');
+    if (currentRegion === finalBossRegionIndex || discoveredRegions.includes(currentRegion + 1)) return;
     const region = GAME_DATA.regions[currentRegion];
     let regionProgress = completedRegionObjectives[region.id];
     if (!regionProgress) {
@@ -496,7 +508,7 @@ function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
     const allTasksComplete = getRegionObjectiveRequirements(region).every((task) =>
         getRegionObjectiveTaskProgress(task) >= task.required
     );
-    if (deferRegionUnlock || !allTasksComplete) return;
+    if (deferRegionUnlock || !allTasksComplete || currentRegion >= GAME_DATA.regions.length - 1) return;
 
     currentRegion++;
     if (!discoveredRegions.includes(currentRegion)) discoveredRegions.push(currentRegion);
@@ -574,7 +586,8 @@ function dismissRegionArrival() {
 }
 
 function navigateRegion(direction) {
-    if (isInSpiritWorld || inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
+    if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
+    if (isInSpiritWorld) return;
     if (direction !== -1 && direction !== 1) {
         throw new Error(`Invalid region navigation direction: ${direction}`);
     }
@@ -583,14 +596,17 @@ function navigateRegion(direction) {
     if (!discoveredRegions.includes(targetRegion)) return;
 
     currentRegion = targetRegion;
+    isInSpiritWorld = GAME_DATA.regions[currentRegion].id === GAME_DATA.spiritWorld.id;
     updateUI();
     showRegionArrival(GAME_DATA.regions[currentRegion]);
 }
 
 function resolveFinalBossGate(shouldProceed) {
-    if (currentRegion !== GAME_DATA.regions.length - 1 || inCombat || gameOver || campaignComplete) return;
+    const finalBossRegionIndex = GAME_DATA.regions.findIndex((region) => region.id === 'gudran-throne');
+    if (currentRegion !== finalBossRegionIndex || inCombat || gameOver || campaignComplete) return;
     if (!shouldProceed) {
         currentRegion = Math.max(0, currentRegion - 1);
+        isInSpiritWorld = false;
         logMessage(t('finalBossReturnMessage'), 'special');
         updateUI();
         showRegionArrival(GAME_DATA.regions[currentRegion]);
@@ -609,8 +625,9 @@ function resolveFinalBossGate(shouldProceed) {
 }
 
 function spawnMonster(templateOverride = null) {
+    const finalBossRegionIndex = GAME_DATA.regions.findIndex((region) => region.id === 'gudran-throne');
     if (templateOverride?.isFinalBoss
-        && (!finalBossChallengeAccepted || currentRegion !== GAME_DATA.regions.length - 1)) {
+        && (!finalBossChallengeAccepted || currentRegion !== finalBossRegionIndex)) {
         logMessage(t('denseMist'));
         return;
     }

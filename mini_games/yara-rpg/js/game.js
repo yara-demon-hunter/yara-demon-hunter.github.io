@@ -110,6 +110,7 @@ let enemyTelegraphing = false;
 // Exploração / campanha
 let currentRegion = 0;
 let isInSpiritWorld = false;
+let spiritWorldReturnRegionId = null;
 let foundMapsByRegion = {};
 let discoveredRegions = [0];
 let regionEntryLevels = {};
@@ -147,6 +148,7 @@ function startAdventure({ character, equipment }) {
     // Reset de campanha
     currentRegion = 0;
     isInSpiritWorld = false;
+    spiritWorldReturnRegionId = null;
     discoveredRegions = [0];
     regionEntryLevels = {};
     inCombat = false;

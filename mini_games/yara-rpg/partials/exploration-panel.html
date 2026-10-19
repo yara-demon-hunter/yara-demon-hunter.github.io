@@ -29,7 +29,7 @@
                 <button id="spirit-world-button" type="button" class="spirit-world-arrow" onclick="toggleSpiritWorld()" aria-label="Acessar o Mundo Espiritual" title="Acessar o Mundo Espiritual" hidden><span aria-hidden="true">↑</span></button>
                 <div class="flex items-center gap-2 sm:gap-3">
                     <button id="previous-region-button" type="button" onclick="navigateRegion(-1)" class="region-nav-button" aria-label="Região anterior" title="Região anterior">‹</button>
-                    <div class="min-w-0 flex-1">
+                    <div id="exploration-banner-copy" class="min-w-0 flex-1">
                         <h3 id="exploration-title" class="text-sm sm:text-base text-amber-300 font-bold mb-1">Floresta Sombria</h3>
                         <p id="exploration-description" class="text-xs sm:text-sm text-emerald-300/90 font-medium" data-i18n="explorationIntro">🌲 O sino tocou tarde demais. A névoa esconde o espírito do rio, segredos sombrios e feras famintas. O que você fará?</p>
                     </div>
@@ -50,19 +50,6 @@
                 <p id="treasure-chance-bonus" class="mt-1 text-[11px] text-amber-200" hidden></p>
                 <button id="restart-button" onclick="restartGame()" class="hidden mt-3 bg-amber-600 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded-lg transition" data-i18n="restart">Reiniciar jornada</button>
             </div>
-
-            <section id="spirit-world-content" class="spirit-world-content" hidden aria-labelledby="spirit-world-content-title">
-                <div class="spirit-world-placeholder">
-                    <span class="spirit-world-placeholder-emoji" aria-hidden="true">🕊️ ✨</span>
-                    <h3 id="spirit-world-content-title" data-i18n="benevolentSpiritsTitle">Espíritos bondosos</h3>
-                    <p data-i18n="benevolentSpiritsPlaceholder">Espaço reservado para encontros com espíritos bondosos.</p>
-                </div>
-                <div class="spirit-world-placeholder spirit-world-secret-placeholder">
-                    <span class="spirit-world-placeholder-emoji" aria-hidden="true">🌙 🔒</span>
-                    <h3 data-i18n="secretWorldTitle">Área secreta</h3>
-                    <p data-i18n="secretWorldPlaceholder">Espaço reservado para uma área secreta.</p>
-                </div>
-            </section>
 
             <section id="final-boss-gate" class="campaign-ending-card final-boss-gate" hidden aria-live="polite" aria-labelledby="final-boss-gate-title">
                 <span class="ending-emblem" aria-hidden="true">👑</span>

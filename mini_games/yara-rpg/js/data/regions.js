@@ -1,5 +1,39 @@
 window.YaraRpgData = window.YaraRpgData || {};
 
+const spiritWorldRegion = {
+    id: "spirit-world",
+    sceneIcon: "👁️",
+    sceneImage: "images/regions/spirit-world.webp",
+    title: { pt: "Mundo Espiritual", en: "Spirit World" },
+    description: {
+        pt: "Por trás do olho espiritual, um lugar oculto se revela entre a névoa e as estrelas.",
+        en: "Beyond the spiritual eye, a hidden place emerges between the mist and the stars."
+    },
+    objectives: {
+        title: { pt: "Explore o Mundo Espiritual", en: "Explore the Spirit World" },
+        description: { pt: "Encontre seu caminho por este lugar além do mundo físico.", en: "Find your way through this place beyond the physical world." },
+        tasks: [
+            { id: "exploration", required: 3, title: { pt: "Conclua explorações sem interrupção.", en: "Complete uninterrupted explorations." } },
+            { id: "monsters", required: 3, title: { pt: "Derrote espíritos hostis.", en: "Defeat hostile spirits." } },
+            { id: "story", title: { pt: "Investigue um encontro espiritual.", en: "Investigate a spiritual encounter." } },
+            { id: "combat", title: { pt: "Vença uma luta ou escape.", en: "Win a fight or escape." } },
+            { id: "chest", title: { pt: "Encontre e abra um baú.", en: "Find and open a chest." } }
+        ]
+    },
+    event: [
+        {
+            id: "benevolent-spirit-placeholder",
+            title: { pt: "Uma presença serena", en: "A Serene Presence" },
+            description: { pt: "Uma luz branda se aproxima. Mais adiante, uma figura aguarda em silêncio.", en: "A gentle light draws near. Farther ahead, a figure waits in silence." },
+            choices: [
+                { label: { pt: "Aproximar-se", en: "Approach" }, effect: "heal" },
+                { label: { pt: "Seguir em frente", en: "Move on" }, effect: "gold" }
+            ]
+        }
+    ]
+};
+
+window.YaraRpgData.spiritWorld = Object.freeze(spiritWorldRegion);
 window.YaraRpgData.regions = Object.freeze([
     {
         id: "dark-forest",
@@ -285,21 +319,6 @@ window.YaraRpgData.regions = Object.freeze([
             tasks: []
         },
         event: []
-    }
+    },
+    spiritWorldRegion
 ]);
-
-window.YaraRpgData.spiritWorld = Object.freeze({
-    id: "spirit-world",
-    sceneIcon: "👁️",
-    title: { pt: "Mundo Espiritual", en: "Spirit World" },
-    description: {
-        pt: "Por trás do olho espiritual, um lugar oculto se revela entre a névoa e as estrelas.",
-        en: "Beyond the spiritual eye, a hidden place emerges between the mist and the stars."
-    },
-    objectives: {
-        title: { pt: "Mundo Espiritual", en: "Spirit World" },
-        description: { pt: "Um lugar além do mundo físico.", en: "A place beyond the physical world." },
-        tasks: []
-    },
-    event: []
-});

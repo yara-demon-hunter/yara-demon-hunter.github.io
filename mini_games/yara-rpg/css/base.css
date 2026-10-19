@@ -82,14 +82,6 @@ body {
  .exploration-banner.has-spirit-world-access { padding-top: 3.5rem; }
  .spirit-world-arrow { position: absolute; z-index: 5; top: .35rem; left: 50%; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; transform: translateX(-50%); border: 1px solid rgba(186, 230, 253, .95); border-radius: 50%; background: linear-gradient(145deg, #7dd3fc, #0284c7); box-shadow: 0 0 .8rem rgba(56, 189, 248, .55); color: #082f49; font-size: 1.8rem; font-weight: 800; line-height: 1; transition: filter .18s ease, scale .18s ease; }
  .spirit-world-arrow:hover { filter: brightness(1.2); scale: 1.08; }
- .spirit-world-content[hidden] { display: none; }
- .spirit-world-content { display: grid; gap: .75rem; margin: 0 0 1rem; }
- .spirit-world-placeholder { display: grid; justify-items: center; gap: .35rem; padding: 1.25rem; min-height: 7rem; border: 1px dashed rgba(196, 162, 226, .45); border-radius: .8rem; background: rgba(75, 42, 97, .2); text-align: center; }
- .spirit-world-placeholder-emoji { font-size: 2.1rem; letter-spacing: .4rem; }
- .spirit-world-placeholder h3 { margin: 0 0 .2rem; color: #d8b4fe; font-weight: 700; }
- .spirit-world-placeholder p { margin: 0; color: #c4b5d0; font-size: .9rem; }
- .spirit-world-secret-placeholder { border-color: rgba(201, 177, 124, .45); background: rgba(79, 65, 39, .18); }
- .spirit-world-secret-placeholder h3 { color: #e7ce9b; }
  body.region-spirit-world .game-shell { background-image: radial-gradient(ellipse at 50% 12%, rgba(42, 121, 168, .34), transparent 52%), linear-gradient(#0c1923, #0c0d0f 70%); }
  body.region-spirit-world #exploration-banner { border-color: rgba(125, 211, 252, .55); background-color: rgba(7, 24, 37, .82); }
  .found-map-toast[hidden] { display: none; }
