@@ -31,6 +31,14 @@ ruby mini_games/yara-rpg/build-crazygames.rb
 
 O resultado fica em `mini_games/yara-rpg/crazygames-build/`. Envie o conteúdo dessa pasta pelo portal; `index.html` é a entrada do jogo. A página usa o layout `crazygames` e não carrega o layout do site, AdSense, Analytics nem o link “Voltar ao site”.
 
+Para jogar o pacote localmente sem iniciar o Jekyll, rode na raiz do repositório:
+
+```sh
+python3 -m http.server 8000 --directory mini_games/yara-rpg/crazygames-build
+```
+
+Mantenha esse comando rodando e abra `http://localhost:8000/` no navegador. O servidor precisa continuar ativo enquanto você joga. Se a porta 8000 já estiver ocupada, troque `8000` por `8001` no comando e abra `http://localhost:8001/`.
+
 Esta primeira versão ainda carrega Tailwind e as fontes Cinzel/Inter de CDNs, assim como a página atual. Antes de uma submissão final, compile Tailwind para CSS local e decida se quer empacotar as fontes ou usar alternativas locais. A integração da SDK, seleção de idioma pela configuração da plataforma e o fluxo de início rápido também são etapas separadas ainda necessárias para preparar o lançamento.
 
 ## Estrutura
