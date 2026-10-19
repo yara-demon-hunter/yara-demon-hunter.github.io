@@ -457,6 +457,7 @@ window.logMessage = function logMessage(message, type = 'normal') {
     if (type === 'discovery') colorClass = "text-amber-300 border-l-2 border-amber-500 font-semibold";
     if (type === 'loot') colorClass = "text-purple-300 border-l-2 border-purple-500 font-semibold";
     if (type === 'special') colorClass = "text-cyan-300 border-l-2 border-cyan-500 font-semibold";
+    if (type === 'spirit-message') colorClass = "text-blue-200 border-l-2 border-blue-400 font-semibold";
 
     const div = document.createElement('div');
     div.className = `${colorClass} pl-2 py-0.5`;

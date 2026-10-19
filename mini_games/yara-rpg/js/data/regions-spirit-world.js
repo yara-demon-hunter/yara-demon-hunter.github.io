@@ -127,21 +127,130 @@ window.YaraRpgData.spiritRegions = Object.freeze([
             },
             {
                 id: "spirit-sea-drifting-boat",
-                title: { pt: "O barco à deriva", en: "The Drifting Boat" },
+                title: { 
+                    pt: "O Barco à Deriva", 
+                    en: "The Drifting Boat" 
+                },
                 description: {
-                    pt: "Um pequeno barco passa sem remos nem tripulação. Uma lanterna azul balança na proa.",
-                    en: "A small boat drifts by without oars or crew. A blue lantern sways at its bow."
+                    pt: "Um pequeno barco passa pelo oceano de almas.",
+                    en: "A small boat drifts through the ocean of souls."
                 },
                 choices: [
                     {
-                        label: { pt: "Acender a lanterna", en: "Light the lantern" },
+                        label: { 
+                            pt: "Acenar", 
+                            en: "Wave at it" 
+                        },
                         effect: "spirit-message",
                         messageKey: "spiritWorldSeaLanternFades"
                     },
                     {
-                        label: { pt: "Deixar o barco seguir", en: "Let the boat pass" },
+                        label: { 
+                            pt: "Deixar o barco seguir", 
+                            en: "Let the boat pass" 
+                        },
                         effect: "spirit-message",
                         messageKey: "spiritWorldSeaBoatFades"
+                    }
+                ]
+            },
+            {
+                id: "spirit-sea-grim-reaper-boat",
+                title: { pt: "O Barqueiro do Além", en: "The Ferryman of Beyond" },
+                description: {
+                    pt: "Um barco desgastado desliza sobre a névoa. Uma figura encapuzada segura uma foice cuja lâmina se estende em um remo, impulsionando a embarcação sobre um oceano de almas murmurantes.",
+                    en: "A worn boat glides over the fog. A hooded figure holds a scythe whose blade extends into an oar, propelling the vessel over an ocean of whispering souls."
+                },
+                choices: [
+                    {
+                        label: { pt: "Observar em silêncio", en: "Watch in silence" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperObserves"
+                    },
+                    {
+                        label: { pt: "Desviar o olhar", en: "Look away" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperPasses"
+                    }
+                ]
+            },
+            {
+                id: "spirit-sea-reaper-question-eye",
+                title: { pt: "O Olhar do Barqueiro", en: "The Ferryman's Gaze" },
+                description: {
+                    pt: "A embarcação para abruptamente. O esqueleto encapuzado vira a caveira em sua direção e sussurra com uma voz oca: 'O que faz neste domínio? Como obteve esse olho?'",
+                    en: "The boat comes to a sudden halt. The hooded skeleton turns its skull toward you and hollowly whispers: 'What brings you to this realm? How did you acquire that eye?'"
+                },
+                choices: [
+                    {
+                        label: { pt: "Explicar sua jornada", en: "Explain your journey" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperEyeExplained"
+                    },
+                    {
+                        label: { pt: "Manter o segredo", en: "Keep the secret" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperEyeHidden"
+                    }
+                ]
+            },
+            {
+                id: "spirit-sea-reaper-enigmatic-request",
+                title: { pt: "A Busca Esquecida", en: "The Forgotten Search" },
+                description: {
+                    pt: "A figura detém o remo por um instante. 'Eu busco aquilo que foi levado antes da hora... uma relíquia sem nome, perdida entre os vivos. Se a encontrar e me entregar, a maré responderá a você.'",
+                    en: "The figure pauses its oar for a moment. 'I seek that which was taken before its time... a nameless relic lost among the living. Bring it to me, and the tide shall answer to you.'"
+                },
+                choices: [
+                    {
+                        label: { pt: "Aceitar o pacto", en: "Accept the pact" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperPactAccepted"
+                    },
+                    {
+                        label: { pt: "Recusar a oferta", en: "Decline the offer" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperPactRefused"
+                    }
+                ]
+            },
+            {
+                id: "spirit-sea-reaper-soul-devourer",
+                title: { pt: "O Devorador de Almas", en: "The Soul Devourer" },
+                description: {
+                    pt: "'O fluxo das águas está perturbado', murmura a entidade. 'No mundo dos vivos, há uma aberração que devora o que não lhe pertence e recusa a morte. A ordem precisa ser restaurada.'",
+                    en: "'The flow of the waters is disturbed,' the entity whispers. 'In the realm of the living, there is an abomination that devours what is not its own and defies death. Order must be restored.'"
+                },
+                choices: [
+                    {
+                        label: { pt: "Perguntar sobre a entidade", en: "Ask about the entity" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperDevourerInfo"
+                    },
+                    {
+                        label: { pt: "Oferecer-se para caçá-la", en: "Offer to hunt it" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperDevourerQuest"
+                    }
+                ]
+            },
+            {
+                id: "spirit-sea-reaper-line-irony",
+                title: { pt: "A Fila das Almas", en: "The Queue of Souls" },
+                description: {
+                    pt: "A Morte aponta a foice para a procissão de sombras agonizantes que a seguem. 'Tantos esperam pacientemente pelo seu fim... Diga-me, errante, você quer fazer parte dessa fila também?'",
+                    en: "Death points its scythe toward the procession of agonizing shadows behind it. 'So many wait patiently for their end... Tell me, wanderer, do you wish to join this line as well?'"
+                },
+                choices: [
+                    {
+                        label: { pt: "Recuar com cuidado", en: "Step back carefully" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperLineStepBack"
+                    },
+                    {
+                        label: { pt: "Responder com arrogância", en: "Respond with arrogance" },
+                        effect: "spirit-message",
+                        messageKey: "spiritWorldReaperLineDefy"
                     }
                 ]
             }

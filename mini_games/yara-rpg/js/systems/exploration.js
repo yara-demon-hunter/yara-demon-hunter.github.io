@@ -275,7 +275,7 @@ function resolveStoryEvent(choiceIndex) {
     pendingStoryEvent = null;
     completeRegionObjective('story', true);
     if (effect === 'spirit-message') {
-        logMessage(t(choice.messageKey), 'special');
+        logMessage(t(choice.messageKey), 'spirit-message');
         completeRegionObjective('story');
         updateUI();
         return;
