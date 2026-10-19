@@ -165,7 +165,7 @@ window.YaraRpgTranslations.en = {
         regionObjectiveCompleted: "Objective completed",
         regionObjectivesCompleted: "Objectives completed",
         closeObjectives: "Close objectives",
-        potions: "Healing Potions",
+        potions: "Potions",
         available: "available",
         passiveSkills: "Passive Skills",
         passiveButtonAria: "{name}. {description}. Click for details.",

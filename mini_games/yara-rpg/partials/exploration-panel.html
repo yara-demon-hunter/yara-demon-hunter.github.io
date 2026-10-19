@@ -116,25 +116,21 @@
             <!-- Controles de Ação -->
             <div id="action-controls">
                 <!-- Ações de Exploração -->
-                <div id="controls-explore" class="grid grid-cols-2 gap-2">
-                    <button id="potion-button" type="button" onclick="usePotion()" class="potion-action-button action-potion-button rounded-xl" data-i18n-aria="potionActionAria">
-                        <span aria-hidden="true">🧪</span><span data-i18n="drink">Poção</span>
-                        <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
-                    </button>
+                <div id="controls-explore" class="grid grid-cols-3 gap-2">
                     <button onclick="exploreForest()" class="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 active:scale-[0.98] text-white font-semibold py-3 px-3 rounded-xl shadow-lg border border-emerald-500/50 flex items-center justify-center gap-2 transition text-sm">
                         <span aria-hidden="true">🧭</span> <span data-i18n="explore">Explorar</span>
                     </button>
                     <button id="camp-button" onclick="restAtCamp()" class="bg-forest-800 hover:bg-forest-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-emerald-200 font-semibold py-3 px-3 rounded-xl shadow border border-forest-700 flex items-center justify-center gap-2 transition text-sm">
                         <span aria-hidden="true">⛺</span> <span data-i18n="camp">Descansar</span> <span data-i18n="campCost">(🪙50)</span>
                     </button>
+                    <button id="potion-button" type="button" onclick="usePotion()" class="potion-action-button action-potion-button flex items-center justify-center gap-2 rounded-xl" data-i18n-aria="potionActionAria">
+                        <span aria-hidden="true">🧪</span>
+                        <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
+                    </button>
                 </div>
 
                 <!-- Novos Golpes e Ações de Combate -->
-                <div id="controls-combat" class="hidden grid grid-cols-2 sm:grid-cols-5 gap-2">
-                    <button type="button" onclick="usePotion()" class="potion-action-button action-potion-button rounded-xl" data-i18n-aria="potionActionAria">
-                        <span aria-hidden="true">🧪</span><span data-i18n="drink">Poção</span>
-                        <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
-                    </button>
+                <div id="controls-combat" class="hidden grid grid-cols-6 gap-2">
                     <button id="quick-attack-button" onclick="combatQuickAttack()" class="bg-stone-800 hover:bg-stone-700 active:scale-[0.98] text-amber-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-600 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span id="quick-attack-icon">🗡️</span> <span id="quick-attack-label" data-i18n="quickAttack">Ataque Rápido</span>
                     </button>
@@ -149,6 +145,10 @@
                     </button>
                     <button id="run-button" onclick="combatRun()" class="bg-stone-900 hover:bg-stone-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-stone-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-700 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span>🏃</span> <span data-i18n="run">Fugir na Névoa</span>
+                    </button>
+                    <button type="button" onclick="usePotion()" class="potion-action-button action-potion-button flex flex-col items-center justify-center gap-1 rounded-xl" data-i18n-aria="potionActionAria">
+                        <span aria-hidden="true">🧪</span>
+                        <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
                     </button>
                 </div>
             </div>

@@ -222,13 +222,6 @@ function updateUI() {
     equipmentShortcut?.classList.toggle('has-upgrade', hasEquipmentUpgrade);
     const attributesShortcut = document.querySelector('[data-open-panel="hero-attributes"]');
     attributesShortcut?.classList.toggle('has-upgrade', sp > 0);
-    document.querySelectorAll('.action-potion-button').forEach((button) => {
-        button.disabled = hero.potions <= 0
-            || (hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco'))
-            || (inCombat && combatActionLocked)
-            || gameOver || campaignComplete;
-        button.setAttribute('aria-label', `${t('potionActionAria')} (${hero.potions}/${hero.maxPotions})`);
-    });
     const unlockedPassiveSkills = MIST_CONTACT_DATA.passiveSkills.filter((skill) => hero.passiveSkills.includes(skill.id));
     const unlockedPacts = MIST_CONTACT_DATA.pacts.filter((pact) => hero.monsterPacts.includes(pact.id));
     const passiveSkills = [selectedCharacter.passive, ...unlockedPassiveSkills, ...unlockedPacts].filter(Boolean);
@@ -460,9 +453,14 @@ function updateUI() {
         hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco')
     );
     document.querySelectorAll('.potion-action-button').forEach((button) => {
-        button.disabled = gameOver || campaignComplete || combatActionLocked;
+        button.disabled = hero.potions <= 0
+            || (hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco'))
+            || (inCombat && combatActionLocked)
+            || gameOver || campaignComplete;
+        button.setAttribute('aria-label', `${t('potionActionAria')} (${hero.potions}/${hero.maxPotions})`);
     });
     document.querySelectorAll('#controls-combat button').forEach((button) => {
+        if (button.classList.contains('action-potion-button')) return;
         const disabledByGameState = (button.id === 'dodge-button' && (
             !selectedCharacter.skills.dodge
             ||

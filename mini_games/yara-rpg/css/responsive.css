@@ -1,4 +1,24 @@
 /* Ajustes de layout para telas médias e dispositivos móveis. */
+.action-potion-button {
+    border: 1px solid rgba(94, 234, 212, 0.72);
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.92), rgba(20, 184, 166, 0.82));
+    color: #ecfeff;
+    box-shadow: 0 0 12px rgba(45, 212, 191, 0.2);
+}
+.action-potion-button:hover:not(:disabled) {
+    border-color: #99f6e4;
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+}
+.action-potion-button:disabled,
+.action-potion-button:disabled:hover {
+    border-color: rgba(75, 85, 84, 0.75);
+    background: linear-gradient(135deg, #252b2a, #343b39);
+    color: #7c8986;
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.4 !important;
+    filter: grayscale(0.75);
+}
 @media (prefers-reduced-motion: reduce) {
     .hero-quick-link.has-upgrade { animation: none !important; }
 }
@@ -296,6 +316,10 @@
     #controls-explore button > span:first-child {
         font-size: 1rem;
     }
+    #controls-explore .action-potion-button {
+        flex-direction: row;
+        gap: 6px;
+    }
     #controls-explore .potion-count,
     #controls-explore [data-i18n="campCost"] {
         font-size: 0.58rem;
@@ -320,7 +344,18 @@
         font-size: 0.43rem;
         line-height: 1;
     }
-    #controls-combat .action-potion-button { min-height: 48px; }
+    #controls-combat .action-potion-button {
+        min-width: 0;
+        min-height: 48px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2px 1px !important;
+        border-radius: 7px;
+        font-size: 0.54rem !important;
+        line-height: 1.05;
+        gap: 2px;
+    }
     footer {
         padding-bottom: 4px;
     }
