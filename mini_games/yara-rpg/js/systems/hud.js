@@ -270,6 +270,14 @@ function updateUI() {
     const storyCard = document.getElementById('story-event-card');
     storyCard.hidden = !pendingStoryEvent || inCombat || gameOver || pendingChest;
     if (pendingStoryEvent) {
+        const eventImage = document.getElementById('story-event-image');
+        eventImage.hidden = !pendingStoryEvent.image;
+        eventImage.removeAttribute('src');
+        eventImage.onerror = null;
+        if (pendingStoryEvent.image) {
+            eventImage.src = pendingStoryEvent.image;
+            eventImage.onerror = () => { eventImage.hidden = true; };
+        }
         document.getElementById('story-event-title').textContent = pendingStoryEvent.title[gameLanguage];
         document.getElementById('story-event-description').textContent = pendingStoryEvent.description[gameLanguage];
         const choices = document.getElementById('story-event-choices');

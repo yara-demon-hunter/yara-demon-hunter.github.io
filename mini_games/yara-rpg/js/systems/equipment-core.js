@@ -30,7 +30,6 @@ function getEquipmentConflicts(item) {
         conflictingSlots.add('offHand');
     }
     if (item.slot === 'offHand'
-        && isTwoHandedWeapon
         && hero.equipment.mainHand?.itemType === 'weapon'
         && hero.equipment.mainHand.handUsage === 'two-handed') {
         conflictingSlots.add('mainHand');

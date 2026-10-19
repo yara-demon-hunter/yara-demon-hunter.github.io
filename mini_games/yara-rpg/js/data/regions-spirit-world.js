@@ -156,6 +156,7 @@ window.YaraRpgData.spiritRegions = Object.freeze([
             },
             {
                 id: "spirit-sea-grim-reaper-boat",
+                image: "images/special_monsters/death.webp",
                 title: { pt: "O Barqueiro do Além", en: "The Ferryman of Beyond" },
                 description: {
                     pt: "Um barco desgastado desliza sobre a névoa. Uma figura encapuzada segura uma foice cuja lâmina se estende em um remo, impulsionando a embarcação sobre um oceano de almas murmurantes.",
@@ -176,6 +177,7 @@ window.YaraRpgData.spiritRegions = Object.freeze([
             },
             {
                 id: "spirit-sea-reaper-question-eye",
+                image: "images/special_monsters/death.webp",
                 title: { pt: "O Olhar do Barqueiro", en: "The Ferryman's Gaze" },
                 description: {
                     pt: "A embarcação para abruptamente. O esqueleto encapuzado vira a caveira em sua direção e sussurra com uma voz oca: 'O que faz neste domínio? Como obteve esse olho?'",
@@ -196,6 +198,7 @@ window.YaraRpgData.spiritRegions = Object.freeze([
             },
             {
                 id: "spirit-sea-reaper-enigmatic-request",
+                image: "images/special_monsters/death.webp",
                 title: { pt: "A Busca Esquecida", en: "The Forgotten Search" },
                 description: {
                     pt: "A figura detém o remo por um instante. 'Eu busco aquilo que foi levado antes da hora... uma relíquia sem nome, perdida entre os vivos. Se a encontrar e me entregar, a maré responderá a você.'",
@@ -216,6 +219,7 @@ window.YaraRpgData.spiritRegions = Object.freeze([
             },
             {
                 id: "spirit-sea-reaper-soul-devourer",
+                image: "images/special_monsters/death.webp",
                 title: { pt: "O Devorador de Almas", en: "The Soul Devourer" },
                 description: {
                     pt: "'O fluxo das águas está perturbado', murmura a entidade. 'No mundo dos vivos, há uma aberração que devora o que não lhe pertence e recusa a morte. A ordem precisa ser restaurada.'",
@@ -236,6 +240,7 @@ window.YaraRpgData.spiritRegions = Object.freeze([
             },
             {
                 id: "spirit-sea-reaper-line-irony",
+                image: "images/special_monsters/death.webp",
                 title: { pt: "A Fila das Almas", en: "The Queue of Souls" },
                 description: {
                     pt: "A Morte aponta a foice para a procissão de sombras agonizantes que a seguem. 'Tantos esperam pacientemente pelo seu fim... Diga-me, errante, você quer fazer parte dessa fila também?'",
