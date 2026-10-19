@@ -2,7 +2,7 @@
 window.YaraRpgData = window.YaraRpgData || {};
 window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
     loot: {
-        equipmentDropChance: 40,
+        equipmentDropChance: 30,
         animalEventGoldMinimum: 25,
         animalEventGoldRange: 26,
         equipmentRarities: [
