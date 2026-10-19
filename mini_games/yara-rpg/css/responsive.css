@@ -1,4 +1,7 @@
 /* Ajustes de layout para telas médias e dispositivos móveis. */
+@media (prefers-reduced-motion: reduce) {
+    .hero-quick-link.has-upgrade { animation: none !important; }
+}
 @media (max-width: 899px) {
     body.game-shell {
         justify-content: flex-start;
@@ -120,11 +123,8 @@
     #hero-panel {
         display: contents;
     }
-    .hero-vitals {
-        display: contents;
-    }
+    .hero-vitals { display: flex; flex-direction: column; gap: 8px; }
     .hero-summary {
-        order: 3;
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -136,6 +136,22 @@
         background: rgba(23, 25, 31, 0.95);
     }
     .hero-summary-heading { width: 100%; }
+    .hero-quick-links { display: flex; flex-wrap: wrap; gap: 6px; margin: 7px 0 9px; }
+    .hero-quick-link {
+        position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+        min-height: 34px; padding: 5px 9px; border: 1px solid rgba(120, 103, 67, .7);
+        border-radius: 999px; background: rgba(12, 25, 20, .9); color: #e8e3d4;
+        font-size: .65rem; font-weight: 700;
+    }
+    .hero-quick-link.has-upgrade { animation: quick-link-pulse 2.2s ease-in-out infinite; }
+    .hero-quick-link[data-open-panel="hero-equipment"].has-upgrade { --pulse-color: 250, 204, 21; }
+    .hero-quick-link[data-open-panel="hero-attributes"].has-upgrade { --pulse-color: 74, 222, 128; }
+    .quick-link-count { min-width: 16px; padding: 2px 4px; border-radius: 999px; background: #166534; color: #dcfce7; font-size: .58rem; }
+    @keyframes quick-link-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(var(--pulse-color), 0); }
+        50% { box-shadow: 0 0 0 3px rgba(var(--pulse-color), .45), 0 0 12px rgba(var(--pulse-color), .22); }
+    }
+    .mobile-panel-source { display: none !important; }
     .hero-summary > div:first-child {
         display: flex;
         align-items: center;
@@ -253,7 +269,7 @@
         display: none;
     }
     #controls-explore {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 5px;
     }
     #controls-explore button {
@@ -274,7 +290,7 @@
         line-height: 1;
     }
     #controls-combat {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
         gap: 3px;
     }
     #controls-combat button {
@@ -292,6 +308,7 @@
         font-size: 0.43rem;
         line-height: 1;
     }
+    #controls-combat .action-potion-button { min-height: 48px; }
     footer {
         padding-bottom: 4px;
     }

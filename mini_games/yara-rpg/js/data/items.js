@@ -15,7 +15,7 @@ window.YaraRpgData.items = Object.freeze({
         { id: "wooden-shield", slot: "offHand", itemType: "shield", icon: "🛡️", image: "images/items/wooden-shield.webp", name: { pt: "Escudo de Madeira", en: "Wooden Shield" }, stats: { def: 5, parry: 5 }, starter: true },
         { id: "leather-cap", slot: "head", icon: "⛑️", image: "images/items/leather-cap.webp", name: { pt: "Capuz de Couro", en: "Leather Hood" }, stats: { def: 1, evasion: 3 }, starter: true },
         { id: "leather-armor", slot: "body", icon: "🦺", image: "images/items/leather-armor.webp", name: { pt: "Armadura de Couro", en: "Leather Armor" }, stats: { def: 1, maxHp: 30 }, starter: true },
-        { id: "night-cloak", slot: "body", icon: "🧥", image: "images/items/night-cloak.webp", name: { pt: "Capa Noturna", en: "Night Cloak" }, stats: { evasion: 3, parry: 1 }, starter: true  },
+        { id: "night-cloak", slot: "cloak", icon: "🧥", image: "images/items/night-cloak.webp", name: { pt: "Capa Noturna", en: "Night Cloak" }, stats: { evasion: 3, parry: 1 }, starter: true  },
         { id: "trail-trousers", slot: "legs", icon: "👖", image: "images/items/trail-trousers.webp", name: { pt: "Calças de Trilha", en: "Trail Trousers" }, stats: { def: 1, maxHp: 30 }, starter: true },
         { id: "swift-boots", slot: "boots", icon: "🥾", image: "images/items/swift-boots.webp", name: { pt: "Botas Ligeiras", en: "Swift Boots" }, stats: { evasion: 4 }, starter: true },
         { id: "river-charm", slot: "necklace", icon: "📿", image: "images/items/river-charm.webp",name: { pt: "Amuleto do Rio", en: "River Charm" }, stats: { maxFoco: 30, parry: 1 }, starter: true },

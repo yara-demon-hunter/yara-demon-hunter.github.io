@@ -117,6 +117,10 @@
             <div id="action-controls">
                 <!-- Ações de Exploração -->
                 <div id="controls-explore" class="grid grid-cols-2 gap-2">
+                    <button id="potion-button" type="button" onclick="usePotion()" class="potion-action-button action-potion-button rounded-xl" data-i18n-aria="potionActionAria">
+                        <span aria-hidden="true">🧪</span><span data-i18n="drink">Poção</span>
+                        <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
+                    </button>
                     <button onclick="exploreForest()" class="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 active:scale-[0.98] text-white font-semibold py-3 px-3 rounded-xl shadow-lg border border-emerald-500/50 flex items-center justify-center gap-2 transition text-sm">
                         <span aria-hidden="true">🧭</span> <span data-i18n="explore">Explorar</span>
                     </button>
@@ -127,6 +131,10 @@
 
                 <!-- Novos Golpes e Ações de Combate -->
                 <div id="controls-combat" class="hidden grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <button type="button" onclick="usePotion()" class="potion-action-button action-potion-button rounded-xl" data-i18n-aria="potionActionAria">
+                        <span aria-hidden="true">🧪</span><span data-i18n="drink">Poção</span>
+                        <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
+                    </button>
                     <button id="quick-attack-button" onclick="combatQuickAttack()" class="bg-stone-800 hover:bg-stone-700 active:scale-[0.98] text-amber-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-600 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span id="quick-attack-icon">🗡️</span> <span id="quick-attack-label" data-i18n="quickAttack">Ataque Rápido</span>
                     </button>

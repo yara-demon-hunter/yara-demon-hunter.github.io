@@ -1,6 +1,106 @@
 // Character/game interface rendering and the scrolling event log.
 // Classic browser script; state is initialized by game.js before user actions run.
 
+document.addEventListener('click', (event) => {
+    const shortcut = event.target instanceof Element
+        ? event.target.closest('[data-open-panel]')
+        : null;
+    if (shortcut) {
+        openMobileCharacterPanel(shortcut.dataset.openPanel);
+        return;
+    }
+    if (event.target instanceof Element && event.target.closest('#mobile-open-equipment-bag-button')) {
+        openEquipmentBag();
+    }
+});
+
+function openMobileCharacterPanel(panelId) {
+    if (!window.matchMedia('(max-width: 640px)').matches) {
+        const panel = document.getElementById(panelId);
+        if (!panel) return;
+        panel.open = !panel.open;
+        panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    const source = document.getElementById(panelId);
+    const dialog = document.getElementById('mobile-character-panel-dialog');
+    const content = document.getElementById('mobile-character-panel-content');
+    const title = document.getElementById('mobile-character-panel-title');
+    if (!source || !dialog || !content || !title) return;
+    if (dialog.open && dialog.dataset.panel === panelId) return;
+    if (dialog.open) dialog.close();
+    const summary = source.querySelector(':scope > summary');
+    title.textContent = summary?.querySelector('[data-i18n]')?.textContent || summary?.textContent.trim() || '';
+    content.replaceChildren();
+    if (panelId === 'hero-equipment') {
+        content.classList.add('mobile-equipment-panel-content');
+        const equipmentGrid = document.getElementById('equipment-slots');
+        renderEquipment();
+        const equipmentContent = source.querySelector('.hero-equipment-content');
+        if (equipmentContent && equipmentGrid && equipmentGrid.parentElement !== content) content.append(equipmentGrid);
+        content.onclick = (event) => {
+            const button = event.target instanceof Element ? event.target.closest('button') : null;
+            if (!button) return;
+            if (button.matches('.equipment-slot-item, .equipment-upgrade-trigger')) {
+                const slot = button.closest('.equipment-slot');
+                const slotId = [...slot.classList].find((name) => name.startsWith('equipment-slot-'))?.slice('equipment-slot-'.length);
+                const item = slotId && hero.equipment[slotId];
+                if (item) showEquipmentItemDetails(item, 'equipped', slotId);
+            }
+        };
+    } else {
+        const panelContent = source.querySelector(':scope > div');
+        const clone = panelContent.cloneNode(true);
+        const passiveSkills = source.querySelector('.passive-skills-section');
+        if (panelId === 'hero-attributes' && passiveSkills) clone.append(passiveSkills.cloneNode(true));
+        clone.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+        clone.querySelectorAll('[data-upgrade-options]').forEach((element) => {
+            const upgrade = element.dataset.upgradeOptions;
+            element.hidden = !upgrade || openUpgradeOptions !== upgrade;
+        });
+        clone.querySelectorAll('[data-upgrade]').forEach((element) => {
+            element.setAttribute('aria-expanded', String(element.closest('.skill-upgrade-control')
+                ?.querySelector('[data-upgrade-options]')?.hidden === false));
+        });
+        content.replaceChildren(clone);
+        content.classList.remove('mobile-equipment-panel-content');
+        content.onclick = (event) => {
+            const button = event.target instanceof Element ? event.target.closest('button') : null;
+            if (!button) return;
+            if (button.matches('[data-upgrade]')) {
+                toggleUpgradeOptions(button.dataset.upgrade);
+                openMobileCharacterPanel(panelId);
+            } else if (button.matches('[data-upgrade-quantity]')) {
+                const upgrade = button.closest('[data-upgrade-options]')?.dataset.upgradeOptions;
+                if (upgrade) purchaseUpgrade(upgrade, button.dataset.upgradeQuantity === 'max' ? 'max' : Number(button.dataset.upgradeQuantity));
+                openMobileCharacterPanel(panelId);
+            } else if (button.matches('.passive-skill-icon-button')) {
+                const skillIndex = [...button.parentElement.children].indexOf(button);
+                document.querySelectorAll('#passive-skill-icons button')[skillIndex]?.click();
+            }
+        };
+    }
+    dialog.dataset.panel = panelId;
+    if (!dialog.open) dialog.showModal();
+}
+
+function closeMobileCharacterPanel() {
+    const dialog = document.getElementById('mobile-character-panel-dialog');
+    if (dialog?.open) dialog.close();
+    const grid = document.getElementById('equipment-slots');
+    const equipmentContent = document.querySelector('#hero-equipment .hero-equipment-content');
+    if (grid && equipmentContent && grid.parentElement !== equipmentContent) equipmentContent.append(grid);
+    const mobileContent = document.getElementById('mobile-character-panel-content');
+    mobileContent?.classList.remove('mobile-equipment-panel-content');
+}
+
+document.getElementById('mobile-character-panel-dialog')?.addEventListener('close', () => {
+    const grid = document.getElementById('equipment-slots');
+    const equipmentContent = document.querySelector('#hero-equipment .hero-equipment-content');
+    if (grid && equipmentContent && grid.parentElement !== equipmentContent) equipmentContent.append(grid);
+    document.getElementById('mobile-character-panel-content')?.classList.remove('mobile-equipment-panel-content');
+});
+
 function updateUI() {
     document.getElementById('hero-name').innerText = hero.name;
     const heroPortrait = document.getElementById('hero-portrait');
@@ -22,6 +122,13 @@ function updateUI() {
             spBadge.setAttribute('aria-label', t('skillPointsAria', { count: sp }));
         }
     }
+    const quickSkillPoints = document.getElementById('quick-skill-points');
+    if (quickSkillPoints) {
+        quickSkillPoints.textContent = sp;
+        quickSkillPoints.hidden = sp === 0;
+    }
+    const mobileBagCount = document.getElementById('mobile-equipment-bag-count');
+    if (mobileBagCount) mobileBagCount.textContent = `${hero.equipmentInventory.length}/${EQUIPMENT_BAG_CAPACITY}`;
     document.getElementById('hero-xp').innerText = hero.xp;
     document.getElementById('hero-xp-max').innerText = hero.maxXp;
     document.getElementById('hero-hp').innerText = hero.hp;
@@ -87,6 +194,19 @@ function updateUI() {
         element.textContent = hero.maxPotions;
     });
     renderEquipment();
+    const equipmentShortcut = document.querySelector('[data-open-panel="hero-equipment"]');
+    const attributesShortcut = document.querySelector('[data-open-panel="hero-attributes"]');
+    const hasEquipmentUpgrade = [...document.querySelectorAll('.equipment-upgrade-available')].length > 0;
+    equipmentShortcut?.classList.toggle('has-upgrade', hasEquipmentUpgrade);
+    attributesShortcut?.classList.toggle('has-upgrade', sp > 0);
+    attributesShortcut?.classList.toggle('has-skill-points', sp > 0);
+    document.querySelectorAll('.action-potion-button').forEach((button) => {
+        button.disabled = hero.potions <= 0
+            || (hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco'))
+            || (inCombat && combatActionLocked)
+            || gameOver || campaignComplete;
+        button.setAttribute('aria-label', `${t('potionActionAria')} (${hero.potions}/${hero.maxPotions})`);
+    });
     const unlockedPassiveSkills = MIST_CONTACT_DATA.passiveSkills.filter((skill) => hero.passiveSkills.includes(skill.id));
     const unlockedPacts = MIST_CONTACT_DATA.pacts.filter((pact) => hero.monsterPacts.includes(pact.id));
     const passiveSkills = [selectedCharacter.passive, ...unlockedPassiveSkills, ...unlockedPacts].filter(Boolean);

@@ -51,6 +51,10 @@ function loadSavedGame(snapshot = readSavedGame()) {
         ? savedChestChanceBonus
         : 0;
     const savedEquipment = { ...(snapshot.hero?.equipment || {}) };
+    if (savedEquipment.body?.id === 'night-cloak' && !savedEquipment.cloak) {
+        savedEquipment.cloak = { ...savedEquipment.body, slot: 'cloak' };
+        savedEquipment.body = null;
+    }
     if (!savedEquipment.mainHand && savedEquipment.rightHand) {
         savedEquipment.mainHand = savedEquipment.rightHand;
     }

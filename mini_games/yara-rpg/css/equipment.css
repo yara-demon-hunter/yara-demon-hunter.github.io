@@ -136,6 +136,20 @@
     color: #e8e5df;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
 }
+.mobile-character-panel-dialog { max-height: min(82dvh, 46rem); overflow-y: auto; }
+.mobile-character-panel-dialog .item-drop-content { padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); }
+.mobile-character-panel-dialog #mobile-character-panel-content.mobile-equipment-panel-content #equipment-slots {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas:
+        "necklace head cloak"
+        "mainHand body offHand"
+        "accessory legs ring"
+        "pet boots empty-bottom";
+    width: 100%;
+    margin: 0;
+}
+.mobile-character-panel-dialog .hero-attribute-stats { margin-inline: 0; }
 .item-drop-dialog::backdrop {
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(4px);
@@ -678,12 +692,13 @@
     }
 }
 #equipment-slots {
+    display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-areas:
-        "necklace head bag"
+        "necklace head cloak"
         "mainHand body offHand"
         "accessory legs ring"
-        "pet boots potion";
+        "pet boots empty-bottom";
     width: min(100%, 17rem);
     margin-inline: auto;
     gap: 0.4rem;
@@ -703,6 +718,7 @@
 .equipment-slot-mainHand { grid-area: mainHand; }
 .equipment-slot-offHand { grid-area: offHand; }
 .equipment-slot-head { grid-area: head; }
+.equipment-slot-cloak { grid-area: cloak; }
 .equipment-slot-body { grid-area: body; }
 .equipment-slot-legs { grid-area: legs; }
 .equipment-slot-boots { grid-area: boots; }
@@ -711,7 +727,6 @@
 .equipment-slot-accessory { grid-area: accessory; }
 .equipment-slot-pet { grid-area: pet; }
 .equipment-slot-potion {
-    grid-area: potion;
     border-color: rgba(13, 148, 136, 0.65);
     background: rgba(19, 78, 74, 0.75);
     color: #ccfbf1;

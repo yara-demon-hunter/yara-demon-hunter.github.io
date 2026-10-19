@@ -18,7 +18,6 @@
                         <span id="hero-skill-points-badge" class="skill-points-badge no-points inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] leading-none" aria-label="0 pontos de habilidade"><span aria-hidden="true">✦</span><span id="hero-skill-points" class="font-bold">0</span><span data-i18n="skillPointsShort" class="uppercase tracking-wide">PH</span></span>
                     </div>
                     </div>
-
                 <!-- Status Bars -->
                 <div class="hero-status-bars space-y-3 mb-4">
                     <!-- HP -->
@@ -55,28 +54,41 @@
                 </div>
                 </div>
 
-                <details id="hero-equipment" class="hero-equipment">
+                <nav class="hero-quick-links" aria-label="Acesso rápido">
+                    <button type="button" class="hero-quick-link" data-open-panel="hero-equipment">
+                        <span aria-hidden="true">🛡️</span><span data-i18n="equipment">Equipamento</span>
+                        <span id="equipped-item-count" class="quick-link-count">0/11</span>
+                    </button>
+                    <button type="button" class="hero-quick-link" data-open-panel="hero-attributes">
+                        <span aria-hidden="true">✨</span><span data-i18n="attributes">Atributos</span>
+                        <span id="quick-skill-points" class="quick-link-count" hidden></span>
+                    </button>
+                    <button type="button" id="mobile-open-equipment-bag-button" class="hero-quick-link mobile-bag-shortcut" aria-haspopup="dialog" aria-controls="equipment-bag-dialog" data-i18n-aria="openEquipmentBag">
+                        <span aria-hidden="true">🎒</span><span data-i18n="inventory">Mochila</span>
+                        <span id="mobile-equipment-bag-count" class="quick-link-count">0/12</span>
+                    </button>
+                </nav>
+
+                <details id="hero-equipment" class="hero-equipment mobile-panel-source">
                     <summary id="hero-equipment-toggle">
                         <span data-i18n="equipment">Equipamento</span>
-                        <span id="equipped-item-count" class="equipped-item-count" aria-hidden="true">0/10</span>
                     </summary>
                     <div class="hero-equipment-content">
                         <div id="equipment-slots" class="grid grid-cols-2 gap-2 text-xs">
-                    <button id="potion-button" type="button" onclick="usePotion()" class="potion-action-button equipment-slot equipment-slot-potion rounded-lg border border-fantasy-border/50 bg-forest-950/60" data-i18n-aria="potionActionAria">
+                    <button type="button" onclick="usePotion()" class="potion-action-button equipment-slot equipment-slot-potion rounded-lg border border-fantasy-border/50 bg-forest-950/60" data-i18n-aria="potionActionAria" hidden>
                         <span aria-hidden="true">🧪</span>
                         <span data-i18n="drink">Poção</span>
                         <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
                     </button>
-                    <button id="open-equipment-bag-button" type="button" class="equipment-bag-button" aria-haspopup="dialog" aria-controls="equipment-bag-dialog" data-i18n-aria="openEquipmentBag">
-                        <span aria-hidden="true">🎒</span>
-                        <span id="equipment-bag-count">0/12</span>
+                    <button id="open-equipment-bag-button" type="button" class="equipment-bag-button" aria-haspopup="dialog" aria-controls="equipment-bag-dialog" data-i18n-aria="openEquipmentBag" hidden>
+                        <span aria-hidden="true">🎒</span><span id="equipment-bag-count">0/12</span>
                     </button>
                         </div>
                     </div>
                 </details>
 
                 <!-- Atributos -->
-                <details id="hero-attributes" class="hero-attributes">
+                <details id="hero-attributes" class="hero-attributes mobile-panel-source">
                         <summary data-i18n="attributes">Atributos</summary>
                         <div class="hero-attribute-stats grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
                             <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">

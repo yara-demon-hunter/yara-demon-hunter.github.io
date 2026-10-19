@@ -14,6 +14,7 @@ const EQUIPMENT_SLOTS = Object.freeze([
     { id: "offHand",  icon: "🛡️" },
     { id: "head",      icon: "⛑️", image: "images/items/leather-cap.webp" },
     { id: "body",      icon: "🦺", image: "images/items/leather-armor.webp" },
+    { id: "cloak",     icon: "🧥", image: "images/items/night-cloak.webp" },
     { id: "legs",      icon: "👖", image: "images/items/trail-trousers.webp" },
     { id: "boots",     icon: "🥾", image: "images/items/swift-boots.webp" },
     { id: "necklace",  icon: "📿" },

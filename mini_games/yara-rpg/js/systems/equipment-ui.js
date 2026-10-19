@@ -72,11 +72,10 @@ function createEquipmentUpgradeTrigger(item, source, slot = null) {
 function renderEquipment() {
     const slotsContainer = document.getElementById('equipment-slots');
     const bagButton = document.getElementById('open-equipment-bag-button');
-    const potionButton = document.getElementById('potion-button');
     slotsContainer.replaceChildren();
     const equippedCount = Object.values(hero.equipment).filter(Boolean).length;
     const equippedItemCount = document.getElementById('equipped-item-count');
-    equippedItemCount.textContent = `${equippedCount}/${EQUIPMENT_SLOTS.length}`;
+    if (equippedItemCount) equippedItemCount.textContent = `${equippedCount}/${EQUIPMENT_SLOTS.length}`;
     document.getElementById('hero-equipment-toggle').setAttribute(
         'aria-label',
         t('equipmentSummary', { count: equippedCount })
@@ -139,7 +138,6 @@ function renderEquipment() {
     bagButton.setAttribute('aria-haspopup', 'dialog');
     bagButton.setAttribute('aria-controls', 'equipment-bag-dialog');
     slotsContainer.append(bagButton);
-    slotsContainer.append(potionButton);
 
     const inventoryContainer = document.getElementById('equipment-inventory-list');
     inventoryContainer.replaceChildren();
