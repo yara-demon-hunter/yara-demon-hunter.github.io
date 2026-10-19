@@ -218,10 +218,14 @@ function updateUI() {
     });
     renderEquipment();
     const equipmentShortcut = document.querySelector('[data-open-panel="hero-equipment"]');
+    const equipmentPanel = document.getElementById('hero-equipment');
     const hasEquipmentUpgrade = [...document.querySelectorAll('.equipment-upgrade-available')].length > 0;
     equipmentShortcut?.classList.toggle('has-upgrade', hasEquipmentUpgrade);
+    equipmentPanel?.classList.toggle('has-upgrade', hasEquipmentUpgrade);
     const attributesShortcut = document.querySelector('[data-open-panel="hero-attributes"]');
+    const attributesPanel = document.getElementById('hero-attributes');
     attributesShortcut?.classList.toggle('has-upgrade', sp > 0);
+    attributesPanel?.classList.toggle('has-upgrade', sp > 0);
     const unlockedPassiveSkills = MIST_CONTACT_DATA.passiveSkills.filter((skill) => hero.passiveSkills.includes(skill.id));
     const unlockedPacts = MIST_CONTACT_DATA.pacts.filter((pact) => hero.monsterPacts.includes(pact.id));
     const passiveSkills = [selectedCharacter.passive, ...unlockedPassiveSkills, ...unlockedPacts].filter(Boolean);

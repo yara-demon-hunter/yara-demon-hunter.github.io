@@ -21,6 +21,8 @@
 }
 @media (prefers-reduced-motion: reduce) {
     .hero-quick-link.has-upgrade { animation: none !important; }
+    .hero-equipment.has-upgrade > summary > [data-i18n="equipment"],
+    .hero-attributes.has-upgrade > summary[data-i18n="attributes"] { animation: none !important; }
 }
 @media (max-width: 899px) {
     body.game-shell {
