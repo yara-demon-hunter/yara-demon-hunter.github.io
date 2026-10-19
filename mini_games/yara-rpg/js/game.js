@@ -91,6 +91,7 @@ const hero = {
     parryBonus: 0,
     chestChanceBonus: 0,
     passiveSkills: [],
+    monsterPacts: [],
     equipment: createEmptyEquipmentMap(),
     equipmentInventory: [],
 };
@@ -179,6 +180,7 @@ function startAdventure({ character, equipment }) {
         chestChanceBonus: 0,
         fury: 0,
         passiveSkills: [],
+        monsterPacts: [],
         equipment: createEmptyEquipmentMap(),
         equipmentInventory: [],
     });

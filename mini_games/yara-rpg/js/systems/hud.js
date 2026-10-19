@@ -88,7 +88,8 @@ function updateUI() {
     });
     renderEquipment();
     const unlockedPassiveSkills = MIST_CONTACT_DATA.passiveSkills.filter((skill) => hero.passiveSkills.includes(skill.id));
-    const passiveSkills = [selectedCharacter.passive, ...unlockedPassiveSkills].filter(Boolean);
+    const unlockedPacts = MIST_CONTACT_DATA.pacts.filter((pact) => hero.monsterPacts.includes(pact.id));
+    const passiveSkills = [selectedCharacter.passive, ...unlockedPassiveSkills, ...unlockedPacts].filter(Boolean);
     const passiveSkillIcons = document.getElementById('passive-skill-icons');
     const passiveSkillsEmpty = document.getElementById('passive-skills-empty');
     passiveSkillIcons.replaceChildren();
@@ -401,7 +402,10 @@ function showPassiveDetails(passiveId) {
     const mistSkill = MIST_CONTACT_DATA.passiveSkills.find((entry) =>
         entry.id === passiveId && hero.passiveSkills.includes(entry.id)
     );
-    const skill = characterPassive || mistSkill;
+    const pact = MIST_CONTACT_DATA.pacts.find((entry) =>
+        entry.id === passiveId && hero.monsterPacts.includes(entry.id)
+    );
+    const skill = characterPassive || mistSkill || pact;
     if (!skill) return;
     document.getElementById('passive-detail-title').textContent = skill.name[gameLanguage];
     document.getElementById('passive-detail-icon').textContent = skill.icon || '✧';

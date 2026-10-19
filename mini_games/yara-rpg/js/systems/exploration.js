@@ -38,7 +38,12 @@ function exploreForest() {
         explorationsSinceMistContact,
         GAME_RULES.probabilityScale
     )) {
-        pendingMistContact = MIST_CONTACT_SYSTEM.chooseContact(MIST_CONTACT_DATA.contacts, hero.level);
+        pendingMistContact = MIST_CONTACT_SYSTEM.chooseContact(
+            MIST_CONTACT_DATA.contacts,
+            hero.level,
+            hero,
+            MIST_CONTACT_DATA.pacts
+        );
         if (pendingMistContact) {
             explorationsSinceMistContact = 0;
             logMessage(t('mistContactAppears', {
@@ -95,6 +100,10 @@ function exploreForest() {
         logMessage(t('chestFoundLog'), 'discovery');
         updateUI();
         return;
+    } else if (outcome === 'map') {
+        const mapBonus = EXPLORATION_RULES.map.treasureChanceBonus;
+        hero.chestChanceBonus = Math.max(hero.chestChanceBonus, mapBonus);
+        logMessage(t('explorationMapFound', { chance: hero.chestChanceBonus }), 'discovery');
     } else {
         logMessage(t('denseMist'));
     }
@@ -577,19 +586,30 @@ function spawnMonster(templateOverride = null) {
         GAME_DATA.monsters.minimumRolledAttribute,
         Math.round(value * variation * levelScale)
     );
-    const monsterHp = vary(template.hp);
+    const applyMonsterPacts = (stat, value) => {
+        const adjusted = MIST_CONTACT_DATA.pacts
+            .filter((pact) => hero.monsterPacts.includes(pact.id) && pact.monsterStat === stat)
+            .reduce((total, pact) => pact.percent
+                ? total * (1 + pact.amount / GAME_RULES.probabilityScale)
+                : total + pact.amount, value);
+        const minimum = ['def', 'parry', 'evasion'].includes(stat) ? 0 : 1;
+        const maximum = ['parry', 'evasion'].includes(stat) ? GAME_RULES.probabilityScale : Infinity;
+        return Math.max(minimum, Math.min(maximum, Math.round(adjusted)));
+    };
+    const monsterMaxHp = vary(template.hp);
+    const monsterStartingHp = applyMonsterPacts('hp', monsterMaxHp);
 
     currentMonster = {
         name: template.name[gameLanguage],
         icon: template.icon,
         image: template.image || null,
         isMistBoss,
-        hp: monsterHp,
-        maxHp: monsterHp,
-        atk: vary(template.atk),
-        def: vary(template.def),
-        parry: vary(template.parry),
-        evasion: vary(template.evasion),
+        hp: monsterStartingHp,
+        maxHp: monsterMaxHp,
+        atk: applyMonsterPacts('atk', vary(template.atk)),
+        def: applyMonsterPacts('def', vary(template.def)),
+        parry: applyMonsterPacts('parry', vary(template.parry)),
+        evasion: applyMonsterPacts('evasion', vary(template.evasion)),
         xpReward: vary(template.xpReward),
         goldReward: vary(template.goldReward),
         id: template.id || null,
@@ -645,12 +665,83 @@ function spawnMonster(templateOverride = null) {
     setBossMusic(currentMonster.isBoss);
 }
 
+function receiveSpiritSurgery(amount) {
+    hero.skillPoints = (Number(hero.skillPoints) || 0) + amount;
+    logMessage(t('spiritSurgeryReceived', { amount }), 'special');
+    completeRegionObjective('story');
+    updateUI();
+}
+
+function resolvePactOffer() {
+    const availablePacts = MIST_CONTACT_DATA.pacts.filter((pact) =>
+        !hero.monsterPacts.includes(pact.id)
+    );
+    if (!availablePacts.length) {
+        logMessage(t('pactAlreadyKnown'), 'normal');
+        updateUI();
+        return;
+    }
+
+    const pact = availablePacts[Math.floor(Math.random() * availablePacts.length)];
+    const equippedItems = Object.entries(hero.equipment).filter(([, item]) => item);
+    const penalties = [
+        { type: 'life' },
+        { type: 'focus' },
+        ...(hero.equipmentInventory.length ? [{ type: 'inventory' }] : []),
+        ...(equippedItems.length ? [{ type: 'equipment' }] : [])
+    ];
+    const penalty = penalties[Math.floor(Math.random() * penalties.length)];
+    let penaltyDescription;
+
+    if (penalty.type === 'life') {
+        hero.hp = 1;
+        penaltyDescription = t('pactPenaltyLife');
+    } else if (penalty.type === 'focus') {
+        hero.foco = 0;
+        penaltyDescription = t('pactPenaltyFocus');
+    } else if (penalty.type === 'inventory') {
+        const lostCount = hero.equipmentInventory.length;
+        hero.equipmentInventory = [];
+        selectedInventoryItems.clear();
+        penaltyDescription = t('pactPenaltyInventory', { count: lostCount });
+    } else {
+        const [slot, item] = equippedItems[Math.floor(Math.random() * equippedItems.length)];
+        hero.equipment[slot] = null;
+        hero.hp = Math.min(hero.hp, getEffectiveStat('maxHp'));
+        hero.foco = Math.min(hero.foco, getEffectiveStat('maxFoco'));
+        hero.fury = Math.min(hero.fury, getEffectiveFuryThreshold());
+        penaltyDescription = t('pactPenaltyEquippedItem', {
+            item: getEquipmentDisplayName(item)
+        });
+    }
+
+    hero.monsterPacts.push(pact.id);
+    logMessage(t('pactReceived', {
+        icon: pact.icon,
+        pact: pact.name[gameLanguage],
+        description: pact.description[gameLanguage],
+        penalty: penaltyDescription
+    }), 'special');
+    completeRegionObjective('story');
+    updateUI();
+}
+
 function acceptMistContact() {
     if (!pendingMistContact || inCombat || gameOver) return;
 
     const contact = pendingMistContact;
     pendingMistContact = null;
     logMessage(t('mistContactAccepted', { contact: contact.name[gameLanguage] }), 'special');
+
+    if (contact.onAccept?.type === 'skill-point') {
+        receiveSpiritSurgery(contact.onAccept.amount);
+        return;
+    }
+
+    if (contact.onAccept?.type === 'pact') {
+        resolvePactOffer();
+        return;
+    }
 
     if (contact.onAccept?.type === 'boss') {
         completeRegionObjective('story', true);

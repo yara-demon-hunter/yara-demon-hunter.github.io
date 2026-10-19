@@ -7,7 +7,7 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `regions.js`: IDs, títulos, descrições e eventos com escolhas por região em português e inglês. Cada região pode ter vários eventos; eles aparecem sem repetição até o conjunto se esgotar.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.
 - `special-monsters.js`: atributos, nível mínimo e recompensas dos chefes e monstros especiais usados em eventos.
-- `mist-contacts.js`: contatos com ícones e ofertas próprias, além das skills passivas permanentes obtidas nos encontros da névoa. O catálogo fica em `passiveSkills`; cada skill tem ID, ícone, nome/descrição em PT/EN, atributo (`stat`), bônus (`amount`) e, se também recuperar recurso, o campo `currentStat` (`hp` ou `foco`). Missões podem referenciar monstros por `bossId`.
+- `mist-contacts.js`: contatos com ícones e ofertas próprias, skills passivas (`passiveSkills`), pactos que enfraquecem monstros (`pacts`) e efeitos especiais de contato (`onAccept`). Cada skill/pacto tem ID, ícone, nome e descrição em PT/EN. Skills de atributo usam `stat` e `amount`; pactos declaram `monsterStat` e o bônus/penalidade em `amount`. Missões podem referenciar monstros por `bossId`.
 - `special-monsters.js`: atributos, requisitos e recompensas dos chefes e monstros especiais.
 - `world-rules.js`: escala de probabilidade, frequência/resultados dos contatos e custos/recuperação do acampamento.
 - `equipment-rules.js`: chance de drop, raridades e chances especiais para itens de baús, limite da mochila e aprimoramentos.
@@ -42,19 +42,20 @@ Explorar
    │  ├─ Precisa ter passado o intervalo de 3 explorações desde o último contato
    │  ├─ Chance = mínimo entre 25% e (3% + 1% por nível acima do nível 1)
    │  ├─ Disparou: escolhe aleatoriamente um contato elegível para o nível
-   │  └─ Aceitar pode iniciar uma luta, oferecer uma bebida, skill passiva ou sacrifício
+   │  └─ Aceitar pode iniciar uma luta, oferecer bebida, skill passiva, pacto ou ponto de habilidade
    └─ 3. Resultado aleatório da exploração (só se nenhum evento anterior disparou)
-      ├─ Monstro: 40%
-      ├─ Ouro: 19%
-      ├─ Trilha segura: 13% (HP/foco; removida se ambos estiverem cheios)
+      ├─ Monstro: 38%
+      ├─ Ouro: 17%
+      ├─ Trilha segura: 12% (HP/foco; removida se ambos estiverem cheios)
       ├─ Poção: 8% (removida se já estiver no limite)
       ├─ Armadilha: 6%
       ├─ Foco: 6% (removido se estiver no limite)
       ├─ Suprimentos: 6% (ouro e recuperação de HP)
+      ├─ Mapa: 5% → +25 pontos percentuais na chance de baú até encontrar um
       └─ Baú: 2% → ao abrir, 70% de chance de equipamento; caso contrário, vazio
 ```
 
-Os pesos do resultado aleatório totalizam 100% quando todas as opções estão disponíveis. Poção, foco e trilha segura são removidos quando não podem ajudar; os pesos restantes são então normalizados. Portanto, as porcentagens efetivas podem mudar conforme HP, foco e poções atuais. Um rumor de tesouro soma 10 pontos percentuais à chance calculada de baú; se o baú não sair, o resultado é sorteado entre os demais resultados.
+Os pesos do resultado aleatório totalizam 100% quando todas as opções estão disponíveis. Poção, foco e trilha segura são removidos quando não podem ajudar; os pesos restantes são então normalizados. Portanto, as porcentagens efetivas podem mudar conforme HP, foco e poções atuais. Encontrar um mapa ativa +25 pontos percentuais à chance calculada de baú; a pista recebida ao poupar um monstro ativa +10. O bônus persiste até encontrar um baú; se ele não aparecer, o resultado é sorteado entre os demais resultados.
 
 ### Eventos narrativos por região
 
@@ -71,7 +72,7 @@ Os desafios da fenda e Brutos são eventos encadeados: escolher enfrentar inicia
 ### Ramificações depois de encontrar um monstro
 
 ```text
-Encontrou monstro (resultado de 40%, ou escolha de evento/contato)
+Encontrou monstro (resultado de 38%, ou escolha de evento/contato)
 ├─ Fugir: 70% de sucesso; chefes finais não podem ser evitados
 └─ Vencer
    ├─ Chefe: vitória e recompensa; equipamento de raridade da lista do chefe é garantido
@@ -91,7 +92,7 @@ O teste de 10% é feito depois de derrotar um monstro comum; chefes não oferece
 
 ### Monstros que podem aparecer
 
-O encontro comum escolhe aleatoriamente um dos três monstros cadastrados para a região. Os atributos do modelo variam entre 70% e 160% por encontro. O nível não muda a chance de encontrar monstro (40% antes das redistribuições descritas acima).
+O encontro comum escolhe aleatoriamente um dos três monstros cadastrados para a região. Os atributos do modelo variam entre 70% e 160% por encontro. O nível não muda a chance de encontrar monstro (38% antes das redistribuições descritas acima).
 
 | Região | Monstros comuns |
 | --- | --- |
@@ -100,7 +101,7 @@ O encontro comum escolhe aleatoriamente um dos três monstros cadastrados para a
 | Aldeia das Tochas Azuladas | Saqueador da Névoa, Cavaleiro Possuído, Cavaleiro sem Cabeça |
 | Castelo de Gudran | Soldado de Gudran, Criatura Corrompida, Golem |
 
-Monstros especiais têm gatilhos próprios, não fazem parte do sorteio comum de 40%:
+Monstros especiais têm gatilhos próprios, não fazem parte do sorteio comum de 38%:
 
 - **Morte:** pode ser escolhido como chefe de contato a partir do nível 2.
 - **Morto-Vivo:** pode ser escolhido por contato a partir do nível 3; a Bruxa Caçadora também o convoca ao aceitar sua oferta.
@@ -113,7 +114,7 @@ Ao vencer chefes especiais, um equipamento é garantido. A raridade usa a lista 
 
 ### Baús, ouro e equipamentos
 
-- Exploração pode encontrar baú com peso-base de 2% (sujeito à redistribuição de pesos). Abrir o baú dá equipamento em 70% dos casos; nos outros 30%, está vazio.
+- Exploração pode encontrar baú com peso-base de 2% ou mapa com peso-base de 5% (sujeitos à redistribuição de pesos). Encontrar mapa ativa +25 pontos percentuais à chance de baú até encontrá-lo. Abrir o baú dá equipamento em 70% dos casos; nos outros 30%, está vazio.
 - A raridade de item de baú é sorteada entre Épico 40%, Lendário 30%, Demoníaco 20% e Divino 10%. O sorteio de baú permite Demoníaco/Divino em qualquer região.
 - Um monstro comum derrotado tem 40% de chance de equipamento. A distribuição padrão é: Comum 38%, Incomum 25%, Raro 11%, Super Raro 9%, Épico 7%, Lendário 5%, Demoníaco 3,5%, Divino 1,5%; antes do Castelo, Demoníaco/Divino são removidos e as demais chances são normalizadas.
 - Ouro encontrado diretamente na exploração: 5–14. Suprimentos: 10–20 de ouro e até 12 HP. Armadilha: 8–15 de dano, sem reduzir HP abaixo de 1. Trilha segura recupera até 30 HP e 15 foco; poção dá +1; foco encontrado dá 12–24.
@@ -130,6 +131,8 @@ A chance de aparecer é calculada após o intervalo de 3 explorações: nível 1
 - **Espectro:** disponível desde o nível 3; usa os resultados genéricos.
 - **Bruxa Caçadora:** inicia a luta contra o morto-vivo indicado.
 - **Bruxa Velha:** oferece 150 de ouro; ao aceitar, HP atual cai para no máximo 20% do HP máximo.
+- **Cirurgião Espiritual:** ao aceitar, concede 1 Ponto de Habilidade. Pode aparecer novamente em outro contato.
+- **Negociante de Pactos:** antes da decisão, informa que aceitar causa um sacrifício aleatório disponível: ficar com 1 HP, zerar o Foco, perder todos os itens da mochila ou perder um equipamento vestido. Em troca, concede um pacto passivo ainda não obtido. Quando não há pactos novos, esse contato deixa de ser elegível.
 - **Demais contatos:** sorteiam entre resultados disponíveis: combate 45%, sacrifício 30% ou skill passiva 25%. Se não houver chefe elegível, combate é removido; se não houver skill passiva elegível, essa opção é removida; os pesos disponíveis são normalizados.
 
 No resultado genérico **combate** (45%), escolhe-se aleatoriamente um chefe especial elegível ao nível (entre Morte, Morto-Vivo, Dragão da Névoa, Demônio do Abismo e Brutos). As chances de chefe são iguais entre os elegíveis; Gudran não entra nessa seleção. No resultado **sacrifício** (30%), recebe-se 25–50 de ouro e perde-se 10–20% do HP máximo (sem cair abaixo de 1 HP). No resultado **skill passiva** (25%), uma skill ainda não obtida é escolhida aleatoriamente entre as disponíveis. Ela é permanente, aparece na seção **Skills passivas** do bloco de atributos e seu ícone abre a descrição:
@@ -143,7 +146,17 @@ No resultado genérico **combate** (45%), escolhe-se aleatoriamente um chefe esp
 - **Passo Veloz:** +3% de Esquiva.
 - **Aparo Espectral:** +3% de Aparo.
 
-O HP/Foco recuperado não ultrapassa o novo máximo efetivo. Stun e crítico continuam respeitando os limites configurados para cada personagem. Skills que já foram obtidas não entram novamente no sorteio. Saves existentes com a lista antiga `hero.mistPowers` são migrados para `hero.passiveSkills` ao carregar.
+Pactos são skills passivas que afetam cada monstro criado depois de selados, inclusive chefes. Cada pacto só pode ser obtido uma vez:
+
+- **Pacto da Carne Frágil:** monstros começam com 10% menos HP atual; o máximo continua original, por exemplo `90/100`.
+- **Pacto da Guarda Partida:** −5 de Defesa dos monstros.
+- **Pacto das Garras Cegas:** −5 de Ataque dos monstros.
+- **Pacto dos Reflexos Presos:** −10 pontos percentuais de Esquiva dos monstros.
+- **Pacto do Ritmo Quebrado:** −10 pontos percentuais de Aparo dos monstros.
+
+Quando o sacrifício é perder itens da mochila ou equipamento vestido, os itens são removidos permanentemente. O equipamento roubado é escolhido aleatoriamente entre os slots ocupados. Se o jogador não tiver itens em uma dessas categorias, aquela penalidade não entra no sorteio. Pactos adquiridos aparecem junto das demais skills na seção **Skills passivas** e seus efeitos já são aplicados às lutas seguintes.
+
+O HP/Foco recuperado não ultrapassa o novo máximo efetivo. Stun e crítico continuam respeitando os limites configurados para cada personagem. Skills que já foram obtidas não entram novamente no sorteio. Saves existentes com a lista antiga `hero.mistPowers` são migrados para `hero.passiveSkills` ao carregar; pactos ficam em `hero.monsterPacts`.
 
 Os valores e conteúdo ficam em `world-rules.js` e `mist-contacts.js`; as probabilidades e efeitos de exploração ficam em `exploration-rules.js`.
 
@@ -163,7 +176,7 @@ As quatro regiões de exploração têm cinco tarefas cada, incluindo metas cumu
 
 ### O que as porcentagens significam
 
-- **40% monstro** e os demais pesos são a rolagem final de exploração, somente se evento narrativo e contato da névoa não aparecerem naquele clique.
+- **38% monstro** e os demais pesos são a rolagem final de exploração, somente se evento narrativo e contato da névoa não aparecerem naquele clique.
 - **20% evento narrativo** é testado antes do contato da névoa, depois do intervalo; portanto, se disparar, o contato e a rolagem de exploração não são testados naquele clique.
 - A chance de contato da névoa também é uma rolagem separada, testada depois do evento narrativo e antes do resultado de exploração.
 - **10% spare** é testado apenas depois da vitória contra monstro comum; se aparecer, o jogador decide entre golpe final e poupar. As cinco consequências de poupar são então sorteadas com 20% cada.

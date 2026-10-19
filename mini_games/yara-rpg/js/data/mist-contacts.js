@@ -81,6 +81,71 @@ window.YaraRpgData.mistContacts = Object.freeze({
                 gold: 150,
                 hpPercent: 20
             }
+        },
+        {
+            id: "pact-broker",
+            icon: "🩸",
+            name: { pt: "Negociante de Pactos", en: "Pact Broker" },
+            message: {
+                pt: "A figura oferece um pacto: você receberá uma penalidade aleatória — ficar com 1 HP, perder todo o Foco, perder os itens da mochila ou um equipamento vestido — e, em troca, ganhará uma skill passiva que enfraquece todos os monstros. Aceitar é permanente.",
+                en: "The figure offers a pact: you will receive a random penalty — be left at 1 HP, lose all Focus, lose your backpack items, or lose one equipped item — and in return gain a passive skill that weakens every monster. Accepting is permanent."
+            },
+            minLevel: 1,
+            onAccept: { type: "pact" }
+        },
+        {
+            id: "spirit-surgeon",
+            icon: "🧙‍♂️",
+            name: { pt: "Cirurgião Espiritual", en: "Spirit Surgeon" },
+            message: {
+                pt: "O cirurgião toca sua testa e purifica sua alma. Você sente que pode aperfeiçoar uma habilidade: recebe 1 Ponto de Habilidade para distribuir.",
+                en: "The surgeon touches your forehead and purifies your soul. You feel able to improve a skill: gain 1 Skill Point to spend."
+            },
+            minLevel: 1,
+            onAccept: { type: "skill-point", amount: 1 }
+        }
+    ],
+    pacts: [
+        {
+            id: "frail-monsters",
+            icon: "🫀",
+            name: { pt: "Pacto da Carne Frágil", en: "Pact of Frail Flesh" },
+            description: { pt: "Todos os monstros começam com 10% menos HP.", en: "All monsters start with 10% less HP." },
+            monsterStat: "hp",
+            amount: -10,
+            percent: true
+        },
+        {
+            id: "weakened-monsters",
+            icon: "🛡️",
+            name: { pt: "Pacto da Guarda Partida", en: "Pact of the Broken Guard" },
+            description: { pt: "Todos os monstros têm 5 pontos a menos de Defesa.", en: "All monsters have 5 less Defense." },
+            monsterStat: "def",
+            amount: -5
+        },
+        {
+            id: "dulled-monsters",
+            icon: "⚔️",
+            name: { pt: "Pacto das Garras Cegas", en: "Pact of Blunted Claws" },
+            description: { pt: "Todos os monstros têm 5 pontos a menos de Ataque.", en: "All monsters have 5 less Attack." },
+            monsterStat: "atk",
+            amount: -5
+        },
+        {
+            id: "sluggish-monsters",
+            icon: "⛓️",
+            name: { pt: "Pacto dos Reflexos Presos", en: "Pact of Bound Reflexes" },
+            description: { pt: "Todos os monstros têm 10 pontos percentuais a menos de Esquiva.", en: "All monsters have 10 percentage points less Evasion." },
+            monsterStat: "evasion",
+            amount: -10
+        },
+        {
+            id: "unsteady-monsters",
+            icon: "🔔",
+            name: { pt: "Pacto do Ritmo Quebrado", en: "Pact of Broken Rhythm" },
+            description: { pt: "Todos os monstros têm 10 pontos percentuais a menos de Aparo.", en: "All monsters have 10 percentage points less Parry." },
+            monsterStat: "parry",
+            amount: -10
         }
     ],
     passiveSkills: [

@@ -30,6 +30,7 @@ function loadSavedGame(snapshot = readSavedGame()) {
     hero.passiveSkills = Array.isArray(snapshot.hero?.passiveSkills)
         ? snapshot.hero.passiveSkills
         : Array.isArray(snapshot.hero?.mistPowers) ? snapshot.hero.mistPowers : [];
+    hero.monsterPacts = Array.isArray(snapshot.hero?.monsterPacts) ? snapshot.hero.monsterPacts : [];
     delete hero.mistPowers;
     if (snapshot.hero?.criticalChance === undefined) {
         hero.criticalChance = DEFAULT_CHARACTER.baseStats.criticalChance
@@ -40,8 +41,13 @@ function loadSavedGame(snapshot = readSavedGame()) {
     }
     // Migração: saves antigos não têm skillPoints
     hero.skillPoints = Number(snapshot.hero?.skillPoints ?? DEFAULT_CHARACTER.baseStats.skillPoints ?? 0) || 0;
-    hero.chestChanceBonus = snapshot.hero?.chestChanceBonus === EXPLORATION_RULES.sparedMonster.treasureChanceBonus
-        ? EXPLORATION_RULES.sparedMonster.treasureChanceBonus
+    const savedChestChanceBonus = Number(snapshot.hero?.chestChanceBonus) || 0;
+    const allowedChestChanceBonuses = [
+        EXPLORATION_RULES.sparedMonster.treasureChanceBonus,
+        EXPLORATION_RULES.map.treasureChanceBonus
+    ];
+    hero.chestChanceBonus = allowedChestChanceBonuses.includes(savedChestChanceBonus)
+        ? savedChestChanceBonus
         : 0;
     const savedEquipment = { ...(snapshot.hero?.equipment || {}) };
     if (!savedEquipment.mainHand && savedEquipment.rightHand) {
