@@ -18,6 +18,21 @@ Ao abrir o mini game, escolha um personagem e os equipamentos iniciais, cada um 
 
 A página do jogo usa o layout base do site, que centraliza a verificação do Bing, o Google Analytics 4 e o Google AdSense para todas as páginas.
 
+## Build para CrazyGames
+
+O código de jogo continua mantido uma única vez nesta pasta. A página normal do site e a página de distribuição para CrazyGames reutilizam os mesmos fragmentos HTML, scripts, dados, estilos, imagens e áudio. Não edite os arquivos gerados em `crazygames-build/`.
+
+Na raiz do repositório, gere primeiro o site e depois o pacote:
+
+```sh
+bundle exec jekyll build
+ruby mini_games/yara-rpg/build-crazygames.rb
+```
+
+O resultado fica em `mini_games/yara-rpg/crazygames-build/`. Envie o conteúdo dessa pasta pelo portal; `index.html` é a entrada do jogo. A página usa o layout `crazygames` e não carrega o layout do site, AdSense, Analytics nem o link “Voltar ao site”.
+
+Esta primeira versão ainda carrega Tailwind e as fontes Cinzel/Inter de CDNs, assim como a página atual. Antes de uma submissão final, compile Tailwind para CSS local e decida se quer empacotar as fontes ou usar alternativas locais. A integração da SDK, seleção de idioma pela configuração da plataforma e o fluxo de início rápido também são etapas separadas ainda necessárias para preparar o lançamento.
+
 ## Estrutura
 
 - `game.html`: front matter e composição dos fragmentos HTML do RPG.
