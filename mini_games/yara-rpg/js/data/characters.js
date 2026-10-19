@@ -29,6 +29,7 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "zeph",
         name: "Zeph",
+        startingEquipment: ["hunter-dagger", "leather-armor", "rope"],
         image: "images/characters/zeph.webp",
         icon: "🌿",
         baseStats: BASE_CHARACTER_STATS,
@@ -76,6 +77,7 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "oskar",
         name: "Oskar",
+        startingEquipment: ["hunter-axe", "wooden-shield", "leather-armor"],
         image: "images/characters/oskar.webp",
         icon: "🪓",
         baseStats: BASE_CHARACTER_STATS,
@@ -122,6 +124,7 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "yara",
         name: "Yara",
+        startingEquipment: ["hunter-bow", "night-cloak", "fury-seal"],
         image: "images/characters/yara.webp",
         icon: "🗡️",
         baseStats: BASE_CHARACTER_STATS,

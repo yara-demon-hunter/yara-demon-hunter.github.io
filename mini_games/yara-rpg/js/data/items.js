@@ -38,6 +38,7 @@ window.YaraRpgData.items = Object.freeze({
         { id: "double-headed-axe", slot: "mainHand", handUsage: "two-handed", itemType: "weapon", icon: "🪓", image: "images/items/double-headed-axe.webp", name: { pt: "Machado de Duas Lâminas", en: "Double Headed Axe" }, stats: { atk: 9, parry: 3, criticalChance: 5 }, starter: false },
         { id: "mist-ring", slot: "ring", icon: "💍", image: "images/items/mist-ring.webp", name: { pt: "Anel da Névoa", en: "Mist Ring" }, stats: { atk: 1, evasion: 5, stunChance: 1 }, starter: false },
         { id: "lumen-necklace", slot: "necklace", icon: "📿", image: "images/items/lumen-necklace.webp",name: { pt: "Colar Reluzente", en: "Lumen Necklace" }, stats: { def: 1, parry: 3, stunChance: 2 }, starter: false },
+        { id: "rope", slot: "accessory", icon: "🪢", image: "images/items/rope.webp", name: { pt: "Corda", en: "Rope" }, stats: { stunChance: 3, evasion: 2 }, starter: false },
 
     ])
 });

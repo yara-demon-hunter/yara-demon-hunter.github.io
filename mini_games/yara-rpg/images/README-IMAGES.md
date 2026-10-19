@@ -15,6 +15,10 @@ find . -type f -iname "*.png" -exec sh -c 'for img; do cwebp -q 90 "$img" -o "${
 find . -type f -iname "*.jpeg" -exec sh -c 'for img; do cwebp -q 90 "$img" -o "${img%.*}.webp"; done' _ {} +
 ```
 
+## New item image placeholders
+
+The Rope item uses `images/items/rope.webp`. Add the image at that path when it is ready.
+
 3- Clean images folder (move all png / jpeg to draft folder)
 
 ```bash

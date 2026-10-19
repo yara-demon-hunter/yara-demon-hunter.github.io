@@ -2,7 +2,7 @@ window.YaraRpgData = window.YaraRpgData || {};
 window.YaraRpgData.rules = Object.assign(window.YaraRpgData.rules || {}, {
     progression: {
         xpRequirementMultiplier: 1.5,
-        startingSkillPoints: 3,
+        startingSkillPoints: 6,
         skillPointsPerLevel: 1
     },
     upgrades: {

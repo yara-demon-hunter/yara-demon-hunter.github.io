@@ -1,8 +1,6 @@
 window.YaraRpgCharacterSetup = (() => {
     const CHARACTER_DATA = window.YaraRpgData.characters;
-    const EQUIPMENT_DATA = window.YaraRpgData.items.equipment.filter((item) => item.starter === true);
-    const EQUIPMENT_BY_ID = new Map(EQUIPMENT_DATA.map((item) => [item.id, item]));
-    const SELECTION_LIMIT = window.YaraRpgData.setup.starterEquipmentCount;
+    const EQUIPMENT_BY_ID = new Map(window.YaraRpgData.items.equipment.map((item) => [item.id, item]));
     const BASIC_STAT_KEYS = Object.freeze({
         maxHp: "hpStat",
         maxFoco: "focusStat",
@@ -39,8 +37,7 @@ window.YaraRpgCharacterSetup = (() => {
         maxPotions: { name: "maximumPotions", suffix: "" },
         maxCriticalChance: { name: "maximumCriticalChance", suffix: "%" }
     });
-    let selectedCharacterId = CHARACTER_DATA[0].id;
-    let selectedEquipmentIds = [];
+    let selectedCharacterId = null;
     let translate = (key) => key;
     let describeEquipment = () => "";
     let onStart = () => {};
@@ -153,7 +150,7 @@ window.YaraRpgCharacterSetup = (() => {
             selectButton.addEventListener("click", () => {
                 selectedCharacterId = character.id;
                 renderCharacters();
-                container.querySelector(`[data-character-id="${character.id}"]`).focus();
+                document.getElementById("begin-adventure-button").disabled = false;
             });
             card.append(selectButton, extraInfo);
             container.append(card);
@@ -189,146 +186,23 @@ window.YaraRpgCharacterSetup = (() => {
         section.append(list);
     }
 
-    function renderEquipment() {
-        const container = document.getElementById("starter-equipment-options");
-        container.replaceChildren();
-
-        EQUIPMENT_DATA.forEach((item) => {
-            const selectedIndex = selectedEquipmentIds.indexOf(item.id);
-            const selected = selectedIndex !== -1;
-            const card = document.createElement("button");
-            card.type = "button";
-            card.className = `starter-equipment-option${selected ? " is-selected" : ""}`;
-            card.disabled = !selected
-                && selectedEquipmentIds.length >= SELECTION_LIMIT;
-            card.classList.toggle("is-unavailable", card.disabled);
-            card.setAttribute("aria-pressed", String(selected));
-            card.setAttribute("aria-label", `${item.name[document.documentElement.lang.startsWith("en") ? "en" : "pt"]}: ${describeEquipment(item)}`);
-
-            const icon = document.createElement("span");
-            icon.className = "starter-equipment-icon";
-            icon.setAttribute("aria-hidden", "true");
-            if (item.image) {
-                const image = document.createElement("img");
-                image.src = item.image;
-                image.alt = "";
-                image.className = "equipment-icon-image";
-                image.addEventListener("error", () => {
-                    icon.textContent = item.icon;
-                }, { once: true });
-                icon.append(image);
-            } else {
-                icon.textContent = item.icon;
-            }
-
-            const details = document.createElement("span");
-            details.className = "starter-equipment-details";
-
-            const name = document.createElement("span");
-            name.className = "starter-equipment-name";
-            name.textContent = item.name[document.documentElement.lang.startsWith("en") ? "en" : "pt"];
-
-            const bonus = document.createElement("span");
-            bonus.className = "starter-equipment-bonus";
-            bonus.textContent = describeEquipment(item);
-
-            const selection = document.createElement("span");
-            selection.className = "starter-equipment-selection";
-            selection.setAttribute("aria-hidden", "true");
-            selection.textContent = selected ? String(selectedIndex + 1) : "+";
-
-            details.append(name, bonus);
-            card.append(icon, details, selection);
-            card.addEventListener("click", () => toggleEquipment(item));
-            container.append(card);
-        });
-
-        const selectionTitle = translate("selectStarterEquipment", { count: SELECTION_LIMIT });
-        document.getElementById("equipment-selection-title").textContent = selectionTitle;
-        document.getElementById("starter-equipment-count").textContent =
-            `${selectedEquipmentIds.length}/${SELECTION_LIMIT}`;
-        document.getElementById("starter-equipment-options").setAttribute("aria-label", selectionTitle);
-        document.getElementById("begin-adventure-button").disabled =
-            selectedEquipmentIds.length !== SELECTION_LIMIT;
-    }
-
-    function toggleEquipment(item) {
-        const selectedIndex = selectedEquipmentIds.indexOf(item.id);
-        if (selectedIndex !== -1) {
-            selectedEquipmentIds.splice(selectedIndex, 1);
-        } else {
-            const conflictingIds = selectedEquipmentIds.filter((id) =>
-                starterEquipmentConflicts(item, EQUIPMENT_BY_ID.get(id))
-            );
-            if (conflictingIds.length) {
-                selectedEquipmentIds = selectedEquipmentIds.filter((id) => !conflictingIds.includes(id));
-            }
-            if (selectedEquipmentIds.length < SELECTION_LIMIT) {
-                const candidateIds = [...selectedEquipmentIds, item.id];
-                const candidateItems = candidateIds.map((id) => EQUIPMENT_BY_ID.get(id));
-                if (getStarterEquipmentSlots(candidateItems)) selectedEquipmentIds = candidateIds;
-            }
-        }
-        renderEquipment();
-    }
-
-    function starterEquipmentConflicts(first, second) {
-        if (first.slot === second.slot) {
-            const bothOneHandedWeapons = first.itemType === "weapon"
-                && second.itemType === "weapon"
-                && first.handUsage !== "two-handed"
-                && second.handUsage !== "two-handed";
-            if (bothOneHandedWeapons && first.slot === "mainHand") return false;
-            return true;
-        }
-        return (first.slot === "mainHand" && first.handUsage === "two-handed" && second.slot === "offHand")
-            || (second.slot === "mainHand" && second.handUsage === "two-handed" && first.slot === "offHand");
-    }
-
-    function getStarterEquipmentSlots(items) {
-        const occupiedSlots = new Set();
-        const assignments = [];
-        for (const item of items) {
-            let slot = item.slot;
-            if (item.itemType === "weapon" && item.handUsage !== "two-handed" && occupiedSlots.has(slot)) {
-                slot = slot === "mainHand" ? "offHand" : "mainHand";
-            }
-            const requiredSlots = item.handUsage === "two-handed" ? ["mainHand", "offHand"] : [slot];
-            if (requiredSlots.some((requiredSlot) => occupiedSlots.has(requiredSlot))) return null;
-            requiredSlots.forEach((requiredSlot) => occupiedSlots.add(requiredSlot));
-            assignments.push({ item, slot });
-        }
-        return assignments;
-    }
-
     function beginAdventure() {
-        if (selectedEquipmentIds.length !== SELECTION_LIMIT) return;
-        const selectedItems = selectedEquipmentIds.map((id) => {
-            const item = EQUIPMENT_BY_ID.get(id);
-            if (!item) throw new Error(`Unknown starter equipment: ${id}`);
-            return item;
-        });
-        const equipmentSlots = getStarterEquipmentSlots(selectedItems);
-        if (!equipmentSlots) return;
-        const equipment = equipmentSlots.map(({ item, slot }) =>
-            slot === item.slot ? item : { ...item, slot }
-        );
         const character = CHARACTER_DATA.find(({ id }) => id === selectedCharacterId);
         if (!character) throw new Error(`Unknown starting character: ${selectedCharacterId}`);
+        const equipment = (character.startingEquipment || []).map((id) => {
+            const item = EQUIPMENT_BY_ID.get(id);
+            if (!item) throw new Error(`Unknown starter equipment for ${character.id}: ${id}`);
+            return item;
+        });
         onStart({ character, equipment });
     }
 
     function initialize(options) {
-        const availableStarterSlots = new Set(EQUIPMENT_DATA.map((item) => item.slot)).size;
-        if (!Number.isInteger(SELECTION_LIMIT) || SELECTION_LIMIT < 1 || SELECTION_LIMIT > availableStarterSlots) {
-            throw new Error(`Starter equipment count must be between 1 and ${availableStarterSlots}.`);
-        }
         translate = options.translate;
         describeEquipment = options.describeEquipment;
         onStart = options.onStart;
         document.getElementById("begin-adventure-button").addEventListener("click", beginAdventure);
         renderCharacters();
-        renderEquipment();
     }
 
     return Object.freeze({ initialize });

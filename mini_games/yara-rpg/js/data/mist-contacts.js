@@ -93,6 +93,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
             id: "pact-broker",
             chancePercent: 12,
             icon: "🩸",
+            image: "images/mist_contacts/pact-broker.webp",
             name: { pt: "Negociante de Pactos", en: "Pact Broker" },
             message: {
                 pt: "A figura oferece um pacto: você receberá uma penalidade aleatória — ficar com 1 HP, perder todo o Foco, perder os itens da mochila ou um equipamento vestido — e, em troca, ganhará uma skill passiva que enfraquece todos os monstros. Aceitar é permanente.",
