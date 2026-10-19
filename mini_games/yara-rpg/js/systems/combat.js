@@ -1,6 +1,19 @@
 // Combat actions, enemy turns, upgrades, rewards, and journey endings.
 // Loaded as a classic script before game.js; shares the RPG global state.
 
+let pendingFuryAnimation = 0;
+
+function queueFuryAnimation(amount) {
+    pendingFuryAnimation += Math.max(0, Number(amount) || 0);
+}
+
+function flushFuryAnimation() {
+    if (pendingFuryAnimation > 0) {
+        showFloatingDamage('hero-fury-anchor', pendingFuryAnimation, 'fury', 0, 0, '+');
+        pendingFuryAnimation = 0;
+    }
+}
+
 function queueMonsterAttackTurn() {
     if (!inCombat || !currentMonster || !combatActionLocked) return;
     monsterAttackTurn();
@@ -137,7 +150,7 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     const totalDamageDealt = damageDealt + offHandDamageDealt;
     const furyGained = Math.min(getEffectiveFuryThreshold() - hero.fury, Math.floor(totalDamageDealt * furyMultiplier));
     hero.fury += furyGained;
-    if (furyGained > 0) showFloatingDamage('hero-fury-anchor', furyGained, 'fury', 0, 0, '+');
+    queueFuryAnimation(furyGained);
     if (isCritical) {
         logMessage(t('criticalDamage', {
             damage: totalDamageDealt,
@@ -337,10 +350,12 @@ function checkCombatProgress(monsterStunned = false) {
     if (!inCombat || !currentMonster) return;
     updateMonsterUI();
     if (currentMonster.hp <= 0) {
+        flushFuryAnimation();
         endCombatVictory();
         return;
     }
     if (monsterStunned) {
+        flushFuryAnimation();
         combatActionLocked = false;
         updateUI();
         return;
@@ -363,7 +378,8 @@ function monsterAttackTurn() {
         const dodgeFuryBonus = Number(selectedCharacter.passive?.furyPerDodgeBonus) || 0;
         const furyGained = Math.min(FURY_PER_DODGE + dodgeFuryBonus, getEffectiveFuryThreshold() - hero.fury);
         hero.fury += furyGained;
-        if (furyGained > 0) showFloatingDamage('hero-fury-anchor', furyGained, 'fury', 0, 0, '+');
+        queueFuryAnimation(furyGained);
+        flushFuryAnimation();
         logMessage(t("heroDodges", { monster: currentMonster.name, amount: furyGained }), "special");
         if (encounterId !== combatEncounterId || !inCombat) return;
         combatActionLocked = false;
@@ -393,11 +409,12 @@ function monsterAttackTurn() {
     const furyBeforeHit = hero.fury;
     hero.fury = Math.min(getEffectiveFuryThreshold(), hero.fury + damageTaken * FURY_PER_DAMAGE);
     const furyGained = hero.fury - furyBeforeHit;
-    if (furyGained > 0) showFloatingDamage('hero-fury-anchor', furyGained, 'fury', 0, 0, '+');
+    queueFuryAnimation(furyGained);
     logMessage(parried
         ? t('heroParries', { damage: damageTaken })
         : t("monsterDamage", { monster: currentMonster.name, damage: damageTaken }), parried ? 'special' : 'combat-monster');
     if (encounterId !== combatEncounterId || !inCombat) return;
+    flushFuryAnimation();
     updateUI();
 
     if (hero.hp <= 0) {
