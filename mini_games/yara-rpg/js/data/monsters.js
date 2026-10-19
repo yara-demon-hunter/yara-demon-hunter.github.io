@@ -9,7 +9,7 @@ window.YaraRpgData.monsters = Object.freeze({
     byRegion: {
         "dark-forest": [
             { name: { pt: "Lobo Sombriço", en: "Shadow Wolf" }, icon: "🐺", image: "images/monsters/shadow-wolf.webp", hp: 35, atk: 10, def: 2, parry: 15, evasion: 8, xpReward: 8, goldReward: 5 },
-            { name: { pt: "Demônio do Rio", en: "River Demon" }, icon: "👻", image: "images/monsters/river-demon.webp", hp: 42, atk: 12, def: 3, parry: 18, evasion: 12, xpReward: 9, goldReward: 8 },
+            { name: { pt: "Espectro Corrompido", en: "Corrupted Specter" }, icon: "👻", image: "images/monsters/corrupted-spirit.webp", hp: 42, atk: 12, def: 3, parry: 18, evasion: 12, xpReward: 9, goldReward: 8 },
             { name: { pt: "Bruxa", en: "Witch" }, icon: "🧙‍♀️", image: "images/monsters/witch.webp", hp: 50, atk: 14, def: 4, parry: 22, evasion: 10, xpReward: 15, goldReward: 12 },
         ],
         "river-crossing": [
