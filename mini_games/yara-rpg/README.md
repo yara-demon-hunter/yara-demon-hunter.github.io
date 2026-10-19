@@ -18,23 +18,23 @@ Ao abrir o mini game, escolha um personagem e os equipamentos iniciais, cada um 
 
 A página do jogo usa o layout base do site, que centraliza a verificação do Bing, o Google Analytics 4 e o Google AdSense para todas as páginas.
 
-## Build para CrazyGames
+## Build do módulo independente
 
-O código de jogo continua mantido uma única vez nesta pasta. A página normal do site e a página de distribuição para CrazyGames reutilizam os mesmos fragmentos HTML, scripts, dados, estilos, imagens e áudio. Não edite os arquivos gerados em `crazygames-build/`.
+O código do jogo continua mantido uma única vez nesta pasta. A página normal do site e a página independente reutilizam os mesmos fragmentos HTML, scripts, dados, estilos, imagens e áudio. Não edite os arquivos gerados em `standalone-build/`.
 
 Na raiz do repositório, gere primeiro o site e depois o pacote:
 
 ```sh
 bundle exec jekyll build
-ruby mini_games/yara-rpg/build-crazygames.rb
+ruby mini_games/yara-rpg/build-standalone.rb
 ```
 
-O resultado fica em `mini_games/yara-rpg/crazygames-build/`. Envie o conteúdo dessa pasta pelo portal; `index.html` é a entrada do jogo. A página usa o layout `crazygames` e não carrega o layout do site, AdSense, Analytics nem o link “Voltar ao site”.
+O resultado fica em `mini_games/yara-rpg/standalone-build/`. `index.html` é a entrada do jogo e pode ser usado como um módulo independente. A página usa o layout `standalone` e não carrega o layout do site, AdSense, Analytics nem o link “Voltar ao site”.
 
 Para jogar o pacote localmente sem iniciar o Jekyll, rode na raiz do repositório:
 
 ```sh
-python3 -m http.server 8000 --directory mini_games/yara-rpg/crazygames-build
+python3 -m http.server 8000 --directory mini_games/yara-rpg/standalone-build
 ```
 
 Mantenha esse comando rodando e abra `http://localhost:8000/` no navegador. O servidor precisa continuar ativo enquanto você joga. Se a porta 8000 já estiver ocupada, troque `8000` por `8001` no comando e abra `http://localhost:8001/`.
