@@ -104,7 +104,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "spirit-surgeon",
-            chancePercent: 40,
+            chancePercent: 100,
             icon: "🧙‍♂️",
             image: "images/mist_contacts/spirit-surgeon.webp",
             name: { pt: "Cirurgião Espiritual", en: "Spirit Surgeon" },
@@ -118,7 +118,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "spirit-purifier",
-            chancePercent: 40,
+            chancePercent: 12,
             icon: "✨",
             image: "images/mist_contacts/spirit-purifier.webp",
             name: { pt: "Espírito Purificador", en: "Purifying Spirit" },

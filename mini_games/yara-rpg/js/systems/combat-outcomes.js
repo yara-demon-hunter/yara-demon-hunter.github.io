@@ -83,7 +83,6 @@ function combatRun() {
     if (success) {
         setBossMusic(false);
         logMessage(t("escaped"), "discovery");
-        hero.fury = 0;
         hero.evasionBonus = 0;
         hero.parryBonus = 0;
         inCombat = false;
@@ -113,7 +112,6 @@ async function endCombatVictory() {
         combatEncounterId++;
         combatActionLocked = false;
         currentMonster = null;
-        hero.fury = 0;
         hero.evasionBonus = 0;
         hero.parryBonus = 0;
         completeRegionObjective('combat', true);
@@ -180,7 +178,6 @@ function awardCombatVictory(monster) {
 
     hero.gold += monster.goldReward;
     hero.xp += monster.xpReward;
-    hero.fury = 0;
     hero.evasionBonus = 0;
     hero.parryBonus = 0;
 

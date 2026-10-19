@@ -137,7 +137,9 @@ function updateUI() {
     if (isInSpiritWorld) {
         const spiritRegionIndex = GAME_DATA.spiritRegions.findIndex((region) => region.id === currentRegionData.id);
         previousRegionButton.disabled = regionNavigationBlocked || spiritRegionIndex <= 0;
-        nextRegionButton.disabled = regionNavigationBlocked || spiritRegionIndex >= GAME_DATA.spiritRegions.length - 1;
+        nextRegionButton.disabled = regionNavigationBlocked
+            || spiritRegionIndex >= GAME_DATA.spiritRegions.length - 1
+            || !areCurrentRegionObjectivesComplete(currentRegionData);
     } else {
         previousRegionButton.disabled = regionNavigationBlocked || !discoveredRegions.includes(currentRegion - 1);
         nextRegionButton.disabled = regionNavigationBlocked || !discoveredRegions.includes(currentRegion + 1);

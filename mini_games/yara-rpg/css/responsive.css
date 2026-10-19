@@ -67,6 +67,18 @@
         padding: 11px !important;
         margin-bottom: 10px !important;
     }
+    #exploration-banner .spirit-world-arrow {
+        left: 0.35rem;
+        transform: none;
+    }
+    #exploration-banner .region-nav-button {
+        position: relative;
+        z-index: 6;
+    }
+    #exploration-banner.has-spirit-world-access #exploration-banner-copy {
+        padding-left: 1.2rem;
+        padding-bottom:1.2rem;
+    }
     #rpg-log {
         height: 126px !important;
         margin-bottom: 10px !important;

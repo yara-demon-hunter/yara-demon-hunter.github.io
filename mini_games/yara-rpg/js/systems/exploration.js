@@ -287,7 +287,6 @@ function resolveStoryEvent(choiceIndex) {
         const rules = EXPLORATION_RULES.sparedMonster;
         const gold = Math.floor(monster.goldReward * rules.goldPercent / GAME_RULES.probabilityScale);
         hero.gold += gold;
-        hero.fury = 0;
         hero.evasionBonus = 0;
         hero.parryBonus = 0;
         const outcomes = Object.entries(rules.outcomeWeights);
@@ -509,6 +508,12 @@ function getRegionObjectiveTaskProgress(task, region = getCurrentRegionData()) {
     return Number(isRegionObjectiveComplete(task.id, region));
 }
 
+function areCurrentRegionObjectivesComplete(region = getCurrentRegionData()) {
+    return getRegionObjectiveRequirements(region).every((task) =>
+        getRegionObjectiveTaskProgress(task, region) >= task.required
+    );
+}
+
 function completeRegionObjective(objectiveId, deferRegionUnlock = false) {
     completeRegionObjectives([objectiveId], deferRegionUnlock);
 }
@@ -638,6 +643,7 @@ function navigateRegion(direction) {
 
     if (isInSpiritWorld) {
         const currentSpiritIndex = GAME_DATA.spiritRegions.findIndex((region) => region.id === currentSpiritRegionId);
+        if (direction === 1 && !areCurrentRegionObjectivesComplete(getCurrentRegionData())) return;
         const targetSpiritRegion = GAME_DATA.spiritRegions[currentSpiritIndex + direction];
         if (!targetSpiritRegion) return;
         currentSpiritRegionId = targetSpiritRegion.id;
