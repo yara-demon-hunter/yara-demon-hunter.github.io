@@ -110,6 +110,7 @@ let enemyTelegraphing = false;
 // Exploração / campanha
 let currentRegion = 0;
 let isInSpiritWorld = false;
+let currentSpiritRegionId = GAME_DATA.spiritRegions[0]?.id || null;
 let spiritWorldReturnRegionId = null;
 let foundMapsByRegion = {};
 let discoveredRegions = [0];
@@ -148,6 +149,7 @@ function startAdventure({ character, equipment }) {
     // Reset de campanha
     currentRegion = 0;
     isInSpiritWorld = false;
+    currentSpiritRegionId = GAME_DATA.spiritRegions[0]?.id || null;
     spiritWorldReturnRegionId = null;
     discoveredRegions = [0];
     regionEntryLevels = {};
@@ -210,7 +212,7 @@ function startAdventure({ character, equipment }) {
     document.getElementById("character-setup").hidden = true;
 
     updateUI();
-    showRegionArrival(GAME_DATA.regions[currentRegion]);
+    showRegionArrival(getCurrentRegionData());
     saveGame();
     showContinueOption();
     startGameMusic();

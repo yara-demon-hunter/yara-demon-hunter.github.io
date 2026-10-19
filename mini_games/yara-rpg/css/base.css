@@ -80,10 +80,17 @@ body {
  .spirit-world-arrow[hidden] { display: none; }
  .exploration-banner { position: relative; }
  .exploration-banner.has-spirit-world-access { padding-top: 3.5rem; }
- .spirit-world-arrow { position: absolute; z-index: 5; top: .35rem; left: 50%; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; transform: translateX(-50%); border: 1px solid rgba(186, 230, 253, .95); border-radius: 50%; background: linear-gradient(145deg, #7dd3fc, #0284c7); box-shadow: 0 0 .8rem rgba(56, 189, 248, .55); color: #082f49; font-size: 1.8rem; font-weight: 800; line-height: 1; transition: filter .18s ease, scale .18s ease; }
- .spirit-world-arrow:hover { filter: brightness(1.2); scale: 1.08; }
- body.region-spirit-world .game-shell { background-image: radial-gradient(ellipse at 50% 12%, rgba(42, 121, 168, .34), transparent 52%), linear-gradient(#0c1923, #0c0d0f 70%); }
- body.region-spirit-world #exploration-banner { border-color: rgba(125, 211, 252, .55); background-color: rgba(7, 24, 37, .82); }
+ .spirit-world-arrow { position: absolute; z-index: 5; top: .35rem; left: 50%; display: grid; place-items: center; width: 3rem; height: 3rem; padding: 0; transform: translateX(-50%); border: 0; border-radius: 0; background: transparent; box-shadow: none; transition: filter .18s ease, scale .18s ease; }
+ .spirit-world-arrow img { display: block; width: 100%; height: 100%; object-fit: contain; }
+ .spirit-world-arrow:hover { filter: brightness(1.15); scale: 1.08; }
+body:is(.region-spirit-world, .region-spirit-world-sea) .game-shell { background-image: radial-gradient(ellipse at 50% 12%, rgba(42, 121, 168, .34), transparent 52%), linear-gradient(#0c1923, #0c0d0f 70%); }
+body:is(.region-spirit-world, .region-spirit-world-sea) #exploration-banner { border-color: rgba(125, 211, 252, .55); background-color: rgba(7, 24, 37, .82); }
+body:is(.region-spirit-world, .region-spirit-world-sea) .story-event-card { border-color: rgba(96, 165, 250, .72); background: radial-gradient(ellipse at 50% 0%, rgba(30, 64, 110, .42), transparent 68%), linear-gradient(145deg, rgba(15, 30, 49, .98), rgba(8, 18, 31, .98)); box-shadow: 0 0 1.2rem rgba(59, 130, 246, .12), 0 12px 34px rgba(0, 0, 0, .38); }
+body:is(.region-spirit-world, .region-spirit-world-sea) .story-event-kicker { color: #93c5fd; }
+body:is(.region-spirit-world, .region-spirit-world-sea) #story-event-title { color: #bfdbfe; }
+body:is(.region-spirit-world, .region-spirit-world-sea) #story-event-description { color: #dbeafe; }
+body:is(.region-spirit-world, .region-spirit-world-sea) .story-event-choice { border-color: rgba(96, 165, 250, .55); background: rgba(23, 49, 78, .9); color: #dbeafe; }
+body:is(.region-spirit-world, .region-spirit-world-sea) .story-event-choice:hover { border-color: #93c5fd; background: rgba(30, 64, 110, .95); }
  .found-map-toast[hidden] { display: none; }
  .found-map-toast { position: fixed; z-index: 125; inset: 0; display: grid; place-items: center; padding: 1rem; background: rgba(5, 8, 7, .78); opacity: 0; }
  .found-map-toast-visible { animation: region-arrival-fade-in .2s ease-out forwards; }

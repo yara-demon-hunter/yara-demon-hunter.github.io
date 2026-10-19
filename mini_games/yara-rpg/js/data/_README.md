@@ -4,7 +4,9 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 
 - `characters.js`: atributos-base compartilhados e dados de cada personagem. Cada personagem separa `basicStats` (bônus iniciais somados aos atributos compartilhados), `progression` (ganhos por nível), `skills` (ações especiais), `passive` (passiva permanente com ícone, nome e descrição) e `limits` (tetos de esquiva, aparo e stun, além do limiar mínimo de fúria). Passivas percentuais usam `statBonusPercent`; efeitos acionados em combate declaram seu bônus, como `furyPerDodgeBonus`.
 - `items.js`: poção de cura e catálogo de equipamentos que podem cair dos monstros.
-- `regions.js`: IDs, títulos, descrições e eventos com escolhas por região em português e inglês. Cada região pode ter vários eventos; eles aparecem sem repetição até o conjunto se esgotar.
+- `regions.js`: IDs, títulos, descrições e eventos com escolhas das regiões físicas em português e inglês. Cada região pode ter vários eventos; eles aparecem sem repetição até o conjunto se esgotar.
+- `regions-spirit-world.js`: lista `spiritRegions` com as regiões independentes do Mundo Espiritual. Cada região segue o formato de `regions.js` (`id`, `sceneIcon`, `sceneImage`, `title`, `description`, `objectives` e `event`); as setas navegam por essa lista sem alterar a progressão física.
+- `spiritual-contacts.js`: contatos espirituais placeholder em `spiritualContacts.contacts`, seguindo o agrupamento de `mistContacts.contacts`; não participam do sorteio nem executam efeitos.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.
 - `special-monsters.js`: atributos, nível mínimo e recompensas dos chefes e monstros especiais usados em eventos.
 - `mist-contacts.js`: contatos com ícones e ofertas próprias, skills passivas (`passiveSkills`), pactos que enfraquecem monstros (`pacts`) e efeitos especiais de contato (`onAccept`). Cada skill/pacto tem ID, ícone, nome e descrição em PT/EN. Skills de atributo usam `stat` e `amount`; pactos declaram `monsterStat` e o bônus/penalidade em `amount`. Missões podem referenciar monstros por `bossId`.

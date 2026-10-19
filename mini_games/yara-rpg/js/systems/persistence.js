@@ -5,7 +5,7 @@ function saveGame() {
     if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return;
     const snapshot = {
         version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)), inCombat,
-        currentRegion, isInSpiritWorld, spiritWorldReturnRegionId, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
+        currentRegion, isInSpiritWorld, currentSpiritRegionId, spiritWorldReturnRegionId, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
         explorationsSinceStoryEvent,
         storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
         seenStoryEvents: [...seenStoryEvents], seenMistContacts: [...seenMistContacts], pendingChest,
@@ -78,26 +78,25 @@ function loadSavedGame(snapshot = readSavedGame()) {
         hero.equipment.offHand = null;
     }
     selectedInventoryItems.clear();
-    currentRegion = Math.max(0, Math.min(GAME_DATA.regions.length - 1, Number(snapshot.currentRegion) || 0));
+    const savedRegionIndex = Math.max(0, Number(snapshot.currentRegion) || 0);
     spiritWorldReturnRegionId = snapshot.spiritWorldReturnRegionId
         || (Number.isInteger(snapshot.spiritWorldReturnRegion)
             ? GAME_DATA.regions[snapshot.spiritWorldReturnRegion]?.id
             : null);
-    if (snapshot.isInSpiritWorld && hero.spiritWorldUnlocked) {
-        const spiritWorldIndex = GAME_DATA.regions.findIndex((region) => region.id === GAME_DATA.spiritWorld.id);
-        if (spiritWorldIndex >= 0) {
-            spiritWorldReturnRegionId ||= GAME_DATA.regions[
-                Math.max(0, Math.min(spiritWorldIndex - 1, Number(snapshot.currentRegion) || 0))
-            ]?.id;
-            currentRegion = spiritWorldIndex;
-        }
-    }
+    isInSpiritWorld = Boolean(snapshot.isInSpiritWorld && hero.spiritWorldUnlocked);
     if (!GAME_DATA.regions.some((region) => region.id === spiritWorldReturnRegionId)) {
-        spiritWorldReturnRegionId = GAME_DATA.regions.find((region) => region.id !== GAME_DATA.spiritWorld.id)?.id || null;
+        spiritWorldReturnRegionId = GAME_DATA.regions[Math.min(savedRegionIndex, GAME_DATA.regions.length - 1)]?.id || null;
     }
-    isInSpiritWorld = GAME_DATA.regions[currentRegion]?.id === GAME_DATA.spiritWorld.id
-        && Boolean(hero.spiritWorldUnlocked);
-    discoveredRegions = Array.isArray(snapshot.discoveredRegions) ? snapshot.discoveredRegions : [0];
+    currentRegion = isInSpiritWorld
+        ? Math.max(0, GAME_DATA.regions.findIndex((region) => region.id === spiritWorldReturnRegionId))
+        : Math.max(0, Math.min(GAME_DATA.regions.length - 1, savedRegionIndex));
+    currentSpiritRegionId = GAME_DATA.spiritRegions.some((region) => region.id === snapshot.currentSpiritRegionId)
+        ? snapshot.currentSpiritRegionId
+        : GAME_DATA.spiritRegions[0]?.id || null;
+    discoveredRegions = Array.isArray(snapshot.discoveredRegions)
+        ? snapshot.discoveredRegions.filter((regionIndex) => Number.isInteger(regionIndex)
+            && regionIndex >= 0 && regionIndex < GAME_DATA.regions.length)
+        : [0];
     regionEntryLevels = snapshot.regionEntryLevels && typeof snapshot.regionEntryLevels === 'object'
         ? snapshot.regionEntryLevels
         : Object.fromEntries(discoveredRegions.map((regionIndex) => [
@@ -131,7 +130,7 @@ function loadSavedGame(snapshot = readSavedGame()) {
     seenMistContacts.clear();
     (snapshot.seenMistContacts || []).forEach((id) => seenMistContacts.add(id));
     pendingStoryEvent = snapshot.pendingStoryEvent || null;
-    if (pendingStoryEvent && !pendingStoryEvent.choices) pendingStoryEvent = GAME_DATA.regions[currentRegion].event?.[0] || null;
+    if (pendingStoryEvent && !pendingStoryEvent.choices) pendingStoryEvent = getCurrentRegionData().event?.[0] || null;
     pendingMistContact = snapshot.pendingMistContact || null;
     pendingChest = Boolean(snapshot.pendingChest);
     pendingEquipment = snapshot.pendingEquipment || null;

@@ -6,6 +6,12 @@ let regionObjectiveToastTimeout = null;
 const regionObjectiveToastQueue = [];
 let foundMapToastTimeout = null;
 
+function getCurrentRegionData() {
+    if (!isInSpiritWorld) return GAME_DATA.regions[currentRegion];
+    return GAME_DATA.spiritRegions.find((region) => region.id === currentSpiritRegionId)
+        || GAME_DATA.spiritRegions[0];
+}
+
 function exploreForest() {
     if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
     if (hero.hp <= 0) {
@@ -16,7 +22,11 @@ function exploreForest() {
     explorationsSinceMistContact++;
     explorationsSinceStoryEvent++;
 
-    const regionData = GAME_DATA.regions[currentRegion];
+    const regionData = getCurrentRegionData();
+    if (isInSpiritWorld) {
+        exploreSpiritWorld(regionData);
+        return;
+    }
     const regionEvents = Array.isArray(regionData.event) ? regionData.event : [regionData.event].filter(Boolean);
     const unseenEvents = regionEvents.filter((event) =>
         !seenStoryEvents.has(`${regionData.id}:${event.id || event.title.pt}`)
@@ -104,7 +114,7 @@ function exploreForest() {
         updateUI();
         return;
     } else if (outcome === 'map') {
-        const region = GAME_DATA.regions[currentRegion];
+        const region = getCurrentRegionData();
         foundMapsByRegion[region.id] = (foundMapsByRegion[region.id] || 0) + 1;
         const mapBonus = EXPLORATION_RULES.map.treasureChanceBonus;
         hero.chestChanceBonus = Math.max(hero.chestChanceBonus, mapBonus);
@@ -113,6 +123,34 @@ function exploreForest() {
     } else {
         logMessage(t('denseMist'));
     }
+    completeRegionObjective('exploration');
+    updateUI();
+}
+
+function exploreSpiritWorld(regionData) {
+    const unseenEvents = regionData.event.filter((event) =>
+        !seenStoryEvents.has(`${regionData.id}:${event.id || event.title.pt}`)
+    );
+    const storyRules = EXPLORATION_RULES.storyEvents;
+    const encounterChance = Math.min(
+        GAME_RULES.probabilityScale,
+        Math.max(storyRules.chance, 35)
+    );
+    if (unseenEvents.length
+        && explorationsSinceStoryEvent >= storyRules.cooldownExplorations
+        && Math.random() * GAME_RULES.probabilityScale < encounterChance) {
+        pendingStoryEvent = unseenEvents[Math.floor(Math.random() * unseenEvents.length)];
+        storyEventSeen.add(regionData.id);
+        seenStoryEvents.add(`${regionData.id}:${pendingStoryEvent.id || pendingStoryEvent.title.pt}`);
+        explorationsSinceStoryEvent = 0;
+        updateUI();
+        return;
+    }
+
+    const quietMessage = Math.random() < 0.2
+        ? 'spiritWorldSpiritFled'
+        : 'spiritWorldNothingAppeared';
+    logMessage(t(quietMessage), 'normal');
     completeRegionObjective('exploration');
     updateUI();
 }
@@ -139,7 +177,7 @@ function openFoundChest() {
 function chooseExplorationOutcome() {
     const availableOutcomes = EXPLORATION_RULES.outcomes.filter((outcome) => {
         if (outcome.type === 'map') {
-            const regionId = GAME_DATA.regions[currentRegion].id;
+            const regionId = getCurrentRegionData().id;
             return (foundMapsByRegion[regionId] || 0) < EXPLORATION_RULES.map.maxMaps;
         }
         if (outcome.type === 'potion') return hero.potions < hero.maxPotions;
@@ -211,23 +249,20 @@ function dismissFoundMap() {
 }
 
 function toggleSpiritWorld() {
-    if (!hero.spiritWorldUnlocked || inCombat || gameOver || campaignComplete) return;
+    if (!hero.spiritWorldUnlocked || inCombat || gameOver || campaignComplete || pendingStoryEvent) return;
     if (isInSpiritWorld) {
         const returnRegionIndex = GAME_DATA.regions.findIndex((region) => region.id === spiritWorldReturnRegionId);
-        if (returnRegionIndex < 0 || returnRegionIndex === currentRegion) return;
+        if (returnRegionIndex < 0) return;
         currentRegion = returnRegionIndex;
         isInSpiritWorld = false;
     } else {
-        const spiritWorldIndex = GAME_DATA.regions.findIndex((region) => region.id === GAME_DATA.spiritWorld.id);
-        if (spiritWorldIndex < 0) return;
         spiritWorldReturnRegionId = GAME_DATA.regions[currentRegion].id;
-        if (!discoveredRegions.includes(spiritWorldIndex)) discoveredRegions.push(spiritWorldIndex);
-        regionEntryLevels[GAME_DATA.spiritWorld.id] = regionEntryLevels[GAME_DATA.spiritWorld.id] || hero.level;
-        currentRegion = spiritWorldIndex;
+        currentSpiritRegionId ||= GAME_DATA.spiritRegions[0]?.id;
+        if (!currentSpiritRegionId) return;
         isInSpiritWorld = true;
     }
     updateUI();
-    showRegionArrival(GAME_DATA.regions[currentRegion]);
+    showRegionArrival(getCurrentRegionData());
 }
 
 function resolveStoryEvent(choiceIndex) {
@@ -236,10 +271,15 @@ function resolveStoryEvent(choiceIndex) {
     const choice = event.choices[choiceIndex];
     if (!choice) return;
     const effect = choice.effect;
-    const eventSeenKey = `${GAME_DATA.regions[currentRegion].id}:${event.id || event.title.pt}`;
+    const eventSeenKey = `${getCurrentRegionData().id}:${event.id || event.title.pt}`;
     pendingStoryEvent = null;
     completeRegionObjective('story', true);
-    if (effect === 'monster-final-blow') {
+    if (effect === 'spirit-message') {
+        logMessage(t(choice.messageKey), 'special');
+        completeRegionObjective('story');
+        updateUI();
+        return;
+    } else if (effect === 'monster-final-blow') {
         awardCombatVictory(event.monster);
         return;
     } else if (effect === 'monster-spared') {
@@ -256,7 +296,7 @@ function resolveStoryEvent(choiceIndex) {
         const outcome = outcomes.find(([, weight]) => (outcomeRoll -= weight) < 0)?.[0] || 'strike';
 
         if (outcome === 'treasure') {
-            const regionId = GAME_DATA.regions[currentRegion].id;
+            const regionId = getCurrentRegionData().id;
             const clues = rules.clues[regionId] || [];
             const clue = clues.length
                 ? clues[Math.floor(Math.random() * clues.length)][gameLanguage]
@@ -412,19 +452,22 @@ function resolveStoryEvent(choiceIndex) {
     updateUI();
 }
 
-function getRegionObjectiveProgress(regionIndex = currentRegion) {
-    const region = GAME_DATA.regions[regionIndex];
+function getRegionObjectiveProgress(regionIndex = null) {
+    const region = Number.isInteger(regionIndex)
+        ? GAME_DATA.regions[regionIndex]
+        : getCurrentRegionData();
     if (!region) return 0;
-    if (discoveredRegions.includes(regionIndex + 1)) {
+    if (!isInSpiritWorld && Number.isInteger(regionIndex ?? currentRegion)
+        && discoveredRegions.includes((regionIndex ?? currentRegion) + 1)) {
         return getRegionObjectiveRequirements(region).length;
     }
     return getRegionObjectiveRequirements(region).filter((task) =>
-        getRegionObjectiveTaskProgress(task, regionIndex) >= task.required
+        getRegionObjectiveTaskProgress(task, region) >= task.required
     ).length;
 }
 
-function isRegionObjectiveComplete(objectiveId, regionIndex = currentRegion) {
-    const region = GAME_DATA.regions[regionIndex];
+function isRegionObjectiveComplete(objectiveId, region = getCurrentRegionData()) {
+    if (Number.isInteger(region)) region = GAME_DATA.regions[region];
     if (!region) return false;
     const task = region.objectives.tasks.find((objective) => objective.id === objectiveId);
     if (!task) return false;
@@ -458,12 +501,12 @@ function getDefeatedMonsters(regionId) {
     return Math.max(0, Number(completedRegionObjectives[regionId]?.monsterCount) || 0);
 }
 
-function getRegionObjectiveTaskProgress(task, regionIndex = currentRegion) {
-    const region = GAME_DATA.regions[regionIndex];
+function getRegionObjectiveTaskProgress(task, region = getCurrentRegionData()) {
+    if (Number.isInteger(region)) region = GAME_DATA.regions[region];
     if (!region) return 0;
     if (task.id === 'exploration') return getCompletedUninterruptedExplorations(region.id);
     if (task.id === 'monsters') return getDefeatedMonsters(region.id);
-    return Number(isRegionObjectiveComplete(task.id, regionIndex));
+    return Number(isRegionObjectiveComplete(task.id, region));
 }
 
 function completeRegionObjective(objectiveId, deferRegionUnlock = false) {
@@ -472,8 +515,8 @@ function completeRegionObjective(objectiveId, deferRegionUnlock = false) {
 
 function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
     const finalBossRegionIndex = GAME_DATA.regions.findIndex((region) => region.id === 'gudran-throne');
-    if (currentRegion === finalBossRegionIndex || discoveredRegions.includes(currentRegion + 1)) return;
-    const region = GAME_DATA.regions[currentRegion];
+    if (!isInSpiritWorld && (currentRegion === finalBossRegionIndex || discoveredRegions.includes(currentRegion + 1))) return;
+    const region = getCurrentRegionData();
     let regionProgress = completedRegionObjectives[region.id];
     if (!regionProgress) {
         regionProgress = { completedIds: [], explorationCount: 0, monsterCount: 0 };
@@ -506,9 +549,9 @@ function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
         showRegionObjectiveToast(newlyCompleted);
     }
     const allTasksComplete = getRegionObjectiveRequirements(region).every((task) =>
-        getRegionObjectiveTaskProgress(task) >= task.required
+        getRegionObjectiveTaskProgress(task, region) >= task.required
     );
-    if (deferRegionUnlock || !allTasksComplete || currentRegion >= GAME_DATA.regions.length - 1) return;
+    if (isInSpiritWorld || deferRegionUnlock || !allTasksComplete || currentRegion >= GAME_DATA.regions.length - 1) return;
 
     currentRegion++;
     if (!discoveredRegions.includes(currentRegion)) discoveredRegions.push(currentRegion);
@@ -567,7 +610,9 @@ function showRegionArrival(regionData) {
         regionArt.textContent = regionData.sceneIcon || '';
     }
     document.getElementById('region-arrival-kicker').textContent = t(
-        regionData.id === 'spirit-world' ? 'spiritWorldArrivalKicker' : 'regionArrivalKicker'
+        GAME_DATA.spiritRegions.some((region) => region.id === regionData.id)
+            ? 'spiritWorldArrivalKicker'
+            : 'regionArrivalKicker'
     );
     document.getElementById('region-arrival-title').textContent = regionData.title[gameLanguage];
     document.getElementById('region-arrival-description').textContent = regionData.description[gameLanguage];
@@ -587,16 +632,24 @@ function dismissRegionArrival() {
 
 function navigateRegion(direction) {
     if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
-    if (isInSpiritWorld) return;
     if (direction !== -1 && direction !== 1) {
         throw new Error(`Invalid region navigation direction: ${direction}`);
+    }
+
+    if (isInSpiritWorld) {
+        const currentSpiritIndex = GAME_DATA.spiritRegions.findIndex((region) => region.id === currentSpiritRegionId);
+        const targetSpiritRegion = GAME_DATA.spiritRegions[currentSpiritIndex + direction];
+        if (!targetSpiritRegion) return;
+        currentSpiritRegionId = targetSpiritRegion.id;
+        updateUI();
+        showRegionArrival(targetSpiritRegion);
+        return;
     }
 
     const targetRegion = currentRegion + direction;
     if (!discoveredRegions.includes(targetRegion)) return;
 
     currentRegion = targetRegion;
-    isInSpiritWorld = GAME_DATA.regions[currentRegion].id === GAME_DATA.spiritWorld.id;
     updateUI();
     showRegionArrival(GAME_DATA.regions[currentRegion]);
 }

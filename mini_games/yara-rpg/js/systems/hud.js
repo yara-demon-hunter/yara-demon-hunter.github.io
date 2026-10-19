@@ -108,11 +108,11 @@ function updateUI() {
         button.addEventListener('click', () => showPassiveDetails(skill.id));
         passiveSkillIcons.append(button);
     });
-    const currentRegionData = GAME_DATA.regions[currentRegion];
+    const currentRegionData = getCurrentRegionData();
     const finalBossGateActive = !isInSpiritWorld && GAME_DATA.regions[currentRegion].id === 'gudran-throne'
         && !inCombat && !gameOver && !campaignComplete
         && !pendingMistContact && !pendingStoryEvent && !pendingChest;
-    document.body.classList.remove(...GAME_DATA.regions.map((region) => `region-${region.id}`));
+    document.body.classList.remove(...[...GAME_DATA.regions, ...GAME_DATA.spiritRegions].map((region) => `region-${region.id}`));
     document.body.classList.add(`region-${currentRegionData.id}`);
     const explorationBanner = document.getElementById('exploration-banner');
     document.getElementById('exploration-title').innerText = currentRegionData.title[gameLanguage];
@@ -134,8 +134,14 @@ function updateUI() {
     const nextRegionButton = document.getElementById('next-region-button');
     previousRegionButton.hidden = false;
     nextRegionButton.hidden = false;
-    previousRegionButton.disabled = isInSpiritWorld || regionNavigationBlocked || !discoveredRegions.includes(currentRegion - 1);
-    nextRegionButton.disabled = isInSpiritWorld || regionNavigationBlocked || !discoveredRegions.includes(currentRegion + 1);
+    if (isInSpiritWorld) {
+        const spiritRegionIndex = GAME_DATA.spiritRegions.findIndex((region) => region.id === currentRegionData.id);
+        previousRegionButton.disabled = regionNavigationBlocked || spiritRegionIndex <= 0;
+        nextRegionButton.disabled = regionNavigationBlocked || spiritRegionIndex >= GAME_DATA.spiritRegions.length - 1;
+    } else {
+        previousRegionButton.disabled = regionNavigationBlocked || !discoveredRegions.includes(currentRegion - 1);
+        nextRegionButton.disabled = regionNavigationBlocked || !discoveredRegions.includes(currentRegion + 1);
+    }
     previousRegionButton.setAttribute('aria-label', t('previousRegion'));
     previousRegionButton.title = t('previousRegion');
     nextRegionButton.setAttribute('aria-label', t('nextRegion'));
@@ -154,9 +160,13 @@ function updateUI() {
     regionProgressTrack.setAttribute('aria-valuenow', String(objectiveProgress));
     const treasureChanceBonusDisplay = document.getElementById('treasure-chance-bonus');
     const spiritWorldButton = document.getElementById('spirit-world-button');
+    const spiritWorldEye = spiritWorldButton.querySelector('img');
     spiritWorldButton.hidden = !hero.spiritWorldUnlocked;
-    spiritWorldButton.disabled = inCombat || gameOver || campaignComplete;
+    spiritWorldButton.disabled = inCombat || gameOver || campaignComplete || pendingStoryEvent;
     const spiritWorldButtonLabel = t(isInSpiritWorld ? 'returnToPhysicalWorld' : 'enterSpiritWorld');
+    spiritWorldEye.src = isInSpiritWorld
+        ? 'images/exploration_icons/spirit-eye-open.webp'
+        : 'images/exploration_icons/spirit-eye-close.webp';
     spiritWorldButton.setAttribute('aria-label', spiritWorldButtonLabel);
     spiritWorldButton.title = spiritWorldButtonLabel;
     explorationBanner.classList.toggle('has-spirit-world-access', hero.spiritWorldUnlocked);
@@ -336,9 +346,9 @@ function updateUI() {
         explorationBanner.classList.add('hidden');
         restartButton.classList.add('hidden');
     } else if (isInSpiritWorld) {
-        exploreControls.classList.remove('hidden'); combatControls.classList.add('hidden');
+        exploreControls.classList.toggle('hidden', Boolean(pendingStoryEvent)); combatControls.classList.add('hidden');
         encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden');
-        storyCard.hidden = true; chestCard.hidden = true;
+        storyCard.hidden = !pendingStoryEvent; chestCard.hidden = true;
         explorationBanner.classList.remove('hidden'); restartButton.classList.add('hidden');
     } else if (pendingStoryEvent) {
         exploreControls.classList.add('hidden'); combatControls.classList.add('hidden');
@@ -378,7 +388,7 @@ function updateUI() {
 }
 
 function openRegionObjectives() {
-    const region = GAME_DATA.regions[currentRegion];
+    const region = getCurrentRegionData();
     const objectives = region.objectives;
     const dialog = document.getElementById('region-objectives-dialog');
     document.getElementById('region-objectives-title').textContent = objectives.title[gameLanguage];
@@ -392,14 +402,14 @@ function openRegionObjectives() {
     list.replaceChildren();
     getRegionObjectiveRequirements(region).forEach((task) => {
         const item = document.createElement('li');
-        const completed = getRegionObjectiveTaskProgress(task) >= task.required;
+        const completed = getRegionObjectiveTaskProgress(task, region) >= task.required;
         item.className = completed ? 'region-objective-complete' : 'region-objective-pending';
         const mark = document.createElement('span');
         mark.className = 'region-objective-check';
         mark.textContent = completed ? '✓' : '○';
         mark.setAttribute('aria-hidden', 'true');
         const label = document.createElement('span');
-        const progress = Math.min(task.required, getRegionObjectiveTaskProgress(task));
+        const progress = Math.min(task.required, getRegionObjectiveTaskProgress(task, region));
         label.textContent = ['exploration', 'monsters'].includes(task.id)
             ? `${task.title[gameLanguage]} (${progress}/${task.required})`
             : task.title[gameLanguage];

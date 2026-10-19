@@ -27,11 +27,6 @@ window.YaraRpgData.monsters = Object.freeze({
             { name: { pt: "Soldado de Gudran", en: "Gudran's Soldier" }, icon: "🛡️", image: "images/monsters/gudran-soldier.webp", hp: 220, atk: 30, def: 30, parry: 38, evasion: 12, xpReward: 110, goldReward: 100 },
             { name: { pt: "Criatura Corrompida", en: "Corrupted Creature" }, icon: "💀", image: "images/monsters/corrupted-creature.webp", hp: 250, atk: 35, def: 20, parry: 20, evasion: 30, xpReward: 120, goldReward: 90 },
             { name: { pt: "Golem", en: "Golem" }, icon: "🗿", image: "images/monsters/golem.webp", hp: 270, atk: 40, def: 10, parry: 0, evasion: 0, xpReward: 160, goldReward: 120 }
-        ],
-        "spirit-world": [
-            { name: { pt: "Espírito Errante", en: "Wandering Spirit" }, icon: "👻", hp: 90, atk: 22, def: 8, parry: 18, evasion: 24, xpReward: 45, goldReward: 35 },
-            { name: { pt: "Guardião Etéreo", en: "Ethereal Guardian" }, icon: "🛡️", hp: 125, atk: 28, def: 16, parry: 24, evasion: 18, xpReward: 65, goldReward: 50 },
-            { name: { pt: "Sombra Astral", en: "Astral Shade" }, icon: "🌑", hp: 105, atk: 30, def: 10, parry: 20, evasion: 30, xpReward: 70, goldReward: 45 }
         ]
     }
 });
