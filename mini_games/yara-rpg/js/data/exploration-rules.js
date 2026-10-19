@@ -20,7 +20,9 @@ window.YaraRpgData.exploration = Object.freeze({
         { type: "map", weight: 5 }
     ]),
     map: {
-        treasureChanceBonus: 25
+        image: "images/exploration_items/map.webp",
+        maxMaps: 1,
+        treasureChanceBonus: 10
     },
     chest: {
         itemChance: 70,

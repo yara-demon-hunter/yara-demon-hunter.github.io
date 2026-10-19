@@ -9,6 +9,7 @@ function saveGame() {
         explorationsSinceStoryEvent,
         storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
         seenStoryEvents: [...seenStoryEvents], pendingChest,
+        foundMapsByRegion,
         pendingEquipment, equipmentInstanceId
     };
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot)); } catch {}
@@ -97,6 +98,9 @@ function loadSavedGame(snapshot = readSavedGame()) {
                 monsterCount: Math.max(0, Number(progress.monsterCount) || 0)
             }
         ]))
+        : {};
+    foundMapsByRegion = snapshot.foundMapsByRegion && typeof snapshot.foundMapsByRegion === 'object'
+        ? Object.fromEntries(Object.entries(snapshot.foundMapsByRegion).map(([regionId, count]) => [regionId, Math.max(0, Number(count) || 0)]))
         : {};
     explorationsSinceMistContact = Number(snapshot.explorationsSinceMistContact) || 0;
     explorationCount = Number(snapshot.explorationCount) || 0;

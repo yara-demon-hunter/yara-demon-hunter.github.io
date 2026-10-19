@@ -108,6 +108,7 @@ let enemyTelegraphing = false;
 
 // Exploração / campanha
 let currentRegion = 0;
+let foundMapsByRegion = {};
 let discoveredRegions = [0];
 let regionEntryLevels = {};
 let explorationCount = 0;

@@ -4,6 +4,7 @@
 let regionArrivalTimeout = null;
 let regionObjectiveToastTimeout = null;
 const regionObjectiveToastQueue = [];
+let foundMapToastTimeout = null;
 
 function exploreForest() {
     if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
@@ -101,9 +102,12 @@ function exploreForest() {
         updateUI();
         return;
     } else if (outcome === 'map') {
+        const region = GAME_DATA.regions[currentRegion];
+        foundMapsByRegion[region.id] = (foundMapsByRegion[region.id] || 0) + 1;
         const mapBonus = EXPLORATION_RULES.map.treasureChanceBonus;
         hero.chestChanceBonus = Math.max(hero.chestChanceBonus, mapBonus);
-        logMessage(t('explorationMapFound', { chance: hero.chestChanceBonus }), 'discovery');
+        logMessage(t('explorationMapFound', { chance: mapBonus }), 'discovery');
+        showFoundMap(mapBonus);
     } else {
         logMessage(t('denseMist'));
     }
@@ -132,6 +136,10 @@ function openFoundChest() {
 
 function chooseExplorationOutcome() {
     const availableOutcomes = EXPLORATION_RULES.outcomes.filter((outcome) => {
+        if (outcome.type === 'map') {
+            const regionId = GAME_DATA.regions[currentRegion].id;
+            return (foundMapsByRegion[regionId] || 0) < EXPLORATION_RULES.map.maxMaps;
+        }
         if (outcome.type === 'potion') return hero.potions < hero.maxPotions;
         if (outcome.type === 'focus') return hero.foco < getEffectiveStat('maxFoco');
         if (outcome.type === 'safeTrail') {
@@ -169,6 +177,35 @@ function chooseExplorationOutcome() {
         if (roll < 0) return outcome.type;
     }
     return availableOutcomes[availableOutcomes.length - 1]?.type ?? null;
+}
+
+function showFoundMap(chance) {
+    const toast = document.getElementById('found-map-toast');
+    const image = document.getElementById('found-map-image');
+    image.src = EXPLORATION_RULES.map.image;
+    image.alt = t('foundMapImageAlt');
+    document.getElementById('found-map-kicker').textContent = t('foundMapKicker');
+    document.getElementById('found-map-title').textContent = t('foundMapTitle');
+    document.getElementById('found-map-description').textContent = t('foundMapDescription', { chance });
+    document.getElementById('found-map-close').setAttribute('aria-label', t('foundMapClose'));
+    toast.hidden = false;
+    toast.classList.remove('found-map-toast-visible');
+    void toast.offsetWidth;
+    toast.classList.add('found-map-toast-visible');
+    if (foundMapToastTimeout !== null) clearTimeout(foundMapToastTimeout);
+    foundMapToastTimeout = window.setTimeout(() => {
+        toast.classList.remove('found-map-toast-visible');
+        toast.hidden = true;
+        foundMapToastTimeout = null;
+    }, 6000);
+}
+
+function dismissFoundMap() {
+    const toast = document.getElementById('found-map-toast');
+    if (foundMapToastTimeout !== null) clearTimeout(foundMapToastTimeout);
+    foundMapToastTimeout = null;
+    toast.classList.remove('found-map-toast-visible');
+    toast.hidden = true;
 }
 
 function resolveStoryEvent(choiceIndex) {

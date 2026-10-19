@@ -1,5 +1,14 @@
 <main id="game-main" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 items-start gap-4 mb-4" hidden>
     <div id="region-objective-toast" class="region-objective-toast" role="status" aria-live="polite" hidden></div>
+    <aside id="found-map-toast" class="found-map-toast" role="dialog" aria-modal="true" aria-live="assertive" aria-labelledby="found-map-title" hidden>
+        <article class="found-map-card">
+            <button id="found-map-close" type="button" class="found-map-close" onclick="dismissFoundMap()">×</button>
+            <p id="found-map-kicker" class="found-map-kicker"></p>
+            <h2 id="found-map-title"></h2>
+            <img id="found-map-image" class="found-map-image" alt="">
+            <p id="found-map-description"></p>
+        </article>
+    </aside>
     <section id="region-arrival-transition" class="region-arrival-transition" hidden role="status" aria-live="polite" aria-labelledby="region-arrival-title">
         <div id="region-arrival-scene" class="region-arrival-scene" data-region="dark-forest">
             <div class="region-arrival-art" aria-hidden="true">
