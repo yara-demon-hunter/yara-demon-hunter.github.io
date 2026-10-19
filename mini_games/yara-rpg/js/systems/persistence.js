@@ -5,7 +5,7 @@ function saveGame() {
     if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return;
     const snapshot = {
         version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)), inCombat,
-        currentRegion, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
+        currentRegion, isInSpiritWorld, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
         explorationsSinceStoryEvent,
         storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
         seenStoryEvents: [...seenStoryEvents], seenMistContacts: [...seenMistContacts], pendingChest,
@@ -79,6 +79,7 @@ function loadSavedGame(snapshot = readSavedGame()) {
     }
     selectedInventoryItems.clear();
     currentRegion = Math.max(0, Math.min(GAME_DATA.regions.length - 1, Number(snapshot.currentRegion) || 0));
+    isInSpiritWorld = Boolean(snapshot.isInSpiritWorld && hero.spiritWorldUnlocked);
     discoveredRegions = Array.isArray(snapshot.discoveredRegions) ? snapshot.discoveredRegions : [0];
     regionEntryLevels = snapshot.regionEntryLevels && typeof snapshot.regionEntryLevels === 'object'
         ? snapshot.regionEntryLevels

@@ -25,7 +25,8 @@
             </div>
 
             <!-- Banner de Exploração -->
-            <div id="exploration-banner" class="bg-forest-950/50 border border-forest-800 rounded-xl p-4 mb-4 text-center">
+            <div id="exploration-banner" class="exploration-banner bg-forest-950/50 border border-forest-800 rounded-xl p-4 mb-4 text-center">
+                <button id="spirit-world-button" type="button" class="spirit-world-arrow" onclick="toggleSpiritWorld()" aria-label="Acessar o Mundo Espiritual" title="Acessar o Mundo Espiritual" hidden><span aria-hidden="true">↑</span></button>
                 <div class="flex items-center gap-2 sm:gap-3">
                     <button id="previous-region-button" type="button" onclick="navigateRegion(-1)" class="region-nav-button" aria-label="Região anterior" title="Região anterior">‹</button>
                     <div class="min-w-0 flex-1">
@@ -50,21 +51,18 @@
                 <button id="restart-button" onclick="restartGame()" class="hidden mt-3 bg-amber-600 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded-lg transition" data-i18n="restart">Reiniciar jornada</button>
             </div>
 
-            <dialog id="spirit-world-dialog" class="spirit-world-dialog" aria-labelledby="spirit-world-title">
-                <div class="spirit-world-screen">
-                    <p class="story-event-kicker" data-i18n="spiritWorldKicker">Olho Espiritual</p>
-                    <h2 id="spirit-world-title" data-i18n="spiritWorldTitle">Mundo Espiritual</h2>
-                    <section class="spirit-world-placeholder">
-                        <h3 data-i18n="benevolentSpiritsTitle">Espíritos bondosos</h3>
-                        <p data-i18n="benevolentSpiritsPlaceholder">Espaço reservado para encontros com espíritos bondosos.</p>
-                    </section>
-                    <section class="spirit-world-placeholder spirit-world-secret-placeholder">
-                        <h3 data-i18n="secretWorldTitle">Área secreta</h3>
-                        <p data-i18n="secretWorldPlaceholder">Espaço reservado para uma área secreta.</p>
-                    </section>
-                    <button type="button" class="story-event-choice" onclick="closeSpiritWorld()" data-i18n="leaveSpiritWorld">Voltar ao mundo físico</button>
+            <section id="spirit-world-content" class="spirit-world-content" hidden aria-labelledby="spirit-world-content-title">
+                <div class="spirit-world-placeholder">
+                    <span class="spirit-world-placeholder-emoji" aria-hidden="true">🕊️ ✨</span>
+                    <h3 id="spirit-world-content-title" data-i18n="benevolentSpiritsTitle">Espíritos bondosos</h3>
+                    <p data-i18n="benevolentSpiritsPlaceholder">Espaço reservado para encontros com espíritos bondosos.</p>
                 </div>
-            </dialog>
+                <div class="spirit-world-placeholder spirit-world-secret-placeholder">
+                    <span class="spirit-world-placeholder-emoji" aria-hidden="true">🌙 🔒</span>
+                    <h3 data-i18n="secretWorldTitle">Área secreta</h3>
+                    <p data-i18n="secretWorldPlaceholder">Espaço reservado para uma área secreta.</p>
+                </div>
+            </section>
 
             <section id="final-boss-gate" class="campaign-ending-card final-boss-gate" hidden aria-live="polite" aria-labelledby="final-boss-gate-title">
                 <span class="ending-emblem" aria-hidden="true">👑</span>
@@ -79,7 +77,7 @@
 
             <section id="mist-contact-card" class="hidden bg-purple-950/40 border border-purple-700/60 rounded-xl p-4 mb-4" aria-live="polite" aria-labelledby="mist-contact-name">
                 <div class="flex items-start gap-3">
-                    <span id="mist-contact-icon" class="text-3xl" aria-hidden="true">🌊</span>
+                    <span id="mist-contact-icon" class="text-3xl shrink-0" aria-hidden="true">🌊</span>
                     <div>
                         <h3 id="mist-contact-name" class="text-sm sm:text-base text-purple-200 font-bold"></h3>
                         <p id="mist-contact-message" class="mt-1 text-xs sm:text-sm text-purple-100/90"></p>

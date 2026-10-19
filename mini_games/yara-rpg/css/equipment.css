@@ -800,9 +800,13 @@
 }
 .mist-contact-icon-image {
     display: block;
-    width: 6rem;
-    height: 6rem;
+    width: 10rem;
+    height: 10rem;
+    flex: 0 0 auto;
     object-fit: contain;
+}
+@media (max-width: 520px) {
+    .mist-contact-icon-image { width: 8rem; height: 8rem; }
 }
 .equipment-bag-item-icon {
     width: 2.25rem;

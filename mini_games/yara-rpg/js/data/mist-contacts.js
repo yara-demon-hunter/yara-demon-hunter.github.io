@@ -1,9 +1,12 @@
 window.YaraRpgData = window.YaraRpgData || {};
 
 window.YaraRpgData.mistContacts = Object.freeze({
+    // Weights among eligible contacts after a mist encounter triggers.
+    // Set one contact to 100 to force its selection for testing; other weights are ignored.
     contacts: [
         {
             id: "river-spirit",
+            chancePercent: 15,
             icon: "🌊",
             image: "images/mist_contacts/river-spirit.webp",
             name: {
@@ -18,6 +21,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "lost-scout",
+            chancePercent: 12,
             icon: "💀",
             image: "images/mist_contacts/lost-scout.webp",
             name: {
@@ -32,6 +36,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "specter",
+            chancePercent: 12,
             icon: "🔔",
             image: "images/mist_contacts/specter.webp",
             name: {
@@ -46,6 +51,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "witch-hunter",
+            chancePercent: 10,
             icon: "🧙‍♀️",
             image: "images/mist_contacts/witch-hunter.webp",
 
@@ -65,6 +71,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "old-witch",
+            chancePercent: 16,
             icon: "👵",
             image: "images/mist_contacts/old-witch.webp",
             name: {
@@ -84,6 +91,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "pact-broker",
+            chancePercent: 12,
             icon: "🩸",
             name: { pt: "Negociante de Pactos", en: "Pact Broker" },
             message: {
@@ -95,12 +103,13 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "spirit-surgeon",
+            chancePercent: 40,
             icon: "🧙‍♂️",
             image: "images/mist_contacts/spirit-surgeon.webp",
             name: { pt: "Cirurgião Espiritual", en: "Spirit Surgeon" },
             message: {
-                pt: "O cirurgião propõe implantar um olho espiritual em sua testa. Você ficará com 1 HP, perderá todo o ouro e ficará sem Foco, mas poderá atravessar para um mundo espiritual secreto. Aceitar é arriscado e irreversível.",
-                en: "The surgeon offers to implant a spiritual eye in your forehead. You will be left with 1 HP, lose all your gold, and have no Focus, but you will be able to cross into a secret spirit world. Accepting is risky and irreversible."
+                pt: "O Cirurgião Espiritual faz uma proposta misteriosa. Ninguém sabe o que acontecerá se você aceitar.",
+                en: "The Spirit Surgeon makes a mysterious offer. No one knows what will happen if you accept."
             },
             minLevel: 1,
             oncePerGame: true,
@@ -108,6 +117,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "spirit-purifier",
+            chancePercent: 40,
             icon: "✨",
             image: "images/mist_contacts/spirit-purifier.webp",
             name: { pt: "Espírito Purificador", en: "Purifying Spirit" },

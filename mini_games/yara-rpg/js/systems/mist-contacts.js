@@ -21,7 +21,27 @@ window.YaraMistContactSystem = Object.freeze({
             && (contact.onAccept?.type !== "pact" || availablePactIds.length > 0)
         );
         if (availableContacts.length === 0) return null;
-        return availableContacts[Math.floor(Math.random() * availableContacts.length)];
+
+        const forcedContacts = availableContacts.filter((contact) =>
+            Number(contact.chancePercent) >= 100
+        );
+        if (forcedContacts.length) {
+            return forcedContacts[Math.floor(Math.random() * forcedContacts.length)];
+        }
+
+        const weightedContacts = availableContacts.map((contact) => ({
+            contact,
+            weight: Math.max(0, Number(contact.chancePercent) || 0)
+        }));
+        const totalWeight = weightedContacts.reduce((total, entry) => total + entry.weight, 0);
+        if (totalWeight <= 0) return null;
+
+        let roll = Math.random() * totalWeight;
+        for (const entry of weightedContacts) {
+            roll -= entry.weight;
+            if (roll < 0) return entry.contact;
+        }
+        return weightedContacts[weightedContacts.length - 1].contact;
     },
 
     chooseOutcome(outcomes, hasAvailableBoss, hasAvailablePassiveSkill) {

@@ -287,3 +287,19 @@ window.YaraRpgData.regions = Object.freeze([
         event: []
     }
 ]);
+
+window.YaraRpgData.spiritWorld = Object.freeze({
+    id: "spirit-world",
+    sceneIcon: "👁️",
+    title: { pt: "Mundo Espiritual", en: "Spirit World" },
+    description: {
+        pt: "Por trás do olho espiritual, um lugar oculto se revela entre a névoa e as estrelas.",
+        en: "Beyond the spiritual eye, a hidden place emerges between the mist and the stars."
+    },
+    objectives: {
+        title: { pt: "Mundo Espiritual", en: "Spirit World" },
+        description: { pt: "Um lugar além do mundo físico.", en: "A place beyond the physical world." },
+        tasks: []
+    },
+    event: []
+});

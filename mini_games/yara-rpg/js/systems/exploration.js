@@ -7,7 +7,7 @@ const regionObjectiveToastQueue = [];
 let foundMapToastTimeout = null;
 
 function exploreForest() {
-    if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
+    if (isInSpiritWorld || inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
     if (hero.hp <= 0) {
             logMessage(t("injured"), "combat-monster");
         return;
@@ -210,14 +210,12 @@ function dismissFoundMap() {
     toast.hidden = true;
 }
 
-function openSpiritWorld() {
-    if (!hero.spiritWorldUnlocked) return;
-    document.getElementById('spirit-world-dialog').showModal();
-}
-
-function closeSpiritWorld() {
-    const dialog = document.getElementById('spirit-world-dialog');
-    if (dialog.open) dialog.close();
+function toggleSpiritWorld() {
+    if (!hero.spiritWorldUnlocked || inCombat || gameOver || campaignComplete
+        || pendingMistContact || pendingStoryEvent || pendingChest) return;
+    isInSpiritWorld = !isInSpiritWorld;
+    updateUI();
+    showRegionArrival(isInSpiritWorld ? GAME_DATA.spiritWorld : GAME_DATA.regions[currentRegion]);
 }
 
 function resolveStoryEvent(choiceIndex) {
@@ -461,6 +459,7 @@ function completeRegionObjective(objectiveId, deferRegionUnlock = false) {
 }
 
 function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
+    if (isInSpiritWorld) return;
     if (currentRegion >= GAME_DATA.regions.length - 1 || discoveredRegions.includes(currentRegion + 1)) return;
     const region = GAME_DATA.regions[currentRegion];
     let regionProgress = completedRegionObjectives[region.id];
@@ -555,7 +554,9 @@ function showRegionArrival(regionData) {
     } else {
         regionArt.textContent = regionData.sceneIcon || '';
     }
-    document.getElementById('region-arrival-kicker').textContent = t('regionArrivalKicker');
+    document.getElementById('region-arrival-kicker').textContent = t(
+        regionData.id === 'spirit-world' ? 'spiritWorldArrivalKicker' : 'regionArrivalKicker'
+    );
     document.getElementById('region-arrival-title').textContent = regionData.title[gameLanguage];
     document.getElementById('region-arrival-description').textContent = regionData.description[gameLanguage];
     const closeButton = document.getElementById('region-arrival-close');
@@ -573,7 +574,7 @@ function dismissRegionArrival() {
 }
 
 function navigateRegion(direction) {
-    if (inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
+    if (isInSpiritWorld || inCombat || gameOver || campaignComplete || pendingMistContact || pendingStoryEvent || pendingChest) return;
     if (direction !== -1 && direction !== 1) {
         throw new Error(`Invalid region navigation direction: ${direction}`);
     }
@@ -725,6 +726,7 @@ function performSpiritEyeSurgery() {
     hero.hp = 1;
     hero.gold = 0;
     hero.foco = 0;
+    hero.potions = 0;
     hero.spiritWorldUnlocked = true;
     logMessage(t('spiritEyeSurgeryAccepted'), 'special');
     logMessage(t('spiritWorldUnlocked'), 'discovery');
