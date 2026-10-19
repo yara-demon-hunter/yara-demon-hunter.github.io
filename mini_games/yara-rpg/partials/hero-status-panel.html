@@ -1,0 +1,34 @@
+<aside id="hero-status-panel" class="hero-status-panel bg-fantasy-card/90 backdrop-blur border border-fantasy-border rounded-2xl p-4 shadow-xl" aria-label="Status do personagem">
+    <div class="hero-vitals">
+        <div class="hero-summary border-b border-fantasy-border pb-3 mb-4">
+            <div class="hero-summary-heading flex items-center justify-between">
+                <div>
+                    <div class="hero-identity">
+                        <span id="hero-portrait-anchor" class="hero-portrait-anchor"><img id="hero-portrait" class="hero-portrait" src="images/characters/zeph.webp" alt="" aria-hidden="true"></span>
+                        <h2 id="hero-name" class="text-lg font-bold text-amber-400">Zeph</h2>
+                    </div>
+                    <span class="text-xs bg-forest-800 text-emerald-300 px-2 py-0.5 rounded-full border border-forest-700"><span data-i18n="level">Nível</span> <span id="hero-level">1</span></span>
+                </div>
+                <div class="text-right flex flex-col items-end gap-1">
+                    <div class="text-xs font-semibold"><span class="text-amber-400"><span data-i18n="gold">Ouro:</span> <span id="hero-gold" class="text-white">15</span> 🪙</span></div>
+                    <span class="text-xs text-purple-400 font-semibold"><span data-i18n="experience">XP:</span> <span id="hero-xp" class="text-white">0</span>/<span id="hero-xp-max" class="text-white">30</span></span>
+                    <span id="hero-skill-points-badge" class="skill-points-badge no-points inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] leading-none" aria-label="0 pontos de habilidade"><span aria-hidden="true">✦</span><span id="hero-skill-points" class="font-bold">0</span><span data-i18n="skillPointsShort" class="uppercase tracking-wide">PH</span></span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-status-bars space-y-3 mb-4">
+            <div>
+                <div class="flex justify-between text-xs font-semibold mb-1"><span class="text-red-400">❤️ HP</span><span class="flex items-center gap-2"><span><span id="hero-hp">100</span> / <span id="hero-hp-max">100</span></span><span class="skill-upgrade-control" data-upgrade-control="hp"><button type="button" data-upgrade="hp" onclick="toggleUpgradeOptions('hp')" class="skill-upgrade-button" aria-label="Melhorar HP (1 ponto)" aria-expanded="false" aria-controls="upgrade-options-hp" title="Melhorar por 1 ponto de habilidade">+</button><span id="upgrade-options-hp" class="skill-upgrade-options" data-upgrade-options="hp" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('hp', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('hp', 'max')" data-i18n="upgradeMax">Máx</button></span></span></span></div>
+                <div id="hero-hp-anchor" class="relative w-full bg-forest-950 rounded-full h-3.5 p-0.5 border border-fantasy-border overflow-visible"><div id="hero-hp-bar" class="bg-gradient-to-r from-red-600 to-red-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div></div>
+            </div>
+            <div>
+                <div class="flex justify-between text-xs font-semibold mb-1"><span class="text-blue-400">⚡ <span data-i18n="focusShort">Foco</span></span><span class="flex items-center gap-2"><span><span id="hero-foco">50</span> / <span id="hero-foco-max">50</span></span><span class="skill-upgrade-control" data-upgrade-control="foco"><button type="button" data-upgrade="foco" onclick="toggleUpgradeOptions('foco')" class="skill-upgrade-button" aria-label="Melhorar estamina (1 ponto)" aria-expanded="false" aria-controls="upgrade-options-foco" title="Melhorar por 1 ponto de habilidade">+</button><span id="upgrade-options-foco" class="skill-upgrade-options" data-upgrade-options="foco" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('foco', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('foco', 'max')" data-i18n="upgradeMax">Máx</button></span></span></span></div>
+                <div id="hero-focus-anchor" class="relative w-full bg-forest-950 rounded-full h-2.5 p-0.5 border border-fantasy-border overflow-visible"><div id="hero-foco-bar" class="bg-gradient-to-r from-blue-600 to-cyan-400 h-full rounded-full transition-all duration-300" style="width: 100%;"></div></div>
+            </div>
+            <div>
+                <div class="flex justify-between text-xs font-semibold mb-1"><span class="text-orange-300">🔥 <span data-i18n="fury">Fúria</span></span><span class="flex items-center gap-2"><span><span id="hero-fury">0</span>/<span id="hero-fury-max">100</span></span><span class="skill-upgrade-control" data-upgrade-control="fury"><button type="button" data-upgrade="fury" onclick="toggleUpgradeOptions('fury')" class="skill-upgrade-button" aria-label="Melhorar limite de Fúria (1 ponto)" aria-expanded="false" aria-controls="upgrade-options-fury" title="Melhorar por 1 ponto de habilidade">+</button><span id="upgrade-options-fury" class="skill-upgrade-options" data-upgrade-options="fury" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('fury', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('fury', 'max')" data-i18n="upgradeMax">Máx</button></span></span></span></div>
+                <div id="hero-fury-anchor" class="relative w-full bg-forest-950 rounded-full h-2.5 p-0.5 border border-fantasy-border overflow-visible"><div id="hero-fury-bar" class="bg-gradient-to-r from-orange-700 to-amber-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div></div>
+            </div>
+        </div>
+    </div>
+</aside>

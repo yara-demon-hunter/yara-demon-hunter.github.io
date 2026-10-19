@@ -122,11 +122,6 @@ function updateUI() {
             spBadge.setAttribute('aria-label', t('skillPointsAria', { count: sp }));
         }
     }
-    const quickSkillPoints = document.getElementById('quick-skill-points');
-    if (quickSkillPoints) {
-        quickSkillPoints.textContent = sp;
-        quickSkillPoints.hidden = sp === 0;
-    }
     const mobileBagCount = document.getElementById('mobile-equipment-bag-count');
     if (mobileBagCount) mobileBagCount.textContent = `${hero.equipmentInventory.length}/${EQUIPMENT_BAG_CAPACITY}`;
     document.getElementById('hero-xp').innerText = hero.xp;
@@ -195,11 +190,8 @@ function updateUI() {
     });
     renderEquipment();
     const equipmentShortcut = document.querySelector('[data-open-panel="hero-equipment"]');
-    const attributesShortcut = document.querySelector('[data-open-panel="hero-attributes"]');
     const hasEquipmentUpgrade = [...document.querySelectorAll('.equipment-upgrade-available')].length > 0;
     equipmentShortcut?.classList.toggle('has-upgrade', hasEquipmentUpgrade);
-    attributesShortcut?.classList.toggle('has-upgrade', sp > 0);
-    attributesShortcut?.classList.toggle('has-skill-points', sp > 0);
     document.querySelectorAll('.action-potion-button').forEach((button) => {
         button.disabled = hero.potions <= 0
             || (hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco'))
