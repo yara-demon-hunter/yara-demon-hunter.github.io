@@ -14,6 +14,23 @@ document.addEventListener('click', (event) => {
     }
 });
 
+document.getElementById('mobile-character-panel-dialog')?.addEventListener('click', (event) => {
+    const content = document.getElementById('mobile-character-panel-content');
+    const button = event.target instanceof Element ? event.target.closest('button') : null;
+    if (!content?.contains(button)) return;
+
+    if (button.matches('[data-upgrade]')) {
+        event.preventDefault();
+        toggleUpgradeOptions(button.dataset.upgrade);
+        openMobileCharacterPanel('hero-attributes');
+    } else if (button.matches('[data-upgrade-quantity]')) {
+        event.preventDefault();
+        const upgrade = button.closest('[data-upgrade-options]')?.dataset.upgradeOptions;
+        if (upgrade) purchaseUpgrade(upgrade, button.dataset.upgradeQuantity === 'max' ? 'max' : Number(button.dataset.upgradeQuantity));
+        openMobileCharacterPanel('hero-attributes');
+    }
+}, true);
+
 function openMobileCharacterPanel(panelId) {
     if (!window.matchMedia('(max-width: 640px)').matches) {
         const panel = document.getElementById(panelId);
@@ -27,8 +44,7 @@ function openMobileCharacterPanel(panelId) {
     const content = document.getElementById('mobile-character-panel-content');
     const title = document.getElementById('mobile-character-panel-title');
     if (!source || !dialog || !content || !title) return;
-    if (dialog.open && dialog.dataset.panel === panelId) return;
-    if (dialog.open) dialog.close();
+    if (dialog.open && dialog.dataset.panel !== panelId) dialog.close();
     const summary = source.querySelector(':scope > summary');
     title.textContent = summary?.querySelector('[data-i18n]')?.textContent || summary?.textContent.trim() || '';
     content.replaceChildren();
@@ -54,27 +70,39 @@ function openMobileCharacterPanel(panelId) {
         const passiveSkills = source.querySelector('.passive-skills-section');
         if (panelId === 'hero-attributes' && passiveSkills) clone.append(passiveSkills.cloneNode(true));
         clone.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+        clone.querySelectorAll('[data-upgrade], [data-upgrade-quantity]').forEach((element) => {
+            element.removeAttribute('onclick');
+        });
         clone.querySelectorAll('[data-upgrade-options]').forEach((element) => {
             const upgrade = element.dataset.upgradeOptions;
             element.hidden = !upgrade || openUpgradeOptions !== upgrade;
         });
         clone.querySelectorAll('[data-upgrade]').forEach((element) => {
-            element.setAttribute('aria-expanded', String(element.closest('.skill-upgrade-control')
-                ?.querySelector('[data-upgrade-options]')?.hidden === false));
+            const upgrade = element.dataset.upgrade;
+            const configuration = getUpgradeConfiguration(upgrade);
+            const disabled = gameOver || campaignComplete
+                || getMaxUpgradeQuantity(upgrade, configuration) < 1
+                || isUpgradeMaxed(upgrade, configuration);
+            element.disabled = disabled;
+            element.classList.toggle('has-skill-points', !disabled);
+            element.setAttribute('aria-expanded', String(openUpgradeOptions === upgrade && !disabled));
+        });
+        clone.querySelectorAll('[data-upgrade-options]').forEach((options) => {
+            options.querySelectorAll('[data-upgrade-quantity]').forEach((option) => {
+                const upgrade = options.dataset.upgradeOptions;
+                const maximum = getMaxUpgradeQuantity(upgrade, getUpgradeConfiguration(upgrade));
+                const quantity = option.dataset.upgradeQuantity === 'max'
+                    ? maximum
+                    : Number(option.dataset.upgradeQuantity);
+                option.disabled = quantity < 1 || quantity > maximum;
+            });
         });
         content.replaceChildren(clone);
         content.classList.remove('mobile-equipment-panel-content');
         content.onclick = (event) => {
             const button = event.target instanceof Element ? event.target.closest('button') : null;
             if (!button) return;
-            if (button.matches('[data-upgrade]')) {
-                toggleUpgradeOptions(button.dataset.upgrade);
-                openMobileCharacterPanel(panelId);
-            } else if (button.matches('[data-upgrade-quantity]')) {
-                const upgrade = button.closest('[data-upgrade-options]')?.dataset.upgradeOptions;
-                if (upgrade) purchaseUpgrade(upgrade, button.dataset.upgradeQuantity === 'max' ? 'max' : Number(button.dataset.upgradeQuantity));
-                openMobileCharacterPanel(panelId);
-            } else if (button.matches('.passive-skill-icon-button')) {
+            if (button.matches('.passive-skill-icon-button')) {
                 const skillIndex = [...button.parentElement.children].indexOf(button);
                 document.querySelectorAll('#passive-skill-icons button')[skillIndex]?.click();
             }
@@ -192,6 +220,8 @@ function updateUI() {
     const equipmentShortcut = document.querySelector('[data-open-panel="hero-equipment"]');
     const hasEquipmentUpgrade = [...document.querySelectorAll('.equipment-upgrade-available')].length > 0;
     equipmentShortcut?.classList.toggle('has-upgrade', hasEquipmentUpgrade);
+    const attributesShortcut = document.querySelector('[data-open-panel="hero-attributes"]');
+    attributesShortcut?.classList.toggle('has-upgrade', sp > 0);
     document.querySelectorAll('.action-potion-button').forEach((button) => {
         button.disabled = hero.potions <= 0
             || (hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco'))
