@@ -98,6 +98,9 @@
         font-size: 0.7rem !important;
     }
 }
+@media (min-width: 641px) {
+    .mobile-quick-links { display: none !important; }
+}
 @media (max-width: 640px) {
     body.game-shell {
         gap: 6px;

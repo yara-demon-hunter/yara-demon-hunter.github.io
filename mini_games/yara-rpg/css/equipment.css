@@ -8,7 +8,7 @@
 }
 .equipment-bag-button {
     position: relative;
-    grid-area: bag;
+    grid-area: empty-bottom;
     min-width: 0;
     width: 100%;
     min-height: 2.75rem;
@@ -24,6 +24,7 @@
     color: #fcd34d;
     cursor: pointer;
     text-align: center;
+    font-size: 0.65rem;
 }
 .equipment-bag-button:hover:not(:disabled) {
     border-color: #d2a644;
