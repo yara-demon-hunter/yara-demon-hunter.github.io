@@ -421,8 +421,6 @@ function closePassiveDetails() {
 
 window.logMessage = function logMessage(message, type = 'normal') {
     const logBox = document.getElementById('rpg-log');
-    const locale = gameLanguage === "en" ? "en-US" : "pt-BR";
-    const time = new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     
     let colorClass = "text-gray-300 border-l-2 border-gray-600";
     if (type === 'combat-hero') colorClass = "text-emerald-400 border-l-2 border-emerald-500 font-semibold";
@@ -434,9 +432,9 @@ window.logMessage = function logMessage(message, type = 'normal') {
     const div = document.createElement('div');
     div.className = `${colorClass} pl-2 py-0.5`;
     if (message.includes('<')) {
-        div.innerHTML = `[${time}] ${message}`;
+        div.innerHTML = message;
     } else {
-        div.textContent = `[${time}] ${message}`;
+        div.textContent = message;
     }
     
     logBox.appendChild(div);
