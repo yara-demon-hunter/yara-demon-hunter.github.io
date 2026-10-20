@@ -29,7 +29,8 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "zeph",
         name: "Zeph",
-        startingEquipment: ["hunter-dagger", "leather-armor", "rope"],
+        startingEquipment: ["hunter-dagger", "leather-armor", "rope","swift-boots"],
+        startingEquipmentInventory: [],
         image: "images/characters/zeph.webp",
         icon: "🌿",
         baseStats: BASE_CHARACTER_STATS,
@@ -78,6 +79,7 @@ window.YaraRpgData.characters = Object.freeze([
         id: "oskar",
         name: "Oskar",
         startingEquipment: ["hunter-axe", "wooden-shield", "leather-armor"],
+        startingEquipmentInventory: ["double-headed-axe"],
         image: "images/characters/oskar.webp",
         icon: "🪓",
         baseStats: BASE_CHARACTER_STATS,
@@ -89,8 +91,8 @@ window.YaraRpgData.characters = Object.freeze([
             id: "oskar-predator-strength",
             icon: "💪",
             name: { pt: "Força predadora", en: "Predator Strength" },
-            description: { pt: "+1% de Ataque total.", en: "+1% total Attack." },
-            statBonusPercent: { atk: 1 }
+            description: { pt: "+5% de Ataque total.", en: "+5% total Attack." },
+            statBonusPercent: { atk: 5 }
         },
         basicStats: {
             atk: 3,
@@ -124,7 +126,8 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "yara",
         name: "Yara",
-        startingEquipment: ["hunter-bow", "night-cloak", "fury-seal"],
+        startingEquipment: ["hunter-bow", "night-cloak", "fury-seal","swift-boots"],
+        startingEquipmentInventory: ["hunter-dagger","wooden-shield"],
         image: "images/characters/yara.webp",
         icon: "🗡️",
         baseStats: BASE_CHARACTER_STATS,

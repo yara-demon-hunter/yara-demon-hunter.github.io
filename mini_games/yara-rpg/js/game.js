@@ -202,6 +202,11 @@ function startAdventure({ character, equipment }) {
         hero[stat] += amount;
     });
     equipment.forEach((item) => { hero.equipment[item.slot] = item; });
+    hero.equipmentInventory = (character.startingEquipmentInventory || []).map((id) => {
+        const item = ITEM_DATA.equipment.find((entry) => entry.id === id);
+        if (!item) throw new Error(`Unknown starting inventory equipment for ${character.id}: ${id}`);
+        return createEquipmentInstance(item, GAME_RULES.loot.equipmentRarities[0]);
+    });
 
     hero.hp = getEffectiveStat("maxHp");
     hero.foco = getEffectiveStat("maxFoco");
