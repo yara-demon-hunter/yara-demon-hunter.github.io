@@ -361,7 +361,9 @@ function resolveStoryEvent(choiceIndex) {
         updateUI();
         return;
     } else if (effect === 'abyssal-challenge') {
-        const boss = SPECIAL_MONSTERS.find((monster) => monster.id === 'abyssal-demon');
+        const isFirstRegion = getCurrentRegionData().id === 'dark-forest';
+        const bossId = isFirstRegion ? 'lesser-abyssal-demon' : 'abyssal-demon';
+        const boss = SPECIAL_MONSTERS.find((monster) => monster.id === bossId);
         if (!boss) {
             logMessage(t('denseMist'));
             updateUI();

@@ -2,6 +2,22 @@ window.YaraRpgData = window.YaraRpgData || {};
 
 window.YaraRpgData.specialMonsters = Object.freeze([
     {
+        id: "lesser-abyssal-demon",
+        name: { pt: "Arauto Menor do Abismo", en: "Lesser Abyssal Herald" },
+        icon: "👹",
+        image: "images/special_monsters/abyssal-demon.webp",
+        minLevel: 1,
+        suggestedLevel: 3,
+        hp: 180,
+        atk: 20,
+        def: 5,
+        parry: 15,
+        evasion: 8,
+        xpReward: 160,
+        goldReward: 180,
+        challengeRewardRarities: ["rare", "super-rare"]
+    },
+    {
         id: "death",
         name: { pt: "Morte", en: "Death" },
         icon: "💀",

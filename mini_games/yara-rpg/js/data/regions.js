@@ -58,7 +58,7 @@ window.YaraRpgData.regions = Object.freeze([
             {
                 id: "abyssal-challenge-forest",
                 title: { pt: "O desafio da fenda", en: "The Rift Challenge" },
-                description: { pt: "Uma fenda se abre sob uma árvore antiga. O Arauto do Abismo surge e bloqueia a trilha. A presença dele é esmagadora; dizem que monstros assim guardam equipamentos Épicos ou Lendários.", en: "A rift opens beneath an ancient tree. The Abyssal Herald emerges and blocks the trail. Its presence is overwhelming; creatures like this are said to guard Epic or Legendary gear." },
+                description: { pt: "Uma fenda se abre sob uma árvore antiga. Um Arauto Menor do Abismo surge e bloqueia a trilha. Mesmo enfraquecido, ele guarda equipamentos Épicos ou Lendários.", en: "A rift opens beneath an ancient tree. A Lesser Abyssal Herald emerges and blocks the trail. Even weakened, it guards Epic or Legendary gear." },
                 choices: [
                     { label: { pt: "Enfrentar o Arauto (alto risco)", en: "Face the Herald (high risk)" }, effect: "abyssal-challenge" },
                     { label: { pt: "Recuar e se preparar", en: "Withdraw and prepare" }, effect: "abyssal-challenge-retreat" }
