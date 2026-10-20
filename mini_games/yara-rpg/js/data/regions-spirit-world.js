@@ -32,8 +32,9 @@ window.YaraRpgData.spiritRegions = Object.freeze([
                 choices: [
                     {
                         label: { pt: "Chamar por ela", en: "Call out to it" },
-                        effect: "spirit-message",
-                        messageKey: "spiritWorldSpiritFled"
+                        effect: "spirit-potion",
+                        foundMessageKey: "spiritWorldShadowPotionFound",
+                        fullMessageKey: "spiritWorldShadowPotionFull"
                     },
                     {
                         label: { pt: "Continuar em silêncio", en: "Continue in silence" },
@@ -72,8 +73,7 @@ window.YaraRpgData.spiritRegions = Object.freeze([
                 choices: [
                     {
                         label: { pt: "Seguir a luz", en: "Follow the light" },
-                        effect: "spirit-message",
-                        messageKey: "spiritWorldLightFades"
+                        effect: "spirit-potion"
                     },
                     {
                         label: { pt: "Esperar", en: "Wait" },

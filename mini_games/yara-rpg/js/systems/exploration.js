@@ -309,6 +309,16 @@ function resolveStoryEvent(choiceIndex) {
         completeRegionObjective('story');
         updateUI();
         return;
+    } else if (effect === 'spirit-potion') {
+        if (hero.potions < hero.maxPotions) {
+            hero.potions++;
+            logMessage(t(choice.foundMessageKey || 'spiritWorldPotionFound', {
+                potions: hero.potions,
+                capacity: hero.maxPotions
+            }), 'loot');
+        } else {
+            logMessage(t(choice.fullMessageKey || 'spiritWorldPotionFull'), 'normal');
+        }
     } else if (effect === 'monster-final-blow') {
         awardCombatVictory(event.monster);
         return;
