@@ -63,19 +63,27 @@ function loadSavedGame(snapshot = readSavedGame()) {
     }
     delete savedEquipment.rightHand;
     delete savedEquipment.leftHand;
+    const migratedAccessoryItems = [];
     const legacyAccessory = savedEquipment.accessory;
     if (legacyAccessory) {
         const migratedSlot = legacyAccessory.id === 'river-charm' ? 'necklace'
             : legacyAccessory.id === 'mist-ring' ? 'ring' : 'accessory';
-        savedEquipment[migratedSlot] = { ...legacyAccessory, slot: migratedSlot };
+        const migratedItem = { ...legacyAccessory, slot: migratedSlot };
+        if (savedEquipment[migratedSlot]) migratedAccessoryItems.push(migratedItem);
+        else savedEquipment[migratedSlot] = migratedItem;
         delete savedEquipment.accessory;
     }
+    const orphanedEquipment = Object.entries(savedEquipment)
+        .filter(([slot, item]) => item && !EQUIPMENT_SLOTS.some(({ id }) => id === slot))
+        .map(([, item]) => item);
     hero.equipment = Object.fromEntries(EQUIPMENT_SLOTS.map(({ id }) => [
         id,
         savedEquipment[id] ? hydrateItem(savedEquipment[id], id) : null
     ]));
     hero.equipmentInventory = Array.isArray(snapshot.hero?.equipmentInventory)
-        ? snapshot.hero.equipmentInventory.map(hydrateItem) : [];
+        ? snapshot.hero.equipmentInventory.map((item) => hydrateItem(item)) : [];
+    hero.equipmentInventory.push(...migratedAccessoryItems.map((item) => hydrateItem(item)));
+    hero.equipmentInventory.push(...orphanedEquipment.map((item) => hydrateItem(item)));
     if (hero.equipment.mainHand?.handUsage === 'two-handed' && hero.equipment.offHand) {
         // Saves from before hand usage was enforced could contain a two-handed weapon and an off-hand item.
         hero.equipmentInventory.push(hero.equipment.offHand);
@@ -163,6 +171,7 @@ function showContinueOption() {
 function hydrateItem(savedItem, slotOverride = null) {
     const catalogItem = ITEM_DATA.equipment.find((item) => item.id === savedItem?.id);
     if (!catalogItem) return savedItem;
+    const validSlot = (slot) => EQUIPMENT_SLOTS.some(({ id }) => id === slot);
     const savedRarity = GAME_RULES.loot.equipmentRarities.find((rarity) => rarity.id === savedItem.rarity)
         || GAME_RULES.loot.equipmentRarities[0];
     const savedVersion = Number(savedItem.upgradeSystemVersion) || 0;
@@ -185,7 +194,9 @@ function hydrateItem(savedItem, slotOverride = null) {
         ...catalogItem,
         ...savedItem,
         stats,
-        slot: slotOverride || catalogItem.slot,
+        slot: validSlot(slotOverride)
+            ? slotOverride
+            : validSlot(savedItem.slot) ? savedItem.slot : catalogItem.slot,
         rarity: savedRarity.id,
         upgradeLevel: savedVersion >= 2 ? Math.min(
             GAME_RULES.equipmentUpgrade.maxLevel,

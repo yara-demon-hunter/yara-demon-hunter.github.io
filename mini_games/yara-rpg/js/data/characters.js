@@ -89,20 +89,20 @@ window.YaraRpgData.characters = Object.freeze([
             id: "oskar-predator-strength",
             icon: "💪",
             name: { pt: "Força predadora", en: "Predator Strength" },
-            description: { pt: "+5% de Ataque total.", en: "+5% total Attack." },
-            statBonusPercent: { atk: 5 }
+            description: { pt: "+1% de Ataque total.", en: "+1% total Attack." },
+            statBonusPercent: { atk: 1 }
         },
         basicStats: {
-            atk: 4,
-            def: 2,
-            parry: 5,
+            atk: 3,
+            def: 1,
+            parry: 4,
         },
         progression: {
             maxHp: 25,
             maxFoco: 5,
             maxPotions: 1,
-            atk: 1,
-            def: 1,
+            atk: 0.5,
+            def: 0.5,
             evasion: 0,
             parry: 1,
             stunChance: 0,
@@ -153,7 +153,7 @@ window.YaraRpgData.characters = Object.freeze([
             evasion: 1,
             parry: 1,
             stunChance: 2,
-            criticalChance: 0
+            criticalChance: 0.5
         },
         skills: {
             heavyAttack: { focoCost: 15, attackMultiplier: 2.0 },

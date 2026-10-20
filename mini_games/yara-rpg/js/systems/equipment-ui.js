@@ -1,17 +1,17 @@
 // Equipment panels, dialogs, and user actions.
 // Load after equipment-core.js.
 
-document.getElementById('equip-new-item-button').addEventListener('click', equipPendingEquipment);
+document.getElementById('equip-new-item-button').addEventListener('click', () => equipPendingInHand('mainHand'));
 document.getElementById('keep-current-item-button').addEventListener('click', keepPendingEquipment);
-document.getElementById('equip-other-hand-from-drop-button').addEventListener('click', equipPendingInOtherHand);
+document.getElementById('equip-other-hand-from-drop-button').addEventListener('click', () => equipPendingInHand('offHand'));
 document.getElementById('open-equipment-bag-button').addEventListener('click', openEquipmentBag);
 document.getElementById('open-bag-from-drop-button').addEventListener('click', openEquipmentBag);
 document.getElementById('discard-pending-item-button').addEventListener('click', discardPendingEquipment);
 document.getElementById('close-equipment-bag-button').addEventListener('click', closeEquipmentBag);
 document.getElementById('discard-selected-items-button').addEventListener('click', discardSelectedInventoryItems);
 document.getElementById('close-equipment-item-button').addEventListener('click', closeEquipmentItemDetails);
-document.getElementById('equipment-item-equip-button').addEventListener('click', equipSelectedInventoryItem);
-document.getElementById('equipment-item-equip-other-hand-button').addEventListener('click', equipSelectedInventoryItemInOtherHand);
+document.getElementById('equipment-item-equip-button').addEventListener('click', () => equipSelectedInventoryItem('mainHand'));
+document.getElementById('equipment-item-equip-other-hand-button').addEventListener('click', () => equipSelectedInventoryItem('offHand'));
 document.getElementById('equipment-item-unequip-button').addEventListener('click', unequipSelectedEquipment);
 document.getElementById('equipment-item-discard-button').addEventListener('click', discardSelectedInventoryItem);
 document.getElementById('equipment-item-upgrade-button').addEventListener('click', upgradeSelectedEquipment);
@@ -304,11 +304,11 @@ function renderEquipmentItemDetails(item, source, slot = null) {
     }));
     const canSwitchHand = isInventoryItem
         && ['mainHand', 'offHand'].includes(item.slot)
-        && item.itemType !== 'shield'
+        && item.itemType === 'weapon'
         && item.handUsage !== 'two-handed';
-    const otherHandSlot = item.slot === 'mainHand' ? 'offHand' : 'mainHand';
+    equipButton.textContent = canSwitchHand ? t('equipRightHand') : t('equip');
     equipOtherHandButton.hidden = !canSwitchHand;
-    equipOtherHandButton.textContent = t(otherHandSlot === 'offHand' ? 'equipOffHand' : 'equipMainHand');
+    equipOtherHandButton.textContent = t('equipLeftHand');
     equipOtherHandButton.disabled = gameOver || Boolean(pendingEquipment);
     unequipButton.hidden = isInventoryItem;
     unequipButton.disabled = gameOver || Boolean(pendingEquipment)
@@ -355,19 +355,16 @@ function closeEquipmentItemDetails() {
     if (dialog.open) dialog.close();
 }
 
-function equipSelectedInventoryItem() {
+function equipSelectedInventoryItem(targetSlot = null) {
     const selection = selectedEquipmentDetails;
     if (!selection || selection.source !== 'inventory') return;
+    const { item } = selection;
+    const canChooseHand = item.itemType === 'weapon'
+        && item.handUsage !== 'two-handed'
+        && ['mainHand', 'offHand'].includes(item.slot);
+    const slot = canChooseHand ? targetSlot : item.slot;
     closeEquipmentItemDetails();
-    equipInventoryItem(selection.item);
-}
-
-function equipSelectedInventoryItemInOtherHand() {
-    const selection = selectedEquipmentDetails;
-    if (!selection || selection.source !== 'inventory') return;
-    const targetSlot = selection.item.slot === 'mainHand' ? 'offHand' : 'mainHand';
-    closeEquipmentItemDetails();
-    equipInventoryItem(selection.item, targetSlot);
+    equipInventoryItem(item, slot);
 }
 
 function unequipSelectedEquipment() {
@@ -526,11 +523,18 @@ function showEquipmentChoice(item, fromInventory, targetSlot = item.slot) {
         ? false
         : blockedByStorageCapacity;
     document.getElementById('keep-current-item-button').hidden = !fromInventory && blockedByStorageCapacity;
+    const equipButton = document.getElementById('equip-new-item-button');
     const otherHandButton = document.getElementById('equip-other-hand-from-drop-button');
-    const canEquipInOtherHand = item.itemType === 'weapon' && item.handUsage !== 'two-handed';
-    otherHandButton.hidden = !canEquipInOtherHand;
-    otherHandButton.textContent = t(targetSlot === 'mainHand' ? 'equipOffHand' : 'equipMainHand');
-    otherHandButton.disabled = gameOver;
+    const canChooseHand = ['mainHand', 'offHand'].includes(item.slot)
+        && item.itemType === 'weapon'
+        && item.handUsage !== 'two-handed';
+    document.getElementById('item-drop-actions').classList.toggle('item-drop-actions-hand-choice', canChooseHand);
+    equipButton.textContent = t(canChooseHand
+        ? 'equipRightHand'
+        : currentItem ? 'equipNewItem' : 'equipFoundItem');
+    otherHandButton.hidden = !canChooseHand;
+    otherHandButton.textContent = t('equipLeftHand');
+    otherHandButton.disabled = blockedByFullBag;
     document.getElementById('open-bag-from-drop-button').hidden = fromInventory
         || (!blockedByFullBag && !blockedByStorageCapacity);
     const discardPendingButton = document.getElementById('discard-pending-item-button');
@@ -607,8 +611,12 @@ function equipPendingEquipment() {
         return;
     }
     pendingEquipment = null;
+    if (!equipItem(item, fromInventory, targetSlot)) {
+        pendingEquipment = { item, fromInventory, targetSlot };
+        updateUI();
+        return;
+    }
     document.getElementById('item-drop-dialog').close();
-    equipItem(item, fromInventory, targetSlot);
 }
 
 function keepPendingEquipment() {
@@ -629,13 +637,16 @@ function keepPendingEquipment() {
     if (fromInventory) openEquipmentBag();
 }
 
-function equipPendingInOtherHand() {
-    if (!pendingEquipment || pendingEquipment.item.itemType !== 'weapon'
-        || pendingEquipment.item.handUsage === 'two-handed') return;
-    const { item, fromInventory, targetSlot = item.slot } = pendingEquipment;
-    const otherHandSlot = targetSlot === 'mainHand' ? 'offHand' : 'mainHand';
-    document.getElementById('item-drop-dialog').close();
-    showEquipmentChoice(item, fromInventory, otherHandSlot);
+function equipPendingInHand(targetSlot) {
+    if (!pendingEquipment || gameOver || campaignComplete) return;
+    const { item } = pendingEquipment;
+    if (item.itemType === 'weapon' && item.handUsage !== 'two-handed'
+        && ['mainHand', 'offHand'].includes(item.slot)) {
+        pendingEquipment.targetSlot = targetSlot;
+    } else {
+        pendingEquipment.targetSlot = item.slot;
+    }
+    equipPendingEquipment();
 }
 
 function discardPendingEquipment() {

@@ -271,6 +271,14 @@
     gap: 0.6rem;
     margin-top: 1rem;
 }
+.item-drop-actions-hand-choice {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4rem;
+}
+.item-drop-actions-hand-choice .item-drop-action {
+    padding-inline: 0.35rem;
+    font-size: 0.75rem;
+}
 .item-drop-action {
     min-width: 0;
     min-height: 2.75rem;
@@ -297,7 +305,6 @@
 }
 .item-drop-action-secondary:hover:not(:disabled) { background: #065f46; }
 .item-drop-action-alternative {
-    grid-column: 1 / -1;
     justify-self: stretch;
     border-color: rgba(217, 170, 65, 0.65);
     background: rgba(69, 45, 12, 0.75);
@@ -326,7 +333,7 @@
     outline: 2px solid #fcd34d;
     outline-offset: 2px;
 }
-.item-drop-actions-blocked .item-drop-action-alternative {
+.item-drop-actions-blocked:not(.item-drop-actions-hand-choice) .item-drop-action-alternative {
     grid-column: 1 / -1;
 }
 .item-drop-action[hidden] { display: none; }

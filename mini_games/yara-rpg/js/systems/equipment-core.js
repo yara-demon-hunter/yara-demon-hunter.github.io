@@ -26,13 +26,17 @@ function getEquipmentSlotLabel(item) {
 function getEquipmentConflicts(item) {
     const conflictingSlots = new Set([item.slot]);
     const isTwoHandedWeapon = item.itemType === 'weapon' && item.handUsage === 'two-handed';
-    if (item.slot === 'mainHand' && isTwoHandedWeapon) {
-        conflictingSlots.add('offHand');
-    }
-    if (item.slot === 'offHand'
-        && hero.equipment.mainHand?.itemType === 'weapon'
-        && hero.equipment.mainHand.handUsage === 'two-handed') {
+    const occupiesHandSlot = ['mainHand', 'offHand'].includes(item.slot);
+    if (occupiesHandSlot && isTwoHandedWeapon) {
         conflictingSlots.add('mainHand');
+        conflictingSlots.add('offHand');
+    } else if (occupiesHandSlot) {
+        if (hero.equipment.mainHand?.handUsage === 'two-handed') {
+            conflictingSlots.add('mainHand');
+        }
+        if (hero.equipment.offHand?.handUsage === 'two-handed') {
+            conflictingSlots.add('offHand');
+        }
     }
     return [...conflictingSlots]
         .map((slot) => ({ slot, item: hero.equipment[slot] }))
@@ -183,20 +187,24 @@ function createEquipmentDrop() {
 
 function equipItem(item, fromInventory, targetSlot = item.slot) {
     const equippedItem = targetSlot === item.slot ? item : { ...item, slot: targetSlot };
-    let inventoryIndex = -1;
+    const inventoryIndex = fromInventory ? hero.equipmentInventory.indexOf(item) : -1;
     if (fromInventory) {
-        inventoryIndex = hero.equipmentInventory.indexOf(item);
-        if (inventoryIndex === -1) return;
-        hero.equipmentInventory.splice(inventoryIndex, 1);
-        selectedInventoryItems.delete(item);
+        if (inventoryIndex === -1) return false;
     }
 
     const conflicts = getEquipmentConflicts(equippedItem);
-    if (hero.equipmentInventory.length + conflicts.length > EQUIPMENT_BAG_CAPACITY) {
-        if (fromInventory) hero.equipmentInventory.splice(inventoryIndex, 0, item);
+    const resultingInventorySize = hero.equipmentInventory.length
+        - (fromInventory ? 1 : 0)
+        + conflicts.length;
+    if (resultingInventorySize > EQUIPMENT_BAG_CAPACITY) {
         logMessage(t('inventoryFull', { capacity: EQUIPMENT_BAG_CAPACITY }), 'loot');
         updateUI();
-        return;
+        return false;
+    }
+
+    if (fromInventory) {
+        hero.equipmentInventory.splice(inventoryIndex, 1);
+        selectedInventoryItems.delete(item);
     }
     conflicts.forEach(({ slot, item: displacedItem }) => {
         hero.equipment[slot] = null;
@@ -212,17 +220,21 @@ function equipItem(item, fromInventory, targetSlot = item.slot) {
         slot: getEquipmentSlotLabel(equippedItem)
     }), 'special');
     updateUI();
+    return true;
 }
 
 function equipInventoryItem(item, targetSlot = item.slot) {
     if (gameOver || campaignComplete || !hero.equipmentInventory.includes(item)) return;
-    const candidate = targetSlot === item.slot ? item : { ...item, slot: targetSlot };
+    const resolvedTargetSlot = item.itemType === 'weapon' && item.handUsage === 'two-handed'
+        ? item.slot
+        : targetSlot;
+    const candidate = resolvedTargetSlot === item.slot ? item : { ...item, slot: resolvedTargetSlot };
     if (getEquipmentConflicts(candidate).length) {
         document.getElementById('equipment-bag-dialog').close();
-        showEquipmentChoice(item, true, targetSlot);
+        showEquipmentChoice(item, true, resolvedTargetSlot);
         return;
     }
-    equipItem(item, true, targetSlot);
+    equipItem(item, true, resolvedTargetSlot);
 }
 
 function unequipItem(slot) {
