@@ -48,6 +48,7 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "zeph",
         name: "Zeph",
+        unlocked: true,
         startingEquipment: ["hunter-dagger", "leather-armor", "rope","swift-boots"],
         startingEquipmentInventory: [],
         startingPassiveSkills: [],
@@ -99,6 +100,7 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "oskar",
         name: "Oskar",
+        unlocked: true,
         startingEquipment: ["hunter-axe", "wooden-shield", "leather-armor"],
         startingEquipmentInventory: ["double-headed-axe"],
         startingPassiveSkills: [],
@@ -149,6 +151,7 @@ window.YaraRpgData.characters = Object.freeze([
     {
         id: "yara",
         name: "Yara",
+        unlocked: true,
         startingEquipment: ["hunter-bow", "night-cloak", "fury-seal","swift-boots"],
         startingEquipmentInventory: ["hunter-dagger","wooden-shield"],
         startingPassiveSkills: [],
@@ -195,6 +198,57 @@ window.YaraRpgData.characters = Object.freeze([
             minFuryThreshold: 40,
             maxPotions: 10,
             maxCriticalChance: 35
+        }
+    },
+    {
+        id: "demon-hunter",
+        name: "Demon Hunter",
+        unlocked: false,
+        startingEquipment: ["demon-hunter-sword", "demon-hunter-cloak"],
+        startingEquipmentInventory: [],
+        startingPassiveSkills: [],
+        startingMonsterPacts: [],
+        image: "images/characters/demon-hunter.webp",
+        icon: "⚔️",
+        baseStats: BASE_CHARACTER_STATS,
+        description: {
+            pt: "Caçador lendário que transforma a força dos demônios contra eles mesmos.",
+            en: "A legendary hunter who turns demonic strength against the demons themselves."
+        },
+        passive: {
+            id: "demon-hunter-hunters-edge",
+            icon: "🔥",
+            name: { pt: "Lâmina do Caçador", en: "Hunter's Edge" },
+            description: { pt: "+10% de Ataque total.", en: "+10% total Attack." },
+            statBonusPercent: { atk: 10 }
+        },
+        basicStats: {
+            atk: 5,
+            evasion: 4,
+            criticalChance: 2
+        },
+        progression: {
+            maxHp: 10,
+            maxFoco: 10,
+            maxPotions: 1,
+            atk: 2,
+            def: 0,
+            evasion: 1.5,
+            parry: 0.5,
+            stunChance: 0.5,
+            criticalChance: 1.5
+        },
+        skills: {
+            heavyAttack: { focoCost: 20, attackMultiplier: 2.3 },
+            dodge: { focoCost: 10, bonus: 20 }
+        },
+        limits: {
+            maxEvasion: 65,
+            maxParry: 50,
+            maxStunChance: 50,
+            minFuryThreshold: 30,
+            maxPotions: 5,
+            maxCriticalChance: 50
         }
     }
 ]);

@@ -280,6 +280,7 @@ window.onload = function () {
     window.YaraRpgCharacterSetup.initialize({
         translate: t,
         describeEquipment: getItemBonusText,
+        isUnlocked: isCharacterUnlocked,
         onStart: startAdventure,
     });
     showContinueOption();

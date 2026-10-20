@@ -377,7 +377,9 @@ function resolveStoryEvent(choiceIndex) {
             }), 'loot');
         } else if (outcome === 'missingSlotItem') {
             const emptySlots = Object.keys(hero.equipment).filter((slot) => !hero.equipment[slot]);
-            const equipment = ITEM_DATA.equipment.filter((item) => emptySlots.includes(item.slot));
+            const equipment = ITEM_DATA.equipment.filter((item) =>
+                !item.characterExclusive && emptySlots.includes(item.slot)
+            );
             if (equipment.length) {
                 const template = equipment[Math.floor(Math.random() * equipment.length)];
                 const item = createEquipmentInstance(template, rollEquipmentRarity());

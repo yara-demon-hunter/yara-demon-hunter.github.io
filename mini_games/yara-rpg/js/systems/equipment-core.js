@@ -107,7 +107,7 @@ function rollEquipmentRarity(allowedRarityIds = null, chanceOverrides = null, al
 }
 
 function createEquipmentInstanceDrop(rarity) {
-    const equipment = ITEM_DATA.equipment;
+    const equipment = ITEM_DATA.equipment.filter((item) => !item.characterExclusive);
     if (equipment.length === 0) return null;
     const template = equipment[Math.floor(Math.random() * equipment.length)];
     return createEquipmentInstance(template, rarity);
@@ -179,7 +179,7 @@ function handleEquipmentDrop(item) {
 }
 
 function createEquipmentDrop() {
-    const equipment = ITEM_DATA.equipment;
+    const equipment = ITEM_DATA.equipment.filter((item) => !item.characterExclusive);
     if (Math.random() * GAME_RULES.probabilityScale >= GAME_RULES.loot.equipmentDropChance) {
         return null;
     }

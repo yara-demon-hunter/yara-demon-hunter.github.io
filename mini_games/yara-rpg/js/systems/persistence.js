@@ -1,6 +1,21 @@
 // Save snapshots, restore runs, and migrate saved equipment.
 // Classic browser script; state is initialized by game.js before user actions run.
 
+const CHARACTER_UNLOCK_KEY = 'yara-rpg-campaign-complete-v1';
+
+function isCharacterUnlocked(character) {
+    if (character?.unlocked === true) return true;
+    try {
+        return localStorage.getItem(CHARACTER_UNLOCK_KEY) === 'true';
+    } catch {
+        return false;
+    }
+}
+
+function unlockCharactersAfterCampaign() {
+    try { localStorage.setItem(CHARACTER_UNLOCK_KEY, 'true'); } catch {}
+}
+
 function saveGame() {
     if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return;
     const snapshot = {

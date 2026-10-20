@@ -193,6 +193,7 @@ function awardCombatVictory(monster) {
     checkLevelUp();
     if (monster.isFinalBoss) {
         campaignComplete = true;
+        unlockCharactersAfterCampaign();
         logMessage(t('finalBossVictory'), 'discovery');
         try { localStorage.removeItem(SAVE_KEY); } catch {}
     }

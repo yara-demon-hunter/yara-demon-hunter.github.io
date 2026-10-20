@@ -40,6 +40,7 @@ window.YaraRpgCharacterSetup = (() => {
     let selectedCharacterId = null;
     let translate = (key) => key;
     let describeEquipment = () => "";
+    let isUnlocked = (character) => character.unlocked !== false;
     let onStart = () => {};
 
     function renderCharacters() {
@@ -48,14 +49,20 @@ window.YaraRpgCharacterSetup = (() => {
 
         CHARACTER_DATA.forEach((character) => {
             const card = document.createElement("div");
+            const unlocked = isUnlocked(character);
             const selected = character.id === selectedCharacterId;
-            card.className = `character-option${selected ? " is-selected" : ""}`;
+            card.className = `character-option${selected ? " is-selected" : ""}${unlocked ? "" : " is-locked"}`;
 
             const selectButton = document.createElement("button");
             selectButton.type = "button";
-            selectButton.className = "character-option-select";
+            selectButton.className = `character-option-select${unlocked ? "" : " is-locked"}`;
             selectButton.dataset.characterId = character.id;
             selectButton.setAttribute("aria-pressed", String(selected));
+            selectButton.disabled = !unlocked;
+            if (!unlocked) {
+                selectButton.setAttribute("aria-label", `${character.name}. ${translate("characterLocked")}`);
+                selectButton.title = translate("characterLocked");
+            }
 
             const portrait = document.createElement("span");
             portrait.className = "character-option-icon";
@@ -140,6 +147,10 @@ window.YaraRpgCharacterSetup = (() => {
                 passiveSummary.textContent = `${passiveLabel}: ${character.passive.icon} ${passiveName} — ${passiveDescription}`;
             }
 
+            const lockedNotice = document.createElement("span");
+            lockedNotice.className = "character-option-lock";
+            lockedNotice.textContent = `🔒 ${translate("characterLocked")}`;
+
             const extraInfo = document.createElement("details");
             extraInfo.className = "character-option-extra";
             const extraInfoSummary = document.createElement("summary");
@@ -147,12 +158,15 @@ window.YaraRpgCharacterSetup = (() => {
             extraInfo.append(extraInfoSummary, progression, skills, limits);
 
             selectButton.append(portrait, name, description, basicStatsSummary, passiveSummary);
+            if (!unlocked) selectButton.append(lockedNotice);
             selectButton.addEventListener("click", () => {
+                if (!unlocked) return;
                 selectedCharacterId = character.id;
                 renderCharacters();
                 document.getElementById("begin-adventure-button").disabled = false;
             });
-            card.append(selectButton, extraInfo);
+            card.append(selectButton);
+            if (unlocked) card.append(extraInfo);
             container.append(card);
         });
     }
@@ -188,7 +202,7 @@ window.YaraRpgCharacterSetup = (() => {
 
     function beginAdventure() {
         const character = CHARACTER_DATA.find(({ id }) => id === selectedCharacterId);
-        if (!character) throw new Error(`Unknown starting character: ${selectedCharacterId}`);
+        if (!character || !isUnlocked(character)) return;
         const equipment = (character.startingEquipment || []).map((id) => {
             const item = EQUIPMENT_BY_ID.get(id);
             if (!item) throw new Error(`Unknown starter equipment for ${character.id}: ${id}`);
@@ -200,6 +214,7 @@ window.YaraRpgCharacterSetup = (() => {
     function initialize(options) {
         translate = options.translate;
         describeEquipment = options.describeEquipment;
+        isUnlocked = options.isUnlocked || isUnlocked;
         onStart = options.onStart;
         document.getElementById("begin-adventure-button").addEventListener("click", beginAdventure);
         renderCharacters();

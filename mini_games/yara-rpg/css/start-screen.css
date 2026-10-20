@@ -92,6 +92,13 @@
 .starter-equipment-option:hover {
     border-color: #a98540;
 }
+.character-option.is-locked {
+    filter: grayscale(0.85);
+    opacity: 0.55;
+}
+.character-option.is-locked:hover {
+    border-color: rgba(92, 81, 55, 0.72);
+}
 .character-option.is-selected,
 .starter-equipment-option.is-selected {
     border-color: #e1ae43;
@@ -115,6 +122,23 @@
     color: inherit;
     cursor: pointer;
     text-align: left;
+}
+.character-option-select:disabled {
+    cursor: not-allowed;
+}
+.character-option-select.is-locked {
+    grid-template-areas:
+        "portrait name"
+        "description description"
+        "specialty specialty"
+        "passive passive"
+        "locked locked";
+}
+.character-option-lock {
+    grid-area: locked;
+    color: #e1c77d;
+    font-size: 0.7rem;
+    font-weight: 700;
 }
 .character-option-select:focus-visible {
     outline: 2px solid #fbbf24;

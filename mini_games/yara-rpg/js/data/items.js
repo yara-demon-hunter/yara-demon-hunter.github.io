@@ -39,6 +39,9 @@ window.YaraRpgData.items = Object.freeze({
         { id: "mist-ring", slot: "ring", icon: "💍", image: "images/items/mist-ring.webp", name: { pt: "Anel da Névoa", en: "Mist Ring" }, stats: { atk: 1, evasion: 5, stunChance: 1 }, starter: false },
         { id: "lumen-necklace", slot: "necklace", icon: "📿", image: "images/items/lumen-necklace.webp",name: { pt: "Colar Reluzente", en: "Lumen Necklace" }, stats: { def: 1, parry: 3, stunChance: 2 }, starter: false },
         { id: "rope", slot: "accessory", icon: "🪢", image: "images/items/rope.webp", name: { pt: "Corda", en: "Rope" }, stats: { stunChance: 3, evasion: 2 }, starter: false },
+        // Exclusives
+        { id: "demon-hunter-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "⚔️", image: "images/items/demon-hunter-sword.webp", name: { pt: "Espada Demon Hunter", en: "Demon Hunter Sword" }, stats: { atk: 8, criticalChance: 4, maxFury: -10 }, characterExclusive: "demon-hunter" },
+        { id: "demon-hunter-cloak", slot: "cloak", icon: "🧥", image: "images/items/demon-hunter-cloak.webp", name: { pt: "Capa Demon Hunter", en: "Demon Hunter Cloak" }, stats: { evasion: 5, stunChance: 2, maxFury: -10 }, characterExclusive: "demon-hunter" },
 
     ])
 });
