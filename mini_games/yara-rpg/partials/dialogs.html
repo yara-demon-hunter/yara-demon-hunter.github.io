@@ -59,7 +59,12 @@
 
     <dialog id="item-drop-dialog" class="item-drop-dialog" aria-labelledby="item-drop-title" aria-describedby="item-drop-message item-drop-choice-help">
         <div class="item-drop-content">
-            <h2 id="item-drop-title" class="text-lg font-bold text-amber-300" data-i18n="itemDropTitle">Equipamento encontrado</h2>
+            <div class="equipment-bag-heading">
+                <div>
+                    <h2 id="item-drop-title" class="text-lg font-bold text-amber-300" data-i18n="itemDropTitle">Equipamento encontrado</h2>
+                </div>
+                <button id="close-acquired-equipment-button" type="button" class="dialog-close-button" data-i18n-aria="closeItemDetails" aria-label="Fechar detalhes do equipamento" hidden>×</button>
+            </div>
             <p id="item-drop-message" class="mt-2 text-sm text-gray-200"></p>
             <p id="item-drop-choice-help" class="mt-2 text-xs text-gray-300" data-i18n="itemDropChoiceHelp">Equipar o novo guarda o atual na mochila; manter o atual guarda o item encontrado.</p>
             <div class="equipment-comparison" role="group" aria-labelledby="item-drop-title">

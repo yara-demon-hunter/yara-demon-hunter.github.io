@@ -89,6 +89,7 @@ window.YaraRpgTranslations.pt = {
         pendingEquipmentFullHelp: "A mochila não tem espaço para guardar todos os itens substituídos. Abra-a e libere espaço; o item encontrado ficará aguardando.",
         emptySlot: "Vazio",
         viewEquipmentDetails: "Ver propriedades de {item}",
+        equipmentAutoEquipped: "Novo item equipado automaticamente",
         upgradeEquipmentAria: "Aprimorar {item}",
         closeItemDetails: "Fechar detalhes do equipamento",
         mainHand: "Mão direita",

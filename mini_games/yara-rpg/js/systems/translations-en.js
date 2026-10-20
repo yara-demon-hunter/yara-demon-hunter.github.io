@@ -89,6 +89,7 @@ window.YaraRpgTranslations.en = {
         pendingEquipmentFullHelp: "The bag has no room for all replaced equipment. Open it and free space; the found item will remain here.",
         emptySlot: "Empty",
         viewEquipmentDetails: "View {item} properties",
+        equipmentAutoEquipped: "New item equipped automatically",
         upgradeEquipmentAria: "Upgrade {item}",
         closeItemDetails: "Close equipment details",
         mainHand: "Right hand",

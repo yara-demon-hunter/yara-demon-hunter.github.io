@@ -4,6 +4,9 @@
 document.getElementById('equip-new-item-button').addEventListener('click', () => equipPendingInHand('mainHand'));
 document.getElementById('keep-current-item-button').addEventListener('click', keepPendingEquipment);
 document.getElementById('equip-other-hand-from-drop-button').addEventListener('click', () => equipPendingInHand('offHand'));
+document.getElementById('close-acquired-equipment-button').addEventListener('click', () => {
+    document.getElementById('item-drop-dialog').close();
+});
 document.getElementById('open-equipment-bag-button').addEventListener('click', openEquipmentBag);
 document.getElementById('open-bag-from-drop-button').addEventListener('click', openEquipmentBag);
 document.getElementById('discard-pending-item-button').addEventListener('click', discardPendingEquipment);
@@ -28,6 +31,7 @@ document.getElementById('equipment-bag-dialog').addEventListener('cancel', (even
     }
 });
 document.getElementById('item-drop-dialog').addEventListener('cancel', (event) => {
+    if (!pendingEquipment) return;
     event.preventDefault();
     if (isPendingDropBlocked()) {
         openEquipmentBag();
@@ -234,6 +238,38 @@ function showEquipmentItemDetails(item, source, slot = null) {
     selectedEquipmentDetails = { item, source, slot };
     renderEquipmentItemDetails(item, source, slot);
     document.getElementById('equipment-item-dialog').showModal();
+}
+
+function showAcquiredEquipment(item) {
+    const dialog = document.getElementById('item-drop-dialog');
+    dialog.setAttribute('aria-describedby', 'item-drop-message');
+    document.getElementById('item-drop-title').textContent = t('itemDropTitle');
+    const message = document.getElementById('item-drop-message');
+    message.textContent = t('equipmentAutoEquipped');
+    message.hidden = false;
+    document.getElementById('item-drop-choice-help').hidden = true;
+
+    const candidate = item;
+    const comparison = document.querySelector('.equipment-comparison');
+    comparison.classList.add('equipment-comparison-single');
+    comparison.classList.remove('equipment-comparison-multiple');
+    document.querySelector('.equipment-comparison-current').hidden = true;
+    document.querySelector('.equipment-comparison-arrow').hidden = true;
+    document.querySelectorAll('.equipment-comparison-current-extra').forEach((card) => card.remove());
+
+    setEquipmentIcon(document.getElementById('item-drop-new-icon'), candidate);
+    const name = document.getElementById('item-drop-new-name');
+    name.textContent = getEquipmentDisplayName(candidate);
+    name.className = `equipment-comparison-name ${getEquipmentRarityClass(candidate)}`;
+    document.querySelector('.equipment-comparison-new .equipment-comparison-label').textContent = t('newEquipmentLabel');
+    const slot = document.getElementById('item-drop-new-slot');
+    slot.textContent = `${getEquipmentRarity(candidate).name[gameLanguage]} · ${getEquipmentSlotLabel(candidate)}`;
+    slot.className = `equipment-comparison-slot ${getEquipmentRarityClass(candidate)}`;
+    renderEquipmentBonuses(document.getElementById('item-drop-new-bonuses'), candidate);
+
+    document.getElementById('item-drop-actions').hidden = true;
+    document.getElementById('close-acquired-equipment-button').hidden = false;
+    dialog.showModal();
 }
 
 function renderEquipmentItemDetails(item, source, slot = null) {
@@ -453,6 +489,14 @@ function showEquipmentChoice(item, fromInventory, targetSlot = item.slot) {
     const conflicts = getEquipmentConflicts(candidate);
     const currentItems = conflicts.map(({ item: equippedItem }) => equippedItem);
     const currentItem = currentItems[0] || null;
+    document.getElementById('item-drop-dialog').setAttribute(
+        'aria-describedby',
+        'item-drop-message item-drop-choice-help'
+    );
+    document.getElementById('close-acquired-equipment-button').hidden = true;
+    document.getElementById('item-drop-actions').hidden = false;
+    document.getElementById('item-drop-message').hidden = false;
+    document.getElementById('item-drop-choice-help').hidden = false;
     document.getElementById('item-drop-title').textContent = t(
         fromInventory ? 'compareEquipmentTitle' : 'itemDropTitle'
     );

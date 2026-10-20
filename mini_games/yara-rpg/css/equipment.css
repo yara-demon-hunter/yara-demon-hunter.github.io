@@ -275,6 +275,7 @@
     gap: 0.6rem;
     margin-top: 1rem;
 }
+.item-drop-actions[hidden] { display: none; }
 .item-drop-actions-hand-choice {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.4rem;
