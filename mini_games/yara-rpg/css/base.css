@@ -175,6 +175,17 @@ body:is(.region-spirit-world, .region-spirit-world-sea) .story-event-choice:hove
     animation: critical-impact-shake 550ms ease-out;
     filter: brightness(1.8) drop-shadow(0 0 14px rgba(255, 184, 46, .95));
 }
+#monster-icon.heavy-attack-impact {
+    animation: heavy-attack-impact 620ms cubic-bezier(.2, .8, .2, 1);
+    filter: brightness(1.65) drop-shadow(0 0 13px rgba(248, 113, 113, .9));
+}
+@keyframes heavy-attack-impact {
+    0% { transform: translateX(0) scale(1); }
+    16% { transform: translateX(-.65rem) scale(1.12, .88); }
+    38% { transform: translateX(.4rem) scale(.96, 1.04); }
+    62% { transform: translateX(-.18rem) scale(1.03, .97); }
+    100% { transform: translateX(0) scale(1); }
+}
 #monster-icon.monster-stunned {
     position: relative;
     overflow: visible;

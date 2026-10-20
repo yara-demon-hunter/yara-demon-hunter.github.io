@@ -85,6 +85,16 @@ function playCriticalImpact() {
     }, 500);
 }
 
+function playHeavyAttackImpact() {
+    const target = document.getElementById('monster-icon');
+    if (!target) return;
+    target.classList.remove('heavy-attack-impact');
+    void target.offsetWidth;
+    target.classList.add('heavy-attack-impact');
+    target.addEventListener('animationend', () => target.classList.remove('heavy-attack-impact'), { once: true });
+    window.setTimeout(() => target.classList.remove('heavy-attack-impact'), 700);
+}
+
 function playMonsterStunEffect() {
     const target = document.getElementById('monster-icon');
     if (!target) return;
@@ -97,7 +107,18 @@ function playMonsterStunEffect() {
     playSound('stun');
 }
 
-function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0, isCritical = false) {
+function playHeroBuffEffect(buffType) {
+    const target = document.getElementById('hero-portrait-anchor');
+    if (!target) return;
+    const effectClass = buffType === 'dodge' ? 'hero-buff-dodge' : 'hero-buff-parry';
+    target.classList.remove('hero-buff-dodge', 'hero-buff-parry');
+    void target.offsetWidth;
+    target.classList.add(effectClass);
+    target.addEventListener('animationend', () => target.classList.remove(effectClass), { once: true });
+    window.setTimeout(() => target.classList.remove(effectClass), 1500);
+}
+
+function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0, isCritical = false, isHeavyAttack = false) {
     if (!inCombat || !currentMonster) return;
     combatActionLocked = true;
     enemyTelegraphing = false;
@@ -108,6 +129,7 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     currentMonster.hp -= damageDealt;
     showFloatingDamage('monster-icon', damageDealt, isCritical ? 'critical-monster' : 'monster');
     if (isCritical) playCriticalImpact();
+    else if (isHeavyAttack) playHeavyAttackImpact();
     const furyGained = Math.min(getEffectiveFuryThreshold() - hero.fury, Math.floor(damageDealt * furyMultiplier));
     hero.fury += furyGained;
     queueFuryAnimation(furyGained);
@@ -199,7 +221,8 @@ function combatHeavyAttack() {
         isCritical ? "criticalDamage" : "heavyDamage",
         0,
         0,
-        isCritical
+        isCritical,
+        true
     );
 }
 
@@ -247,6 +270,7 @@ function combatDefend() {
     hero.foco -= selectedCharacter.skills.parry.focoCost;
     showFloatingDamage('hero-focus-anchor', selectedCharacter.skills.parry.focoCost, 'focus');
     hero.parryBonus += bonusGained;
+    playHeroBuffEffect('parry');
     logMessage(t('defendMessage', { amount: bonusGained }), 'special');
 
     queueMonsterAttackTurn();
@@ -274,6 +298,7 @@ function combatDodge() {
     showFloatingDamage('hero-focus-anchor', selectedCharacter.skills.dodge.focoCost, 'focus');
     hero.defending = false;
     hero.evasionBonus += bonusGained;
+    playHeroBuffEffect('dodge');
     logMessage(t("dodgeMessage", { amount: bonusGained }), "special");
 
     queueMonsterAttackTurn();
