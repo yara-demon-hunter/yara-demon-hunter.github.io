@@ -204,7 +204,7 @@ window.YaraRpgData.characters = Object.freeze([
         id: "demon-hunter",
         name: "Demon Hunter",
         unlocked: false,
-        startingEquipment: ["demon-hunter-sword", "demon-hunter-cloak"],
+        startingEquipment: ["demon-hunter-sword", "demon-hunter-cloak","demon-hunter-mask"],
         startingEquipmentInventory: [],
         startingPassiveSkills: [],
         startingMonsterPacts: [],

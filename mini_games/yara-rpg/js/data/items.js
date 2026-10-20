@@ -42,6 +42,7 @@ window.YaraRpgData.items = Object.freeze({
         // Exclusives
         { id: "demon-hunter-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "⚔️", image: "images/items/demon-hunter-sword.webp", name: { pt: "Espada Demon Hunter", en: "Demon Hunter Sword" }, stats: { atk: 8, criticalChance: 4, maxFury: -10 }, characterExclusive: "demon-hunter" },
         { id: "demon-hunter-cloak", slot: "cloak", icon: "🧥", image: "images/items/demon-hunter-cloak.webp", name: { pt: "Capa Demon Hunter", en: "Demon Hunter Cloak" }, stats: { evasion: 5, stunChance: 2, maxFury: -10 }, characterExclusive: "demon-hunter" },
+        { id: "demon-hunter-mask", slot: "head", icon: "🪖", image: "images/items/demon-hunter-mask.webp", name: { pt: "Máscara Demon Hunter", en: "Demon Hunter Mask" }, stats: { atk: 1, criticalChance: 2, maxFury: -5 } , characterExclusive: "demon-hunter" },
 
     ])
 });
