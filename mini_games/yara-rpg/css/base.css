@@ -115,6 +115,15 @@ body:is(.region-spirit-world, .region-spirit-world-sea) .story-event-choice:hove
  .found-map-image { display: block; width: 100%; max-height: min(52vh, 24rem); object-fit: contain; border-radius: .65rem; border: 1px solid rgba(214,178,102,.45); background: #161613; }
  .found-map-card > p:last-child { margin: .8rem 0 0; color: #d3cbb9; font-size: .88rem; line-height: 1.5; }
  @keyframes found-map-card-in { to { transform: translateY(0) scale(1); } }
+ .passive-reward-toast[hidden] { display: none; }
+ .passive-reward-toast { position: fixed; z-index: 126; inset: 0; display: grid; place-items: center; padding: 1rem; background: rgba(5, 8, 7, .78); opacity: 0; }
+ .passive-reward-toast-visible { animation: region-arrival-fade-in .2s ease-out forwards; }
+ .passive-reward-card { position: relative; width: min(100%, 31rem); padding: 1.25rem; border: 1px solid rgba(167, 139, 250, .82); border-radius: 1rem; background: radial-gradient(ellipse at 50% 0%, rgba(91, 55, 135, .32), transparent 60%), linear-gradient(145deg, rgba(31, 27, 40, .99), rgba(18, 20, 18, .99)); box-shadow: 0 1rem 3rem rgba(0,0,0,.65); color: #f3e8cf; text-align: center; transform: translateY(.6rem) scale(.98); animation: found-map-card-in .3s ease-out forwards; }
+ .passive-reward-card h2 { margin: 0 2rem .65rem; font-size: 1.35rem; color: #ddd6fe; }
+ .passive-reward-card > p:not(.found-map-kicker) { margin: .65rem 0 0; color: #d3cbb9; font-size: .88rem; line-height: 1.5; }
+ .passive-reward-card .found-map-kicker { color: #c4b5fd; }
+ .passive-reward-icon { margin: .45rem auto .35rem; font-size: 2.8rem; line-height: 1.2; }
+ .passive-reward-card .passive-reward-penalty { padding-top: .65rem; border-top: 1px solid rgba(167, 139, 250, .28); color: #fca5a5; }
 @keyframes region-objective-toast-in { to { transform: translate(-50%, 0); opacity: 1; } }
 .final-boss-gate { text-align: center; border-color: rgba(194, 72, 56, .8); background: radial-gradient(ellipse at 50% 0%, rgba(112, 35, 31, .34), transparent 62%), linear-gradient(145deg, rgba(37, 25, 25, .98), rgba(15, 16, 18, .98)); }
 .final-boss-gate .ending-emblem { margin-bottom: .35rem; }

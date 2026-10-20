@@ -171,6 +171,10 @@
     margin: 0;
 }
 .mobile-character-panel-dialog .hero-attribute-stats { margin-inline: 0; }
+.mobile-character-panel-dialog #mobile-character-panel-content .passive-skills-section {
+    grid-column: 1 / -1;
+    margin-inline: 0;
+}
 .item-drop-dialog::backdrop {
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(4px);

@@ -25,12 +25,33 @@ const BASE_CHARACTER_STATS = Object.freeze({
     maxXp: 30
 });
 
+const STARTING_PASSIVE_SKILLS = Object.freeze([
+    "mist-blade",
+    "vital-reservoir",
+    "deep-reserve",
+    "electric-shock",
+    "sure-aim",
+    "stone-skin",
+    "swift-step",
+    "spectral-parry"
+]);
+
+const STARTING_MONSTER_PACTS = Object.freeze([
+    "frail-monsters",
+    "weakened-monsters",
+    "dulled-monsters",
+    "sluggish-monsters",
+    "unsteady-monsters"
+]);
+
 window.YaraRpgData.characters = Object.freeze([
     {
         id: "zeph",
         name: "Zeph",
         startingEquipment: ["hunter-dagger", "leather-armor", "rope","swift-boots"],
         startingEquipmentInventory: [],
+        startingPassiveSkills: [],
+        startingMonsterPacts: [],
         image: "images/characters/zeph.webp",
         icon: "🌿",
         baseStats: BASE_CHARACTER_STATS,
@@ -80,6 +101,8 @@ window.YaraRpgData.characters = Object.freeze([
         name: "Oskar",
         startingEquipment: ["hunter-axe", "wooden-shield", "leather-armor"],
         startingEquipmentInventory: ["double-headed-axe"],
+        startingPassiveSkills: [],
+        startingMonsterPacts: [],
         image: "images/characters/oskar.webp",
         icon: "🪓",
         baseStats: BASE_CHARACTER_STATS,
@@ -128,6 +151,8 @@ window.YaraRpgData.characters = Object.freeze([
         name: "Yara",
         startingEquipment: ["hunter-bow", "night-cloak", "fury-seal","swift-boots"],
         startingEquipmentInventory: ["hunter-dagger","wooden-shield"],
+        startingPassiveSkills: [],
+        startingMonsterPacts: [],
         image: "images/characters/yara.webp",
         icon: "🗡️",
         baseStats: BASE_CHARACTER_STATS,

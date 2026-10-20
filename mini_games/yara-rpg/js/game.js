@@ -207,6 +207,20 @@ function startAdventure({ character, equipment }) {
         if (!item) throw new Error(`Unknown starting inventory equipment for ${character.id}: ${id}`);
         return createEquipmentInstance(item, GAME_RULES.loot.equipmentRarities[0]);
     });
+    hero.passiveSkills = (character.startingPassiveSkills || []).map((id) => {
+        const skill = MIST_CONTACT_DATA.passiveSkills.find((entry) => entry.id === id);
+        if (!skill) throw new Error(`Unknown starting passive skill for ${character.id}: ${id}`);
+        const currentValue = Number(hero[skill.stat]) || 0;
+        hero[skill.stat] = skill.max === undefined
+            ? currentValue + skill.amount
+            : Math.min(skill.max, currentValue + skill.amount);
+        return skill.id;
+    });
+    hero.monsterPacts = (character.startingMonsterPacts || []).map((id) => {
+        const pact = MIST_CONTACT_DATA.pacts.find((entry) => entry.id === id);
+        if (!pact) throw new Error(`Unknown starting monster pact for ${character.id}: ${id}`);
+        return pact.id;
+    });
 
     hero.hp = getEffectiveStat("maxHp");
     hero.foco = getEffectiveStat("maxFoco");

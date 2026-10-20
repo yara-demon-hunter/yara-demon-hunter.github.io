@@ -9,6 +9,16 @@
             <p id="found-map-description"></p>
         </article>
     </aside>
+    <aside id="passive-reward-toast" class="passive-reward-toast" role="dialog" aria-modal="true" aria-live="assertive" aria-labelledby="passive-reward-title" hidden>
+        <article class="passive-reward-card">
+            <button id="passive-reward-close" type="button" class="found-map-close" onclick="dismissPassiveReward()">×</button>
+            <p id="passive-reward-kicker" class="found-map-kicker"></p>
+            <div id="passive-reward-icon" class="passive-reward-icon" aria-hidden="true"></div>
+            <h2 id="passive-reward-title"></h2>
+            <p id="passive-reward-description"></p>
+            <p id="passive-reward-penalty" class="passive-reward-penalty" hidden></p>
+        </article>
+    </aside>
     <section id="region-arrival-transition" class="region-arrival-transition" hidden role="status" aria-live="polite" aria-labelledby="region-arrival-title">
         <div id="region-arrival-scene" class="region-arrival-scene" data-region="dark-forest">
             <div class="region-arrival-art" aria-hidden="true">

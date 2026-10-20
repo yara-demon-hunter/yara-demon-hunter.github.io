@@ -5,6 +5,7 @@ let regionArrivalTimeout = null;
 let regionObjectiveToastTimeout = null;
 const regionObjectiveToastQueue = [];
 let foundMapToastTimeout = null;
+let passiveRewardToastTimeout = null;
 
 function getCurrentRegionData() {
     if (!isInSpiritWorld) return GAME_DATA.regions[currentRegion];
@@ -245,6 +246,35 @@ function dismissFoundMap() {
     if (foundMapToastTimeout !== null) clearTimeout(foundMapToastTimeout);
     foundMapToastTimeout = null;
     toast.classList.remove('found-map-toast-visible');
+    toast.hidden = true;
+}
+
+function showPassiveReward(type, reward, penalty = '') {
+    const toast = document.getElementById('passive-reward-toast');
+    const penaltyElement = document.getElementById('passive-reward-penalty');
+    document.getElementById('passive-reward-kicker').textContent = t(
+        type === 'pact' ? 'passiveRewardPactKicker' : 'passiveRewardSkillKicker'
+    );
+    document.getElementById('passive-reward-icon').textContent = reward.icon || (type === 'pact' ? '🩸' : '✨');
+    document.getElementById('passive-reward-title').textContent = reward.name[gameLanguage];
+    document.getElementById('passive-reward-description').textContent = reward.description[gameLanguage];
+    document.getElementById('passive-reward-close').setAttribute('aria-label', t('passiveRewardClose'));
+    penaltyElement.hidden = !penalty;
+    penaltyElement.textContent = penalty ? t('passiveRewardPenalty', { penalty }) : '';
+    toast.hidden = false;
+    toast.classList.remove('passive-reward-toast-visible');
+    void toast.offsetWidth;
+    toast.classList.add('passive-reward-toast-visible');
+    if (passiveRewardToastTimeout !== null) clearTimeout(passiveRewardToastTimeout);
+    passiveRewardToastTimeout = window.setTimeout(dismissPassiveReward, 6000);
+}
+
+function dismissPassiveReward() {
+    const toast = document.getElementById('passive-reward-toast');
+    if (!toast) return;
+    if (passiveRewardToastTimeout !== null) clearTimeout(passiveRewardToastTimeout);
+    passiveRewardToastTimeout = null;
+    toast.classList.remove('passive-reward-toast-visible');
     toast.hidden = true;
 }
 
@@ -862,6 +892,7 @@ function resolvePactOffer() {
         description: pact.description[gameLanguage],
         penalty: penaltyDescription
     }), 'special');
+    showPassiveReward('pact', pact, penaltyDescription);
     completeRegionObjective('story');
     updateUI();
 }
@@ -960,6 +991,7 @@ function acceptMistContact() {
             skill: passiveSkill.name[gameLanguage],
             description: passiveSkill.description[gameLanguage]
         }), 'special');
+        showPassiveReward('skill', passiveSkill);
         completeRegionObjective('story');
         updateUI();
         return;
