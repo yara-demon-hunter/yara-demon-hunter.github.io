@@ -49,7 +49,7 @@ window.YaraRpgData.characters = Object.freeze([
         id: "zeph",
         name: "Zeph",
         startingEquipment: ["hunter-dagger", "leather-armor", "rope","swift-boots"],
-        startingEquipmentInventory: new Array(12).fill("rope"),
+        startingEquipmentInventory: [],
         startingPassiveSkills: [],
         startingMonsterPacts: [],
         image: "images/characters/zeph.webp",
