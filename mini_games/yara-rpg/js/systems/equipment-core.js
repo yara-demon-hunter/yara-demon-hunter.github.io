@@ -169,6 +169,12 @@ function handleEquipmentDrop(item) {
         item: getEquipmentDisplayName(item),
         slot: getEquipmentSlotLabel(item)
     }), 'loot');
+    if (getEquipmentConflicts(item).length === 0) {
+        if (equipItem(item, false)) {
+            showEquipmentItemDetails(item, 'equipped', item.slot);
+            return;
+        }
+    }
     showEquipmentChoice(item, false);
 }
 

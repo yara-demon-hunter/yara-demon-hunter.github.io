@@ -19,7 +19,7 @@ document.getElementById('equipment-item-dialog').addEventListener('close', () =>
     selectedEquipmentDetails = null;
 });
 document.getElementById('equipment-bag-dialog').addEventListener('cancel', (event) => {
-    if (isPendingDropBlocked()) {
+    if (isPendingDropWaitingForSpace()) {
         event.preventDefault();
         openEquipmentBag();
     } else if (pendingEquipment && !pendingEquipment.fromInventory) {
@@ -182,6 +182,10 @@ function renderEquipment() {
             itemIcon.setAttribute('aria-hidden', 'true');
             itemButton.append(itemIcon);
             itemButton.addEventListener('click', () => {
+                if (pendingEquipment && !pendingEquipment.fromInventory) {
+                    showEquipmentItemDetails(item, 'inventory');
+                    return;
+                }
                 document.getElementById('equipment-bag-dialog').close();
                 showEquipmentChoice(item, true);
             });
@@ -382,10 +386,24 @@ function discardSelectedInventoryItem() {
 }
 
 function closeEquipmentBag() {
+    if (isPendingDropWaitingForSpace()) {
+        openEquipmentBag();
+        return;
+    }
     document.getElementById('equipment-bag-dialog').close();
     if (pendingEquipment && !pendingEquipment.fromInventory) {
-        showEquipmentChoice(pendingEquipment.item, false);
+        showEquipmentChoice(pendingEquipment.item, false, pendingEquipment.targetSlot);
     }
+}
+
+function resumePendingEquipmentDrop() {
+    if (!pendingEquipment || pendingEquipment.fromInventory || isPendingDropWaitingForSpace()) return;
+    const waitingDrop = pendingEquipment;
+    document.getElementById('equipment-bag-dialog').close();
+    requestAnimationFrame(() => {
+        if (pendingEquipment !== waitingDrop) return;
+        showEquipmentChoice(waitingDrop.item, false, waitingDrop.targetSlot);
+    });
 }
 
 function discardInventoryItem(item) {
@@ -395,10 +413,7 @@ function discardInventoryItem(item) {
     selectedInventoryItems.delete(item);
     logMessage(t('itemDiscarded', { item: getEquipmentDisplayName(item) }), 'loot');
     updateUI();
-    if (pendingEquipment && !pendingEquipment.fromInventory) {
-        document.getElementById('equipment-bag-dialog').close();
-        showEquipmentChoice(pendingEquipment.item, false);
-    }
+    resumePendingEquipmentDrop();
 }
 
 function updateBulkDiscardControls() {
@@ -425,14 +440,15 @@ function discardSelectedInventoryItems() {
     logMessage(t('itemsDiscarded', { count: selectedItems.length }), 'loot');
     updateUI();
 
-    if (hasWaitingDrop && !isPendingDropBlocked()) {
-        document.getElementById('equipment-bag-dialog').close();
-        showEquipmentChoice(pendingEquipment.item, false);
-    }
+    if (hasWaitingDrop) resumePendingEquipmentDrop();
 }
 
 function showEquipmentChoice(item, fromInventory, targetSlot = item.slot) {
     pendingEquipment = { item, fromInventory, targetSlot };
+    if (!fromInventory && hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY) {
+        openEquipmentBag();
+        return;
+    }
     const candidate = targetSlot === item.slot ? item : { ...item, slot: targetSlot };
     const conflicts = getEquipmentConflicts(candidate);
     const currentItems = conflicts.map(({ item: equippedItem }) => equippedItem);
@@ -598,6 +614,12 @@ function isPendingDropBlocked() {
         ? pendingEquipment.item
         : { ...pendingEquipment.item, slot: pendingEquipment.targetSlot };
     return inventoryAfterEquip + getEquipmentConflicts(candidate).length > EQUIPMENT_BAG_CAPACITY;
+}
+
+function isPendingDropWaitingForSpace() {
+    if (!pendingEquipment || pendingEquipment.fromInventory) return false;
+    return hero.equipmentInventory.length >= EQUIPMENT_BAG_CAPACITY
+        || isPendingDropBlocked();
 }
 
 
