@@ -118,6 +118,26 @@ function playHeroBuffEffect(buffType) {
     window.setTimeout(() => target.classList.remove(effectClass), 1500);
 }
 
+function healFromLifeSteal(damageDealt) {
+    const lifeStealPercent = Number(selectedCharacter?.passive?.lifeStealPercent) || 0;
+    if (lifeStealPercent <= 0 || damageDealt <= 0) return 0;
+
+    const maxHp = getEffectiveStat('maxHp');
+    if (hero.hp >= maxHp) {
+        hero.lifeStealRemainder = 0;
+        return 0;
+    }
+
+    const accumulatedHealing = Math.max(0, Number(hero.lifeStealRemainder) || 0)
+        + damageDealt * lifeStealPercent / 100;
+    const wholeHealing = Math.floor(accumulatedHealing);
+    hero.lifeStealRemainder = accumulatedHealing - wholeHealing;
+    const healed = Math.min(wholeHealing, maxHp - hero.hp);
+    hero.hp += healed;
+    if (hero.hp >= maxHp) hero.lifeStealRemainder = 0;
+    return healed;
+}
+
 function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0, isCritical = false, isHeavyAttack = false) {
     if (!inCombat || !currentMonster) return;
     combatActionLocked = true;
@@ -128,6 +148,11 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
     const damageDealt = Math.min(currentMonster.hp, damage);
     currentMonster.hp -= damageDealt;
     showFloatingDamage('monster-icon', damageDealt, isCritical ? 'critical-monster' : 'monster');
+    const lifeStealHealing = healFromLifeSteal(damageDealt);
+    if (lifeStealHealing > 0) {
+        showFloatingDamage('hero-hp-anchor', lifeStealHealing, 'heal', 0, 0, '+');
+        logMessage(t('lifeStealHealed', { amount: lifeStealHealing }), 'special');
+    }
     if (isCritical) playCriticalImpact();
     else if (isHeavyAttack) playHeavyAttackImpact();
     const furyGained = Math.min(getEffectiveFuryThreshold() - hero.fury, Math.floor(damageDealt * furyMultiplier));

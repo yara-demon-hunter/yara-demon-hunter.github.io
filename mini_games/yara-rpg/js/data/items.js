@@ -23,7 +23,7 @@ window.YaraRpgData.items = Object.freeze({
         { id: "forest-dog", slot: "pet", icon: "🐕", image: "images/items/forest-dog.webp", name: { pt: "Cão da Trilha", en: "Trail Hound" }, stats: { atk: 1, evasion: 2, parry: 1 }, starter: true },
         { id: "shadow-cat", slot: "pet", icon: "🐈", image: "images/items/shadow-cat.webp", name: { pt: "Gato Sombrio", en: "Shadow Cat" }, stats: { evasion: 3, stunChance: 1 }, starter: true },
         { id: "wild-horse", slot: "pet", icon: "🐎", image: "images/items/wild-horse.webp", name: { pt: "Cavalo Selvagem", en: "Wild Horse" }, stats: { maxHp: 20, maxFoco: 10, evasion: 1 }, starter: true },
-        { id: "fury-seal", slot: "accessory", icon: "🩸", name: { pt: "Selo da Fúria", en: "Fury Seal" }, stats: { maxFury: -10, criticalChance: 5 }, starter: true },
+        { id: "fury-seal", slot: "accessory", icon: "🩸", image: "images/items/fury-seal.webp", name: { pt: "Selo da Fúria", en: "Fury Seal" }, stats: { maxFury: -10, criticalChance: 5 }, starter: true },
         // Starter False below
         { id: "raven", slot: "pet", icon: "🐦‍⬛", image: "images/items/raven.webp", name: { pt: "Corvo", en: "Raven" }, stats: { evasion: 2, stunChance: 2 }, starter: false  },
         { id: "demonic-flute", slot: "accessory", icon: "🪈", image: "images/items/demonic-flute.webp", name: { pt: "Flauta Demoníaca", en: "Demonic Flute" }, stats: { atk: 1, stunChance: 3 }, starter: false },
@@ -43,8 +43,8 @@ window.YaraRpgData.items = Object.freeze({
         { id: "demon-hunter-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "⚔️", image: "images/items/demon-hunter-sword.webp", name: { pt: "Espada Demon Hunter", en: "Demon Hunter Sword" }, stats: { atk: 8, criticalChance: 4, maxFury: -10 }, characterExclusive: "demon-hunter" },
         { id: "demon-hunter-cloak", slot: "cloak", icon: "🧥", image: "images/items/demon-hunter-cloak.webp", name: { pt: "Capa Demon Hunter", en: "Demon Hunter Cloak" }, stats: { evasion: 5, stunChance: 2, maxFury: -10 }, characterExclusive: "demon-hunter" },
         { id: "demon-hunter-mask", slot: "head", icon: "🪖", image: "images/items/demon-hunter-mask.webp", name: { pt: "Máscara Demon Hunter", en: "Demon Hunter Mask" }, stats: { atk: 1, criticalChance: 2, maxFury: -5 } , characterExclusive: "demon-hunter" },
-        { id: "spirit-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🗡️", image: "images/items/spirit-sword.webp", name: { pt: "Espada Espiritual", en: "Spirit Sword" }, stats: { atk: 6, criticalChance: 3, stunChance: 2 }, characterExclusive: "mysterious-creature" },
-        { id: "bandana", slot: "head", icon: "🥷", image: "images/items/bandana.webp", name: { pt: "Bandana Misteriosa", en: "Mysterious Bandana" }, stats: { def: 1, evasion: 3, maxFoco: 10 }, characterExclusive: "mysterious-creature" },
+        { id: "spirit-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🗡️", image: "images/items/spirit-sword.webp", name: { pt: "Espada Espiritual", en: "Spirit Sword" }, stats: { atk: 8, criticalChance: 3, stunChance: 5 }, characterExclusive: "mysterious-creature" },
+        { id: "bandana", slot: "head", icon: "🥷", image: "images/items/bandana.webp", name: { pt: "Bandana Misteriosa", en: "Mysterious Bandana" }, stats: { maxFoco: 30, stunChance: 5 }, characterExclusive: "mysterious-creature" },
 
     ])
 });

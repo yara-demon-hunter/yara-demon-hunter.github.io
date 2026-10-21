@@ -32,6 +32,7 @@ window.YaraRpgTranslations.en = {
         continueAdventure: "Continue saved journey",
         storyEventKicker: "Choose your path",
         enemyTelegraph: "⚠️ {monster} is preparing a devastating strike!",
+        lifeStealHealed: "🩸 The creature drained {amount} HP from its enemy.",
         campaignVictoryTitle: "Journey complete",
         campaignVictoryDescription: "You defeated Gudran and freed the castle from the mist. Demon Hunter is unlocked for new journeys.",
         campaignDefeatTitle: "The mist won this time",

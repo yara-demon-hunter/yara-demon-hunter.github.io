@@ -255,7 +255,7 @@ window.YaraRpgData.characters = Object.freeze([
         id: "mysterious-creature",
         name: "Mysterious Creature",
         unlocked: false,
-        startingEquipment: ["spirit-sword", "bandana"],
+        startingEquipment: ["spirit-sword", "bandana", "demonic-flute"],
         startingEquipmentInventory: [],
         startingPassiveSkills: [],
         startingMonsterPacts: [],
@@ -267,21 +267,24 @@ window.YaraRpgData.characters = Object.freeze([
             en: "An enigmatic creature that channels spirit energy through its sword."
         },
         passive: {
-            id: "mysterious-creature-spirit-resonance",
-            icon: "✨",
-            name: { pt: "Ressonância espiritual", en: "Spirit Resonance" },
-            description: { pt: "+10% de dano crítico.", en: "+10% critical damage." },
-            statBonusPercent: { criticalDamage: 10 }
+            id: "mysterious-creature-spirit-siphon",
+            icon: "🩸",
+            name: { pt: "Dreno espiritual", en: "Spirit Siphon" },
+            description: {
+                pt: "Drena 10% do dano causado e converte em HP.",
+                en: "Drains 10% of damage dealt and converts it to HP."
+            },
+            lifeStealPercent: 10
         },
         basicStats: {
-            atk: 2,
-            maxFoco: 10,
+            atk: 4,
+            maxFoco: 30,
             criticalChance: 2,
-            stunChance: 2
+            stunChance: 5
         },
         progression: {
-            maxHp: 15,
-            maxFoco: 12,
+            maxHp: 25,
+            maxFoco: 10,
             maxPotions: 1,
             atk: 1,
             def: 0.5,
@@ -291,16 +294,16 @@ window.YaraRpgData.characters = Object.freeze([
             criticalChance: 1
         },
         skills: {
-            heavyAttack: { focoCost: 20, attackMultiplier: 2.1 },
+            heavyAttack: { focoCost: 10, attackMultiplier: 1.8 },
             dodge: { focoCost: 10, bonus: 15 }
         },
         limits: {
             maxEvasion: 60,
-            maxParry: 50,
-            maxStunChance: 45,
-            minFuryThreshold: 40,
-            maxPotions: 6,
-            maxCriticalChance: 40
+            maxParry: 35,
+            maxStunChance: 60,
+            minFuryThreshold: 50,
+            maxPotions: 5,
+            maxCriticalChance: 35
         }
     }
 ]);

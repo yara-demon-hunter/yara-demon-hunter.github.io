@@ -153,6 +153,10 @@ body:is(.region-spirit-world, .region-spirit-world-sea) .story-event-choice:hove
     animation: critical-damage-burst 1.5s cubic-bezier(.16, .84, .3, 1) both;
 }
 .floating-damage-hero { color: #ff3b3b; }
+.floating-damage-heal {
+    left: calc(50% + 1.75rem);
+    color: #86efac;
+}
 .floating-damage-focus { color: #38bdf8; }
 .floating-damage-fury {
     color: #fb923c;

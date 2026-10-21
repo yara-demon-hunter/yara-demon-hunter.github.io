@@ -32,6 +32,7 @@ window.YaraRpgTranslations.pt = {
         continueAdventure: "Continuar jornada salva",
         storyEventKicker: "Escolha seu caminho",
         enemyTelegraph: "⚠️ {monster} prepara um golpe devastador!",
+        lifeStealHealed: "🩸 A criatura drenou {amount} HP do inimigo.",
         campaignVictoryTitle: "Jornada concluída",
         campaignVictoryDescription: "Você derrotou Gudran e libertou o castelo da névoa. Demon Hunter foi desbloqueado para novas jornadas.",
         campaignDefeatTitle: "A névoa venceu esta vez",
