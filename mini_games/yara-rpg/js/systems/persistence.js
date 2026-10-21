@@ -175,7 +175,9 @@ function loadSavedGame(snapshot = readSavedGame()) {
     if (interruptedCombat && !gameOver) logMessage(t('denseMist'), 'normal');
     document.getElementById('game-main').hidden = false;
     document.getElementById('character-setup').hidden = true;
-    updateUI(); saveGame(); startGameMusic();
+    updateUI();
+    if (isInSpiritWorld) advanceSpiritRegionIfComplete();
+    saveGame(); startGameMusic();
     return true;
 }
 

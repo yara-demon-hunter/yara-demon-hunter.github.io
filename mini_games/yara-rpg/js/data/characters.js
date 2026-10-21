@@ -250,5 +250,57 @@ window.YaraRpgData.characters = Object.freeze([
             maxPotions: 5,
             maxCriticalChance: 50
         }
+    },
+    {
+        id: "mysterious-creature",
+        name: "Mysterious Creature",
+        unlocked: false,
+        startingEquipment: ["spirit-sword", "bandana"],
+        startingEquipmentInventory: [],
+        startingPassiveSkills: [],
+        startingMonsterPacts: [],
+        image: "images/characters/mysterious_creature.webp",
+        icon: "👁️",
+        baseStats: BASE_CHARACTER_STATS,
+        description: {
+            pt: "Uma criatura enigmática que canaliza energia espiritual em sua espada.",
+            en: "An enigmatic creature that channels spirit energy through its sword."
+        },
+        passive: {
+            id: "mysterious-creature-spirit-resonance",
+            icon: "✨",
+            name: { pt: "Ressonância espiritual", en: "Spirit Resonance" },
+            description: { pt: "+10% de dano crítico.", en: "+10% critical damage." },
+            statBonusPercent: { criticalDamage: 10 }
+        },
+        basicStats: {
+            atk: 2,
+            maxFoco: 10,
+            criticalChance: 2,
+            stunChance: 2
+        },
+        progression: {
+            maxHp: 15,
+            maxFoco: 12,
+            maxPotions: 1,
+            atk: 1,
+            def: 0.5,
+            evasion: 1,
+            parry: 0.5,
+            stunChance: 1,
+            criticalChance: 1
+        },
+        skills: {
+            heavyAttack: { focoCost: 20, attackMultiplier: 2.1 },
+            dodge: { focoCost: 10, bonus: 15 }
+        },
+        limits: {
+            maxEvasion: 60,
+            maxParry: 50,
+            maxStunChance: 45,
+            minFuryThreshold: 40,
+            maxPotions: 6,
+            maxCriticalChance: 40
+        }
     }
 ]);

@@ -558,6 +558,28 @@ function areCurrentRegionObjectivesComplete(region = getCurrentRegionData()) {
     );
 }
 
+function advanceSpiritRegionIfComplete() {
+    if (!isInSpiritWorld || inCombat || gameOver || campaignComplete
+        || pendingStoryEvent || pendingMistContact || pendingChest
+        || !areCurrentRegionObjectivesComplete()) return false;
+
+    const currentSpiritIndex = GAME_DATA.spiritRegions.findIndex(
+        (region) => region.id === currentSpiritRegionId
+    );
+    const nextSpiritRegion = GAME_DATA.spiritRegions[currentSpiritIndex + 1];
+    if (!nextSpiritRegion) return false;
+
+    currentSpiritRegionId = nextSpiritRegion.id;
+    regionEntryLevels[nextSpiritRegion.id] = hero.level;
+    explorationsSinceStoryEvent = 0;
+    explorationCount = 0;
+    playSound('regionDiscovered');
+    logMessage(t('regionArrival', { region: nextSpiritRegion.title[gameLanguage] }), 'discovery');
+    showRegionArrival(nextSpiritRegion);
+    updateUI();
+    return true;
+}
+
 function completeRegionObjective(objectiveId, deferRegionUnlock = false) {
     completeRegionObjectives([objectiveId], deferRegionUnlock);
 }
@@ -600,7 +622,12 @@ function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
     const allTasksComplete = getRegionObjectiveRequirements(region).every((task) =>
         getRegionObjectiveTaskProgress(task, region) >= task.required
     );
-    if (isInSpiritWorld || deferRegionUnlock || !allTasksComplete || currentRegion >= GAME_DATA.regions.length - 1) return;
+    if (!allTasksComplete) return;
+    if (isInSpiritWorld) {
+        if (!deferRegionUnlock) advanceSpiritRegionIfComplete();
+        return;
+    }
+    if (deferRegionUnlock || currentRegion >= GAME_DATA.regions.length - 1) return;
 
     currentRegion++;
     if (!discoveredRegions.includes(currentRegion)) discoveredRegions.push(currentRegion);
