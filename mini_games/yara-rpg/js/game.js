@@ -51,15 +51,8 @@ const GAME_RULES = GAME_DATA.rules;
 const EXPLORATION_RULES = GAME_DATA.exploration;
 const ITEM_DATA = GAME_DATA.items;
 const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
-const SPIRIT_EYE_PASSIVE = Object.freeze({
-    id: "spirit-eye-treasure-sense",
-    iconImage: "images/exploration_icons/spirit-eye-open.webp",
-    name: { pt: "Olho Espiritual", en: "Spirit Eye" },
-    description: {
-        pt: "+5 pontos percentuais na chance de encontrar um baú.",
-        en: "+5 percentage points to the chance of finding a chest."
-    }
-});
+const PASSIVE_SKILL_DATA = GAME_DATA.passiveSkills;
+const SPIRIT_EYE_PASSIVE = PASSIVE_SKILL_DATA.spiritEye;
 const SPECIAL_MONSTERS = GAME_DATA.specialMonsters;
 const MIST_CONTACT_SYSTEM = window.YaraMistContactSystem;
 
@@ -219,7 +212,7 @@ function startAdventure({ character, equipment }) {
         return createEquipmentInstance(item, GAME_RULES.loot.equipmentRarities[0]);
     });
     hero.passiveSkills = (character.startingPassiveSkills || []).map((id) => {
-        const skill = MIST_CONTACT_DATA.passiveSkills.find((entry) => entry.id === id);
+        const skill = PASSIVE_SKILL_DATA.skills.find((entry) => entry.id === id);
         if (!skill) throw new Error(`Unknown starting passive skill for ${character.id}: ${id}`);
         const currentValue = Number(hero[skill.stat]) || 0;
         hero[skill.stat] = skill.max === undefined
@@ -228,7 +221,7 @@ function startAdventure({ character, equipment }) {
         return skill.id;
     });
     hero.monsterPacts = (character.startingMonsterPacts || []).map((id) => {
-        const pact = MIST_CONTACT_DATA.pacts.find((entry) => entry.id === id);
+        const pact = PASSIVE_SKILL_DATA.pacts.find((entry) => entry.id === id);
         if (!pact) throw new Error(`Unknown starting monster pact for ${character.id}: ${id}`);
         return pact.id;
     });

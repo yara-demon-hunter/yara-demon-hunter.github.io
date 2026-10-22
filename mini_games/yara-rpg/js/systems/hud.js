@@ -226,8 +226,8 @@ function updateUI() {
     const attributesPanel = document.getElementById('hero-attributes');
     attributesShortcut?.classList.toggle('has-upgrade', sp > 0);
     attributesPanel?.classList.toggle('has-upgrade', sp > 0);
-    const unlockedPassiveSkills = MIST_CONTACT_DATA.passiveSkills.filter((skill) => hero.passiveSkills.includes(skill.id));
-    const unlockedPacts = MIST_CONTACT_DATA.pacts.filter((pact) => hero.monsterPacts.includes(pact.id));
+    const unlockedPassiveSkills = PASSIVE_SKILL_DATA.skills.filter((skill) => hero.passiveSkills.includes(skill.id));
+    const unlockedPacts = PASSIVE_SKILL_DATA.pacts.filter((pact) => hero.monsterPacts.includes(pact.id));
     const unlockedSpiritEye = hero.spiritWorldUnlocked ? [SPIRIT_EYE_PASSIVE] : [];
     const passiveSkills = [selectedCharacter.passive, ...unlockedPassiveSkills, ...unlockedPacts, ...unlockedSpiritEye].filter(Boolean);
     const passiveSkillIcons = document.getElementById('passive-skill-icons');
@@ -592,10 +592,10 @@ function showPassiveDetails(passiveId) {
     const characterPassive = selectedCharacter.passive?.id === passiveId
         ? selectedCharacter.passive
         : null;
-    const mistSkill = MIST_CONTACT_DATA.passiveSkills.find((entry) =>
+    const mistSkill = PASSIVE_SKILL_DATA.skills.find((entry) =>
         entry.id === passiveId && hero.passiveSkills.includes(entry.id)
     );
-    const pact = MIST_CONTACT_DATA.pacts.find((entry) =>
+    const pact = PASSIVE_SKILL_DATA.pacts.find((entry) =>
         entry.id === passiveId && hero.monsterPacts.includes(entry.id)
     );
     const skill = characterPassive || mistSkill || pact

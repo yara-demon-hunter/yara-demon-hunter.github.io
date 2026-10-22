@@ -9,7 +9,8 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `spiritual-contacts.js`: contatos espirituais placeholder em `spiritualContacts.contacts`, seguindo o agrupamento de `mistContacts.contacts`; não participam do sorteio nem executam efeitos.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.
 - `special-monsters.js`: atributos, nível mínimo e recompensas dos chefes e monstros especiais usados em eventos.
-- `mist-contacts.js`: contatos com ícones e ofertas próprias, skills passivas (`passiveSkills`), pactos que enfraquecem monstros (`pacts`) e efeitos especiais de contato (`onAccept`). Cada skill/pacto tem ID, ícone, nome e descrição em PT/EN. Skills de atributo usam `stat` e `amount`; pactos declaram `monsterStat` e o bônus/penalidade em `amount`. Missões podem referenciar monstros por `bossId`.
+- `mist-contacts.js`: contatos da névoa com ícones, ofertas e efeitos especiais (`onAccept`). Missões podem referenciar monstros por `bossId`.
+- `passive-skills.js`: catálogo de skills passivas, pactos que enfraquecem monstros e a passiva Olho Espiritual. Cada entrada contém nome, descrição e efeito em PT/EN.
 - `special-monsters.js`: atributos, requisitos e recompensas dos chefes e monstros especiais.
 - `world-rules.js`: escala de probabilidade, frequência/resultados dos contatos e custos/recuperação do acampamento.
 - `equipment-rules.js`: chance de drop, raridades e chances especiais para itens de baús, limite da mochila e aprimoramentos.
@@ -18,7 +19,7 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `exploration-rules.js`: chance de descobrir áreas e eventos, intervalo entre eventos narrativos, pesos dos resultados de exploração, recompensas, chance de obter item ao abrir baú e chance de poupar um monstro derrotado.
 - `setup-config.js`: quantidade de equipamentos iniciais escolhidos antes da aventura; ajuste `starterEquipmentCount` para mudar o limite.
 
-A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`; os encontros durante a exploração são tratados em `../systems/exploration.js`. Para ajustar o ritmo, edite `mistContacts` em `world-rules.js`; adicione contatos e skills passivas em `mist-contacts.js` e chefes em `special-monsters.js`. Contatos que iniciam uma missão podem apontar para o `id` de um chefe por `bossId`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos. Todos os monstros usam o mesmo banner e a mesma interface de status durante o combate.
+A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`; os encontros durante a exploração são tratados em `../systems/exploration.js`. Para ajustar o ritmo, edite `mistContacts` em `world-rules.js`; adicione contatos em `mist-contacts.js`, passivas e pactos em `passive-skills.js` e chefes em `special-monsters.js`. Contatos que iniciam uma missão podem apontar para o `id` de um chefe por `bossId`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos. Todos os monstros usam o mesmo banner e a mesma interface de status durante o combate.
 
 A lógica da tela inicial e a seleção dos equipamentos ficam em `../systems/character-setup.js`. O limite de escolhas vem de `setup-config.js`. Os eventos narrativos são declarados em cada região e executados por `resolveStoryEvent` em `../systems/exploration.js`. Os textos PT/EN ficam em `../systems/translations-pt.js` e `../systems/translations-en.js`. Os scripts de dados e sistemas precisam ser carregados antes de `game.js`, que inicia a aventura com as escolhas feitas.
 

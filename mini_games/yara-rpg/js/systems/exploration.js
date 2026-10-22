@@ -54,7 +54,7 @@ function exploreForest() {
             MIST_CONTACT_DATA.contacts,
             hero.level,
             hero,
-            MIST_CONTACT_DATA.pacts,
+            PASSIVE_SKILL_DATA.pacts,
             [...seenMistContacts]
         );
         if (pendingMistContact) {
@@ -837,7 +837,7 @@ function spawnMonster(templateOverride = null) {
         Math.round(value * variation * levelScale)
     );
     const applyMonsterPacts = (stat, value) => {
-        const adjusted = MIST_CONTACT_DATA.pacts
+        const adjusted = PASSIVE_SKILL_DATA.pacts
             .filter((pact) => hero.monsterPacts.includes(pact.id) && pact.monsterStat === stat)
             .reduce((total, pact) => pact.percent
                 ? total * (1 + pact.amount / GAME_RULES.probabilityScale)
@@ -936,7 +936,7 @@ function performSpiritEyeSurgery() {
 }
 
 function resolvePactOffer() {
-    const availablePacts = MIST_CONTACT_DATA.pacts.filter((pact) =>
+    const availablePacts = PASSIVE_SKILL_DATA.pacts.filter((pact) =>
         !hero.monsterPacts.includes(pact.id)
     );
     if (!availablePacts.length) {
@@ -1046,7 +1046,7 @@ function acceptMistContact() {
 
     const boss = MIST_CONTACT_SYSTEM.chooseBoss(SPECIAL_MONSTERS, hero.level);
     const passiveSkill = MIST_CONTACT_SYSTEM.choosePassiveSkill(
-        MIST_CONTACT_DATA.passiveSkills,
+        PASSIVE_SKILL_DATA.skills,
         hero.passiveSkills,
         hero
     );
