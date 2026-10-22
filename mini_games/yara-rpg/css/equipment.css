@@ -816,7 +816,7 @@
     z-index: 10;
     bottom: calc(100% + .45rem);
     width: max-content;
-    max-width: min(13rem, 62vw);
+    max-width: min(13rem, calc(100vw - 3rem));
     padding: .42rem .58rem;
     border: 1px solid rgba(230, 205, 151, .8);
     border-radius: .65rem;
@@ -828,14 +828,14 @@
     line-height: 1.35;
     text-align: left;
     white-space: normal;
+    overflow-wrap: anywhere;
     animation: dialogue-bubble-in .2s ease-out both;
     pointer-events: none;
 }
 .character-dialogue-bubble[hidden] { display: none; }
 .hero-dialogue-bubble { left: 0; }
 .monster-dialogue-bubble {
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
     background: rgba(255, 239, 239, .97);
     border-color: rgba(248, 113, 113, .8);
 }
