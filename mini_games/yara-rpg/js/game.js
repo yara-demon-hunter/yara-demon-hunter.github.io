@@ -49,6 +49,7 @@ function createEmptyEquipmentMap() {
 const GAME_DATA = window.YaraRpgData;
 const GAME_RULES = GAME_DATA.rules;
 const EXPLORATION_RULES = GAME_DATA.exploration;
+const DIALOGUE_RULES = GAME_DATA.dialogueRules;
 const ITEM_DATA = GAME_DATA.items;
 const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
 const PASSIVE_SKILL_DATA = GAME_DATA.passiveSkills;
@@ -236,6 +237,7 @@ function startAdventure({ character, equipment }) {
     document.getElementById("character-setup").hidden = true;
 
     updateUI();
+    startCharacterDialogues();
     showRegionArrival(getCurrentRegionData());
     saveGame();
     showContinueOption();

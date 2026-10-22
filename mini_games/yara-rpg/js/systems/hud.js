@@ -1,6 +1,96 @@
 // Character/game interface rendering and the scrolling event log.
 // Classic browser script; state is initialized by game.js before user actions run.
 
+let characterDialogueTimeout = null;
+let characterBubbleTimeout = null;
+let lastDialogueSpeaker = null;
+let lastDialogueContext = null;
+
+function hideCharacterDialogueBubbles() {
+    window.clearTimeout(characterBubbleTimeout);
+    document.querySelectorAll('.character-dialogue-bubble').forEach((bubble) => {
+        bubble.hidden = true;
+        bubble.textContent = '';
+    });
+}
+
+function getDialogueDelay(interval) {
+    return interval.minimumMs + Math.random() * (interval.maximumMs - interval.minimumMs);
+}
+
+function getCharacterDialogueContext() {
+    if (!selectedCharacter || gameOver || campaignComplete
+        || document.getElementById('game-main')?.hidden
+        || document.hidden) return null;
+
+    if (pendingStoryEvent || pendingMistContact || pendingChest || pendingEquipment) return null;
+    if (document.querySelector('dialog[open]')) return null;
+    if (inCombat && currentMonster) return 'combat';
+    return 'exploration';
+}
+
+function showCharacterDialogueBubble(speaker, lines) {
+    if (!Array.isArray(lines) || lines.length === 0) return;
+    const bubbleId = speaker === 'hero' ? 'hero-dialogue-bubble' : 'monster-dialogue-bubble';
+    const bubble = document.getElementById(bubbleId);
+    if (!bubble) return;
+    document.querySelectorAll('.character-dialogue-bubble').forEach((otherBubble) => {
+        otherBubble.hidden = true;
+        otherBubble.textContent = '';
+    });
+    const line = lines[Math.floor(Math.random() * lines.length)];
+    bubble.textContent = line;
+    bubble.hidden = false;
+    window.clearTimeout(characterBubbleTimeout);
+    characterBubbleTimeout = window.setTimeout(() => {
+        bubble.hidden = true;
+        bubble.textContent = '';
+    }, DIALOGUE_RULES.bubbleDurationMs);
+}
+
+function scheduleCharacterDialogue() {
+    const context = getCharacterDialogueContext();
+    if (!context) {
+        hideCharacterDialogueBubbles();
+        characterDialogueTimeout = window.setTimeout(
+            scheduleCharacterDialogue,
+            getDialogueDelay(DIALOGUE_RULES.inactiveRetry)
+        );
+        return;
+    }
+    const speakers = [];
+    if (Array.isArray(selectedCharacter?.dialogues?.[context]?.[gameLanguage])) speakers.push('hero');
+    if (context === 'combat' && Array.isArray(currentMonster.dialogues?.[gameLanguage])) {
+        speakers.push('monster');
+    }
+    if (speakers.length) {
+        const availableSpeakers = speakers.length > 1 && context === lastDialogueContext
+            ? speakers.filter((speaker) => speaker !== lastDialogueSpeaker)
+            : speakers;
+        const speaker = availableSpeakers[Math.floor(Math.random() * availableSpeakers.length)];
+        const lines = speaker === 'hero'
+            ? selectedCharacter.dialogues[context][gameLanguage]
+            : currentMonster.dialogues[gameLanguage];
+        showCharacterDialogueBubble(speaker, lines);
+        lastDialogueSpeaker = speaker;
+        lastDialogueContext = context;
+    }
+    const nextDelay = getDialogueDelay(DIALOGUE_RULES[context].interval);
+    characterDialogueTimeout = window.setTimeout(scheduleCharacterDialogue, nextDelay);
+}
+
+function startCharacterDialogues(initialDelay = DIALOGUE_RULES.exploration.initialDelayMs) {
+    window.clearTimeout(characterDialogueTimeout);
+    hideCharacterDialogueBubbles();
+    lastDialogueSpeaker = null;
+    lastDialogueContext = null;
+    characterDialogueTimeout = window.setTimeout(scheduleCharacterDialogue, initialDelay);
+}
+
+function startCombatDialogue() {
+    startCharacterDialogues(getDialogueDelay(DIALOGUE_RULES.combat.initialDelay));
+}
+
 document.addEventListener('click', (event) => {
     const shortcut = event.target instanceof Element
         ? event.target.closest('[data-open-panel]')
@@ -130,6 +220,10 @@ document.getElementById('mobile-character-panel-dialog')?.addEventListener('clos
 });
 
 function updateUI() {
+    if (gameOver || campaignComplete || document.getElementById('game-main')?.hidden) {
+        window.clearTimeout(characterDialogueTimeout);
+        hideCharacterDialogueBubbles();
+    }
     document.getElementById('hero-name').innerText = hero.name;
     const heroPortrait = document.getElementById('hero-portrait');
     const characterImage = selectedCharacter?.image;

@@ -853,6 +853,7 @@ function spawnMonster(templateOverride = null) {
         name: template.name[gameLanguage],
         icon: template.icon,
         image: template.image || null,
+        dialogues: template.dialogues || null,
         isMistBoss,
         hp: monsterStartingHp,
         maxHp: monsterMaxHp,
@@ -888,6 +889,7 @@ function spawnMonster(templateOverride = null) {
     clearMonsterStunEffect();
     monsterIcon.classList.remove('critical-impact');
     monsterIcon.style.removeProperty('filter');
+    const monsterDialogueBubble = document.getElementById('monster-dialogue-bubble');
     monsterIcon.replaceChildren();
     if (currentMonster.image) {
         const image = document.createElement('img');
@@ -896,18 +898,20 @@ function spawnMonster(templateOverride = null) {
         image.className = 'monster-icon-image';
         image.setAttribute('aria-hidden', 'true');
         image.addEventListener('error', () => {
-            monsterIcon.textContent = currentMonster?.icon || '';
+            image.replaceWith(document.createTextNode(currentMonster?.icon || ''));
         }, { once: true });
         monsterIcon.append(image);
     } else {
         monsterIcon.textContent = currentMonster.icon;
     }
+    if (monsterDialogueBubble) monsterIcon.append(monsterDialogueBubble);
     document.getElementById('monster-hp-bar').style.width = '100%';
     document.getElementById('monster-atk').innerText = currentMonster.atk;
     document.getElementById('monster-def').innerText = currentMonster.def;
     document.getElementById('monster-parry').innerText = currentMonster.parry + '%';
     document.getElementById('monster-evasion').innerText = currentMonster.evasion + '%';
 
+    startCombatDialogue();
     logMessage(t(isMistBoss ? "mistBossAppears" : "monsterAppears", {
         monster: currentMonster.name
     }), "combat-monster");

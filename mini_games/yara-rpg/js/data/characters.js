@@ -55,6 +55,16 @@ window.YaraRpgData.characters = Object.freeze([
         startingMonsterPacts: [],
         image: "images/characters/zeph.webp",
         icon: "🌿",
+        dialogues: {
+            exploration: {
+                pt: ["A mata está quieta demais...", "Tem pegadas recentes por aqui.", "A névoa muda o som da floresta.", "Vamos seguir pela trilha mais segura.", "Ouvi água correndo adiante."],
+                en: ["The forest is too quiet...", "There are fresh tracks here.", "The mist changes the forest's sounds.", "Let's take the safer trail.", "I hear running water ahead."]
+            },
+            combat: {
+                pt: ["Fique perto. A névoa engana os sentidos.", "Já passei por noites piores.", "Ouvi algo entre as árvores.", "Respire fundo. Ainda estamos de pé.", "Não vou deixar você passar."],
+                en: ["Stay close. The mist confuses the senses.", "I've lived through worse nights.", "I heard something in the trees.", "Take a breath. We're still standing.", "I won't let you pass."]
+            }
+        },
         baseStats: BASE_CHARACTER_STATS,
         description: {
             pt: "Sobrevivente atento, acostumado a resistir aos perigos da floresta.",
@@ -107,6 +117,16 @@ window.YaraRpgData.characters = Object.freeze([
         startingMonsterPacts: [],
         image: "images/characters/oskar.webp",
         icon: "🪓",
+        dialogues: {
+            exploration: {
+                pt: ["Trilha longa. Melhor manter o passo.", "Tem madeira boa para uma fogueira por aqui.", "Prefiro um caminho aberto a uma emboscada.", "Quando chegarmos, vou precisar de comida.", "Aquele barulho não me assustou. Só avisando."],
+                en: ["Long trail. Best keep moving.", "There's good firewood around here.", "I prefer an open path to an ambush.", "When we arrive, I'll need food.", "That noise didn't scare me. Just saying."]
+            },
+            combat: {
+                pt: ["Vamos acabar com isso de uma vez.", "Pode vir. Meu machado está pronto.", "Esse golpe vai abrir caminho.", "Já vi monstros maiores.", "Não vou recuar agora."],
+                en: ["Let's end this in one blow.", "Come on. My axe is ready.", "This strike will clear the way.", "I've faced bigger monsters.", "I'm not backing down now."]
+            }
+        },
         baseStats: BASE_CHARACTER_STATS,
         description: {
             pt: "Caçador implacável que prefere encerrar uma luta com um golpe forte.",
@@ -158,6 +178,16 @@ window.YaraRpgData.characters = Object.freeze([
         startingMonsterPacts: [],
         image: "images/characters/yara.webp",
         icon: "🗡️",
+        dialogues: {
+            exploration: {
+                pt: ["A névoa está mais densa nesta direção.", "Preciso descobrir o que aconteceu aqui.", "Sinto algo antigo sob estas árvores.", "Não vou deixar a escuridão decidir por mim.", "Vamos procurar sinais de quem passou por aqui."],
+                en: ["The mist is thicker in this direction.", "I need to find out what happened here.", "I sense something old beneath these trees.", "I won't let the darkness decide for me.", "Let's look for signs of who came this way."]
+            },
+            combat: {
+                pt: ["Eu escolho quem controla este poder.", "A névoa não vai me esconder de você.", "Meu sangue conhece esse tipo de escuridão.", "Fique alerta. Ele está esperando uma brecha.", "Ainda há humanidade em mim. E força também."],
+                en: ["I decide who controls this power.", "The mist won't hide you from me.", "My blood knows this kind of darkness.", "Stay sharp. It's waiting for an opening.", "There's humanity in me still. And strength."]
+            }
+        },
         baseStats: BASE_CHARACTER_STATS,
         description: {
             pt: "Caçadora de demônios mestiça, dividida entre sua natureza humana e o poder demoníaco.",
@@ -210,6 +240,16 @@ window.YaraRpgData.characters = Object.freeze([
         startingMonsterPacts: [],
         image: "images/characters/demon-hunter.webp",
         icon: "⚔️",
+        dialogues: {
+            exploration: {
+                pt: ["Há marcas de demônio nesta região.", "A caçada ainda não terminou.", "Vou examinar as ruínas antes de seguir.", "Cada pista nos aproxima do alvo.", "Mantenha os olhos na trilha."],
+                en: ["There are demon traces in this region.", "The hunt is not over yet.", "I'll inspect the ruins before we move on.", "Every clue brings us closer to the target.", "Keep your eyes on the trail."]
+            },
+            combat: {
+                pt: ["Demônios sempre deixam rastros.", "Já conheço o fim desta caçada.", "Sua força agora será sua ruína.", "A lâmina não hesita. Eu também não.", "Mais um passo rumo à justiça."],
+                en: ["Demons always leave a trail.", "I already know how this hunt ends.", "Your strength will be your undoing.", "The blade does not hesitate. Neither do I.", "One more step toward justice."]
+            }
+        },
         baseStats: BASE_CHARACTER_STATS,
         description: {
             pt: "Caçador lendário que transforma a força dos demônios contra eles mesmos.",
@@ -261,6 +301,16 @@ window.YaraRpgData.characters = Object.freeze([
         startingMonsterPacts: [],
         image: "images/characters/mysterious_creature.webp",
         icon: "👁️",
+        dialogues: {
+            exploration: {
+                pt: ["O vento traz vozes de outro tempo.", "Este lugar já foi diferente.", "A energia espiritual aponta para o norte.", "A névoa esconde algo além da trilha.", "Minha espada vibra perto deste santuário."],
+                en: ["The wind carries voices from another time.", "This place was once different.", "The spirit energy points north.", "The mist hides something beyond the trail.", "My sword hums near this shrine."]
+            },
+            combat: {
+                pt: ["Então parece que meu oponente tem medo de sangrar...", "A névoa sussurra um nome antigo.", "Minha espada se lembra deste lugar.", "Sinto energia espiritual por perto.", "A resposta está além do véu."],
+                en: ["So it seems my opponent is afraid to bleed...", "The mist whispers an ancient name.", "My sword remembers this place.", "I sense spirit energy nearby.", "The answer lies beyond the veil."]
+            }
+        },
         baseStats: BASE_CHARACTER_STATS,
         description: {
             pt: "Uma criatura enigmática que canaliza energia espiritual em sua espada.",

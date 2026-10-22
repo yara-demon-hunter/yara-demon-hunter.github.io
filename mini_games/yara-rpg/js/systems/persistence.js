@@ -179,6 +179,7 @@ function loadSavedGame(snapshot = readSavedGame()) {
     document.getElementById('game-main').hidden = false;
     document.getElementById('character-setup').hidden = true;
     updateUI();
+    startCharacterDialogues();
     if (isInSpiritWorld) advanceSpiritRegionIfComplete();
     saveGame(); startGameMusic();
     return true;
