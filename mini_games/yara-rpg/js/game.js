@@ -51,6 +51,15 @@ const GAME_RULES = GAME_DATA.rules;
 const EXPLORATION_RULES = GAME_DATA.exploration;
 const ITEM_DATA = GAME_DATA.items;
 const MIST_CONTACT_DATA = GAME_DATA.mistContacts;
+const SPIRIT_EYE_PASSIVE = Object.freeze({
+    id: "spirit-eye-treasure-sense",
+    iconImage: "images/exploration_icons/spirit-eye-open.webp",
+    name: { pt: "Olho Espiritual", en: "Spirit Eye" },
+    description: {
+        pt: "+5 pontos percentuais na chance de encontrar um baú.",
+        en: "+5 percentage points to the chance of finding a chest."
+    }
+});
 const SPECIAL_MONSTERS = GAME_DATA.specialMonsters;
 const MIST_CONTACT_SYSTEM = window.YaraMistContactSystem;
 

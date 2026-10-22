@@ -123,6 +123,7 @@ body:is(.region-spirit-world, .region-spirit-world-sea) .story-event-choice:hove
  .passive-reward-card > p:not(.found-map-kicker) { margin: .65rem 0 0; color: #d3cbb9; font-size: .88rem; line-height: 1.5; }
  .passive-reward-card .found-map-kicker { color: #c4b5fd; }
  .passive-reward-icon { margin: .45rem auto .35rem; font-size: 2.8rem; line-height: 1.2; }
+ .passive-reward-icon img { width: 3rem; height: 3rem; object-fit: contain; }
  .passive-reward-card .passive-reward-penalty { padding-top: .65rem; border-top: 1px solid rgba(167, 139, 250, .28); color: #fca5a5; }
 @keyframes region-objective-toast-in { to { transform: translate(-50%, 0); opacity: 1; } }
 .final-boss-gate { text-align: center; border-color: rgba(194, 72, 56, .8); background: radial-gradient(ellipse at 50% 0%, rgba(112, 35, 31, .34), transparent 62%), linear-gradient(145deg, rgba(37, 25, 25, .98), rgba(15, 16, 18, .98)); }

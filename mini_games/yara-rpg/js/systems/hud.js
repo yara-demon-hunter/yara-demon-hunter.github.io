@@ -228,7 +228,8 @@ function updateUI() {
     attributesPanel?.classList.toggle('has-upgrade', sp > 0);
     const unlockedPassiveSkills = MIST_CONTACT_DATA.passiveSkills.filter((skill) => hero.passiveSkills.includes(skill.id));
     const unlockedPacts = MIST_CONTACT_DATA.pacts.filter((pact) => hero.monsterPacts.includes(pact.id));
-    const passiveSkills = [selectedCharacter.passive, ...unlockedPassiveSkills, ...unlockedPacts].filter(Boolean);
+    const unlockedSpiritEye = hero.spiritWorldUnlocked ? [SPIRIT_EYE_PASSIVE] : [];
+    const passiveSkills = [selectedCharacter.passive, ...unlockedPassiveSkills, ...unlockedPacts, ...unlockedSpiritEye].filter(Boolean);
     const passiveSkillIcons = document.getElementById('passive-skill-icons');
     const passiveSkillsEmpty = document.getElementById('passive-skills-empty');
     passiveSkillIcons.replaceChildren();
@@ -237,7 +238,16 @@ function updateUI() {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'passive-skill-icon-button';
-        button.textContent = skill.icon || '✧';
+        if (skill.iconImage) {
+            const icon = document.createElement('img');
+            icon.src = skill.iconImage;
+            icon.alt = '';
+            icon.width = 24;
+            icon.height = 24;
+            button.append(icon);
+        } else {
+            button.textContent = skill.icon || '✧';
+        }
         button.setAttribute('aria-label', t('passiveButtonAria', {
             name: skill.name[gameLanguage],
             description: skill.description[gameLanguage]
@@ -588,10 +598,20 @@ function showPassiveDetails(passiveId) {
     const pact = MIST_CONTACT_DATA.pacts.find((entry) =>
         entry.id === passiveId && hero.monsterPacts.includes(entry.id)
     );
-    const skill = characterPassive || mistSkill || pact;
+    const skill = characterPassive || mistSkill || pact
+        || (hero.spiritWorldUnlocked && SPIRIT_EYE_PASSIVE.id === passiveId ? SPIRIT_EYE_PASSIVE : null);
     if (!skill) return;
     document.getElementById('passive-detail-title').textContent = skill.name[gameLanguage];
-    document.getElementById('passive-detail-icon').textContent = skill.icon || '✧';
+    const iconElement = document.getElementById('passive-detail-icon');
+    iconElement.replaceChildren();
+    if (skill.iconImage) {
+        const image = document.createElement('img');
+        image.src = skill.iconImage;
+        image.alt = '';
+        iconElement.append(image);
+    } else {
+        iconElement.textContent = skill.icon || '✧';
+    }
     document.getElementById('passive-detail-description').textContent = skill.description[gameLanguage];
     const dialog = document.getElementById('passive-detail-dialog');
     if (!dialog.open) dialog.showModal();

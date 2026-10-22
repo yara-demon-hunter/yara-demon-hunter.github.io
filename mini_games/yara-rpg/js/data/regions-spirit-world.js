@@ -104,7 +104,8 @@ window.YaraRpgData.spiritRegions = Object.freeze([
                 { id: "story", title: { pt: "Encontre uma presença no mar.", en: "Encounter a presence at sea." } }
             ]
         },
-        event: [
+        storySequenceCooldownExplorations: 1,
+        storySequence: [
             {
                 id: "spirit-sea-bell",
                 title: { pt: "O sino sob as ondas", en: "The Bell Beneath the Waves" },
@@ -132,8 +133,8 @@ window.YaraRpgData.spiritRegions = Object.freeze([
                     en: "The Drifting Boat" 
                 },
                 description: {
-                    pt: "Um pequeno barco passa pelo oceano de almas.",
-                    en: "A small boat drifts through the ocean of souls."
+                    pt: "Uma pequena embarcação atravessa o oceano de almas. Ao longe, uma luz azul balança sobre o convés.",
+                    en: "A small boat crosses the ocean of souls. In the distance, a blue lantern sways above its deck."
                 },
                 choices: [
                     {
@@ -159,17 +160,17 @@ window.YaraRpgData.spiritRegions = Object.freeze([
                 image: "images/special_monsters/death.webp",
                 title: { pt: "O Barqueiro do Além", en: "The Ferryman of Beyond" },
                 description: {
-                    pt: "Um barco desgastado desliza sobre a névoa. Uma figura encapuzada segura uma foice cuja lâmina se estende em um remo, impulsionando a embarcação sobre um oceano de almas murmurantes.",
-                    en: "A worn boat glides over the fog. A hooded figure holds a scythe whose blade extends into an oar, propelling the vessel over an ocean of whispering souls."
+                    pt: "Depois de desaparecer na névoa, o barco retorna e se aproxima. A figura encapuzada maneja uma foice como remo sobre o oceano de almas murmurantes.",
+                    en: "After vanishing into the mist, the boat returns and draws near. A hooded figure rows with a scythe across the ocean of whispering souls."
                 },
                 choices: [
                     {
-                        label: { pt: "Observar em silêncio", en: "Watch in silence" },
+                        label: { pt: "Chamar o barqueiro", en: "Call to the ferryman" },
                         effect: "spirit-message",
                         messageKey: "spiritWorldReaperObserves"
                     },
                     {
-                        label: { pt: "Desviar o olhar", en: "Look away" },
+                        label: { pt: "Esperar que ele fale", en: "Wait for him to speak" },
                         effect: "spirit-message",
                         messageKey: "spiritWorldReaperPasses"
                     }
@@ -258,8 +259,30 @@ window.YaraRpgData.spiritRegions = Object.freeze([
                         messageKey: "spiritWorldReaperLineDefy"
                     }
                 ]
+            },
+            {
+                id: "spirit-sea-reaper-gift",
+                image: "images/special_monsters/death.webp",
+                title: { pt: "A Dádiva do Barqueiro", en: "The Ferryman's Gift" },
+                description: {
+                    pt: "A Morte observa você por um longo instante. Então, uma luz divina surge entre as almas. 'Se chegou até aqui, é porque o destino ainda tem algo reservado para você. Escolha uma dádiva; as águas decidirão qual relíquia receberá.'",
+                    en: "Death watches you for a long moment. Then, a divine light appears among the souls. 'If you have made it this far, fate still has something in store for you. Choose a gift; the waters will decide which relic you receive.'"
+                },
+                choices: [
+                    {
+                        label: { pt: "Escolher uma arma", en: "Choose a weapon" },
+                        effect: "spirit-god-reward",
+                        itemCategory: "weapon"
+                    },
+                    {
+                        label: { pt: "Escolher outro equipamento", en: "Choose other equipment" },
+                        effect: "spirit-god-reward",
+                        itemCategory: "other"
+                    }
+                ]
             }
-        ]
+        ],
+        event: []
     }
 ]);
 

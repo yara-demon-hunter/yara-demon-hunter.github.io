@@ -157,7 +157,10 @@ function loadSavedGame(snapshot = readSavedGame()) {
     seenMistContacts.clear();
     (snapshot.seenMistContacts || []).forEach((id) => seenMistContacts.add(id));
     pendingStoryEvent = snapshot.pendingStoryEvent || null;
-    if (pendingStoryEvent && !pendingStoryEvent.choices) pendingStoryEvent = getCurrentRegionData().event?.[0] || null;
+    if (pendingStoryEvent && !pendingStoryEvent.choices) {
+        const region = getCurrentRegionData();
+        pendingStoryEvent = region.storySequence?.[0] || region.event?.[0] || null;
+    }
     pendingMistContact = snapshot.pendingMistContact || null;
     pendingChest = Boolean(snapshot.pendingChest);
     pendingEquipment = snapshot.pendingEquipment || null;

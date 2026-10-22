@@ -129,10 +129,29 @@ function exploreForest() {
 }
 
 function exploreSpiritWorld(regionData) {
-    const unseenEvents = regionData.event.filter((event) =>
+    const storyRules = EXPLORATION_RULES.storyEvents;
+    const storySequence = Array.isArray(regionData.storySequence) ? regionData.storySequence : [];
+    const nextStoryBeat = storySequence.find((beat) =>
+        !seenStoryEvents.has(`${regionData.id}:${beat.id || beat.title.pt}`)
+    );
+    const sequenceCooldown = Math.max(
+        1,
+        Number(regionData.storySequenceCooldownExplorations) || storyRules.cooldownExplorations
+    );
+
+    if (nextStoryBeat && explorationsSinceStoryEvent >= sequenceCooldown) {
+        pendingStoryEvent = nextStoryBeat;
+        storyEventSeen.add(regionData.id);
+        seenStoryEvents.add(`${regionData.id}:${nextStoryBeat.id || nextStoryBeat.title.pt}`);
+        explorationsSinceStoryEvent = 0;
+        updateUI();
+        return;
+    }
+
+    const regionEvents = Array.isArray(regionData.event) ? regionData.event : [];
+    const unseenEvents = regionEvents.filter((event) =>
         !seenStoryEvents.has(`${regionData.id}:${event.id || event.title.pt}`)
     );
-    const storyRules = EXPLORATION_RULES.storyEvents;
     const encounterChance = Math.min(
         GAME_RULES.probabilityScale,
         Math.max(storyRules.chance, 35)
@@ -193,11 +212,13 @@ function chooseExplorationOutcome() {
 
     const chestOutcome = availableOutcomes.find((outcome) => outcome.type === 'chest');
     const otherOutcomes = availableOutcomes.filter((outcome) => outcome.type !== 'chest');
-    if (chestOutcome && hero.chestChanceBonus > 0) {
+    const spiritEyeBonus = hero.spiritWorldUnlocked ? 5 : 0;
+    const totalChestChanceBonus = hero.chestChanceBonus + spiritEyeBonus;
+    if (chestOutcome && totalChestChanceBonus > 0) {
         const baseChestChance = chestOutcome.weight / totalWeight * GAME_RULES.probabilityScale;
         const boostedChestChance = Math.min(
             GAME_RULES.probabilityScale,
-            baseChestChance + hero.chestChanceBonus
+            baseChestChance + totalChestChanceBonus
         );
         if (Math.random() * GAME_RULES.probabilityScale < boostedChestChance) {
             return chestOutcome.type;
@@ -255,7 +276,16 @@ function showPassiveReward(type, reward, penalty = '') {
     document.getElementById('passive-reward-kicker').textContent = t(
         type === 'pact' ? 'passiveRewardPactKicker' : 'passiveRewardSkillKicker'
     );
-    document.getElementById('passive-reward-icon').textContent = reward.icon || (type === 'pact' ? '🩸' : '✨');
+    const rewardIcon = document.getElementById('passive-reward-icon');
+    rewardIcon.replaceChildren();
+    if (reward.iconImage) {
+        const image = document.createElement('img');
+        image.src = reward.iconImage;
+        image.alt = '';
+        rewardIcon.append(image);
+    } else {
+        rewardIcon.textContent = reward.icon || (type === 'pact' ? '🩸' : '✨');
+    }
     document.getElementById('passive-reward-title').textContent = reward.name[gameLanguage];
     document.getElementById('passive-reward-description').textContent = reward.description[gameLanguage];
     document.getElementById('passive-reward-close').setAttribute('aria-label', t('passiveRewardClose'));
@@ -306,6 +336,29 @@ function resolveStoryEvent(choiceIndex) {
     completeRegionObjective('story', true);
     if (effect === 'spirit-message') {
         logMessage(t(choice.messageKey), 'spirit-message');
+        completeRegionObjective('story');
+        updateUI();
+        return;
+    } else if (effect === 'spirit-god-reward') {
+        const isWeapon = choice.itemCategory === 'weapon';
+        const templates = ITEM_DATA.equipment.filter((item) =>
+            !item.characterExclusive
+            && (isWeapon ? item.itemType === 'weapon' : item.itemType !== 'weapon')
+        );
+        const godRarity = GAME_RULES.loot.equipmentRarities.find((rarity) => rarity.id === 'god');
+        if (!templates.length || !godRarity) {
+            logMessage(t('denseMist'));
+            completeRegionObjective('story');
+            updateUI();
+            return;
+        }
+        const template = templates[Math.floor(Math.random() * templates.length)];
+        const item = createEquipmentInstance(template, godRarity);
+        logMessage(t('spiritWorldGodGift', {
+            item: item.name[gameLanguage],
+            rarity: godRarity.name[gameLanguage]
+        }), 'special');
+        handleEquipmentDrop(item);
         completeRegionObjective('story');
         updateUI();
         return;
@@ -877,6 +930,7 @@ function performSpiritEyeSurgery() {
     hero.spiritWorldUnlocked = true;
     logMessage(t('spiritEyeSurgeryAccepted'), 'special');
     logMessage(t('spiritWorldUnlocked'), 'discovery');
+    showPassiveReward('skill', SPIRIT_EYE_PASSIVE);
     completeRegionObjective('story');
     updateUI();
 }
