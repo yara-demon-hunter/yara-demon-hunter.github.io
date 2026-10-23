@@ -100,6 +100,86 @@
     list-style: none;
 }
 @media (min-width: 641px) {
+    .hero-equipment > summary,
+    .hero-attributes > summary {
+        display: flex;
+        column-gap: 8px;
+    }
+    .hero-equipment > summary > span:first-child,
+    .hero-attributes > summary > span:first-child {
+        flex: 0 0 1.25rem;
+        order: 1;
+    }
+    .hero-equipment > summary > [data-i18n="equipment"],
+    .hero-attributes > summary > [data-i18n="attributes"] {
+        order: 2;
+    }
+    .hero-equipment > summary > .panel-attention-badge,
+    .hero-attributes > summary > .panel-attention-badge {
+        order: 0;
+        margin-left: 0;
+    }
+    .hero-equipment > summary::after,
+    .hero-attributes > summary::after {
+        order: 3;
+        margin-left: auto;
+    }
+}
+.hero-equipment.has-upgrade,
+.hero-attributes.has-upgrade {
+    border-color: rgba(251, 191, 36, 0.72);
+    box-shadow: 0 0 14px rgba(251, 191, 36, 0.16);
+}
+.hero-attributes.has-upgrade { border-color: rgba(74, 222, 128, 0.65); }
+.hero-equipment.has-upgrade > summary,
+.hero-attributes.has-upgrade > summary { color: #fef3c7; }
+.panel-attention-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid rgba(251, 191, 36, 0.75);
+    border-radius: 50%;
+    background: rgba(120, 53, 15, 0.9);
+    color: #fef3c7;
+    font-size: 0.8rem;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+    animation: attention-badge-pulse 1.8s ease-in-out infinite;
+}
+.panel-attention-badge[hidden] { display: none; }
+.attributes-attention-badge {
+    border-color: rgba(74, 222, 128, 0.8);
+    background: rgba(20, 83, 45, 0.95);
+    color: #dcfce7;
+}
+.attention-indicator {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    background: #f59e0b;
+    color: #1c1917;
+    font-size: 0.75rem;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.55);
+}
+.attributes-attention-indicator { background: #4ade80; }
+.attention-indicator[hidden] { display: none; }
+@keyframes attention-badge-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.18); }
+    50% { box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.16), 0 0 14px rgba(251, 191, 36, 0.3); }
+}
+@media (min-width: 641px) {
     .hero-equipment.has-upgrade > summary,
     .hero-attributes.has-upgrade > summary {
         animation: none;
@@ -107,7 +187,7 @@
     .hero-equipment.has-upgrade > summary > [data-i18n="equipment"] {
         animation: equipment-title-pulse 2.2s ease-in-out infinite;
     }
-    .hero-attributes.has-upgrade > summary[data-i18n="attributes"] {
+    .hero-attributes.has-upgrade > summary > [data-i18n="attributes"] {
         animation: attributes-title-pulse 2.2s ease-in-out infinite;
     }
 }
@@ -1031,6 +1111,10 @@
     0%, 100% { box-shadow: 0 0 0 1px rgba(34,197,94,0.35), 0 0 8px rgba(34,197,94,0.2); }
     50% { box-shadow: 0 0 0 1px rgba(34,197,94,0.55), 0 0 14px rgba(34,197,94,0.4); }
 }
+@keyframes skill-points-attention {
+    0%, 100% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.3); }
+    50% { box-shadow: 0 0 14px rgba(34, 197, 94, 0.75); }
+}
 .skill-upgrade-button:focus-visible {
     outline: 2px solid #fbbf24;
     outline-offset: 2px;
@@ -1043,6 +1127,7 @@
     border-color: #22c55e;
     color: #86efac;
     box-shadow: 0 0 10px rgba(34, 197, 94, 0.35);
+    animation: skill-points-attention 1.8s ease-in-out infinite;
 }
 .skill-points-badge.no-points {
     background: #1a1d1a;

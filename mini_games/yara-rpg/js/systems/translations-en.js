@@ -74,6 +74,8 @@ window.YaraRpgTranslations.en = {
         attributes: "Stats",
         equipment: "Equipment",
         equipmentSummary: "Equipment, {count} of 11 equipped",
+        equipmentAttention: "UPGRADE · {count}",
+        attributesAttention: "SPEND SP · {count}",
         inventory: "Bag",
         equipmentBagDescription: "Store up to 12 pieces of equipment.",
         bagCapacity: "{count}/{capacity} spaces used",

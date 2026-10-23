@@ -74,6 +74,8 @@ window.YaraRpgTranslations.pt = {
         attributes: "Atributos",
         equipment: "Equipamento",
         equipmentSummary: "Equipamento, {count} de 11 equipados",
+        equipmentAttention: "MELHORAR · {count}",
+        attributesAttention: "USAR PH · {count}",
         inventory: "Mochila",
         equipmentBagDescription: "Até 12 equipamentos guardados.",
         bagCapacity: "{count}/{capacity} espaços usados",

@@ -313,13 +313,47 @@ function updateUI() {
     renderEquipment();
     const equipmentShortcut = document.querySelector('[data-open-panel="hero-equipment"]');
     const equipmentPanel = document.getElementById('hero-equipment');
-    const hasEquipmentUpgrade = [...document.querySelectorAll('.equipment-upgrade-available')].length > 0;
+    const availableEquipmentUpgrades = [
+        ...Object.values(hero.equipment),
+        ...hero.equipmentInventory
+    ].filter(canAffordEquipmentUpgrade).length;
+    const hasEquipmentUpgrade = availableEquipmentUpgrades > 0;
+    const equipmentAttentionLabel = t('equipmentAttention', { count: availableEquipmentUpgrades });
+    const equipmentAttentionBadge = document.getElementById('equipment-attention-badge');
+    equipmentAttentionBadge.hidden = !hasEquipmentUpgrade;
+    equipmentAttentionBadge.textContent = '!';
+    equipmentAttentionBadge.title = equipmentAttentionLabel;
+    equipmentAttentionBadge.setAttribute('aria-label', equipmentAttentionLabel);
+    document.querySelectorAll('.equipment-attention-indicator').forEach((indicator) => {
+        indicator.hidden = !hasEquipmentUpgrade;
+        indicator.title = equipmentAttentionLabel;
+    });
     equipmentShortcut?.classList.toggle('has-upgrade', hasEquipmentUpgrade);
+    equipmentShortcut?.setAttribute('aria-label', hasEquipmentUpgrade
+        ? `${t('equipment')} · ${equipmentAttentionLabel}`
+        : t('equipment'));
     equipmentPanel?.classList.toggle('has-upgrade', hasEquipmentUpgrade);
     const attributesShortcut = document.querySelector('[data-open-panel="hero-attributes"]');
     const attributesPanel = document.getElementById('hero-attributes');
-    attributesShortcut?.classList.toggle('has-upgrade', sp > 0);
-    attributesPanel?.classList.toggle('has-upgrade', sp > 0);
+    const hasSkillPoints = sp > 0;
+    const attributesAttentionLabel = t('attributesAttention', { count: sp });
+    const attributesAttentionBadge = document.getElementById('attributes-attention-badge');
+    attributesAttentionBadge.hidden = !hasSkillPoints;
+    attributesAttentionBadge.textContent = '!';
+    attributesAttentionBadge.title = attributesAttentionLabel;
+    attributesAttentionBadge.setAttribute('aria-label', attributesAttentionLabel);
+    document.querySelector('#hero-attributes > summary').setAttribute('aria-label', hasSkillPoints
+        ? `${t('attributes')} · ${attributesAttentionLabel}`
+        : t('attributes'));
+    document.querySelectorAll('.attributes-attention-indicator').forEach((indicator) => {
+        indicator.hidden = !hasSkillPoints;
+        indicator.title = attributesAttentionLabel;
+    });
+    attributesShortcut?.classList.toggle('has-upgrade', hasSkillPoints);
+    attributesShortcut?.setAttribute('aria-label', hasSkillPoints
+        ? `${t('attributes')} · ${attributesAttentionLabel}`
+        : t('attributes'));
+    attributesPanel?.classList.toggle('has-upgrade', hasSkillPoints);
     const unlockedPassiveSkills = PASSIVE_SKILL_DATA.skills.filter((skill) => hero.passiveSkills.includes(skill.id));
     const unlockedPacts = PASSIVE_SKILL_DATA.pacts.filter((pact) => hero.monsterPacts.includes(pact.id));
     const unlockedSpiritEye = hero.spiritWorldUnlocked ? [SPIRIT_EYE_PASSIVE] : [];

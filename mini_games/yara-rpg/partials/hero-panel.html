@@ -58,9 +58,11 @@
                     <button type="button" class="hero-quick-link" data-open-panel="hero-equipment">
                         <span aria-hidden="true">🛡️</span><span data-i18n="equipment">Equipamento</span>
                         <span id="equipped-item-count" class="quick-link-count">0/11</span>
+                        <span class="attention-indicator equipment-attention-indicator" aria-hidden="true" hidden>!</span>
                     </button>
                     <button type="button" class="hero-quick-link" data-open-panel="hero-attributes">
                         <span aria-hidden="true">✨</span><span data-i18n="attributes">Atributos</span>
+                        <span class="attention-indicator attributes-attention-indicator" aria-hidden="true" hidden>!</span>
                     </button>
                     <button type="button" id="mobile-open-equipment-bag-button" class="hero-quick-link mobile-bag-shortcut" aria-haspopup="dialog" aria-controls="equipment-bag-dialog" data-i18n-aria="openEquipmentBag">
                         <span aria-hidden="true">🎒</span><span data-i18n="inventory">Mochila</span>
@@ -70,7 +72,9 @@
 
                 <details id="hero-equipment" class="hero-equipment mobile-panel-source">
                     <summary id="hero-equipment-toggle">
+                        <span aria-hidden="true">🛡️</span>
                         <span data-i18n="equipment">Equipamento</span>
+                        <span id="equipment-attention-badge" class="panel-attention-badge equipment-attention-badge" hidden></span>
                     </summary>
                     <div class="hero-equipment-content">
                         <div id="equipment-slots" class="grid grid-cols-2 gap-2 text-xs">
@@ -88,7 +92,11 @@
 
                 <!-- Atributos -->
                 <details id="hero-attributes" class="hero-attributes mobile-panel-source">
-                        <summary data-i18n="attributes">Atributos</summary>
+                        <summary>
+                            <span aria-hidden="true">✨</span>
+                            <span data-i18n="attributes">Atributos</span>
+                            <span id="attributes-attention-badge" class="panel-attention-badge attributes-attention-badge" hidden></span>
+                        </summary>
                         <div class="hero-attribute-stats grid grid-cols-2 gap-2 pt-2 border-t border-fantasy-border/50 text-xs">
                             <div class="bg-forest-950/60 p-2 rounded-lg border border-fantasy-border/40 text-center">
                                 <div class="flex items-center justify-center gap-1 text-gray-400 mb-0.5">🗡️ <span data-i18n="attack">Ataque</span><span class="skill-upgrade-control" data-upgrade-control="atk"><button type="button" data-upgrade="atk" onclick="toggleUpgradeOptions('atk')" class="skill-upgrade-button" aria-label="Melhorar ataque (1 ponto)" aria-expanded="false" aria-controls="upgrade-options-atk" title="Melhorar por 1 ponto de habilidade">+</button><span id="upgrade-options-atk" class="skill-upgrade-options" data-upgrade-options="atk" role="group" data-i18n-aria="upgradeChoicesLabel" aria-label="Opções de melhoria" hidden><button type="button" data-upgrade-quantity="1" onclick="purchaseUpgrade('atk', 1)">x1</button><button type="button" data-upgrade-quantity="max" onclick="purchaseUpgrade('atk', 'max')" data-i18n="upgradeMax">Máx</button></span></span></div>
