@@ -253,7 +253,7 @@ window.YaraRpgTranslations.en = {
         chestItemFound: "✨ The chest revealed <span class=\"text-amber-300 font-bold\">{rarity}</span> equipment!",
         chestEmpty: "🕸️ The chest was empty. The mist hid its treasure this time.",
         monsterFateTitle: "The {monster} is still alive",
-        monsterFateDescription: "You can deliver the final blow for the normal rewards, or spare the monster. Sparing it grants half the gold and no XP, then each of five outcomes has a 20% chance: it strikes and flees, reveals a chest, restores your HP and Focus, leaves an item for an empty slot, or gives extra gold.",
+        monsterFateDescription: "You can deliver the final blow for the normal rewards, or spare the monster.",
         monsterFateFinish: "Deliver the final blow (+XP and rewards)",
         monsterFateSpare: "Spare it (5 possible outcomes)",
         monsterSparedTreasure: "🕊️ You spared {monster} and received {gold} gold. It whispers: “{clue}” Your chance to find a chest increased by {chance} percentage points until you find one.",

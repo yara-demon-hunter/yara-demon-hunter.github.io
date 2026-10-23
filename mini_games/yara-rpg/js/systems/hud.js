@@ -5,6 +5,7 @@ let characterDialogueTimeout = null;
 let characterBubbleTimeout = null;
 let lastDialogueSpeaker = null;
 let lastDialogueContext = null;
+let initialEquipmentPanelStateSet = false;
 
 function hideCharacterDialogueBubbles() {
     window.clearTimeout(characterBubbleTimeout);
@@ -220,6 +221,14 @@ document.getElementById('mobile-character-panel-dialog')?.addEventListener('clos
 });
 
 function updateUI() {
+    const gameMain = document.getElementById('game-main');
+    if (!initialEquipmentPanelStateSet && gameMain && !gameMain.hidden) {
+        const equipmentPanel = document.getElementById('hero-equipment');
+        if (equipmentPanel) {
+            equipmentPanel.open = !window.matchMedia('(max-width: 640px)').matches;
+            initialEquipmentPanelStateSet = true;
+        }
+    }
     if (gameOver || campaignComplete || document.getElementById('game-main')?.hidden) {
         window.clearTimeout(characterDialogueTimeout);
         hideCharacterDialogueBubbles();
@@ -555,7 +564,26 @@ function updateUI() {
             eventImage.src = pendingStoryEvent.image;
             eventImage.onerror = () => { eventImage.hidden = true; };
         }
-        document.getElementById('story-event-title').textContent = pendingStoryEvent.title[gameLanguage];
+        const eventMonster = pendingStoryEvent.monsterFate ? pendingStoryEvent.monster : null;
+        const monsterPortrait = document.getElementById('story-event-monster-portrait');
+        const monsterImage = document.getElementById('story-event-monster-image');
+        const monsterIcon = document.getElementById('story-event-monster-icon');
+        monsterPortrait.hidden = !eventMonster;
+        monsterImage.hidden = !eventMonster?.image;
+        monsterImage.removeAttribute('src');
+        monsterImage.onerror = null;
+        monsterIcon.textContent = eventMonster?.icon || '';
+        monsterIcon.hidden = Boolean(eventMonster?.image);
+        if (eventMonster?.image) {
+            monsterImage.src = eventMonster.image;
+            monsterImage.onerror = () => {
+                monsterImage.hidden = true;
+                monsterIcon.hidden = false;
+            };
+        }
+        const eventTitle = document.getElementById('story-event-title');
+        eventTitle.classList.toggle('has-monster-portrait', Boolean(eventMonster));
+        document.getElementById('story-event-title-text').textContent = pendingStoryEvent.title[gameLanguage];
         document.getElementById('story-event-description').textContent = pendingStoryEvent.description[gameLanguage];
         const choices = document.getElementById('story-event-choices');
         choices.replaceChildren();

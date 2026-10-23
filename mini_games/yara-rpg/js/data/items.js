@@ -40,10 +40,10 @@ window.YaraRpgData.items = Object.freeze({
         { id: "lumen-necklace", slot: "necklace", icon: "📿", image: "images/items/lumen-necklace.webp",name: { pt: "Colar Reluzente", en: "Lumen Necklace" }, stats: { def: 1, parry: 3, stunChance: 2 }, starter: false },
         { id: "rope", slot: "accessory", icon: "🪢", image: "images/items/rope.webp", name: { pt: "Corda", en: "Rope" }, stats: { stunChance: 3, evasion: 2 }, starter: false },
         // Exclusives
-        { id: "demon-hunter-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "⚔️", image: "images/items/demon-hunter-sword.webp", name: { pt: "Espada Demon Hunter", en: "Demon Hunter Sword" }, stats: { atk: 8, criticalChance: 4, maxFury: -10 }, characterExclusive: "demon-hunter" },
+        { id: "demon-hunter-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "⚔️", image: "images/items/demon-hunter-sword.webp", name: { pt: "Espada Demon Hunter", en: "Demon Hunter Sword" }, stats: { atk: 5, criticalChance: 2, maxFury: -10 }, characterExclusive: "demon-hunter" },
         { id: "demon-hunter-cloak", slot: "cloak", icon: "🧥", image: "images/items/demon-hunter-cloak.webp", name: { pt: "Capa Demon Hunter", en: "Demon Hunter Cloak" }, stats: { evasion: 5, stunChance: 2, maxFury: -10 }, characterExclusive: "demon-hunter" },
         { id: "demon-hunter-mask", slot: "head", icon: "🪖", image: "images/items/demon-hunter-mask.webp", name: { pt: "Máscara Demon Hunter", en: "Demon Hunter Mask" }, stats: { atk: 1, criticalChance: 2, maxFury: -5 } , characterExclusive: "demon-hunter" },
-        { id: "spirit-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🗡️", image: "images/items/spirit-sword.webp", name: { pt: "Espada Espiritual", en: "Spirit Sword" }, stats: { atk: 8, criticalChance: 3, stunChance: 5 }, characterExclusive: "mysterious-creature" },
+        { id: "spirit-sword", slot: "mainHand", handUsage: "one-handed", itemType: "weapon", icon: "🗡️", image: "images/items/spirit-sword.webp", name: { pt: "Espada Espiritual", en: "Spirit Sword" }, stats: { atk: 5, criticalChance: 2, stunChance: 3 }, characterExclusive: "mysterious-creature" },
         { id: "bandana", slot: "head", icon: "🥷", image: "images/items/bandana.webp", name: { pt: "Bandana Misteriosa", en: "Mysterious Bandana" }, stats: { maxFoco: 30, stunChance: 5 }, characterExclusive: "mysterious-creature" },
 
     ])

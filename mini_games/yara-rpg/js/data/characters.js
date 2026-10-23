@@ -92,7 +92,7 @@ window.YaraRpgData.characters = Object.freeze([
             evasion: 2,
             parry: 0,
             stunChance: 1,
-            criticalChance: 1
+            criticalChance: 0.5
         },
         skills: {
             heavyAttack: { focoCost: 10, attackMultiplier: 1.5 },
@@ -217,7 +217,7 @@ window.YaraRpgData.characters = Object.freeze([
             criticalChance: 0.5
         },
         skills: {
-            heavyAttack: { focoCost: 15, attackMultiplier: 2.0 },
+            heavyAttack: { focoCost: 15, attackMultiplier: 1.9 },
             parry: { focoCost: 10, bonus: 10 },
             dodge: { focoCost: 10, bonus: 10 }
         },
@@ -263,9 +263,9 @@ window.YaraRpgData.characters = Object.freeze([
             statBonusPercent: { atk: 10 }
         },
         basicStats: {
-            atk: 5,
+            atk: 3,
             evasion: 4,
-            criticalChance: 2
+            criticalChance: 1
         },
         progression: {
             maxHp: 10,
@@ -276,11 +276,12 @@ window.YaraRpgData.characters = Object.freeze([
             evasion: 1.5,
             parry: 0.5,
             stunChance: 0.5,
-            criticalChance: 1.5
+            criticalChance: 0.5
         },
         skills: {
-            heavyAttack: { focoCost: 20, attackMultiplier: 2.3 },
-            dodge: { focoCost: 10, bonus: 20 }
+            heavyAttack: { focoCost: 20, attackMultiplier: 2.0 },
+            parry: { focoCost: 10, bonus: 10 },
+            dodge: { focoCost: 10, bonus: 10 }
         },
         limits: {
             maxEvasion: 65,
@@ -327,9 +328,8 @@ window.YaraRpgData.characters = Object.freeze([
             lifeStealPercent: 10
         },
         basicStats: {
-            atk: 4,
-            maxFoco: 30,
-            criticalChance: 2,
+            atk: 3,
+            criticalChance: 1,
             stunChance: 5
         },
         progression: {
@@ -341,10 +341,10 @@ window.YaraRpgData.characters = Object.freeze([
             evasion: 1,
             parry: 0.5,
             stunChance: 1,
-            criticalChance: 1
+            criticalChance: 0.5
         },
         skills: {
-            heavyAttack: { focoCost: 10, attackMultiplier: 1.8 },
+            heavyAttack: { focoCost: 15, attackMultiplier: 1.8 },
             dodge: { focoCost: 10, bonus: 15 }
         },
         limits: {

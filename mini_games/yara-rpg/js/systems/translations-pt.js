@@ -253,7 +253,7 @@ window.YaraRpgTranslations.pt = {
         chestItemFound: "✨ O baú revelou um equipamento de raridade <span class=\"text-amber-300 font-bold\">{rarity}</span>!",
         chestEmpty: "🕸️ O baú estava vazio. A névoa escondeu seu tesouro desta vez.",
         monsterFateTitle: "O {monster} ainda está vivo",
-        monsterFateDescription: "Você pode dar o golpe final e receber as recompensas normais, ou poupar o monstro. Ao poupá-lo, recebe metade do ouro, sem XP, e há 20% de chance para cada resultado: ele ataca e foge, revela um baú, recupera seu HP e Foco, deixa um item para um slot vazio ou entrega ouro extra.",
+        monsterFateDescription: "Você pode dar o golpe final e receber as recompensas normais, ou poupar o monstro.",
         monsterFateFinish: "Dar o golpe final (+XP e recompensas)",
         monsterFateSpare: "Poupar (5 resultados possíveis)",
         monsterSparedTreasure: "🕊️ Você poupou {monster} e recebeu {gold} de ouro. Ele sussurra: “{clue}” Sua chance de achar um baú aumentou em {chance} pontos percentuais até encontrar um.",
