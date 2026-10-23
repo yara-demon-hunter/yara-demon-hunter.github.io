@@ -79,6 +79,9 @@
     .hero-attribute-stats {
         margin: 0 0 7px;
     }
+    #hero-panel .hero-attribute-stats > .hero-attribute-stat {
+        padding: 0.2rem 0.3rem;
+    }
     #hero-panel .space-y-3 > :not([hidden]) ~ :not([hidden]) {
         margin-top: 0.55rem !important;
     }

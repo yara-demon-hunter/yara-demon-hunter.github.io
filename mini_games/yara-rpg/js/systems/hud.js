@@ -279,8 +279,6 @@ function updateUI() {
     document.getElementById('hero-evasion-base').innerText = effectiveEvasion + '%';
     evasionBonusDisplay.innerText = ` +${hero.evasionBonus}% = ${evasionTotal}%`;
     evasionBonusDisplay.classList.toggle('hidden', hero.evasionBonus === 0);
-    evasionDisplay.classList.toggle('text-sm', hero.evasionBonus === 0);
-    evasionDisplay.classList.toggle('text-[10px]', hero.evasionBonus > 0);
     evasionDisplay.setAttribute('aria-label', hero.evasionBonus
         ? `${effectiveEvasion}% + ${hero.evasionBonus}% = ${evasionTotal}%`
         : `${effectiveEvasion}%`);

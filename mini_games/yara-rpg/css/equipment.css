@@ -226,8 +226,43 @@
     line-height: 1.2;
 }
 .hero-attribute-stats {
+    grid-template-columns: minmax(0, 1fr);
     margin: 0 10px 10px;
 }
+.hero-attribute-stats > .hero-attribute-stat {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+    min-height: 1.5rem;
+    padding: 0.1rem 0.35rem;
+    border: 1px solid rgba(92, 81, 55, 0.4);
+    border-radius: 0.5rem;
+    background: rgba(12, 13, 15, 0.55);
+}
+.hero-attribute-stat-name {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 0;
+    overflow: hidden;
+    color: #9ca3af;
+    font-size: 0.68rem;
+    white-space: nowrap;
+}
+.hero-attribute-stat-name > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.hero-attribute-stat-value {
+    justify-self: end;
+    color: #fbbf24;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.hero-attribute-stat .skill-upgrade-control { justify-self: end; }
 .item-drop-dialog {
     width: min(28rem, calc(100vw - 2rem));
     padding: 0;
