@@ -12,6 +12,7 @@ layout: null
     {%- elsif page.date -%}
     <lastmod>{{ page.date | date: "%Y-%m-%d" }}</lastmod>
     {%- endif -%}
+    <changefreq>daily</changefreq>
   </url>
   {%- endunless -%}
 {%- endfor -%}
@@ -28,6 +29,7 @@ layout: null
         {%- elsif doc.date -%}
     <lastmod>{{ doc.date | date: "%Y-%m-%d" }}</lastmod>
         {%- endif -%}
+    <changefreq>daily</changefreq>
   </url>
         {%- endunless -%}
       {%- endfor -%}
@@ -44,6 +46,7 @@ layout: null
     {%- elsif post.date -%}
     <lastmod>{{ post.date | date: "%Y-%m-%d" }}</lastmod>
     {%- endif -%}
+    <changefreq>daily</changefreq>
   </url>
   {%- endunless -%}
 {%- endfor -%}
