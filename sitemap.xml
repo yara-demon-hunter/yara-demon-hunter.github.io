@@ -3,24 +3,48 @@ layout: null
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-{% for page in site.pages %}
-  {% unless page.sitemap == false or page.noindex or page.url contains ".xml" or page.url contains ".txt" or page.url contains "404" %}
+{%- for page in site.pages -%}
+  {%- unless page.sitemap == false or page.noindex or page.url contains ".xml" or page.url contains ".txt" or page.url contains "404" or page.url contains "assets" -%}
   <url>
     <loc>{{ page.url | absolute_url }}</loc>
-    {% if page.last_updated %}
-    <lastmod>{{ page.last_updated | date: "%Y-%m-%d" }}</lastmod>
-    {% endif %}
+    {%- if page.last_modified_at -%}
+    <lastmod>{{ page.last_modified_at | date: "%Y-%m-%d" }}</lastmod>
+    {%- elsif page.date -%}
+    <lastmod>{{ page.date | date: "%Y-%m-%d" }}</lastmod>
+    {%- endif -%}
   </url>
-  {% endunless %}
-{% endfor %}
-{% for post in site.posts %}
+  {%- endunless -%}
+{%- endfor -%}
+
+{%- if site.collections -%}
+  {%- for collection in site.collections -%}
+    {%- unless collection.label == "posts" or collection.label == "navigation" -%}
+      {%- for doc in collection.docs -%}
+        {%- unless doc.sitemap == false or doc.noindex -%}
   <url>
-    <loc>{{ site.url }}{{ site.baseurl }}{{ post.url }}</loc>
-    {% if post.last_updated %}
-    <lastmod>{{ post.last_updated | date: "%Y-%m-%d" }}</lastmod>
-    {% elsif post.date %}
-    <lastmod>{{ post.date | date: "%Y-%m-%d" }}</lastmod>
-    {% endif %}
+    <loc>{{ doc.url | absolute_url }}</loc>
+        {%- if doc.last_modified_at -%}
+    <lastmod>{{ doc.last_modified_at | date: "%Y-%m-%d" }}</lastmod>
+        {%- elsif doc.date -%}
+    <lastmod>{{ doc.date | date: "%Y-%m-%d" }}</lastmod>
+        {%- endif -%}
   </url>
-{% endfor %}
+        {%- endunless -%}
+      {%- endfor -%}
+    {%- endunless -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- for post in site.posts -%}
+  {%- unless post.sitemap == false or post.noindex -%}
+  <url>
+    <loc>{{ post.url | absolute_url }}</loc>
+    {%- if post.last_modified_at -%}
+    <lastmod>{{ post.last_modified_at | date: "%Y-%m-%d" }}</lastmod>
+    {%- elsif post.date -%}
+    <lastmod>{{ post.date | date: "%Y-%m-%d" }}</lastmod>
+    {%- endif -%}
+  </url>
+  {%- endunless -%}
+{%- endfor -%}
 </urlset>
