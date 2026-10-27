@@ -45,6 +45,23 @@
                 {% endif %}
             </div>
         </article>
+
+        <article class="mini-game-card mini-game-card--neon">
+            <div class="mini-game-card__art" role="img" aria-label="{% if page.lang == 'pt' %}Arena futurista iluminada por neon{% else %}Futuristic neon-lit arena{% endif %}"></div>
+            <div class="mini-game-card__body">
+                {% if page.lang == "pt" %}
+                    <p class="mini-game-card__eyebrow">Jogo 3 · Ação</p>
+                    <h2>Neon Blade: Center Guardian</h2>
+                    <p>Defenda o centro da arena contra ondas de inimigos, aprimore sua lâmina e ative o Frenesi.</p>
+                    <a class="mini-game-card__button" href="{{ '/mini_games/neon_blade_center_guardian/neon_blade_center_guardian.html' | relative_url }}">Jogar Neon Game</a>
+                {% else %}
+                    <p class="mini-game-card__eyebrow">Game 3 · Action</p>
+                    <h2>Neon Blade: Center Guardian</h2>
+                    <p>Defend the center of the arena against waves of enemies, upgrade your blade, and unleash Frenzy.</p>
+                    <a class="mini-game-card__button" href="{{ '/mini_games/neon_blade_center_guardian/neon_blade_center_guardian.html' | relative_url }}">Play Neon Game</a>
+                {% endif %}
+            </div>
+        </article>
     </div>
 
     <nav class="mini-games-hub__language" aria-label="{% if page.lang == 'pt' %}Idioma{% else %}Language{% endif %}">
