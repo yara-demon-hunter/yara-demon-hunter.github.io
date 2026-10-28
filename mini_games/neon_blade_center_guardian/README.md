@@ -32,8 +32,8 @@ js/
   systems/progression.js          XP e level up
   systems/effects.js              partículas e screen shake
   render/renderer.js              ordem das camadas de desenho
-  render/arena.js                 núcleo e raio de alcance
-  render/forest.js                cenário: noite fria na floresta (chão, árvores e grama ao vento, névoa, vaga-lumes, vinheta)
+  render/arena.js                 tocha (núcleo) e raio de alcance do herói
+  render/forest.js                cenário: noite fria (chão, grama ao vento, névoa, vaga-lumes, luz da tocha que abre um círculo sem névoa)
   render/entities.js              inimigos, projéteis, golpes, power-ups e partículas
   render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
   render/fx/random.js             aleatório com semente (cenário estável)

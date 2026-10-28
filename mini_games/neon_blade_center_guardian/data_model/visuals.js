@@ -26,7 +26,8 @@ export const HERO_VISUALS = {
         bladeGlow: '#38bdf8',
         bladeGlowFrenzy: '#f0abfc',
         bladeGlowDoubleDmg: '#f59e0b',
-        hurtFlash: '#ffffff',
+        hurtRim: '#fb7185',
+        hurtRing: '#fb7185',
         shadowTrail: '#0e3a4a'
     },
 
@@ -78,9 +79,20 @@ export const HERO_VISUALS = {
     },
     restBladeAngle: 2.0,
 
-    // Dano
-    hurtSquashSeconds: 0.1,
-    hurtSquash: 0.22,
+    // Dano: o herói é empurrado para longe do golpe e volta (só visual, sem piscar branco)
+    knockback: {
+        seconds: 0.32,
+        distance: 15,          // px de recuo visual
+        peakAt: 0.3,           // fração da animação em que o recuo é máximo
+        squash: 0.28,          // achata na direção do empurrão
+        tilt: 0.38,            // inclinação (radianos) do corpo
+        rimSeconds: 0.12,      // contorno rosado logo no impacto
+        ringSeconds: 0.35,     // anel de impacto
+        ringStartRadius: 8,
+        ringEndRadius: 34
+    },
+    invulnerableAlphaMin: 0.6, // pulso suave de transparência enquanto invulnerável
+    invulnerablePulseMs: 110,
 
     // Rastro de sombra (quase imperceptível)
     shadowTrailAlpha: 0.18,
@@ -102,8 +114,8 @@ export const SLASH_VISUALS = {
 };
 
 // --- CENÁRIO: FLORESTA SOMBRIA (vista de cima) ---
-// Noite fria: clareira no centro (onde fica o núcleo), árvores nas bordas (de onde saem
-// os monstros), vento mexendo árvores e grama, e névoa densa se movendo por cima de tudo.
+// Noite fria: o núcleo é uma tocha que ilumina um círculo sem névoa; conforme ela perde
+// vida, a luz encolhe e a névoa avança. Vento mexe a grama e a névoa rola por cima de tudo.
 export const FOREST_VISUALS = {
     seed: 1337,
 
@@ -126,39 +138,14 @@ export const FOREST_VISUALS = {
     // Clareira: elipse proporcional à tela (0 = centro, 1 = borda)
     clearingRadiusRatio: 0.62,
 
-    // Vento: rajadas que atravessam a tela (afetam árvores e grama)
+    // Vento: rajadas que atravessam a tela (afetam a grama)
     windSpeed: 0.55,              // velocidade das rajadas
     windWaveLength: 0.0035,       // quanto a rajada varia ao longo da tela (menor = onda mais larga)
     windBase: 0.35,               // vento constante mínimo (0 a 1)
 
-    // Árvores: ficam numa faixa colada às bordas da tela
-    treeEdgeBandRatio: 0.07,      // largura da faixa (fração do menor lado da tela)
-    treeEdgeBandMin: 28,
-    treeEdgeBandMax: 70,
-    treeEdgeJitter: 22,           // irregularidade da linha das árvores (px)
-    treeSpacing: 44,              // espaçamento base entre árvores (px)
-    treeOverflow: 60,             // quanto as árvores passam da borda da tela (px)
-    treeMinRadius: 26,
-    treeMaxRadius: 58,
-    treeVariants: 8,
-    canopyColors: ['#040d12', '#06161d', '#09202a', '#0c2933'],
-    canopyShadow: 'rgba(0, 0, 0, 0.6)',
-    canopyHighlight: 'rgba(140, 190, 230, 0.16)',
-    canopyRimLight: 'rgba(150, 200, 235, 0.22)',
-    branchColor: '#02070a',
-    leafTones: ['#0d3340', '#0a2a35', '#12414a', '#07202a'],
-    leafGapColor: 'rgba(0, 4, 8, 0.55)',
-    leafDensity: 2.4,             // folhinhas por px de raio
-    canopyAlpha: 0.97,
-    // Balanço pelo vento (px): a base balança pouco, a folhagem muito
-    baseSwayAmount: 1.2,
-    crownSwayAmount: 4.2,
-    crownTiltAmount: 0.05,        // inclinação (radianos) da folhagem na rajada
-    swayFlutter: 0.9,             // tremor rápido da folhagem
-
     // Grama animada: tufos que se curvam com o vento
     grassClumpsPer100kPx: 42,
-    grassBladesPerClump: 4,
+    grassBladesPerClump: 3,
     grassMinHeight: 6,
     grassMaxHeight: 13,
     grassBend: 6,                 // curvatura máxima na rajada (px)
@@ -166,6 +153,8 @@ export const FOREST_VISUALS = {
 
     // Névoa: camadas de textura rolando em direções diferentes + manchas soltas
     fogColor: '170, 195, 215',
+    fogDensityBoostAtZeroHp: 1.3, // quanto a névoa fica mais densa com a torre quase apagada (+130%)
+    fogResolution: 0.5,           // fração da resolução da tela usada para desenhar a névoa (menor = mais rápido)
     fogTileSize: 512,
     fogTilePuffs: 80,
     fogLayers: [
@@ -191,4 +180,29 @@ export const FOREST_VISUALS = {
     // Vinheta escura
     vignetteColor: 'rgba(0, 2, 8, 0.88)',
     vignetteInnerRatio: 0.4
+};
+
+// --- TOCHA (CENTER TOWER) ---
+// A luz da tocha abre um círculo sem névoa. O raio acompanha a vida do núcleo.
+export const TORCH_VISUALS = {
+    // Raio da luz (fração do menor lado da tela): cheio com 100% de vida, mínimo com 0%
+    lightRadiusMaxRatio: 0.62,
+    lightRadiusMinRatio: 0.13,
+    lightShrinkCurve: 0.85,        // <1: encolhe mais rápido no começo; >1: mais devagar
+    lightSmoothing: 2.5,           // suavidade ao mudar de tamanho (maior = mais rápido)
+    lightFlicker: 0.03,            // tremida da luz (fração do raio)
+    lightEdgeSoftness: 0.45,       // 0 = borda dura; 1 = degradê até o centro
+    groundGlowColor: '255, 150, 60',
+    groundGlowAlpha: 0.3,
+
+    // Corpo da tocha (visto de cima)
+    baseColor: '#1b1410',
+    baseRimColor: '#4a3322',
+    flameColors: ['rgba(234, 88, 12, 0.85)', 'rgba(251, 146, 60, 0.85)', 'rgba(253, 224, 71, 0.9)'],
+    flameCoreColor: '#fff7ed',
+    flameGlowColor: 'rgba(251, 146, 60, 0.9)',
+    flameMinScale: 0.45,           // tamanho da chama com a vida zerada
+    tongues: 6,
+    embers: 8,
+    emberColor: '#fdba74'
 };

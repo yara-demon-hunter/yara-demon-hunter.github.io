@@ -1,11 +1,25 @@
-import { state } from '../core/state.js';
+import { player, state } from '../core/state.js';
 
 // --- EFEITOS VISUAIS (Partículas e Screen Shake) ---
 export function shakeScreen(intensity) {
     state.shakeIntensity = Math.max(state.shakeIntensity, intensity);
 }
 
+const MAX_PARTICLES = 220;
+
+// Registra de onde veio o golpe no herói (só para a animação de empurrão)
+export function registerPlayerHit(fromX, fromY) {
+    const dx = player.x - fromX;
+    const dy = player.y - fromY;
+    const len = Math.hypot(dx, dy) || 1;
+    player.hitDirX = dx / len;
+    player.hitDirY = dy / len;
+    player.hitTime = performance.now();
+}
+
 export function createExplosion(x, y, color, count = 10) {
+    // Limite de partículas vivas: evita acúmulo de memória em momentos caóticos
+    count = Math.min(count, MAX_PARTICLES - state.particles.length);
     for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 40 + Math.random() * 160;

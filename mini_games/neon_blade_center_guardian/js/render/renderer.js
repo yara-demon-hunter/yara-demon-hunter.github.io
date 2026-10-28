@@ -7,7 +7,7 @@ import {
     renderParticles,
     renderPowerups
 } from './entities.js';
-import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestGround, renderTreeCanopies } from './forest.js';
+import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestGround, renderTorchLight } from './forest.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 
 // --- RENDER LOOP ---
@@ -25,13 +25,13 @@ export function render() {
 
     renderForestGround();
     renderForestGrass();
+    renderTorchLight();
     renderCore();
     renderAttackRange();
     renderPowerups();
     renderBladeSlashes();
     renderEnemyProjectiles();
     renderEnemies();
-    renderTreeCanopies();
     renderPlayerTrail();
     renderPlayer();
     renderParticles();

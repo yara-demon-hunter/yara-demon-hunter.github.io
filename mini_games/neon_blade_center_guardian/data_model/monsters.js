@@ -1,7 +1,7 @@
 export const MONSTER_MODELS = {
     NORMAL: {
         spawnWeight: 0.42,
-        hpBase: 150,
+        hpBase: 40,
         hpPerTurn: 10,
         speedMin: 55,
         speedMax: 85,

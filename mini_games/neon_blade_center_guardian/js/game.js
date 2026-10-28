@@ -13,6 +13,7 @@ import { updatePowerups } from './systems/powerups.js';
 import { updateSpawner } from './systems/spawner.js';
 import { setupButtons } from './ui/buttons.js';
 
+const MIN_FRAME_MS = 12;
 let lastTime = performance.now();
 
 // --- UPDATE LOOP ---
@@ -36,6 +37,11 @@ function update(dt) {
 
 // --- GAME LOOP ---
 function gameLoop(timestamp) {
+    // Limita a ~60 FPS (monitores de 120/144 Hz desenhariam o dobro sem ganho real)
+    if (timestamp - lastTime < MIN_FRAME_MS) {
+        requestAnimationFrame(gameLoop);
+        return;
+    }
     const dt = (timestamp - lastTime) / 1000;
     lastTime = timestamp;
 

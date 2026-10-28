@@ -2,6 +2,7 @@ import { POWERUP_MODELS } from '../../data_model/skills.js';
 import { SLASH_VISUALS } from '../../data_model/visuals.js';
 import { ctx, state } from '../core/state.js';
 import { easeOutCubic } from './fx/easing.js';
+import { drawGlow } from './fx/glow.js';
 
 // --- ENTIDADES: Powerups, Golpes, Projéteis, Inimigos e Partículas ---
 export function renderPowerups() {
@@ -80,22 +81,18 @@ export function renderBladeSlashes() {
 
 export function renderEnemyProjectiles() {
     state.enemyProjectiles.forEach(p => {
-        ctx.save();
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#f59e0b';
+        drawGlow(ctx, 'rgba(245, 158, 11, 0.55)', p.x, p.y, p.radius * 3);
         ctx.fillStyle = '#fbbf24';
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
     });
 }
 
 export function renderEnemies() {
     state.enemies.forEach(e => {
-        ctx.save();
-        ctx.shadowBlur = e.type === 'BOSS' ? 25 : 12;
-        ctx.shadowColor = e.color;
+        // Brilho em cache (em vez de shadowBlur)
+        drawGlow(ctx, e.color, e.x, e.y, e.radius * (e.type === 'BOSS' ? 2.6 : 2.1), 0.45);
         ctx.fillStyle = e.color;
         ctx.beginPath();
         ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
@@ -109,19 +106,17 @@ export function renderEnemies() {
             ctx.fillStyle = e.color;
             ctx.fillRect(e.x - bw / 2, e.y - e.radius - 8, bw * (e.hp / e.maxHp), 4);
         }
-
-        ctx.restore();
     });
 }
 
 export function renderParticles() {
+    ctx.save();
     state.particles.forEach(p => {
-        ctx.save();
         ctx.globalAlpha = p.life / p.maxLife;
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
     });
+    ctx.restore();
 }

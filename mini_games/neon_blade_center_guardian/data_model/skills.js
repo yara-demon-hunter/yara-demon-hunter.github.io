@@ -13,7 +13,7 @@ export const BLADE_SKILL = {
     baseDamage: 25,
     damagePerUpgrade: 15,
     damagePerCharacterLevel: 10,
-    baseRadius: 75,
+    baseRadius: 45,
     radiusPerUpgrade: 14,
     radiusPerCharacterLevel: 4,
     maxRadiusScreenRatio: 0.38,

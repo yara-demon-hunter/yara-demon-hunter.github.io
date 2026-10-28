@@ -5,7 +5,7 @@ import { audio, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { triggerGameOver } from '../ui/screens.js';
 import { openShop } from '../ui/shop.js';
-import { createExplosion, shakeScreen } from './effects.js';
+import { createExplosion, registerPlayerHit, shakeScreen } from './effects.js';
 import { gainXp } from './progression.js';
 import { spawnPowerup } from './spawner.js';
 
@@ -55,6 +55,7 @@ export function updateEnemies(dt) {
             }
 
             player.iFrames = CHARACTER_MODEL.invulnerabilitySeconds;
+            registerPlayerHit(e.x, e.y);
             createExplosion(player.x, player.y, '#f43f5e', 12);
             updateHUD();
 
@@ -144,6 +145,7 @@ export function updateEnemyProjectiles(dt) {
                 audio.playHurt();
             }
             player.iFrames = CHARACTER_MODEL.projectileInvulnerabilitySeconds;
+            registerPlayerHit(p.x - p.vx * 0.05, p.y - p.vy * 0.05);
             updateHUD();
             enemyProjectiles.splice(i, 1);
             if (player.hp <= 0) { triggerGameOver('PLAYER'); return; }

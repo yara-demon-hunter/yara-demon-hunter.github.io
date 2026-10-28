@@ -1,7 +1,7 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { HERO_VISUALS as V } from '../../data_model/visuals.js';
 import { ctx, player, state } from '../core/state.js';
-import { easeOutCubic, lerpAngle } from './fx/easing.js';
+import { easeOutCubic, easeOutQuad, lerpAngle } from './fx/easing.js';
 
 // --- HERÓI (desenho procedural, sem imagens) ---
 // Referência: art_reference/hero. Vista de cima: capa atrás, botas, ombros,
@@ -228,34 +228,32 @@ function drawSwordArm(t, frenzy) {
     ctx.restore();
 }
 
-function drawBody(t, run, hurtFlash) {
+function drawBody(t, run) {
     // Respiração ofegante no idle
     const breath = Math.sin((t / V.breathPeriodSeconds) * Math.PI * 2) * V.breathAmount * (1 - run);
 
     ctx.save();
     ctx.scale(1 - breath * 0.5, 1 + breath);
     // Ombros / túnica
-    ctx.fillStyle = hurtFlash ? V.colors.hurtFlash : V.colors.body;
+    ctx.fillStyle = V.colors.body;
     ctx.beginPath();
     ctx.ellipse(0, 0, V.shoulderDepth, V.shoulderWidth, 0, 0, Math.PI * 2);
     ctx.fill();
     // Faixa na cintura (aparece atrás do capuz)
-    if (!hurtFlash) {
-        ctx.strokeStyle = V.colors.sash;
-        ctx.lineWidth = 1.4;
-        ctx.beginPath();
-        ctx.ellipse(-1, 0, V.shoulderDepth * 0.7, V.shoulderWidth * 0.85, 0, Math.PI * 0.6, Math.PI * 1.4);
-        ctx.stroke();
-    }
+    ctx.strokeStyle = V.colors.sash;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.ellipse(-1, 0, V.shoulderDepth * 0.7, V.shoulderWidth * 0.85, 0, Math.PI * 0.6, Math.PI * 1.4);
+    ctx.stroke();
     ctx.restore();
 }
 
 // Capuz profundo: a abertura escura projeta sombra sobre o topo da máscara
-function drawHoodAndMask(run, hurtFlash) {
+function drawHoodAndMask(run) {
     const hx = 1 + run * 1.5;
     const r = V.hoodRadius;
 
-    ctx.fillStyle = hurtFlash ? V.colors.hurtFlash : V.colors.hood;
+    ctx.fillStyle = V.colors.hood;
     ctx.beginPath();
     ctx.arc(hx, 0, r, 0, Math.PI * 2);
     ctx.fill();
@@ -301,28 +299,67 @@ export function renderPlayer() {
     const frenzy = state.frenzyActiveTimer > 0;
     const run = Math.min(1, anim.speed / V.runSpeedForFullEffect);
 
-    // Dano: pisca branco e achata no início da invulnerabilidade
-    const hurtElapsed = CHARACTER_MODEL.invulnerabilitySeconds - player.iFrames;
-    const squash = player.iFrames > 0 && hurtElapsed < V.hurtSquashSeconds
-        ? V.hurtSquash * (1 - hurtElapsed / V.hurtSquashSeconds)
-        : 0;
-    const hurtFlash = player.iFrames > 0
-        && Math.floor(performance.now() / CHARACTER_MODEL.damageImmunityFlashIntervalMs) % 2 === 0;
+    // Dano: curva do empurrão (0 → 1 no pico → 0), na direção oposta ao golpe
+    const K = V.knockback;
+    const hitP = (performance.now() - player.hitTime) / 1000 / K.seconds;
+    let push = 0;
+    if (hitP >= 0 && hitP < 1) {
+        push = hitP < K.peakAt
+            ? easeOutCubic(hitP / K.peakAt)
+            : 1 - easeOutQuad((hitP - K.peakAt) / (1 - K.peakAt));
+    }
+    const hitAngle = Math.atan2(player.hitDirY, player.hitDirX);
+
+    // Anel de impacto no chão (não é empurrado)
+    const ringP = (performance.now() - player.hitTime) / 1000 / K.ringSeconds;
+    if (ringP >= 0 && ringP < 1) {
+        ctx.save();
+        ctx.globalAlpha = (1 - ringP) * 0.7;
+        ctx.strokeStyle = V.colors.hurtRing;
+        ctx.lineWidth = 2.5 * (1 - ringP) + 0.5;
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, K.ringStartRadius + (K.ringEndRadius - K.ringStartRadius) * easeOutCubic(ringP), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    // Invulnerável: pulso suave de transparência (em vez de piscar branco)
+    const pulse = player.iFrames > 0
+        ? V.invulnerableAlphaMin + (1 - V.invulnerableAlphaMin) * (0.5 + 0.5 * Math.sin(performance.now() / V.invulnerablePulseMs))
+        : 1;
+    const rim = hitP >= 0 && hitP < K.rimSeconds / K.seconds;
 
     ctx.save();
-    ctx.translate(player.x, player.y);
-    ctx.rotate(anim.facing);
+    ctx.globalAlpha = pulse;
+    // Recuo + achatamento na direção do golpe
+    ctx.translate(player.x + player.hitDirX * K.distance * push, player.y + player.hitDirY * K.distance * push);
+    if (push > 0) {
+        ctx.rotate(hitAngle);
+        ctx.scale(1 - K.squash * push, 1 + K.squash * 0.5 * push);
+        ctx.rotate(-hitAngle);
+    }
+    ctx.rotate(anim.facing + push * K.tilt * (Math.sin(hitAngle - anim.facing) >= 0 ? 1 : -1));
     ctx.scale(V.scale, V.scale);
-    // Corrida estica na direção do movimento; dano achata
-    ctx.scale(1 + run * V.runLeanStretch - squash, 1 - run * V.runLeanStretch * 0.5 + squash);
+    // Corrida estica na direção do movimento
+    ctx.scale(1 + run * V.runLeanStretch, 1 - run * V.runLeanStretch * 0.5);
 
     const swinging = anim.swingTimer > 0;
     drawCape(t, run);
     drawBoots(run);
     if (!swinging) drawSwordArm(t, frenzy);
-    drawBody(t, run, hurtFlash);
-    drawHoodAndMask(run, hurtFlash);
+    drawBody(t, run);
+    drawHoodAndMask(run);
     if (swinging) drawSwordArm(t, frenzy);
+
+    // Contorno rosado só no instante do impacto
+    if (rim) {
+        ctx.strokeStyle = V.colors.hurtRim;
+        ctx.globalAlpha = pulse * (1 - hitP / (K.rimSeconds / K.seconds));
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, V.shoulderDepth + 1.5, V.shoulderWidth + 1.5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+    }
 
     ctx.restore();
 

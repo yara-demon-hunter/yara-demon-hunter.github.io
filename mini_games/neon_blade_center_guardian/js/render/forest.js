@@ -1,25 +1,29 @@
 import { FOREST_VISUALS as F } from '../../data_model/visuals.js';
 import { ctx, state } from '../core/state.js';
+import { TORCH_VISUALS as T } from '../../data_model/visuals.js';
+import { drawGlow } from './fx/glow.js';
 import { createRandom, pick, randomRange } from './fx/random.js';
 
-// --- CENÁRIO: FLORESTA SOMBRIA (desenho procedural, sem imagens) ---
-// O chão e as copas são pré-desenhados em canvas fora da tela e refeitos só
-// quando a tela muda de tamanho. A cada quadro só a névoa e o balanço das
-// copas são calculados.
+// --- CENÁRIO: NOITE NA FLORESTA (desenho procedural, sem imagens) ---
+// O chão é pré-desenhado em canvas fora da tela e refeito só quando a tela muda de
+// tamanho. A cada quadro: grama ao vento, luz da tocha e a névoa (com um buraco de luz).
 
 const cache = {
     width: 0,
     height: 0,
     ground: null,
     vignette: null,
-    treeSprites: [],
-    trees: [],
     fogSprite: null,
     fogTile: null,
     fog: [],
     fireflies: [],
     fireflyTime: 0,
-    grass: []
+    grass: [],
+    grassByColor: [],
+    fogCanvas: null,
+    fogCtx: null,
+    lightRadius: 0,
+    lightTime: 0
 };
 
 function makeCanvas(width, height) {
@@ -117,150 +121,6 @@ function windAt(t, x, y) {
     return Math.min(1, F.windBase + (1 - F.windBase) * (gust * 0.75 + flutter * 0.25) * gust);
 }
 
-// Árvore vista de cima, em duas camadas para o vento mexer cada uma de um jeito:
-// base = sombra + galhos escuros; crown = folhagem detalhada (folhinhas, vãos, luz da lua)
-function buildTreeSprite(rand, radius) {
-    const pad = 14;
-    const size = Math.ceil((radius + pad) * 2);
-    const c = size / 2;
-    const base = makeCanvas(size, size);
-    const crown = makeCanvas(size, size);
-    const b = base.getContext('2d');
-    const g = crown.getContext('2d');
-
-    // BASE: sombra no chão
-    b.fillStyle = F.canopyShadow;
-    b.beginPath();
-    b.arc(c + radius * 0.18, c + radius * 0.22, radius * 0.95, 0, Math.PI * 2);
-    b.fill();
-
-    // BASE: camadas escuras de folhagem
-    const lobes = 8 + Math.floor(rand() * 5);
-    for (let layer = 0; layer < 2; layer++) {
-        const layerRadius = radius * (1 - layer * 0.12);
-        b.fillStyle = F.canopyColors[layer];
-        for (let i = 0; i < lobes; i++) {
-            const a = (i / lobes) * Math.PI * 2 + rand() * 0.5;
-            const dist = layerRadius * randomRange(rand, 0.4, 0.62);
-            const r = layerRadius * randomRange(rand, 0.42, 0.56);
-            b.beginPath();
-            b.arc(c + Math.cos(a) * dist, c + Math.sin(a) * dist, r, 0, Math.PI * 2);
-            b.fill();
-        }
-    }
-
-    // BASE: galhos grossos saindo do tronco, com ramificações (aparecem pelos vãos)
-    b.strokeStyle = F.branchColor;
-    b.lineCap = 'round';
-    const branches = 5 + Math.floor(rand() * 3);
-    for (let i = 0; i < branches; i++) {
-        const a = (i / branches) * Math.PI * 2 + rand() * 0.6;
-        const len = radius * randomRange(rand, 0.65, 0.92);
-        const ex = c + Math.cos(a) * len;
-        const ey = c + Math.sin(a) * len;
-        b.lineWidth = Math.max(1.5, radius * 0.07);
-        b.beginPath();
-        b.moveTo(c, c);
-        b.lineTo(ex, ey);
-        b.stroke();
-        for (const t of [0.55, 0.8]) {
-            const bx = c + Math.cos(a) * len * t;
-            const by = c + Math.sin(a) * len * t;
-            const sa = a + (rand() < 0.5 ? -1 : 1) * randomRange(rand, 0.5, 0.9);
-            b.lineWidth = Math.max(1, radius * 0.035);
-            b.beginPath();
-            b.moveTo(bx, by);
-            b.lineTo(bx + Math.cos(sa) * len * 0.28, by + Math.sin(sa) * len * 0.28);
-            b.stroke();
-        }
-    }
-
-    // CROWN: massas de folhagem (mais claras, menores => deixam vãos para ver os galhos)
-    for (let layer = 2; layer < F.canopyColors.length; layer++) {
-        const layerRadius = radius * (0.96 - (layer - 2) * 0.2);
-        g.fillStyle = F.canopyColors[layer];
-        for (let i = 0; i < lobes; i++) {
-            const a = (i / lobes) * Math.PI * 2 + rand() * 0.6;
-            const dist = layerRadius * randomRange(rand, 0.4, 0.68);
-            const r = layerRadius * randomRange(rand, 0.28, 0.42);
-            g.beginPath();
-            g.arc(c + Math.cos(a) * dist, c + Math.sin(a) * dist, r, 0, Math.PI * 2);
-            g.fill();
-        }
-    }
-
-    // CROWN: folhinhas individuais para dar textura
-    const leaves = Math.floor(radius * F.leafDensity * 6);
-    for (let i = 0; i < leaves; i++) {
-        const a = rand() * Math.PI * 2;
-        const d = Math.sqrt(rand()) * radius * 0.92;
-        g.save();
-        g.translate(c + Math.cos(a) * d, c + Math.sin(a) * d);
-        g.rotate(rand() * Math.PI);
-        g.fillStyle = pick(rand, F.leafTones);
-        g.beginPath();
-        g.ellipse(0, 0, randomRange(rand, 2.2, 4.2), randomRange(rand, 1, 1.8), 0, 0, Math.PI * 2);
-        g.fill();
-        g.restore();
-    }
-
-    // CROWN: vãos escuros entre as folhas (profundidade)
-    g.fillStyle = F.leafGapColor;
-    for (let i = 0; i < radius * 0.35; i++) {
-        const a = rand() * Math.PI * 2;
-        const d = rand() * radius * 0.8;
-        g.beginPath();
-        g.arc(c + Math.cos(a) * d, c + Math.sin(a) * d, randomRange(rand, 1.5, 3.5), 0, Math.PI * 2);
-        g.fill();
-    }
-
-    // CROWN: luz fria da lua (cima-esquerda) + brilho no contorno
-    g.globalCompositeOperation = 'source-atop';
-    const lx = c - radius * 0.4;
-    const light = g.createRadialGradient(lx, lx, 0, lx, lx, radius);
-    light.addColorStop(0, F.canopyHighlight);
-    light.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    g.fillStyle = light;
-    g.fillRect(0, 0, size, size);
-    g.strokeStyle = F.canopyRimLight;
-    g.lineWidth = 1.4;
-    g.beginPath();
-    g.arc(c, c, radius * 0.9, Math.PI * 1.05, Math.PI * 1.65);
-    g.stroke();
-
-    return { base, crown, size };
-}
-
-function buildTrees(w, h, rand) {
-    const sprites = [];
-    for (let i = 0; i < F.treeVariants; i++) {
-        const radius = F.treeMinRadius + (F.treeMaxRadius - F.treeMinRadius) * (i / Math.max(1, F.treeVariants - 1));
-        sprites.push(buildTreeSprite(rand, radius));
-    }
-
-    // Faixa colada às bordas: o centro da tela fica livre
-    const band = Math.max(F.treeEdgeBandMin, Math.min(F.treeEdgeBandMax, Math.min(w, h) * F.treeEdgeBandRatio));
-    const trees = [];
-    const step = F.treeSpacing;
-    for (let y = -F.treeOverflow; y < h + F.treeOverflow; y += step) {
-        for (let x = -F.treeOverflow; x < w + F.treeOverflow; x += step) {
-            const tx = x + randomRange(rand, -step * 0.45, step * 0.45);
-            const ty = y + randomRange(rand, -step * 0.45, step * 0.45);
-            // Distância até a borda mais próxima (negativa = fora da tela)
-            const edgeDist = Math.min(tx, ty, w - tx, h - ty);
-            if (edgeDist > band + rand() * F.treeEdgeJitter) continue;
-
-            // Mais para fora => árvores maiores; dentro da tela => menores, para não invadir
-            const outer = Math.min(1, Math.max(0, 1 - edgeDist / band));
-            const variant = Math.min(F.treeVariants - 1, Math.floor((outer * 0.75 + rand() * 0.25) * F.treeVariants));
-            trees.push({ x: tx, y: ty, sprite: sprites[variant], phase: rand() * Math.PI * 2 });
-        }
-    }
-    // Menores primeiro, maiores por cima
-    trees.sort((a, b) => a.sprite.size - b.sprite.size);
-    return { sprites, trees };
-}
-
 // Textura de névoa que se repete sem emenda (os puffs "dão a volta" no tile)
 function buildFogTile(rand) {
     const size = F.fogTileSize;
@@ -330,6 +190,9 @@ function buildVignette(w, h) {
     const canvas = makeCanvas(w, h);
     const g = canvas.getContext('2d');
     const r = Math.hypot(w, h) / 2;
+    // Noite fria e vinheta numa única camada pré-desenhada
+    g.fillStyle = F.nightTint;
+    g.fillRect(0, 0, w, h);
     const grad = g.createRadialGradient(w / 2, h / 2, r * F.vignetteInnerRatio, w / 2, h / 2, r);
     grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
     grad.addColorStop(1, F.vignetteColor);
@@ -346,9 +209,6 @@ function ensureCache() {
 
     const rand = createRandom(F.seed);
     cache.ground = buildGround(w, h, rand);
-    const { sprites, trees } = buildTrees(w, h, rand);
-    cache.treeSprites = sprites;
-    cache.trees = trees;
     const { sprite, fog } = buildFog(w, h, rand);
     cache.fogSprite = sprite;
     cache.fog = fog;
@@ -361,7 +221,11 @@ function ensureCache() {
         blink: randomRange(rand, 0.6, 1.6)
     }));
     cache.grass = buildGrass(w, h, rand);
-    cache.vignette = buildVignette(w, h);
+    cache.grassByColor = F.grassColors.map((_, ci) => cache.grass.filter(c => c.color === ci));
+    cache.fogCanvas = makeCanvas(w * F.fogResolution, h * F.fogResolution);
+    cache.fogCtx = cache.fogCanvas.getContext('2d');
+    cache.vignette = buildVignette(w * F.fogResolution, h * F.fogResolution);
+    cache.lightRadius = 0;
 }
 
 // Camada 1: chão da floresta e clareira
@@ -375,13 +239,11 @@ export function renderForestGrass() {
     ensureCache();
     const t = performance.now() / 1000;
     ctx.save();
-    ctx.lineCap = 'round';
     ctx.lineWidth = 1.1;
     F.grassColors.forEach((color, ci) => {
         ctx.strokeStyle = color;
         ctx.beginPath();
-        cache.grass.forEach(clump => {
-            if (clump.color !== ci) return;
+        cache.grassByColor[ci].forEach(clump => {
             const wind = windAt(t, clump.x, clump.y);
             const sway = (wind * F.grassBend + Math.sin(t * 2.4 + clump.phase) * 0.8) * clump.height / F.grassMaxHeight;
             clump.blades.forEach(blade => {
@@ -396,32 +258,42 @@ export function renderForestGrass() {
     ctx.restore();
 }
 
-// Camada por cima dos monstros: eles saem de baixo das copas
-export function renderTreeCanopies() {
-    const t = performance.now() / 1000;
+// Raio da luz da tocha: acompanha a vida do núcleo, com transição suave e leve tremida
+export function getTorchLightRadius() {
+    const hpRatio = Math.max(0, Math.min(1, state.coreHp / state.coreHpMax));
+    const minSide = Math.min(state.width, state.height);
+    const target = minSide * (T.lightRadiusMinRatio
+        + (T.lightRadiusMaxRatio - T.lightRadiusMinRatio) * Math.pow(hpRatio, T.lightShrinkCurve));
+
+    const now = performance.now() / 1000;
+    const dt = Math.min(0.1, cache.lightTime ? now - cache.lightTime : 0);
+    cache.lightTime = now;
+    cache.lightRadius = cache.lightRadius
+        ? cache.lightRadius + (target - cache.lightRadius) * Math.min(1, dt * T.lightSmoothing)
+        : target;
+
+    const flicker = 1 + Math.sin(now * 11) * T.lightFlicker * 0.5 + Math.sin(now * 23.7) * T.lightFlicker * 0.5;
+    return cache.lightRadius * flicker;
+}
+
+// Brilho quente da tocha sobre o chão (soma de luz)
+export function renderTorchLight() {
+    const { coreX, coreY } = state;
+    const radius = getTorchLightRadius();
+    cache.currentLight = radius;
+
+    const grad = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, radius);
+    grad.addColorStop(0, `rgba(${T.groundGlowColor}, ${T.groundGlowAlpha})`);
+    grad.addColorStop(0.5, `rgba(${T.groundGlowColor}, ${T.groundGlowAlpha * 0.35})`);
+    grad.addColorStop(1, `rgba(${T.groundGlowColor}, 0)`);
     ctx.save();
-    ctx.globalAlpha = F.canopyAlpha;
-    cache.trees.forEach(tree => {
-        const wind = windAt(t, tree.x, tree.y);
-        const flutter = Math.sin(t * 5 + tree.phase) * F.swayFlutter * wind;
-        const slow = Math.sin(t * 0.7 + tree.phase) * 0.35;
-        const push = wind + slow * 0.4;
-        const half = tree.sprite.size / 2;
-
-        // Base: balanço leve
-        ctx.drawImage(tree.sprite.base, tree.x - half + push * F.baseSwayAmount, tree.y - half + push * F.baseSwayAmount * 0.4);
-
-        // Folhagem: empurrada e inclinada pela rajada, com tremor rápido
-        ctx.save();
-        ctx.translate(tree.x + push * F.crownSwayAmount + flutter, tree.y + push * F.crownSwayAmount * 0.4 + flutter * 0.5);
-        ctx.rotate(push * F.crownTiltAmount);
-        ctx.drawImage(tree.sprite.crown, -half, -half);
-        ctx.restore();
-    });
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = grad;
+    ctx.fillRect(coreX - radius, coreY - radius, radius * 2, radius * 2);
     ctx.restore();
 }
 
-// Vaga-lumes vagando e piscando (mais perto das árvores)
+// Vaga-lumes vagando e piscando
 export function renderFireflies() {
     const t = performance.now() / 1000;
     const dt = Math.min(0.05, cache.fireflyTime ? t - cache.fireflyTime : 0);
@@ -439,11 +311,7 @@ export function renderFireflies() {
 
         const glow = Math.max(0, Math.sin(t * f.blink * Math.PI + f.phase));
         if (glow <= 0.05) return;
-        const halo = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, F.fireflyGlowRadius);
-        halo.addColorStop(0, `rgba(${F.fireflyColor}, ${0.55 * glow})`);
-        halo.addColorStop(1, `rgba(${F.fireflyColor}, 0)`);
-        ctx.fillStyle = halo;
-        ctx.fillRect(f.x - F.fireflyGlowRadius, f.y - F.fireflyGlowRadius, F.fireflyGlowRadius * 2, F.fireflyGlowRadius * 2);
+        drawGlow(ctx, `rgba(${F.fireflyColor}, 0.6)`, f.x, f.y, F.fireflyGlowRadius, glow);
         ctx.fillStyle = `rgba(${F.fireflyColor}, ${glow})`;
         ctx.beginPath();
         ctx.arc(f.x, f.y, F.fireflyRadius, 0, Math.PI * 2);
@@ -453,25 +321,33 @@ export function renderFireflies() {
 }
 
 // Desenha o tile de névoa repetido, deslocado pelo tempo (rolagem contínua)
-function drawFogLayer(layer, t, w, h) {
+function drawFogLayer(g, layer, t, w, h) {
     const size = F.fogTileSize * layer.scale;
     const ox = (((t * layer.speedX) % size) + size) % size;
     const oy = (((t * layer.speedY) % size) + size) % size;
-    ctx.globalAlpha = layer.alpha;
+    g.globalAlpha = layer.alpha;
     for (let y = oy - size; y < h; y += size) {
         for (let x = ox - size; x < w; x += size) {
-            ctx.drawImage(cache.fogTile, x, y, size, size);
+            g.drawImage(cache.fogTile, x, y, size, size);
         }
     }
 }
 
-// Camada final: névoa rolando (duas camadas) + manchas à deriva (mais densas nas bordas) e vinheta escura
+// Camada final: a "sombra" da noite = névoa rolando + noite fria + vinheta, desenhada numa tela
+// de resolução reduzida. A luz da tocha apaga um círculo dessa sombra (sem névoa dentro da luz).
+// Quanto menos vida o núcleo tem, mais densa a névoa e menor o círculo de luz.
 export function renderFogAndVignette() {
-    const { width: w, height: h } = state;
+    const { width: w, height: h, coreX, coreY } = state;
     const t = performance.now() / 1000;
+    const g = cache.fogCtx;
+    const res = F.fogResolution;
+    const hpRatio = Math.max(0, Math.min(1, state.coreHp / state.coreHpMax));
+    const density = 1 + (1 - hpRatio) * F.fogDensityBoostAtZeroHp;
 
-    ctx.save();
-    F.fogLayers.forEach(layer => drawFogLayer(layer, t, w, h));
+    g.setTransform(res, 0, 0, res, 0, 0);
+    g.globalCompositeOperation = 'source-over';
+    g.clearRect(0, 0, w, h);
+    F.fogLayers.forEach(layer => drawFogLayer(g, { ...layer, alpha: Math.min(0.85, layer.alpha * density) }, t, w, h));
     cache.fog.forEach(blob => {
         // Deriva lenta para a direita, dando a volta na tela, com ondulação
         const span = w + blob.radius * blob.stretch * 2;
@@ -480,14 +356,28 @@ export function renderFogAndVignette() {
         const edge = Math.min(1, ellipticDistance(x, y, w, h));
         const breathe = 0.75 + 0.25 * Math.sin(t * 0.3 + blob.phase);
 
-        ctx.globalAlpha = (F.fogAlphaCenter + (F.fogAlphaEdge - F.fogAlphaCenter) * edge) * breathe;
+        g.globalAlpha = Math.min(0.85, (F.fogAlphaCenter + (F.fogAlphaEdge - F.fogAlphaCenter) * edge) * breathe * density);
         const rw = blob.radius * blob.stretch;
         const rh = blob.radius;
-        ctx.drawImage(cache.fogSprite, x - rw, y - rh, rw * 2, rh * 2);
+        g.drawImage(cache.fogSprite, x - rw, y - rh, rw * 2, rh * 2);
     });
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = F.nightTint;
-    ctx.fillRect(0, 0, w, h);
-    ctx.drawImage(cache.vignette, 0, 0, w, h);
-    ctx.restore();
+
+    // Noite fria + vinheta por cima da névoa
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalAlpha = 1;
+    g.drawImage(cache.vignette, 0, 0);
+
+    // Luz da tocha: apaga a sombra num círculo com borda suave
+    const lightR = (cache.currentLight || getTorchLightRadius()) * res;
+    const solid = 1 - T.lightEdgeSoftness;
+    const hole = g.createRadialGradient(coreX * res, coreY * res, 0, coreX * res, coreY * res, lightR);
+    hole.addColorStop(0, 'rgba(0, 0, 0, 1)');
+    hole.addColorStop(Math.max(0.01, solid), 'rgba(0, 0, 0, 1)');
+    hole.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    g.globalCompositeOperation = 'destination-out';
+    g.fillStyle = hole;
+    g.fillRect(0, 0, g.canvas.width, g.canvas.height);
+    g.globalCompositeOperation = 'source-over';
+
+    ctx.drawImage(cache.fogCanvas, 0, 0, w, h);
 }
