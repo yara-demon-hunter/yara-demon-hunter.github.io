@@ -1,4 +1,4 @@
-// --- NEON BLADE: CENTER GUARDIAN ---
+// --- LAST TORCH: DEMON HUNTER ---
 // Ponto de entrada: importa os motores e roda o game loop.
 // Dados (balanceamento) ficam em ../data_model/; o estado da partida em ./core/state.js.
 import { setupInput } from './core/input.js';

@@ -11,6 +11,8 @@ window.YaraVendor = (() => {
 
     // Chamado por exploreForest(): decide se o vendedor aparece nesta exploração.
     function shouldOffer() {
+        // O vendedor só existe no mundo físico; o Mundo Espiritual tem encontros próprios.
+        if (isInSpiritWorld) return false;
         const rules = EXPLORATION_RULES.vendor;
         explorationsSinceVendor++;
         if (explorationsSinceVendor < rules.cooldownExplorations) return false;

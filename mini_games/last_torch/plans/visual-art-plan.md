@@ -68,7 +68,7 @@ Usar `fx/shapes.js` e definir as formas em `visuals.js`:
 ## Como validar cada etapa
 
 - Abrir o jogo por servidor HTTP local (módulos ES não funcionam via `file://`):
-  `python3 -m http.server` na raiz do repositório e acessar `/mini_games/neon_blade_center_guardian/neon_blade_center_guardian.html`.
+  `python3 -m http.server` na raiz do repositório e acessar `/mini_games/last_torch/last_torch.html`.
 - Conferir o console sem erros, jogar até a loja (fim do turno 1) e, se possível, até um chefão.
 - Testar em largura de celular (~400px) e em paisagem.
 - Relatar ao usuário o que foi testado e o que não foi.

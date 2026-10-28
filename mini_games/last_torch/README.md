@@ -1,9 +1,9 @@
-# Neon Blade: Center Guardian
+# Last Torch: Demon Hunter
 
 ## Estrutura
 
 ```
-neon_blade_center_guardian.html   tela e elementos da interface
+last_torch.html   tela e elementos da interface
 css/
   game.css                        ponto de entrada: só importa os arquivos abaixo
   base/base.css                   fonte, body e canvas

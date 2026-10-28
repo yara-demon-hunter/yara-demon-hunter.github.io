@@ -12,7 +12,7 @@ window.YaraRpgData.exploration = Object.freeze({
     // O catálogo e os preços ficam em vendor.js; a lógica em ../systems/vendor.js.
     vendor: {
         chance: 10,
-        cooldownExplorations: 4
+        cooldownExplorations: 10
     },
     outcomes: Object.freeze([
         { type: "monster", weight: 38 },

@@ -45,7 +45,7 @@ Explorar
    │  ├─ Chance configurada: 20%
    │  └─ Disparou: escolhe aleatoriamente um evento ainda não visto e mostra suas opções
    ├─ 2. Vendedor ambulante (só se não disparou evento narrativo)
-   │  ├─ Precisa ter passado o intervalo de 4 explorações desde o último vendedor
+   │  ├─ Precisa ter passado o intervalo de 10 explorações desde o último vendedor
    │  ├─ Chance configurada: 10% (exploration-rules.js › vendor)
    │  └─ Disparou: mostra o evento "O vendedor ambulante"; "Ver as mercadorias" abre a loja
    │     (compra 4 mercadorias sorteadas e vende itens da mochila); "Seguir viagem" encerra o evento
@@ -190,6 +190,6 @@ As quatro regiões de exploração têm cinco tarefas cada, incluindo metas cumu
 - **38% monstro** e os demais pesos são a rolagem final de exploração, somente se evento narrativo e contato da névoa não aparecerem naquele clique.
 - **20% evento narrativo** é testado antes do contato da névoa, depois do intervalo; portanto, se disparar, o contato e a rolagem de exploração não são testados naquele clique.
 - A chance de contato da névoa também é uma rolagem separada, testada depois do evento narrativo e antes do resultado de exploração.
-- **10% de vendedor** é testado depois do evento narrativo e antes do contato da névoa, respeitando o intervalo de 4 explorações.
+- **10% de vendedor** é testado depois do evento narrativo e antes do contato da névoa, respeitando o intervalo de 10 explorações.
 - **10% spare** é testado apenas depois da vitória contra monstro comum; se aparecer, o jogador decide entre golpe final e poupar. As cinco consequências de poupar são então sorteadas com 20% cada.
 - As chances de recompensa (baú, drop de monstro, raridade) são novas rolagens dentro do resultado que as habilita; não são pontos percentuais da chance principal de explorar.

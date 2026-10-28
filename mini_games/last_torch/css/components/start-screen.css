@@ -1,0 +1,124 @@
+/* --- START SCREEN: dark forest at night ---
+   Near-black background, a flickering torch glow at the bottom, slow drifting fog,
+   bone-colored title. No display rules on #startScreen (the "hidden" class must keep working). */
+#startScreen {
+    background:
+        radial-gradient(ellipse 80% 55% at 50% 105%, rgba(124, 45, 18, 0.45), transparent 70%),
+        radial-gradient(ellipse at 50% 40%, #0a1116 0%, #04070a 70%, #010203 100%);
+    overflow: hidden;
+}
+
+/* Slow fog drifting across the screen */
+.start-fog {
+    position: absolute;
+    inset: -20%;
+    background:
+        radial-gradient(ellipse 40% 30% at 20% 30%, rgba(148, 170, 190, 0.10), transparent 70%),
+        radial-gradient(ellipse 45% 25% at 75% 55%, rgba(148, 170, 190, 0.09), transparent 70%),
+        radial-gradient(ellipse 50% 30% at 40% 85%, rgba(148, 170, 190, 0.08), transparent 70%);
+    animation: fogDrift 38s linear infinite alternate;
+    pointer-events: none;
+}
+@keyframes fogDrift {
+    from { transform: translate3d(-4%, -2%, 0) scale(1); }
+    to   { transform: translate3d(5%, 3%, 0) scale(1.12); }
+}
+
+/* Torch glow flickering at the bottom center */
+.start-torch {
+    position: absolute;
+    left: 50%;
+    bottom: -18vh;
+    width: min(90vw, 46rem);
+    height: min(60vh, 28rem);
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at 50% 100%, rgba(251, 146, 60, 0.38), rgba(194, 65, 12, 0.14) 45%, transparent 70%);
+    animation: torchFlicker 2.6s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes torchFlicker {
+    0%, 100% { opacity: 0.85; }
+    20% { opacity: 1; }
+    45% { opacity: 0.7; }
+    70% { opacity: 0.95; }
+}
+
+.start-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 30rem;
+    padding: 0 0.5rem;
+    text-align: center;
+}
+.start-eyebrow {
+    margin-bottom: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5em;
+    text-indent: 0.5em;
+    color: #94a3b8;
+}
+.start-title {
+    font-family: 'Cinzel', Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.6rem, 11vw, 4.6rem);
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-indent: 0.14em;
+    line-height: 1.05;
+    color: #e7e0cf;
+    text-shadow: 0 0 22px rgba(251, 146, 60, 0.45), 0 0 60px rgba(194, 65, 12, 0.35), 0 2px 0 #1a0f08;
+    animation: titleFlicker 4s ease-in-out infinite;
+}
+@keyframes titleFlicker {
+    0%, 100% { text-shadow: 0 0 22px rgba(251, 146, 60, 0.45), 0 0 60px rgba(194, 65, 12, 0.35), 0 2px 0 #1a0f08; }
+    50% { text-shadow: 0 0 30px rgba(251, 146, 60, 0.7), 0 0 80px rgba(194, 65, 12, 0.5), 0 2px 0 #1a0f08; }
+}
+.start-tagline {
+    margin: 0.7rem 0 1.4rem;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: #94a3b8;
+}
+
+.start-tips {
+    margin: 0 0 1.5rem;
+    padding: 0.9rem 1rem;
+    list-style: none;
+    text-align: left;
+    background: rgba(8, 12, 16, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 0.9rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.5);
+}
+.start-tips li { display: flex; gap: 0.7rem; padding: 0.4rem 0; }
+.start-tips li + li { border-top: 1px solid rgba(148, 163, 184, 0.08); }
+.start-tips span { flex-shrink: 0; font-size: 1.05rem; line-height: 1.4; }
+.start-tips p { font-size: 0.8rem; line-height: 1.45; color: #8b98a8; }
+.start-tips b { color: #d6cdb8; font-weight: 700; }
+
+.start-btn {
+    width: 100%;
+    padding: 0.95rem 1.5rem;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.25em;
+    text-indent: 0.25em;
+    color: #fde4c8;
+    background: linear-gradient(180deg, #7c2d12, #431407);
+    border: 1px solid rgba(251, 146, 60, 0.55);
+    border-radius: 0.75rem;
+    box-shadow: 0 0 22px rgba(194, 65, 12, 0.35), inset 0 1px 0 rgba(253, 186, 116, 0.25);
+    transition: transform 0.12s, box-shadow 0.2s, filter 0.2s;
+}
+.start-btn:hover { filter: brightness(1.2); box-shadow: 0 0 34px rgba(234, 88, 12, 0.6), inset 0 1px 0 rgba(253, 186, 116, 0.3); }
+.start-btn:active { transform: scale(0.97); }
+
+@media (max-height: 560px) {
+    .start-tagline { margin: 0.4rem 0 0.7rem; }
+    .start-tips { padding: 0.5rem 0.8rem; margin-bottom: 0.8rem; }
+    .start-tips li { padding: 0.2rem 0; }
+    .start-tips p { font-size: 0.72rem; line-height: 1.3; }
+    .start-btn { padding: 0.7rem 1rem; }
+}
