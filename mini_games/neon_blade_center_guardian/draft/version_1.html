@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Neon Blade: Center Guardian</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
+
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #05030a;
+            font-family: 'Rajdhani', sans-serif;
+            color: #fff;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Neon Glow Effects */
+        .neon-text-cyan {
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.8), 0 0 20px rgba(0, 243, 255, 0.5);
+        }
+        .neon-text-pink {
+            text-shadow: 0 0 8px rgba(255, 0, 127, 0.8), 0 0 20px rgba(255, 0, 127, 0.5);
+        }
+        .neon-text-yellow {
+            text-shadow: 0 0 8px rgba(255, 221, 0, 0.8), 0 0 20px rgba(255, 221, 0, 0.5);
+        }
+
+        .neon-border-cyan {
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
+            border: 2px solid #00f3ff;
+        }
+
+        .neon-border-pink {
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4), inset 0 0 15px rgba(255, 0, 127, 0.2);
+            border: 2px solid #ff007f;
+        }
+
+        .neon-border-yellow {
+            box-shadow: 0 0 15px rgba(255, 221, 0, 0.4), inset 0 0 15px rgba(255, 221, 0, 0.2);
+            border: 2px solid #ffdd00;
+        }
+
+        .btn-action {
+            transition: all 0.2s ease;
+            background: linear-gradient(135deg, rgba(255,0,127,0.25) 0%, rgba(0,243,255,0.25) 100%);
+        }
+        .btn-action:hover {
+            transform: scale(1.03);
+            background: linear-gradient(135deg, rgba(255,0,127,0.5) 0%, rgba(0,243,255,0.5) 100%);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.8);
+        }
+        .btn-action:active {
+            transform: scale(0.97);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 10, 25, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff007f;
+            border-radius: 3px;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .interactive {
+            pointer-events: auto;
+        }
+
+        /* Scanline effect */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="select-none overflow-hidden">
+
+    <!-- Canvas principal -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Camada de Scanlines Retrô -->
+    <div class="scanlines absolute inset-0 z-20 opacity-30 pointer-events-none"></div>
+
+    <!-- UI Overlay HUD -->
+    <div class="ui-layer flex flex-col justify-between p-3 md:p-6 font-orbitron">
+        
+        <!-- Top Bar Header -->
+        <div class="flex justify-between items-start w-full max-w-6xl mx-auto gap-2">
+            <!-- Barra de Vida do Núcleo -->
+            <div class="w-1/3 md:w-1/4">
+                <div class="text-[10px] md:text-xs text-cyan-400 font-bold mb-1 flex justify-between items-center">
+                    <span>🔥 NÚCLEO CENTRAL</span>
+                    <span id="coreHpText" class="text-white">100%</span>
+                </div>
+                <div class="w-full bg-gray-900 rounded-full h-2.5 p-0.5 border border-cyan-500/50">
+                    <div id="coreHpBar" class="bg-gradient-to-r from-cyan-500 to-pink-500 h-full rounded-full transition-all duration-200" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Progresso de Pontos do Turno Central -->
+            <div class="flex-1 max-w-xs text-center px-2">
+                <div class="flex justify-between text-[10px] md:text-xs font-bold text-yellow-400 mb-0.5">
+                    <span id="turnLabel">TURNO 1</span>
+                    <span id="targetScoreDisplay">META: 0 / 500 Pts</span>
+                </div>
+                <div class="w-full bg-gray-950/80 rounded-full h-3 p-0.5 border border-yellow-500/60 shadow-lg">
+                    <div id="turnProgressBar" class="bg-gradient-to-r from-yellow-500 via-pink-500 to-cyan-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+                <div id="scoreDisplay" class="text-[10px] md:text-xs text-cyan-300 tracking-wider mt-1">PONTOS TOTAIS: 0</div>
+            </div>
+
+            <!-- Moedas e Áudio -->
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="bg-black/60 border border-yellow-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+                    <span class="text-yellow-400 text-sm md:text-lg">🪙</span>
+                    <span id="coinDisplay" class="text-yellow-300 font-bold text-xs md:text-base">0</span>
+                </div>
+                
+                <button id="audioBtn" class="interactive bg-black/60 border border-pink-500/50 hover:bg-pink-500/20 text-pink-400 p-1.5 md:p-2 rounded-lg text-base md:text-lg transition">
+                    🔊
+                </button>
+            </div>
+        </div>
+
+        <!-- Combo & Frenzy Gauge (Centro-Baixo) -->
+        <div class="flex flex-col items-center justify-center w-full max-w-md mx-auto mb-2">
+            <div id="comboDisplay" class="text-pink-400 text-lg md:text-2xl font-black opacity-0 transition-opacity duration-200 mb-1">
+                2x COMBO!
+            </div>
+            
+            <!-- Barra de Frenzy -->
+            <div class="w-full bg-black/70 rounded-full h-4 p-0.5 border border-purple-500 relative overflow-hidden interactive cursor-pointer">
+                <div id="frenzyBar" class="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 h-full rounded-full transition-all duration-100" style="width: 0%;"></div>
+                <div id="frenzyText" class="absolute inset-0 flex items-center justify-center text-[10px] md:text-xs font-bold text-white tracking-widest uppercase shadow-text">
+                    MODO FRENZI PRONTO [ESPAÇO]
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modais / Overlays -->
+
+    <!-- MENU INICIAL -->
+    <div id="mainMenu" class="ui-layer interactive flex items-center justify-center bg-black/80 backdrop-blur-md">
+        <div class="text-center p-6 md:p-8 rounded-2xl max-w-lg w-11/12 neon-border-pink bg-slate-950/90 flex flex-col items-center">
+            <h1 class="text-3xl md:text-5xl font-black font-orbitron text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-pink-500 to-yellow-400 mb-2 neon-text-pink">
+                NEON BLADE
+            </h1>
+            <p class="text-cyan-300 text-xs md:text-sm font-bold mb-5 tracking-widest">CENTER GUARDIAN: SLASH & BOUNCE</p>
+            
+            <div class="text-left text-gray-300 text-xs md:text-sm space-y-2 mb-6 bg-black/50 p-4 rounded-xl border border-cyan-500/30">
+                <p>🛡️ <strong class="text-pink-400">Proteja a Tocha Central:</strong> Elimine os inimigos antes que eles destruam o núcleo.</p>
+                <p>💥 <strong class="text-yellow-400">Empurrão Repulsivo (Knockback):</strong> Seus golpes empurram blocos e inimigos para longe!</p>
+                <p>🏪 <strong class="text-cyan-400">Loja Aberta a Cada Turno:</strong> Use suas moedas acumuladas ao final de cada turno para evoluir livremente seus 8 atributos.</p>
+                <p>⚡ <strong class="text-purple-400">Ataque Automático:</strong> Os ataques disparam no <span class="text-red-500 font-bold">Raio Vermelho</span>.</p>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full">
+                <button id="startBtn" class="btn-action w-full py-3.5 rounded-xl text-white font-orbitron font-bold text-base md:text-lg border border-cyan-400 tracking-wider">
+                    INICIAR BATALHA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOJA DE HABILIDADES ENTRE TURNOS -->
+    <div id="turnShopMenu" class="ui-layer interactive hidden flex items-center justify-center bg-black/85 backdrop-blur-lg">
+        <div class="p-5 md:p-8 rounded-2xl max-w-4xl w-11/12 max-h-[92vh] flex flex-col neon-border-yellow bg-slate-950/95">
+            
+            <!-- Header da Loja do Turno -->
+            <div class="flex justify-between items-center mb-3 pb-3 border-b border-yellow-500/30">
+                <div>
+                    <div class="text-[10px] md:text-xs text-yellow-400 font-orbitron tracking-widest uppercase">✨ TURNO CONCLUÍDO! ✨</div>
+                    <h2 class="text-xl md:text-3xl font-black font-orbitron text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-400 neon-text-yellow">
+                        LOJA DE EVOLUÇÃO
+                    </h2>
+                </div>
+
+                <div class="flex items-center gap-2 bg-black/70 px-3 py-1.5 rounded-xl border border-yellow-500/50">
+                    <span class="text-lg">🪙</span>
+                    <span id="turnShopCoins" class="text-yellow-400 font-bold font-orbitron text-base md:text-xl">0</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-300 mb-3">Evolua livremente seus <strong>8 Atributos</strong> para encarar a próxima rodada:</p>
+
+            <!-- Grid com todos os 8 Atributos Evoluíveis -->
+            <div class="overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3 my-2 pr-1 flex-1 text-xs md:text-sm">
+                
+                <!-- 1. Dano -->
+                <div class="bg-black/60 p-3 rounded-xl border border-pink-500/40 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-pink-300 font-orbitron flex items-center gap-1.5">
+                            <span>🗡️</span> 1. DANO DA LÂMINA
+                        </div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Aumenta o dano de todos os ataques.</div>
+                        <div id="attrLvlDamage" class="text-[10px] text-pink-400 font-bold mt-1">Nível: 1 (Dano: 1.0)</div>
+                    </div>
+                    <button onclick="buyAttribute('damage')" class="btn-action px-3 py-2 rounded-lg font-orbitron font-bold text-xs text-white border border-pink-400 min-w-[95px]">
+                        + <span id="attrCostDamage">100</span> 🪙
+                    </button>
+                </div>
+
+                <!-- 2. Raio de Ação -->
+                <div class="bg-black/60 p-3 rounded-xl border border-red-500/40 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-red-300 font-orbitron flex items-center gap-1.5">
+                            <span>⭕</span> 2. RAIO DE ATAQUE
+                        </div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Expande o tamanho do Círculo Vermelho.</div>
+                        <div id="attrLvlRadius" class="text-[10px] text-red-400 font-bold mt-1">Nível: 1 (Raio: 70px)</div>
+                    </div>
+                    <button onclick="buyAttribute('radius')" class="btn-action px-3 py-2 rounded-lg font-orbitron font-bold text-xs text-white border border-red-400 min-w-[95px]">
+                        + <span id="attrCostRadius">100</span> 🪙
+                    </button>
+                </div>
+
+                <!-- 3. Velocidade de Ataque -->
+                <div class="bg-black/60 p-3 rounded-xl border border-yellow-500/40 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-yellow-300 font-orbitron flex items-center gap-1.5">
+                            <span>⚡</span> 3. VELOCIDADE DE ATAQUE
+                        </div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Reduz o tempo de espera entre cortes.</div>
+                        <div id="attrLvlAtkSpeed" class="text-[10px] text-yellow-400 font-bold mt-1">Nível: 1 (Intervalo: 0.22s)</div>
+                    </div>
+                    <button onclick="buyAttribute('atkSpeed')" class="btn-action px-3 py-2 rounded-lg font-orbitron font-bold text-xs text-white border border-yellow-400 min-w-[95px]">
+                        + <span id="attrCostAtkSpeed">120</span> 🪙
+                    </button>
+                </div>
+
+                <!-- 4. Velocidade de Movimento -->
+                <div class="bg-black/60 p-3 rounded-xl border border-cyan-500/40 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-cyan-300 font-orbitron flex items-center gap-1.5">
+                            <span>🚀</span> 4. VELOCIDADE DE MOVIMENTO
+                        </div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Acelera o deslocamento físico até a mira.</div>
+                        <div id="attrLvlMoveSpeed" class="text-[10px] text-cyan-400 font-bold mt-1">Nível: 1 (Vel: 220)</div>
+                    </div>
+                    <button onclick="buyAttribute('moveSpeed')" class="btn-action px-3 py-2 rounded-lg font-orbitron font-bold text-xs text-white border border-cyan-400 min-w-[95px]">
+                        + <span id="attrCostMoveSpeed">100</span> 🪙
+                    </button>
+                </div>
+
+                <!-- 5. Força de Empurrão / Knockback -->
+                <div class="bg-black/60 p-3 rounded-xl border border-orange-500/40 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-orange-300 font-orbitron flex items-center gap-1.5">
+                            <span>💥</span> 5. FORÇA DE EMPURRÃO
+                        </div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Arremessa inimigos e blocos para longe.</div>
+                        <div id="attrLvlKnockback" class="text-[10px] text-orange-400 font-bold mt-1">Nível: 1 (Impulso: 15px)</div>
+                    </div>
+                    <button onclick="buyAttribute('knockback')" class="btn-action px-3 py-2 rounded-lg font-orbitron font-bold text-xs text-white border border-orange-400 min-w-[95px]">
+                        + <span id="attrCostKnockback">110</span> 🪙
+                    </button>
+                </div>
+
+                <!-- 6. Ímã de Moedas -->
+                <div class="bg-black/60 p-3 rounded-xl border border-purple-500/40 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-purple-300 font-orbitron flex items-center gap-1.5">
+                            <span>🧲</span> 6. ÍMÃ DE MOEDAS
+                        </div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Puxa moedas de distâncias maiores.</div>
+                        <div id="attrLvlMagnet" class="text-[10px] text-purple-400 font-bold mt-1">Nível: 1 (Alcance: 100px)</div>
+                    </div>
+                    <button onclick="buyAttribute('magnet')" class="btn-action px-3 py-2 rounded-lg font-orbitron font-bold text-xs text-white border border-purple-400 min-w-[95px]">
+                        + <span id="attrCostMagnet">90</span> 🪙
+                    </button>
+                </div>
+
+                <!-- 7. Integridade do Núcleo -->
+                <div class="bg-black/60 p-3 rounded-xl border border-green-500/40 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-green-300 font-orbitron flex items-center gap-1.5">
+                            <span>❤️</span> 7. VIDA DO NÚCLEO
+                        </div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Aumenta e restaura a saúde do núcleo.</div>
+                        <div id="attrLvlCoreHp" class="text-[10px] text-green-400 font-bold mt-1">Nível: 1 (Máx: 100 HP)</div>
+                    </div>
+                    <button onclick="buyAttribute('coreHp')" class="btn-action px-3 py-2 rounded-lg font-orbitron font-bold text-xs text-white border border-green-400 min-w-[95px]">
+                        + <span id="attrCostCoreHp">130</span> 🪙
+                    </button>
+                </div>
+
+                <!-- 8. Multiplicador Frenzi -->
+                <div class="bg-black/60 p-3 rounded-xl border border-blue-500/40 flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-blue-300 font-orbitron flex items-center gap-1.5">
+                            <span>🔥</span> 8. TAXA DE FRENZI
+                        </div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Carrega a barra de Frenzi mais rápido.</div>
+                        <div id="attrLvlFrenzy" class="text-[10px] text-blue-400 font-bold mt-1">Nível: 1 (Carga: 1x)</div>
+                    </div>
+                    <button onclick="buyAttribute('frenzy')" class="btn-action px-3 py-2 rounded-lg font-orbitron font-bold text-xs text-white border border-blue-400 min-w-[95px]">
+                        + <span id="attrCostFrenzy">140</span> 🪙
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Botão Continuar Turno -->
+            <button id="startNextTurnBtn" class="btn-action w-full py-3.5 mt-2 rounded-xl text-white font-orbitron font-bold text-base border border-yellow-400 tracking-wider shadow-lg">
+                INICIAR PRÓXIMO TURNO ▶
+            </button>
+        </div>
+    </div>
+
+    <!-- GAME OVER / DERROTA -->
+    <div id="gameOverMenu" class="ui-layer interactive hidden flex items-center justify-center bg-black/90 backdrop-blur-md">
+        <div class="text-center p-8 rounded-2xl max-w-md w-11/12 neon-border-pink bg-slate-950/95 flex flex-col items-center">
+            <h2 class="text-3xl md:text-4xl font-black font-orbitron text-red-500 mb-2 neon-text-pink">
+                NÚCLEO DESTRUÍDO
+            </h2>
+            <p class="text-gray-400 text-xs md:text-sm mb-6">A defesa synthwave sucumbiu ao ataque.</p>
+
+            <div class="w-full bg-black/60 p-4 rounded-xl border border-pink-500/30 space-y-2 mb-6 font-orbitron text-xs md:text-sm">
+                <div class="flex justify-between text-gray-300">
+                    <span>Turnos Alcançados:</span>
+                    <span id="finalTurn" class="text-pink-400 font-bold">0</span>
+                </div>
+                <div class="flex justify-between text-gray-300">
+                    <span>Pontuação Total:</span>
+                    <span id="finalScore" class="text-cyan-400 font-bold">0</span>
+                </div>
+                <div class="flex justify-between text-gray-300">
+                    <span>Moedas Restantes:</span>
+                    <span id="finalCoins" class="text-yellow-400 font-bold">0</span>
+                </div>
+            </div>
+
+            <button id="restartBtn" class="btn-action w-full py-3.5 rounded-xl text-white font-orbitron font-bold text-base border border-cyan-400 tracking-wider">
+                NOVA PARTIDA
+            </button>
+        </div>
+    </div>
+
+    <!-- NOTIFICAÇÃO TOAST -->
+    <div id="toastMessage" class="absolute top-20 left-1/2 -translate-x-1/2 bg-cyan-950/90 border border-cyan-400 text-cyan-200 px-6 py-2 rounded-full font-orbitron text-xs md:text-sm shadow-lg pointer-events-none opacity-0 transition-opacity duration-300 z-30">
+        Mensagem
+    </div>
+
+    <!-- LÓGICA DO JOGO EM JAVASCRIPT -->
+    <script>
+        /* ==========================================================================
+           MOTOR DE ÁUDIO SINTETIZADO (WEB AUDIO API)
+           ========================================================================== */
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+                this.isMusicPlaying = false;
+                this.tempo = 124;
+                this.nextNoteTime = 0;
+                this.step = 0;
+
+                this.bassline = [110, 110, 220, 110, 146.83, 110, 130.81, 98.00];
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            toggleMute() {
+                this.muted = !this.muted;
+                return this.muted;
+            }
+
+            playSlash() {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(850, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.09);
+
+                gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.09);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.09);
+            }
+
+            playExplosion() {
+                if (this.muted || !this.ctx) return;
+                const bufferSize = this.ctx.sampleRate * 0.18;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1200, this.ctx.currentTime);
+                filter.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.18);
+
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.18);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                noise.start();
+            }
+
+            playCoin() {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(987.77, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(1318.51, this.ctx.currentTime + 0.07);
+
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+
+            playLevelUp() {
+                if (this.muted || !this.ctx) return;
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.08);
+
+                    gain.gain.setValueAtTime(0.25, this.ctx.currentTime + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.08 + 0.2);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(this.ctx.currentTime + idx * 0.08);
+                    osc.stop(this.ctx.currentTime + idx * 0.08 + 0.2);
+                });
+            }
+
+            playFrenzy() {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(900, this.ctx.currentTime + 0.35);
+
+                gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.4);
+            }
+
+            playCoreHit() {
+                if (this.muted || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(130, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(35, this.ctx.currentTime + 0.2);
+
+                gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.2);
+            }
+
+            startMusic() {
+                if (this.isMusicPlaying) return;
+                this.init();
+                this.isMusicPlaying = true;
+                this.nextNoteTime = this.ctx.currentTime;
+                this.scheduler();
+            }
+
+            scheduler() {
+                if (!this.isMusicPlaying) return;
+                while (this.nextNoteTime < this.ctx.currentTime + 0.1) {
+                    this.playSynthStep(this.nextNoteTime);
+                    this.nextNoteTime += 60 / this.tempo / 4;
+                    this.step = (this.step + 1) % 16;
+                }
+                setTimeout(() => this.scheduler(), 25);
+            }
+
+            playSynthStep(time) {
+                if (this.muted) return;
+
+                if (this.step % 2 === 0) {
+                    const bassOsc = this.ctx.createOscillator();
+                    const bassGain = this.ctx.createGain();
+                    const freq = this.bassline[Math.floor(this.step / 2) % this.bassline.length];
+
+                    bassOsc.type = 'sawtooth';
+                    bassOsc.frequency.setValueAtTime(freq / 2, time);
+
+                    bassGain.gain.setValueAtTime(0.1, time);
+                    bassGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
+
+                    bassOsc.connect(bassGain);
+                    bassGain.connect(this.ctx.destination);
+
+                    bassOsc.start(time);
+                    bassOsc.stop(time + 0.1);
+                }
+
+                if (this.step % 4 === 0) {
+                    const kickOsc = this.ctx.createOscillator();
+                    const kickGain = this.ctx.createGain();
+
+                    kickOsc.frequency.setValueAtTime(140, time);
+                    kickOsc.frequency.exponentialRampToValueAtTime(0.01, time + 0.12);
+
+                    kickGain.gain.setValueAtTime(0.28, time);
+                    kickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.12);
+
+                    kickOsc.connect(kickGain);
+                    kickGain.connect(this.ctx.destination);
+
+                    kickOsc.start(time);
+                    kickOsc.stop(time + 0.12);
+                }
+            }
+        }
+
+        const audio = new SoundEngine();
+
+        /* ==========================================================================
+           ESTADO GLOBAL DO JOGO & OS 8 ATRIBUTOS
+           ========================================================================== */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height, centerX, centerY;
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            centerX = width / 2;
+            centerY = height / 2;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const gameState = {
+            running: false,
+            paused: false,
+            totalScore: 0,
+            turnScore: 0,
+            targetTurnScore: 500,
+            turn: 1,
+            coins: 0,
+            
+            frenzyEnergy: 0,
+            frenzyActive: false,
+            frenzyTimer: 0,
+            timeScale: 1.0,
+            comboCount: 0,
+            comboTimer: 0,
+            screenShake: 0,
+
+            // Vida do Núcleo
+            coreHp: 100,
+
+            // Jogador / Cursor
+            playerX: centerX,
+            playerY: centerY,
+            targetX: centerX,
+            targetY: centerY,
+            vx: 0,
+            vy: 0,
+            lastX: centerX,
+            lastY: centerY,
+            velocity: 0,
+
+            // OS 8 ATRIBUTOS COMPRÁVEIS NA LOJA DE TURNOS
+            attributes: {
+                damage: { level: 1, baseCost: 100 },      // 1. Dano da Lâmina
+                radius: { level: 1, baseCost: 100 },      // 2. Raio de Ação (Círculo Vermelho)
+                atkSpeed: { level: 1, baseCost: 120 },    // 3. Velocidade de Ataque / Cooldown
+                moveSpeed: { level: 1, baseCost: 100 },   // 4. Velocidade de Movimento
+                knockback: { level: 1, baseCost: 110 },   // 5. Força de Empurrão / Repulsão (NOVO)
+                magnet: { level: 1, baseCost: 90 },       // 6. Ímã de Moedas
+                coreHp: { level: 1, baseCost: 130 },      // 7. Vida do Núcleo
+                frenzy: { level: 1, baseCost: 140 }       // 8. Taxa de Frenzi
+            }
+        };
+
+        /* ==========================================================================
+           CÁLCULO DE VALORES DERIVADOS DOS 8 ATRIBUTOS
+           ========================================================================== */
+        function getBladeDamage() {
+            return 1.0 + (gameState.attributes.damage.level - 1) * 0.8;
+        }
+
+        function getActionRadius() {
+            return 70 + (gameState.attributes.radius.level - 1) * 18;
+        }
+
+        function getAttackCooldownSpeed() {
+            return Math.max(0.06, 0.22 - (gameState.attributes.atkSpeed.level - 1) * 0.025);
+        }
+
+        function getPlayerMaxSpeed() {
+            return 220 + (gameState.attributes.moveSpeed.level - 1) * 50;
+        }
+
+        function getKnockbackForce() {
+            // Empurrão em pixels aplicado no alvo ao acertar um golpe
+            return 15 + (gameState.attributes.knockback.level - 1) * 12;
+        }
+
+        function getMagnetRadius() {
+            return 100 + (gameState.attributes.magnet.level - 1) * 45;
+        }
+
+        function getMaxCoreHp() {
+            return 100 + (gameState.attributes.coreHp.level - 1) * 35;
+        }
+
+        function getFrenzyChargeRate() {
+            return 1.0 + (gameState.attributes.frenzy.level - 1) * 0.4;
+        }
+
+        /* ==========================================================================
+           ENTIDADES DO JOGO (INIMIGOS / BLOCOS, MOEDAS, PARTÍCULAS)
+           ========================================================================== */
+        let enemies = [];
+        let particles = [];
+        let coins = [];
+        let slashes = [];
+        let mouseTrail = [];
+
+        class Enemy {
+            constructor(type = 'basic') {
+                this.type = type;
+                const angle = Math.random() * Math.PI * 2;
+                const spawnDist = Math.max(width, height) / 2 + 60;
+                this.x = centerX + Math.cos(angle) * spawnDist;
+                this.y = centerY + Math.sin(angle) * spawnDist;
+
+                this.size = type === 'tank' ? 26 : (type === 'fast' ? 12 : (type === 'splitter' ? 20 : 16));
+                this.hp = type === 'tank' ? 6 : (type === 'fast' ? 1 : (type === 'splitter' ? 3 : 2));
+                this.maxHp = this.hp;
+                
+                this.speed = type === 'fast' ? 3.0 : (type === 'tank' ? 1.0 : 1.7);
+                this.speed += (gameState.turn - 1) * 0.15;
+
+                this.color = type === 'tank' ? '#ff0055' : (type === 'fast' ? '#00f3ff' : (type === 'splitter' ? '#a855f7' : '#ffea00'));
+                this.angle = 0;
+                this.rotSpeed = (Math.random() - 0.5) * 0.1;
+            }
+
+            update(dt) {
+                const dx = centerX - this.x;
+                const dy = centerY - this.y;
+                const dist = Math.hypot(dx, dy);
+
+                this.angle += this.rotSpeed;
+
+                if (dist > 18) {
+                    this.x += (dx / dist) * this.speed * gameState.timeScale;
+                    this.y += (dy / dist) * this.speed * gameState.timeScale;
+                } else {
+                    damageCore(this.type === 'tank' ? 25 : 12);
+                    this.destroy(false);
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 3;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 12;
+
+                if (this.type === 'basic') {
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size);
+                    ctx.lineTo(this.size, 0);
+                    ctx.lineTo(0, this.size);
+                    ctx.lineTo(-this.size, 0);
+                    ctx.closePath();
+                } else if (this.type === 'fast') {
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size * 1.3);
+                    ctx.lineTo(this.size, this.size);
+                    ctx.lineTo(-this.size, this.size);
+                    ctx.closePath();
+                } else if (this.type === 'tank') {
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        const a = (i * Math.PI) / 3;
+                        const px = Math.cos(a) * this.size;
+                        const py = Math.sin(a) * this.size;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                } else if (this.type === 'splitter') {
+                    ctx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        const r = (i % 2 === 0) ? this.size : this.size * 0.5;
+                        const a = (i * Math.PI) / 4;
+                        const px = Math.cos(a) * r;
+                        const py = Math.sin(a) * r;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                }
+                ctx.stroke();
+
+                if (this.hp < this.maxHp) {
+                    ctx.restore();
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(255,0,0,0.6)';
+                    ctx.fillRect(this.x - 15, this.y - this.size - 10, 30, 4);
+                    ctx.fillStyle = '#00f3ff';
+                    ctx.fillRect(this.x - 15, this.y - this.size - 10, (this.hp / this.maxHp) * 30, 4);
+                }
+
+                ctx.restore();
+            }
+
+            takeDamage(amount, pushVector = {x: 0, y: 0}) {
+                this.hp -= amount;
+                
+                // SISTEMA DE EMPURRÃO / KNOCKBACK APLICADO
+                const force = getKnockbackForce();
+                this.x += pushVector.x * force;
+                this.y += pushVector.y * force;
+
+                createSparkExplosion(this.x, this.y, this.color, 8);
+
+                if (this.hp <= 0) {
+                    this.destroy(true);
+                }
+            }
+
+            destroy(killedByPlayer = true) {
+                const index = enemies.indexOf(this);
+                if (index !== -1) enemies.splice(index, 1);
+
+                if (killedByPlayer) {
+                    let pts = this.type === 'tank' ? 40 : (this.type === 'splitter' ? 25 : 12);
+                    if (gameState.frenzyActive) {
+                        pts = Math.floor(pts * 1.8);
+                    }
+
+                    addTurnScore(pts);
+                    addCombo();
+                    audio.playExplosion();
+                    triggerScreenShake(this.type === 'tank' ? 12 : 6);
+
+                    if (this.type === 'splitter') {
+                        for (let i = 0; i < 2; i++) {
+                            const sub = new Enemy('fast');
+                            sub.x = this.x + (Math.random() - 0.5) * 24;
+                            sub.y = this.y + (Math.random() - 0.5) * 24;
+                            enemies.push(sub);
+                        }
+                    }
+
+                    const coinCount = this.type === 'tank' ? 4 : (this.type === 'splitter' ? 2 : 1);
+                    for (let i = 0; i < coinCount; i++) {
+                        coins.push(new Coin(this.x, this.y));
+                    }
+
+                    createSparkExplosion(this.x, this.y, this.color, 20);
+                }
+            }
+        }
+
+        class Coin {
+            constructor(x, y) {
+                this.x = x + (Math.random() - 0.5) * 20;
+                this.y = y + (Math.random() - 0.5) * 20;
+                this.size = 6;
+            }
+
+            update() {
+                const dx = gameState.playerX - this.x;
+                const dy = gameState.playerY - this.y;
+                const dist = Math.hypot(dx, dy);
+
+                const magnet = getMagnetRadius();
+                if (dist < magnet) {
+                    const speed = 10 * (1 - dist / magnet) + 3;
+                    this.x += (dx / dist) * speed;
+                    this.y += (dy / dist) * speed;
+                }
+
+                if (dist < 22) {
+                    gameState.coins++;
+                    audio.playCoin();
+                    createSparkExplosion(this.x, this.y, '#ffea00', 6);
+                    const idx = coins.indexOf(this);
+                    if (idx !== -1) coins.splice(idx, 1);
+                    updateHUD();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.fillStyle = '#ffea00';
+                ctx.shadowColor = '#ffea00';
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 6 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.life = 1.0;
+                this.decay = Math.random() * 0.04 + 0.02;
+                this.size = Math.random() * 3 + 1;
+            }
+
+            update() {
+                this.x += this.vx * gameState.timeScale;
+                this.y += this.vy * gameState.timeScale;
+                this.life -= this.decay;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.life);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createSparkExplosion(x, y, color, count = 15) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        class SlashArc {
+            constructor(x, y, angle, radius) {
+                this.x = x;
+                this.y = y;
+                this.angle = angle;
+                this.radius = radius;
+                this.life = 1.0;
+            }
+
+            update() {
+                this.life -= 0.12;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                ctx.strokeStyle = '#00f3ff';
+                ctx.shadowColor = '#ff007f';
+                ctx.shadowBlur = 15;
+                ctx.lineWidth = 4 * this.life;
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, -Math.PI / 4, Math.PI / 4);
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        /* ==========================================================================
+           LÓGICA DO JOGO, MOVIMENTO E TURNOS
+           ========================================================================== */
+        let autoAttackCooldown = 0;
+
+        function addTurnScore(points) {
+            gameState.turnScore += points;
+            gameState.totalScore += points;
+
+            if (gameState.turnScore >= gameState.targetTurnScore) {
+                completeTurn();
+            }
+            updateHUD();
+        }
+
+        function completeTurn() {
+            gameState.running = false;
+            audio.playLevelUp();
+            triggerScreenShake(18);
+
+            updateTurnShopUI();
+            document.getElementById('turnShopMenu').classList.remove('hidden');
+        }
+
+        function updateGameplay(dt) {
+            if (!gameState.running || gameState.paused) return;
+
+            // Slow Motion no Frenzi
+            if (gameState.frenzyActive) {
+                gameState.frenzyTimer -= dt;
+                gameState.timeScale = 0.35;
+                if (gameState.frenzyTimer <= 0) {
+                    gameState.frenzyActive = false;
+                    gameState.timeScale = 1.0;
+                    showToast("Frenzi Finalizado");
+                }
+            }
+
+            if (gameState.screenShake > 0) {
+                gameState.screenShake -= dt * 30;
+            }
+
+            // FÍSICA DE MOVIMENTO DO JOGADOR
+            const dxTarget = gameState.targetX - gameState.playerX;
+            const dyTarget = gameState.targetY - gameState.playerY;
+            const distTarget = Math.hypot(dxTarget, dyTarget);
+
+            const maxSpeed = getPlayerMaxSpeed() * (gameState.frenzyActive ? 1.4 : 1.0);
+            
+            if (distTarget > 2) {
+                const moveDist = Math.min(distTarget, maxSpeed * dt);
+                const dirX = dxTarget / distTarget;
+                const dirY = dyTarget / distTarget;
+
+                gameState.playerX += dirX * moveDist;
+                gameState.playerY += dirY * moveDist;
+            } else {
+                gameState.playerX = gameState.targetX;
+                gameState.playerY = gameState.targetY;
+            }
+
+            const stepDx = gameState.playerX - gameState.lastX;
+            const stepDy = gameState.playerY - gameState.lastY;
+            gameState.velocity = Math.hypot(stepDx, stepDy) / Math.max(0.001, dt);
+
+            mouseTrail.push({ x: gameState.playerX, y: gameState.playerY, life: 1.0 });
+            if (mouseTrail.length > 14) mouseTrail.shift();
+
+            // 1. Corte Manual Rápido (Aplica Empurrão)
+            if (gameState.velocity > 380) {
+                audio.playSlash();
+                checkSlashCollision(gameState.lastX, gameState.lastY, gameState.playerX, gameState.playerY);
+            }
+
+            // 2. Ataque Automático no CÍRCULO VERMELHO (Aplica Empurrão)
+            autoAttackCooldown -= dt;
+            const radius = getActionRadius();
+
+            if (autoAttackCooldown <= 0) {
+                let target = null;
+                let minDist = radius;
+
+                for (let enemy of enemies) {
+                    const dist = Math.hypot(enemy.x - gameState.playerX, enemy.y - gameState.playerY);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        target = enemy;
+                    }
+                }
+
+                if (target) {
+                    const attackAngle = Math.atan2(target.y - gameState.playerY, target.x - gameState.playerX);
+                    slashes.push(new SlashArc(gameState.playerX, gameState.playerY, attackAngle, radius * 0.85));
+                    
+                    const dmg = getBladeDamage() * (gameState.frenzyActive ? 2 : 1);
+                    // Vetor direcionado do centro da lâmina empurrando o inimigo para fora
+                    const pushVec = { x: Math.cos(attackAngle), y: Math.sin(attackAngle) };
+                    
+                    target.takeDamage(dmg, pushVec);
+                    audio.playSlash();
+                    
+                    autoAttackCooldown = gameState.frenzyActive ? 0.06 : getAttackCooldownSpeed();
+                }
+            }
+
+            gameState.lastX = gameState.playerX;
+            gameState.lastY = gameState.playerY;
+
+            updateEnemySpawner();
+
+            enemies.forEach(e => e.update(dt));
+            particles.forEach((p, idx) => {
+                p.update();
+                if (p.life <= 0) particles.splice(idx, 1);
+            });
+            coins.forEach(c => c.update());
+            slashes.forEach((s, idx) => {
+                s.update();
+                if (s.life <= 0) slashes.splice(idx, 1);
+            });
+
+            if (gameState.comboTimer > 0) {
+                gameState.comboTimer -= dt;
+                if (gameState.comboTimer <= 0) {
+                    gameState.comboCount = 0;
+                    updateHUD();
+                }
+            }
+        }
+
+        function checkSlashCollision(x1, y1, x2, y2) {
+            const dmg = getBladeDamage() * 1.4;
+            enemies.forEach(enemy => {
+                const dist = distToSegment({ x: enemy.x, y: enemy.y }, { x: x1, y: y1 }, { x: x2, y: y2 });
+                if (dist < enemy.size + 14) {
+                    const angle = Math.atan2(y2 - y1, x2 - x1);
+                    const pushVec = { x: Math.cos(angle), y: Math.sin(angle) };
+                    enemy.takeDamage(dmg, pushVec);
+                }
+            });
+        }
+
+        function distToSegment(p, v, w) {
+            const l2 = (w.x - v.x) ** 2 + (w.y - v.y) ** 2;
+            if (l2 === 0) return Math.hypot(p.x - v.x, p.y - v.y);
+            let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+            t = Math.max(0, Math.min(1, t));
+            return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
+        }
+
+        let spawnTimer = 0;
+        function updateEnemySpawner() {
+            spawnTimer -= 0.016;
+            if (spawnTimer <= 0) {
+                const rand = Math.random();
+                let type = 'basic';
+                if (rand > 0.65) type = 'fast';
+                if (rand > 0.80 && gameState.turn >= 2) type = 'splitter';
+                if (rand > 0.88 && gameState.turn >= 2) type = 'tank';
+
+                enemies.push(new Enemy(type));
+                spawnTimer = Math.max(0.3, 1.3 - gameState.turn * 0.1);
+            }
+        }
+
+        /* ==========================================================================
+           LOJA DE HABILIDADES DO TURNO (TODOS OS 8 ATRIBUTOS COMPRÁVEIS)
+           ========================================================================== */
+        function getAttrCost(key) {
+            const attr = gameState.attributes[key];
+            return Math.floor(attr.baseCost * Math.pow(1.3, attr.level - 1));
+        }
+
+        function buyAttribute(key) {
+            const cost = getAttrCost(key);
+            if (gameState.coins >= cost) {
+                gameState.coins -= cost;
+                gameState.attributes[key].level++;
+
+                // Se comprou vida do núcleo, restaura vida proporcional
+                if (key === 'coreHp') {
+                    const maxHp = getMaxCoreHp();
+                    gameState.coreHp = Math.min(maxHp, gameState.coreHp + 35);
+                }
+
+                audio.playCoin();
+                updateTurnShopUI();
+                updateHUD();
+                showToast("ATRIBUTO EVOLUÍDO!");
+            } else {
+                showToast("MOEDAS INSUFICIENTES!");
+            }
+        }
+
+        function updateTurnShopUI() {
+            document.getElementById('turnShopCoins').innerText = gameState.coins;
+
+            const a = gameState.attributes;
+
+            // 1. Dano
+            document.getElementById('attrLvlDamage').innerText = `Nível: ${a.damage.level} (Dano: ${getBladeDamage().toFixed(1)})`;
+            document.getElementById('attrCostDamage').innerText = getAttrCost('damage');
+
+            // 2. Raio
+            document.getElementById('attrLvlRadius').innerText = `Nível: ${a.radius.level} (Raio: ${getActionRadius()}px)`;
+            document.getElementById('attrCostRadius').innerText = getAttrCost('radius');
+
+            // 3. Vel Ataque
+            document.getElementById('attrLvlAtkSpeed').innerText = `Nível: ${a.atkSpeed.level} (Intervalo: ${getAttackCooldownSpeed().toFixed(2)}s)`;
+            document.getElementById('attrCostAtkSpeed').innerText = getAttrCost('atkSpeed');
+
+            // 4. Vel Movimento
+            document.getElementById('attrLvlMoveSpeed').innerText = `Nível: ${a.moveSpeed.level} (Vel: ${getPlayerMaxSpeed()})`;
+            document.getElementById('attrCostMoveSpeed').innerText = getAttrCost('moveSpeed');
+
+            // 5. Empurrão / Knockback
+            document.getElementById('attrLvlKnockback').innerText = `Nível: ${a.knockback.level} (Impulso: ${getKnockbackForce()}px)`;
+            document.getElementById('attrCostKnockback').innerText = getAttrCost('knockback');
+
+            // 6. Ímã
+            document.getElementById('attrLvlMagnet').innerText = `Nível: ${a.magnet.level} (Alcance: ${getMagnetRadius()}px)`;
+            document.getElementById('attrCostMagnet').innerText = getAttrCost('magnet');
+
+            // 7. Vida Núcleo
+            document.getElementById('attrLvlCoreHp').innerText = `Nível: ${a.coreHp.level} (Máx: ${getMaxCoreHp()} HP)`;
+            document.getElementById('attrCostCoreHp').innerText = getAttrCost('coreHp');
+
+            // 8. Taxa Frenzi
+            document.getElementById('attrLvlFrenzy').innerText = `Nível: ${a.frenzy.level} (Carga: ${getFrenzyChargeRate().toFixed(1)}x)`;
+            document.getElementById('attrCostFrenzy').innerText = getAttrCost('frenzy');
+        }
+
+        document.getElementById('startNextTurnBtn').addEventListener('click', () => {
+            document.getElementById('turnShopMenu').classList.add('hidden');
+            gameState.turn++;
+            gameState.turnScore = 0;
+            gameState.targetTurnScore = Math.floor(500 * Math.pow(1.5, gameState.turn - 1));
+            
+            enemies = [];
+            gameState.running = true;
+            updateHUD();
+        });
+
+        /* ==========================================================================
+           COMBO & FRENZI
+           ========================================================================== */
+        function addCombo() {
+            gameState.comboCount++;
+            gameState.comboTimer = 2.5;
+
+            if (!gameState.frenzyActive && gameState.frenzyEnergy < 100) {
+                const charge = 7 * getFrenzyChargeRate();
+                gameState.frenzyEnergy = Math.min(100, gameState.frenzyEnergy + charge);
+            }
+
+            const comboElem = document.getElementById('comboDisplay');
+            comboElem.innerText = `${gameState.comboCount}x COMBO!`;
+            comboElem.style.opacity = '1';
+        }
+
+        function activateFrenzy() {
+            if (gameState.frenzyEnergy >= 100 && !gameState.frenzyActive) {
+                gameState.frenzyActive = true;
+                gameState.frenzyEnergy = 0;
+                gameState.frenzyTimer = 6;
+                audio.playFrenzy();
+                triggerScreenShake(20);
+                showToast("⚡ MODO FRENZI ATIVADO! ⚡");
+            }
+        }
+
+        /* ==========================================================================
+           DANOS E GAME OVER
+           ========================================================================== */
+        function damageCore(amount) {
+            gameState.coreHp -= amount;
+            audio.playCoreHit();
+            triggerScreenShake(15);
+
+            if (gameState.coreHp <= 0) {
+                gameState.coreHp = 0;
+                gameOver();
+            }
+        }
+
+        function triggerScreenShake(intensity) {
+            gameState.screenShake = intensity;
+        }
+
+        function gameOver() {
+            gameState.running = false;
+
+            document.getElementById('finalTurn').innerText = gameState.turn;
+            document.getElementById('finalScore').innerText = gameState.totalScore;
+            document.getElementById('finalCoins').innerText = gameState.coins;
+
+            document.getElementById('gameOverMenu').classList.remove('hidden');
+        }
+
+        /* ==========================================================================
+           RENDERIZAÇÃO GRÁFICA (CANVAS & GRID SYNTHWAVE)
+           ========================================================================== */
+        let gridOffset = 0;
+
+        function drawBackground() {
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+            bgGradient.addColorStop(0, '#05030a');
+            bgGradient.addColorStop(0.5, '#150a21');
+            bgGradient.addColorStop(1, '#080010');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 0, 127, 0.18)';
+            ctx.lineWidth = 1;
+
+            gridOffset = (gridOffset + 0.5 * gameState.timeScale) % 40;
+
+            const numRays = 16;
+            for (let i = 0; i < numRays; i++) {
+                const angle = (i * Math.PI * 2) / numRays;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + Math.cos(angle) * width, centerY + Math.sin(angle) * width);
+                ctx.stroke();
+            }
+
+            for (let r = (gridOffset % 40); r < Math.max(width, height); r += 40) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function drawCoreTorch() {
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            const pulse = Math.sin(Date.now() * 0.005) * 5;
+            const radius = 22 + pulse;
+
+            ctx.shadowColor = '#00f3ff';
+            ctx.shadowBlur = 25;
+
+            const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, radius);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.4, '#00f3ff');
+            grad.addColorStop(0.8, '#ff007f');
+            grad.addColorStop(1, 'rgba(255, 0, 127, 0)');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 32, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawPlayerAndRadius() {
+            const px = gameState.playerX;
+            const py = gameState.playerY;
+            const tx = gameState.targetX;
+            const ty = gameState.targetY;
+            const actionRadius = getActionRadius();
+
+            // MIRA / RETÍCULO
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(tx, ty);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+            ctx.strokeStyle = '#00f3ff';
+            ctx.shadowColor = '#00f3ff';
+            ctx.shadowBlur = 8;
+            
+            ctx.beginPath();
+            ctx.arc(tx, ty, 8, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(tx - 12, ty); ctx.lineTo(tx - 4, ty);
+            ctx.moveTo(tx + 4, ty); ctx.lineTo(tx + 12, ty);
+            ctx.moveTo(tx, ty - 12); ctx.lineTo(tx, ty - 4);
+            ctx.moveTo(tx, ty + 4); ctx.lineTo(tx, ty + 12);
+            ctx.stroke();
+            ctx.restore();
+
+            // CÍRCULO VERMELHO DE AÇÃO AUTOMÁTICA
+            ctx.save();
+            ctx.strokeStyle = gameState.frenzyActive ? 'rgba(255, 221, 0, 0.85)' : 'rgba(255, 30, 60, 0.65)';
+            ctx.fillStyle = gameState.frenzyActive ? 'rgba(255, 221, 0, 0.08)' : 'rgba(255, 0, 50, 0.05)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 6]);
+
+            ctx.beginPath();
+            ctx.arc(px, py, actionRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+
+            // RASTRO NEON DO PERSONAGEM
+            if (mouseTrail.length > 1) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(mouseTrail[0].x, mouseTrail[0].y);
+                for (let i = 1; i < mouseTrail.length; i++) {
+                    ctx.lineTo(mouseTrail[i].x, mouseTrail[i].y);
+                }
+                ctx.strokeStyle = gameState.frenzyActive ? '#ffea00' : '#00f3ff';
+                ctx.shadowColor = '#ff007f';
+                ctx.shadowBlur = 12;
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // PERSONAGEM / CURSOR
+            ctx.save();
+            ctx.translate(px, py);
+
+            ctx.shadowColor = '#00f3ff';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#ffffff';
+
+            ctx.beginPath();
+            ctx.arc(0, 0, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 12, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        /* ==========================================================================
+           GAME LOOP PRINCIPAL
+           ========================================================================== */
+        let lastTime = performance.now();
+
+        function render() {
+            const now = performance.now();
+            const dt = (now - lastTime) / 1000;
+            lastTime = now;
+
+            ctx.save();
+
+            if (gameState.screenShake > 0) {
+                const rx = (Math.random() - 0.5) * gameState.screenShake;
+                const ry = (Math.random() - 0.5) * gameState.screenShake;
+                ctx.translate(rx, ry);
+            }
+
+            drawBackground();
+            drawCoreTorch();
+
+            if (gameState.running) {
+                updateGameplay(dt);
+            }
+
+            coins.forEach(c => c.draw());
+            enemies.forEach(e => e.draw());
+            particles.forEach(p => p.draw());
+            slashes.forEach(s => s.draw());
+
+            drawPlayerAndRadius();
+
+            ctx.restore();
+
+            requestAnimationFrame(render);
+        }
+
+        /* ==========================================================================
+           CONTROLES HÍBRIDOS (MOUSE & TOUCH)
+           ========================================================================== */
+        function updateTargetPos(clientX, clientY) {
+            gameState.targetX = clientX;
+            gameState.targetY = clientY;
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            updateTargetPos(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                updateTargetPos(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                updateTargetPos(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                activateFrenzy();
+            }
+        });
+
+        /* ==========================================================================
+           INTERFACE HUD E TOASTS
+           ========================================================================== */
+        function updateHUD() {
+            const maxHp = getMaxCoreHp();
+            document.getElementById('coreHpText').innerText = `${Math.ceil((gameState.coreHp / maxHp) * 100)}%`;
+            document.getElementById('coreHpBar').style.width = `${Math.max(0, (gameState.coreHp / maxHp) * 100)}%`;
+
+            document.getElementById('turnLabel').innerText = `TURNO ${gameState.turn}`;
+            document.getElementById('targetScoreDisplay').innerText = `META: ${gameState.turnScore} / ${gameState.targetTurnScore} Pts`;
+            
+            const progressPct = Math.min(100, (gameState.turnScore / gameState.targetTurnScore) * 100);
+            document.getElementById('turnProgressBar').style.width = `${progressPct}%`;
+
+            document.getElementById('scoreDisplay').innerText = `PONTOS TOTAIS: ${gameState.totalScore}`;
+            document.getElementById('coinDisplay').innerText = gameState.coins;
+
+            document.getElementById('frenzyBar').style.width = `${gameState.frenzyEnergy}%`;
+            const frenzyText = document.getElementById('frenzyText');
+            if (gameState.frenzyEnergy >= 100) {
+                frenzyText.innerText = "FRENZI PRONTO! [ESPAÇO / TOQUE]";
+                frenzyText.classList.add('neon-text-yellow');
+            } else if (gameState.frenzyActive) {
+                frenzyText.innerText = `FRENZI ATIVO! (${Math.ceil(gameState.frenzyTimer)}s)`;
+            } else {
+                frenzyText.innerText = `ENERGIA FRENZI: ${Math.floor(gameState.frenzyEnergy)}%`;
+                frenzyText.classList.remove('neon-text-yellow');
+            }
+        }
+
+        document.getElementById('frenzyBar').parentElement.addEventListener('click', () => {
+            activateFrenzy();
+        });
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastMessage');
+            toast.innerText = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 1800);
+        }
+
+        /* ==========================================================================
+           INICIALIZAÇÃO E RESET
+           ========================================================================== */
+        function resetGame() {
+            gameState.totalScore = 0;
+            gameState.turnScore = 0;
+            gameState.targetTurnScore = 500;
+            gameState.turn = 1;
+            gameState.coins = 0;
+
+            // Resetar níveis dos 8 Atributos
+            Object.keys(gameState.attributes).forEach(k => {
+                gameState.attributes[k].level = 1;
+            });
+
+            gameState.coreHp = getMaxCoreHp();
+            gameState.frenzyEnergy = 0;
+            gameState.frenzyActive = false;
+            gameState.comboCount = 0;
+
+            gameState.playerX = centerX;
+            gameState.playerY = centerY;
+            gameState.targetX = centerX;
+            gameState.targetY = centerY;
+            gameState.lastX = centerX;
+            gameState.lastY = centerY;
+
+            enemies = [];
+            particles = [];
+            coins = [];
+            slashes = [];
+            spawnTimer = 0;
+            gameState.running = true;
+            updateHUD();
+        }
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            audio.init();
+            audio.startMusic();
+            document.getElementById('mainMenu').classList.add('hidden');
+            resetGame();
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            document.getElementById('gameOverMenu').classList.add('hidden');
+            resetGame();
+        });
+
+        document.getElementById('audioBtn').addEventListener('click', () => {
+            audio.init();
+            const muted = audio.toggleMute();
+            document.getElementById('audioBtn').innerText = muted ? '🔇' : '🔊';
+        });
+
+        window.onload = () => {
+            requestAnimationFrame(render);
+        };
+    </script>
+</body>
+</html>
