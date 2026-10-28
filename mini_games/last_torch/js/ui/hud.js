@@ -1,11 +1,4 @@
-import { attributes, maxUltEnergy, player, state } from '../core/state.js';
-import {
-    getAtkCooldown,
-    getAtkDamage,
-    getAtkRadius,
-    getPlayerMaxSpeed,
-    getSlashArcDegree
-} from '../systems/stats.js';
+import { maxUltEnergy, player, state } from '../core/state.js';
 
 // --- BARRA DE FÚRIA ---
 // Carregando: enche conforme os golpes acertam (mostra %). Ativa: esvazia mostrando os segundos restantes.
@@ -67,10 +60,4 @@ export function updateHUD() {
 
     // Status Panel
     document.getElementById('statusLevel').innerText = `LEVEL ${playerLevel}`;
-    document.getElementById('statDmg').innerText = getAtkDamage();
-    document.getElementById('statRad').innerText = `${Math.round(getAtkRadius())}px`;
-    document.getElementById('statArc').innerText = `${getSlashArcDegree()}°`;
-    document.getElementById('statSpeed').innerText = `${getAtkCooldown().toFixed(2)}s`;
-    document.getElementById('statMove').innerText = Math.round(getPlayerMaxSpeed());
-    document.getElementById('statUlt').innerText = `Lv. ${attributes.frenzyNova.lvl}`;
 }

@@ -1,10 +1,25 @@
 import { attributes, audio, player, state } from '../core/state.js';
-import { getMaxPlayerHp } from '../systems/stats.js';
+import {
+    getAtkCooldown, getAtkDamage, getAtkRadius, getKnockback,
+    getMaxPlayerHp, getPlayerMaxSpeed, getSlashArcDegree
+} from '../systems/stats.js';
 import { collectAllGold } from '../systems/gold.js';
 import { updateHUD } from './hud.js';
 import { renderPassiveSkills } from './passives.js';
 
 // --- LOJA DE UPGRADES ---
+// Valor atual de cada stat, mostrado no próprio card de upgrade.
+const STAT_VALUES = {
+    damage: () => getAtkDamage(),
+    radius: () => `${Math.round(getAtkRadius())}px`,
+    slashArc: () => `${getSlashArcDegree()}°`,
+    atkSpeed: () => `${getAtkCooldown().toFixed(2)}s`,
+    moveSpeed: () => Math.round(getPlayerMaxSpeed()),
+    frenzyNova: () => `Lv. ${attributes.frenzyNova.lvl}`,
+    playerHp: () => getMaxPlayerHp(),
+    knockback: () => Math.round(getKnockback())
+};
+
 function getUpgradeCost(attr) {
     return Math.floor(attr.baseCost * Math.pow(attr.costMult, attr.lvl - 1));
 }
@@ -33,19 +48,20 @@ export function renderShopItems() {
         const isMax = attr.lvl >= attr.maxLvl;
         const cost = isMax ? 0 : getUpgradeCost(attr);
 
+        const value = STAT_VALUES[key] ? STAT_VALUES[key]() : '';
         const item = document.createElement('div');
-        item.className = 'bg-slate-800/80 border border-slate-700 p-2.5 rounded-xl flex items-center justify-between gap-2';
+        item.className = 'bg-slate-900/60 border border-slate-800 p-2 rounded-lg flex flex-col gap-1.5';
         item.innerHTML = `
-            <div class="flex items-center gap-2.5">
-                <span class="text-xl">${attr.icon}</span>
-                <div>
-                    <div class="font-bold text-xs text-cyan-300">${attr.name} <span class="text-amber-400">${isMax ? 'MAX' : 'Lv. ' + attr.lvl}</span></div>
-                    <div class="text-[10px] text-slate-400">${attr.desc}</div>
-                </div>
+            <div class="flex items-center justify-between gap-1 text-[11px] text-slate-300">
+                <span class="truncate" title="${attr.desc}">${attr.icon} ${attr.name}</span>
+                <span class="text-[10px] text-amber-400 whitespace-nowrap">${isMax ? 'MAX' : 'Lv. ' + attr.lvl}</span>
             </div>
-            <button data-upgrade="${key}" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow" ${isMax || state.coins < cost ? 'disabled' : ''}>
-                ${isMax ? 'MAX' : `<span>🪙</span> ${cost}`}
-            </button>
+            <div class="flex items-center justify-between gap-2">
+                <b class="text-base text-cyan-300">${value}</b>
+                <button data-upgrade="${key}" aria-label="Upgrade ${attr.name}" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow whitespace-nowrap" ${isMax || state.coins < cost ? 'disabled' : ''}>
+                    ${isMax ? 'MAX' : `+ 🪙 ${cost}`}
+                </button>
+            </div>
         `;
         list.appendChild(item);
     });

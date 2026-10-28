@@ -13,7 +13,7 @@ export function renderPassiveSkills() {
         const isMax = skill.lvl >= skill.maxLvl;
 
         const item = document.createElement('div');
-        item.className = 'bg-slate-800/80 border border-violet-500/30 p-2.5 rounded-xl flex items-center justify-between gap-2';
+        item.className = 'bg-slate-800/80 border border-violet-500/30 p-2 rounded-lg flex items-center justify-between gap-2';
         item.innerHTML = `
             <div class="flex items-center gap-2.5">
                 <span class="text-xl">${skill.icon}</span>
