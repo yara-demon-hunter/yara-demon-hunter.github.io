@@ -1,4 +1,14 @@
-import { createAttributes, createPlayerState } from './models.js';
+import { CHARACTER_MODEL, createPlayerState } from '../data_model/character.js';
+import { CORE_MODEL } from '../data_model/core.js';
+import { BLADE_SKILL, FRENZY_NOVA_SKILL, POWERUP_MODELS, createAttributes } from '../data_model/skills.js';
+import {
+    MONSTER_MODELS,
+    MONSTER_SPAWNING,
+    chooseMonsterType,
+    createMonster,
+    createSplitterChild,
+    rollMonsterGold
+} from '../data_model/monsters.js';
 import { SoundEngine } from './sound-engine.js';
 
 const audio = new SoundEngine();
@@ -25,16 +35,16 @@ let coins = 0;
 // Level & XP
 let playerLevel = 1;
 let playerXp = 0;
-let playerMaxXp = 100;
+let playerMaxXp = CHARACTER_MODEL.xpToNextLevel;
 
 // Carga da Skill Ult (Frenzy Nova)
 let ultEnergy = 0;
-const maxUltEnergy = 100;
+const maxUltEnergy = FRENZY_NOVA_SKILL.maximumEnergy;
 let frenzyActiveTimer = 0;
 
 // Vida Núcleo
-let coreHpMax = 100;
-let coreHp = 100;
+let coreHpMax = CORE_MODEL.initialHp;
+let coreHp = CORE_MODEL.initialHp;
 let coreX = 0, coreY = 0;
 
 // Teclas pressionadas
@@ -69,7 +79,7 @@ function resize() {
 
     if (gameState === 'START') {
         player.x = coreX;
-        player.y = coreY - 60;
+        player.y = coreY + CHARACTER_MODEL.initialPositionOffsetY;
         player.targetX = player.x;
         player.targetY = player.y;
     }
@@ -79,17 +89,26 @@ resize();
 
 // --- FÓRMULAS DE ATRIBUTOS ---
 function getAtkDamage() { 
-    let base = (25 + (attributes.damage.lvl - 1) * 15 + (playerLevel - 1) * 10); 
+    let base = BLADE_SKILL.baseDamage
+        + (attributes.damage.lvl - 1) * BLADE_SKILL.damagePerUpgrade
+        + (playerLevel - 1) * BLADE_SKILL.damagePerCharacterLevel;
     if (player.doubleDmgTimer > 0) base *= 2;
-    if (frenzyActiveTimer > 0) base *= (1 + attributes.frenzyNova.lvl * 0.2);
+    if (frenzyActiveTimer > 0) base *= 1 + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;
     return base;
 }
-function getAtkRadius() { return Math.min(width * 0.38, 75 + (attributes.radius.lvl - 1) * 14 + (playerLevel - 1) * 4); }
+function getAtkRadius() {
+    return Math.min(
+        width * BLADE_SKILL.maxRadiusScreenRatio,
+        BLADE_SKILL.baseRadius
+            + (attributes.radius.lvl - 1) * BLADE_SKILL.radiusPerUpgrade
+            + (playerLevel - 1) * BLADE_SKILL.radiusPerCharacterLevel
+    );
+}
 
 // Retorna a amplitude do corte em radianos (Nv 1: ~40° -> Nv 6: 180° = Math.PI radianos)
 function getSlashArcRadian() {
-    const minDeg = 40;
-    const maxDeg = 180;
+    const minDeg = BLADE_SKILL.minimumSlashArcDegrees;
+    const maxDeg = BLADE_SKILL.maximumSlashArcDegrees;
     const currentDeg = minDeg + (attributes.slashArc.lvl - 1) * ((maxDeg - minDeg) / (attributes.slashArc.maxLvl - 1));
     return (currentDeg * Math.PI) / 180;
 }
@@ -98,14 +117,30 @@ function getSlashArcDegree() {
 }
 
 function getAtkCooldown() { 
-    let cd = 0.45 - (attributes.atkSpeed.lvl - 1) * 0.04 - (playerLevel - 1) * 0.02;
-    if (frenzyActiveTimer > 0) cd *= 0.25; // Alta cadência no Frenzy Nova
-    return Math.max(0.07, cd); 
+    let cd = BLADE_SKILL.baseCooldownSeconds
+        - (attributes.atkSpeed.lvl - 1) * BLADE_SKILL.cooldownReductionPerUpgrade
+        - (playerLevel - 1) * BLADE_SKILL.cooldownReductionPerCharacterLevel;
+    if (frenzyActiveTimer > 0) cd *= BLADE_SKILL.frenzyCooldownMultiplier;
+    return Math.max(BLADE_SKILL.minimumCooldownSeconds, cd);
 }
-function getPlayerMaxSpeed() { return 220 + (attributes.moveSpeed.lvl - 1) * 55 + (playerLevel - 1) * 12; }
-function getKnockback() { return 180 + (attributes.knockback.lvl - 1) * 65; }
-function getMaxPlayerHp() { return 100 + (attributes.playerHp.lvl - 1) * 25 + (playerLevel - 1) * 20; }
-function getFrenzyDuration() { return 3.0 + attributes.frenzyNova.lvl * 0.5; }
+function getPlayerMaxSpeed() {
+    return CHARACTER_MODEL.initialMoveSpeed
+        + (attributes.moveSpeed.lvl - 1) * CHARACTER_MODEL.moveSpeedPerUpgrade
+        + (playerLevel - 1) * CHARACTER_MODEL.moveSpeedPerLevel;
+}
+function getKnockback() {
+    return BLADE_SKILL.baseKnockback
+        + (attributes.knockback.lvl - 1) * BLADE_SKILL.knockbackPerUpgrade;
+}
+function getMaxPlayerHp() {
+    return CHARACTER_MODEL.baseHp
+        + (attributes.playerHp.lvl - 1) * CHARACTER_MODEL.hpPerUpgrade
+        + (playerLevel - 1) * CHARACTER_MODEL.hpPerLevel;
+}
+function getFrenzyDuration() {
+    return FRENZY_NOVA_SKILL.baseDurationSeconds
+        + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.durationPerUpgradeLevelSeconds;
+}
 
 // --- INPUTS CONTROLS ---
 function setTarget(x, y) {
@@ -184,13 +219,13 @@ function startGame() {
 
     playerLevel = 1;
     playerXp = 0;
-    playerMaxXp = 100;
+    playerMaxXp = CHARACTER_MODEL.xpToNextLevel;
     ultEnergy = 0;
     frenzyActiveTimer = 0;
 
     Object.keys(attributes).forEach(k => attributes[k].lvl = 1);
 
-    coreHpMax = 100;
+    coreHpMax = CORE_MODEL.initialHp;
     coreHp = coreHpMax;
 
     player.maxHp = getMaxPlayerHp();
@@ -208,7 +243,7 @@ function startGame() {
     currentBoss = null;
 
     player.x = coreX;
-    player.y = coreY - 60;
+    player.y = coreY + CHARACTER_MODEL.initialPositionOffsetY;
     player.targetX = player.x;
     player.targetY = player.y;
     player.comboStep = 1;
@@ -266,10 +301,10 @@ function gainXp(amount) {
     if (playerXp >= playerMaxXp) {
         playerXp -= playerMaxXp;
         playerLevel++;
-        playerMaxXp = Math.floor(playerMaxXp * 1.35);
+        playerMaxXp = Math.floor(playerMaxXp * CHARACTER_MODEL.xpGrowthMultiplier);
 
         player.maxHp = getMaxPlayerHp();
-        player.hp = Math.min(player.maxHp, player.hp + player.maxHp * 0.3);
+        player.hp = Math.min(player.maxHp, player.hp + player.maxHp * CHARACTER_MODEL.levelUpHealRatio);
 
         createExplosion(player.x, player.y, '#38bdf8', 30);
         shakeScreen(8);
@@ -297,9 +332,15 @@ function triggerFrenzyUlt() {
     shakeScreen(15);
 
     // Disparo de ondas de lâminas em várias direções no momento de ativação
-    for (let i = 0; i < 8; i++) {
-        const angle = (Math.PI * 2 / 8) * i;
-        executeBladeSlash(player.x, player.y, angle, getAtkRadius() * 1.3, 3);
+    for (let i = 0; i < FRENZY_NOVA_SKILL.slashCount; i++) {
+        const angle = (Math.PI * 2 / FRENZY_NOVA_SKILL.slashCount) * i;
+        executeBladeSlash(
+            player.x,
+            player.y,
+            angle,
+            getAtkRadius() * FRENZY_NOVA_SKILL.slashRadiusMultiplier,
+            3
+        );
     }
 
     updateHUD();
@@ -399,7 +440,7 @@ function executeBladeSlash(x, y, angle, radius, comboStep) {
 
     // Pequeno avanço (dash) direcional no 3º ataque
     if (comboStep === 3) {
-        const dashDist = 35;
+        const dashDist = BLADE_SKILL.comboDashDistance;
         player.x += Math.cos(angle) * dashDist;
         player.y += Math.sin(angle) * dashDist;
         createExplosion(player.x, player.y, '#c084fc', 12);
@@ -424,56 +465,38 @@ function createExplosion(x, y, color, count = 10) {
 
 // --- SPAWNER DE INIMIGOS ---
 function spawnEnemy() {
-    if (turn % 5 === 0 && !currentBoss && enemies.length < 3) {
+    if (turn % MONSTER_SPAWNING.bossEveryTurns === 0
+        && !currentBoss
+        && enemies.length < MONSTER_SPAWNING.maximumEnemiesBeforeBoss) {
         spawnBoss();
         return;
     }
 
-    const spawnDist = Math.max(width, height) * 0.6 + 50;
+    const spawnDist = Math.max(width, height) * MONSTER_SPAWNING.regularSpawnScreenRatio
+        + MONSTER_SPAWNING.regularSpawnOffset;
     const angle = Math.random() * Math.PI * 2;
     const x = coreX + Math.cos(angle) * spawnDist;
     const y = coreY + Math.sin(angle) * spawnDist;
-
-    const r = Math.random();
-    let type = 'NORMAL', hp = 30 + turn * 10, speed = 55 + Math.random() * 30, radius = 14, color = '#f43f5e', damage = 15;
-
-    if (r < 0.22) {
-        type = 'FAST'; hp = 20 + turn * 5; speed = 105 + Math.random() * 35; radius = 10; color = '#38bdf8'; damage = 10;
-    } else if (r < 0.40) {
-        type = 'SPLITTER'; hp = 55 + turn * 15; speed = 45; radius = 18; color = '#a855f7'; damage = 20;
-    } else if (r < 0.58) {
-        type = 'SHOOTER'; hp = 40 + turn * 8; speed = 40; radius = 13; color = '#f59e0b'; damage = 12;
-    }
-
-    enemies.push({ x, y, vx: 0, vy: 0, hp, maxHp: hp, speed, radius, color, type, damage, shootTimer: 2.0 });
+    const type = chooseMonsterType();
+    enemies.push(createMonster(type, turn, x, y));
 }
 
 function spawnBoss() {
-    const spawnDist = Math.max(width, height) * 0.5;
+    const spawnDist = Math.max(width, height) * MONSTER_SPAWNING.bossSpawnScreenRatio;
     const angle = Math.random() * Math.PI * 2;
     const x = coreX + Math.cos(angle) * spawnDist;
     const y = coreY + Math.sin(angle) * spawnDist;
-    const hp = 350 + turn * 150;
 
-    currentBoss = {
-        x, y, vx: 0, vy: 0,
-        hp, maxHp: hp,
-        speed: 35,
-        radius: 32,
-        color: '#ec4899',
-        type: 'BOSS',
-        damage: 30,
-        shootTimer: 1.5
-    };
+    currentBoss = createMonster('BOSS', turn, x, y);
     enemies.push(currentBoss);
     updateHUD();
     shakeScreen(12);
 }
 
 function spawnPowerup(x, y) {
-    const types = ['SHIELD', 'DOUBLE_DMG', 'BOMB'];
+    const types = Object.keys(POWERUP_MODELS);
     const type = types[Math.floor(Math.random() * types.length)];
-    powerups.push({ x, y, type, life: 10.0 });
+    powerups.push({ x, y, type, life: POWERUP_MODELS[type].lifeSeconds });
 }
 
 // --- UPDATE LOOP ---
@@ -523,10 +546,10 @@ function update(dt) {
 
     // Atualizar rastro de luz de movimento do herói
     player.trail.unshift({ x: player.x, y: player.y, alpha: 1.0 });
-    if (player.trail.length > 12) {
+    if (player.trail.length > CHARACTER_MODEL.trailLength) {
         player.trail.pop();
     }
-    player.trail.forEach(t => t.alpha -= dt * 4);
+    player.trail.forEach(t => t.alpha -= dt * CHARACTER_MODEL.trailFadePerSecond);
 
     // Ataque Direcional Direto
     player.attackTimer -= dt;
@@ -552,8 +575,8 @@ function update(dt) {
             
             executeBladeSlash(player.x, player.y, atkAngle, attackRad, player.comboStep);
 
-            const dmg = getAtkDamage() * (player.comboStep === 3 ? 1.5 : 1.0);
-            const kbForce = getKnockback() * (player.comboStep === 3 ? 1.4 : 1.0);
+            const dmg = getAtkDamage() * (player.comboStep === 3 ? BLADE_SKILL.comboDamageMultiplier : 1.0);
+            const kbForce = getKnockback() * (player.comboStep === 3 ? BLADE_SKILL.comboKnockbackMultiplier : 1.0);
 
             // Colisão de dano no arco do golpe
             enemies.forEach(e => {
@@ -567,7 +590,7 @@ function update(dt) {
                     // Aplica dano se o inimigo está dentro da abertura angular atual do corte
                     if (diffAngle <= currentArcHalf + 0.1 || frenzyActiveTimer > 0) {
                         e.hp -= dmg;
-                        chargeUlt(5);
+                        chargeUlt(FRENZY_NOVA_SKILL.chargePerHit);
 
                         const pushAngle = Math.atan2(e.y - player.y, e.x - player.x);
                         e.vx += Math.cos(pushAngle) * kbForce;
@@ -585,7 +608,11 @@ function update(dt) {
     spawnTimer -= dt;
     if (spawnTimer <= 0) {
         spawnEnemy();
-        spawnTimer = Math.max(0.2, 1.5 - turn * 0.1);
+        spawnTimer = Math.max(
+            MONSTER_SPAWNING.minimumIntervalSeconds,
+            MONSTER_SPAWNING.initialIntervalSeconds
+                - turn * MONSTER_SPAWNING.intervalReductionPerTurnSeconds
+        );
     }
 
     // Inimigos
@@ -593,12 +620,12 @@ function update(dt) {
         const e = enemies[i];
         e.x += e.vx * dt;
         e.y += e.vy * dt;
-        e.vx *= 0.88;
-        e.vy *= 0.88;
+        e.vx *= MONSTER_SPAWNING.movementDamping;
+        e.vy *= MONSTER_SPAWNING.movementDamping;
 
         const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
-        const targetX = distToPlayer < 240 ? player.x : coreX;
-        const targetY = distToPlayer < 240 ? player.y : coreY;
+        const targetX = distToPlayer < MONSTER_SPAWNING.targetPlayerDistance ? player.x : coreX;
+        const targetY = distToPlayer < MONSTER_SPAWNING.targetPlayerDistance ? player.y : coreY;
 
         const toTargetAngle = Math.atan2(targetY - e.y, targetX - e.x);
         e.x += Math.cos(toTargetAngle) * e.speed * dt;
@@ -608,19 +635,20 @@ function update(dt) {
         if (e.type === 'SHOOTER' || e.type === 'BOSS') {
             e.shootTimer -= dt;
             if (e.shootTimer <= 0) {
-                e.shootTimer = e.type === 'BOSS' ? 1.0 : 2.5;
+                const model = MONSTER_MODELS[e.type];
+                e.shootTimer = model.shootCooldownSeconds;
                 enemyProjectiles.push({
                     x: e.x, y: e.y,
-                    vx: Math.cos(toTargetAngle) * 160,
-                    vy: Math.sin(toTargetAngle) * 160,
-                    radius: 5,
-                    damage: e.damage * 0.8
+                    vx: Math.cos(toTargetAngle) * model.projectileSpeed,
+                    vy: Math.sin(toTargetAngle) * model.projectileSpeed,
+                    radius: model.projectileRadius,
+                    damage: e.damage * model.projectileDamageMultiplier
                 });
             }
         }
 
         // Colisão com Herói
-        if (distToPlayer < e.radius + 12 && player.iFrames <= 0) {
+        if (distToPlayer < e.radius + CHARACTER_MODEL.collisionRadius && player.iFrames <= 0) {
             if (player.shieldTimer <= 0) {
                 player.hp -= e.damage;
                 shakeScreen(6);
@@ -629,13 +657,13 @@ function update(dt) {
                 audio.playExplode();
             }
 
-            player.iFrames = 0.5;
+            player.iFrames = CHARACTER_MODEL.invulnerabilitySeconds;
             createExplosion(player.x, player.y, '#f43f5e', 12);
             updateHUD();
 
             const pushAngle = Math.atan2(e.y - player.y, e.x - player.x);
-            e.vx += Math.cos(pushAngle) * 220;
-            e.vy += Math.sin(pushAngle) * 220;
+            e.vx += Math.cos(pushAngle) * MONSTER_SPAWNING.contactKnockback;
+            e.vy += Math.sin(pushAngle) * MONSTER_SPAWNING.contactKnockback;
 
             if (player.hp <= 0) {
                 triggerGameOver('PLAYER');
@@ -645,8 +673,8 @@ function update(dt) {
 
         // Colisão com Núcleo
         const distCore = Math.hypot(coreX - e.x, coreY - e.y);
-        if (distCore < e.radius + 22) {
-            coreHp -= 10;
+        if (distCore < e.radius + CORE_MODEL.collisionRadius) {
+            coreHp -= CORE_MODEL.damageTakenPerMonster;
             shakeScreen(8);
             audio.playExplode();
             createExplosion(e.x, e.y, '#f43f5e', 14);
@@ -667,30 +695,25 @@ function update(dt) {
             audio.playExplode();
             createExplosion(e.x, e.y, e.color, 12);
 
-            const pts = e.type === 'BOSS' ? 250 : e.type === 'SPLITTER' ? 40 : 20;
+            const monsterModel = MONSTER_MODELS[e.type];
+            const pts = monsterModel.scoreReward;
             scoreTurn += pts;
             totalScore += pts;
 
             // Concessão direta de recompensa de Moedas e XP ao eliminar (Sem itens dropados no chão)
-            const gainedCoins = e.type === 'BOSS' ? 10 : 1 + Math.floor(Math.random() * 2);
-            const gainedXp = 20 + turn * 3;
+            const gainedCoins = rollMonsterGold(e.type);
+            const gainedXp = monsterModel.xpRewardBase + turn * monsterModel.xpRewardPerTurn;
             coins += gainedCoins;
             gainXp(gainedXp);
             audio.playCoin();
 
-            if (Math.random() < 0.15 || e.type === 'BOSS') {
+            if (Math.random() < monsterModel.powerupDropChance) {
                 spawnPowerup(e.x, e.y);
             }
 
             if (e.type === 'SPLITTER') {
-                for (let s = 0; s < 2; s++) {
-                    enemies.push({
-                        x: e.x + (Math.random() - 0.5) * 20,
-                        y: e.y + (Math.random() - 0.5) * 20,
-                        vx: (Math.random() - 0.5) * 100,
-                        vy: (Math.random() - 0.5) * 100,
-                        hp: 15, maxHp: 15, speed: 95, radius: 8, color: '#38bdf8', type: 'FAST', damage: 8
-                    });
+                for (let s = 0; s < monsterModel.splitCount; s++) {
+                    enemies.push(createSplitterChild(e.x, e.y));
                 }
             }
 
@@ -714,12 +737,12 @@ function update(dt) {
         p.x += p.vx * dt;
         p.y += p.vy * dt;
 
-        if (Math.hypot(player.x - p.x, player.y - p.y) < p.radius + 12 && player.iFrames <= 0) {
+        if (Math.hypot(player.x - p.x, player.y - p.y) < p.radius + CHARACTER_MODEL.collisionRadius && player.iFrames <= 0) {
             if (player.shieldTimer <= 0) {
                 player.hp -= p.damage;
                 audio.playHurt();
             }
-            player.iFrames = 0.4;
+            player.iFrames = CHARACTER_MODEL.projectileInvulnerabilitySeconds;
             updateHUD();
             enemyProjectiles.splice(i, 1);
             if (player.hp <= 0) { triggerGameOver('PLAYER'); return; }
@@ -737,14 +760,14 @@ function update(dt) {
         pw.life -= dt;
         if (pw.life <= 0) { powerups.splice(i, 1); continue; }
 
-        if (Math.hypot(player.x - pw.x, player.y - pw.y) < 22) {
+        if (Math.hypot(player.x - pw.x, player.y - pw.y) < CHARACTER_MODEL.powerupPickupRadius) {
             audio.playPowerup();
-            if (pw.type === 'SHIELD') player.shieldTimer = 6.0;
-            else if (pw.type === 'DOUBLE_DMG') player.doubleDmgTimer = 8.0;
+            if (pw.type === 'SHIELD') player.shieldTimer = POWERUP_MODELS.SHIELD.durationSeconds;
+            else if (pw.type === 'DOUBLE_DMG') player.doubleDmgTimer = POWERUP_MODELS.DOUBLE_DMG.durationSeconds;
             else if (pw.type === 'BOMB') {
                 shakeScreen(16);
                 enemies.forEach(e => {
-                    e.hp -= 150;
+                    e.hp -= POWERUP_MODELS.BOMB.damage;
                     createExplosion(e.x, e.y, '#f43f5e', 8);
                 });
             }
@@ -801,7 +824,7 @@ function render() {
     ctx.shadowColor = '#f43f5e';
     ctx.fillStyle = '#f43f5e';
     ctx.beginPath();
-    ctx.arc(coreX, coreY, 22, 0, Math.PI * 2);
+    ctx.arc(coreX, coreY, CORE_MODEL.visualRadius, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.strokeStyle = '#fda4af';
@@ -810,11 +833,11 @@ function render() {
     ctx.restore();
 
     // Anéis de energia no núcleo
-    const pulse = Math.sin(performance.now() * 0.005) * 6;
+    const pulse = Math.sin(performance.now() * CORE_MODEL.pulseFrequency) * CORE_MODEL.pulseAmplitude;
     ctx.strokeStyle = 'rgba(244, 63, 94, 0.3)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(coreX, coreY, 32 + pulse, 0, Math.PI * 2);
+    ctx.arc(coreX, coreY, CORE_MODEL.pulseRadius + pulse, 0, Math.PI * 2);
     ctx.stroke();
 
     // Raio de Alcance do herói: Círculo Vermelho com Linhas Tracejadas
@@ -833,7 +856,7 @@ function render() {
     powerups.forEach(pw => {
         ctx.save();
         ctx.shadowBlur = 12;
-        ctx.shadowColor = pw.type === 'SHIELD' ? '#38bdf8' : pw.type === 'DOUBLE_DMG' ? '#f59e0b' : '#ef4444';
+        ctx.shadowColor = POWERUP_MODELS[pw.type].color;
         ctx.fillStyle = ctx.shadowColor;
         ctx.beginPath();
         ctx.arc(pw.x, pw.y, 10, 0, Math.PI * 2);
@@ -927,10 +950,13 @@ function render() {
     ctx.save();
     ctx.shadowBlur = frenzyActiveTimer > 0 ? 25 : 15;
     ctx.shadowColor = frenzyActiveTimer > 0 ? '#e879f9' : player.doubleDmgTimer > 0 ? '#f59e0b' : '#38bdf8';
-    ctx.fillStyle = player.iFrames > 0 && Math.floor(performance.now() / 50) % 2 === 0 ? '#ffffff' : ctx.shadowColor;
+    ctx.fillStyle = player.iFrames > 0
+        && Math.floor(performance.now() / CHARACTER_MODEL.damageImmunityFlashIntervalMs) % 2 === 0
+        ? '#ffffff'
+        : ctx.shadowColor;
 
     ctx.beginPath();
-    ctx.arc(player.x, player.y, 12, 0, Math.PI * 2);
+    ctx.arc(player.x, player.y, CHARACTER_MODEL.collisionRadius, 0, Math.PI * 2);
     ctx.fill();
 
     // Escudo Visual
@@ -938,7 +964,7 @@ function render() {
         ctx.strokeStyle = '#38bdf8';
         ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.arc(player.x, player.y, 18, 0, Math.PI * 2);
+        ctx.arc(player.x, player.y, CHARACTER_MODEL.shieldRadius, 0, Math.PI * 2);
         ctx.stroke();
     }
     ctx.restore();
