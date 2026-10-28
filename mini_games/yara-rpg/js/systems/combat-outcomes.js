@@ -172,6 +172,7 @@ function createMonsterFateEvent(monster) {
 }
 
 function awardCombatVictory(monster) {
+    window.YaraMeta?.onVictory(monster);
     const challengeRewardRarities = monster.challengeRewardRarities;
     logMessage(t("victory", { monster: monster.name }), "discovery");
     logMessage(t("rewards", { xp: monster.xpReward, gold: monster.goldReward }), "loot");
@@ -194,6 +195,7 @@ function awardCombatVictory(monster) {
     if (monster.isFinalBoss) {
         campaignComplete = true;
         unlockCharactersAfterCampaign();
+        window.YaraMeta?.onCampaignComplete();
         logMessage(t('finalBossVictory'), 'discovery');
         try { localStorage.removeItem(SAVE_KEY); } catch {}
     }
@@ -231,6 +233,7 @@ function endCombatDefeat() {
     endingCard.hidden = false;
     document.getElementById('campaign-ending-title').textContent = t('campaignDefeatTitle');
     document.getElementById('campaign-ending-description').textContent = t('campaignDefeatDescription');
+    window.YaraMeta?.onDefeat();
     document.getElementById('campaign-ending-card').querySelector('[data-i18n="restartCampaign"]').textContent = t('restart');
     try { localStorage.removeItem(SAVE_KEY); } catch {}
     updateUI();

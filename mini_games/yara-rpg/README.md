@@ -79,6 +79,16 @@ Esta primeira versão ainda carrega Tailwind e as fontes Cinzel/Inter de CDNs, a
 - `js/tailwind.config.js`: cores customizadas usadas pelas classes Tailwind.
 - `components/yara-rpg.html`: fragmento antigo para incorporação; não é usado pela página completa nem publicado como página.
 
+## Meta-progressão e retenção
+
+`js/systems/meta.js` (estilos em `css/meta.css`) guarda em `localStorage` (`yara-rpg-meta-v1`) o que sobrevive à morte e é consultado no **Santuário** (tela inicial e tela de derrota): conquistas, bestiário, coleção de itens, **poderes** (passivas e pactos já descobertos) e recordes. Também contém o resumo da jornada, o **vendedor ambulante**, o brilho de drops raros e o aviso de telegrafia.
+
+- Novas conquistas e mercadorias: constantes `ACHIEVEMENTS` e `VENDOR` no topo de `meta.js` (frequência do vendedor em `VENDOR.chance`/`cooldownExplorations`). Textos de interface em `S` (PT/EN).
+- O vendedor é um evento de exploração (`shouldOfferVendor` em `exploreForest`); cada visita sorteia 4 mercadorias com estoque limitado e preço que sobe com a região.
+- Os outros sistemas só chamam `window.YaraMeta?.hook()`; sem `meta.js` o jogo continua funcionando.
+- Telegrafia: o aviso aparece no monstro; atacar durante o aviso **interrompe** o golpe e dá fúria (`telegraphInterruptFury` em `combat-rules.js`).
+- Eventos de aposta (efeito `gamble`) ficam em `js/data/extra-events.js`.
+
 ## Contatos na névoa
 
 Durante a exploração, um contato pode abordar Zeph. Cada contato tem um ícone próprio, e a chance de encontro começa baixa, aumenta com o nível e respeita um intervalo mínimo. O jogador pode aceitar a oferta ou recusá-la sem penalidade. Em geral, aceitar sorteia entre enfrentar um chefe, receber ouro em troca de HP ou despertar um poder permanente; a bruxa caçadora sempre inicia sua missão contra um morto-vivo forte, enquanto a bruxa velha troca uma bebida que reduz o HP para no máximo 20% do máximo por 150 de ouro.

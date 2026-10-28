@@ -227,6 +227,8 @@ function startAdventure({ character, equipment }) {
         return pact.id;
     });
 
+    window.YaraMeta?.beginRun(character);
+
     hero.hp = getEffectiveStat("maxHp");
     hero.foco = getEffectiveStat("maxFoco");
 
@@ -277,6 +279,7 @@ function checkLevelUp() {
         playSound("levelUp");
         window.logMessage(t("levelUp", { level: hero.level }), "discovery");
         window.logMessage(t("skillPointsGained", { amount: SKILL_POINTS_PER_LEVEL, total: hero.skillPoints }), "special");
+        window.YaraMeta?.onLevelUp();
     }
 }
 

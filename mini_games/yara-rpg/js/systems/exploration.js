@@ -43,6 +43,12 @@ function exploreForest() {
         return;
     }
 
+    if (window.YaraMeta?.shouldOfferVendor()) {
+        pendingStoryEvent = window.YaraMeta.createVendorEvent();
+        updateUI();
+        return;
+    }
+
     const mistRules = GAME_RULES.mistContacts;
     if (MIST_CONTACT_SYSTEM.shouldTrigger(
         hero.level,
@@ -179,6 +185,7 @@ function openFoundChest() {
     if (!pendingChest || inCombat || gameOver || campaignComplete) return;
 
     pendingChest = false;
+    window.YaraMeta?.onChest();
     const rules = EXPLORATION_RULES.chest;
     if (Math.random() * GAME_RULES.probabilityScale < rules.itemChance) {
         const item = createChestEquipmentDrop();
@@ -377,6 +384,7 @@ function resolveStoryEvent(choiceIndex) {
         return;
     } else if (effect === 'monster-spared') {
         const monster = event.monster;
+        window.YaraMeta?.onSpare(monster);
         const rules = EXPLORATION_RULES.sparedMonster;
         const gold = Math.floor(monster.goldReward * rules.goldPercent / GAME_RULES.probabilityScale);
         hero.gold += gold;
@@ -541,6 +549,21 @@ function resolveStoryEvent(choiceIndex) {
         hero.gold += gold;
         if (hero.potions < hero.maxPotions) hero.potions++;
         logMessage(t('eventCastleCache', { gold }), 'loot');
+    } else if (effect === 'gamble') {
+        const rules = choice.gamble;
+        if (Math.random() * GAME_RULES.probabilityScale < rules.winChance) {
+            const gold = rules.gold + Math.floor(Math.random() * (rules.goldRange || 1));
+            hero.gold += gold;
+            logMessage(window.YaraMeta.text('gambleWin', { gold }), 'loot');
+        } else {
+            const hp = Math.min(rules.hpLoss, Math.max(0, hero.hp - 1));
+            hero.hp -= hp;
+            logMessage(window.YaraMeta.text('gambleLose', { hp }), 'combat-monster');
+        }
+    } else if (effect === 'vendor') {
+        window.YaraMeta?.openVendor();
+    } else if (effect === 'vendor-leave') {
+        logMessage(window.YaraMeta.text('vendorLeft'));
     } else if (effect === 'combat') {
         spawnMonster(); return;
     }
@@ -685,6 +708,7 @@ function completeRegionObjectives(objectiveIds, deferRegionUnlock = false) {
     currentRegion++;
     if (!discoveredRegions.includes(currentRegion)) discoveredRegions.push(currentRegion);
     regionEntryLevels[GAME_DATA.regions[currentRegion].id] = hero.level;
+    window.YaraMeta?.onRegionChange();
     playSound('regionDiscovered');
     explorationsSinceStoryEvent = 0;
     logMessage(t("regionArrival", { region: GAME_DATA.regions[currentRegion].title[gameLanguage] }), "discovery");
@@ -864,11 +888,14 @@ function spawnMonster(templateOverride = null) {
         xpReward: vary(template.xpReward),
         goldReward: vary(template.goldReward),
         id: template.id || null,
+        bestiaryKey: template.id || template.name.en,
         isBoss: isMistBoss,
         isFinalBoss: Boolean(template.isFinalBoss),
         isUnescapable: Boolean(template.isUnescapable),
         challengeRewardRarities: template.challengeRewardRarities || null
     };
+
+    window.YaraMeta?.onEncounter(currentMonster);
 
     inCombat = true;
     combatEncounterId++;

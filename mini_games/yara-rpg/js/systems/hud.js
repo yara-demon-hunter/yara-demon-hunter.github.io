@@ -221,6 +221,7 @@ document.getElementById('mobile-character-panel-dialog')?.addEventListener('clos
 });
 
 function updateUI() {
+    window.YaraMeta?.sync();
     const gameMain = document.getElementById('game-main');
     if (!initialEquipmentPanelStateSet && gameMain && !gameMain.hidden) {
         const equipmentPanel = document.getElementById('hero-equipment');

@@ -165,6 +165,7 @@ function getItemBonusText(item) {
 }
 
 function handleEquipmentDrop(item) {
+    window.YaraMeta?.onItem(item);
     logMessage(t('itemFound', {
         item: getEquipmentDisplayName(item),
         slot: getEquipmentSlotLabel(item)

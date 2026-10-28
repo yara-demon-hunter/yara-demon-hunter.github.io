@@ -186,7 +186,9 @@ function loadSavedGame(snapshot = readSavedGame()) {
 }
 
 function showContinueOption() {
-    document.getElementById('continue-adventure-button').hidden = !readSavedGame();
+    const savedGame = readSavedGame();
+    document.getElementById('continue-adventure-button').hidden = !savedGame;
+    window.YaraMeta?.renderContinueSummary(savedGame);
 }
 
 function hydrateItem(savedItem, slotOverride = null) {

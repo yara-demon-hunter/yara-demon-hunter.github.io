@@ -19,6 +19,7 @@ Use this page to find the smallest relevant files before changing the game.
 | Character panel, journey display, game log | `js/systems/hud.js` |
 | Title screen or starter selection | `js/systems/character-setup.js`; wiring in `js/game.js` |
 | New run, global state, level growth, startup | `js/game.js` |
+| Achievements, bestiary, collection, powers, wandering vendor, run summary | `js/systems/meta.js`, `css/meta.css`; gamble events in `js/data/extra-events.js` |
 
 ## Loading model
 

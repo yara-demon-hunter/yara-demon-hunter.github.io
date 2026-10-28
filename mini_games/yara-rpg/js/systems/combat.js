@@ -141,6 +141,7 @@ function healFromLifeSteal(damageDealt) {
 function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultiplier = 0, isCritical = false, isHeavyAttack = false) {
     if (!inCombat || !currentMonster) return;
     combatActionLocked = true;
+    const interruptedTelegraph = enemyTelegraphing;
     enemyTelegraphing = false;
     const encounterId = combatEncounterId;
     damage = applyMonsterParry(damage);
@@ -165,6 +166,14 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
         }), "combat-hero");
     } else {
         logMessage(t(messageKey, { damage: damageDealt, fury: furyGained }), "combat-hero");
+    }
+
+    if (interruptedTelegraph && currentMonster.hp > 0) {
+        const interruptFury = Math.min(GAME_RULES.combat.telegraphInterruptFury, getEffectiveFuryThreshold() - hero.fury);
+        hero.fury += interruptFury;
+        queueFuryAnimation(interruptFury);
+        logMessage(window.YaraMeta.text('interrupted', { monster: currentMonster.name, fury: interruptFury }), 'combat-hero');
+        window.YaraMeta?.onInterrupt();
     }
 
     const stunChance = Math.min(
