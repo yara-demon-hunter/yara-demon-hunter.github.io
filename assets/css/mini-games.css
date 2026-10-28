@@ -52,7 +52,7 @@
 
 .mini-game-card--neon .mini-game-card__art {
     background-image:
-        linear-gradient(135deg, rgba(255, 0, 127, 0.38), rgba(0, 243, 255, 0.2)), url('/assets/images/common/mini-game/neon_blade.jpeg');
+        linear-gradient(135deg, rgba(48, 3, 26, 0.38), rgba(0, 243, 255, 0.2)), url('/assets/images/common/mini-game/last_torch_cover.jpeg');
 }
 
 .mini-game-card__body {
