@@ -1,0 +1,15 @@
+/* --- BASE: fonte, body e canvas --- */
+body {
+    font-family: 'Inter', sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    overscroll-behavior: none;
+}
+body.h-screen {
+    height: 100vh;
+    height: 100dvh;
+}
+#gameCanvas {
+    touch-action: none;
+}

@@ -1,0 +1,61 @@
+import { CHARACTER_MODEL, createPlayerState } from '../../data_model/character.js';
+import { CORE_MODEL } from '../../data_model/core.js';
+import { FRENZY_NOVA_SKILL, createAttributes } from '../../data_model/skills.js';
+import { SoundEngine } from '../audio/sound-engine.js';
+
+// --- OBJETOS COMPARTILHADOS ---
+export const canvas = document.getElementById('gameCanvas');
+export const ctx = canvas.getContext('2d');
+export const audio = new SoundEngine();
+export const attributes = createAttributes();
+
+// Heroi & Light Trail
+export const player = createPlayerState();
+
+// Teclas pressionadas
+export const keys = {};
+
+export const maxUltEnergy = FRENZY_NOVA_SKILL.maximumEnergy;
+
+// --- VARIÁVEIS DE ESTADO ---
+// Tudo que muda durante a partida fica neste objeto para ser compartilhado entre os módulos.
+export const state = {
+    gameState: 'START',
+    width: 0,
+    height: 0,
+
+    // Screen Shake
+    shakeIntensity: 0,
+
+    // Dados de Progresso
+    turn: 1,
+    scoreTurn: 0,
+    targetScore: 500,
+    totalScore: 0,
+    coins: 0,
+
+    // Level & XP
+    playerLevel: 1,
+    playerXp: 0,
+    playerMaxXp: CHARACTER_MODEL.xpToNextLevel,
+
+    // Carga da Skill Ult (Frenzy Nova)
+    ultEnergy: 0,
+    frenzyActiveTimer: 0,
+
+    // Vida Núcleo
+    coreHpMax: CORE_MODEL.initialHp,
+    coreHp: CORE_MODEL.initialHp,
+    coreX: 0,
+    coreY: 0,
+
+    // Entidades
+    enemies: [],
+    particles: [],
+    bladeSlashes: [],
+    enemyProjectiles: [],
+    powerups: [],
+    currentBoss: null,
+
+    spawnTimer: 0
+};
