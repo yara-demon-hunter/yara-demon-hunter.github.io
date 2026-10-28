@@ -8,4 +8,5 @@
 @import url('./base/base.css');
 @import url('./components/hud.css');
 @import url('./components/shop.css');
+@import url('./components/joystick.css');
 @import url('./components/start-screen.css');

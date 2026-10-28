@@ -17,6 +17,9 @@ export const player = createPlayerState();
 // Teclas pressionadas
 export const keys = {};
 
+// Direção do joystick virtual (-1..1 em cada eixo; 0,0 = solto)
+export const joystick = { x: 0, y: 0 };
+
 export const maxUltEnergy = FRENZY_NOVA_SKILL.maximumEnergy;
 
 // --- VARIÁVEIS DE ESTADO ---

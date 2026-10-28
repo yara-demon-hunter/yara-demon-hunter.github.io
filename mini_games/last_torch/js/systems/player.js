@@ -1,5 +1,5 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { keys, player, state } from '../core/state.js';
+import { joystick, keys, player, state } from '../core/state.js';
 import { getPlayerMaxSpeed } from './stats.js';
 
 // --- MOVIMENTAÇÃO DO HERÓI ---
@@ -17,7 +17,15 @@ export function updatePlayer(dt) {
 
     const speed = getPlayerMaxSpeed();
 
-    if (moveX !== 0 || moveY !== 0) {
+    const joyMag = Math.hypot(joystick.x, joystick.y);
+
+    if (joyMag > 0) {
+        // Analógico: inclinar menos anda mais devagar
+        player.x += (joystick.x / joyMag) * Math.min(1, joyMag) * speed * dt;
+        player.y += (joystick.y / joyMag) * Math.min(1, joyMag) * speed * dt;
+        player.targetX = player.x;
+        player.targetY = player.y;
+    } else if (moveX !== 0 || moveY !== 0) {
         const len = Math.hypot(moveX, moveY);
         player.x += (moveX / len) * speed * dt;
         player.y += (moveY / len) * speed * dt;
