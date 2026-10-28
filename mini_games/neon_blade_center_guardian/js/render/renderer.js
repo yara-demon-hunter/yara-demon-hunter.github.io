@@ -1,4 +1,5 @@
-import { ctx, state } from '../core/state.js';
+import { WORLD } from '../../data_model/world.js';
+import { canvas, ctx, state } from '../core/state.js';
 import { renderAttackRange, renderCore } from './arena.js';
 import {
     renderBladeSlashes,
@@ -10,11 +11,43 @@ import {
 import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestGround, renderTorchLight } from './forest.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 
+// Funde a borda do mundo com as faixas laterais/superiores (se existirem) para não haver corte seco
+function renderLetterboxFade() {
+    const { offsetX, offsetY } = state.view;
+    const { width: w, height: h } = state;
+    const fade = WORLD.letterboxFadeWidth;
+    const edge = (x0, y0, x1, y1, rx, ry, rw, rh) => {
+        const g = ctx.createLinearGradient(x0, y0, x1, y1);
+        g.addColorStop(0, WORLD.letterboxColor);
+        g.addColorStop(1, 'rgba(1, 4, 10, 0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(rx, ry, rw, rh);
+    };
+    if (offsetX > 0.5) {
+        edge(0, 0, fade, 0, 0, 0, fade, h);
+        edge(w, 0, w - fade, 0, w - fade, 0, fade, h);
+    }
+    if (offsetY > 0.5) {
+        edge(0, 0, 0, fade, 0, 0, w, fade);
+        edge(0, h, 0, h - fade, 0, h - fade, w, fade);
+    }
+}
+
 // --- RENDER LOOP ---
 // A ordem das chamadas define as camadas (do fundo para a frente).
 export function render() {
+    // Faixas fora do mundo (quando a proporção da tela passa do limite)
     ctx.save();
-    ctx.clearRect(0, 0, state.width, state.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = WORLD.letterboxColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+
+    ctx.save();
+    // Nada é desenhado fora do mundo (tremor de tela, brilhos etc.)
+    ctx.beginPath();
+    ctx.rect(0, 0, state.width, state.height);
+    ctx.clip();
 
     // Screen Shake offset
     if (state.shakeIntensity > 0) {
@@ -37,6 +70,7 @@ export function render() {
     renderParticles();
     renderFireflies();
     renderFogAndVignette();
+    renderLetterboxFade();
 
     ctx.restore();
 }

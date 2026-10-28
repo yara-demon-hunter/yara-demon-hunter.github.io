@@ -23,7 +23,8 @@ const cache = {
     fogCanvas: null,
     fogCtx: null,
     lightRadius: 0,
-    lightTime: 0
+    lightTime: 0,
+    groundRes: 0
 };
 
 function makeCanvas(width, height) {
@@ -40,9 +41,10 @@ function ellipticDistance(x, y, w, h) {
     return Math.hypot(nx, ny);
 }
 
-function buildGround(w, h, rand) {
-    const canvas = makeCanvas(w, h);
+function buildGround(w, h, rand, res) {
+    const canvas = makeCanvas(w * res, h * res);
     const g = canvas.getContext('2d');
+    g.scale(res, res);
     const density = (w * h) / 100000;
 
     g.fillStyle = F.groundColor;
@@ -203,12 +205,15 @@ function buildVignette(w, h) {
 
 function ensureCache() {
     const { width: w, height: h } = state;
-    if (cache.width === w && cache.height === h && cache.ground) return;
+    // O chão é pré-desenhado na resolução em que aparece na tela (nítido em telas grandes)
+    const res = Math.max(1, Math.min(2, Math.round(state.view.scale * state.view.pixelRatio * 4) / 4));
+    if (cache.width === w && cache.height === h && cache.groundRes === res && cache.ground) return;
     cache.width = w;
     cache.height = h;
+    cache.groundRes = res;
 
     const rand = createRandom(F.seed);
-    cache.ground = buildGround(w, h, rand);
+    cache.ground = buildGround(w, h, rand, res);
     const { sprite, fog } = buildFog(w, h, rand);
     cache.fogSprite = sprite;
     cache.fog = fog;

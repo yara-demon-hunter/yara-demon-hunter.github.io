@@ -23,8 +23,11 @@ export const maxUltEnergy = FRENZY_NOVA_SKILL.maximumEnergy;
 // Tudo que muda durante a partida fica neste objeto para ser compartilhado entre os módulos.
 export const state = {
     gameState: 'START',
+    // Tamanho do MUNDO (unidades do jogo), não da janela. Veja data_model/world.js
     width: 0,
     height: 0,
+    // Como o mundo é mostrado na tela (escala e deslocamento em px do navegador)
+    view: { scale: 1, offsetX: 0, offsetY: 0, cssWidth: 0, cssHeight: 0, pixelRatio: 1, mobile: false },
 
     // Screen Shake
     shakeIntensity: 0,

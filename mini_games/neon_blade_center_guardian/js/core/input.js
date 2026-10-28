@@ -1,7 +1,10 @@
+import { screenToWorld } from './resize.js';
 import { audio, canvas, keys, player, state } from './state.js';
 
 // --- INPUTS CONTROLS ---
-function setTarget(x, y) {
+// Recebe coordenadas da janela e converte para o mundo
+function setTarget(clientX, clientY) {
+    const { x, y } = screenToWorld(clientX, clientY);
     player.targetX = x;
     player.targetY = y;
 }
