@@ -17,9 +17,12 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `combat-rules.js`: dano, custos, defesa, fuga e tempos dos turnos.
 - `progression-rules.js`: multiplicador de XP e melhorias compradas.
 - `exploration-rules.js`: chance de descobrir áreas e eventos, intervalo entre eventos narrativos, pesos dos resultados de exploração, recompensas, chance de obter item ao abrir baú e chance de poupar um monstro derrotado.
+- `extra-events.js`: eventos de aposta (efeito `gamble`) acrescentados aos eventos de cada região em `regions.js`; usam as mesmas escolhas e a mesma execução em `resolveStoryEvent`.
+- `vendor.js`: vendedor ambulante. Define o evento de apresentação (`event`), o catálogo de mercadorias (`offers`, com nome, descrição, preço, estoque e `effect`), quantas mercadorias são sorteadas por visita, a variação de preço por região e a tabela de venda de itens da mochila por raridade. A frequência com que ele aparece fica em `exploration-rules.js` (campo `vendor`).
+- `achievements.js`: conquistas do Santuário. Cada uma tem `id`, `icon`, `name`, `description` (PT/EN) e uma `condition` com `type` e `value`; os tipos aceitos e a avaliação estão em `CONDITIONS` no topo de `../systems/meta.js`.
 - `setup-config.js`: quantidade de equipamentos iniciais escolhidos antes da aventura; ajuste `starterEquipmentCount` para mudar o limite.
 
-A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`; os encontros durante a exploração são tratados em `../systems/exploration.js`. Para ajustar o ritmo, edite `mistContacts` em `world-rules.js`; adicione contatos em `mist-contacts.js`, passivas e pactos em `passive-skills.js` e chefes em `special-monsters.js`. Contatos que iniciam uma missão podem apontar para o `id` de um chefe por `bossId`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos. Todos os monstros usam o mesmo banner e a mesma interface de status durante o combate.
+A lógica do vendedor fica em `../systems/vendor.js`; conquistas, bestiário, coleção, poderes e recordes do Santuário em `../systems/meta.js` (textos nas chaves `meta...` e `vendor...` dos arquivos `translations-*.js`). A lógica de sorteio dos contatos fica em `../systems/mist-contacts.js`; os encontros durante a exploração são tratados em `../systems/exploration.js`. Para ajustar o ritmo, edite `mistContacts` em `world-rules.js`; adicione contatos em `mist-contacts.js`, passivas e pactos em `passive-skills.js` e chefes em `special-monsters.js`. Contatos que iniciam uma missão podem apontar para o `id` de um chefe por `bossId`. Chefes exigem o nível definido em `minLevel` e usam `suggestedLevel` como referência para escalar atributos. Todos os monstros usam o mesmo banner e a mesma interface de status durante o combate.
 
 A lógica da tela inicial e a seleção dos equipamentos ficam em `../systems/character-setup.js`. O limite de escolhas vem de `setup-config.js`. Os eventos narrativos são declarados em cada região e executados por `resolveStoryEvent` em `../systems/exploration.js`. Os textos PT/EN ficam em `../systems/translations-pt.js` e `../systems/translations-en.js`. Os scripts de dados e sistemas precisam ser carregados antes de `game.js`, que inicia a aventura com as escolhas feitas.
 
@@ -41,12 +44,17 @@ Explorar
    │  ├─ Precisa ter passado o intervalo de 3 explorações desde o último evento
    │  ├─ Chance configurada: 20%
    │  └─ Disparou: escolhe aleatoriamente um evento ainda não visto e mostra suas opções
-   ├─ 2. Contato da névoa (só se não disparou evento narrativo)
+   ├─ 2. Vendedor ambulante (só se não disparou evento narrativo)
+   │  ├─ Precisa ter passado o intervalo de 4 explorações desde o último vendedor
+   │  ├─ Chance configurada: 10% (exploration-rules.js › vendor)
+   │  └─ Disparou: mostra o evento "O vendedor ambulante"; "Ver as mercadorias" abre a loja
+   │     (compra 4 mercadorias sorteadas e vende itens da mochila); "Seguir viagem" encerra o evento
+   ├─ 3. Contato da névoa (só se não disparou nenhum dos anteriores)
    │  ├─ Precisa ter passado o intervalo de 3 explorações desde o último contato
    │  ├─ Chance = mínimo entre 25% e (3% + 1% por nível acima do nível 1)
    │  ├─ Disparou: escolhe aleatoriamente um contato elegível para o nível
    │  └─ Aceitar pode iniciar uma luta, oferecer bebida, skill passiva, pacto ou ponto de habilidade
-   └─ 3. Resultado aleatório da exploração (só se nenhum evento anterior disparou)
+   └─ 4. Resultado aleatório da exploração (só se nenhum evento anterior disparou)
       ├─ Monstro: 38%
       ├─ Ouro: 17%
       ├─ Trilha segura: 12% (HP/foco; removida se ambos estiverem cheios)
@@ -182,5 +190,6 @@ As quatro regiões de exploração têm cinco tarefas cada, incluindo metas cumu
 - **38% monstro** e os demais pesos são a rolagem final de exploração, somente se evento narrativo e contato da névoa não aparecerem naquele clique.
 - **20% evento narrativo** é testado antes do contato da névoa, depois do intervalo; portanto, se disparar, o contato e a rolagem de exploração não são testados naquele clique.
 - A chance de contato da névoa também é uma rolagem separada, testada depois do evento narrativo e antes do resultado de exploração.
+- **10% de vendedor** é testado depois do evento narrativo e antes do contato da névoa, respeitando o intervalo de 4 explorações.
 - **10% spare** é testado apenas depois da vitória contra monstro comum; se aparecer, o jogador decide entre golpe final e poupar. As cinco consequências de poupar são então sorteadas com 20% cada.
 - As chances de recompensa (baú, drop de monstro, raridade) são novas rolagens dentro do resultado que as habilita; não são pontos percentuais da chance principal de explorar.

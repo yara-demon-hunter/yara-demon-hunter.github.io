@@ -22,6 +22,7 @@
                         <div><span class="block text-gray-500" data-i18n="evasionShort">EVA</span><span id="monster-evasion" class="text-emerald-200">8%</span></div>
                     </div>
                 </div>
+                <p id="telegraph-hint" class="telegraph-hint" hidden></p>
             </div>
 
             <!-- Banner de Exploração -->
@@ -47,6 +48,7 @@
                         <button type="button" class="region-objectives-button" onclick="openRegionObjectives()" data-i18n="regionObjectivesButton">Ver objetivos</button>
                     </div>
                 </div>
+                <button id="run-stats" type="button" class="run-stats" onclick="YaraMeta?.openSanctuary('achievements')"></button>
                 <p id="treasure-chance-bonus" class="mt-1 text-[11px] text-amber-200" hidden></p>
                 <button id="restart-button" onclick="restartGame()" class="hidden mt-3 bg-amber-600 hover:bg-amber-500 text-black font-bold py-2 px-4 rounded-lg transition" data-i18n="restart">Reiniciar jornada</button>
             </div>

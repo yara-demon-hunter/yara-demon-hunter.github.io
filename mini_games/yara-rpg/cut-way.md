@@ -15,3 +15,23 @@ showPassiveReward('skill', SPIRIT_EYE_PASSIVE);
 localStorage.setItem("yara-rpg-campaign-complete-v1", "true");
 location.reload();
 ```
+- Test the wandering vendor (start a journey first)
+```js
+// Evento completo (Ver as mercadorias / Seguir viagem)
+pendingStoryEvent = YaraVendor.createEvent();
+updateUI();
+
+// Só a loja
+hero.gold = 1000;
+YaraVendor.open();
+
+// Forçar o vendedor na próxima exploração (ignora uma vez a chance e o intervalo)
+const r = Math.random; Math.random = () => 0.05;
+for (let i = 0; i < 5; i++) { if (pendingStoryEvent) break; exploreForest(); }
+Math.random = r;
+```
+- Test the Sanctuary / achievements
+```js
+YaraMeta.openSanctuary('achievements');   // achievements | bestiary | collection | powers | records
+performSpiritEyeSurgery();                // conquista do Olho Espiritual
+```

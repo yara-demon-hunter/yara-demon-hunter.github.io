@@ -8,6 +8,12 @@ window.YaraRpgData.exploration = Object.freeze({
         chance: 20,
         cooldownExplorations: 3
     },
+    // Vendedor ambulante: testado depois dos eventos narrativos e antes dos contatos da névoa.
+    // O catálogo e os preços ficam em vendor.js; a lógica em ../systems/vendor.js.
+    vendor: {
+        chance: 10,
+        cooldownExplorations: 4
+    },
     outcomes: Object.freeze([
         { type: "monster", weight: 38 },
         { type: "gold", weight: 17 },

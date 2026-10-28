@@ -43,8 +43,8 @@ function exploreForest() {
         return;
     }
 
-    if (window.YaraMeta?.shouldOfferVendor()) {
-        pendingStoryEvent = window.YaraMeta.createVendorEvent();
+    if (window.YaraVendor?.shouldOffer()) {
+        pendingStoryEvent = window.YaraVendor.createEvent();
         updateUI();
         return;
     }
@@ -554,16 +554,16 @@ function resolveStoryEvent(choiceIndex) {
         if (Math.random() * GAME_RULES.probabilityScale < rules.winChance) {
             const gold = rules.gold + Math.floor(Math.random() * (rules.goldRange || 1));
             hero.gold += gold;
-            logMessage(window.YaraMeta.text('gambleWin', { gold }), 'loot');
+            logMessage(t('metaGambleWin', { gold }), 'loot');
         } else {
             const hp = Math.min(rules.hpLoss, Math.max(0, hero.hp - 1));
             hero.hp -= hp;
-            logMessage(window.YaraMeta.text('gambleLose', { hp }), 'combat-monster');
+            logMessage(t('metaGambleLose', { hp }), 'combat-monster');
         }
     } else if (effect === 'vendor') {
-        window.YaraMeta?.openVendor();
+        window.YaraVendor?.open();
     } else if (effect === 'vendor-leave') {
-        logMessage(window.YaraMeta.text('vendorLeft'));
+        logMessage(t('vendorLeft'));
     } else if (effect === 'combat') {
         spawnMonster(); return;
     }

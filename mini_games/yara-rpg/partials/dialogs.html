@@ -114,3 +114,28 @@
             </div>
         </div>
     </dialog>
+
+<dialog id="meta-dialog" class="item-drop-dialog meta-dialog" aria-labelledby="meta-dialog-title">
+    <div class="item-drop-content">
+        <div class="equipment-bag-heading">
+            <h2 id="meta-dialog-title" class="text-lg font-bold text-amber-300" data-i18n="metaSanctuaryTitle">🏛️ Santuário</h2>
+            <button type="button" class="dialog-close-button" onclick="YaraMeta?.closeSanctuary()" data-i18n-aria="metaClose" aria-label="Fechar">×</button>
+        </div>
+        <div id="meta-dialog-tabs" class="meta-tabs"></div>
+        <div id="meta-dialog-body" class="meta-body"></div>
+    </div>
+</dialog>
+
+<dialog id="vendor-dialog" class="item-drop-dialog meta-dialog" aria-labelledby="vendor-dialog-title">
+    <div class="item-drop-content">
+        <div class="equipment-bag-heading">
+            <h2 id="vendor-dialog-title" class="text-lg font-bold text-amber-300" data-i18n="vendorDialogTitle">🛒 O vendedor ambulante</h2>
+            <span id="vendor-dialog-gold" class="equipped-item-count"></span>
+            <button type="button" class="dialog-close-button" onclick="YaraVendor?.close()" data-i18n-aria="metaClose" aria-label="Fechar">×</button>
+        </div>
+        <div id="vendor-dialog-body" class="meta-body"></div>
+    </div>
+</dialog>
+
+<div id="meta-toast" class="meta-toast" role="status" hidden></div>
+<div id="rarity-flash" class="rarity-flash" aria-hidden="true" hidden></div>

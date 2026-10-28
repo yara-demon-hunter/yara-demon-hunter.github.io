@@ -81,11 +81,12 @@ Esta primeira versão ainda carrega Tailwind e as fontes Cinzel/Inter de CDNs, a
 
 ## Meta-progressão e retenção
 
-`js/systems/meta.js` (estilos em `css/meta.css`) guarda em `localStorage` (`yara-rpg-meta-v1`) o que sobrevive à morte e é consultado no **Santuário** (tela inicial e tela de derrota): conquistas, bestiário, coleção de itens, **poderes** (passivas e pactos já descobertos) e recordes. Também contém o resumo da jornada, o **vendedor ambulante**, o brilho de drops raros e o aviso de telegrafia.
+`js/systems/meta.js` (estilos em `css/meta.css`) guarda em `localStorage` (`yara-rpg-meta-v1`) o que sobrevive à morte e é consultado no **Santuário** (tela inicial, faixa do banner e tela de derrota): conquistas, bestiário, coleção de itens, **poderes** (passivas e pactos já descobertos) e recordes. Também cuida do tempo de jogo, do resumo da jornada, do brilho de drops raros e do aviso de telegrafia.
 
-- Novas conquistas e mercadorias: constantes `ACHIEVEMENTS` e `VENDOR` no topo de `meta.js` (frequência do vendedor em `VENDOR.chance`/`cooldownExplorations`). Textos de interface em `S` (PT/EN).
-- O vendedor é um evento de exploração (`shouldOfferVendor` em `exploreForest`); cada visita sorteia 4 mercadorias com estoque limitado e preço que sobe com a região.
-- Os outros sistemas só chamam `window.YaraMeta?.hook()`; sem `meta.js` o jogo continua funcionando.
+- Conquistas: `js/data/achievements.js` (nome, descrição, ícone e `condition`); os tipos de condição ficam em `CONDITIONS` no topo de `meta.js`.
+- Vendedor ambulante: catálogo, preços e evento em `js/data/vendor.js`; frequência em `exploration-rules.js` (`vendor`); lógica em `js/systems/vendor.js`. Aparece como evento de exploração e permite comprar mercadorias e vender itens da mochila.
+- Textos: chaves `meta...` e `vendor...` em `translations-pt.js` e `translations-en.js`. A marcação do Santuário, da loja e dos avisos está em `partials/` (`dialogs.html`, `character-setup.html`, `exploration-panel.html`).
+- Os outros sistemas só chamam `window.YaraMeta?.hook()` e `window.YaraVendor?.…`; sem esses arquivos o jogo continua funcionando.
 - Telegrafia: o aviso aparece no monstro; atacar durante o aviso **interrompe** o golpe e dá fúria (`telegraphInterruptFury` em `combat-rules.js`).
 - Eventos de aposta (efeito `gamble`) ficam em `js/data/extra-events.js`.
 

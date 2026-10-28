@@ -227,6 +227,7 @@ function startAdventure({ character, equipment }) {
         return pact.id;
     });
 
+    window.YaraVendor?.reset();
     window.YaraMeta?.beginRun(character);
 
     hero.hp = getEffectiveStat("maxHp");

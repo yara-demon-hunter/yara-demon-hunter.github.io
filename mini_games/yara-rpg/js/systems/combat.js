@@ -172,7 +172,7 @@ function resolveHeroAttack(damage, messageKey, criticalStunBonus = 0, furyMultip
         const interruptFury = Math.min(GAME_RULES.combat.telegraphInterruptFury, getEffectiveFuryThreshold() - hero.fury);
         hero.fury += interruptFury;
         queueFuryAnimation(interruptFury);
-        logMessage(window.YaraMeta.text('interrupted', { monster: currentMonster.name, fury: interruptFury }), 'combat-hero');
+        logMessage(t('metaInterrupted', { monster: currentMonster.name, fury: interruptFury }), 'combat-hero');
         window.YaraMeta?.onInterrupt();
     }
 
