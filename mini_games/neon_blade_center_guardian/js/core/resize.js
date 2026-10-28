@@ -19,12 +19,13 @@ function computeWorldSize(cssWidth, cssHeight) {
     const profile = mobile ? WORLD.mobile : WORLD.desktop;
     const aspect = Math.max(cssWidth, cssHeight) / Math.max(1, shortSide);
     const longRatio = Math.max(profile.minAspect, Math.min(profile.maxAspect, aspect));
-    const longSide = Math.round(profile.shortSide * longRatio);
+    const baseShort = Math.round(profile.shortSide * (profile.areaScale || 1));
+    const longSide = Math.round(baseShort * longRatio);
     const landscape = cssWidth >= cssHeight;
     return {
         mobile,
-        width: landscape ? longSide : profile.shortSide,
-        height: landscape ? profile.shortSide : longSide
+        width: landscape ? longSide : baseShort,
+        height: landscape ? baseShort : longSide
     };
 }
 
