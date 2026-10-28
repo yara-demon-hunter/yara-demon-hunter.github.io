@@ -1,5 +1,6 @@
 import { CHARACTER_MODEL, createPlayerState } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
+import { createPassives } from '../../data_model/passives.js';
 import { FRENZY_NOVA_SKILL, createAttributes } from '../../data_model/skills.js';
 import { SoundEngine } from '../audio/sound-engine.js';
 
@@ -8,6 +9,7 @@ export const canvas = document.getElementById('gameCanvas');
 export const ctx = canvas.getContext('2d');
 export const audio = new SoundEngine();
 export const attributes = createAttributes();
+export const passives = createPassives();
 
 // Heroi & Light Trail
 export const player = createPlayerState();
@@ -38,6 +40,7 @@ export const state = {
     playerLevel: 1,
     playerXp: 0,
     playerMaxXp: CHARACTER_MODEL.xpToNextLevel,
+    skillPoints: 0,
 
     // Carga da Skill Ult (Frenzy Nova)
     ultEnergy: 0,

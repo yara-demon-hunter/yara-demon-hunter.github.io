@@ -1,6 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
-import { attributes, audio, player, state } from '../core/state.js';
+import { attributes, audio, passives, player, state } from '../core/state.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { updateHUD } from './hud.js';
 
@@ -20,6 +20,8 @@ export function startGame() {
     state.frenzyActiveTimer = 0;
 
     Object.keys(attributes).forEach(k => attributes[k].lvl = 1);
+    Object.keys(passives).forEach(k => passives[k].lvl = 0);
+    state.skillPoints = 0;
 
     state.coreHpMax = CORE_MODEL.initialHp;
     state.coreHp = state.coreHpMax;

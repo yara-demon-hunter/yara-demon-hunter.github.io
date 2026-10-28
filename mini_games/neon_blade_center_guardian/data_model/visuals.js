@@ -68,11 +68,13 @@ export const HERO_VISUALS = {
     runSpeedForFullEffect: 220,
     turnSmoothing: 14,
 
-    // Ataques do combo (1: corte, 2: corte de volta, 3: giro 360°)
+    // Ataques do combo (1: corte, 2: corte de volta, 3: corte pesado)
+    // whirl: 3º golpe com a skill passiva Giro Sombrio (giro 360°)
     combo: {
-        1: { seconds: 0.12, from: 1, to: -1, extraArc: 0.35, glow: 18 },
-        2: { seconds: 0.12, from: -1, to: 1, extraArc: 0.6, glow: 22 },
-        3: { seconds: 0.2, spin: true, glow: 30 }
+        1: { seconds: 0.2, from: 1, to: -1, extraArc: 0.35, glow: 18 },
+        2: { seconds: 0.22, from: -1, to: 1, extraArc: 0.6, glow: 22 },
+        3: { seconds: 0.26, from: 1, to: -1, extraArc: 0.9, glow: 26 },
+        whirl: { seconds: 0.3, spin: true, glow: 30 }
     },
     restBladeAngle: 2.0,
 
@@ -83,4 +85,18 @@ export const HERO_VISUALS = {
     // Rastro de sombra (quase imperceptível)
     shadowTrailAlpha: 0.18,
     shadowTrailRadius: 9
+};
+
+// --- EFEITO DO GOLPE (arco neon da lâmina) ---
+// Cada passo do combo tem um visual próprio. Só afeta o desenho, não o dano.
+export const SLASH_VISUALS = {
+    1: { lifeSeconds: 0.2, from: 1, to: -1, color: '#06b6d4', lineWidth: 6, glow: 20, tail: 0.65, lines: 1 },
+    2: { lifeSeconds: 0.22, from: -1, to: 1, color: '#38bdf8', lineWidth: 7, glow: 24, tail: 0.75, lines: 2 },
+    3: { lifeSeconds: 0.26, from: 1, to: -1, color: '#a855f7', lineWidth: 10, glow: 28, tail: 0.85, lines: 1 },
+    whirl: { lifeSeconds: 0.3, spin: true, color: '#a855f7', lineWidth: 9, glow: 30, tail: 1, lines: 1, shockwave: true },
+    frenzyColor: '#f0abfc',
+    frenzyExtraWidth: 3,
+    coreColor: '#ffffff',
+    coreWidth: 2.2,
+    doubleLineGap: 7
 };

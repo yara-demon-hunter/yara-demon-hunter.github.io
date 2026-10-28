@@ -1,5 +1,6 @@
 import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
-import { audio, maxUltEnergy, player, state } from '../core/state.js';
+import { SLASH_VISUALS } from '../../data_model/visuals.js';
+import { audio, maxUltEnergy, passives, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { createExplosion, shakeScreen } from './effects.js';
 import {
@@ -13,13 +14,14 @@ import {
 
 // --- SISTEMA DE CORTE COM A LÂMINA ---
 // Amplitude configurável via upgrade (getSlashArcRadian)
-export function executeBladeSlash(x, y, angle, radius, comboStep) {
+export function executeBladeSlash(x, y, angle, radius, comboStep, spin = false) {
     const currentArc = getSlashArcRadian();
+    const visualLife = (spin ? SLASH_VISUALS.whirl : SLASH_VISUALS[comboStep]).lifeSeconds;
 
     state.bladeSlashes.push({
-        x, y, angle, radius, comboStep,
+        x, y, angle, radius, comboStep, spin,
         arcWidth: currentArc,
-        life: 0.12, maxLife: 0.12
+        life: visualLife, maxLife: visualLife
     });
 
     audio.playSwordSlash(comboStep);
@@ -94,7 +96,9 @@ export function updateAutoAttack(dt) {
     const atkAngle = Math.atan2(targetEnemy.y - player.y, targetEnemy.x - player.x);
     player.angle = atkAngle;
 
-    executeBladeSlash(player.x, player.y, atkAngle, attackRad, player.comboStep);
+    // Skill passiva Giro Sombrio: o 3º golpe vira um giro de 360°
+    const whirl = player.comboStep === 3 && passives.shadowWhirl.lvl > 0;
+    executeBladeSlash(player.x, player.y, atkAngle, attackRad, player.comboStep, whirl);
 
     const dmg = getAtkDamage() * (player.comboStep === 3 ? BLADE_SKILL.comboDamageMultiplier : 1.0);
     const kbForce = getKnockback() * (player.comboStep === 3 ? BLADE_SKILL.comboKnockbackMultiplier : 1.0);
@@ -109,7 +113,7 @@ export function updateAutoAttack(dt) {
             diffAngle = Math.abs(diffAngle);
 
             // Aplica dano se o inimigo está dentro da abertura angular atual do corte
-            if (diffAngle <= currentArcHalf + 0.1 || state.frenzyActiveTimer > 0) {
+            if (diffAngle <= currentArcHalf + 0.1 || state.frenzyActiveTimer > 0 || whirl) {
                 e.hp -= dmg;
                 chargeUlt(FRENZY_NOVA_SKILL.chargePerHit);
 

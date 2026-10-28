@@ -1,4 +1,5 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
+import { SKILL_POINTS_PER_LEVEL } from '../../data_model/passives.js';
 import { player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { createExplosion, shakeScreen } from './effects.js';
@@ -10,6 +11,7 @@ export function gainXp(amount) {
     if (state.playerXp >= state.playerMaxXp) {
         state.playerXp -= state.playerMaxXp;
         state.playerLevel++;
+        state.skillPoints += SKILL_POINTS_PER_LEVEL;
         state.playerMaxXp = Math.floor(state.playerMaxXp * CHARACTER_MODEL.xpGrowthMultiplier);
 
         player.maxHp = getMaxPlayerHp();

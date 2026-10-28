@@ -1,5 +1,7 @@
 import { POWERUP_MODELS } from '../../data_model/skills.js';
+import { SLASH_VISUALS } from '../../data_model/visuals.js';
 import { ctx, state } from '../core/state.js';
+import { easeOutCubic } from './fx/easing.js';
 
 // --- ENTIDADES: Powerups, Golpes, Projéteis, Inimigos e Partículas ---
 export function renderPowerups() {
@@ -15,37 +17,62 @@ export function renderPowerups() {
     });
 }
 
-// Slashes de Espada (Golpes de Arco Direcional em Estilo Neon Cyan/Purple)
+// Slashes de Espada: cada passo do combo tem um visual próprio (data_model/visuals.js)
+// 1: corte que varre da direita para a esquerda
+// 2: corte de volta, duplo e mais largo
+// 3: corte pesado roxo
+// whirl (skill passiva Giro Sombrio): giro de 360° com onda de choque
+function strokeSweep(radius, from, to, color, lineWidth) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, from, to, to < from);
+    ctx.stroke();
+}
+
 export function renderBladeSlashes() {
     const frenzyActive = state.frenzyActiveTimer > 0;
 
     state.bladeSlashes.forEach(s => {
+        const look = s.spin ? SLASH_VISUALS.whirl : (SLASH_VISUALS[s.comboStep] || SLASH_VISUALS[1]);
+        const progress = easeOutCubic(1 - (s.life / s.maxLife));
+        const fadeOut = Math.min(1, (s.life / s.maxLife) * 3);
+
+        // Ângulo inicial/final do varrido
+        const half = s.arcWidth / 2;
+        const start = look.spin ? -Math.PI : look.from * half;
+        const end = look.spin ? Math.PI : look.to * half;
+        const head = start + (end - start) * progress;
+        const tail = start + (end - start) * Math.max(0, progress - look.tail);
+
+        const color = frenzyActive ? SLASH_VISUALS.frenzyColor : look.color;
+        const width = look.lineWidth + (frenzyActive ? SLASH_VISUALS.frenzyExtraWidth : 0);
+
         ctx.save();
         ctx.translate(s.x, s.y);
         ctx.rotate(s.angle);
-
-        const progress = 1 - (s.life / s.maxLife);
-        const currentArc = s.arcWidth;
-        const startAngle = -currentArc / 2;
-        const endAngle = currentArc / 2;
-
-        // Arco Neon distintivo
-        ctx.shadowBlur = frenzyActive ? 30 : 22;
-        ctx.shadowColor = frenzyActive ? '#f0abfc' : s.comboStep === 3 ? '#a855f7' : '#06b6d4';
-        ctx.strokeStyle = ctx.shadowColor;
-        ctx.lineWidth = frenzyActive ? 12 : s.comboStep === 3 ? 9 : 7;
+        ctx.globalAlpha = fadeOut;
         ctx.lineCap = 'round';
+        ctx.shadowBlur = look.glow;
+        ctx.shadowColor = color;
 
-        ctx.beginPath();
-        ctx.arc(0, 0, s.radius * (0.85 + progress * 0.15), startAngle, endAngle);
-        ctx.stroke();
+        for (let l = 0; l < look.lines; l++) {
+            const r = s.radius * (0.88 + progress * 0.12) - l * SLASH_VISUALS.doubleLineGap;
+            strokeSweep(r, tail, head, color, width - l * 2);
+            // Rastro interno brilhante (Branco Neon)
+            strokeSweep(r, tail, head, SLASH_VISUALS.coreColor, SLASH_VISUALS.coreWidth);
+        }
 
-        // Rastro interno brilhante (Branco Neon)
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.arc(0, 0, s.radius * (0.85 + progress * 0.15), startAngle, endAngle);
-        ctx.stroke();
+        // Finalizador: onda de choque expandindo
+        if (look.shockwave) {
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = fadeOut * (1 - progress) * 0.7;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, s.radius * (0.3 + progress * 0.9), 0, Math.PI * 2);
+            ctx.stroke();
+        }
 
         ctx.restore();
     });

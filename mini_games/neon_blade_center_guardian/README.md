@@ -16,6 +16,7 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   core.js                         vida, colisão e aparência do núcleo
   monsters.js                     monstros, chefão, aparição e recompensas
   skills.js                       upgrades, lâmina, Frenzy Nova e power-ups
+  passives.js                     skills passivas (compradas com pontos de skill, 1 por nível)
   visuals.js                      cores, tamanhos e ritmos das animações (arte procedural)
 js/
   game.js                         ponto de entrada: importa os motores e roda o game loop
@@ -37,6 +38,7 @@ js/
   render/fx/easing.js             funções de easing e interpolação de ângulos
   ui/hud.js                       atualização do HUD
   ui/shop.js                      loja de upgrades
+  ui/passives.js                  skills passivas na loja
   ui/screens.js                   início de partida e game over
   ui/buttons.js                   eventos dos botões
   audio/sound-engine.js           efeitos de áudio via Web Audio API

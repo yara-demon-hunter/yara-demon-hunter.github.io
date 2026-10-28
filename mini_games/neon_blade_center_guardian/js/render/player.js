@@ -28,9 +28,11 @@ const anim = {
 const capeJag = Array.from({ length: V.capeStrips + 1 }, (_, i) => (i % 2 === 0 ? 1 : 0.6 + Math.random() * 0.2));
 
 function startSwing(step) {
-    const combo = V.combo[step];
-    const half = state.bladeSlashes.length ? state.bladeSlashes[state.bladeSlashes.length - 1].arcWidth / 2 : 0.7;
-    anim.swingStep = step;
+    const lastSlash = state.bladeSlashes[state.bladeSlashes.length - 1];
+    const comboKey = lastSlash && lastSlash.spin ? 'whirl' : step;
+    const combo = V.combo[comboKey];
+    const half = lastSlash ? lastSlash.arcWidth / 2 : 0.7;
+    anim.swingStep = comboKey;
     anim.swingSeconds = combo.seconds;
     anim.swingTimer = combo.seconds;
     if (combo.spin) {

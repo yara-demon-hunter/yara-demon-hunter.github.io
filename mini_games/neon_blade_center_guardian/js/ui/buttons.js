@@ -1,4 +1,5 @@
 import { audio } from '../core/state.js';
+import { buyPassiveSkill } from './passives.js';
 import { startGame } from './screens.js';
 import { buyUpgrade, openShop, resumeGame } from './shop.js';
 
@@ -17,5 +18,9 @@ export function setupButtons() {
     document.getElementById('shopList').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-upgrade]');
         if (button && !button.disabled) buyUpgrade(button.dataset.upgrade);
+    });
+    document.getElementById('passiveList').addEventListener('click', (e) => {
+        const button = e.target.closest('button[data-passive]');
+        if (button && !button.disabled) buyPassiveSkill(button.dataset.passive);
     });
 }

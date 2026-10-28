@@ -1,6 +1,7 @@
 import { attributes, audio, player, state } from '../core/state.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { updateHUD } from './hud.js';
+import { renderPassiveSkills } from './passives.js';
 
 // --- LOJA DE UPGRADES ---
 function getUpgradeCost(attr) {
@@ -11,6 +12,7 @@ export function openShop() {
     state.gameState = 'SHOP';
     document.getElementById('shopCoinsText').innerText = state.coins;
     renderShopItems();
+    renderPassiveSkills();
     updateHUD();
     document.getElementById('shopScreen').classList.remove('hidden');
 }
