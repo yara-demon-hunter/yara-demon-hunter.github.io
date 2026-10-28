@@ -54,3 +54,12 @@ Dark fantasy; caçador encapuzado com máscara de osso; espada rúnica neon. Ver
 
 - O jogo é visto de cima: priorizar silhueta (capuz + capa + espada) e contraste da máscara branca.
 - Não usar contorno azul forte no capuz (no jogo parecia uma "bolinha azul"); o brilho azul fica só na espada.
+
+## Detalhes implementados no jogo (versão 2)
+
+- Capa em duas camadas (forro mais claro), barra rasgada com entalhes e dobras; tem física: fica para trás ao correr e se abre para o lado ao virar.
+- Capuz com ponta caindo para trás, dobras de tecido e brilho frio nos olhos da máscara.
+- Ombros com volume, braços (o livre balança na corrida), luvas, tira no peito com fivela e pontas da faixa esvoaçando.
+- Botas enfaixadas alternando a passada; corpo sobe e desce levemente ao correr.
+- Golpes: o herói puxa a espada para trás (antecipação), corta, deixa rastro em leque e volta suave à pose de repouso.
+- Espada com bisel, fio central, guarda e runas que acendem em onda; brilho pulsante.

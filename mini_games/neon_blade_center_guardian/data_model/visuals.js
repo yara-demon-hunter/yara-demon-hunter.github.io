@@ -4,7 +4,7 @@
 
 export const HERO_VISUALS = {
     // Escala visual do desenho (não altera o raio de colisão em CHARACTER_MODEL)
-    scale: 1.45,
+    scale: 1.70,
 
     // Paleta (art_reference/hero: caçador encapuzado, máscara de osso, espada rúnica azul)
     colors: {
@@ -26,6 +26,15 @@ export const HERO_VISUALS = {
         bladeGlow: '#38bdf8',
         bladeGlowFrenzy: '#f0abfc',
         bladeGlowDoubleDmg: '#f59e0b',
+        capeInner: '#0a2a37',
+        glove: '#0a1218',
+        strap: '#16262e',
+        buckle: '#7e929c',
+        hoodFold: '#0f2a34',
+        eyeGlint: '#7dd3fc',
+        bladeGlowSoft: 'rgba(56, 189, 248, 0.85)',
+        bladeGlowSoftFrenzy: 'rgba(240, 171, 252, 0.85)',
+        bladeGlowSoftDoubleDmg: 'rgba(245, 158, 11, 0.85)',
         hurtRim: '#fb7185',
         hurtRing: '#fb7185',
         shadowTrail: '#0e3a4a'
@@ -54,6 +63,24 @@ export const HERO_VISUALS = {
     capeWaveIdle: 1,
     capeWaveRun: 3,
     capeWaveSpeed: 9,
+
+    // Suavização dos movimentos (maior = acompanha mais rápido)
+    speedSmoothing: 12,
+    runSmoothing: 9,
+    capeFollow: 7,                // quão rápido a capa "alcança" o corpo
+    capeDragPerSpeed: 0.055,      // quanto a capa fica para trás por px/s de velocidade
+    capeMaxLag: 14,
+    capeTurnLag: 0.8,             // capa abre para o lado ao virar
+    bobAmount: 0.045,             // sobe e desce do corpo na corrida
+    armSwing: 3.2,                // balanço do braço livre na corrida
+
+    // Golpe: preparação (puxa a lâmina para trás), corte e retorno suave
+    windupFraction: 0.22,
+    windupExtra: 0.3,
+    recoverSeconds: 0.14,
+    swingBlendRate: 16,
+    ghostCount: 4,                // cópias fantasmas da lâmina (rastro do corte)
+    ghostGapSeconds: 0.018,
 
     // Idle: respiração ofegante
     breathPeriodSeconds: 1.1,
