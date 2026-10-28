@@ -1,20 +1,18 @@
 export const CHARACTER_MODEL = {
     id: 'hero',
-    name: 'Herói',
+    name: 'Demon Hunter',
     initialHp: 100,
     initialPositionOffsetY: -60,
     initialMoveSpeed: 150,
     moveSpeedPerUpgrade: 10,
     moveSpeedPerLevel: 5,
     baseHp: 100,
-    hpPerUpgrade: 25,
-    hpPerLevel: 20,
+    hpPerUpgrade: 10,
+    hpPerLevel: 5,
     invulnerabilitySeconds: 0.5,
     projectileInvulnerabilitySeconds: 0.4,
     damageImmunityFlashIntervalMs: 50,
-    shieldRadius: 18,
     collisionRadius: 12,
-    powerupPickupRadius: 22,
     trailLength: 12,
     trailFadePerSecond: 4,
     xpToNextLevel: 100,
@@ -34,8 +32,6 @@ export function createPlayerState() {
         // Só visual: direção e instante do último golpe recebido (animação de empurrão)
         hitDirX: 0, hitDirY: 0, hitTime: -100000,
         comboStep: 1,
-        shieldTimer: 0,
-        doubleDmgTimer: 0,
         trail: []
     };
 }

@@ -6,7 +6,7 @@ import {
     renderEnemies,
     renderEnemyProjectiles,
     renderParticles,
-    renderPowerups
+    renderGoldDrops
 } from './entities.js';
 import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestGround, renderTorchLight } from './forest.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
@@ -61,7 +61,7 @@ export function render() {
     renderTorchLight();
     renderCore();
     renderAttackRange();
-    renderPowerups();
+    renderGoldDrops();
     renderBladeSlashes();
     renderEnemyProjectiles();
     renderEnemies();

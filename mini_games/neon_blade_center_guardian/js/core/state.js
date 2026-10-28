@@ -48,6 +48,7 @@ export const state = {
     // Carga da Skill Ult (Frenzy Nova)
     ultEnergy: 0,
     frenzyActiveTimer: 0,
+    frenzyDuration: 0,
 
     // Vida Núcleo
     coreHpMax: CORE_MODEL.initialHp,
@@ -60,7 +61,7 @@ export const state = {
     particles: [],
     bladeSlashes: [],
     enemyProjectiles: [],
-    powerups: [],
+    goldDrops: [],
     currentBoss: null,
 
     spawnTimer: 0

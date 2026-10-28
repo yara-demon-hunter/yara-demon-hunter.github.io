@@ -1,20 +1,24 @@
-import { POWERUP_MODELS } from '../../data_model/skills.js';
-import { SLASH_VISUALS } from '../../data_model/visuals.js';
+import { GOLD_VISUALS as G, SLASH_VISUALS } from '../../data_model/visuals.js';
 import { ctx, state } from '../core/state.js';
 import { easeOutCubic } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
 
-// --- ENTIDADES: Powerups, Golpes, Projéteis, Inimigos e Partículas ---
-export function renderPowerups() {
-    state.powerups.forEach(pw => {
-        ctx.save();
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = POWERUP_MODELS[pw.type].color;
-        ctx.fillStyle = ctx.shadowColor;
+// --- ENTIDADES: Ouro, Golpes, Projéteis, Inimigos e Partículas ---
+// Moedas de ouro dropadas pelos monstros (girando, com brilho)
+export function renderGoldDrops() {
+    const t = performance.now() / 1000;
+    state.goldDrops.forEach(c => {
+        const spin = Math.abs(Math.cos(t * 7 + c.phase));        // moeda girando (achata e abre)
+        const r = G.radius;
+        drawGlow(ctx, G.glowColor, c.x, c.y, r * 2.8, 0.55);
+        ctx.fillStyle = G.edgeColor;
         ctx.beginPath();
-        ctx.arc(pw.x, pw.y, 10, 0, Math.PI * 2);
+        ctx.ellipse(c.x, c.y, Math.max(1, r * spin), r, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
+        ctx.fillStyle = G.faceColor;
+        ctx.beginPath();
+        ctx.ellipse(c.x, c.y, Math.max(0.6, r * spin * 0.7), r * 0.7, 0, 0, Math.PI * 2);
+        ctx.fill();
     });
 }
 

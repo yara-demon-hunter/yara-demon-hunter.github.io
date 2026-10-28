@@ -15,7 +15,6 @@ export const MONSTER_MODELS = {
         goldRewardMax: 2,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
-        powerupDropChance: 0.15
     },
     FAST: {
         spawnWeight: 0.22,
@@ -33,7 +32,6 @@ export const MONSTER_MODELS = {
         goldRewardMax: 2,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
-        powerupDropChance: 0.15
     },
     SPLITTER: {
         spawnWeight: 0.18,
@@ -51,7 +49,6 @@ export const MONSTER_MODELS = {
         goldRewardMax: 2,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
-        powerupDropChance: 0.15,
         splitCount: 2
     },
     SHOOTER: {
@@ -61,7 +58,7 @@ export const MONSTER_MODELS = {
         speedMin: 40,
         speedMax: 40,
         radius: 13,
-        color: '#f59e0b',
+        color: '#f50bca',
         damage: 12,
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2.5,
@@ -73,7 +70,6 @@ export const MONSTER_MODELS = {
         goldRewardMax: 2,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
-        powerupDropChance: 0.15
     },
     BOSS: {
         hpBase: 350,
@@ -93,7 +89,6 @@ export const MONSTER_MODELS = {
         goldRewardMax: 10,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
-        powerupDropChance: 1
     },
     SPLITTER_CHILD: {
         hpBase: 15,
@@ -110,7 +105,6 @@ export const MONSTER_MODELS = {
         goldRewardMax: 2,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
-        powerupDropChance: 0.15,
         splitVelocity: 100,
         parentSplitOffset: 20
     }

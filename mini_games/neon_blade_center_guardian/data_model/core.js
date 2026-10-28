@@ -1,5 +1,5 @@
 export const CORE_MODEL = {
-    name: 'Núcleo',
+    name: 'Torch',
     initialHp: 100,
     collisionRadius: 22,
     damageTakenPerMonster: 10,

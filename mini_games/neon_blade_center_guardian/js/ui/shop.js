@@ -1,5 +1,6 @@
 import { attributes, audio, player, state } from '../core/state.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
+import { collectAllGold } from '../systems/gold.js';
 import { updateHUD } from './hud.js';
 import { renderPassiveSkills } from './passives.js';
 
@@ -10,6 +11,7 @@ function getUpgradeCost(attr) {
 
 export function openShop() {
     state.gameState = 'SHOP';
+    collectAllGold();
     document.getElementById('shopCoinsText').innerText = state.coins;
     renderShopItems();
     renderPassiveSkills();
@@ -37,12 +39,12 @@ export function renderShopItems() {
             <div class="flex items-center gap-2.5">
                 <span class="text-xl">${attr.icon}</span>
                 <div>
-                    <div class="font-bold text-xs text-cyan-300">${attr.name} <span class="text-amber-400">${isMax ? 'MAX' : 'Nv. ' + attr.lvl}</span></div>
+                    <div class="font-bold text-xs text-cyan-300">${attr.name} <span class="text-amber-400">${isMax ? 'MAX' : 'Lv. ' + attr.lvl}</span></div>
                     <div class="text-[10px] text-slate-400">${attr.desc}</div>
                 </div>
             </div>
             <button data-upgrade="${key}" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow" ${isMax || state.coins < cost ? 'disabled' : ''}>
-                ${isMax ? 'MÁXIMO' : `<span>⚡</span> ${cost}`}
+                ${isMax ? 'MAX' : `<span>🪙</span> ${cost}`}
             </button>
         `;
         list.appendChild(item);

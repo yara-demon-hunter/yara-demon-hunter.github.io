@@ -50,7 +50,8 @@ export function chargeUlt(amount) {
 // Ativação Automática da Skill Frenzy Nova
 export function triggerFrenzyUlt() {
     state.ultEnergy = 0;
-    state.frenzyActiveTimer = getFrenzyDuration();
+    state.frenzyDuration = getFrenzyDuration();
+    state.frenzyActiveTimer = state.frenzyDuration;
     audio.playUltSound();
     shakeScreen(15);
 

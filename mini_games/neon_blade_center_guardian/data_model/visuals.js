@@ -25,7 +25,6 @@ export const HERO_VISUALS = {
         runes: '#e0f2fe',
         bladeGlow: '#38bdf8',
         bladeGlowFrenzy: '#f0abfc',
-        bladeGlowDoubleDmg: '#f59e0b',
         capeInner: '#0a2a37',
         glove: '#0a1218',
         strap: '#16262e',
@@ -34,7 +33,6 @@ export const HERO_VISUALS = {
         eyeGlint: '#7dd3fc',
         bladeGlowSoft: 'rgba(56, 189, 248, 0.85)',
         bladeGlowSoftFrenzy: 'rgba(240, 171, 252, 0.85)',
-        bladeGlowSoftDoubleDmg: 'rgba(245, 158, 11, 0.85)',
         hurtRim: '#fb7185',
         hurtRing: '#fb7185',
         shadowTrail: '#0e3a4a'
@@ -232,4 +230,12 @@ export const TORCH_VISUALS = {
     tongues: 6,
     embers: 8,
     emberColor: '#fdba74'
+};
+
+// --- OURO (moedas dropadas) ---
+export const GOLD_VISUALS = {
+    radius: 4.5,
+    faceColor: '#fde047',
+    edgeColor: '#b45309',
+    glowColor: 'rgba(250, 204, 21, 0.9)'
 };

@@ -7,7 +7,7 @@ import { triggerGameOver } from '../ui/screens.js';
 import { openShop } from '../ui/shop.js';
 import { createExplosion, registerPlayerHit, shakeScreen } from './effects.js';
 import { gainXp } from './progression.js';
-import { spawnPowerup } from './spawner.js';
+import { dropGold } from './gold.js';
 
 // --- INIMIGOS ---
 export function updateEnemies(dt) {
@@ -46,13 +46,9 @@ export function updateEnemies(dt) {
 
         // Colisão com Herói
         if (distToPlayer < e.radius + CHARACTER_MODEL.collisionRadius && player.iFrames <= 0) {
-            if (player.shieldTimer <= 0) {
-                player.hp -= e.damage;
-                shakeScreen(6);
-                audio.playHurt();
-            } else {
-                audio.playExplode();
-            }
+            player.hp -= e.damage;
+            shakeScreen(6);
+            audio.playHurt();
 
             player.iFrames = CHARACTER_MODEL.invulnerabilitySeconds;
             registerPlayerHit(e.x, e.y);
@@ -98,16 +94,10 @@ export function updateEnemies(dt) {
             state.scoreTurn += pts;
             state.totalScore += pts;
 
-            // Concessão direta de recompensa de Moedas e XP ao eliminar (Sem itens dropados no chão)
-            const gainedCoins = rollMonsterGold(e.type);
+            // XP é direto; o ouro cai em moedas que voam até o herói
             const gainedXp = monsterModel.xpRewardBase + state.turn * monsterModel.xpRewardPerTurn;
-            state.coins += gainedCoins;
             gainXp(gainedXp);
-            audio.playCoin();
-
-            if (Math.random() < monsterModel.powerupDropChance) {
-                spawnPowerup(e.x, e.y);
-            }
+            dropGold(e.x, e.y, rollMonsterGold(e.type));
 
             if (e.type === 'SPLITTER') {
                 for (let s = 0; s < monsterModel.splitCount; s++) {
@@ -140,10 +130,8 @@ export function updateEnemyProjectiles(dt) {
         p.y += p.vy * dt;
 
         if (Math.hypot(player.x - p.x, player.y - p.y) < p.radius + CHARACTER_MODEL.collisionRadius && player.iFrames <= 0) {
-            if (player.shieldTimer <= 0) {
-                player.hp -= p.damage;
-                audio.playHurt();
-            }
+            player.hp -= p.damage;
+            audio.playHurt();
             player.iFrames = CHARACTER_MODEL.projectileInvulnerabilitySeconds;
             registerPlayerHit(p.x - p.vx * 0.05, p.y - p.vy * 0.05);
             updateHUD();

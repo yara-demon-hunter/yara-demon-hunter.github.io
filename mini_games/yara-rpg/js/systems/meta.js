@@ -11,6 +11,7 @@ window.YaraMeta = (() => {
         pt: {
             sanctuary: 'Santuário', sanctuaryHint: 'Conquistas, bestiário, coleções e poderes descobertos', close: 'Fechar',
             tabAchievements: 'Conquistas', tabBestiary: 'Bestiário', tabCollection: 'Coleção', tabPowers: 'Poderes', tabRecords: 'Recordes',
+            summaryTime: 'Tempo de sobrevivência', recLongest: 'Maior tempo de sobrevivência', recPlaytime: 'Tempo total de jogo',
             achUnlocked: 'Conquista desbloqueada',
             seen: 'Visto', defeated: 'Derrotado', unknown: '???', foundTimes: 'Encontrado {n}x', notFound: 'Não encontrado',
             bestiaryProgress: 'Bestiário: {a}/{b} derrotados', collectionProgress: 'Coleção: {a}/{b} itens encontrados',
@@ -48,6 +49,7 @@ window.YaraMeta = (() => {
         en: {
             sanctuary: 'Sanctuary', sanctuaryHint: 'Achievements, bestiary, collections and discovered powers', close: 'Close',
             tabAchievements: 'Achievements', tabBestiary: 'Bestiary', tabCollection: 'Collection', tabPowers: 'Powers', tabRecords: 'Records',
+            summaryTime: 'Survival time', recLongest: 'Longest survival', recPlaytime: 'Total play time',
             achUnlocked: 'Achievement unlocked',
             seen: 'Seen', defeated: 'Defeated', unknown: '???', foundTimes: 'Found {n}x', notFound: 'Not found',
             bestiaryProgress: 'Bestiary: {a}/{b} defeated', collectionProgress: 'Collection: {a}/{b} items found',
@@ -90,6 +92,7 @@ window.YaraMeta = (() => {
     const bi = (obj) => obj[gameLanguage] || obj.pt;
 
     // ---------- Catálogo ----------
+    const MINUTE = 60000;
     const ACHIEVEMENTS = Object.freeze([
         { id: 'first-blood', icon: '🩸', name: { pt: 'Primeiro sangue', en: 'First blood' }, desc: { pt: 'Derrote seu primeiro monstro.', en: 'Defeat your first monster.' }, test: (c) => c.meta.totals.kills >= 1 },
         { id: 'slayer-50', icon: '🗡️', name: { pt: 'Caçador veterano', en: 'Veteran hunter' }, desc: { pt: 'Derrote 50 monstros no total.', en: 'Defeat 50 monsters in total.' }, test: (c) => c.meta.totals.kills >= 50 },
@@ -107,6 +110,10 @@ window.YaraMeta = (() => {
         { id: 'region-3', icon: '🏘️', name: { pt: 'Além do rio', en: 'Beyond the river' }, desc: { pt: 'Alcance a terceira região.', en: 'Reach the third region.' }, test: (c) => c.meta.best.region >= 3 },
         { id: 'region-5', icon: '🏰', name: { pt: 'Às portas do trono', en: "At the throne's gate" }, desc: { pt: 'Alcance a quinta região.', en: 'Reach the fifth region.' }, test: (c) => c.meta.best.region >= 5 },
         { id: 'rich', icon: '💰', name: { pt: 'Mão de ouro', en: 'Golden hand' }, desc: { pt: 'Tenha 500 de ouro ao mesmo tempo.', en: 'Hold 500 gold at once.' }, test: (c) => (Number(c.hero.gold) || 0) >= 500 },
+        { id: 'survive-15', icon: '⏳', name: { pt: 'Sobrevivente', en: 'Survivor' }, desc: { pt: 'Sobreviva 15 minutos em uma única jornada.', en: 'Survive 15 minutes in a single journey.' }, test: (c) => c.run.playMs >= 15 * MINUTE },
+        { id: 'survive-30', icon: '⌛', name: { pt: 'Inabalável', en: 'Unshakable' }, desc: { pt: 'Sobreviva 30 minutos em uma única jornada.', en: 'Survive 30 minutes in a single journey.' }, test: (c) => c.run.playMs >= 30 * MINUTE },
+        { id: 'playtime-1h', icon: '🕐', name: { pt: 'Preso na névoa', en: 'Lost in the mist' }, desc: { pt: 'Jogue 1 hora no total.', en: 'Play for 1 hour in total.' }, test: (c) => c.meta.totals.playMs >= 60 * MINUTE },
+        { id: 'playtime-5h', icon: '🕰️', name: { pt: 'Alma da floresta', en: 'Soul of the forest' }, desc: { pt: 'Jogue 5 horas no total.', en: 'Play for 5 hours in total.' }, test: (c) => c.meta.totals.playMs >= 300 * MINUTE },
         { id: 'victory', icon: '🔔', name: { pt: 'O sino toca', en: 'The bell tolls' }, desc: { pt: 'Vença a campanha.', en: 'Win the campaign.' }, test: (c) => c.meta.wins >= 1 },
     ]);
 
@@ -129,13 +136,13 @@ window.YaraMeta = (() => {
 
     // ---------- Armazenamento ----------
     function blankRun(characterId = null) {
-        return { characterId, kills: 0, bosses: 0, chests: 0, spared: 0, interrupts: 0, flawless: 0, maxFlawless: 0, hpAtStart: 0, finished: false };
+        return { characterId, kills: 0, bosses: 0, chests: 0, spared: 0, interrupts: 0, flawless: 0, maxFlawless: 0, hpAtStart: 0, playMs: 0, finished: false };
     }
     function blankMeta() {
         return {
             v: 1, runs: 0, wins: 0,
-            best: { region: 1, level: 1 },
-            totals: { kills: 0, bosses: 0, chests: 0, spared: 0, interrupts: 0 },
+            best: { region: 1, level: 1, time: 0 },
+            totals: { kills: 0, bosses: 0, chests: 0, spared: 0, interrupts: 0, playMs: 0 },
             bestiary: {}, items: {}, passives: {}, pacts: {}, achievements: {}, run: blankRun()
         };
     }
@@ -212,6 +219,25 @@ window.YaraMeta = (() => {
         (hero.monsterPacts || []).forEach((id) => { if (!meta.pacts[id]) { meta.pacts[id] = true; changed = true; } });
         if (changed) save();
     }
+
+    // ---------- Tempo de jogo ----------
+    // Conta só o tempo ativo: aba visível, jornada em andamento e sem fim de jogo.
+    function formatTime(ms) {
+        const total = Math.floor(ms / 1000);
+        const h = Math.floor(total / 3600), min = Math.floor((total % 3600) / 60), sec = total % 60;
+        const two = (n) => String(n).padStart(2, '0');
+        return h > 0 ? `${h}h ${two(min)}min ${two(sec)}s` : `${min}min ${two(sec)}s`;
+    }
+    let tickCount = 0;
+    window.setInterval(() => {
+        const gameMain = document.getElementById('game-main');
+        const r = run();
+        if (document.hidden || !gameMain || gameMain.hidden || !r.characterId || r.finished || gameOver || campaignComplete) return;
+        r.playMs += 1000;
+        meta.totals.playMs += 1000;
+        tickCount++;
+        if (tickCount % 10 === 0) { save(); check(); }
+    }, 1000);
 
     // ---------- Ciclo da jornada ----------
     let explorationsSinceVendor = 0;
@@ -293,14 +319,15 @@ window.YaraMeta = (() => {
     function finishRun(won) {
         const r = run();
         if (r.finished) return null;
-        const before = { region: meta.best.region, level: meta.best.level };
+        const before = { region: meta.best.region, level: meta.best.level, time: meta.best.time };
+        meta.best.time = Math.max(meta.best.time, r.playMs);
         trackBest();
         r.finished = true;
         if (won) meta.wins++;
         const summary = {
             kills: r.kills, bosses: r.bosses, chests: r.chests, spared: r.spared, interrupts: r.interrupts,
-            level: hero.level, region: (currentRegion || 0) + 1,
-            record: (currentRegion || 0) + 1 > before.region || hero.level > before.level
+            level: hero.level, region: (currentRegion || 0) + 1, time: r.playMs,
+            record: (currentRegion || 0) + 1 > before.region || hero.level > before.level || r.playMs > before.time
         };
         save();
         check();
@@ -314,7 +341,7 @@ window.YaraMeta = (() => {
         const box = el('div', 'run-summary');
         box.append(el('h3', '', m('summaryTitle')));
         const list = el('ul');
-        [['summaryLevel', summary.level], ['summaryRegion', summary.region], ['summaryKills', summary.kills], ['summaryBosses', summary.bosses],
+        [['summaryTime', formatTime(summary.time)], ['summaryLevel', summary.level], ['summaryRegion', summary.region], ['summaryKills', summary.kills], ['summaryBosses', summary.bosses],
          ['summaryChests', summary.chests], ['summarySpared', summary.spared], ['summaryInterrupts', summary.interrupts]]
             .forEach(([key, value]) => { const li = el('li'); li.append(el('span', '', m(key)), el('b', '', String(value))); list.append(li); });
         box.append(list);
@@ -352,9 +379,9 @@ window.YaraMeta = (() => {
         const body = document.getElementById('meta-dialog-body');
         const tabs = document.getElementById('meta-dialog-tabs');
         document.getElementById('meta-dialog-title').textContent = `🏛️ ${m('sanctuary')}`;
-        tabs.replaceChildren(...[['achievements', 'tabAchievements'], ['bestiary', 'tabBestiary'], ['collection', 'tabCollection'], ['powers', 'tabPowers'], ['records', 'tabRecords']]
-            .map(([id, key]) => {
-                const b = el('button', `meta-tab${id === activeTab ? ' meta-tab-active' : ''}`, m(key));
+        tabs.replaceChildren(...[['achievements', 'tabAchievements', '🏆'], ['bestiary', 'tabBestiary', '👹'], ['collection', 'tabCollection', '🎒'], ['powers', 'tabPowers', '✨'], ['records', 'tabRecords', '📜']]
+            .map(([id, key, emoji]) => {
+                const b = el('button', `meta-tab${id === activeTab ? ' meta-tab-active' : ''}`, `${emoji} ${m(key)}`);
                 b.type = 'button';
                 b.addEventListener('click', () => { activeTab = id; renderSanctuary(); });
                 return b;
@@ -451,7 +478,7 @@ window.YaraMeta = (() => {
     function renderRecords() {
         const list = el('div', 'meta-list');
         [['recRuns', meta.runs], ['recWins', meta.wins], ['recKills', meta.totals.kills], ['recBosses', meta.totals.bosses],
-         ['recRegion', `${meta.best.region}/${GAME_DATA.regions.length}`], ['recLevel', meta.best.level]]
+         ['recRegion', `${meta.best.region}/${GAME_DATA.regions.length}`], ['recLevel', meta.best.level], ['recLongest', formatTime(meta.best.time)], ['recPlaytime', formatTime(meta.totals.playMs)]]
             .forEach(([key, value]) => {
                 const row = el('div', 'meta-row');
                 row.append(el('div', 'meta-row-text', m(key)), el('b', '', String(value)));

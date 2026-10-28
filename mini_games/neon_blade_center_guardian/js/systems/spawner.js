@@ -1,4 +1,3 @@
-import { POWERUP_MODELS } from '../../data_model/skills.js';
 import { MONSTER_SPAWNING, chooseMonsterType, createMonster } from '../../data_model/monsters.js';
 import { state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
@@ -32,12 +31,6 @@ export function spawnBoss() {
     state.enemies.push(state.currentBoss);
     updateHUD();
     shakeScreen(12);
-}
-
-export function spawnPowerup(x, y) {
-    const types = Object.keys(POWERUP_MODELS);
-    const type = types[Math.floor(Math.random() * types.length)];
-    state.powerups.push({ x, y, type, life: POWERUP_MODELS[type].lifeSeconds });
 }
 
 export function updateSpawner(dt) {

@@ -7,7 +7,6 @@ export function getAtkDamage() {
     let base = BLADE_SKILL.baseDamage
         + (attributes.damage.lvl - 1) * BLADE_SKILL.damagePerUpgrade
         + (state.playerLevel - 1) * BLADE_SKILL.damagePerCharacterLevel;
-    if (player.doubleDmgTimer > 0) base *= 2;
     if (state.frenzyActiveTimer > 0) base *= 1 + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;
     return base;
 }

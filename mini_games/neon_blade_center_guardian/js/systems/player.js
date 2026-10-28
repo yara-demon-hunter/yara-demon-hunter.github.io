@@ -6,8 +6,6 @@ import { getPlayerMaxSpeed } from './stats.js';
 export function updatePlayer(dt) {
     // Timers
     if (player.iFrames > 0) player.iFrames -= dt;
-    if (player.shieldTimer > 0) player.shieldTimer -= dt;
-    if (player.doubleDmgTimer > 0) player.doubleDmgTimer -= dt;
 
     let moveX = 0;
     let moveY = 0;

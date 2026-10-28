@@ -76,7 +76,7 @@ export function resize() {
         // Janela redimensionada no meio da partida: desloca tudo junto com o centro
         const dx = state.coreX - oldCoreX;
         const dy = state.coreY - oldCoreY;
-        [player, ...state.enemies, ...state.enemyProjectiles, ...state.powerups, ...state.particles].forEach(o => {
+        [player, ...state.enemies, ...state.enemyProjectiles, ...state.goldDrops, ...state.particles].forEach(o => {
             o.x += dx;
             o.y += dy;
         });

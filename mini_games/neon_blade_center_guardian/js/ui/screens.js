@@ -18,6 +18,7 @@ export function startGame() {
     state.playerMaxXp = CHARACTER_MODEL.xpToNextLevel;
     state.ultEnergy = 0;
     state.frenzyActiveTimer = 0;
+    state.frenzyDuration = 0;
 
     Object.keys(attributes).forEach(k => attributes[k].lvl = 1);
     Object.keys(passives).forEach(k => passives[k].lvl = 0);
@@ -29,15 +30,13 @@ export function startGame() {
     player.maxHp = getMaxPlayerHp();
     player.hp = player.maxHp;
     player.iFrames = 0;
-    player.shieldTimer = 0;
-    player.doubleDmgTimer = 0;
     player.trail = [];
 
     state.enemies = [];
     state.particles = [];
     state.bladeSlashes = [];
     state.enemyProjectiles = [];
-    state.powerups = [];
+    state.goldDrops = [];
     state.currentBoss = null;
 
     player.x = state.coreX;
@@ -57,16 +56,16 @@ export function startGame() {
 // --- GAME OVER ---
 export function triggerGameOver(reason) {
     state.gameState = 'GAMEOVER';
-    document.getElementById('finalLevel').innerText = `Nv. ${state.playerLevel}`;
+    document.getElementById('finalLevel').innerText = `Lv. ${state.playerLevel}`;
     document.getElementById('finalTurn').innerText = state.turn;
     document.getElementById('finalScore').innerText = state.totalScore;
 
     if (reason === 'PLAYER') {
-        document.getElementById('gameOverTitle').innerText = 'HERÓI DERROTADO';
-        document.getElementById('gameOverSub').innerText = 'Você foi destruído na arena neon.';
+        document.getElementById('gameOverTitle').innerText = 'DEMON HUNTER DEFEATED';
+        document.getElementById('gameOverSub').innerText = 'You were destroyed in the neon arena.';
     } else {
-        document.getElementById('gameOverTitle').innerText = 'NÚCLEO DESTRUÍDO';
-        document.getElementById('gameOverSub').innerText = 'A tocha do centro apagou-se.';
+        document.getElementById('gameOverTitle').innerText = 'TORCH DESTROYED';
+        document.getElementById('gameOverSub').innerText = 'The torch at the center went out.';
     }
 
     document.getElementById('gameOverScreen').classList.remove('hidden');

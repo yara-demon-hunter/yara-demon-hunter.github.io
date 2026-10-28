@@ -9,9 +9,10 @@ import { updateAutoAttack } from './systems/combat.js';
 import { updateEffects } from './systems/effects.js';
 import { updateEnemies, updateEnemyProjectiles } from './systems/enemies.js';
 import { updatePlayer } from './systems/player.js';
-import { updatePowerups } from './systems/powerups.js';
+import { updateGold } from './systems/gold.js';
 import { updateSpawner } from './systems/spawner.js';
 import { setupButtons } from './ui/buttons.js';
+import { updateFuryBar } from './ui/hud.js';
 
 const MIN_FRAME_MS = 12;
 let lastTime = performance.now();
@@ -31,7 +32,8 @@ function update(dt) {
     updateEnemyProjectiles(dt);
     if (state.gameState === 'GAMEOVER') return;
 
-    updatePowerups(dt);
+    updateGold(dt);
+    updateFuryBar();
     updateEffects(dt);
 }
 

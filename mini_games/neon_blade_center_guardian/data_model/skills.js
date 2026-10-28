@@ -1,12 +1,12 @@
 export const UPGRADE_MODELS = {
-    damage: { name: 'Dano da Lâmina', icon: '⚔️', lvl: 1, maxLvl: 99, baseCost: 10, costMult: 1.5, desc: 'Aumenta o dano base de cada golpe.' },
-    radius: { name: 'Alcance do Ataque', icon: '⭕', lvl: 1, maxLvl: 99, baseCost: 12, costMult: 1.6, desc: 'Aumenta o raio de detecção de alvos.' },
-    slashArc: { name: 'Amplitude do Corte', icon: '📐', lvl: 1, maxLvl: 6, baseCost: 15, costMult: 1.8, desc: 'Aumenta a abertura do corte (Nv. 1: 40° até Nv. Max: 180°).' },
-    atkSpeed: { name: 'Velocidade de Ataque', icon: '⚡', lvl: 1, maxLvl: 99, baseCost: 15, costMult: 1.5, desc: 'Reduz o tempo de recarga entre golpes.' },
-    moveSpeed: { name: 'Velocidade de Movimento', icon: '🚀', lvl: 1, maxLvl: 99, baseCost: 10, costMult: 1.4, desc: 'Acelera a movimentação do personagem.' },
-    frenzyNova: { name: 'Frenzy Nova (Skill)', icon: '🔥', lvl: 1, maxLvl: 99, baseCost: 20, costMult: 1.8, desc: 'Aumenta a duração e o dano do especial automático.' },
-    playerHp: { name: 'Vida do Herói', icon: '❤️', lvl: 1, maxLvl: 99, baseCost: 12, costMult: 1.5, desc: 'Aumenta a vida máxima e cura o personagem.' },
-    knockback: { name: 'Força de Empurrão', icon: '💥', lvl: 1, maxLvl: 99, baseCost: 10, costMult: 1.4, desc: 'Aumenta o empurrão ao acertar os alvos.' }
+    damage: { name: 'Blade Damage', icon: '⚔️', lvl: 1, maxLvl: 99, baseCost: 10, costMult: 1.5, desc: 'Increases the base damage of each hit.' },
+    radius: { name: 'Attack Range', icon: '⭕', lvl: 1, maxLvl: 99, baseCost: 12, costMult: 1.6, desc: 'Increases the radius that detects targets.' },
+    slashArc: { name: 'Slash Width', icon: '📐', lvl: 1, maxLvl: 6, baseCost: 15, costMult: 1.8, desc: 'Widens the slash (Lv. 1: 40° up to Max Lv.: 180°).' },
+    atkSpeed: { name: 'Attack Speed', icon: '💨', lvl: 1, maxLvl: 99, baseCost: 15, costMult: 1.5, desc: 'Reduces the cooldown between hits.' },
+    moveSpeed: { name: 'Move Speed', icon: '🚀', lvl: 1, maxLvl: 99, baseCost: 10, costMult: 1.4, desc: 'Makes the character move faster.' },
+    frenzyNova: { name: 'Fury (Skill)', icon: '🔥', lvl: 1, maxLvl: 99, baseCost: 20, costMult: 1.8, desc: 'Increases the duration and damage of Fury, which fires on its own when the bar fills.' },
+    playerHp: { name: 'Hero Health', icon: '❤️', lvl: 1, maxLvl: 99, baseCost: 12, costMult: 1.5, desc: 'Increases max health and heals the character.' },
+    knockback: { name: 'Knockback', icon: '💥', lvl: 1, maxLvl: 99, baseCost: 10, costMult: 1.4, desc: 'Increases the push when hitting targets.' }
 };
 
 export const BLADE_SKILL = {
@@ -39,12 +39,6 @@ export const FRENZY_NOVA_SKILL = {
     damageBonusPerUpgradeLevel: 0.2,
     slashCount: 8,
     slashRadiusMultiplier: 1.3
-};
-
-export const POWERUP_MODELS = {
-    SHIELD: { color: '#38bdf8', durationSeconds: 6, lifeSeconds: 10 },
-    DOUBLE_DMG: { color: '#f59e0b', durationSeconds: 8, lifeSeconds: 10 },
-    BOMB: { color: '#ef4444', damage: 150, lifeSeconds: 10 }
 };
 
 export function createAttributes() {

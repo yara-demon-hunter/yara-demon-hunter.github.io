@@ -255,7 +255,6 @@ function drawBoots() {
 
 function getBladeColors(frenzy) {
     if (frenzy) return { soft: V.colors.bladeGlowSoftFrenzy };
-    if (player.doubleDmgTimer > 0) return { soft: V.colors.bladeGlowSoftDoubleDmg };
     return { soft: V.colors.bladeGlowSoft };
 }
 
@@ -576,15 +575,4 @@ export function renderPlayer() {
     }
 
     ctx.restore();
-
-    // Escudo Visual
-    if (player.shieldTimer > 0) {
-        ctx.save();
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.arc(player.x, player.y, CHARACTER_MODEL.shieldRadius * V.scale, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-    }
 }
