@@ -16,6 +16,7 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   core.js                         vida, colisão e aparência do núcleo
   monsters.js                     monstros, chefão, aparição e recompensas
   skills.js                       upgrades, lâmina, Frenzy Nova e power-ups
+  visuals.js                      cores, tamanhos e ritmos das animações (arte procedural)
 js/
   game.js                         ponto de entrada: importa os motores e roda o game loop
   core/state.js                   estado compartilhado da partida (state, player, keys, canvas, audio)
@@ -32,12 +33,14 @@ js/
   render/renderer.js              ordem das camadas de desenho
   render/arena.js                 fundo, núcleo e raio de alcance
   render/entities.js              inimigos, projéteis, golpes, power-ups e partículas
-  render/player.js                herói e rastro de luz
+  render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
+  render/fx/easing.js             funções de easing e interpolação de ângulos
   ui/hud.js                       atualização do HUD
   ui/shop.js                      loja de upgrades
   ui/screens.js                   início de partida e game over
   ui/buttons.js                   eventos dos botões
   audio/sound-engine.js           efeitos de áudio via Web Audio API
+art_reference/                    imagens e fichas de referência dos personagens (não carregadas pelo jogo)
 draft/                            versões anteriores mantidas como referência
 ```
 
