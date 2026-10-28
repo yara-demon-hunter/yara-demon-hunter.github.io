@@ -1,2 +1,0 @@
-- Do not include this files in the project reading unless requested.
-- This is just draft from different versions.

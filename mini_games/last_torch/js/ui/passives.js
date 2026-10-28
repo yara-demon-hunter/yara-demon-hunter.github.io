@@ -5,6 +5,10 @@ import { updateHUD } from './hud.js';
 export function renderPassiveSkills() {
     document.getElementById('skillPointsText').innerText = state.skillPoints;
 
+    const canBuy = Object.values(passives).some(sk => sk.lvl < sk.maxLvl && state.skillPoints >= sk.cost);
+    document.getElementById('passiveBadge').classList.toggle('hidden', !canBuy);
+    document.getElementById('passivesPanel').classList.toggle('has-upgrade', canBuy);
+
     const list = document.getElementById('passiveList');
     list.innerHTML = '';
 
@@ -13,17 +17,13 @@ export function renderPassiveSkills() {
         const isMax = skill.lvl >= skill.maxLvl;
 
         const item = document.createElement('div');
-        item.className = 'bg-slate-800/80 border border-violet-500/30 p-2 rounded-lg flex items-center justify-between gap-2';
+        item.className = 'shop-row shop-row-passive';
+        item.title = skill.desc;
         item.innerHTML = `
-            <div class="flex items-center gap-2.5">
-                <span class="text-xl">${skill.icon}</span>
-                <div>
-                    <div class="font-bold text-xs text-violet-300">${skill.name} <span class="text-amber-400">${isMax ? 'ACQUIRED' : ''}</span></div>
-                    <div class="text-[10px] text-slate-400">${skill.desc}</div>
-                </div>
-            </div>
-            <button data-passive="${key}" class="px-3 py-1.5 bg-violet-500 hover:bg-violet-600 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow whitespace-nowrap" ${isMax || state.skillPoints < skill.cost ? 'disabled' : ''}>
-                ${isMax ? '✔' : `<span>⚡</span> ${skill.cost}`}
+            <span class="shop-row-name"><span>${skill.icon}</span><span>${skill.name}</span></span>
+            <b class="shop-row-value">${isMax ? 'ACQUIRED' : ''}</b>
+            <button data-passive="${key}" class="shop-row-btn shop-row-btn-passive" ${isMax || state.skillPoints < skill.cost ? 'disabled' : ''}>
+                ${isMax ? '✔' : `⚡ ${skill.cost}`}
             </button>
         `;
         list.appendChild(item);

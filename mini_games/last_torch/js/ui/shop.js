@@ -42,6 +42,8 @@ export function resumeGame() {
 export function renderShopItems() {
     const list = document.getElementById('shopList');
     list.innerHTML = '';
+    document.getElementById('statsPanel').classList.toggle('has-upgrade',
+        Object.values(attributes).some(a => a.lvl < a.maxLvl && state.coins >= getUpgradeCost(a)));
 
     Object.keys(attributes).forEach(key => {
         const attr = attributes[key];
@@ -50,18 +52,14 @@ export function renderShopItems() {
 
         const value = STAT_VALUES[key] ? STAT_VALUES[key]() : '';
         const item = document.createElement('div');
-        item.className = 'bg-slate-900/60 border border-slate-800 p-2 rounded-lg flex flex-col gap-1.5';
+        item.className = 'shop-row';
+        item.title = attr.desc;
         item.innerHTML = `
-            <div class="flex items-center justify-between gap-1 text-[11px] text-slate-300">
-                <span class="truncate" title="${attr.desc}">${attr.icon} ${attr.name}</span>
-                <span class="text-[10px] text-amber-400 whitespace-nowrap">${isMax ? 'MAX' : 'Lv. ' + attr.lvl}</span>
-            </div>
-            <div class="flex items-center justify-between gap-2">
-                <b class="text-base text-cyan-300">${value}</b>
-                <button data-upgrade="${key}" aria-label="Upgrade ${attr.name}" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-bold text-xs rounded-lg transition-all flex items-center gap-1 shadow whitespace-nowrap" ${isMax || state.coins < cost ? 'disabled' : ''}>
-                    ${isMax ? 'MAX' : `+ 🪙 ${cost}`}
-                </button>
-            </div>
+            <span class="shop-row-name"><span>${attr.icon}</span><span>${attr.name}</span><em>${isMax ? 'MAX' : 'Lv. ' + attr.lvl}</em></span>
+            <b class="shop-row-value">${value}</b>
+            <button data-upgrade="${key}" aria-label="Upgrade ${attr.name}" class="shop-row-btn" ${isMax || state.coins < cost ? 'disabled' : ''}>
+                ${isMax ? 'MAX' : `+ 🪙 ${cost}`}
+            </button>
         `;
         list.appendChild(item);
     });

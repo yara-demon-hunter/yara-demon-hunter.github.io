@@ -13,3 +13,91 @@
 .custom-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(56, 189, 248, 0.8);
 }
+
+/* --- LOJA: painéis em acordeão (details/summary) --- */
+.shop-panel {
+    border-width: 1px;
+    border-radius: 12px;
+    background: rgba(2, 6, 23, 0.7);
+}
+.shop-panel > summary {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    color: #22d3ee;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    list-style: none;
+}
+.shop-panel > summary::-webkit-details-marker { display: none; }
+.shop-panel > summary::after {
+    content: '▾';
+    color: #94a3b8;
+    transition: transform 160ms ease;
+}
+.shop-panel:not([open]) > summary::after { transform: rotate(-90deg); }
+.shop-panel.has-upgrade { border-color: rgba(251, 191, 36, 0.72); box-shadow: 0 0 14px rgba(251, 191, 36, 0.16); }
+.shop-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 1px solid rgba(251, 191, 36, 0.75);
+    border-radius: 50%;
+    background: rgba(120, 53, 15, 0.9);
+    color: #fef3c7;
+    font-size: 0.7rem;
+    font-weight: 900;
+}
+.shop-badge.hidden { display: none; }
+
+/* --- LOJA: linha compacta (nome | valor | botão), uma por stat --- */
+.shop-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+    min-height: 1.75rem;
+    padding: 0.15rem 0.35rem;
+    border: 1px solid rgba(51, 65, 85, 0.7);
+    border-radius: 0.5rem;
+    background: rgba(15, 23, 42, 0.6);
+}
+.shop-row-passive { border-color: rgba(139, 92, 246, 0.3); }
+.shop-row-name {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 0;
+    overflow: hidden;
+    color: #cbd5e1;
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+.shop-row-name > span:last-of-type { overflow: hidden; text-overflow: ellipsis; }
+.shop-row-name > em { color: #fbbf24; font-size: 0.6rem; font-style: normal; }
+.shop-row-value {
+    justify-self: end;
+    color: #67e8f9;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+.shop-row-btn {
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.4rem;
+    background: #f59e0b;
+    color: #020617;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.shop-row-btn:hover:not(:disabled) { background: #d97706; }
+.shop-row-btn-passive { background: #8b5cf6; color: #fff; }
+.shop-row-btn-passive:hover:not(:disabled) { background: #7c3aed; }
+.shop-row-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
