@@ -2,25 +2,8 @@ import { CORE_MODEL } from '../../data_model/core.js';
 import { ctx, player, state } from '../core/state.js';
 import { getAtkRadius } from '../systems/stats.js';
 
-// --- ARENA: Fundo, Núcleo e Raio de Alcance ---
-export function renderBackground() {
-    const { width, height } = state;
-
-    // Fundo com Grade Neon
-    ctx.fillStyle = '#020617';
-    ctx.fillRect(0, 0, width, height);
-
-    ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
-    ctx.lineWidth = 1;
-    const gridSize = 40;
-    for (let x = 0; x < width; x += gridSize) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
-    }
-    for (let y = 0; y < height; y += gridSize) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
-    }
-}
-
+// --- ARENA: Núcleo e Raio de Alcance ---
+// (o chão/fundo fica em forest.js)
 export function renderCore() {
     const { coreX, coreY } = state;
 

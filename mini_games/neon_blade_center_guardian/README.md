@@ -32,9 +32,11 @@ js/
   systems/progression.js          XP e level up
   systems/effects.js              partículas e screen shake
   render/renderer.js              ordem das camadas de desenho
-  render/arena.js                 fundo, núcleo e raio de alcance
+  render/arena.js                 núcleo e raio de alcance
+  render/forest.js                cenário: chão da floresta, copas das árvores, névoa e vinheta
   render/entities.js              inimigos, projéteis, golpes, power-ups e partículas
   render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
+  render/fx/random.js             aleatório com semente (cenário estável)
   render/fx/easing.js             funções de easing e interpolação de ângulos
   ui/hud.js                       atualização do HUD
   ui/shop.js                      loja de upgrades

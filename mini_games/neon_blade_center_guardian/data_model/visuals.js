@@ -100,3 +100,70 @@ export const SLASH_VISUALS = {
     coreWidth: 2.2,
     doubleLineGap: 7
 };
+
+// --- CENÁRIO: FLORESTA SOMBRIA (vista de cima) ---
+// Clareira no centro (onde fica o núcleo), árvores nas bordas (de onde saem os monstros)
+// e névoa se movendo por cima de tudo.
+export const FOREST_VISUALS = {
+    seed: 1337,
+
+    // Chão
+    groundColor: '#040a07',
+    clearingColor: 'rgba(30, 52, 40, 0.55)',
+    moonlightColor: 'rgba(120, 160, 190, 0.07)',
+    mossColors: ['rgba(20, 45, 28, 0.35)', 'rgba(10, 28, 18, 0.45)', 'rgba(35, 40, 25, 0.25)'],
+    mossPatchesPer100kPx: 14,
+    grassColor: 'rgba(60, 110, 70, 0.28)',
+    grassTuftsPer100kPx: 260,
+    stoneColor: 'rgba(90, 105, 110, 0.18)',
+    stonesPer100kPx: 10,
+    leafColors: ['rgba(90, 60, 30, 0.25)', 'rgba(70, 80, 40, 0.22)'],
+    leavesPer100kPx: 60,
+
+    // Clareira: elipse proporcional à tela (0 = centro, 1 = borda)
+    clearingRadiusRatio: 0.62,
+
+    // Árvores: ficam numa faixa colada às bordas da tela
+    treeEdgeBandRatio: 0.07,      // largura da faixa (fração do menor lado da tela)
+    treeEdgeBandMin: 28,
+    treeEdgeBandMax: 70,
+    treeEdgeJitter: 22,           // irregularidade da linha das árvores (px)
+    treeSpacing: 44,              // espaçamento base entre árvores (px)
+    treeOverflow: 60,             // quanto as árvores passam da borda da tela (px)
+    treeMinRadius: 26,
+    treeMaxRadius: 58,
+    treeVariants: 8,
+    canopyColors: ['#071a10', '#0a2215', '#0d2a1a', '#0f3020'],
+    canopyHighlight: 'rgba(110, 170, 150, 0.10)',
+    canopyShadow: 'rgba(0, 0, 0, 0.55)',
+    canopyAlpha: 0.96,
+    swayAmount: 1.6,
+    swaySpeed: 0.6,
+
+    // Névoa: duas camadas de textura rolando em direções diferentes + manchas soltas
+    fogColor: '200, 215, 225',
+    fogTileSize: 512,
+    fogTilePuffs: 70,
+    fogLayers: [
+        { speedX: 26, speedY: 7, scale: 1.6, alpha: 0.13 },
+        { speedX: -16, speedY: -11, scale: 1.1, alpha: 0.09 }
+    ],
+    fogBlobs: 12,
+    fogMinRadius: 120,
+    fogMaxRadius: 260,
+    fogAlphaCenter: 0.06,
+    fogAlphaEdge: 0.2,
+    fogDriftSpeed: 34,
+    fogWobble: 50,
+
+    // Vaga-lumes
+    fireflies: 22,
+    fireflyColor: '190, 255, 140',
+    fireflySpeed: 18,
+    fireflyRadius: 1.6,
+    fireflyGlowRadius: 9,
+
+    // Vinheta escura
+    vignetteColor: 'rgba(0, 0, 0, 0.75)',
+    vignetteInnerRatio: 0.45
+};

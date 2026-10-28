@@ -1,5 +1,5 @@
 import { ctx, state } from '../core/state.js';
-import { renderAttackRange, renderBackground, renderCore } from './arena.js';
+import { renderAttackRange, renderCore } from './arena.js';
 import {
     renderBladeSlashes,
     renderEnemies,
@@ -7,6 +7,7 @@ import {
     renderParticles,
     renderPowerups
 } from './entities.js';
+import { renderFireflies, renderFogAndVignette, renderForestGround, renderTreeCanopies } from './forest.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 
 // --- RENDER LOOP ---
@@ -22,16 +23,19 @@ export function render() {
         ctx.translate(rx, ry);
     }
 
-    renderBackground();
+    renderForestGround();
     renderCore();
     renderAttackRange();
     renderPowerups();
     renderBladeSlashes();
     renderEnemyProjectiles();
     renderEnemies();
+    renderTreeCanopies();
     renderPlayerTrail();
     renderPlayer();
     renderParticles();
+    renderFireflies();
+    renderFogAndVignette();
 
     ctx.restore();
 }
