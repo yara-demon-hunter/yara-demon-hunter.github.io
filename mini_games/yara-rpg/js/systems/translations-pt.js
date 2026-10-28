@@ -13,7 +13,6 @@ window.YaraRpgTranslations.pt = {
         selectCharacter: "Personagem",
         characterLocked: "Zere o jogo para desbloquear",
         characterExtraInfo: "Ver evolução, skills e limites",
-        selectStarterEquipment: "Escolha {count} equipamentos",
         characterSpecialty: "+{amount} {stat}",
         basicStatsSummary: "📊 Bônus iniciais",
         progressionSummary: "📈 Por nível",

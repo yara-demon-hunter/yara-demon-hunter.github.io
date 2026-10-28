@@ -14,13 +14,15 @@ Abra `/mini_games/yara-rpg/game.html`. A página também pode ser aberta diretam
 
 Os menus do site abrem o jogo no idioma da página (`?lang=pt` ou `?lang=en`). O seletor PT/EN no jogo também permite trocar o idioma; a troca reinicia a partida.
 
-Ao abrir o mini game, escolha um personagem e os equipamentos iniciais, cada um de um espaço diferente. Zeph começa com mais HP máximo; Oskar começa com mais ataque. A quantidade de equipamentos iniciais fica em `js/data/setup-config.js`, na variável `starterEquipmentCount`; contador e botão de início acompanham esse valor automaticamente.
+Ao abrir o mini game, escolha um personagem. Cada personagem já começa com seu próprio equipamento inicial (`startingEquipment` em `js/data/characters.js`). Zeph começa com mais HP máximo; Oskar começa com mais ataque.
 
 A página do jogo usa o layout base do site, que centraliza a verificação do Bing, o Google Analytics 4 e o Google AdSense para todas as páginas.
 
 ## Build do módulo independente
 
 O código do jogo continua mantido uma única vez nesta pasta. A página normal do site e a página independente reutilizam os mesmos fragmentos HTML, scripts, dados, estilos, imagens e áudio. Não edite os arquivos gerados em `standalone-build/`.
+
+A versão independente não usa CDN nem Google Fonts: o Tailwind é compilado para `css/tailwind.css` e as fontes ficam em `css/fonts/` (carregadas por `css/fonts.css`). O `css/tailwind.css` já está versionado (gerado com o motor do Tailwind v3 a partir das classes de `partials/` e `js/`). Sempre que adicionar ou mudar classes Tailwind nesses arquivos, regenere-o com `mini_games/yara-rpg/build-tailwind.sh` (instruções para obter o Tailwind CLI standalone no topo do script); classes novas que não estiverem no arquivo ficam sem estilo na versão standalone. O build do pacote aborta se `css/tailwind.css` não existir. A página do site continua usando o CDN.
 
 Na raiz do repositório, gere primeiro o site e depois o pacote:
 
@@ -67,7 +69,6 @@ Esta primeira versão ainda carrega Tailwind e as fontes Cinzel/Inter de CDNs, a
 - `js/systems/combat-outcomes.js`: poções, acampamento, fuga, recompensas e finais do combate.
 - `js/systems/mist-contacts.js`: regras reutilizáveis para sortear contatos, resultados, chefes e poderes da névoa.
 - `js/systems/character-setup.js`: controla a seleção inicial do personagem e do equipamento.
-- `js/data/setup-config.js`: configura a quantidade de equipamentos iniciais que o jogador pode escolher.
 - `js/data/mist-contacts.js`: conteúdo editável dos espíritos, chefes especiais e poderes permanentes.
 - `js/data/characters.js`: personagens iniciais, descrições, especialidades e evolução individual por nível.
 - `js/data/world-rules.js`: escala de probabilidade, contatos da névoa e acampamento.

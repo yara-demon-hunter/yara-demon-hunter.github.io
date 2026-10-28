@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0c0d0f">
     <title>Yara, Demon Hunter: Lost in the Mist</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="js/tailwind.config.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <!-- Sem CDN nem Google Fonts: Tailwind compilado (build-tailwind.sh) e fontes locais. -->
+    <link rel="stylesheet" href="css/fonts.css">
     <link rel="stylesheet" href="css/main.css">
+    <!-- Depois do main.css, como o CDN do Tailwind já fazia (mesma ordem de cascata). -->
+    <link rel="stylesheet" href="css/tailwind.css">
 </head>
 <body class="game-shell min-h-screen flex flex-col items-center justify-between p-3 sm:p-6">
     {{ content }}

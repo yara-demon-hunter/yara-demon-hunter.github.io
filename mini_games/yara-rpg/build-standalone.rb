@@ -14,6 +14,10 @@ unless site_output.file?
   abort "Missing #{site_output}. Run `bundle exec jekyll build` first."
 end
 
+unless source_game.join("css/tailwind.css").file?
+  abort "Missing css/tailwind.css. Run mini_games/yara-rpg/build-tailwind.sh first."
+end
+
 marker = build_output.join(".generated-by-yara-rpg-build")
 if build_output.exist? && !marker.file?
   abort "Refusing to overwrite #{build_output}: it is not marked as generated output."

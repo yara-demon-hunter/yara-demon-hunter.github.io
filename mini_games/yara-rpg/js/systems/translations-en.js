@@ -13,7 +13,6 @@ window.YaraRpgTranslations.en = {
         selectCharacter: "Character",
         characterLocked: "Beat the game to unlock",
         characterExtraInfo: "View progression, skills & limits",
-        selectStarterEquipment: "Choose {count} pieces of equipment",
         characterSpecialty: "+{amount} {stat}",
         basicStatsSummary: "📊 Starting bonuses",
         progressionSummary: "📈 Per level",
