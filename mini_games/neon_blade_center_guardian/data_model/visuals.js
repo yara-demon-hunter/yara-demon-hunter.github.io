@@ -102,26 +102,34 @@ export const SLASH_VISUALS = {
 };
 
 // --- CENÁRIO: FLORESTA SOMBRIA (vista de cima) ---
-// Clareira no centro (onde fica o núcleo), árvores nas bordas (de onde saem os monstros)
-// e névoa se movendo por cima de tudo.
+// Noite fria: clareira no centro (onde fica o núcleo), árvores nas bordas (de onde saem
+// os monstros), vento mexendo árvores e grama, e névoa densa se movendo por cima de tudo.
 export const FOREST_VISUALS = {
     seed: 1337,
 
+    // Noite fria: camada azulada escura por cima de tudo (antes da vinheta)
+    nightTint: 'rgba(3, 9, 26, 0.42)',
+
     // Chão
-    groundColor: '#040a07',
-    clearingColor: 'rgba(30, 52, 40, 0.55)',
-    moonlightColor: 'rgba(120, 160, 190, 0.07)',
-    mossColors: ['rgba(20, 45, 28, 0.35)', 'rgba(10, 28, 18, 0.45)', 'rgba(35, 40, 25, 0.25)'],
+    groundColor: '#02070a',
+    clearingColor: 'rgba(22, 42, 56, 0.5)',
+    moonlightColor: 'rgba(130, 170, 220, 0.10)',
+    mossColors: ['rgba(10, 34, 38, 0.38)', 'rgba(6, 20, 26, 0.5)', 'rgba(24, 32, 40, 0.3)'],
     mossPatchesPer100kPx: 14,
-    grassColor: 'rgba(60, 110, 70, 0.28)',
-    grassTuftsPer100kPx: 260,
-    stoneColor: 'rgba(90, 105, 110, 0.18)',
+    grassColor: 'rgba(40, 90, 85, 0.22)',
+    grassTuftsPer100kPx: 110,
+    stoneColor: 'rgba(100, 120, 140, 0.18)',
     stonesPer100kPx: 10,
-    leafColors: ['rgba(90, 60, 30, 0.25)', 'rgba(70, 80, 40, 0.22)'],
+    leafColors: ['rgba(60, 50, 40, 0.22)', 'rgba(40, 70, 60, 0.2)'],
     leavesPer100kPx: 60,
 
     // Clareira: elipse proporcional à tela (0 = centro, 1 = borda)
     clearingRadiusRatio: 0.62,
+
+    // Vento: rajadas que atravessam a tela (afetam árvores e grama)
+    windSpeed: 0.55,              // velocidade das rajadas
+    windWaveLength: 0.0035,       // quanto a rajada varia ao longo da tela (menor = onda mais larga)
+    windBase: 0.35,               // vento constante mínimo (0 a 1)
 
     // Árvores: ficam numa faixa colada às bordas da tela
     treeEdgeBandRatio: 0.07,      // largura da faixa (fração do menor lado da tela)
@@ -133,37 +141,54 @@ export const FOREST_VISUALS = {
     treeMinRadius: 26,
     treeMaxRadius: 58,
     treeVariants: 8,
-    canopyColors: ['#071a10', '#0a2215', '#0d2a1a', '#0f3020'],
-    canopyHighlight: 'rgba(110, 170, 150, 0.10)',
-    canopyShadow: 'rgba(0, 0, 0, 0.55)',
-    canopyAlpha: 0.96,
-    swayAmount: 1.6,
-    swaySpeed: 0.6,
+    canopyColors: ['#040d12', '#06161d', '#09202a', '#0c2933'],
+    canopyShadow: 'rgba(0, 0, 0, 0.6)',
+    canopyHighlight: 'rgba(140, 190, 230, 0.16)',
+    canopyRimLight: 'rgba(150, 200, 235, 0.22)',
+    branchColor: '#02070a',
+    leafTones: ['#0d3340', '#0a2a35', '#12414a', '#07202a'],
+    leafGapColor: 'rgba(0, 4, 8, 0.55)',
+    leafDensity: 2.4,             // folhinhas por px de raio
+    canopyAlpha: 0.97,
+    // Balanço pelo vento (px): a base balança pouco, a folhagem muito
+    baseSwayAmount: 1.2,
+    crownSwayAmount: 4.2,
+    crownTiltAmount: 0.05,        // inclinação (radianos) da folhagem na rajada
+    swayFlutter: 0.9,             // tremor rápido da folhagem
 
-    // Névoa: duas camadas de textura rolando em direções diferentes + manchas soltas
-    fogColor: '200, 215, 225',
+    // Grama animada: tufos que se curvam com o vento
+    grassClumpsPer100kPx: 42,
+    grassBladesPerClump: 4,
+    grassMinHeight: 6,
+    grassMaxHeight: 13,
+    grassBend: 6,                 // curvatura máxima na rajada (px)
+    grassColors: ['rgba(46, 110, 100, 0.55)', 'rgba(30, 80, 78, 0.5)', 'rgba(70, 140, 120, 0.4)'],
+
+    // Névoa: camadas de textura rolando em direções diferentes + manchas soltas
+    fogColor: '170, 195, 215',
     fogTileSize: 512,
-    fogTilePuffs: 70,
+    fogTilePuffs: 80,
     fogLayers: [
-        { speedX: 26, speedY: 7, scale: 1.6, alpha: 0.13 },
-        { speedX: -16, speedY: -11, scale: 1.1, alpha: 0.09 }
+        { speedX: 26, speedY: 7, scale: 1.6, alpha: 0.24 },
+        { speedX: -16, speedY: -11, scale: 1.1, alpha: 0.17 },
+        { speedX: 9, speedY: -5, scale: 2.4, alpha: 0.12 }
     ],
-    fogBlobs: 12,
-    fogMinRadius: 120,
-    fogMaxRadius: 260,
-    fogAlphaCenter: 0.06,
-    fogAlphaEdge: 0.2,
+    fogBlobs: 14,
+    fogMinRadius: 140,
+    fogMaxRadius: 300,
+    fogAlphaCenter: 0.1,
+    fogAlphaEdge: 0.3,
     fogDriftSpeed: 34,
     fogWobble: 50,
 
-    // Vaga-lumes
-    fireflies: 22,
-    fireflyColor: '190, 255, 140',
-    fireflySpeed: 18,
-    fireflyRadius: 1.6,
-    fireflyGlowRadius: 9,
+    // Vaga-lumes (verde-azulados e discretos)
+    fireflies: 16,
+    fireflyColor: '140, 230, 200',
+    fireflySpeed: 16,
+    fireflyRadius: 1.5,
+    fireflyGlowRadius: 8,
 
     // Vinheta escura
-    vignetteColor: 'rgba(0, 0, 0, 0.75)',
-    vignetteInnerRatio: 0.45
+    vignetteColor: 'rgba(0, 2, 8, 0.88)',
+    vignetteInnerRatio: 0.4
 };

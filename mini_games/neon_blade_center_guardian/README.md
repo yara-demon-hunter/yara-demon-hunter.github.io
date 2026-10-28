@@ -33,7 +33,7 @@ js/
   systems/effects.js              partículas e screen shake
   render/renderer.js              ordem das camadas de desenho
   render/arena.js                 núcleo e raio de alcance
-  render/forest.js                cenário: chão da floresta, copas das árvores, névoa e vinheta
+  render/forest.js                cenário: noite fria na floresta (chão, árvores e grama ao vento, névoa, vaga-lumes, vinheta)
   render/entities.js              inimigos, projéteis, golpes, power-ups e partículas
   render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
   render/fx/random.js             aleatório com semente (cenário estável)

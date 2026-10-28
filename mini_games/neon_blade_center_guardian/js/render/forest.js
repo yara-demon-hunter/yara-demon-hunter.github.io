@@ -18,7 +18,8 @@ const cache = {
     fogTile: null,
     fog: [],
     fireflies: [],
-    fireflyTime: 0
+    fireflyTime: 0,
+    grass: []
 };
 
 function makeCanvas(width, height) {
@@ -109,44 +110,125 @@ function buildGround(w, h, rand) {
     return canvas;
 }
 
-// Copa de árvore vista de cima: aglomerado de "bolhas" de folhagem
+// Vento: 0 a 1, rajadas que viajam pela tela da esquerda para a direita
+function windAt(t, x, y) {
+    const gust = 0.5 + 0.5 * Math.sin(t * F.windSpeed - x * F.windWaveLength + y * F.windWaveLength * 0.4);
+    const flutter = 0.5 + 0.5 * Math.sin(t * F.windSpeed * 2.3 - x * F.windWaveLength * 2.1);
+    return Math.min(1, F.windBase + (1 - F.windBase) * (gust * 0.75 + flutter * 0.25) * gust);
+}
+
+// Árvore vista de cima, em duas camadas para o vento mexer cada uma de um jeito:
+// base = sombra + galhos escuros; crown = folhagem detalhada (folhinhas, vãos, luz da lua)
 function buildTreeSprite(rand, radius) {
-    const pad = 12;
-    const size = (radius + pad) * 2;
-    const canvas = makeCanvas(size, size);
-    const g = canvas.getContext('2d');
+    const pad = 14;
+    const size = Math.ceil((radius + pad) * 2);
     const c = size / 2;
+    const base = makeCanvas(size, size);
+    const crown = makeCanvas(size, size);
+    const b = base.getContext('2d');
+    const g = crown.getContext('2d');
 
-    // Sombra projetada no chão
-    g.fillStyle = F.canopyShadow;
-    g.beginPath();
-    g.arc(c + radius * 0.18, c + radius * 0.22, radius * 0.95, 0, Math.PI * 2);
-    g.fill();
+    // BASE: sombra no chão
+    b.fillStyle = F.canopyShadow;
+    b.beginPath();
+    b.arc(c + radius * 0.18, c + radius * 0.22, radius * 0.95, 0, Math.PI * 2);
+    b.fill();
 
-    // Bolhas de folhagem (de fora para dentro, de escuro para claro)
-    const lobes = 7 + Math.floor(rand() * 5);
-    for (let layer = 0; layer < F.canopyColors.length; layer++) {
-        const layerRadius = radius * (1 - layer * 0.2);
-        g.fillStyle = F.canopyColors[layer];
+    // BASE: camadas escuras de folhagem
+    const lobes = 8 + Math.floor(rand() * 5);
+    for (let layer = 0; layer < 2; layer++) {
+        const layerRadius = radius * (1 - layer * 0.12);
+        b.fillStyle = F.canopyColors[layer];
         for (let i = 0; i < lobes; i++) {
             const a = (i / lobes) * Math.PI * 2 + rand() * 0.5;
-            const dist = layerRadius * randomRange(rand, 0.35, 0.6);
-            const r = layerRadius * randomRange(rand, 0.4, 0.55);
+            const dist = layerRadius * randomRange(rand, 0.4, 0.62);
+            const r = layerRadius * randomRange(rand, 0.42, 0.56);
+            b.beginPath();
+            b.arc(c + Math.cos(a) * dist, c + Math.sin(a) * dist, r, 0, Math.PI * 2);
+            b.fill();
+        }
+    }
+
+    // BASE: galhos grossos saindo do tronco, com ramificações (aparecem pelos vãos)
+    b.strokeStyle = F.branchColor;
+    b.lineCap = 'round';
+    const branches = 5 + Math.floor(rand() * 3);
+    for (let i = 0; i < branches; i++) {
+        const a = (i / branches) * Math.PI * 2 + rand() * 0.6;
+        const len = radius * randomRange(rand, 0.65, 0.92);
+        const ex = c + Math.cos(a) * len;
+        const ey = c + Math.sin(a) * len;
+        b.lineWidth = Math.max(1.5, radius * 0.07);
+        b.beginPath();
+        b.moveTo(c, c);
+        b.lineTo(ex, ey);
+        b.stroke();
+        for (const t of [0.55, 0.8]) {
+            const bx = c + Math.cos(a) * len * t;
+            const by = c + Math.sin(a) * len * t;
+            const sa = a + (rand() < 0.5 ? -1 : 1) * randomRange(rand, 0.5, 0.9);
+            b.lineWidth = Math.max(1, radius * 0.035);
+            b.beginPath();
+            b.moveTo(bx, by);
+            b.lineTo(bx + Math.cos(sa) * len * 0.28, by + Math.sin(sa) * len * 0.28);
+            b.stroke();
+        }
+    }
+
+    // CROWN: massas de folhagem (mais claras, menores => deixam vãos para ver os galhos)
+    for (let layer = 2; layer < F.canopyColors.length; layer++) {
+        const layerRadius = radius * (0.96 - (layer - 2) * 0.2);
+        g.fillStyle = F.canopyColors[layer];
+        for (let i = 0; i < lobes; i++) {
+            const a = (i / lobes) * Math.PI * 2 + rand() * 0.6;
+            const dist = layerRadius * randomRange(rand, 0.4, 0.68);
+            const r = layerRadius * randomRange(rand, 0.28, 0.42);
             g.beginPath();
             g.arc(c + Math.cos(a) * dist, c + Math.sin(a) * dist, r, 0, Math.PI * 2);
             g.fill();
         }
     }
 
-    // Luz da lua batendo de um lado (cima-esquerda)
-    const light = g.createRadialGradient(c - radius * 0.4, c - radius * 0.4, 0, c - radius * 0.4, c - radius * 0.4, radius);
+    // CROWN: folhinhas individuais para dar textura
+    const leaves = Math.floor(radius * F.leafDensity * 6);
+    for (let i = 0; i < leaves; i++) {
+        const a = rand() * Math.PI * 2;
+        const d = Math.sqrt(rand()) * radius * 0.92;
+        g.save();
+        g.translate(c + Math.cos(a) * d, c + Math.sin(a) * d);
+        g.rotate(rand() * Math.PI);
+        g.fillStyle = pick(rand, F.leafTones);
+        g.beginPath();
+        g.ellipse(0, 0, randomRange(rand, 2.2, 4.2), randomRange(rand, 1, 1.8), 0, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+    }
+
+    // CROWN: vãos escuros entre as folhas (profundidade)
+    g.fillStyle = F.leafGapColor;
+    for (let i = 0; i < radius * 0.35; i++) {
+        const a = rand() * Math.PI * 2;
+        const d = rand() * radius * 0.8;
+        g.beginPath();
+        g.arc(c + Math.cos(a) * d, c + Math.sin(a) * d, randomRange(rand, 1.5, 3.5), 0, Math.PI * 2);
+        g.fill();
+    }
+
+    // CROWN: luz fria da lua (cima-esquerda) + brilho no contorno
+    g.globalCompositeOperation = 'source-atop';
+    const lx = c - radius * 0.4;
+    const light = g.createRadialGradient(lx, lx, 0, lx, lx, radius);
     light.addColorStop(0, F.canopyHighlight);
     light.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    g.globalCompositeOperation = 'source-atop';
     g.fillStyle = light;
     g.fillRect(0, 0, size, size);
+    g.strokeStyle = F.canopyRimLight;
+    g.lineWidth = 1.4;
+    g.beginPath();
+    g.arc(c, c, radius * 0.9, Math.PI * 1.05, Math.PI * 1.65);
+    g.stroke();
 
-    return canvas;
+    return { base, crown, size };
 }
 
 function buildTrees(w, h, rand) {
@@ -175,7 +257,7 @@ function buildTrees(w, h, rand) {
         }
     }
     // Menores primeiro, maiores por cima
-    trees.sort((a, b) => a.sprite.width - b.sprite.width);
+    trees.sort((a, b) => a.sprite.size - b.sprite.size);
     return { sprites, trees };
 }
 
@@ -227,6 +309,23 @@ function buildFog(w, h, rand) {
     return { sprite, fog };
 }
 
+function buildGrass(w, h, rand) {
+    const count = Math.floor(F.grassClumpsPer100kPx * (w * h) / 100000);
+    return Array.from({ length: count }, () => ({
+        x: rand() * w,
+        y: rand() * h,
+        height: randomRange(rand, F.grassMinHeight, F.grassMaxHeight),
+        phase: rand() * Math.PI * 2,
+        color: Math.floor(rand() * F.grassColors.length),
+        blades: Array.from({ length: F.grassBladesPerClump }, () => ({
+            offset: randomRange(rand, -2.5, 2.5),
+            lean: randomRange(rand, -0.35, 0.35),
+            length: randomRange(rand, 0.65, 1),
+            stiffness: randomRange(rand, 0.6, 1.2)
+        }))
+    }));
+}
+
 function buildVignette(w, h) {
     const canvas = makeCanvas(w, h);
     const g = canvas.getContext('2d');
@@ -261,6 +360,7 @@ function ensureCache() {
         phase: rand() * Math.PI * 2,
         blink: randomRange(rand, 0.6, 1.6)
     }));
+    cache.grass = buildGrass(w, h, rand);
     cache.vignette = buildVignette(w, h);
 }
 
@@ -270,15 +370,53 @@ export function renderForestGround() {
     ctx.drawImage(cache.ground, 0, 0, state.width, state.height);
 }
 
+// Grama animada: tufos que se curvam com o vento (um único traçado por cor)
+export function renderForestGrass() {
+    ensureCache();
+    const t = performance.now() / 1000;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 1.1;
+    F.grassColors.forEach((color, ci) => {
+        ctx.strokeStyle = color;
+        ctx.beginPath();
+        cache.grass.forEach(clump => {
+            if (clump.color !== ci) return;
+            const wind = windAt(t, clump.x, clump.y);
+            const sway = (wind * F.grassBend + Math.sin(t * 2.4 + clump.phase) * 0.8) * clump.height / F.grassMaxHeight;
+            clump.blades.forEach(blade => {
+                const tipX = clump.x + blade.lean * clump.height + sway * blade.stiffness;
+                const tipY = clump.y - clump.height * blade.length;
+                ctx.moveTo(clump.x + blade.offset, clump.y);
+                ctx.quadraticCurveTo(clump.x + blade.offset + sway * 0.2, clump.y - clump.height * 0.55, tipX, tipY);
+            });
+        });
+        ctx.stroke();
+    });
+    ctx.restore();
+}
+
 // Camada por cima dos monstros: eles saem de baixo das copas
 export function renderTreeCanopies() {
     const t = performance.now() / 1000;
     ctx.save();
     ctx.globalAlpha = F.canopyAlpha;
     cache.trees.forEach(tree => {
-        const sway = Math.sin(t * F.swaySpeed + tree.phase) * F.swayAmount;
-        const half = tree.sprite.width / 2;
-        ctx.drawImage(tree.sprite, tree.x - half + sway, tree.y - half + sway * 0.5);
+        const wind = windAt(t, tree.x, tree.y);
+        const flutter = Math.sin(t * 5 + tree.phase) * F.swayFlutter * wind;
+        const slow = Math.sin(t * 0.7 + tree.phase) * 0.35;
+        const push = wind + slow * 0.4;
+        const half = tree.sprite.size / 2;
+
+        // Base: balanço leve
+        ctx.drawImage(tree.sprite.base, tree.x - half + push * F.baseSwayAmount, tree.y - half + push * F.baseSwayAmount * 0.4);
+
+        // Folhagem: empurrada e inclinada pela rajada, com tremor rápido
+        ctx.save();
+        ctx.translate(tree.x + push * F.crownSwayAmount + flutter, tree.y + push * F.crownSwayAmount * 0.4 + flutter * 0.5);
+        ctx.rotate(push * F.crownTiltAmount);
+        ctx.drawImage(tree.sprite.crown, -half, -half);
+        ctx.restore();
     });
     ctx.restore();
 }
@@ -348,6 +486,8 @@ export function renderFogAndVignette() {
         ctx.drawImage(cache.fogSprite, x - rw, y - rh, rw * 2, rh * 2);
     });
     ctx.globalAlpha = 1;
+    ctx.fillStyle = F.nightTint;
+    ctx.fillRect(0, 0, w, h);
     ctx.drawImage(cache.vignette, 0, 0, w, h);
     ctx.restore();
 }
