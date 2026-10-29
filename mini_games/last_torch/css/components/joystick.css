@@ -81,3 +81,22 @@
 @media (pointer: coarse) {
     #joystick, #knifeButton { display: block; }
 }
+
+/* Celular deitado (pouca altura): controles menores e um pouco mais altos, para o polegar ter
+   espaço de puxar o joystick para baixo sem bater na borda (e na barra de gestos do celular) */
+@media (pointer: coarse) and (max-height: 520px) and (orientation: landscape) {
+    #joystick {
+        width: 5.75rem;
+        height: 5.75rem;
+        left: max(1.75rem, env(safe-area-inset-left));
+        bottom: max(2.5rem, env(safe-area-inset-bottom));
+    }
+    #joystickKnob { width: 2.5rem; height: 2.5rem; }
+    #knifeButton {
+        width: 5rem;
+        height: 5rem;
+        right: max(1.75rem, env(safe-area-inset-right));
+        bottom: max(2.5rem, env(safe-area-inset-bottom));
+    }
+    #knifeButtonKnob { width: 2.6rem; height: 2.6rem; font-size: 1.2rem; }
+}

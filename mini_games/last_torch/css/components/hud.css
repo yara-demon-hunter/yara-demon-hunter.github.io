@@ -172,13 +172,38 @@
     #heroChips { font-size: 0.72rem; gap: 0.5rem; }
 }
 
-/* --- Celular deitado (pouca altura): mais baixo e compacto --- */
+/* --- Celular deitado (pouca altura, é como o jogo é jogado no celular): o mais compacto possível
+   para sobrar tela de jogo. Cartão do herói em 3 linhas (vida / XP + ouro / Fúria), letras e barras
+   finas, botões só com ícone. --- */
 @media (max-height: 520px) and (orientation: landscape) {
-    #hud { padding-top: max(0.3rem, env(safe-area-inset-top)); }
-    #heroCard { width: 14rem; gap: 0.2rem; padding: 0.3rem 0.5rem; }
-    #hudWorld { padding: 0.3rem 0.5rem; gap: 0.25rem; max-width: 17rem; }
-    .hud-label { font-size: 0.6rem; margin-bottom: 0.1rem; }
-    .hud-bar { height: 0.4rem; }
-    #heroChips { font-size: 0.72rem; }
-    .hud-btn { padding: 0.3rem 0.5rem; font-size: 0.78rem; }
+    #hud { padding: max(0.25rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) 0 max(0.5rem, env(safe-area-inset-left)); }
+    #hudTop { gap: 0.4rem; }
+    .hud-panel { border-radius: 0.5rem; background: rgba(15, 23, 42, 0.62); }
+    #heroCard {
+        width: 11.5rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "hp   hp"
+            "xp   chips"
+            "fury fury";
+        column-gap: 0.4rem;
+        row-gap: 0.15rem;
+        padding: 0.22rem 0.4rem;
+    }
+    #heroCard > .hud-stat { grid-area: hp; }
+    #xpRow { grid-area: xp; font-size: 0.52rem; gap: 0.3rem; }
+    #heroChips { grid-area: chips; font-size: 0.55rem; gap: 0.35rem; align-items: center; }
+    #furyRow { grid-area: fury; font-size: 0.5rem; }
+    #furyLabel { display: none; }
+    #ultText { min-width: 1.9rem; }
+    #ultText::before { content: '🔥 '; }
+    #hudWorld { padding: 0.22rem 0.4rem; gap: 0.15rem; max-width: 13rem; }
+    .hud-label { font-size: 0.52rem; margin-bottom: 0.08rem; }
+    .hud-bar { height: 0.28rem; }
+    .hud-bar-thin { height: 0.22rem; }
+    .hud-bar-fury { height: 0.24rem; }
+    #hudButtons { flex-direction: row; gap: 0.25rem; }
+    .hud-btn-text { display: none; }
+    .hud-btn { padding: 0.22rem 0.4rem; font-size: 0.75rem; border-radius: 0.5rem; }
 }
