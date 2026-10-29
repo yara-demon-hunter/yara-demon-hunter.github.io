@@ -63,9 +63,18 @@ export const state = {
     enemies: [],
     particles: [],
     bladeSlashes: [],
+    knives: [],
     enemyProjectiles: [],
     goldDrops: [],
     currentBoss: null,
+
+    // Adaga de arremesso: mira em coordenadas do mundo, se o botão/dedo está pressionado, recarga,
+    // instante e direção do último arremesso (animação) e segundos até a adaga sair da mão (null = nenhuma)
+    knifeInput: { held: false, x: 0, y: 0 },
+    knifeTimer: 0,
+    knifeThrowTime: -100000,
+    knifeThrowAngle: 0,
+    knifePending: null,
 
     spawnTimer: 0
 };

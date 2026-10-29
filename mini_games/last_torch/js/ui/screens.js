@@ -38,6 +38,9 @@ export function startGame() {
     state.particles = [];
     state.bladeSlashes = [];
     state.enemyProjectiles = [];
+    state.knives = [];
+    state.knifeTimer = 0;
+    state.knifePending = null;
     state.goldDrops = [];
     state.currentBoss = null;
 

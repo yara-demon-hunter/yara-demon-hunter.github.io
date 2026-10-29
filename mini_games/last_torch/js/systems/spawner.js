@@ -49,6 +49,8 @@ export function resetFieldForNewTurn() {
     state.enemyProjectiles.length = 0;
     state.particles.length = 0;
     state.bladeSlashes.length = 0;
+    state.knives.length = 0;
+    state.knifePending = null;
     state.goldDrops.length = 0;
     state.currentBoss = null;
     state.spawnTimer = TURN_DIFFICULTY.turnStartGraceSeconds;

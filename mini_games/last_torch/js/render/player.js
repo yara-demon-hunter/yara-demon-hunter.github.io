@@ -1,5 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { HERO_VISUALS as V } from '../../data_model/visuals/characters/hero_visual.js';
+import { KNIFE_VISUALS } from '../../data_model/visuals/effects/knife_visual.js';
 import { ctx, player, state } from '../core/state.js';
 import { easeOutCubic, easeOutQuad, lerpAngle } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
@@ -96,9 +97,12 @@ function updateAnim() {
         anim.run += (runTarget - anim.run) * Math.min(1, dt * V.runSmoothing);
         anim.stride += dt * V.strideSpeed * (0.25 + anim.run);
 
-        // Giro suave para o lado do movimento (não durante o golpe)
+        // Giro suave para o lado do movimento (não durante o golpe). No arremesso da adaga vira rápido para o alvo.
         const before = anim.facing;
-        if (Math.hypot(dx, dy) > 0.3 && !anim.swingActive) {
+        const throwing = (now - state.knifeThrowTime) / 1000 < KNIFE_VISUALS.throwSeconds;
+        if (throwing) {
+            anim.facing = lerpAngle(anim.facing, state.knifeThrowAngle, Math.min(1, dt * 25));
+        } else if (Math.hypot(dx, dy) > 0.3 && !anim.swingActive) {
             anim.facing = lerpAngle(anim.facing, Math.atan2(dy, dx), Math.min(1, dt * V.turnSmoothing));
         }
         let dAng = anim.facing - before;

@@ -8,6 +8,7 @@ import { render } from './render/renderer.js';
 import { updateAutoAttack } from './systems/combat.js';
 import { updateEffects } from './systems/effects.js';
 import { updateEnemies, updateEnemyProjectiles } from './systems/enemies.js';
+import { updateKnives } from './systems/knives.js';
 import { updatePlayer } from './systems/player.js';
 import { updateGold } from './systems/gold.js';
 import { updateSpawner } from './systems/spawner.js';
@@ -24,6 +25,7 @@ function update(dt) {
 
     updatePlayer(dt);
     updateAutoAttack(dt);
+    updateKnives(dt);
     updateSpawner(dt);
 
     updateEnemies(dt);

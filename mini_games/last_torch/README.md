@@ -61,8 +61,8 @@ draft/                            versões anteriores mantidas como referência
 
 ## Controles
 
-- **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente.
-- **Celular ou tablet:** toque na arena para mover o herói até o ponto escolhido; arraste o dedo para atualizar o destino enquanto se move. Os ataques são automáticos, sem joystick ou botões extras.
+- **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente. Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria).
+- **Celular ou tablet:** toque na arena para mover o herói até o ponto escolhido; arraste o dedo para atualizar o destino enquanto se move. Toque (ou segure o dedo) no canvas para arremessar a faca na direção do dedo. Os ataques corpo a corpo são automáticos, sem joystick ou botões extras.
 
 O jogo usa a mesma lógica e progressão em todas as telas; apenas a disposição da interface e o controle de movimento se adaptam ao dispositivo.
 

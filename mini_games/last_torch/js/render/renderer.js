@@ -5,6 +5,7 @@ import {
     renderBladeSlashes,
     renderEnemies,
     renderEnemyProjectiles,
+    renderKnives,
     renderParticles,
     renderGoldDrops
 } from './entities.js';
@@ -71,6 +72,7 @@ export function render() {
     renderBladeSlashes();
     renderEnemyProjectiles();
     renderEnemies();
+    renderKnives();
     renderPlayerTrail();
     if (HERO_25D) renderPlayer25D();
     else renderPlayer();

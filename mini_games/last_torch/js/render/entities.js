@@ -2,8 +2,10 @@ import { BAT_VISUALS } from '../../data_model/visuals/monsters/bat_visual.js';
 import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
 import { GOLD_VISUALS as G } from '../../data_model/visuals/items/gold_visual.js';
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
+import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { ctx, state } from '../core/state.js';
 import { renderBat } from './bat.js';
+import { drawDagger } from './knife.js';
 import { renderReflectedBolt } from './reflect.js';
 import { renderWitch, renderWitchBolt } from './witch.js';
 import { easeOutCubic } from './fx/easing.js';
@@ -133,6 +135,56 @@ export function renderEnemies() {
             ctx.fillStyle = e.color;
             ctx.fillRect(e.x - bw / 2, e.y - barY, bw * (e.hp / e.maxHp), 4);
         }
+    });
+}
+
+// Adaga de arremesso: voa na altura da mão (sombra no chão marca a posição real), com brilho frio,
+// riscos de velocidade e cópias apagadas atrás. Desenho da adaga em js/render/knife.js
+export function renderKnives() {
+    const t = performance.now() / 1000;
+    state.knives.forEach(k => {
+        const y = k.y - K.flightHeight;
+        const trail = Math.min(1, k.travelled / 40);
+
+        ctx.fillStyle = K.colors.shadow;
+        ctx.beginPath();
+        ctx.ellipse(k.x, k.y, K.shadowLength, K.shadowWidth, k.angle, 0, Math.PI * 2);
+        ctx.fill();
+
+        drawGlow(ctx, K.colors.glow, k.x, y, K.glowRadius, 0.55);
+
+        ctx.save();
+        ctx.translate(k.x, y);
+        ctx.rotate(k.angle);
+
+        // Riscos de velocidade
+        ctx.strokeStyle = K.colors.trail;
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 0.8;
+        [-2.2, 0, 2.2].forEach((side, i) => {
+            ctx.globalAlpha = 0.35 * trail;
+            ctx.beginPath();
+            ctx.moveTo(-6 - K.trailLength * (i === 1 ? 1 : 0.7) * trail, side);
+            ctx.lineTo(-6, side);
+            ctx.stroke();
+        });
+
+        // Cópias apagadas da adaga (rastro)
+        for (let g = K.ghostCount; g >= 1; g--) {
+            ctx.save();
+            ctx.globalAlpha = 0.28 * (1 - g / (K.ghostCount + 1)) * trail;
+            ctx.translate(-g * K.ghostGap * trail, 0);
+            ctx.scale(K.flightScale, K.flightScale);
+            ctx.translate(-K.shape.centerX, 0);
+            drawDagger(ctx, t);
+            ctx.restore();
+        }
+
+        ctx.globalAlpha = 1;
+        ctx.scale(K.flightScale, K.flightScale);
+        ctx.translate(-K.shape.centerX, 0);
+        drawDagger(ctx, t);
+        ctx.restore();
     });
 }
 

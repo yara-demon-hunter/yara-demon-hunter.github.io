@@ -1,8 +1,10 @@
 import { HERO_VISUALS as H } from '../../data_model/visuals/characters/hero_visual.js';
 import { HERO_25D_VISUALS as V } from '../../data_model/visuals/characters/hero25d_visual.js';
+import { KNIFE_VISUALS } from '../../data_model/visuals/effects/knife_visual.js';
 import { ctx, player, state } from '../core/state.js';
 import { easeOutCubic, easeOutQuad, lerpAngle } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
+import { drawDagger } from './knife.js';
 import { heroAnim as anim, heroCapeJag as capeJag, heroSwingAngleAt as swingAngleAt } from './player.js';
 
 // --- HERÓI 2.5D ---
@@ -74,7 +76,9 @@ function sectionHalfWidth(A, B) {
 // --- POSE DO QUADRO ---
 function buildPose(t) {
     const run = anim.run;
-    const lean = V.runLean * run;
+    // No arremesso o tronco se inclina para a frente, junto com o braço
+    const throwK = throwProgress();
+    const lean = V.runLean * run + (throwK >= 0 ? KNIFE_VISUALS.throwLean * Math.sin(Math.PI * throwK) : 0);
     const breath = Math.sin((t / H.breathPeriodSeconds) * Math.PI * 2) * V.breathAmount * (1 - run);
     return {
         t,
@@ -238,17 +242,72 @@ function capePart(pose) {
     };
 }
 
-// Braço livre (esquerdo): balança contra a passada; recolhe durante o golpe
+// --- ARREMESSO DA ADAGA (mão esquerda) ---
+// Progresso da animação: 0 a 1 durante o arremesso, -1 fora dele
+function throwProgress() {
+    const k = (performance.now() - state.knifeThrowTime) / 1000 / KNIFE_VISUALS.throwSeconds;
+    return k >= 0 && k < 1 ? k : -1;
+}
+
+// Mão esquerda no arremesso: puxa a adaga para trás e acima do ombro, lança para a frente
+// (braço estendido na direção do alvo) e volta ao repouso
+function throwHand(start, pose, k) {
+    const back = [pose.lean * 0.5 - 2.6, -V.chest.B - 1.6, pose.shoulderZ + 2.2];
+    const front = [pose.lean + 6.5, -V.chest.B * 0.35, pose.shoulderZ - 2.5];
+    const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+    const { windupFraction: w, releaseFraction: r } = KNIFE_VISUALS;
+    if (k < w) return mix(start, back, easeOutQuad(k / w));
+    if (k < r) return mix(back, front, easeOutCubic((k - w) / (r - w)));
+    return mix(front, start, easeOutQuad((k - r) / (1 - r)));
+}
+
+// Adaga presa na mão, apontando na direção do antebraço (encurta quando aponta para a câmera)
+function drawHeldDagger(shoulder, hand, t) {
+    const d = [hand[0] - shoulder[0], hand[1] - shoulder[1], hand[2] - shoulder[2]];
+    const len = Math.hypot(...d) || 1;
+    const p0 = project(...hand);
+    const p1 = project(hand[0] + d[0] / len, hand[1] + d[1] / len, hand[2] + d[2] / len);
+    const fore = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+    ctx.save();
+    ctx.translate(p0.x, p0.y);
+    ctx.rotate(Math.atan2(p1.y - p0.y, p1.x - p0.x));
+    ctx.scale(KNIFE_VISUALS.handScale * Math.max(0.35, fore), KNIFE_VISUALS.handScale);
+    drawDagger(ctx, t);
+    ctx.restore();
+}
+
+// Arco brilhante do movimento da mão logo antes e depois de soltar a adaga
+function drawThrowArc(start, pose, k) {
+    const { windupFraction: w, releaseFraction: r } = KNIFE_VISUALS;
+    const end = Math.min(k, r);
+    const from = Math.max(w, end - 0.2);
+    if (end <= from) return;
+    const fade = k < r ? 1 : 1 - (k - r) / 0.15;
+    if (fade <= 0) return;
+    const points = [];
+    for (let i = 0; i <= 8; i++) points.push(throwHand(start, pose, from + (end - from) * (i / 8)));
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha *= 0.55 * fade;
+    limb(points, 1.6, KNIFE_VISUALS.colors.trail);
+    ctx.restore();
+}
+
+// Braço livre (esquerdo): balança contra a passada; recolhe durante o golpe e arremessa a adaga
 function freeArmPart(pose) {
     const swing = Math.sin(anim.stride) * V.armSwing * pose.run;
     const shoulder = [pose.lean, -V.chest.B, pose.shoulderZ - 0.5];
-    const hand = [pose.lean * 0.5 + 0.6 + swing * (1 - pose.blend) - pose.blend * 1.2, -V.chest.B - 0.6 + pose.blend * 1.5, V.handHeight + pose.blend * 2];
-    const elbow = [(shoulder[0] + hand[0]) / 2 - 0.4, -V.chest.B - 1, (shoulder[2] + hand[2]) / 2];
+    const restHand = [pose.lean * 0.5 + 0.6 + swing * (1 - pose.blend) - pose.blend * 1.2, -V.chest.B - 0.6 + pose.blend * 1.5, V.handHeight + pose.blend * 2];
+    const throwK = throwProgress();
+    const hand = throwK >= 0 ? throwHand(restHand, pose, throwK) : restHand;
+    const elbow = [(shoulder[0] + hand[0]) / 2 - 0.4, -V.chest.B - 1, (shoulder[2] + hand[2]) / 2 + (throwK >= 0 ? 0.8 : 0)];
     return {
         depth: project(...elbow).depth + 0.1,
         draw() {
+            if (throwK >= 0) drawThrowArc(restHand, pose, throwK);
             ball(shoulder, V.shoulderRadius, C.sleeve);
             limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
+            if (throwK >= 0 && throwK < KNIFE_VISUALS.letGoFraction) drawHeldDagger(shoulder, hand, pose.t);
             ball(hand, V.handRadius, C.glove);
         }
     };

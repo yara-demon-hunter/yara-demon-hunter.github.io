@@ -41,6 +41,16 @@ export const FRENZY_NOVA_SKILL = {
     slashRadiusMultiplier: 1.3
 };
 
+// Faca de arremesso: golpe separado da lâmina, com recarga própria. Anda enquanto arremessa.
+export const KNIFE_SKILL = {
+    cooldownSeconds: 0.9,
+    speed: 520,
+    radius: 7,
+    maxRange: 420,
+    damageMultiplier: 0.8,
+    knockbackMultiplier: 0.8
+};
+
 export function createAttributes() {
     return Object.fromEntries(
         Object.entries(UPGRADE_MODELS).map(([key, attribute]) => [key, { ...attribute }])
