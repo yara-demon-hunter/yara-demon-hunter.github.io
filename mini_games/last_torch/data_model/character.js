@@ -31,6 +31,8 @@ export function createPlayerState() {
         iFrames: 0,
         // Só visual: direção e instante do último golpe recebido (animação de empurrão)
         hitDirX: 0, hitDirY: 0, hitTime: -100000,
+        // Mirror Ward: recarga restante, instante e direção do último rebate (animação)
+        reflectTimer: 0, reflectTime: -100000, reflectAngle: 0,
         comboStep: 1,
         trail: []
     };

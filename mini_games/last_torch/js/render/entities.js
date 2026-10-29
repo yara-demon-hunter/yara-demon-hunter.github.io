@@ -4,6 +4,7 @@ import { GOLD_VISUALS as G } from '../../data_model/visuals/items/gold_visual.js
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { ctx, state } from '../core/state.js';
 import { renderBat } from './bat.js';
+import { renderReflectedBolt } from './reflect.js';
 import { renderWitch, renderWitchBolt } from './witch.js';
 import { easeOutCubic } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
@@ -90,6 +91,10 @@ export function renderBladeSlashes() {
 
 export function renderEnemyProjectiles() {
     state.enemyProjectiles.forEach(p => {
+        if (p.reflected) {
+            renderReflectedBolt(p);
+            return;
+        }
         if (p.owner === 'WITCH') {
             renderWitchBolt(p);
             return;

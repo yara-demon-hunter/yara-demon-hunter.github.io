@@ -1,7 +1,8 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, createGoblinChild, rollMonsterGold } from '../../data_model/monsters.js';
-import { audio, player, state } from '../core/state.js';
+import { MIRROR_WARD } from '../../data_model/passives.js';
+import { audio, passives, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { triggerGameOver } from '../ui/screens.js';
 import { openShop } from '../ui/shop.js';
@@ -123,13 +124,82 @@ export function updateEnemies(dt) {
 }
 
 // --- PROJÉTEIS INIMIGOS ---
+// Mirror Ward: rebate o tiro para o monstro mais próximo (null se não houver alvo)
+function tryReflect(p) {
+    let target = null;
+    let best = Infinity;
+    state.enemies.forEach(e => {
+        const d = Math.hypot(e.x - p.x, e.y - p.y);
+        if (d < best) { best = d; target = e; }
+    });
+    if (!target) return false;
+
+    const angle = Math.atan2(target.y - p.y, target.x - p.x);
+    const speed = Math.hypot(p.vx, p.vy) * MIRROR_WARD.speedMultiplier;
+    p.reflected = true;
+    p.target = target;
+    p.vx = Math.cos(angle) * speed;
+    p.vy = Math.sin(angle) * speed;
+    p.damage = Math.max(MIRROR_WARD.minimumDamage, p.damage * MIRROR_WARD.damageMultiplier);
+
+    player.reflectTimer = MIRROR_WARD.cooldownSeconds;
+    player.reflectTime = performance.now();
+    player.reflectAngle = Math.atan2(p.y - player.y, p.x - player.x);
+    audio.playReflect();
+    createExplosion(p.x, p.y, '#7dd3fc', 8);
+    shakeScreen(3);
+    return true;
+}
+
+// Tiro rebatido: curva suave até o alvo e machuca monstros (nunca o herói)
+function updateReflectedProjectile(p, i, dt) {
+    const { enemyProjectiles, enemies } = state;
+    if (p.target && enemies.includes(p.target)) {
+        const speed = Math.hypot(p.vx, p.vy);
+        const current = Math.atan2(p.vy, p.vx);
+        let diff = Math.atan2(p.target.y - p.y, p.target.x - p.x) - current;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        const turned = current + Math.max(-1, Math.min(1, diff)) * Math.min(Math.abs(diff), MIRROR_WARD.homingTurnRate * dt);
+        p.vx = Math.cos(turned) * speed;
+        p.vy = Math.sin(turned) * speed;
+    }
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+
+    for (const e of enemies) {
+        if (Math.hypot(e.x - p.x, e.y - p.y) < e.radius + p.radius) {
+            e.hp -= p.damage;
+            e.vx += p.vx * 0.4;
+            e.vy += p.vy * 0.4;
+            createExplosion(p.x, p.y, '#7dd3fc', 12);
+            audio.playExplode();
+            enemyProjectiles.splice(i, 1);
+            return;
+        }
+    }
+    if (p.x < 0 || p.x > state.width || p.y < 0 || p.y > state.height) enemyProjectiles.splice(i, 1);
+}
+
 export function updateEnemyProjectiles(dt) {
     const { enemyProjectiles } = state;
+    player.reflectTimer = Math.max(0, player.reflectTimer - dt);
 
     for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
         const p = enemyProjectiles[i];
+        if (p.reflected) {
+            updateReflectedProjectile(p, i, dt);
+            continue;
+        }
+
         p.x += p.vx * dt;
         p.y += p.vy * dt;
+
+        if (passives.mirrorWard.lvl > 0 && player.reflectTimer <= 0
+            && Math.hypot(player.x - p.x, player.y - p.y) < p.radius + MIRROR_WARD.catchRadius
+            && tryReflect(p)) {
+            continue;
+        }
 
         if (Math.hypot(player.x - p.x, player.y - p.y) < p.radius + CHARACTER_MODEL.collisionRadius && player.iFrames <= 0) {
             player.hp -= p.damage;

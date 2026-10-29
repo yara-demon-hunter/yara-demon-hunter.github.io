@@ -98,6 +98,25 @@ export class SoundEngine {
         osc.stop(this.ctx.currentTime + 0.2);
     }
 
+    // Rebate (Mirror Ward): "ting" metálico que sobe de tom
+    playReflect() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        [1320, 1980].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = i === 0 ? 'triangle' : 'sine';
+            osc.frequency.setValueAtTime(freq * 0.8, now);
+            osc.frequency.exponentialRampToValueAtTime(freq, now + 0.06);
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.35);
+        });
+    }
+
     playXp() {
         if (!this.ctx || this.muted) return;
         const osc = this.ctx.createOscillator();

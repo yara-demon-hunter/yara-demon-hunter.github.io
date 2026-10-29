@@ -14,47 +14,24 @@
     background: rgba(56, 189, 248, 0.8);
 }
 
-/* --- LOJA: painéis em acordeão (details/summary) --- */
+/* --- LOJA: painéis (sempre abertos) --- */
 .shop-panel {
     border-width: 1px;
     border-radius: 12px;
     background: rgba(2, 6, 23, 0.7);
 }
-.shop-panel > summary {
+.shop-panel-title {
     min-height: 40px;
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 0 10px;
     color: #22d3ee;
-    cursor: pointer;
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.05em;
-    list-style: none;
 }
-.shop-panel > summary::-webkit-details-marker { display: none; }
-.shop-panel > summary::after {
-    content: '▾';
-    color: #94a3b8;
-    transition: transform 160ms ease;
-}
-.shop-panel:not([open]) > summary::after { transform: rotate(-90deg); }
 .shop-panel.has-upgrade { border-color: rgba(251, 191, 36, 0.72); box-shadow: 0 0 14px rgba(251, 191, 36, 0.16); }
-.shop-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.2rem;
-    height: 1.2rem;
-    border: 1px solid rgba(251, 191, 36, 0.75);
-    border-radius: 50%;
-    background: rgba(120, 53, 15, 0.9);
-    color: #fef3c7;
-    font-size: 0.7rem;
-    font-weight: 900;
-}
-.shop-badge.hidden { display: none; }
 
 /* --- LOJA: linha compacta (nome | valor | botão), uma por stat --- */
 .shop-row {
@@ -101,3 +78,38 @@
 .shop-row-btn-passive { background: #8b5cf6; color: #fff; }
 .shop-row-btn-passive:hover:not(:disabled) { background: #7c3aed; }
 .shop-row-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+
+/* --- LOJA: cartões das skills passivas --- */
+.passive-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+@media (max-width: 340px) {
+    .passive-cards { grid-template-columns: minmax(0, 1fr); }
+}
+.passive-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 0.5rem;
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, rgba(76, 29, 149, 0.28), rgba(15, 23, 42, 0.7));
+    text-align: center;
+}
+.passive-card.is-ready {
+    border-color: rgba(251, 191, 36, 0.75);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
+}
+.passive-card.is-acquired {
+    border-color: rgba(52, 211, 153, 0.55);
+    background: linear-gradient(180deg, rgba(6, 78, 59, 0.3), rgba(15, 23, 42, 0.7));
+}
+.passive-card-icon { font-size: 1.7rem; line-height: 1; }
+.passive-card-name { color: #ddd6fe; font-size: 0.75rem; font-weight: 700; }
+.passive-card-desc { color: #94a3b8; font-size: 0.65rem; line-height: 1.3; flex: 1; }
+.passive-card .shop-row-btn { width: 100%; padding: 0.3rem 0.5rem; }
+.passive-card-owned { color: #6ee7b7; font-size: 0.7rem; font-weight: 700; padding: 0.3rem 0; }
+#passivesPanel .shop-panel-title { color: #c4b5fd; }

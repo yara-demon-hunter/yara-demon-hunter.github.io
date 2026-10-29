@@ -32,7 +32,7 @@ export const HERO_25D_VISUALS = {
     bootWidth: 3,
     bootLength: 2,
     strideLength: 4.5,
-    footLift: 15.5,
+    footLift: 2.5,
 
     // Tronco (meio-eixos da seção: A = frente/trás, B = lados)
     waist: { A: 2.5, B: 3.4 },

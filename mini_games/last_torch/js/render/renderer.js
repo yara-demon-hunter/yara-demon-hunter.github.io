@@ -11,6 +11,7 @@ import {
 import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestGround, renderTorchLight } from './forest.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 import { renderPlayer25D } from './player25d.js';
+import { renderReflectWard } from './reflect.js';
 
 // Teste: ?hero=25d na URL troca o herói pelo desenho 2.5D (js/render/player25d.js)
 const HERO_25D = new URLSearchParams(window.location.search).get('hero') === '25d';
@@ -72,6 +73,7 @@ export function render() {
     renderPlayerTrail();
     if (HERO_25D) renderPlayer25D();
     else renderPlayer();
+    renderReflectWard();
     renderParticles();
     renderFireflies();
     renderFogAndVignette();

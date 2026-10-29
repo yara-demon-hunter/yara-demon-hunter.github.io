@@ -6,7 +6,6 @@ export function renderPassiveSkills() {
     document.getElementById('skillPointsText').innerText = state.skillPoints;
 
     const canBuy = Object.values(passives).some(sk => sk.lvl < sk.maxLvl && state.skillPoints >= sk.cost);
-    document.getElementById('passiveBadge').classList.toggle('hidden', !canBuy);
     document.getElementById('passivesPanel').classList.toggle('has-upgrade', canBuy);
 
     const list = document.getElementById('passiveList');
@@ -16,15 +15,16 @@ export function renderPassiveSkills() {
         const skill = passives[key];
         const isMax = skill.lvl >= skill.maxLvl;
 
+        const affordable = !isMax && state.skillPoints >= skill.cost;
         const item = document.createElement('div');
-        item.className = 'shop-row shop-row-passive';
-        item.title = skill.desc;
+        item.className = `passive-card${isMax ? ' is-acquired' : affordable ? ' is-ready' : ''}`;
         item.innerHTML = `
-            <span class="shop-row-name"><span>${skill.icon}</span><span>${skill.name}</span></span>
-            <b class="shop-row-value">${isMax ? 'ACQUIRED' : ''}</b>
-            <button data-passive="${key}" class="shop-row-btn shop-row-btn-passive" ${isMax || state.skillPoints < skill.cost ? 'disabled' : ''}>
-                ${isMax ? '✔' : `⚡ ${skill.cost}`}
-            </button>
+            <span class="passive-card-icon">${skill.icon}</span>
+            <span class="passive-card-name">${skill.name}</span>
+            <span class="passive-card-desc">${skill.desc}</span>
+            ${isMax
+                ? '<span class="passive-card-owned">✔ ACQUIRED</span>'
+                : `<button data-passive="${key}" class="shop-row-btn shop-row-btn-passive" ${affordable ? '' : 'disabled'}>⚡ ${skill.cost}</button>`}
         `;
         list.appendChild(item);
     });

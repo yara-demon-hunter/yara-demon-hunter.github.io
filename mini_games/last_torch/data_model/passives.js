@@ -9,7 +9,24 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 2,
         maxLvl: 1,
         desc: 'The 3rd combo hit becomes a 360° spin that strikes every enemy in range.'
+    },
+    mirrorWard: {
+        name: 'Mirror Ward',
+        icon: '🛡️',
+        cost: 2,
+        maxLvl: 1,
+        desc: 'Reflects an incoming enemy shot at the nearest monster. Recharges in 8s.'
     }
+};
+
+// Mirror Ward: rebate o tiro que chega perto do herói para o monstro mais próximo
+export const MIRROR_WARD = {
+    cooldownSeconds: 8,
+    catchRadius: 34,            // distância do herói em que o tiro é rebatido (além do raio do tiro)
+    speedMultiplier: 1.5,
+    damageMultiplier: 2.5,      // dano do tiro original (vira dano no monstro)
+    minimumDamage: 40,
+    homingTurnRate: 4           // rad/s: o tiro rebatido curva suave até o alvo
 };
 
 export function createPassives() {

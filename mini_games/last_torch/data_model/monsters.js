@@ -60,8 +60,8 @@ export const MONSTER_MODELS = {
         radius: 13,
         color: '#f50bca',
         damage: 12,
-        initialShootCooldownSeconds: 2,
-        shootCooldownSeconds: 2.5,
+        initialShootCooldownSeconds: 4,
+        shootCooldownSeconds: 5.5,       // segundos entre um tiro e outro
         projectileSpeed: 160,
         projectileRadius: 5,
         projectileDamageMultiplier: 0.8,

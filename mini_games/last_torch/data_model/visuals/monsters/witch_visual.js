@@ -80,7 +80,7 @@ export const WITCH_VISUALS = {
     clawCount: 4,
 
     // Feitiço
-    chargeSeconds: 0.9,        // começa a carregar quando falta isso para o tiro
+    chargeSeconds: 1.5,        // começa a carregar quando falta isso para o tiro
     releaseSeconds: 0.35,      // depois do disparo o braço segura esticado e volta
     orbOffset: 0.2,            // distância do orbe à frente da mão
     orbMinRadius: 0.05,

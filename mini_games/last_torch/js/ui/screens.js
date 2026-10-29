@@ -30,6 +30,8 @@ export function startGame() {
     player.maxHp = getMaxPlayerHp();
     player.hp = player.maxHp;
     player.iFrames = 0;
+    player.reflectTimer = 0;
+    player.reflectTime = -100000;
     player.trail = [];
 
     state.enemies = [];

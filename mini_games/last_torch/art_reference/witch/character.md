@@ -35,6 +35,6 @@ Dark fantasy. Sinistra, lenta e corcunda: anda mancando com o manto arrastando, 
 | Animação | Quando acontece | O que se move | Duração / ritmo | Imagens |
 |---|---|---|---|---|
 | idle / andar | sempre (ela anda devagar o tempo todo) | corpo balança mancando; mão direita agarrando à frente, esquerda para trás; manto arrasta e tremula; cabelo balança | ~1,4 passos por segundo | images/witch.webp, images/witch_running.webp |
-| carregar feitiço | ~0,9s antes de cada tiro | braço direito estica com a mão aberta; bola escura cresce na frente da mão sugando partículas; olho e aura acendem | acompanha o cooldown do tiro | images/witch_attacking.webp |
+| carregar feitiço | ~1,5s antes de cada tiro | braço direito estica com a mão aberta; bola escura cresce na frente da mão sugando partículas; olho e aura acendem | acompanha o cooldown do tiro | images/witch_attacking.webp |
 | lançar | no disparo | partículas explodem para fora; braço segura esticado e volta | ~0,35s | images/witch_attacking.webp |
 | projétil | voando | bola escura com borda roxa girando e rastro de partículas | contínuo | images/witch_attacking.webp |
