@@ -3,7 +3,7 @@ import { getTurnDifficulty, isMonsterUnlocked } from './difficulty.js';
 export const MONSTER_MODELS = {
     SKELETON: {
         spawnWeight: 0.42,
-        hpBase: 40,
+        hpBase: 50,
         hpPerTurn: 10,
         speedMin: 55,
         speedMax: 85,
@@ -37,7 +37,7 @@ export const MONSTER_MODELS = {
     },
     VAMPIRE: {
         spawnWeight: 0.18,
-        hpBase: 55,
+        hpBase: 75,
         hpPerTurn: 15,
         speedMin: 45,
         speedMax: 45,
@@ -55,7 +55,7 @@ export const MONSTER_MODELS = {
     },
     WITCH: {
         spawnWeight: 0.18,
-        hpBase: 40,
+        hpBase: 65,
         hpPerTurn: 8,
         speedMin: 40,
         speedMax: 40,
@@ -113,7 +113,7 @@ export const MONSTER_MODELS = {
 };
 
 export const MONSTER_SPAWNING = {
-    bossEveryTurns: 5,
+    bossEveryTurns: 2,
     maximumEnemiesBeforeBoss: 3,
     regularSpawnScreenRatio: 0.6,
     regularSpawnOffset: 50,
