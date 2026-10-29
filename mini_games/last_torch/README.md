@@ -9,6 +9,8 @@ css/
   base/base.css                   fonte, body e canvas
   components/hud.css              HUD responsivo, tudo no topo: cartão do herói (nível, vida, XP, Fúria, ouro), tocha/turno e botões
   components/shop.css             loja (scrollbar)
+  components/joystick.css         controles de toque: joystick e botão da adaga (anel de recarga)
+  components/orientation.css      aviso de girar o aparelho (celular deitado)
 data_model/                       DADOS do jogo (balanceamento), separados do motor
   character.js                    atributos e progressão do herói
   core.js                         vida, colisão e aparência do núcleo
@@ -48,6 +50,7 @@ js/
   ui/shop.js                      loja de upgrades
   ui/passives.js                  skills passivas na loja
   ui/screens.js                   início de partida e game over
+  ui/orientation.js               celular em retrato: trava de orientação e pausa com o aparelho deitado
   ui/buttons.js                   eventos dos botões
   audio/sound-engine.js           efeitos de áudio via Web Audio API
 art_reference/                    imagens e fichas de referência dos personagens (não carregadas pelo jogo)
@@ -62,7 +65,7 @@ draft/                            versões anteriores mantidas como referência
 ## Controles
 
 - **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente. Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria).
-- **Celular ou tablet:** toque na arena para mover o herói até o ponto escolhido; arraste o dedo para atualizar o destino enquanto se move. Toque (ou segure o dedo) no canvas para arremessar a faca na direção do dedo. Os ataques corpo a corpo são automáticos, sem joystick ou botões extras.
+- **Celular:** jogado em **retrato**. Ao começar, o jogo entra em tela cheia e trava em retrato (Android); onde não dá para travar (iOS), um aviso pede para girar o aparelho e a partida fica pausada enquanto ele estiver deitado. O joystick (canto inferior esquerdo) move o herói. O botão da adaga (canto inferior direito) arremessa: um toque mira no monstro mais perto, arrastar a partir do botão mira na direção do arraste (com linha de mira saindo do herói) e segurar repete na recarga, mostrada pelo anel em volta do botão. Tocar no canvas também arremessa na direção do dedo. Os ataques corpo a corpo são automáticos.
 
 O jogo usa a mesma lógica e progressão em todas as telas; apenas a disposição da interface e o controle de movimento se adaptam ao dispositivo.
 

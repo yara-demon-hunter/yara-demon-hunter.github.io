@@ -28,9 +28,8 @@ function releaseKnife() {
     const x = player.x + cos * K.spawnForward - sin * K.spawnSide;
     const y = player.y + sin * K.spawnForward + cos * K.spawnSide;
 
-    const long = passives.longThrow.lvl > 0;
-    const speed = KNIFE_SKILL.speed * (long ? LONG_THROW.speedMultiplier : 1);
-    const maxRange = KNIFE_SKILL.maxRange * (long ? LONG_THROW.rangeMultiplier : 1);
+    const speed = KNIFE_SKILL.speed * (passives.longThrow.lvl > 0 ? LONG_THROW.speedMultiplier : 1);
+    const maxRange = getKnifeRange();
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
     const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
     const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier;
@@ -51,8 +50,37 @@ function releaseKnife() {
     audio.playSwordSlash(1);
 }
 
+// Alcance atual da adaga (com Long Throw)
+export function getKnifeRange() {
+    return KNIFE_SKILL.maxRange * (passives.longThrow.lvl > 0 ? LONG_THROW.rangeMultiplier : 1);
+}
+
+// Botão da adaga (toque): arrastando mira na direção do arraste; sem arrastar, no monstro
+// mais perto dentro do alcance (ou para onde o herói está virado)
+function aimWithStick(stick) {
+    let angle = player.angle;
+    if (stick.x || stick.y) {
+        angle = Math.atan2(stick.y, stick.x);
+    } else {
+        let best = getKnifeRange();
+        state.enemies.forEach(e => {
+            const d = Math.hypot(e.x - player.x, e.y - player.y);
+            if (d < best) {
+                best = d;
+                angle = Math.atan2(e.y - player.y, e.x - player.x);
+            }
+        });
+    }
+    stick.aimAngle = angle;
+    state.knifeInput.x = player.x + Math.cos(angle) * 100;
+    state.knifeInput.y = player.y + Math.sin(angle) * 100;
+}
+
 export function updateKnives(dt) {
     state.knifeTimer = Math.max(0, state.knifeTimer - dt);
+
+    const { stick } = state.knifeInput;
+    if (stick.active) aimWithStick(stick);
 
     if (state.knifePending !== null) {
         state.knifePending -= dt;
@@ -63,7 +91,7 @@ export function updateKnives(dt) {
     }
 
     const { held, x, y } = state.knifeInput;
-    if (held && state.knifeTimer <= 0 && state.knifePending === null) throwKnife(x, y);
+    if ((held || stick.active) && state.knifeTimer <= 0 && state.knifePending === null) throwKnife(x, y);
 
     const { knives, enemies } = state;
     for (let i = knives.length - 1; i >= 0; i--) {

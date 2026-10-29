@@ -1,5 +1,6 @@
 import { audio } from '../core/state.js';
 import { buyPassiveSkill } from './passives.js';
+import { lockPortrait } from './orientation.js';
 import { startGame } from './screens.js';
 import { buyUpgrade, openShop, resumeGame } from './shop.js';
 
@@ -10,8 +11,13 @@ export function setupButtons() {
         document.getElementById('btnSound').innerText = isMuted ? '🔇' : '🔊';
     });
 
-    document.getElementById('btnStart').addEventListener('click', startGame);
-    document.getElementById('btnRestart').addEventListener('click', startGame);
+    // No celular: tela cheia travada em retrato (precisa de um toque do jogador para ser permitido)
+    const start = () => {
+        lockPortrait();
+        startGame();
+    };
+    document.getElementById('btnStart').addEventListener('click', start);
+    document.getElementById('btnRestart').addEventListener('click', start);
     document.getElementById('btnPause').addEventListener('click', openShop);
     document.getElementById('btnCloseShop').addEventListener('click', resumeGame);
     document.getElementById('btnResume').addEventListener('click', resumeGame);

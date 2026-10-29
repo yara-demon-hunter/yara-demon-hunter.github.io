@@ -5,6 +5,7 @@ import {
     renderBladeSlashes,
     renderEnemies,
     renderEnemyProjectiles,
+    renderKnifeAim,
     renderKnives,
     renderParticles,
     renderGoldDrops
@@ -72,6 +73,7 @@ export function render() {
     renderBladeSlashes();
     renderEnemyProjectiles();
     renderEnemies();
+    renderKnifeAim();
     renderKnives();
     renderPlayerTrail();
     if (HERO_25D) renderPlayer25D();

@@ -1,0 +1,42 @@
+/* --- AVISO DE GIRAR O APARELHO: celular deitado (o jogo é jogado em retrato) ---
+   Mesma condição de js/ui/orientation.js (max-height = WORLD.mobileMaxShortSide - 1). Fica acima de tudo. */
+#rotateNotice {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.5rem;
+    text-align: center;
+    background: radial-gradient(circle at center, #0b1424 0%, #01040a 75%);
+    color: #e2e8f0;
+}
+#rotateNotice p {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #fdba74;
+}
+#rotateNotice span {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+.rotate-phone {
+    width: 2.6rem;
+    height: 4.4rem;
+    border: 3px solid #67e8f9;
+    border-radius: 0.6rem;
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
+    animation: rotate-phone 2.2s ease-in-out infinite;
+}
+@keyframes rotate-phone {
+    0%, 20% { transform: rotate(90deg); }
+    55%, 100% { transform: rotate(0deg); }
+}
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 599px) {
+    #rotateNotice { display: flex; }
+}

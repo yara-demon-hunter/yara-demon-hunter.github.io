@@ -3,8 +3,10 @@ import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js
 import { GOLD_VISUALS as G } from '../../data_model/visuals/items/gold_visual.js';
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
-import { ctx, state } from '../core/state.js';
 import { SKELETON_VISUALS } from '../../data_model/visuals/monsters/skeleton_visual.js';
+import { FAN_OF_KNIVES } from '../../data_model/passives.js';
+import { ctx, passives, player, state } from '../core/state.js';
+import { getKnifeRange } from '../systems/knives.js';
 import { renderBat } from './bat.js';
 import { drawDagger } from './knife.js';
 import { renderReflectedBolt } from './reflect.js';
@@ -141,6 +143,31 @@ export function renderEnemies() {
             ctx.fillRect(e.x - bw / 2, e.y - barY, bw * (e.hp / e.maxHp), 4);
         }
     });
+}
+
+// Mira do botão da adaga (toque): linhas tracejadas saindo do herói, uma por adaga do leque.
+// Mais apagada enquanto a adaga recarrega.
+export function renderKnifeAim() {
+    const { stick } = state.knifeInput;
+    if (!stick.active || state.gameState !== 'PLAYING') return;
+    const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
+    const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
+    const length = getKnifeRange() * 0.45;
+
+    ctx.save();
+    ctx.strokeStyle = K.colors.trail;
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.setLineDash([6, 8]);
+    ctx.globalAlpha = state.knifeTimer > 0 ? 0.25 : 0.55;
+    ctx.beginPath();
+    for (let i = 0; i < count; i++) {
+        const a = stick.aimAngle + (i - (count - 1) / 2) * spread;
+        ctx.moveTo(player.x + Math.cos(a) * 18, player.y + Math.sin(a) * 18);
+        ctx.lineTo(player.x + Math.cos(a) * length, player.y + Math.sin(a) * length);
+    }
+    ctx.stroke();
+    ctx.restore();
 }
 
 // Adaga de arremesso: voa na altura da mão (sombra no chão marca a posição real), com brilho frio,

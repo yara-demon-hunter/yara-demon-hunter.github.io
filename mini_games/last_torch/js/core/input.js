@@ -9,6 +9,59 @@ function setTarget(clientX, clientY) {
     player.targetY = y;
 }
 
+// Posição do dedo em relação ao centro de um botão circular: move o "knob" junto e devolve
+// x, y de -1 a 1 (0, 0 dentro da zona morta)
+function readStick(base, knob, e, deadZone) {
+    const rect = base.getBoundingClientRect();
+    const radius = rect.width / 2;
+    let dx = e.clientX - (rect.left + radius);
+    let dy = e.clientY - (rect.top + radius);
+    const dist = Math.hypot(dx, dy);
+    if (dist > radius) { dx = dx / dist * radius; dy = dy / dist * radius; }
+    knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    const mag = Math.hypot(dx, dy) / radius;
+    return mag < deadZone ? { x: 0, y: 0 } : { x: dx / radius, y: dy / radius };
+}
+
+// --- BOTÃO DA ADAGA (telas de toque, canto oposto ao joystick) ---
+// Tocar e segurar arremessa (repete na recarga). Sem arrastar mira no monstro mais perto;
+// arrastando mira na direção do arraste, como um segundo joystick (js/systems/knives.js).
+function setupKnifeButton() {
+    const base = document.getElementById('knifeButton');
+    const knob = document.getElementById('knifeButtonKnob');
+    if (!base || !knob) return;
+
+    const { stick } = state.knifeInput;
+    let pointerId = null;
+    const release = (e) => {
+        if (e && e.pointerId !== pointerId) return;
+        pointerId = null;
+        stick.active = false;
+        stick.x = 0;
+        stick.y = 0;
+        knob.style.transform = 'translate(-50%, -50%)';
+    };
+    const drag = (e) => {
+        // Zona morta maior: um toque rápido sem arrastar fica na mira automática
+        const v = readStick(base, knob, e, 0.3);
+        stick.x = v.x;
+        stick.y = v.y;
+    };
+    base.addEventListener('pointerdown', (e) => {
+        if (pointerId !== null || state.gameState !== 'PLAYING') return;
+        pointerId = e.pointerId;
+        base.setPointerCapture(e.pointerId);
+        audio.init();
+        stick.active = true;
+        drag(e);
+        e.preventDefault();
+    });
+    base.addEventListener('pointermove', (e) => { if (e.pointerId === pointerId) drag(e); });
+    base.addEventListener('pointerup', release);
+    base.addEventListener('pointercancel', release);
+    window.addEventListener('blur', () => release());
+}
+
 // --- JOYSTICK VIRTUAL (telas de toque) ---
 function setupJoystick() {
     const base = document.getElementById('joystick');
@@ -24,17 +77,10 @@ function setupJoystick() {
         knob.style.transform = 'translate(-50%, -50%)';
     };
     const drag = (e) => {
-        const rect = base.getBoundingClientRect();
-        const radius = rect.width / 2;
-        let dx = e.clientX - (rect.left + radius);
-        let dy = e.clientY - (rect.top + radius);
-        const dist = Math.hypot(dx, dy);
-        if (dist > radius) { dx = dx / dist * radius; dy = dy / dist * radius; }
-        knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
         // Zona morta pequena para o dedo parado não escorregar o herói
-        const mag = Math.hypot(dx, dy) / radius;
-        joystick.x = mag < 0.12 ? 0 : dx / radius;
-        joystick.y = mag < 0.12 ? 0 : dy / radius;
+        const v = readStick(base, knob, e, 0.12);
+        joystick.x = v.x;
+        joystick.y = v.y;
     };
     base.addEventListener('pointerdown', (e) => {
         if (pointerId !== null) return;
@@ -76,6 +122,7 @@ export function setupInput() {
     });
 
     setupJoystick();
+    setupKnifeButton();
 
     // Em telas de toque o joystick move o herói; arrastar no canvas só vale sem ele
     const hasJoystick = window.matchMedia('(pointer: coarse)').matches;

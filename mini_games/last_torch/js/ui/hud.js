@@ -1,3 +1,4 @@
+import { KNIFE_SKILL } from '../../data_model/skills.js';
 import { maxUltEnergy, player, state } from '../core/state.js';
 
 // --- BARRA DE FÚRIA ---
@@ -25,6 +26,27 @@ export function updateFuryBar() {
         v => { document.getElementById('furyLabel').innerText = v; });
     setIfChanged('active', active,
         v => { document.getElementById('heroCard').classList.toggle('fury-active', v); });
+}
+
+// --- BOTÃO DA ADAGA (telas de toque) ---
+// Anel de recarga (--cd: 1 logo após o arremesso, 0 = pronto) e brilho quando está pronto.
+// Também só escreve no DOM quando muda.
+const knifeButton = document.getElementById('knifeButton');
+const knifeShown = { cd: '', ready: null };
+
+export function updateKnifeButton() {
+    if (!knifeButton) return;
+    const ratio = Math.min(1, state.knifeTimer / KNIFE_SKILL.cooldownSeconds);
+    const cd = ratio.toFixed(2);
+    if (knifeShown.cd !== cd) {
+        knifeShown.cd = cd;
+        knifeButton.style.setProperty('--cd', cd);
+    }
+    const ready = ratio <= 0;
+    if (knifeShown.ready !== ready) {
+        knifeShown.ready = ready;
+        knifeButton.classList.toggle('is-ready', ready);
+    }
 }
 
 // --- HUD ---

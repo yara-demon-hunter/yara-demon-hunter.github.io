@@ -88,9 +88,20 @@ permalink: /mini_games/last_torch/last_torch.html
     </div>
 </div>
 
-<!-- JOYSTICK VIRTUAL (só em telas de toque). Styles in css/components/joystick.css -->
+<!-- CONTROLES DE TOQUE (só em telas de toque). Styles in css/components/joystick.css -->
 <div id="joystick" aria-label="Virtual joystick">
     <div id="joystickKnob"></div>
+</div>
+<!-- Botão da adaga: toque = mira no monstro mais perto; arrastar = mira na direção; segurar repete -->
+<div id="knifeButton" aria-label="Throw dagger">
+    <div id="knifeButtonKnob">🗡️</div>
+</div>
+
+<!-- AVISO DE GIRAR O APARELHO (celular deitado). Styles in css/components/orientation.css -->
+<div id="rotateNotice" role="alert">
+    <div class="rotate-phone" aria-hidden="true"></div>
+    <p>TURN YOUR PHONE UPRIGHT</p>
+    <span>Last Torch is played in portrait. The hunt is paused.</span>
 </div>
 
 <!-- SHOP & PAUSE PANEL -->

@@ -13,7 +13,8 @@ import { updatePlayer } from './systems/player.js';
 import { updateGold } from './systems/gold.js';
 import { updateSpawner } from './systems/spawner.js';
 import { setupButtons } from './ui/buttons.js';
-import { updateFuryBar } from './ui/hud.js';
+import { updateFuryBar, updateKnifeButton } from './ui/hud.js';
+import { isPhoneLandscape } from './ui/orientation.js';
 
 const MIN_FRAME_MS = 12;
 let lastTime = performance.now();
@@ -21,6 +22,8 @@ let lastTime = performance.now();
 // --- UPDATE LOOP ---
 function update(dt) {
     if (state.gameState !== 'PLAYING') return;
+    // Celular deitado: o aviso de girar o aparelho cobre a tela e a partida fica parada
+    if (isPhoneLandscape()) return;
     dt = Math.min(dt, 0.05);
 
     updatePlayer(dt);
@@ -36,6 +39,7 @@ function update(dt) {
 
     updateGold(dt);
     updateFuryBar();
+    updateKnifeButton();
     updateEffects(dt);
 }
 
