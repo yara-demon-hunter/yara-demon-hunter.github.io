@@ -1,6 +1,7 @@
+import { FAN_OF_KNIVES, LONG_THROW } from '../../data_model/passives.js';
 import { FRENZY_NOVA_SKILL, KNIFE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
-import { audio, player, state } from '../core/state.js';
+import { audio, passives, player, state } from '../core/state.js';
 import { chargeUlt } from './combat.js';
 import { createExplosion } from './effects.js';
 import { getAtkDamage, getKnockback } from './stats.js';
@@ -18,25 +19,35 @@ export function throwKnife(aimX, aimY) {
     state.knifePending = K.throwSeconds * K.letGoFraction;
 }
 
-// A adaga deixa a mão esquerda: nasce à frente e à esquerda do herói. Para no primeiro inimigo atingido.
+// A adaga deixa a mão esquerda: nasce à frente e à esquerda do herói. Cada adaga para no primeiro inimigo atingido.
+// Skills passivas: Long Throw (mais alcance e velocidade) e Fan of Knives (várias adagas em leque).
 function releaseKnife() {
-    const angle = state.knifeThrowAngle;
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
+    const aim = state.knifeThrowAngle;
+    const cos = Math.cos(aim);
+    const sin = Math.sin(aim);
     const x = player.x + cos * K.spawnForward - sin * K.spawnSide;
     const y = player.y + sin * K.spawnForward + cos * K.spawnSide;
 
-    state.knives.push({
-        x, y,
-        vx: cos * KNIFE_SKILL.speed,
-        vy: sin * KNIFE_SKILL.speed,
-        angle,
-        damage: getAtkDamage() * KNIFE_SKILL.damageMultiplier,
-        knockback: getKnockback() * KNIFE_SKILL.knockbackMultiplier,
-        travelled: 0
-    });
+    const long = passives.longThrow.lvl > 0;
+    const speed = KNIFE_SKILL.speed * (long ? LONG_THROW.speedMultiplier : 1);
+    const maxRange = KNIFE_SKILL.maxRange * (long ? LONG_THROW.rangeMultiplier : 1);
+    const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
+    const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
+    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier;
+    const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
 
-    createExplosion(x, y - K.flightHeight, K.colors.edge, 5);
+    for (let i = 0; i < count; i++) {
+        const angle = aim + (i - (count - 1) / 2) * spread;
+        state.knives.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            angle, speed, maxRange, damage, knockback,
+            travelled: 0
+        });
+    }
+
+    createExplosion(x, y - K.flightHeight, K.colors.edge, 5 + count * 2);
     audio.playSwordSlash(1);
 }
 
@@ -59,7 +70,7 @@ export function updateKnives(dt) {
         const k = knives[i];
         k.x += k.vx * dt;
         k.y += k.vy * dt;
-        k.travelled += KNIFE_SKILL.speed * dt;
+        k.travelled += k.speed * dt;
 
         const hit = enemies.find(e => Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius);
         if (hit) {
@@ -73,6 +84,6 @@ export function updateKnives(dt) {
         }
 
         const outside = k.x < 0 || k.x > state.width || k.y < 0 || k.y > state.height;
-        if (outside || k.travelled >= KNIFE_SKILL.maxRange) knives.splice(i, 1);
+        if (outside || k.travelled >= k.maxRange) knives.splice(i, 1);
     }
 }

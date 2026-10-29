@@ -16,7 +16,33 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 2,
         maxLvl: 1,
         desc: 'Reflects an incoming enemy shot at the nearest monster. Recharges in 8s.'
+    },
+    longThrow: {
+        name: 'Long Throw',
+        icon: '🎯',
+        cost: 2,
+        maxLvl: 1,
+        desc: 'Thrown daggers fly 60% farther and faster.'
+    },
+    fanOfKnives: {
+        name: 'Fan of Knives',
+        icon: '🗡️',
+        cost: 2,
+        maxLvl: 1,
+        desc: 'Throws 3 daggers at once in a fan. Combines with Long Throw.'
     }
+};
+
+// Long Throw: a adaga vai mais longe e mais rápido (vale para todas as adagas do leque)
+export const LONG_THROW = {
+    rangeMultiplier: 1.6,
+    speedMultiplier: 1.25
+};
+
+// Fan of Knives: várias adagas de uma vez, abertas em leque em volta da mira
+export const FAN_OF_KNIVES = {
+    count: 3,
+    spreadDegrees: 14           // ângulo entre uma adaga e a vizinha
 };
 
 // Mirror Ward: rebate o tiro que chega perto do herói para o monstro mais próximo
