@@ -483,29 +483,35 @@ function updateUI() {
     const heavyAttackSkill = selectedCharacter.skills.heavyAttack;
     const parrySkill = selectedCharacter.skills.parry;
     const dodgeSkill = selectedCharacter.skills.dodge;
-    const heavyAttackButton = document.querySelector('[data-i18n="focusCost"]').closest('button');
+    const heavyAttackButton = document.getElementById('heavy-attack-button');
     const parryButton = document.getElementById('parry-button');
     const dodgeButton = document.getElementById('dodge-button');
-    heavyAttackButton.hidden = !heavyAttackSkill;
-    parryButton.hidden = !parrySkill;
-    dodgeButton.hidden = !dodgeSkill;
+    // Botões de skills que o personagem não tem saem do layout (a classe flex do Tailwind anularia o atributo hidden).
+    heavyAttackButton.style.display = heavyAttackSkill ? '' : 'none';
+    parryButton.style.display = parrySkill ? '' : 'none';
+    dodgeButton.style.display = dodgeSkill ? '' : 'none';
+    const visibleCombatButtons = [...combatControls.children].filter((button) => button.style.display !== 'none').length;
+    combatControls.style.gridTemplateColumns = `repeat(${visibleCombatButtons}, minmax(0, 1fr))`;
     if (heavyAttackSkill) {
-        document.querySelector('[data-i18n="focusCost"]').innerText = t('focusCost', {
-            cost: heavyAttackSkill.focoCost
+        document.getElementById('heavy-attack-cost').textContent = heavyAttackSkill.focoCost;
+        heavyAttackButton.title = t('heavyAttackTooltip', {
+            cost: heavyAttackSkill.focoCost,
+            multiplier: heavyAttackSkill.attackMultiplier
         });
     }
     if (parrySkill) {
-        document.querySelector('[data-i18n="parryBonus"]').innerText = t('parryBonus', {
-            bonus: parrySkill.bonus,
-            cost: parrySkill.focoCost
-        });
+        document.getElementById('parry-cost').textContent = parrySkill.focoCost;
+        parryButton.title = t('parryBuffTooltip', { bonus: parrySkill.bonus, cost: parrySkill.focoCost });
     }
     if (dodgeSkill) {
-        document.querySelector('[data-i18n="dodgeBonus"]').innerText = t('dodgeBonus', {
-            bonus: dodgeSkill.bonus,
-            cost: dodgeSkill.focoCost
-        });
+        document.getElementById('dodge-cost').textContent = dodgeSkill.focoCost;
+        dodgeButton.title = t('dodgeBuffTooltip', { bonus: dodgeSkill.bonus, cost: dodgeSkill.focoCost });
     }
+    // Buffs já usados ficam marcados como ativos até o fim do combate, em vez de parecerem indisponíveis.
+    parryButton.classList.toggle('is-active', parrySkillUsedThisCombat);
+    dodgeButton.classList.toggle('is-active', dodgeSkillUsedThisCombat);
+    parryButton.dataset.activeLabel = t('buffActive');
+    dodgeButton.dataset.activeLabel = t('buffActive');
     document.querySelectorAll('[data-upgrade]').forEach((button) => {
         const upgrade = button.dataset.upgrade;
         const upgradeConfiguration = getUpgradeConfiguration(upgrade);

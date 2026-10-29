@@ -368,3 +368,48 @@
         padding-bottom: 4px;
     }
 }
+
+/* Botões de skill do combate: custo de Foco num selo, buffs ativos destacados. */
+#controls-combat .combat-skill-button {
+    position: relative;
+}
+#controls-combat .combat-skill-button > span.combat-cost-badge:last-child {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    min-width: 1.15rem;
+    padding: 1px 4px;
+    border: 1px solid rgba(34, 211, 238, 0.7);
+    border-radius: 999px;
+    background: #0b2a4a;
+    color: #a5f3fc;
+    font-size: 0.6rem;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+    pointer-events: none;
+}
+#controls-combat .combat-buff-button.is-active:disabled {
+    opacity: 1;
+    cursor: default;
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.45), 0 0 12px rgba(251, 191, 36, 0.35);
+}
+#controls-combat .combat-buff-button.is-active > span.combat-cost-badge:last-child {
+    display: none;
+}
+#controls-combat .combat-buff-button.is-active::after {
+    content: attr(data-active-label);
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    padding: 1px 5px;
+    border: 1px solid rgba(251, 191, 36, 0.8);
+    border-radius: 999px;
+    background: #3b2a08;
+    color: #fde68a;
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}

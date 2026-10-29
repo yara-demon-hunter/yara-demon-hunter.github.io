@@ -142,14 +142,14 @@
                     <button id="quick-attack-button" onclick="combatQuickAttack()" class="bg-stone-800 hover:bg-stone-700 active:scale-[0.98] text-amber-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-600 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span id="quick-attack-icon">🗡️</span> <span id="quick-attack-label" data-i18n="quickAttack">Ataque Rápido</span>
                     </button>
-                    <button onclick="combatHeavyAttack()" class="bg-red-900/80 hover:bg-red-800 active:scale-[0.98] text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-red-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>🗡️</span> <span data-i18n="heavyAttack">Estocada Pesada</span> <span class="text-[10px] text-red-200" data-i18n="focusCost">(15 Foco)</span>
+                    <button id="heavy-attack-button" onclick="combatHeavyAttack()" class="combat-skill-button bg-red-900/80 hover:bg-red-800 active:scale-[0.98] text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-red-600 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span>🗡️</span> <span data-i18n="heavyAttack">Pesado</span> <span id="heavy-attack-cost" class="combat-cost-badge">15</span>
                     </button>
-                    <button id="parry-button" onclick="combatDefend()" class="bg-blue-900/80 hover:bg-blue-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-blue-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>⚔️</span> <span data-i18n="defend">Brace for Impact</span> <span class="text-[10px] text-blue-200" data-i18n="parryBonus">+5% (10 Foco)</span>
+                    <button id="parry-button" onclick="combatDefend()" class="combat-skill-button combat-buff-button bg-blue-900/80 hover:bg-blue-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-blue-600 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span>⚔️</span> <span data-i18n="defend">Aparo</span> <span id="parry-cost" class="combat-cost-badge">10</span>
                     </button>
-                    <button id="dodge-button" onclick="combatDodge()" class="bg-emerald-900/80 hover:bg-emerald-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-emerald-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>💨</span> <span data-i18n="dodge">Preparar Esquiva</span> <span class="text-[10px] text-emerald-200" data-i18n="dodgeBonus">+15% (15 Foco)</span>
+                    <button id="dodge-button" onclick="combatDodge()" class="combat-skill-button combat-buff-button bg-emerald-900/80 hover:bg-emerald-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-emerald-600 flex flex-col items-center justify-center gap-1 transition text-xs">
+                        <span>💨</span> <span data-i18n="dodge">Esquiva</span> <span id="dodge-cost" class="combat-cost-badge">15</span>
                     </button>
                     <button id="run-button" onclick="combatRun()" class="bg-stone-900 hover:bg-stone-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-stone-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-700 flex flex-col items-center justify-center gap-1 transition text-xs">
                         <span>🏃</span> <span data-i18n="run">Fugir na Névoa</span>
