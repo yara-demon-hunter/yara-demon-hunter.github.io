@@ -122,3 +122,40 @@
     .start-tips p { font-size: 0.72rem; line-height: 1.3; }
     .start-btn { padding: 0.7rem 1rem; }
 }
+
+/* Celular de lado (tela baixa): duas colunas, título à esquerda e dicas + botão à direita,
+   para o botão caber sem rolar. Se ainda faltar altura, a tela rola (safe center não corta o topo). */
+@media (max-height: 500px) and (orientation: landscape) {
+    #startScreen {
+        justify-content: safe center;
+        overflow-y: auto;
+        padding: max(0.6rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(0.6rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    }
+    .start-content {
+        max-width: 52rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+        grid-template-areas:
+            "eyebrow tips"
+            "title   tips"
+            "tagline btn";
+        column-gap: 1.5rem;
+        align-items: center;
+    }
+    .start-eyebrow { grid-area: eyebrow; align-self: end; margin-bottom: 0.2rem; font-size: 0.65rem; }
+    .start-title { grid-area: title; font-size: clamp(1.9rem, 14vh, 3.4rem); }
+    .start-tagline { grid-area: tagline; align-self: start; margin: 0.3rem 0 0; font-size: 0.8rem; }
+    .start-tips { grid-area: tips; margin: 0; padding: 0.4rem 0.7rem; }
+    .start-tips li { padding: 0.15rem 0; gap: 0.5rem; }
+    .start-tips span { font-size: 0.9rem; }
+    .start-tips p { font-size: 0.68rem; line-height: 1.3; }
+    .start-btn { grid-area: btn; margin-top: 0.6rem; padding: 0.6rem 1rem; font-size: 0.95rem; }
+
+    /* Game Over (fim da partida): mesmo cuidado, mais compacto e rolando se faltar altura */
+    #gameOverScreen { justify-content: safe center; overflow-y: auto; padding: 0.5rem 1rem; }
+    #gameOverScreen > div { padding: 0.9rem 1.2rem; }
+    #gameOverTitle { font-size: 1.6rem; margin-bottom: 0.2rem; }
+    #gameOverSub { margin-bottom: 0.6rem; }
+    #gameOverScreen .space-y-2 { padding: 0.6rem 0.9rem; margin-bottom: 0.8rem; }
+    #btnRestart { padding-top: 0.6rem; padding-bottom: 0.6rem; font-size: 1rem; }
+}
