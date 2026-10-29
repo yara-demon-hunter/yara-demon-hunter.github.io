@@ -1,5 +1,5 @@
-/* --- AVISO DE GIRAR O APARELHO: celular deitado (o jogo é jogado em retrato) ---
-   Mesma condição de js/ui/orientation.js (max-height = WORLD.mobileMaxShortSide - 1). Fica acima de tudo. */
+/* --- AVISO DE VIRAR O APARELHO: celular em pé (o jogo é jogado de lado, em paisagem) ---
+   Mesma condição de js/ui/orientation.js (max-width = WORLD.mobileMaxShortSide - 1). Fica acima de tudo. */
 #rotateNotice {
     display: none;
     position: absolute;
@@ -25,18 +25,20 @@
     font-size: 0.85rem;
     color: #94a3b8;
 }
+/* Celular desenhado em pé que deita (gira 90°) */
 .rotate-phone {
     width: 2.6rem;
     height: 4.4rem;
+    margin-bottom: 0.8rem;
     border: 3px solid #67e8f9;
     border-radius: 0.6rem;
     box-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
     animation: rotate-phone 2.2s ease-in-out infinite;
 }
 @keyframes rotate-phone {
-    0%, 20% { transform: rotate(90deg); }
-    55%, 100% { transform: rotate(0deg); }
+    0%, 20% { transform: rotate(0deg); }
+    55%, 100% { transform: rotate(-90deg); }
 }
-@media (pointer: coarse) and (orientation: landscape) and (max-height: 599px) {
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) {
     #rotateNotice { display: flex; }
 }

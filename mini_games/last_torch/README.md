@@ -10,7 +10,7 @@ css/
   components/hud.css              HUD responsivo, tudo no topo: cartão do herói (nível, vida, XP, Fúria, ouro), tocha/turno e botões
   components/shop.css             loja (scrollbar)
   components/joystick.css         controles de toque: joystick e botão da adaga (anel de recarga)
-  components/orientation.css      aviso de girar o aparelho (celular deitado)
+  components/orientation.css      aviso de virar o aparelho de lado (celular em pé)
 data_model/                       DADOS do jogo (balanceamento), separados do motor
   character.js                    atributos e progressão do herói
   core.js                         vida, colisão e aparência do núcleo
@@ -50,7 +50,7 @@ js/
   ui/shop.js                      loja de upgrades
   ui/passives.js                  skills passivas na loja
   ui/screens.js                   início de partida e game over
-  ui/orientation.js               celular em retrato: trava de orientação e pausa com o aparelho deitado
+  ui/orientation.js               celular de lado (paisagem): trava de orientação e pausa com o aparelho em pé
   ui/buttons.js                   eventos dos botões
   audio/sound-engine.js           efeitos de áudio via Web Audio API
 art_reference/                    imagens e fichas de referência dos personagens (não carregadas pelo jogo)
@@ -65,7 +65,7 @@ draft/                            versões anteriores mantidas como referência
 ## Controles
 
 - **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente. Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria).
-- **Celular:** jogado em **retrato**. Ao começar, o jogo entra em tela cheia e trava em retrato (Android); onde não dá para travar (iOS), um aviso pede para girar o aparelho e a partida fica pausada enquanto ele estiver deitado. O joystick (canto inferior esquerdo) move o herói. O botão da adaga (canto inferior direito) mira enquanto está pressionado, com uma linha tracejada saindo do herói: sem arrastar mira no monstro mais perto; arrastando mira na direção do arraste. A adaga só é arremessada ao **soltar** o botão, uma vez, se a recarga (anel em volta do botão) já terminou. Tocar na tela não arremessa. Os ataques corpo a corpo são automáticos.
+- **Celular:** jogado **de lado (paisagem)**, com os dois polegares. Ao começar, o jogo entra em tela cheia e trava em paisagem (Android); onde não dá para travar (iOS), um aviso pede para virar o aparelho de lado e a partida fica pausada enquanto ele estiver em pé. O joystick (canto inferior esquerdo) move o herói. O botão da adaga (canto inferior direito) mira enquanto está pressionado, com uma linha tracejada saindo do herói: sem arrastar mira no monstro mais perto; arrastando mira na direção do arraste. A adaga só é arremessada ao **soltar** o botão, uma vez, se a recarga (anel em volta do botão) já terminou. Tocar na tela não arremessa. Os ataques corpo a corpo são automáticos.
 
 O jogo usa a mesma lógica e progressão em todas as telas; apenas a disposição da interface e o controle de movimento se adaptam ao dispositivo.
 

@@ -14,7 +14,7 @@ import { updateGold } from './systems/gold.js';
 import { updateSpawner } from './systems/spawner.js';
 import { setupButtons } from './ui/buttons.js';
 import { updateFuryBar, updateKnifeButton } from './ui/hud.js';
-import { isPhoneLandscape } from './ui/orientation.js';
+import { isPhonePortrait } from './ui/orientation.js';
 
 const MIN_FRAME_MS = 12;
 let lastTime = performance.now();
@@ -22,8 +22,8 @@ let lastTime = performance.now();
 // --- UPDATE LOOP ---
 function update(dt) {
     if (state.gameState !== 'PLAYING') return;
-    // Celular deitado: o aviso de girar o aparelho cobre a tela e a partida fica parada
-    if (isPhoneLandscape()) return;
+    // Celular em pé: o aviso de virar o aparelho de lado cobre a tela e a partida fica parada
+    if (isPhonePortrait()) return;
     dt = Math.min(dt, 0.05);
 
     updatePlayer(dt);
