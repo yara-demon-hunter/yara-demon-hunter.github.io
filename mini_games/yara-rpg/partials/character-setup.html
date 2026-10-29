@@ -4,7 +4,10 @@
         </div>
         <section class="setup-section" aria-labelledby="character-selection-title">
             <h3 id="character-selection-title" class="setup-section-title" data-i18n="selectCharacter">Personagem</h3>
-            <div id="character-options" class="character-options" role="group" aria-label="Personagens" data-i18n-aria="selectCharacter"></div>
+            <div class="character-select">
+                <div id="character-options" class="character-roster" role="group" aria-label="Personagens" data-i18n-aria="selectCharacter"></div>
+                <article id="character-detail" class="character-detail" aria-live="polite"></article>
+            </div>
         </section>
         <div class="setup-actions">
             <button id="sanctuary-button" type="button" class="start-secondary-button sanctuary-button" onclick="YaraMeta?.openSanctuary('achievements')" data-i18n-aria="metaSanctuaryLabel" data-i18n-title="metaSanctuaryHint" aria-label="Santuário" title="Conquistas, bestiário, coleções e poderes descobertos">

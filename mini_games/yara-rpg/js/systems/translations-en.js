@@ -12,7 +12,6 @@ window.YaraRpgTranslations.en = {
         setupKicker: "Prepare for the journey",
         selectCharacter: "Character",
         characterLocked: "Beat the game to unlock",
-        characterExtraInfo: "More info: progression, skills & limits",
         characterSpecialty: "+{amount} {stat}",
         basicStatsSummary: "📊 Starting bonuses",
         progressionSummary: "📈 Per level",

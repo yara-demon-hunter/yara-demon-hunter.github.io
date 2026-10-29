@@ -38,6 +38,7 @@ window.YaraRpgCharacterSetup = (() => {
         maxCriticalChance: { name: "maximumCriticalChance", suffix: "%" }
     });
     let selectedCharacterId = null;
+    let viewedCharacterId = null;
     let translate = (key) => key;
     let describeEquipment = () => "";
     let isUnlocked = (character) => character.unlocked !== false;
@@ -48,130 +49,151 @@ window.YaraRpgCharacterSetup = (() => {
         container.replaceChildren();
 
         CHARACTER_DATA.forEach((character) => {
-            const card = document.createElement("div");
             const unlocked = isUnlocked(character);
-            const selected = character.id === selectedCharacterId;
-            card.className = `character-option${selected ? " is-selected" : ""}${unlocked ? "" : " is-locked"}`;
+            const selected = character.id === viewedCharacterId;
 
-            const selectButton = document.createElement("button");
-            selectButton.type = "button";
-            selectButton.className = `character-option-select${unlocked ? "" : " is-locked"}`;
-            selectButton.dataset.characterId = character.id;
-            selectButton.setAttribute("aria-pressed", String(selected));
-            selectButton.disabled = !unlocked;
+            const tile = document.createElement("button");
+            tile.type = "button";
+            tile.className = `character-tile${selected ? " is-selected" : ""}${unlocked ? "" : " is-locked"}`;
+            tile.dataset.characterId = character.id;
+            tile.setAttribute("aria-pressed", String(selected));
             if (!unlocked) {
-                selectButton.setAttribute("aria-label", `${character.name}. ${translate("characterLocked")}`);
-                selectButton.title = translate("characterLocked");
-            }
-
-            const portrait = document.createElement("span");
-            portrait.className = "character-option-icon";
-            portrait.setAttribute("aria-hidden", "true");
-            if (character.image) {
-                const image = document.createElement("img");
-                image.src = character.image;
-                image.alt = "";
-                image.loading = "lazy";
-                image.addEventListener("error", () => {
-                    portrait.replaceChildren(document.createTextNode(character.icon));
-                }, { once: true });
-                portrait.append(image);
-            } else {
-                portrait.textContent = character.icon;
+                tile.setAttribute("aria-label", `${character.name}. ${translate("characterLocked")}`);
+                tile.title = translate("characterLocked");
             }
 
             const name = document.createElement("span");
-            name.className = "character-option-name";
+            name.className = "character-tile-name";
             name.textContent = character.name;
-
-            const description = document.createElement("span");
-            description.className = "character-option-description";
-            description.textContent = character.description[document.documentElement.lang.startsWith("en") ? "en" : "pt"];
-
-            const progression = createDetailsSection("progressionSummary", "character-option-progression");
-            appendStatList(progression, character.progression, PROGRESSION_STAT_KEYS);
-
-            const skills = createDetailsSection("skillsSummary", "character-option-skills");
-            const skillsList = document.createElement("ul");
-            skillsList.className = "character-details-list character-skills-list";
-            Object.entries(character.skills).forEach(([skill, values]) => {
-                const presentation = SKILL_PRESENTATION[skill];
-                if (!presentation) throw new Error(`Unknown character skill: ${skill}`);
-                const item = document.createElement("li");
-                const name = document.createElement("strong");
-                name.textContent = translate(presentation.name);
-                const description = document.createElement("span");
-                description.textContent = translate(presentation.description, values);
-                item.append(name, description);
-                skillsList.append(item);
-            });
-            skills.append(skillsList);
-
-            const limits = createDetailsSection("limitsSummary", "character-option-limits");
-            const limitsList = document.createElement("ul");
-            limitsList.className = "character-details-list character-limits-list";
-            Object.entries(character.limits).forEach(([limit, amount]) => {
-                const presentation = LIMIT_PRESENTATION[limit];
-                if (!presentation) throw new Error(`Unknown character limit: ${limit}`);
-                const item = document.createElement("li");
-                const name = document.createElement("strong");
-                name.textContent = translate(presentation.name);
-                const value = document.createElement("span");
-                value.textContent = `${amount}${presentation.suffix}`;
-                item.append(name, value);
-                limitsList.append(item);
-            });
-            limits.append(limitsList);
-
-            const basicStatsSummary = document.createElement("p");
-            basicStatsSummary.className = "character-option-specialty";
-            basicStatsSummary.textContent = Object.entries(character.basicStats)
-                .map(([stat, amount]) => {
-                    const statKey = BASIC_STAT_KEYS[stat];
-                    if (!statKey) throw new Error(`Unknown character basic stat: ${stat}`);
-                    const formattedAmount = PERCENTAGE_SPECIALTY_STATS.has(stat) ? `${amount}%` : amount;
-                    return translate("characterSpecialty", {
-                        stat: translate(statKey),
-                        amount: formattedAmount
-                    });
-                })
-                .join(" · ");
-
-            const passiveSummary = document.createElement("p");
-            passiveSummary.className = "character-option-passive";
-            if (character.passive) {
-                const language = document.documentElement.lang.startsWith("en") ? "en" : "pt";
-                const passiveLabel = translateForLanguage(language, language === "en" ? "Passive" : "Passiva");
-                const passiveName = translateForLanguage(language, character.passive.name[language]);
-                const passiveDescription = translateForLanguage(language, character.passive.description[language]);
-                passiveSummary.textContent = `${passiveLabel}: ${character.passive.icon} ${passiveName} — ${passiveDescription}`;
+            tile.append(createPortrait(character, "character-tile-portrait"), name);
+            if (!unlocked) {
+                const lock = document.createElement("span");
+                lock.className = "character-tile-lock";
+                lock.setAttribute("aria-hidden", "true");
+                lock.textContent = "🔒";
+                tile.append(lock);
             }
 
-            const lockedNotice = document.createElement("span");
-            lockedNotice.className = "character-option-lock";
-            lockedNotice.textContent = `🔒 ${translate("characterLocked")}`;
-
-            const extraInfo = document.createElement("details");
-            extraInfo.className = "character-option-extra";
-            const extraInfoSummary = document.createElement("summary");
-            extraInfoSummary.className = "character-option-info";
-            extraInfoSummary.textContent = "i";
-            extraInfoSummary.title = translate("characterExtraInfo");
-            extraInfoSummary.setAttribute("aria-label", translate("characterExtraInfo"));
-            extraInfo.append(extraInfoSummary, progression, skills, limits);
-
-            selectButton.append(portrait, name, description, basicStatsSummary, passiveSummary);
-            if (!unlocked) selectButton.append(lockedNotice);
-            selectButton.addEventListener("click", () => {
-                if (!unlocked) return;
-                selectedCharacterId = character.id;
+            tile.addEventListener("click", () => {
+                viewedCharacterId = character.id;
+                if (unlocked) selectedCharacterId = character.id;
                 renderCharacters();
-                document.getElementById("begin-adventure-button").disabled = false;
             });
-            card.append(selectButton);
-            if (unlocked) card.append(extraInfo);
-            container.append(card);
+            container.append(tile);
         });
+
+        const viewed = CHARACTER_DATA.find(({ id }) => id === viewedCharacterId);
+        document.getElementById("begin-adventure-button").disabled = !viewed || !isUnlocked(viewed);
+        renderDetail(viewed);
+    }
+
+    function createPortrait(character, className) {
+        const portrait = document.createElement("span");
+        portrait.className = className;
+        portrait.setAttribute("aria-hidden", "true");
+        if (character.image) {
+            const image = document.createElement("img");
+            image.src = character.image;
+            image.alt = "";
+            image.loading = "lazy";
+            image.addEventListener("error", () => {
+                portrait.replaceChildren(document.createTextNode(character.icon));
+            }, { once: true });
+            portrait.append(image);
+        } else {
+            portrait.textContent = character.icon;
+        }
+        return portrait;
+    }
+
+    function renderDetail(character) {
+        const panel = document.getElementById("character-detail");
+        panel.replaceChildren();
+        if (!character) return;
+        const language = document.documentElement.lang.startsWith("en") ? "en" : "pt";
+
+        const header = document.createElement("header");
+        header.className = "character-detail-header";
+        const title = document.createElement("div");
+        const name = document.createElement("h3");
+        name.className = "character-detail-name";
+        name.textContent = character.name;
+        const description = document.createElement("p");
+        description.className = "character-detail-description";
+        description.textContent = character.description[language];
+        title.append(name, description);
+        header.append(createPortrait(character, "character-detail-portrait"), title);
+
+        const basicStatsSummary = document.createElement("p");
+        basicStatsSummary.className = "character-option-specialty";
+        basicStatsSummary.textContent = Object.entries(character.basicStats)
+            .map(([stat, amount]) => {
+                const statKey = BASIC_STAT_KEYS[stat];
+                if (!statKey) throw new Error(`Unknown character basic stat: ${stat}`);
+                const formattedAmount = PERCENTAGE_SPECIALTY_STATS.has(stat) ? `${amount}%` : amount;
+                return translate("characterSpecialty", {
+                    stat: translate(statKey),
+                    amount: formattedAmount
+                });
+            })
+            .join(" · ");
+
+        panel.classList.toggle("is-locked", !isUnlocked(character));
+        if (!isUnlocked(character)) {
+            const lockedNotice = document.createElement("p");
+            lockedNotice.className = "character-detail-lock";
+            lockedNotice.textContent = `🔒 ${translate("characterLocked")}`;
+            panel.append(header, lockedNotice);
+            return;
+        }
+        panel.append(header, basicStatsSummary);
+
+        if (character.passive) {
+            const passiveSummary = document.createElement("p");
+            passiveSummary.className = "character-option-passive";
+            const passiveLabel = translateForLanguage(language, language === "en" ? "Passive" : "Passiva");
+            const passiveName = translateForLanguage(language, character.passive.name[language]);
+            const passiveDescription = translateForLanguage(language, character.passive.description[language]);
+            passiveSummary.textContent = `${passiveLabel}: ${character.passive.icon} ${passiveName} — ${passiveDescription}`;
+            panel.append(passiveSummary);
+        }
+
+        const progression = createDetailsSection("progressionSummary", "character-option-progression");
+        appendStatList(progression, character.progression, PROGRESSION_STAT_KEYS);
+
+        const skills = createDetailsSection("skillsSummary", "character-option-skills");
+        const skillsList = document.createElement("ul");
+        skillsList.className = "character-details-list character-skills-list";
+        Object.entries(character.skills).forEach(([skill, values]) => {
+            const presentation = SKILL_PRESENTATION[skill];
+            if (!presentation) throw new Error(`Unknown character skill: ${skill}`);
+            const item = document.createElement("li");
+            const skillName = document.createElement("strong");
+            skillName.textContent = translate(presentation.name);
+            const skillDescription = document.createElement("span");
+            skillDescription.textContent = translate(presentation.description, values);
+            item.append(skillName, skillDescription);
+            skillsList.append(item);
+        });
+        skills.append(skillsList);
+
+        const limits = createDetailsSection("limitsSummary", "character-option-limits");
+        const limitsList = document.createElement("ul");
+        limitsList.className = "character-details-list character-limits-list";
+        Object.entries(character.limits).forEach(([limit, amount]) => {
+            const presentation = LIMIT_PRESENTATION[limit];
+            if (!presentation) throw new Error(`Unknown character limit: ${limit}`);
+            const item = document.createElement("li");
+            const limitName = document.createElement("strong");
+            limitName.textContent = translate(presentation.name);
+            const value = document.createElement("span");
+            value.textContent = `${amount}${presentation.suffix}`;
+            item.append(limitName, value);
+            limitsList.append(item);
+        });
+        limits.append(limitsList);
+
+        panel.append(progression, skills, limits);
     }
 
     function createDetailsSection(titleKey, className) {
@@ -220,6 +242,11 @@ window.YaraRpgCharacterSetup = (() => {
         isUnlocked = options.isUnlocked || isUnlocked;
         onStart = options.onStart;
         document.getElementById("begin-adventure-button").addEventListener("click", beginAdventure);
+        const firstUnlocked = CHARACTER_DATA.find(isUnlocked);
+        if (firstUnlocked) {
+            selectedCharacterId = firstUnlocked.id;
+            viewedCharacterId = firstUnlocked.id;
+        }
         renderCharacters();
     }
 

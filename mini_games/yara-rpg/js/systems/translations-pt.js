@@ -12,7 +12,6 @@ window.YaraRpgTranslations.pt = {
         setupKicker: "Prepare sua jornada",
         selectCharacter: "Personagem",
         characterLocked: "Zere o jogo para desbloquear",
-        characterExtraInfo: "Mais informações: evolução, skills e limites",
         characterSpecialty: "+{amount} {stat}",
         basicStatsSummary: "📊 Bônus iniciais",
         progressionSummary: "📈 Por nível",
