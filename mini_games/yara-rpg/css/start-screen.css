@@ -81,6 +81,7 @@
     margin-top: 0.6rem;
 }
 .character-option {
+    position: relative;
     min-width: 0;
     border: 1px solid rgba(92, 81, 55, 0.72);
     border-radius: 0.85rem;
@@ -116,7 +117,7 @@
         "passive passive";
     align-items: center;
     gap: 0.3rem 0.6rem;
-    padding: 0.7rem;
+    padding: 0.7rem 2.4rem 0.7rem 0.7rem;
     border-radius: inherit;
     background: transparent;
     color: inherit;
@@ -261,17 +262,41 @@
 .character-option-limits .character-details-list {
     color: #a8c8dc;
 }
-.character-option-extra {
+.character-option-extra[open] {
     margin: 0 0.9rem 0.8rem;
     padding-top: 0.55rem;
     border-top: 1px solid rgba(92, 81, 55, 0.55);
     color: #c7b992;
 }
 .character-option-extra summary {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid rgba(169, 133, 64, 0.75);
+    border-radius: 999px;
+    background: rgba(23, 25, 31, 0.9);
     color: #c7b992;
     cursor: pointer;
-    font-size: 0.68rem;
+    font-family: Georgia, serif;
+    font-size: 0.8rem;
+    font-style: italic;
     font-weight: 700;
+    line-height: 1;
+    list-style: none;
+    transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease;
+}
+.character-option-extra summary::-webkit-details-marker {
+    display: none;
+}
+.character-option-extra summary:hover,
+.character-option-extra[open] summary {
+    border-color: #e1ae43;
+    background: rgba(82, 62, 23, 0.6);
+    color: #f3cf79;
 }
 .character-option-extra summary:focus-visible {
     outline: 2px solid #fbbf24;
@@ -380,7 +405,7 @@ h1, h2, h3, .font-title {
         gap: 0.4rem;
     }
     .character-option-select {
-        padding: 0.65rem;
+        padding: 0.65rem 2.3rem 0.65rem 0.65rem;
     }
     .starter-equipment-option {
         min-height: 3.5rem;

@@ -26,7 +26,6 @@
 .meta-card-stats { color: #9ca3af; }
 
 .meta-section-title { margin: .8rem 0 .4rem; font-size: .8rem; font-weight: 700; color: #6ee7b7; }
-.continue-summary { width: 100%; text-align: center; font-size: .75rem; color: #9ca3af; margin: 0 0 .4rem; }
 
 .run-summary { margin: 1rem auto; max-width: 22rem; text-align: left; font-size: .8rem; color: #e5e7eb; }
 .run-summary h3 { text-align: center; color: #fbbf24; font-weight: 700; margin-bottom: .4rem; }
@@ -61,11 +60,10 @@
 }
 
 /* Barra de ações da tela inicial: sempre uma única linha.
-   Desktop: Santuário à esquerda, continuar/iniciar à direita. Celular: Santuário vira ícone e "Continuar" encurta. */
+   Desktop: Santuário à esquerda, continuar/iniciar à direita. Celular: Santuário vira ícone. */
 .setup-actions { flex-wrap: nowrap; align-items: stretch; }
 .setup-actions .sanctuary-button { margin-right: auto; white-space: nowrap; }
 .setup-actions .sanctuary-button .btn-icon { font-size: 1.1rem; line-height: 1; }
-.setup-actions .btn-short { display: none; }
 .setup-actions button { white-space: nowrap; }
 @media (max-width: 600px) {
     .setup-actions { gap: .5rem; }
@@ -74,8 +72,6 @@
     .setup-actions .sanctuary-button .btn-label { display: none; }
     .setup-actions #continue-adventure-button { flex: 1 1 0; }
     .setup-actions #begin-adventure-button { flex: 1.5 1 0; margin-left: 0; overflow: hidden; text-overflow: ellipsis; }
-    .setup-actions .btn-long { display: none; }
-    .setup-actions .btn-short { display: inline; }
 }
 
 /* Faixa de números da jornada no banner de exploração. */

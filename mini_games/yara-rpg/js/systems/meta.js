@@ -428,24 +428,11 @@ window.YaraMeta = (() => {
         return list;
     }
 
-    // ---------- Tela inicial ----------
-    function renderContinueSummary(snapshot) {
-        const holder = document.getElementById('continue-summary');
-        if (!holder) return;
-        if (!snapshot) { holder.hidden = true; return; }
-        const region = GAME_DATA.regions[snapshot.currentRegion] || GAME_DATA.regions[0];
-        holder.textContent = m('continueSummary', {
-            region: region.title[gameLanguage], level: snapshot.hero?.level ?? 1,
-            potions: snapshot.hero?.potions ?? 0, gold: snapshot.hero?.gold ?? 0
-        });
-        holder.hidden = false;
-    }
-
     renderRunStats();
 
     return {
         beginRun, onEncounter, onVictory, onSpare, onChest, onInterrupt, onLevelUp, onRegionChange, onItem,
-        onDefeat, onCampaignComplete, sync, renderContinueSummary, openSanctuary, closeSanctuary, check,
+        onDefeat, onCampaignComplete, sync, openSanctuary, closeSanctuary, check,
         get data() { return meta; }
     };
 })();

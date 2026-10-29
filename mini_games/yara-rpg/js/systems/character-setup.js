@@ -154,7 +154,10 @@ window.YaraRpgCharacterSetup = (() => {
             const extraInfo = document.createElement("details");
             extraInfo.className = "character-option-extra";
             const extraInfoSummary = document.createElement("summary");
-            extraInfoSummary.textContent = translate("characterExtraInfo");
+            extraInfoSummary.className = "character-option-info";
+            extraInfoSummary.textContent = "i";
+            extraInfoSummary.title = translate("characterExtraInfo");
+            extraInfoSummary.setAttribute("aria-label", translate("characterExtraInfo"));
             extraInfo.append(extraInfoSummary, progression, skills, limits);
 
             selectButton.append(portrait, name, description, basicStatsSummary, passiveSummary);
