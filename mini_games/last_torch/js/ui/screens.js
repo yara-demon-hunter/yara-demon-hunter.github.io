@@ -41,6 +41,7 @@ export function startGame() {
     state.knives = [];
     state.knifeTimer = 0;
     state.knifePending = null;
+    state.knifeInput.stick.fire = false;
     state.goldDrops = [];
     state.currentBoss = null;
 

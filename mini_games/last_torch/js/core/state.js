@@ -70,8 +70,9 @@ export const state = {
 
     // Adaga de arremesso: mira em coordenadas do mundo, se o botão/dedo está pressionado, recarga,
     // instante e direção do último arremesso (animação) e segundos até a adaga sair da mão (null = nenhuma)
-    // stick: botão da adaga em telas de toque (x, y de -1 a 1; 0,0 = mira automática; aimAngle = mira atual)
-    knifeInput: { held: false, x: 0, y: 0, stick: { active: false, x: 0, y: 0, aimAngle: 0 } },
+    // stick: botão da adaga em telas de toque (x, y de -1 a 1; 0,0 = mira automática; aimAngle = mira atual;
+    // fire = dedo acabou de soltar, arremessar no próximo quadro)
+    knifeInput: { held: false, x: 0, y: 0, stick: { active: false, x: 0, y: 0, aimAngle: 0, fire: false } },
     knifeTimer: 0,
     knifeThrowTime: -100000,
     knifeThrowAngle: 0,

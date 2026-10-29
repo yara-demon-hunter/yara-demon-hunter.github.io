@@ -36,6 +36,8 @@ export function openShop() {
 
 export function resumeGame() {
     document.getElementById('shopScreen').classList.add('hidden');
+    // Um dedo solto do botão da adaga enquanto a loja estava aberta não arremessa ao voltar
+    state.knifeInput.stick.fire = false;
     state.gameState = 'PLAYING';
 }
 

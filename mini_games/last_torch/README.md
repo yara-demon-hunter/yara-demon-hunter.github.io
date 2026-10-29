@@ -65,7 +65,7 @@ draft/                            versões anteriores mantidas como referência
 ## Controles
 
 - **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente. Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria).
-- **Celular:** jogado em **retrato**. Ao começar, o jogo entra em tela cheia e trava em retrato (Android); onde não dá para travar (iOS), um aviso pede para girar o aparelho e a partida fica pausada enquanto ele estiver deitado. O joystick (canto inferior esquerdo) move o herói. O botão da adaga (canto inferior direito) arremessa: um toque mira no monstro mais perto, arrastar a partir do botão mira na direção do arraste (com linha de mira saindo do herói) e segurar repete na recarga, mostrada pelo anel em volta do botão. Tocar no canvas também arremessa na direção do dedo. Os ataques corpo a corpo são automáticos.
+- **Celular:** jogado em **retrato**. Ao começar, o jogo entra em tela cheia e trava em retrato (Android); onde não dá para travar (iOS), um aviso pede para girar o aparelho e a partida fica pausada enquanto ele estiver deitado. O joystick (canto inferior esquerdo) move o herói. O botão da adaga (canto inferior direito) mira enquanto está pressionado, com uma linha tracejada saindo do herói: sem arrastar mira no monstro mais perto; arrastando mira na direção do arraste. A adaga só é arremessada ao **soltar** o botão, uma vez, se a recarga (anel em volta do botão) já terminou. Tocar na tela não arremessa. Os ataques corpo a corpo são automáticos.
 
 O jogo usa a mesma lógica e progressão em todas as telas; apenas a disposição da interface e o controle de movimento se adaptam ao dispositivo.
 

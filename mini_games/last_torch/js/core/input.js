@@ -24,8 +24,8 @@ function readStick(base, knob, e, deadZone) {
 }
 
 // --- BOTÃO DA ADAGA (telas de toque, canto oposto ao joystick) ---
-// Tocar e segurar arremessa (repete na recarga). Sem arrastar mira no monstro mais perto;
-// arrastando mira na direção do arraste, como um segundo joystick (js/systems/knives.js).
+// Segurando, só mira: sem arrastar, no monstro mais perto; arrastando, na direção do arraste,
+// como um segundo joystick. Ao soltar o dedo a adaga é arremessada na direção mirada (js/systems/knives.js).
 function setupKnifeButton() {
     const base = document.getElementById('knifeButton');
     const knob = document.getElementById('knifeButtonKnob');
@@ -33,12 +33,18 @@ function setupKnifeButton() {
 
     const { stick } = state.knifeInput;
     let pointerId = null;
-    const release = (e) => {
+    // fire = true só quando o dedo é solto sobre a tela; cancelar (ou sair da janela) não arremessa
+    const release = (e, fire) => {
         if (e && e.pointerId !== pointerId) return;
+        if (pointerId === null) return;
         pointerId = null;
         stick.active = false;
-        stick.x = 0;
-        stick.y = 0;
+        if (fire) {
+            stick.fire = true;
+        } else {
+            stick.x = 0;
+            stick.y = 0;
+        }
         knob.style.transform = 'translate(-50%, -50%)';
     };
     const drag = (e) => {
@@ -57,9 +63,9 @@ function setupKnifeButton() {
         e.preventDefault();
     });
     base.addEventListener('pointermove', (e) => { if (e.pointerId === pointerId) drag(e); });
-    base.addEventListener('pointerup', release);
-    base.addEventListener('pointercancel', release);
-    window.addEventListener('blur', () => release());
+    base.addEventListener('pointerup', (e) => release(e, true));
+    base.addEventListener('pointercancel', (e) => release(e, false));
+    window.addEventListener('blur', () => release(null, false));
 }
 
 // --- JOYSTICK VIRTUAL (telas de toque) ---
@@ -144,10 +150,11 @@ export function setupInput() {
     canvas.addEventListener('pointerup', endTouchMovement);
     canvas.addEventListener('pointercancel', endTouchMovement);
 
-    // Faca no toque: o toque mira e segurar dispara repetido na direção do dedo (sem mover o herói por ele)
+    // Faca no toque (só sem o botão da adaga): o toque mira e segurar dispara repetido na direção do dedo.
+    // Com o botão da adaga (telas coarse), tocar na tela não arremessa: só o botão, ao soltar.
     let knifePointerId = null;
     canvas.addEventListener('pointerdown', (e) => {
-        if (e.pointerType !== 'touch' || state.gameState !== 'PLAYING') return;
+        if (hasJoystick || e.pointerType !== 'touch' || state.gameState !== 'PLAYING') return;
         knifePointerId = e.pointerId;
         aimKnife(e.clientX, e.clientY);
         state.knifeInput.held = true;

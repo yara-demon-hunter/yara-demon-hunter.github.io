@@ -1,8 +1,7 @@
 import { FAN_OF_KNIVES, LONG_THROW } from '../../data_model/passives.js';
-import { FRENZY_NOVA_SKILL, KNIFE_SKILL } from '../../data_model/skills.js';
+import { KNIFE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { audio, passives, player, state } from '../core/state.js';
-import { chargeUlt } from './combat.js';
 import { createExplosion } from './effects.js';
 import { getAtkDamage, getKnockback } from './stats.js';
 
@@ -79,8 +78,16 @@ function aimWithStick(stick) {
 export function updateKnives(dt) {
     state.knifeTimer = Math.max(0, state.knifeTimer - dt);
 
+    // Botão da adaga (toque): segurando só mira (linha tracejada); ao soltar arremessa uma vez na
+    // direção mirada, se a recarga já terminou
     const { stick } = state.knifeInput;
-    if (stick.active) aimWithStick(stick);
+    if (stick.active || stick.fire) aimWithStick(stick);
+    if (stick.fire) {
+        stick.fire = false;
+        stick.x = 0;
+        stick.y = 0;
+        if (state.knifeTimer <= 0 && state.knifePending === null) throwKnife(state.knifeInput.x, state.knifeInput.y);
+    }
 
     if (state.knifePending !== null) {
         state.knifePending -= dt;
@@ -91,7 +98,7 @@ export function updateKnives(dt) {
     }
 
     const { held, x, y } = state.knifeInput;
-    if ((held || stick.active) && state.knifeTimer <= 0 && state.knifePending === null) throwKnife(x, y);
+    if (held && state.knifeTimer <= 0 && state.knifePending === null) throwKnife(x, y);
 
     const { knives, enemies } = state;
     for (let i = knives.length - 1; i >= 0; i--) {
@@ -106,7 +113,6 @@ export function updateKnives(dt) {
             hit.vx += Math.cos(k.angle) * k.knockback;
             hit.vy += Math.sin(k.angle) * k.knockback;
             createExplosion(k.x, k.y, hit.color, 6);
-            chargeUlt(FRENZY_NOVA_SKILL.chargePerHit);
             knives.splice(i, 1);
             continue;
         }
