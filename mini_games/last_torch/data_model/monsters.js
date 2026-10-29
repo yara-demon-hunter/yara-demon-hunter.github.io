@@ -1,5 +1,5 @@
 export const MONSTER_MODELS = {
-    NORMAL: {
+    SPIRIT: {
         spawnWeight: 0.42,
         hpBase: 40,
         hpPerTurn: 10,
@@ -16,7 +16,7 @@ export const MONSTER_MODELS = {
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
-    FAST: {
+    BAT: {
         spawnWeight: 0.22,
         hpBase: 20,
         hpPerTurn: 5,
@@ -33,7 +33,7 @@ export const MONSTER_MODELS = {
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
-    SPLITTER: {
+    GOBLIN: {
         spawnWeight: 0.18,
         hpBase: 55,
         hpPerTurn: 15,
@@ -51,7 +51,7 @@ export const MONSTER_MODELS = {
         xpRewardPerTurn: 3,
         splitCount: 2
     },
-    SHOOTER: {
+    WITCH: {
         spawnWeight: 0.18,
         hpBase: 40,
         hpPerTurn: 8,
@@ -90,7 +90,7 @@ export const MONSTER_MODELS = {
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
-    SPLITTER_CHILD: {
+    GOBLIN_CHILD: {
         hpBase: 15,
         hpPerTurn: 0,
         speedMin: 95,
@@ -124,7 +124,7 @@ export const MONSTER_SPAWNING = {
     contactKnockback: 220
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['FAST', 'SPLITTER', 'SHOOTER', 'NORMAL'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'GOBLIN', 'WITCH', 'SPIRIT'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];
@@ -139,18 +139,20 @@ export function createMonster(type, turn, x, y, random = Math.random) {
         x, y, vx: 0, vy: 0,
         hp, maxHp: hp,
         speed, radius: model.radius, color: model.color, type, damage: model.damage,
-        shootTimer: model.initialShootCooldownSeconds
+        shootTimer: model.initialShootCooldownSeconds,
+        angle: 0,                        // direção do movimento (usada só no desenho)
+        phase: random() * Math.PI * 2    // defasagem das animações (cada monstro bate asa/pulsa diferente)
     };
 }
 
-export function createSplitterChild(x, y, random = Math.random) {
-    const model = MONSTER_MODELS.SPLITTER_CHILD;
+export function createGoblinChild(x, y, random = Math.random) {
+    const model = MONSTER_MODELS.GOBLIN_CHILD;
     const spread = model.parentSplitOffset;
     const velocity = model.splitVelocity;
 
     return {
-        ...createMonster('SPLITTER_CHILD', 0, x + (random() - 0.5) * spread, y + (random() - 0.5) * spread, random),
-        type: 'FAST',
+        ...createMonster('GOBLIN_CHILD', 0, x + (random() - 0.5) * spread, y + (random() - 0.5) * spread, random),
+        type: 'BAT',
         vx: (random() - 0.5) * velocity,
         vy: (random() - 0.5) * velocity
     };
@@ -163,7 +165,7 @@ export function chooseMonsterType(random = Math.random) {
         if (roll < model.spawnWeight) return type;
         roll -= model.spawnWeight;
     }
-    return 'NORMAL';
+    return 'SPIRIT';
 }
 
 export function rollMonsterGold(type, random = Math.random) {

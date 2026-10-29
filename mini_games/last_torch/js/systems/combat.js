@@ -1,5 +1,5 @@
 import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
-import { SLASH_VISUALS } from '../../data_model/visuals.js';
+import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { audio, maxUltEnergy, passives, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { createExplosion, shakeScreen } from './effects.js';

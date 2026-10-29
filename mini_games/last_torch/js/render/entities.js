@@ -1,5 +1,10 @@
-import { GOLD_VISUALS as G, SLASH_VISUALS } from '../../data_model/visuals.js';
+import { BAT_VISUALS } from '../../data_model/visuals/monsters/bat_visual.js';
+import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
+import { GOLD_VISUALS as G } from '../../data_model/visuals/items/gold_visual.js';
+import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { ctx, state } from '../core/state.js';
+import { renderBat } from './bat.js';
+import { renderWitch, renderWitchBolt } from './witch.js';
 import { easeOutCubic } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
 
@@ -22,7 +27,7 @@ export function renderGoldDrops() {
     });
 }
 
-// Slashes de Espada: cada passo do combo tem um visual próprio (data_model/visuals.js)
+// Slashes de Espada: cada passo do combo tem um visual próprio (data_model/visuals/effects/slash_visual.js)
 // 1: corte que varre da direita para a esquerda
 // 2: corte de volta, duplo e mais largo
 // 3: corte pesado roxo
@@ -85,6 +90,10 @@ export function renderBladeSlashes() {
 
 export function renderEnemyProjectiles() {
     state.enemyProjectiles.forEach(p => {
+        if (p.owner === 'WITCH') {
+            renderWitchBolt(p);
+            return;
+        }
         drawGlow(ctx, 'rgba(245, 158, 11, 0.55)', p.x, p.y, p.radius * 3);
         ctx.fillStyle = '#fbbf24';
         ctx.beginPath();
@@ -95,20 +104,29 @@ export function renderEnemyProjectiles() {
 
 export function renderEnemies() {
     state.enemies.forEach(e => {
-        // Brilho em cache (em vez de shadowBlur)
-        drawGlow(ctx, e.color, e.x, e.y, e.radius * (e.type === 'BOSS' ? 2.6 : 2.1), 0.45);
-        ctx.fillStyle = e.color;
-        ctx.beginPath();
-        ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
-        ctx.fill();
+        if (e.type === 'BAT') {
+            renderBat(e);
+        } else if (e.type === 'WITCH') {
+            renderWitch(e);
+        } else {
+            // Brilho em cache (em vez de shadowBlur)
+            drawGlow(ctx, e.color, e.x, e.y, e.radius * (e.type === 'BOSS' ? 2.6 : 2.1), 0.45);
+            ctx.fillStyle = e.color;
+            ctx.beginPath();
+            ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
         // Barra de vida simples acima do inimigo
         if (e.hp < e.maxHp) {
             const bw = e.radius * 2;
+            const barY = e.type === 'BAT' ? e.radius + BAT_VISUALS.healthBarOffset
+                : e.type === 'WITCH' ? e.radius + WITCH_VISUALS.healthBarOffset
+                : e.radius + 8;
             ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
-            ctx.fillRect(e.x - bw / 2, e.y - e.radius - 8, bw, 4);
+            ctx.fillRect(e.x - bw / 2, e.y - barY, bw, 4);
             ctx.fillStyle = e.color;
-            ctx.fillRect(e.x - bw / 2, e.y - e.radius - 8, bw * (e.hp / e.maxHp), 4);
+            ctx.fillRect(e.x - bw / 2, e.y - barY, bw * (e.hp / e.maxHp), 4);
         }
     });
 }

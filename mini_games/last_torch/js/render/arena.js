@@ -1,5 +1,5 @@
 import { CORE_MODEL } from '../../data_model/core.js';
-import { TORCH_VISUALS as T } from '../../data_model/visuals.js';
+import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
 import { ctx, player, state } from '../core/state.js';
 import { getAtkRadius } from '../systems/stats.js';
 import { drawGlow } from './fx/glow.js';

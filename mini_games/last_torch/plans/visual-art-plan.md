@@ -10,7 +10,7 @@ Melhorar o visual do jogo **sem usar imagens, sprites ou arquivos externos**. Tu
 
 1. **Proibido:** imagens (`.png`, `.svg` externos, `new Image()`), spritesheets, bibliotecas de terceiros (Pixi, Three, etc.).
 2. **Não alterar a lógica do jogo** (dano, colisão, spawn, progressão). O trabalho é só visual, em `js/render/` e nos novos arquivos citados abaixo. Exceção: hit stop (etapa 2) precisa de um ajuste mínimo no `dt` em `js/game.js`.
-3. **Dados visuais ficam em `data_model/visuals.js`** (cores, tamanhos de glow, formas, durações de efeitos). Os renderizadores não devem ter cores ou números mágicos hardcoded: importe de `visuals.js`. Mesmo princípio dos outros arquivos de `data_model/`: separar dados do motor.
+3. **Dados visuais ficam em `data_model/visuals/` (um arquivo `<nome>_visual.js` por personagem/efeito)** (cores, tamanhos de glow, formas, durações de efeitos). Os renderizadores não devem ter cores ou números mágicos hardcoded: importe do arquivo `*_visual.js` correspondente. Mesmo princípio dos outros arquivos de `data_model/`: separar dados do motor.
 4. **Estado de efeitos** (ondas de choque, números de dano, hit flash) vai em `js/core/state.js` dentro do objeto `state`, e precisa ser resetado em `startGame()` (`js/ui/screens.js`).
 5. **Desempenho:** o jogo roda em celular. Evite `shadowBlur` dentro de loops (é caro); prefira glow em cache (etapa 1). Limite de partículas ativas.
 6. **Siga o estilo do código existente:** módulos ES, comentários curtos em português no formato `// --- TÍTULO ---`, funções `export function renderX()`.
@@ -20,7 +20,7 @@ Melhorar o visual do jogo **sem usar imagens, sprites ou arquivos externos**. Tu
 ## Estrutura de arquivos a criar
 
 ```
-data_model/visuals.js        paleta, glows, formas e durações (DADOS)
+data_model/visuals/          paleta, glows, formas e durações (DADOS)
 js/render/fx/
   glow.js                    cache de sprites de brilho em canvas offscreen
   easing.js                  funções de easing (easeOutQuad, easeOutBack, ...)
@@ -34,7 +34,7 @@ Os renderizadores existentes (`render/arena.js`, `render/entities.js`, `render/p
 ## Etapas (executar em ordem, uma por vez)
 
 ### Etapa 1: Iluminação neon e desempenho
-- Criar `data_model/visuals.js` com a paleta atual extraída dos renderizadores (cores do herói, núcleo, inimigos, golpes, projéteis, power-ups).
+- Criar `data_model/visuals/*_visual.js` com a paleta atual extraída dos renderizadores (cores do herói, núcleo, inimigos, golpes, projéteis, power-ups).
 - Criar `fx/glow.js`: gera uma vez, num canvas offscreen, um gradiente radial por cor/tamanho e reaproveita com `ctx.drawImage` (cache por chave `cor+raio`).
 - Trocar os `shadowBlur` dos renderizadores pelo glow em cache.
 - Usar `ctx.globalCompositeOperation = 'lighter'` nas camadas de brilho (golpes, partículas, glows). Sempre restaurar para `'source-over'` (usar `save/restore`).
@@ -49,11 +49,11 @@ Os renderizadores existentes (`render/arena.js`, `render/entities.js`, `render/p
 - **Critério de pronto:** cada acerto tem resposta visual clara; FPS estável.
 
 ### Etapa 3: Formas procedurais
-Usar `fx/shapes.js` e definir as formas em `visuals.js`:
+Usar `fx/shapes.js` e definir as formas em `data_model/visuals/`:
 - **Herói:** corpo em losango/chevron apontando para `player.angle`; *squash & stretch* conforme a velocidade.
-- **NORMAL:** círculo com espinhos que giram devagar.
-- **SHOOTER:** triângulo com "canhão" apontando para o alvo.
-- **SPLITTER:** célula pulsante (raio variando com `Math.sin`).
+- **SPIRIT:** círculo com espinhos que giram devagar.
+- **WITCH:** triângulo com "canhão" apontando para o alvo.
+- **GOBLIN:** célula pulsante (raio variando com `Math.sin`).
 - **BOSS:** polígono grande girando com anéis concêntricos.
 - **Núcleo:** cristal hexagonal com camadas girando em sentidos opostos.
 - Usar easing (`easeOutBack`) para o surgimento dos inimigos.
@@ -77,7 +77,7 @@ Usar `fx/shapes.js` e definir as formas em `visuals.js`:
 
 Antes de desenhar um personagem, verifique se existe `art_reference/<id>/`. Se existir:
 - Leia o `character.md` e veja as imagens em `images/` (silhueta, cores, poses-chave).
-- Recrie em código: formas simples (`fx/shapes.js`), cores em `data_model/visuals.js`, animações por interpolação/easing entre as poses descritas.
+- Recrie em código: formas simples (`fx/shapes.js`), cores em `data_model/visuals/`, animações por interpolação/easing entre as poses descritas.
 - **Nunca** carregue essas imagens no jogo; elas são só referência.
 - Se algo estiver ambíguo (ex.: como uma parte se move), pergunte ao usuário antes de inventar.
 

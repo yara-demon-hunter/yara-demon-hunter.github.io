@@ -1,6 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
-import { MONSTER_MODELS, MONSTER_SPAWNING, createSplitterChild, rollMonsterGold } from '../../data_model/monsters.js';
+import { MONSTER_MODELS, MONSTER_SPAWNING, createGoblinChild, rollMonsterGold } from '../../data_model/monsters.js';
 import { audio, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { triggerGameOver } from '../ui/screens.js';
@@ -25,16 +25,18 @@ export function updateEnemies(dt) {
         const targetY = distToPlayer < MONSTER_SPAWNING.targetPlayerDistance ? player.y : state.coreY;
 
         const toTargetAngle = Math.atan2(targetY - e.y, targetX - e.x);
+        e.angle = toTargetAngle;
         e.x += Math.cos(toTargetAngle) * e.speed * dt;
         e.y += Math.sin(toTargetAngle) * e.speed * dt;
 
-        // SHOOTER / BOSS
-        if (e.type === 'SHOOTER' || e.type === 'BOSS') {
+        // WITCH / BOSS
+        if (e.type === 'WITCH' || e.type === 'BOSS') {
             e.shootTimer -= dt;
             if (e.shootTimer <= 0) {
                 const model = MONSTER_MODELS[e.type];
                 e.shootTimer = model.shootCooldownSeconds;
                 state.enemyProjectiles.push({
+                    owner: e.type,          // quem atirou (só muda o desenho do projétil)
                     x: e.x, y: e.y,
                     vx: Math.cos(toTargetAngle) * model.projectileSpeed,
                     vy: Math.sin(toTargetAngle) * model.projectileSpeed,
@@ -99,9 +101,9 @@ export function updateEnemies(dt) {
             gainXp(gainedXp);
             dropGold(e.x, e.y, rollMonsterGold(e.type));
 
-            if (e.type === 'SPLITTER') {
+            if (e.type === 'GOBLIN') {
                 for (let s = 0; s < monsterModel.splitCount; s++) {
-                    enemies.push(createSplitterChild(e.x, e.y));
+                    enemies.push(createGoblinChild(e.x, e.y));
                 }
             }
 

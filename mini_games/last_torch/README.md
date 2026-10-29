@@ -17,7 +17,13 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   passives.js                     skills passivas (compradas com pontos de skill, 1 por nível)
   gold.js                         ouro dropado pelos monstros (moedas que voam até o herói)
   world.js                        tamanho padronizado do mundo e zoom (areaScale) por perfil desktop/mobile
-  visuals.js                      cores, tamanhos e ritmos das animações (arte procedural)
+  visuals/                        cores, tamanhos e ritmos das animações (arte procedural)
+    characters/hero_visual.js     personagens jogáveis
+    monsters/                     monstros (bat_visual.js, witch_visual.js)
+    scenery/                      cenário (forest_visual.js, torch_visual.js)
+    items/gold_visual.js          itens dropados
+    effects/slash_visual.js       efeitos (golpes)
+    index.js                      reexporta tudo
 js/
   game.js                         ponto de entrada: importa os motores e roda o game loop
   core/state.js                   estado compartilhado da partida (state, player, keys, canvas, audio)

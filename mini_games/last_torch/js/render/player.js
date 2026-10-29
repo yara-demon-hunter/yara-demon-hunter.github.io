@@ -1,5 +1,5 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { HERO_VISUALS as V } from '../../data_model/visuals.js';
+import { HERO_VISUALS as V } from '../../data_model/visuals/characters/hero_visual.js';
 import { ctx, player, state } from '../core/state.js';
 import { easeOutCubic, easeOutQuad, lerpAngle } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
