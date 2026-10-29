@@ -62,13 +62,15 @@ export function renderCore() {
 // Raio de Alcance do herói: Círculo Vermelho com Linhas Tracejadas
 export function renderAttackRange() {
     ctx.save();
-    ctx.strokeStyle = state.frenzyActiveTimer > 0 ? 'rgba(236, 72, 153, 0.7)' : 'rgba(239, 68, 68, 0.6)';
-    ctx.lineWidth = 2;
     ctx.setLineDash([8, 8]); // Linha tracejada
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = '#ef4444';
     ctx.beginPath();
     ctx.arc(player.x, player.y, getAtkRadius(), 0, Math.PI * 2);
+    // Brilho: traço largo e translúcido por baixo (bem mais barato que shadowBlur)
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.18)';
+    ctx.lineWidth = 7;
+    ctx.stroke();
+    ctx.strokeStyle = state.frenzyActiveTimer > 0 ? 'rgba(236, 72, 153, 0.7)' : 'rgba(239, 68, 68, 0.6)';
+    ctx.lineWidth = 2;
     ctx.stroke();
     ctx.restore();
 }

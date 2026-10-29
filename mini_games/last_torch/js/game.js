@@ -17,7 +17,15 @@ import { updateFuryBar, updateKnifeButton } from './ui/hud.js';
 import { isPhonePortrait } from './ui/orientation.js';
 
 const MIN_FRAME_MS = 12;
+// Fora da partida (menu, loja, game over, aviso de girar) só o cenário se mexe atrás da tela:
+// ~15 FPS bastam e poupam GPU/bateria
+const IDLE_FRAME_MS = 66;
 let lastTime = performance.now();
+let lastRender = 0;
+
+function isIdle() {
+    return state.gameState !== 'PLAYING' || isPhonePortrait();
+}
 
 // --- UPDATE LOOP ---
 function update(dt) {
@@ -54,7 +62,10 @@ function gameLoop(timestamp) {
     lastTime = timestamp;
 
     update(dt);
-    render();
+    if (!isIdle() || timestamp - lastRender >= IDLE_FRAME_MS) {
+        render();
+        lastRender = timestamp;
+    }
 
     requestAnimationFrame(gameLoop);
 }
