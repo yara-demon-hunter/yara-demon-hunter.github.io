@@ -1,6 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
-import { MONSTER_MODELS, MONSTER_SPAWNING, createGoblinChild, rollMonsterGold } from '../../data_model/monsters.js';
+import { MONSTER_MODELS, MONSTER_SPAWNING, createVampireBat, rollMonsterGold } from '../../data_model/monsters.js';
 import { MIRROR_WARD } from '../../data_model/passives.js';
 import { audio, passives, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
@@ -103,9 +103,9 @@ export function updateEnemies(dt) {
             gainXp(gainedXp);
             dropGold(e.x, e.y, rollMonsterGold(e.type));
 
-            if (e.type === 'GOBLIN') {
+            if (e.type === 'VAMPIRE') {
                 for (let s = 0; s < monsterModel.splitCount; s++) {
-                    enemies.push(createGoblinChild(e.x, e.y, state.turn));
+                    enemies.push(createVampireBat(e.x, e.y, state.turn));
                 }
             }
 

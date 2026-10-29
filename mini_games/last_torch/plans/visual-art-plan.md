@@ -53,7 +53,7 @@ Usar `fx/shapes.js` e definir as formas em `data_model/visuals/`:
 - **Herói:** corpo em losango/chevron apontando para `player.angle`; *squash & stretch* conforme a velocidade.
 - **SKELETON:** esqueleto procedural (ver art_reference/skeleton); substituiu o SPIRIT.
 - **WITCH:** triângulo com "canhão" apontando para o alvo.
-- **GOBLIN:** célula pulsante (raio variando com `Math.sin`).
+- **VAMPIRE:** nobre de capa com gola alta; ao morrer se desfaz em morcegos (ver `art_reference/vampire`).
 - **BOSS:** polígono grande girando com anéis concêntricos.
 - **Núcleo:** cristal hexagonal com camadas girando em sentidos opostos.
 - Usar easing (`easeOutBack`) para o surgimento dos inimigos.

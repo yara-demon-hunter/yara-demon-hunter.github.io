@@ -7,3 +7,4 @@ export * from './effects/slash_visual.js';
 export * from './monsters/witch_visual.js';
 export * from './monsters/skeleton_visual.js';
 export * from './effects/reflect_visual.js';
+export * from './monsters/vampire_visual.js';

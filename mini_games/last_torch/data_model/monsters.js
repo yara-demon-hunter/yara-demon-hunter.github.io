@@ -35,14 +35,14 @@ export const MONSTER_MODELS = {
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
-    GOBLIN: {
+    VAMPIRE: {
         spawnWeight: 0.18,
         hpBase: 55,
         hpPerTurn: 15,
         speedMin: 45,
         speedMax: 45,
         radius: 18,
-        color: '#a855f7',
+        color: '#b91c1c',
         damage: 20,
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
@@ -92,7 +92,7 @@ export const MONSTER_MODELS = {
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
-    GOBLIN_CHILD: {
+    VAMPIRE_BAT: {
         hpBase: 15,
         hpPerTurn: 0,
         speedMin: 95,
@@ -123,7 +123,7 @@ export const MONSTER_SPAWNING = {
     contactKnockback: 220
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'GOBLIN', 'WITCH', 'SKELETON'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];
@@ -147,13 +147,13 @@ export function createMonster(type, turn, x, y, random = Math.random) {
     };
 }
 
-export function createGoblinChild(x, y, turn = 1, random = Math.random) {
-    const model = MONSTER_MODELS.GOBLIN_CHILD;
+export function createVampireBat(x, y, turn = 1, random = Math.random) {
+    const model = MONSTER_MODELS.VAMPIRE_BAT;
     const spread = model.parentSplitOffset;
     const velocity = model.splitVelocity;
 
     return {
-        ...createMonster('GOBLIN_CHILD', turn, x + (random() - 0.5) * spread, y + (random() - 0.5) * spread, random),
+        ...createMonster('VAMPIRE_BAT', turn, x + (random() - 0.5) * spread, y + (random() - 0.5) * spread, random),
         type: 'BAT',
         vx: (random() - 0.5) * velocity,
         vy: (random() - 0.5) * velocity
