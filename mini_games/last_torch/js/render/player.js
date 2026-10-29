@@ -37,6 +37,9 @@ const anim = {
 // Pontas fixas da barra da capa (aleatórias uma vez, para o rasgado não "tremer")
 const capeJag = Array.from({ length: V.capeStrips + 1 }, (_, i) => (i % 2 === 0 ? 1 : 0.58 + Math.random() * 0.2));
 
+// O teste 2.5D (js/render/player25d.js) usa o mesmo estado de animação e a mesma capa rasgada
+export { anim as heroAnim, capeJag as heroCapeJag, swingAngleAt as heroSwingAngleAt };
+
 function startSwing(step) {
     const lastSlash = state.bladeSlashes[state.bladeSlashes.length - 1];
     const key = lastSlash && lastSlash.spin ? 'whirl' : step;

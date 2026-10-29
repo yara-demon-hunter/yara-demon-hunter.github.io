@@ -10,6 +10,10 @@ import {
 } from './entities.js';
 import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestGround, renderTorchLight } from './forest.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
+import { renderPlayer25D } from './player25d.js';
+
+// Teste: ?hero=25d na URL troca o herói pelo desenho 2.5D (js/render/player25d.js)
+const HERO_25D = new URLSearchParams(window.location.search).get('hero') === '25d';
 
 // Funde a borda do mundo com as faixas laterais/superiores (se existirem) para não haver corte seco
 function renderLetterboxFade() {
@@ -66,7 +70,8 @@ export function render() {
     renderEnemyProjectiles();
     renderEnemies();
     renderPlayerTrail();
-    renderPlayer();
+    if (HERO_25D) renderPlayer25D();
+    else renderPlayer();
     renderParticles();
     renderFireflies();
     renderFogAndVignette();
