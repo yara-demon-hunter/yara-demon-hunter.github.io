@@ -4,9 +4,11 @@ import { GOLD_VISUALS as G } from '../../data_model/visuals/items/gold_visual.js
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { ctx, state } from '../core/state.js';
+import { SKELETON_VISUALS } from '../../data_model/visuals/monsters/skeleton_visual.js';
 import { renderBat } from './bat.js';
 import { drawDagger } from './knife.js';
 import { renderReflectedBolt } from './reflect.js';
+import { renderSkeleton } from './skeleton.js';
 import { renderWitch, renderWitchBolt } from './witch.js';
 import { easeOutCubic } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
@@ -115,6 +117,8 @@ export function renderEnemies() {
             renderBat(e);
         } else if (e.type === 'WITCH') {
             renderWitch(e);
+        } else if (e.type === 'SKELETON') {
+            renderSkeleton(e);
         } else {
             // Brilho em cache (em vez de shadowBlur)
             drawGlow(ctx, e.color, e.x, e.y, e.radius * (e.type === 'BOSS' ? 2.6 : 2.1), 0.45);
@@ -129,6 +133,7 @@ export function renderEnemies() {
             const bw = e.radius * 2;
             const barY = e.type === 'BAT' ? e.radius + BAT_VISUALS.healthBarOffset
                 : e.type === 'WITCH' ? e.radius + WITCH_VISUALS.healthBarOffset
+                : e.type === 'SKELETON' ? e.radius + SKELETON_VISUALS.healthBarOffset
                 : e.radius + 8;
             ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
             ctx.fillRect(e.x - bw / 2, e.y - barY, bw, 4);

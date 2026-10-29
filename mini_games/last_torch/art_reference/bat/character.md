@@ -9,7 +9,7 @@
 - **Cabeça e rosto:** cabeça redonda à frente, orelhas pontudas, dois olhos vermelhos brilhantes e presinhas brancas.
 - **Asas:** membrana roxa escura com borda de trás recortada (3 "dentes") e 3 ossos finos saindo do encaixe; a borda tem um fio roxo claro.
 - **Partes que se movem separadamente:** asa esquerda e asa direita (batem em oposição ao eixo do corpo), corpo (sobe e desce levemente).
-- **Tamanho relativo:** menor que o Spirit, mas as asas abertas o fazem parecer maior que o raio de colisão.
+- **Tamanho relativo:** menor que o Esqueleto, mas as asas abertas o fazem parecer maior que o raio de colisão.
 - **Detalhes que NÃO podem faltar:** olhos vermelhos, asas batendo rápido, orelhas pontudas.
 - **Detalhes que podem ser simplificados:** pelagem, patas e garras.
 

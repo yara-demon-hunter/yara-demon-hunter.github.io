@@ -1,14 +1,14 @@
 import { getTurnDifficulty, isMonsterUnlocked } from './difficulty.js';
 
 export const MONSTER_MODELS = {
-    SPIRIT: {
+    SKELETON: {
         spawnWeight: 0.42,
         hpBase: 40,
         hpPerTurn: 10,
         speedMin: 55,
         speedMax: 85,
         radius: 14,
-        color: '#f43f5e',
+        color: '#d9d2bc',
         damage: 15,
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
@@ -123,7 +123,7 @@ export const MONSTER_SPAWNING = {
     contactKnockback: 220
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'GOBLIN', 'WITCH', 'SPIRIT'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'GOBLIN', 'WITCH', 'SKELETON'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];
@@ -170,7 +170,7 @@ export function chooseMonsterType(turn, random = Math.random) {
         if (roll < weight) return type;
         roll -= weight;
     }
-    return 'SPIRIT';
+    return 'SKELETON';
 }
 
 export function rollMonsterGold(type, random = Math.random) {

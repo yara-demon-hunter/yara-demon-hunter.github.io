@@ -51,7 +51,7 @@ Os renderizadores existentes (`render/arena.js`, `render/entities.js`, `render/p
 ### Etapa 3: Formas procedurais
 Usar `fx/shapes.js` e definir as formas em `data_model/visuals/`:
 - **Herói:** corpo em losango/chevron apontando para `player.angle`; *squash & stretch* conforme a velocidade.
-- **SPIRIT:** círculo com espinhos que giram devagar.
+- **SKELETON:** esqueleto procedural (ver art_reference/skeleton); substituiu o SPIRIT.
 - **WITCH:** triângulo com "canhão" apontando para o alvo.
 - **GOBLIN:** célula pulsante (raio variando com `Math.sin`).
 - **BOSS:** polígono grande girando com anéis concêntricos.

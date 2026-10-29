@@ -19,7 +19,7 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   world.js                        tamanho padronizado do mundo e zoom (areaScale) por perfil desktop/mobile
   visuals/                        cores, tamanhos e ritmos das animações (arte procedural)
     characters/hero_visual.js     personagens jogáveis
-    monsters/                     monstros (bat_visual.js, witch_visual.js)
+    monsters/                     monstros (bat_visual.js, witch_visual.js, skeleton_visual.js)
     scenery/                      cenário (forest_visual.js, torch_visual.js)
     items/gold_visual.js          itens dropados
     effects/slash_visual.js       efeitos (golpes)
