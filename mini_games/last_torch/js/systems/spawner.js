@@ -1,3 +1,4 @@
+import { TURN_DIFFICULTY, getTurnDifficulty } from '../../data_model/difficulty.js';
 import { MONSTER_SPAWNING, chooseMonsterType, createMonster } from '../../data_model/monsters.js';
 import { state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
@@ -17,7 +18,7 @@ export function spawnEnemy() {
     const angle = Math.random() * Math.PI * 2;
     const x = state.coreX + Math.cos(angle) * spawnDist;
     const y = state.coreY + Math.sin(angle) * spawnDist;
-    const type = chooseMonsterType();
+    const type = chooseMonsterType(state.turn);
     state.enemies.push(createMonster(type, state.turn, x, y));
 }
 
@@ -37,10 +38,18 @@ export function updateSpawner(dt) {
     state.spawnTimer -= dt;
     if (state.spawnTimer <= 0) {
         spawnEnemy();
-        state.spawnTimer = Math.max(
-            MONSTER_SPAWNING.minimumIntervalSeconds,
-            MONSTER_SPAWNING.initialIntervalSeconds
-                - state.turn * MONSTER_SPAWNING.intervalReductionPerTurnSeconds
-        );
+        state.spawnTimer = getTurnDifficulty(state.turn).spawnIntervalSeconds;
     }
+}
+
+// Novo turno: a tela é limpa (monstros, tiros, efeitos e moedas) e os monstros voltam a aparecer
+// depois de uma pequena pausa, já com a dificuldade do turno novo.
+export function resetFieldForNewTurn() {
+    state.enemies.length = 0;
+    state.enemyProjectiles.length = 0;
+    state.particles.length = 0;
+    state.bladeSlashes.length = 0;
+    state.goldDrops.length = 0;
+    state.currentBoss = null;
+    state.spawnTimer = TURN_DIFFICULTY.turnStartGraceSeconds;
 }

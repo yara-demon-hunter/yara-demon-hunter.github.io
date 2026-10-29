@@ -9,6 +9,7 @@ import { openShop } from '../ui/shop.js';
 import { createExplosion, registerPlayerHit, shakeScreen } from './effects.js';
 import { gainXp } from './progression.js';
 import { dropGold } from './gold.js';
+import { resetFieldForNewTurn } from './spawner.js';
 
 // --- INIMIGOS ---
 export function updateEnemies(dt) {
@@ -104,7 +105,7 @@ export function updateEnemies(dt) {
 
             if (e.type === 'GOBLIN') {
                 for (let s = 0; s < monsterModel.splitCount; s++) {
-                    enemies.push(createGoblinChild(e.x, e.y));
+                    enemies.push(createGoblinChild(e.x, e.y, state.turn));
                 }
             }
 
@@ -116,7 +117,8 @@ export function updateEnemies(dt) {
                 state.turn++;
                 state.scoreTurn = 0;
                 state.targetScore = Math.floor(500 * Math.pow(1.35, state.turn - 1));
-                openShop();
+                openShop();              // coleta o ouro que ainda está no chão
+                resetFieldForNewTurn();
                 break;
             }
         }

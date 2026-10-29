@@ -1,3 +1,5 @@
+import { getTurnDifficulty, isMonsterUnlocked } from './difficulty.js';
+
 export const MONSTER_MODELS = {
     SPIRIT: {
         spawnWeight: 0.42,
@@ -116,9 +118,6 @@ export const MONSTER_SPAWNING = {
     regularSpawnScreenRatio: 0.6,
     regularSpawnOffset: 50,
     bossSpawnScreenRatio: 0.5,
-    initialIntervalSeconds: 1.5,
-    intervalReductionPerTurnSeconds: 0.1,
-    minimumIntervalSeconds: 0.2,
     targetPlayerDistance: 240,
     movementDamping: 0.88,
     contactKnockback: 220
@@ -130,40 +129,46 @@ export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];
     if (!model) throw new Error(`Unknown monster type: ${type}`);
 
-    const speed = model.speedMin === model.speedMax
+    // Vida, velocidade e dano crescem com o turno (data_model/difficulty.js)
+    const difficulty = getTurnDifficulty(turn);
+    const baseSpeed = model.speedMin === model.speedMax
         ? model.speedMin
         : model.speedMin + random() * (model.speedMax - model.speedMin);
-    const hp = model.hpBase + turn * model.hpPerTurn;
+    const speed = baseSpeed * difficulty.speedMultiplier;
+    const hp = Math.round((model.hpBase + turn * model.hpPerTurn) * difficulty.hpMultiplier);
 
     return {
         x, y, vx: 0, vy: 0,
         hp, maxHp: hp,
-        speed, radius: model.radius, color: model.color, type, damage: model.damage,
+        speed, radius: model.radius, color: model.color, type, damage: model.damage * difficulty.damageMultiplier,
         shootTimer: model.initialShootCooldownSeconds,
         angle: 0,                        // direção do movimento (usada só no desenho)
         phase: random() * Math.PI * 2    // defasagem das animações (cada monstro bate asa/pulsa diferente)
     };
 }
 
-export function createGoblinChild(x, y, random = Math.random) {
+export function createGoblinChild(x, y, turn = 1, random = Math.random) {
     const model = MONSTER_MODELS.GOBLIN_CHILD;
     const spread = model.parentSplitOffset;
     const velocity = model.splitVelocity;
 
     return {
-        ...createMonster('GOBLIN_CHILD', 0, x + (random() - 0.5) * spread, y + (random() - 0.5) * spread, random),
+        ...createMonster('GOBLIN_CHILD', turn, x + (random() - 0.5) * spread, y + (random() - 0.5) * spread, random),
         type: 'BAT',
         vx: (random() - 0.5) * velocity,
         vy: (random() - 0.5) * velocity
     };
 }
 
-export function chooseMonsterType(random = Math.random) {
-    let roll = random();
-    for (const type of SPAWNABLE_MONSTER_TYPES) {
-        const model = MONSTER_MODELS[type];
-        if (roll < model.spawnWeight) return type;
-        roll -= model.spawnWeight;
+// Sorteia entre os monstros já liberados no turno (os pesos são reescalados entre eles)
+export function chooseMonsterType(turn, random = Math.random) {
+    const available = SPAWNABLE_MONSTER_TYPES.filter(type => isMonsterUnlocked(type, turn));
+    const total = available.reduce((sum, type) => sum + MONSTER_MODELS[type].spawnWeight, 0);
+    let roll = random() * total;
+    for (const type of available) {
+        const weight = MONSTER_MODELS[type].spawnWeight;
+        if (roll < weight) return type;
+        roll -= weight;
     }
     return 'SPIRIT';
 }
