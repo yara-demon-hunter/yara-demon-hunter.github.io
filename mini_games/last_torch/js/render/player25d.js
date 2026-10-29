@@ -5,12 +5,12 @@ import { easeOutCubic, easeOutQuad, lerpAngle } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
 import { heroAnim as anim, heroCapeJag as capeJag, heroSwingAngleAt as swingAngleAt } from './player.js';
 
-// --- HERÓI 2.5D (TESTE) ---
+// --- HERÓI 2.5D ---
 // O mesmo herói de player.js, montado como um boneco 3D simples: pernas, tronco, braços, capuz,
 // capa e espada. A câmera olha quase de cima: o chão segue igual ao resto do jogo e a altura do
 // corpo "sobe" na tela, mostrando o corpo e o rosto de frente/perfil conforme a direção.
 // A animação (velocidade, passada, capa, golpe) vem do mesmo estado de player.js.
-// Ative com ?hero=25d na URL. Coordenadas locais: a = frente, b = direita, z = altura.
+// É o herói padrão do jogo (?hero=topdown usa o antigo de player.js). Coordenadas locais: a = frente, b = direita, z = altura.
 
 const C = V.colors;
 

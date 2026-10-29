@@ -1,5 +1,5 @@
-// --- DADOS VISUAIS: Herói em 2.5D (TESTE). ---
-// Lidos por js/render/player25d.js (ative com ?hero=25d na URL).
+// --- DADOS VISUAIS: Herói em 2.5D (padrão do jogo). ---
+// Lidos por js/render/player25d.js. O herói top-down antigo continua em hero_visual.js.
 // Usa a mesma paleta do herói top-down; aqui ficam só a câmera e as medidas do corpo em 3D.
 import { HERO_VISUALS } from './hero_visual.js';
 

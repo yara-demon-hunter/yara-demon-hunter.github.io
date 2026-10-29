@@ -13,8 +13,9 @@ import { renderPlayer, renderPlayerTrail } from './player.js';
 import { renderPlayer25D } from './player25d.js';
 import { renderReflectWard } from './reflect.js';
 
-// Teste: ?hero=25d na URL troca o herói pelo desenho 2.5D (js/render/player25d.js)
-const HERO_25D = new URLSearchParams(window.location.search).get('hero') === '25d';
+// O herói padrão é o 2.5D (js/render/player25d.js). O top-down antigo (js/render/player.js) continua
+// no projeto: abra a página com ?hero=topdown para usá-lo.
+const HERO_25D = new URLSearchParams(window.location.search).get('hero') !== 'topdown';
 
 // Funde a borda do mundo com as faixas laterais/superiores (se existirem) para não haver corte seco
 function renderLetterboxFade() {
