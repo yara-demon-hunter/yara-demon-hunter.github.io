@@ -32,14 +32,14 @@ export const HERO_25D_VISUALS = {
     bootWidth: 3,
     bootLength: 2,
     strideLength: 4.5,
-    footLift: 2.5,
+    footLift: 15.5,
 
     // Tronco (meio-eixos da seção: A = frente/trás, B = lados)
     waist: { A: 2.5, B: 3.4 },
     chest: { A: 2.8, B: 4.6 },
     shoulderHeight: 17,
     sashHeight: 10.8,
-    runLean: 2.6,                 // tronco e cabeça vão para a frente na corrida
+    runLean: 5,                 // tronco e cabeça vão para a frente na corrida
     breathAmount: 0.35,
 
     // Braços
@@ -62,9 +62,9 @@ export const HERO_25D_VISUALS = {
     // Capa (presa nas costas dos ombros, barra perto do chão; sobe e vai para trás na corrida)
     capeAnchorHeight: 17.4,
     capeHemHeight: 2.5,
-    capeRunLift: 5,
+    capeRunLift: 10.5,
     capeLength: 3,
-    capeRunLength: 4,
+    capeRunLength: 20,
     capeTailWidth: 7,
 
     // Espada: em repouso aponta para trás e para baixo; no golpe varre na horizontal

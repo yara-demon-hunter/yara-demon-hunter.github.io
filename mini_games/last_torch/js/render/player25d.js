@@ -80,9 +80,9 @@ function buildPose(t) {
         t,
         run,
         lean,
-        shoulderZ: V.shoulderHeight + breath,
+        shoulderZ: V.shoulderHeight + breath - run * 0.8,
         headA: 0.8 + lean,
-        headZ: V.headHeight + breath - run * 0.6,
+        headZ: V.headHeight + breath - run * 1.4,
         blend: anim.swingBlend
     };
 }
@@ -172,7 +172,7 @@ function capePart(pose) {
     const t = pose.t;
     const run = pose.run;
     const n = H.capeStrips;
-    const lengthBack = V.capeLength + V.capeRunLength * run + Math.max(0, -anim.capeX) * 0.15;
+    const lengthBack = V.capeLength + V.capeRunLength * run + Math.max(0, -anim.capeX) * 0.25;
     const hemZ = V.capeHemHeight + V.capeRunLift * run;
     const wave = H.capeWaveIdle + (H.capeWaveRun - H.capeWaveIdle) * run;
     const tailHalf = V.capeTailWidth * (1 - run * 0.2);
