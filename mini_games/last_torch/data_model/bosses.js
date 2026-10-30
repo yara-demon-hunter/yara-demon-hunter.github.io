@@ -19,8 +19,8 @@ export const BOSS_MODELS = {
         projectileRadius: 7,          // bola de fogo (raio de acerto)
         projectileDamageMultiplier: 0.8,
         scoreReward: 250,
-        goldRewardMin: 10,
-        goldRewardMax: 10,
+        goldBase: 45,
+        goldVariance: 0,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     }

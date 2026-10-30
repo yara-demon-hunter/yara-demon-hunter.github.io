@@ -13,8 +13,8 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 20,
-        goldRewardMin: 1,
-        goldRewardMax: 2,
+        goldBase: 3,
+        goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
@@ -30,8 +30,8 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 20,
-        goldRewardMin: 1,
-        goldRewardMax: 2,
+        goldBase: 2,
+        goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
@@ -47,8 +47,8 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 40,
-        goldRewardMin: 1,
-        goldRewardMax: 2,
+        goldBase: 8,
+        goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
         splitCount: 2
@@ -68,8 +68,8 @@ export const MONSTER_MODELS = {
         projectileRadius: 5,
         projectileDamageMultiplier: 0.8,
         scoreReward: 20,
-        goldRewardMin: 1,
-        goldRewardMax: 2,
+        goldBase: 8,
+        goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
@@ -84,8 +84,8 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 20,
-        goldRewardMin: 1,
-        goldRewardMax: 2,
+        goldBase: 2,
+        goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
         splitVelocity: 100,
@@ -156,7 +156,10 @@ export function chooseMonsterType(turn, random = Math.random) {
     return 'SKELETON';
 }
 
+// Ouro de um monstro: o valor base sobe ou desce até goldVariance (0.5 = de metade ao dobro).
+// Arredonda e nunca dá menos que 1 moeda.
 export function rollMonsterGold(model, random = Math.random) {
-    const { goldRewardMin, goldRewardMax } = model;
-    return goldRewardMin + Math.floor(random() * (goldRewardMax - goldRewardMin + 1));
+    const { goldBase, goldVariance } = model;
+    const factor = 1 + (random() * 2 - 1) * goldVariance;
+    return Math.max(1, Math.round(goldBase * factor));
 }
