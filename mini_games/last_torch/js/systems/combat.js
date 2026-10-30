@@ -13,26 +13,66 @@ import {
 } from './stats.js';
 
 // --- SISTEMA DE CORTE COM A LÂMINA ---
-// Amplitude configurável via upgrade (getSlashArcRadian)
-export function executeBladeSlash(x, y, angle, radius, comboStep, spin = false) {
+// Amplitude configurável via upgrade (getSlashArcRadian). attacker: herói (padrão) ou Shadow Clone,
+// que golpeia em silêncio e tem o efeito pintado de sombra (shadow: true).
+export function executeBladeSlash(x, y, angle, radius, comboStep, spin = false, attacker = player) {
     const currentArc = getSlashArcRadian();
     const visualLife = (spin ? SLASH_VISUALS.whirl : SLASH_VISUALS[comboStep]).lifeSeconds;
+    const shadow = attacker !== player;
 
     state.bladeSlashes.push({
-        x, y, angle, radius, comboStep, spin,
+        x, y, angle, radius, comboStep, spin, shadow,
         arcWidth: currentArc,
         life: visualLife, maxLife: visualLife
     });
 
-    audio.playSwordSlash(comboStep);
+    if (!shadow) audio.playSwordSlash(comboStep);
 
     // Pequeno avanço (dash) direcional no 3º ataque
     if (comboStep === 3) {
         const dashDist = BLADE_SKILL.comboDashDistance;
-        player.x += Math.cos(angle) * dashDist;
-        player.y += Math.sin(angle) * dashDist;
-        createExplosion(player.x, player.y, '#c084fc', 12);
+        attacker.x += Math.cos(angle) * dashDist;
+        attacker.y += Math.sin(angle) * dashDist;
+        createExplosion(attacker.x, attacker.y, '#c084fc', 12);
     }
+}
+
+// Monstro mais perto de (x, y) a menos de maxDist (ou null)
+export function findNearestEnemy(x, y, maxDist) {
+    let target = null;
+    let minDist = maxDist;
+    state.enemies.forEach(e => {
+        const d = Math.hypot(e.x - x, e.y - y);
+        if (d < minDist) {
+            minDist = d;
+            target = e;
+        }
+    });
+    return target;
+}
+
+// Dano e empurrão em todo monstro dentro do alcance e da abertura do corte (ou em volta toda:
+// giro e Fúria ativa). onHit é chamado a cada monstro atingido.
+export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, allAround, onHit) {
+    state.enemies.forEach(e => {
+        const d = Math.hypot(e.x - x, e.y - y);
+        if (d <= radius + e.radius) {
+            const enemyAngle = Math.atan2(e.y - y, e.x - x);
+            let diffAngle = Math.abs(atkAngle - enemyAngle);
+            while (diffAngle > Math.PI) diffAngle -= Math.PI * 2;
+            diffAngle = Math.abs(diffAngle);
+
+            // Aplica dano se o inimigo está dentro da abertura angular atual do corte
+            if (diffAngle <= arcHalf + 0.1 || state.frenzyActiveTimer > 0 || allAround) {
+                e.hp -= dmg;
+                if (onHit) onHit(e);
+
+                e.vx += Math.cos(enemyAngle) * kbForce;
+                e.vy += Math.sin(enemyAngle) * kbForce;
+                createExplosion(e.x, e.y, e.color, 4);
+            }
+        }
+    });
 }
 
 export function chargeUlt(amount) {
@@ -80,17 +120,7 @@ export function updateAutoAttack(dt) {
 
     if (player.attackTimer > 0) return;
 
-    let targetEnemy = null;
-    let minDist = attackRad;
-
-    state.enemies.forEach(e => {
-        const d = Math.hypot(e.x - player.x, e.y - player.y);
-        if (d < minDist) {
-            minDist = d;
-            targetEnemy = e;
-        }
-    });
-
+    const targetEnemy = findNearestEnemy(player.x, player.y, attackRad);
     if (!targetEnemy) return;
 
     player.attackTimer = getAtkCooldown();
@@ -105,26 +135,8 @@ export function updateAutoAttack(dt) {
     const kbForce = getKnockback() * (player.comboStep === 3 ? BLADE_SKILL.comboKnockbackMultiplier : 1.0);
 
     // Colisão de dano no arco do golpe
-    state.enemies.forEach(e => {
-        const d = Math.hypot(e.x - player.x, e.y - player.y);
-        if (d <= attackRad + e.radius) {
-            const enemyAngle = Math.atan2(e.y - player.y, e.x - player.x);
-            let diffAngle = Math.abs(atkAngle - enemyAngle);
-            while (diffAngle > Math.PI) diffAngle -= Math.PI * 2;
-            diffAngle = Math.abs(diffAngle);
-
-            // Aplica dano se o inimigo está dentro da abertura angular atual do corte
-            if (diffAngle <= currentArcHalf + 0.1 || state.frenzyActiveTimer > 0 || whirl) {
-                e.hp -= dmg;
-                chargeUlt(FRENZY_NOVA_SKILL.chargePerHit);
-
-                const pushAngle = Math.atan2(e.y - player.y, e.x - player.x);
-                e.vx += Math.cos(pushAngle) * kbForce;
-                e.vy += Math.sin(pushAngle) * kbForce;
-                createExplosion(e.x, e.y, e.color, 4);
-            }
-        }
-    });
+    hitEnemiesInArc(player.x, player.y, atkAngle, attackRad, currentArcHalf, dmg, kbForce, whirl,
+        () => chargeUlt(FRENZY_NOVA_SKILL.chargePerHit));
 
     player.comboStep = player.comboStep >= 3 ? 1 : player.comboStep + 1;
 }

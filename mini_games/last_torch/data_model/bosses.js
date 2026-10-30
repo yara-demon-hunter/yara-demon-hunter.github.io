@@ -27,7 +27,7 @@ export const BOSS_MODELS = {
 };
 
 export const BOSS_SPAWNING = {
-    everyTurns: 2,
+    everyTurns: 3,
     maximumEnemiesBeforeBoss: 3,
     spawnScreenRatio: 0.5,
     // Ordem em que os bosses aparecem (repete do início quando acaba)

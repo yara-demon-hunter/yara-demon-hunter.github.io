@@ -1,4 +1,5 @@
 export * from './characters/hero_visual.js';
+export * from './characters/shadow_clone_visual.js';
 export * from './monsters/bat_visual.js';
 export * from './scenery/forest_visual.js';
 export * from './scenery/torch_visual.js';

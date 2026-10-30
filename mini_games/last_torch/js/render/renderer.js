@@ -14,6 +14,7 @@ import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestG
 import { renderPlayer, renderPlayerTrail } from './player.js';
 import { renderPlayer25D } from './player25d.js';
 import { renderReflectWard } from './reflect.js';
+import { renderShadowClone } from './shadow_clone.js';
 
 // O herói padrão é o 2.5D (js/render/player25d.js). O top-down antigo (js/render/player.js) continua
 // no projeto: abra a página com ?hero=topdown para usá-lo.
@@ -76,6 +77,7 @@ export function render() {
     renderKnifeAim();
     renderKnives();
     renderPlayerTrail();
+    renderShadowClone();
     if (HERO_25D) renderPlayer25D();
     else renderPlayer();
     renderReflectWard();

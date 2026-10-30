@@ -4,7 +4,7 @@ title: "Copyright and Usage"
 lang: en
 translation_id: copyright
 translation: /pt/copyright/
-last_updated: "2026-09-26"
+last_updated: "2026-10-30"
 full_width: true
 brand_label: YARA, DEMON HUNTER
 intro: Information about ownership, permitted use, and requests to license the original work and project materials.
@@ -17,6 +17,8 @@ sections:
     title: Ownership
   - id: copyright
     title: Copyright
+  - id: games-and-source-code
+    title: Games and source code
   - id: unauthorized-use
     title: Unauthorized use
   - id: fan-art-and-fan-created-content
@@ -48,6 +50,9 @@ This includes, where applicable:
 - Descriptions and narrative content;
 - Original illustrations and artwork;
 - Book covers and original graphic assets;
+- The project's games and mini-games, including their source code, scripts, text, interfaces, and levels;
+- Sprites, animations, icons, music, sound effects, and other original game assets;
+- The source code, layout, and design of this website;
 - Other creative materials produced specifically for this project.
 
 Rights to any third-party materials used remain with their respective owners or holders.
@@ -61,6 +66,20 @@ The original content available on this website is protected by applicable copyri
 In many jurisdictions, copyright protection generally arises automatically when an original work is created and fixed in a tangible form. Registration is not generally required for protection, though its evidentiary value and effect on available remedies vary by jurisdiction.
 
 This website makes the work available for personal, non-commercial reading. Public availability of the content **does not grant a general license for reproduction, distribution, or adaptation**.
+
+## Games and source code {#games-and-source-code}
+
+The games and mini-games available on this website, as well as the source code of the website and the games, are computer programs protected by copyright and software laws.
+
+The source code of this project may be publicly visible, for example on GitHub or in your browser. **This does not make it free or open-source software** and does not grant any license. Unless authorized in advance and in writing, you may not:
+- Copy, host, mirror, or redistribute the games, in whole or in part, on other websites, apps, or platforms;
+- Reuse the source code, sprites, images, music, sound effects, or other assets in other projects;
+- Modify the games and distribute altered versions, mods, or remakes;
+- Remove or alter authorship and copyright notices in the code or the games.
+
+Viewing the repository and forking it within GitHub is allowed only to the extent required by the GitHub Terms of Service, which does not grant any right to use, modify, or redistribute the contents outside of GitHub.
+
+Playing the games directly on this website, for personal and non-commercial use, is allowed and welcome.
 
 ## Unauthorized use {#unauthorized-use}
 

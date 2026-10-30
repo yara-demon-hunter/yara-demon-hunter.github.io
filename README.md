@@ -6,6 +6,9 @@ The project is initially published in **Portuguese and English**, with the possi
 
 [⚔️ Yara, Demon Hunter](https://yara-demon-hunter.github.io)
 
+> **© 2026 Miguel Angelo do Amaral Junior. All rights reserved.**
+> This is **not** open-source software. The source code is publicly visible, but no license is granted to copy, reuse, modify or redistribute any part of this repository (text, games, code or assets). See [`LICENSE`](LICENSE) and the [Copyright and Usage](https://yara-demon-hunter.github.io/en/copyright/) page.
+
 ## About the Project
 
 This repository contains the source code for the official web serial website.
@@ -529,3 +532,11 @@ The project intentionally uses Jekyll rather than a dynamic web framework.
 Jekyll generates static HTML pages from Markdown, templates, CSS and JavaScript. This makes it well suited to a chapter-based web serial because the website does not need a database or server-side application for normal reading.
 
 Ruby is required by Jekyll, but the project itself does not require extensive Ruby programming. Most of the content will be written in Markdown, while the site's structure and appearance will be handled using HTML, CSS and JavaScript.
+
+---
+
+# License
+
+**All rights reserved.** This repository is proprietary. See [`LICENSE`](LICENSE) for the full terms and the [Copyright and Usage](https://yara-demon-hunter.github.io/en/copyright/) page ([Portuguese version](https://yara-demon-hunter.github.io/pt/copyright/)).
+
+Permission requests: yarademonhunter@gmail.com

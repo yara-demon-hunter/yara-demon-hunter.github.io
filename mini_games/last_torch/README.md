@@ -21,6 +21,7 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   world.js                        tamanho padronizado do mundo e zoom (areaScale) por perfil desktop/mobile
   visuals/                        cores, tamanhos e ritmos das animações (arte procedural)
     characters/hero_visual.js     personagens jogáveis
+    characters/shadow_clone_visual.js  paleta de sombra do Shadow Clone
     monsters/                     monstros (bat_visual.js, witch_visual.js, skeleton_visual.js)
     scenery/                      cenário (forest_visual.js, torch_visual.js)
     items/gold_visual.js          itens dropados
@@ -34,6 +35,7 @@ js/
   systems/stats.js                fórmulas de atributos (dano, alcance, cooldown...)
   systems/player.js               movimentação e rastro do herói
   systems/combat.js               ataque automático, golpes da lâmina e Frenzy Nova
+  systems/shadow_clone.js         Shadow Clone (passiva): reflexo do herói (anda e arremessa junto, golpeia no próprio círculo, morre e volta)
   systems/spawner.js              aparição de inimigos e chefão
   systems/enemies.js              IA, colisões, mortes/recompensas e projéteis inimigos
   systems/gold.js                 moedas de ouro dropadas: pulo, atração e coleta
@@ -44,6 +46,7 @@ js/
   render/forest.js                cenário: noite fria (chão, grama ao vento, névoa, vaga-lumes, luz da tocha que abre um círculo sem névoa)
   render/entities.js              inimigos, projéteis, golpes, moedas de ouro e partículas
   render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
+  render/shadow_clone.js          Shadow Clone: herói 2.5D com paleta de sombra
   render/fx/random.js             aleatório com semente (cenário estável)
   render/fx/easing.js             funções de easing e interpolação de ângulos
   ui/hud.js                       atualização do HUD

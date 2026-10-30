@@ -5,7 +5,7 @@ import { ctx, player, state } from '../core/state.js';
 import { easeOutCubic, easeOutQuad, lerpAngle } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
 import { drawDagger } from './knife.js';
-import { heroAnim as anim, heroCapeJag as capeJag, heroSwingAngleAt as swingAngleAt } from './player.js';
+import { heroAnim, heroCapeJag as capeJag, heroSwingAngleAt as swingAngleAt } from './player.js';
 
 // --- HERÓI 2.5D ---
 // O mesmo herói de player.js, montado como um boneco 3D simples: pernas, tronco, braços, capuz,
@@ -14,7 +14,10 @@ import { heroAnim as anim, heroCapeJag as capeJag, heroSwingAngleAt as swingAngl
 // A animação (velocidade, passada, capa, golpe) vem do mesmo estado de player.js.
 // É o herói padrão do jogo (?hero=topdown usa o antigo de player.js). Coordenadas locais: a = frente, b = direita, z = altura.
 
-const C = V.colors;
+// Paleta e estado de animação do boneco sendo desenhado: o herói, ou o Shadow Clone
+// (renderPlayer25D troca os dois antes de montar as partes)
+let C = V.colors;
+let anim = heroAnim;
 
 // Direção do herói no quadro atual (atualizada em renderPlayer25D)
 let cosF = 1;
@@ -317,7 +320,7 @@ function freeArmPart(pose) {
 function swordArmPose(pose) {
     const restAngle = H.restBladeAngle + Math.sin(anim.stride) * 0.12 * pose.run;
     let swingAngle = restAngle;
-    if (anim.swingActive || pose.blend > 0) swingAngle = swingAngleAt(Math.min(anim.swingElapsed, anim.swingSeconds));
+    if (anim.swingActive || pose.blend > 0) swingAngle = swingAngleAt(Math.min(anim.swingElapsed, anim.swingSeconds), anim);
     const blend = pose.blend;
     const restHand = [pose.lean * 0.5 + 1.6 + Math.sin(anim.stride + Math.PI) * V.armSwing * 0.4 * pose.run, V.chest.B + 0.8, V.handHeight];
     const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
@@ -387,7 +390,7 @@ function swordPart(pose, frenzy) {
             // Rastro fantasma do corte: lâminas em instantes anteriores
             if (anim.swingActive && anim.swingElapsed < anim.swingSeconds + 0.05) {
                 for (let g = H.ghostCount; g >= 1; g--) {
-                    const a = swingAngleAt(anim.swingElapsed - g * H.ghostGapSeconds);
+                    const a = swingAngleAt(anim.swingElapsed - g * H.ghostGapSeconds, anim);
                     const ghostHand = [Math.cos(a) * V.swingRadius, Math.sin(a) * V.swingRadius, V.swingHeight];
                     bladeShape(ghostHand, [Math.cos(a), Math.sin(a), 0], t, 0.5 * (1 - g / (H.ghostCount + 1)) * pose.blend);
                 }
@@ -497,7 +500,10 @@ function headPart(pose) {
     };
 }
 
-export function renderPlayer25D() {
+// body: herói (padrão) ou Shadow Clone, com o seu estado de animação e a sua paleta
+export function renderPlayer25D(body = player, bodyAnim = heroAnim, colors = V.colors) {
+    anim = bodyAnim;
+    C = colors;
     const t = performance.now() / 1000;
     const frenzy = state.frenzyActiveTimer > 0;
     cosF = Math.cos(anim.facing);
@@ -505,31 +511,31 @@ export function renderPlayer25D() {
 
     // Dano: mesmo empurrão do herói top-down (data_model/visuals/characters/hero_visual.js)
     const K = H.knockback;
-    const hitP = (performance.now() - player.hitTime) / 1000 / K.seconds;
+    const hitP = (performance.now() - body.hitTime) / 1000 / K.seconds;
     let push = 0;
     if (hitP >= 0 && hitP < 1) {
         push = hitP < K.peakAt
             ? easeOutCubic(hitP / K.peakAt)
             : 1 - easeOutQuad((hitP - K.peakAt) / (1 - K.peakAt));
     }
-    const ringP = (performance.now() - player.hitTime) / 1000 / K.ringSeconds;
+    const ringP = (performance.now() - body.hitTime) / 1000 / K.ringSeconds;
     if (ringP >= 0 && ringP < 1) {
         ctx.save();
         ctx.globalAlpha = (1 - ringP) * 0.7;
         ctx.strokeStyle = C.hurtRing;
         ctx.lineWidth = 2.5 * (1 - ringP) + 0.5;
         ctx.beginPath();
-        ctx.arc(player.x, player.y, K.ringStartRadius + (K.ringEndRadius - K.ringStartRadius) * easeOutCubic(ringP), 0, Math.PI * 2);
+        ctx.arc(body.x, body.y, K.ringStartRadius + (K.ringEndRadius - K.ringStartRadius) * easeOutCubic(ringP), 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
     }
-    const pulse = player.iFrames > 0
+    const pulse = body.iFrames > 0
         ? H.invulnerableAlphaMin + (1 - H.invulnerableAlphaMin) * (0.5 + 0.5 * Math.sin(performance.now() / H.invulnerablePulseMs))
         : 1;
 
     ctx.save();
-    ctx.globalAlpha = pulse;
-    ctx.translate(player.x + player.hitDirX * K.distance * push, player.y + player.hitDirY * K.distance * push);
+    ctx.globalAlpha *= pulse;
+    ctx.translate(body.x + body.hitDirX * K.distance * push, body.y + body.hitDirY * K.distance * push);
     ctx.scale(V.scale, V.scale);
 
     drawShadow();

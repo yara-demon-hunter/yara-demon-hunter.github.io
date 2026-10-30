@@ -1,6 +1,8 @@
 import { CORE_MODEL } from '../../data_model/core.js';
+import { SHADOW_CLONE } from '../../data_model/passives.js';
+import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
-import { ctx, player, state } from '../core/state.js';
+import { ctx, player, shadowClone, state } from '../core/state.js';
 import { getAtkRadius } from '../systems/stats.js';
 import { drawGlow } from './fx/glow.js';
 
@@ -59,12 +61,13 @@ export function renderCore() {
     ctx.restore();
 }
 
-// Raio de Alcance do herói: Círculo Vermelho com Linhas Tracejadas
-export function renderAttackRange() {
+// Círculo vermelho tracejado de alcance em volta de (x, y); alpha < 1 deixa mais apagado
+function drawRangeCircle(x, y, radius, alpha = 1) {
     ctx.save();
+    ctx.globalAlpha = alpha;
     ctx.setLineDash([8, 8]); // Linha tracejada
     ctx.beginPath();
-    ctx.arc(player.x, player.y, getAtkRadius(), 0, Math.PI * 2);
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
     // Brilho: traço largo e translúcido por baixo (bem mais barato que shadowBlur)
     ctx.strokeStyle = 'rgba(239, 68, 68, 0.18)';
     ctx.lineWidth = 7;
@@ -73,4 +76,14 @@ export function renderAttackRange() {
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.restore();
+}
+
+// Raio de Alcance do herói e do Shadow Clone (o do clone um pouco mais apagado)
+export function renderAttackRange() {
+    if (shadowClone.active) {
+        const appear = Math.min(1, (performance.now() - shadowClone.spawnTime) / 1000 / SHADOW_CLONE_VISUALS.spawnSeconds);
+        drawRangeCircle(shadowClone.x, shadowClone.y, getAtkRadius() * SHADOW_CLONE.radiusMultiplier,
+            SHADOW_CLONE_VISUALS.rangeAlpha * appear);
+    }
+    drawRangeCircle(player.x, player.y, getAtkRadius());
 }

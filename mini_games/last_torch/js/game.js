@@ -10,6 +10,7 @@ import { updateEffects } from './systems/effects.js';
 import { updateEnemies, updateEnemyProjectiles } from './systems/enemies.js';
 import { updateKnives } from './systems/knives.js';
 import { updatePlayer } from './systems/player.js';
+import { updateShadowClone } from './systems/shadow_clone.js';
 import { updateGold } from './systems/gold.js';
 import { updateSpawner } from './systems/spawner.js';
 import { setupButtons } from './ui/buttons.js';
@@ -36,6 +37,7 @@ function update(dt) {
 
     updatePlayer(dt);
     updateAutoAttack(dt);
+    updateShadowClone(dt);
     updateKnives(dt);
     updateSpawner(dt);
 

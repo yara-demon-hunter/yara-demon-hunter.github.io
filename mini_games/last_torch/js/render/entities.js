@@ -3,6 +3,7 @@ import { BAT_VISUALS } from '../../data_model/visuals/monsters/bat_visual.js';
 import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
 import { GOLD_VISUALS as G } from '../../data_model/visuals/items/gold_visual.js';
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
+import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { SKELETON_VISUALS } from '../../data_model/visuals/monsters/skeleton_visual.js';
 import { VAMPIRE_VISUALS } from '../../data_model/visuals/monsters/vampire_visual.js';
@@ -117,7 +118,10 @@ export function renderBladeSlashes() {
         const head = start + (end - start) * progress;
         const tail = start + (end - start) * Math.max(0, progress - look.tail);
 
-        const color = frenzyActive ? SLASH_VISUALS.frenzyColor : look.color;
+        // Golpes do Shadow Clone em violeta escuro
+        const color = s.shadow
+            ? (frenzyActive ? SHADOW_CLONE_VISUALS.slashFrenzyColor : SHADOW_CLONE_VISUALS.slashColor)
+            : (frenzyActive ? SLASH_VISUALS.frenzyColor : look.color);
         const width = look.lineWidth + (frenzyActive ? SLASH_VISUALS.frenzyExtraWidth : 0);
 
         ctx.save();

@@ -15,6 +15,22 @@ export const passives = createPassives();
 // Heroi & Light Trail
 export const player = createPlayerState();
 
+// Shadow Clone (passiva): só existe com a passiva comprada. active = vivo e na tela;
+// respawnTimer > 0 = morto, esperando para voltar.
+export const shadowClone = {
+    active: false,
+    hp: 0, maxHp: 0,
+    respawnTimer: 0,
+    spawnTime: 0,
+    x: 0, y: 0,
+    angle: 0,
+    attackTimer: 0,             // recarga do golpe próprio do clone
+    comboStep: 1,
+    frenzy: false,              // Fúria ativa no quadro anterior (para soltar as lâminas junto)
+    iFrames: 0,
+    hitDirX: 0, hitDirY: 0, hitTime: -100000
+};
+
 // Teclas pressionadas
 export const keys = {};
 

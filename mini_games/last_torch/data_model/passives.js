@@ -29,6 +29,13 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 110,
         maxLvl: 1,
         desc: 'Throws 3 daggers at once in a fan. Combines with Long Throw.'
+    },
+    shadowClone: {
+        name: 'Shadow Clone',
+        icon: '👥',
+        cost: 150,
+        maxLvl: 1,
+        desc: 'A shadow reflection walks and throws daggers with you, and slashes any monster that enters its own circle. If it falls, it returns after a while.'
     }
 };
 
@@ -59,3 +66,23 @@ export function createPassives() {
         Object.entries(PASSIVE_SKILL_MODELS).map(([key, model]) => [key, { ...model, lvl: 0 }])
     );
 }
+
+// Shadow Clone: reflexo de sombra do herói. Fica sempre na mesma posição em relação a ele, anda junto,
+// arremessa adagas junto (mesma direção) e solta as lâminas da Fúria junto. A espada é dele: golpeia
+// sozinho quando um monstro entra no círculo dele. Usa os stats do herói com os multiplicadores abaixo.
+// Leva dano de monstros e tiros como o herói; se morrer, volta depois de respawnSeconds. Não carrega a Fúria.
+export const SHADOW_CLONE = {
+    // DISTÂNCIA ENTRE O HERÓI E O CLONE (unidades do mundo). Maior = mais longe.
+    // Com ~80 os círculos de alcance dos dois quase se encostam.
+    followDistance: 150,
+    // LADO EM QUE O CLONE FICA (graus): 0 = direita, 90 = abaixo, 180 = esquerda, 270 = acima
+    offsetAngleDegrees: 180,
+    damageMultiplier: 0.3,      // golpes e adagas do clone
+    knockbackMultiplier: 0.3,
+    radiusMultiplier: 0.9,      // alcance da lâmina do clone (círculo vermelho dele)
+    cooldownMultiplier: 1,      // x recarga do golpe do herói (maior = golpeia mais devagar)
+    // VIDA DO CLONE: fração da vida máxima do herói (sobe junto com o upgrade Hero Health)
+    hpRatio: 0.5,
+    // TEMPO PARA VOLTAR depois de morrer (segundos)
+    respawnSeconds: 12
+};

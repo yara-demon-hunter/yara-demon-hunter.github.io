@@ -1,6 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { WORLD } from '../../data_model/world.js';
-import { canvas, ctx, player, state } from './state.js';
+import { canvas, ctx, player, shadowClone, state } from './state.js';
 
 // Telas 2x/3x (retina) têm 4x/9x mais pixels para pintar; 1.5 é um bom equilíbrio
 const MAX_PIXEL_RATIO = 1.5;
@@ -80,7 +80,7 @@ export function resize() {
         // Janela redimensionada no meio da partida: desloca tudo junto com o centro
         const dx = state.coreX - oldCoreX;
         const dy = state.coreY - oldCoreY;
-        [player, ...state.enemies, ...state.enemyProjectiles, ...state.goldDrops, ...state.particles].forEach(o => {
+        [player, shadowClone, ...state.enemies, ...state.enemyProjectiles, ...state.goldDrops, ...state.particles].forEach(o => {
             o.x += dx;
             o.y += dy;
         });

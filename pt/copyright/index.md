@@ -4,7 +4,7 @@ title: "Direitos autorais e uso"
 lang: pt
 translation_id: copyright
 translation: /en/copyright/
-last_updated: "2026-09-26"
+last_updated: "2026-10-30"
 full_width: true
 brand_label: YARA, CAÇADORA DE DEMÔNIOS
 intro: Informações sobre titularidade, usos permitidos e pedidos de licença para a obra original e os materiais do projeto.
@@ -17,6 +17,8 @@ sections:
     title: Titularidade
   - id: direitos-autorais
     title: Direitos autorais
+  - id: jogos-e-codigo-fonte
+    title: Jogos e código-fonte
   - id: uso-nao-autorizado
     title: Uso não autorizado
   - id: fan-art
@@ -48,6 +50,9 @@ Isso inclui, conforme aplicável:
 - Descrições e conteúdos narrativos;
 - Ilustrações e artes originais;
 - Capas e materiais gráficos originais;
+- Jogos e mini-games do projeto, incluindo seu código-fonte, roteiros, textos, interfaces e níveis;
+- Sprites, animações, ícones, músicas, efeitos sonoros e demais *assets* originais dos jogos;
+- O código-fonte, o layout e o design deste site;
 - Outros conteúdos criativos produzidos especificamente para este projeto.
 
 Os direitos sobre materiais de terceiros eventualmente utilizados permanecem com seus respectivos autores ou titulares.
@@ -61,6 +66,20 @@ Os conteúdos originais disponibilizados neste site são protegidos pelas leis d
 Em muitos países, a proteção autoral geralmente surge automaticamente quando uma obra original é criada e registrada em algum suporte. O registro não costuma ser obrigatório para que exista proteção, mas seu valor como prova e seus efeitos sobre eventuais medidas legais variam conforme a legislação de cada país.
 
 Este site disponibiliza a obra para leitura e apreciação pessoal e gratuita. A disponibilização pública do conteúdo **não constitui uma licença geral para sua reprodução, distribuição ou adaptação**.
+
+## Jogos e código-fonte {#jogos-e-codigo-fonte}
+
+Os jogos e mini-games disponibilizados neste site, assim como o código-fonte do site e dos jogos, são programas de computador protegidos pela legislação de direitos autorais e de software (no Brasil, as Leis nº 9.610/98 e nº 9.609/98).
+
+O código-fonte deste projeto pode estar visível publicamente, por exemplo no GitHub ou no próprio navegador. **Isso não o torna software livre ou de código aberto** e não concede qualquer licença de uso. Salvo autorização prévia por escrito, não é permitido:
+- Copiar, hospedar, espelhar ou redistribuir os jogos, no todo ou em parte, em outros sites, aplicativos ou plataformas;
+- Reutilizar o código-fonte, os *sprites*, as imagens, as músicas, os efeitos sonoros ou outros *assets* em outros projetos;
+- Modificar os jogos e distribuir versões alteradas, *mods* ou recriações;
+- Remover ou alterar avisos de autoria e direitos autorais presentes no código ou nos jogos.
+
+Visualizar o repositório e criar um *fork* dentro do GitHub é permitido apenas na medida exigida pelos Termos de Serviço do GitHub, o que não concede direito de uso, modificação ou redistribuição fora da plataforma.
+
+Jogar os jogos diretamente neste site, para uso pessoal e não comercial, é permitido e bem-vindo.
 
 ## Uso não autorizado {#uso-nao-autorizado}
 

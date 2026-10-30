@@ -11,134 +11,148 @@ import { drawGlow } from './fx/glow.js';
 // No sistema local, +x é a frente do herói e +y é o lado direito.
 // Todo movimento passa por suavização para não haver "saltos" entre poses.
 
-// Estado puramente visual (não afeta a lógica do jogo)
-const anim = {
-    lastTime: performance.now(),
-    lastX: 0,
-    lastY: 0,
-    velX: 0,            // velocidade suavizada (px/s, mundo)
-    velY: 0,
-    speed: 0,
-    run: 0,             // 0 a 1, suavizado
-    stride: 0,
-    facing: -Math.PI / 2,
-    turnRate: 0,        // rad/s suavizado
-    capeX: 0,           // atraso da capa (local)
-    capeY: 0,
-    lastComboStep: 1,
-    swingActive: false,
-    swingElapsed: 0,
-    swingKey: 1,
-    swingFrom: 0,
-    swingTo: 0,
-    swingSeconds: 0.2,
-    swingBlend: 0
-};
+// Estado puramente visual (não afeta a lógica do jogo). O Shadow Clone (js/render/shadow_clone.js)
+// tem o seu próprio, criado com a mesma função.
+export function createHeroAnim() {
+    return {
+        lastTime: performance.now(),
+        lastX: 0,
+        lastY: 0,
+        velX: 0,            // velocidade suavizada (px/s, mundo)
+        velY: 0,
+        speed: 0,
+        run: 0,             // 0 a 1, suavizado
+        stride: 0,
+        facing: -Math.PI / 2,
+        turnRate: 0,        // rad/s suavizado
+        capeX: 0,           // atraso da capa (local)
+        capeY: 0,
+        lastComboStep: 1,
+        swingActive: false,
+        swingElapsed: 0,
+        swingKey: 1,
+        swingFrom: 0,
+        swingTo: 0,
+        swingSeconds: 0.2,
+        swingBlend: 0
+    };
+}
+const anim = createHeroAnim();
 
 // Pontas fixas da barra da capa (aleatórias uma vez, para o rasgado não "tremer")
 const capeJag = Array.from({ length: V.capeStrips + 1 }, (_, i) => (i % 2 === 0 ? 1 : 0.58 + Math.random() * 0.2));
 
 // O teste 2.5D (js/render/player25d.js) usa o mesmo estado de animação e a mesma capa rasgada
-export { anim as heroAnim, capeJag as heroCapeJag, swingAngleAt as heroSwingAngleAt };
+export { anim as heroAnim, capeJag as heroCapeJag, swingAngleAt as heroSwingAngleAt, updateAnim as updateHeroAnim };
 
-function startSwing(step) {
-    const lastSlash = state.bladeSlashes[state.bladeSlashes.length - 1];
+// Último golpe de quem anima (herói ou clone: os golpes do clone têm shadow: true)
+function lastSlashOf(shadow) {
+    for (let i = state.bladeSlashes.length - 1; i >= 0; i--) {
+        if (!!state.bladeSlashes[i].shadow === shadow) return state.bladeSlashes[i];
+    }
+    return null;
+}
+
+function startSwing(a, step, shadow) {
+    const lastSlash = lastSlashOf(shadow);
     const key = lastSlash && lastSlash.spin ? 'whirl' : step;
     const combo = V.combo[key];
     const half = lastSlash ? lastSlash.arcWidth / 2 : 0.7;
-    anim.swingKey = key;
-    anim.swingSeconds = combo.seconds;
-    anim.swingElapsed = 0;
-    anim.swingActive = true;
+    a.swingKey = key;
+    a.swingSeconds = combo.seconds;
+    a.swingElapsed = 0;
+    a.swingActive = true;
     if (combo.spin) {
-        anim.swingFrom = -Math.PI;
-        anim.swingTo = Math.PI;
+        a.swingFrom = -Math.PI;
+        a.swingTo = Math.PI;
     } else {
-        anim.swingFrom = combo.from * (half + combo.extraArc);
-        anim.swingTo = combo.to * (half + combo.extraArc);
+        a.swingFrom = combo.from * (half + combo.extraArc);
+        a.swingTo = combo.to * (half + combo.extraArc);
     }
 }
 
 // Ângulo local da lâmina em um instante do golpe: preparação → corte → segura no fim
-function swingAngleAt(elapsed) {
-    const dur = anim.swingSeconds;
+function swingAngleAt(elapsed, a = anim) {
+    const dur = a.swingSeconds;
     const windEnd = dur * V.windupFraction;
-    const dir = Math.sign(anim.swingTo - anim.swingFrom) || 1;
-    const windAngle = anim.swingFrom - dir * V.windupExtra;
-    if (elapsed <= 0) return anim.swingFrom;
+    const dir = Math.sign(a.swingTo - a.swingFrom) || 1;
+    const windAngle = a.swingFrom - dir * V.windupExtra;
+    if (elapsed <= 0) return a.swingFrom;
     if (elapsed < windEnd) {
         // Puxa a lâmina para trás antes de cortar (antecipação)
         const p = easeOutQuad(elapsed / windEnd);
-        return anim.swingFrom + (windAngle - anim.swingFrom) * p;
+        return a.swingFrom + (windAngle - a.swingFrom) * p;
     }
     const p = Math.min(1, (elapsed - windEnd) / (dur - windEnd));
-    return windAngle + (anim.swingTo - windAngle) * easeOutCubic(p);
+    return windAngle + (a.swingTo - windAngle) * easeOutCubic(p);
 }
 
-function updateAnim() {
+// body: quem é animado (herói por padrão, ou o Shadow Clone com o seu próprio estado a)
+function updateAnim(a = anim, body = player) {
     const now = performance.now();
-    const dt = Math.min((now - anim.lastTime) / 1000, 0.05);
-    anim.lastTime = now;
+    const dt = Math.min((now - a.lastTime) / 1000, 0.05);
+    a.lastTime = now;
     const playing = state.gameState === 'PLAYING';
 
-    const dx = player.x - anim.lastX;
-    const dy = player.y - anim.lastY;
-    anim.lastX = player.x;
-    anim.lastY = player.y;
+    const dx = body.x - a.lastX;
+    const dy = body.y - a.lastY;
+    a.lastX = body.x;
+    a.lastY = body.y;
 
     if (playing && dt > 0) {
         // Velocidade suavizada
         const k = Math.min(1, dt * V.speedSmoothing);
-        anim.velX += (Math.max(-600, Math.min(600, dx / dt)) - anim.velX) * k;
-        anim.velY += (Math.max(-600, Math.min(600, dy / dt)) - anim.velY) * k;
-        anim.speed = Math.hypot(anim.velX, anim.velY);
+        a.velX += (Math.max(-600, Math.min(600, dx / dt)) - a.velX) * k;
+        a.velY += (Math.max(-600, Math.min(600, dy / dt)) - a.velY) * k;
+        a.speed = Math.hypot(a.velX, a.velY);
 
-        const runTarget = Math.min(1, anim.speed / V.runSpeedForFullEffect);
-        anim.run += (runTarget - anim.run) * Math.min(1, dt * V.runSmoothing);
-        anim.stride += dt * V.strideSpeed * (0.25 + anim.run);
+        const runTarget = Math.min(1, a.speed / V.runSpeedForFullEffect);
+        a.run += (runTarget - a.run) * Math.min(1, dt * V.runSmoothing);
+        a.stride += dt * V.strideSpeed * (0.25 + a.run);
 
         // Giro suave para o lado do movimento (não durante o golpe). No arremesso da adaga vira rápido para o alvo.
-        const before = anim.facing;
+        const before = a.facing;
+        // O Shadow Clone arremessa junto com o herói
         const throwing = (now - state.knifeThrowTime) / 1000 < KNIFE_VISUALS.throwSeconds;
         if (throwing) {
-            anim.facing = lerpAngle(anim.facing, state.knifeThrowAngle, Math.min(1, dt * 25));
-        } else if (Math.hypot(dx, dy) > 0.3 && !anim.swingActive) {
-            anim.facing = lerpAngle(anim.facing, Math.atan2(dy, dx), Math.min(1, dt * V.turnSmoothing));
+            a.facing = lerpAngle(a.facing, state.knifeThrowAngle, Math.min(1, dt * 25));
+        } else if (Math.hypot(dx, dy) > 0.3 && !a.swingActive) {
+            a.facing = lerpAngle(a.facing, Math.atan2(dy, dx), Math.min(1, dt * V.turnSmoothing));
         }
-        let dAng = anim.facing - before;
+        let dAng = a.facing - before;
         while (dAng > Math.PI) dAng -= Math.PI * 2;
         while (dAng < -Math.PI) dAng += Math.PI * 2;
-        anim.turnRate += (dAng / dt - anim.turnRate) * Math.min(1, dt * 10);
+        a.turnRate += (dAng / dt - a.turnRate) * Math.min(1, dt * 10);
 
         // Capa: atraso suave oposto à velocidade (no referencial do herói)
-        const cos = Math.cos(-anim.facing);
-        const sin = Math.sin(-anim.facing);
-        const lx = anim.velX * cos - anim.velY * sin;
-        const ly = anim.velX * sin + anim.velY * cos;
+        const cos = Math.cos(-a.facing);
+        const sin = Math.sin(-a.facing);
+        const lx = a.velX * cos - a.velY * sin;
+        const ly = a.velX * sin + a.velY * cos;
         const clamp = (v) => Math.max(-V.capeMaxLag, Math.min(V.capeMaxLag, v));
         const targetX = clamp(-lx * V.capeDragPerSpeed);
-        const targetY = clamp(-ly * V.capeDragPerSpeed - anim.turnRate * V.capeTurnLag);
+        const targetY = clamp(-ly * V.capeDragPerSpeed - a.turnRate * V.capeTurnLag);
         const f = Math.min(1, dt * V.capeFollow);
-        anim.capeX += (targetX - anim.capeX) * f;
-        anim.capeY += (targetY - anim.capeY) * f;
+        a.capeX += (targetX - a.capeX) * f;
+        a.capeY += (targetY - a.capeY) * f;
     }
 
     // Novo golpe: o passo executado é o valor anterior do combo
-    if (player.comboStep !== anim.lastComboStep) {
-        const executedStep = anim.lastComboStep;
-        anim.lastComboStep = player.comboStep;
-        anim.facing = player.angle;
-        startSwing(executedStep);
+    if (body.comboStep !== a.lastComboStep) {
+        const executedStep = a.lastComboStep;
+        a.lastComboStep = body.comboStep;
+        a.facing = body.angle;
+        startSwing(a, executedStep, body !== player);
     }
 
-    if (anim.swingActive && playing) {
-        anim.swingElapsed += dt;
-        if (anim.swingElapsed > anim.swingSeconds + V.recoverSeconds) anim.swingActive = false;
+    if (a.swingActive && playing) {
+        a.swingElapsed += dt;
+        if (a.swingElapsed > a.swingSeconds + V.recoverSeconds) a.swingActive = false;
     }
     // Mistura suave entre a pose de repouso e a pose de golpe (entra e sai sem estalo)
-    const blendTarget = anim.swingActive && anim.swingElapsed < anim.swingSeconds + V.recoverSeconds * 0.4 ? 1 : 0;
-    anim.swingBlend += (blendTarget - anim.swingBlend) * Math.min(1, dt * V.swingBlendRate);
-    if (anim.swingBlend < 0.001) anim.swingBlend = 0;
+    const blendTarget = a.swingActive && a.swingElapsed < a.swingSeconds + V.recoverSeconds * 0.4 ? 1 : 0;
+    a.swingBlend += (blendTarget - a.swingBlend) * Math.min(1, dt * V.swingBlendRate);
+    if (a.swingBlend < 0.001) a.swingBlend = 0;
 }
 
 // Rastro de sombra escura, quase imperceptível

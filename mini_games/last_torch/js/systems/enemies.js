@@ -3,13 +3,14 @@ import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, createVampireBat, rollMonsterGold } from '../../data_model/monsters.js';
 import { MIRROR_WARD } from '../../data_model/passives.js';
-import { audio, passives, player, state } from '../core/state.js';
+import { audio, passives, player, shadowClone, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { triggerGameOver } from '../ui/screens.js';
 import { openShop } from '../ui/shop.js';
 import { createExplosion, registerPlayerHit, shakeScreen } from './effects.js';
 import { gainXp } from './progression.js';
 import { dropGold } from './gold.js';
+import { damageShadowClone } from './shadow_clone.js';
 import { resetFieldForNewTurn } from './spawner.js';
 
 // Modelo de dados do inimigo (monstro comum ou boss)
@@ -71,6 +72,15 @@ export function updateEnemies(dt) {
                 triggerGameOver('PLAYER');
                 return;
             }
+        }
+
+        // Colisão com o Shadow Clone (passiva): ele também se machuca
+        if (shadowClone.active && shadowClone.iFrames <= 0
+            && Math.hypot(shadowClone.x - e.x, shadowClone.y - e.y) < e.radius + CHARACTER_MODEL.collisionRadius) {
+            damageShadowClone(e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            const pushAngle = Math.atan2(e.y - shadowClone.y, e.x - shadowClone.x);
+            e.vx += Math.cos(pushAngle) * MONSTER_SPAWNING.contactKnockback;
+            e.vy += Math.sin(pushAngle) * MONSTER_SPAWNING.contactKnockback;
         }
 
         // Colisão com Núcleo
@@ -215,6 +225,13 @@ export function updateEnemyProjectiles(dt) {
             updateHUD();
             enemyProjectiles.splice(i, 1);
             if (player.hp <= 0) { triggerGameOver('PLAYER'); return; }
+            continue;
+        }
+
+        if (shadowClone.active && shadowClone.iFrames <= 0
+            && Math.hypot(shadowClone.x - p.x, shadowClone.y - p.y) < p.radius + CHARACTER_MODEL.collisionRadius) {
+            damageShadowClone(p.damage, p.x - p.vx * 0.05, p.y - p.vy * 0.05, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
+            enemyProjectiles.splice(i, 1);
             continue;
         }
 
