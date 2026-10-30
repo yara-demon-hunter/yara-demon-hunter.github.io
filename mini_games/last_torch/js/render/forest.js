@@ -332,11 +332,6 @@ function updateTorchLight(now) {
     cache.currentLight = cache.lightRadius * flicker;
 }
 
-// Raio de luz atual da tocha (atualizado junto com a névoa)
-export function getCurrentLightRadius() {
-    return cache.currentLight;
-}
-
 // Vaga-lumes vagando e piscando
 export function renderFireflies() {
     const t = performance.now() / 1000;

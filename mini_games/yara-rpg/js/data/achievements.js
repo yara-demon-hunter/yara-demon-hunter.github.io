@@ -3,7 +3,8 @@ window.YaraRpgData = window.YaraRpgData || {};
 // Conquistas do Santuário. A avaliação fica em ../systems/meta.js (CONDITIONS); cada conquista aponta para um tipo
 // de condição e um valor. Tipos: totalKills, totalBosses, totalInterrupts, totalSpared, totalChests, wins,
 // bestLevel, bestRegion, monsterDefeated (id/nome EN do monstro), runFlawless, distinctItems,
-// itemRarityIndex (posição em equipmentRarities), gold, runMinutes, totalMinutes e spiritEye.
+// itemRarityIndex (posição em equipmentRarities), gold, runMinutes, totalMinutes, spiritEye,
+// soulDark, soulLight (pico da alma em módulo), balancedWins e petCommands.
 window.YaraRpgData.achievements = Object.freeze([
     { id: "first-blood", icon: "🩸", name: { pt: "Primeiro sangue", en: "First blood" }, description: { pt: "Derrote seu primeiro monstro.", en: "Defeat your first monster." }, condition: { type: "totalKills", value: 1 } },
     { id: "slayer-50", icon: "🗡️", name: { pt: "Caçador veterano", en: "Veteran hunter" }, description: { pt: "Derrote 50 monstros no total.", en: "Defeat 50 monsters in total." }, condition: { type: "totalKills", value: 50 } },
@@ -26,5 +27,9 @@ window.YaraRpgData.achievements = Object.freeze([
     { id: "playtime-1h", icon: "🕐", name: { pt: "Preso na névoa", en: "Lost in the mist" }, description: { pt: "Jogue 1 hora no total.", en: "Play for 1 hour in total." }, condition: { type: "totalMinutes", value: 60 } },
     { id: "playtime-5h", icon: "🕰️", name: { pt: "Alma da floresta", en: "Soul of the forest" }, description: { pt: "Jogue 5 horas no total.", en: "Play for 5 hours in total." }, condition: { type: "totalMinutes", value: 300 } },
     { id: "spirit-eye", icon: "👁️", name: { pt: "Olho que tudo vê", en: "The all-seeing eye" }, description: { pt: "Tenha o Olho Espiritual implantado.", en: "Have the Spirit Eye implanted." }, condition: { type: "spiritEye" } },
+    { id: "soul-abyssal", icon: "🌑", name: { pt: "Cria do Abismo", en: "Child of the Abyss" }, description: { pt: "Alcance a Alma Abissal.", en: "Reach the Abyssal Soul." }, condition: { type: "soulDark", value: 70 } },
+    { id: "soul-divine", icon: "☀️", name: { pt: "Luz na névoa", en: "Light in the mist" }, description: { pt: "Alcance a Alma Divina.", en: "Reach the Divine Soul." }, condition: { type: "soulLight", value: 70 } },
+    { id: "soul-balance", icon: "⚖️", name: { pt: "Fiel da balança", en: "Keeper of the scales" }, description: { pt: "Vença a campanha com a alma em equilíbrio.", en: "Win the campaign with a balanced soul." }, condition: { type: "balancedWins", value: 1 } },
+    { id: "pet-commands-25", icon: "🐾", name: { pt: "Melhor amigo", en: "Best friend" }, description: { pt: "Use comandos do companheiro 25 vezes.", en: "Use companion commands 25 times." }, condition: { type: "petCommands", value: 25 } },
     { id: "victory", icon: "🔔", name: { pt: "O sino toca", en: "The bell tolls" }, description: { pt: "Vença a campanha.", en: "Win the campaign." }, condition: { type: "wins", value: 1 } },
 ]);

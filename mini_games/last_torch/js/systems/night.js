@@ -5,7 +5,6 @@ import { save, persist } from '../core/save.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { openCamp } from '../ui/camp.js';
-import { openCards } from '../ui/cards.js';
 import { updateHUD } from '../ui/hud.js';
 import { triggerGameOver } from '../ui/screens.js';
 import { addGibs, addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, slowMotion, zoomPunch } from './effects.js';
@@ -87,9 +86,7 @@ function finishHour() {
     save.stats.bestHour = Math.max(save.stats.bestHour, state.turn);
     persist();
     state.nextOmen = rollOmen(state.turn);
-    state.campPending = true;
-    if (state.pendingCards.length > 0) openCards();
-    else openCamp();
+    openCamp();
 }
 
 // --- BOSS MORTO ---
@@ -145,7 +142,6 @@ export function continueEndless() {
     state.dawn = 0;
     state.turn++;
     state.nextOmen = rollOmen(state.turn);
-    state.campPending = false;
     state.gameState = 'PLAYING';
     startHour();
 }
@@ -156,8 +152,6 @@ export function beginDeath(reason) {
     state.phase = 'DYING';
     state.phaseTimer = 1.4 * DEATH_SLOW;
     state.gameOverReason = reason;
-    state.pendingCards.length = 0;
-    state.campPending = false;
     slowMotion(DEATH_SLOW, 2);
     shakeScreen(20);
     audio.setMood('silent');

@@ -42,6 +42,13 @@ export function feedTorch(amount) {
     updateHUD();
 }
 
+// Vida máxima da tocha mudou (árvore): a diferença entra na vida atual
+export function syncTorchMax() {
+    const oldMax = state.coreHpMax;
+    state.coreHpMax = getTorchMaxHp();
+    state.coreHp = Math.min(state.coreHpMax, state.coreHp + Math.max(0, state.coreHpMax - oldMax));
+}
+
 export function resetTorch() {
     warnedLow = false;
     warmthFloat = 0;

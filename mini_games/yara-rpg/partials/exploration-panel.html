@@ -123,6 +123,13 @@
 
             <!-- Controles de Ação -->
             <div id="action-controls">
+                <!-- Comando do companheiro: faro na exploração, ação gratuita no combate -->
+                <button id="pet-command-button" type="button" class="pet-command" hidden>
+                    <span id="pet-command-icon" class="pet-command-icon" aria-hidden="true"></span>
+                    <span class="pet-command-copy"><span id="pet-command-name" class="pet-command-name"></span><span id="pet-command-detail" class="pet-command-detail"></span></span>
+                    <span id="pet-command-status" class="pet-command-status"></span>
+                </button>
+
                 <!-- Ações de Exploração -->
                 <div id="controls-explore" class="grid grid-cols-3 gap-2">
                     <button onclick="exploreForest()" class="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 active:scale-[0.98] text-white font-semibold py-3 px-3 rounded-xl shadow-lg border border-emerald-500/50 flex items-center justify-center gap-2 transition text-sm">

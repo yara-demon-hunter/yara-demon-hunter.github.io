@@ -2,6 +2,8 @@ import { ACHIEVEMENTS, META_UPGRADES, getMetaUpgradeCost } from '../../data_mode
 import { HEROES } from '../../data_model/heroes.js';
 import { save, persist } from '../core/save.js';
 import { audio } from '../core/state.js';
+import { TREE_BRANCHES, TREE_NODES } from '../../data_model/tree.js';
+import { getNodeInfo, unlockNode } from '../systems/tree.js';
 import { renderStartScreen } from './screens.js';
 
 // --- HEARTH ---
@@ -75,7 +77,29 @@ function renderTrials(list) {
     });
 }
 
-const TABS = { upgrades: renderUpgrades, heroes: renderHeroes, trials: renderTrials };
+// Nós extras da árvore de skills, comprados com brasas
+function renderTreeNodes(list) {
+    TREE_NODES.filter(node => node.lock?.embers).forEach(node => {
+        const info = getNodeInfo(node);
+        const owned = save.unlockedNodes.includes(node.id);
+        const can = !owned && save.embers >= node.lock.embers;
+        const branch = TREE_BRANCHES[node.branch];
+        const item = document.createElement('div');
+        item.className = `hearth-item${can ? ' is-ready' : ''}${owned ? ' is-max' : ''}`;
+        item.innerHTML = `
+            <span class="hearth-icon"></span>
+            <div class="hearth-text"><b></b><span></span></div>
+            ${owned ? '<span class="hearth-tag">UNLOCKED</span>'
+                : `<button data-unlock="${node.id}" class="hearth-buy" ${can ? '' : 'disabled'}>🔥 ${node.lock.embers}</button>`}
+        `;
+        item.querySelector('.hearth-icon').textContent = info.icon;
+        item.querySelector('b').textContent = info.name;
+        item.querySelector('.hearth-text span').textContent = `${branch.name} branch. ${info.desc}`;
+        list.appendChild(item);
+    });
+}
+
+const TABS = { upgrades: renderUpgrades, heroes: renderHeroes, tree: renderTreeNodes, trials: renderTrials };
 
 function renderHearth() {
     renderEmbers();
@@ -115,6 +139,10 @@ export function buyMetaUpgrade(key) {
     persist();
     renderHearth();
     audio.playPurchase();
+}
+
+export function buyTreeNode(id) {
+    if (unlockNode(id)) renderHearth();
 }
 
 export function chooseHero(key) {

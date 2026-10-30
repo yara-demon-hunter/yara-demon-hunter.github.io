@@ -21,7 +21,6 @@ import { updateSpawner } from './systems/spawner.js';
 import { updateStreak } from './systems/streak.js';
 import { updateTorch } from './systems/torch.js';
 import { setupButtons } from './ui/buttons.js';
-import { openCards } from './ui/cards.js';
 import { flushHud, updateDashButton, updateKnifeButton } from './ui/hud.js';
 import { isPhonePortrait } from './ui/orientation.js';
 import { setupScreens } from './ui/screens.js';
@@ -96,9 +95,6 @@ export function update(dt) {
     updateKnifeButton();
     updateDashButton();
     updateEffects(dt);
-
-    // Level up ou baú: o quadro termina antes da escolha de cartas abrir
-    if (state.phase === 'HUNT' && state.gameState === 'PLAYING' && state.pendingCards.length > 0) openCards();
 }
 
 // --- GAME LOOP ---

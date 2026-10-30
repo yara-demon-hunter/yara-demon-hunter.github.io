@@ -349,6 +349,7 @@ function checkCombatProgress(monsterStunned = false) {
     }
     if (monsterStunned) {
         flushFuryAnimation();
+        window.YaraPets?.tickCooldown();
         combatActionLocked = false;
         updateUI();
         return;
@@ -358,13 +359,15 @@ function checkCombatProgress(monsterStunned = false) {
 
 function monsterAttackTurn() {
     if (!inCombat || !currentMonster || !combatActionLocked) return;
+    if (window.YaraPets?.beforeMonsterTurn()) return;
     const encounterId = combatEncounterId;
     enemyTurnCount++;
     const wasTelegraphing = enemyTelegraphing;
     enemyTelegraphing = false;
 
     const evasionChance = Math.min(selectedCharacter.limits.maxEvasion, getEffectiveStat('evasion') + hero.evasionBonus);
-    const evaded = Math.random() * GAME_RULES.probabilityScale < evasionChance;
+    const evaded = window.YaraPets?.consumeDodge()
+        || Math.random() * GAME_RULES.probabilityScale < evasionChance;
     if (evaded) {
         playSound('dodge');
         hero.defending = false;

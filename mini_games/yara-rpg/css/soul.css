@@ -1,0 +1,324 @@
+/* Alma do herói (medidor, aura e marcas nas escolhas) e comandos dos companheiros. */
+#game-main {
+    --soul-power: 0;
+    --soul-color: 148, 163, 184;
+    --soul-glow: 148, 163, 184;
+}
+#game-main[data-soul-side="dark"] { --soul-color: 88, 28, 135; --soul-glow: 168, 85, 247; }
+#game-main[data-soul-side="light"] { --soul-color: 250, 204, 21; --soul-glow: 254, 240, 138; }
+
+/* Vinheta: cresce com a força da alma e some quando luz e sombra se anulam. */
+.soul-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 52%, rgba(var(--soul-color), .55) 100%);
+    opacity: calc(var(--soul-power) * .5);
+    transition: opacity 1.2s ease;
+}
+#game-main[data-soul-side="neutral"] .soul-vignette { opacity: 0; }
+
+.soul-meter {
+    display: block;
+    width: 100%;
+    padding: .3rem .1rem .1rem;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.soul-meter-heading {
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    margin-bottom: .25rem;
+    color: #e7e0cf;
+    font-size: .75rem;
+    font-weight: 600;
+}
+.soul-meter-heading #soul-meter-value { margin-left: auto; font-variant-numeric: tabular-nums; }
+.soul-meter[data-soul-side="dark"] .soul-meter-heading { color: #d8b4fe; }
+.soul-meter[data-soul-side="light"] .soul-meter-heading { color: #fde68a; }
+.soul-meter-track {
+    position: relative;
+    display: block;
+    height: .6rem;
+    border: 1px solid rgba(120, 103, 67, .7);
+    border-radius: 999px;
+    background: linear-gradient(90deg, #2e1065, #161a1e 50%, #713f12);
+}
+.soul-meter-track::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    left: 50%;
+    width: 1px;
+    background: rgba(231, 224, 207, .55);
+}
+.soul-meter-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: 999px;
+    transition: left .7s ease, width .7s ease;
+}
+.soul-meter[data-soul-side="dark"] .soul-meter-fill { background: linear-gradient(90deg, #a855f7, #581c87); box-shadow: 0 0 .5rem rgba(168, 85, 247, .8); }
+.soul-meter[data-soul-side="light"] .soul-meter-fill { background: linear-gradient(90deg, #ca8a04, #fde68a); box-shadow: 0 0 .5rem rgba(253, 230, 138, .8); }
+.soul-meter[data-soul-side="neutral"] .soul-meter-fill { background: rgba(203, 213, 225, .55); }
+.soul-meter-marker {
+    position: absolute;
+    top: 50%;
+    width: .7rem;
+    height: .7rem;
+    border: 1px solid #f8f4e6;
+    border-radius: 50%;
+    background: #15171b;
+    transform: translate(-50%, -50%);
+    transition: left .7s cubic-bezier(.2, .8, .2, 1);
+}
+.soul-meter-ends {
+    display: flex;
+    justify-content: space-between;
+    margin-top: .2rem;
+    color: #8f8a7c;
+    font-size: .58rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+/* Aura em volta do retrato. Usa elementos próprios porque ::before e ::after são dos efeitos de buff e nível. */
+.soul-aura {
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    left: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(calc(1.25 + var(--soul-power) * 1.1));
+    transition: opacity 1s ease, transform 1s ease;
+}
+.hero-portrait-anchor .hero-portrait { position: relative; z-index: 1; transition: filter 1s ease; }
+/* Nome e nível ficam acima da aura para continuarem legíveis. */
+.hero-summary #hero-name,
+.hero-summary-heading > div:first-child > span {
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+}
+.hero-portrait-anchor[data-soul-side="dark"] .soul-aura,
+.hero-portrait-anchor[data-soul-side="light"] .soul-aura { opacity: calc(.45 + var(--soul-power) * .55); }
+.soul-aura-core {
+    position: absolute;
+    inset: -12%;
+    border-radius: 42% 58% 55% 45%;
+    filter: blur(5px);
+    animation: soul-aura-breathe 3.6s ease-in-out infinite;
+}
+.soul-aura-ring {
+    position: absolute;
+    inset: -6%;
+    border-radius: 50%;
+    filter: blur(2px);
+    animation: soul-aura-spin 7s linear infinite;
+}
+.soul-aura-wisp {
+    position: absolute;
+    bottom: 10%;
+    width: .32rem;
+    height: .32rem;
+    border-radius: 50%;
+    opacity: 0;
+    animation: soul-wisp-rise 2.8s ease-in infinite;
+}
+.soul-aura-wisp:nth-of-type(3) { left: 8%; animation-delay: 0s; }
+.soul-aura-wisp:nth-of-type(4) { left: 78%; animation-delay: .7s; }
+.soul-aura-wisp:nth-of-type(5) { left: 42%; animation-delay: 1.4s; }
+.soul-aura-wisp:nth-of-type(6) { left: 22%; animation-delay: 2.1s; }
+.soul-aura-wisp:nth-of-type(7) { left: 62%; animation-delay: 1.05s; }
+.soul-aura-wisp:nth-of-type(8) { left: 92%; animation-delay: 1.75s; }
+.hero-portrait-anchor[data-soul-level="1"] .soul-aura-wisp:nth-of-type(n+5) { display: none; }
+.hero-portrait-anchor[data-soul-level="2"] .soul-aura-wisp:nth-of-type(n+7) { display: none; }
+
+.hero-portrait-anchor[data-soul-side="dark"] .soul-aura-core { background: radial-gradient(circle, rgba(10, 4, 20, .95) 35%, rgba(88, 28, 135, .75) 68%, transparent 80%); }
+.hero-portrait-anchor[data-soul-side="dark"] .soul-aura-ring { background: conic-gradient(from 0deg, transparent, rgba(0, 0, 0, .95), transparent 40%, rgba(126, 34, 206, .85), transparent 75%); }
+.hero-portrait-anchor[data-soul-side="dark"] .soul-aura-wisp { background: #0a0414; box-shadow: 0 0 .45rem .15rem rgba(126, 34, 206, .85); }
+.hero-portrait-anchor[data-soul-side="light"] .soul-aura-core { background: radial-gradient(circle, rgba(255, 251, 235, .95) 35%, rgba(250, 204, 21, .6) 68%, transparent 80%); }
+.hero-portrait-anchor[data-soul-side="light"] .soul-aura-ring { background: conic-gradient(from 0deg, transparent, rgba(254, 249, 195, .95), transparent 40%, rgba(250, 204, 21, .85), transparent 75%); }
+.hero-portrait-anchor[data-soul-side="light"] .soul-aura-wisp { background: #fffbeb; box-shadow: 0 0 .45rem .15rem rgba(253, 224, 71, .9); }
+.hero-portrait-anchor[data-soul-side="dark"] .hero-portrait { filter: saturate(calc(1 - var(--soul-power) * .55)) contrast(calc(1 + var(--soul-power) * .25)) brightness(calc(1 - var(--soul-power) * .15)); }
+.hero-portrait-anchor[data-soul-side="light"] .hero-portrait { filter: brightness(calc(1 + var(--soul-power) * .2)) sepia(calc(var(--soul-power) * .3)); }
+
+@keyframes soul-aura-breathe {
+    0%, 100% { transform: scale(.94) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(14deg); }
+}
+@keyframes soul-aura-spin {
+    to { transform: rotate(360deg); }
+}
+@keyframes soul-wisp-rise {
+    0% { opacity: 0; transform: translateY(0) scale(.7); }
+    25% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-2.6rem) translateX(.3rem) scale(1.25); }
+}
+
+/* Explosão de quando a alma muda: um anel da cor do lado, ou as duas energias se chocando. */
+.soul-burst-light .hero-portrait,
+.soul-burst-dark .hero-portrait,
+.soul-burst-clash .hero-portrait { animation: soul-portrait-pulse .9s ease-out; }
+.soul-burst {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+.soul-burst-light .soul-burst { border: 3px solid #fde68a; box-shadow: 0 0 1.2rem #facc15, inset 0 0 .8rem #fef9c3; animation: soul-burst-ring 1.1s ease-out; }
+.soul-burst-dark .soul-burst { border: 3px solid #581c87; box-shadow: 0 0 1.2rem #000, 0 0 1.6rem #7e22ce, inset 0 0 .8rem #000; animation: soul-burst-ring 1.1s ease-out; }
+.soul-burst-clash .soul-burst { border: 3px solid transparent; background: conic-gradient(#fde68a, #581c87, #fde68a, #581c87, #fde68a); mask: radial-gradient(circle, transparent 54%, #000 56%); box-shadow: 0 0 1.4rem #fff; animation: soul-burst-clash 1.2s ease-out; }
+@keyframes soul-burst-ring {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(.5); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(3); }
+}
+@keyframes soul-burst-clash {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(.5) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(2.6) rotate(260deg); }
+}
+@keyframes soul-portrait-pulse {
+    0%, 100% { scale: 1; }
+    35% { scale: 1.16; }
+}
+
+.floating-damage-soul-light { color: #fde68a; }
+.floating-damage-soul-dark { color: #c084fc; }
+.floating-damage-pet { color: #fbbf24; }
+.floating-damage-bleed { color: #f43f5e; }
+
+/* Marcas das escolhas. */
+.soul-choice-tag {
+    display: block;
+    margin-top: .2rem;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+}
+.soul-choice-tag-light { color: #fde68a; }
+.soul-choice-tag-dark { color: #c084fc; }
+.soul-choice-tag-locked { color: #a8a29e; font-weight: 600; }
+.soul-choice-locked,
+.soul-choice-locked:hover {
+    border-style: dashed;
+    border-color: #57534e;
+    background: rgba(28, 25, 23, .75);
+    color: #a8a29e;
+    cursor: not-allowed;
+}
+
+.soul-dialog-history { display: grid; gap: .35rem; margin-top: .6rem; }
+.soul-dialog-history li { display: flex; align-items: center; justify-content: space-between; gap: .75rem; color: #d0cec5; font-size: .75rem; }
+.soul-dialog-heading { margin-top: .9rem; color: #f3d78e; font-size: .8rem; font-weight: 700; }
+.soul-dialog-description { margin-top: .5rem; color: #e7e0cf; font-size: .82rem; line-height: 1.55; }
+.soul-dialog-empty { margin-top: .5rem; color: #a8a29e; font-size: .75rem; }
+.soul-dialog-empty[hidden] { display: none; }
+
+/* Companheiros. */
+.hero-pet-companion {
+    position: absolute;
+    z-index: 2;
+    right: -.55rem;
+    bottom: -.4rem;
+    display: grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    overflow: hidden;
+    border: 1px solid rgba(229, 185, 86, .8);
+    border-radius: 50%;
+    background: #12161a;
+    font-size: .8rem;
+    line-height: 1;
+    animation: pet-companion-bob 2.6s ease-in-out infinite;
+}
+.hero-pet-companion[hidden] { display: none; }
+.hero-pet-companion img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@keyframes pet-companion-bob {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -.12rem; }
+}
+
+.pet-command {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    width: 100%;
+    margin-bottom: .5rem;
+    padding: .4rem .7rem;
+    border: 1px solid rgba(229, 185, 86, .45);
+    border-radius: .75rem;
+    background: linear-gradient(90deg, rgba(58, 44, 16, .9), rgba(23, 25, 31, .9));
+    color: #f3e7c6;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.pet-command[hidden] { display: none; }
+.pet-command:disabled { opacity: .55; cursor: not-allowed; }
+.pet-command-ready { box-shadow: 0 0 .7rem rgba(250, 204, 21, .3); }
+.pet-command-ready:hover { border-color: #e5b956; }
+.pet-command-icon { flex: 0 0 auto; font-size: 1.2rem; line-height: 1; }
+.pet-command-copy { display: flex; flex: 1 1 auto; flex-direction: column; min-width: 0; }
+.pet-command-name { font-size: .78rem; font-weight: 700; }
+.pet-command-detail { overflow: hidden; color: #b9b19c; font-size: .65rem; text-overflow: ellipsis; white-space: nowrap; }
+.pet-command-status { flex: 0 0 auto; color: #fde68a; font-size: .68rem; font-weight: 700; white-space: nowrap; }
+.pet-command:disabled .pet-command-status { color: #a8a29e; }
+
+.pet-strike-sprite {
+    position: absolute;
+    z-index: 15;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    overflow: hidden;
+    border: 2px solid #fde68a;
+    border-radius: 50%;
+    background: #12161a;
+    box-shadow: 0 0 1rem rgba(253, 230, 138, .85);
+    font-size: 1.7rem;
+    pointer-events: none;
+    animation: pet-strike .75s cubic-bezier(.2, .8, .2, 1) both;
+}
+.pet-strike-sprite img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@keyframes pet-strike {
+    0% { opacity: 0; transform: translate(-190%, 40%) scale(.5) rotate(-18deg); }
+    45% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(6deg); }
+    75% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-30%, -60%) scale(.8); }
+}
+
+@media (max-width: 640px) {
+    .pet-command { padding: .3rem .55rem; margin-bottom: .35rem; }
+    .pet-command-detail { display: none; }
+    .soul-meter-ends { display: none; }
+    .soul-meter { padding-top: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .soul-aura-core,
+    .soul-aura-ring,
+    .soul-aura-wisp,
+    .hero-pet-companion { animation: none; }
+    .soul-aura-wisp { display: none; }
+}

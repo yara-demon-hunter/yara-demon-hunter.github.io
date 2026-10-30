@@ -70,7 +70,7 @@ function scheduleCharacterDialogue() {
             : speakers;
         const speaker = availableSpeakers[Math.floor(Math.random() * availableSpeakers.length)];
         const lines = speaker === 'hero'
-            ? selectedCharacter.dialogues[context][gameLanguage]
+            ? [...selectedCharacter.dialogues[context][gameLanguage], ...(window.YaraSoul?.dialogueLines(context) || [])]
             : currentMonster.dialogues[gameLanguage];
         showCharacterDialogueBubble(speaker, lines);
         lastDialogueSpeaker = speaker;
@@ -598,6 +598,7 @@ function updateUI() {
             const button = document.createElement('button');
             button.type = 'button'; button.className = 'story-event-choice';
             button.textContent = choice.label[gameLanguage];
+            window.YaraSoul?.decorateChoice(button, choice);
             button.addEventListener('click', () => resolveStoryEvent(index));
             choices.append(button);
         });
@@ -619,10 +620,13 @@ function updateUI() {
             contactIcon.textContent = pendingMistContact.icon;
         }
         document.getElementById('mist-contact-name').textContent = pendingMistContact.name[gameLanguage];
-        document.getElementById('mist-contact-message').textContent = pendingMistContact.message[gameLanguage];
-        document.getElementById('mist-contact-accept').textContent = t(
+        document.getElementById('mist-contact-message').textContent = window.YaraSoul?.contactMessage(pendingMistContact)
+            ?? pendingMistContact.message[gameLanguage];
+        const mistAcceptButton = document.getElementById('mist-contact-accept');
+        mistAcceptButton.textContent = t(
             pendingMistContact.onAccept?.type === 'spirit-surgery' ? 'acceptSpiritSurgery' : 'mistAccept'
         );
+        window.YaraSoul?.decorateChoice(mistAcceptButton, pendingMistContact);
     }
     campButton.disabled = inCombat || gameOver || campaignComplete || hero.gold < CAMP_COST || (
         hero.hp >= getEffectiveStat('maxHp') && hero.foco >= getEffectiveStat('maxFoco')
@@ -660,7 +664,9 @@ function updateUI() {
         encounterCard.classList.add('hidden'); mistContactCard.classList.add('hidden'); storyCard.hidden = true; chestCard.hidden = true;
         explorationBanner.classList.add('hidden'); restartButton.classList.add('hidden');
         document.getElementById('campaign-ending-title').textContent = t(campaignComplete ? 'campaignVictoryTitle' : 'campaignDefeatTitle');
-        document.getElementById('campaign-ending-description').textContent = t(campaignComplete ? 'campaignVictoryDescription' : 'campaignDefeatDescription');
+        document.getElementById('campaign-ending-description').textContent = campaignComplete
+            ? `${t('campaignVictoryDescription')} ${window.YaraSoul?.ending() || ''}`.trim()
+            : t('campaignDefeatDescription');
         document.getElementById('campaign-ending-card').querySelector('[data-i18n="restartCampaign"]').textContent = t('restart');
     } else if (inCombat) {
         exploreControls.classList.add('hidden');
@@ -700,6 +706,8 @@ function updateUI() {
         storyCard.hidden = true; chestCard.hidden = true;
         explorationBanner.classList.add('hidden'); restartButton.classList.add('hidden');
         finalBossGateCard.hidden = false;
+        document.getElementById('final-boss-gate-description').textContent =
+            `${t('finalBossGateDescription')} ${window.YaraSoul?.regionEcho(currentRegionData) || ''}`.trim();
     } else {
         exploreControls.classList.remove('hidden');
         combatControls.classList.add('hidden');
@@ -709,6 +717,8 @@ function updateUI() {
         explorationBanner.classList.remove('hidden');
         restartButton.classList.add('hidden');
     }
+    window.YaraSoul?.render();
+    window.YaraPets?.render();
     saveGame();
 }
 

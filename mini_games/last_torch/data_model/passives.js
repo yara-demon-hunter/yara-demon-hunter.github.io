@@ -1,6 +1,8 @@
-// --- SKILLS PASSIVAS (RELÍQUIAS) ---
-// Compradas com o ouro que os monstros dropam (cost = moedas), no acampamento ao fim de cada hora.
-// mods: efeitos simples, somados por js/systems/modifiers.js. As demais têm mecânica própria.
+// --- PASSIVAS ---
+// type 'skill': aprendidas na árvore de skills, com pontos (data_model/tree.js).
+// Sem type (relíquias): compradas com ouro na árvore de relíquias do acampamento (data_model/relics.js),
+// onde cost é o preço base em moedas.
+// mods: efeitos simples, somados por js/systems/modifiers.js. As skills têm mecânica própria.
 
 export const PASSIVE_SKILL_MODELS = {
     shadowWhirl: {
@@ -8,13 +10,15 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🌀',
         cost: 80,
         maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'The 3rd combo hit becomes a 360° spin that strikes every enemy in range.'
     },
     mirrorWard: {
         name: 'Mirror Ward',
-        icon: '🛡️',
+        icon: '🪞',
         cost: 60,
         maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'Reflects an incoming enemy shot at the nearest monster. Recharges in 8s.'
     },
     longThrow: {
@@ -22,6 +26,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🏹',
         cost: 40,
         maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'Thrown daggers fly 60% farther and faster.'
     },
     fanOfKnives: {
@@ -29,6 +34,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🔱',
         cost: 110,
         maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'Throws 3 daggers at once in a fan. Combines with Long Throw.'
     },
     shadowClone: {
@@ -36,6 +42,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '👥',
         cost: 150,
         maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'A shadow reflection walks with you and slashes any monster that enters its own circle. If it falls, it returns after a while.'
     },
     greedyIdol: {
@@ -75,8 +82,8 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🔮',
         cost: 130,
         maxLvl: 1,
-        desc: 'Level ups offer 4 cards instead of 3.',
-        mods: { cardChoices: 1 }
+        desc: 'Every third level grants an extra skill point.',
+        mods: { levelPoints: 0.34 }
     },
     berserkDraught: {
         name: 'Berserk Draught',
@@ -107,8 +114,8 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🍀',
         cost: 65,
         maxLvl: 1,
-        desc: 'Better card rarity and +1 reroll.',
-        mods: { luck: 0.25, rerolls: 1 }
+        desc: 'Chests give +1 skill point and you find 10% more gold.',
+        mods: { chestPoints: 1, gold: 0.1 }
     },
     hunterMark: {
         name: 'Hunter Mark',
@@ -137,13 +144,10 @@ export const PASSIVE_SKILL_MODELS = {
 };
 
 // --- ACAMPAMENTO ---
-// Fim de cada hora: o mercador oferece relíquias (as passivas) e o ouro também alimenta a tocha.
+// Fim de cada hora: o ouro compra relíquias na árvore do acampamento e também alimenta a tocha.
 export const CAMP = {
-    offers: 3,
     costMultiplier: 1.35,
     costGrowthPerHour: 0.15,        // relíquias ficam mais caras a cada hora
-    rerollCost: 15,
-    rerollCostGrowth: 12,
     fuel: { heal: 30, cost: 40, costPerHour: 12, costPerUse: 25 },
     rest: { healRatio: 0.5, cost: 30, costPerHour: 9, costPerUse: 20 }
 };

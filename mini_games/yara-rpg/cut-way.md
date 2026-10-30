@@ -35,3 +35,15 @@ Math.random = r;
 YaraMeta.openSanctuary('achievements');   // achievements | bestiary | collection | powers | records
 performSpiritEyeSurgery();                // conquista do Olho Espiritual
 ```
+- Test the soul and pets (start a journey first)
+```js
+YaraSoul.shift(-40, { pt: 'Teste', en: 'Test' });   // positivo purifica, negativo escurece
+hero.soul = 80; updateUI();                         // pula direto para um nível
+
+// Equipa um pet
+hero.equipment.pet = createEquipmentInstance(
+    ITEM_DATA.equipment.find((item) => item.id === 'forest-wolf'),
+    GAME_RULES.loot.equipmentRarities[4]
+);
+updateUI();
+```

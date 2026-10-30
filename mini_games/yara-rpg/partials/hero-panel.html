@@ -5,7 +5,7 @@
                     <div class="hero-summary-heading flex items-center justify-between">
                     <div>
                         <div class="hero-identity">
-                            <span id="hero-portrait-anchor" class="hero-portrait-anchor"><img id="hero-portrait" class="hero-portrait" src="images/characters/zeph.webp" alt="" aria-hidden="true"><span id="hero-dialogue-bubble" class="character-dialogue-bubble hero-dialogue-bubble" hidden aria-hidden="true"></span></span>
+                            <span id="hero-portrait-anchor" class="hero-portrait-anchor" data-soul-side="neutral" data-soul-level="0"><span class="soul-aura" aria-hidden="true"><span class="soul-aura-core"></span><span class="soul-aura-ring"></span><span class="soul-aura-wisp"></span><span class="soul-aura-wisp"></span><span class="soul-aura-wisp"></span><span class="soul-aura-wisp"></span><span class="soul-aura-wisp"></span><span class="soul-aura-wisp"></span></span><span class="soul-burst" aria-hidden="true"></span><img id="hero-portrait" class="hero-portrait" src="images/characters/zeph.webp" alt="" aria-hidden="true"><span id="hero-pet-companion" class="hero-pet-companion" aria-hidden="true" hidden></span><span id="hero-dialogue-bubble" class="character-dialogue-bubble hero-dialogue-bubble" hidden aria-hidden="true"></span></span>
                             <h2 id="hero-name" class="text-lg font-bold text-amber-400">Zeph</h2>
                         </div>
                         <span class="text-xs bg-forest-800 text-emerald-300 px-2 py-0.5 rounded-full border border-forest-700"><span data-i18n="level">Nível</span> <span id="hero-level">1</span></span>
@@ -51,6 +51,13 @@
                             <div id="hero-fury-bar" class="bg-gradient-to-r from-orange-700 to-amber-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
                         </div>
                     </div>
+
+                    <!-- Alma: maligno à esquerda, divino à direita -->
+                    <button id="soul-meter" type="button" class="soul-meter" data-soul-side="neutral" aria-haspopup="dialog" onclick="YaraSoul?.openDialog()">
+                        <span class="soul-meter-heading"><span id="soul-meter-icon" aria-hidden="true">⚖️</span><span id="soul-meter-tier"></span><span id="soul-meter-value">0</span></span>
+                        <span class="soul-meter-track" aria-hidden="true"><span id="soul-meter-fill" class="soul-meter-fill"></span><span id="soul-meter-marker" class="soul-meter-marker"></span></span>
+                        <span class="soul-meter-ends" aria-hidden="true"><span data-i18n="soulSideDark">Maligno</span><span data-i18n="soulSideLight">Divino</span></span>
+                    </button>
                 </div>
                 </div>
 

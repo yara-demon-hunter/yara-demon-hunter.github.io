@@ -1,6 +1,7 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { PICKUP_DROP as D, PICKUP_MODELS, rollChestPicks, rollPickupType } from '../../data_model/pickups.js';
+import { PICKUP_DROP as D, PICKUP_MODELS, rollChestPoints, rollPickupType } from '../../data_model/pickups.js';
 import { audio, player, state } from '../core/state.js';
+import { showToast } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { blast } from './damage.js';
 import { addFloater, addNumber, addShockwave, screenFlash, shakeScreen } from './effects.js';
@@ -52,7 +53,10 @@ function collect(p) {
         screenFlash('#fef9c3', 0.55);
         shakeScreen(12);
     } else if (p.type === 'CHEST') {
-        for (let i = rollChestPicks(); i > 0; i--) state.pendingCards.push('chest');
+        const points = rollChestPoints() + mod('chestPoints');
+        state.skillPoints += points;
+        showToast('⚡', `+${points} skill points`, 'Spend them in the skill tree');
+        audio.playChest();
         addShockwave(p.x, p.y, { radius: 120, color: '#fbbf24', width: 6, seconds: 0.5 });
         screenFlash('#fde68a', 0.3);
     }

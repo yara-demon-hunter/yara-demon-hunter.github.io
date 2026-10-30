@@ -18,11 +18,11 @@ export const PICKUP_DROP = {
     maxOnGround: 6
 };
 
-// Baú: escolha entre cartas boas. Quantas escolhas o baú dá (sorteio com pesos)
+// Baú: pontos de skill para a árvore (sorteio com pesos)
 export const CHEST_REWARDS = [
-    { picks: 1, weight: 0.72 },
-    { picks: 2, weight: 0.23 },
-    { picks: 3, weight: 0.05 }
+    { points: 1, weight: 0.7 },
+    { points: 2, weight: 0.24 },
+    { points: 3, weight: 0.06 }
 ];
 
 export function rollPickupType(random = Math.random) {
@@ -36,11 +36,11 @@ export function rollPickupType(random = Math.random) {
     return 'MEAT';
 }
 
-export function rollChestPicks(random = Math.random) {
+export function rollChestPoints(random = Math.random) {
     let roll = random();
     for (const reward of CHEST_REWARDS) {
         roll -= reward.weight;
-        if (roll < 0) return reward.picks;
+        if (roll < 0) return reward.points;
     }
-    return 1;
+    return CHEST_REWARDS[0].points;
 }

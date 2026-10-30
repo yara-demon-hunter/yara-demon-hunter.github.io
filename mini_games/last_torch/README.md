@@ -4,9 +4,9 @@
 
 Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o herói vivo e a tocha acesa.
 
-- **30 segundos:** matar monstros dá XP e ouro. Cada nível pausa o jogo e oferece cartas: o jogador escolhe 1 entre stats e poderes. Sequências de mortes multiplicam pontos e ouro.
-- **Uma hora (~45 s):** fechada a cota de pontos, uma onda de fogo sai da tocha, o ouro do chão voa até o herói e o jogo vai ao acampamento, onde o ouro compra relíquias ou alimenta a tocha. As horas 4, 8 e 12 têm boss.
-- **Entre partidas:** cada noite rende brasas, gastas no Hearth em melhorias permanentes. Os Trials liberam poderes e heróis. Vencer abre a noite sem fim e os níveis de Escuridão.
+- **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 1 ponto de skill. O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos (Blade, Shadow, Flame, Curse) com stats, poderes, efeitos, evoluções e skills passivas (Shadow Clone, Fan of Knives, Long Throw, Mirror Ward, Shadow Whirl). Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
+- **Uma hora (~45 s):** fechada a cota de pontos, uma onda de fogo sai da tocha, o ouro do chão voa até o herói e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha. As horas 4, 8 e 12 têm boss.
+- **Entre partidas:** a árvore recomeça a cada noite, mas o que está destravado fica: os Trials liberam poderes (nós trancados) e heróis, e as brasas compram melhorias e nós extras no Hearth (aba TREE). Vencer abre a noite sem fim e os níveis de Escuridão.
 
 Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
 
@@ -15,7 +15,7 @@ Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
 O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça com CPU limitada):
 
 - **Monstros são sprites.** `js/render/monster_sprites.js` roda a arte procedural uma vez por quadro de animação e guarda num atlas; em campo cada monstro custa 2 `drawImage`. Só bosses e herói são desenhados a cada quadro. Monstro novo: entra em `ART` e em `data_model/visuals/monsters/sprites_visual.js`.
-- **Nada repetido é desenhado do zero:** moedas, adagas, tiros, olhos, brilhos e algarismos vêm de sprites (`js/render/fx/`). Evite `fillText`, `setLineDash`, `shadowBlur`, gradientes novos por quadro e `ctx.save/restore` por objeto.
+- **Nada repetido é desenhado do zero:** moedas, adagas, tiros, brilhos e algarismos vêm de sprites (`js/render/fx/`). Evite `fillText`, `setLineDash`, `shadowBlur`, gradientes novos por quadro e `ctx.save/restore` por objeto.
 - **Chão e névoa:** o chão é copiado 1:1 (grama e brilho da tocha já pintados nele); a névoa é desenhada numa tela pequena poucas vezes por segundo.
 - **DOM:** os sistemas só chamam `updateHUD()`; a escrita sai no máximo 10 vezes por segundo, só do que mudou, e as barras usam `transform`. Sem `backdrop-filter` nem animação de sombra.
 - **Resolução interna** limitada em `data_model/world.js` (`maxPixelRatio`, `maxCanvasPixels`). O HUD é DOM e continua nítido.
@@ -31,14 +31,14 @@ last_torch.html   tela e elementos da interface
 css/
   game.css                        ponto de entrada: só importa os arquivos abaixo
   base/base.css                   fonte, body e canvas
-  components/hud.css              HUD responsivo, tudo no topo: cartão do herói, hora da noite, boss, poderes, pontos e sequência
+  components/hud.css              HUD responsivo, tudo no topo: cartão do herói, medalhão pulsante, hora da noite, boss, poderes, pontos e sequência
   components/banner.css           faixas centrais, gritos de sequência, notificações e efeitos de borda da tela
   components/screens.css          base das telas que pausam a partida
-  components/cards.css            cartas de level up e baú
   components/camp.css             acampamento
   components/summary.css          tela de fim da noite
   components/hearth.css           Hearth: melhorias, heróis e Trials
-  components/shop.css             tela de status (pausa)
+  components/shop.css             tela de status (pausa, abas)
+  components/tree.css             mapa da árvore de skills
   components/joystick.css         controles de toque: joystick, adaga e dash
   components/start-screen.css     tela inicial
   components/orientation.css      aviso de virar o aparelho de lado (celular em pé)
@@ -52,9 +52,10 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   difficulty.js                   crescimento por hora: vida, dano, spawn, cota de pontos
   night.js                        a noite: horas, hordas, presságios, Escuridão
   skills.js                       stats, lâmina, Fúria, adaga e dash
-  powers.js                       poderes (cartas de level up) e evoluções
-  passives.js                     relíquias (compradas com ouro) e preços do acampamento
-  cards.js                        raridades e pesos das cartas
+  powers.js                       poderes (aprendidos na árvore) e evoluções
+  passives.js                     skills passivas (type 'skill', na árvore de pontos) e relíquias (preço base em ouro), e preços do acampamento
+  tree.js                         árvore de skills: nós, ramos, posições e pontos por nível
+  relics.js                       árvore de relíquias (acampamento): nós, ramos e pré-requisitos
   streak.js                       sequência de mortes
   pickups.js                      itens no chão e baús
   gold.js                         ouro dropado
@@ -85,7 +86,7 @@ js/
   systems/knives.js               adaga de arremesso e Ricochet
   systems/dash.js                 dash e esquiva perfeita
   systems/powers.js               poderes do level up
-  systems/cards.js                monta as ofertas de cartas e aplica a escolhida
+  systems/tree.js                 regras das duas árvores: nível, custo (pontos ou ouro), pré-requisitos, travas, compra
   systems/player.js               movimentação e dano no herói
   systems/torch.js                vida da tocha e calor que cura
   systems/shadow_clone.js         Shadow Clone
@@ -97,7 +98,7 @@ js/
   render/renderer.js              ordem das camadas de desenho
   render/arena.js                 tocha (núcleo) e raio de alcance do herói
   render/forest.js                cenário: chão pré-pintado, névoa em baixa resolução, luz da tocha e do herói
-  render/entities.js              inimigos, olhos na névoa, projéteis, golpes e moedas
+  render/entities.js              inimigos, projéteis, golpes e moedas
   render/effects.js               manchas, pedaços, ondas de choque, avisos no chão, números, amanhecer
   render/powers.js                desenho dos poderes
   render/pickups.js               itens e baús
@@ -109,9 +110,9 @@ js/
   render/fx/                      glow, carimbos (stamp), sprites pequenos, atlas de números, anéis, relógio do desenho, easing, barra de vida
   ui/hud.js                       atualização do HUD
   ui/banner.js                    faixas, gritos e notificações
-  ui/cards.js                     tela de cartas
-  ui/camp.js                      acampamento
-  ui/status.js                    tela de status (pausa) e opções
+  ui/tree.js                      desenho das árvores (mapa de nós e ligações) e painel de detalhe; uma fábrica monta a de skills e a de relíquias
+  ui/camp.js                      acampamento: árvore de relíquias, tocha e descanso
+  ui/status.js                    tela de status: abas Skill Tree, Build e Options
   ui/hearth.js                    Hearth
   ui/screens.js                   início de partida, fim da noite, brasas e Trials
   ui/hints.js                     dicas da primeira partida
@@ -131,7 +132,7 @@ draft/                            versões anteriores mantidas como referência
 
 ## Controles
 
-- **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente (ao usar o teclado, o mouse passa a servir só para mirar). Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria). `Espaço`, `Shift` ou o botão direito dão o dash. `Esc` ou `P` pausam. Nas cartas, `1`-`4` escolhem e `R` sorteia de novo. `Enter` recomeça.
+- **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente (ao usar o teclado, o mouse passa a servir só para mirar). Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria). `Espaço`, `Shift` ou o botão direito dão o dash. `Esc` ou `P` pausam. `Enter` recomeça.
 - **Celular:** jogado **de lado (paisagem)**, com os dois polegares. Ao começar, o jogo entra em tela cheia e trava em paisagem (Android); onde não dá para travar (iOS), um aviso pede para virar o aparelho de lado e a partida fica pausada enquanto ele estiver em pé. O joystick (canto inferior esquerdo) move o herói. O botão menor, acima da adaga, dá o dash. O botão da adaga (canto inferior direito) mira enquanto está pressionado, com uma linha tracejada saindo do herói: sem arrastar mira no monstro mais perto; arrastando mira na direção do arraste. A adaga só é arremessada ao **soltar** o botão, uma vez, se a recarga (anel em volta do botão) já terminou. Tocar na tela não arremessa. Os ataques corpo a corpo são automáticos.
 
 O jogo usa a mesma lógica e progressão em todas as telas; apenas a disposição da interface e o controle de movimento se adaptam ao dispositivo.

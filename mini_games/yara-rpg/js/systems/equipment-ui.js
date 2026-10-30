@@ -649,6 +649,11 @@ function renderEquipmentBonuses(container, item, currentItem = null, compare = f
         }
         container.append(bonus);
     });
+    (window.YaraPets?.describe(item) || []).forEach((line) => {
+        const ability = document.createElement('li');
+        ability.textContent = line;
+        container.append(ability);
+    });
 }
 
 function isPendingDropBlocked() {

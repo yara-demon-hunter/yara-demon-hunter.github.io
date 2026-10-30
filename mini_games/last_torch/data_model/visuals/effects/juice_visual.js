@@ -71,9 +71,6 @@ export const JUICE_VISUALS = {
         lineGlow: 'rgba(34, 211, 238, 0.25)'
     },
 
-    // Olhos sobre a névoa (fora da luz da tocha e do herói)
-    fogEyes: { color: 'rgba(248, 113, 113, 0.9)', core: '#fecaca', glowAlpha: 0.5, torchLightRatio: 0.62, heroLightRatio: 0.55 },
-
     // Fim de hora: onda de fogo saindo da tocha
     clearWave: { width: 46, color: '253, 186, 116', coreColor: '255, 247, 237' },
 

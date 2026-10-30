@@ -2,16 +2,16 @@
 // Brasas (embers) são ganhas ao fim de cada noite e gastas no Hearth em melhorias permanentes.
 // mods: somados por nível (js/systems/modifiers.js). Custo do nível n: baseCost x costGrowth^n.
 export const META_UPGRADES = {
-    hearthstone: { name: 'Hearthstone', icon: '🔥', desc: '+12 Torch health', maxLvl: 10, baseCost: 10, costGrowth: 1.42, mods: { torchHp: 12 } },
-    oldScars: { name: 'Old Scars', icon: '❤️', desc: '+7 Hero health', maxLvl: 10, baseCost: 10, costGrowth: 1.42, mods: { maxHpFlat: 7 } },
-    whetstone: { name: 'Whetstone', icon: '⚔️', desc: '+4% damage', maxLvl: 10, baseCost: 14, costGrowth: 1.45, mods: { damage: 0.04 } },
-    wornBoots: { name: 'Worn Boots', icon: '🥾', desc: '+2% move speed', maxLvl: 6, baseCost: 12, costGrowth: 1.5, mods: { moveSpeed: 0.02 } },
+    hearthstone: { name: 'Hearthstone', icon: '🧱', desc: '+12 Torch health', maxLvl: 10, baseCost: 10, costGrowth: 1.42, mods: { torchHp: 12 } },
+    oldScars: { name: 'Old Scars', icon: '🩹', desc: '+7 Hero health', maxLvl: 10, baseCost: 10, costGrowth: 1.42, mods: { maxHpFlat: 7 } },
+    whetstone: { name: 'Whetstone', icon: '⚒️', desc: '+4% damage', maxLvl: 10, baseCost: 14, costGrowth: 1.45, mods: { damage: 0.04 } },
+    wornBoots: { name: 'Worn Boots', icon: '👢', desc: '+2% move speed', maxLvl: 6, baseCost: 12, costGrowth: 1.5, mods: { moveSpeed: 0.02 } },
     coinPurse: { name: 'Coin Purse', icon: '🪙', desc: '+7% gold', maxLvl: 8, baseCost: 12, costGrowth: 1.45, mods: { gold: 0.07 } },
     hunterLore: { name: 'Hunter Lore', icon: '📖', desc: '+4% XP', maxLvl: 8, baseCost: 14, costGrowth: 1.45, mods: { xp: 0.04 } },
-    smolderingRage: { name: 'Smoldering Rage', icon: '💢', desc: '+8% Fury charge', maxLvl: 5, baseCost: 18, costGrowth: 1.5, mods: { furyCharge: 0.08 } },
-    loadedDice: { name: 'Loaded Dice', icon: '🎲', desc: '+1 card reroll each night', maxLvl: 5, baseCost: 25, costGrowth: 1.7, mods: { rerolls: 1 } },
-    fourLeaf: { name: 'Four-Leaf Charm', icon: '🍀', desc: 'Better card rarity', maxLvl: 5, baseCost: 30, costGrowth: 1.6, mods: { luck: 0.12 } },
-    lastPrayer: { name: 'Last Prayer', icon: '📿', desc: 'Rise once per night', maxLvl: 2, baseCost: 120, costGrowth: 2.6, mods: { revives: 1 } },
+    smolderingRage: { name: 'Smoldering Rage', icon: '🧨', desc: '+8% Fury charge', maxLvl: 5, baseCost: 18, costGrowth: 1.5, mods: { furyCharge: 0.08 } },
+    huntersNotes: { name: "Hunter's Notes", icon: '📜', desc: '+1 starting skill point', maxLvl: 5, baseCost: 25, costGrowth: 1.7, mods: { startPoints: 1 } },
+    treasureSense: { name: 'Treasure Sense', icon: '🗝️', desc: '+1 skill point from chests', maxLvl: 3, baseCost: 30, costGrowth: 1.9, mods: { chestPoints: 1 } },
+    lastPrayer: { name: 'Last Prayer', icon: '🙏', desc: 'Rise once per night', maxLvl: 2, baseCost: 120, costGrowth: 2.6, mods: { revives: 1 } },
     emberKeeper: { name: 'Ember Keeper', icon: '✨', desc: '+7% embers earned', maxLvl: 6, baseCost: 22, costGrowth: 1.55, mods: { embers: 0.07 } }
 };
 

@@ -13,17 +13,15 @@ import { SPRITE_FRAMES } from '../../data_model/visuals/monsters/sprites_visual.
 import { VAMPIRE_VISUALS } from '../../data_model/visuals/monsters/vampire_visual.js';
 import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
 import { WRAITH_VISUALS } from '../../data_model/visuals/monsters/wraith_visual.js';
-import { TORCH_VISUALS } from '../../data_model/visuals/scenery/torch_visual.js';
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { FAN_OF_KNIVES } from '../../data_model/passives.js';
 import { ctx, passives, player, state } from '../core/state.js';
 import { getKnifeRange } from '../systems/knives.js';
 import { renderDemonLord } from './demon_lord.js';
-import { getCurrentLightRadius } from './forest.js';
 import { easeOutCubic } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
 import { getDashedRing } from './fx/rings.js';
-import { COIN_SIZE, DAGGER_LENGTH, DAGGER_WIDTH, getCoinAtlas, getDaggerSprite, getEyesSprite } from './fx/sprites.js';
+import { COIN_SIZE, DAGGER_LENGTH, DAGGER_WIDTH, getCoinAtlas, getDaggerSprite } from './fx/sprites.js';
 import { resetWorldView, stamp } from './fx/stamp.js';
 import { getBoltSprite, getMonsterSprite, withColors } from './monster_sprites.js';
 import { renderReflectedBolt } from './reflect.js';
@@ -325,32 +323,6 @@ export function renderEnemies() {
         if (e.isBoss) drawBoss(e);
     }
     renderEnemyOverlays(t);
-}
-
-// Olhos no escuro: o que está fora da luz aparece como dois pontos brilhando sobre a névoa.
-// Dá medo, e o jogador continua vendo o que vem vindo.
-export function renderEyesInFog() {
-    const E = J.fogEyes;
-    const torchLight = getCurrentLightRadius() * E.torchLightRatio;
-    const heroLight = TORCH_VISUALS.heroLightRadius * E.heroLightRatio;
-    const eyes = getEyesSprite(E.color, E.core);
-    const torch2 = torchLight * torchLight;
-    const hero2 = heroLight * heroLight;
-    let stamped = false;
-    for (const e of state.enemies) {
-        const tx = e.x - state.coreX;
-        const ty = e.y - state.coreY;
-        if (tx * tx + ty * ty < torch2) continue;
-        const px = e.x - player.x;
-        const py = e.y - player.y;
-        if (px * px + py * py < hero2) continue;
-
-        const size = Math.max(16, e.radius * 2.2);
-        const rotation = e.facing ?? e.angle;
-        stamp(eyes, 0, 0, eyes.width, eyes.height, e.x, e.y, rotation, size, size);
-        stamped = true;
-    }
-    if (stamped) resetWorldView();
 }
 
 // Mira do botão da adaga (toque): linhas tracejadas saindo do herói, uma por adaga do leque.

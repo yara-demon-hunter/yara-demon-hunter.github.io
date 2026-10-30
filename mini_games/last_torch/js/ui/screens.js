@@ -5,7 +5,7 @@ import { HEROES } from '../../data_model/heroes.js';
 import { POWER_MODELS } from '../../data_model/powers.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
-import { getOwnedPowers } from '../systems/cards.js';
+import { getOwnedPowers } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
 import { continueEndless, startHour } from '../systems/night.js';
@@ -48,8 +48,9 @@ export function startGame() {
     state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, embersBanked: 0 };
     state.streak = 0;
     state.streakTimer = 0;
-    state.pendingCards = [];
-    state.campPending = false;
+    state.skillPoints = 0;
+    state.levelPointsCarry = 0;
+    state.tree = {};
     state.pickupPity = 0;
 
     Object.keys(attributes).forEach(k => attributes[k].lvl = 1);
@@ -90,7 +91,7 @@ export function startGame() {
     state.levelUpFx = null;
 
     refreshModifiers();
-    state.rerolls = mod('rerolls');
+    state.skillPoints = mod('startPoints');
     state.revives = mod('revives');
     resetTorch();
 
@@ -114,7 +115,7 @@ export function startGame() {
     document.getElementById('heroPortrait').style.filter = hero.portrait;
 
     state.gameState = 'PLAYING';
-    ['startScreen', 'gameOverScreen', 'shopScreen', 'cardScreen', 'campScreen', 'hearthScreen'].forEach(id => {
+    ['startScreen', 'gameOverScreen', 'shopScreen', 'campScreen', 'hearthScreen'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
     startHour();

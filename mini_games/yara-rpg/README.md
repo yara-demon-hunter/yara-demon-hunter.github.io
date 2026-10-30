@@ -91,6 +91,25 @@ Esta primeira versão ainda carrega Tailwind e as fontes Cinzel/Inter de CDNs, a
 - Telegrafia: o aviso aparece no monstro; atacar durante o aviso **interrompe** o golpe e dá fúria (`telegraphInterruptFury` em `combat-rules.js`).
 - Eventos de aposta (efeito `gamble`) ficam em `js/data/extra-events.js`.
 
+## Alma do herói
+
+Toda decisão moral desloca `hero.soul`, de -100 (maligno) a +100 (divino). Valores opostos se anulam: quem alterna luz e sombra volta para o equilíbrio, e a aura some. Os botões mostram antes da escolha para onde ela puxa (`✦ +8` ou `☾ −8`).
+
+- Medidor no painel do herói; ao tocar, mostra os efeitos do nível atual e as últimas escolhas.
+- Aura no retrato, vinheta na tela e cor do retrato crescem com a força da alma. Mudar de lado faz as duas energias se chocarem.
+- Sete níveis em `js/data/soul-rules.js`: o lado maligno dá ataque e ouro em troca de cura; o divino dá defesa e cura em troca de ouro; o equilíbrio dá XP.
+- Consequências: escolhas trancadas por nível (`requires` na escolha), eventos que só aparecem para um lado (`requires` no evento), frases das regiões (`soulEcho`), falas do herói, reação dos chefes, texto do portão de Gudran, final da campanha e conquistas.
+- Para dar peso a uma escolha, some `soul: N` nela; contatos da névoa aceitam o mesmo campo. O efeito `deal` aplica ganhos e custos descritos nos dados, sem código novo.
+
+## Companheiros
+
+Equipar um pet coloca o animal ao lado do retrato e libera um botão próprio acima das ações:
+
+- Em combate, um comando gratuito que não gasta o turno, com recarga em turnos do inimigo.
+- Na exploração, uma ação de faro, com recarga em explorações.
+
+Cada pet tem efeitos diferentes em `js/data/pets.js`, e raridade e aprimoramento aumentam a potência. A lógica fica em `js/systems/pets.js`.
+
 ## Contatos na névoa
 
 Durante a exploração, um contato pode abordar Zeph. Cada contato tem um ícone próprio, e a chance de encontro começa baixa, aumenta com o nível e respeita um intervalo mínimo. O jogador pode aceitar a oferta ou recusá-la sem penalidade. Em geral, aceitar sorteia entre enfrentar um chefe, receber ouro em troca de HP ou despertar um poder permanente; a bruxa caçadora sempre inicia sua missão contra um morto-vivo forte, enquanto a bruxa velha troca uma bebida que reduz o HP para no máximo 20% do máximo por 150 de ouro.

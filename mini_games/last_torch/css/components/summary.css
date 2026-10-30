@@ -71,7 +71,11 @@
     border: 1px solid rgba(253, 224, 71, 0.5);
     border-radius: 0.6rem;
     background: rgba(66, 46, 8, 0.5);
-    animation: cardIn 0.35s ease-out both;
+    animation: unlockIn 0.35s ease-out both;
+}
+@keyframes unlockIn {
+    from { opacity: 0; transform: translateY(14px) scale(0.92); }
+    to { opacity: 1; transform: none; }
 }
 .unlock-row b { display: block; color: #fde68a; font-size: 0.74rem; }
 .unlock-row span { display: block; color: #d6cdb8; font-size: 0.66rem; }

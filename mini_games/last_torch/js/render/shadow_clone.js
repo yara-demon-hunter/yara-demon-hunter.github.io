@@ -9,7 +9,7 @@ import { renderPlayer25D } from './player25d.js';
 // O mesmo boneco 2.5D do herói, com animação própria (anda, vira e golpeia por conta) e a paleta
 // de sombra de SHADOW_CLONE_VISUALS, semitransparente sobre uma aura violeta no chão.
 // Vivo: barra de vida em cima da cabeça. Morto: anel no lugar dele que enche até ele voltar.
-const cloneAnim = createHeroAnim();
+const cloneAnim = createHeroAnim(false);
 
 function renderHpBar() {
     const B = V.hpBar;

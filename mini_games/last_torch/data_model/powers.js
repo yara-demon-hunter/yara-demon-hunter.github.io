@@ -1,9 +1,7 @@
 // --- PODERES ---
-// Oferecidos nas cartas de level up. Cada um tem 5 níveis e o herói carrega no máximo POWER_SLOTS.
+// Aprendidos na árvore de skills (data_model/tree.js). Cada um tem 5 níveis.
 // Os que têm `unlock` só entram no sorteio depois de ganhos nos Trials (data_model/achievements.js).
 // damage = fração do dano da lâmina. Os dados de cada nível ficam em `levels`.
-export const POWER_SLOTS = 5;
-
 export const POWER_MODELS = {
     orbitBlades: {
         name: 'Spectral Blades', icon: '🗡️', maxLvl: 5,
@@ -165,12 +163,12 @@ export const EVOLUTIONS = {
         levels: { count: 8, damage: 1.1, radius: 104 }
     },
     emberTrail: {
-        name: 'Hellwalker', icon: '🔥', need: { stat: 'moveSpeed', lvl: 4 }, needText: 'Move Speed Lv. 4',
+        name: 'Hellwalker', icon: '☄️', need: { stat: 'moveSpeed', lvl: 4 }, needText: 'Move Speed Lv. 4',
         desc: 'Great pillars of fire rise from every step you take.',
         levels: { dps: 1.3, life: 4.5, radius: 42 }
     },
     corpseBurst: {
-        name: 'Red Harvest', icon: '🩸', need: { power: 'bloodEdge', lvl: 3 }, needText: 'Blood Edge Lv. 3',
+        name: 'Red Harvest', icon: '🥀', need: { power: 'bloodEdge', lvl: 3 }, needText: 'Blood Edge Lv. 3',
         desc: 'Every kill explodes. Every blast heals you.',
         levels: { chance: 1, radius: 110, damage: 1.7 }
     },

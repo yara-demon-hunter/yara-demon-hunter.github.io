@@ -4,6 +4,7 @@ import { isBossTurn } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { passives, player, powers, state } from '../core/state.js';
 import { getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
+import { hasBuyableNode } from '../systems/tree.js';
 
 // --- HUD ---
 // Escrever no DOM é caro: força o navegador a recalcular estilo e layout. Por isso os sistemas só
@@ -16,7 +17,7 @@ const ui = {
     kills: el('killsHud'), coins: el('coinsText'), score: el('hudScore'),
     turn: el('turnLabel'), hourName: el('hourName'), scoreBar: el('scoreBar'), pips: el('nightPips'),
     bossBox: el('bossHpContainer'), bossName: el('bossNameText'), bossHp: el('bossHpText'), bossBar: el('bossHpBar'),
-    heroCard: el('heroCard'), screenFx: el('screenFx'),
+    heroCard: el('heroCard'), screenFx: el('screenFx'), statusButton: el('btnPause'), statusBadge: el('statusBadge'),
     streakBox: el('hudStreak'), streakCount: el('streakCount'), streakBar: el('streakBar'),
     knifeButton: el('knifeButton'), dashButton: el('dashButton'), dashCharges: el('dashCharges')
 };
@@ -188,6 +189,10 @@ function writeHud() {
     setBar(ui.xpBar, playerXp / playerMaxXp);
 
     updateDangerFx();
+    // Medalhão: pulsa em vermelho e mostra os pontos quando há algo para aprender na árvore
+    const canSpend = hasBuyableNode();
+    setFlag(ui.statusButton, 'can-upgrade', canSpend);
+    setText(ui.statusBadge, canSpend ? `+${state.skillPoints}` : '');
     setText(ui.kills, state.run.kills);
     setText(ui.coins, state.coins);
     setText(ui.score, state.totalScore.toLocaleString('en-US'));

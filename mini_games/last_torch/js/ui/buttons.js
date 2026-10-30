@@ -1,12 +1,12 @@
 import { save } from '../core/save.js';
 import { audio, state } from '../core/state.js';
-import { buyFuel, buyOffer, buyRest, leaveCamp, rerollOffers } from './camp.js';
-import { chooseCard, rerollCards } from './cards.js';
-import { buyMetaUpgrade, chooseHero, closeHearth, openHearth, setHearthTab } from './hearth.js';
+import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
+import { buyMetaUpgrade, buyTreeNode, chooseHero, closeHearth, openHearth, setHearthTab } from './hearth.js';
 import { beginDeath } from '../systems/night.js';
 import { lockLandscape } from './orientation.js';
 import { changeDarkness, keepHunting, returnToMenu, shareResult, startGame } from './screens.js';
-import { openStatus, resumeGame, toggleSetting } from './status.js';
+import { openStatus, resumeGame, setStatusTab, toggleSetting } from './status.js';
+import { skillTree } from './tree.js';
 
 // --- EVENTOS DA INTERFACE (BOTOES) ---
 export function setupButtons() {
@@ -47,21 +47,9 @@ export function setupButtons() {
         beginDeath('PLAYER');
     });
 
-    // Cartas
-    document.getElementById('cardRow').addEventListener('click', (e) => {
-        const card = e.target.closest('button[data-card]');
-        if (card) chooseCard(Number(card.dataset.card));
-    });
-    on('btnReroll', rerollCards);
-
     // Acampamento
-    document.getElementById('campOffers').addEventListener('click', (e) => {
-        const button = e.target.closest('button[data-offer]');
-        if (button && !button.disabled) buyOffer(Number(button.dataset.offer));
-    });
     on('btnFuel', buyFuel);
     on('btnRest', buyRest);
-    on('btnCampReroll', rerollOffers);
     on('btnCampLeave', () => {
         lockLandscape();
         leaveCamp();
@@ -87,21 +75,28 @@ export function setupButtons() {
         if (upgrade && !upgrade.disabled) buyMetaUpgrade(upgrade.dataset.upgrade);
         const hero = e.target.closest('button[data-hero]');
         if (hero) chooseHero(hero.dataset.hero);
+        const node = e.target.closest('button[data-unlock]');
+        if (node && !node.disabled) buyTreeNode(node.dataset.unlock);
     });
 
     on('btnDarkDown', () => changeDarkness(-1));
     on('btnDarkUp', () => changeDarkness(1));
 
+    skillTree.setup();
+    setupCamp();
+    document.getElementById('statusTabs').addEventListener('click', (e) => {
+        const button = e.target.closest('button[data-status-tab]');
+        if (button) setStatusTab(button.dataset.statusTab);
+    });
+
     document.querySelectorAll('[data-setting]').forEach(button => {
         button.addEventListener('click', () => toggleSetting(button.dataset.setting));
     });
 
-    // Teclado: 1-4 escolhem carta, Esc/P pausam, Enter recomeça
+    // Teclado: Esc/P abrem e fecham o status, Enter recomeça
     window.addEventListener('keydown', (e) => {
         if (e.repeat) return;
-        if (state.gameState === 'CARDS' && /^Digit[1-4]$/.test(e.code)) chooseCard(Number(e.code.slice(5)) - 1);
-        else if (state.gameState === 'CARDS' && e.code === 'KeyR') rerollCards();
-        else if (e.code === 'Escape' || e.code === 'KeyP') {
+        if (e.code === 'Escape' || e.code === 'KeyP') {
             if (state.gameState === 'PLAYING') openStatus();
             else if (state.gameState === 'PAUSED') resumeGame();
         } else if (e.code === 'Enter') {

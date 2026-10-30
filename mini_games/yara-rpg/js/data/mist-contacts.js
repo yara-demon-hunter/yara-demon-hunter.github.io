@@ -6,6 +6,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
     contacts: [
         {
             id: "river-spirit",
+            soul: -3,
             chancePercent: 15,
             icon: "🌊",
             image: "images/mist_contacts/river-spirit.webp",
@@ -21,6 +22,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "lost-scout",
+            soul: 2,
             chancePercent: 12,
             icon: "💀",
             image: "images/mist_contacts/lost-scout.webp",
@@ -36,6 +38,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "specter",
+            soul: -4,
             chancePercent: 12,
             icon: "🔔",
             image: "images/mist_contacts/specter.webp",
@@ -51,6 +54,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "witch-hunter",
+            soul: 4,
             chancePercent: 10,
             icon: "🧙‍♀️",
             image: "images/mist_contacts/witch-hunter.webp",
@@ -71,6 +75,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "old-witch",
+            soul: -4,
             chancePercent: 16,
             icon: "👵",
             image: "images/mist_contacts/old-witch.webp",
@@ -91,6 +96,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "pact-broker",
+            soul: -15,
             chancePercent: 12,
             icon: "🩸",
             image: "images/mist_contacts/pact-broker.webp",
@@ -118,6 +124,7 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "spirit-purifier",
+            soul: 10,
             chancePercent: 12,
             icon: "✨",
             image: "images/mist_contacts/spirit-purifier.webp",
@@ -128,6 +135,58 @@ window.YaraRpgData.mistContacts = Object.freeze({
             },
             minLevel: 1,
             onAccept: { type: "skill-point", amount: 1 }
+        },
+        {
+            id: "threshold-keeper",
+            chancePercent: 8,
+            icon: "🕯️",
+            name: { pt: "Guardião do Limiar", en: "Threshold Keeper" },
+            message: {
+                pt: "Uma figura encapuzada protege uma porta que não leva a lugar algum: “Toda alma pesa alguma coisa. Quer saber quanto pesa a sua?”",
+                en: "A hooded figure watches over a door that leads nowhere: “Every soul weighs something. Do you wish to know what yours weighs?”"
+            },
+            messageBySide: {
+                dark: {
+                    pt: "Uma figura encapuzada recua da sua sombra, mas mantém a mão na porta: “Conheço esse peso. O Abismo paga bem aos seus. Quer cruzar?”",
+                    en: "A hooded figure recoils from your shadow but keeps a hand on the door: “I know that weight. The Abyss pays its own well. Will you cross?”"
+                },
+                neutral: {
+                    pt: "Uma figura encapuzada inclina a cabeça: “Nem luz, nem sombra. Faz muito tempo que não vejo alguém assim. Quer cruzar?”",
+                    en: "A hooded figure tilts its head: “Neither light nor shadow. It has been long since I saw one like you. Will you cross?”"
+                },
+                light: {
+                    pt: "Uma figura encapuzada se curva diante da sua luz: “A porta nunca esteve fechada para você. Quer cruzar?”",
+                    en: "A hooded figure bows before your light: “The door was never closed to you. Will you cross?”"
+                }
+            },
+            minLevel: 2,
+            oncePerGame: true,
+            onAccept: { type: "soul-judgement" }
+        },
+        {
+            id: "mist-child",
+            chancePercent: 10,
+            icon: "🫧",
+            name: { pt: "Criança da Névoa", en: "Mist Child" },
+            message: {
+                pt: "Uma criança translúcida brinca com reflexos que não pertencem a ninguém e estende a mão: “Isso que você carrega parece pesado. Posso levar um pouco?”",
+                en: "A translucent child plays with reflections that belong to no one and holds out a hand: “What you carry looks heavy. May I take some of it?”"
+            },
+            minLevel: 1,
+            requires: { soulAbsMin: 15 },
+            onAccept: { type: "soul-cleanse" }
+        },
+        {
+            id: "star-cartographer",
+            chancePercent: 8,
+            icon: "🪶",
+            name: { pt: "Cartógrafa das Estrelas", en: "Star Cartographer" },
+            message: {
+                pt: "Uma viajante desenha constelações em um mapa que muda quando observado: “Quer ver onde as estrelas esconderam algo?”",
+                en: "A traveler draws constellations on a map that changes when watched: “Would you like to see where the stars hid something?”"
+            },
+            minLevel: 1,
+            onAccept: { type: "star-chart" }
         }
     ]
 });

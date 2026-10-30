@@ -2,34 +2,20 @@ import { CAMP } from '../../data_model/passives.js';
 import { BOSS_MODELS, chooseBossType, isBossTurn } from '../../data_model/bosses.js';
 import { getHourName } from '../../data_model/night.js';
 import { persist } from '../core/save.js';
-import { audio, passives, player, state } from '../core/state.js';
+import { audio, player, state } from '../core/state.js';
 import { collectAllGold } from '../systems/gold.js';
-import { refreshModifiers } from '../systems/modifiers.js';
 import { startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
-import { feedTorch, syncMaxHp } from '../systems/torch.js';
-import { updateBuildStrip, updateHUD } from './hud.js';
+import { feedTorch } from '../systems/torch.js';
+import { updateHUD } from './hud.js';
 import { reportProgress } from './screens.js';
+import { relicTree } from './tree.js';
 
 // --- ACAMPAMENTO ---
-// Fim de cada hora: o ouro compra relíquias do mercador ou alimenta a tocha. A próxima hora fica à
-// vista, para o jogador decidir sabendo o que vem.
-let offers = [];
-let rerollCost = 0;
+// Fim de cada hora: o ouro compra relíquias na árvore (js/ui/tree.js) ou alimenta a tocha. A próxima hora
+// fica à vista, para o jogador decidir sabendo o que vem.
 let fuelUses = 0;
 let restUses = 0;
-
-function priceOf(skill) {
-    return Math.round(skill.cost * CAMP.costMultiplier * (1 + CAMP.costGrowthPerHour * (state.turn - 1)));
-}
-
-function rollOffers() {
-    const available = Object.keys(passives).filter(key => passives[key].lvl < passives[key].maxLvl);
-    offers = [];
-    for (let i = 0; i < CAMP.offers && available.length > 0; i++) {
-        offers.push(available.splice(Math.floor(Math.random() * available.length), 1)[0]);
-    }
-}
 
 function fuelCost() {
     return CAMP.fuel.cost + CAMP.fuel.costPerHour * state.turn + CAMP.fuel.costPerUse * fuelUses;
@@ -37,32 +23,6 @@ function fuelCost() {
 
 function restCost() {
     return CAMP.rest.cost + CAMP.rest.costPerHour * state.turn + CAMP.rest.costPerUse * restUses;
-}
-
-function renderOffers() {
-    const list = document.getElementById('campOffers');
-    list.innerHTML = '';
-    if (offers.length === 0) {
-        list.innerHTML = '<p class="camp-empty">The trader has nothing left to sell.</p>';
-    }
-    offers.forEach((key, i) => {
-        const skill = passives[key];
-        const sold = skill.lvl > 0;
-        const price = priceOf(skill);
-        const item = document.createElement('div');
-        item.className = `relic${sold ? ' is-sold' : state.coins >= price ? ' is-ready' : ''}`;
-        item.innerHTML = `
-            <span class="relic-icon"></span>
-            <span class="relic-name"></span>
-            <span class="relic-desc"></span>
-            ${sold ? '<span class="relic-sold">✔ YOURS</span>'
-                : `<button data-offer="${i}" class="shop-row-btn" ${state.coins >= price ? '' : 'disabled'}>🪙 ${price}</button>`}
-        `;
-        item.querySelector('.relic-icon').textContent = skill.icon;
-        item.querySelector('.relic-name').textContent = skill.name;
-        item.querySelector('.relic-desc').textContent = skill.desc;
-        list.appendChild(item);
-    });
 }
 
 function renderServices() {
@@ -82,16 +42,22 @@ function renderServices() {
     const btnRest = document.getElementById('btnRest');
     btnRest.innerHTML = heroFull ? 'FULL' : `+50% 🪙 ${rest}`;
     btnRest.disabled = heroFull || state.coins < rest;
+}
 
-    const btnReroll = document.getElementById('btnCampReroll');
-    btnReroll.innerHTML = `🎲 New wares 🪙 ${rerollCost}`;
-    btnReroll.disabled = state.coins < rerollCost;
+// Ouro e serviços (a árvore se redesenha sozinha)
+function renderWallet() {
+    document.getElementById('campCoins').innerText = state.coins;
+    renderServices();
 }
 
 function renderCamp() {
-    document.getElementById('campCoins').innerText = state.coins;
-    renderOffers();
-    renderServices();
+    renderWallet();
+    relicTree.render();
+}
+
+export function setupCamp() {
+    relicTree.setup();
+    relicTree.onChange = renderWallet;
 }
 
 // O que vem na próxima hora
@@ -109,38 +75,18 @@ function renderNext() {
 }
 
 export function openCamp() {
-    state.campPending = false;
     state.gameState = 'CAMP';
     collectAllGold();
     fuelUses = 0;
     restUses = 0;
-    rerollCost = CAMP.rerollCost;
-    rollOffers();
     document.getElementById('campEyebrow').innerText = `HOUR ${state.turn - 1} SURVIVED`;
-    renderCamp();
+    renderWallet();
     renderNext();
     updateHUD();
     document.getElementById('campScreen').classList.remove('hidden');
+    relicTree.open();
     audio.setMood('camp');
     reportProgress();
-}
-
-export function buyOffer(index) {
-    const key = offers[index];
-    const skill = passives[key];
-    if (!skill || skill.lvl > 0) return;
-    const price = priceOf(skill);
-    if (state.coins < price) return;
-    state.coins -= price;
-    skill.lvl = 1;
-    refreshModifiers();
-    syncMaxHp();
-    state.revives += skill.mods?.revives ?? 0;
-    state.rerolls += skill.mods?.rerolls ?? 0;
-    updateBuildStrip();
-    updateHUD();
-    renderCamp();
-    audio.playPurchase();
 }
 
 export function buyFuel() {
@@ -150,7 +96,7 @@ export function buyFuel() {
     fuelUses++;
     feedTorch(CAMP.fuel.heal);
     updateHUD();
-    renderCamp();
+    renderWallet();
     audio.playPurchase();
 }
 
@@ -161,18 +107,8 @@ export function buyRest() {
     restUses++;
     player.hp = Math.min(player.maxHp, player.hp + getMaxPlayerHp() * CAMP.rest.healRatio);
     updateHUD();
-    renderCamp();
+    renderWallet();
     audio.playPurchase();
-}
-
-export function rerollOffers() {
-    if (state.coins < rerollCost) return;
-    state.coins -= rerollCost;
-    rerollCost += CAMP.rerollCostGrowth;
-    rollOffers();
-    updateHUD();
-    renderCamp();
-    audio.playCardShow();
 }
 
 export function leaveCamp() {

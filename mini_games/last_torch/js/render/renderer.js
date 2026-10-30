@@ -4,7 +4,6 @@ import { renderAttackRange, renderCore, renderHpBars } from './arena.js';
 import {
     renderBladeSlashes,
     renderEnemies,
-    renderEyesInFog,
     renderEnemyProjectiles,
     renderKnifeAim,
     renderKnives,
@@ -147,7 +146,6 @@ export function render() {
     renderShockwaves();
     renderFireflies();
     renderFogAndVignette();
-    renderEyesInFog();
     renderDawn();
     renderClearWave();
     renderHpBars();

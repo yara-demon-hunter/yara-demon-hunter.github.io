@@ -13,8 +13,9 @@ import { drawGlow } from './fx/glow.js';
 
 // Estado puramente visual (não afeta a lógica do jogo). O Shadow Clone (js/render/shadow_clone.js)
 // tem o seu próprio, criado com a mesma função.
-export function createHeroAnim() {
+export function createHeroAnim(throwsKnives = true) {
     return {
+        throwsKnives,       // false no Shadow Clone: ele não lança adagas, então não faz o gesto
         lastTime: performance.now(),
         lastX: 0,
         lastY: 0,
@@ -113,7 +114,7 @@ function updateAnim(a = anim, body = player) {
         // Giro suave para o lado do movimento (não durante o golpe). No arremesso da adaga vira rápido para o alvo.
         const before = a.facing;
         // O Shadow Clone arremessa junto com o herói
-        const throwing = (now - state.knifeThrowTime) / 1000 < KNIFE_VISUALS.throwSeconds;
+        const throwing = a.throwsKnives && (now - state.knifeThrowTime) / 1000 < KNIFE_VISUALS.throwSeconds;
         if (throwing) {
             a.facing = lerpAngle(a.facing, state.knifeThrowAngle, Math.min(1, dt * 25));
         } else if (Math.hypot(dx, dy) > 0.3 && !a.swingActive) {

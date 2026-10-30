@@ -247,7 +247,10 @@ function capePart(pose) {
 
 // --- ARREMESSO DA ADAGA (mão esquerda) ---
 // Progresso da animação: 0 a 1 durante o arremesso, -1 fora dele
+let throwsKnives = true;
+
 function throwProgress() {
+    if (!throwsKnives) return -1;
     const k = (performance.now() - state.knifeThrowTime) / 1000 / KNIFE_VISUALS.throwSeconds;
     return k >= 0 && k < 1 ? k : -1;
 }
@@ -503,6 +506,7 @@ function headPart(pose) {
 // body: herói (padrão) ou Shadow Clone, com o seu estado de animação e a sua paleta
 export function renderPlayer25D(body = player, bodyAnim = heroAnim, colors = V.colors) {
     anim = bodyAnim;
+    throwsKnives = bodyAnim.throwsKnives !== false;
     C = colors;
     const t = performance.now() / 1000;
     const frenzy = state.frenzyActiveTimer > 0;

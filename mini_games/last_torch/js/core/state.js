@@ -52,7 +52,7 @@ export const maxUltEnergy = FRENZY_NOVA_SKILL.maximumEnergy;
 // --- VARIÁVEIS DE ESTADO ---
 // Tudo que muda durante a partida fica neste objeto para ser compartilhado entre os módulos.
 export const state = {
-    // START, PLAYING, PAUSED (status), CARDS (level up / baú), CAMP (acampamento), GAMEOVER
+    // START, PLAYING, PAUSED (status e árvore), CAMP (acampamento), GAMEOVER
     gameState: 'START',
     // Fase dentro de PLAYING: HUNT (caçada), CLEAR (onda de fogo no fim da hora), DYING (morte), DAWN (amanhecer)
     phase: 'HUNT',
@@ -98,10 +98,10 @@ export const state = {
     streak: 0,
     streakTimer: 0,
     streakTierShown: 0,
-    rerolls: 0,
     revives: 0,
-    pendingCards: [],           // próximas telas de carta: 'level' ou 'chest'
-    campPending: false,         // acampamento abre depois das cartas pendentes
+    skillPoints: 0,             // pontos para gastar na árvore (medalhão de status)
+    levelPointsCarry: 0,        // fração de ponto acumulada (relíquias que dão pontos extras)
+    tree: {},                   // níveis dos nós de efeito simples (data_model/tree.js, kind 'mod')
     pickupPity: 0,
 
     // Level & XP

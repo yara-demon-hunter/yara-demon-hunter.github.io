@@ -48,6 +48,10 @@ function loadSavedGame(snapshot = readSavedGame()) {
         : Array.isArray(snapshot.hero?.mistPowers) ? snapshot.hero.mistPowers : [];
     hero.monsterPacts = Array.isArray(snapshot.hero?.monsterPacts) ? snapshot.hero.monsterPacts : [];
     delete hero.mistPowers;
+    // Migração: saves antigos não têm alma nem recarga de faro do pet
+    hero.soul = Number(snapshot.hero?.soul) || 0;
+    hero.soulHistory = Array.isArray(snapshot.hero?.soulHistory) ? snapshot.hero.soulHistory : [];
+    hero.petScoutCooldown = Number(snapshot.hero?.petScoutCooldown) || 0;
     if (snapshot.hero?.criticalChance === undefined) {
         hero.criticalChance = DEFAULT_CHARACTER.baseStats.criticalChance
             + (Number(selectedCharacter.basicStats.criticalChance) || 0);

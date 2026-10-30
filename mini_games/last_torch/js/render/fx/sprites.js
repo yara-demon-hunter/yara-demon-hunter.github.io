@@ -4,7 +4,7 @@ import { getGlowSprite } from './glow.js';
 import { drawDagger } from '../knife.js';
 
 // --- SPRITES PEQUENOS ---
-// Tudo que aparece muitas vezes é desenhado uma vez e depois carimbado: moeda, adaga, olhos no escuro.
+// Tudo que aparece muitas vezes é desenhado uma vez e depois carimbado: moeda e adaga.
 export function makeCanvas(width, height, draw) {
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.ceil(width));
@@ -60,26 +60,4 @@ export function getDaggerSprite() {
         drawDagger(g, 0);
     });
     return dagger;
-}
-
-// Olhos no escuro, olhando para +x
-const EYES_SIZE = 32;
-let eyes = null;
-
-export function getEyesSprite(color, core) {
-    if (eyes) return eyes;
-    eyes = makeCanvas(EYES_SIZE, EYES_SIZE, (g) => {
-        const c = EYES_SIZE / 2;
-        const glow = getGlowSprite(color);
-        g.globalAlpha = 0.42;
-        g.drawImage(glow, c - 3, c - 16, 16, 16);
-        g.drawImage(glow, c - 3, c, 16, 16);
-        g.globalAlpha = 1;
-        g.fillStyle = core;
-        g.beginPath();
-        g.arc(c + 5, c - 8, 2.6, 0, Math.PI * 2);
-        g.arc(c + 5, c + 8, 2.6, 0, Math.PI * 2);
-        g.fill();
-    });
-    return eyes;
 }

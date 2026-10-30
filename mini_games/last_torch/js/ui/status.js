@@ -1,7 +1,8 @@
 import { EVOLUTIONS } from '../../data_model/powers.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, state } from '../core/state.js';
-import { getOwnedPowers } from '../systems/cards.js';
+import { getOwnedPowers } from '../systems/tree.js';
+import { skillTree } from './tree.js';
 import {
     getAtkCooldown, getAtkDamage, getAtkRadius, getCritChance, getKnockback,
     getMaxPlayerHp, getPlayerMaxSpeed, getSlashArcDegree
@@ -73,24 +74,52 @@ function renderSettings() {
     });
 }
 
+const TABS = ['tree', 'build', 'options'];
+let currentTab = 'tree';
+
+function showTab(name) {
+    currentTab = name;
+    TABS.forEach(tab => {
+        const id = `tab${tab[0].toUpperCase()}${tab.slice(1)}`;
+        document.getElementById(id).classList.toggle('hidden', tab !== name);
+    });
+    document.querySelectorAll('[data-status-tab]').forEach(b => b.classList.toggle('is-on', b.dataset.statusTab === name));
+    if (name === 'tree') skillTree.open();
+}
+
+export function setStatusTab(name) {
+    showTab(name);
+}
+
+// Pontos e ouro no cabeçalho
+function renderHeader() {
+    document.getElementById('statusPoints').innerText = state.skillPoints;
+    document.getElementById('shopCoinsText').innerText = state.coins;
+}
+
+skillTree.onChange = renderHeader;
+
 export function openStatus() {
     if (state.gameState !== 'PLAYING') return;
     state.gameState = 'PAUSED';
     document.getElementById('statusLevel').innerText = `LEVEL ${state.playerLevel}`;
-    document.getElementById('shopCoinsText').innerText = state.coins;
     document.getElementById('statusHour').innerText = `Hour ${state.turn} · ${getHourName(state.turn)} · ${getHero().name}`;
+    renderHeader();
     renderStats();
-    renderBuildList('powerList', getOwnedPowers().map(p => ({
+    const skills = Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0)
+        .map(p => ({ icon: p.icon, name: p.name, desc: p.desc, level: 0 }));
+    renderBuildList('powerList', [...getOwnedPowers().map(p => ({
         icon: p.evolved ? EVOLUTIONS[p.key].icon : p.icon,
         name: p.evolved ? `${EVOLUTIONS[p.key].name} ✦` : p.name,
         desc: !p.evolved && EVOLUTIONS[p.key] ? `${p.desc} Evolves at max level with ${EVOLUTIONS[p.key].needText}.` : p.desc,
         level: p.lvl
-    })), 'No powers yet. Level up to earn them.');
-    renderBuildList('passiveList', Object.values(passives).filter(p => p.lvl > 0).map(p => ({
+    })), ...skills], 'No powers yet. Learn them in the skill tree.');
+    renderBuildList('passiveList', Object.values(passives).filter(p => p.type !== 'skill' && p.lvl > 0).map(p => ({
         icon: p.icon, name: p.name, desc: p.desc, level: 0
-    })), 'No relics yet. The trader waits at the end of each hour.');
+    })), 'No relics yet. Buy them at the camp, between hours.');
     renderSettings();
     document.getElementById('shopScreen').classList.remove('hidden');
+    showTab(currentTab);
     audio.setPaused(true);
 }
 

@@ -38,6 +38,19 @@
     </div>
 </dialog>
 
+<dialog id="soul-dialog" class="item-drop-dialog passive-detail-dialog" aria-labelledby="soul-dialog-title" aria-describedby="soul-dialog-description">
+    <div class="item-drop-content">
+        <div class="equipment-bag-heading">
+            <h2 id="soul-dialog-title" class="text-lg font-bold text-amber-300"></h2>
+            <button type="button" class="dialog-close-button" onclick="YaraSoul?.closeDialog()" data-i18n-aria="metaClose" aria-label="Fechar">×</button>
+        </div>
+        <p id="soul-dialog-description" class="soul-dialog-description"></p>
+        <h3 class="soul-dialog-heading" data-i18n="soulHistoryTitle">Últimas escolhas</h3>
+        <p id="soul-dialog-empty" class="soul-dialog-empty" data-i18n="soulHistoryEmpty">Nenhuma escolha pesou na sua alma ainda.</p>
+        <ul id="soul-dialog-history" class="soul-dialog-history"></ul>
+    </div>
+</dialog>
+
 <dialog id="equipment-bag-dialog" class="item-drop-dialog equipment-bag-dialog" aria-labelledby="equipment-bag-title" aria-describedby="equipment-bag-description">
         <div class="item-drop-content">
             <div class="equipment-bag-heading">

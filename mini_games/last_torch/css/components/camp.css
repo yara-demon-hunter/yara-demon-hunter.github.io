@@ -25,7 +25,7 @@
 }
 .camp-body {
     display: grid;
-    grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
     gap: 0.8rem;
     min-height: 0;
     overflow-y: auto;
@@ -41,31 +41,10 @@
     letter-spacing: 0.2em;
     color: #94a3b8;
 }
-.camp-section-title .screen-link { padding: 0.1rem 0.4rem; letter-spacing: 0; }
-#campOffers {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
-}
-.camp-empty { grid-column: 1 / -1; color: #64748b; font-size: 0.8rem; }
-.relic {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.28rem;
-    padding: 0.7rem 0.5rem;
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    border-radius: 0.75rem;
-    background: linear-gradient(180deg, rgba(40, 24, 72, 0.5), rgba(10, 12, 20, 0.8));
-    text-align: center;
-}
-.relic.is-ready { border-color: rgba(251, 191, 36, 0.7); box-shadow: 0 0 14px rgba(251, 191, 36, 0.18); }
-.relic.is-sold { border-color: rgba(52, 211, 153, 0.5); opacity: 0.7; }
-.relic-icon { font-size: 1.7rem; line-height: 1.1; }
-.relic-name { color: #e7e0cf; font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 800; line-height: 1.15; }
-.relic-desc { flex: 1; color: #94a3b8; font-size: 0.66rem; line-height: 1.28; }
-.relic .shop-row-btn { width: 100%; padding: 0.3rem 0.4rem; }
-.relic-sold { color: #6ee7b7; font-size: 0.7rem; font-weight: 800; padding: 0.3rem 0; }
+.camp-hint { color: #64748b; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.04em; }
+.camp-relics { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; --cell: 3.2rem; }
+.camp-relics .tree-scroll { max-height: 17.5rem; }
+.camp-relics .tdetail-text span { font-size: 0.64rem; }
 
 .camp-service {
     display: flex;
@@ -103,11 +82,8 @@
     .camp-head .screen-eyebrow { font-size: 0.5rem; }
     .camp-gold { padding: 0.15rem 0.5rem; font-size: 0.8rem; }
     .camp-section-title { min-height: 1.1rem; margin-bottom: 0.1rem; font-size: 0.52rem; }
-    .relic { padding: 0.3rem 0.3rem; gap: 0.1rem; }
-    .relic-icon { font-size: 1.05rem; }
-    .relic-name { font-size: 0.62rem; }
-    .relic-desc { font-size: 0.54rem; line-height: 1.18; }
-    .relic .shop-row-btn { padding: 0.15rem; font-size: 0.6rem; }
+    .camp-relics { --cell: 2.5rem; gap: 0.2rem; }
+    .camp-relics .tree-scroll { max-height: 10.5rem; }
     .camp-service { padding: 0.25rem 0.4rem; margin-bottom: 0.2rem; gap: 0.3rem; }
     .camp-service-icon { font-size: 0.95rem; }
     .camp-service-info b { font-size: 0.6rem; }
