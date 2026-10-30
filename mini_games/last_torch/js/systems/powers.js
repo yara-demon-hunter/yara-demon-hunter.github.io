@@ -9,7 +9,6 @@ import { getAtkDamage } from './stats.js';
 // Cada poder lê os dados do nível atual com getPowerLevel (data_model/powers.js).
 // O desenho fica em js/render/powers.js. Temporizadores: state.powerTimers.
 const TAU = Math.PI * 2;
-const FIRE_DAMAGE_COLOR = '#fdba74';
 
 // Conta o tempo de um poder com recarga: true quando disparou
 function ready(key, dt, cooldown) {
@@ -104,7 +103,7 @@ function updateGroundFires(dt) {
         }
         const damage = getAtkDamage() * f.dps * tickSeconds;
         for (const e of state.enemies) {
-            if (Math.hypot(e.x - f.x, e.y - f.y) < f.radius + e.radius) dealDamage(e, damage, { noCrit: true, quiet: true, color: FIRE_DAMAGE_COLOR });
+            if (Math.hypot(e.x - f.x, e.y - f.y) < f.radius + e.radius) dealDamage(e, damage, { noCrit: true, quiet: true });
         }
     }
 }
@@ -122,7 +121,7 @@ function strikeChain(startX, startY, level, first = null) {
     while (current && jumps > 0) {
         struck.add(current);
         points.push({ x: current.x, y: current.y });
-        dealDamage(current, damage, { noCrit: true, color: '#bae6fd' });
+        dealDamage(current, damage, { noCrit: true, style: 'storm' });
         createExplosion(current.x, current.y, '#7dd3fc', 4);
         jumps--;
         current = nearestEnemy(current.x, current.y, M.jumpRange, struck);

@@ -10,6 +10,8 @@ import { updateHUD } from '../ui/hud.js';
 import { addShockwave, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { mod } from './modifiers.js';
 
+const MIN_HORDE = 3;
+
 // --- SPAWNER DE INIMIGOS ---
 // Monstros nascem logo fora da tela, em qualquer ponto da borda do mundo
 function edgePoint() {
@@ -108,6 +110,9 @@ function spawnGraves(h) {
 const HORDE_SPAWNERS = { ring: spawnRing, wall: spawnWall, swarm: spawnSwarm, grave: spawnGraves };
 
 function spawnHorde(h) {
+    // A horda respeita o limite de monstros, mas sempre chega com alguma força
+    const room = TURN_DIFFICULTY.maxAliveEnemies - state.enemies.length;
+    h.count = Math.min(h.count, Math.max(MIN_HORDE, room));
     HORDE_SPAWNERS[h.kind](h);
     showBanner('', h.banner, '', 'warn');
     audio.playHorn();

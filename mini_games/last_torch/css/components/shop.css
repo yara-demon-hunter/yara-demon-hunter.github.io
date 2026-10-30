@@ -1,3 +1,38 @@
+/* --- STATUS: painel de pausa --- */
+#shopScreen { background: rgba(2, 6, 23, 0.94); }
+.status-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+    max-width: 42rem;
+    max-height: 100%;
+    padding: 1rem 1.2rem;
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    border-radius: 1rem;
+    background: rgba(15, 23, 42, 0.92);
+}
+.status-head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid #1e293b;
+}
+.status-head > div:first-child { flex: 1; min-width: 0; }
+.status-title { color: #fbbf24; font-size: 1.3rem; font-weight: 700; line-height: 1.2; }
+#statusHour { color: #94a3b8; font-size: 0.75rem; }
+.status-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.4rem 0.2rem 0.4rem 0;
+}
+.status-panel .screen-link { align-self: center; }
+
 /* --- STATUS E ACAMPAMENTO: Custom Scrollbar --- */
 .custom-scroll::-webkit-scrollbar {
     width: 6px;
@@ -16,12 +51,27 @@
 
 /* --- STATUS: painéis (sempre abertos) --- */
 .shop-panel {
-    border-width: 1px;
+    flex-shrink: 0;
+    padding: 0 0.5rem 0.5rem;
+    border: 1px solid #1e293b;
     border-radius: 12px;
     background: rgba(2, 6, 23, 0.7);
 }
+.shop-panel-amber { border-color: rgba(245, 158, 11, 0.3); }
+.shop-panel-violet { border-color: rgba(139, 92, 246, 0.3); }
+.shop-panel-amber .shop-panel-title { color: #fcd34d; }
+.shop-panel-violet .shop-panel-title { color: #c4b5fd; }
+#statusLevel { margin-left: auto; color: #fbbf24; }
+.stat-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+}
+@media (max-width: 480px) {
+    .stat-list { grid-template-columns: minmax(0, 1fr); }
+}
 .shop-panel-title {
-    min-height: 40px;
+    min-height: 36px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -31,7 +81,6 @@
     font-weight: 700;
     letter-spacing: 0.05em;
 }
-.shop-panel.has-upgrade { border-color: rgba(251, 191, 36, 0.72); box-shadow: 0 0 14px rgba(251, 191, 36, 0.16); }
 
 /* --- STATUS: linha compacta (nome | valor), uma por stat --- */
 .shop-row {
@@ -123,10 +172,10 @@
 
 /* Celular de lado: a área com rolagem fica com a tela quase toda */
 @media (max-height: 520px) and (orientation: landscape) {
-    #shopScreen { padding: 0.4rem; }
-    #shopScreen > div { padding: 0.5rem 0.7rem; }
-    #shopScreen h2 { font-size: 0.95rem; }
-    #shopScreen > div > div:first-child { padding-bottom: 0.25rem; }
-    #btnResume { margin-top: 0.3rem; padding: 0.35rem; font-size: 0.8rem; }
-    #btnAbandon { margin-top: 0.1rem; padding: 0.1rem; font-size: 0.62rem; }
+    .status-panel { padding: 0.45rem 0.7rem; gap: 0.2rem; }
+    .status-head { padding-bottom: 0.2rem; }
+    .status-title { font-size: 0.9rem; }
+    #statusHour { font-size: 0.6rem; }
+    .status-panel .start-btn { padding: 0.35rem; font-size: 0.8rem; }
+    .status-panel .screen-link { padding: 0; font-size: 0.6rem; }
 }

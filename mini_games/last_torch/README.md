@@ -10,6 +10,20 @@ Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o heró
 
 Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
 
+## Desempenho
+
+O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça com CPU limitada):
+
+- **Monstros são sprites.** `js/render/monster_sprites.js` roda a arte procedural uma vez por quadro de animação e guarda num atlas; em campo cada monstro custa 2 `drawImage`. Só bosses e herói são desenhados a cada quadro. Monstro novo: entra em `ART` e em `data_model/visuals/monsters/sprites_visual.js`.
+- **Nada repetido é desenhado do zero:** moedas, adagas, tiros, olhos, brilhos e algarismos vêm de sprites (`js/render/fx/`). Evite `fillText`, `setLineDash`, `shadowBlur`, gradientes novos por quadro e `ctx.save/restore` por objeto.
+- **Chão e névoa:** o chão é copiado 1:1 (grama e brilho da tocha já pintados nele); a névoa é desenhada numa tela pequena poucas vezes por segundo.
+- **DOM:** os sistemas só chamam `updateHUD()`; a escrita sai no máximo 10 vezes por segundo, só do que mudou, e as barras usam `transform`. Sem `backdrop-filter` nem animação de sombra.
+- **Resolução interna** limitada em `data_model/world.js` (`maxPixelRatio`, `maxCanvasPixels`). O HUD é DOM e continua nítido.
+- **Detalhe adaptativo:** `state.quality` vai de 0 a 2. O celular começa em 1 e `js/game.js` desce sozinho se o aparelho não sustentar ~42 FPS; o nível 2 trava em ~30 FPS.
+- **Sem lixo de memória:** partículas, pedaços e números são reaproveitados (`js/systems/effects.js`).
+- **Fora da partida o canvas não é redesenhado.**
+- Limite de monstros vivos: `maxAliveEnemies` em `data_model/difficulty.js`.
+
 ## Estrutura
 
 ```
@@ -48,7 +62,7 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   world.js                        tamanho padronizado do mundo e zoom (areaScale) por perfil desktop/mobile
   visuals/                        cores, tamanhos e ritmos das animações (arte procedural)
     characters/                   herói e Shadow Clone
-    monsters/                     um arquivo por monstro (bat, skeleton, witch, vampire, moth, bloater, wraith)
+    monsters/                     um arquivo por monstro (bat, skeleton, witch, vampire, moth, bloater, wraith) e sprites_visual.js (quadros dos sprites)
     bosses/                       Demon Lord e paletas de quem reaproveita arte (palettes_visual.js)
     scenery/                      cenário (forest_visual.js, torch_visual.js)
     items/gold_visual.js          ouro
@@ -82,16 +96,17 @@ js/
   systems/effects.js              tempo (hit stop, câmera lenta), partículas, pedaços, manchas, números, ondas
   render/renderer.js              ordem das camadas de desenho
   render/arena.js                 tocha (núcleo) e raio de alcance do herói
-  render/forest.js                cenário: noite fria, névoa, luz da tocha e do herói
+  render/forest.js                cenário: chão pré-pintado, névoa em baixa resolução, luz da tocha e do herói
   render/entities.js              inimigos, olhos na névoa, projéteis, golpes e moedas
   render/effects.js               manchas, pedaços, ondas de choque, avisos no chão, números, amanhecer
   render/powers.js                desenho dos poderes
   render/pickups.js               itens e baús
-  render/moth.js, bloater.js, wraith.js ...   um arquivo por monstro
+  render/monster_sprites.js       gera os sprites dos monstros e dos tiros a partir da arte procedural
+  render/moth.js, bloater.js, wraith.js ...   arte de cada monstro (usada para gerar os sprites)
   render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
   render/player25d.js             herói 2.5D (padrão)
   render/shadow_clone.js          Shadow Clone: herói 2.5D com paleta de sombra
-  render/fx/                      aleatório com semente, easing, glow em cache, barra de vida
+  render/fx/                      glow, carimbos (stamp), sprites pequenos, atlas de números, anéis, relógio do desenho, easing, barra de vida
   ui/hud.js                       atualização do HUD
   ui/banner.js                    faixas, gritos e notificações
   ui/cards.js                     tela de cartas

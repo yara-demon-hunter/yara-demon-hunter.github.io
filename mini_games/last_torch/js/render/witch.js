@@ -1,6 +1,7 @@
 import { WITCH_VISUALS as V } from '../../data_model/visuals/monsters/witch_visual.js';
 import { ctx, state } from '../core/state.js';
 import { easeOutCubic, lerpAngle } from './fx/easing.js';
+import { renderNow } from './fx/clock.js';
 import { drawGlow } from './fx/glow.js';
 import { createRandom } from './fx/random.js';
 
@@ -20,7 +21,7 @@ function getAnim(e) {
     if (!a) {
         const rand = createRandom(Math.floor(e.phase * 1e6));
         a = {
-            lastTime: performance.now(),
+            lastTime: renderNow(),
             lastX: e.x,
             lastY: e.y,
             speed: 0,
@@ -39,7 +40,7 @@ function getAnim(e) {
 }
 
 function updateAnim(e, a) {
-    const now = performance.now();
+    const now = renderNow();
     const dt = Math.min((now - a.lastTime) / 1000, 0.05);
     a.lastTime = now;
     const dx = e.x - a.lastX;
@@ -398,7 +399,7 @@ function drawSpell(r, t, phase, handX, handY, charge, release) {
 
 export function renderWitch(e) {
     const c = V.colors;
-    const t = performance.now() / 1000;
+    const t = renderNow() / 1000;
     const r = e.radius * V.scale;
     const a = getAnim(e);
     updateAnim(e, a);
@@ -407,11 +408,13 @@ export function renderWitch(e) {
     const cast = Math.max(easeOutCubic(charge), a.release);
 
     // Aura escura (mais forte ao conjurar) e sombra
-    drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha + charge * 0.25);
-    ctx.fillStyle = `rgba(0, 0, 0, ${V.shadowAlpha})`;
-    ctx.beginPath();
-    ctx.ellipse(e.x + r * 0.12, e.y + r * 0.35, r * 0.75, r * 0.4, 0, 0, Math.PI * 2);
-    ctx.fill();
+    if (!e.baking) {
+        drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha + charge * 0.25);
+        ctx.fillStyle = `rgba(0, 0, 0, ${V.shadowAlpha})`;
+        ctx.beginPath();
+        ctx.ellipse(e.x + r * 0.12, e.y + r * 0.35, r * 0.75, r * 0.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
     // Mancando: o corpo balança de um lado para o outro
     const hobble = Math.sin(a.stride) * V.hobbleAmount * (0.3 + a.run * 0.7);
@@ -444,7 +447,7 @@ export function renderWitch(e) {
 export function renderWitchBolt(p) {
     const B = V.bolt;
     const c = V.colors;
-    const t = performance.now() / 1000;
+    const t = renderNow() / 1000;
     const spin = t * B.spinHz * Math.PI * 2;
 
     drawGlow(ctx, B.glowColor, p.x, p.y, p.radius * B.glowRadius, 0.7);

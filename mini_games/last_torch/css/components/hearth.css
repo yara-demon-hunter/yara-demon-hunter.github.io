@@ -67,7 +67,7 @@
     flex-shrink: 0;
     border: 1px solid rgba(103, 232, 249, 0.4);
     border-radius: 0.45rem;
-    background: #0b1120 url('../../images/characters/demon-hunter.webp') 26% 8% / 220% no-repeat;
+    background: #0b1120 url('../../images/characters/demon-hunter-small.webp') 26% 8% / 220% no-repeat;
     image-rendering: pixelated;
 }
 .hearth-item.is-locked .hearth-portrait { filter: brightness(0.15) !important; }

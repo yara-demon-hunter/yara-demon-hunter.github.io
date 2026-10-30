@@ -2,8 +2,15 @@ import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { WORLD } from '../../data_model/world.js';
 import { canvas, ctx, player, shadowClone, state } from './state.js';
 
-// Telas 2x/3x (retina) têm 4x/9x mais pixels para pintar; 1.5 é um bom equilíbrio
-const MAX_PIXEL_RATIO = 1.5;
+// Resolução interna do canvas: segue a tela até o teto do perfil. Telas 2x/3x têm 4x/9x mais pixels
+// para pintar e, numa cena escura e em movimento, quase não mostram a diferença.
+function computePixelRatio(cssWidth, cssHeight, profile) {
+    const screen = Math.min(window.devicePixelRatio || 1, profile.maxPixelRatio);
+    const capped = Math.min(screen, Math.sqrt(profile.maxCanvasPixels / Math.max(1, cssWidth * cssHeight)));
+    return capped * WORLD.qualityPixelScale[state.quality];
+}
+
+let qualityReady = false;
 
 // Converte um ponto da janela (clientX/Y do mouse ou toque) para coordenadas do mundo
 export function screenToWorld(clientX, clientY) {
@@ -36,11 +43,15 @@ function computeWorldSize(cssWidth, cssHeight) {
 export function resize() {
     const cssWidth = canvas.clientWidth || window.innerWidth;
     const cssHeight = canvas.clientHeight || window.innerHeight;
-    const pixelRatio = state.lowQuality ? 1 : Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
+    const world = computeWorldSize(cssWidth, cssHeight);
+    if (!qualityReady) {
+        qualityReady = true;
+        state.quality = world.mobile ? WORLD.startQuality.mobile : WORLD.startQuality.desktop;
+    }
+    const pixelRatio = computePixelRatio(cssWidth, cssHeight, world.mobile ? WORLD.mobile : WORLD.desktop);
     const { view } = state;
     // Nada mudou (o ResizeObserver e o 'resize' da janela costumam avisar juntos)
     if (cssWidth === view.cssWidth && cssHeight === view.cssHeight && pixelRatio === view.pixelRatio) return;
-    const world = computeWorldSize(cssWidth, cssHeight);
 
     // Guarda o centro antigo para manter tudo na mesma posição relativa à tocha
     const oldCoreX = state.coreX;
@@ -63,6 +74,7 @@ export function resize() {
 
     canvas.width = Math.round(cssWidth * pixelRatio);
     canvas.height = Math.round(cssHeight * pixelRatio);
+    state.redraw = true;
     ctx.setTransform(
         pixelRatio * scale, 0, 0, pixelRatio * scale,
         pixelRatio * state.view.offsetX, pixelRatio * state.view.offsetY
@@ -80,7 +92,7 @@ export function resize() {
         // Janela redimensionada no meio da partida: desloca tudo junto com o centro
         const dx = state.coreX - oldCoreX;
         const dy = state.coreY - oldCoreY;
-        [player, shadowClone, ...state.enemies, ...state.enemyProjectiles, ...state.goldDrops, ...state.particles].forEach(o => {
+        [player, shadowClone, ...state.enemies, ...state.enemyProjectiles, ...state.goldDrops, ...state.pickups, ...state.particles].forEach(o => {
             o.x += dx;
             o.y += dy;
         });

@@ -18,6 +18,7 @@ import { gainXp } from './progression.js';
 import { damageShadowClone } from './shadow_clone.js';
 
 import { addStreakKill, getScoreMultiplier, getStreakGoldBonus } from './streak.js';
+import { lerpAngle } from '../render/fx/easing.js';
 import { getAtkDamage } from './stats.js';
 import { hurtTorch } from './torch.js';
 
@@ -26,47 +27,32 @@ const getEnemyModel = type => MONSTER_MODELS[type] || BOSS_MODELS[type];
 
 // Explosões em cadeia por quadro (data: js/systems/damage.js)
 const MAX_BLASTS_PER_FRAME = 6;
+const FACING_SMOOTHING = 8;
 let separationTick = 0;
 
 // --- SEPARAÇÃO ---
-// Monstros se empurram de leve para a horda ocupar espaço. Grade para não comparar todos com todos;
-// roda em quadros alternados. Boss não é empurrado.
+// Monstros se empurram de leve para a horda ocupar espaço. Boss não é empurrado. Com poucas dezenas
+// de monstros, comparar pares direto é mais rápido que qualquer grade e não gera lixo. Quadros alternados.
 function separateEnemies(dt) {
     const { enemies } = state;
-    const cell = MONSTER_SPAWNING.separationCell;
-    const grid = new Map();
-    for (const e of enemies) {
-        const key = (Math.floor(e.x / cell) + 64) * 4096 + Math.floor(e.y / cell) + 64;
-        const bucket = grid.get(key);
-        if (bucket) bucket.push(e);
-        else grid.set(key, [e]);
-    }
-
     const strength = MONSTER_SPAWNING.separationStrength * dt;
-    const push = (a, b) => {
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const min = (a.radius + b.radius) * 0.9;
-        const dist2 = dx * dx + dy * dy;
-        if (dist2 >= min * min || dist2 < 0.01) return;
-        const dist = Math.sqrt(dist2);
-        const force = ((min - dist) / min) * strength;
-        const nx = (dx / dist) * force;
-        const ny = (dy / dist) * force;
-        if (!a.isBoss) { a.x -= nx; a.y -= ny; }
-        if (!b.isBoss) { b.x += nx; b.y += ny; }
-    };
-
-    grid.forEach((bucket, key) => {
-        for (let i = 0; i < bucket.length; i++) {
-            for (let j = i + 1; j < bucket.length; j++) push(bucket[i], bucket[j]);
-            // Metade das células vizinhas (a outra metade é vista do outro lado)
-            [key + 1, key + 4096, key + 4096 + 1, key + 4096 - 1].forEach(next => {
-                const other = grid.get(next);
-                if (other) for (const b of other) push(bucket[i], b);
-            });
+    for (let i = 0; i < enemies.length; i++) {
+        const a = enemies[i];
+        for (let j = i + 1; j < enemies.length; j++) {
+            const b = enemies[j];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const min = (a.radius + b.radius) * 0.9;
+            const dist2 = dx * dx + dy * dy;
+            if (dist2 >= min * min || dist2 < 0.01) continue;
+            const dist = Math.sqrt(dist2);
+            const force = ((min - dist) / min) * strength;
+            const nx = (dx / dist) * force;
+            const ny = (dy / dist) * force;
+            if (!a.isBoss) { a.x -= nx; a.y -= ny; }
+            if (!b.isBoss) { b.x += nx; b.y += ny; }
         }
-    });
+    }
 }
 
 // Espectro: para, mira (linha no chão) e dispara em linha reta. true = ele controla o movimento agora.
@@ -275,6 +261,7 @@ export function updateEnemies(dt) {
             e.frozen -= dt;
         } else {
             e.angle = toTargetAngle;
+            e.facing = lerpAngle(e.facing ?? e.angle, e.angle, Math.min(1, dt * FACING_SMOOTHING));
             const lunging = model.lunge && hunting && updateLunge(e, model.lunge, distToTarget, toTargetAngle, dt);
             const holdsDistance = model.keepDistance && distToTarget < model.keepDistance;
             const blockedByTorch = e.isBoss && distCore < CORE_MODEL.bossStopDistance + e.radius;

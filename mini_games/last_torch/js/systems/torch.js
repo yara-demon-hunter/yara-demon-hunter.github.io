@@ -3,7 +3,7 @@ import { CORE_MODEL } from '../../data_model/core.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
-import { addFloater, createExplosion, screenFlash, shakeScreen } from './effects.js';
+import { addNumber, createExplosion, screenFlash, shakeScreen } from './effects.js';
 import { mod } from './modifiers.js';
 import { beginDeath } from './night.js';
 import { getMaxPlayerHp } from './stats.js';
@@ -25,7 +25,7 @@ export function hurtTorch(amount, x, y) {
     audio.playTorchHit();
     screenFlash('#fb923c', 0.16);
     createExplosion(x, y, '#f43f5e', 14);
-    addFloater(state.coreX, state.coreY - 72, `-${Math.round(amount)}`, '#fb923c');
+    addNumber(state.coreX, state.coreY - 72, amount, -1, 'torch');
 
     if (!warnedLow && state.coreHp > 0 && state.coreHp < state.coreHpMax * CORE_MODEL.lowHpRatio) {
         warnedLow = true;
@@ -60,7 +60,7 @@ export function updateTorch(dt) {
         player.hp = Math.min(player.maxHp, player.hp + heal);
         warmthFloat += heal;
         if (warmthFloat >= 4) {
-            addFloater(player.x, player.y - 40, `+${Math.round(warmthFloat)}`, '#86efac');
+            addNumber(player.x, player.y - 40, warmthFloat, 1, 'heal');
             warmthFloat = 0;
         }
     }

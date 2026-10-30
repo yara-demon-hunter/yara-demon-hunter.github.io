@@ -11,6 +11,8 @@ import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
 import { continueEndless, startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { resetTorch } from '../systems/torch.js';
+import { prepareForest } from '../render/forest.js';
+import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_sprites.js';
 import { showToast } from './banner.js';
 import { startHints } from './hints.js';
 import { updateBuildStrip, updateHUD } from './hud.js';
@@ -18,6 +20,8 @@ import { updateBuildStrip, updateHUD } from './hud.js';
 // --- INÍCIO DE PARTIDA ---
 export function startGame() {
     audio.init();
+    prepareForest();
+    ensureMonsterSprites();
     state.turn = 1;
     state.scoreTurn = 0;
     state.totalScore = 0;
@@ -113,8 +117,6 @@ export function startGame() {
     ['startScreen', 'gameOverScreen', 'shopScreen', 'cardScreen', 'campScreen', 'hearthScreen'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
-    document.getElementById('bossHpContainer').classList.add('hidden');
-    document.getElementById('screenFx').className = '';
     startHour();
     updateBuildStrip();
     updateHUD();
@@ -389,4 +391,5 @@ export function returnToMenu() {
 export function setupScreens() {
     audio.applySettings();
     renderStartScreen();
+    scheduleMonsterSprites();
 }

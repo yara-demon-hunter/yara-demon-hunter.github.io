@@ -8,7 +8,7 @@ export const POWERS_VISUALS = {
         hostileColors: ['rgba(185, 28, 28, 0.85)', 'rgba(239, 68, 68, 0.85)', 'rgba(251, 146, 60, 0.9)'],
         hostileGlow: 'rgba(220, 38, 38, 0.75)',
         evolvedColors: ['rgba(220, 38, 38, 0.85)', 'rgba(249, 115, 22, 0.9)', 'rgba(254, 240, 138, 0.95)'],
-        tongues: 3
+        tongues: 2
     },
     lightning: { color: '#bae6fd', core: '#ffffff', glow: 'rgba(56, 189, 248, 0.35)', width: 3, coreWidth: 1.2, glowWidth: 11 },
     bolt: { glow: 'rgba(249, 115, 22, 0.9)', core: '#fff7ed', mid: '#fb923c', radius: 5, trail: 4, trailGap: 6 },

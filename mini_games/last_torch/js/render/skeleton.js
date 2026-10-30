@@ -1,6 +1,7 @@
 import { SKELETON_VISUALS as V } from '../../data_model/visuals/monsters/skeleton_visual.js';
 import { ctx, state } from '../core/state.js';
 import { lerpAngle } from './fx/easing.js';
+import { renderNow } from './fx/clock.js';
 import { drawGlow } from './fx/glow.js';
 
 // --- ESQUELETO (desenho procedural, sem imagens) ---
@@ -16,7 +17,7 @@ function getAnim(e) {
     let a = animBySkeleton.get(e);
     if (!a) {
         a = {
-            lastTime: performance.now(),
+            lastTime: renderNow(),
             lastX: e.x,
             lastY: e.y,
             speed: 0,
@@ -31,7 +32,7 @@ function getAnim(e) {
 }
 
 function updateAnim(e, a) {
-    const now = performance.now();
+    const now = renderNow();
     const dt = Math.min((now - a.lastTime) / 1000, 0.05);
     a.lastTime = now;
     const dx = e.x - a.lastX;
@@ -287,7 +288,7 @@ function drawSkull(r, t, phase, pulse, boneColor, shake) {
 
 export function renderSkeleton(e) {
     const c = V.colors;
-    const t = performance.now() / 1000;
+    const t = renderNow() / 1000;
     const r = e.radius * V.scale;
     const a = getAnim(e);
     updateAnim(e, a);
@@ -298,11 +299,13 @@ export function renderSkeleton(e) {
     // Chacoalhar ao levar dano: cada osso treme desencontrado
     const shake = (i) => a.rattle * r * V.rattleAmount * Math.sin(t * 90 + i * 12.9);
 
-    drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha + pulse * 0.06);
-    ctx.fillStyle = `rgba(0, 0, 0, ${V.shadowAlpha})`;
-    ctx.beginPath();
-    ctx.ellipse(e.x + r * 0.1, e.y + r * 0.3, r * 0.8, r * 0.42, 0, 0, Math.PI * 2);
-    ctx.fill();
+    if (!e.baking) {
+        drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha + pulse * 0.06);
+        ctx.fillStyle = `rgba(0, 0, 0, ${V.shadowAlpha})`;
+        ctx.beginPath();
+        ctx.ellipse(e.x + r * 0.1, e.y + r * 0.3, r * 0.8, r * 0.42, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
     ctx.save();
     ctx.translate(e.x, e.y);

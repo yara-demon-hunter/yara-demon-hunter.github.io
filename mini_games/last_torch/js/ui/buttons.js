@@ -114,5 +114,6 @@ export function setupButtons() {
     // Saiu da aba no meio da caçada: pausa sozinho
     document.addEventListener('visibilitychange', () => {
         if (document.hidden && state.gameState === 'PLAYING' && state.phase === 'HUNT') openStatus();
+        audio.setHidden(document.hidden);
     });
 }

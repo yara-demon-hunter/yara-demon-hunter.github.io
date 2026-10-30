@@ -16,3 +16,4 @@ export * from './monsters/bloater_visual.js';
 export * from './monsters/wraith_visual.js';
 export * from './effects/juice_visual.js';
 export * from './effects/powers_visual.js';
+export * from './monsters/sprites_visual.js';

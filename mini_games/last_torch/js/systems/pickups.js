@@ -3,7 +3,7 @@ import { PICKUP_DROP as D, PICKUP_MODELS, rollChestPicks, rollPickupType } from 
 import { audio, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { blast } from './damage.js';
-import { addFloater, addShockwave, screenFlash, shakeScreen } from './effects.js';
+import { addFloater, addNumber, addShockwave, screenFlash, shakeScreen } from './effects.js';
 import { mod } from './modifiers.js';
 import { getAtkDamage } from './stats.js';
 import { feedTorch } from './torch.js';
@@ -38,10 +38,10 @@ function collect(p) {
     if (p.type === 'MEAT') {
         const heal = player.maxHp * model.healRatio;
         player.hp = Math.min(player.maxHp, player.hp + heal);
-        addFloater(player.x, player.y - 40, `+${Math.round(heal)}`, '#86efac');
+        addNumber(player.x, player.y - 40, heal, 1, 'heal');
     } else if (p.type === 'OIL') {
         feedTorch(model.torchHeal);
-        addFloater(state.coreX, state.coreY - 72, `+${model.torchHeal}`, '#fdba74');
+        addNumber(state.coreX, state.coreY - 72, model.torchHeal, 1, 'torch');
         addShockwave(state.coreX, state.coreY, { radius: 70, color: '#fdba74', width: 4, seconds: 0.4 });
     } else if (p.type === 'MAGNET') {
         state.magnetTimer = 1.6;

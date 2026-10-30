@@ -4,7 +4,7 @@ import { audio, joystick, keys, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { moveDash } from './dash.js';
-import { addFloater, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion } from './effects.js';
+import { addNumber, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { mod } from './modifiers.js';
 import { beginDeath } from './night.js';
 import { getPlayerMaxSpeed } from './stats.js';
@@ -42,7 +42,7 @@ export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
     player.iFrames = invulnerableSeconds;
     registerPlayerHit(fromX, fromY);
     createExplosion(player.x, player.y, '#f43f5e', 12);
-    addFloater(player.x, player.y - 40, `-${Math.round(damage)}`, '#fb7185');
+    addNumber(player.x, player.y - 40, damage, -1, 'hurt');
     shakeScreen(6);
     audio.playHurt();
     if (player.hp <= 0) heroDown();
@@ -132,10 +132,12 @@ export function updatePlayer(dt) {
     player.targetX = target.x;
     player.targetY = target.y;
 
-    // Atualizar rastro de luz de movimento do herói
-    player.trail.unshift({ x: player.x, y: player.y, alpha: 1.0 });
-    if (player.trail.length > CHARACTER_MODEL.trailLength) {
-        player.trail.pop();
-    }
-    player.trail.forEach(t => t.alpha -= dt * CHARACTER_MODEL.trailFadePerSecond);
+    // Atualizar rastro de luz de movimento do herói: reaproveita o ponto mais antigo
+    const { trail } = player;
+    const point = trail.length >= CHARACTER_MODEL.trailLength ? trail.pop() : {};
+    point.x = player.x;
+    point.y = player.y;
+    point.alpha = 1;
+    trail.unshift(point);
+    for (const t of trail) t.alpha -= dt * CHARACTER_MODEL.trailFadePerSecond;
 }

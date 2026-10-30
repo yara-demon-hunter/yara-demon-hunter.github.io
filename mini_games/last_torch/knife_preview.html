@@ -17,6 +17,7 @@
         import { KNIFE_VISUALS as K } from './data_model/visuals/effects/knife_visual.js';
         import { ctx, player, state } from './js/core/state.js';
         import { renderKnives } from './js/render/entities.js';
+        import { setWorldView } from './js/render/fx/stamp.js';
         import { drawDagger } from './js/render/knife.js';
         import { heroAnim } from './js/render/player.js';
         import { renderPlayer25D } from './js/render/player25d.js';
@@ -45,6 +46,8 @@
                 angle: facing,
                 travelled
             }] : [];
+            const m = ctx.getTransform();
+            setWorldView(m.a, m.e, m.f);    // os carimbos usam a transformação do mundo
             renderKnives();
             renderPlayer25D();
         }

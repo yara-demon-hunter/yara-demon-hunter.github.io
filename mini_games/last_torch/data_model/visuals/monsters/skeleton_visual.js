@@ -58,14 +58,14 @@ export const SKELETON_VISUALS = {
     turnSmoothing: 8,
 
     // Cabeça e mandíbula
-    chatterHz: 6,
+    chatterHz: 5.4,
     twitchHz: 0.35,              // frequência dos trancos de cabeça
     twitchAngle: 0.45,
 
     // Alma e olhos
     soulX: -0.08,
     soulRadius: 0.13,
-    soulPulseHz: 1.2,
+    soulPulseHz: 1.8,
     soulGlowRadius: 0.6,
     eyeGlowRadius: 0.18,
     auraAlpha: 0.1,
@@ -74,7 +74,7 @@ export const SKELETON_VISUALS = {
     // Trapo preso à bacia
     ragStrips: 3,
     ragLength: 0.42,
-    ragFlutterHz: 3,
+    ragFlutterHz: 3.6,
 
     // Levar dano: ossos chacoalham e piscam em branco
     rattleSeconds: 0.25,

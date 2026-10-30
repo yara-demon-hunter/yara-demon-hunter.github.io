@@ -71,9 +71,9 @@ function renderServices() {
     const fuel = fuelCost();
     const rest = restCost();
 
-    document.getElementById('campTorchBar').style.width = `${(state.coreHp / state.coreHpMax) * 100}%`;
+    document.getElementById('campTorchBar').style.transform = `scaleX(${state.coreHp / state.coreHpMax})`;
     document.getElementById('campTorchText').innerText = `${Math.ceil(state.coreHp)}/${state.coreHpMax}`;
-    document.getElementById('campHeroBar').style.width = `${(player.hp / player.maxHp) * 100}%`;
+    document.getElementById('campHeroBar').style.transform = `scaleX(${player.hp / player.maxHp})`;
     document.getElementById('campHeroText').innerText = `${Math.ceil(player.hp)}/${player.maxHp}`;
 
     const btnFuel = document.getElementById('btnFuel');

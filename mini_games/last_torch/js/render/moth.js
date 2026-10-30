@@ -1,5 +1,6 @@
 import { MOTH_VISUALS as V } from '../../data_model/visuals/monsters/moth_visual.js';
 import { ctx } from '../core/state.js';
+import { renderNow } from './fx/clock.js';
 import { drawGlow } from './fx/glow.js';
 
 // --- MARIPOSA DE CINZAS (desenho procedural, sem imagens) ---
@@ -43,24 +44,26 @@ function drawWing(r, side, open) {
 
 export function renderMoth(e) {
     const c = V.colors;
-    const t = performance.now() / 1000;
+    const t = renderNow() / 1000;
     const r = e.radius * V.scale;
     const flap = 0.5 + 0.5 * Math.sin(t * V.flapHz * Math.PI * 2 + e.phase);
-    const wobble = Math.sin(t * V.wobbleHz * Math.PI * 2 + e.phase) * V.wobbleAmount;
+    const wobble = e.baking ? 0 : Math.sin(t * V.wobbleHz * Math.PI * 2 + e.phase) * V.wobbleAmount;
 
-    drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha);
+    if (!e.baking) {
+        drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha);
 
-    // Rastro de cinzas em brasa
-    ctx.fillStyle = c.ember;
-    for (let i = 0; i < V.embers; i++) {
-        const p = (t * 1.4 + i / V.embers + e.phase) % 1;
-        ctx.globalAlpha = (1 - p) * 0.7;
-        ctx.beginPath();
-        ctx.arc(e.x - Math.cos(e.angle) * r * (0.6 + p * 1.8) + Math.sin(t * 9 + i) * 3,
-            e.y - Math.sin(e.angle) * r * (0.6 + p * 1.8) + Math.cos(t * 7 + i) * 3, 1.3, 0, Math.PI * 2);
-        ctx.fill();
+        // Rastro de cinzas em brasa
+        ctx.fillStyle = c.ember;
+        for (let i = 0; i < V.embers; i++) {
+            const p = (t * 1.4 + i / V.embers + e.phase) % 1;
+            ctx.globalAlpha = (1 - p) * 0.7;
+            ctx.beginPath();
+            ctx.arc(e.x - Math.cos(e.angle) * r * (0.6 + p * 1.8) + Math.sin(t * 9 + i) * 3,
+                e.y - Math.sin(e.angle) * r * (0.6 + p * 1.8) + Math.cos(t * 7 + i) * 3, 1.3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
     }
-    ctx.globalAlpha = 1;
 
     ctx.save();
     ctx.translate(e.x, e.y);

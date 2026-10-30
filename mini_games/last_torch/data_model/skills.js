@@ -33,7 +33,7 @@ export const BLADE_SKILL = {
 };
 
 export const FRENZY_NOVA_SKILL = {
-    chargePerHit: 4,
+    chargePerHit: 6,
     maximumEnergy: 100,
     baseDurationSeconds: 3,
     durationPerUpgradeLevelSeconds: 0.5,

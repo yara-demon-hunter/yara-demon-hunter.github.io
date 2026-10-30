@@ -1,5 +1,6 @@
 import { BLOATER_VISUALS as V } from '../../data_model/visuals/monsters/bloater_visual.js';
 import { ctx } from '../core/state.js';
+import { renderNow } from './fx/clock.js';
 import { drawGlow } from './fx/glow.js';
 
 // --- INCHADO (desenho procedural, sem imagens) ---
@@ -7,17 +8,19 @@ import { drawGlow } from './fx/glow.js';
 // o jogador lê de longe que aquilo vai estourar.
 export function renderBloater(e) {
     const c = V.colors;
-    const t = performance.now() / 1000;
+    const t = renderNow() / 1000;
     const r = e.radius * V.scale;
     const hurt = 1 - Math.max(0, e.hp / e.maxHp);
     const hz = V.pulseHz + (V.pulseHzLowHp - V.pulseHz) * hurt;
     const pulse = 1 + Math.sin(t * hz * Math.PI * 2 + e.phase) * V.pulseAmount * (1 + hurt);
 
-    drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius * pulse, V.auraAlpha + hurt * 0.2);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
-    ctx.beginPath();
-    ctx.ellipse(e.x + r * 0.1, e.y + r * 0.34, r * 1.02, r * 0.56, 0, 0, Math.PI * 2);
-    ctx.fill();
+    if (!e.baking) {
+        drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius * pulse, V.auraAlpha + hurt * 0.2);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+        ctx.beginPath();
+        ctx.ellipse(e.x + r * 0.1, e.y + r * 0.34, r * 1.02, r * 0.56, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
     ctx.save();
     ctx.translate(e.x, e.y);
@@ -29,7 +32,7 @@ export function renderBloater(e) {
     ctx.lineWidth = r * 0.2;
     ctx.lineCap = 'round';
     [1, -1].forEach(side => {
-        const swing = Math.sin(t * 3 + e.phase + side) * r * 0.1;
+        const swing = Math.sin(t * hz * Math.PI * 2 + e.phase + side) * r * 0.1;
         ctx.beginPath();
         ctx.moveTo(r * 0.2, side * r * 0.82);
         ctx.lineTo(r * 0.7 + swing, side * r * 0.86);

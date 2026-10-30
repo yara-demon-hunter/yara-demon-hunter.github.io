@@ -1,4 +1,26 @@
-/* --- BASE: fonte, body e canvas --- */
+/* --- BASE: reset, fonte, body e canvas --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    border: 0 solid transparent;
+}
+html { line-height: 1.5; -webkit-text-size-adjust: 100%; }
+body, h1, h2, h3, p, ul { margin: 0; }
+h1, h2, h3 { font-size: inherit; font-weight: inherit; }
+ul { padding: 0; list-style: none; }
+b { font-weight: bolder; }
+canvas { display: block; }
+button {
+    margin: 0;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    background: transparent;
+    cursor: pointer;
+}
+button:disabled { cursor: default; }
+.hidden { display: none !important; }
+
 /* O body fica preso à área visível da tela e a página não rola. Ao girar o celular o navegador
    não tem como deixar a página rolada ou maior que a tela (o jogo aparecia "deslocado"). */
 html {
@@ -9,6 +31,8 @@ body {
     position: fixed;
     inset: 0;
     overflow: hidden;
+    color: #f1f5f9;
+    background: #020617;
     font-family: 'Inter', sans-serif;
     user-select: none;
     -webkit-user-select: none;
@@ -17,7 +41,8 @@ body {
 }
 /* O CSS estica o canvas na tela toda; js/core/resize.js lê esse tamanho e ajusta a resolução */
 #gameCanvas {
-    display: block;
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     touch-action: none;

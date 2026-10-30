@@ -32,7 +32,7 @@ export const LEVEL_UP_VISUALS = {
     glowRadius: 46,
 
     // Fios de energia que sobem girando em volta do herói
-    streakCount: 20,
+    streakCount: 10,
     streakSeconds: 0.85,
     streakDelayMax: 0.75,       // os fios saem aos poucos, não todos juntos
     streakRadius: 25,

@@ -36,7 +36,7 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
 }
-.summary-stat span.is-record { color: #fde047; font-weight: 800; animation: canBuy 1.2s ease-in-out infinite; text-shadow: 0 0 10px #fbbf24; }
+.summary-stat span.is-record { color: #fde047; font-weight: 800; text-shadow: 0 0 10px #fbbf24; }
 .summary-stat b { display: block; color: #e7e0cf; font-family: 'Cinzel', serif; font-size: 1.05rem; }
 .summary-stat-main b { font-size: 1.5rem; line-height: 1.15; }
 .summary-stat em { display: block; color: #94a3b8; font-size: 0.66rem; font-style: normal; }

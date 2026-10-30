@@ -9,19 +9,18 @@ permalink: /mini_games/last_torch/last_torch.html
     <!-- Google Analytics, AdSense e Bing (mesmo include das demais páginas do site) -->
     {% include head-resources.html %}
     <title>Last Torch: Demon Hunter</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./css/game.css">
 </head>
-<body class="bg-slate-950 text-slate-100 overflow-hidden">
+<body>
 
 <!-- CANVAS -->
-<canvas id="gameCanvas" class="absolute inset-0 z-0"></canvas>
+<canvas id="gameCanvas"></canvas>
 
 <!-- Efeitos de tela sobre o canvas: Fúria, vida baixa, tocha morrendo. Styles in css/components/banner.css -->
 <div id="screenFx" aria-hidden="true"></div>
 
 <!-- HUD: everything at the top. Styles in css/components/hud.css -->
-<div id="hud" class="absolute inset-0 z-10 pointer-events-none">
+<div id="hud">
     <div id="hudTop">
 
         <!-- DEMON HUNTER card: name, portrait, level, XP and gold (vida e Fúria ficam em cima do herói, no canvas) -->
@@ -29,7 +28,7 @@ permalink: /mini_games/last_torch/last_torch.html
             <div id="heroPortrait" role="img" aria-label="Demon Hunter"></div>
             <div id="heroStats">
                 <div id="heroName"><span>DEMON HUNTER</span><span id="levelText">LV 1</span></div>
-                <div id="xpTrack" class="hud-bar"><div id="xpBar" class="hud-fill" style="width: 0%"></div></div>
+                <div id="xpTrack" class="hud-bar"><div id="xpBar" class="hud-fill" style="transform: scaleX(0)"></div></div>
                 <div id="xpRow">
                     <!-- Gold and kills -->
                     <div id="heroChips">
@@ -48,13 +47,13 @@ permalink: /mini_games/last_torch/last_torch.html
         <div id="hudWorld" class="hud-panel" style="--tone: #fdba74;">
             <div class="hud-stat hud-turn">
                 <div class="hud-label" style="--tone: #fcd34d;"><span id="turnLabel">HOUR 1</span><span id="hourName">Dusk</span></div>
-                <div class="hud-bar hud-bar-amber hud-bar-thin"><div id="scoreBar" class="hud-fill" style="background: linear-gradient(90deg, #f59e0b, #fde68a); width: 0%"></div></div>
+                <div class="hud-bar hud-bar-amber hud-bar-thin"><div id="scoreBar" class="hud-fill" style="background: linear-gradient(90deg, #f59e0b, #fde68a); transform: scaleX(0)"></div></div>
                 <div id="nightPips" aria-hidden="true"></div>
             </div>
             <!-- Boss Health Bar -->
             <div id="bossHpContainer" class="hidden hud-stat hud-boss">
                 <div class="hud-label" style="--tone: #f87171;"><span id="bossNameText">☠️ BOSS</span><span id="bossHpText">1000</span></div>
-                <div class="hud-bar hud-bar-red"><div id="bossHpBar" class="hud-fill" style="background: linear-gradient(90deg, #dc2626, #f43f5e, #f59e0b); width: 100%"></div></div>
+                <div class="hud-bar hud-bar-red"><div id="bossHpBar" class="hud-fill" style="background: linear-gradient(90deg, #dc2626, #f43f5e, #f59e0b)"></div></div>
             </div>
         </div>
 
@@ -88,7 +87,7 @@ permalink: /mini_games/last_torch/last_torch.html
 <div id="toasts" aria-live="polite"></div>
 
 <!-- START SCREEN: dark forest at night. Styles in css/components/start-screen.css -->
-<div id="startScreen" class="absolute inset-0 z-20 flex flex-col items-center justify-center p-4">
+<div id="startScreen">
     <div class="start-fog" aria-hidden="true"></div>
     <div class="start-torch" aria-hidden="true"></div>
 
@@ -197,48 +196,41 @@ permalink: /mini_games/last_torch/last_torch.html
     </div>
 </div>
 
-<!-- STATUS & PAUSE PANEL -->
-<div id="shopScreen" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center p-3 sm:p-6 bg-slate-950/95 backdrop-blur-md">
-    <div class="w-full max-w-2xl bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-4 sm:p-6 flex flex-col max-h-[96dvh] shadow-2xl">
-        <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+<!-- STATUS & PAUSE PANEL. Styles in css/components/shop.css -->
+<div id="shopScreen" class="game-screen hidden" role="dialog" aria-label="Hero status">
+    <div class="status-panel">
+        <div class="status-head">
             <div>
-                <h2 class="text-xl sm:text-2xl font-bold text-amber-400 flex items-center gap-2">
-                    <span>🛡️</span> HERO STATUS
-                </h2>
-                <p id="statusHour" class="text-xs text-slate-400">Hour 1</p>
+                <h2 class="status-title">🛡️ HERO STATUS</h2>
+                <p id="statusHour">Hour 1</p>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-amber-500/30 flex items-center gap-1.5">
-                    <span class="text-amber-400">🪙</span>
-                    <span id="shopCoinsText" class="font-bold text-amber-300 text-base">0</span>
-                </div>
-                <button id="btnCloseShop" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl text-sm font-bold">✕</button>
-            </div>
+            <div class="camp-gold">🪙 <b id="shopCoinsText">0</b></div>
+            <button id="btnCloseShop" class="hearth-close" aria-label="Close">✕</button>
         </div>
 
         <!-- ÚNICA ÁREA COM SCROLL -->
-        <div class="custom-scroll flex-1 min-h-0 overflow-y-auto py-2 pr-1 space-y-3">
-            <section class="shop-panel border-amber-500/30">
-                <div class="shop-panel-title text-amber-300"><span>✨ POWERS</span></div>
-                <div id="powerList" class="build-list px-2 pb-2"></div>
+        <div class="status-body custom-scroll">
+            <section class="shop-panel shop-panel-amber">
+                <div class="shop-panel-title"><span>✨ POWERS</span></div>
+                <div id="powerList" class="build-list"></div>
             </section>
 
-            <section id="passivesPanel" class="shop-panel border-violet-500/30">
-                <div class="shop-panel-title text-violet-300"><span>🌀 RELICS</span></div>
-                <div id="passiveList" class="build-list px-2 pb-2"></div>
+            <section class="shop-panel shop-panel-violet">
+                <div class="shop-panel-title"><span>🌀 RELICS</span></div>
+                <div id="passiveList" class="build-list"></div>
             </section>
 
-            <section id="statsPanel" class="shop-panel border-slate-800">
+            <section class="shop-panel">
                 <div class="shop-panel-title">
                     <span>📊 STATS</span>
-                    <span id="statusLevel" class="ml-auto text-amber-400">LEVEL 1</span>
+                    <span id="statusLevel">LEVEL 1</span>
                 </div>
-                <div id="shopList" class="grid grid-cols-1 sm:grid-cols-2 gap-1 px-2 pb-2"></div>
+                <div id="shopList" class="stat-list"></div>
             </section>
 
-            <section class="shop-panel border-slate-800">
+            <section class="shop-panel">
                 <div class="shop-panel-title"><span>⚙️ OPTIONS</span></div>
-                <div class="settings-row px-2 pb-2">
+                <div class="settings-row">
                     <button data-setting="music" class="setting-toggle">🎵 Music</button>
                     <button data-setting="sfx" class="setting-toggle">🔊 Effects</button>
                     <button data-setting="shake" class="setting-toggle">📳 Screen shake</button>
@@ -247,10 +239,8 @@ permalink: /mini_games/last_torch/last_torch.html
             </section>
         </div>
 
-        <button id="btnResume" class="w-full mt-3 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold rounded-xl text-base shadow-lg transition-all active:scale-95">
-            BACK TO THE HUNT ▶
-        </button>
-        <button id="btnAbandon" class="screen-link mt-2">Abandon this night</button>
+        <button id="btnResume" class="start-btn">BACK TO THE HUNT ▶</button>
+        <button id="btnAbandon" class="screen-link">Abandon this night</button>
     </div>
 </div>
 

@@ -83,6 +83,13 @@ export class SoundEngine {
         if (this.music) this.music.setMuffled(paused);
     }
 
+    // Aba em segundo plano: desliga o áudio de vez e poupa bateria
+    setHidden(hidden) {
+        if (!this.ctx) return;
+        if (hidden) this.ctx.suspend();
+        else this.ctx.resume();
+    }
+
     // true se este som tocou há menos de gap segundos
     throttled(key, gap) {
         const now = this.ctx.currentTime;
@@ -133,7 +140,7 @@ export class SoundEngine {
 
     // --- COMBATE ---
     playSwordSlash(comboIndex = 1) {
-        if (!this.ctx || this.throttled('slash', 0.04)) return;
+        if (!this.ctx || this.throttled('slash', 0.06)) return;
         const base = comboIndex === 1 ? 2400 : comboIndex === 2 ? 3000 : 1800;
         this.burst({ filter: 'bandpass', freq: base, to: base * 0.3, q: 1.4, decay: 0.1, gain: comboIndex === 3 ? 0.32 : 0.22 });
         this.tone({ type: 'triangle', freq: 620 + comboIndex * 90, to: 150, decay: 0.08, gain: 0.05 });
@@ -141,7 +148,7 @@ export class SoundEngine {
 
     // Impacto: batida grave curta + estalo. Quanto mais alvos, mais gordo
     playHit(targets = 1) {
-        if (!this.ctx || this.throttled('hit', 0.035)) return;
+        if (!this.ctx || this.throttled('hit', 0.06)) return;
         this.tone({ type: 'sine', freq: 170, to: 60, decay: 0.07, gain: Math.min(0.3, 0.16 + targets * 0.03) });
         this.burst({ filter: 'highpass', freq: 1500, decay: 0.03, gain: 0.1 });
     }
@@ -154,7 +161,7 @@ export class SoundEngine {
 
     // Morte: a nota sobe com a sequência. É o som que faz querer manter a sequência viva
     playKill(streak = 0) {
-        if (!this.ctx || this.throttled('kill', 0.03)) return;
+        if (!this.ctx || this.throttled('kill', 0.05)) return;
         const step = Math.min(SCALE.length - 1, Math.floor(streak / 3));
         const freq = 220 * Math.pow(2, SCALE[step] / 12);
         this.tone({ type: 'triangle', freq, decay: 0.12, gain: 0.13 });
@@ -241,7 +248,7 @@ export class SoundEngine {
     // --- PROGRESSO ---
     // Moeda: em sequência, cada uma um tom acima
     playCoin() {
-        if (!this.ctx || this.throttled('coin', 0.03)) return;
+        if (!this.ctx || this.throttled('coin', 0.06)) return;
         const now = this.ctx.currentTime;
         this.coinChain = now - this.coinTime < 0.5 ? this.coinChain + 1 : 0;
         this.coinTime = now;

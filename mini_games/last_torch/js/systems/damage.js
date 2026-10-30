@@ -8,7 +8,7 @@ import { getCritChance, getCritMultiplier } from './stats.js';
 // --- DANO NOS MONSTROS ---
 // Todo golpe do herói passa por aqui: crítico, clarão, número na tela, recuo e estatísticas.
 // A morte em si é tratada em js/systems/enemies.js, no mesmo quadro ou no próximo.
-// o: { kbX, kbY } empurrão; noCrit; quiet = sem número (dano contínuo); color = cor do número
+// o: { kbX, kbY } empurrão; noCrit; quiet = sem número (dano contínuo); style = estilo do número
 export function dealDamage(e, amount, o = {}) {
     if (e.hp <= 0) return 0;
     const crit = !o.noCrit && Math.random() < getCritChance();
@@ -25,7 +25,7 @@ export function dealDamage(e, amount, o = {}) {
         e.recoilX = Math.sign(o.kbX ?? 0);
         e.recoilY = Math.sign(o.kbY ?? 0);
     }
-    if (!o.quiet) addDamageNumber(e.x, e.y - e.radius - 4, dmg, crit, o.color);
+    if (!o.quiet) addDamageNumber(e.x, e.y - e.radius - 4, dmg, crit, crit ? null : o.style);
     if (crit) {
         audio.playCrit();
         createExplosion(e.x, e.y, '#fde047', 4);

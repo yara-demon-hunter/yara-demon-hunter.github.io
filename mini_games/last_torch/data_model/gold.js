@@ -2,8 +2,8 @@
 // Ao morrer, o monstro solta moedas que pulam para os lados e ficam no chão. Dentro do raio de atração
 // do herói elas voam até ele; no fim da hora todas voam de uma vez.
 export const GOLD_DROP = {
-    maxCoinsPerKill: 6,          // quantidade máxima de moedas visuais por monstro (o valor total é dividido entre elas)
-    maxActiveCoins: 140,         // limite de moedas na tela (acima disso, o valor entra direto)
+    maxCoinsPerKill: 2,          // quantidade máxima de moedas visuais por monstro (o valor total é dividido entre elas)
+    maxActiveCoins: 48,          // limite de moedas na tela (acima disso, o valor entra direto)
     scatterSpeedMin: 60,         // velocidade do pulo inicial (px/s)
     scatterSpeedMax: 150,
     scatterDamping: 0.9,         // freio do pulo (por quadro)

@@ -63,7 +63,7 @@ export const WITCH_VISUALS = {
     robeTailWidth: 1.35,
     robeWaveIdle: 0.04,
     robeWaveRun: 0.1,
-    robeWaveHz: 1.6,
+    robeWaveHz: 1.82,
     robeTurnLag: 0.25,         // o manto abre para o lado ao virar
 
     // Andar mancando (balanço lateral do corpo)

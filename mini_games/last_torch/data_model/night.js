@@ -6,7 +6,7 @@ export const NIGHT = {
     clearSeconds: 1.9,          // onda de fogo + ouro voando até o herói, antes do acampamento
     clearWaveSpeed: 1250,       // velocidade da onda que sai da tocha (unidades por segundo)
     dawnSeconds: 5.5,           // animação do amanhecer antes da tela de vitória
-    openingMonsters: 4,         // monstros que já nascem perto no início da hora (a ação começa na hora)
+    openingMonsters: 3,         // monstros que já nascem perto no início da hora (a ação começa na hora)
     openingRadius: 300,         // distância da tocha em que eles nascem
     bossDelaySeconds: 2.4       // tempo entre o aviso do boss e ele surgir
 };
@@ -25,12 +25,12 @@ export function getHourName(hour) {
 // Eventos dentro da hora, para quebrar o ritmo. kind: ring (círculo fechando em volta do herói),
 // wall (parede vindo de um lado), swarm (bando apertado de um canto), grave (brotam do chão perto do herói).
 export const HORDES = {
-    boneWall: { kind: 'wall', type: 'SKELETON', minHour: 1, baseCount: 5, perHour: 1.1, banner: 'THE DEAD MARCH' },
-    batRing: { kind: 'ring', type: 'BAT', minHour: 2, baseCount: 7, perHour: 1.3, banner: 'THE SKY IS MOVING' },
-    mothSwarm: { kind: 'swarm', type: 'MOTH', minHour: 5, baseCount: 4, perHour: 0.7, banner: 'MOTHS TO THE FLAME' },
-    graveRise: { kind: 'grave', type: 'SKELETON', minHour: 3, baseCount: 5, perHour: 0.8, banner: 'THE GROUND OPENS' },
-    plague: { kind: 'wall', type: 'BLOATER', minHour: 7, baseCount: 2, perHour: 0.4, banner: 'PLAGUE ON THE WIND' },
-    coven: { kind: 'ring', type: 'WITCH', minHour: 7, baseCount: 3, perHour: 0.35, banner: 'A COVEN GATHERS' }
+    boneWall: { kind: 'wall', type: 'SKELETON', minHour: 1, baseCount: 3, perHour: 0.6, banner: 'THE DEAD MARCH' },
+    batRing: { kind: 'ring', type: 'BAT', minHour: 2, baseCount: 5, perHour: 0.7, banner: 'THE SKY IS MOVING' },
+    mothSwarm: { kind: 'swarm', type: 'MOTH', minHour: 5, baseCount: 3, perHour: 0.4, banner: 'MOTHS TO THE FLAME' },
+    graveRise: { kind: 'grave', type: 'SKELETON', minHour: 3, baseCount: 3, perHour: 0.45, banner: 'THE GROUND OPENS' },
+    plague: { kind: 'wall', type: 'BLOATER', minHour: 7, baseCount: 2, perHour: 0.2, banner: 'PLAGUE ON THE WIND' },
+    coven: { kind: 'ring', type: 'WITCH', minHour: 7, baseCount: 2, perHour: 0.2, banner: 'A COVEN GATHERS' }
 };
 
 // Momentos da hora (fração dos pontos) em que entram as hordas e os elites

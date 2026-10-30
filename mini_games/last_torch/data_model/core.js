@@ -3,7 +3,7 @@ export const CORE_MODEL = {
     initialHp: 100,
     collisionRadius: 22,
     playerBlockRadius: 40,    // o herói não entra neste raio em volta da tocha
-    damageTakenPerMonster: 8,    // monstros sem torchDamage próprio
+    damageTakenPerMonster: 12,   // monstros sem torchDamage próprio
     bossHitDamage: 5,            // boss encostado na tocha: dano a cada bossHitSeconds
     bossHitSeconds: 1.6,
     bossStopDistance: 74,        // o boss para aqui, em vez de se jogar na chama

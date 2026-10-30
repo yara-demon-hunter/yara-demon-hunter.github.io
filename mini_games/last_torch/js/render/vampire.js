@@ -1,6 +1,7 @@
 import { VAMPIRE_VISUALS as V } from '../../data_model/visuals/monsters/vampire_visual.js';
 import { ctx, player, state } from '../core/state.js';
 import { easeOutCubic, lerpAngle } from './fx/easing.js';
+import { renderNow } from './fx/clock.js';
 import { drawGlow } from './fx/glow.js';
 import { createRandom } from './fx/random.js';
 
@@ -20,7 +21,7 @@ function getAnim(e) {
     if (!a) {
         const rand = createRandom(Math.floor(e.phase * 1e6));
         a = {
-            lastTime: performance.now(),
+            lastTime: renderNow(),
             facing: e.angle,
             turnRate: 0,        // rad/s suavizado
             grab: 0,            // 0 = braços para trás, 1 = esticados agarrando
@@ -33,7 +34,7 @@ function getAnim(e) {
 }
 
 function updateAnim(e, a) {
-    const now = performance.now();
+    const now = renderNow();
     const dt = Math.min((now - a.lastTime) / 1000, 0.05);
     a.lastTime = now;
     if (state.gameState !== 'PLAYING' || dt <= 0) return;
@@ -256,20 +257,22 @@ function drawHead(r, hx, t, phase, grab) {
 
 export function renderVampire(e) {
     const c = V.colors;
-    const t = performance.now() / 1000;
+    const t = renderNow() / 1000;
     const r = e.radius * V.scale;
     const a = getAnim(e);
     updateAnim(e, a);
     const grab = easeOutCubic(a.grab);
 
     // Desliza flutuando: a sombra fica, o corpo sobe e desce
-    const float = Math.sin(t * V.floatHz * Math.PI * 2 + e.phase) * r * V.floatAmount;
+    const float = e.baking ? 0 : Math.sin(t * V.floatHz * Math.PI * 2 + e.phase) * r * V.floatAmount;
 
-    drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha + grab * 0.2);
-    ctx.fillStyle = `rgba(0, 0, 0, ${V.shadowAlpha})`;
-    ctx.beginPath();
-    ctx.ellipse(e.x + r * 0.1, e.y + r * 0.35, r * 0.8, r * 0.42, 0, 0, Math.PI * 2);
-    ctx.fill();
+    if (!e.baking) {
+        drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha + grab * 0.2);
+        ctx.fillStyle = `rgba(0, 0, 0, ${V.shadowAlpha})`;
+        ctx.beginPath();
+        ctx.ellipse(e.x + r * 0.1, e.y + r * 0.35, r * 0.8, r * 0.42, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
     ctx.save();
     ctx.translate(e.x, e.y - float);

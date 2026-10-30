@@ -29,7 +29,7 @@ export const POWER_MODELS = {
             { dps: 0.7, life: 3.2, radius: 22 },
             { dps: 0.7, life: 3.6, radius: 30 }
         ],
-        dropEvery: 26, tickSeconds: 0.3, maxFires: 44
+        dropEvery: 34, tickSeconds: 0.3, maxFires: 22
     },
     bloodEdge: {
         name: 'Blood Edge', icon: '🩸', maxLvl: 5,

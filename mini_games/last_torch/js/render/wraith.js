@@ -1,19 +1,20 @@
 import { WRAITH_VISUALS as V } from '../../data_model/visuals/monsters/wraith_visual.js';
 import { ctx } from '../core/state.js';
+import { renderNow } from './fx/clock.js';
 import { drawGlow } from './fx/glow.js';
 
 // --- ESPECTRO (desenho procedural, sem imagens) ---
 // Vista de cima; no sistema local +x é a frente. Mirando ele brilha; disparando, os fiapos esticam.
 export function renderWraith(e) {
     const c = V.colors;
-    const t = performance.now() / 1000;
+    const t = renderNow() / 1000;
     const r = e.radius * V.scale;
     const aiming = e.lungeState === 1;
     const lunging = e.lungeState === 2;
-    const float = Math.sin(t * V.floatHz * Math.PI * 2 + e.phase) * r * V.floatAmount;
+    const float = e.baking ? 0 : Math.sin(t * V.floatHz * Math.PI * 2 + e.phase) * r * V.floatAmount;
     const facing = lunging ? Math.atan2(e.lungeY, e.lungeX) : e.angle;
 
-    drawGlow(ctx, aiming ? c.aimAura : c.aura, e.x, e.y, r * V.auraRadius, aiming ? 0.5 : V.auraAlpha);
+    if (!e.baking) drawGlow(ctx, aiming ? c.aimAura : c.aura, e.x, e.y, r * V.auraRadius, aiming ? 0.5 : V.auraAlpha);
 
     ctx.save();
     ctx.translate(e.x, e.y - float);

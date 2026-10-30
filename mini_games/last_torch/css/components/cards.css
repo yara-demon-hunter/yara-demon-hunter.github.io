@@ -47,10 +47,7 @@
     --rim: #fde047;
     --glow: rgba(253, 224, 71, 0.6);
     background: linear-gradient(180deg, rgba(66, 46, 8, 0.97), rgba(16, 11, 4, 0.98));
-    animation: cardIn 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.3) both, evolutionGlow 1.2s ease-in-out infinite;
-}
-@keyframes evolutionGlow {
-    50% { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 56px var(--glow); }
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 52px var(--glow);
 }
 .card-rarity {
     font-size: 0.6rem;

@@ -1,9 +1,10 @@
 import { getPowerLevel } from '../../data_model/powers.js';
 import { POWERS_VISUALS as V } from '../../data_model/visuals/effects/powers_visual.js';
-import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { ctx, player, powers, state } from '../core/state.js';
 import { drawGlow } from './fx/glow.js';
-import { drawDagger } from './knife.js';
+import { getDashedRing } from './fx/rings.js';
+import { DAGGER_LENGTH, DAGGER_WIDTH, getDaggerSprite } from './fx/sprites.js';
+import { resetWorldView, stamp } from './fx/stamp.js';
 
 // --- PODERES (desenho procedural) ---
 const TAU = Math.PI * 2;
@@ -36,20 +37,17 @@ export function renderOrbitBlades() {
     const level = getPowerLevel(powers.orbitBlades);
     if (!level) return;
     const O = V.orbit;
-    const t = performance.now() / 1000;
     const glow = powers.orbitBlades.evolved ? O.evolvedGlow : O.glow;
+    const dagger = getDaggerSprite();
+    const width = DAGGER_LENGTH * O.scale;
+    const height = DAGGER_WIDTH * O.scale;
     for (let i = 0; i < level.count; i++) {
         const a = state.orbitAngle + (i / level.count) * TAU;
         const x = player.x + Math.cos(a) * level.radius;
         const y = player.y + Math.sin(a) * level.radius;
         drawGlow(ctx, glow, x, y, O.glowRadius, 0.5);
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(a + Math.PI / 2);
-        ctx.scale(O.scale, O.scale);
-        ctx.translate(-K.shape.centerX, 0);
-        drawDagger(ctx, t);
-        ctx.restore();
+        stamp(dagger, 0, 0, dagger.width, dagger.height, x, y, a + Math.PI / 2, width, height);
+        resetWorldView();
     }
 }
 
@@ -58,25 +56,23 @@ export function renderChillAura() {
     if (!level) return;
     const C = V.chill;
     const t = performance.now() / 1000;
-    ctx.save();
     ctx.fillStyle = C.fill;
-    ctx.strokeStyle = C.ring;
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([3, 10]);
-    ctx.lineDashOffset = -t * 18;
     ctx.beginPath();
     ctx.arc(player.x, player.y, level.radius, 0, TAU);
     ctx.fill();
-    ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.strokeStyle = C.ring;
+    ctx.lineWidth = 1.5;
+    ctx.translate(player.x, player.y);
+    ctx.stroke(getDashedRing(level.radius, 6));
+    ctx.translate(-player.x, -player.y);
     ctx.fillStyle = C.flake;
+    ctx.globalAlpha = 0.65;
     for (let i = 0; i < C.flakes; i++) {
         const a = (i / C.flakes) * TAU + t * 0.5;
         const r = level.radius * (0.45 + 0.5 * Math.abs(Math.sin(t * 0.7 + i * 1.3)));
-        ctx.globalAlpha = 0.65;
         ctx.fillRect(player.x + Math.cos(a) * r - 1, player.y + Math.sin(a) * r - 1, 2, 2);
     }
-    ctx.restore();
+    ctx.globalAlpha = 1;
 }
 
 export function renderLightning() {

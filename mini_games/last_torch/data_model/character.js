@@ -12,10 +12,10 @@ export const CHARACTER_MODEL = {
     damageImmunityFlashIntervalMs: 50,
     collisionRadius: 12,
     topMargin: 76,              // o herói não sobe até atrás do HUD
-    trailLength: 12,
+    trailLength: 6,
     trailFadePerSecond: 4,
     // XP para o próximo nível: base + linear x n + quadratic x n², com n = nível - 1
-    xpCurve: { base: 80, linear: 60, quadratic: 2.4 },
+    xpCurve: { base: 46, linear: 34, quadratic: 1.8 },
     levelUpHealRatio: 0.12,
     // Calor da tocha: perto dela o herói se recupera aos poucos
     warmthRadius: 92,

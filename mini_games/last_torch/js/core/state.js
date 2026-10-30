@@ -8,7 +8,15 @@ import { SoundEngine } from '../audio/sound-engine.js';
 // --- OBJETOS COMPARTILHADOS ---
 export const canvas = document.getElementById('gameCanvas');
 // alpha: false — o fundo é sempre pintado por inteiro, então o navegador não precisa misturar o canvas com a página
-export const ctx = canvas.getContext('2d', { alpha: false });
+export let ctx = canvas.getContext('2d', { alpha: false });
+
+// Desenha em outro canvas (geração de sprites). Quem importa ctx passa a ver o novo destino. Devolve o anterior.
+export function setDrawTarget(target) {
+    const previous = ctx;
+    ctx = target;
+    return previous;
+}
+
 export const audio = new SoundEngine();
 export const attributes = createAttributes();
 export const passives = createPassives();
@@ -56,8 +64,10 @@ export const state = {
     // Como o mundo é mostrado na tela (escala e deslocamento em px do navegador)
     view: { scale: 1, offsetX: 0, offsetY: 0, cssWidth: 0, cssHeight: 0, pixelRatio: 1, mobile: false },
 
-    // Aparelho lento: menos resolução e detalhe (js/game.js liga sozinho, veja detectSlowDevice)
-    lowQuality: false,
+    // Nível de detalhe: 0 = cheio, 1 = reduzido (celular começa aqui), 2 = mínimo.
+    // js/game.js desce sozinho se o aparelho não acompanhar (data_model/world.js)
+    quality: 0,
+    redraw: true,               // fora da partida o canvas fica parado; true pede um quadro novo
 
     // Screen Shake, soco de zoom e clarão de tela
     shakeIntensity: 0,

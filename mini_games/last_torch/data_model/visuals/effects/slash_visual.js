@@ -21,8 +21,8 @@ export const SLASH_VISUALS = {
         edgeAlpha: 0.9,           // opacidade do fio branco na frente da onda
         segments: 18,             // pontos do contorno (mais = mais suave)
         // Rastro de riscos atrás da onda (preenche o caminho até a borda do alcance)
-        trailSpacing: 10,         // distância (px) entre um risco e outro; menor = mais riscos
-        trailMaxLines: 14,        // limite de riscos por golpe
+        trailSpacing: 22,         // distância (px) entre um risco e outro; menor = mais riscos
+        trailMaxLines: 4,        // limite de riscos por golpe
         trailAlpha: 0.55,         // opacidade do risco mais perto da onda (os de trás vão sumindo)
         trailWidth: 2.5           // espessura do risco mais perto da onda
     }

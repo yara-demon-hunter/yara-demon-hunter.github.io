@@ -3,6 +3,10 @@
    [ Demon Hunter card: retrato, nome, level/XP, gold/skills ] [ medalhão de status ]  [ Turno + chefão ]  [ som ]
    Só os botões e o medalhão pegam toques; o cartão do herói deixa passar. */
 #hud {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
     padding-top: max(0.5rem, env(safe-area-inset-top));
     padding-right: max(0.6rem, env(safe-area-inset-right));
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
@@ -11,9 +15,7 @@
 
 /* --- Painéis e barras --- */
 .hud-panel {
-    background: rgba(15, 23, 42, 0.74);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(15, 23, 42, 0.84);
     border: 1px solid rgba(148, 163, 184, 0.22);
     border-radius: 0.75rem;
     padding: 0.4rem 0.55rem;
@@ -40,7 +42,12 @@
     overflow: hidden;
 }
 .hud-bar-thin { height: 0.32rem; }
-.hud-fill { height: 100%; transition: width 0.2s; }
+.hud-fill {
+    width: 100%;
+    height: 100%;
+    transform-origin: left;
+    transition: transform 0.2s;
+}
 .hud-bar-amber { border-color: rgba(120, 53, 15, 0.9); }
 .hud-bar-red { border-color: rgba(220, 38, 38, 0.8); }
 
@@ -64,13 +71,10 @@
     width: 13rem;
     flex-shrink: 0;
     background: linear-gradient(90deg, rgba(8, 13, 26, 0.5), rgba(8, 13, 26, 0.12) 75%, transparent);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
     border-color: transparent;
     box-shadow: none;
     pointer-events: none;
     text-shadow: 0 1px 2px #000, 0 0 6px rgba(0, 0, 0, 0.8);
-    transition: border-color 0.2s, box-shadow 0.2s;
 }
 /* Recorte do rosto na arte do personagem */
 #heroPortrait {
@@ -79,7 +83,7 @@
     flex-shrink: 0;
     border: 1px solid rgba(103, 232, 249, 0.6);
     border-radius: 0.5rem;
-    background: #0b1120 url('../../images/characters/demon-hunter.webp') 26% 8% / 220% no-repeat;
+    background: #0b1120 url('../../images/characters/demon-hunter-small.webp') 26% 8% / 220% no-repeat;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
     image-rendering: pixelated;
 }
@@ -127,14 +131,7 @@
 #heroChips span:nth-child(1) { color: #fcd34d; }
 #heroChips span:nth-child(2) { color: #cbd5e1; }
 
-/* Level up: o nível pulsa de leve */
-#levelText.level-gain {
-    display: inline-block;
-    animation: levelGain 0.5s ease-in-out 2;
-}
-@keyframes levelGain {
-    50% { transform: scale(1.25); color: #e9d5ff; text-shadow: 0 0 8px #a855f7; }
-}
+#levelText { display: inline-block; }
 
 /* Marcas da noite: uma por hora, caveira vermelha nas horas de boss */
 #nightPips {
@@ -227,11 +224,6 @@
     font-weight: 800;
     line-height: 1;
 }
-#hudStreak b.streak-bump { animation: streakBump 0.16s ease-out; }
-@keyframes streakBump {
-    from { transform: scale(1.35); }
-    to { transform: scale(1); }
-}
 #hudStreak span {
     font-size: 0.6rem;
     font-weight: 800;
@@ -252,15 +244,8 @@
     transform-origin: right;
 }
 
-/* Fúria ativa: cartão quente, pulsando; barra esvazia com o tempo */
-#heroCard.fury-active {
-    border-color: rgba(251, 146, 60, 0.9);
-    animation: furyPulse 0.7s ease-in-out infinite;
-}
-@keyframes furyPulse {
-    0%, 100% { box-shadow: 0 0 6px rgba(249, 115, 22, 0.45), 0 4px 14px rgba(0, 0, 0, 0.35); }
-    50% { box-shadow: 0 0 18px rgba(249, 115, 22, 0.9), 0 4px 14px rgba(0, 0, 0, 0.35); }
-}
+/* Fúria ativa: cartão quente; a barra esvazia com o tempo */
+#heroCard.fury-active { border-color: rgba(251, 146, 60, 0.9); }
 
 /* --- Turno + chefão --- */
 #hudWorld {
@@ -300,7 +285,7 @@
     width: 3.2rem;
     height: 3.2rem;
     border-radius: 50%;
-    background: url('../../images/buttons/status.webp') center / 118% no-repeat;
+    background: url('../../images/buttons/status-small.webp') center / 118% no-repeat;
     pointer-events: auto;
     transition: transform 0.1s;
 }
@@ -345,7 +330,7 @@
 @media (max-height: 520px) and (orientation: landscape) {
     #hud { padding: max(0.25rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) 0 max(0.5rem, env(safe-area-inset-left)); }
     #hudTop { gap: 0.4rem; }
-    .hud-panel { border-radius: 0.5rem; background: rgba(15, 23, 42, 0.62); }
+    .hud-panel { border-radius: 0.5rem; background: rgba(15, 23, 42, 0.72); }
     #heroCard { width: 11.5rem; gap: 0.35rem; padding: 0.22rem 0.4rem; }
     #heroPortrait { width: 1.7rem; height: 1.7rem; border-radius: 0.3rem; }
     .status-btn { width: 1.9rem; height: 1.9rem; }

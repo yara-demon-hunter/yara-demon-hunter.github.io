@@ -22,34 +22,35 @@ import { updateStreak } from './systems/streak.js';
 import { updateTorch } from './systems/torch.js';
 import { setupButtons } from './ui/buttons.js';
 import { openCards } from './ui/cards.js';
-import { updateDashButton, updateFuryCard, updateKnifeButton } from './ui/hud.js';
+import { flushHud, updateDashButton, updateKnifeButton } from './ui/hud.js';
 import { isPhonePortrait } from './ui/orientation.js';
 import { setupScreens } from './ui/screens.js';
 
 const MIN_FRAME_MS = 12;
-// Fora da partida (menu, loja, game over, aviso de girar) só o cenário se mexe atrás da tela:
-// ~15 FPS bastam e poupam GPU/bateria
-const IDLE_FRAME_MS = 66;
+// Nível de detalhe mínimo: 30 FPS estáveis são melhores que 45 irregulares, e gastam menos bateria
+const LOWEST_DETAIL_FRAME_MS = 30;
 let lastTime = performance.now();
-let lastRender = 0;
 
-// Qualidade adaptativa: abaixo de ~40 FPS seguidos, troca detalhe por fluidez uma vez e fica assim.
-// Em ação rápida, jogar liso vale mais que resolução.
-const SLOW_FRAME_MS = 25;
-const SLOW_FRAMES_TO_SWITCH = 90;
+// Detalhe adaptativo: abaixo de ~42 FPS por um tempo, troca detalhe por fluidez. Só desce, nunca sobe:
+// oscilar entre níveis é pior que ficar em um.
+const MAX_QUALITY_STEP = 2;
+const SLOW_FRAME_MS = 24;
+const SLOW_FRAMES_TO_SWITCH = 75;
 let frameAverage = 16;
 let slowFrames = 0;
 
-function detectSlowDevice(frameMs) {
-    if (state.lowQuality) return;
+function watchFrameRate(frameMs) {
+    if (state.quality >= MAX_QUALITY_STEP) return;
     frameAverage += (Math.min(frameMs, 100) - frameAverage) * 0.05;
     slowFrames = frameAverage > SLOW_FRAME_MS ? slowFrames + 1 : Math.max(0, slowFrames - 2);
-    if (slowFrames >= SLOW_FRAMES_TO_SWITCH) {
-        state.lowQuality = true;
-        resize();
-    }
+    if (slowFrames < SLOW_FRAMES_TO_SWITCH) return;
+    state.quality++;
+    slowFrames = 0;
+    frameAverage = 16;
+    resize();
 }
 
+// Fora da partida (menu, cartas, acampamento, pausa) nada se mexe no canvas: não desenha nada
 function isIdle() {
     return state.gameState !== 'PLAYING' || isPhonePortrait();
 }
@@ -92,7 +93,6 @@ export function update(dt) {
     updateGold(dt);
     updatePickups(dt);
     updateStreak(dt);
-    updateFuryCard();
     updateKnifeButton();
     updateDashButton();
     updateEffects(dt);
@@ -103,22 +103,24 @@ export function update(dt) {
 
 // --- GAME LOOP ---
 function gameLoop(timestamp) {
+    requestAnimationFrame(gameLoop);
+    const minFrame = state.quality >= MAX_QUALITY_STEP ? LOWEST_DETAIL_FRAME_MS : MIN_FRAME_MS;
     // Limita a ~60 FPS (monitores de 120/144 Hz desenhariam o dobro sem ganho real)
-    if (timestamp - lastTime < MIN_FRAME_MS) {
-        requestAnimationFrame(gameLoop);
-        return;
-    }
+    if (timestamp - lastTime < minFrame) return;
     const dt = (timestamp - lastTime) / 1000;
     lastTime = timestamp;
 
-    if (!isIdle()) detectSlowDevice(dt * 1000);
-    update(dt);
-    if (!isIdle() || timestamp - lastRender >= IDLE_FRAME_MS) {
+    const idle = isIdle();
+    if (idle) {
+        // Só desenha quando a janela muda de tamanho: o resto do tempo a imagem fica parada atrás da tela aberta
+        if (state.redraw && state.gameState !== 'START') render();
+        state.redraw = false;
+    } else {
+        watchFrameRate(dt * 1000);
+        update(dt);
         render();
-        lastRender = timestamp;
     }
-
-    requestAnimationFrame(gameLoop);
+    flushHud(timestamp);
 }
 
 setupResize();

@@ -1,6 +1,7 @@
 import { BAT_VISUALS as V } from '../../data_model/visuals/monsters/bat_visual.js';
 import { ctx } from '../core/state.js';
 import { lerpAngle } from './fx/easing.js';
+import { renderNow } from './fx/clock.js';
 import { drawGlow } from './fx/glow.js';
 
 // --- MORCEGO (desenho procedural, sem imagens) ---
@@ -59,7 +60,7 @@ function drawWing(r, side, open) {
 
 export function renderBat(e, dt = 1 / 60) {
     const c = V.colors;
-    const t = performance.now() / 1000;
+    const t = renderNow() / 1000;
     const r = e.radius * V.scale;
 
     // Direção suavizada + zigue-zague de voo
@@ -67,7 +68,7 @@ export function renderBat(e, dt = 1 / 60) {
     if (facing === undefined) facing = e.angle;
     facing = lerpAngle(facing, e.angle, Math.min(1, V.turnSmoothing * dt));
     facingByBat.set(e, facing);
-    const wobble = Math.sin(t * V.wobbleHz * Math.PI * 2 + e.phase) * V.wobbleAmount;
+    const wobble = e.baking ? 0 : Math.sin(t * V.wobbleHz * Math.PI * 2 + e.phase) * V.wobbleAmount;
 
     // Batida: 0 = asas fechadas, 1 = abertas
     const flap = Math.sin(t * V.flapHz * Math.PI * 2 + e.phase);
@@ -75,11 +76,13 @@ export function renderBat(e, dt = 1 / 60) {
     const bob = 1 + flap * V.bobAmount;
 
     // Aura e sombra (a sombra fica mais afastada quando o morcego "sobe")
-    drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha);
-    ctx.fillStyle = `rgba(0, 0, 0, ${V.shadowAlpha})`;
-    ctx.beginPath();
-    ctx.ellipse(e.x + r * 0.2, e.y + r * V.shadowOffset * 0.5, r * 0.8, r * 0.35, 0, 0, Math.PI * 2);
-    ctx.fill();
+    if (!e.baking) {
+        drawGlow(ctx, c.aura, e.x, e.y, r * V.auraRadius, V.auraAlpha);
+        ctx.fillStyle = `rgba(0, 0, 0, ${V.shadowAlpha})`;
+        ctx.beginPath();
+        ctx.ellipse(e.x + r * 0.2, e.y + r * V.shadowOffset * 0.5, r * 0.8, r * 0.35, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
     ctx.save();
     ctx.translate(e.x, e.y);

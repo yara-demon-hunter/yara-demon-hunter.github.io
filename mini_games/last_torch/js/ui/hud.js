@@ -5,76 +5,110 @@ import { CORE_MODEL } from '../../data_model/core.js';
 import { passives, player, powers, state } from '../core/state.js';
 import { getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
 
-// --- FÚRIA NO CARTÃO DO HERÓI ---
-// A carga fica no filete embaixo da vida do herói (js/render/arena.js); aqui só o cartão pulsa enquanto ela dura.
-// Só escreve no DOM quando muda (é chamada a cada quadro).
-let furyCardActive = false;
+// --- HUD ---
+// Escrever no DOM é caro: força o navegador a recalcular estilo e layout. Por isso os sistemas só
+// marcam o HUD como sujo (updateHUD) e flushHud escreve no máximo ~10 vezes por segundo, e só o que
+// mudou. As barras usam transform, que não refaz o layout.
+const HUD_INTERVAL_MS = 100;
+const el = (id) => document.getElementById(id);
+const ui = {
+    level: el('levelText'), xpText: el('xpText'), xpBar: el('xpBar'),
+    kills: el('killsHud'), coins: el('coinsText'), score: el('hudScore'),
+    turn: el('turnLabel'), hourName: el('hourName'), scoreBar: el('scoreBar'), pips: el('nightPips'),
+    bossBox: el('bossHpContainer'), bossName: el('bossNameText'), bossHp: el('bossHpText'), bossBar: el('bossHpBar'),
+    heroCard: el('heroCard'), screenFx: el('screenFx'),
+    streakBox: el('hudStreak'), streakCount: el('streakCount'), streakBar: el('streakBar'),
+    knifeButton: el('knifeButton'), dashButton: el('dashButton'), dashCharges: el('dashCharges')
+};
+const hasTouchButtons = window.matchMedia('(pointer: coarse)').matches;
 
-export function updateFuryCard() {
-    const active = state.frenzyActiveTimer > 0;
-    if (furyCardActive === active) return;
-    furyCardActive = active;
-    document.getElementById('heroCard').classList.toggle('fury-active', active);
-    document.getElementById('screenFx').classList.toggle('fx-fury', active);
+let dirty = true;
+let lastFlush = 0;
+let pipsHour = -1;
+
+function setText(node, value) {
+    if (node.$text === value) return;
+    node.$text = value;
+    node.textContent = value;
 }
 
-// --- BOTÃO DA ADAGA (telas de toque) ---
-// Anel de recarga (--cd: 1 logo após o arremesso, 0 = pronto) e brilho quando está pronto.
-// Também só escreve no DOM quando muda.
-const knifeButton = document.getElementById('knifeButton');
-const knifeShown = { cd: '', ready: null };
+function setBar(node, ratio) {
+    const rounded = Math.round(Math.max(0, Math.min(1, ratio)) * 200) / 200;
+    if (node.$bar === rounded) return;
+    node.$bar = rounded;
+    node.style.transform = `scaleX(${rounded})`;
+}
+
+function setFlag(node, name, on) {
+    const key = `$${name}`;
+    if (node[key] === on) return;
+    node[key] = on;
+    node.classList.toggle(name, on);
+}
+
+// --- FÚRIA NO CARTÃO DO HERÓI ---
+// A carga fica no filete embaixo da vida do herói (js/render/arena.js); aqui só o cartão muda enquanto ela dura.
+export function updateFuryCard() {
+    const active = state.frenzyActiveTimer > 0;
+    setFlag(ui.heroCard, 'fury-active', active);
+    setFlag(ui.screenFx, 'fx-fury', active);
+}
+
+// --- BOTÕES DE TOQUE ---
+// Anel de recarga (--cd: 1 logo após o uso, 0 = pronto) em poucos degraus: cada mudança repinta o botão.
+const CD_STEPS = 12;
+const knifeShown = { cd: -1, ready: null };
 
 export function updateKnifeButton() {
-    if (!knifeButton) return;
+    if (!hasTouchButtons) return;
     const ratio = Math.min(1, state.knifeTimer / getKnifeCooldown());
-    const cd = ratio.toFixed(2);
+    const cd = Math.ceil(ratio * CD_STEPS) / CD_STEPS;
     if (knifeShown.cd !== cd) {
         knifeShown.cd = cd;
-        knifeButton.style.setProperty('--cd', cd);
+        ui.knifeButton.style.setProperty('--cd', cd);
     }
     const ready = ratio <= 0;
     if (knifeShown.ready !== ready) {
         knifeShown.ready = ready;
-        knifeButton.classList.toggle('is-ready', ready);
+        ui.knifeButton.classList.toggle('is-ready', ready);
     }
 }
 
-// --- BOTÃO DO DASH (telas de toque) ---
-const dashButton = document.getElementById('dashButton');
-const dashShown = { cd: '', charges: -1 };
+const dashShown = { cd: -1, charges: -1 };
 
 export function updateDashButton() {
-    if (!dashButton) return;
+    if (!hasTouchButtons) return;
     const ratio = player.dashCharges > 0 ? 0 : Math.min(1, Math.max(0, player.dashRecharge) / getDashCooldown());
-    const cd = ratio.toFixed(2);
+    const cd = Math.ceil(ratio * CD_STEPS) / CD_STEPS;
     if (dashShown.cd !== cd) {
         dashShown.cd = cd;
-        dashButton.style.setProperty('--cd', cd);
+        ui.dashButton.style.setProperty('--cd', cd);
     }
     if (dashShown.charges !== player.dashCharges) {
         dashShown.charges = player.dashCharges;
-        dashButton.classList.toggle('is-ready', player.dashCharges > 0);
-        document.getElementById('dashCharges').innerText = player.dashCharges > 1 ? player.dashCharges : '';
+        ui.dashButton.classList.toggle('is-ready', player.dashCharges > 0);
+        ui.dashCharges.textContent = player.dashCharges > 1 ? player.dashCharges : '';
     }
 }
 
-// Level up: o nível no cartão do herói pulsa (reinicia a animação se já estiver rodando)
+// Pulso curto feito pelo próprio navegador, sem forçar layout
+function pulse(node, scale, ms) {
+    node.animate?.([{ transform: `scale(${scale})` }, { transform: 'scale(1)' }], { duration: ms, easing: 'ease-out' });
+}
+
+// Level up: o nível no cartão do herói pulsa
 export function pulseLevel() {
-    const level = document.getElementById('levelText');
-    level.classList.remove('level-gain');
-    void level.offsetWidth;
-    level.classList.add('level-gain');
+    pulse(ui.level, 1.35, 450);
 }
 
 // --- SEQUÊNCIA DE MORTES ---
-const streakShown = { count: -1, visible: false, bar: '' };
+const streakShown = { count: -1, visible: false };
 
-export function updateStreakHud() {
+function updateStreakHud() {
     const visible = state.streak >= STREAK.showFrom;
-    const box = document.getElementById('hudStreak');
     if (streakShown.visible !== visible) {
         streakShown.visible = visible;
-        box.classList.toggle('is-visible', visible);
+        ui.streakBox.classList.toggle('is-visible', visible);
     }
     if (!visible) {
         streakShown.count = -1;
@@ -82,70 +116,51 @@ export function updateStreakHud() {
     }
     if (streakShown.count !== state.streak) {
         streakShown.count = state.streak;
-        const number = document.getElementById('streakCount');
-        number.innerText = state.streak;
-        number.classList.remove('streak-bump');
-        void number.offsetWidth;
-        number.classList.add('streak-bump');
+        setText(ui.streakCount, state.streak);
+        pulse(ui.streakCount, 1.3, 160);
         const tier = [...STREAK.tiers].reverse().find(t => state.streak >= t.at);
-        box.style.setProperty('--tone', tier ? tier.color : '#e2e8f0');
+        ui.streakBox.style.setProperty('--tone', tier ? tier.color : '#e2e8f0');
     }
-    const bar = (state.streakTimer / STREAK.windowSeconds).toFixed(2);
-    if (streakShown.bar !== bar) {
-        streakShown.bar = bar;
-        document.getElementById('streakBar').style.transform = `scaleX(${bar})`;
-    }
+    setBar(ui.streakBar, state.streakTimer / STREAK.windowSeconds);
 }
 
 // --- VIDA BAIXA ---
-const dangerShown = { hero: null, torch: null };
-
 function updateDangerFx() {
-    const heroLow = player.hp > 0 && player.hp < player.maxHp * 0.3;
-    const torchLow = state.coreHp > 0 && state.coreHp < state.coreHpMax * CORE_MODEL.lowHpRatio;
-    if (dangerShown.hero !== heroLow) {
-        dangerShown.hero = heroLow;
-        document.getElementById('screenFx').classList.toggle('fx-danger', heroLow);
-    }
-    if (dangerShown.torch !== torchLow) {
-        dangerShown.torch = torchLow;
-        document.getElementById('screenFx').classList.toggle('fx-torch', torchLow);
-    }
+    setFlag(ui.screenFx, 'fx-danger', player.hp > 0 && player.hp < player.maxHp * 0.3);
+    setFlag(ui.screenFx, 'fx-torch', state.coreHp > 0 && state.coreHp < state.coreHpMax * CORE_MODEL.lowHpRatio);
 }
 
 // --- PROGRESSO DA NOITE ---
-// Uma marca por hora: passadas, a atual e as com boss (caveira).
+// Uma marca por hora: passadas, a atual e as com boss. Só muda quando a hora vira.
 function updateNightPips() {
-    const pips = document.getElementById('nightPips');
+    if (pipsHour === state.turn) return;
+    pipsHour = state.turn;
     const total = Math.max(NIGHT.hours, state.endless ? state.turn : 0);
-    if (pips.childElementCount !== total) {
-        pips.innerHTML = '';
+    if (ui.pips.childElementCount !== total) {
+        ui.pips.textContent = '';
         for (let h = 1; h <= total; h++) {
             const pip = document.createElement('i');
             if (isBossTurn(h)) pip.className = 'is-boss';
-            pips.appendChild(pip);
+            ui.pips.appendChild(pip);
         }
     }
-    [...pips.children].forEach((pip, i) => {
+    [...ui.pips.children].forEach((pip, i) => {
         const hour = i + 1;
         pip.classList.toggle('is-done', hour < state.turn);
         pip.classList.toggle('is-now', hour === state.turn);
     });
 }
 
-// Barra de vida do boss: sincronizada a cada golpe (js/systems/damage.js)
+// Barra de vida do boss: acompanha cada golpe (js/systems/damage.js), no ritmo do HUD
 export function syncBossBar() {
-    const boss = state.currentBoss;
-    if (!boss) return;
-    document.getElementById('bossHpText').innerText = `${Math.max(0, Math.ceil(boss.hp))}`;
-    document.getElementById('bossHpBar').style.width = `${Math.max(0, (boss.hp / boss.maxHp) * 100)}%`;
+    dirty = true;
 }
 
 // --- BARRA DE PODERES E RELÍQUIAS ---
 // Faixa de ícones abaixo do cartão do herói: a build crescendo durante a partida.
 export function updateBuildStrip() {
-    const strip = document.getElementById('buildStrip');
-    strip.innerHTML = '';
+    const strip = el('buildStrip');
+    strip.textContent = '';
     const add = (icon, level, evolved) => {
         const item = document.createElement('span');
         item.className = evolved ? 'build-item is-evolved' : 'build-item';
@@ -161,33 +176,44 @@ export function updateBuildStrip() {
     Object.values(passives).forEach(p => { if (p.lvl > 0) add(p.icon, 0, false); });
 }
 
-// --- HUD ---
 export function updateHUD() {
+    dirty = true;
+}
+
+function writeHud() {
     const { playerLevel, playerXp, playerMaxXp, currentBoss } = state;
 
-    document.getElementById('levelText').innerText = `LV ${playerLevel}`;
-    document.getElementById('xpText').innerText = `${Math.floor(playerXp)}/${playerMaxXp} XP`;
-    document.getElementById('xpBar').style.width = `${Math.min(100, (playerXp / playerMaxXp) * 100)}%`;
+    setText(ui.level, `LV ${playerLevel}`);
+    setText(ui.xpText, `${Math.floor(playerXp)}/${playerMaxXp} XP`);
+    setBar(ui.xpBar, playerXp / playerMaxXp);
 
-    updateFuryCard();
     updateDangerFx();
-    document.getElementById('killsHud').innerText = state.run.kills;
-    document.getElementById('coinsText').innerText = state.coins;
-    document.getElementById('hudScore').innerText = state.totalScore.toLocaleString('en-US');
+    setText(ui.kills, state.run.kills);
+    setText(ui.coins, state.coins);
+    setText(ui.score, state.totalScore.toLocaleString('en-US'));
 
     const hour = state.turn;
-    document.getElementById('turnLabel').innerText = `HOUR ${hour}`;
-    document.getElementById('hourName').innerText = getHourName(hour);
-    const progress = state.hourPlan?.boss ? 1 : state.scoreTurn / Math.max(1, state.targetScore);
-    document.getElementById('scoreBar').style.width = `${Math.min(100, progress * 100)}%`;
+    setText(ui.turn, `HOUR ${hour}`);
+    setText(ui.hourName, getHourName(hour));
+    setBar(ui.scoreBar, state.hourPlan?.boss ? 1 : state.scoreTurn / Math.max(1, state.targetScore));
     updateNightPips();
 
     // Boss HUD
+    setFlag(ui.bossBox, 'hidden', !currentBoss);
     if (currentBoss) {
-        document.getElementById('bossHpContainer').classList.remove('hidden');
-        document.getElementById('bossNameText').innerText = `☠️ ${currentBoss.name.toUpperCase()}`;
-        syncBossBar();
-    } else {
-        document.getElementById('bossHpContainer').classList.add('hidden');
+        setText(ui.bossName, `☠️ ${currentBoss.name.toUpperCase()}`);
+        setText(ui.bossHp, `${Math.max(0, Math.ceil(currentBoss.hp))}`);
+        setBar(ui.bossBar, currentBoss.hp / currentBoss.maxHp);
     }
+}
+
+// Chamado a cada quadro pelo loop do jogo
+export function flushHud(now) {
+    if (now - lastFlush < HUD_INTERVAL_MS) return;
+    lastFlush = now;
+    updateStreakHud();
+    updateFuryCard();
+    if (!dirty) return;
+    dirty = false;
+    writeHud();
 }

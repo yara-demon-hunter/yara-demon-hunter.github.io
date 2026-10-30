@@ -7,6 +7,7 @@ import { ctx, maxUltEnergy, player, shadowClone, state } from '../core/state.js'
 import { getAtkRadius } from '../systems/stats.js';
 import { drawGlow } from './fx/glow.js';
 import { drawHpBar } from './fx/hp_bar.js';
+import { getDashedRing } from './fx/rings.js';
 
 // --- ARENA: Núcleo e Raio de Alcance ---
 // (o chão/fundo fica em forest.js)
@@ -96,19 +97,13 @@ export function renderHpBars() {
 
 // Círculo vermelho tracejado de alcance em volta de (x, y); alpha < 1 deixa mais apagado
 function drawRangeCircle(x, y, radius, alpha = 1) {
-    ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.setLineDash([8, 8]); // Linha tracejada
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    // Brilho: traço largo e translúcido por baixo (bem mais barato que shadowBlur)
-    ctx.strokeStyle = 'rgba(239, 68, 68, 0.18)';
-    ctx.lineWidth = 7;
-    ctx.stroke();
-    ctx.strokeStyle = state.frenzyActiveTimer > 0 ? 'rgba(236, 72, 153, 0.7)' : 'rgba(239, 68, 68, 0.6)';
+    ctx.strokeStyle = state.frenzyActiveTimer > 0 ? 'rgba(236, 72, 153, 0.75)' : 'rgba(239, 68, 68, 0.65)';
     ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.restore();
+    ctx.translate(x, y);
+    ctx.stroke(getDashedRing(radius, 8));
+    ctx.translate(-x, -y);
+    ctx.globalAlpha = 1;
 }
 
 // Raio de Alcance do herói e do Shadow Clone (o do clone um pouco mais apagado)

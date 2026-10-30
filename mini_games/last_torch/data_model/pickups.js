@@ -9,8 +9,8 @@ export const PICKUP_MODELS = {
 };
 
 export const PICKUP_DROP = {
-    chancePerKill: 0.022,
-    pityKills: 55,              // sem nenhum item há tantas mortes: o próximo cai com certeza
+    chancePerKill: 0.04,
+    pityKills: 30,              // sem nenhum item há tantas mortes: o próximo cai com certeza
     lifeSeconds: 16,            // some depois disso (pisca nos últimos segundos)
     blinkSeconds: 4,
     radius: 15,                 // distância extra para pegar (somada ao raio do herói)

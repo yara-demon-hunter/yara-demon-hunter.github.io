@@ -5,7 +5,7 @@
 export const TURN_DIFFICULTY = {
     // Vida: multiplicador do turno 1 e quanto sobe a cada turno seguinte
     hpMultiplierFirstTurn: 0.65,
-    hpMultiplierPerTurn: 0.12,
+    hpMultiplierPerTurn: 0.17,
 
     // Velocidade de movimento
     speedMultiplierFirstTurn: 0.85,
@@ -18,18 +18,18 @@ export const TURN_DIFFICULTY = {
     maxDamageMultiplier: 2.6,
 
     // Tempo entre um monstro e o próximo
-    spawnIntervalFirstTurnSeconds: 0.85,
-    spawnIntervalReductionPerTurnSeconds: 0.06,
-    minimumSpawnIntervalSeconds: 0.2,
+    spawnIntervalFirstTurnSeconds: 1.45,
+    spawnIntervalReductionPerTurnSeconds: 0.085,
+    minimumSpawnIntervalSeconds: 0.55,
     bossSpawnIntervalMultiplier: 3.6,   // com o boss em campo nascem menos monstros
 
     // Pontos para fechar a hora: base + porTurno x n + porTurnoQuadrado x n², com n = turno - 1
-    targetScoreFirstTurn: 900,
-    targetScorePerTurn: 240,
-    targetScorePerTurnSquared: 6,
+    targetScoreFirstTurn: 520,
+    targetScorePerTurn: 125,
+    targetScorePerTurnSquared: 3,
 
     // Limite de monstros vivos ao mesmo tempo (desempenho e leitura da tela)
-    maxAliveEnemies: 110,
+    maxAliveEnemies: 42,
 
     // Pausa sem monstros logo depois de voltar da loja (a tela é limpa a cada novo turno)
     turnStartGraceSeconds: 1.5,

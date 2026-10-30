@@ -3,8 +3,8 @@ import { getTurnDifficulty, isMonsterUnlocked } from './difficulty.js';
 export const MONSTER_MODELS = {
     SKELETON: {
         spawnWeight: 0.42,
-        hpBase: 50,
-        hpPerTurn: 10,
+        hpBase: 58,
+        hpPerTurn: 11,
         speedMin: 55,
         speedMax: 85,
         radius: 14,
@@ -13,15 +13,15 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 20,
-        goldBase: 2,
+        goldBase: 4,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
     BAT: {
         spawnWeight: 0.22,
-        hpBase: 20,
-        hpPerTurn: 5,
+        hpBase: 24,
+        hpPerTurn: 6,
         speedMin: 105,
         speedMax: 140,
         radius: 10,
@@ -30,15 +30,15 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 20,
-        goldBase: 1,
+        goldBase: 2,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
     VAMPIRE: {
         spawnWeight: 0.18,
-        hpBase: 75,
-        hpPerTurn: 15,
+        hpBase: 88,
+        hpPerTurn: 17,
         speedMin: 45,
         speedMax: 45,
         radius: 18,
@@ -47,7 +47,7 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 40,
-        goldBase: 5,
+        goldBase: 9,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
@@ -70,7 +70,7 @@ export const MONSTER_MODELS = {
         projectileTorchDamage: 2,
         keepDistance: 165,               // para de andar a esta distância do alvo e atira
         scoreReward: 30,
-        goldBase: 5,
+        goldBase: 9,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
@@ -103,12 +103,12 @@ export const MONSTER_MODELS = {
         radius: 10,
         color: '#d6b98a',
         damage: 8,
-        torchDamage: 6,
+        torchDamage: 9,
         ignoresPlayer: true,
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 25,
-        goldBase: 2,
+        goldBase: 4,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3
@@ -128,7 +128,7 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 50,
-        goldBase: 6,
+        goldBase: 11,
         goldVariance: 0.5,
         xpRewardBase: 24,
         xpRewardPerTurn: 3
@@ -147,7 +147,7 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 35,
-        goldBase: 4,
+        goldBase: 7,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3
@@ -167,7 +167,7 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 3,
         shootCooldownSeconds: 6.5,
         scoreReward: 60,
-        goldBase: 9,
+        goldBase: 16,
         goldVariance: 0.5,
         xpRewardBase: 26,
         xpRewardPerTurn: 3
@@ -181,8 +181,7 @@ export const MONSTER_SPAWNING = {
     movementDamping: 0.88,
     contactKnockback: 220,
     // Monstros se empurram de leve: uma horda ocupa espaço em vez de virar um ponto só
-    separationStrength: 60,
-    separationCell: 44
+    separationStrength: 60
 };
 
 const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER'];

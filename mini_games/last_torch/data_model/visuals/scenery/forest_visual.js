@@ -37,21 +37,23 @@ export const FOREST_VISUALS = {
     grassMinHeight: 6,
     grassMaxHeight: 13,
     grassBend: 6,                 // curvatura máxima na rajada (px)
+    swayingClumps: [80, 0, 0],    // tufos que balançam a cada quadro, por nível de detalhe; o resto fica pintado no chão
     grassColors: ['rgba(46, 110, 100, 0.55)', 'rgba(30, 80, 78, 0.5)', 'rgba(70, 140, 120, 0.4)'],
 
     // Névoa: camadas de textura rolando em direções diferentes + manchas soltas
     fogColor: '170, 195, 215',
     fogDensityBoostAtZeroHp: 1.3, // quanto a névoa fica mais densa com a torre quase apagada (+130%)
-    fogFrameMs: 33,               // intervalo mínimo entre redesenhos da névoa (33 = ~30 FPS)
-    fogResolution: 0.5,           // fração da resolução da tela usada para desenhar a névoa (menor = mais rápido)
-    fogTileSize: 512,
+    fogFrameMs: [55, 80, 125],    // intervalo entre redesenhos da névoa, por nível de detalhe
+    fogResolution: 0.25,          // pixels da névoa por unidade do mundo (ela é borrada: pouca resolução basta)
+    fogTileSize: 512,             // tamanho do tile no mundo
+    fogTilePixels: 128,           // tamanho real do tile
     fogTilePuffs: 80,
     fogLayers: [
         { speedX: 26, speedY: 7, scale: 1.6, alpha: 0.24 },
         { speedX: -16, speedY: -11, scale: 1.1, alpha: 0.17 },
         { speedX: 9, speedY: -5, scale: 2.4, alpha: 0.12 }
     ],
-    fogBlobs: 14,
+    fogBlobs: 12,
     fogMinRadius: 140,
     fogMaxRadius: 300,
     fogAlphaCenter: 0.1,
@@ -60,13 +62,13 @@ export const FOREST_VISUALS = {
     fogWobble: 50,
 
     // Vaga-lumes (verde-azulados e discretos)
-    fireflies: 16,
-    fireflyColor: '140, 230, 200',
+    fireflies: [10, 5, 0],        // quantidade, por nível de detalhe
+    fireflyGlow: 'rgba(140, 230, 200, 0.75)',
     fireflySpeed: 16,
-    fireflyRadius: 1.5,
-    fireflyGlowRadius: 8,
+    fireflyGlowRadius: 6,
 
     // Vinheta escura
     vignetteColor: 'rgba(0, 2, 8, 0.88)',
-    vignetteInnerRatio: 0.4
+    vignetteInnerRatio: 0.4,
+    vignetteResolution: 0.06      // pixels por unidade do mundo: é só um degradê
 };

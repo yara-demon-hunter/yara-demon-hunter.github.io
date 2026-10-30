@@ -4,6 +4,8 @@ import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visua
 import { ctx, player, state } from '../core/state.js';
 import { mod } from '../systems/modifiers.js';
 import { easeOutBack, easeOutCubic } from './fx/easing.js';
+import { drawNumber } from './fx/numbers.js';
+import { getDashedRing } from './fx/rings.js';
 
 // --- EFEITOS: manchas, pedaços, ondas de choque, avisos no chão, números, clarão ---
 const TAU = Math.PI * 2;
@@ -11,34 +13,28 @@ const TAU = Math.PI * 2;
 // Manchas de batalha, sob tudo que anda
 export function renderStains() {
     const fade = J.stains.fadeSeconds;
-    ctx.save();
-    state.stains.forEach(s => {
+    for (const s of state.stains) {
         ctx.globalAlpha = Math.min(1, s.life / fade);
         ctx.fillStyle = s.color;
         ctx.beginPath();
-        s.blobs.forEach(b => {
+        for (const b of s.blobs) {
             ctx.moveTo(s.x + b.x + b.r, s.y + b.y);
             ctx.arc(s.x + b.x, s.y + b.y, b.r, 0, TAU);
-        });
+        }
         ctx.fill();
-    });
-    ctx.restore();
+    }
+    ctx.globalAlpha = 1;
 }
 
 // Calor da tocha: anel fraco no chão, só visível quando o herói precisa de cura
 export function renderWarmth() {
     if (player.hp >= player.maxHp) return;
     const reach = CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
-    ctx.save();
-    ctx.fillStyle = J.warmth.color;
-    ctx.beginPath();
-    ctx.arc(state.coreX, state.coreY, reach, 0, TAU);
-    ctx.fill();
     ctx.strokeStyle = J.warmth.ringColor;
     ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 9]);
-    ctx.stroke();
-    ctx.restore();
+    ctx.translate(state.coreX, state.coreY);
+    ctx.stroke(getDashedRing(reach, 6));
+    ctx.translate(-state.coreX, -state.coreY);
 }
 
 // Tocha ferida: anel pulsando em volta, para o jogador achar o perigo sem olhar a barra
@@ -56,38 +52,24 @@ export function renderTorchAlarm() {
     ctx.restore();
 }
 
-function drawGib(g) {
-    const s = g.size;
-    if (g.shape === 'bone') {
-        ctx.fillRect(-s * 1.2, -s * 0.34, s * 2.4, s * 0.68);
-        ctx.fillRect(-s * 1.4, -s * 0.6, s * 0.6, s * 1.2);
-        ctx.fillRect(s * 0.8, -s * 0.6, s * 0.6, s * 1.2);
-    } else if (g.shape === 'blob') {
-        ctx.beginPath();
-        ctx.arc(0, 0, s * 0.8, 0, TAU);
-        ctx.fill();
-    } else {
-        ctx.beginPath();
-        ctx.moveTo(s, 0);
-        ctx.lineTo(-s * 0.6, s * 0.7);
-        ctx.lineTo(-s * 0.3, -s * 0.8);
-        ctx.closePath();
-        ctx.fill();
-    }
-}
-
 export function renderGibs() {
-    ctx.save();
-    state.gibs.forEach(g => {
+    for (const g of state.gibs) {
         ctx.globalAlpha = Math.min(1, (g.life / g.maxLife) * 2.5);
         ctx.fillStyle = g.color;
-        ctx.save();
+        const s = g.size;
         ctx.translate(g.x, g.y - g.z);
         ctx.rotate(g.rotation);
-        drawGib(g);
-        ctx.restore();
-    });
-    ctx.restore();
+        if (g.shape === 'bone') {
+            ctx.fillRect(-s * 1.2, -s * 0.34, s * 2.4, s * 0.68);
+            ctx.fillRect(-s * 1.4, -s * 0.6, s * 0.6, s * 1.2);
+            ctx.fillRect(s * 0.8, -s * 0.6, s * 0.6, s * 1.2);
+        } else {
+            ctx.fillRect(-s * 0.7, -s * 0.5, s * 1.4, s);
+        }
+        ctx.rotate(-g.rotation);
+        ctx.translate(-g.x, -(g.y - g.z));
+    }
+    ctx.globalAlpha = 1;
 }
 
 export function renderShockwaves() {
@@ -151,56 +133,50 @@ export function renderTelegraphs() {
     ctx.restore();
 }
 
+// Números vêm do atlas (js/render/fx/numbers.js); só textos raros usam fillText
 export function renderFloaters() {
     const N = J.number;
-    ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = N.outline;
-    ctx.lineWidth = N.outlineWidth;
-    state.floaters.forEach(f => {
+    for (const f of state.floaters) {
         const p = f.age / f.seconds;
         const y = f.y - f.rise * easeOutCubic(p);
         ctx.globalAlpha = p < 0.7 ? 1 : (1 - p) / 0.3;
-        ctx.font = f.font;
-        ctx.fillStyle = f.color;
 
+        if (f.text) {
+            ctx.font = f.font;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = N.outline;
+            ctx.lineWidth = N.outlineWidth;
+            ctx.fillStyle = f.color;
+            ctx.strokeText(f.text, f.x, y);
+            ctx.fillText(f.text, f.x, y);
+            continue;
+        }
         // Crítico: nasce grande e encolhe
         const popP = f.pop ? Math.min(1, f.age / N.popSeconds) : 1;
-        const scale = 1 + (N.popScale - 1) * (1 - popP);
-        if (scale !== 1) {
-            ctx.save();
-            ctx.translate(f.x, y);
-            ctx.scale(scale, scale);
-            ctx.strokeText(f.text, 0, 0);
-            ctx.fillText(f.text, 0, 0);
-            ctx.restore();
-            return;
-        }
-        ctx.strokeText(f.text, f.x, y);
-        ctx.fillText(f.text, f.x, y);
-    });
-    ctx.restore();
+        drawNumber(f.value, f.sign, f.x, y, f.style, 1 + (N.popScale - 1) * (1 - popP));
+    }
+    ctx.globalAlpha = 1;
 }
 
-// Fim da hora: a onda de fogo saindo da tocha
+// Fim da hora: a onda de fogo saindo da tocha. Dois traços em vez de um gradiente na tela inteira
 export function renderClearWave() {
     if (state.phase !== 'CLEAR' && state.phase !== 'DAWN') return;
     const W = J.clearWave;
     const r = state.clearWaveRadius;
     if (r <= 0 || r > Math.hypot(state.width, state.height)) return;
 
-    const inner = Math.max(1, r - W.width * 2);
-    const grad = ctx.createRadialGradient(state.coreX, state.coreY, inner, state.coreX, state.coreY, r);
-    grad.addColorStop(0, `rgba(${W.color}, 0)`);
-    grad.addColorStop(0.75, `rgba(${W.color}, 0.5)`);
-    grad.addColorStop(0.93, `rgba(${W.coreColor}, 0.9)`);
-    grad.addColorStop(1, `rgba(${W.color}, 0)`);
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, state.width, state.height);
+    ctx.beginPath();
+    ctx.arc(state.coreX, state.coreY, r, 0, TAU);
+    ctx.strokeStyle = `rgba(${W.color}, 0.3)`;
+    ctx.lineWidth = W.width * 2;
+    ctx.stroke();
+    ctx.strokeStyle = `rgba(${W.coreColor}, 0.85)`;
+    ctx.lineWidth = W.width * 0.4;
+    ctx.stroke();
     ctx.restore();
 }
 

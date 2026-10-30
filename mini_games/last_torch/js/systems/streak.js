@@ -1,7 +1,6 @@
 import { STREAK } from '../../data_model/streak.js';
 import { audio, state } from '../core/state.js';
 import { showCallout } from '../ui/banner.js';
-import { updateStreakHud } from '../ui/hud.js';
 import { chargeUlt } from './combat.js';
 import { mod } from './modifiers.js';
 
@@ -35,5 +34,4 @@ export function updateStreak(dt) {
             state.streakTimer = 0;
         }
     }
-    updateStreakHud();
 }

@@ -9,7 +9,19 @@ export function shakeScreen(intensity) {
     state.shakeIntensity = Math.max(state.shakeIntensity, intensity);
 }
 
-const MAX_PARTICLES = 220;
+// Partículas, pedaços e números são criados o tempo todo: os objetos são reaproveitados para não
+// gerar lixo de memória, que no celular vira engasgo quando o coletor roda.
+const MAX_PARTICLES = [110, 64, 36];        // por nível de detalhe
+const freeParticles = [];
+const freeGibs = [];
+const freeFloaters = [];
+
+// Tira o item i da lista sem deslocar os outros e devolve o objeto para reuso
+function recycle(list, i, free) {
+    free.push(list[i]);
+    const last = list.pop();
+    if (i < list.length) list[i] = last;
+}
 
 // Registra de onde veio o golpe no herói (só para a animação de empurrão)
 export function registerPlayerHit(fromX, fromY) {
@@ -23,20 +35,20 @@ export function registerPlayerHit(fromX, fromY) {
 
 export function createExplosion(x, y, color, count = 10) {
     // Limite de partículas vivas: evita acúmulo de memória em momentos caóticos
-    if (state.lowQuality) count = Math.ceil(count / 2);
-    count = Math.min(count, MAX_PARTICLES - state.particles.length);
+    count = Math.min(count, MAX_PARTICLES[state.quality] - state.particles.length);
     for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 40 + Math.random() * 160;
-        state.particles.push({
-            x, y,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            life: 0.2 + Math.random() * 0.3,
-            maxLife: 0.5,
-            color,
-            size: 2 + Math.random() * 3
-        });
+        const p = freeParticles.pop() ?? {};
+        p.x = x;
+        p.y = y;
+        p.vx = Math.cos(angle) * speed;
+        p.vy = Math.sin(angle) * speed;
+        p.life = 0.2 + Math.random() * 0.3;
+        p.maxLife = 0.5;
+        p.color = color;
+        p.size = 2.5 + Math.random() * 3;
+        state.particles.push(p);
     }
 }
 
@@ -81,27 +93,49 @@ export function addShockwave(x, y, { radius = 60, color = '#ffffff', width = 4, 
     state.shockwaves.push({ x, y, radius, color, width, age: 0, seconds });
 }
 
-// Texto curto que sobe (ouro, cura, avisos em cima de quem recebeu)
-export function addFloater(x, y, text, color = '#f1f5f9') {
-    state.floaters.push({ x, y, text, color, age: 0, seconds: J.floater.seconds, rise: J.floater.rise, font: J.floater.font });
+function takeFloater() {
+    const { floaters } = state;
+    if (floaters.length >= J.number.maxActive[state.quality]) recycle(floaters, 0, freeFloaters);
+    const f = freeFloaters.pop() ?? {};
+    f.age = 0;
+    floaters.push(f);
+    return f;
 }
 
-export function addDamageNumber(x, y, value, crit = false, color = null) {
+// Texto curto que sobe (avisos em cima de quem recebeu). Raro: usa fillText
+export function addFloater(x, y, text, color = '#f1f5f9') {
+    const f = takeFloater();
+    f.x = x;
+    f.y = y;
+    f.text = text;
+    f.color = color;
+    f.font = J.floater.font;
+    f.seconds = J.floater.seconds;
+    f.rise = J.floater.rise;
+    f.pop = false;
+}
+
+// Número que sobe: sign 1 = +, -1 = -, 0 = sem sinal. style: chave de J.numberStyles
+export function addNumber(x, y, value, sign, style, seconds = J.floater.seconds, rise = J.floater.rise, pop = false) {
+    const f = takeFloater();
+    f.x = x;
+    f.y = y;
+    f.text = null;
+    f.value = value;
+    f.sign = sign;
+    f.style = style;
+    f.seconds = seconds;
+    f.rise = rise;
+    f.pop = pop;
+}
+
+export function addDamageNumber(x, y, value, crit = false, style = null) {
     if (!save.settings.numbers) return;
     const N = J.number;
-    const { floaters } = state;
-    if (floaters.length >= N.maxActive) floaters.shift();
-    floaters.push({
-        x: x + (Math.random() - 0.5) * 14,
-        y: y + (Math.random() - 0.5) * 6,
-        text: `${Math.round(value)}`,
-        color: color ?? (crit ? N.critColor : N.color),
-        age: 0,
-        seconds: N.seconds * (crit ? 1.25 : 1),
-        rise: N.rise,
-        font: crit ? N.critFont : N.font,
-        pop: crit
-    });
+    addNumber(
+        x + (Math.random() - 0.5) * 14, y + (Math.random() - 0.5) * 6,
+        value, 0, style ?? (crit ? 'crit' : 'normal'), N.seconds * (crit ? 1.25 : 1), N.rise, crit
+    );
 }
 
 // Pedaços que voam na morte: cada um tem altura (z), quica uma vez e fica no chão até sumir
@@ -109,25 +143,26 @@ export function addGibs(type, x, y, scale = 1) {
     const bits = J.deathBits[type];
     if (!bits) return;
     const G = J.gibs;
-    const count = Math.min(Math.round(bits.count * scale), G.maxActive - state.gibs.length);
+    const count = Math.min(Math.round(bits.count * scale), G.maxActive[state.quality] - state.gibs.length);
     for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = G.speedMin + Math.random() * (G.speedMax - G.speedMin);
         const life = G.lifeMin + Math.random() * (G.lifeMax - G.lifeMin);
-        state.gibs.push({
-            x, y,
-            z: 6,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            vz: G.liftMin + Math.random() * (G.liftMax - G.liftMin),
-            rotation: Math.random() * Math.PI * 2,
-            spin: (Math.random() - 0.5) * 16,
-            size: (2.2 + Math.random() * 3.4) * Math.min(1.6, 0.8 + scale * 0.2),
-            color: bits.colors[Math.floor(Math.random() * bits.colors.length)],
-            shape: bits.shape,
-            life,
-            maxLife: life
-        });
+        const g = freeGibs.pop() ?? {};
+        g.x = x;
+        g.y = y;
+        g.z = 6;
+        g.vx = Math.cos(angle) * speed;
+        g.vy = Math.sin(angle) * speed;
+        g.vz = G.liftMin + Math.random() * (G.liftMax - G.liftMin);
+        g.rotation = Math.random() * Math.PI * 2;
+        g.spin = (Math.random() - 0.5) * 16;
+        g.size = (2.2 + Math.random() * 3.4) * Math.min(1.6, 0.8 + scale * 0.2);
+        g.color = bits.colors[Math.floor(Math.random() * bits.colors.length)];
+        g.shape = bits.shape;
+        g.life = life;
+        g.maxLife = life;
+        state.gibs.push(g);
     }
 }
 
@@ -155,11 +190,12 @@ export function updateRealTimeEffects(dt) {
 
 function updateGibs(dt) {
     const G = J.gibs;
-    for (let i = state.gibs.length - 1; i >= 0; i--) {
-        const g = state.gibs[i];
+    const { gibs } = state;
+    for (let i = gibs.length - 1; i >= 0; i--) {
+        const g = gibs[i];
         g.life -= dt;
         if (g.life <= 0) {
-            state.gibs.splice(i, 1);
+            recycle(gibs, i, freeGibs);
             continue;
         }
         if (g.z > 0 || g.vz > 0) {
@@ -202,18 +238,22 @@ export function updateEffects(dt) {
     }
 
     // Partículas
-    for (let i = state.particles.length - 1; i >= 0; i--) {
-        const p = state.particles[i];
+    const { particles, floaters } = state;
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
         p.x += p.vx * dt;
         p.y += p.vy * dt;
         p.life -= dt;
-        if (p.life <= 0) state.particles.splice(i, 1);
+        if (p.life <= 0) recycle(particles, i, freeParticles);
     }
 
     updateGibs(dt);
     updateList(state.shockwaves, dt);
-    updateList(state.floaters, dt);
     updateList(state.dashGhosts, dt);
+    for (let i = floaters.length - 1; i >= 0; i--) {
+        floaters[i].age += dt;
+        if (floaters[i].age >= floaters[i].seconds) recycle(floaters, i, freeFloaters);
+    }
 
     for (let i = state.stains.length - 1; i >= 0; i--) {
         state.stains[i].life -= dt;

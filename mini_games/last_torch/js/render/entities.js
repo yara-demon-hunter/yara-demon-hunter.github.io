@@ -1,54 +1,47 @@
 import { DEMON_LORD_VISUALS } from '../../data_model/visuals/bosses/demon_lord_visual.js';
-import { BAT_VISUALS } from '../../data_model/visuals/monsters/bat_visual.js';
-import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
-import { GOLD_VISUALS as G } from '../../data_model/visuals/items/gold_visual.js';
+import { BOSS_PALETTES } from '../../data_model/visuals/bosses/palettes_visual.js';
+import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
+import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
+import { POWERS_VISUALS } from '../../data_model/visuals/effects/powers_visual.js';
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
-import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
-import { SKELETON_VISUALS } from '../../data_model/visuals/monsters/skeleton_visual.js';
-import { VAMPIRE_VISUALS } from '../../data_model/visuals/monsters/vampire_visual.js';
+import { BAT_VISUALS } from '../../data_model/visuals/monsters/bat_visual.js';
 import { BLOATER_VISUALS } from '../../data_model/visuals/monsters/bloater_visual.js';
 import { MOTH_VISUALS } from '../../data_model/visuals/monsters/moth_visual.js';
+import { SKELETON_VISUALS } from '../../data_model/visuals/monsters/skeleton_visual.js';
+import { SPRITE_FRAMES } from '../../data_model/visuals/monsters/sprites_visual.js';
+import { VAMPIRE_VISUALS } from '../../data_model/visuals/monsters/vampire_visual.js';
+import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
 import { WRAITH_VISUALS } from '../../data_model/visuals/monsters/wraith_visual.js';
-import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
-import { POWERS_VISUALS } from '../../data_model/visuals/effects/powers_visual.js';
-import { BOSS_PALETTES, NECROMANCER_COLORS } from '../../data_model/visuals/bosses/palettes_visual.js';
+import { TORCH_VISUALS } from '../../data_model/visuals/scenery/torch_visual.js';
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { FAN_OF_KNIVES } from '../../data_model/passives.js';
 import { ctx, passives, player, state } from '../core/state.js';
 import { getKnifeRange } from '../systems/knives.js';
-import { renderBat } from './bat.js';
-import { renderBloater } from './bloater.js';
-import { renderDemonFireball, renderDemonLord } from './demon_lord.js';
-import { drawDagger } from './knife.js';
-import { renderMoth } from './moth.js';
-import { renderReflectedBolt } from './reflect.js';
-import { renderSkeleton } from './skeleton.js';
-import { renderVampire } from './vampire.js';
-import { renderWitch, renderWitchBolt } from './witch.js';
-import { renderWraith } from './wraith.js';
-import { TORCH_VISUALS } from '../../data_model/visuals/scenery/torch_visual.js';
+import { renderDemonLord } from './demon_lord.js';
 import { getCurrentLightRadius } from './forest.js';
 import { easeOutCubic } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
+import { getDashedRing } from './fx/rings.js';
+import { COIN_SIZE, DAGGER_LENGTH, DAGGER_WIDTH, getCoinAtlas, getDaggerSprite, getEyesSprite } from './fx/sprites.js';
+import { resetWorldView, stamp } from './fx/stamp.js';
+import { getBoltSprite, getMonsterSprite, withColors } from './monster_sprites.js';
+import { renderReflectedBolt } from './reflect.js';
+import { renderVampire } from './vampire.js';
+
+const TAU = Math.PI * 2;
 
 // --- ENTIDADES: Ouro, Golpes, Projéteis, Inimigos e Partículas ---
-// Moedas de ouro dropadas pelos monstros (girando, com brilho)
+// Moedas de ouro dropadas pelos monstros (girando, com brilho): quadros de um atlas
 export function renderGoldDrops() {
+    if (state.goldDrops.length === 0) return;
+    const { canvas, cell, frames } = getCoinAtlas();
     const t = performance.now() / 1000;
-    state.goldDrops.forEach(c => {
-        const spin = Math.abs(Math.cos(t * 7 + c.phase));        // moeda girando (achata e abre)
-        const r = G.radius;
-        drawGlow(ctx, G.glowColor, c.x, c.y, r * 2.8, 0.55);
-        ctx.fillStyle = G.edgeColor;
-        ctx.beginPath();
-        ctx.ellipse(c.x, c.y, Math.max(1, r * spin), r, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = G.faceColor;
-        ctx.beginPath();
-        ctx.ellipse(c.x, c.y, Math.max(0.6, r * spin * 0.7), r * 0.7, 0, 0, Math.PI * 2);
-        ctx.fill();
-    });
+    const half = COIN_SIZE / 2;
+    for (const c of state.goldDrops) {
+        const frame = Math.floor(t * 12 + c.phase * 3) % frames;
+        ctx.drawImage(canvas, frame * cell, 0, cell, cell, c.x - half, c.y - half, COIN_SIZE, COIN_SIZE);
+    }
 }
 
 // Slashes de Espada: cada passo do combo tem um visual próprio (data_model/visuals/effects/slash_visual.js)
@@ -153,11 +146,9 @@ export function renderBladeSlashes() {
 
         for (let l = 0; l < look.lines; l++) {
             const r = s.radius * (0.88 + progress * 0.12) - l * SLASH_VISUALS.doubleLineGap;
-            // Brilho: traços largos e translúcidos por baixo (bem mais barato que shadowBlur)
-            ctx.globalAlpha = fadeOut * 0.12;
-            strokeSweep(r, tail, head, color, width + look.glow);
-            ctx.globalAlpha = fadeOut * 0.22;
-            strokeSweep(r, tail, head, color, width + look.glow * 0.45);
+            // Brilho: um traço largo e translúcido por baixo (bem mais barato que shadowBlur)
+            ctx.globalAlpha = fadeOut * 0.26;
+            strokeSweep(r, tail, head, color, width + look.glow * 0.6);
             ctx.globalAlpha = fadeOut;
             strokeSweep(r, tail, head, color, width - l * 2);
             // Rastro interno brilhante (Branco Neon)
@@ -179,156 +170,161 @@ export function renderBladeSlashes() {
 }
 
 export function renderEnemyProjectiles() {
-    state.enemyProjectiles.forEach(p => {
+    if (state.enemyProjectiles.length === 0) return;
+    for (const p of state.enemyProjectiles) {
         if (p.reflected) {
+            resetWorldView();
             renderReflectedBolt(p);
-            return;
+            continue;
         }
-        if (p.owner === 'WITCH') {
-            renderWitchBolt(p);
-            return;
-        }
-        if (p.owner === 'DEMON_LORD') {
-            renderDemonFireball(p);
-            return;
-        }
-        // Demais bosses: orbe na cor de quem atirou
-        const len = Math.hypot(p.vx, p.vy) || 1;
-        drawGlow(ctx, p.color, p.x, p.y, p.radius * 3.2, 0.7);
-        ctx.fillStyle = p.color;
-        for (let i = 1; i <= 3; i++) {
-            ctx.globalAlpha = 0.5 / i;
-            ctx.beginPath();
-            ctx.arc(p.x - (p.vx / len) * p.radius * i * 1.3, p.y - (p.vy / len) * p.radius * i * 1.3, p.radius * (1 - i * 0.18), 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius * 0.45, 0, Math.PI * 2);
-        ctx.fill();
-    });
-}
-
-// Reaproveita a arte de um monstro com outra paleta (bosses e necromante)
-function withColors(visuals, colors, draw) {
-    if (!colors) {
-        draw();
-        return;
+        const sprite = getBoltSprite(p.owner, p.color, p.radius);
+        const k = p.radius / sprite.radius;
+        const rotation = Math.atan2(p.vy, p.vx);
+        // O miolo do tiro fica à frente do centro do sprite: compensa para ele cair em (p.x, p.y)
+        const shift = sprite.centerShift * k;
+        stamp(sprite.canvas, 0, 0, sprite.canvas.width, sprite.canvas.height,
+            p.x - Math.cos(rotation) * shift, p.y - Math.sin(rotation) * shift,
+            rotation, sprite.width * k, sprite.height * k);
     }
-    const original = visuals.colors;
-    visuals.colors = colors;
-    draw();
-    visuals.colors = original;
+    resetWorldView();
 }
 
-// Desenha o corpo. renderAs e palette vêm de data_model/bosses.js
-function drawEnemyBody(e) {
-    if (e.isBoss) {
-        const model = BOSS_MODELS[e.type];
-        if (model.renderAs === 'VAMPIRE') withColors(VAMPIRE_VISUALS, BOSS_PALETTES[model.palette], () => renderVampire(e));
-        else withColors(DEMON_LORD_VISUALS, BOSS_PALETTES[model.palette], () => renderDemonLord(e));
-        return;
+// Corpo procedural: só bosses, que são poucos e têm animações de ataque próprias
+function drawBoss(e) {
+    const model = BOSS_MODELS[e.type];
+    if (model.renderAs === 'VAMPIRE') withColors(VAMPIRE_VISUALS, BOSS_PALETTES[model.palette], () => renderVampire(e));
+    else withColors(DEMON_LORD_VISUALS, BOSS_PALETTES[model.palette], () => renderDemonLord(e));
+}
+
+// Aura e sombra no chão, sob todos os monstros
+function renderUnderlays() {
+    if (state.quality >= 2) return;
+    for (const e of state.enemies) {
+        if (e.isBoss) continue;
+        const sprite = getMonsterSprite(e.type);
+        const size = sprite.underlaySize * (e.radius / sprite.radius);
+        ctx.drawImage(sprite.underlay, e.x - size / 2, e.y - size / 2, size, size);
     }
-    if (e.type === 'BAT') renderBat(e);
-    else if (e.type === 'WITCH') renderWitch(e);
-    else if (e.type === 'NECROMANCER') withColors(WITCH_VISUALS, NECROMANCER_COLORS, () => renderWitch(e));
-    else if (e.type === 'SKELETON') renderSkeleton(e);
-    else if (e.type === 'VAMPIRE') renderVampire(e);
-    else if (e.type === 'MOTH') renderMoth(e);
-    else if (e.type === 'BLOATER') renderBloater(e);
-    else if (e.type === 'WRAITH') renderWraith(e);
 }
 
-// Aparelho lento: monstro longe do herói vira sombra colorida, bem mais barata de desenhar
-function drawSimpleEnemy(e) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-    ctx.beginPath();
-    ctx.ellipse(e.x, e.y + e.radius * 0.35, e.radius * 1.05, e.radius * 0.55, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = e.color;
-    ctx.globalAlpha = 0.75;
-    ctx.beginPath();
-    ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
+// Corpo do monstro: um carimbo do atlas. Balanço, flutuação e investida são aplicados aqui
+function stampMonster(e, t) {
+    const sprite = getMonsterSprite(e.type);
+    const { spec, cell, atlas } = sprite;
+    const k = e.radius / sprite.radius;
+    let rotation = e.facing ?? e.angle;
+    let width = sprite.worldSize * k;
+    let height = width;
+    let x = e.x;
+    let y = e.y;
+
+    if (e.hitFlash > 0) {
+        const flash = e.hitFlash / J.hitFlashSeconds;
+        x += (e.recoilX ?? 0) * J.hitRecoil * flash;
+        y += (e.recoilY ?? 0) * J.hitRecoil * flash;
+    }
+    if (spec.wobbleAmount) rotation += Math.sin(t * spec.wobbleHz * TAU + e.phase) * spec.wobbleAmount;
+    if (spec.floatAmount) y -= Math.sin(t * spec.floatHz * TAU + e.phase) * e.radius * spec.floatAmount * 1.5;
+    if (e.lungeState === 2) {
+        rotation = Math.atan2(e.lungeY, e.lungeX);
+        width *= 1.4;
+        height *= 0.85;
+    }
+
+    const cycle = (t / spec.playSeconds + e.phase / TAU) % 1;
+    const frame = Math.floor(cycle * SPRITE_FRAMES);
+    stamp(atlas, frame * cell, 0, cell, cell, x, y, rotation, width, height);
 }
 
-// Elite: um anel girando, para ser reconhecido de longe
+// Anel girando em volta do elite, para ser reconhecido de longe
 function renderEliteMark(e) {
-    const t = performance.now() / 1000;
     const E = POWERS_VISUALS.elite;
-    const r = e.radius * 1.5;
-    drawGlow(ctx, e.elite.color, e.x, e.y, r * 1.9, 0.26);
-    ctx.save();
-    ctx.translate(e.x, e.y);
+    const r = e.radius * 1.5 + E.ringGap;
+    drawGlow(ctx, e.elite.color, e.x, e.y, r * 1.5, 0.26);
     ctx.strokeStyle = e.elite.color;
     ctx.lineWidth = E.ringWidth;
-    ctx.setLineDash([9, 7]);
-    ctx.rotate(t * 1.3);
-    ctx.beginPath();
-    ctx.arc(0, 0, r + E.ringGap, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
+    ctx.translate(e.x, e.y);
+    ctx.stroke(getDashedRing(r, 8));
+    ctx.translate(-e.x, -e.y);
+}
+
+// Bruxa e necromante carregando: a mão brilha antes do tiro
+function renderCastGlow(e, charge) {
+    const f = e.facing ?? e.angle;
+    const reach = e.radius * WITCH_VISUALS.scale * 0.95;
+    const hand = e.radius * WITCH_VISUALS.scale * 0.26;
+    const x = e.x + Math.cos(f) * reach - Math.sin(f) * hand;
+    const y = e.y + Math.sin(f) * reach + Math.cos(f) * hand;
+    drawGlow(ctx, e.type === 'WITCH' ? WITCH_VISUALS.colors.orbGlow : 'rgba(34, 197, 94, 0.85)', x, y, e.radius * (0.4 + charge), 0.9);
 }
 
 // Altura da barra de vida acima do monstro
-function healthBarOffset(e) {
-    if (e.isBoss) return e.radius + DEMON_LORD_VISUALS.healthBarOffset;
-    const offsets = {
-        BAT: BAT_VISUALS.healthBarOffset,
-        WITCH: WITCH_VISUALS.healthBarOffset,
-        NECROMANCER: WITCH_VISUALS.healthBarOffset,
-        SKELETON: SKELETON_VISUALS.healthBarOffset,
-        VAMPIRE: VAMPIRE_VISUALS.healthBarOffset,
-        MOTH: MOTH_VISUALS.healthBarOffset,
-        BLOATER: BLOATER_VISUALS.healthBarOffset,
-        WRAITH: WRAITH_VISUALS.healthBarOffset
-    };
-    return e.radius + (offsets[e.type] ?? 8);
-}
+const HEALTH_BAR_OFFSETS = {
+    BAT: BAT_VISUALS.healthBarOffset,
+    WITCH: WITCH_VISUALS.healthBarOffset,
+    NECROMANCER: WITCH_VISUALS.healthBarOffset,
+    SKELETON: SKELETON_VISUALS.healthBarOffset,
+    VAMPIRE: VAMPIRE_VISUALS.healthBarOffset,
+    MOTH: MOTH_VISUALS.healthBarOffset,
+    BLOATER: BLOATER_VISUALS.healthBarOffset,
+    WRAITH: WRAITH_VISUALS.healthBarOffset
+};
 
-export function renderEnemies() {
-    state.enemies.forEach(e => {
-        if (e.elite) renderEliteMark(e);
-
-        // Golpe recebido: treme para trás e pisca branco
-        const flash = e.hitFlash > 0 ? e.hitFlash / J.hitFlashSeconds : 0;
-        if (flash > 0) {
-            ctx.save();
-            ctx.translate((e.recoilX ?? 0) * J.hitRecoil * flash, (e.recoilY ?? 0) * J.hitRecoil * flash);
-        }
-        const simple = state.lowQuality && !e.isBoss && !e.elite
-            && Math.hypot(e.x - player.x, e.y - player.y) > J.lowQualityDetailDistance;
-        if (simple) drawSimpleEnemy(e);
-        else drawEnemyBody(e);
-        if (flash > 0) {
-            ctx.restore();
-            ctx.save();
+// Tudo que vem por cima do corpo: clarão do golpe, gelo, mira, aviso de estouro e vida
+function renderEnemyOverlays(t) {
+    for (const e of state.enemies) {
+        if (e.hitFlash > 0) {
             ctx.globalCompositeOperation = 'lighter';
-            drawGlow(ctx, '#ffffff', e.x, e.y, e.radius * 1.5, flash * 0.75);
-            ctx.restore();
+            drawGlow(ctx, '#ffffff', e.x, e.y, e.radius * 1.5, (e.hitFlash / J.hitFlashSeconds) * 0.75);
+            ctx.globalCompositeOperation = 'source-over';
         }
         if (e.frozen > 0) {
             ctx.fillStyle = POWERS_VISUALS.frost.color;
             ctx.beginPath();
-            ctx.arc(e.x, e.y, e.radius * 1.15, 0, Math.PI * 2);
+            ctx.arc(e.x, e.y, e.radius * 1.15, 0, TAU);
             ctx.fill();
+        }
+        if (!e.isBoss) {
+            if (e.type === 'WITCH' || e.type === 'NECROMANCER') {
+                const charge = 1 - e.shootTimer / WITCH_VISUALS.chargeSeconds;
+                if (charge > 0) renderCastGlow(e, charge);
+            } else if (e.type === 'WRAITH' && e.lungeState === 1) {
+                drawGlow(ctx, WRAITH_VISUALS.colors.aimAura, e.x, e.y, e.radius * 2.6, 0.5);
+            } else if (e.type === 'BLOATER' && e.hp < e.maxHp) {
+                const hurt = 1 - e.hp / e.maxHp;
+                const pulse = 0.5 + 0.5 * Math.sin(t * (2 + hurt * 7) * TAU);
+                drawGlow(ctx, BLOATER_VISUALS.colors.sacGlow, e.x, e.y, e.radius * 1.5, hurt * pulse * 0.6);
+            }
         }
 
         // Barra de vida simples acima do inimigo (o boss tem a dele no HUD)
         if (e.hp < e.maxHp && !e.isBoss) {
             const bw = e.radius * 2;
-            const barY = healthBarOffset(e);
+            const barY = e.radius + (HEALTH_BAR_OFFSETS[e.type] ?? 8);
             ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
             ctx.fillRect(e.x - bw / 2, e.y - barY, bw, 4);
             ctx.fillStyle = e.elite ? e.elite.color : e.color;
             ctx.fillRect(e.x - bw / 2, e.y - barY, bw * Math.max(0, e.hp / e.maxHp), 4);
         }
-    });
+    }
+}
+
+export function renderEnemies() {
+    const t = performance.now() / 1000;
+    renderUnderlays();
+
+    for (const e of state.enemies) {
+        if (e.elite) renderEliteMark(e);
+    }
+    for (const e of state.enemies) {
+        if (!e.isBoss) stampMonster(e, t);
+    }
+    resetWorldView();
+
+    for (const e of state.enemies) {
+        if (e.isBoss) drawBoss(e);
+    }
+    renderEnemyOverlays(t);
 }
 
 // Olhos no escuro: o que está fora da luz aparece como dois pontos brilhando sobre a névoa.
@@ -337,25 +333,24 @@ export function renderEyesInFog() {
     const E = J.fogEyes;
     const torchLight = getCurrentLightRadius() * E.torchLightRatio;
     const heroLight = TORCH_VISUALS.heroLightRadius * E.heroLightRatio;
-    ctx.save();
-    state.enemies.forEach(e => {
-        if (Math.hypot(e.x - state.coreX, e.y - state.coreY) < torchLight) return;
-        if (Math.hypot(e.x - player.x, e.y - player.y) < heroLight) return;
-        const fx = Math.cos(e.angle);
-        const fy = Math.sin(e.angle);
-        const x = e.x + fx * e.radius * 0.7;
-        const y = e.y + fy * e.radius * 0.7;
-        const gap = Math.max(1.6, e.radius * 0.26);
-        const size = Math.max(1.3, e.radius * 0.11);
-        const color = e.elite?.color ?? (e.isBoss ? e.color : E.color);
-        drawGlow(ctx, color, x, y, Math.max(7, e.radius * 0.8), E.glowAlpha);
-        ctx.fillStyle = E.core;
-        ctx.beginPath();
-        ctx.arc(x - fy * gap, y + fx * gap, size, 0, Math.PI * 2);
-        ctx.arc(x + fy * gap, y - fx * gap, size, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    ctx.restore();
+    const eyes = getEyesSprite(E.color, E.core);
+    const torch2 = torchLight * torchLight;
+    const hero2 = heroLight * heroLight;
+    let stamped = false;
+    for (const e of state.enemies) {
+        const tx = e.x - state.coreX;
+        const ty = e.y - state.coreY;
+        if (tx * tx + ty * ty < torch2) continue;
+        const px = e.x - player.x;
+        const py = e.y - player.y;
+        if (px * px + py * py < hero2) continue;
+
+        const size = Math.max(16, e.radius * 2.2);
+        const rotation = e.facing ?? e.angle;
+        stamp(eyes, 0, 0, eyes.width, eyes.height, e.x, e.y, rotation, size, size);
+        stamped = true;
+    }
+    if (stamped) resetWorldView();
 }
 
 // Mira do botão da adaga (toque): linhas tracejadas saindo do herói, uma por adaga do leque.
@@ -384,63 +379,55 @@ export function renderKnifeAim() {
 }
 
 // Adaga de arremesso: voa na altura da mão (sombra no chão marca a posição real), com brilho frio,
-// riscos de velocidade e cópias apagadas atrás. Desenho da adaga em js/render/knife.js
+// um risco de velocidade e cópias apagadas atrás. É um carimbo: o desenho fica em js/render/knife.js
 export function renderKnives() {
-    const t = performance.now() / 1000;
-    state.knives.forEach(k => {
+    if (state.knives.length === 0) return;
+    const dagger = getDaggerSprite();
+    const width = DAGGER_LENGTH * K.flightScale;
+    const height = DAGGER_WIDTH * K.flightScale;
+    for (const k of state.knives) {
         const y = k.y - K.flightHeight;
         const trail = Math.min(1, k.travelled / 40);
+        const dx = Math.cos(k.angle);
+        const dy = Math.sin(k.angle);
 
         ctx.fillStyle = K.colors.shadow;
         ctx.beginPath();
-        ctx.ellipse(k.x, k.y, K.shadowLength, K.shadowWidth, k.angle, 0, Math.PI * 2);
+        ctx.ellipse(k.x, k.y, K.shadowLength, K.shadowWidth, k.angle, 0, TAU);
         ctx.fill();
-
         drawGlow(ctx, K.colors.glow, k.x, y, K.glowRadius, 0.55);
 
-        ctx.save();
-        ctx.translate(k.x, y);
-        ctx.rotate(k.angle);
-
-        // Riscos de velocidade
+        // Risco de velocidade
         ctx.strokeStyle = K.colors.trail;
-        ctx.lineCap = 'round';
         ctx.lineWidth = 0.8;
-        [-2.2, 0, 2.2].forEach((side, i) => {
-            ctx.globalAlpha = 0.35 * trail;
-            ctx.beginPath();
-            ctx.moveTo(-6 - K.trailLength * (i === 1 ? 1 : 0.7) * trail, side);
-            ctx.lineTo(-6, side);
-            ctx.stroke();
-        });
+        ctx.globalAlpha = 0.35 * trail;
+        ctx.beginPath();
+        ctx.moveTo(k.x - dx * 6, y - dy * 6);
+        ctx.lineTo(k.x - dx * (6 + K.trailLength * trail), y - dy * (6 + K.trailLength * trail));
+        ctx.stroke();
 
         // Cópias apagadas da adaga (rastro)
         for (let g = K.ghostCount; g >= 1; g--) {
-            ctx.save();
             ctx.globalAlpha = 0.28 * (1 - g / (K.ghostCount + 1)) * trail;
-            ctx.translate(-g * K.ghostGap * trail, 0);
-            ctx.scale(K.flightScale, K.flightScale);
-            ctx.translate(-K.shape.centerX, 0);
-            drawDagger(ctx, t);
-            ctx.restore();
+            const back = g * K.ghostGap * trail;
+            stamp(dagger, 0, 0, dagger.width, dagger.height, k.x - dx * back, y - dy * back, k.angle, width, height);
         }
-
         ctx.globalAlpha = 1;
-        ctx.scale(K.flightScale, K.flightScale);
-        ctx.translate(-K.shape.centerX, 0);
-        drawDagger(ctx, t);
-        ctx.restore();
-    });
+        stamp(dagger, 0, 0, dagger.width, dagger.height, k.x, y, k.angle, width, height);
+        resetWorldView();
+    }
 }
 
+// Quadradinhos em vez de círculos: mesma leitura em movimento, bem menos trabalho
 export function renderParticles() {
-    ctx.save();
-    state.particles.forEach(p => {
+    let color = '';
+    for (const p of state.particles) {
         ctx.globalAlpha = p.life / p.maxLife;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    ctx.restore();
+        if (p.color !== color) {
+            color = p.color;
+            ctx.fillStyle = color;
+        }
+        ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+    }
+    ctx.globalAlpha = 1;
 }
