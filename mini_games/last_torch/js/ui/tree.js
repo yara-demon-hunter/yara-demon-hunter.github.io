@@ -5,61 +5,54 @@ import { buyNode, getNextText, getNodeInfo, getNodeState } from '../systems/tree
 
 // --- ÁRVORES (tela) ---
 // Uma fábrica monta cada árvore: skills (tela de status) e relíquias (acampamento). O mapa é montado uma
-// vez: cada nó é um botão posicionado pela grade dos dados e as ligações são um SVG na mesma grade, então
-// nada precisa ser medido. Depois só as classes mudam.
+// vez: cada ramo é um bloco com a própria grade, onde cada nó é um botão posicionado pelos dados e as ligações
+// são um SVG, então nada precisa ser medido. Depois só as classes mudam. Como os blocos são independentes, o
+// CSS decide como eles aparecem (um por vez, em abas, ou todos à vista) e calcula o tamanho da célula.
 const el = (id) => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
 
-// cfg: nodes, branches, layout, mapId, prefix dos ids do painel de detalhe, requiredState (estado do jogo em que
-// dá para comprar), buyLabel (função com o custo), emptyHint
+// cfg: nodes, branches, layout, mapId, railId (abas de ramo; opcional), prefix dos ids do painel de detalhe,
+// requiredState (estado do jogo em que dá para comprar), buyLabel (função com o custo), emptyHint
 function createTreeView(cfg) {
     const { nodes, branches, layout, prefix, requiredState } = cfg;
     const byId = Object.fromEntries(nodes.map(node => [node.id, node]));
     const map = el(cfg.mapId);
+    const rail = cfg.railId ? el(cfg.railId) : null;
     const buttons = new Map();
+    const blocks = new Map();
+    const tabs = new Map();
     const lines = [];
     let selected = null;
+    let activeBranch = Object.keys(branches)[0];
     let built = false;
     const view = { onChange: null };
 
     const detail = (name) => el(`${prefix}${name}`);
 
-    function nodePosition(node) {
-        const { labelWidth, rows, branchGap } = layout;
-        const branchIndex = Object.keys(branches).indexOf(node.branch);
-        return { x: labelWidth + node.x + 0.5, y: branchIndex * (rows + branchGap) + node.y + 0.5 };
-    }
+    const branchNodes = (key) => nodes.filter(node => node.branch === key);
+    const branchRows = (key) => Math.max(...branchNodes(key).map(node => node.y)) + 1;
+    const nodePosition = (node) => ({ x: node.x + 0.5, y: node.y + 0.5 });
 
-    function build() {
-        built = true;
-        const { labelWidth, tiers, rows, branchGap } = layout;
-        const branchKeys = Object.keys(branches);
-        const width = labelWidth + tiers;
-        const height = branchKeys.length * (rows + branchGap) - branchGap;
-        map.style.setProperty('--w', width);
-        map.style.setProperty('--h', height);
-        map.style.setProperty('--label', labelWidth);
-
-        branchKeys.forEach((key, i) => {
-            const b = branches[key];
-            const band = document.createElement('div');
-            band.className = 'tree-band';
-            band.style.setProperty('--tone', b.color);
-            band.style.setProperty('--y', i * (rows + branchGap));
-            band.style.setProperty('--rows', rows);
-            band.innerHTML = '<span class="tree-band-icon"></span><span class="tree-band-name"></span>';
-            band.querySelector('.tree-band-icon').textContent = b.icon;
-            band.querySelector('.tree-band-name').textContent = b.name;
-            map.appendChild(band);
-        });
+    function buildBranch(key) {
+        const b = branches[key];
+        const { tiers } = layout;
+        const rows = branchRows(key);
+        const block = document.createElement('div');
+        block.className = 'tree-branch';
+        block.style.setProperty('--tone', b.color);
+        block.style.setProperty('--branch-rows', rows);
+        block.innerHTML = '<div class="tree-band"><span class="tree-band-icon"></span><span class="tree-band-name"></span></div><div class="tree-grid"></div>';
+        block.querySelector('.tree-band-icon').textContent = b.icon;
+        block.querySelector('.tree-band-name').textContent = b.name;
+        const grid = block.querySelector('.tree-grid');
 
         const svg = document.createElementNS(NS, 'svg');
-        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        svg.setAttribute('viewBox', `0 0 ${tiers} ${rows}`);
         svg.setAttribute('preserveAspectRatio', 'none');
         svg.classList.add('tree-lines');
-        nodes.forEach(node => {
+        branchNodes(key).forEach(node => {
             const to = nodePosition(node);
-            node.requires.forEach(({ id }) => {
+            node.requires.forEach(({ id, lvl }) => {
                 const parent = byId[id];
                 if (!parent) return;
                 const from = nodePosition(parent);
@@ -68,14 +61,13 @@ function createTreeView(cfg) {
                 line.setAttribute('y1', from.y);
                 line.setAttribute('x2', to.x);
                 line.setAttribute('y2', to.y);
-                line.style.setProperty('--tone', branches[node.branch].color);
                 svg.appendChild(line);
-                lines.push({ line, from: parent, to: node, need: node.requires.find(r => r.id === id).lvl });
+                lines.push({ line, from: parent, to: node, need: lvl });
             });
         });
-        map.appendChild(svg);
+        grid.appendChild(svg);
 
-        nodes.forEach(node => {
+        branchNodes(key).forEach(node => {
             const pos = nodePosition(node);
             const info = getNodeInfo(node);
             const button = document.createElement('button');
@@ -84,12 +76,41 @@ function createTreeView(cfg) {
             button.setAttribute('aria-label', info.name);
             button.style.setProperty('--x', pos.x);
             button.style.setProperty('--y', pos.y);
-            button.style.setProperty('--tone', branches[node.branch].color);
             button.innerHTML = '<span class="tnode-icon"></span><i class="tnode-level"></i>';
             button.querySelector('.tnode-icon').textContent = info.icon;
-            map.appendChild(button);
+            grid.appendChild(button);
             buttons.set(node.id, button);
         });
+        map.appendChild(block);
+        blocks.set(key, block);
+    }
+
+    function buildTab(key) {
+        const b = branches[key];
+        const tab = document.createElement('button');
+        tab.className = 'tree-tab';
+        tab.dataset.branch = key;
+        tab.style.setProperty('--tone', b.color);
+        tab.innerHTML = '<span class="tree-band-icon"></span><span class="tree-band-name"></span><i></i>';
+        tab.querySelector('.tree-band-icon').textContent = b.icon;
+        tab.querySelector('.tree-band-name').textContent = b.name;
+        rail.appendChild(tab);
+        tabs.set(key, tab);
+    }
+
+    function build() {
+        built = true;
+        const { labelWidth, tiers, branchGap } = layout;
+        const branchKeys = Object.keys(branches);
+        const rows = branchKeys.map(branchRows);
+        map.style.setProperty('--label', labelWidth);
+        map.style.setProperty('--tiers', tiers);
+        map.style.setProperty('--gap', branchGap);
+        map.style.setProperty('--w', labelWidth + tiers);
+        map.style.setProperty('--rows', Math.max(...rows));
+        map.style.setProperty('--h', rows.reduce((sum, n) => sum + n, 0) + (branchKeys.length - 1) * branchGap);
+        branchKeys.forEach(buildBranch);
+        if (rail) branchKeys.forEach(buildTab);
     }
 
     const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic';
@@ -102,9 +123,17 @@ function createTreeView(cfg) {
     }
 
     // Lista do que falta (e do que já foi cumprido), uma linha por pedido. Vazia se tudo está cumprido.
-    function requirementText(st) {
-        if (st.reached) return '';
-        return st.checks.map(c => `${c.met ? '✔' : '✖'} ${c.label}${c.showCount && !c.met ? ` (${c.have}/${c.need})` : ''}`).join('\n');
+    function renderNote(st) {
+        const note = detail('Note');
+        note.replaceChildren();
+        const add = (met, text) => {
+            const line = document.createElement('span');
+            line.classList.toggle('is-met', met);
+            line.textContent = `${met ? '✔' : '✖'} ${text}`;
+            note.appendChild(line);
+        };
+        if (st.maxed) add(true, 'Complete');
+        else if (!st.reached) st.checks.forEach(c => add(c.met, `${c.label}${c.showCount && !c.met ? ` (${c.have}/${c.need})` : ''}`));
     }
 
     function renderDetail() {
@@ -116,7 +145,7 @@ function createTreeView(cfg) {
             detail('Level').textContent = '';
             detail('Desc').textContent = cfg.emptyHint;
             detail('Next').textContent = '';
-            detail('Note').textContent = '';
+            detail('Note').replaceChildren();
             buy.classList.add('hidden');
             return;
         }
@@ -128,7 +157,7 @@ function createTreeView(cfg) {
         detail('Level').textContent = levelText(node, st);
         detail('Desc').textContent = info.desc;
         detail('Next').textContent = next ? `Next: ${next}` : '';
-        detail('Note').textContent = st.maxed ? '✔ Complete' : requirementText(st);
+        renderNote(st);
         buy.classList.toggle('hidden', st.maxed);
         buy.disabled = !st.canBuy;
         const symbol = st.currency === 'gold' ? '🪙' : '⚡';
@@ -137,9 +166,19 @@ function createTreeView(cfg) {
         buy.classList.toggle('is-short', st.open && !st.canBuy);
     }
 
+    function renderBranches() {
+        blocks.forEach((block, key) => block.classList.toggle('is-active', key === activeBranch));
+        tabs.forEach((tab, key) => {
+            const ready = branchNodes(key).filter(node => getNodeState(node).canBuy).length;
+            tab.classList.toggle('is-on', key === activeBranch);
+            tab.querySelector('i').textContent = ready || '';
+        });
+    }
+
     // Atualiza o visual de cada nó e das ligações
     view.render = function render() {
         if (!built) build();
+        renderBranches();
         nodes.forEach(node => {
             const st = getNodeState(node);
             const button = buttons.get(node.id);
@@ -162,9 +201,16 @@ function createTreeView(cfg) {
 
     view.select = function select(id) {
         selected = id;
+        activeBranch = byId[id].branch;
         view.render();
-        buttons.get(id)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     };
+
+    // Trocar de ramo já mostra algo dele no detalhe: o que dá para comprar ou, senão, a raiz
+    function showBranch(key) {
+        if (key === activeBranch) return;
+        const members = branchNodes(key);
+        view.select((members.find(node => getNodeState(node).canBuy) ?? members[0]).id);
+    }
 
     // Ao abrir: já mostra o primeiro nó que dá para comprar, se houver
     view.open = function open() {
@@ -172,8 +218,8 @@ function createTreeView(cfg) {
         const ready = nodes.find(node => getNodeState(node).canBuy);
         const keep = selected && getNodeState(byId[selected]).canBuy;
         selected = keep ? selected : ready?.id ?? selected;
+        if (selected) activeBranch = byId[selected].branch;
         view.render();
-        if (selected) buttons.get(selected)?.scrollIntoView({ block: 'center', inline: 'center' });
     };
 
     view.buySelected = function buySelected() {
@@ -189,6 +235,10 @@ function createTreeView(cfg) {
             const button = e.target.closest('button[data-node]');
             if (button) view.select(button.dataset.node);
         });
+        rail?.addEventListener('click', (e) => {
+            const tab = e.target.closest('button[data-branch]');
+            if (tab) showBranch(tab.dataset.branch);
+        });
         detail('Buy').addEventListener('click', view.buySelected);
     };
 
@@ -198,7 +248,7 @@ function createTreeView(cfg) {
 // Skills: pontos, tela de status
 export const skillTree = createTreeView({
     nodes: TREE_NODES, branches: TREE_BRANCHES, layout: TREE_LAYOUT,
-    mapId: 'treeMap', prefix: 'td', requiredState: 'PAUSED',
+    mapId: 'treeMap', railId: 'treeRail', prefix: 'td', requiredState: 'PAUSED',
     emptyIcon: '🌳', emptyTitle: 'Skill tree',
     emptyHint: 'Tap a node to see what it does. Glowing nodes can be learned now.'
 });

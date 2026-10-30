@@ -17,6 +17,7 @@ button {
     line-height: inherit;
     background: transparent;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 button:disabled { cursor: default; }
 .hidden { display: none !important; }

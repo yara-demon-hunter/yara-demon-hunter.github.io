@@ -18,8 +18,7 @@ export const TREE_POINTS = {
 export const TREE_LAYOUT = {
     labelWidth: 1.5,            // coluna do nome do ramo, em células
     tiers: 6,
-    rows: 3,
-    branchGap: 0.45
+    branchGap: 0.3
 };
 
 export const TREE_BRANCHES = {

@@ -5,7 +5,7 @@ import { buyMetaUpgrade, chooseHero, closeHearth, openHearth, setHearthTab } fro
 import { beginDeath } from '../systems/night.js';
 import { lockLandscape } from './orientation.js';
 import { changeDarkness, keepHunting, returnToMenu, shareResult, startGame } from './screens.js';
-import { openStatus, resumeGame, setStatusTab, toggleSetting } from './status.js';
+import { openStatus, resumeGame, setStatusTab, showBuildNote, toggleSetting } from './status.js';
 import { skillTree } from './tree.js';
 
 // --- EVENTOS DA INTERFACE (BOTOES) ---
@@ -86,6 +86,10 @@ export function setupButtons() {
     document.getElementById('statusTabs').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-status-tab]');
         if (button) setStatusTab(button.dataset.statusTab);
+    });
+    document.getElementById('tabBuild').addEventListener('click', (e) => {
+        const row = e.target.closest('[data-note]');
+        if (row) showBuildNote(row);
     });
 
     document.querySelectorAll('[data-setting]').forEach(button => {

@@ -37,8 +37,8 @@ css/
   components/camp.css             acampamento
   components/summary.css          tela de fim da noite
   components/hearth.css           Hearth: melhorias, heróis e Trials
-  components/shop.css             tela de status (pausa, abas)
-  components/tree.css             mapa da árvore de skills
+  components/shop.css             tela de status (pausa, abas, build em colunas)
+  components/tree.css             árvores: cada ramo é um bloco; abas em tela pequena, 2 x 2 em tela grande, célula calculada para caber sem rolar
   components/joystick.css         controles de toque: joystick, adaga e dash
   components/start-screen.css     tela inicial
   components/orientation.css      aviso de virar o aparelho de lado (celular em pé)
@@ -110,7 +110,7 @@ js/
   render/fx/                      glow, carimbos (stamp), sprites pequenos, atlas de números, anéis, relógio do desenho, easing, barra de vida
   ui/hud.js                       atualização do HUD
   ui/banner.js                    faixas, gritos e notificações
-  ui/tree.js                      desenho das árvores (mapa de nós e ligações) e painel de detalhe; uma fábrica monta a de skills e a de relíquias
+  ui/tree.js                      desenho das árvores (ramos, nós, ligações e abas de ramo) e painel de detalhe; uma fábrica monta a de skills e a de relíquias
   ui/camp.js                      acampamento: árvore de relíquias, tocha e descanso
   ui/status.js                    tela de status: abas Skill Tree, Build e Options
   ui/hearth.js                    Hearth

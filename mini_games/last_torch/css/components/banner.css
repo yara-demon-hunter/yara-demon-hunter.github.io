@@ -80,6 +80,8 @@
     transform: translateX(-50%);
     pointer-events: none;
 }
+/* Acampamento: sobem para a linha do título, para não cobrir o botão de compra */
+body:has(#campScreen:not(.hidden)) #toasts { top: 0.3rem; bottom: auto; flex-direction: row; }
 .toast {
     display: flex;
     align-items: center;

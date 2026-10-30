@@ -8,8 +8,7 @@ import { req } from './tree.js';
 export const RELIC_LAYOUT = {
     labelWidth: 1.5,
     tiers: 4,
-    rows: 2,
-    branchGap: 0.45
+    branchGap: 0.15
 };
 
 export const RELIC_BRANCHES = {

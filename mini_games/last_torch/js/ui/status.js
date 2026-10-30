@@ -35,6 +35,7 @@ function renderStats() {
         const item = document.createElement('div');
         item.className = 'shop-row';
         item.title = attr.desc;
+        item.dataset.note = `${attr.name}: ${attr.desc}`;
         item.innerHTML = `
             <span class="shop-row-name"><span>${attr.icon}</span><span>${attr.name}</span><em>Lv. ${attr.lvl}</em></span>
             <b class="shop-row-value">${getStatText(key)}</b>
@@ -43,6 +44,7 @@ function renderStats() {
     });
     const crit = document.createElement('div');
     crit.className = 'shop-row';
+    crit.dataset.note = 'Crit Chance: how often a hit lands as a critical.';
     crit.innerHTML = `<span class="shop-row-name"><span>🎲</span><span>Crit Chance</span></span><b class="shop-row-value">${Math.round(getCritChance() * 100)}%</b>`;
     list.appendChild(crit);
 }
@@ -59,12 +61,23 @@ function renderBuildList(id, items, emptyText) {
     items.forEach(({ icon, name, desc, level }) => {
         const item = document.createElement('div');
         item.className = 'build-row';
-        item.innerHTML = '<span class="build-row-icon"></span><div><b></b><span></span></div>';
+        item.dataset.note = `${name}: ${desc}`;
+        item.innerHTML = '<span class="build-row-icon"></span><div><b></b><span></span></div><em></em>';
         item.querySelector('.build-row-icon').textContent = icon;
-        item.querySelector('b').textContent = level ? `${name} · Lv. ${level}` : name;
+        item.querySelector('b').textContent = name;
         item.querySelector('b + span').textContent = desc;
+        item.querySelector('em').textContent = level ? `Lv. ${level}` : '';
         list.appendChild(item);
     });
+}
+
+// Celular: as linhas mostram só o nome; a descrição aparece aqui ao tocar
+const BUILD_NOTE_HINT = 'Tap anything to read what it does.';
+
+export function showBuildNote(row) {
+    document.querySelectorAll('#tabBuild .is-selected').forEach(r => r.classList.remove('is-selected'));
+    row?.classList.add('is-selected');
+    document.getElementById('buildNote').textContent = row?.dataset.note ?? BUILD_NOTE_HINT;
 }
 
 function renderSettings() {
@@ -103,7 +116,8 @@ export function openStatus() {
     if (state.gameState !== 'PLAYING') return;
     state.gameState = 'PAUSED';
     document.getElementById('statusLevel').innerText = `LEVEL ${state.playerLevel}`;
-    document.getElementById('statusHour').innerText = `Hour ${state.turn} · ${getHourName(state.turn)} · ${getHero().name}`;
+    document.getElementById('statusHour').innerText = `Hour ${state.turn} · ${getHourName(state.turn)}`;
+    document.getElementById('statusHero').innerText = ` · ${getHero().name}`;
     renderHeader();
     renderStats();
     const skills = Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0)
@@ -117,6 +131,7 @@ export function openStatus() {
     renderBuildList('passiveList', Object.values(passives).filter(p => p.type !== 'skill' && p.lvl > 0).map(p => ({
         icon: p.icon, name: p.name, desc: p.desc, level: 0
     })), 'No relics yet. Buy them at the camp, between hours.');
+    showBuildNote(null);
     renderSettings();
     document.getElementById('shopScreen').classList.remove('hidden');
     showTab(currentTab);

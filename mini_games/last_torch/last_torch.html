@@ -151,50 +151,53 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
             <div class="camp-gold">🪙 <b id="campCoins">0</b></div>
         </header>
-        <div class="camp-body custom-scroll">
-            <section class="camp-relics tree-view">
+        <!-- Árvore à esquerda; relíquia escolhida, fogueira e saída à direita (mesma ideia no celular e no desktop) -->
+        <div class="camp-body tree-view">
+            <section class="camp-relics">
                 <div class="camp-section-title"><span>RELIC TREE</span><span class="camp-hint">gold buys relics</span></div>
-                <div class="tree-scroll custom-scroll"><div id="relicMap" class="tree-map"></div></div>
+                <div class="tree-area"><div id="relicMap" class="tree-map"></div></div>
+            </section>
+            <div class="camp-side custom-scroll">
                 <div class="tree-detail">
-                    <span id="rdIcon" class="tdetail-icon"></span>
-                    <div class="tdetail-text">
-                        <b><span id="rdName"></span> <em id="rdLevel"></em></b>
+                    <div class="tdetail-head">
+                        <span id="rdIcon" class="tdetail-icon"></span>
+                        <b class="tdetail-name"><span id="rdName"></span><em id="rdLevel"></em></b>
+                    </div>
+                    <div class="tdetail-text custom-scroll">
                         <span id="rdDesc"></span>
                         <span id="rdNext" class="tdetail-next"></span>
                         <span id="rdNote" class="tdetail-note"></span>
                     </div>
                     <button id="rdBuy" class="tdetail-buy tdetail-gold">BUY</button>
                 </div>
-            </section>
-            <section class="camp-fire">
-                <div class="camp-section-title"><span>AT THE FIRE</span></div>
-                <div class="camp-service">
-                    <span class="camp-service-icon">🔥</span>
-                    <div class="camp-service-info">
-                        <b>Feed the Torch</b>
-                        <div class="hud-bar"><div id="campTorchBar" class="hud-fill" style="background: linear-gradient(90deg, #e11d48, #fb923c);"></div></div>
-                        <em id="campTorchText">100/100</em>
+                <section class="camp-fire">
+                    <div class="camp-section-title"><span>AT THE FIRE</span></div>
+                    <div class="camp-service">
+                        <span class="camp-service-icon">🔥</span>
+                        <div class="camp-service-info">
+                            <b>Feed the Torch <em id="campTorchText">100/100</em></b>
+                            <div class="hud-bar"><div id="campTorchBar" class="hud-fill" style="background: linear-gradient(90deg, #e11d48, #fb923c);"></div></div>
+                        </div>
+                        <button id="btnFuel" class="shop-row-btn">+30</button>
                     </div>
-                    <button id="btnFuel" class="shop-row-btn">+30</button>
-                </div>
-                <div class="camp-service">
-                    <span class="camp-service-icon">🍖</span>
-                    <div class="camp-service-info">
-                        <b>Rest</b>
-                        <div class="hud-bar"><div id="campHeroBar" class="hud-fill" style="background: linear-gradient(90deg, #10b981, #2dd4bf);"></div></div>
-                        <em id="campHeroText">100/100</em>
+                    <div class="camp-service">
+                        <span class="camp-service-icon">🍖</span>
+                        <div class="camp-service-info">
+                            <b>Rest <em id="campHeroText">100/100</em></b>
+                            <div class="hud-bar"><div id="campHeroBar" class="hud-fill" style="background: linear-gradient(90deg, #10b981, #2dd4bf);"></div></div>
+                        </div>
+                        <button id="btnRest" class="shop-row-btn">+50%</button>
                     </div>
-                    <button id="btnRest" class="shop-row-btn">+50%</button>
-                </div>
-            </section>
-        </div>
-        <footer class="camp-foot">
-            <div class="camp-next">
-                <b id="campNextHour">HOUR 2 · First Dark</b>
-                <span id="campNextThreat">The night is quiet.</span>
+                </section>
+                <footer class="camp-foot">
+                    <div class="camp-next">
+                        <b id="campNextHour">HOUR 2 · First Dark</b>
+                        <span id="campNextThreat">The night is quiet.</span>
+                    </div>
+                    <button id="btnCampLeave" class="start-btn">INTO THE DARK ▶</button>
+                </footer>
             </div>
-            <button id="btnCampLeave" class="start-btn">INTO THE DARK ▶</button>
-        </footer>
+        </div>
     </div>
 </div>
 
@@ -204,26 +207,28 @@ permalink: /mini_games/last_torch/last_torch.html
         <div class="status-head">
             <div>
                 <h2 class="status-title">🛡️ HERO STATUS</h2>
-                <p id="statusHour">Hour 1</p>
+                <p class="status-sub"><span id="statusHour">Hour 1</span><span id="statusHero"></span></p>
+            </div>
+            <div id="statusTabs">
+                <button data-status-tab="tree">SKILL TREE</button>
+                <button data-status-tab="build">BUILD</button>
+                <button data-status-tab="options">OPTIONS</button>
             </div>
             <div class="points-chip" title="Skill points">⚡ <b id="statusPoints">0</b></div>
             <div class="camp-gold">🪙 <b id="shopCoinsText">0</b></div>
             <button id="btnCloseShop" class="hearth-close" aria-label="Close">✕</button>
         </div>
 
-        <div id="statusTabs">
-            <button data-status-tab="tree">SKILL TREE</button>
-            <button data-status-tab="build">BUILD</button>
-            <button data-status-tab="options">OPTIONS</button>
-        </div>
-
-        <!-- ÁRVORE -->
-        <div id="tabTree" class="status-tab tree-view">
-            <div class="tree-scroll custom-scroll"><div id="treeMap" class="tree-map"></div></div>
+        <!-- ÁRVORE: abas de ramo (só em tela pequena), mapa e detalhe do nó escolhido, lado a lado -->
+        <div id="tabTree" class="status-tab tree-view tree-tabs">
+            <div id="treeRail" class="tree-rail"></div>
+            <div class="tree-area"><div id="treeMap" class="tree-map"></div></div>
             <div class="tree-detail">
-                <span id="tdIcon" class="tdetail-icon"></span>
-                <div class="tdetail-text">
-                    <b><span id="tdName"></span> <em id="tdLevel"></em></b>
+                <div class="tdetail-head">
+                    <span id="tdIcon" class="tdetail-icon"></span>
+                    <b class="tdetail-name"><span id="tdName"></span><em id="tdLevel"></em></b>
+                </div>
+                <div class="tdetail-text custom-scroll">
                     <span id="tdDesc"></span>
                     <span id="tdNext" class="tdetail-next"></span>
                     <span id="tdNote" class="tdetail-note"></span>
@@ -233,24 +238,26 @@ permalink: /mini_games/last_torch/last_torch.html
         </div>
 
         <!-- BUILD: poderes, relíquias e stats -->
-        <div id="tabBuild" class="status-tab status-body custom-scroll hidden">
-            <section class="shop-panel shop-panel-amber">
+        <div id="tabBuild" class="status-tab hidden">
+            <section class="shop-panel shop-panel-amber custom-scroll">
                 <div class="shop-panel-title"><span>✨ POWERS</span></div>
                 <div id="powerList" class="build-list"></div>
             </section>
 
-            <section class="shop-panel shop-panel-violet">
+            <section class="shop-panel shop-panel-violet custom-scroll">
                 <div class="shop-panel-title"><span>🌀 RELICS</span></div>
                 <div id="passiveList" class="build-list"></div>
             </section>
 
-            <section class="shop-panel">
+            <section class="shop-panel custom-scroll">
                 <div class="shop-panel-title">
                     <span>📊 STATS</span>
                     <span id="statusLevel">LEVEL 1</span>
                 </div>
                 <div id="shopList" class="stat-list"></div>
             </section>
+            <!-- No celular as descrições somem das linhas: tocar numa linha mostra a dela aqui -->
+            <p id="buildNote"></p>
         </div>
 
         <!-- OPÇÕES -->
@@ -319,14 +326,14 @@ permalink: /mini_games/last_torch/last_torch.html
                 <p class="screen-eyebrow">WHAT THE FIRE REMEMBERS</p>
                 <h2 class="screen-title">THE HEARTH</h2>
             </div>
+            <div id="hearthTabs">
+                <button data-tab="upgrades">UPGRADES</button>
+                <button data-tab="heroes">HEROES</button>
+                <button data-tab="trials">TRIALS</button>
+            </div>
             <div class="camp-gold">🔥 <b id="hearthEmbers">0</b></div>
             <button id="btnCloseHearth" class="hearth-close" aria-label="Close">✕</button>
         </header>
-        <div id="hearthTabs">
-            <button data-tab="upgrades">UPGRADES</button>
-            <button data-tab="heroes">HEROES</button>
-            <button data-tab="trials">TRIALS</button>
-        </div>
         <div id="hearthList" class="custom-scroll"></div>
     </div>
 </div>
