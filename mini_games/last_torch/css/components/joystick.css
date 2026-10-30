@@ -1,13 +1,25 @@
 /* --- CONTROLES DE TOQUE: só aparecem em telas de toque, abaixo dos menus (z-20+) ---
-   Joystick no canto inferior esquerdo (movimento) e botão da adaga no direito (arremesso). */
+   Joystick no canto inferior esquerdo (movimento) e botão da adaga no direito (arremesso).
+   Os dois usam as mesmas medidas (variáveis abaixo): mesmo tamanho, mesma altura e mesma
+   distância da borda, então ficam sempre alinhados. */
+:root {
+    --touch-size: 7rem;                                  /* diâmetro dos dois controles */
+    --touch-knob: 3.3rem;                                /* bolinha de dentro */
+    --touch-icon: 1.6rem;                                /* emoji da adaga */
+    --touch-ring: 7px;                                   /* anel de recarga, fora do botão da adaga */
+    --touch-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    --touch-left: max(1.25rem, env(safe-area-inset-left));
+    --touch-right: max(1.25rem, env(safe-area-inset-right));
+}
+
 #joystick {
     display: none;
     position: absolute;
     z-index: 15;
-    left: max(1.25rem, env(safe-area-inset-left));
-    bottom: max(1.5rem, env(safe-area-inset-bottom));
-    width: 7.5rem;
-    height: 7.5rem;
+    left: var(--touch-left);
+    bottom: var(--touch-bottom);
+    width: var(--touch-size);
+    height: var(--touch-size);
     border: 2px solid rgba(34, 211, 238, 0.35);
     border-radius: 50%;
     background: rgba(15, 23, 42, 0.35);
@@ -15,12 +27,19 @@
     user-select: none;
     -webkit-user-select: none;
 }
+/* Área de toque um pouco maior que o círculo desenhado: o polegar pega o joystick mesmo sem olhar */
+#joystick::after {
+    content: '';
+    position: absolute;
+    inset: -0.9rem;
+    border-radius: 50%;
+}
 #joystickKnob {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 3.25rem;
-    height: 3.25rem;
+    width: var(--touch-knob);
+    height: var(--touch-knob);
     border: 2px solid rgba(34, 211, 238, 0.7);
     border-radius: 50%;
     background: rgba(34, 211, 238, 0.35);
@@ -34,10 +53,10 @@
     display: none;
     position: absolute;
     z-index: 15;
-    right: max(1.25rem, env(safe-area-inset-right));
-    bottom: max(1.5rem, env(safe-area-inset-bottom));
-    width: 6.5rem;
-    height: 6.5rem;
+    right: var(--touch-right);
+    bottom: var(--touch-bottom);
+    width: var(--touch-size);
+    height: var(--touch-size);
     border: 2px solid rgba(103, 232, 249, 0.4);
     border-radius: 50%;
     background: rgba(15, 23, 42, 0.35);
@@ -50,7 +69,7 @@
 #knifeButton::before {
     content: '';
     position: absolute;
-    inset: -7px;
+    inset: calc(-1 * var(--touch-ring));
     border-radius: 50%;
     background: conic-gradient(rgba(103, 232, 249, 0.6) calc((1 - var(--cd)) * 360deg), rgba(15, 23, 42, 0.4) 0);
     -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
@@ -65,12 +84,12 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 3.4rem;
-    height: 3.4rem;
+    width: var(--touch-knob);
+    height: var(--touch-knob);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
+    font-size: var(--touch-icon);
     border: 2px solid rgba(103, 232, 249, 0.7);
     border-radius: 50%;
     background: rgba(34, 211, 238, 0.3);
@@ -82,21 +101,17 @@
     #joystick, #knifeButton { display: block; }
 }
 
-/* Celular deitado (pouca altura): controles menores e um pouco mais altos, para o polegar ter
-   espaço de puxar o joystick para baixo sem bater na borda (e na barra de gestos do celular) */
+/* Celular deitado (pouca altura): controles pequenos e bem acima da borda de baixo, na altura
+   natural do polegar. Assim sobra espaço para puxar o joystick para baixo sem bater na borda
+   (nem na barra de gestos do celular). O % do bottom é da altura da tela. */
 @media (pointer: coarse) and (max-height: 520px) and (orientation: landscape) {
-    #joystick {
-        width: 4.1rem;
-        height: 4.1rem;
-        left: max(2rem, env(safe-area-inset-left));
-        bottom: max(4.25rem, env(safe-area-inset-bottom));
+    :root {
+        --touch-size: 3.5rem;
+        --touch-knob: 1.75rem;
+        --touch-icon: 0.95rem;
+        --touch-ring: 5px;
+        --touch-bottom: max(24%, calc(env(safe-area-inset-bottom) + 3rem));
+        --touch-left: max(3rem, calc(env(safe-area-inset-left) + 1.25rem));
+        --touch-right: max(3rem, calc(env(safe-area-inset-right) + 1.25rem));
     }
-    #joystickKnob { width: 2rem; height: 2rem; }
-    #knifeButton {
-        width: 4.0rem;
-        height: 4.0rem;
-        right: max(2rem, env(safe-area-inset-right));
-        bottom: max(2.25rem, env(safe-area-inset-bottom));
-    }
-    #knifeButtonKnob { width: 2.1rem; height: 2.1rem; font-size: 1rem; }
 }

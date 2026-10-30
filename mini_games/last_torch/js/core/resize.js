@@ -30,9 +30,16 @@ function computeWorldSize(cssWidth, cssHeight) {
 }
 
 // --- RESIZE ---
+// Usa o tamanho que o canvas ocupa de fato na página (o CSS o estica na tela toda). Ao girar o
+// celular ou entrar em tela cheia, window.innerWidth/innerHeight às vezes ainda trazem o tamanho
+// antigo no evento 'resize', e o jogo ficava desenhado deslocado até o próximo evento.
 export function resize() {
-    const cssWidth = window.innerWidth;
-    const cssHeight = window.innerHeight;
+    const cssWidth = canvas.clientWidth || window.innerWidth;
+    const cssHeight = canvas.clientHeight || window.innerHeight;
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
+    const { view } = state;
+    // Nada mudou (o ResizeObserver e o 'resize' da janela costumam avisar juntos)
+    if (cssWidth === view.cssWidth && cssHeight === view.cssHeight && pixelRatio === view.pixelRatio) return;
     const world = computeWorldSize(cssWidth, cssHeight);
 
     // Guarda o centro antigo para manter tudo na mesma posição relativa à tocha
@@ -44,7 +51,6 @@ export function resize() {
 
     // Mundo inteiro visível, centralizado (sobram faixas só se a proporção passar do limite)
     const scale = Math.min(cssWidth / world.width, cssHeight / world.height);
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
     state.view = {
         scale,
         offsetX: (cssWidth - world.width * scale) / 2,
@@ -57,8 +63,6 @@ export function resize() {
 
     canvas.width = Math.round(cssWidth * pixelRatio);
     canvas.height = Math.round(cssHeight * pixelRatio);
-    canvas.style.width = `${cssWidth}px`;
-    canvas.style.height = `${cssHeight}px`;
     ctx.setTransform(
         pixelRatio * scale, 0, 0, pixelRatio * scale,
         pixelRatio * state.view.offsetX, pixelRatio * state.view.offsetY
@@ -83,4 +87,13 @@ export function resize() {
         player.targetX += dx;
         player.targetY += dy;
     }
+}
+
+// Recalcula sempre que o canvas muda de tamanho: girar o celular, tela cheia, barra do navegador.
+// O ResizeObserver só avisa depois que a página terminou de se ajustar, já com o tamanho certo;
+// o 'resize' da janela fica de reserva.
+export function setupResize() {
+    resize();
+    if (window.ResizeObserver) new ResizeObserver(() => resize()).observe(canvas);
+    window.addEventListener('resize', resize);
 }

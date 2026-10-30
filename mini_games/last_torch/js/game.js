@@ -2,7 +2,7 @@
 // Ponto de entrada: importa os motores e roda o game loop.
 // Dados (balanceamento) ficam em ../data_model/; o estado da partida em ./core/state.js.
 import { setupInput } from './core/input.js';
-import { resize } from './core/resize.js';
+import { setupResize } from './core/resize.js';
 import { state } from './core/state.js';
 import { render } from './render/renderer.js';
 import { updateAutoAttack } from './systems/combat.js';
@@ -70,8 +70,7 @@ function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 }
 
-window.addEventListener('resize', resize);
-resize();
+setupResize();
 setupInput();
 setupButtons();
 requestAnimationFrame(gameLoop);
