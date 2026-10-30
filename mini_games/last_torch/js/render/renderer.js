@@ -1,6 +1,6 @@
 import { WORLD } from '../../data_model/world.js';
 import { canvas, ctx, state } from '../core/state.js';
-import { renderAttackRange, renderCore } from './arena.js';
+import { renderAttackRange, renderCore, renderCoreHpBar } from './arena.js';
 import {
     renderBladeSlashes,
     renderEnemies,
@@ -86,6 +86,7 @@ export function render() {
     renderParticles();
     renderFireflies();
     renderFogAndVignette();
+    renderCoreHpBar();
     renderLevelUpFront();
     renderLetterboxFade();
 

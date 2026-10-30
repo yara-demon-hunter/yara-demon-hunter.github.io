@@ -20,8 +20,20 @@ export const TORCH_VISUALS = {
     flameColors: ['rgba(234, 88, 12, 0.85)', 'rgba(251, 146, 60, 0.85)', 'rgba(253, 224, 71, 0.9)'],
     flameCoreColor: '#fff7ed',
     flameGlowColor: 'rgba(251, 146, 60, 0.9)',
-    flameMinScale: 0.45,           // tamanho da chama com a vida zerada
+    flameMinScale: 0.1,            // tamanho da chama com a vida zerada: quase apagada
+    flameSmoothing: 5,             // suavidade ao encolher após um golpe (maior = mais rápido)
     tongues: 6,
     embers: 8,
-    emberColor: '#fdba74'
+    emberColor: '#fdba74',
+
+    // Barrinha de vida em cima da fogueira
+    hpBar: {
+        width: 58,
+        height: 6,
+        offsetY: 58,               // distância do centro da fogueira até a barra
+        back: 'rgba(15, 23, 42, 0.85)',
+        fillLeft: '#e11d48',
+        fillRight: '#fb923c',
+        border: 'rgba(253, 186, 116, 0.6)'
+    }
 };

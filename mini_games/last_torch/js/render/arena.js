@@ -10,10 +10,25 @@ import { drawGlow } from './fx/glow.js';
 // (o chão/fundo fica em forest.js)
 // Tocha (Center Tower) vista de cima: base de pedra, chama que tremula e brasas.
 // A chama encolhe conforme o núcleo perde vida.
+let shownHpRatio = 1;
+let lastFlameTime = 0;
+
+function getCoreHpRatio() {
+    return Math.max(0, Math.min(1, state.coreHp / state.coreHpMax));
+}
+
+// A chama não salta de tamanho: desce suave até a vida atual
+function updateShownHpRatio(now) {
+    const dt = Math.min(0.1, lastFlameTime ? now - lastFlameTime : 0);
+    lastFlameTime = now;
+    shownHpRatio += (getCoreHpRatio() - shownHpRatio) * Math.min(1, dt * T.flameSmoothing);
+    return shownHpRatio;
+}
+
 export function renderCore() {
     const { coreX: x, coreY: y } = state;
     const t = performance.now() / 1000;
-    const hpRatio = Math.max(0, Math.min(1, state.coreHp / state.coreHpMax));
+    const hpRatio = updateShownHpRatio(t);
     const scale = T.flameMinScale + (1 - T.flameMinScale) * hpRatio;
     const flicker = 1 + Math.sin(t * 17) * 0.08 + Math.sin(t * 31) * 0.06;
 
@@ -59,6 +74,24 @@ export function renderCore() {
         ctx.fill();
     }
     ctx.restore();
+}
+
+// Barrinha de vida em cima da fogueira. Fica acima da névoa para ser vista mesmo com pouca luz
+export function renderCoreHpBar() {
+    const B = T.hpBar;
+    const x = state.coreX - B.width / 2;
+    const y = state.coreY - B.offsetY;
+    const fill = ctx.createLinearGradient(x, 0, x + B.width, 0);
+    fill.addColorStop(0, B.fillLeft);
+    fill.addColorStop(1, B.fillRight);
+
+    ctx.fillStyle = B.back;
+    ctx.fillRect(x, y, B.width, B.height);
+    ctx.fillStyle = fill;
+    ctx.fillRect(x, y, B.width * getCoreHpRatio(), B.height);
+    ctx.strokeStyle = B.border;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, B.width, B.height);
 }
 
 // Círculo vermelho tracejado de alcance em volta de (x, y); alpha < 1 deixa mais apagado

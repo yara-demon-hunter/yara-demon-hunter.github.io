@@ -59,10 +59,7 @@ export function pulseSkillPoints() {
 
 // --- HUD ---
 export function updateHUD() {
-    const { coreHp, coreHpMax, playerLevel, playerXp, playerMaxXp, ultEnergy, currentBoss } = state;
-
-    document.getElementById('hpText').innerText = `${Math.ceil(coreHp)}/${coreHpMax}`;
-    document.getElementById('hpBar').style.width = `${Math.max(0, (coreHp / coreHpMax) * 100)}%`;
+    const { playerLevel, playerXp, playerMaxXp, ultEnergy, currentBoss } = state;
 
     document.getElementById('playerHpText').innerText = `${Math.ceil(player.hp)}/${player.maxHp}`;
     document.getElementById('playerHpBar').style.width = `${Math.max(0, (player.hp / player.maxHp) * 100)}%`;

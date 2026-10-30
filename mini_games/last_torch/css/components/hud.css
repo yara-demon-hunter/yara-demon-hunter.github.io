@@ -1,6 +1,6 @@
 /* --- HUD ---
    Tudo no topo; a base da tela fica livre.
-   [ Demon Hunter card: health, level/XP, Fury, gold/skills ]  [ Tocha + turno + chefão ]  [ botões ]
+   [ Demon Hunter card: health, level/XP, Fury, gold/skills ]  [ Turno + chefão ]  [ botões ]
    Os painéis não bloqueiam toques no jogo (só os botões). */
 #hud {
     padding-top: max(0.5rem, env(safe-area-inset-top));
@@ -41,7 +41,6 @@
 }
 .hud-bar-thin { height: 0.32rem; }
 .hud-fill { height: 100%; transition: width 0.2s; }
-.hud-bar-rose { border-color: rgba(159, 18, 57, 0.7); }
 .hud-bar-green { border-color: rgba(6, 95, 70, 0.8); }
 .hud-bar-amber { border-color: rgba(120, 53, 15, 0.9); }
 .hud-bar-red { border-color: rgba(220, 38, 38, 0.8); }
@@ -118,7 +117,7 @@
     50% { box-shadow: 0 0 18px rgba(249, 115, 22, 0.9), 0 4px 14px rgba(0, 0, 0, 0.35); }
 }
 
-/* --- Tocha + turno + chefão --- */
+/* --- Turno + chefão --- */
 #hudWorld {
     display: flex;
     flex-direction: column;
@@ -167,7 +166,7 @@
     .hud-btn { font-size: 0.9rem; padding: 0.5rem 0.8rem; }
 }
 
-/* --- Celular em pé (< 640px): cartão do herói à esquerda, tocha/turno ao centro, botões só com ícone --- */
+/* --- Celular em pé (< 640px): cartão do herói à esquerda, turno ao centro, botões só com ícone --- */
 @media (max-width: 639px) {
     .hud-btn-text { display: none; }
     .hud-btn { padding: 0.45rem 0.5rem; }
