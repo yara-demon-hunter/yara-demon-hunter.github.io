@@ -3,7 +3,7 @@ import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { HERO_VISUALS } from '../../data_model/visuals/characters/hero_visual.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
-import { ctx, player, shadowClone, state } from '../core/state.js';
+import { ctx, maxUltEnergy, player, shadowClone, state } from '../core/state.js';
 import { getAtkRadius } from '../systems/stats.js';
 import { drawGlow } from './fx/glow.js';
 import { drawHpBar } from './fx/hp_bar.js';
@@ -78,10 +78,19 @@ export function renderCore() {
     ctx.restore();
 }
 
-// Barrinhas de vida da fogueira e do herói. Ficam acima da névoa para serem vistas mesmo com pouca luz
+function renderFuryBar() {
+    const { ultEnergy, frenzyActiveTimer, frenzyDuration } = state;
+    const active = frenzyActiveTimer > 0;
+    const ratio = active ? frenzyActiveTimer / Math.max(0.01, frenzyDuration) : ultEnergy / maxUltEnergy;
+    if (ratio <= 0) return;
+    drawHpBar(ctx, active ? HERO_VISUALS.furyBarActive : HERO_VISUALS.furyBar, player.x, player.y, Math.min(1, ratio));
+}
+
+// Barrinhas da fogueira e do herói (vida e Fúria). Ficam acima da névoa para serem vistas mesmo com pouca luz
 export function renderHpBars() {
     drawHpBar(ctx, T.hpBar, state.coreX, state.coreY, getCoreHpRatio());
     drawHpBar(ctx, HERO_VISUALS.hpBar, player.x, player.y, Math.max(0, Math.min(1, player.hp / player.maxHp)));
+    renderFuryBar();
 }
 
 // Círculo vermelho tracejado de alcance em volta de (x, y); alpha < 1 deixa mais apagado

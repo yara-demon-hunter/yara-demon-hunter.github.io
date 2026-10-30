@@ -21,25 +21,25 @@ permalink: /mini_games/last_torch/last_torch.html
 <div id="hud" class="absolute inset-0 z-10 pointer-events-none">
     <div id="hudTop">
 
-        <!-- DEMON HUNTER card: portrait, level, XP, Fury and gold (a vida fica em cima do herói, no canvas) -->
+        <!-- DEMON HUNTER card: name, portrait, level, XP and gold (vida e Fúria ficam em cima do herói, no canvas) -->
         <div id="heroCard" class="hud-panel" style="--tone: #6ee7b7;">
             <div id="heroPortrait" role="img" aria-label="Demon Hunter"></div>
             <div id="heroStats">
-                <!-- Level e XP em texto simples -->
-                <div id="xpRow"><span id="levelText">LV 1</span><span id="xpText">0/100 XP</span></div>
-                <!-- Fury: charges on hits; when full it fires on its own and lasts a few seconds -->
-                <div id="furyRow">
-                    <span id="furyLabel">🔥 FURY</span>
-                    <div class="hud-bar hud-bar-fury"><div id="ultBar" class="hud-fill" style="width: 0%"></div></div>
-                    <span id="ultText">0%</span>
-                </div>
-                <!-- Gold and skill points -->
-                <div id="heroChips">
-                    <span title="Gold: dropped by monsters, spent on passive skills in the shop">🪙 <b id="coinsText">0</b></span>
-                    <span title="Skill points: +1 per hero level, spent on any stat in the shop">⚡ <b id="skillPointsHud">0</b></span>
+                <div id="heroName"><span>DEMON HUNTER</span><span id="levelText">LV 1</span></div>
+                <div id="xpTrack" class="hud-bar"><div id="xpBar" class="hud-fill" style="width: 0%"></div></div>
+                <div id="xpRow">
+                    <!-- Gold and skill points -->
+                    <div id="heroChips">
+                        <span>🪙 <b id="coinsText">0</b></span>
+                        <span>⚡ <b id="skillPointsHud">0</b></span>
+                    </div>
+                    <span id="xpText">0/100 XP</span>
                 </div>
             </div>
         </div>
+
+        <!-- Medalhão de status: abre stats e passivas; alerta em vermelho quando há algo para melhorar -->
+        <button id="btnPause" class="status-btn" title="Hero status" aria-label="Hero status and upgrades"><span id="statusBadge" class="hud-badge"></span></button>
 
         <!-- Turn and boss (a vida da tocha fica em cima da fogueira, no canvas) -->
         <div id="hudWorld" class="hud-panel" style="--tone: #fdba74;">
@@ -56,7 +56,6 @@ permalink: /mini_games/last_torch/last_torch.html
 
         <!-- Buttons -->
         <div id="hudButtons">
-            <button id="btnPause" class="hud-btn hud-btn-shop" aria-label="Shop"><span>🛒</span><span class="hud-btn-text">SHOP</span></button>
             <button id="btnSound" class="hud-btn" aria-label="Sound">🔊</button>
         </div>
     </div>
@@ -74,7 +73,7 @@ permalink: /mini_games/last_torch/last_torch.html
 
         <ul class="start-tips">
             <li><span>🔥</span><p><b>Guard the torch.</b> Its light holds back the fog. As it burns down, the light shrinks and the dark closes in.</p></li>
-            <li><span>⚔️</span><p><b>Hunt what comes.</b> Your blade strikes on its own. Widen the slash in the shop, up to a full 180° sweep.</p></li>
+            <li><span>⚔️</span><p><b>Hunt what comes.</b> Your blade strikes on its own. Widen the slash in the status screen, up to a full 180° sweep.</p></li>
             <li><span>🪙</span><p><b>Gold &amp; skills.</b> Every level grants a ⚡ skill point to raise any stat. Monsters drop gold for passive powers.</p></li>
             <li><span>☠️</span><p><b>Bosses &amp; shooters.</b> Some things in the fog hit back from afar.</p></li>
         </ul>
@@ -105,7 +104,7 @@ permalink: /mini_games/last_torch/last_torch.html
         <div class="flex justify-between items-center pb-3 border-b border-slate-800">
             <div>
                 <h2 class="text-xl sm:text-2xl font-bold text-amber-400 flex items-center gap-2">
-                    <span>🛒</span> SHOP & UPGRADES
+                    <span>🛡️</span> HERO STATUS
                 </h2>
                 <p class="text-xs text-slate-400">⚡ Skill points raise stats. 🪙 Gold buys passive skills.</p>
             </div>

@@ -1,31 +1,16 @@
-import { KNIFE_SKILL } from '../../data_model/skills.js';
-import { maxUltEnergy, state } from '../core/state.js';
+import { KNIFE_SKILL, STAT_UPGRADE_COST } from '../../data_model/skills.js';
+import { attributes, passives, state } from '../core/state.js';
 
-// --- BARRA DE FÚRIA ---
-// Carregando: enche conforme os golpes acertam (mostra %). Ativa: esvazia mostrando os segundos restantes.
-// Só escreve no DOM quando o texto muda (é chamada a cada quadro).
-const furyShown = { width: '', text: '', label: '', active: false };
+// --- FÚRIA NO CARTÃO DO HERÓI ---
+// A carga fica no filete embaixo da vida do herói (js/render/arena.js); aqui só o cartão pulsa enquanto ela dura.
+// Só escreve no DOM quando muda (é chamada a cada quadro).
+let furyCardActive = false;
 
-function setIfChanged(key, value, apply) {
-    if (furyShown[key] !== value) {
-        furyShown[key] = value;
-        apply(value);
-    }
-}
-
-export function updateFuryBar() {
-    const { ultEnergy, frenzyActiveTimer, frenzyDuration } = state;
-    const active = frenzyActiveTimer > 0;
-
-    const ratio = active ? frenzyActiveTimer / Math.max(0.01, frenzyDuration) : ultEnergy / maxUltEnergy;
-    setIfChanged('width', `${Math.max(0, Math.min(100, ratio * 100)).toFixed(1)}%`,
-        v => { document.getElementById('ultBar').style.width = v; });
-    setIfChanged('text', active ? `${frenzyActiveTimer.toFixed(1)}s` : `${Math.floor(ultEnergy)}%`,
-        v => { document.getElementById('ultText').innerText = v; });
-    setIfChanged('label', active ? '🔥 ACTIVE!' : '🔥 FURY',
-        v => { document.getElementById('furyLabel').innerText = v; });
-    setIfChanged('active', active,
-        v => { document.getElementById('heroCard').classList.toggle('fury-active', v); });
+export function updateFuryCard() {
+    const active = state.frenzyActiveTimer > 0;
+    if (furyCardActive === active) return;
+    furyCardActive = active;
+    document.getElementById('heroCard').classList.toggle('fury-active', active);
 }
 
 // --- BOTÃO DA ADAGA (telas de toque) ---
@@ -57,14 +42,26 @@ export function pulseSkillPoints() {
     chip.classList.add('sp-gain');
 }
 
+// --- MEDALHÃO DE STATUS ---
+// Alerta em vermelho quando há algo para melhorar: pontos de skill (selo com a quantidade) ou ouro para uma passiva (!).
+function updateStatusButton() {
+    const canUpgrade = state.skillPoints >= STAT_UPGRADE_COST && Object.values(attributes).some(a => a.lvl < a.maxLvl);
+    const canBuy = Object.values(passives).some(sk => sk.lvl < sk.maxLvl && state.coins >= sk.cost);
+
+    const button = document.getElementById('btnPause');
+    button.classList.toggle('can-upgrade', canUpgrade || canBuy);
+    document.getElementById('statusBadge').innerText = canUpgrade ? `+${state.skillPoints}` : canBuy ? '!' : '';
+}
+
 // --- HUD ---
 export function updateHUD() {
     const { playerLevel, playerXp, playerMaxXp, ultEnergy, currentBoss } = state;
 
     document.getElementById('levelText').innerText = `LV ${playerLevel}`;
     document.getElementById('xpText').innerText = `${playerXp}/${playerMaxXp} XP`;
+    document.getElementById('xpBar').style.width = `${Math.min(100, (playerXp / playerMaxXp) * 100)}%`;
 
-    updateFuryBar();
+    updateFuryCard();
     document.getElementById('skillPointsHud').innerText = state.skillPoints;
 
     document.getElementById('turnLabel').innerText = `TURN ${state.turn}`;
@@ -72,6 +69,7 @@ export function updateHUD() {
     document.getElementById('scoreBar').style.width = `${Math.min(100, (state.scoreTurn / state.targetScore) * 100)}%`;
 
     document.getElementById('coinsText').innerText = state.coins;
+    updateStatusButton();
 
     // Boss HUD
     if (currentBoss) {

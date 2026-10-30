@@ -1,6 +1,17 @@
 // --- DADOS VISUAIS: Herói (Caçador das Sombras). Referência: art_reference/hero. ---
 // Cores, tamanhos e ritmos de animação lidos pelos renderizadores em js/render/.
 
+// Filete da Fúria, colado embaixo da barrinha de vida (mesma largura)
+const FURY_BAR = {
+    width: 44,
+    height: 3,
+    offsetY: 48,
+    back: 'rgba(15, 23, 42, 0.85)',
+    fillLeft: '#a855f7',
+    fillRight: '#f472b6',
+    border: 'rgba(216, 180, 254, 0.45)'
+};
+
 export const HERO_VISUALS = {
     // Barrinha de vida em cima da cabeça
     hpBar: {
@@ -12,6 +23,10 @@ export const HERO_VISUALS = {
         fillRight: '#2dd4bf',
         border: 'rgba(167, 243, 208, 0.5)'
     },
+    // Carregando: enche conforme os golpes acertam. Ativa: esvazia até a Fúria acabar, em tons quentes.
+    // Sem carga nenhuma o filete nem aparece.
+    furyBar: FURY_BAR,
+    furyBarActive: { ...FURY_BAR, fillLeft: '#dc2626', fillRight: '#fde047', border: 'rgba(253, 186, 116, 0.7)' },
 
     // Escala visual do desenho (não altera o raio de colisão em CHARACTER_MODEL)
     scale: 1.70,

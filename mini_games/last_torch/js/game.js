@@ -14,7 +14,7 @@ import { updateShadowClone } from './systems/shadow_clone.js';
 import { updateGold } from './systems/gold.js';
 import { updateSpawner } from './systems/spawner.js';
 import { setupButtons } from './ui/buttons.js';
-import { updateFuryBar, updateKnifeButton } from './ui/hud.js';
+import { updateFuryCard, updateKnifeButton } from './ui/hud.js';
 import { isPhonePortrait } from './ui/orientation.js';
 
 const MIN_FRAME_MS = 12;
@@ -48,7 +48,7 @@ function update(dt) {
     if (state.gameState === 'GAMEOVER') return;
 
     updateGold(dt);
-    updateFuryBar();
+    updateFuryCard();
     updateKnifeButton();
     updateEffects(dt);
 }

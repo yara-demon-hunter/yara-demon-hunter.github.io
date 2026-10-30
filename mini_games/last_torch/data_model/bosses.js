@@ -23,8 +23,8 @@ export const BOSS_MODELS = {
         projectileRadius: 7,          // bola de fogo (raio de acerto)
         projectileDamageMultiplier: 0.8,
         // Tremor de tela enquanto anda: um a cada walkShakeIntervalSeconds, não o tempo todo
-        walkShakeIntensity: 5,
-        walkShakeIntervalSeconds: 2.2,
+        walkShakeIntensity: 8,
+        walkShakeIntervalSeconds: 4.5,
         scoreReward: 250,
         goldBase: 45,
         goldVariance: 0,
@@ -34,7 +34,7 @@ export const BOSS_MODELS = {
 };
 
 export const BOSS_SPAWNING = {
-    everyTurns: 3,
+    everyTurns: 4,
     maximumEnemiesBeforeBoss: 3,
     spawnScreenRatio: 0.5,
     // Ordem em que os bosses aparecem (repete do início quando acaba)
