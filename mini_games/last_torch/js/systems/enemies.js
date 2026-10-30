@@ -16,6 +16,16 @@ import { resetFieldForNewTurn } from './spawner.js';
 // Modelo de dados do inimigo (monstro comum ou boss)
 const getEnemyModel = type => MONSTER_MODELS[type] || BOSS_MODELS[type];
 
+// Segundos até o próximo tiro. Bosses atiram em rajada: burstCount tiros com burstIntervalSeconds
+// entre eles, e depois param por shootCooldownSeconds. Quem não tem burstCount (bruxa) só espera o cooldown.
+function nextShootDelay(e, model) {
+    if (!model.burstCount) return model.shootCooldownSeconds;
+    e.burstShotsLeft = (e.burstShotsLeft ?? model.burstCount) - 1;
+    if (e.burstShotsLeft > 0) return model.burstIntervalSeconds;
+    e.burstShotsLeft = model.burstCount;
+    return model.shootCooldownSeconds;
+}
+
 // --- INIMIGOS ---
 export function updateEnemies(dt) {
     const { enemies } = state;
@@ -36,12 +46,22 @@ export function updateEnemies(dt) {
         e.x += Math.cos(toTargetAngle) * e.speed * dt;
         e.y += Math.sin(toTargetAngle) * e.speed * dt;
 
+        // Boss andando: o chão treme de tempos em tempos (não a cada passo)
+        if (e.isBoss) {
+            const model = getEnemyModel(e.type);
+            e.walkShakeTimer = (e.walkShakeTimer ?? model.walkShakeIntervalSeconds) - dt;
+            if (e.walkShakeTimer <= 0) {
+                e.walkShakeTimer = model.walkShakeIntervalSeconds;
+                shakeScreen(model.walkShakeIntensity);
+            }
+        }
+
         // Atiradores: bruxa e bosses
         if (e.type === 'WITCH' || e.isBoss) {
             e.shootTimer -= dt;
             if (e.shootTimer <= 0) {
                 const model = getEnemyModel(e.type);
-                e.shootTimer = model.shootCooldownSeconds;
+                e.shootTimer = nextShootDelay(e, model);
                 state.enemyProjectiles.push({
                     owner: e.type,          // quem atirou (só muda o desenho do projétil)
                     x: e.x, y: e.y,

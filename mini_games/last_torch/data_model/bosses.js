@@ -8,16 +8,23 @@ export const BOSS_MODELS = {
         name: 'Demon Lord',
         hpBase: 500,
         hpPerTurn: 150,
-        speedMin: 35,
-        speedMax: 35,
+        speedMin: 28,
+        speedMax: 28,
         radius: 32,
         color: '#dc2626',
         damage: 30,
-        shootCooldownSeconds: 1,
+        // Ataque em rajada: burstCount bolas de fogo seguidas (burstIntervalSeconds entre elas) e depois
+        // uma pausa de shootCooldownSeconds sem atirar
+        burstCount: 3,
+        burstIntervalSeconds: 0.55,
+        shootCooldownSeconds: 3.5,
         initialShootCooldownSeconds: 1.5,
         projectileSpeed: 160,
         projectileRadius: 7,          // bola de fogo (raio de acerto)
         projectileDamageMultiplier: 0.8,
+        // Tremor de tela enquanto anda: um a cada walkShakeIntervalSeconds, não o tempo todo
+        walkShakeIntensity: 5,
+        walkShakeIntervalSeconds: 2.2,
         scoreReward: 250,
         goldBase: 45,
         goldVariance: 0,
