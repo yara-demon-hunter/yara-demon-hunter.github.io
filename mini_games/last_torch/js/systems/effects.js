@@ -1,3 +1,4 @@
+import { LEVEL_UP_VISUALS } from '../../data_model/visuals/effects/level_up_visual.js';
 import { player, state } from '../core/state.js';
 
 // --- EFEITOS VISUAIS (Partículas e Screen Shake) ---
@@ -43,6 +44,12 @@ export function updateEffects(dt) {
         const s = state.bladeSlashes[i];
         s.life -= dt;
         if (s.life <= 0) state.bladeSlashes.splice(i, 1);
+    }
+
+    // Animação de level up
+    if (state.levelUpFx) {
+        state.levelUpFx.age += dt;
+        if (state.levelUpFx.age >= LEVEL_UP_VISUALS.durationSeconds) state.levelUpFx = null;
     }
 
     // Partículas

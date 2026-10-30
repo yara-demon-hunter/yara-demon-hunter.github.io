@@ -49,6 +49,14 @@ export function updateKnifeButton() {
     }
 }
 
+// Destaca o contador de pontos de skill no cartão do herói (reinicia a animação se já estiver rodando)
+export function pulseSkillPoints() {
+    const chip = document.getElementById('skillPointsHud').parentElement;
+    chip.classList.remove('sp-gain');
+    void chip.offsetWidth;
+    chip.classList.add('sp-gain');
+}
+
 // --- HUD ---
 export function updateHUD() {
     const { coreHp, coreHpMax, playerLevel, playerXp, playerMaxXp, ultEnergy, currentBoss } = state;

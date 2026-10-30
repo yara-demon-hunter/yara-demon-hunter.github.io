@@ -44,6 +44,7 @@ export function startGame() {
     state.knifeInput.stick.fire = false;
     state.goldDrops = [];
     state.currentBoss = null;
+    state.levelUpFx = null;
 
     player.x = state.coreX;
     player.y = state.coreY + CHARACTER_MODEL.initialPositionOffsetY;

@@ -1,7 +1,7 @@
 // --- STATS DO HERÓI ---
 // Comprados com pontos de skill: cada nível de stat custa STAT_UPGRADE_COST pontos.
 // Subir de nível não melhora nada sozinho, só dá pontos para o jogador distribuir.
-export const SKILL_POINTS_PER_LEVEL = 1;
+export const SKILL_POINTS_PER_LEVEL = 3;
 export const STAT_UPGRADE_COST = 1;
 
 export const UPGRADE_MODELS = {

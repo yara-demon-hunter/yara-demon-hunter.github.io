@@ -97,6 +97,15 @@
 #heroChips span:nth-child(1) { color: #fcd34d; }
 #heroChips span:nth-child(2) { color: #c4b5fd; }
 
+/* Level up: o contador de pontos de skill pulsa de leve */
+#heroChips span.sp-gain {
+    display: inline-block;
+    animation: spGain 0.5s ease-in-out 2;
+}
+@keyframes spGain {
+    50% { transform: scale(1.2); color: #e9d5ff; text-shadow: 0 0 8px #a855f7; }
+}
+
 /* Fúria ativa: cartão quente, pulsando; barra esvazia com o tempo */
 #heroCard.fury-active {
     border-color: rgba(251, 146, 60, 0.9);

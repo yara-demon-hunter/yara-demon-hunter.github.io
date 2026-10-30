@@ -11,6 +11,7 @@ import {
     renderGoldDrops
 } from './entities.js';
 import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestGround, renderTorchLight } from './forest.js';
+import { renderLevelUpBack, renderLevelUpFront } from './level_up.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 import { renderPlayer25D } from './player25d.js';
 import { renderReflectWard } from './reflect.js';
@@ -78,12 +79,14 @@ export function render() {
     renderKnives();
     renderPlayerTrail();
     renderShadowClone();
+    renderLevelUpBack();
     if (HERO_25D) renderPlayer25D();
     else renderPlayer();
     renderReflectWard();
     renderParticles();
     renderFireflies();
     renderFogAndVignette();
+    renderLevelUpFront();
     renderLetterboxFade();
 
     ctx.restore();

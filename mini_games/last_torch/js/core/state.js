@@ -85,6 +85,9 @@ export const state = {
     goldDrops: [],
     currentBoss: null,
 
+    // Animação de level up em andamento: { age, points } ou null
+    levelUpFx: null,
+
     // Adaga de arremesso: mira em coordenadas do mundo, se o botão/dedo está pressionado, recarga,
     // instante e direção do último arremesso (animação) e segundos até a adaga sair da mão (null = nenhuma)
     // stick: botão da adaga em telas de toque (x, y de -1 a 1; 0,0 = mira automática; aimAngle = mira atual;

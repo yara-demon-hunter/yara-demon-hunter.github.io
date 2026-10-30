@@ -117,6 +117,25 @@ export class SoundEngine {
         });
     }
 
+    // Level up: duas notas suaves subindo
+    playLevelUp() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        [392, 587.33].forEach((freq, i) => {
+            const start = now + i * 0.1;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(0.09, start);
+            gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(start);
+            osc.stop(start + 0.35);
+        });
+    }
+
     playXp() {
         if (!this.ctx || this.muted) return;
         const osc = this.ctx.createOscillator();
