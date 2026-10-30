@@ -84,6 +84,24 @@ function fillAirWave(radius, half, thickness, color, alpha) {
     ctx.stroke();
 }
 
+// Rastro de riscos entre a lâmina e a onda: um risco a cada trailSpacing px do caminho já
+// percorrido, então alcances grandes ganham mais riscos e o corte parece contínuo
+function strokeWaveTrail(startRadius, frontRadius, half, color, alpha) {
+    const W = SLASH_VISUALS.wave;
+    const count = Math.min(W.trailMaxLines, Math.floor((frontRadius - startRadius) / W.trailSpacing));
+    ctx.strokeStyle = color;
+    for (let i = 1; i <= count; i++) {
+        const k = i / (count + 1);                 // 0 = colado na onda, 1 = perto da lâmina
+        const r = frontRadius - (frontRadius - startRadius) * k;
+        const span = half * (0.8 - k * 0.3);       // riscos mais curtos perto da lâmina
+        ctx.globalAlpha = alpha * W.trailAlpha * (1 - k);
+        ctx.lineWidth = Math.max(1, W.trailWidth * (1 - k * 0.5));
+        ctx.beginPath();
+        ctx.arc(0, 0, r, -span, span);
+        ctx.stroke();
+    }
+}
+
 export function renderBladeSlashes() {
     const frenzyActive = state.frenzyActiveTimer > 0;
 
@@ -110,8 +128,11 @@ export function renderBladeSlashes() {
         // Onda de ar viajando da lâmina até o círculo (o giro já tem a onda de choque)
         if (!look.spin) {
             const W = SLASH_VISUALS.wave;
-            const travel = s.radius * (W.startRatio + (1 - W.startRatio) * progress);
-            fillAirWave(travel, half, width * W.thicknessScale, color, Math.sqrt(1 - progress));
+            const startRadius = s.radius * W.startRatio;
+            const travel = startRadius + (s.radius - startRadius) * progress;
+            const waveAlpha = Math.sqrt(1 - progress);
+            strokeWaveTrail(startRadius, travel, half, color, waveAlpha);
+            fillAirWave(travel, half, width * W.thicknessScale, color, waveAlpha);
         }
 
         for (let l = 0; l < look.lines; l++) {
