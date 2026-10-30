@@ -5,7 +5,7 @@
 Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o herói vivo e a tocha acesa.
 
 - **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 1 ponto de skill. O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos (Blade, Shadow, Flame, Curse) com stats, poderes, efeitos, evoluções e skills passivas (Shadow Clone, Fan of Knives, Long Throw, Mirror Ward, Shadow Whirl). Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
-- **Uma hora (~45 s):** fechada a cota de pontos, uma onda de fogo sai da tocha, o ouro do chão voa até o herói e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha. As horas 4, 8 e 12 têm boss.
+- **Uma hora (~45 s):** fechada a cota de pontos (ou morto o boss), para de nascer monstro e o jogador mata o que sobrou. Com a tela limpa, uma onda de fogo sai da tocha, o ouro do chão voa até o herói, sobra um tempo curto para pegar os itens e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha. As horas 4, 8 e 12 têm boss.
 - **Entre partidas:** a árvore recomeça a cada noite e está toda aberta desde a primeira partida. Cada nó pede só o que aparece na árvore: nível mínimo de outras skills e, em alguns, quantos monstros de um tipo você matou na partida inteira, somando todas as horas (por exemplo, 10 Witches). A contagem só zera ao começar uma partida nova. O painel do nó mostra a lista inteira de pedidos de uma vez. O que persiste entre noites são as brasas (melhorias do Hearth), os Trials (heróis e brasas) e os recordes. Vencer abre a noite sem fim e os níveis de Escuridão.
 
 Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
@@ -77,7 +77,7 @@ js/
   core/input.js                   mouse, toque e teclado
   systems/modifiers.js            soma os bônus de herói, Hearth, relíquias, poderes, presságios e Escuridão (mod('chave'))
   systems/stats.js                fórmulas de atributos (dano, alcance, cooldown...)
-  systems/night.js                fases da hora: caçada, onda de fogo, amanhecer, morte
+  systems/night.js                fases da hora: caçada, últimos monstros, onda de fogo, amanhecer, morte
   systems/spawner.js              aparição de monstros, hordas, elites e bosses
   systems/enemies.js              IA, colisões, mortes/recompensas e projéteis inimigos
   systems/boss_ai.js              ataques dos bosses e avisos no chão

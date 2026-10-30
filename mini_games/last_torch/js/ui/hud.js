@@ -200,7 +200,7 @@ function writeHud() {
 
     const hour = state.turn;
     setText(ui.turn, `HOUR ${hour}`);
-    setText(ui.hourName, getHourName(hour));
+    setText(ui.hourName, state.lastStand ? `${state.enemies.length} LEFT` : getHourName(hour));
     setBar(ui.scoreBar, state.hourPlan?.boss ? 1 : state.scoreTurn / Math.max(1, state.targetScore));
     updateNightPips();
 

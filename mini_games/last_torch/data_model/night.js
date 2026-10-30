@@ -3,7 +3,9 @@
 // o boss dela) e termina no acampamento. Sobreviver à última hora traz o amanhecer (vitória).
 export const NIGHT = {
     hours: 12,
-    clearSeconds: 1.9,          // onda de fogo + ouro voando até o herói, antes do acampamento
+    lastStandSeconds: 25,       // cota fechada: tempo para matar os monstros que sobraram; depois a onda de fogo apaga o resto
+    clearSeconds: 4,            // tela limpa: tempo máximo para pegar os itens do chão antes do acampamento
+    clearMinSeconds: 1.6,       // sem itens no chão, a transição acaba aqui (a onda e o título precisam desse tempo)
     clearWaveSpeed: 1250,       // velocidade da onda que sai da tocha (unidades por segundo)
     dawnSeconds: 5.5,           // animação do amanhecer antes da tela de vitória
     openingMonsters: 3,         // monstros que já nascem perto no início da hora (a ação começa na hora)

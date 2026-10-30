@@ -138,7 +138,7 @@ export function spawnBoss() {
 }
 
 export function updateSpawner(dt) {
-    if (state.phase !== 'HUNT') return;
+    if (state.phase !== 'HUNT' || state.lastStand) return;
 
     if (state.bossPending > 0) {
         state.bossPending -= dt;

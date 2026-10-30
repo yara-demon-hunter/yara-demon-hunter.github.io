@@ -126,8 +126,8 @@ function updateAttacks(e, model, angle, dt) {
     e.shootTimer -= dt;
     if (e.shootTimer > 0) return;
     e.shootTimer = model.shootCooldownSeconds;
-    if (model.summon) raiseDead(e, model);
-    else shoot(e, model, angle);
+    if (!model.summon) shoot(e, model, angle);
+    else if (!state.lastStand) raiseDead(e, model);
 }
 
 // Inchado: estoura ferindo o herói e os monstros em volta

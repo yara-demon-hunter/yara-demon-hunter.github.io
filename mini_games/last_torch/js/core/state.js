@@ -130,6 +130,7 @@ export const state = {
     pickups: [],
     currentBoss: null,
     goldVacuum: false,          // fim da hora: todas as moedas voam até o herói
+    lastStand: false,           // cota da hora fechada: não nasce mais nada, falta matar o que sobrou
     magnetTimer: 0,             // ímã pego no chão: o mesmo, por alguns segundos
 
     // Efeitos (js/systems/effects.js, desenhados em js/render/effects.js)

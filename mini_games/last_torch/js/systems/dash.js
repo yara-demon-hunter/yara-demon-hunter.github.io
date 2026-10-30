@@ -47,7 +47,7 @@ function isNearMiss() {
 }
 
 export function tryDash() {
-    if (state.gameState !== 'PLAYING' || state.phase !== 'HUNT') return;
+    if (state.gameState !== 'PLAYING' || (state.phase !== 'HUNT' && state.phase !== 'CLEAR')) return;
     if (player.dashCharges <= 0 || player.dashTimer > 0) return;
 
     const dir = getDashDirection();

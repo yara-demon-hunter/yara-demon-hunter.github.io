@@ -14,8 +14,10 @@ import { collectAllPickups } from './pickups.js';
 import { buildHourPlan, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
 // --- A NOITE ---
-// Fases de uma hora: HUNT (caçada) -> CLEAR (onda de fogo, ouro vem todo) -> acampamento -> próxima.
-// Na última hora, matar o boss leva ao amanhecer (DAWN). Morrer leva a DYING -> tela final.
+// Fases de uma hora: HUNT (caçada) -> CLEAR (onda de fogo, ouro vem todo, tempo para pegar os itens) ->
+// acampamento -> próxima. Fechada a cota (ou morto o boss), a HUNT continua em lastStand: nada mais nasce e o
+// jogador mata o que sobrou. Continua sendo HUNT porque os monstros que restam seguem perigosos, e é possível
+// morrer aqui. Na última hora, matar o boss leva ao amanhecer (DAWN). Morrer leva a DYING -> tela final.
 const DEATH_SLOW = 0.28;
 
 export function startHour() {
@@ -28,6 +30,7 @@ export function startHour() {
     refreshModifiers();
     state.hourPlan = buildHourPlan(hour);
     state.goldVacuum = false;
+    state.lastStand = false;
     state.clearWaveRadius = 0;
     resetFieldForNewTurn();
 
@@ -48,12 +51,32 @@ export function startHour() {
 }
 
 export function checkHourEnd() {
-    if (state.phase !== 'HUNT' || state.bossPending > 0 || state.hourPlan.boss) return;
-    if (state.scoreTurn >= state.targetScore) beginClear();
+    if (state.phase !== 'HUNT' || state.lastStand || state.bossPending > 0 || state.hourPlan.boss) return;
+    if (state.scoreTurn >= state.targetScore) beginLastStand();
+}
+
+function beginLastStand() {
+    if (state.enemies.length === 0) {
+        beginClear();
+        return;
+    }
+    state.lastStand = true;
+    state.phaseTimer = NIGHT.lastStandSeconds;
+    // Covas que ainda iam abrir contam como monstros novos
+    state.telegraphs = state.telegraphs.filter(t => t.kind !== 'grave');
+    showBanner('', 'FINISH THEM', 'No more will come', 'warn');
+    updateHUD();
+}
+
+// Checado a cada quadro: o último monstro pode morrer sozinho, consumido pela tocha
+function updateLastStand(dt) {
+    state.phaseTimer -= dt;
+    if (state.enemies.length === 0 || state.phaseTimer <= 0) beginClear();
 }
 
 function beginClear() {
     state.phase = 'CLEAR';
+    state.lastStand = false;
     state.phaseTimer = NIGHT.clearSeconds;
     state.clearWaveRadius = 0;
     state.goldVacuum = true;
@@ -64,11 +87,12 @@ function beginClear() {
     screenFlash('#fed7aa', 0.5);
     zoomPunch(0.03);
     shakeScreen(13);
-    showBanner('', `HOUR ${state.turn} SURVIVED`, '', 'gold');
+    showBanner('', `HOUR ${state.turn} SURVIVED`, state.pickups.length > 0 ? 'Grab what is left' : '', 'gold');
     audio.playHourClear();
+    updateHUD();
 }
 
-// A onda sai da tocha e apaga os monstros que alcança
+// A onda sai da tocha e apaga os monstros que alcança (normalmente só resta quem passou do tempo do lastStand)
 function updateClear(dt) {
     state.clearWaveRadius += NIGHT.clearWaveSpeed * dt;
     const { enemies, coreX, coreY } = state;
@@ -76,7 +100,8 @@ function updateClear(dt) {
         if (Math.hypot(enemies[i].x - coreX, enemies[i].y - coreY) < state.clearWaveRadius) purgeEnemy(i);
     }
     state.phaseTimer -= dt;
-    if (state.phaseTimer <= 0) finishHour();
+    const nothingLeft = state.pickups.length === 0 && state.goldDrops.length === 0;
+    if (state.phaseTimer <= 0 || (nothingLeft && state.phaseTimer <= NIGHT.clearSeconds - NIGHT.clearMinSeconds)) finishHour();
 }
 
 function finishHour() {
@@ -104,8 +129,14 @@ export function onBossKilled(e, model) {
     const key = `boss_${e.type}`;
     save.stats[key] = (save.stats[key] ?? 0) + 1;
 
-    if (state.turn === NIGHT.hours && !state.endless) beginDawn();
-    else beginClear();
+    if (state.turn === NIGHT.hours && !state.endless) {
+        beginDawn();
+        return;
+    }
+    // Os ataques do boss morrem com ele; os monstros que ele trouxe, não
+    state.enemyProjectiles.length = 0;
+    state.telegraphs.length = 0;
+    beginLastStand();
 }
 
 // --- AMANHECER ---
@@ -176,7 +207,8 @@ function updateDeath(dt) {
 }
 
 export function updateNight(dt) {
-    if (state.phase === 'CLEAR') updateClear(dt);
+    if (state.lastStand && state.phase === 'HUNT') updateLastStand(dt);
+    else if (state.phase === 'CLEAR') updateClear(dt);
     else if (state.phase === 'DAWN') updateDawn(dt);
     else if (state.phase === 'DYING') updateDeath(dt);
 }
