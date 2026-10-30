@@ -1,10 +1,12 @@
 import { CORE_MODEL } from '../../data_model/core.js';
 import { SHADOW_CLONE } from '../../data_model/passives.js';
+import { HERO_VISUALS } from '../../data_model/visuals/characters/hero_visual.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
 import { ctx, player, shadowClone, state } from '../core/state.js';
 import { getAtkRadius } from '../systems/stats.js';
 import { drawGlow } from './fx/glow.js';
+import { drawHpBar } from './fx/hp_bar.js';
 
 // --- ARENA: Núcleo e Raio de Alcance ---
 // (o chão/fundo fica em forest.js)
@@ -76,22 +78,10 @@ export function renderCore() {
     ctx.restore();
 }
 
-// Barrinha de vida em cima da fogueira. Fica acima da névoa para ser vista mesmo com pouca luz
-export function renderCoreHpBar() {
-    const B = T.hpBar;
-    const x = state.coreX - B.width / 2;
-    const y = state.coreY - B.offsetY;
-    const fill = ctx.createLinearGradient(x, 0, x + B.width, 0);
-    fill.addColorStop(0, B.fillLeft);
-    fill.addColorStop(1, B.fillRight);
-
-    ctx.fillStyle = B.back;
-    ctx.fillRect(x, y, B.width, B.height);
-    ctx.fillStyle = fill;
-    ctx.fillRect(x, y, B.width * getCoreHpRatio(), B.height);
-    ctx.strokeStyle = B.border;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x, y, B.width, B.height);
+// Barrinhas de vida da fogueira e do herói. Ficam acima da névoa para serem vistas mesmo com pouca luz
+export function renderHpBars() {
+    drawHpBar(ctx, T.hpBar, state.coreX, state.coreY, getCoreHpRatio());
+    drawHpBar(ctx, HERO_VISUALS.hpBar, player.x, player.y, Math.max(0, Math.min(1, player.hp / player.maxHp)));
 }
 
 // Círculo vermelho tracejado de alcance em volta de (x, y); alpha < 1 deixa mais apagado

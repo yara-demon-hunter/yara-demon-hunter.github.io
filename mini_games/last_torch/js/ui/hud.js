@@ -1,5 +1,5 @@
 import { KNIFE_SKILL } from '../../data_model/skills.js';
-import { maxUltEnergy, player, state } from '../core/state.js';
+import { maxUltEnergy, state } from '../core/state.js';
 
 // --- BARRA DE FÚRIA ---
 // Carregando: enche conforme os golpes acertam (mostra %). Ativa: esvazia mostrando os segundos restantes.
@@ -60,9 +60,6 @@ export function pulseSkillPoints() {
 // --- HUD ---
 export function updateHUD() {
     const { playerLevel, playerXp, playerMaxXp, ultEnergy, currentBoss } = state;
-
-    document.getElementById('playerHpText').innerText = `${Math.ceil(player.hp)}/${player.maxHp}`;
-    document.getElementById('playerHpBar').style.width = `${Math.max(0, (player.hp / player.maxHp) * 100)}%`;
 
     document.getElementById('levelText').innerText = `LV ${playerLevel}`;
     document.getElementById('xpText').innerText = `${playerXp}/${playerMaxXp} XP`;

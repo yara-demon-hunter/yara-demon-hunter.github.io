@@ -21,24 +21,23 @@ permalink: /mini_games/last_torch/last_torch.html
 <div id="hud" class="absolute inset-0 z-10 pointer-events-none">
     <div id="hudTop">
 
-        <!-- DEMON HUNTER card: level, health, XP, Fury and gold -->
+        <!-- DEMON HUNTER card: portrait, level, XP, Fury and gold (a vida fica em cima do herói, no canvas) -->
         <div id="heroCard" class="hud-panel" style="--tone: #6ee7b7;">
-            <div class="hud-stat">
-                <div class="hud-label"><span>❤️ DEMON HUNTER</span><span id="playerHpText">100/100</span></div>
-                <div class="hud-bar hud-bar-green"><div id="playerHpBar" class="hud-fill" style="background: linear-gradient(90deg, #10b981, #2dd4bf); width: 100%"></div></div>
-            </div>
-            <!-- Level e XP em texto simples -->
-            <div id="xpRow"><span id="levelText">LV 1</span><span id="xpText">0/100 XP</span></div>
-            <!-- Fury: charges on hits; when full it fires on its own and lasts a few seconds -->
-            <div id="furyRow">
-                <span id="furyLabel">🔥 FURY</span>
-                <div class="hud-bar hud-bar-fury"><div id="ultBar" class="hud-fill" style="width: 0%"></div></div>
-                <span id="ultText">0%</span>
-            </div>
-            <!-- Gold and skill points -->
-            <div id="heroChips">
-                <span title="Gold: dropped by monsters, spent on passive skills in the shop">🪙 <b id="coinsText">0</b></span>
-                <span title="Skill points: +1 per hero level, spent on any stat in the shop">⚡ <b id="skillPointsHud">0</b></span>
+            <div id="heroPortrait" role="img" aria-label="Demon Hunter"></div>
+            <div id="heroStats">
+                <!-- Level e XP em texto simples -->
+                <div id="xpRow"><span id="levelText">LV 1</span><span id="xpText">0/100 XP</span></div>
+                <!-- Fury: charges on hits; when full it fires on its own and lasts a few seconds -->
+                <div id="furyRow">
+                    <span id="furyLabel">🔥 FURY</span>
+                    <div class="hud-bar hud-bar-fury"><div id="ultBar" class="hud-fill" style="width: 0%"></div></div>
+                    <span id="ultText">0%</span>
+                </div>
+                <!-- Gold and skill points -->
+                <div id="heroChips">
+                    <span title="Gold: dropped by monsters, spent on passive skills in the shop">🪙 <b id="coinsText">0</b></span>
+                    <span title="Skill points: +1 per hero level, spent on any stat in the shop">⚡ <b id="skillPointsHud">0</b></span>
+                </div>
             </div>
         </div>
 

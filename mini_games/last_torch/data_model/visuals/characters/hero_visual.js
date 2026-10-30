@@ -2,6 +2,17 @@
 // Cores, tamanhos e ritmos de animação lidos pelos renderizadores em js/render/.
 
 export const HERO_VISUALS = {
+    // Barrinha de vida em cima da cabeça
+    hpBar: {
+        width: 44,
+        height: 5,
+        offsetY: 54,
+        back: 'rgba(15, 23, 42, 0.85)',
+        fillLeft: '#10b981',
+        fillRight: '#2dd4bf',
+        border: 'rgba(167, 243, 208, 0.5)'
+    },
+
     // Escala visual do desenho (não altera o raio de colisão em CHARACTER_MODEL)
     scale: 1.70,
 

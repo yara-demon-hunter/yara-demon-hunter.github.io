@@ -20,7 +20,7 @@ export const LEVEL_UP_VISUALS = {
     titleText: 'LEVEL UP',
     titleFont: '800 15px Cinzel, serif',
     pointsFont: '800 10px Inter, sans-serif',
-    textOffsetY: 66,            // distância do herói até o título
+    textOffsetY: 88,            // distância do herói até o título
     pointsGap: 20,              // distância do título até a linha dos pontos
     fadeInSeconds: 1.0,
     riseDistance: 12,           // quanto o texto sobe durante a animação
