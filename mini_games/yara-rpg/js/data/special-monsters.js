@@ -101,6 +101,23 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         evasion: 10,
         xpReward: 280,
         goldReward: 240,
+        challengeRewardRarities: ["legendary", "demon"]
+    },
+    {
+        id: "demon-lord",
+        name: { pt: "Lorde Demônio", en: "Demon Lord" },
+        icon: "😈",
+        image: "images/special_monsters/demon-lord.webp",
+        dialogues: { pt: ["Todos os demônios curvam-se diante de mim.","Sua alma será minha coroa."], en: ["All demons bow before me.","Your soul shall be my crown."] },
+        minLevel: 8,
+        suggestedLevel: 10,
+        hp: 900,
+        atk: 55,
+        def: 28,
+        parry: 40,
+        evasion: 15,
+        xpReward: 450,
+        goldReward: 450,
         challengeRewardRarities: ["demon", "god"]
     },
     {
@@ -111,7 +128,7 @@ window.YaraRpgData.specialMonsters = Object.freeze([
         dialogues: { pt: ["Este reino sempre será meu.","Você chegou longe. Aqui termina sua jornada."], en: ["This kingdom will always be mine.","You came far. Your journey ends here."] },
         minLevel: 8,
         suggestedLevel: 10,
-        hp: 1000,
+        hp: 1300,
         atk: 60,
         def: 25,
         parry: 25,
