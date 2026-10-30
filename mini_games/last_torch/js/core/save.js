@@ -7,9 +7,7 @@ function createSave() {
     return {
         embers: 0,
         upgrades: {},               // melhorias do Hearth: chave -> nível
-        unlockedPowers: [],         // poderes ganhos nos Trials
         unlockedHeroes: ['hunter'],
-        unlockedNodes: [],          // nós da árvore comprados com brasas no Hearth
         achievements: {},           // id do Trial -> true
         hero: 'hunter',
         darkness: 1,                // nível de Escuridão escolhido

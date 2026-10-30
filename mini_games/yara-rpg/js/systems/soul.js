@@ -29,7 +29,6 @@ window.YaraSoul = (() => {
         const soul = value();
         if (requirement.soulMin !== undefined && soul < requirement.soulMin) return false;
         if (requirement.soulMax !== undefined && soul > requirement.soulMax) return false;
-        if (requirement.soulAbsMin !== undefined && Math.abs(soul) < requirement.soulAbsMin) return false;
         if (requirement.potions !== undefined && hero.potions < requirement.potions) return false;
         if (requirement.gold !== undefined && hero.gold < requirement.gold) return false;
         return true;
@@ -125,48 +124,6 @@ window.YaraSoul = (() => {
         logMessage(localized(deal.log), deal.tone || 'special');
     }
 
-    // Contatos da névoa que dependem da alma. Devolve true quando o contato foi resolvido aqui.
-    function resolveContact(contact) {
-        const type = contact.onAccept?.type;
-        if (type === 'soul-judgement') {
-            judge();
-            return true;
-        }
-        if (type === 'soul-cleanse') {
-            const soul = value();
-            const amount = Math.min(RULES.cleanseAmount, Math.abs(soul));
-            shift(soul > 0 ? -amount : amount, contact.name);
-            logMessage(t('soulCleansed'), 'special');
-            return true;
-        }
-        if (type === 'star-chart') {
-            hero.chestChanceBonus = Math.max(hero.chestChanceBonus, EXPLORATION_RULES.map.treasureChanceBonus);
-            logMessage(t('starChartRead', { chance: hero.chestChanceBonus }), 'discovery');
-            return true;
-        }
-        return false;
-    }
-
-    function judge() {
-        const { side } = currentTier();
-        const reward = RULES.judgement[side];
-        if (side === 'dark') {
-            hero.gold += reward.gold;
-            logMessage(t('soulJudgementDark', { gold: reward.gold }), 'loot');
-        } else if (side === 'light') {
-            hero.hp = getEffectiveStat('maxHp');
-            hero.foco = getEffectiveStat('maxFoco');
-            logMessage(t('soulJudgementLight'), 'special');
-        } else {
-            hero.skillPoints = (Number(hero.skillPoints) || 0) + reward.skillPoints;
-            logMessage(t('soulJudgementNeutral', { amount: reward.skillPoints }), 'special');
-        }
-    }
-
-    function contactMessage(contact) {
-        return localized(contact.messageBySide?.[currentTier().side] || contact.message);
-    }
-
     // Frase que o mundo devolve ao herói em uma região, conforme o lado da alma.
     function regionEcho(region) {
         return localized(region?.soulEcho?.[currentTier().side]);
@@ -234,8 +191,8 @@ window.YaraSoul = (() => {
     }
 
     return {
-        statPercent, scaleHealing, scaleGold, scaleXp, meets, shift, decorateChoice, applyDeal, resolveContact,
-        contactMessage, regionEcho, dialogueLines, bossTaunt, ending, render, openDialog, closeDialog,
+        statPercent, scaleHealing, scaleGold, scaleXp, meets, shift, decorateChoice, applyDeal,
+        regionEcho, dialogueLines, bossTaunt, ending, render, openDialog, closeDialog,
         currentTier, localized,
         get shifts() { return RULES.shifts; }
     };

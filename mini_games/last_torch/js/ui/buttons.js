@@ -1,7 +1,7 @@
 import { save } from '../core/save.js';
 import { audio, state } from '../core/state.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
-import { buyMetaUpgrade, buyTreeNode, chooseHero, closeHearth, openHearth, setHearthTab } from './hearth.js';
+import { buyMetaUpgrade, chooseHero, closeHearth, openHearth, setHearthTab } from './hearth.js';
 import { beginDeath } from '../systems/night.js';
 import { lockLandscape } from './orientation.js';
 import { changeDarkness, keepHunting, returnToMenu, shareResult, startGame } from './screens.js';
@@ -75,8 +75,7 @@ export function setupButtons() {
         if (upgrade && !upgrade.disabled) buyMetaUpgrade(upgrade.dataset.upgrade);
         const hero = e.target.closest('button[data-hero]');
         if (hero) chooseHero(hero.dataset.hero);
-        const node = e.target.closest('button[data-unlock]');
-        if (node && !node.disabled) buyTreeNode(node.dataset.unlock);
+
     });
 
     on('btnDarkDown', () => changeDarkness(-1));

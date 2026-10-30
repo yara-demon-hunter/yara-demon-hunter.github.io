@@ -1,7 +1,8 @@
 import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES } from '../../data_model/tree.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { state } from '../core/state.js';
-import { buyNode, getBlockText, getNextText, getNodeInfo, getNodeState } from '../systems/tree.js';
+import { setSkillIcon } from '../render/skill_icons.js';
+import { buyNode, getNextText, getNodeInfo, getNodeState } from '../systems/tree.js';
 
 // --- ÁRVORES (tela) ---
 // Uma fábrica monta cada árvore: skills (tela de status) e relíquias (acampamento). O mapa é montado uma
@@ -59,8 +60,10 @@ function createTreeView(cfg) {
         svg.classList.add('tree-lines');
         nodes.forEach(node => {
             const to = nodePosition(node);
-            node.requires.forEach(id => {
-                const from = nodePosition(byId[id]);
+            node.requires.forEach(({ id }) => {
+                const parent = byId[id];
+                if (!parent) return;
+                const from = nodePosition(parent);
                 const line = document.createElementNS(NS, 'line');
                 line.setAttribute('x1', from.x);
                 line.setAttribute('y1', from.y);
@@ -68,23 +71,22 @@ function createTreeView(cfg) {
                 line.setAttribute('y2', to.y);
                 line.style.setProperty('--tone', branches[node.branch].color);
                 svg.appendChild(line);
-                lines.push({ line, from: byId[id], to: node });
+                lines.push({ line, from: parent, to: node, need: node.requires.find(r => r.id === id).lvl });
             });
         });
         map.appendChild(svg);
 
         nodes.forEach(node => {
             const pos = nodePosition(node);
-            const info = getNodeInfo(node);
             const button = document.createElement('button');
             button.className = `tnode tnode-${node.kind}`;
             button.dataset.node = node.id;
-            button.setAttribute('aria-label', info.name);
+            button.setAttribute('aria-label', getNodeInfo(node).name);
             button.style.setProperty('--x', pos.x);
             button.style.setProperty('--y', pos.y);
             button.style.setProperty('--tone', branches[node.branch].color);
             button.innerHTML = '<span class="tnode-icon"></span><i class="tnode-level"></i>';
-            button.querySelector('.tnode-icon').textContent = info.icon;
+            setSkillIcon(button.querySelector('.tnode-icon'), node.id);
             map.appendChild(button);
             buttons.set(node.id, button);
         });
@@ -97,6 +99,12 @@ function createTreeView(cfg) {
         if (node.kind === 'relic') return st.maxed ? 'OWNED' : 'RELIC';
         if (node.kind === 'passive') return st.maxed ? 'LEARNED' : 'PASSIVE SKILL';
         return `Lv. ${st.level}/${st.max}`;
+    }
+
+    // Lista do que falta (e do que já foi cumprido), uma linha por pedido. Vazia se tudo está cumprido.
+    function requirementText(st) {
+        if (st.reached) return '';
+        return st.checks.map(c => `${c.met ? '✔' : '✖'} ${c.label}${c.showCount && !c.met ? ` (${c.have}/${c.need})` : ''}`).join('\n');
     }
 
     function renderDetail() {
@@ -115,12 +123,12 @@ function createTreeView(cfg) {
         const st = getNodeState(node);
         const info = getNodeInfo(node);
         const next = st.maxed ? '' : getNextText(node);
-        detail('Icon').textContent = info.icon;
+        setSkillIcon(detail('Icon'), node.id);
         detail('Name').textContent = info.name;
         detail('Level').textContent = levelText(node, st);
         detail('Desc').textContent = info.desc;
         detail('Next').textContent = next ? `Next: ${next}` : '';
-        detail('Note').textContent = st.maxed ? '✔ Complete' : getBlockText(node, st);
+        detail('Note').textContent = st.maxed ? '✔ Complete' : requirementText(st);
         buy.classList.toggle('hidden', st.maxed);
         buy.disabled = !st.canBuy;
         const symbol = st.currency === 'gold' ? '🪙' : '⚡';
@@ -139,15 +147,15 @@ function createTreeView(cfg) {
             button.classList.toggle('is-maxed', st.maxed);
             button.classList.toggle('is-ready', st.canBuy);
             button.classList.toggle('is-open', st.open && !st.canBuy);
-            button.classList.toggle('is-locked', !st.unlocked);
             button.classList.toggle('is-selected', node.id === selected);
-            button.querySelector('.tnode-level').textContent = st.unlocked && node.kind !== 'evolve' && !isSingle(node) ? `${st.level}/${st.max}` : '';
+            // Corrente: só quando falta um pré-requisito ou kills (não quando falta só ponto)
+            button.classList.toggle('is-chained', !st.reached && !st.maxed);
+            button.querySelector('.tnode-level').textContent = node.kind !== 'evolve' && !isSingle(node) ? `${st.level}/${st.max}` : '';
         });
-        lines.forEach(({ line, from, to }) => {
-            const fromState = getNodeState(from);
-            const toState = getNodeState(to);
-            line.classList.toggle('is-lit', fromState.level > 0);
-            line.classList.toggle('is-owned', fromState.level > 0 && toState.level > 0);
+        lines.forEach(({ line, from, to, need }) => {
+            const fromLevel = getNodeState(from).level;
+            line.classList.toggle('is-lit', fromLevel >= need);
+            line.classList.toggle('is-owned', fromLevel >= need && getNodeState(to).level > 0);
         });
         renderDetail();
     };

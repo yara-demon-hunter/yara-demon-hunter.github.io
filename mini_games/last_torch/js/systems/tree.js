@@ -1,4 +1,3 @@
-import { ACHIEVEMENTS } from '../../data_model/meta.js';
 import { CAMP } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
 import { RELIC_BY_ID } from '../../data_model/relics.js';
@@ -90,33 +89,27 @@ export function getNextText(node) {
     return `${before} → ${after}`;
 }
 
-function meetsNeed(need) {
-    if (need.power) return powers[need.power].lvl >= need.lvl;
-    return attributes[need.stat].lvl >= need.lvl;
+const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || node.kind === 'evolve';
+
+// Quantos monstros do tipo o jogador já matou nesta partida (todas as horas; zera só ao começar outra)
+function getKillCount(type) {
+    return type === 'ANY' ? state.run.kills : state.run.killsByType[type] ?? 0;
 }
 
-// Poderes de Trial só aparecem depois de ganhos; nós extras, depois de comprados no Hearth
-export function isNodeUnlocked(node) {
-    if (node.lock?.embers) return save.unlockedNodes.includes(node.id);
-    if (node.kind === 'power' || node.kind === 'evolve') {
-        return !POWER_MODELS[node.key].unlock || save.unlockedPowers.includes(node.key);
+// Lista completa do que um nó pede, com o que o jogador já tem: { label, have, need, met }.
+// Fica toda visível de uma vez: quem cumpriu os pedidos do nó anterior nunca esbarra num pedido novo escondido.
+export function getRequirementChecks(node) {
+    const checks = node.requires.map(({ id, lvl }) => {
+        const parent = NODE_BY_ID[id];
+        const name = getNodeInfo(parent).name;
+        const have = getNodeLevel(parent);
+        return { label: isSingle(parent) ? name : `${name} Lv. ${lvl}`, have: Math.min(have, lvl), need: lvl, met: have >= lvl, showCount: lvl > 1 && !isSingle(parent) };
+    });
+    if (node.kills) {
+        const have = getKillCount(node.kills.type);
+        checks.push({ label: `Slay ${node.kills.count} ${node.kills.label}`, have: Math.min(have, node.kills.count), need: node.kills.count, met: have >= node.kills.count, showCount: true });
     }
-    return true;
-}
-
-export function getLockText(node) {
-    if (node.lock?.embers) return `Unlock in the Hearth for ${node.lock.embers} embers`;
-    const trial = ACHIEVEMENTS.find(a => a.reward.power === node.key);
-    return trial ? `Trial: ${trial.name}. ${trial.desc}` : 'Locked';
-}
-
-// Condição extra de uma evolução (poder no máximo e o requisito dele). ok = pode comprar
-function checkEvolution(node) {
-    const power = powers[node.key];
-    if (power.lvl < power.maxLvl) return { ok: false, text: `Max out ${power.name} first` };
-    const evo = EVOLUTIONS[node.key];
-    if (!meetsNeed(evo.need)) return { ok: false, text: `Needs ${evo.needText}` };
-    return { ok: true, text: '' };
+    return checks;
 }
 
 // Estado de um nó, para desenho e compra
@@ -124,27 +117,16 @@ export function getNodeState(node) {
     const level = getNodeLevel(node);
     const max = getNodeMax(node);
     const cost = getNodeCost(node);
-    const unlocked = isNodeUnlocked(node);
-    // O herói que já começa com o poder abre o nó sem passar pelos anteriores
-    const reached = level > 0 || node.requires.every(id => getNodeLevel(NODE_BY_ID[id]) > 0);
-    const extra = node.kind === 'evolve' ? checkEvolution(node) : { ok: true, text: '' };
+    const checks = getRequirementChecks(node);
+    // O herói que já começa com o poder abre o nó sem passar pelos requisitos
+    const reached = level > 0 || checks.every(c => c.met);
     const maxed = level >= max;
-    const open = unlocked && reached && extra.ok && !maxed;
+    const open = reached && !maxed;
     const currency = getNodeCurrency(node);
     const balance = currency === 'gold' ? state.coins : state.skillPoints;
     // Relíquias só se compram no acampamento
     const atCamp = node.kind !== 'relic' || state.gameState === 'CAMP';
-    return { level, max, cost, currency, unlocked, reached, extra, maxed, open, canBuy: open && atCamp && balance >= cost };
-}
-
-// Por que um nó fechado está fechado (vazio se estiver aberto)
-export function getBlockText(node, st = getNodeState(node)) {
-    if (!st.unlocked) return getLockText(node);
-    if (!st.reached) {
-        const missing = node.requires.map(id => NODE_BY_ID[id]).filter(n => getNodeLevel(n) === 0).map(n => getNodeInfo(n).name);
-        return `Learn first: ${missing.join(', ')}`;
-    }
-    return st.extra.text;
+    return { level, max, cost, currency, checks, reached, maxed, open, canBuy: open && atCamp && balance >= cost };
 }
 
 // Algum nó que o jogador pode comprar agora? Faz o medalhão pulsar
@@ -182,17 +164,5 @@ export function buyNode(id) {
     updateHUD();
     if (st.currency === 'gold') audio.playPurchase();
     else audio.playCardPick(node.kind === 'evolve' ? 'evolution' : node.kind === 'power' || node.kind === 'passive' ? 'rare' : 'common');
-    return true;
-}
-
-// Compra de um nó extra no Hearth
-export function unlockNode(id) {
-    const node = NODE_BY_ID[id];
-    const cost = node?.lock?.embers;
-    if (!cost || save.unlockedNodes.includes(id) || save.embers < cost) return false;
-    save.embers -= cost;
-    save.unlockedNodes.push(id);
-    persist();
-    audio.playPurchase();
     return true;
 }

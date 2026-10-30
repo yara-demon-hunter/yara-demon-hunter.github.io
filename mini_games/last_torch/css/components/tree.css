@@ -95,10 +95,8 @@
 }
 .tnode-level:empty { display: none; }
 
-/* Fechado (falta aprender o anterior): apagado */
-.tnode:not(.is-open):not(.is-ready):not(.is-owned):not(.is-maxed) .tnode-icon { opacity: 0.4; filter: grayscale(0.7); }
-/* Aberto, mas faltam pontos */
-.tnode.is-open { border-color: color-mix(in srgb, var(--tone) 65%, #64748b); }
+/* Requisito cumprido, mas faltam pontos: só apagado (sem cadeado) */
+.tnode.is-open:not(.is-owned) .tnode-icon { opacity: 0.42; filter: grayscale(0.7); }
 /* Dá para aprender agora */
 .tnode.is-ready {
     border-color: var(--tone);
@@ -109,14 +107,34 @@
 .tnode.is-owned .tnode-level { color: var(--tone); }
 .tnode.is-maxed { border-color: #fde047; background: rgba(66, 46, 8, 0.8); box-shadow: 0 0 10px rgba(253, 224, 71, 0.4); }
 .tnode.is-maxed .tnode-level { color: #fde047; }
-.tnode.is-locked { border-style: dashed; background: #060a14; }
-.tnode.is-locked .tnode-icon { opacity: 0.3; filter: grayscale(1); }
-.tnode.is-locked::after {
+.tnode.is-chained { border-style: dashed; background: #060a14; }
+.tnode.is-chained .tnode-icon { opacity: 0.5; filter: grayscale(0.8); }
+/* Cadeado com corrente: preso por pré-requisito ou por kills que ainda faltam */
+.tnode.is-chained::before {
+    content: '⛓️';
+    position: absolute;
+    inset: -0.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    opacity: 0.55;
+    font-size: calc(var(--cell) * 0.46);
+    transform: rotate(-25deg);
+    pointer-events: none;
+}
+.tnode.is-chained::after {
     content: '🔒';
     position: absolute;
-    font-size: calc(var(--cell) * 0.3);
+    right: -0.45rem;
+    top: -0.45rem;
+    font-size: calc(var(--cell) * 0.26);
+    line-height: 1;
+    pointer-events: none;
 }
-.tnode-evolve.is-locked::after { transform: rotate(-45deg); }
+.tnode-evolve.is-chained::before, .tnode-evolve.is-chained::after { transform-origin: center; }
 .tnode.is-selected { border-color: #fff; }
 .tnode:not(.tnode-evolve):hover { transform: translate(-50%, -50%) scale(1.07); }
 
@@ -137,7 +155,7 @@
 .tdetail-text span { display: block; color: #94a3b8; font-size: 0.68rem; line-height: 1.3; }
 .tdetail-text .tdetail-next { color: #67e8f9; font-weight: 700; }
 .tdetail-text .tdetail-next:empty, .tdetail-text .tdetail-note:empty { display: none; }
-.tdetail-text .tdetail-note { color: #fca5a5; }
+.tdetail-text .tdetail-note { color: #fca5a5; white-space: pre-line; }
 .tdetail-buy {
     flex-shrink: 0;
     padding: 0.6rem 0.9rem;
@@ -171,3 +189,20 @@
 /* Botão de compra com ouro */
 .tdetail-gold { background: #d97706; }
 .tdetail-gold:hover:not(:disabled) { background: #b45309; }
+
+/* Ícones procedurais: um único atlas (js/render/skill_icons.js) */
+.skill-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-image: var(--skill-atlas);
+    background-size: var(--skill-atlas-size);
+}
+.tnode-icon { display: block; width: 70%; height: 70%; font-size: 0; }
+.tdetail-icon { display: block; width: 2.5rem; height: 2.5rem; }
+.build-row-icon { display: block; flex-shrink: 0; width: 1.8rem; height: 1.8rem; }
+.build-item .skill-icon { width: 86%; height: 86%; }
+#finalBuild span { display: block; width: 1.7rem; height: 1.7rem; }
+@media (max-height: 520px) and (orientation: landscape) {
+    .tdetail-icon { width: 1.7rem; height: 1.7rem; }
+}

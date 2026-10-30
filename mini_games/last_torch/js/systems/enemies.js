@@ -178,6 +178,7 @@ function killEnemy(i, e, model) {
     state.scoreTurn += pts;
     state.totalScore += Math.round(pts * getScoreMultiplier());
     state.run.kills++;
+    state.run.killsByType[e.type] = (state.run.killsByType[e.type] ?? 0) + 1;
 
     // XP é direto; o ouro cai em moedas no chão
     gainXp((model.xpRewardBase + state.turn * model.xpRewardPerTurn) * (e.elite ? 5 : 1) * (1 + mod('xp')));

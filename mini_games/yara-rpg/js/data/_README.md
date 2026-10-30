@@ -6,6 +6,7 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `items.js`: poção de cura e catálogo de equipamentos que podem cair dos monstros.
 - `regions.js`: IDs, títulos, descrições e eventos com escolhas das regiões físicas em português e inglês. Cada região pode ter vários eventos; eles aparecem sem repetição até o conjunto se esgotar.
 - `regions-spirit-world.js`: lista `spiritRegions` com as regiões independentes do Mundo Espiritual. Cada região pode ter `event` para encontros aleatórios e `storySequence` para cenas narrativas apresentadas em ordem fixa. A sequência usa os mesmos campos de título, descrição e escolhas dos eventos, mas é registrada à parte; seu progresso reaproveita o salvamento das cenas vistas.
+- `spiritual-contacts.js`: contatos espirituais placeholder em `spiritualContacts.contacts`, seguindo o agrupamento de `mistContacts.contacts`; não participam do sorteio nem executam efeitos.
 - `monsters.js`: atributos-base dos monstros, agrupados pelo ID da região, e faixa de variação por encontro.
 - `special-monsters.js`: atributos, nível mínimo e recompensas dos chefes e monstros especiais usados em eventos.
 - `mist-contacts.js`: contatos da névoa com ícones, ofertas e efeitos especiais (`onAccept`). Missões podem referenciar monstros por `bossId`.

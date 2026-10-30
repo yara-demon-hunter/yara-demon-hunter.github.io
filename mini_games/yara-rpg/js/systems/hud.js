@@ -620,8 +620,7 @@ function updateUI() {
             contactIcon.textContent = pendingMistContact.icon;
         }
         document.getElementById('mist-contact-name').textContent = pendingMistContact.name[gameLanguage];
-        document.getElementById('mist-contact-message').textContent = window.YaraSoul?.contactMessage(pendingMistContact)
-            ?? pendingMistContact.message[gameLanguage];
+        document.getElementById('mist-contact-message').textContent = pendingMistContact.message[gameLanguage];
         const mistAcceptButton = document.getElementById('mist-contact-accept');
         mistAcceptButton.textContent = t(
             pendingMistContact.onAccept?.type === 'spirit-surgery' ? 'acceptSpiritSurgery' : 'mistAccept'

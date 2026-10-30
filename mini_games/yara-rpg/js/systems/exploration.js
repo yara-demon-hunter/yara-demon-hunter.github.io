@@ -59,7 +59,7 @@ function exploreForest() {
         GAME_RULES.probabilityScale
     )) {
         pendingMistContact = MIST_CONTACT_SYSTEM.chooseContact(
-            MIST_CONTACT_DATA.contacts.filter((contact) => window.YaraSoul?.meets(contact.requires) !== false),
+            MIST_CONTACT_DATA.contacts,
             hero.level,
             hero,
             PASSIVE_SKILL_DATA.pacts,
@@ -1051,12 +1051,6 @@ function acceptMistContact() {
     pendingMistContact = null;
     logMessage(t('mistContactAccepted', { contact: contact.name[gameLanguage] }), 'special');
     if (contact.soul) window.YaraSoul?.shift(contact.soul, contact.name);
-
-    if (window.YaraSoul?.resolveContact(contact)) {
-        completeRegionObjective('story');
-        updateUI();
-        return;
-    }
 
     if (contact.onAccept?.type === 'spirit-surgery') {
         performSpiritEyeSurgery();

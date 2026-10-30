@@ -1,6 +1,5 @@
 // --- PODERES ---
 // Aprendidos na árvore de skills (data_model/tree.js). Cada um tem 5 níveis.
-// Os que têm `unlock` só entram no sorteio depois de ganhos nos Trials (data_model/achievements.js).
 // damage = fração do dano da lâmina. Os dados de cada nível ficam em `levels`.
 export const POWER_MODELS = {
     orbitBlades: {
@@ -76,7 +75,7 @@ export const POWER_MODELS = {
         range: 360, speed: 420, turnRate: 7, radius: 6
     },
     soulNova: {
-        name: 'Soul Nova', icon: '💫', maxLvl: 5, unlock: true,
+        name: 'Soul Nova', icon: '💫', maxLvl: 5,
         desc: 'A pulse of force bursts from you, hurling monsters away.',
         upgrades: ['Pulse every 7s', '+30% radius', 'Every 5.5s', '+50% damage', 'Every 4.5s'],
         levels: [
@@ -89,7 +88,7 @@ export const POWER_MODELS = {
         knockback: 520
     },
     corpseBurst: {
-        name: 'Corpse Burst', icon: '💥', maxLvl: 5, unlock: true,
+        name: 'Corpse Burst', icon: '💥', maxLvl: 5,
         desc: 'Slain monsters may explode, and explosions can chain.',
         upgrades: ['20% chance', '30% chance', 'Bigger blasts', '40% chance', '50% chance, bigger blasts'],
         levels: [
@@ -102,7 +101,7 @@ export const POWER_MODELS = {
         knockback: 240
     },
     chainLightning: {
-        name: 'Storm Sigil', icon: '⚡', maxLvl: 5, unlock: true,
+        name: 'Storm Sigil', icon: '⚡', maxLvl: 5,
         desc: 'Lightning leaps from monster to monster.',
         upgrades: ['Strikes 3 targets', 'Strikes 5 targets', 'Strikes faster', '+40% damage', 'Strikes 8 targets'],
         levels: [
@@ -115,7 +114,7 @@ export const POWER_MODELS = {
         range: 300, jumpRange: 170
     },
     chillAura: {
-        name: 'Cold Moon', icon: '❄️', maxLvl: 5, unlock: true,
+        name: 'Cold Moon', icon: '❄️', maxLvl: 5,
         desc: 'Monsters near you slow down and freeze over.',
         upgrades: ['25% slow nearby', '+30% radius', '35% slow', '+30% radius', '45% slow'],
         levels: [
@@ -127,7 +126,7 @@ export const POWER_MODELS = {
         ]
     },
     starfall: {
-        name: 'Starfall', icon: '🌠', maxLvl: 5, unlock: true,
+        name: 'Starfall', icon: '🌠', maxLvl: 5,
         desc: 'Stars fall on the monsters, crushing everything around the impact.',
         upgrades: ['1 star every 5s', '2 stars', 'Bigger impact', '3 stars', '4 stars, heavier'],
         levels: [
@@ -140,7 +139,7 @@ export const POWER_MODELS = {
         fallSeconds: 0.6, knockback: 200
     },
     phantomDash: {
-        name: 'Phantom Rush', icon: '👻', maxLvl: 5, unlock: true,
+        name: 'Phantom Rush', icon: '👻', maxLvl: 5,
         desc: 'Your dash cuts through everything in its path.',
         upgrades: ['Dash deals damage', '-15% dash cooldown', '+1 dash charge', '+60% damage', '-15% dash cooldown'],
         levels: [
@@ -154,37 +153,36 @@ export const POWER_MODELS = {
 };
 
 // --- EVOLUÇÕES ---
-// Poder no nível máximo + requisito = carta dourada garantida, que transforma o poder.
-// need: { power: key, lvl } exige outro poder; { stat: key, lvl } exige um stat; { passive: key } exige uma relíquia.
+// Poder no nível máximo + requisitos do nó de evolução (data_model/tree.js) = transforma o poder.
 export const EVOLUTIONS = {
     orbitBlades: {
-        name: 'Blade Tempest', icon: '🌪️', need: { stat: 'damage', lvl: 5 }, needText: 'Blade Damage Lv. 5',
+        name: 'Blade Tempest', icon: '🌪️',
         desc: 'Eight blades in a wide storm, and they hit far harder.',
         levels: { count: 8, damage: 1.1, radius: 104 }
     },
     emberTrail: {
-        name: 'Hellwalker', icon: '☄️', need: { stat: 'moveSpeed', lvl: 4 }, needText: 'Move Speed Lv. 4',
+        name: 'Hellwalker', icon: '☄️',
         desc: 'Great pillars of fire rise from every step you take.',
         levels: { dps: 1.3, life: 4.5, radius: 42 }
     },
     corpseBurst: {
-        name: 'Red Harvest', icon: '🥀', need: { power: 'bloodEdge', lvl: 3 }, needText: 'Blood Edge Lv. 3',
+        name: 'Red Harvest', icon: '🥀',
         desc: 'Every kill explodes. Every blast heals you.',
         levels: { chance: 1, radius: 110, damage: 1.7 }
     },
     chainLightning: {
-        name: 'Wrath of Heaven', icon: '🌩️', need: { power: 'keenEye', lvl: 3 }, needText: 'Keen Eye Lv. 3',
+        name: 'Wrath of Heaven', icon: '🌩️',
         desc: 'Lightning strikes on every critical hit.',
         levels: { cooldown: 1.4, jumps: 12, damage: 1.5 }
     },
     soulNova: {
-        name: 'Absolute Zero', icon: '🧊', need: { power: 'chillAura', lvl: 3 }, needText: 'Cold Moon Lv. 3',
+        name: 'Absolute Zero', icon: '🧊',
         desc: 'Your pulse freezes everything it touches solid.',
         levels: { cooldown: 4, radius: 250, damage: 2.2 },
         freezeSeconds: 1.6
     },
     torchBolts: {
-        name: 'Sun Spire', icon: '☀️', need: { stat: 'frenzyNova', lvl: 4 }, needText: 'Fury Lv. 4',
+        name: 'Sun Spire', icon: '☀️',
         desc: 'The torch becomes a sun, raining fire across the clearing.',
         levels: { cooldown: 0.8, count: 5, damage: 1.7 }
     }

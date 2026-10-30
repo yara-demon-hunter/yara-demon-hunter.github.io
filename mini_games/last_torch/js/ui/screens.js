@@ -2,7 +2,6 @@ import { CHARACTER_MODEL, getXpToNextLevel } from '../../data_model/character.js
 import { ACHIEVEMENTS, EMBER_REWARDS, META_UPGRADES, getMetaUpgradeCost } from '../../data_model/meta.js';
 import { DARKNESS, getHourName } from '../../data_model/night.js';
 import { HEROES } from '../../data_model/heroes.js';
-import { POWER_MODELS } from '../../data_model/powers.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
 import { getOwnedPowers } from '../systems/tree.js';
@@ -12,6 +11,7 @@ import { continueEndless, startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { resetTorch } from '../systems/torch.js';
 import { prepareForest } from '../render/forest.js';
+import { getPowerIconKey, setSkillIcon } from '../render/skill_icons.js';
 import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_sprites.js';
 import { showToast } from './banner.js';
 import { startHints } from './hints.js';
@@ -45,7 +45,7 @@ export function startGame() {
     state.frenzyActiveTimer = 0;
     state.frenzyDuration = 0;
 
-    state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, embersBanked: 0 };
+    state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, embersBanked: 0, killsByType: {} };
     state.streak = 0;
     state.streakTimer = 0;
     state.skillPoints = 0;
@@ -136,7 +136,6 @@ function pushStats() {
 function unlockReward(a) {
     const r = a.reward;
     if (r.embers) save.embers += r.embers;
-    if (r.power && !save.unlockedPowers.includes(r.power)) save.unlockedPowers.push(r.power);
     if (r.hero && !save.unlockedHeroes.includes(r.hero)) save.unlockedHeroes.push(r.hero);
 }
 
@@ -144,7 +143,6 @@ function rewardText(a) {
     const r = a.reward;
     const parts = [];
     if (r.embers) parts.push(`+${r.embers} 🔥`);
-    if (r.power) parts.push(`New power: ${POWER_MODELS[r.power].name}`);
     if (r.hero) parts.push(`New hero: ${HEROES[r.hero].name}`);
     return parts.join(' · ');
 }
@@ -300,9 +298,9 @@ export function triggerGameOver(reason) {
 
     const build = document.getElementById('finalBuild');
     build.innerHTML = '';
-    [...getOwnedPowers().map(p => p.icon), ...Object.values(passives).filter(p => p.lvl > 0).map(p => p.icon)].forEach(icon => {
+    [...getOwnedPowers().map(getPowerIconKey), ...Object.keys(passives).filter(key => passives[key].lvl > 0)].forEach(key => {
         const item = document.createElement('span');
-        item.textContent = icon;
+        setSkillIcon(item, key);
         build.appendChild(item);
     });
 

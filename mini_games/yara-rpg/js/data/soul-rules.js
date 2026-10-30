@@ -12,12 +12,6 @@ window.YaraRpgData.soul = Object.freeze({
         monsterFinalBlow: -4,
         monsterSpared: 6
     },
-    cleanseAmount: 30,
-    judgement: {
-        dark: { gold: 150 },
-        neutral: { skillPoints: 2 },
-        light: { hpPercent: 100, focoPercent: 100 }
-    },
     tiers: Object.freeze([
         {
             id: "abyssal", side: "dark", level: 3, min: -100, max: -70, icon: "🌑",

@@ -94,7 +94,7 @@ export const state = {
     dawn: 0,                    // 0 a 1: a noite clareando
 
     // Números da partida (tela final, Trials, brasas)
-    run: { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, embersBanked: 0 },
+    run: { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, embersBanked: 0, killsByType: {} },
     streak: 0,
     streakTimer: 0,
     streakTierShown: 0,
