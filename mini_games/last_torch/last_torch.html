@@ -17,6 +17,9 @@ permalink: /mini_games/last_torch/last_torch.html
 <!-- CANVAS -->
 <canvas id="gameCanvas" class="absolute inset-0 z-0"></canvas>
 
+<!-- Efeitos de tela sobre o canvas: Fúria, vida baixa, tocha morrendo. Styles in css/components/banner.css -->
+<div id="screenFx" aria-hidden="true"></div>
+
 <!-- HUD: everything at the top. Styles in css/components/hud.css -->
 <div id="hud" class="absolute inset-0 z-10 pointer-events-none">
     <div id="hudTop">
@@ -28,28 +31,29 @@ permalink: /mini_games/last_torch/last_torch.html
                 <div id="heroName"><span>DEMON HUNTER</span><span id="levelText">LV 1</span></div>
                 <div id="xpTrack" class="hud-bar"><div id="xpBar" class="hud-fill" style="width: 0%"></div></div>
                 <div id="xpRow">
-                    <!-- Gold and skill points -->
+                    <!-- Gold and kills -->
                     <div id="heroChips">
                         <span>🪙 <b id="coinsText">0</b></span>
-                        <span>⚡ <b id="skillPointsHud">0</b></span>
+                        <span>💀 <b id="killsHud">0</b></span>
                     </div>
                     <span id="xpText">0/100 XP</span>
                 </div>
             </div>
         </div>
 
-        <!-- Medalhão de status: abre stats e passivas; alerta em vermelho quando há algo para melhorar -->
-        <button id="btnPause" class="status-btn" title="Hero status" aria-label="Hero status and upgrades"><span id="statusBadge" class="hud-badge"></span></button>
+        <!-- Medalhão de status: pausa e mostra a build -->
+        <button id="btnPause" class="status-btn" title="Hero status (Esc)" aria-label="Pause and hero status"></button>
 
-        <!-- Turn and boss (a vida da tocha fica em cima da fogueira, no canvas) -->
+        <!-- Hora da noite e boss (a vida da tocha fica em cima da fogueira, no canvas) -->
         <div id="hudWorld" class="hud-panel" style="--tone: #fdba74;">
             <div class="hud-stat hud-turn">
-                <div class="hud-label" style="--tone: #fcd34d;"><span id="turnLabel">TURN 1</span><span id="scoreText">0 / 500 PTS</span></div>
-                <div class="hud-bar hud-bar-amber hud-bar-thin"><div id="scoreBar" class="hud-fill" style="background: linear-gradient(90deg, #f59e0b, #34d399); width: 0%"></div></div>
+                <div class="hud-label" style="--tone: #fcd34d;"><span id="turnLabel">HOUR 1</span><span id="hourName">Dusk</span></div>
+                <div class="hud-bar hud-bar-amber hud-bar-thin"><div id="scoreBar" class="hud-fill" style="background: linear-gradient(90deg, #f59e0b, #fde68a); width: 0%"></div></div>
+                <div id="nightPips" aria-hidden="true"></div>
             </div>
             <!-- Boss Health Bar -->
             <div id="bossHpContainer" class="hidden hud-stat hud-boss">
-                <div class="hud-label" style="--tone: #f87171;"><span id="bossNameText">☠️ BOSS</span><span id="bossHpText">1000/1000</span></div>
+                <div class="hud-label" style="--tone: #f87171;"><span id="bossNameText">☠️ BOSS</span><span id="bossHpText">1000</span></div>
                 <div class="hud-bar hud-bar-red"><div id="bossHpBar" class="hud-fill" style="background: linear-gradient(90deg, #dc2626, #f43f5e, #f59e0b); width: 100%"></div></div>
             </div>
         </div>
@@ -59,7 +63,29 @@ permalink: /mini_games/last_torch/last_torch.html
             <button id="btnSound" class="hud-btn" aria-label="Sound">🔊</button>
         </div>
     </div>
+
+    <!-- Poderes e relíquias da partida -->
+    <div id="buildStrip" aria-hidden="true"></div>
+
+    <!-- Pontuação da partida -->
+    <div id="hudScore" aria-hidden="true">0</div>
+
+    <!-- Sequência de mortes -->
+    <div id="hudStreak" aria-hidden="true">
+        <b id="streakCount">0</b>
+        <span>STREAK</span>
+        <i><u id="streakBar"></u></i>
+    </div>
 </div>
+
+<!-- Avisos: faixa central, grito de sequência e notificações -->
+<div id="banner" aria-live="polite">
+    <p id="bannerEyebrow"></p>
+    <h2 id="bannerTitle"></h2>
+    <p id="bannerSub"></p>
+</div>
+<div id="callout" aria-hidden="true"></div>
+<div id="toasts" aria-live="polite"></div>
 
 <!-- START SCREEN: dark forest at night. Styles in css/components/start-screen.css -->
 <div id="startScreen" class="absolute inset-0 z-20 flex flex-col items-center justify-center p-4">
@@ -69,16 +95,32 @@ permalink: /mini_games/last_torch/last_torch.html
     <div class="start-content">
         <p class="start-eyebrow">DEMON HUNTER</p>
         <h1 class="start-title">LAST TORCH</h1>
-        <p class="start-tagline">Keep the flame alive. The fog is hungry.</p>
+        <p class="start-tagline">Survive twelve hours of night. Keep the flame alive until dawn.</p>
 
-        <ul class="start-tips">
-            <li><span>🔥</span><p><b>Guard the torch.</b> Its light holds back the fog. As it burns down, the light shrinks and the dark closes in.</p></li>
-            <li><span>⚔️</span><p><b>Hunt what comes.</b> Your blade strikes on its own. Widen the slash in the status screen, up to a full 180° sweep.</p></li>
-            <li><span>🪙</span><p><b>Gold &amp; skills.</b> Every level grants a ⚡ skill point to raise any stat. Monsters drop gold for passive powers.</p></li>
-            <li><span>☠️</span><p><b>Bosses &amp; shooters.</b> Some things in the fog hit back from afar.</p></li>
+        <!-- Primeira partida: dicas. Depois: recordes -->
+        <ul id="startTips" class="start-tips">
+            <li><span>🔥</span><p><b>Guard the torch.</b> Its light holds back the fog. If it dies, the night is over.</p></li>
+            <li><span>⚔️</span><p><b>Hunt what comes.</b> Your blade strikes on its own. Throw daggers and dash to stay alive.</p></li>
+            <li><span>🃏</span><p><b>Grow with every level.</b> Pick one of three powers, and build something terrible.</p></li>
+            <li><span>🌅</span><p><b>Every night counts.</b> Embers you earn stay with you, even when you fall.</p></li>
         </ul>
+        <div id="startRecords" class="start-records hidden">
+            <div><span>Best hour</span><b id="recordHour">0</b></div>
+            <div><span>Best score</span><b id="recordScore">0</b></div>
+            <div><span>Best streak</span><b id="recordStreak">0</b></div>
+        </div>
+
+        <div id="darknessPicker" class="darkness-picker hidden">
+            <span>DARKNESS</span>
+            <button id="btnDarkDown" aria-label="Lower darkness">◀</button>
+            <b id="darknessValue">1</b>
+            <button id="btnDarkUp" aria-label="Raise darkness">▶</button>
+        </div>
 
         <button id="btnStart" class="start-btn">LIGHT THE TORCH</button>
+        <button id="btnHearth" class="start-btn-small">
+            <span>🔥 HEARTH</span><em><span id="startHeroName">Demon Hunter</span> · <b id="startEmbers">0</b> embers</em>
+        </button>
     </div>
 </div>
 
@@ -90,6 +132,8 @@ permalink: /mini_games/last_torch/last_torch.html
 <div id="knifeButton" aria-label="Throw dagger">
     <div id="knifeButtonKnob">🗡️</div>
 </div>
+<!-- Botão do dash -->
+<div id="dashButton" aria-label="Dash">💨<b id="dashCharges"></b></div>
 
 <!-- AVISO DE VIRAR O APARELHO (celular em pé; o jogo é jogado de lado). Styles in css/components/orientation.css -->
 <div id="rotateNotice" role="alert">
@@ -98,7 +142,62 @@ permalink: /mini_games/last_torch/last_torch.html
     <span>Last Torch is played in landscape, with both thumbs. The hunt is paused.</span>
 </div>
 
-<!-- SHOP & PAUSE PANEL -->
+<!-- ESCOLHA DE CARTAS (level up e baú). Styles in css/components/cards.css -->
+<div id="cardScreen" class="game-screen hidden" role="dialog" aria-label="Choose an upgrade">
+    <p id="cardEyebrow" class="screen-eyebrow">LEVEL 2</p>
+    <h2 id="cardTitle" class="screen-title">CHOOSE YOUR POWER</h2>
+    <div id="cardRow"></div>
+    <button id="btnReroll" class="screen-link hidden">🎲 REROLL (<span id="rerollCount">0</span>)</button>
+</div>
+
+<!-- ACAMPAMENTO (fim de cada hora). Styles in css/components/camp.css -->
+<div id="campScreen" class="game-screen hidden" role="dialog" aria-label="Camp">
+    <div class="camp-panel">
+        <header class="camp-head">
+            <div>
+                <p id="campEyebrow" class="screen-eyebrow">HOUR 1 SURVIVED</p>
+                <h2 class="screen-title">THE FIRE HOLDS</h2>
+            </div>
+            <div class="camp-gold">🪙 <b id="campCoins">0</b></div>
+        </header>
+        <div class="camp-body custom-scroll">
+            <section class="camp-trader">
+                <div class="camp-section-title"><span>WANDERING TRADER</span><button id="btnCampReroll" class="screen-link">🎲 New wares</button></div>
+                <div id="campOffers"></div>
+            </section>
+            <section class="camp-fire">
+                <div class="camp-section-title"><span>AT THE FIRE</span></div>
+                <div class="camp-service">
+                    <span class="camp-service-icon">🔥</span>
+                    <div class="camp-service-info">
+                        <b>Feed the Torch</b>
+                        <div class="hud-bar"><div id="campTorchBar" class="hud-fill" style="background: linear-gradient(90deg, #e11d48, #fb923c);"></div></div>
+                        <em id="campTorchText">100/100</em>
+                    </div>
+                    <button id="btnFuel" class="shop-row-btn">+30</button>
+                </div>
+                <div class="camp-service">
+                    <span class="camp-service-icon">🍖</span>
+                    <div class="camp-service-info">
+                        <b>Rest</b>
+                        <div class="hud-bar"><div id="campHeroBar" class="hud-fill" style="background: linear-gradient(90deg, #10b981, #2dd4bf);"></div></div>
+                        <em id="campHeroText">100/100</em>
+                    </div>
+                    <button id="btnRest" class="shop-row-btn">+50%</button>
+                </div>
+            </section>
+        </div>
+        <footer class="camp-foot">
+            <div class="camp-next">
+                <b id="campNextHour">HOUR 2 · First Dark</b>
+                <span id="campNextThreat">The night is quiet.</span>
+            </div>
+            <button id="btnCampLeave" class="start-btn">INTO THE DARK ▶</button>
+        </footer>
+    </div>
+</div>
+
+<!-- STATUS & PAUSE PANEL -->
 <div id="shopScreen" class="hidden absolute inset-0 z-30 flex flex-col items-center justify-center p-3 sm:p-6 bg-slate-950/95 backdrop-blur-md">
     <div class="w-full max-w-2xl bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-4 sm:p-6 flex flex-col max-h-[96dvh] shadow-2xl">
         <div class="flex justify-between items-center pb-3 border-b border-slate-800">
@@ -106,7 +205,7 @@ permalink: /mini_games/last_torch/last_torch.html
                 <h2 class="text-xl sm:text-2xl font-bold text-amber-400 flex items-center gap-2">
                     <span>🛡️</span> HERO STATUS
                 </h2>
-                <p class="text-xs text-slate-400">⚡ Skill points raise stats. 🪙 Gold buys passive skills.</p>
+                <p id="statusHour" class="text-xs text-slate-400">Hour 1</p>
             </div>
             <div class="flex items-center gap-3">
                 <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-amber-500/30 flex items-center gap-1.5">
@@ -117,53 +216,101 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
         </div>
 
-        <!-- ÚNICA ÁREA COM SCROLL: stats + upgrades juntos, passivas abaixo -->
+        <!-- ÚNICA ÁREA COM SCROLL -->
         <div class="custom-scroll flex-1 min-h-0 overflow-y-auto py-2 pr-1 space-y-3">
-            <!-- DEMON HUNTER STATS (cada stat tem seu botão de upgrade; pontos de skill, 1 por nível) -->
-            <section id="statsPanel" class="shop-panel border-slate-800">
-                <div class="shop-panel-title">
-                    <span>📊 DEMON HUNTER STATS</span>
-                    <span id="statusLevel" class="ml-auto text-amber-400">LEVEL 1</span>
-                    <span class="text-violet-200">⚡ <b id="skillPointsText">0</b> points</span>
-                </div>
-                <div id="shopList" class="grid grid-cols-1 gap-1 px-2 pb-2">
-                    <!-- Generated by JS -->
-                </div>
+            <section class="shop-panel border-amber-500/30">
+                <div class="shop-panel-title text-amber-300"><span>✨ POWERS</span></div>
+                <div id="powerList" class="build-list px-2 pb-2"></div>
             </section>
 
-            <!-- PASSIVE SKILLS (compradas com ouro), em cartões -->
             <section id="passivesPanel" class="shop-panel border-violet-500/30">
-                <div class="shop-panel-title text-violet-300">
-                    <span>🌀 PASSIVE SKILLS</span>
-                    <span class="ml-auto text-amber-300">🪙 paid with gold</span>
+                <div class="shop-panel-title text-violet-300"><span>🌀 RELICS</span></div>
+                <div id="passiveList" class="build-list px-2 pb-2"></div>
+            </section>
+
+            <section id="statsPanel" class="shop-panel border-slate-800">
+                <div class="shop-panel-title">
+                    <span>📊 STATS</span>
+                    <span id="statusLevel" class="ml-auto text-amber-400">LEVEL 1</span>
                 </div>
-                <div id="passiveList" class="passive-cards px-2 pb-2">
-                    <!-- Generated by JS -->
+                <div id="shopList" class="grid grid-cols-1 sm:grid-cols-2 gap-1 px-2 pb-2"></div>
+            </section>
+
+            <section class="shop-panel border-slate-800">
+                <div class="shop-panel-title"><span>⚙️ OPTIONS</span></div>
+                <div class="settings-row px-2 pb-2">
+                    <button data-setting="music" class="setting-toggle">🎵 Music</button>
+                    <button data-setting="sfx" class="setting-toggle">🔊 Effects</button>
+                    <button data-setting="shake" class="setting-toggle">📳 Screen shake</button>
+                    <button data-setting="numbers" class="setting-toggle">🔢 Damage numbers</button>
                 </div>
             </section>
         </div>
 
         <button id="btnResume" class="w-full mt-3 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold rounded-xl text-base shadow-lg transition-all active:scale-95">
-            BACK TO GAME ▶
+            BACK TO THE HUNT ▶
         </button>
+        <button id="btnAbandon" class="screen-link mt-2">Abandon this night</button>
     </div>
 </div>
 
-<!-- GAME OVER -->
-<div id="gameOverScreen" class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center p-4 bg-rose-950/90 backdrop-blur-md">
-    <div class="text-center max-w-md bg-slate-900/90 border border-rose-500/30 p-6 rounded-2xl shadow-2xl">
-        <h2 id="gameOverTitle" class="text-3xl sm:text-4xl font-extrabold text-rose-500 mb-2">DEFENSE FELL</h2>
-        <p id="gameOverSub" class="text-slate-300 text-sm mb-4">Your hero or torch was destroyed.</p>
-
-        <div class="bg-slate-950/60 p-4 rounded-xl text-left space-y-2 text-sm text-slate-300 mb-6 border border-slate-800">
-            <div class="flex justify-between"><span>Hero Level:</span><b id="finalLevel" class="text-cyan-400">Lv. 1</b></div>
-            <div class="flex justify-between"><span>Turns Sobrevividos:</span><b id="finalTurn" class="text-amber-400">1</b></div>
-            <div class="flex justify-between"><span>Total Score:</span><b id="finalScore" class="text-emerald-400">0</b></div>
+<!-- FIM DA NOITE. Styles in css/components/summary.css -->
+<div id="gameOverScreen" class="game-screen hidden">
+    <div class="summary">
+        <header class="summary-head">
+            <h2 id="gameOverTitle" class="screen-title">THE HUNTER FELL</h2>
+            <p id="gameOverSub">The fog closes over the clearing.</p>
+        </header>
+        <div class="summary-grid">
+            <div class="summary-col">
+                <div class="summary-stats">
+                    <div class="summary-stat summary-stat-main"><span>Reached</span><b id="finalHour">Hour 1</b><em id="finalHourName">Dusk</em></div>
+                    <div class="summary-stat summary-stat-main"><span id="finalScoreLabel">Score</span><b id="finalScore">0</b></div>
+                    <div class="summary-stat"><span>Kills</span><b id="finalKills">0</b></div>
+                    <div class="summary-stat"><span>Best streak</span><b id="finalStreak">0</b></div>
+                    <div class="summary-stat"><span>Level</span><b id="finalLevel">1</b></div>
+                </div>
+                <div id="finalBuild"></div>
+            </div>
+            <div class="summary-col">
+                <div class="summary-embers">
+                    <div class="ember-total">
+                        <span class="ember-icon">🔥</span>
+                        <div><b>+<span id="emberEarned">0</span></b><em>embers · <span id="emberTotal">0</span> total</em></div>
+                    </div>
+                    <div id="emberLines"></div>
+                </div>
+                <div id="summaryUnlocks"></div>
+                <div id="summaryGoal"></div>
+            </div>
         </div>
+        <div class="summary-actions">
+            <button id="btnRestart" class="start-btn">HUNT AGAIN</button>
+            <button id="btnEndless" class="start-btn start-btn-dark hidden">STAY IN THE DARK</button>
+            <button id="btnHearthSummary" class="start-btn-small"><span>🔥 HEARTH</span></button>
+            <button id="btnShare" class="start-btn-small"><span>↗ SHARE</span></button>
+            <button id="btnMenu" class="start-btn-small"><span>MENU</span></button>
+        </div>
+    </div>
+</div>
 
-        <button id="btnRestart" class="w-full py-3.5 px-6 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white font-bold rounded-xl text-lg shadow-lg transition-all active:scale-95">
-            TRY AGAIN
-        </button>
+<!-- HEARTH: melhorias permanentes, heróis e Trials. Styles in css/components/hearth.css -->
+<div id="hearthScreen" class="game-screen hidden">
+    <div class="hearth-panel">
+        <header class="hearth-head">
+            <div>
+                <p class="screen-eyebrow">WHAT THE FIRE REMEMBERS</p>
+                <h2 class="screen-title">THE HEARTH</h2>
+            </div>
+            <div class="camp-gold">🔥 <b id="hearthEmbers">0</b></div>
+            <button id="btnCloseHearth" class="hearth-close" aria-label="Close">✕</button>
+        </header>
+        <div id="hearthTabs">
+            <button data-tab="upgrades">UPGRADES</button>
+            <button data-tab="heroes">HEROES</button>
+            <button data-tab="trials">TRIALS</button>
+        </div>
+        <div id="hearthList" class="custom-scroll"></div>
     </div>
 </div>
 

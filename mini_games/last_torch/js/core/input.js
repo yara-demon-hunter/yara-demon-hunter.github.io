@@ -1,9 +1,13 @@
+import { tryDash } from '../systems/dash.js';
 import { screenToWorld } from './resize.js';
 import { audio, canvas, joystick, keys, player, state } from './state.js';
+
+const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
 // --- INPUTS CONTROLS ---
 // Recebe coordenadas da janela e converte para o mundo
 function setTarget(clientX, clientY) {
+    if (!player.mouseFollow) return;
     const { x, y } = screenToWorld(clientX, clientY);
     player.targetX = x;
     player.targetY = y;
@@ -103,6 +107,17 @@ function setupJoystick() {
     window.addEventListener('blur', () => release());
 }
 
+// --- BOTÃO DO DASH (telas de toque) ---
+function setupDashButton() {
+    const base = document.getElementById('dashButton');
+    if (!base) return;
+    base.addEventListener('pointerdown', (e) => {
+        audio.init();
+        tryDash();
+        e.preventDefault();
+    });
+}
+
 // Mira da faca em coordenadas do mundo (o arremesso sai do herói nessa direção)
 function aimKnife(clientX, clientY) {
     const { x, y } = screenToWorld(clientX, clientY);
@@ -127,8 +142,17 @@ export function setupInput() {
         if (e.button === 0) state.knifeInput.held = false;
     });
 
+    // Botão direito: dash na direção do cursor
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    canvas.addEventListener('mousedown', (e) => {
+        if (e.button !== 2 || state.gameState !== 'PLAYING') return;
+        aimKnife(e.clientX, e.clientY);
+        tryDash();
+    });
+
     setupJoystick();
     setupKnifeButton();
+    setupDashButton();
 
     // Em telas de toque o joystick move o herói; arrastar no canvas só vale sem ele
     const hasJoystick = window.matchMedia('(pointer: coarse)').matches;
@@ -175,6 +199,9 @@ export function setupInput() {
             e.preventDefault();
         }
         keys[e.code] = true;
+        // Quem anda pelo teclado usa o mouse só para mirar: o herói para de seguir o cursor
+        if (MOVE_KEYS.includes(e.code)) player.mouseFollow = false;
+        if (!e.repeat && (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight')) tryDash();
     });
     window.addEventListener('keyup', (e) => {
         keys[e.code] = false;

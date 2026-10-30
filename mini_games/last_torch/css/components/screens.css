@@ -1,0 +1,58 @@
+/* --- TELAS DE JOGO: base comum das telas que pausam a partida (cartas, acampamento, fim da noite, Hearth) ---
+   Mesmo clima da tela inicial: quase preto, letras cor de osso e brasa. */
+.game-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-content: safe center;
+    padding: max(0.8rem, env(safe-area-inset-top)) max(0.8rem, env(safe-area-inset-right)) max(0.8rem, env(safe-area-inset-bottom)) max(0.8rem, env(safe-area-inset-left));
+    overflow-y: auto;
+    background: radial-gradient(ellipse at 50% 45%, rgba(10, 14, 22, 0.78), rgba(2, 4, 8, 0.92));
+    animation: screenIn 0.18s ease-out both;
+}
+.game-screen.hidden { display: none; }
+#gameOverScreen { z-index: 40; }
+#hearthScreen { z-index: 45; }
+@keyframes screenIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.screen-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.38em;
+    text-indent: 0.38em;
+    color: #94a3b8;
+}
+.screen-title {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: clamp(1.5rem, 5vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+    color: #e7e0cf;
+    text-shadow: 0 0 22px rgba(251, 146, 60, 0.4), 0 2px 0 #1a0f08;
+}
+.screen-link {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 0.3rem 0.7rem;
+    border-radius: 0.5rem;
+    transition: color 0.15s;
+}
+.screen-link:hover:not(:disabled) { color: #fdba74; }
+.screen-link:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Botão principal escuro: a alternativa ao "caçar de novo" */
+.start-btn-dark {
+    color: #ddd6fe;
+    background: linear-gradient(180deg, #2e1065, #140a2e);
+    border-color: rgba(167, 139, 250, 0.55);
+    box-shadow: 0 0 22px rgba(109, 40, 217, 0.35), inset 0 1px 0 rgba(196, 181, 253, 0.25);
+}

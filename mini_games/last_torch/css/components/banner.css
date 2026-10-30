@@ -1,0 +1,137 @@
+/* --- AVISOS NA TELA --- */
+/* Faixa central: início de hora, boss, hordas */
+#banner {
+    position: absolute;
+    top: 22%;
+    left: 0;
+    right: 0;
+    z-index: 12;
+    padding: 0.8rem 1rem;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(90deg, transparent, rgba(2, 4, 8, 0.72) 25%, rgba(2, 4, 8, 0.72) 75%, transparent);
+}
+#banner.is-showing { animation: bannerShow 2.3s ease-out both; }
+@keyframes bannerShow {
+    0% { opacity: 0; transform: scaleY(0.5); }
+    8% { opacity: 1; transform: scaleY(1.06); }
+    13% { transform: scaleY(1); }
+    78% { opacity: 1; }
+    100% { opacity: 0; }
+}
+#banner p:first-child {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.42em;
+    text-indent: 0.42em;
+    color: #94a3b8;
+}
+#banner p:first-child:empty, #bannerSub:empty { display: none; }
+#bannerTitle {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: clamp(1.4rem, 4.6vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1.15;
+    color: #e7e0cf;
+    text-shadow: 0 0 24px rgba(251, 146, 60, 0.5), 0 2px 0 #000;
+}
+#bannerSub { font-size: 0.82rem; font-style: italic; color: #cbd5e1; }
+#banner.banner-danger #bannerTitle { color: #fca5a5; text-shadow: 0 0 26px rgba(239, 68, 68, 0.8), 0 2px 0 #000; }
+#banner.banner-warn #bannerTitle { color: #fde68a; font-size: clamp(1.1rem, 3.4vw, 1.8rem); text-shadow: 0 0 20px rgba(245, 158, 11, 0.7), 0 2px 0 #000; }
+#banner.banner-gold #bannerTitle { color: #fef3c7; text-shadow: 0 0 30px rgba(251, 191, 36, 0.9), 0 2px 0 #000; }
+
+/* Grito de sequência */
+#callout {
+    position: absolute;
+    top: 36%;
+    left: 0;
+    right: 0;
+    z-index: 12;
+    text-align: center;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: clamp(1.2rem, 4vw, 2.1rem);
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    color: var(--tone, #fde047);
+    text-shadow: 0 0 22px var(--tone, #fde047), 0 2px 0 #000;
+    pointer-events: none;
+    opacity: 0;
+}
+#callout.is-showing { animation: calloutShow 1.15s ease-out both; }
+@keyframes calloutShow {
+    0% { opacity: 0; transform: scale(1.7); }
+    14% { opacity: 1; transform: scale(1); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Notificações (Trials, elites, dicas) */
+#toasts {
+    position: absolute;
+    left: 50%;
+    bottom: 1.2rem;
+    z-index: 35;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    max-width: min(88vw, 24rem);
+    padding: 0.42rem 0.8rem;
+    border: 1px solid rgba(251, 146, 60, 0.4);
+    border-radius: 0.7rem;
+    background: rgba(8, 12, 16, 0.86);
+    animation: toastShow 3.6s ease-out both;
+}
+@keyframes toastShow {
+    0% { opacity: 0; transform: translateY(12px); }
+    7% { opacity: 1; transform: none; }
+    88% { opacity: 1; }
+    100% { opacity: 0; }
+}
+.toast-icon { font-size: 1.1rem; }
+.toast b { display: block; color: #fde4c8; font-size: 0.76rem; white-space: nowrap; }
+.toast div span { display: block; color: #94a3b8; font-size: 0.66rem; }
+
+/* Efeitos de tela: bordas coloridas, baratas para a GPU */
+#screenFx {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+}
+#screenFx::before, #screenFx::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+#screenFx::before { background: radial-gradient(ellipse at center, transparent 55%, rgba(220, 38, 38, 0.5)); }
+#screenFx::after { background: radial-gradient(ellipse at center, transparent 62%, rgba(217, 70, 239, 0.34)); }
+#screenFx.fx-danger::before { animation: dangerPulse 1s ease-in-out infinite; }
+#screenFx.fx-torch::before { background: radial-gradient(ellipse at center, transparent 60%, rgba(234, 88, 12, 0.42)); animation: dangerPulse 1.5s ease-in-out infinite; }
+#screenFx.fx-fury::after { opacity: 1; }
+@keyframes dangerPulse {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 1; }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+    #banner { top: 16%; padding: 0.3rem 1rem; }
+    #banner p:first-child { font-size: 0.55rem; }
+    #bannerSub { font-size: 0.65rem; }
+    #callout { top: 32%; }
+    #toasts { bottom: 0.4rem; }
+    .toast { padding: 0.25rem 0.6rem; }
+    .toast b { font-size: 0.64rem; }
+    .toast div span { font-size: 0.56rem; }
+}

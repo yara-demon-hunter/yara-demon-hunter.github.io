@@ -125,15 +125,131 @@
     line-height: 1;
 }
 #heroChips span:nth-child(1) { color: #fcd34d; }
-#heroChips span:nth-child(2) { color: #c4b5fd; }
+#heroChips span:nth-child(2) { color: #cbd5e1; }
 
-/* Level up: o contador de pontos de skill pulsa de leve */
-#heroChips span.sp-gain {
+/* Level up: o nível pulsa de leve */
+#levelText.level-gain {
     display: inline-block;
-    animation: spGain 0.5s ease-in-out 2;
+    animation: levelGain 0.5s ease-in-out 2;
 }
-@keyframes spGain {
-    50% { transform: scale(1.2); color: #e9d5ff; text-shadow: 0 0 8px #a855f7; }
+@keyframes levelGain {
+    50% { transform: scale(1.25); color: #e9d5ff; text-shadow: 0 0 8px #a855f7; }
+}
+
+/* Marcas da noite: uma por hora, caveira vermelha nas horas de boss */
+#nightPips {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.14rem;
+    margin-top: 0.24rem;
+}
+#nightPips i {
+    flex: 1;
+    height: 0.22rem;
+    border-radius: 2px;
+    background: rgba(148, 163, 184, 0.22);
+}
+#nightPips i.is-boss { background: rgba(220, 38, 38, 0.45); }
+#nightPips i.is-done { background: #f59e0b; }
+#nightPips i.is-now { background: #fde68a; box-shadow: 0 0 6px #fbbf24; }
+#nightPips i.is-boss.is-now { background: #f87171; box-shadow: 0 0 6px #ef4444; }
+
+/* Poderes e relíquias da partida */
+#buildStrip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    width: min(100%, 64rem);
+    margin: 0.25rem auto 0;
+    max-height: 3.4rem;
+    overflow: hidden;
+}
+.build-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 0.85rem;
+    border-radius: 0.35rem;
+    background: rgba(8, 13, 26, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+.build-item i {
+    position: absolute;
+    right: -0.14rem;
+    bottom: -0.14rem;
+    min-width: 0.72rem;
+    padding: 0 0.12rem;
+    border-radius: 0.2rem;
+    background: #0f172a;
+    color: #fbbf24;
+    font-size: 0.5rem;
+    font-weight: 800;
+    font-style: normal;
+    line-height: 0.72rem;
+    text-align: center;
+}
+.build-item.is-evolved { border-color: #fde047; box-shadow: 0 0 8px rgba(253, 224, 71, 0.6); }
+
+/* Pontuação */
+#hudScore {
+    position: absolute;
+    top: 3.6rem;
+    right: max(1rem, env(safe-area-inset-right));
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #e7e0cf;
+    text-shadow: 0 2px 4px #000;
+}
+
+/* Sequência de mortes */
+#hudStreak {
+    position: absolute;
+    top: 5.2rem;
+    right: max(1rem, env(safe-area-inset-right));
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+    opacity: 0;
+    transform: translateX(0.6rem);
+    transition: opacity 0.18s, transform 0.18s;
+    color: var(--tone, #e2e8f0);
+    text-shadow: 0 2px 6px #000, 0 0 12px rgba(0, 0, 0, 0.8);
+}
+#hudStreak.is-visible { opacity: 1; transform: none; }
+#hudStreak b {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+#hudStreak b.streak-bump { animation: streakBump 0.16s ease-out; }
+@keyframes streakBump {
+    from { transform: scale(1.35); }
+    to { transform: scale(1); }
+}
+#hudStreak span {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+}
+#hudStreak i {
+    display: block;
+    width: 5.2rem;
+    height: 0.2rem;
+    border-radius: 2px;
+    background: rgba(148, 163, 184, 0.2);
+    overflow: hidden;
+}
+#hudStreak u {
+    display: block;
+    height: 100%;
+    background: currentColor;
+    transform-origin: right;
 }
 
 /* Fúria ativa: cartão quente, pulsando; barra esvazia com o tempo */
@@ -190,41 +306,6 @@
 }
 .status-btn:active { transform: scale(0.94); }
 
-/* Algo para melhorar (pontos de skill ou ouro para uma passiva): pulsa em vermelho e solta uma onda */
-.status-btn.can-upgrade { animation: statusAlert 1.1s ease-in-out infinite; }
-.status-btn.can-upgrade::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border: 2px solid #ef4444;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: statusRipple 1.1s ease-out infinite;
-}
-@keyframes statusAlert {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 6px 1px rgba(220, 38, 38, 0.6); }
-    50% { transform: scale(1.1); box-shadow: 0 0 20px 6px rgba(239, 68, 68, 0.95); }
-}
-@keyframes statusRipple {
-    from { transform: scale(1); opacity: 0.9; }
-    to { transform: scale(1.6); opacity: 0; }
-}
-.hud-badge {
-    position: absolute;
-    top: -0.2rem;
-    right: -0.3rem;
-    min-width: 1.05rem;
-    padding: 0.14rem 0.26rem;
-    border-radius: 999px;
-    background: #dc2626;
-    color: #fff;
-    font-size: 0.62rem;
-    font-weight: 800;
-    line-height: 1;
-    text-align: center;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-}
-.hud-badge:empty { display: none; }
 
 /* --- Computador / tablet (>= 640px): botões lado a lado, tipografia maior --- */
 @media (min-width: 640px) {
@@ -268,7 +349,6 @@
     #heroCard { width: 11.5rem; gap: 0.35rem; padding: 0.22rem 0.4rem; }
     #heroPortrait { width: 1.7rem; height: 1.7rem; border-radius: 0.3rem; }
     .status-btn { width: 1.9rem; height: 1.9rem; }
-    .hud-badge { top: -0.1rem; right: -0.35rem; font-size: 0.52rem; }
     #heroStats { gap: 0.12rem; }
     #heroName { font-size: 0.5rem; }
     #xpTrack { height: 0.14rem; }
@@ -280,4 +360,14 @@
     .hud-bar-thin { height: 0.22rem; }
     #hudButtons { flex-direction: row; gap: 0.25rem; }
     .hud-btn { padding: 0.22rem 0.4rem; font-size: 0.75rem; border-radius: 0.5rem; }
+    #nightPips { margin-top: 0.12rem; }
+    #nightPips i { height: 0.14rem; }
+    #buildStrip { max-height: 1.2rem; gap: 0.12rem; margin-top: 0.15rem; }
+    .build-item { width: 1.05rem; height: 1.05rem; font-size: 0.56rem; border-radius: 0.22rem; }
+    .build-item i { min-width: 0.5rem; font-size: 0.38rem; line-height: 0.5rem; right: -0.08rem; bottom: -0.08rem; }
+    #hudScore { top: 2.1rem; font-size: 0.68rem; }
+    #hudStreak { top: 3.1rem; }
+    #hudStreak b { font-size: 1.6rem; }
+    #hudStreak span { font-size: 0.42rem; }
+    #hudStreak i { width: 3.4rem; height: 0.14rem; }
 }

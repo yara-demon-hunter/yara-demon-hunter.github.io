@@ -4,6 +4,7 @@ import { renderAttackRange, renderCore, renderHpBars } from './arena.js';
 import {
     renderBladeSlashes,
     renderEnemies,
+    renderEyesInFog,
     renderEnemyProjectiles,
     renderKnifeAim,
     renderKnives,
@@ -14,6 +15,19 @@ import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestG
 import { renderLevelUpBack, renderLevelUpFront } from './level_up.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 import { renderPlayer25D } from './player25d.js';
+import { HERO_25D_VISUALS } from '../../data_model/visuals/characters/hero25d_visual.js';
+import { player } from '../core/state.js';
+import { getHero } from '../systems/modifiers.js';
+import {
+    renderClearWave, renderDawn, renderFloaters, renderGibs, renderScreenFlash,
+    renderShockwaves, renderStains, renderTelegraphs, renderTorchAlarm, renderWarmth
+} from './effects.js';
+import { renderPickups } from './pickups.js';
+import { heroAnim } from './player.js';
+import {
+    renderBolts, renderChillAura, renderDashGhosts, renderGroundFires, renderLightning,
+    renderOrbitBlades, renderStars
+} from './powers.js';
 import { renderReflectWard } from './reflect.js';
 import { renderShadowClone } from './shadow_clone.js';
 
@@ -59,6 +73,14 @@ export function render() {
     ctx.rect(0, 0, state.width, state.height);
     ctx.clip();
 
+    // Soco de zoom: aproxima um instante nos momentos grandes
+    if (state.zoomPunch > 0) {
+        const zoom = 1 + state.zoomPunch;
+        ctx.translate(state.width / 2, state.height / 2);
+        ctx.scale(zoom, zoom);
+        ctx.translate(-state.width / 2, -state.height / 2);
+    }
+
     // Screen Shake offset
     if (state.shakeIntensity > 0) {
         const rx = (Math.random() - 0.5) * state.shakeIntensity;
@@ -68,27 +90,48 @@ export function render() {
 
     renderForestGround();
     renderForestGrass();
+    renderStains();
     renderTorchLight();
+    renderWarmth();
+    renderGroundFires();
     renderCore();
+    renderTorchAlarm();
     renderAttackRange();
+    renderChillAura();
+    renderTelegraphs();
     renderGoldDrops();
+    renderPickups();
     renderBladeSlashes();
     renderEnemyProjectiles();
     renderEnemies();
+    renderGibs();
     renderKnifeAim();
     renderKnives();
+    renderBolts();
     renderPlayerTrail();
+    renderDashGhosts();
     renderShadowClone();
     renderLevelUpBack();
-    if (HERO_25D) renderPlayer25D();
-    else renderPlayer();
+    if (!player.hidden) {
+        if (HERO_25D) renderPlayer25D(player, heroAnim, getHero().colors ?? HERO_25D_VISUALS.colors);
+        else renderPlayer();
+        renderOrbitBlades();
+    }
     renderReflectWard();
     renderParticles();
+    renderLightning();
+    renderStars();
+    renderShockwaves();
     renderFireflies();
     renderFogAndVignette();
+    renderEyesInFog();
+    renderDawn();
+    renderClearWave();
     renderHpBars();
+    renderFloaters();
     renderLevelUpFront();
     renderLetterboxFade();
+    renderScreenFlash();
 
     ctx.restore();
 }

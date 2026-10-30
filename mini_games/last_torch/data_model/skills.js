@@ -1,9 +1,5 @@
 // --- STATS DO HERÓI ---
-// Comprados com pontos de skill: cada nível de stat custa STAT_UPGRADE_COST pontos.
-// Subir de nível não melhora nada sozinho, só dá pontos para o jogador distribuir.
-export const SKILL_POINTS_PER_LEVEL = 3;
-export const STAT_UPGRADE_COST = 1;
-
+// Melhorados pelas cartas de level up (data_model/cards.js): cada carta sobe um ou mais níveis.
 export const UPGRADE_MODELS = {
     damage: { name: 'Blade Damage', icon: '⚔️', lvl: 1, maxLvl: 99, desc: 'Increases the base damage of each hit.' },
     radius: { name: 'Attack Range', icon: '⭕', lvl: 1, maxLvl: 99, desc: 'Increases the radius that detects targets.' },
@@ -18,8 +14,8 @@ export const UPGRADE_MODELS = {
 export const BLADE_SKILL = {
     baseDamage: 20,
     damagePerUpgrade: 5,
-    baseRadius: 42,
-    radiusPerUpgrade: 5,
+    baseRadius: 56,
+    radiusPerUpgrade: 7,
     maxRadiusScreenRatio: 0.38,
     minimumSlashArcDegrees: 40,
     maximumSlashArcDegrees: 180,
@@ -29,6 +25,8 @@ export const BLADE_SKILL = {
     minimumCooldownSeconds: 0.07,
     baseKnockback: 170,
     knockbackPerUpgrade: 50,
+    baseCritChance: 0.06,
+    baseCritMultiplier: 2,
     comboDamageMultiplier: 1.5,
     comboKnockbackMultiplier: 1.4,
     comboDashDistance: 35
@@ -41,7 +39,11 @@ export const FRENZY_NOVA_SKILL = {
     durationPerUpgradeLevelSeconds: 0.5,
     damageBonusPerUpgradeLevel: 0.15,
     slashCount: 8,
-    slashRadiusMultiplier: 1.3
+    slashRadiusMultiplier: 1.3,
+    // Explosão ao ativar: empurra e fere tudo em volta (o resto da Fúria é o golpe acelerado)
+    burstRadiusMultiplier: 2.4,
+    burstDamageMultiplier: 2,
+    burstKnockback: 460
 };
 
 // Faca de arremesso: golpe separado da lâmina, com recarga própria. Anda enquanto arremessa.
@@ -52,6 +54,16 @@ export const KNIFE_SKILL = {
     maxRange: 420,
     damageMultiplier: 0.8,
     knockbackMultiplier: 0.8
+};
+
+// Dash: esquiva rápida com invulnerabilidade. Espaço, Shift ou botão direito; botão próprio no celular.
+export const DASH_SKILL = {
+    charges: 1,
+    cooldownSeconds: 2.6,       // tempo para recuperar uma carga
+    seconds: 0.17,              // duração do avanço
+    distance: 150,
+    invulnerableSeconds: 0.3,
+    ghosts: 6                   // imagens deixadas pelo caminho
 };
 
 export function createAttributes() {

@@ -11,3 +11,8 @@ export * from './effects/reflect_visual.js';
 export * from './effects/level_up_visual.js';
 export * from './monsters/vampire_visual.js';
 export * from './bosses/demon_lord_visual.js';
+export * from './monsters/moth_visual.js';
+export * from './monsters/bloater_visual.js';
+export * from './monsters/wraith_visual.js';
+export * from './effects/juice_visual.js';
+export * from './effects/powers_visual.js';

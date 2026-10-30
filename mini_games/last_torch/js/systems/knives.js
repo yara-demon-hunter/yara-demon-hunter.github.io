@@ -1,9 +1,12 @@
 import { FAN_OF_KNIVES, LONG_THROW } from '../../data_model/passives.js';
 import { KNIFE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
-import { audio, passives, player, shadowClone, state } from '../core/state.js';
+import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
+import { audio, passives, player, powers, state } from '../core/state.js';
+import { dealDamage } from './damage.js';
 import { createExplosion } from './effects.js';
-import { getAtkDamage, getKnockback } from './stats.js';
+import { mod } from './modifiers.js';
+import { getAtkDamage, getKnifeCooldown, getKnockback } from './stats.js';
 
 // --- ADAGA DE ARREMESSO (golpe separado da lâmina, com recarga própria) ---
 // Começa o arremesso na direção da mira (mouse ou dedo): a mão esquerda recua e a adaga
@@ -12,7 +15,7 @@ export function throwKnife(aimX, aimY) {
     let angle = Math.atan2(aimY - player.y, aimX - player.x);
     if (Math.hypot(aimX - player.x, aimY - player.y) < 1) angle = player.angle;
 
-    state.knifeTimer = KNIFE_SKILL.cooldownSeconds;
+    state.knifeTimer = getKnifeCooldown();
     state.knifeThrowTime = performance.now();
     state.knifeThrowAngle = angle;
     state.knifePending = K.throwSeconds * K.letGoFraction;
@@ -31,7 +34,8 @@ function releaseKnife(thrower = player) {
     const maxRange = getKnifeRange();
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
     const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
-    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier;
+    const ricochet = getPowerLevel(powers.ricochet);
+    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0));
     const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
 
     for (let i = 0; i < count; i++) {
@@ -41,7 +45,9 @@ function releaseKnife(thrower = player) {
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
             angle, speed, maxRange, damage, knockback,
-            travelled: 0
+            travelled: 0,
+            bounces: ricochet?.bounces ?? 0,
+            struck: null                // monstros já atingidos por esta adaga (Ricochet)
         });
     }
 
@@ -73,6 +79,31 @@ function aimWithStick(stick) {
     stick.aimAngle = angle;
     state.knifeInput.x = player.x + Math.cos(angle) * 100;
     state.knifeInput.y = player.y + Math.sin(angle) * 100;
+}
+
+// Ricochet: a adaga salta para o monstro mais perto que ainda não acertou
+function bounceKnife(k, hit) {
+    if (k.bounces <= 0) return false;
+    (k.struck ??= new Set()).add(hit);
+
+    let next = null;
+    let best = POWER_MODELS.ricochet.bounceRange;
+    state.enemies.forEach(e => {
+        if (e.hp <= 0 || k.struck.has(e)) return;
+        const d = Math.hypot(e.x - k.x, e.y - k.y);
+        if (d < best) {
+            best = d;
+            next = e;
+        }
+    });
+    if (!next) return false;
+
+    k.bounces--;
+    k.angle = Math.atan2(next.y - k.y, next.x - k.x);
+    k.vx = Math.cos(k.angle) * k.speed;
+    k.vy = Math.sin(k.angle) * k.speed;
+    k.travelled = 0;
+    return true;
 }
 
 export function updateKnives(dt) {
@@ -107,13 +138,13 @@ export function updateKnives(dt) {
         k.y += k.vy * dt;
         k.travelled += k.speed * dt;
 
-        const hit = enemies.find(e => Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius);
+        const hit = enemies.find(e => e.hp > 0 && !k.struck?.has(e)
+            && Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius);
         if (hit) {
-            hit.hp -= k.damage;
-            hit.vx += Math.cos(k.angle) * k.knockback;
-            hit.vy += Math.sin(k.angle) * k.knockback;
+            dealDamage(hit, k.damage, { kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
             createExplosion(k.x, k.y, hit.color, 6);
-            knives.splice(i, 1);
+            audio.playHit(1);
+            if (!bounceKnife(k, hit)) knives.splice(i, 1);
             continue;
         }
 

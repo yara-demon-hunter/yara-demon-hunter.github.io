@@ -36,7 +36,7 @@ function computeWorldSize(cssWidth, cssHeight) {
 export function resize() {
     const cssWidth = canvas.clientWidth || window.innerWidth;
     const cssHeight = canvas.clientHeight || window.innerHeight;
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
+    const pixelRatio = state.lowQuality ? 1 : Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
     const { view } = state;
     // Nada mudou (o ResizeObserver e o 'resize' da janela costumam avisar juntos)
     if (cssWidth === view.cssWidth && cssHeight === view.cssHeight && pixelRatio === view.pixelRatio) return;

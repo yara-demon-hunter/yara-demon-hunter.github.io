@@ -89,6 +89,7 @@ function renderFuryBar() {
 // Barrinhas da fogueira e do herói (vida e Fúria). Ficam acima da névoa para serem vistas mesmo com pouca luz
 export function renderHpBars() {
     drawHpBar(ctx, T.hpBar, state.coreX, state.coreY, getCoreHpRatio());
+    if (player.hidden) return;
     drawHpBar(ctx, HERO_VISUALS.hpBar, player.x, player.y, Math.max(0, Math.min(1, player.hp / player.maxHp)));
     renderFuryBar();
 }
@@ -117,5 +118,5 @@ export function renderAttackRange() {
         drawRangeCircle(shadowClone.x, shadowClone.y, getAtkRadius() * SHADOW_CLONE.radiusMultiplier,
             SHADOW_CLONE_VISUALS.rangeAlpha * appear);
     }
-    drawRangeCircle(player.x, player.y, getAtkRadius());
+    if (!player.hidden) drawRangeCircle(player.x, player.y, getAtkRadius());
 }

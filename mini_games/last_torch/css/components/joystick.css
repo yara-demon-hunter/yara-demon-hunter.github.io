@@ -97,8 +97,61 @@
     pointer-events: none;
 }
 
+/* Botão do dash: acima e à esquerda da adaga, ao alcance do mesmo polegar */
+#dashButton {
+    --cd: 0;
+    display: none;
+    position: absolute;
+    z-index: 15;
+    right: calc(var(--touch-right) + var(--touch-size) * 0.86);
+    bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.8);
+    width: calc(var(--touch-size) * 0.78);
+    height: calc(var(--touch-size) * 0.78);
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--touch-icon) * 0.95);
+    border: 2px solid rgba(167, 139, 250, 0.35);
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.4);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+#dashButton::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    background: conic-gradient(rgba(196, 181, 253, 0.65) calc((1 - var(--cd)) * 360deg), rgba(15, 23, 42, 0.4) 0);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+    pointer-events: none;
+}
+/* Área de toque maior que o desenho */
+#dashButton::after {
+    content: '';
+    position: absolute;
+    inset: -0.7rem;
+    border-radius: 50%;
+}
+#dashButton.is-ready {
+    border-color: rgba(196, 181, 253, 0.85);
+    box-shadow: 0 0 14px rgba(139, 92, 246, 0.45);
+}
+#dashButton b {
+    position: absolute;
+    right: -0.1rem;
+    bottom: -0.1rem;
+    color: #e9d5ff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-shadow: 0 1px 2px #000;
+}
+
 @media (pointer: coarse) {
     #joystick, #knifeButton { display: block; }
+    #dashButton { display: flex; }
 }
 
 /* Celular deitado (pouca altura): controles pequenos e bem acima da borda de baixo, na altura

@@ -1,5 +1,6 @@
-// --- SKILLS PASSIVAS ---
-// Compradas com o ouro que os monstros dropam (cost = moedas). Os pontos de skill vão para os stats.
+// --- SKILLS PASSIVAS (RELÍQUIAS) ---
+// Compradas com o ouro que os monstros dropam (cost = moedas), no acampamento ao fim de cada hora.
+// mods: efeitos simples, somados por js/systems/modifiers.js. As demais têm mecânica própria.
 
 export const PASSIVE_SKILL_MODELS = {
     shadowWhirl: {
@@ -18,14 +19,14 @@ export const PASSIVE_SKILL_MODELS = {
     },
     longThrow: {
         name: 'Long Throw',
-        icon: '🎯',
+        icon: '🏹',
         cost: 40,
         maxLvl: 1,
         desc: 'Thrown daggers fly 60% farther and faster.'
     },
     fanOfKnives: {
         name: 'Fan of Knives',
-        icon: '🗡️',
+        icon: '🔱',
         cost: 110,
         maxLvl: 1,
         desc: 'Throws 3 daggers at once in a fan. Combines with Long Throw.'
@@ -35,8 +36,116 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '👥',
         cost: 150,
         maxLvl: 1,
-        desc: 'A shadow reflection walks and throws daggers with you, and slashes any monster that enters its own circle. If it falls, it returns after a while.'
+        desc: 'A shadow reflection walks with you and slashes any monster that enters its own circle. If it falls, it returns after a while.'
+    },
+    greedyIdol: {
+        name: 'Greedy Idol',
+        icon: '🗿',
+        cost: 70,
+        maxLvl: 1,
+        desc: '+35% gold, but -12% max health.',
+        mods: { gold: 0.35, maxHp: -0.12 }
+    },
+    emberFlask: {
+        name: 'Ember Flask',
+        icon: '🏺',
+        cost: 90,
+        maxLvl: 1,
+        desc: 'The torch slowly recovers: +1 health every 2 seconds.',
+        mods: { torchRegen: 0.5 }
+    },
+    secondPrayer: {
+        name: 'Second Prayer',
+        icon: '📿',
+        cost: 170,
+        maxLvl: 1,
+        desc: 'Rise once with half your health when you fall.',
+        mods: { revives: 1 }
+    },
+    boneCharm: {
+        name: 'Bone Charm',
+        icon: '🦴',
+        cost: 85,
+        maxLvl: 1,
+        desc: '+1 dash charge.',
+        mods: { dashCharges: 1 }
+    },
+    witchEye: {
+        name: "Witch's Eye",
+        icon: '🔮',
+        cost: 130,
+        maxLvl: 1,
+        desc: 'Level ups offer 4 cards instead of 3.',
+        mods: { cardChoices: 1 }
+    },
+    berserkDraught: {
+        name: 'Berserk Draught',
+        icon: '🧪',
+        cost: 80,
+        maxLvl: 1,
+        desc: '+60% damage while under 35% health.',
+        mods: { lowHpDamage: 0.6 }
+    },
+    thornCrown: {
+        name: 'Crown of Thorns',
+        icon: '👑',
+        cost: 75,
+        maxLvl: 1,
+        desc: 'Monsters that touch you take 150% of your blade damage.',
+        mods: { thorns: 1.5 }
+    },
+    ironHeart: {
+        name: 'Iron Heart',
+        icon: '🫀',
+        cost: 120,
+        maxLvl: 1,
+        desc: 'Take 18% less damage.',
+        mods: { damageTaken: -0.18 }
+    },
+    luckyCoin: {
+        name: 'Lucky Coin',
+        icon: '🍀',
+        cost: 65,
+        maxLvl: 1,
+        desc: 'Better card rarity and +1 reroll.',
+        mods: { luck: 0.25, rerolls: 1 }
+    },
+    hunterMark: {
+        name: 'Hunter Mark',
+        icon: '🎖️',
+        cost: 95,
+        maxLvl: 1,
+        desc: 'Daggers deal +50% damage and recharge 20% faster.',
+        mods: { knifeDamage: 0.5, knifeCooldown: 0.2 }
+    },
+    warmCloak: {
+        name: 'Warm Cloak',
+        icon: '🧥',
+        cost: 55,
+        maxLvl: 1,
+        desc: 'The warmth of the torch reaches twice as far and heals twice as fast.',
+        mods: { warmth: 1 }
+    },
+    furyStone: {
+        name: 'Fury Stone',
+        icon: '💢',
+        cost: 100,
+        maxLvl: 1,
+        desc: 'Fury lasts 2 seconds longer and charges 25% faster.',
+        mods: { furyDuration: 2, furyCharge: 0.25 }
     }
+};
+
+// --- ACAMPAMENTO ---
+// Fim de cada hora: o mercador oferece relíquias (as passivas) e o ouro também alimenta a tocha.
+export const CAMP = {
+    offers: 3,
+    costMultiplier: 1.35,
+    costGrowthPerHour: 0.15,        // relíquias ficam mais caras a cada hora
+    rerollCost: 15,
+    rerollCostGrowth: 12,
+    fuel: { heal: 30, cost: 40, costPerHour: 12, costPerUse: 25 },
+    rest: { healRatio: 0.5, cost: 30, costPerHour: 9, costPerUse: 20 }
 };
 
 // Long Throw: a adaga vai mais longe e mais rápido (vale para todas as adagas do leque)

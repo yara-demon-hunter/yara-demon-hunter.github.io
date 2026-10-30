@@ -1,5 +1,5 @@
 import { FOREST_VISUALS as F } from '../../data_model/visuals/scenery/forest_visual.js';
-import { ctx, state } from '../core/state.js';
+import { ctx, player, state } from '../core/state.js';
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
 import { drawGlow } from './fx/glow.js';
 import { createRandom, pick, randomRange } from './fx/random.js';
@@ -283,6 +283,11 @@ export function getTorchLightRadius() {
     return cache.lightRadius * flicker;
 }
 
+// Raio de luz atual da tocha, já calculado neste quadro
+export function getCurrentLightRadius() {
+    return cache.currentLight || 0;
+}
+
 // Brilho quente da tocha sobre o chão (soma de luz)
 export function renderTorchLight() {
     const { coreX, coreY } = state;
@@ -347,7 +352,7 @@ export function renderFogAndVignette() {
     const { width: w, height: h, coreX, coreY } = state;
     const now = performance.now();
     // A névoa anda devagar: redesenhada a ~30 FPS, nos quadros intermediários reaproveita a anterior
-    if (now - cache.fogDrawnAt < F.fogFrameMs) {
+    if (now - cache.fogDrawnAt < F.fogFrameMs * (state.lowQuality ? 2 : 1)) {
         ctx.drawImage(cache.fogCanvas, 0, 0, w, h);
         return;
     }
@@ -356,7 +361,7 @@ export function renderFogAndVignette() {
     const g = cache.fogCtx;
     const res = F.fogResolution;
     const hpRatio = Math.max(0, Math.min(1, state.coreHp / state.coreHpMax));
-    const density = 1 + (1 - hpRatio) * F.fogDensityBoostAtZeroHp;
+    const density = (1 + (1 - hpRatio) * F.fogDensityBoostAtZeroHp) * (1 - Math.min(1, state.dawn * 1.6));
 
     g.setTransform(res, 0, 0, res, 0, 0);
     g.globalCompositeOperation = 'source-over';
@@ -378,8 +383,9 @@ export function renderFogAndVignette() {
 
     // Noite fria + vinheta por cima da névoa
     g.setTransform(1, 0, 0, 1, 0, 0);
-    g.globalAlpha = 1;
+    g.globalAlpha = 1 - Math.min(1, state.dawn * 1.4);
     g.drawImage(cache.vignette, 0, 0);
+    g.globalAlpha = 1;
 
     // Luz da tocha: apaga a sombra num círculo com borda suave
     const lightR = (cache.currentLight || getTorchLightRadius()) * res;
@@ -391,6 +397,16 @@ export function renderFogAndVignette() {
     g.globalCompositeOperation = 'destination-out';
     g.fillStyle = hole;
     g.fillRect(0, 0, g.canvas.width, g.canvas.height);
+
+    // Luz do herói: uma área menor em volta dele, para a luta nunca sumir na névoa
+    const heroX = player.x * res;
+    const heroY = player.y * res;
+    const heroR = T.heroLightRadius * res;
+    const heroHole = g.createRadialGradient(heroX, heroY, heroR * T.heroLightSolid, heroX, heroY, heroR);
+    heroHole.addColorStop(0, `rgba(0, 0, 0, ${T.heroLightStrength})`);
+    heroHole.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    g.fillStyle = heroHole;
+    g.fillRect(heroX - heroR, heroY - heroR, heroR * 2, heroR * 2);
     g.globalCompositeOperation = 'source-over';
 
     ctx.drawImage(cache.fogCanvas, 0, 0, w, h);

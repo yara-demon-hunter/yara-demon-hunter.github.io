@@ -19,7 +19,7 @@
 
         state.gameState = 'PLAYING';     // o boss só anima durante a partida
         const M = BOSS_MODELS.DEMON_LORD;
-        const make = (angle, phase) => ({ x: 0, y: 0, angle, phase, radius: M.radius, shootTimer: M.shootCooldownSeconds });
+        const make = (angle, phase) => ({ x: 0, y: 0, angle, phase, radius: M.radius, shootTimer: M.patternGapSeconds });
 
         const main = make(0, 0.4);
         const facings = [-Math.PI / 2, Math.PI / 2, Math.PI].map((a, i) => make(a, 1 + i));
@@ -55,7 +55,7 @@
             ctx.fillRect(0, 0, 1200, 760);
 
             // Ciclo de tiro igual ao do jogo
-            main.shootTimer = M.shootCooldownSeconds - ((now / 1000) % M.shootCooldownSeconds);
+            main.shootTimer = M.patternGapSeconds - ((now / 1000) % M.patternGapSeconds);
             fireball.x = ((now / 1000 * M.projectileSpeed) % 900) - 450;
 
             text('DEMON LORD — prévia (boss)', 24, 34, 20, '#f87171', 700);

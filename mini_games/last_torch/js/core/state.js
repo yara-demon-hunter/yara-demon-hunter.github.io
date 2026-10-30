@@ -1,6 +1,7 @@
-import { CHARACTER_MODEL, createPlayerState } from '../../data_model/character.js';
+import { createPlayerState } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { createPassives } from '../../data_model/passives.js';
+import { createPowers } from '../../data_model/powers.js';
 import { FRENZY_NOVA_SKILL, createAttributes } from '../../data_model/skills.js';
 import { SoundEngine } from '../audio/sound-engine.js';
 
@@ -11,6 +12,7 @@ export const ctx = canvas.getContext('2d', { alpha: false });
 export const audio = new SoundEngine();
 export const attributes = createAttributes();
 export const passives = createPassives();
+export const powers = createPowers();
 
 // Heroi & Light Trail
 export const player = createPlayerState();
@@ -42,28 +44,60 @@ export const maxUltEnergy = FRENZY_NOVA_SKILL.maximumEnergy;
 // --- VARIÁVEIS DE ESTADO ---
 // Tudo que muda durante a partida fica neste objeto para ser compartilhado entre os módulos.
 export const state = {
+    // START, PLAYING, PAUSED (status), CARDS (level up / baú), CAMP (acampamento), GAMEOVER
     gameState: 'START',
+    // Fase dentro de PLAYING: HUNT (caçada), CLEAR (onda de fogo no fim da hora), DYING (morte), DAWN (amanhecer)
+    phase: 'HUNT',
+    phaseTimer: 0,
+    gameOverReason: '',
     // Tamanho do MUNDO (unidades do jogo), não da janela. Veja data_model/world.js
     width: 0,
     height: 0,
     // Como o mundo é mostrado na tela (escala e deslocamento em px do navegador)
     view: { scale: 1, offsetX: 0, offsetY: 0, cssWidth: 0, cssHeight: 0, pixelRatio: 1, mobile: false },
 
-    // Screen Shake
-    shakeIntensity: 0,
+    // Aparelho lento: menos resolução e detalhe (js/game.js liga sozinho, veja detectSlowDevice)
+    lowQuality: false,
 
-    // Dados de Progresso
+    // Screen Shake, soco de zoom e clarão de tela
+    shakeIntensity: 0,
+    zoomPunch: 0,
+    flash: { color: '#ffffff', alpha: 0 },
+
+    // Hit stop (segundos congelado), câmera lenta (segundos e escala) e relógio da partida
+    hitStop: 0,
+    slowMoTimer: 0,
+    slowMoScale: 1,
+    runTime: 0,
+
+    // Dados de Progresso (turn = hora da noite; targetScore fecha a hora)
     turn: 1,
     scoreTurn: 0,
-    targetScore: 500,
+    targetScore: 0,
     totalScore: 0,
     coins: 0,
+    hourPlan: null,
+    omen: null,
+    nextOmen: null,
+    bossPending: 0,             // segundos até o boss surgir (0 = nenhum a caminho)
+    endless: false,             // jogador escolheu continuar depois do amanhecer
+    dawn: 0,                    // 0 a 1: a noite clareando
+
+    // Números da partida (tela final, Trials, brasas)
+    run: { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, embersBanked: 0 },
+    streak: 0,
+    streakTimer: 0,
+    streakTierShown: 0,
+    rerolls: 0,
+    revives: 0,
+    pendingCards: [],           // próximas telas de carta: 'level' ou 'chest'
+    campPending: false,         // acampamento abre depois das cartas pendentes
+    pickupPity: 0,
 
     // Level & XP
     playerLevel: 1,
     playerXp: 0,
-    playerMaxXp: CHARACTER_MODEL.xpToNextLevel,
-    skillPoints: 0,
+    playerMaxXp: 0,
 
     // Carga da Skill Ult (Frenzy Nova)
     ultEnergy: 0,
@@ -83,9 +117,31 @@ export const state = {
     knives: [],
     enemyProjectiles: [],
     goldDrops: [],
+    pickups: [],
     currentBoss: null,
+    goldVacuum: false,          // fim da hora: todas as moedas voam até o herói
+    magnetTimer: 0,             // ímã pego no chão: o mesmo, por alguns segundos
 
-    // Animação de level up em andamento: { age, points } ou null
+    // Efeitos (js/systems/effects.js, desenhados em js/render/effects.js)
+    gibs: [],
+    stains: [],
+    shockwaves: [],
+    floaters: [],
+    telegraphs: [],             // avisos no chão: círculos (slam) e linhas (espectro)
+    dashGhosts: [],
+    clearWaveRadius: 0,
+
+    // Poderes (js/systems/powers.js, desenhados em js/render/powers.js)
+    orbitAngle: 0,
+    trailDistance: 0,
+    groundFires: [],
+    lightning: [],
+    bolts: [],
+    stars: [],
+    powerTimers: {},
+    blastBudget: 0,
+
+    // Animação de level up em andamento: { age, label } ou null
     levelUpFx: null,
 
     // Adaga de arremesso: mira em coordenadas do mundo, se o botão/dedo está pressionado, recarga,

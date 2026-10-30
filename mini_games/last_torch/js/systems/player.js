@@ -1,6 +1,12 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
-import { joystick, keys, player, state } from '../core/state.js';
+import { audio, joystick, keys, player, state } from '../core/state.js';
+import { showBanner } from '../ui/banner.js';
+import { updateHUD } from '../ui/hud.js';
+import { moveDash } from './dash.js';
+import { addFloater, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion } from './effects.js';
+import { mod } from './modifiers.js';
+import { beginDeath } from './night.js';
 import { getPlayerMaxSpeed } from './stats.js';
 
 // Ponto (x, y) empurrado para a borda da área bloqueada da tocha, se estiver dentro dela.
@@ -27,6 +33,49 @@ function aroundTorch(dirX, dirY) {
     return { x: -toCoreY / dist * side, y: toCoreX / dist * side };
 }
 
+// --- DANO NO HERÓI ---
+// Contato e tiros passam por aqui. Devolve false se o golpe não pegou (invulnerável).
+export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
+    if (player.iFrames > 0 || state.phase !== 'HUNT') return false;
+    const damage = amount * Math.max(0.1, 1 + mod('damageTaken'));
+    player.hp -= damage;
+    player.iFrames = invulnerableSeconds;
+    registerPlayerHit(fromX, fromY);
+    createExplosion(player.x, player.y, '#f43f5e', 12);
+    addFloater(player.x, player.y - 40, `-${Math.round(damage)}`, '#fb7185');
+    shakeScreen(6);
+    audio.playHurt();
+    if (player.hp <= 0) heroDown();
+    updateHUD();
+    return true;
+}
+
+// Com um Last Prayer sobrando o herói levanta; senão, a noite acaba
+function heroDown() {
+    if (state.revives <= 0) {
+        player.hp = 0;
+        beginDeath('PLAYER');
+        return;
+    }
+    state.revives--;
+    state.run.revivesUsed++;
+    player.hp = player.maxHp * 0.5;
+    player.iFrames = 2.5;
+    state.enemyProjectiles.length = 0;
+    state.enemies.forEach(e => {
+        const a = Math.atan2(e.y - player.y, e.x - player.x);
+        if (!e.isBoss) {
+            e.vx += Math.cos(a) * 900;
+            e.vy += Math.sin(a) * 900;
+        }
+    });
+    slowMotion(0.3, 0.8);
+    screenFlash('#fef3c7', 0.7);
+    addShockwave(player.x, player.y, { radius: 420, color: '#fde68a', width: 10, seconds: 0.7 });
+    showBanner('', 'NOT YET', 'The prayer is answered', 'gold');
+    audio.playRevive();
+}
+
 // --- MOVIMENTAÇÃO DO HERÓI ---
 export function updatePlayer(dt) {
     // Timers
@@ -44,7 +93,9 @@ export function updatePlayer(dt) {
 
     const joyMag = Math.hypot(joystick.x, joystick.y);
 
-    if (joyMag > 0) {
+    if (player.dashTimer > 0) {
+        moveDash(dt);
+    } else if (joyMag > 0) {
         // Analógico: inclinar menos anda mais devagar
         player.x += (joystick.x / joyMag) * Math.min(1, joyMag) * speed * dt;
         player.y += (joystick.y / joyMag) * Math.min(1, joyMag) * speed * dt;
@@ -71,7 +122,7 @@ export function updatePlayer(dt) {
     }
 
     player.x = Math.max(15, Math.min(state.width - 15, player.x));
-    player.y = Math.max(15, Math.min(state.height - 15, player.y));
+    player.y = Math.max(CHARACTER_MODEL.topMargin, Math.min(state.height - 15, player.y));
 
     // A tocha é sólida: nem o herói nem o ponto clicado ficam dentro dela
     const pos = pushOutOfTorch(player.x, player.y);

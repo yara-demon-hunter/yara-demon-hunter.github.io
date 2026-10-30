@@ -1,26 +1,22 @@
-import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { SKILL_POINTS_PER_LEVEL } from '../../data_model/skills.js';
+import { CHARACTER_MODEL, getXpToNextLevel } from '../../data_model/character.js';
 import { audio, player, state } from '../core/state.js';
-import { pulseSkillPoints, updateHUD } from '../ui/hud.js';
+import { pulseLevel, updateHUD } from '../ui/hud.js';
+import { addShockwave } from './effects.js';
 
 // --- LEVEL & XP ---
-// Cada nível dá pontos de skill para o jogador gastar nos stats que quiser (loja)
+// Cada nível abre a escolha de cartas (js/ui/cards.js) e dá uma cura parcial.
 export function gainXp(amount) {
     state.playerXp += amount;
-    if (state.playerXp >= state.playerMaxXp) {
+    while (state.playerXp >= state.playerMaxXp) {
         state.playerXp -= state.playerMaxXp;
         state.playerLevel++;
-        state.skillPoints += SKILL_POINTS_PER_LEVEL;
-        state.playerMaxXp = Math.floor(state.playerMaxXp * CHARACTER_MODEL.xpGrowthMultiplier);
-
-        // Não melhora stats: só o ponto de skill e uma cura parcial
+        state.playerMaxXp = getXpToNextLevel(state.playerLevel);
         player.hp = Math.min(player.maxHp, player.hp + player.maxHp * CHARACTER_MODEL.levelUpHealRatio);
+        state.pendingCards.push('level');
 
-        // Dois níveis seguidos somam os pontos na mesma mensagem
-        const pendingPoints = state.levelUpFx ? state.levelUpFx.points : 0;
-        state.levelUpFx = { age: 0, points: pendingPoints + SKILL_POINTS_PER_LEVEL };
+        addShockwave(player.x, player.y, { radius: 90, color: '#c084fc', width: 5, seconds: 0.45 });
         audio.playLevelUp();
-        pulseSkillPoints();
+        pulseLevel();
     }
     updateHUD();
 }

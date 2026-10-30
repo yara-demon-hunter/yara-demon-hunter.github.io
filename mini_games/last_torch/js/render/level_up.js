@@ -4,8 +4,8 @@ import { easeOutCubic, easeOutQuad } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
 
 // --- LEVEL UP ---
-// Aviso discreto em cima do herói: fios de energia roxa sobem girando em volta dele e um texto
-// pequeno mostra os pontos de skill ganhos. Acompanha o herói enquanto ele anda.
+// Depois de escolher a carta: fios de energia roxa sobem girando em volta do herói e um texto
+// pequeno mostra o que ele ganhou. Acompanha o herói enquanto ele anda.
 // Os dados visuais ficam em LEVEL_UP_VISUALS (data_model/visuals/effects/level_up_visual.js).
 
 const TAU = Math.PI * 2;
@@ -91,8 +91,6 @@ export function renderLevelUpFront() {
     const rise = V.riseDistance * easeOutCubic(fx.age / V.durationSeconds);
     const x = Math.max(V.textMarginX, Math.min(state.width - V.textMarginX, player.x));
     const y = Math.max(V.textMinY, player.y - V.textOffsetY - rise);
-    const label = `+${fx.points} SKILL POINT${fx.points === 1 ? '' : 'S'}`;
-
     ctx.save();
     ctx.globalAlpha = fade * Math.min(1, fx.age / V.fadeInSeconds);
     ctx.textAlign = 'center';
@@ -100,6 +98,6 @@ export function renderLevelUpFront() {
     ctx.lineJoin = 'round';
     ctx.lineWidth = V.outlineWidth;
     renderLabel(V.titleText, x, y, V.titleFont, V.colors.title);
-    renderLabel(label, x, y + V.pointsGap, V.pointsFont, V.colors.points);
+    renderLabel(fx.label, x, y + V.pointsGap, V.pointsFont, V.colors.points);
     ctx.restore();
 }

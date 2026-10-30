@@ -11,6 +11,10 @@ export const TORCH_VISUALS = {
     lightSmoothing: 2.5,           // suavidade ao mudar de tamanho (maior = mais rápido)
     lightFlicker: 0.03,            // tremida da luz (fração do raio)
     lightEdgeSoftness: 0.45,       // 0 = borda dura; 1 = degradê até o centro
+    // Luz do herói: abre a névoa em volta dele, onde quer que esteja
+    heroLightRadius: 210,
+    heroLightSolid: 0.35,          // fração do raio totalmente iluminada
+    heroLightStrength: 0.92,       // 1 = sem névoa nenhuma no centro
     groundGlowColor: '255, 150, 60',
     groundGlowAlpha: 0.3,
 

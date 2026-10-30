@@ -11,12 +11,24 @@ export const CHARACTER_MODEL = {
     projectileInvulnerabilitySeconds: 0.4,
     damageImmunityFlashIntervalMs: 50,
     collisionRadius: 12,
+    topMargin: 76,              // o herói não sobe até atrás do HUD
     trailLength: 12,
     trailFadePerSecond: 4,
-    xpToNextLevel: 100,
-    xpGrowthMultiplier: 1.35,
-    levelUpHealRatio: 0.3
+    // XP para o próximo nível: base + linear x n + quadratic x n², com n = nível - 1
+    xpCurve: { base: 80, linear: 60, quadratic: 2.4 },
+    levelUpHealRatio: 0.12,
+    // Calor da tocha: perto dela o herói se recupera aos poucos
+    warmthRadius: 92,
+    warmthHealPerSecond: 3,
+    // Ouro no chão só vem até o herói dentro deste raio (no fim da hora vem tudo)
+    magnetRadius: 105
 };
+
+export function getXpToNextLevel(level) {
+    const { base, linear, quadratic } = CHARACTER_MODEL.xpCurve;
+    const n = level - 1;
+    return Math.round(base + linear * n + quadratic * n * n);
+}
 
 export function createPlayerState() {
     return {
@@ -32,6 +44,10 @@ export function createPlayerState() {
         // Mirror Ward: recarga restante, instante e direção do último rebate (animação)
         reflectTimer: 0, reflectTime: -100000, reflectAngle: 0,
         comboStep: 1,
-        trail: []
+        trail: [],
+        // Dash: cargas, recarga, tempo restante do avanço e direção
+        dashCharges: 0, dashRecharge: 0, dashTimer: 0, dashX: 0, dashY: 0,
+        hidden: false,              // morto: o boneco some na explosão de sombra
+        mouseFollow: true           // herói anda até o cursor (desliga ao usar o teclado)
     };
 }

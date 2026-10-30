@@ -1,4 +1,4 @@
-/* --- LOJA: Custom Scrollbar --- */
+/* --- STATUS E ACAMPAMENTO: Custom Scrollbar --- */
 .custom-scroll::-webkit-scrollbar {
     width: 6px;
 }
@@ -14,7 +14,7 @@
     background: rgba(56, 189, 248, 0.8);
 }
 
-/* --- LOJA: painéis (sempre abertos) --- */
+/* --- STATUS: painéis (sempre abertos) --- */
 .shop-panel {
     border-width: 1px;
     border-radius: 12px;
@@ -33,10 +33,10 @@
 }
 .shop-panel.has-upgrade { border-color: rgba(251, 191, 36, 0.72); box-shadow: 0 0 14px rgba(251, 191, 36, 0.16); }
 
-/* --- LOJA: linha compacta (nome | valor | botão), uma por stat --- */
+/* --- STATUS: linha compacta (nome | valor), uma por stat --- */
 .shop-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.35rem;
     min-width: 0;
@@ -46,7 +46,6 @@
     border-radius: 0.5rem;
     background: rgba(15, 23, 42, 0.6);
 }
-.shop-row-passive { border-color: rgba(139, 92, 246, 0.3); }
 .shop-row-name {
     display: flex;
     align-items: center;
@@ -75,42 +74,59 @@
     white-space: nowrap;
 }
 .shop-row-btn:hover:not(:disabled) { background: #d97706; }
-/* Âmbar = ouro (passivas); roxo = pontos de skill (stats) */
-.shop-row-btn-points { background: #8b5cf6; color: #fff; }
-.shop-row-btn-points:hover:not(:disabled) { background: #7c3aed; }
 .shop-row-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
 
-/* --- LOJA: cartões das skills passivas --- */
-.passive-cards {
+/* --- STATUS: poderes e relíquias da partida --- */
+.build-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-}
-@media (max-width: 340px) {
-    .passive-cards { grid-template-columns: minmax(0, 1fr); }
-}
-.passive-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     gap: 0.35rem;
-    padding: 0.6rem 0.5rem;
-    border: 1px solid rgba(139, 92, 246, 0.35);
-    border-radius: 0.75rem;
-    background: linear-gradient(180deg, rgba(76, 29, 149, 0.28), rgba(15, 23, 42, 0.7));
-    text-align: center;
 }
-.passive-card.is-ready {
-    border-color: rgba(251, 191, 36, 0.75);
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
+@media (max-width: 480px) {
+    .build-list { grid-template-columns: minmax(0, 1fr); }
 }
-.passive-card.is-acquired {
-    border-color: rgba(52, 211, 153, 0.55);
-    background: linear-gradient(180deg, rgba(6, 78, 59, 0.3), rgba(15, 23, 42, 0.7));
+.build-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid rgba(51, 65, 85, 0.7);
+    border-radius: 0.5rem;
+    background: rgba(15, 23, 42, 0.6);
 }
-.passive-card-icon { font-size: 1.7rem; line-height: 1; }
-.passive-card-name { color: #ddd6fe; font-size: 0.75rem; font-weight: 700; }
-.passive-card-desc { color: #94a3b8; font-size: 0.65rem; line-height: 1.3; flex: 1; }
-.passive-card .shop-row-btn { width: 100%; padding: 0.3rem 0.5rem; }
-.passive-card-owned { color: #6ee7b7; font-size: 0.7rem; font-weight: 700; padding: 0.3rem 0; }
-#passivesPanel .shop-panel-title { color: #c4b5fd; }
+.build-row-icon { font-size: 1.2rem; line-height: 1; }
+.build-row div { min-width: 0; }
+.build-row b { display: block; color: #e2e8f0; font-size: 0.72rem; }
+.build-row span:not(.build-row-icon) { display: block; color: #94a3b8; font-size: 0.62rem; line-height: 1.25; }
+.build-empty { grid-column: 1 / -1; color: #64748b; font-size: 0.72rem; padding: 0.2rem 0.3rem; }
+
+/* --- STATUS: opções --- */
+.settings-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+.setting-toggle {
+    padding: 0.35rem 0.6rem;
+    border: 1px solid rgba(51, 65, 85, 0.9);
+    border-radius: 0.5rem;
+    background: rgba(15, 23, 42, 0.6);
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+.setting-toggle.is-on {
+    border-color: rgba(52, 211, 153, 0.6);
+    color: #a7f3d0;
+    background: rgba(6, 78, 59, 0.3);
+}
+
+/* Celular de lado: a área com rolagem fica com a tela quase toda */
+@media (max-height: 520px) and (orientation: landscape) {
+    #shopScreen { padding: 0.4rem; }
+    #shopScreen > div { padding: 0.5rem 0.7rem; }
+    #shopScreen h2 { font-size: 0.95rem; }
+    #shopScreen > div > div:first-child { padding-bottom: 0.25rem; }
+    #btnResume { margin-top: 0.3rem; padding: 0.35rem; font-size: 0.8rem; }
+    #btnAbandon { margin-top: 0.1rem; padding: 0.1rem; font-size: 0.62rem; }
+}

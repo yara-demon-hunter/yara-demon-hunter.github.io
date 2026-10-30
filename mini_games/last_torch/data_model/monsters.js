@@ -13,7 +13,7 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 20,
-        goldBase: 3,
+        goldBase: 2,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
@@ -30,7 +30,7 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 20,
-        goldBase: 2,
+        goldBase: 1,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
@@ -47,14 +47,14 @@ export const MONSTER_MODELS = {
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 40,
-        goldBase: 8,
+        goldBase: 5,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
         splitCount: 2
     },
     WITCH: {
-        spawnWeight: 0.18,
+        spawnWeight: 0.1,
         hpBase: 65,
         hpPerTurn: 8,
         speedMin: 40,
@@ -63,12 +63,14 @@ export const MONSTER_MODELS = {
         color: '#f50bca',
         damage: 12,
         initialShootCooldownSeconds: 4,
-        shootCooldownSeconds: 5.5,       // segundos entre um tiro e outro
+        shootCooldownSeconds: 6.5,       // segundos entre um tiro e outro
         projectileSpeed: 160,
         projectileRadius: 5,
         projectileDamageMultiplier: 0.8,
-        scoreReward: 20,
-        goldBase: 8,
+        projectileTorchDamage: 2,
+        keepDistance: 165,               // para de andar a esta distância do alvo e atira
+        scoreReward: 30,
+        goldBase: 5,
         goldVariance: 0.5,
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
@@ -83,26 +85,107 @@ export const MONSTER_MODELS = {
         damage: 8,
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
-        scoreReward: 20,
+        scoreReward: 10,
+        goldBase: 1,
+        goldVariance: 0.5,
+        xpRewardBase: 8,
+        xpRewardPerTurn: 1,
+        splitVelocity: 100,
+        parentSplitOffset: 20
+    },
+    // Mariposa de cinzas: ignora o herói e voa direto para a chama. A adaga é a resposta.
+    MOTH: {
+        spawnWeight: 0.1,
+        hpBase: 16,
+        hpPerTurn: 4,
+        speedMin: 88,
+        speedMax: 112,
+        radius: 10,
+        color: '#d6b98a',
+        damage: 8,
+        torchDamage: 6,
+        ignoresPlayer: true,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 25,
         goldBase: 2,
         goldVariance: 0.5,
         xpRewardBase: 20,
-        xpRewardPerTurn: 3,
-        splitVelocity: 100,
-        parentSplitOffset: 20
+        xpRewardPerTurn: 3
+    },
+    // Inchado: lento e cheio de gás. Explode ao morrer, ferindo herói e monstros em volta.
+    BLOATER: {
+        spawnWeight: 0.1,
+        hpBase: 100,
+        hpPerTurn: 16,
+        speedMin: 30,
+        speedMax: 36,
+        radius: 19,
+        color: '#a3e635',
+        damage: 14,
+        torchDamage: 20,
+        explosion: { radius: 86, damage: 26, monsterDamageRatio: 0.9 },
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 50,
+        goldBase: 6,
+        goldVariance: 0.5,
+        xpRewardBase: 24,
+        xpRewardPerTurn: 3
+    },
+    // Espectro: mira e dispara em linha reta. O dash é a resposta.
+    WRAITH: {
+        spawnWeight: 0.1,
+        hpBase: 44,
+        hpPerTurn: 10,
+        speedMin: 58,
+        speedMax: 66,
+        radius: 12,
+        color: '#a5f3fc',
+        damage: 16,
+        lunge: { cooldownSeconds: 3.6, aimSeconds: 0.75, seconds: 0.42, speed: 560, triggerDistance: 330 },
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 35,
+        goldBase: 4,
+        goldVariance: 0.5,
+        xpRewardBase: 20,
+        xpRewardPerTurn: 3
+    },
+    // Necromante: fica longe e levanta esqueletos até alguém ir buscá-lo.
+    NECROMANCER: {
+        spawnWeight: 0.06,
+        hpBase: 80,
+        hpPerTurn: 12,
+        speedMin: 34,
+        speedMax: 34,
+        radius: 13,
+        color: '#86efac',
+        damage: 12,
+        keepDistance: 290,
+        summon: { type: 'SKELETON', count: 2, spread: 46 },
+        initialShootCooldownSeconds: 3,
+        shootCooldownSeconds: 6.5,
+        scoreReward: 60,
+        goldBase: 9,
+        goldVariance: 0.5,
+        xpRewardBase: 26,
+        xpRewardPerTurn: 3
     }
 };
 
 // Os bosses ficam em ./bosses.js (BOSS_MODELS / BOSS_SPAWNING)
 export const MONSTER_SPAWNING = {
-    regularSpawnScreenRatio: 0.6,
-    regularSpawnOffset: 50,
+    edgeMargin: 34,                  // nascem logo fora da tela (unidades do mundo)
     targetPlayerDistance: 240,
     movementDamping: 0.88,
-    contactKnockback: 220
+    contactKnockback: 220,
+    // Monstros se empurram de leve: uma horda ocupa espaço em vez de virar um ponto só
+    separationStrength: 60,
+    separationCell: 44
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];

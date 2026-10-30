@@ -11,3 +11,9 @@
 @import url('./components/joystick.css');
 @import url('./components/start-screen.css');
 @import url('./components/orientation.css');
+@import url('./components/screens.css');
+@import url('./components/banner.css');
+@import url('./components/cards.css');
+@import url('./components/camp.css');
+@import url('./components/summary.css');
+@import url('./components/hearth.css');

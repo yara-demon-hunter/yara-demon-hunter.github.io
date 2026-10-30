@@ -1,6 +1,5 @@
 // --- DADOS VISUAIS: Level up. ---
 // Cores, tamanhos e ritmos de animação lidos por js/render/level_up.js.
-// Os pontos ganhos por nível ficam em SKILL_POINTS_PER_LEVEL (data_model/skills.js).
 
 export const LEVEL_UP_VISUALS = {
     colors: {
@@ -19,10 +18,10 @@ export const LEVEL_UP_VISUALS = {
     // Texto acima do herói
     titleText: 'LEVEL UP',
     titleFont: '800 15px Cinzel, serif',
-    pointsFont: '800 10px Inter, sans-serif',
+    pointsFont: '800 11px Inter, sans-serif',
     textOffsetY: 88,            // distância do herói até o título
     pointsGap: 20,              // distância do título até a linha dos pontos
-    fadeInSeconds: 1.0,
+    fadeInSeconds: 0.2,
     riseDistance: 12,           // quanto o texto sobe durante a animação
     outlineWidth: 3.5,
     // Limites para o texto não sair do mundo nem ficar atrás do HUD do topo

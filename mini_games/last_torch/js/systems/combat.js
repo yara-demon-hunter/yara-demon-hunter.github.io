@@ -2,7 +2,9 @@ import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { audio, maxUltEnergy, passives, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
-import { createExplosion, shakeScreen } from './effects.js';
+import { blast, dealDamage } from './damage.js';
+import { addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
+import { mod } from './modifiers.js';
 import {
     getAtkCooldown,
     getAtkDamage,
@@ -54,6 +56,7 @@ export function findNearestEnemy(x, y, maxDist) {
 // Dano e empurrão em todo monstro dentro do alcance e da abertura do corte (ou em volta toda:
 // giro e Fúria ativa). onHit é chamado a cada monstro atingido.
 export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, allAround, onHit) {
+    let hits = 0;
     state.enemies.forEach(e => {
         const d = Math.hypot(e.x - x, e.y - y);
         if (d <= radius + e.radius) {
@@ -64,15 +67,14 @@ export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, a
 
             // Aplica dano se o inimigo está dentro da abertura angular atual do corte
             if (diffAngle <= arcHalf + 0.1 || state.frenzyActiveTimer > 0 || allAround) {
-                e.hp -= dmg;
+                dealDamage(e, dmg, { kbX: Math.cos(enemyAngle) * kbForce, kbY: Math.sin(enemyAngle) * kbForce });
                 if (onHit) onHit(e);
-
-                e.vx += Math.cos(enemyAngle) * kbForce;
-                e.vy += Math.sin(enemyAngle) * kbForce;
                 createExplosion(e.x, e.y, e.color, 4);
+                hits++;
             }
         }
     });
+    return hits;
 }
 
 export function chargeUlt(amount) {
@@ -94,6 +96,13 @@ export function triggerFrenzyUlt() {
     state.frenzyActiveTimer = state.frenzyDuration;
     audio.playUltSound();
     shakeScreen(15);
+    hitStop(0.07);
+    zoomPunch(0.035);
+    screenFlash('#f0abfc', 0.3);
+    addShockwave(player.x, player.y, { radius: getAtkRadius() * FRENZY_NOVA_SKILL.burstRadiusMultiplier, color: '#f0abfc', width: 8, seconds: 0.45 });
+    state.blastBudget++;
+    blast(player.x, player.y, getAtkRadius() * FRENZY_NOVA_SKILL.burstRadiusMultiplier,
+        getAtkDamage() * FRENZY_NOVA_SKILL.burstDamageMultiplier, FRENZY_NOVA_SKILL.burstKnockback, '#f0abfc');
 
     // Disparo de ondas de lâminas em várias direções no momento de ativação
     for (let i = 0; i < FRENZY_NOVA_SKILL.slashCount; i++) {
@@ -135,8 +144,15 @@ export function updateAutoAttack(dt) {
     const kbForce = getKnockback() * (player.comboStep === 3 ? BLADE_SKILL.comboKnockbackMultiplier : 1.0);
 
     // Colisão de dano no arco do golpe
-    hitEnemiesInArc(player.x, player.y, atkAngle, attackRad, currentArcHalf, dmg, kbForce, whirl,
-        () => chargeUlt(FRENZY_NOVA_SKILL.chargePerHit));
+    const hits = hitEnemiesInArc(player.x, player.y, atkAngle, attackRad, currentArcHalf, dmg, kbForce, whirl,
+        () => chargeUlt(FRENZY_NOVA_SKILL.chargePerHit * (1 + mod('furyCharge'))));
+    if (hits > 0) {
+        audio.playHit(hits);
+        if (player.comboStep === 3) {
+            hitStop(0.04);
+            shakeScreen(3);
+        }
+    }
 
     player.comboStep = player.comboStep >= 3 ? 1 : player.comboStep + 1;
 }
