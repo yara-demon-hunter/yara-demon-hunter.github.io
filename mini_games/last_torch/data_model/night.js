@@ -32,7 +32,8 @@ export const HORDES = {
     mothSwarm: { kind: 'swarm', type: 'MOTH', minHour: 5, baseCount: 3, perHour: 0.4, banner: 'MOTHS TO THE FLAME' },
     graveRise: { kind: 'grave', type: 'SKELETON', minHour: 3, baseCount: 3, perHour: 0.45, banner: 'THE GROUND OPENS' },
     plague: { kind: 'wall', type: 'BLOATER', minHour: 7, baseCount: 2, perHour: 0.2, banner: 'PLAGUE ON THE WIND' },
-    coven: { kind: 'ring', type: 'WITCH', minHour: 7, baseCount: 2, perHour: 0.2, banner: 'A COVEN GATHERS' }
+    coven: { kind: 'ring', type: 'WITCH', minHour: 7, baseCount: 2, perHour: 0.2, banner: 'A COVEN GATHERS' },
+    packHunt: { kind: 'swarm', type: 'ZOMBIE_WOLF', minHour: 5, baseCount: 3, perHour: 0.5, banner: 'THE PACK HUNTS' }
 };
 
 // Momentos da hora (fração dos pontos) em que entram as hordas e os elites
@@ -60,13 +61,12 @@ export const OMENS = {
 export const OMEN_SPAWNING = { firstHour: 3, chance: 0.6 };
 
 // --- NÍVEIS DE ESCURIDÃO ---
-// Liberados ao vencer a noite: tudo fica mais duro e as brasas valem mais.
+// Liberados ao vencer a noite: tudo fica mais duro.
 export const DARKNESS = {
     maxLevel: 8,
     enemyHpPerLevel: 0.28,
     enemyDamagePerLevel: 0.12,
-    enemySpeedPerLevel: 0.03,
-    embersPerLevel: 0.3
+    enemySpeedPerLevel: 0.03
 };
 
 // Sorteia as hordas da hora (uma de cada tipo, entre as já liberadas)

@@ -140,7 +140,18 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         desc: 'Fury lasts 2 seconds longer and charges 25% faster.',
         mods: { furyDuration: 2, furyCharge: 0.25 }
-    }
+    },
+    hearthstone: { name: 'Hearthstone', icon: '🧱', cost: 70, maxLvl: 1, desc: '+30 torch health.', mods: { torchHp: 30 } },
+    oldScars: { name: 'Old Scars', icon: '🩹', cost: 60, maxLvl: 1, desc: '+20 hero health.', mods: { maxHpFlat: 20 } },
+    whetstone: { name: 'Whetstone', icon: '⚒️', cost: 85, maxLvl: 1, desc: '+12% damage.', mods: { damage: 0.12 } },
+    wornBoots: { name: 'Worn Boots', icon: '👢', cost: 60, maxLvl: 1, desc: '+6% move speed.', mods: { moveSpeed: 0.06 } },
+    coinPurse: { name: 'Coin Purse', icon: '🪙', cost: 55, maxLvl: 1, desc: '+15% gold.', mods: { gold: 0.15 } },
+    hunterLore: { name: 'Hunter Lore', icon: '📖', cost: 70, maxLvl: 1, desc: '+10% XP.', mods: { xp: 0.1 } },
+    smolderingRage: { name: 'Smoldering Rage', icon: '🧨', cost: 70, maxLvl: 1, desc: '+20% Fury charge.', mods: { furyCharge: 0.2 } },
+    // grantPoints: pontos de skill entregues uma vez, na compra
+    huntersNotes: { name: "Hunter's Notes", icon: '📜', cost: 110, maxLvl: 1, desc: 'Gain 2 skill points right away.', grantPoints: 2 },
+    treasureSense: { name: 'Treasure Sense', icon: '🗝️', cost: 95, maxLvl: 1, desc: 'Chests give +1 skill point.', mods: { chestPoints: 1 } },
+    lastPrayer: { name: 'Last Prayer', icon: '🙏', cost: 200, maxLvl: 1, desc: 'Rise once more when you fall.', mods: { revives: 1 } }
 };
 
 // --- ACAMPAMENTO ---

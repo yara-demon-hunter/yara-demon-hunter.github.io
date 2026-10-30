@@ -146,6 +146,7 @@ export function buyNode(id) {
     if (node.kind === 'passive' || node.kind === 'relic') {
         passives[node.key].lvl++;
         state.revives += passives[node.key].mods?.revives ?? 0;
+        state.skillPoints += passives[node.key].grantPoints ?? 0;
     } else if (node.kind === 'stat') attributes[node.key].lvl++;
     else if (node.kind === 'power') powers[node.key].lvl++;
     else if (node.kind === 'mod') state.tree[node.id] = st.level + 1;

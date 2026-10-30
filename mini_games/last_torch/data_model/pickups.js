@@ -20,9 +20,8 @@ export const PICKUP_DROP = {
 
 // Baú: pontos de skill para a árvore (sorteio com pesos)
 export const CHEST_REWARDS = [
-    { points: 1, weight: 0.7 },
-    { points: 2, weight: 0.24 },
-    { points: 3, weight: 0.06 }
+    { points: 1, weight: 0.85 },
+    { points: 2, weight: 0.15 }
 ];
 
 export function rollPickupType(random = Math.random) {

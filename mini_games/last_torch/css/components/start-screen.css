@@ -169,11 +169,10 @@
 .start-btn-small {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.8rem;
+    justify-content: center;
+    gap: 0.6rem;
     width: 100%;
-    margin-top: 0.6rem;
-    padding: 0.6rem 1rem;
+    padding: 0.5rem 0.8rem;
     font-family: 'Cinzel', Georgia, serif;
     font-size: 0.85rem;
     font-weight: 800;
@@ -185,19 +184,24 @@
     transition: border-color 0.15s, filter 0.2s;
 }
 .start-btn-small:hover { filter: brightness(1.2); }
-.start-btn-small em {
+
+/* Herói e Santuário lado a lado */
+.start-links { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+.start-links .start-btn-small { flex: 1; min-width: 0; justify-content: flex-start; text-align: left; }
+.start-links .hero-portrait { width: 2rem; height: 2rem; }
+.link-icon { flex-shrink: 0; width: 2rem; font-size: 1.5rem; line-height: 1; text-align: center; }
+.link-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.link-text > span { font-size: 0.76rem; }
+.link-text em {
+    overflow: hidden;
     font-family: 'Inter', sans-serif;
-    font-size: 0.68rem;
+    font-size: 0.66rem;
     font-weight: 600;
     font-style: normal;
     letter-spacing: 0;
     color: #8b98a8;
-}
-.start-btn-small em b { color: #fdba74; }
-/* Brasas suficientes para uma melhoria */
-.start-btn-small.can-buy {
-    border-color: rgba(251, 146, 60, 0.7);
-    box-shadow: 0 0 18px rgba(234, 88, 12, 0.45);
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @media (max-height: 560px) {
@@ -225,7 +229,7 @@
             "title   tips"
             "tagline dark"
             "tagline btn"
-            "tagline hearth";
+            "tagline links";
         column-gap: 1.5rem;
         align-items: center;
     }
@@ -234,7 +238,12 @@
     .start-tagline { grid-area: tagline; align-self: start; margin: 0.3rem 0 0; font-size: 0.8rem; }
     .start-tips, .start-records { grid-area: tips; margin: 0; padding: 0.4rem 0.7rem; }
     .darkness-picker { grid-area: dark; margin: 0.4rem 0 0; }
-    .start-content .start-btn-small { grid-area: hearth; margin-top: 0.35rem; padding: 0.4rem 0.8rem; font-size: 0.72rem; }
+    .start-links { grid-area: links; margin-top: 0.35rem; }
+    .start-links .start-btn-small { padding: 0.3rem 0.6rem; }
+    .start-links .hero-portrait { width: 1.7rem; height: 1.7rem; }
+    .link-icon { width: 1.7rem; font-size: 1.25rem; }
+    .link-text > span { font-size: 0.66rem; }
+    .link-text em { font-size: 0.6rem; }
     .start-tips li { padding: 0.15rem 0; gap: 0.5rem; }
     .start-tips span { font-size: 0.9rem; }
     .start-tips p { font-size: 0.68rem; line-height: 1.3; }

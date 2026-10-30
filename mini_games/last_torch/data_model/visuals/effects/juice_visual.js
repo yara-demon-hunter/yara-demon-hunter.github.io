@@ -51,6 +51,8 @@ export const JUICE_VISUALS = {
         MOTH: { count: 4, colors: ['#d6b98a', '#8a6d47', '#f5e6c8'], shape: 'shard', stain: 'rgba(30, 22, 12, 0.42)' },
         BLOATER: { count: 8, colors: ['#a3e635', '#4d7c0f', '#d9f99d'], shape: 'blob', stain: 'rgba(30, 48, 6, 0.62)' },
         WRAITH: { count: 5, colors: ['#a5f3fc', '#0e7490', '#ecfeff'], shape: 'shard', stain: 'rgba(6, 30, 38, 0.42)' },
+        ZOMBIE_WOLF: { count: 6, colors: ['#2b2744', '#a78bfa', '#0d0b17'], shape: 'shard', stain: 'rgba(20, 10, 40, 0.55)' },
+        HEADLESS_KNIGHT: { count: 9, colors: ['#4f576b', '#2b3140', '#a5f3fc'], shape: 'shard', stain: 'rgba(10, 12, 20, 0.6)' },
         NECROMANCER: { count: 6, colors: ['#86efac', '#14532d', '#e7e0cf'], shape: 'bone', stain: 'rgba(6, 30, 16, 0.55)' },
         HERO: { count: 20, colors: ['#07222d', '#0b2f3c', '#38bdf8', '#e8eef2'], shape: 'shard', stain: 'rgba(4, 14, 20, 0.6)' },
         BOSS: { count: 28, colors: ['#fde047', '#f97316', '#dc2626', '#f1f5f9'], shape: 'shard', stain: 'rgba(44, 6, 8, 0.7)' }

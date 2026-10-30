@@ -4,6 +4,7 @@ import { audio, joystick, keys, player, powers, state } from '../core/state.js';
 import { chargeUlt } from './combat.js';
 import { dealDamage } from './damage.js';
 import { addFloater, createExplosion, hitStop, slowMotion } from './effects.js';
+import { bumpStat } from './sanctuary.js';
 import { getAtkDamage, getDashCharges, getDashCooldown } from './stats.js';
 
 // --- DASH ---
@@ -66,6 +67,7 @@ export function tryDash() {
         hitStop(0.05);
         slowMotion(0.4, 0.3);
         audio.playPerfect();
+        bumpStat('perfectDodges');
     }
 }
 

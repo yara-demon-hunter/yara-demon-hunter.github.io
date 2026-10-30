@@ -6,6 +6,7 @@ import { updateHUD } from '../ui/hud.js';
 import { blast } from './damage.js';
 import { addFloater, addNumber, addShockwave, screenFlash, shakeScreen } from './effects.js';
 import { mod } from './modifiers.js';
+import { bumpStat } from './sanctuary.js';
 import { getAtkDamage } from './stats.js';
 import { feedTorch } from './torch.js';
 
@@ -55,6 +56,7 @@ function collect(p) {
     } else if (p.type === 'CHEST') {
         const points = rollChestPoints() + mod('chestPoints');
         state.skillPoints += points;
+        bumpStat('chests');
         showToast('⚡', `+${points} skill points`, 'Spend them in the skill tree');
         audio.playChest();
         addShockwave(p.x, p.y, { radius: 120, color: '#fbbf24', width: 6, seconds: 0.5 });

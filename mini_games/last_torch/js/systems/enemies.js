@@ -17,8 +17,10 @@ import { addHostileFire, onEnemyKilled } from './powers.js';
 import { gainXp } from './progression.js';
 import { damageShadowClone } from './shadow_clone.js';
 
+import { recordBeast } from './sanctuary.js';
 import { addStreakKill, getScoreMultiplier, getStreakGoldBonus } from './streak.js';
 import { lerpAngle } from '../render/fx/easing.js';
+import { knightHeadPosition } from '../render/headless_knight.js';
 import { getAtkDamage } from './stats.js';
 import { hurtTorch } from './torch.js';
 
@@ -93,10 +95,12 @@ function updateLunge(e, L, dist, angle, dt) {
 
 // Bruxa: tiro no alvo; acerta a tocha também
 function shoot(e, model, angle) {
+    // O Cavaleiro Sem Cabeça atira com a cabeça, que flutua de lado
+    const from = e.type === 'HEADLESS_KNIGHT' ? knightHeadPosition(e) : e;
     state.enemyProjectiles.push({
         owner: e.type,          // quem atirou (só muda o desenho do projétil)
-        color: model.color,
-        x: e.x, y: e.y,
+        color: model.projectileColor ?? model.color,
+        x: from.x, y: from.y,
         vx: Math.cos(angle) * model.projectileSpeed,
         vy: Math.sin(angle) * model.projectileSpeed,
         radius: model.projectileRadius,
@@ -117,12 +121,17 @@ function raiseDead(e, model) {
     }
 }
 
-function updateAttacks(e, model, angle, dt) {
+function updateAttacks(e, model, angle, dt, distToTarget) {
     if (e.isBoss) {
         updateBossAI(e, model, dt);
         return;
     }
-    if (e.type !== 'WITCH' && !model.summon) return;
+    if (!model.projectileSpeed && !model.summon) return;
+    // Fora do alcance o relógio espera: ao chegar perto ainda sobra o tempo do aviso (o brilho do elmo)
+    if (model.shootRange && distToTarget > model.shootRange) {
+        e.shootTimer = Math.max(e.shootTimer, 0.6);
+        return;
+    }
     e.shootTimer -= dt;
     if (e.shootTimer > 0) return;
     e.shootTimer = model.shootCooldownSeconds;
@@ -172,6 +181,7 @@ function removeEnemy(i, e) {
 function killEnemy(i, e, model) {
     deathEffects(e, model);
     addStreakKill();
+    recordBeast(e.type);
     audio.playKill(state.streak);
 
     const pts = model.scoreReward * (e.elite ? 4 : 1);
@@ -274,7 +284,7 @@ export function updateEnemies(dt) {
             }
 
             if (hunting) {
-                updateAttacks(e, model, toTargetAngle, dt);
+                updateAttacks(e, model, toTargetAngle, dt, distToTarget);
 
                 // Boss na tocha: não se joga na chama, fica mordendo até ser expulso ou morto
                 if (blockedByTorch) {

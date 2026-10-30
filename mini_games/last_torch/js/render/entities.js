@@ -12,7 +12,10 @@ import { SKELETON_VISUALS } from '../../data_model/visuals/monsters/skeleton_vis
 import { SPRITE_FRAMES } from '../../data_model/visuals/monsters/sprites_visual.js';
 import { VAMPIRE_VISUALS } from '../../data_model/visuals/monsters/vampire_visual.js';
 import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
+import { ZOMBIE_WOLF_VISUALS } from '../../data_model/visuals/monsters/zombie_wolf_visual.js';
+import { HEADLESS_KNIGHT_VISUALS } from '../../data_model/visuals/monsters/headless_knight_visual.js';
 import { WRAITH_VISUALS } from '../../data_model/visuals/monsters/wraith_visual.js';
+import { knightHeadPosition } from './headless_knight.js';
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { FAN_OF_KNIVES } from '../../data_model/passives.js';
 import { ctx, passives, player, state } from '../core/state.js';
@@ -265,7 +268,9 @@ const HEALTH_BAR_OFFSETS = {
     VAMPIRE: VAMPIRE_VISUALS.healthBarOffset,
     MOTH: MOTH_VISUALS.healthBarOffset,
     BLOATER: BLOATER_VISUALS.healthBarOffset,
-    WRAITH: WRAITH_VISUALS.healthBarOffset
+    WRAITH: WRAITH_VISUALS.healthBarOffset,
+    ZOMBIE_WOLF: ZOMBIE_WOLF_VISUALS.healthBarOffset,
+    HEADLESS_KNIGHT: HEADLESS_KNIGHT_VISUALS.healthBarOffset
 };
 
 // Tudo que vem por cima do corpo: clarão do golpe, gelo, mira, aviso de estouro e vida
@@ -288,6 +293,13 @@ function renderEnemyOverlays(t) {
                 if (charge > 0) renderCastGlow(e, charge);
             } else if (e.type === 'WRAITH' && e.lungeState === 1) {
                 drawGlow(ctx, WRAITH_VISUALS.colors.aimAura, e.x, e.y, e.radius * 2.6, 0.5);
+            } else if (e.type === 'ZOMBIE_WOLF' && e.lungeState === 1) {
+                drawGlow(ctx, ZOMBIE_WOLF_VISUALS.colors.aimAura, e.x, e.y, e.radius * 2.6, 0.55);
+            } else if (e.type === 'HEADLESS_KNIGHT' && e.shootTimer > 0 && e.shootTimer < HEADLESS_KNIGHT_VISUALS.chargeSeconds) {
+                // A cabeça acende os olhos antes do tiro
+                const head = knightHeadPosition(e);
+                const charge = 1 - e.shootTimer / HEADLESS_KNIGHT_VISUALS.chargeSeconds;
+                drawGlow(ctx, HEADLESS_KNIGHT_VISUALS.colors.eyeGlow, head.x, head.y, e.radius * (0.7 + charge * 0.8), 0.9);
             } else if (e.type === 'BLOATER' && e.hp < e.maxHp) {
                 const hurt = 1 - e.hp / e.maxHp;
                 const pulse = 0.5 + 0.5 * Math.sin(t * (2 + hurt * 7) * TAU);

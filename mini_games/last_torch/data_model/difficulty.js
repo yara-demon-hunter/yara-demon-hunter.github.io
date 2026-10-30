@@ -8,9 +8,9 @@ export const TURN_DIFFICULTY = {
     hpMultiplierPerTurn: 0.17,
 
     // Velocidade de movimento
-    speedMultiplierFirstTurn: 0.85,
-    speedMultiplierPerTurn: 0.03,
-    maxSpeedMultiplier: 1.3,
+    speedMultiplierFirstTurn: 0.75,
+    speedMultiplierPerTurn: 0.025,
+    maxSpeedMultiplier: 1.1,
 
     // Dano (contato e tiros)
     damageMultiplierFirstTurn: 0.8,
@@ -43,7 +43,9 @@ export const TURN_DIFFICULTY = {
         MOTH: 5,
         BLOATER: 6,
         WRAITH: 7,
-        NECROMANCER: 9
+        NECROMANCER: 9,
+        ZOMBIE_WOLF: 4,
+        HEADLESS_KNIGHT: 8
     }
 };
 

@@ -214,7 +214,7 @@
     #statusTabs button { min-height: 2.1rem; padding: 0 0.2rem; font-size: 0.58rem; letter-spacing: 0.08em; }
     .points-chip { padding: 0.15rem 0.5rem; font-size: 0.8rem; }
     .status-panel .camp-gold { padding: 0.15rem 0.5rem; font-size: 0.8rem; }
-    #btnCloseShop { min-width: 2.4rem; min-height: 2.1rem; }
+    #btnCloseShop { min-width: 2.4rem; min-height: 2.1rem; padding-block: 0; }
     #btnResume { display: none; }
 
     /* Build: mais espaço para os poderes (duas colunas) e só o nome em cada linha */

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prévia do Demon Hunter</title>
+    <style>
+        body { margin: 0; background: #050b16; }
+        canvas { display: block; margin: 0 auto; max-width: 100%; }
+    </style>
+</head>
+<body>
+    <!-- Página de desenvolvimento: tudo do herói (corrida, golpes, dash, efeitos, heróis alternativos, clone e adaga)
+         usando o código real do jogo. Como abrir: previews/README.md -->
+    <canvas id="gameCanvas" width="1200" height="2120"></canvas>
+    <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
+    <script>
+        if (location.protocol === 'file:') {
+            const g = document.getElementById('gameCanvas').getContext('2d');
+            g.fillStyle = '#050b16';
+            g.fillRect(0, 0, 1200, 2120);
+            g.textAlign = 'center';
+            g.fillStyle = '#fbbf24';
+            g.font = '600 26px system-ui, sans-serif';
+            g.fillText('Esta página precisa de um servidor local', 600, 130);
+            g.fillStyle = '#cbd5e1';
+            g.font = '400 18px system-ui, sans-serif';
+            g.fillText('O navegador bloqueia módulos abertos direto do disco.', 600, 170);
+            g.fillText('No terminal:  cd mini_games/last_torch && python3 -m http.server 8000', 600, 220);
+            g.fillText('Depois abra:  http://localhost:8000/previews/demon_hunter_preview.html', 600, 255);
+        }
+    </script>
+    <script type="module">
+        import { HEROES } from '../data_model/heroes.js';
+        import { KNIFE_SKILL } from '../data_model/skills.js';
+        import { HERO_25D_VISUALS } from '../data_model/visuals/characters/hero25d_visual.js';
+        import { SHADOW_CLONE_VISUALS } from '../data_model/visuals/characters/shadow_clone_visual.js';
+        import { KNIFE_VISUALS as K } from '../data_model/visuals/effects/knife_visual.js';
+        import { SLASH_VISUALS } from '../data_model/visuals/effects/slash_visual.js';
+        import { LEVEL_UP_VISUALS } from '../data_model/visuals/effects/level_up_visual.js';
+        import { ctx, passives, player, state } from '../js/core/state.js';
+        import { renderBladeSlashes, renderKnives } from '../js/render/entities.js';
+        import { drawGlow } from '../js/render/fx/glow.js';
+        import { setWorldView } from '../js/render/fx/stamp.js';
+        import { drawDagger } from '../js/render/knife.js';
+        import { renderLevelUpBack, renderLevelUpFront } from '../js/render/level_up.js';
+        import { createHeroAnim, heroAnim, updateHeroAnim } from '../js/render/player.js';
+        import { renderPlayer25D } from '../js/render/player25d.js';
+        import { renderDashGhosts } from '../js/render/powers.js';
+        import { renderReflectWard } from '../js/render/reflect.js';
+
+        state.gameState = 'PLAYING';     // o herói só anima durante a partida
+        const WIDTH = 1200;
+        const HEIGHT = 2120;
+        const start = performance.now();
+        let last = start;
+
+        function text(str, x, y, size = 13, color = '#cbd5e1', weight = 400) {
+            ctx.fillStyle = color;
+            ctx.font = `${weight} ${size}px system-ui, sans-serif`;
+            ctx.fillText(str, x, y);
+        }
+
+        function panel(x, y, w, h, draw) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#0b1424';
+            ctx.fillRect(0, 0, w, h);
+            ctx.beginPath();
+            ctx.rect(0, 0, w, h);
+            ctx.clip();
+            draw();
+            ctx.restore();
+        }
+
+        // --- CENAS ---
+        // O desenho do herói lê o objeto `player`: cada cena guarda o próprio herói e o copia para lá antes de desenhar.
+        // Ela anda de verdade, com a câmera seguindo, para a corrida, a capa e a passada funcionarem.
+        function scene(opts = {}) {
+            return {
+                body: { x: 0, y: 0, angle: 0, comboStep: 1, hitTime: -100000, hitDirX: 0, hitDirY: 0, iFrames: 0, reflectTimer: 0, reflectTime: -100000 },
+                anim: createHeroAnim(opts.throwsKnives ?? false),
+                slashes: [],
+                ghosts: [],
+                colors: HERO_25D_VISUALS.colors,
+                speed: 0,
+                heading: 0,
+                ...opts
+            };
+        }
+
+        function renderScene(s, dt) {
+            const b = s.body;
+            b.x += Math.cos(s.heading) * s.speed * dt;
+            b.y += Math.sin(s.heading) * s.speed * dt;
+            Object.assign(player, b);
+            s.before?.(s, dt);
+            Object.assign(player, b);
+            updateHeroAnim(s.anim, player);
+
+            s.slashes.forEach(c => { c.life -= dt; });
+            s.slashes = s.slashes.filter(c => c.life > 0);
+            state.bladeSlashes = s.slashes;
+            s.ghosts.forEach(g => { g.age += dt; });
+            s.ghosts = s.ghosts.filter(g => g.age < g.seconds);
+            state.dashGhosts = s.ghosts;
+            state.frenzyActiveTimer = s.frenzy ? 1 : 0;
+            state.levelUpFx = s.levelUp ?? null;
+            passives.mirrorWard.lvl = s.ward ? 1 : 0;
+
+            s.behind?.();
+            renderDashGhosts();
+            renderLevelUpBack();
+            renderPlayer25D(player, s.anim, s.colors);
+            renderBladeSlashes();
+            renderReflectWard();
+            renderLevelUpFront();
+            state.frenzyActiveTimer = 0;
+            state.bladeSlashes = [];
+            state.dashGhosts = [];
+            state.levelUpFx = null;
+        }
+
+        // Quadro de 1 cena: amplia e centraliza a câmera no herói
+        function view(s, x, y, w, h, zoom, dt, offsetY = 12) {
+            panel(x, y, w, h, () => {
+                ctx.scale(zoom, zoom);
+                ctx.translate(w / 2 / zoom - s.body.x, h / 2 / zoom + offsetY - s.body.y);
+                renderScene(s, dt);
+            });
+        }
+
+        // Golpe em loop: comboStep muda (é assim que o jogo avisa o desenho) e a marca do corte nasce junto
+        function slashEvery(seconds, step, spin = false) {
+            let wait = 0.4;
+            return (s, dt) => {
+                wait -= dt;
+                if (wait > 0) return;
+                wait = seconds;
+                const look = spin ? SLASH_VISUALS.whirl : SLASH_VISUALS[step];
+                s.anim.lastComboStep = step;
+                s.body.comboStep = step === 3 ? 1 : step + 1;
+                s.slashes.push({ x: s.body.x, y: s.body.y, angle: s.body.angle, radius: 70, comboStep: step, spin, shadow: false, arcWidth: 1.4, life: look.lifeSeconds, maxLife: look.lifeSeconds });
+            };
+        }
+
+        const octants = Array.from({ length: 8 }, (_, i) => (i / 8) * Math.PI * 2 - Math.PI / 2);
+        const OCTANT_NAMES = ['cima', 'cima-direita', 'direita', 'baixo-direita', 'baixo', 'baixo-esquerda', 'esquerda', 'cima-esquerda'];
+        const running = octants.map(a => scene({ speed: 150, heading: a }));
+
+        const poses = [
+            ['parado', scene()],
+            ['andando devagar', scene({ speed: 60, heading: 0.6 })],
+            ['Fúria ativa', scene({ speed: 150, heading: 0.6, frenzy: true })],
+            ['invulnerável', scene({ speed: 150, heading: 2.6, before: (s) => { s.body.iFrames = 1; } })]
+        ];
+
+        const swings = [
+            ['1º golpe', scene({ before: slashEvery(1, 1) })],
+            ['2º golpe', scene({ before: slashEvery(1, 2) })],
+            ['3º golpe', scene({ before: slashEvery(1, 3) })],
+            ['Shadow Whirl (360°)', scene({ before: slashEvery(1, 3, true) })]
+        ];
+
+        // Dash: arranque rápido, com os fantasmas que ficam para trás, e volta ao início
+        function dashLoop(s, dt) {
+            s.clock = (s.clock ?? 0) + dt;
+            const dashing = s.clock < 0.18;
+            s.speed = dashing ? 620 : 0;
+            if (dashing) s.ghosts.push({ x: s.body.x, y: s.body.y, age: 0, seconds: 0.3 });
+            if (s.clock > 1.2) {
+                s.clock = 0;
+                s.body.x = 0;
+            }
+        }
+
+        function hurtLoop(s, dt) {
+            s.clock = (s.clock ?? 1) + dt;
+            if (s.clock < 1.2) return;
+            s.clock = 0;
+            s.body.hitTime = performance.now();
+            s.body.hitDirX = -1;
+            s.body.hitDirY = 0;
+            s.body.iFrames = 0.6;
+        }
+
+        function levelLoop(s, dt) {
+            s.levelUp = s.levelUp ?? { age: 0, label: '+1 SKILL POINT' };
+            s.levelUp.age += dt;
+            if (s.levelUp.age > LEVEL_UP_VISUALS.durationSeconds + 0.5) s.levelUp = { age: 0, label: '+1 SKILL POINT' };
+        }
+
+        const effects = [
+            ['dash', scene({ heading: 0, before: dashLoop })],
+            ['levando dano', scene({ before: hurtLoop })],
+            ['subindo de nível', scene({ before: levelLoop })],
+            ['Mirror Ward (pronto)', scene({ ward: true })]
+        ];
+
+        const heroes = Object.values(HEROES).map(hero => [hero.name, scene({ speed: 150, heading: 0.5, colors: hero.colors ?? HERO_25D_VISUALS.colors })]);
+        const clone = scene({
+            speed: 120, heading: 0.5, colors: SHADOW_CLONE_VISUALS.colors,
+            behind: () => drawGlow(ctx, SHADOW_CLONE_VISUALS.auraColor, player.x, player.y, SHADOW_CLONE_VISUALS.auraRadius, 1)
+        });
+
+        function gallery(title, top, items, zoom = 2.3) {
+            text(title, 24, top, 17, '#67e8f9', 700);
+            const w = (WIDTH - 48 - (items.length - 1) * 12) / items.length;
+            items.forEach(([label, s], i) => {
+                const x = 24 + i * (w + 12);
+                view(s, x, top + 12, w, 220, zoom, s.dt);
+                text(label, x + 6, top + 250, 13);
+            });
+        }
+
+        // --- ADAGA ---
+        // Duas direções: arremesso para a direita (mão esquerda atrás do corpo) e para baixo-esquerda (mão na frente)
+        const FACINGS = [[0.25, 'para a direita'], [2.2, 'para baixo e à esquerda']];
+        const LOOP_SECONDS = 1.3;
+        const letGo = K.throwSeconds * K.letGoFraction;
+        const steps = [
+            [0.04, 'segura'], [0.18, 'puxa'], [0.3, 'acima do ombro'],
+            [0.4, 'lança'], [0.5, 'solta'], [0.75, 'volta']
+        ];
+
+        // Herói arremessando no instante "elapsed" (segundos desde o início do arremesso).
+        // Usa performance.now(), o mesmo relógio que o desenho do herói usa para a animação.
+        function drawThrowAt(x, y, facing, elapsed) {
+            const now = performance.now();
+            heroAnim.facing = facing;
+            state.knifeThrowTime = now - elapsed * 1000;
+            player.x = x;
+            player.y = y;
+            player.iFrames = 0;
+            player.hitTime = -100000;
+            const flight = elapsed - letGo;
+            const cos = Math.cos(facing);
+            const sin = Math.sin(facing);
+            const travelled = flight * KNIFE_SKILL.speed;
+            state.knives = flight > 0 && travelled < 330 ? [{
+                x: x + cos * (K.spawnForward + travelled) - sin * K.spawnSide,
+                y: y + sin * (K.spawnForward + travelled) + cos * K.spawnSide,
+                angle: facing,
+                travelled
+            }] : [];
+            const m = ctx.getTransform();
+            setWorldView(m.a, m.e, m.f);    // os carimbos usam a transformação do mundo
+            renderKnives();
+            renderPlayer25D();
+            state.knifeThrowTime = -100000;
+        }
+
+        function drawKnifeSection(now, base) {
+            text('Adaga: arremesso ao vivo (loop)', 24, base, 17, '#67e8f9', 700);
+            const loop = ((now - start) / 1000) % LOOP_SECONDS;
+            panel(24, base + 10, 570, 260, () => {
+                ctx.scale(2, 2);
+                drawThrowAt(50, 70, FACINGS[0][0], loop);
+            });
+            panel(606, base + 10, 570, 260, () => {
+                ctx.scale(2, 2);
+                drawThrowAt(220, 40, FACINGS[1][0], loop);
+            });
+
+            FACINGS.forEach(([facing, label], row) => {
+                const top = base + 310 + row * 260;
+                text(`Quadro a quadro: ${label}`, 24, top - 10, 15, '#94a3b8', 600);
+                steps.forEach(([k, name], i) => {
+                    panel(24 + i * 192, top, 180, 200, () => {
+                        ctx.scale(2.4, 2.4);
+                        drawThrowAt(row === 0 ? 30 : 45, row === 0 ? 52 : 40, facing, k * K.throwSeconds);
+                    });
+                    text(`${i + 1}. ${name}`, 32 + i * 192, top + 220);
+                });
+            });
+
+            text('Adaga em detalhe', 24, base + 845, 15, '#94a3b8', 600);
+            const cx = 560;
+            const cy = base + 970;
+            const zoom = 20;
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.scale(zoom, zoom);
+            drawDagger(ctx, now / 1000);
+            ctx.restore();
+
+            const S = K.shape;
+            // [x, y na adaga, texto, -1 acima / 1 abaixo, alinhamento]
+            const notes = [
+                [S.pommelX, 0.6, 'pomo dourado + gema', 1, 'right'],
+                [(S.gripStart + S.gripEnd) / 2, 0.8, 'cabo de couro com tiras', 1, 'left'],
+                [S.guardX + 0.4, -2.4, 'guarda curva', -1, 'right'],
+                [S.bladeStart + 2.8, -0.6, 'runas', -1, 'left'],
+                [6.5, 0, 'nervura central', 1, 'left'],
+                [9, -0.6, 'fio brilhante', -1, 'left']
+            ];
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+            ctx.lineWidth = 1;
+            notes.forEach(([x, y, label, dir, align]) => {
+                const px = cx + x * zoom;
+                const py = cy + y * zoom;
+                const ly = cy + dir * 90;
+                ctx.beginPath();
+                ctx.moveTo(px, py);
+                ctx.lineTo(px, ly);
+                ctx.stroke();
+                ctx.font = '13px system-ui, sans-serif';
+                const w = ctx.measureText(label).width;
+                const tx = align === 'right' ? px - w + 4 : px - 4;
+                text(label, tx, ly + (dir < 0 ? -6 : 16));
+            });
+        }
+
+        function frame() {
+            const now = performance.now();
+            const dt = Math.min(0.05, (now - last) / 1000);
+            last = now;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#050b16';
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+            text('DEMON HUNTER: tudo do herói', 24, 34, 20, '#fde68a', 700);
+
+            text('Correndo nas oito direções', 24, 66, 17, '#67e8f9', 700);
+            running.forEach((s, i) => {
+                view(s, 24 + i * 145, 78, 137, 170, 1.7, dt);
+                text(OCTANT_NAMES[i], 30 + i * 145, 266, 12);
+            });
+
+            [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone]].forEach(([, s]) => { s.dt = dt; });
+            gallery('Poses', 300, poses);
+            gallery('Golpes (com a marca do corte)', 570, swings, 1.7);
+            gallery('Dash, dano, nível e Mirror Ward', 840, effects, 1.9);
+            gallery('Heróis e Shadow Clone', 1110, [...heroes, ['Shadow Clone', clone]], 2);
+
+            drawKnifeSection(now, 1000 + 400);
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    </script>
+</body>
+</html>

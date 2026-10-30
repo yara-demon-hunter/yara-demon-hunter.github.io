@@ -40,6 +40,7 @@ export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
     const damage = amount * Math.max(0.1, 1 + mod('damageTaken'));
     player.hp -= damage;
     player.iFrames = invulnerableSeconds;
+    state.hourHit = true;
     registerPlayerHit(fromX, fromY);
     createExplosion(player.x, player.y, '#f43f5e', 12);
     addNumber(player.x, player.y - 40, damage, -1, 'hurt');

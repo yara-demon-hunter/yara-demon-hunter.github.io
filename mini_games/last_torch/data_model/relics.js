@@ -22,19 +22,29 @@ export const RELIC_NODES = [
     { id: 'greedyIdol', branch: 'fortune', kind: 'relic', key: 'greedyIdol', x: 0, y: 0, requires: [] },
     { id: 'luckyCoin', branch: 'fortune', kind: 'relic', key: 'luckyCoin', x: 1, y: 0, requires: [req('greedyIdol')] },
     { id: 'witchEye', branch: 'fortune', kind: 'relic', key: 'witchEye', x: 2, y: 0, requires: [req('luckyCoin')] },
+    { id: 'huntersNotes', branch: 'fortune', kind: 'relic', key: 'huntersNotes', x: 3, y: 0, requires: [req('witchEye')] },
+    { id: 'coinPurse', branch: 'fortune', kind: 'relic', key: 'coinPurse', x: 0, y: 1, requires: [] },
+    { id: 'hunterLore', branch: 'fortune', kind: 'relic', key: 'hunterLore', x: 1, y: 1, requires: [req('coinPurse')] },
+    { id: 'treasureSense', branch: 'fortune', kind: 'relic', key: 'treasureSense', x: 2, y: 1, requires: [req('hunterLore')] },
 
     // --- PROTEÇÃO ---
     { id: 'emberFlask', branch: 'ward', kind: 'relic', key: 'emberFlask', x: 0, y: 0, requires: [] },
     { id: 'warmCloak', branch: 'ward', kind: 'relic', key: 'warmCloak', x: 1, y: 0, requires: [req('emberFlask')] },
     { id: 'ironHeart', branch: 'ward', kind: 'relic', key: 'ironHeart', x: 2, y: 0, requires: [req('warmCloak')] },
     { id: 'secondPrayer', branch: 'ward', kind: 'relic', key: 'secondPrayer', x: 3, y: 0, requires: [req('ironHeart')] },
+    { id: 'hearthstone', branch: 'ward', kind: 'relic', key: 'hearthstone', x: 0, y: 1, requires: [] },
+    { id: 'oldScars', branch: 'ward', kind: 'relic', key: 'oldScars', x: 1, y: 1, requires: [req('hearthstone')] },
+    { id: 'lastPrayer', branch: 'ward', kind: 'relic', key: 'lastPrayer', x: 2, y: 1, requires: [req('oldScars')] },
 
     // --- FÚRIA ---
     { id: 'berserkDraught', branch: 'wrath', kind: 'relic', key: 'berserkDraught', x: 0, y: 0, requires: [] },
     { id: 'thornCrown', branch: 'wrath', kind: 'relic', key: 'thornCrown', x: 1, y: 0, requires: [req('berserkDraught')] },
     { id: 'furyStone', branch: 'wrath', kind: 'relic', key: 'furyStone', x: 2, y: 0, requires: [req('thornCrown')] },
-    { id: 'hunterMark', branch: 'wrath', kind: 'relic', key: 'hunterMark', x: 1, y: 1, requires: [req('berserkDraught')] },
-    { id: 'boneCharm', branch: 'wrath', kind: 'relic', key: 'boneCharm', x: 2, y: 1, requires: [req('hunterMark')] }
+    { id: 'smolderingRage', branch: 'wrath', kind: 'relic', key: 'smolderingRage', x: 3, y: 0, requires: [req('furyStone')] },
+    { id: 'whetstone', branch: 'wrath', kind: 'relic', key: 'whetstone', x: 0, y: 1, requires: [] },
+    { id: 'hunterMark', branch: 'wrath', kind: 'relic', key: 'hunterMark', x: 1, y: 1, requires: [req('whetstone')] },
+    { id: 'boneCharm', branch: 'wrath', kind: 'relic', key: 'boneCharm', x: 2, y: 1, requires: [req('hunterMark')] },
+    { id: 'wornBoots', branch: 'wrath', kind: 'relic', key: 'wornBoots', x: 3, y: 1, requires: [req('boneCharm')] }
 ];
 
 export const RELIC_BY_ID = Object.fromEntries(RELIC_NODES.map(node => [node.id, node]));

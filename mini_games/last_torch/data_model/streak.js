@@ -1,4 +1,5 @@
 // --- SEQUÊNCIA DE MORTES (STREAK) ---
+// Matar vários de uma vez (MULTI_KILL) fica em data_model/sanctuary.js.
 // Cada morte renova o tempo; deixar o tempo acabar zera a sequência. Quanto maior, mais pontos e ouro.
 export const STREAK = {
     windowSeconds: 3,           // tempo para a próxima morte

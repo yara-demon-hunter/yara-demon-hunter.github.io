@@ -1,9 +1,10 @@
 import { save } from '../core/save.js';
 import { audio, state } from '../core/state.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
-import { buyMetaUpgrade, chooseHero, closeHearth, openHearth, setHearthTab } from './hearth.js';
+import { chooseHero, closeHeroes, openHeroes } from './heroes.js';
 import { beginDeath } from '../systems/night.js';
 import { lockLandscape } from './orientation.js';
+import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
 import { changeDarkness, keepHunting, returnToMenu, shareResult, startGame } from './screens.js';
 import { openStatus, resumeGame, setStatusTab, showBuildNote, toggleSetting } from './status.js';
 import { skillTree } from './tree.js';
@@ -55,27 +56,26 @@ export function setupButtons() {
         leaveCamp();
     });
 
-    // Hearth
-    on('btnHearth', openHearth);
-    on('btnHearthSummary', () => {
+    // Santuário e escolha do herói
+    on('btnSanctuary', openSanctuary);
+    on('btnSanctuarySummary', () => {
         document.getElementById('gameOverScreen').classList.add('hidden');
         document.getElementById('startScreen').classList.remove('hidden');
         state.gameState = 'START';
-        openHearth();
+        openSanctuary();
     });
-    on('btnCloseHearth', closeHearth);
+    on('btnCloseSanctuary', closeSanctuary);
     on('btnMenu', returnToMenu);
     on('btnShare', shareResult);
-    document.getElementById('hearthTabs').addEventListener('click', (e) => {
+    document.getElementById('sanctuaryTabs').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-tab]');
-        if (button) setHearthTab(button.dataset.tab);
+        if (button) setSanctuaryTab(button.dataset.tab);
     });
-    document.getElementById('hearthList').addEventListener('click', (e) => {
-        const upgrade = e.target.closest('button[data-upgrade]');
-        if (upgrade && !upgrade.disabled) buyMetaUpgrade(upgrade.dataset.upgrade);
-        const hero = e.target.closest('button[data-hero]');
-        if (hero) chooseHero(hero.dataset.hero);
-
+    on('btnHeroes', openHeroes);
+    on('btnCloseHeroes', closeHeroes);
+    document.getElementById('heroRoster').addEventListener('click', (e) => {
+        const card = e.target.closest('button[data-hero]');
+        if (card && !card.disabled) chooseHero(card.dataset.hero);
     });
 
     on('btnDarkDown', () => changeDarkness(-1));
@@ -96,16 +96,20 @@ export function setupButtons() {
         button.addEventListener('click', () => toggleSetting(button.dataset.setting));
     });
 
-    // Teclado: Esc/P abrem e fecham o status, Enter recomeça
+    // Teclado: Esc/P abrem e fecham o status (e as telas do menu), Enter recomeça
+    const menuScreenOpen = () => ['sanctuaryScreen', 'heroScreen'].some(id => !document.getElementById(id).classList.contains('hidden'));
     window.addEventListener('keydown', (e) => {
         if (e.repeat) return;
         if (e.code === 'Escape' || e.code === 'KeyP') {
-            if (state.gameState === 'PLAYING') openStatus();
+            if (state.gameState === 'START' && menuScreenOpen()) {
+                closeSanctuary();
+                closeHeroes();
+            } else if (state.gameState === 'PLAYING') openStatus();
             else if (state.gameState === 'PAUSED') resumeGame();
         } else if (e.code === 'Enter') {
             if (state.gameState === 'GAMEOVER') start();
             else if (state.gameState === 'CAMP') leaveCamp();
-            else if (state.gameState === 'START' && document.getElementById('hearthScreen').classList.contains('hidden')) start();
+            else if (state.gameState === 'START' && !menuScreenOpen()) start();
         }
     });
 

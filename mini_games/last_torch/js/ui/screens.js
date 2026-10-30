@@ -1,9 +1,9 @@
 import { CHARACTER_MODEL, getXpToNextLevel } from '../../data_model/character.js';
-import { ACHIEVEMENTS, EMBER_REWARDS, META_UPGRADES, getMetaUpgradeCost } from '../../data_model/meta.js';
+import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
 import { DARKNESS, getHourName } from '../../data_model/night.js';
-import { HEROES } from '../../data_model/heroes.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
+import { checkAchievements, pushStats, rewardText } from '../systems/sanctuary.js';
 import { getOwnedPowers } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
@@ -44,9 +44,11 @@ export function startGame() {
     state.frenzyActiveTimer = 0;
     state.frenzyDuration = 0;
 
-    state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, embersBanked: 0, killsByType: {} };
+    state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, killsByType: {} };
     state.streak = 0;
     state.streakTimer = 0;
+    state.multiKill = 0;
+    state.multiTimer = 0;
     state.skillPoints = 0;
     state.levelPointsCarry = 0;
     state.tree = {};
@@ -90,7 +92,6 @@ export function startGame() {
     state.levelUpFx = null;
 
     refreshModifiers();
-    state.skillPoints = mod('startPoints');
     state.revives = mod('revives');
     resetTorch();
 
@@ -114,7 +115,7 @@ export function startGame() {
     document.getElementById('heroPortrait').style.filter = hero.portrait;
 
     state.gameState = 'PLAYING';
-    ['startScreen', 'gameOverScreen', 'shopScreen', 'campScreen', 'hearthScreen'].forEach(id => {
+    ['startScreen', 'gameOverScreen', 'shopScreen', 'campScreen', 'sanctuaryScreen', 'heroScreen'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
     startHour();
@@ -124,59 +125,11 @@ export function startGame() {
 }
 
 // --- PROGRESSO ---
-// Soma a partida no histórico do jogador. Chamado no acampamento e ao fim da noite.
-function pushStats() {
-    const { stats } = save;
-    stats.bestHour = Math.max(stats.bestHour, state.turn);
-    stats.bestStreak = Math.max(stats.bestStreak, state.run.bestStreak);
-    stats.bestScore = Math.max(stats.bestScore, state.totalScore);
-}
-
-function unlockReward(a) {
-    const r = a.reward;
-    if (r.embers) save.embers += r.embers;
-    if (r.hero && !save.unlockedHeroes.includes(r.hero)) save.unlockedHeroes.push(r.hero);
-}
-
-function rewardText(a) {
-    const r = a.reward;
-    const parts = [];
-    if (r.embers) parts.push(`+${r.embers} 🔥`);
-    if (r.hero) parts.push(`New hero: ${HEROES[r.hero].name}`);
-    return parts.join(' · ');
-}
-
-// Trials completados agora (com a recompensa já entregue)
-function checkAchievements() {
-    const done = [];
-    ACHIEVEMENTS.forEach(a => {
-        if (save.achievements[a.id] || (save.stats[a.stat] ?? 0) < a.target) return;
-        save.achievements[a.id] = true;
-        unlockReward(a);
-        done.push(a);
-    });
-    return done;
-}
-
 // Durante a partida (acampamento): avisa do que foi conquistado
 export function reportProgress() {
     pushStats();
-    checkAchievements().forEach(a => showToast('🏆', a.name, rewardText(a)));
+    checkAchievements();
     persist();
-}
-
-// --- BRASAS ---
-function computeEmberLines() {
-    const { run } = state;
-    const hours = Math.max(0, state.turn - 1);
-    const lines = [
-        { label: `Hours survived (${hours})`, value: hours * EMBER_REWARDS.perHour },
-        { label: `Kills (${run.kills})`, value: Math.floor(run.kills * EMBER_REWARDS.perKills) },
-        { label: `Best streak (${run.bestStreak})`, value: Math.floor(run.bestStreak * EMBER_REWARDS.perStreak) },
-        { label: `Bosses slain (${run.bosses})`, value: run.bosses * EMBER_REWARDS.perBoss }
-    ];
-    if (run.victory) lines.push({ label: 'Survived until dawn', value: EMBER_REWARDS.victory });
-    return lines.filter(l => l.value > 0);
 }
 
 // Número subindo aos poucos, com um tique de som
@@ -201,20 +154,8 @@ function nearestGoal() {
     return best;
 }
 
-function nearestUpgrade() {
-    let best = null;
-    Object.entries(META_UPGRADES).forEach(([key, model]) => {
-        const lvl = save.upgrades[key] ?? 0;
-        if (lvl >= model.maxLvl) return;
-        const cost = getMetaUpgradeCost(model, lvl);
-        if (!best || cost < best.cost) best = { model, cost };
-    });
-    return best;
-}
-
 function renderGoal() {
     const box = document.getElementById('summaryGoal');
-    const upgrade = nearestUpgrade();
     const goal = nearestGoal();
     box.innerHTML = '';
     const add = (title, value, ratio) => {
@@ -226,11 +167,7 @@ function renderGoal() {
         row.querySelector('u').style.width = `${Math.round(ratio * 100)}%`;
         box.appendChild(row);
     };
-    if (upgrade) {
-        const can = save.embers >= upgrade.cost;
-        add(`${upgrade.model.icon} ${upgrade.model.name}`, can ? 'READY TO BUY' : `${upgrade.cost - save.embers} 🔥 to go`, Math.min(1, save.embers / upgrade.cost));
-    }
-    if (goal) add(`🏆 ${goal.a.name}`, goal.a.desc, goal.progress);
+    if (goal) add(`${goal.a.icon} ${goal.a.name}`, goal.a.desc, goal.progress);
 }
 
 const END_TEXTS = {
@@ -259,13 +196,7 @@ export function triggerGameOver(reason) {
     }
     pushStats();
 
-    const lines = computeEmberLines();
-    const base = lines.reduce((sum, l) => sum + l.value, 0);
-    const earned = Math.max(0, Math.round(base * (1 + mod('embers'))) - run.embersBanked);
-    run.embersBanked += earned;
-    save.embers += earned;
-
-    const unlocked = checkAchievements();
+    const unlocked = checkAchievements({ toast: false });
     persist();
 
     // Tela final
@@ -283,18 +214,6 @@ export function triggerGameOver(reason) {
     document.getElementById('finalScoreLabel').classList.toggle('is-record', newRecord);
     countUp(document.getElementById('finalScore'), state.totalScore);
 
-    const breakdown = document.getElementById('emberLines');
-    breakdown.innerHTML = '';
-    lines.forEach(l => {
-        const row = document.createElement('div');
-        row.innerHTML = '<span></span><b></b>';
-        row.querySelector('span').textContent = l.label;
-        row.querySelector('b').textContent = `+${l.value}`;
-        breakdown.appendChild(row);
-    });
-    countUp(document.getElementById('emberEarned'), earned, 1100);
-    document.getElementById('emberTotal').innerText = save.embers;
-
     const build = document.getElementById('finalBuild');
     build.innerHTML = '';
     [...getOwnedPowers().map(p => p.icon), ...Object.values(passives).filter(p => p.lvl > 0).map(p => p.icon)].forEach(icon => {
@@ -309,7 +228,7 @@ export function triggerGameOver(reason) {
         const item = document.createElement('div');
         item.className = 'unlock-row';
         item.innerHTML = '<b></b><span></span>';
-        item.querySelector('b').textContent = `🏆 ${a.name}`;
+        item.querySelector('b').textContent = `${a.icon} ${a.name}`;
         item.querySelector('span').textContent = rewardText(a);
         unlocks.appendChild(item);
     });
@@ -352,17 +271,11 @@ export function renderStartScreen() {
     document.getElementById('recordHour').innerText = stats.bestHour;
     document.getElementById('recordScore').innerText = stats.bestScore.toLocaleString('en-US');
     document.getElementById('recordStreak').innerText = stats.bestStreak;
-    document.getElementById('startEmbers').innerText = save.embers;
-
-    const canAfford = Object.entries(META_UPGRADES).some(([key, model]) => {
-        const lvl = save.upgrades[key] ?? 0;
-        return lvl < model.maxLvl && save.embers >= getMetaUpgradeCost(model, lvl);
-    });
-    document.getElementById('btnHearth').classList.toggle('can-buy', canAfford);
-    document.getElementById('btnHearthSummary').classList.toggle('can-buy', canAfford);
 
     const hero = getHero();
+    document.getElementById('startSanctuaryCount').innerText = `${ACHIEVEMENTS.filter(a => save.achievements[a.id]).length}/${ACHIEVEMENTS.length} earned`;
     document.getElementById('startHeroName').innerText = hero.name;
+    document.getElementById('startHeroPortrait').style.filter = hero.portrait;
     const dark = document.getElementById('darknessPicker');
     dark.classList.toggle('hidden', save.maxDarkness <= 1);
     document.getElementById('darknessValue').innerText = save.darkness;
@@ -378,7 +291,8 @@ export function changeDarkness(step) {
 export function returnToMenu() {
     document.getElementById('gameOverScreen').classList.add('hidden');
     document.getElementById('shopScreen').classList.add('hidden');
-    document.getElementById('hearthScreen').classList.add('hidden');
+    document.getElementById('sanctuaryScreen').classList.add('hidden');
+    document.getElementById('heroScreen').classList.add('hidden');
     document.getElementById('startScreen').classList.remove('hidden');
     state.gameState = 'START';
     audio.setPaused(false);

@@ -11,6 +11,7 @@ import { addGibs, addShockwave, createExplosion, hitStop, screenFlash, shakeScre
 import { purgeEnemy } from './enemies.js';
 import { refreshModifiers } from './modifiers.js';
 import { collectAllPickups } from './pickups.js';
+import { bumpStat } from './sanctuary.js';
 import { buildHourPlan, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
 // --- A NOITE ---
@@ -31,6 +32,7 @@ export function startHour() {
     state.hourPlan = buildHourPlan(hour);
     state.goldVacuum = false;
     state.lastStand = false;
+    state.hourHit = false;
     state.clearWaveRadius = 0;
     resetFieldForNewTurn();
 
@@ -87,7 +89,10 @@ function beginClear() {
     screenFlash('#fed7aa', 0.5);
     zoomPunch(0.03);
     shakeScreen(13);
-    showBanner('', `HOUR ${state.turn} SURVIVED`, state.pickups.length > 0 ? 'Grab what is left' : '', 'gold');
+    const untouched = !state.hourHit;
+    if (untouched) bumpStat('flawlessHours');
+    const sub = [untouched ? 'Untouched' : '', state.pickups.length > 0 ? 'Grab what is left' : ''].filter(Boolean).join(' · ');
+    showBanner('', `HOUR ${state.turn} SURVIVED`, sub, 'gold');
     audio.playHourClear();
     updateHUD();
 }
@@ -128,6 +133,7 @@ export function onBossKilled(e, model) {
 
     const key = `boss_${e.type}`;
     save.stats[key] = (save.stats[key] ?? 0) + 1;
+    bumpStat('bosses');
 
     if (state.turn === NIGHT.hours && !state.endless) {
         beginDawn();

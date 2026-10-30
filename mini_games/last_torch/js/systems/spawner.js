@@ -2,7 +2,7 @@ import { TURN_DIFFICULTY, getTurnDifficulty } from '../../data_model/difficulty.
 import { ELITE_TYPES, rollElite } from '../../data_model/elites.js';
 import { HOUR_EVENTS, NIGHT, rollHourHordes } from '../../data_model/night.js';
 import { BOSS_MODELS, BOSS_SPAWNING, chooseBossType, createBoss, isBossTurn } from '../../data_model/bosses.js';
-import { MONSTER_SPAWNING, chooseMonsterType, createMonster } from '../../data_model/monsters.js';
+import { MONSTER_MODELS, MONSTER_SPAWNING, chooseMonsterType, createMonster } from '../../data_model/monsters.js';
 import { isMonsterUnlocked } from '../../data_model/difficulty.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner, showToast } from '../ui/banner.js';
@@ -45,7 +45,11 @@ export function addMonster(type, x, y) {
 function spawnRegular() {
     if (state.enemies.length >= TURN_DIFFICULTY.maxAliveEnemies) return;
     const { x, y } = edgePoint();
-    addMonster(chooseMonsterType(state.turn), x, y);
+    let type = chooseMonsterType(state.turn);
+    // Alguns tipos têm limite em campo (o cavaleiro): passado dele, nasce um esqueleto
+    const cap = MONSTER_MODELS[type].maxAlive;
+    if (cap && state.enemies.filter(e => e.type === type).length >= cap) type = 'SKELETON';
+    addMonster(type, x, y);
 }
 
 // Elite: maior, mais duro, solta um baú ao morrer

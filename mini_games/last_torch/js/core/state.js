@@ -93,8 +93,8 @@ export const state = {
     endless: false,             // jogador escolheu continuar depois do amanhecer
     dawn: 0,                    // 0 a 1: a noite clareando
 
-    // Números da partida (tela final, Trials, brasas)
-    run: { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, embersBanked: 0, killsByType: {} },
+    // Números da partida (tela final, conquistas)
+    run: { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, killsByType: {} },
     streak: 0,
     streakTimer: 0,
     streakTierShown: 0,
@@ -129,6 +129,9 @@ export const state = {
     goldDrops: [],
     pickups: [],
     currentBoss: null,
+    multiKill: 0,               // mortes dentro da janela atual (matar vários de uma vez)
+    multiTimer: 0,
+    hourHit: false,             // o herói levou dano nesta hora
     goldVacuum: false,          // fim da hora: todas as moedas voam até o herói
     lastStand: false,           // cota da hora fechada: não nasce mais nada, falta matar o que sobrou
     magnetTimer: 0,             // ímã pego no chão: o mesmo, por alguns segundos

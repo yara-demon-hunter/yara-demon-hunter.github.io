@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prévia dos Monstros</title>
+    <style>
+        body { margin: 0; background: #050b16; font-family: system-ui, sans-serif; }
+        canvas { display: block; margin: 0 auto; max-width: 100%; }
+        nav { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; padding: 6px; background: #0b1424; }
+        nav button { padding: 4px 8px; border: 1px solid #334155; border-radius: 6px; background: #111c30; color: #cbd5e1; font: 600 12px system-ui, sans-serif; cursor: pointer; }
+        nav button:hover { border-color: #fbbf24; color: #fde68a; }
+    </style>
+</head>
+<body>
+    <!-- Página de desenvolvimento: todos os monstros e bosses, com o código real do jogo. Como abrir: previews/README.md -->
+    <nav id="nav"></nav>
+    <canvas id="gameCanvas" width="1200" height="400"></canvas>
+    <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
+    <script>
+        if (location.protocol === 'file:') {
+            const g = document.getElementById('gameCanvas').getContext('2d');
+            g.fillStyle = '#050b16';
+            g.fillRect(0, 0, 1200, 400);
+            g.textAlign = 'center';
+            g.fillStyle = '#fbbf24';
+            g.font = '600 26px system-ui, sans-serif';
+            g.fillText('Esta página precisa de um servidor local', 600, 130);
+            g.fillStyle = '#cbd5e1';
+            g.font = '400 18px system-ui, sans-serif';
+            g.fillText('O navegador bloqueia módulos abertos direto do disco.', 600, 170);
+            g.fillText('No terminal:  cd mini_games/last_torch && python3 -m http.server 8000', 600, 220);
+            g.fillText('Depois abra:  http://localhost:8000/previews/monsters_preview.html', 600, 255);
+        }
+    </script>
+    <script type="module">
+        import { BOSS_MODELS, chooseBossType } from '../data_model/bosses.js';
+        import { MONSTER_MODELS } from '../data_model/monsters.js';
+        import { TURN_DIFFICULTY } from '../data_model/difficulty.js';
+        import { BOSS_PALETTES, NECROMANCER_COLORS } from '../data_model/visuals/bosses/palettes_visual.js';
+        import { DEMON_LORD_VISUALS } from '../data_model/visuals/bosses/demon_lord_visual.js';
+        import { VAMPIRE_VISUALS } from '../data_model/visuals/monsters/vampire_visual.js';
+        import { WITCH_VISUALS } from '../data_model/visuals/monsters/witch_visual.js';
+        import { canvas, ctx, player, state } from '../js/core/state.js';
+        import { renderBat } from '../js/render/bat.js';
+        import { renderBloater } from '../js/render/bloater.js';
+        import { renderDemonFireball, renderDemonLord } from '../js/render/demon_lord.js';
+        import { drawGlow } from '../js/render/fx/glow.js';
+        import { renderHeadlessKnight } from '../js/render/headless_knight.js';
+        import { ensureMonsterSprites, getMonsterSprite, withColors } from '../js/render/monster_sprites.js';
+        import { renderMoth } from '../js/render/moth.js';
+        import { renderSkeleton } from '../js/render/skeleton.js';
+        import { renderVampire } from '../js/render/vampire.js';
+        import { renderWitch, renderWitchBolt } from '../js/render/witch.js';
+        import { renderWraith } from '../js/render/wraith.js';
+        import { renderZombieWolf } from '../js/render/zombie_wolf.js';
+
+        state.gameState = 'PLAYING';     // a arte só anima durante a partida
+        player.x = -1e6;                 // herói longe: o vampiro não estica os braços
+        ensureMonsterSprites();
+
+        const CELL = 186;
+        const GAP = 8;
+        const COLUMNS = ['cima', 'direita', 'baixo', 'esquerda', 'levando dano', 'tamanho no jogo'];
+        const DIRECTIONS = [-Math.PI / 2, 0, Math.PI / 2, Math.PI];
+
+        const boss = (model) => (e) => {
+            if (model.renderAs === 'VAMPIRE') withColors(VAMPIRE_VISUALS, BOSS_PALETTES[model.palette], () => renderVampire(e));
+            else withColors(DEMON_LORD_VISUALS, BOSS_PALETTES[model.palette], () => renderDemonLord(e));
+        };
+        const bossHour = (key) => [4, 8, 12].find(h => chooseBossType(h) === key);
+
+        const monsters = [
+            ['SKELETON', 'Skeleton', renderSkeleton],
+            ['BAT', 'Bat', renderBat],
+            ['VAMPIRE', 'Vampire', renderVampire],
+            ['WITCH', 'Witch', renderWitch],
+            ['NECROMANCER', 'Necromancer', (e) => withColors(WITCH_VISUALS, NECROMANCER_COLORS, () => renderWitch(e))],
+            ['MOTH', 'Moth', renderMoth],
+            ['BLOATER', 'Bloater', renderBloater],
+            ['WRAITH', 'Wraith', renderWraith],
+            ['ZOMBIE_WOLF', 'Zombie Wolf', renderZombieWolf],
+            ['HEADLESS_KNIGHT', 'Headless Knight', renderHeadlessKnight]
+        ].map(([key, name, draw]) => ({ key, name, draw, model: MONSTER_MODELS[key], note: `hora ${TURN_DIFFICULTY.monsterUnlockTurn[key]}+` }));
+        const bosses = Object.entries(BOSS_MODELS).map(([key, model]) => ({ key, name: model.name, draw: boss(model), model, isBoss: true, note: `boss, hora ${bossHour(key)}` }));
+
+        const make = (row, angle, phase) => ({
+            x: 0, y: 0, vx: 0, vy: 0, angle, phase, type: row.key, color: row.model.color, radius: row.model.radius,
+            hp: 100, maxHp: 100, shootTimer: 99, isBoss: row.isBoss
+        });
+
+        const rows = [...monsters, ...bosses];
+        rows.forEach(row => {
+            const sprite = getMonsterSprite(row.key);
+            row.reach = sprite ? sprite.worldSize / 2 : row.model.radius * (row.model.renderAs === 'VAMPIRE' ? 1.8 : 3.6);
+            row.zoom = Math.min(4.5, (CELL / 2 - 6) / row.reach);
+            row.speed = (row.model.speedMin + row.model.speedMax) / 2;
+            row.period = row.model.patternGapSeconds ?? row.model.shootCooldownSeconds;
+            row.casts = row.isBoss || row.key === 'WITCH' || row.key === 'NECROMANCER';
+            row.dolls = DIRECTIONS.map((a, i) => make(row, a, i * 1.3));
+            row.hurt = make(row, Math.PI / 2, 2.4);
+            row.real = make(row, 0, 0.8);
+        });
+
+        // Destaques vindos das prévias antigas, seguidos de uma linha por monstro
+        const HERO_HEIGHT = 560;
+        const ROW_HEIGHT = 38 + CELL + 14;
+        const WIDTH = 1200;
+        const HEIGHT = HERO_HEIGHT + rows.length * ROW_HEIGHT + 16;
+        canvas.height = HEIGHT;
+        rows.forEach((row, i) => { row.top = HERO_HEIGHT + i * ROW_HEIGHT; });
+
+        const nav = document.getElementById('nav');
+        const jump = (label, y) => {
+            const button = document.createElement('button');
+            button.textContent = label;
+            button.addEventListener('click', () => {
+                const k = canvas.getBoundingClientRect().height / HEIGHT;
+                const top = canvas.getBoundingClientRect().top + scrollY;
+                scrollTo({ top: top + y * k - nav.offsetHeight, behavior: 'smooth' });
+            });
+            nav.appendChild(button);
+        };
+        jump('Destaques', 0);
+        rows.forEach(row => jump(row.name, row.top));
+
+        function text(str, x, y, size = 13, color = '#cbd5e1', weight = 400) {
+            ctx.fillStyle = color;
+            ctx.font = `${weight} ${size}px system-ui, sans-serif`;
+            ctx.fillText(str, x, y);
+        }
+
+        function panel(x, y, w, h, zoom, draw) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#0b1424';
+            ctx.fillRect(0, 0, w, h);
+            ctx.beginPath();
+            ctx.rect(0, 0, w, h);
+            ctx.clip();
+            ctx.scale(zoom, zoom);
+            draw();
+            ctx.restore();
+        }
+
+        // Câmera seguindo o monstro: ele anda de verdade, e a animação de passo funciona
+        function follow(row, e, x, y, zoom, dt, now) {
+            if (row.casts) e.shootTimer = row.period - ((now / 1000 + e.phase) % row.period);
+            panel(x, y, CELL, CELL, zoom, () => {
+                ctx.translate(CELL / 2 / zoom - e.x, CELL / 2 / zoom - e.y);
+                row.draw(e, dt);
+            });
+        }
+
+        function drawRow(row, dt, now) {
+            const y = row.top;
+            ctx.fillStyle = '#050b16';
+            ctx.fillRect(0, y, WIDTH, ROW_HEIGHT);
+            const m = row.model;
+            text(row.name, 24, y + 22, 17, row.isBoss ? '#f87171' : '#fde68a', 700);
+            const nameWidth = ctx.measureText(row.name).width;
+            text(`${row.note} · raio ${m.radius} · velocidade ${m.speedMin}-${m.speedMax}`, 36 + nameWidth, y + 22, 13, '#94a3b8');
+            COLUMNS.forEach((label, i) => text(label, 28 + i * (CELL + GAP), y + 36 + CELL + 12, 12, '#64748b'));
+
+            row.dolls.forEach((e, i) => {
+                e.x += Math.cos(e.angle) * row.speed * dt;
+                e.y += Math.sin(e.angle) * row.speed * dt;
+                follow(row, e, 24 + i * (CELL + GAP), y + 32, row.zoom, dt, now);
+            });
+
+            // Levando dano: perde vida a cada segundo; o clarão é o mesmo do jogo
+            const e = row.hurt;
+            const hitAge = (now / 1000 + 0.5) % 1;
+            if (hitAge < dt * 1.5) e.hp = e.hp > 10 ? e.hp - 10 : e.maxHp;
+            follow(row, e, 24 + 4 * (CELL + GAP), y + 32, row.zoom, dt, now);
+            if (hitAge < 0.18) {
+                const cx = 24 + 4 * (CELL + GAP) + CELL / 2;
+                ctx.globalCompositeOperation = 'lighter';
+                drawGlow(ctx, '#ffffff', cx, y + 32 + CELL / 2, e.radius * row.zoom * 1.5, (1 - hitAge / 0.18) * 0.75);
+                ctx.globalCompositeOperation = 'source-over';
+            }
+
+            // Tamanho no jogo: o sprite que a partida carimba (bosses não têm sprite: é o desenho em escala 1)
+            const x = 24 + 5 * (CELL + GAP);
+            const sprite = getMonsterSprite(row.key);
+            if (!sprite) {
+                follow(row, row.real, x, y + 32, 1, dt, now);
+                return;
+            }
+            const { atlas, cell, spec, worldSize, underlay, underlaySize } = sprite;
+            const frame = Math.floor(((now / 1000 / spec.playSeconds) % 1) * 6);
+            panel(x, y + 32, CELL, CELL, 1, () => {
+                ctx.translate(CELL / 2, CELL / 2);
+                ctx.drawImage(underlay, -underlaySize / 2, -underlaySize / 2, underlaySize, underlaySize);
+                ctx.drawImage(atlas, frame * cell, 0, cell, cell, -worldSize / 2, -worldSize / 2, worldSize, worldSize);
+            });
+        }
+
+        // --- Destaques ---
+        const D = BOSS_MODELS.DEMON_LORD;
+        const demonRow = rows.find(r => r.key === 'DEMON_LORD');
+        const demon = make(demonRow, 0, 0.4);
+        const fireball = { x: 0, y: 0, vx: D.projectileSpeed, vy: 0, radius: D.projectileRadius };
+        const skeletonRow = rows.find(r => r.key === 'SKELETON');
+        const walker = { ...make(skeletonRow, 0, 0.3), x: 40, y: 34 };
+        let dir = 1;
+        const W = MONSTER_MODELS.WITCH;
+        const bolt = { x: 0, y: 20, vx: W.projectileSpeed, vy: 0, radius: W.projectileRadius, color: W.color };
+
+        function drawHighlights(dt, now) {
+            ctx.fillStyle = '#050b16';
+            ctx.fillRect(0, 0, WIDTH, HERO_HEIGHT);
+            text('Destaques', 24, 32, 20, '#f87171', 700);
+
+            demon.shootTimer = D.patternGapSeconds - ((now / 1000) % D.patternGapSeconds);
+            text('Demon Lord carregando e lançando fogo (2x)', 24, 62);
+            panel(24, 72, 640, 300, 2, () => {
+                demon.x = 160;
+                demon.y = 75;
+                demonRow.draw(demon, dt);
+            });
+
+            walker.x += dir * 70 * dt;
+            if (walker.x > 110) { dir = -1; walker.angle = Math.PI; }
+            if (walker.x < 25) { dir = 1; walker.angle = 0; }
+            text('Esqueleto andando de um lado para o outro (4x)', 684, 62);
+            panel(684, 72, 492, 300, 3.5, () => renderSkeleton(walker));
+
+            text('Bola de fogo do Demon Lord (3x)', 24, 402);
+            fireball.x = ((now / 1000 * D.projectileSpeed) % 200) + 20;
+            fireball.y = 22;
+            panel(24, 412, 564, 132, 3, () => renderDemonFireball(fireball));
+
+            text('Tiro da Bruxa (4x)', 612, 402);
+            bolt.x = ((now / 1000 * W.projectileSpeed) % 100) + 16;
+            bolt.y = 16;
+            panel(612, 412, 564, 132, 4, () => renderWitchBolt(bolt));
+        }
+
+        ctx.fillStyle = '#050b16';
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        let last = performance.now();
+
+        // Só redesenha o que está na tela: são dezenas de monstros procedurais por quadro
+        function frame() {
+            const now = performance.now();
+            const dt = Math.min(0.05, (now - last) / 1000);
+            last = now;
+            const rect = canvas.getBoundingClientRect();
+            const k = rect.height / HEIGHT;
+            const top = -rect.top / k;
+            const bottom = top + innerHeight / k;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.globalAlpha = 1;
+            if (top < HERO_HEIGHT) drawHighlights(dt, now);
+            rows.forEach(row => {
+                if (row.top + ROW_HEIGHT > top && row.top < bottom) drawRow(row, dt, now);
+            });
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    </script>
+</body>
+</html>

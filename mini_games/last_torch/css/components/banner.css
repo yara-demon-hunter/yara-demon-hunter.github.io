@@ -67,7 +67,7 @@
     100% { opacity: 0; transform: translateY(-10px); }
 }
 
-/* Notificações (Trials, elites, dicas) */
+/* Notificações (conquistas, elites, dicas) */
 #toasts {
     position: absolute;
     left: 50%;

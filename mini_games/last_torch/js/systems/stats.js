@@ -5,7 +5,7 @@ import { mod } from './modifiers.js';
 
 // --- FÓRMULAS DE ATRIBUTOS ---
 // Só as cartas escolhidas contam; o nível do herói não muda os stats sozinho.
-// mod(): bônus de herói, Hearth, relíquias e presságios (js/systems/modifiers.js).
+// mod(): bônus de herói, relíquias e presságios (js/systems/modifiers.js).
 export function getAtkDamage() {
     let base = (BLADE_SKILL.baseDamage
         + (attributes.damage.lvl - 1) * BLADE_SKILL.damagePerUpgrade) * (1 + mod('damage'));

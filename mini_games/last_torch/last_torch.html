@@ -101,7 +101,7 @@ permalink: /mini_games/last_torch/last_torch.html
             <li><span>🔥</span><p><b>Guard the torch.</b> Its light holds back the fog. If it dies, the night is over.</p></li>
             <li><span>⚔️</span><p><b>Hunt what comes.</b> Your blade strikes on its own. Throw daggers and dash to stay alive.</p></li>
             <li><span>🃏</span><p><b>Grow with every level.</b> Pick one of three powers, and build something terrible.</p></li>
-            <li><span>🌅</span><p><b>Every night counts.</b> Embers you earn stay with you, even when you fall.</p></li>
+            <li><span>🌅</span><p><b>Every night counts.</b> Trophies and feats fill the Sanctuary and unlock new heroes.</p></li>
         </ul>
         <div id="startRecords" class="start-records hidden">
             <div><span>Best hour</span><b id="recordHour">0</b></div>
@@ -117,9 +117,17 @@ permalink: /mini_games/last_torch/last_torch.html
         </div>
 
         <button id="btnStart" class="start-btn">LIGHT THE TORCH</button>
-        <button id="btnHearth" class="start-btn-small">
-            <span>🔥 HEARTH</span><em><span id="startHeroName">Demon Hunter</span> · <b id="startEmbers">0</b> embers</em>
-        </button>
+        <!-- Herói e Santuário lado a lado: um toque cada, sem gastar altura -->
+        <div class="start-links">
+            <button id="btnHeroes" class="start-btn-small">
+                <span id="startHeroPortrait" class="hero-portrait" aria-hidden="true"></span>
+                <span class="link-text"><span>HUNTER</span><em id="startHeroName">Demon Hunter</em></span>
+            </button>
+            <button id="btnSanctuary" class="start-btn-small">
+                <span class="link-icon" aria-hidden="true">🏛️</span>
+                <span class="link-text"><span>SANCTUARY</span><em id="startSanctuaryCount">0/0 earned</em></span>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -216,7 +224,7 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
             <div class="points-chip" title="Skill points">⚡ <b id="statusPoints">0</b></div>
             <div class="camp-gold">🪙 <b id="shopCoinsText">0</b></div>
-            <button id="btnCloseShop" class="hearth-close" aria-label="Close">✕</button>
+            <button id="btnCloseShop" class="screen-close" aria-label="Close">✕</button>
         </div>
 
         <!-- ÁRVORE: abas de ramo (só em tela pequena), mapa e detalhe do nó escolhido, lado a lado -->
@@ -297,13 +305,6 @@ permalink: /mini_games/last_torch/last_torch.html
                 <div id="finalBuild"></div>
             </div>
             <div class="summary-col">
-                <div class="summary-embers">
-                    <div class="ember-total">
-                        <span class="ember-icon">🔥</span>
-                        <div><b>+<span id="emberEarned">0</span></b><em>embers · <span id="emberTotal">0</span> total</em></div>
-                    </div>
-                    <div id="emberLines"></div>
-                </div>
                 <div id="summaryUnlocks"></div>
                 <div id="summaryGoal"></div>
             </div>
@@ -311,30 +312,43 @@ permalink: /mini_games/last_torch/last_torch.html
         <div class="summary-actions">
             <button id="btnRestart" class="start-btn">HUNT AGAIN</button>
             <button id="btnEndless" class="start-btn start-btn-dark hidden">STAY IN THE DARK</button>
-            <button id="btnHearthSummary" class="start-btn-small"><span>🔥 HEARTH</span></button>
+            <button id="btnSanctuarySummary" class="start-btn-small"><span>🏛️ SANCTUARY</span></button>
             <button id="btnShare" class="start-btn-small"><span>↗ SHARE</span></button>
             <button id="btnMenu" class="start-btn-small"><span>MENU</span></button>
         </div>
     </div>
 </div>
 
-<!-- HEARTH: melhorias permanentes, heróis e Trials. Styles in css/components/hearth.css -->
-<div id="hearthScreen" class="game-screen hidden">
-    <div class="hearth-panel">
-        <header class="hearth-head">
+<!-- SANTUÁRIO: troféus, façanhas e bestiário. Styles in css/components/sanctuary.css -->
+<div id="sanctuaryScreen" class="game-screen hidden" role="dialog" aria-label="Sanctuary">
+    <div class="sanc-panel">
+        <header class="sanc-head">
             <div>
                 <p class="screen-eyebrow">WHAT THE FIRE REMEMBERS</p>
-                <h2 class="screen-title">THE HEARTH</h2>
+                <h2 class="screen-title">SANCTUARY</h2>
             </div>
-            <div id="hearthTabs">
-                <button data-tab="upgrades">UPGRADES</button>
-                <button data-tab="heroes">HEROES</button>
-                <button data-tab="trials">TRIALS</button>
+            <div id="sanctuaryTabs">
+                <button data-tab="trophies">TROPHIES <i></i></button>
+                <button data-tab="feats">FEATS <i></i></button>
+                <button data-tab="bestiary">BESTIARY <i></i></button>
             </div>
-            <div class="camp-gold">🔥 <b id="hearthEmbers">0</b></div>
-            <button id="btnCloseHearth" class="hearth-close" aria-label="Close">✕</button>
+            <button id="btnCloseSanctuary" class="screen-close" aria-label="Close">✕</button>
         </header>
-        <div id="hearthList" class="custom-scroll"></div>
+        <div id="sanctuaryList" class="custom-scroll"></div>
+    </div>
+</div>
+
+<!-- ESCOLHA DO HERÓI (da tela inicial). Styles in css/components/heroes.css -->
+<div id="heroScreen" class="game-screen hidden" role="dialog" aria-label="Choose your hunter">
+    <div class="hero-panel">
+        <header class="hero-head">
+            <div>
+                <p class="screen-eyebrow">WHO CARRIES THE TORCH</p>
+                <h2 class="screen-title">CHOOSE YOUR HUNTER</h2>
+            </div>
+            <button id="btnCloseHeroes" class="screen-close" aria-label="Close">✕</button>
+        </header>
+        <div id="heroRoster"></div>
     </div>
 </div>
 

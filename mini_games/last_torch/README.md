@@ -6,7 +6,7 @@ Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o heró
 
 - **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 1 ponto de skill. O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos (Blade, Shadow, Flame, Curse) com stats, poderes, efeitos, evoluções e skills passivas (Shadow Clone, Fan of Knives, Long Throw, Mirror Ward, Shadow Whirl). Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
 - **Uma hora (~45 s):** fechada a cota de pontos (ou morto o boss), para de nascer monstro e o jogador mata o que sobrou. Com a tela limpa, uma onda de fogo sai da tocha, o ouro do chão voa até o herói, sobra um tempo curto para pegar os itens e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha. As horas 4, 8 e 12 têm boss.
-- **Entre partidas:** a árvore recomeça a cada noite e está toda aberta desde a primeira partida. Cada nó pede só o que aparece na árvore: nível mínimo de outras skills e, em alguns, quantos monstros de um tipo você matou na partida inteira, somando todas as horas (por exemplo, 10 Witches). A contagem só zera ao começar uma partida nova. O painel do nó mostra a lista inteira de pedidos de uma vez. O que persiste entre noites são as brasas (melhorias do Hearth), os Trials (heróis e brasas) e os recordes. Vencer abre a noite sem fim e os níveis de Escuridão.
+- **Entre partidas:** a árvore recomeça a cada noite e está toda aberta desde a primeira partida. Cada nó pede só o que aparece na árvore: nível mínimo de outras skills e, em alguns, quantos monstros de um tipo você matou na partida inteira, somando todas as horas (por exemplo, 10 Witches). A contagem só zera ao começar uma partida nova. O painel do nó mostra a lista inteira de pedidos de uma vez. O que persiste entre noites fica no **Santuário** (botão na tela inicial): troféus (marcos da jornada), façanhas (matar vários de uma vez, esquivar no último instante, terminar uma hora sem levar dano, sequências de mortes) e o bestiário, que mostra cada monstro e boss depois do primeiro abatido. Algumas conquistas liberam heróis, escolhidos na tela de escolha do herói, também na tela inicial. As moedas do jogo são só o ouro e os pontos de skill, e valem para a noite atual. Vencer abre a noite sem fim e os níveis de Escuridão.
 
 Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
 
@@ -36,7 +36,8 @@ css/
   components/screens.css          base das telas que pausam a partida
   components/camp.css             acampamento
   components/summary.css          tela de fim da noite
-  components/hearth.css           Hearth: melhorias, heróis e Trials
+  components/sanctuary.css        Santuário: troféus, façanhas e bestiário
+  components/heroes.css           escolha do herói
   components/shop.css             tela de status (pausa, abas, build em colunas)
   components/tree.css             árvores: cada ramo é um bloco; abas em tela pequena, 2 x 2 em tela grande, célula calculada para caber sem rolar
   components/joystick.css         controles de toque: joystick, adaga e dash
@@ -59,11 +60,11 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   streak.js                       sequência de mortes
   pickups.js                      itens no chão e baús
   gold.js                         ouro dropado
-  meta.js                         melhorias do Hearth, brasas e Trials
+  sanctuary.js                    conquistas (troféus e façanhas), janela de mortes simultâneas e bestiário
   world.js                        tamanho padronizado do mundo e zoom (areaScale) por perfil desktop/mobile
   visuals/                        cores, tamanhos e ritmos das animações (arte procedural)
     characters/                   herói e Shadow Clone
-    monsters/                     um arquivo por monstro (bat, skeleton, witch, vampire, moth, bloater, wraith) e sprites_visual.js (quadros dos sprites)
+    monsters/                     um arquivo por monstro (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, headless_knight) e sprites_visual.js (quadros dos sprites)
     bosses/                       Demon Lord e paletas de quem reaproveita arte (palettes_visual.js)
     scenery/                      cenário (forest_visual.js, torch_visual.js)
     items/gold_visual.js          ouro
@@ -75,7 +76,7 @@ js/
   core/save.js                    progresso salvo entre partidas (localStorage)
   core/resize.js                  redimensionamento do canvas
   core/input.js                   mouse, toque e teclado
-  systems/modifiers.js            soma os bônus de herói, Hearth, relíquias, poderes, presságios e Escuridão (mod('chave'))
+  systems/modifiers.js            soma os bônus de herói, relíquias, poderes, presságios e Escuridão (mod('chave'))
   systems/stats.js                fórmulas de atributos (dano, alcance, cooldown...)
   systems/night.js                fases da hora: caçada, últimos monstros, onda de fogo, amanhecer, morte
   systems/spawner.js              aparição de monstros, hordas, elites e bosses
@@ -90,7 +91,8 @@ js/
   systems/player.js               movimentação e dano no herói
   systems/torch.js                vida da tocha e calor que cura
   systems/shadow_clone.js         Shadow Clone
-  systems/streak.js               sequência de mortes
+  systems/streak.js               sequência de mortes e mortes simultâneas
+  systems/sanctuary.js            registro do Santuário: conquistas, recordes, bestiário
   systems/gold.js                 moedas de ouro: pulo, atração e coleta
   systems/pickups.js              itens no chão e baús
   systems/progression.js          XP e level up
@@ -103,7 +105,7 @@ js/
   render/powers.js                desenho dos poderes
   render/pickups.js               itens e baús
   render/monster_sprites.js       gera os sprites dos monstros e dos tiros a partir da arte procedural
-  render/moth.js, bloater.js, wraith.js ...   arte de cada monstro (usada para gerar os sprites)
+  render/moth.js, bloater.js, wraith.js, zombie_wolf.js, headless_knight.js ...   arte de cada monstro (usada para gerar os sprites)
   render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
   render/player25d.js             herói 2.5D (padrão)
   render/shadow_clone.js          Shadow Clone: herói 2.5D com paleta de sombra
@@ -113,14 +115,16 @@ js/
   ui/tree.js                      desenho das árvores (ramos, nós, ligações e abas de ramo) e painel de detalhe; uma fábrica monta a de skills e a de relíquias
   ui/camp.js                      acampamento: árvore de relíquias, tocha e descanso
   ui/status.js                    tela de status: abas Skill Tree, Build e Options
-  ui/hearth.js                    Hearth
-  ui/screens.js                   início de partida, fim da noite, brasas e Trials
+  ui/sanctuary.js                 Santuário: abas de troféus, façanhas e bestiário
+  ui/heroes.js                    escolha do herói
+  ui/screens.js                   início de partida, fim da noite e tela inicial
   ui/hints.js                     dicas da primeira partida
   ui/orientation.js               celular de lado (paisagem): trava de orientação e pausa com o aparelho em pé
   ui/buttons.js                   eventos dos botões e atalhos de teclado
   audio/sound-engine.js           efeitos sintetizados (Web Audio API), mixagem e volumes
   audio/music.js                  música procedural: clima por momento da noite
 art_reference/                    imagens e fichas de referência dos personagens (não carregadas pelo jogo)
+previews/                         páginas para analisar os monstros e o herói (como abrir: previews/README.md)
 draft/                            versões anteriores mantidas como referência
 ```
 

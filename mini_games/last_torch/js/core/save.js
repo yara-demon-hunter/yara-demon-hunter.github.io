@@ -5,16 +5,16 @@ const SAVE_KEY = 'last_torch_save_v1';
 
 function createSave() {
     return {
-        embers: 0,
-        upgrades: {},               // melhorias do Hearth: chave -> nível
         unlockedHeroes: ['hunter'],
-        achievements: {},           // id do Trial -> true
+        achievements: {},           // id da conquista -> true
+        bestiary: {},               // tipo de monstro -> { kills }
         hero: 'hunter',
         darkness: 1,                // nível de Escuridão escolhido
         maxDarkness: 1,
         stats: {
             runs: 0, kills: 0, bestHour: 0, bestScore: 0, bestStreak: 0, victories: 0,
-            elites: 0, evolutions: 0, bestDarknessWon: 0
+            elites: 0, evolutions: 0, bestDarknessWon: 0, bosses: 0, chests: 0,
+            bestMultiKill: 0, perfectDodges: 0, flawlessHours: 0
         },
         settings: { muted: false, music: true, sfx: true, shake: true, numbers: true },
         seenTutorial: false,
@@ -27,10 +27,14 @@ function load() {
     try {
         const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
         if (!saved) return fresh;
+        // Saves antigos: brasas e melhorias do Hearth não existem mais (o Hearth virou o Santuário)
+        delete saved.embers;
+        delete saved.upgrades;
         // Campos novos em versões futuras entram com o valor padrão
         return {
             ...fresh, ...saved,
             stats: { ...fresh.stats, ...saved.stats },
+            bestiary: { ...saved.bestiary },
             settings: { ...fresh.settings, ...saved.settings }
         };
     } catch {

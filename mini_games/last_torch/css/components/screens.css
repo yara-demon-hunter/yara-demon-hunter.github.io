@@ -1,4 +1,4 @@
-/* --- TELAS DE JOGO: base comum das telas que pausam a partida (cartas, acampamento, fim da noite, Hearth) ---
+/* --- TELAS DE JOGO: base comum das telas que pausam a partida (acampamento, fim da noite, Santuário, escolha do herói) ---
    Mesmo clima da tela inicial: quase preto, letras cor de osso e brasa. */
 .game-screen {
     position: absolute;
@@ -16,7 +16,27 @@
 }
 .game-screen.hidden { display: none; }
 #gameOverScreen { z-index: 40; }
-#hearthScreen { z-index: 45; }
+#sanctuaryScreen, #heroScreen { z-index: 45; }
+/* Botão ✕ das telas */
+.screen-close {
+    min-width: 2.6rem;
+    min-height: 2.4rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.6rem;
+    background: rgba(30, 41, 59, 0.8);
+    color: #cbd5e1;
+    font-weight: 800;
+}
+/* Retrato do herói (escolha do herói e tela inicial); o filtro de cor vem de cada herói */
+.hero-portrait {
+    width: 2.6rem;
+    height: 2.6rem;
+    flex-shrink: 0;
+    border: 1px solid rgba(103, 232, 249, 0.4);
+    border-radius: 0.45rem;
+    background: #0b1120 url('../../images/characters/demon-hunter-small.webp') 26% 8% / 220% no-repeat;
+    image-rendering: pixelated;
+}
 @keyframes screenIn {
     from { opacity: 0; }
     to { opacity: 1; }

@@ -21,5 +21,7 @@ export const MONSTER_SPRITES = {
     NECROMANCER: { extent: 1.3, bakeSeconds: 1 / 1.82, playSeconds: 0.9, speed: 34 },
     MOTH: { extent: 1.45, bakeSeconds: 1 / 9, playSeconds: 0.2, speed: 100, wobbleAmount: 0.3, wobbleHz: 3.1 },
     BLOATER: { extent: 1.25, bakeSeconds: 1 / 1.6, playSeconds: 0.7, speed: 33 },
-    WRAITH: { extent: 1.9, bakeSeconds: 1 / 2.4, playSeconds: 0.5, speed: 60, floatAmount: 0.06, floatHz: 1.1 }
+    WRAITH: { extent: 1.9, bakeSeconds: 1 / 2.4, playSeconds: 0.5, speed: 60, floatAmount: 0.06, floatHz: 1.1 },
+    ZOMBIE_WOLF: { extent: 2.2, bakeSeconds: 1 / 2.6, playSeconds: 0.4, speed: 85 },
+    HEADLESS_KNIGHT: { extent: 2.3, bakeSeconds: 1, playSeconds: 1, speed: 26 }
 };

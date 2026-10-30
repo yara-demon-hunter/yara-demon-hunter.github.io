@@ -15,7 +15,7 @@ export const CHARACTER_MODEL = {
     trailLength: 6,
     trailFadePerSecond: 4,
     // XP para o próximo nível: base + linear x n + quadratic x n², com n = nível - 1
-    xpCurve: { base: 46, linear: 34, quadratic: 1.8 },
+    xpCurve: { base: 110, linear: 75, quadratic: 4 },
     levelUpHealRatio: 0.12,
     // Calor da tocha: perto dela o herói se recupera aos poucos
     warmthRadius: 92,

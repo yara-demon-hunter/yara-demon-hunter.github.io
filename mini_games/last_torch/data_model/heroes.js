@@ -1,7 +1,7 @@
 import { HERO_VISUALS } from './visuals/characters/hero_visual.js';
 
 // --- HERÓIS ---
-// Liberados pelos Trials (data_model/achievements.js). mods: mesmas chaves de js/systems/modifiers.js.
+// Liberados por conquistas do Santuário (data_model/sanctuary.js). mods: mesmas chaves de js/systems/modifiers.js.
 // colors: troca só o que muda na paleta do herói 2.5D; portrait: filtro CSS aplicado no retrato.
 export const HEROES = {
     hunter: {
