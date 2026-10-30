@@ -1,11 +1,11 @@
 import { audio, passives, state } from '../core/state.js';
 import { updateHUD } from './hud.js';
 
-// --- SKILLS PASSIVAS (compradas com pontos de skill) ---
+// --- SKILLS PASSIVAS (compradas com ouro) ---
 export function renderPassiveSkills() {
-    document.getElementById('skillPointsText').innerText = state.skillPoints;
+    document.getElementById('shopCoinsText').innerText = state.coins;
 
-    const canBuy = Object.values(passives).some(sk => sk.lvl < sk.maxLvl && state.skillPoints >= sk.cost);
+    const canBuy = Object.values(passives).some(sk => sk.lvl < sk.maxLvl && state.coins >= sk.cost);
     document.getElementById('passivesPanel').classList.toggle('has-upgrade', canBuy);
 
     const list = document.getElementById('passiveList');
@@ -15,7 +15,7 @@ export function renderPassiveSkills() {
         const skill = passives[key];
         const isMax = skill.lvl >= skill.maxLvl;
 
-        const affordable = !isMax && state.skillPoints >= skill.cost;
+        const affordable = !isMax && state.coins >= skill.cost;
         const item = document.createElement('div');
         item.className = `passive-card${isMax ? ' is-acquired' : affordable ? ' is-ready' : ''}`;
         item.innerHTML = `
@@ -24,7 +24,7 @@ export function renderPassiveSkills() {
             <span class="passive-card-desc">${skill.desc}</span>
             ${isMax
                 ? '<span class="passive-card-owned">✔ ACQUIRED</span>'
-                : `<button data-passive="${key}" class="shop-row-btn shop-row-btn-passive" ${affordable ? '' : 'disabled'}>⚡ ${skill.cost}</button>`}
+                : `<button data-passive="${key}" class="shop-row-btn" ${affordable ? '' : 'disabled'}>🪙 ${skill.cost}</button>`}
         `;
         list.appendChild(item);
     });
@@ -32,11 +32,11 @@ export function renderPassiveSkills() {
 
 export function buyPassiveSkill(key) {
     const skill = passives[key];
-    if (!skill || skill.lvl >= skill.maxLvl || state.skillPoints < skill.cost) return;
+    if (!skill || skill.lvl >= skill.maxLvl || state.coins < skill.cost) return;
 
-    state.skillPoints -= skill.cost;
+    state.coins -= skill.cost;
     skill.lvl++;
     renderPassiveSkills();
     updateHUD();
-    audio.playPowerup();
+    audio.playCoin();
 }

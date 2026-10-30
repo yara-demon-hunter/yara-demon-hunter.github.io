@@ -1,33 +1,32 @@
 // --- SKILLS PASSIVAS ---
-// Compradas com pontos de skill (ganhos ao subir de nível), não com moedas.
-export const SKILL_POINTS_PER_LEVEL = 1;
+// Compradas com o ouro que os monstros dropam (cost = moedas). Os pontos de skill vão para os stats.
 
 export const PASSIVE_SKILL_MODELS = {
     shadowWhirl: {
         name: 'Shadow Whirl',
         icon: '🌀',
-        cost: 2,
+        cost: 80,
         maxLvl: 1,
         desc: 'The 3rd combo hit becomes a 360° spin that strikes every enemy in range.'
     },
     mirrorWard: {
         name: 'Mirror Ward',
         icon: '🛡️',
-        cost: 2,
+        cost: 60,
         maxLvl: 1,
         desc: 'Reflects an incoming enemy shot at the nearest monster. Recharges in 8s.'
     },
     longThrow: {
         name: 'Long Throw',
         icon: '🎯',
-        cost: 2,
+        cost: 40,
         maxLvl: 1,
         desc: 'Thrown daggers fly 60% farther and faster.'
     },
     fanOfKnives: {
         name: 'Fan of Knives',
         icon: '🗡️',
-        cost: 2,
+        cost: 110,
         maxLvl: 1,
         desc: 'Throws 3 daggers at once in a fan. Combines with Long Throw.'
     }

@@ -1,11 +1,11 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { SKILL_POINTS_PER_LEVEL } from '../../data_model/passives.js';
+import { SKILL_POINTS_PER_LEVEL } from '../../data_model/skills.js';
 import { player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { createExplosion, shakeScreen } from './effects.js';
-import { getMaxPlayerHp } from './stats.js';
 
 // --- LEVEL & XP ---
+// Cada nível dá pontos de skill para o jogador gastar nos stats que quiser (loja)
 export function gainXp(amount) {
     state.playerXp += amount;
     if (state.playerXp >= state.playerMaxXp) {
@@ -14,7 +14,7 @@ export function gainXp(amount) {
         state.skillPoints += SKILL_POINTS_PER_LEVEL;
         state.playerMaxXp = Math.floor(state.playerMaxXp * CHARACTER_MODEL.xpGrowthMultiplier);
 
-        player.maxHp = getMaxPlayerHp();
+        // Não melhora stats: só o ponto de skill e uma cura parcial
         player.hp = Math.min(player.maxHp, player.hp + player.maxHp * CHARACTER_MODEL.levelUpHealRatio);
 
         createExplosion(player.x, player.y, '#38bdf8', 30);

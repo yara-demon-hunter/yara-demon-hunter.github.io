@@ -3,10 +3,10 @@ import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
 import { attributes, player, state } from '../core/state.js';
 
 // --- FÓRMULAS DE ATRIBUTOS ---
+// Só os níveis comprados na loja contam; o nível do herói não muda os stats.
 export function getAtkDamage() {
     let base = BLADE_SKILL.baseDamage
-        + (attributes.damage.lvl - 1) * BLADE_SKILL.damagePerUpgrade
-        + (state.playerLevel - 1) * BLADE_SKILL.damagePerCharacterLevel;
+        + (attributes.damage.lvl - 1) * BLADE_SKILL.damagePerUpgrade;
     if (state.frenzyActiveTimer > 0) base *= 1 + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;
     return base;
 }
@@ -15,7 +15,6 @@ export function getAtkRadius() {
         state.width * BLADE_SKILL.maxRadiusScreenRatio,
         BLADE_SKILL.baseRadius
             + (attributes.radius.lvl - 1) * BLADE_SKILL.radiusPerUpgrade
-            + (state.playerLevel - 1) * BLADE_SKILL.radiusPerCharacterLevel
     );
 }
 
@@ -32,15 +31,13 @@ export function getSlashArcDegree() {
 
 export function getAtkCooldown() {
     let cd = BLADE_SKILL.baseCooldownSeconds
-        - (attributes.atkSpeed.lvl - 1) * BLADE_SKILL.cooldownReductionPerUpgrade
-        - (state.playerLevel - 1) * BLADE_SKILL.cooldownReductionPerCharacterLevel;
+        - (attributes.atkSpeed.lvl - 1) * BLADE_SKILL.cooldownReductionPerUpgrade;
     if (state.frenzyActiveTimer > 0) cd *= BLADE_SKILL.frenzyCooldownMultiplier;
     return Math.max(BLADE_SKILL.minimumCooldownSeconds, cd);
 }
 export function getPlayerMaxSpeed() {
     return CHARACTER_MODEL.initialMoveSpeed
-        + (attributes.moveSpeed.lvl - 1) * CHARACTER_MODEL.moveSpeedPerUpgrade
-        + (state.playerLevel - 1) * CHARACTER_MODEL.moveSpeedPerLevel;
+        + (attributes.moveSpeed.lvl - 1) * CHARACTER_MODEL.moveSpeedPerUpgrade;
 }
 export function getKnockback() {
     return BLADE_SKILL.baseKnockback
@@ -48,8 +45,7 @@ export function getKnockback() {
 }
 export function getMaxPlayerHp() {
     return CHARACTER_MODEL.baseHp
-        + (attributes.playerHp.lvl - 1) * CHARACTER_MODEL.hpPerUpgrade
-        + (state.playerLevel - 1) * CHARACTER_MODEL.hpPerLevel;
+        + (attributes.playerHp.lvl - 1) * CHARACTER_MODEL.hpPerUpgrade;
 }
 export function getFrenzyDuration() {
     return FRENZY_NOVA_SKILL.baseDurationSeconds

@@ -15,8 +15,8 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   character.js                    atributos e progressão do herói
   core.js                         vida, colisão e aparência do núcleo
   monsters.js                     monstros, chefão, aparição e recompensas
-  skills.js                       upgrades, lâmina e Fúria (Frenzy Nova)
-  passives.js                     skills passivas (compradas com pontos de skill, 1 por nível)
+  skills.js                       stats (comprados com pontos de skill, 1 por nível), lâmina e Fúria
+  passives.js                     skills passivas (compradas com ouro)
   gold.js                         ouro dropado pelos monstros (moedas que voam até o herói)
   world.js                        tamanho padronizado do mundo e zoom (areaScale) por perfil desktop/mobile
   visuals/                        cores, tamanhos e ritmos das animações (arte procedural)

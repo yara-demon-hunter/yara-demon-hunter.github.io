@@ -1,3 +1,4 @@
+import { STAT_UPGRADE_COST } from '../../data_model/skills.js';
 import { attributes, audio, player, state } from '../core/state.js';
 import {
     getAtkCooldown, getAtkDamage, getAtkRadius, getKnockback,
@@ -8,6 +9,7 @@ import { updateHUD } from './hud.js';
 import { renderPassiveSkills } from './passives.js';
 
 // --- LOJA DE UPGRADES ---
+// Stats: comprados com pontos de skill (1 por nível do herói). As passivas usam ouro (./passives.js).
 // Valor atual de cada stat, mostrado no próprio card de upgrade.
 const STAT_VALUES = {
     damage: () => getAtkDamage(),
@@ -19,10 +21,6 @@ const STAT_VALUES = {
     playerHp: () => getMaxPlayerHp(),
     knockback: () => Math.round(getKnockback())
 };
-
-function getUpgradeCost(attr) {
-    return Math.floor(attr.baseCost * Math.pow(attr.costMult, attr.lvl - 1));
-}
 
 export function openShop() {
     state.gameState = 'SHOP';
@@ -44,13 +42,14 @@ export function resumeGame() {
 export function renderShopItems() {
     const list = document.getElementById('shopList');
     list.innerHTML = '';
+    document.getElementById('skillPointsText').innerText = state.skillPoints;
+    const canSpend = state.skillPoints >= STAT_UPGRADE_COST;
     document.getElementById('statsPanel').classList.toggle('has-upgrade',
-        Object.values(attributes).some(a => a.lvl < a.maxLvl && state.coins >= getUpgradeCost(a)));
+        canSpend && Object.values(attributes).some(a => a.lvl < a.maxLvl));
 
     Object.keys(attributes).forEach(key => {
         const attr = attributes[key];
         const isMax = attr.lvl >= attr.maxLvl;
-        const cost = isMax ? 0 : getUpgradeCost(attr);
 
         const value = STAT_VALUES[key] ? STAT_VALUES[key]() : '';
         const item = document.createElement('div');
@@ -59,8 +58,8 @@ export function renderShopItems() {
         item.innerHTML = `
             <span class="shop-row-name"><span>${attr.icon}</span><span>${attr.name}</span><em>${isMax ? 'MAX' : 'Lv. ' + attr.lvl}</em></span>
             <b class="shop-row-value">${value}</b>
-            <button data-upgrade="${key}" aria-label="Upgrade ${attr.name}" class="shop-row-btn" ${isMax || state.coins < cost ? 'disabled' : ''}>
-                ${isMax ? 'MAX' : `+ 🪙 ${cost}`}
+            <button data-upgrade="${key}" aria-label="Upgrade ${attr.name}" class="shop-row-btn shop-row-btn-points" ${isMax || !canSpend ? 'disabled' : ''}>
+                ${isMax ? 'MAX' : `+ ⚡ ${STAT_UPGRADE_COST}`}
             </button>
         `;
         list.appendChild(item);
@@ -71,10 +70,8 @@ export function buyUpgrade(key) {
     const attr = attributes[key];
     if (!attr || attr.lvl >= attr.maxLvl) return;
 
-    const cost = getUpgradeCost(attr);
-
-    if (state.coins >= cost) {
-        state.coins -= cost;
+    if (state.skillPoints >= STAT_UPGRADE_COST) {
+        state.skillPoints -= STAT_UPGRADE_COST;
         attr.lvl++;
 
         if (key === 'playerHp') {
@@ -83,9 +80,8 @@ export function buyUpgrade(key) {
             player.hp += (player.maxHp - oldMax);
         }
 
-        document.getElementById('shopCoinsText').innerText = state.coins;
         updateHUD();
         renderShopItems();
-        audio.playCoin();
+        audio.playPowerup();
     }
 }

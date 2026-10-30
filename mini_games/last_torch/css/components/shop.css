@@ -75,8 +75,9 @@
     white-space: nowrap;
 }
 .shop-row-btn:hover:not(:disabled) { background: #d97706; }
-.shop-row-btn-passive { background: #8b5cf6; color: #fff; }
-.shop-row-btn-passive:hover:not(:disabled) { background: #7c3aed; }
+/* Âmbar = ouro (passivas); roxo = pontos de skill (stats) */
+.shop-row-btn-points { background: #8b5cf6; color: #fff; }
+.shop-row-btn-points:hover:not(:disabled) { background: #7c3aed; }
 .shop-row-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
 
 /* --- LOJA: cartões das skills passivas --- */
