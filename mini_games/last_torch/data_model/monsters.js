@@ -73,25 +73,6 @@ export const MONSTER_MODELS = {
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
-    BOSS: {
-        hpBase: 350,
-        hpPerTurn: 150,
-        speedMin: 35,
-        speedMax: 35,
-        radius: 32,
-        color: '#ec4899',
-        damage: 30,
-        shootCooldownSeconds: 1,
-        initialShootCooldownSeconds: 1.5,
-        projectileSpeed: 160,
-        projectileRadius: 5,
-        projectileDamageMultiplier: 0.8,
-        scoreReward: 250,
-        goldRewardMin: 10,
-        goldRewardMax: 10,
-        xpRewardBase: 20,
-        xpRewardPerTurn: 3,
-    },
     VAMPIRE_BAT: {
         hpBase: 15,
         hpPerTurn: 0,
@@ -112,12 +93,10 @@ export const MONSTER_MODELS = {
     }
 };
 
+// Os bosses ficam em ./bosses.js (BOSS_MODELS / BOSS_SPAWNING)
 export const MONSTER_SPAWNING = {
-    bossEveryTurns: 2,
-    maximumEnemiesBeforeBoss: 3,
     regularSpawnScreenRatio: 0.6,
     regularSpawnOffset: 50,
-    bossSpawnScreenRatio: 0.5,
     targetPlayerDistance: 240,
     movementDamping: 0.88,
     contactKnockback: 220
@@ -128,7 +107,11 @@ const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON'];
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];
     if (!model) throw new Error(`Unknown monster type: ${type}`);
+    return createEnemy(model, type, turn, x, y, random);
+}
 
+// Monta o inimigo a partir de um modelo (usado também pelos bosses)
+export function createEnemy(model, type, turn, x, y, random = Math.random) {
     // Vida, velocidade e dano crescem com o turno (data_model/difficulty.js)
     const difficulty = getTurnDifficulty(turn);
     const baseSpeed = model.speedMin === model.speedMax
@@ -173,7 +156,7 @@ export function chooseMonsterType(turn, random = Math.random) {
     return 'SKELETON';
 }
 
-export function rollMonsterGold(type, random = Math.random) {
-    const { goldRewardMin, goldRewardMax } = MONSTER_MODELS[type];
+export function rollMonsterGold(model, random = Math.random) {
+    const { goldRewardMin, goldRewardMax } = model;
     return goldRewardMin + Math.floor(random() * (goldRewardMax - goldRewardMin + 1));
 }

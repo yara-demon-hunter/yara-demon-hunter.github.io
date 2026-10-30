@@ -1,4 +1,5 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
+import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, createVampireBat, rollMonsterGold } from '../../data_model/monsters.js';
 import { MIRROR_WARD } from '../../data_model/passives.js';
@@ -10,6 +11,9 @@ import { createExplosion, registerPlayerHit, shakeScreen } from './effects.js';
 import { gainXp } from './progression.js';
 import { dropGold } from './gold.js';
 import { resetFieldForNewTurn } from './spawner.js';
+
+// Modelo de dados do inimigo (monstro comum ou boss)
+const getEnemyModel = type => MONSTER_MODELS[type] || BOSS_MODELS[type];
 
 // --- INIMIGOS ---
 export function updateEnemies(dt) {
@@ -31,11 +35,11 @@ export function updateEnemies(dt) {
         e.x += Math.cos(toTargetAngle) * e.speed * dt;
         e.y += Math.sin(toTargetAngle) * e.speed * dt;
 
-        // WITCH / BOSS
-        if (e.type === 'WITCH' || e.type === 'BOSS') {
+        // Atiradores: bruxa e bosses
+        if (e.type === 'WITCH' || e.isBoss) {
             e.shootTimer -= dt;
             if (e.shootTimer <= 0) {
-                const model = MONSTER_MODELS[e.type];
+                const model = getEnemyModel(e.type);
                 e.shootTimer = model.shootCooldownSeconds;
                 state.enemyProjectiles.push({
                     owner: e.type,          // quem atirou (só muda o desenho do projétil)
@@ -93,7 +97,7 @@ export function updateEnemies(dt) {
             audio.playExplode();
             createExplosion(e.x, e.y, e.color, 12);
 
-            const monsterModel = MONSTER_MODELS[e.type];
+            const monsterModel = getEnemyModel(e.type);
             const pts = monsterModel.scoreReward;
             state.scoreTurn += pts;
             state.totalScore += pts;
@@ -101,7 +105,7 @@ export function updateEnemies(dt) {
             // XP é direto; o ouro cai em moedas que voam até o herói
             const gainedXp = monsterModel.xpRewardBase + state.turn * monsterModel.xpRewardPerTurn;
             gainXp(gainedXp);
-            dropGold(e.x, e.y, rollMonsterGold(e.type));
+            dropGold(e.x, e.y, rollMonsterGold(monsterModel));
 
             if (e.type === 'VAMPIRE') {
                 for (let s = 0; s < monsterModel.splitCount; s++) {

@@ -5,7 +5,7 @@ As imagens daqui **nunca são carregadas pelo jogo**: servem só para a IA enten
 
 ## Como adicionar um personagem
 
-1. Copie a pasta `_template/` e renomeie com o id do personagem (o mesmo id usado no `data_model/`, ex.: `hero`, `normal`, `shooter`, `splitter`, `boss`, `core`).
+1. Copie a pasta `_template/` e renomeie com o id do personagem (o mesmo id usado no `data_model/`, ex.: `hero`, `normal`, `shooter`, `splitter`, `demon_lord`, `core`).
 2. Coloque as imagens em `images/` seguindo os nomes sugeridos abaixo.
 3. Preencha o `character.md`. Quanto mais detalhes, melhor o resultado.
 4. Peça à IA: "crie a animação de `art_reference/<id>` seguindo o plano visual".

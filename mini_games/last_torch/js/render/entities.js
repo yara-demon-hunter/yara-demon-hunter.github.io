@@ -1,3 +1,4 @@
+import { DEMON_LORD_VISUALS } from '../../data_model/visuals/bosses/demon_lord_visual.js';
 import { BAT_VISUALS } from '../../data_model/visuals/monsters/bat_visual.js';
 import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
 import { GOLD_VISUALS as G } from '../../data_model/visuals/items/gold_visual.js';
@@ -9,6 +10,7 @@ import { FAN_OF_KNIVES } from '../../data_model/passives.js';
 import { ctx, passives, player, state } from '../core/state.js';
 import { getKnifeRange } from '../systems/knives.js';
 import { renderBat } from './bat.js';
+import { renderDemonFireball, renderDemonLord } from './demon_lord.js';
 import { drawDagger } from './knife.js';
 import { renderReflectedBolt } from './reflect.js';
 import { renderSkeleton } from './skeleton.js';
@@ -149,6 +151,10 @@ export function renderEnemyProjectiles() {
             renderWitchBolt(p);
             return;
         }
+        if (p.owner === 'DEMON_LORD') {
+            renderDemonFireball(p);
+            return;
+        }
         drawGlow(ctx, 'rgba(245, 158, 11, 0.55)', p.x, p.y, p.radius * 3);
         ctx.fillStyle = '#fbbf24';
         ctx.beginPath();
@@ -167,9 +173,11 @@ export function renderEnemies() {
             renderSkeleton(e);
         } else if (e.type === 'VAMPIRE') {
             renderVampire(e);
+        } else if (e.type === 'DEMON_LORD') {
+            renderDemonLord(e);
         } else {
             // Brilho em cache (em vez de shadowBlur)
-            drawGlow(ctx, e.color, e.x, e.y, e.radius * (e.type === 'BOSS' ? 2.6 : 2.1), 0.45);
+            drawGlow(ctx, e.color, e.x, e.y, e.radius * (e.isBoss ? 2.6 : 2.1), 0.45);
             ctx.fillStyle = e.color;
             ctx.beginPath();
             ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
@@ -183,6 +191,7 @@ export function renderEnemies() {
                 : e.type === 'WITCH' ? e.radius + WITCH_VISUALS.healthBarOffset
                 : e.type === 'SKELETON' ? e.radius + SKELETON_VISUALS.healthBarOffset
                 : e.type === 'VAMPIRE' ? e.radius + VAMPIRE_VISUALS.healthBarOffset
+                : e.type === 'DEMON_LORD' ? e.radius + DEMON_LORD_VISUALS.healthBarOffset
                 : e.radius + 8;
             ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
             ctx.fillRect(e.x - bw / 2, e.y - barY, bw, 4);

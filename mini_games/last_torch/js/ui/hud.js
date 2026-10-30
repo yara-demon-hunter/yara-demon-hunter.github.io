@@ -74,6 +74,7 @@ export function updateHUD() {
     // Boss HUD
     if (currentBoss) {
         document.getElementById('bossHpContainer').classList.remove('hidden');
+        document.getElementById('bossNameText').innerText = `☠️ ${currentBoss.name.toUpperCase()}`;
         document.getElementById('bossHpText').innerText = `${Math.ceil(currentBoss.hp)}/${currentBoss.maxHp}`;
         document.getElementById('bossHpBar').style.width = `${Math.max(0, (currentBoss.hp / currentBoss.maxHp) * 100)}%`;
     } else {
