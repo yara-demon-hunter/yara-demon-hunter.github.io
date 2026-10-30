@@ -1,7 +1,6 @@
 import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES } from '../../data_model/tree.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { state } from '../core/state.js';
-import { setSkillIcon } from '../render/skill_icons.js';
 import { buyNode, getNextText, getNodeInfo, getNodeState } from '../systems/tree.js';
 
 // --- ÁRVORES (tela) ---
@@ -78,15 +77,16 @@ function createTreeView(cfg) {
 
         nodes.forEach(node => {
             const pos = nodePosition(node);
+            const info = getNodeInfo(node);
             const button = document.createElement('button');
             button.className = `tnode tnode-${node.kind}`;
             button.dataset.node = node.id;
-            button.setAttribute('aria-label', getNodeInfo(node).name);
+            button.setAttribute('aria-label', info.name);
             button.style.setProperty('--x', pos.x);
             button.style.setProperty('--y', pos.y);
             button.style.setProperty('--tone', branches[node.branch].color);
             button.innerHTML = '<span class="tnode-icon"></span><i class="tnode-level"></i>';
-            setSkillIcon(button.querySelector('.tnode-icon'), node.id);
+            button.querySelector('.tnode-icon').textContent = info.icon;
             map.appendChild(button);
             buttons.set(node.id, button);
         });
@@ -123,7 +123,7 @@ function createTreeView(cfg) {
         const st = getNodeState(node);
         const info = getNodeInfo(node);
         const next = st.maxed ? '' : getNextText(node);
-        setSkillIcon(detail('Icon'), node.id);
+        detail('Icon').textContent = info.icon;
         detail('Name').textContent = info.name;
         detail('Level').textContent = levelText(node, st);
         detail('Desc').textContent = info.desc;

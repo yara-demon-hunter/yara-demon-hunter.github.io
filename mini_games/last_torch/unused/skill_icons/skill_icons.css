@@ -1,0 +1,16 @@
+/* Guardado, sem uso no jogo. Estilos do atlas de js/render/skill_icons.js */
+.skill-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-image: var(--skill-atlas);
+    background-size: var(--skill-atlas-size);
+}
+.tnode-icon { display: block; width: 70%; height: 70%; font-size: 0; }
+.tdetail-icon { display: block; width: 2.5rem; height: 2.5rem; }
+.build-row-icon { display: block; flex-shrink: 0; width: 1.8rem; height: 1.8rem; }
+.build-item .skill-icon { width: 86%; height: 86%; }
+#finalBuild span { display: block; width: 1.7rem; height: 1.7rem; }
+@media (max-height: 520px) and (orientation: landscape) {
+    .tdetail-icon { width: 1.7rem; height: 1.7rem; }
+}

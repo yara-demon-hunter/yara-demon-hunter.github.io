@@ -3,7 +3,6 @@ import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, state } from '../core/state.js';
 import { getOwnedPowers } from '../systems/tree.js';
 import { skillTree } from './tree.js';
-import { getPowerIconKey, setSkillIcon } from '../render/skill_icons.js';
 import {
     getAtkCooldown, getAtkDamage, getAtkRadius, getCritChance, getKnockback,
     getMaxPlayerHp, getPlayerMaxSpeed, getSlashArcDegree
@@ -61,7 +60,7 @@ function renderBuildList(id, items, emptyText) {
         const item = document.createElement('div');
         item.className = 'build-row';
         item.innerHTML = '<span class="build-row-icon"></span><div><b></b><span></span></div>';
-        setSkillIcon(item.querySelector('.build-row-icon'), icon);
+        item.querySelector('.build-row-icon').textContent = icon;
         item.querySelector('b').textContent = level ? `${name} · Lv. ${level}` : name;
         item.querySelector('b + span').textContent = desc;
         list.appendChild(item);
@@ -107,16 +106,16 @@ export function openStatus() {
     document.getElementById('statusHour').innerText = `Hour ${state.turn} · ${getHourName(state.turn)} · ${getHero().name}`;
     renderHeader();
     renderStats();
-    const skills = Object.entries(passives).filter(([, p]) => p.type === 'skill' && p.lvl > 0)
-        .map(([key, p]) => ({ icon: key, name: p.name, desc: p.desc, level: 0 }));
+    const skills = Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0)
+        .map(p => ({ icon: p.icon, name: p.name, desc: p.desc, level: 0 }));
     renderBuildList('powerList', [...getOwnedPowers().map(p => ({
-        icon: getPowerIconKey(p),
+        icon: p.evolved ? EVOLUTIONS[p.key].icon : p.icon,
         name: p.evolved ? `${EVOLUTIONS[p.key].name} ✦` : p.name,
         desc: !p.evolved && EVOLUTIONS[p.key] ? `${p.desc} Can evolve in the skill tree at max level.` : p.desc,
         level: p.lvl
     })), ...skills], 'No powers yet. Learn them in the skill tree.');
-    renderBuildList('passiveList', Object.entries(passives).filter(([, p]) => p.type !== 'skill' && p.lvl > 0).map(([key, p]) => ({
-        icon: key, name: p.name, desc: p.desc, level: 0
+    renderBuildList('passiveList', Object.values(passives).filter(p => p.type !== 'skill' && p.lvl > 0).map(p => ({
+        icon: p.icon, name: p.name, desc: p.desc, level: 0
     })), 'No relics yet. Buy them at the camp, between hours.');
     renderSettings();
     document.getElementById('shopScreen').classList.remove('hidden');

@@ -1,9 +1,9 @@
+import { EVOLUTIONS } from '../../data_model/powers.js';
 import { NIGHT, getHourName } from '../../data_model/night.js';
 import { STREAK } from '../../data_model/streak.js';
 import { isBossTurn } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { passives, player, powers, state } from '../core/state.js';
-import { getPowerIconKey, setSkillIcon } from '../render/skill_icons.js';
 import { getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
 import { hasBuyableNode } from '../systems/tree.js';
 
@@ -163,10 +163,10 @@ export function syncBossBar() {
 export function updateBuildStrip() {
     const strip = el('buildStrip');
     strip.textContent = '';
-    const add = (key, level, evolved) => {
+    const add = (icon, level, evolved) => {
         const item = document.createElement('span');
         item.className = evolved ? 'build-item is-evolved' : 'build-item';
-        setSkillIcon(item, key);
+        item.textContent = icon;
         if (level) {
             const lv = document.createElement('i');
             lv.textContent = level;
@@ -174,8 +174,8 @@ export function updateBuildStrip() {
         }
         strip.appendChild(item);
     };
-    Object.values(powers).forEach(p => { if (p.lvl > 0) add(getPowerIconKey(p), p.lvl, p.evolved); });
-    Object.entries(passives).forEach(([key, p]) => { if (p.lvl > 0) add(key, 0, false); });
+    Object.values(powers).forEach(p => { if (p.lvl > 0) add(p.evolved ? EVOLUTIONS[p.key].icon : p.icon, p.lvl, p.evolved); });
+    Object.values(passives).forEach(p => { if (p.lvl > 0) add(p.icon, 0, false); });
 }
 
 export function updateHUD() {

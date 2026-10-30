@@ -11,7 +11,6 @@ import { continueEndless, startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { resetTorch } from '../systems/torch.js';
 import { prepareForest } from '../render/forest.js';
-import { getPowerIconKey, setSkillIcon } from '../render/skill_icons.js';
 import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_sprites.js';
 import { showToast } from './banner.js';
 import { startHints } from './hints.js';
@@ -298,9 +297,9 @@ export function triggerGameOver(reason) {
 
     const build = document.getElementById('finalBuild');
     build.innerHTML = '';
-    [...getOwnedPowers().map(getPowerIconKey), ...Object.keys(passives).filter(key => passives[key].lvl > 0)].forEach(key => {
+    [...getOwnedPowers().map(p => p.icon), ...Object.values(passives).filter(p => p.lvl > 0).map(p => p.icon)].forEach(icon => {
         const item = document.createElement('span');
-        setSkillIcon(item, key);
+        item.textContent = icon;
         build.appendChild(item);
     });
 
