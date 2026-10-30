@@ -63,17 +63,16 @@ function beginLastStand() {
         return;
     }
     state.lastStand = true;
-    state.phaseTimer = NIGHT.lastStandSeconds;
     // Covas que ainda iam abrir contam como monstros novos
     state.telegraphs = state.telegraphs.filter(t => t.kind !== 'grave');
     showBanner('', 'FINISH THEM', 'No more will come', 'warn');
     updateHUD();
 }
 
-// Checado a cada quadro: o último monstro pode morrer sozinho, consumido pela tocha
-function updateLastStand(dt) {
-    state.phaseTimer -= dt;
-    if (state.enemies.length === 0 || state.phaseTimer <= 0) beginClear();
+// A hora só fecha com a tela limpa, sem limite de tempo: nenhum monstro foge, então dá sempre para alcançá-los.
+// Checado a cada quadro porque o último monstro pode morrer sozinho, consumido pela tocha.
+function updateLastStand() {
+    if (state.enemies.length === 0) beginClear();
 }
 
 function beginClear() {
@@ -97,13 +96,9 @@ function beginClear() {
     updateHUD();
 }
 
-// A onda sai da tocha e apaga os monstros que alcança (normalmente só resta quem passou do tempo do lastStand)
+// Tela limpa: a onda de fogo sai da tocha só para comemorar, e sobra um tempo para pegar os itens
 function updateClear(dt) {
     state.clearWaveRadius += NIGHT.clearWaveSpeed * dt;
-    const { enemies, coreX, coreY } = state;
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        if (Math.hypot(enemies[i].x - coreX, enemies[i].y - coreY) < state.clearWaveRadius) purgeEnemy(i);
-    }
     state.phaseTimer -= dt;
     const nothingLeft = state.pickups.length === 0 && state.goldDrops.length === 0;
     if (state.phaseTimer <= 0 || (nothingLeft && state.phaseTimer <= NIGHT.clearSeconds - NIGHT.clearMinSeconds)) finishHour();
@@ -213,7 +208,7 @@ function updateDeath(dt) {
 }
 
 export function updateNight(dt) {
-    if (state.lastStand && state.phase === 'HUNT') updateLastStand(dt);
+    if (state.lastStand && state.phase === 'HUNT') updateLastStand();
     else if (state.phase === 'CLEAR') updateClear(dt);
     else if (state.phase === 'DAWN') updateDawn(dt);
     else if (state.phase === 'DYING') updateDeath(dt);
