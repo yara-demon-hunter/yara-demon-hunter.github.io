@@ -12,5 +12,13 @@ export const SLASH_VISUALS = {
     frenzyExtraWidth: 3,
     coreColor: '#ffffff',
     coreWidth: 2.2,
-    doubleLineGap: 7
+    doubleLineGap: 7,
+    // Onda de ar cortante: meia-lua que sai da lâmina e viaja até o círculo de alcance
+    wave: {
+        startRatio: 0.2,          // onde nasce (fração do raio de alcance)
+        thicknessScale: 2.2,      // espessura no meio = lineWidth do golpe x este valor
+        alpha: 0.45,              // opacidade do corpo da onda
+        edgeAlpha: 0.9,           // opacidade do fio branco na frente da onda
+        segments: 18              // pontos do contorno (mais = mais suave)
+    }
 };

@@ -6,7 +6,8 @@ import { SoundEngine } from '../audio/sound-engine.js';
 
 // --- OBJETOS COMPARTILHADOS ---
 export const canvas = document.getElementById('gameCanvas');
-export const ctx = canvas.getContext('2d');
+// alpha: false — o fundo é sempre pintado por inteiro, então o navegador não precisa misturar o canvas com a página
+export const ctx = canvas.getContext('2d', { alpha: false });
 export const audio = new SoundEngine();
 export const attributes = createAttributes();
 export const passives = createPassives();

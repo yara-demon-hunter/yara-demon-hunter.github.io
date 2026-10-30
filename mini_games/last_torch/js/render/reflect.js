@@ -91,14 +91,17 @@ export function renderReflectWard() {
 
         const dist = V.shieldDistance + V.shieldPushOut * ease;
         const half = V.shieldHalfAngle * (0.7 + 0.3 * Math.min(1, p * 4));
-        ctx.shadowBlur = V.shieldGlow;
-        ctx.shadowColor = c.shield;
+        const shieldWidth = V.shieldLineWidth * (0.6 + 0.4 * fade);
         ctx.strokeStyle = c.shield;
-        ctx.lineWidth = V.shieldLineWidth * (0.6 + 0.4 * fade);
         ctx.beginPath();
         ctx.arc(0, 0, dist, player.reflectAngle - half, player.reflectAngle + half);
+        // Brilho: traço largo e translúcido por baixo (bem mais barato que shadowBlur)
+        ctx.globalAlpha = fade * 0.25;
+        ctx.lineWidth = shieldWidth + V.shieldGlow;
         ctx.stroke();
-        ctx.shadowBlur = 0;
+        ctx.globalAlpha = fade;
+        ctx.lineWidth = shieldWidth;
+        ctx.stroke();
         ctx.strokeStyle = c.shieldCore;
         ctx.lineWidth = 1.4;
         ctx.beginPath();

@@ -42,6 +42,7 @@ export const FOREST_VISUALS = {
     // Névoa: camadas de textura rolando em direções diferentes + manchas soltas
     fogColor: '170, 195, 215',
     fogDensityBoostAtZeroHp: 1.3, // quanto a névoa fica mais densa com a torre quase apagada (+130%)
+    fogFrameMs: 33,               // intervalo mínimo entre redesenhos da névoa (33 = ~30 FPS)
     fogResolution: 0.5,           // fração da resolução da tela usada para desenhar a névoa (menor = mais rápido)
     fogTileSize: 512,
     fogTilePuffs: 80,

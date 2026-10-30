@@ -24,7 +24,8 @@ const cache = {
     fogCtx: null,
     lightRadius: 0,
     lightTime: 0,
-    groundRes: 0
+    groundRes: 0,
+    fogDrawnAt: 0
 };
 
 function makeCanvas(width, height) {
@@ -231,6 +232,7 @@ function ensureCache() {
     cache.fogCtx = cache.fogCanvas.getContext('2d');
     cache.vignette = buildVignette(w * F.fogResolution, h * F.fogResolution);
     cache.lightRadius = 0;
+    cache.fogDrawnAt = 0;
 }
 
 // Camada 1: chão da floresta e clareira
@@ -343,7 +345,14 @@ function drawFogLayer(g, layer, t, w, h) {
 // Quanto menos vida o núcleo tem, mais densa a névoa e menor o círculo de luz.
 export function renderFogAndVignette() {
     const { width: w, height: h, coreX, coreY } = state;
-    const t = performance.now() / 1000;
+    const now = performance.now();
+    // A névoa anda devagar: redesenhada a ~30 FPS, nos quadros intermediários reaproveita a anterior
+    if (now - cache.fogDrawnAt < F.fogFrameMs) {
+        ctx.drawImage(cache.fogCanvas, 0, 0, w, h);
+        return;
+    }
+    cache.fogDrawnAt = now;
+    const t = now / 1000;
     const g = cache.fogCtx;
     const res = F.fogResolution;
     const hpRatio = Math.max(0, Math.min(1, state.coreHp / state.coreHpMax));

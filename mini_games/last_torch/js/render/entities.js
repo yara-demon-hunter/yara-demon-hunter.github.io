@@ -49,6 +49,39 @@ function strokeSweep(radius, from, to, color, lineWidth) {
     ctx.stroke();
 }
 
+// Onda de ar cortante: meia-lua afinando nas pontas, de startRatio até o raio de alcance
+function fillAirWave(radius, half, thickness, color, alpha) {
+    const W = SLASH_VISUALS.wave;
+    const n = W.segments;
+    const pointAt = (i, r) => {
+        const a = -half + (2 * half * i) / n;
+        return [Math.cos(a) * r, Math.sin(a) * r];
+    };
+
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+        const [x, y] = pointAt(i, radius);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    for (let i = n; i >= 0; i--) {
+        const taper = Math.sin(Math.PI * i / n);
+        const [x, y] = pointAt(i, Math.max(0, radius - thickness * taper));
+        ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.globalAlpha = alpha * W.alpha;
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    // Fio brilhante na frente da onda
+    ctx.globalAlpha = alpha * W.edgeAlpha;
+    ctx.strokeStyle = SLASH_VISUALS.coreColor;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, -half * 0.85, half * 0.85);
+    ctx.stroke();
+}
+
 export function renderBladeSlashes() {
     const frenzyActive = state.frenzyActiveTimer > 0;
 
@@ -70,13 +103,23 @@ export function renderBladeSlashes() {
         ctx.save();
         ctx.translate(s.x, s.y);
         ctx.rotate(s.angle);
-        ctx.globalAlpha = fadeOut;
         ctx.lineCap = 'round';
-        ctx.shadowBlur = look.glow;
-        ctx.shadowColor = color;
+
+        // Onda de ar viajando da lâmina até o círculo (o giro já tem a onda de choque)
+        if (!look.spin) {
+            const W = SLASH_VISUALS.wave;
+            const travel = s.radius * (W.startRatio + (1 - W.startRatio) * progress);
+            fillAirWave(travel, half, width * W.thicknessScale, color, Math.sqrt(1 - progress));
+        }
 
         for (let l = 0; l < look.lines; l++) {
             const r = s.radius * (0.88 + progress * 0.12) - l * SLASH_VISUALS.doubleLineGap;
+            // Brilho: traços largos e translúcidos por baixo (bem mais barato que shadowBlur)
+            ctx.globalAlpha = fadeOut * 0.12;
+            strokeSweep(r, tail, head, color, width + look.glow);
+            ctx.globalAlpha = fadeOut * 0.22;
+            strokeSweep(r, tail, head, color, width + look.glow * 0.45);
+            ctx.globalAlpha = fadeOut;
             strokeSweep(r, tail, head, color, width - l * 2);
             // Rastro interno brilhante (Branco Neon)
             strokeSweep(r, tail, head, SLASH_VISUALS.coreColor, SLASH_VISUALS.coreWidth);
@@ -84,7 +127,6 @@ export function renderBladeSlashes() {
 
         // Finalizador: onda de choque expandindo
         if (look.shockwave) {
-            ctx.shadowBlur = 0;
             ctx.globalAlpha = fadeOut * (1 - progress) * 0.7;
             ctx.strokeStyle = color;
             ctx.lineWidth = 3;
