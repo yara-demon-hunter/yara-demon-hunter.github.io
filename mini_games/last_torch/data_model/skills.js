@@ -17,13 +17,13 @@ export const UPGRADE_MODELS = {
 
 export const BLADE_SKILL = {
     baseDamage: 20,
-    damagePerUpgrade: 10,
+    damagePerUpgrade: 5,
     baseRadius: 42,
-    radiusPerUpgrade: 10,
+    radiusPerUpgrade: 5,
     maxRadiusScreenRatio: 0.38,
     minimumSlashArcDegrees: 40,
     maximumSlashArcDegrees: 180,
-    baseCooldownSeconds: 0.5,
+    baseCooldownSeconds: 0.7,
     cooldownReductionPerUpgrade: 0.03,
     frenzyCooldownMultiplier: 0.25,
     minimumCooldownSeconds: 0.07,

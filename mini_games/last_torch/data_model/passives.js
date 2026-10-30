@@ -68,7 +68,7 @@ export function createPassives() {
 }
 
 // Shadow Clone: reflexo de sombra do herói. Fica sempre na mesma posição em relação a ele, anda junto,
-// arremessa adagas junto (mesma direção) e solta as lâminas da Fúria junto. A espada é dele: golpeia
+// solta as lâminas da Fúria junto. A espada é dele: golpeia
 // sozinho quando um monstro entra no círculo dele. Usa os stats do herói com os multiplicadores abaixo.
 // Leva dano de monstros e tiros como o herói; se morrer, volta depois de respawnSeconds. Não carrega a Fúria.
 export const SHADOW_CLONE = {
@@ -77,7 +77,7 @@ export const SHADOW_CLONE = {
     followDistance: 150,
     // LADO EM QUE O CLONE FICA (graus): 0 = direita, 90 = abaixo, 180 = esquerda, 270 = acima
     offsetAngleDegrees: 180,
-    damageMultiplier: 0.3,      // golpes e adagas do clone
+    damageMultiplier: 0.3,      // golpes do clone
     knockbackMultiplier: 0.3,
     radiusMultiplier: 0.9,      // alcance da lâmina do clone (círculo vermelho dele)
     cooldownMultiplier: 1,      // x recarga do golpe do herói (maior = golpeia mais devagar)

@@ -9,7 +9,7 @@ import { getAtkCooldown, getAtkDamage, getAtkRadius, getKnockback, getMaxPlayerH
 // --- SHADOW CLONE (passiva) ---
 // Reflexo de sombra do herói: fica sempre a SHADOW_CLONE.followDistance dele (no lado
 // offsetAngleDegrees) e anda junto. A espada é própria: golpeia o monstro mais perto quando ele
-// entra no círculo do clone. As adagas saem junto com as do herói (js/systems/knives.js).
+// entra no círculo do clone. Ele não arremessa adagas (só o herói, em js/systems/knives.js).
 // Leva dano de monstros e tiros (js/systems/enemies.js chama damageShadowClone); morto, volta
 // depois de SHADOW_CLONE.respawnSeconds com a vida cheia.
 function placeClone() {

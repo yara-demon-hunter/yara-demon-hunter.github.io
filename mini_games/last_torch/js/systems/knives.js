@@ -1,4 +1,4 @@
-import { FAN_OF_KNIVES, LONG_THROW, SHADOW_CLONE } from '../../data_model/passives.js';
+import { FAN_OF_KNIVES, LONG_THROW } from '../../data_model/passives.js';
 import { KNIFE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { audio, passives, player, shadowClone, state } from '../core/state.js';
@@ -18,10 +18,9 @@ export function throwKnife(aimX, aimY) {
     state.knifePending = K.throwSeconds * K.letGoFraction;
 }
 
-// A adaga deixa a mão esquerda: nasce à frente e à esquerda de quem arremessa (herói ou Shadow Clone,
-// que arremessa junto, na mesma direção). Cada adaga para no primeiro inimigo atingido.
+// A adaga deixa a mão esquerda: nasce à frente e à esquerda do herói. Cada adaga para no primeiro inimigo atingido.
 // Skills passivas: Long Throw (mais alcance e velocidade) e Fan of Knives (várias adagas em leque).
-function releaseKnife(thrower = player, damageMultiplier = 1, knockbackMultiplier = 1) {
+function releaseKnife(thrower = player) {
     const aim = state.knifeThrowAngle;
     const cos = Math.cos(aim);
     const sin = Math.sin(aim);
@@ -32,8 +31,8 @@ function releaseKnife(thrower = player, damageMultiplier = 1, knockbackMultiplie
     const maxRange = getKnifeRange();
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
     const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
-    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * damageMultiplier;
-    const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier * knockbackMultiplier;
+    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier;
+    const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
 
     for (let i = 0; i < count; i++) {
         const angle = aim + (i - (count - 1) / 2) * spread;
@@ -95,7 +94,6 @@ export function updateKnives(dt) {
         if (state.knifePending <= 0) {
             state.knifePending = null;
             releaseKnife();
-            if (shadowClone.active) releaseKnife(shadowClone, SHADOW_CLONE.damageMultiplier, SHADOW_CLONE.knockbackMultiplier);
         }
     }
 
