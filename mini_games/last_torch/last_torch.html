@@ -59,7 +59,7 @@ permalink: /mini_games/last_torch/last_torch.html
 
         <!-- Buttons -->
         <div id="hudButtons">
-            <button id="btnSound" class="hud-btn" aria-label="Sound">🔊</button>
+            <button id="btnSettings" class="hud-btn" title="Settings" aria-label="Settings">🎮</button>
         </div>
     </div>
 
@@ -209,7 +209,7 @@ permalink: /mini_games/last_torch/last_torch.html
     </div>
 </div>
 
-<!-- STATUS: árvore de skills, build e opções. Styles in css/components/shop.css e tree.css -->
+<!-- STATUS: árvore de skills e build. Styles in css/components/shop.css e tree.css -->
 <div id="shopScreen" class="game-screen hidden" role="dialog" aria-label="Skill tree and hero status">
     <div class="status-panel">
         <div class="status-head">
@@ -220,7 +220,6 @@ permalink: /mini_games/last_torch/last_torch.html
             <div id="statusTabs">
                 <button data-status-tab="tree">SKILL TREE</button>
                 <button data-status-tab="build">BUILD</button>
-                <button data-status-tab="options">OPTIONS</button>
             </div>
             <div class="points-chip" title="Skill points">⚡ <b id="statusPoints">0</b></div>
             <div class="camp-gold">🪙 <b id="shopCoinsText">0</b></div>
@@ -270,21 +269,41 @@ permalink: /mini_games/last_torch/last_torch.html
             <p id="buildNote"></p>
         </div>
 
-        <!-- OPÇÕES -->
-        <div id="tabOptions" class="status-tab status-body custom-scroll hidden">
+        <button id="btnResume" class="start-btn">BACK TO THE HUNT ▶</button>
+    </div>
+</div>
+
+<!-- CONFIGURAÇÕES: som, efeitos, controles. Abre pelo 🎮 do HUD. Styles in css/components/shop.css -->
+<div id="settingsScreen" class="game-screen hidden" role="dialog" aria-label="Settings">
+    <div class="status-panel settings-panel">
+        <div class="status-head">
+            <div>
+                <h2 class="status-title">🎮 SETTINGS</h2>
+                <p class="status-sub">Paused</p>
+            </div>
+            <button id="btnCloseSettings" class="screen-close" aria-label="Close">✕</button>
+        </div>
+        <div class="status-body custom-scroll settings-body">
             <section class="shop-panel">
-                <div class="shop-panel-title"><span>⚙️ OPTIONS</span></div>
+                <div class="shop-panel-title"><span>🔊 SOUND AND EFFECTS</span></div>
                 <div class="settings-row">
+                    <button data-setting="muted" data-invert class="setting-toggle">🔊 Sound</button>
                     <button data-setting="music" class="setting-toggle">🎵 Music</button>
                     <button data-setting="sfx" class="setting-toggle">🔊 Effects</button>
                     <button data-setting="shake" class="setting-toggle">📳 Screen shake</button>
                     <button data-setting="numbers" class="setting-toggle">🔢 Damage numbers</button>
                 </div>
             </section>
+            <section class="shop-panel desktop-only">
+                <div class="shop-panel-title"><span>⌨️ CONTROLS</span></div>
+                <div class="settings-row">
+                    <button data-setting="keyboard" class="setting-toggle">⌨️ Move with arrow keys / WASD</button>
+                </div>
+                <p class="settings-hint">Off: the hero follows the mouse. On: the keys walk and the mouse only aims. Space and Shift dash either way.</p>
+            </section>
             <button id="btnAbandon" class="screen-link">Abandon this night</button>
         </div>
-
-        <button id="btnResume" class="start-btn">BACK TO THE HUNT ▶</button>
+        <button id="btnResumeSettings" class="start-btn">BACK TO THE HUNT ▶</button>
     </div>
 </div>
 

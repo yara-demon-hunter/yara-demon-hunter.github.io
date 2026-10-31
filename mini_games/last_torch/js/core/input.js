@@ -1,6 +1,7 @@
 import { tryDash } from '../systems/dash.js';
 import { screenToWorld } from './resize.js';
 import { mod } from '../systems/modifiers.js';
+import { save } from './save.js';
 import { audio, canvas, joystick, keys, player, state } from './state.js';
 
 const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
@@ -205,8 +206,8 @@ export function setupInput() {
             e.preventDefault();
         }
         keys[e.code] = true;
-        // Quem anda pelo teclado usa o mouse só para mirar: o herói para de seguir o cursor
-        if (MOVE_KEYS.includes(e.code)) player.mouseFollow = false;
+        // Quem escolheu andar pelo teclado usa o mouse só para mirar: o herói para de seguir o cursor
+        if (save.settings.keyboard && MOVE_KEYS.includes(e.code)) player.mouseFollow = false;
         if (!e.repeat && (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight')) tryDash();
     });
     window.addEventListener('keyup', (e) => {

@@ -1,5 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
+import { save } from '../core/save.js';
 import { audio, joystick, keys, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
@@ -93,10 +94,13 @@ export function updatePlayer(dt) {
     let moveX = 0;
     let moveY = 0;
 
-    if (keys['KeyW'] || keys['ArrowUp']) moveY -= 1;
-    if (keys['KeyS'] || keys['ArrowDown']) moveY += 1;
-    if (keys['KeyA'] || keys['ArrowLeft']) moveX -= 1;
-    if (keys['KeyD'] || keys['ArrowRight']) moveX += 1;
+    // Teclas de direção só andam se o jogador ligou em Settings; o padrão é o mouse
+    if (save.settings.keyboard) {
+        if (keys['KeyW'] || keys['ArrowUp']) moveY -= 1;
+        if (keys['KeyS'] || keys['ArrowDown']) moveY += 1;
+        if (keys['KeyA'] || keys['ArrowLeft']) moveX -= 1;
+        if (keys['KeyD'] || keys['ArrowRight']) moveX += 1;
+    }
 
     const speed = getPlayerMaxSpeed();
 

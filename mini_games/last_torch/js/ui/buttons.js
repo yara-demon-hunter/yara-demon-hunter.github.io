@@ -1,4 +1,3 @@
-import { save } from '../core/save.js';
 import { audio, state } from '../core/state.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
 import { chooseHero, closeHeroes, openHeroes } from './heroes.js';
@@ -6,19 +5,17 @@ import { beginDeath } from '../systems/night.js';
 import { lockLandscape } from './orientation.js';
 import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
 import { changeDarkness, keepHunting, returnToMenu, shareResult, startGame } from './screens.js';
-import { openStatus, resumeGame, setStatusTab, showBuildNote, toggleSetting } from './status.js';
+import { openSettings, toggleSetting } from './settings.js';
+import { openStatus, resumeGame, setStatusTab, showBuildNote } from './status.js';
 import { skillTree } from './tree.js';
 
 // --- EVENTOS DA INTERFACE (BOTOES) ---
 export function setupButtons() {
     const on = (id, handler) => document.getElementById(id).addEventListener('click', handler);
 
-    const updateSoundIcon = () => { document.getElementById('btnSound').innerText = save.settings.muted ? '🔇' : '🔊'; };
-    updateSoundIcon();
-    on('btnSound', (e) => {
-        audio.toggleMute();
-        updateSoundIcon();
+    on('btnSettings', (e) => {
         e.currentTarget.blur();     // Espaço é o dash: não pode reacionar o botão focado
+        openSettings();
     });
 
     // No celular: tela cheia travada de lado, em paisagem (precisa de um toque do jogador para ser permitido).
@@ -38,6 +35,8 @@ export function setupButtons() {
         openStatus();
     });
     on('btnCloseShop', resume);
+    on('btnCloseSettings', resume);
+    on('btnResumeSettings', resume);
     on('btnResume', resume);
     on('btnEndless', () => {
         lockLandscape();

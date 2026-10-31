@@ -1,4 +1,5 @@
 import { DASH_SKILL } from '../../data_model/skills.js';
+import { save } from '../core/save.js';
 import { audio, joystick, keys, player, state } from '../core/state.js';
 import { chargeUlt } from './combat.js';
 import { addFloater, hitStop, slowMotion } from './effects.js';
@@ -24,7 +25,7 @@ export function resetDash() {
 function getDashDirection() {
     let x = joystick.x;
     let y = joystick.y;
-    if (!x && !y) {
+    if (!x && !y && save.settings.keyboard) {
         if (keys['KeyW'] || keys['ArrowUp']) y -= 1;
         if (keys['KeyS'] || keys['ArrowDown']) y += 1;
         if (keys['KeyA'] || keys['ArrowLeft']) x -= 1;

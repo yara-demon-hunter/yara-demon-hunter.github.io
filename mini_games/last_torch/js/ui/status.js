@@ -1,5 +1,4 @@
 import { EVOLUTIONS } from '../../data_model/powers.js';
-import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, state } from '../core/state.js';
 import { getOwnedPowers } from '../systems/tree.js';
 import { skillTree } from './tree.js';
@@ -11,7 +10,7 @@ import { getHero } from '../systems/modifiers.js';
 import { getHourName } from '../../data_model/night.js';
 
 // --- STATUS ---
-// O medalhão pausa a partida e mostra a build: stats, poderes, relíquias e as opções de som e tela.
+// O medalhão pausa a partida e mostra a build: stats, poderes e relíquias. Som, efeitos e controles ficam em settings.js.
 const STAT_VALUES = {
     damage: () => Math.round(getAtkDamage()),
     radius: () => `${Math.round(getAtkRadius())}px`,
@@ -80,14 +79,7 @@ export function showBuildNote(row) {
     document.getElementById('buildNote').textContent = row?.dataset.note ?? BUILD_NOTE_HINT;
 }
 
-function renderSettings() {
-    const { settings } = save;
-    document.querySelectorAll('[data-setting]').forEach(button => {
-        button.classList.toggle('is-on', settings[button.dataset.setting]);
-    });
-}
-
-const TABS = ['tree', 'build', 'options'];
+const TABS = ['tree', 'build'];
 let currentTab = 'tree';
 
 function showTab(name) {
@@ -134,7 +126,6 @@ export function openStatus() {
         icon: p.icon, name: p.name, desc: p.desc, level: 0
     })), 'No relics yet. Buy them at the camp, between hours.');
     showBuildNote(null);
-    renderSettings();
     document.getElementById('shopScreen').classList.remove('hidden');
     showTab(currentTab);
     audio.setPaused(true);
@@ -143,15 +134,9 @@ export function openStatus() {
 export function resumeGame() {
     if (state.gameState !== 'PAUSED') return;
     document.getElementById('shopScreen').classList.add('hidden');
+    document.getElementById('settingsScreen').classList.add('hidden');
     // Um dedo solto do botão da adaga enquanto a tela estava aberta não arremessa ao voltar
     state.knifeInput.stick.fire = false;
     state.gameState = 'PLAYING';
     audio.setPaused(false);
-}
-
-export function toggleSetting(key) {
-    save.settings[key] = !save.settings[key];
-    persist();
-    audio.applySettings();
-    renderSettings();
 }

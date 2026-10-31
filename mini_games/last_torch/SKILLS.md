@@ -87,7 +87,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Corpo: Hero Health, Iron Skin, Blood Edge, War Cry*
   - Oath of Slaughter*
 - **Shadow** (raiz: Move Speed)
-  - Adagas: Ricochet, Quick Hands, Dagger Mastery, Long Throw, Fan of Knives
+  - Adagas: Ricochet, Quick Hands, Dagger Mastery (dano, alcance e velocidade), Fan of Knives
   - Técnica: Death Mark*, Soul Lance, Soul Spear
   - Sombras: Shadow Clone*, Shadow Legion*. Move Speed, Shadow Clone, Shadow Legion, Juramento
   - Esquiva: Phantom Rush, Night Reaper*, Smoke Bomb*. Move Speed, Phantom Rush, Night Reaper, Smoke Bomb, Juramento

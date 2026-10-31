@@ -1,5 +1,5 @@
 /* --- STATUS: painel de pausa --- */
-#shopScreen { background: rgba(2, 6, 23, 0.94); }
+#shopScreen, #settingsScreen { background: rgba(2, 6, 23, 0.94); }
 .status-panel {
     display: flex;
     flex-direction: column;
@@ -190,6 +190,14 @@
     color: #a7f3d0;
     background: rgba(6, 78, 59, 0.3);
 }
+
+.settings-panel { max-width: 40rem; height: auto; max-height: 100%; }
+.settings-panel > * { flex-shrink: 0; }
+.settings-panel .screen-close { margin-left: auto; }
+.settings-body { display: flex; flex-direction: column; gap: 0.6rem; min-height: 0; flex-shrink: 1; }
+.settings-hint { margin-top: 0.45rem; color: #94a3b8; font-size: 0.68rem; line-height: 1.35; }
+/* Telas de toque só têm o joystick: sem escolha de teclado */
+@media (pointer: coarse) { .desktop-only { display: none; } }
 
 /* Janela estreita: abas em linha própria, build em uma coluna */
 @media (max-width: 760px) {

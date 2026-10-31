@@ -62,12 +62,6 @@ export class SoundEngine {
         this.musicBus.gain.setTargetAtTime(music ? 0.5 : 0, now, 0.05);
     }
 
-    toggleMute() {
-        save.settings.muted = !save.settings.muted;
-        this.applySettings();
-        return save.settings.muted;
-    }
-
     setMood(mood) {
         this.pendingMood = mood;
         if (this.music) this.music.setMood(mood);

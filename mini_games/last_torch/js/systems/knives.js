@@ -1,4 +1,4 @@
-import { FAN_OF_KNIVES, LONG_THROW } from '../../data_model/passives.js';
+import { FAN_OF_KNIVES } from '../../data_model/passives.js';
 import { KNIFE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
@@ -30,7 +30,7 @@ export function throwKnife(aimX, aimY) {
 }
 
 // A adaga deixa a mão esquerda: nasce à frente e à esquerda do herói. Cada adaga para no primeiro inimigo atingido.
-// Skills passivas: Long Throw (mais alcance e velocidade) e Fan of Knives (várias adagas em leque).
+// Dagger Mastery dá dano, alcance e velocidade (mods knifeDamage, knifeRange, knifeSpeed); Fan of Knives lança várias adagas em leque.
 function releaseKnife(thrower = player) {
     const aim = state.knifeThrowAngle;
     const cos = Math.cos(aim);
@@ -38,7 +38,7 @@ function releaseKnife(thrower = player) {
     const x = thrower.x + cos * K.spawnForward - sin * K.spawnSide;
     const y = thrower.y + sin * K.spawnForward + cos * K.spawnSide;
 
-    const speed = KNIFE_SKILL.speed * (passives.longThrow.lvl > 0 ? LONG_THROW.speedMultiplier : 1);
+    const speed = KNIFE_SKILL.speed * (1 + mod('knifeSpeed'));
     const maxRange = getKnifeRange();
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
     const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
@@ -69,9 +69,9 @@ function releaseKnife(thrower = player) {
     if (thrower === player) audio.playSwordSlash(1);
 }
 
-// Alcance atual da adaga (com Long Throw)
+// Alcance atual da adaga (com Dagger Mastery)
 export function getKnifeRange() {
-    return KNIFE_SKILL.maxRange * (passives.longThrow.lvl > 0 ? LONG_THROW.rangeMultiplier : 1);
+    return KNIFE_SKILL.maxRange * (1 + mod('knifeRange'));
 }
 
 // Soul Lance: fração da carga atual (0 a 1)

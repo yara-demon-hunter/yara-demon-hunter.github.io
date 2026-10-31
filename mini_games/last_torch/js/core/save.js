@@ -16,7 +16,7 @@ function createSave() {
             elites: 0, evolutions: 0, bestDarknessWon: 0, bosses: 0, chests: 0,
             bestMultiKill: 0, perfectDodges: 0, flawlessHours: 0
         },
-        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true },
+        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, keyboard: false },
         seenTutorial: false,
         seenTreeHint: false
     };
@@ -35,7 +35,8 @@ function load() {
             ...fresh, ...saved,
             stats: { ...fresh.stats, ...saved.stats },
             bestiary: { ...saved.bestiary },
-            settings: { ...fresh.settings, ...saved.settings }
+            // Setas do teclado: sempre começa desligado, quem quiser liga em Settings
+            settings: { ...fresh.settings, ...saved.settings, keyboard: false }
         };
     } catch {
         return fresh;

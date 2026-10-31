@@ -21,21 +21,13 @@ export const PASSIVE_SKILL_MODELS = {
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'Reflects an incoming enemy shot at the nearest monster. Recharges in 8s.'
     },
-    longThrow: {
-        name: 'Long Throw',
-        icon: '🏹',
-        cost: 40,
-        maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Thrown daggers fly 60% farther and faster.'
-    },
     fanOfKnives: {
         name: 'Fan of Knives',
         icon: '🔱',
         cost: 110,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Throws 3 daggers at once in a fan. Combines with Long Throw.'
+        desc: 'Throws 3 daggers at once in a fan.'
     },
     shadowClone: {
         name: 'Shadow Clone',
@@ -266,12 +258,6 @@ export const CAMP = {
     costGrowthPerHour: 0.15,        // relíquias ficam mais caras a cada hora
     fuel: { heal: 30, cost: 40, costPerHour: 12, costPerUse: 25 },
     rest: { healRatio: 0.5, cost: 30, costPerHour: 9, costPerUse: 20 }
-};
-
-// Long Throw: a adaga vai mais longe e mais rápido (vale para todas as adagas do leque)
-export const LONG_THROW = {
-    rangeMultiplier: 1.6,
-    speedMultiplier: 1.25
 };
 
 // Fan of Knives: várias adagas de uma vez, abertas em leque em volta da mira

@@ -81,9 +81,8 @@ export const TREE_NODES = [
     { id: 'quickHands', branch: 'shadow', kind: 'mod', x: 2, y: 0, requires: [req('ricochet', 2)],
       name: 'Quick Hands', icon: '🖐️', desc: 'Your daggers recharge faster.', levelText: '-6% dagger recharge', mods: { knifeCooldown: 0.06 } },
     { id: 'daggerMastery', branch: 'shadow', kind: 'mod', x: 3, y: 0, requires: [req('quickHands', 2)],
-      name: 'Dagger Mastery', icon: '🔪', desc: 'Thrown daggers cut deeper.', levelText: '+15% dagger damage', mods: { knifeDamage: 0.15 } },
-    { id: 'longThrow', branch: 'shadow', kind: 'passive', key: 'longThrow', x: 4, y: 0, requires: [req('daggerMastery', 2)] },
-    { id: 'fanOfKnives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 5, y: 0, requires: [req('longThrow')] },
+      name: 'Dagger Mastery', icon: '🔪', desc: 'Your daggers cut deeper and fly farther and faster.', levelText: '+15% dagger damage, +12% range, +5% speed', mods: { knifeDamage: 0.15, knifeRange: 0.12, knifeSpeed: 0.05 } },
+    { id: 'fanOfKnives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 4, y: 0, requires: [req('daggerMastery', 2)] },
     // Linha da técnica: marcar e carregar
     { id: 'deathMark', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
     { id: 'soulLance', branch: 'shadow', kind: 'power', key: 'soulLance', x: 2, y: 1, requires: [req('deathMark', 2)] },

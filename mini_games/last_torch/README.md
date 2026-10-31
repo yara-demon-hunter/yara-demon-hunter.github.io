@@ -132,7 +132,7 @@ js/
   ui/banner.js                    faixas, gritos e notificações
   ui/tree.js                      desenho das árvores (ramos, nós, ligações e abas de ramo) e painel de detalhe; uma fábrica monta a de skills e a de relíquias
   ui/camp.js                      acampamento: árvore de relíquias, tocha e descanso
-  ui/status.js                    tela de status: abas Skill Tree, Build e Options
+  ui/status.js                    tela de status: abas Skill Tree e Build; ui/settings.js: som, efeitos e controles (🎮)
   ui/sanctuary.js                 Santuário: abas de troféus, façanhas e bestiário
   ui/heroes.js                    escolha do herói
   ui/screens.js                   início de partida, fim da noite e tela inicial
