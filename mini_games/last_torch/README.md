@@ -1,5 +1,13 @@
 # Last Torch: Demon Hunter
 
+## Gerar standalone version
+```bash
+ruby mini_games/last_torch/build-standalone.rb
+
+# Testing
+python3 -m http.server 8000 --directory mini_games/last_torch/standalone-build
+```
+
 ## O jogo
 
 Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o herói vivo e a tocha acesa.
