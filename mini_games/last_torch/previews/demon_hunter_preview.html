@@ -13,13 +13,13 @@
     <!-- Página de desenvolvimento: tudo do herói (corrida, golpes, dash, efeitos, heróis alternativos, clone, Juramentos,
          golpes especiais, skills dos quatro ramos e adaga)
          usando o código real do jogo. Como abrir: previews/README.md -->
-    <canvas id="gameCanvas" width="1200" height="5460"></canvas>
+    <canvas id="gameCanvas" width="1200" height="5730"></canvas>
     <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
     <script>
         if (location.protocol === 'file:') {
             const g = document.getElementById('gameCanvas').getContext('2d');
             g.fillStyle = '#050b16';
-            g.fillRect(0, 0, 1200, 5460);
+            g.fillRect(0, 0, 1200, 5730);
             g.textAlign = 'center';
             g.fillStyle = '#fbbf24';
             g.font = '600 26px system-ui, sans-serif';
@@ -34,6 +34,7 @@
     <script type="module">
         import { HEROES } from '../data_model/heroes.js';
         import { KNIFE_SKILL } from '../data_model/skills.js';
+        import { EVOLUTIONS } from '../data_model/powers.js';
         import { HERO_25D_VISUALS } from '../data_model/visuals/characters/hero25d_visual.js';
         import { OATH_VISUALS } from '../data_model/visuals/characters/oath_visual.js';
         import { SHADOW_CLONE_VISUALS } from '../data_model/visuals/characters/shadow_clone_visual.js';
@@ -60,7 +61,7 @@
 
         state.gameState = 'PLAYING';     // o herói só anima durante a partida
         const WIDTH = 1200;
-        const HEIGHT = 5460;
+        const HEIGHT = 5730;
         const start = performance.now();
         let last = start;
 
@@ -121,7 +122,9 @@
         function withLevels(s, draw) {
             Object.entries(s.levels).forEach(([key, lvl]) => { powers[key].lvl = lvl; });
             s.evolved.forEach(key => { powers[key].evolved = true; });
+            const undo = s.tweak?.();       // ajuste só da cena (por exemplo, um anel menor para caber no quadro)
             draw();
+            undo?.();
             Object.keys(s.levels).forEach(key => { powers[key].lvl = 0; });
             s.evolved.forEach(key => { powers[key].evolved = false; });
         }
@@ -255,11 +258,13 @@
         function dashLoop(s, dt) {
             s.clock = (s.clock ?? 0) + dt;
             const dashing = s.clock < 0.18;
+            s.body.dashTimer = dashing ? 1 : 0;
             s.speed = dashing ? 620 : 0;
-            if (dashing) s.ghosts.push({ x: s.body.x, y: s.body.y, age: 0, seconds: 0.3 });
+            if (dashing) s.ghosts.push({ x: s.body.x, y: s.body.y, age: 0, seconds: 0.3, angle: 0 });
             if (s.clock > 1.2) {
                 s.clock = 0;
                 s.body.x = 0;
+                s.anim.lastX = 0;
             }
         }
 
@@ -425,12 +430,23 @@
             }
         }
 
+        // Smoke Bomb: o herói avança deixando uma nuvem a cada 34, como em js/systems/skills_shadow.js. No jogo elas
+        // ficam 7s; aqui somem em 2s para o loop fechar sem nuvens sobrando.
         function smokeLoop(s, dt) {
-            s.clock = (s.clock ?? 7) + dt;
-            if (s.clock < 7.4) return;
-            s.clock = 0;
-            // O rasto de um dash: uma nuvem a cada 34, como em js/systems/skills_shadow.js
-            for (let i = 0; i < 5; i++) s.fx.smokes.push({ x: -60 + i * 34, y: 0, age: 0, seconds: 7, radius: 58, seed: i * 1.7 });
+            s.clock = ((s.clock ?? 0) + dt) % 2.6;
+            if (s.clock < dt) {
+                s.body.x = -70;
+                s.anim.lastX = -70;
+                s.lastCloud = -999;
+            }
+            const dashing = s.clock < 0.5;
+            s.body.dashTimer = dashing ? 1 : 0;
+            s.speed = dashing ? 240 : 0;
+            s.heading = 0;
+            if (dashing && Math.abs(s.body.x - s.lastCloud) >= 34) {
+                s.lastCloud = s.body.x;
+                s.fx.smokes.push({ x: s.body.x, y: 0, age: 0, seconds: 2, radius: 58, seed: s.body.x });
+            }
         }
 
         function echoLoop(s, dt) {
@@ -486,7 +502,7 @@
         ];
         const shadowFx = [
             ['Death Mark', scene({ fx: { ...createFx(), enemies: [dummy(44, 0)] }, before: markLoop })],
-            ['Smoke Bomb', scene({ before: smokeLoop })],
+            ['Smoke Bomb: rasto', scene({ fx: { ...createFx(), enemies: [dummy(30, 26)] }, before: smokeLoop })],
             ['Night Reaper: sombra', scene({ before: echoLoop })],
             ['Oath of Whispers: combate', oathScene('whispers', { fx: { ...createFx(), enemies: [dummy(44, 0, { marked: 1 })] }, before: slashEvery(0.8, 1) })]
         ];
@@ -502,6 +518,119 @@
             ['Void Rift', scene({ before: riftLoop })],
             ['Event Horizon', scene({ levels: { voidRift: 5 }, evolved: ['voidRift'], before: riftLoop })]
         ];
+
+        // --- JURAMENTOS COM AS SKILLS DO RAMO ---
+        // Cada forma em ação com o que o ramo faz: é o que a página do jogo mostra. Ciclos: 2,4s, 2,6s, 2,4s e 2s.
+        function beginMove(s, kind) {
+            const { seconds, impactAt } = HERO_25D_VISUALS.moves[kind];
+            s.body.move = { kind, age: 0, seconds, impactAt };
+        }
+
+        function runMove(s, dt, onImpact) {
+            const move = s.body.move;
+            if (!move) return;
+            move.age += dt;
+            if (!move.hit && move.age >= move.seconds * move.impactAt) {
+                move.hit = true;
+                onImpact?.(s);
+            }
+            if (move.age >= move.seconds) s.body.move = null;
+        }
+
+        function swingNow(s, step) {
+            const look = SLASH_VISUALS[step];
+            s.anim.lastComboStep = step;
+            s.body.comboStep = step === 3 ? 1 : step + 1;
+            s.slashes.push({ x: s.body.x, y: s.body.y, angle: s.body.angle, radius: 70, comboStep: step, spin: false, shadow: false, arcWidth: 1.4, life: look.lifeSeconds, maxLife: look.lifeSeconds });
+        }
+
+        // Blade: golpes lançando meias-luas de sangue, depois o salto que racha o chão
+        function slaughterShow(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 2.4;
+            state.bloodlust.stacks = 8;
+            runMove(s, dt, slamImpactFx(true));
+            if (s.clock >= 1.25 && s.clock < 1.25 + dt) beginMove(s, 'slam');
+            if (s.body.move) return;
+            s.swing = (s.swing ?? 0) - dt;
+            if (s.clock < 1.1 && s.swing <= 0) {
+                s.swing = 0.37;
+                s.step = s.step === 1 ? 2 : 1;
+                swingNow(s, s.step);
+                s.fx.crescents.push({ x: s.body.x, y: s.body.y, angle: 0, vx: 300, vy: 0, age: 0 });
+            }
+        }
+
+        // Shadow: o dash detona a marca, deixa o rasto de fumaça e a sombra corta de novo
+        function whispersShow(s, dt) {
+            smokeLoop(s, dt);
+            const target = s.fx.enemies[0];
+            target.marked = s.clock < 0.25 ? 1 : 0;
+            if (s.clock >= 0.25 && s.clock < 0.25 + dt) s.fx.markBursts.push({ x: target.x, y: target.y, age: 0, seconds: 0.3, radius: 14, big: true });
+            if (s.clock > 0.7 && s.clock < 1 && Math.random() < 0.6) {
+                s.ghosts.push({ x: -70 + (s.clock - 0.7) / 0.3 * 120, y: 0, age: 0, seconds: 0.22, angle: 0, dark: true });
+            }
+        }
+
+        // Flame: ajoelhado atrás do escudo, com a muralha de fogo em volta; o escudo estoura e volta
+        function hearthShow(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 2.4;
+            s.body.vigilStance = true;
+            s.body.shield = s.clock >= 1.8 && s.clock < 2.2 ? 0 : 1;
+            if (s.clock < dt) wave(s, 130, '#fef08a', 10, 0.45);
+            if (s.clock >= 1.8 && s.clock < 1.8 + dt) wave(s, 120, '#fb923c', 8, 0.35);
+        }
+
+        // Curse: a fenda se abre na horda, a caveira atira e a maldição pula entre os monstros
+        function ruinShow(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 2;
+            const k = s.clock;
+            state.wisp.placed = true;
+            state.wisp.x = -26 + Math.cos(k * Math.PI) * 6;
+            state.wisp.y = -40 + Math.sin(k * 4.7) * 5;
+            state.wisp.flash = 0;
+            if (k < dt) s.fx.rifts.push({ x: 78, y: 8, age: 0, seconds: 1.5, radius: 70, evolved: true });
+            if (k >= 0.3 && k < 0.3 + dt) s.fx.bolts.push({ x: state.wisp.x, y: state.wisp.y, vx: 380, vy: 30, soul: true, age: 0 });
+            s.fx.bolts = s.fx.bolts.filter(b => {
+                b.age += dt;
+                b.x += b.vx * dt;
+                b.y += b.vy * dt;
+                return b.age < 0.5;
+            });
+            s.fx.enemies.forEach(e => { e.hexTimer = 1; });
+            if (k >= 1.1 && k < 1.1 + dt) {
+                const [a, b] = s.fx.enemies;
+                s.fx.lightning.push({ points: [{ x: a.x, y: a.y }, { x: b.x, y: b.y }], life: 0.26, maxLife: 0.26, hex: true });
+            }
+        }
+
+        const oathShow = [
+            ['Oath of Slaughter: skills', oathScene('slaughter', { oath: 'oathSlaughter', levels: { bloodlust: 5 }, evolved: ['bloodlust'], before: slaughterShow })],
+            ['Oath of Whispers: skills', oathScene('whispers', { oath: 'oathWhispers', fx: { ...createFx(), enemies: [dummy(-10, 22)] }, before: whispersShow })],
+            ['Oath of the Hearth: skills', oathScene('hearth', {
+                oath: 'oathHearth', levels: { fireRing: 5 }, evolved: ['fireRing'], before: hearthShow,
+                // No jogo o anel tem 200 de raio: aqui é menor, para a muralha e o herói caberem juntos no quadro
+                tweak: () => {
+                    const old = EVOLUTIONS.fireRing.levels.radius;
+                    EVOLUTIONS.fireRing.levels.radius = 92;
+                    return () => { EVOLUTIONS.fireRing.levels.radius = old; };
+                }
+            })],
+            ['Oath of Ruin: skills', oathScene('ruin', { oath: 'oathRuin', levels: { voidRift: 5, graveWisp: 1 }, evolved: ['voidRift'], fx: { ...createFx(), enemies: [dummy(55, -22), dummy(100, 30)] }, before: ruinShow })]
+        ];
+
+        // Modo captura (gera as animações da página do jogo): ?capture=<rótulo>&size=400&zoom=2&lift=12 desenha só essa
+        // cena, em um quadrado. Sem o parâmetro a página é a prévia completa.
+        const params = new URLSearchParams(location.search);
+        const captureLabel = params.get('capture');
+        const captureSize = Number(params.get('size') ?? 400);
+        if (captureLabel) {
+            ctx.canvas.width = captureSize;
+            ctx.canvas.height = captureSize;
+        }
+        const everyScene = new Map([
+            ...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
+            ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...flameFx, ...curseFx
+        ]);
 
         function gallery(title, top, items, zoom = 2.3) {
             text(title, 24, top, 17, '#67e8f9', 700);
@@ -617,6 +746,11 @@
             last = now;
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.globalAlpha = 1;
+            if (captureLabel) {
+                view(everyScene.get(captureLabel), 0, 0, captureSize, captureSize, Number(params.get('zoom') ?? 2), dt, Number(params.get('lift') ?? 12));
+                requestAnimationFrame(frame);
+                return;
+            }
             ctx.fillStyle = '#050b16';
             ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
@@ -628,7 +762,7 @@
                 text(OCTANT_NAMES[i], 30 + i * 145, 266, 12);
             });
 
-            [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing,
+            [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
                 ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...flameFx, ...curseFx].forEach(([, s]) => { s.dt = dt; });
             gallery('Poses', 300, poses);
             gallery('Golpes (com a marca do corte)', 570, swings, 1.7);
@@ -638,15 +772,16 @@
             gallery('Juramentos: as quatro formas', 1380, oathIdle, 2.5);
             gallery('Juramentos em movimento', 1650, oathRun, 2);
             gallery('Juramentos em combate', 1920, oathSwing, 2);
-            gallery('Golpes especiais', 2190, heroMoves, 1.45);
-            gallery('Earthbreaker quadro a quadro', 2460, slamFrames, 1.7);
-            gallery('Juramento quadro a quadro', 2730, oathFrames, 1.8);
-            gallery('Mais poses', 3000, heroMoves2, 1.45);
-            gallery('Skills de Blade', 3270, bladeFx, 1.05);
-            gallery('Skills de Shadow', 3540, shadowFx, 1.05);
-            gallery('Skills de Flame', 3810, flameFx, 0.52);
-            gallery('Skills de Curse', 4080, curseFx, 0.82);
-            drawKnifeSection(now, 4350);
+            gallery('Juramentos com as skills do ramo', 2190, oathShow, 1.2);
+            gallery('Golpes especiais', 2460, heroMoves, 1.45);
+            gallery('Earthbreaker quadro a quadro', 2730, slamFrames, 1.7);
+            gallery('Juramento quadro a quadro', 3000, oathFrames, 1.8);
+            gallery('Mais poses', 3270, heroMoves2, 1.45);
+            gallery('Skills de Blade', 3540, bladeFx, 1.05);
+            gallery('Skills de Shadow', 3810, shadowFx, 1.05);
+            gallery('Skills de Flame', 4080, flameFx, 0.52);
+            gallery('Skills de Curse', 4350, curseFx, 0.82);
+            drawKnifeSection(now, 4620);
             requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);

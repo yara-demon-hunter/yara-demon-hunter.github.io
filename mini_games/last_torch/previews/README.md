@@ -27,6 +27,18 @@ As páginas usam módulos ES, e o navegador os bloqueia em arquivos abertos dire
 
 Se a porta 8000 estiver ocupada, troque o número nos dois lugares (por exemplo, `python3 -m http.server 8001` e `localhost:8001`).
 
+## Gerar as animações da página do jogo
+
+`demon_hunter_preview.html` tem um modo captura que desenha só uma cena, em um quadrado, para gerar os `.webp` de
+`assets/images/common/mini-game/last_torch/`:
+
+```
+demon_hunter_preview.html?capture=<rótulo da cena>&size=400&zoom=3&lift=12
+```
+
+O rótulo é o texto que aparece embaixo da cena na prévia (por exemplo `Earthbreaker: salto` ou `Oath of Ruin: golpe`).
+Os clipes atuais têm 200x200, 24 quadros e duração de um ciclo da cena.
+
 ## Pelo Jekyll
 
 Com o site rodando pelo Jekyll (`bundle exec jekyll serve`, na raiz do repositório), as páginas ficam em:
