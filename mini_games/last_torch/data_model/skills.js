@@ -12,7 +12,7 @@ export const UPGRADE_MODELS = {
 };
 
 export const BLADE_SKILL = {
-    baseDamage: 20,
+    baseDamage: 30,
     damagePerUpgrade: 5,
     baseRadius: 56,
     radiusPerUpgrade: 7,
