@@ -155,6 +155,24 @@ export const state = {
     powerTimers: {},
     blastBudget: 0,
 
+    // Skills dos ramos (js/systems/skills*.js, desenhadas em js/render/skills.js)
+    oath: null,                 // Juramento da noite: chave em data_model/passives.js (ou null)
+    oathCeremony: null,         // Juramento recém-feito, esperando a volta à partida para acontecer
+    oathAnnounced: false,       // o aviso de Juramento disponível já apareceu nesta noite
+    bloodlust: { stacks: 0, timer: 0 },
+    warCryTimer: 0,             // bônus de dano depois do rugido
+    phoenixSpent: false,        // Phoenix Pact já usado nesta hora
+    phoenixFx: null,
+    crescents: [],
+    cracks: [],
+    aftershocks: [],
+    executions: [],
+    markBursts: [],
+    smokes: [],
+    echoes: [],
+    rifts: [],
+    wisp: { x: 0, y: 0, placed: false, flash: 0 },
+
     // Animação de level up em andamento: { age, label } ou null
     levelUpFx: null,
 

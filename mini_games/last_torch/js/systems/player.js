@@ -7,6 +7,7 @@ import { moveDash } from './dash.js';
 import { addNumber, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { mod } from './modifiers.js';
 import { beginDeath } from './night.js';
+import { absorbHit, tryPhoenix } from './skills_flame.js';
 import { getPlayerMaxSpeed } from './stats.js';
 
 // Ponto (x, y) empurrado para a borda da área bloqueada da tocha, se estiver dentro dela.
@@ -37,6 +38,10 @@ function aroundTorch(dirX, dirY) {
 // Contato e tiros passam por aqui. Devolve false se o golpe não pegou (invulnerável).
 export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
     if (player.iFrames > 0 || state.phase !== 'HUNT') return false;
+    if (absorbHit()) {
+        player.iFrames = invulnerableSeconds;
+        return false;
+    }
     const damage = amount * Math.max(0.1, 1 + mod('damageTaken'));
     player.hp -= damage;
     player.iFrames = invulnerableSeconds;
@@ -53,6 +58,7 @@ export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
 
 // Com um Last Prayer sobrando o herói levanta; senão, a noite acaba
 function heroDown() {
+    if (tryPhoenix()) return;
     if (state.revives <= 0) {
         player.hp = 0;
         beginDeath('PLAYER');
@@ -81,6 +87,8 @@ function heroDown() {
 export function updatePlayer(dt) {
     // Timers
     if (player.iFrames > 0) player.iFrames -= dt;
+    const fromX = player.x;
+    const fromY = player.y;
 
     let moveX = 0;
     let moveY = 0;
@@ -129,6 +137,7 @@ export function updatePlayer(dt) {
     const pos = pushOutOfTorch(player.x, player.y);
     player.x = pos.x;
     player.y = pos.y;
+    player.stillTime = Math.hypot(player.x - fromX, player.y - fromY) < 0.2 ? player.stillTime + dt : 0;
     const target = pushOutOfTorch(player.targetX, player.targetY);
     player.targetX = target.x;
     player.targetY = target.y;

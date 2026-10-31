@@ -2,6 +2,7 @@ import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { GOLD_DROP as D } from '../../data_model/gold.js';
 import { audio, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
+import { mod } from './modifiers.js';
 import { getMagnetRadius } from './stats.js';
 
 // --- OURO DROPADO ---
@@ -35,6 +36,12 @@ export function dropGold(x, y, amount) {
 function collectGold(value) {
     state.coins += value;
     state.run.goldEarned += value;
+    // Coin Rush: cada moeda adianta o dash e a adaga
+    const haste = mod('coinHaste');
+    if (haste > 0) {
+        state.knifeTimer = Math.max(0, state.knifeTimer - haste);
+        player.dashRecharge -= haste;
+    }
     audio.playCoin();
     updateHUD();
 }

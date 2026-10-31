@@ -13,6 +13,7 @@ import { resetTorch } from '../systems/torch.js';
 import { prepareForest } from '../render/forest.js';
 import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_sprites.js';
 import { showToast } from './banner.js';
+import { resetSkills } from '../systems/skills.js';
 import { startHints } from './hints.js';
 import { updateBuildStrip, updateHUD } from './hud.js';
 
@@ -91,6 +92,7 @@ export function startGame() {
     state.goldVacuum = false;
     state.currentBoss = null;
     state.levelUpFx = null;
+    resetSkills();
 
     refreshModifiers();
     state.revives = mod('revives');

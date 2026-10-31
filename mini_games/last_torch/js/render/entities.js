@@ -20,6 +20,8 @@ import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { FAN_OF_KNIVES } from '../../data_model/passives.js';
 import { ctx, passives, player, state } from '../core/state.js';
 import { getKnifeChargeRatio, getKnifeRange } from '../systems/knives.js';
+import { OATH_VISUALS } from '../../data_model/visuals/characters/oath_visual.js';
+import { getHeroGear } from './hero_gear.js';
 import { renderDemonLord } from './demon_lord.js';
 import { easeOutCubic } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
@@ -111,6 +113,9 @@ function strokeWaveTrail(startRadius, frontRadius, half, color, alpha) {
 
 export function renderBladeSlashes() {
     const frenzyActive = state.frenzyActiveTimer > 0;
+    // Sob um Juramento o corte tem a cor dele
+    const gear = getHeroGear();
+    const oathSlash = gear ? OATH_VISUALS[gear].slash : null;
 
     state.bladeSlashes.forEach(s => {
         const look = s.spin ? SLASH_VISUALS.whirl : (SLASH_VISUALS[s.comboStep] || SLASH_VISUALS[1]);
@@ -127,7 +132,7 @@ export function renderBladeSlashes() {
         // Golpes do Shadow Clone em violeta escuro
         const color = s.shadow
             ? (frenzyActive ? SHADOW_CLONE_VISUALS.slashFrenzyColor : SHADOW_CLONE_VISUALS.slashColor)
-            : (frenzyActive ? SLASH_VISUALS.frenzyColor : look.color);
+            : (frenzyActive ? SLASH_VISUALS.frenzyColor : oathSlash?.[s.spin ? 2 : s.comboStep - 1] ?? look.color);
         const width = look.lineWidth + (frenzyActive ? SLASH_VISUALS.frenzyExtraWidth : 0);
 
         ctx.save();

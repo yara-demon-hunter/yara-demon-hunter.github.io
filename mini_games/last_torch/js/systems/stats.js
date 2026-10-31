@@ -1,6 +1,8 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { BLADE_SKILL, DASH_SKILL, FRENZY_NOVA_SKILL, KNIFE_SKILL } from '../../data_model/skills.js';
-import { attributes, player, state } from '../core/state.js';
+import { BLADE_SKILL, DASH_SKILL, FRENZY_NOVA_SKILL, KNIFE_SKILL, SPELL_SKILL } from '../../data_model/skills.js';
+import { WAR_CRY } from '../../data_model/passives.js';
+import { getPowerLevel } from '../../data_model/powers.js';
+import { attributes, player, powers, state } from '../core/state.js';
 import { mod } from './modifiers.js';
 
 // --- FÓRMULAS DE ATRIBUTOS ---
@@ -15,6 +17,20 @@ export function getAtkDamage() {
         base *= 1 + mod('warmthDamage');
     }
     return base;
+}
+// Golpes da lâmina: o dano base com o que só vale para ela (Juramentos, Bloodlust, War Cry)
+export function getBladeDamage() {
+    const hunger = getPowerLevel(powers.bloodlust);
+    return getAtkDamage() * (1 + mod('bladeDamage'))
+        * (1 + (hunger ? state.bloodlust.stacks * hunger.damage : 0))
+        * (1 + (state.warCryTimer > 0 ? WAR_CRY.bladeBonus : 0));
+}
+// Feitiços e tudo que a chama faz sozinha
+export function getSpellDamage() {
+    return getAtkDamage() * SPELL_SKILL.damageMultiplier * (1 + mod('spellDamage'));
+}
+export function getSpellCooldown(seconds) {
+    return seconds * Math.max(0.3, 1 - mod('spellHaste'));
 }
 export function getCritChance() {
     return BLADE_SKILL.baseCritChance + mod('critChance');
@@ -45,6 +61,9 @@ export function getAtkCooldown() {
     let cd = (BLADE_SKILL.baseCooldownSeconds
         - (attributes.atkSpeed.lvl - 1) * BLADE_SKILL.cooldownReductionPerUpgrade) * (1 - mod('attackSpeed'));
     if (state.frenzyActiveTimer > 0) cd *= BLADE_SKILL.frenzyCooldownMultiplier;
+    const hunger = getPowerLevel(powers.bloodlust);
+    if (hunger) cd *= 1 - state.bloodlust.stacks * hunger.speed;
+    if (mod('stillAttack') > 0 && player.stillTime > 0.3) cd *= 1 - mod('stillAttack');
     return Math.max(BLADE_SKILL.minimumCooldownSeconds, cd);
 }
 export function getPlayerMaxSpeed() {

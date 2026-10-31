@@ -30,10 +30,21 @@ import {
 } from './powers.js';
 import { renderReflectWard } from './reflect.js';
 import { renderShadowClone } from './shadow_clone.js';
+import { getHeroGear, getOathPalette } from './hero_gear.js';
+import {
+    renderCracks, renderCrescents, renderFireRing, renderMonsterCurses, renderPhoenix, renderRifts,
+    renderShield, renderSkillAuras, renderSkillHits, renderSmokes, renderWisp
+} from './skills.js';
 
 // O herói padrão é o 2.5D (js/render/player25d.js). O top-down antigo (js/render/player.js) continua
 // no projeto: abra a página com ?hero=topdown para usá-lo.
 const HERO_25D = new URLSearchParams(window.location.search).get('hero') !== 'topdown';
+
+// Herói com a forma do Juramento da noite, se houver
+function renderHero() {
+    const gear = getHeroGear();
+    renderPlayer25D(player, heroAnim, getOathPalette(gear, getHero().colors ?? HERO_25D_VISUALS.colors), gear);
+}
 
 // Funde a borda do mundo com as faixas laterais/superiores (se existirem) para não haver corte seco.
 // Os degradês são criados uma vez por tamanho de tela.
@@ -114,18 +125,23 @@ export function render() {
     renderForestGround();
     renderForestGrass();
     if (state.quality < 2) renderStains();
+    renderCracks();
     renderWarmth();
     renderGroundFires();
+    renderFireRing();
     renderCore();
     renderTorchAlarm();
     renderAttackRange();
     renderChillAura();
+    renderRifts();
     renderTelegraphs();
     renderGoldDrops();
     renderPickups();
     renderBladeSlashes();
     renderEnemyProjectiles();
     renderEnemies();
+    renderMonsterCurses();
+    renderSmokes();
     renderGibs();
     renderKnifeAim();
     renderKnives();
@@ -135,11 +151,17 @@ export function render() {
     renderShadowClone();
     renderLevelUpBack();
     if (!player.hidden) {
-        if (HERO_25D) renderPlayer25D(player, heroAnim, getHero().colors ?? HERO_25D_VISUALS.colors);
+        renderSkillAuras();
+        if (HERO_25D) renderHero();
         else renderPlayer();
         renderOrbitBlades();
+        renderShield();
+        renderWisp();
     }
     renderReflectWard();
+    renderCrescents();
+    renderSkillHits();
+    renderPhoenix();
     renderParticles();
     renderLightning();
     renderStars();

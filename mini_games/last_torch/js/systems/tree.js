@@ -4,6 +4,7 @@ import { RELIC_BY_ID } from '../../data_model/relics.js';
 import { TREE_BY_ID, TREE_COSTS, TREE_NODES } from '../../data_model/tree.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, powers, state } from '../core/state.js';
+import { showToast } from '../ui/banner.js';
 import { updateBuildStrip, updateHUD } from '../ui/hud.js';
 import { getStatText } from '../ui/status.js';
 import { refreshModifiers } from './modifiers.js';
@@ -107,6 +108,10 @@ export function getRequirementChecks(node) {
         const have = getNodeLevel(parent);
         return { label: isSingle(parent) ? name : `${name} Lv. ${lvl}`, have: Math.min(have, lvl), need: lvl, met: have >= lvl, showCount: lvl > 1 && !isSingle(parent) };
     });
+    if (node.oath) {
+        const free = !state.oath || state.oath === node.key;
+        checks.push({ label: 'One oath per night', have: free ? 1 : 0, need: 1, met: free, showCount: false });
+    }
     if (node.kills) {
         const have = getKillCount(node.kills.type);
         checks.push({ label: `Slay ${node.kills.count} ${node.kills.label}`, have: Math.min(have, node.kills.count), need: node.kills.count, met: have >= node.kills.count, showCount: true });
@@ -131,6 +136,15 @@ export function getNodeState(node) {
     return { level, max, cost, currency, checks, reached, maxed, open, canBuy: open && atCamp && balance >= cost };
 }
 
+// Um Juramento acabou de abrir: é a decisão da noite, não pode passar despercebida
+function announceOath() {
+    if (state.oath || state.oathAnnounced) return;
+    const open = TREE_NODES.find(node => node.oath && getNodeState(node).reached);
+    if (!open) return;
+    state.oathAnnounced = true;
+    showToast('⬢', 'An oath can be sworn', `${getNodeInfo(open).name}. Only one per night.`);
+}
+
 // Algum nó que o jogador pode comprar agora? Faz o medalhão pulsar
 export function hasBuyableNode() {
     if (state.skillPoints <= 0) return false;
@@ -149,6 +163,10 @@ export function buyNode(id) {
         passives[node.key].lvl++;
         state.revives += passives[node.key].mods?.revives ?? 0;
         state.skillPoints += passives[node.key].grantPoints ?? 0;
+        if (node.oath) {
+            state.oath = node.key;
+            state.oathCeremony = node.key;
+        }
     } else if (node.kind === 'stat') attributes[node.key].lvl++;
     else if (node.kind === 'power') powers[node.key].lvl++;
     else if (node.kind === 'mod') state.tree[node.id] = st.level + 1;
@@ -163,6 +181,7 @@ export function buyNode(id) {
     refreshModifiers();
     syncMaxHp();
     syncTorchMax();
+    announceOath();
     updateBuildStrip();
     updateHUD();
     if (st.currency === 'gold') audio.playPurchase();

@@ -14,6 +14,7 @@ import { checkHourEnd, onBossKilled } from './night.js';
 import { dropChest, maybeDropPickup } from './pickups.js';
 import { hurtPlayer } from './player.js';
 import { addHostileFire, onEnemyKilled } from './powers.js';
+import { onTorchTouched } from './skills_flame.js';
 import { gainXp } from './progression.js';
 import { damageShadowClone } from './shadow_clone.js';
 
@@ -245,6 +246,8 @@ export function updateEnemies(dt) {
 
     const damping = Math.pow(MONSTER_SPAWNING.movementDamping, dt * 60);
     const hunting = state.phase === 'HUNT';
+    // Provoke e Oath of Slaughter: o herói chama a horda de mais longe
+    const provoked = MONSTER_SPAWNING.targetPlayerDistance * (1 + mod('provoke'));
 
     for (let i = enemies.length - 1; i >= 0; i--) {
         const e = enemies[i];
@@ -252,6 +255,7 @@ export function updateEnemies(dt) {
 
         if (e.hitFlash > 0) e.hitFlash -= dt;
         if (e.orbitCd > 0) e.orbitCd -= dt;
+        if (e.marked > 0) e.marked -= dt;
 
         e.x += e.vx * dt;
         e.y += e.vy * dt;
@@ -259,7 +263,7 @@ export function updateEnemies(dt) {
         e.vy *= damping;
 
         const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
-        const huntsPlayer = !model.ignoresPlayer && distToPlayer < MONSTER_SPAWNING.targetPlayerDistance;
+        const huntsPlayer = !model.ignoresPlayer && distToPlayer < provoked;
         const targetX = huntsPlayer ? player.x : state.coreX;
         const targetY = huntsPlayer ? player.y : state.coreY;
         const distToTarget = Math.hypot(targetX - e.x, targetY - e.y);
@@ -271,6 +275,8 @@ export function updateEnemies(dt) {
 
         if (e.frozen > 0) {
             e.frozen -= dt;
+        } else if (e.stunned > 0) {
+            e.stunned -= dt;
         } else {
             e.angle = toTargetAngle;
             e.facing = lerpAngle(e.facing ?? e.angle, e.angle, Math.min(1, dt * FACING_SMOOTHING));
@@ -360,6 +366,7 @@ export function updateEnemies(dt) {
             removeEnemy(i, e);
             hurtTorch(damage, e.x, e.y);
             if (state.phase !== 'HUNT') return;
+            onTorchTouched();
         }
     }
 }

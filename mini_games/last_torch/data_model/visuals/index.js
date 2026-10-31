@@ -1,4 +1,5 @@
 export * from './characters/hero_visual.js';
+export * from './characters/oath_visual.js';
 export * from './characters/shadow_clone_visual.js';
 export * from './monsters/bat_visual.js';
 export * from './scenery/forest_visual.js';
@@ -16,6 +17,7 @@ export * from './monsters/bloater_visual.js';
 export * from './monsters/wraith_visual.js';
 export * from './effects/juice_visual.js';
 export * from './effects/powers_visual.js';
+export * from './effects/skills_visual.js';
 export * from './monsters/sprites_visual.js';
 export * from './monsters/zombie_wolf_visual.js';
 export * from './monsters/headless_knight_visual.js';

@@ -168,3 +168,6 @@
         --touch-right: max(3rem, calc(env(safe-area-inset-right) + 1.25rem));
     }
 }
+
+/* Oath of Slaughter: a adaga está selada */
+#knifeButton.is-sealed { opacity: 0.3; filter: grayscale(1); pointer-events: none; }

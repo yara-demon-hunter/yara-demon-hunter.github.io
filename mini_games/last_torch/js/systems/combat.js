@@ -5,10 +5,13 @@ import { updateHUD } from '../ui/hud.js';
 import { blast, dealDamage } from './damage.js';
 import { addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
 import { mod } from './modifiers.js';
+import { launchCrescent, tryExecute } from './skills_blade.js';
+import { detonateMark } from './skills_shadow.js';
 import {
     getAtkCooldown,
     getAtkDamage,
     getAtkRadius,
+    getBladeDamage,
     getFrenzyDuration,
     getKnockback,
     getSlashArcRadian
@@ -139,12 +142,18 @@ export function updateAutoAttack(dt) {
     const whirl = player.comboStep === 3 && passives.shadowWhirl.lvl > 0;
     executeBladeSlash(player.x, player.y, atkAngle, attackRad, player.comboStep, whirl);
 
-    const dmg = getAtkDamage() * (player.comboStep === 3 ? BLADE_SKILL.comboDamageMultiplier : 1.0);
+    const dmg = getBladeDamage() * (player.comboStep === 3 ? BLADE_SKILL.comboDamageMultiplier : 1.0);
     const kbForce = getKnockback() * (player.comboStep === 3 ? BLADE_SKILL.comboKnockbackMultiplier : 1.0);
 
     // Colisão de dano no arco do golpe
     const hits = hitEnemiesInArc(player.x, player.y, atkAngle, attackRad, currentArcHalf, dmg, kbForce, whirl,
-        () => chargeUlt(FRENZY_NOVA_SKILL.chargePerHit * (1 + mod('furyCharge'))));
+        (e) => {
+            chargeUlt(FRENZY_NOVA_SKILL.chargePerHit * (1 + mod('furyCharge')));
+            // Em pleno dash a marca espera: é o dash que vai detoná-la, com o bônus
+            if (e.marked > 0 && player.dashTimer <= 0) detonateMark(e, false);
+            tryExecute(e);
+        });
+    launchCrescent(atkAngle);
     if (hits > 0) {
         audio.playHit(hits);
         if (player.comboStep === 3) {

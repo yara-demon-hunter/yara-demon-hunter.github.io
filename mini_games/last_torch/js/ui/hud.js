@@ -1,3 +1,4 @@
+import { mod } from '../systems/modifiers.js';
 import { EVOLUTIONS } from '../../data_model/powers.js';
 import { NIGHT, getHourName } from '../../data_model/night.js';
 import { STREAK } from '../../data_model/streak.js';
@@ -59,7 +60,7 @@ export function updateFuryCard() {
 // --- BOTÕES DE TOQUE ---
 // Anel de recarga (--cd: 1 logo após o uso, 0 = pronto) em poucos degraus: cada mudança repinta o botão.
 const CD_STEPS = 12;
-const knifeShown = { cd: -1, ready: null };
+const knifeShown = { cd: -1, ready: null, sealed: null };
 
 export function updateKnifeButton() {
     if (!hasTouchButtons) return;
@@ -69,7 +70,12 @@ export function updateKnifeButton() {
         knifeShown.cd = cd;
         ui.knifeButton.style.setProperty('--cd', cd);
     }
-    const ready = ratio <= 0;
+    const sealed = mod('noKnives') > 0;
+    if (knifeShown.sealed !== sealed) {
+        knifeShown.sealed = sealed;
+        ui.knifeButton.classList.toggle('is-sealed', sealed);
+    }
+    const ready = ratio <= 0 && !sealed;
     if (knifeShown.ready !== ready) {
         knifeShown.ready = ready;
         ui.knifeButton.classList.toggle('is-ready', ready);

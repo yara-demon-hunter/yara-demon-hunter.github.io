@@ -102,6 +102,8 @@ export const HERO_VISUALS = {
     windupExtra: 0.3,
     recoverSeconds: 0.14,
     swingBlendRate: 16,
+    dashBlendRate: 26,            // quão rápido entra e sai a pose do dash
+    vigilBlendRate: 7,            // idem, a pose do Vigil (lenta: é um gesto calmo)
     ghostCount: 4,                // cópias fantasmas da lâmina (rastro do corte)
     ghostGapSeconds: 0.018,
 

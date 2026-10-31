@@ -1,12 +1,10 @@
 import { DASH_SKILL } from '../../data_model/skills.js';
-import { getPowerLevel } from '../../data_model/powers.js';
-import { audio, joystick, keys, passives, player, powers, state } from '../core/state.js';
+import { audio, joystick, keys, player, state } from '../core/state.js';
 import { chargeUlt } from './combat.js';
-import { dealDamage } from './damage.js';
-import { addFloater, createExplosion, hitStop, slowMotion } from './effects.js';
-import { dropGold } from './gold.js';
+import { addFloater, hitStop, slowMotion } from './effects.js';
 import { bumpStat } from './sanctuary.js';
-import { getAtkDamage, getDashCharges, getDashCooldown } from './stats.js';
+import { onDashEnd, onDashStart, stealOnPerfectDodge, strikeDashPath } from './skills_shadow.js';
+import { getDashCharges, getDashCooldown } from './stats.js';
 
 // --- DASH ---
 // Esquiva curta e invulnerável, com cargas. Vai para onde o jogador está indo; parado, para onde
@@ -67,8 +65,11 @@ export function tryDash() {
     player.dashX = dir.x;
     player.dashY = dir.y;
     player.dashStruck = null;
+    player.dashFromX = player.x;
+    player.dashFromY = player.y;
     player.iFrames = Math.max(player.iFrames, DASH_SKILL.invulnerableSeconds);
     audio.playDash();
+    onDashStart(player.x, player.y);
 
     if (isNearMiss()) {
         addFloater(player.x, player.y - 46, 'PERFECT DODGE', '#67e8f9');
@@ -77,7 +78,7 @@ export function tryDash() {
         slowMotion(0.4, 0.3);
         audio.playPerfect();
         bumpStat('perfectDodges');
-        if (passives.masterThief.lvl > 0) dropGold(player.x, player.y, passives.masterThief.gold);
+        stealOnPerfectDodge();
     }
 }
 
@@ -94,19 +95,12 @@ export function moveDash(dt) {
     const spacing = DASH_SKILL.distance / DASH_SKILL.ghosts;
     const last = state.dashGhosts[state.dashGhosts.length - 1];
     if (!last || Math.hypot(last.x - player.x, last.y - player.y) >= spacing) {
-        state.dashGhosts.push({ x: player.x, y: player.y, age: 0, seconds: 0.3 });
+        state.dashGhosts.push({ x: player.x, y: player.y, age: 0, seconds: 0.3, angle: Math.atan2(player.dashY, player.dashX) });
     }
 
-    // Phantom Rush: o dash corta o que estiver no caminho
-    const level = getPowerLevel(powers.phantomDash);
-    if (!level) return;
-    state.enemies.forEach(e => {
-        if (player.dashStruck?.has(e) || Math.hypot(e.x - player.x, e.y - player.y) > e.radius + 26) return;
-        (player.dashStruck ??= new Set()).add(e);
-        const a = Math.atan2(player.dashY, player.dashX);
-        dealDamage(e, getAtkDamage() * level.damage, { kbX: Math.cos(a) * 200, kbY: Math.sin(a) * 200 });
-        createExplosion(e.x, e.y, '#67e8f9', 5);
-    });
+    // Phantom Rush, Death Mark e Master Thief: o que o dash faz ao atravessar um monstro
+    strikeDashPath();
+    if (player.dashTimer <= 0) onDashEnd(player.dashFromX, player.dashFromY);
 }
 
 // Recarga das cargas

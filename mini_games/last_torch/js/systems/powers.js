@@ -2,8 +2,12 @@ import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers
 import { audio, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen } from './effects.js';
+import { mod } from './modifiers.js';
+import { startCast } from './moves.js';
 import { hurtPlayer } from './player.js';
-import { getAtkDamage } from './stats.js';
+import { feedBloodlust } from './skills_blade.js';
+import { spreadHex } from './skills_curse.js';
+import { getSpellCooldown, getSpellDamage } from './stats.js';
 
 // --- PODERES ---
 // Cada poder lê os dados do nível atual com getPowerLevel (data_model/powers.js).
@@ -11,7 +15,7 @@ import { getAtkDamage } from './stats.js';
 const TAU = Math.PI * 2;
 
 // Conta o tempo de um poder com recarga: true quando disparou
-function ready(key, dt, cooldown) {
+export function ready(key, dt, cooldown) {
     const timers = state.powerTimers;
     timers[key] = (timers[key] ?? cooldown * 0.5) - dt;
     if (timers[key] > 0) return false;
@@ -19,7 +23,7 @@ function ready(key, dt, cooldown) {
     return true;
 }
 
-function nearestEnemy(x, y, maxDist, skip = null) {
+export function nearestEnemy(x, y, maxDist, skip = null) {
     let best = null;
     let min = maxDist;
     for (const e of state.enemies) {
@@ -39,7 +43,7 @@ function updateOrbitBlades(dt) {
     if (!level) return;
     const M = POWER_MODELS.orbitBlades;
     state.orbitAngle += M.spin * dt;
-    const damage = getAtkDamage() * level.damage;
+    const damage = getSpellDamage() * level.damage;
 
     for (let i = 0; i < level.count; i++) {
         const a = state.orbitAngle + (i / level.count) * TAU;
@@ -79,6 +83,11 @@ function updateEmberTrail() {
     });
 }
 
+// Fogo aliado fora dos passos (lava do Cataclysm)
+export function addGroundFire(x, y, { life, radius, dps, evolved }) {
+    state.groundFires.push({ x, y, life, maxLife: life, radius, dps, tick: 0, evolved });
+}
+
 // Elite em chamas: o fogo dele machuca o herói
 export function addHostileFire(x, y) {
     state.groundFires.push({ x, y, life: 2.4, maxLife: 2.4, radius: 20, hostile: true, tick: 0 });
@@ -101,7 +110,7 @@ function updateGroundFires(dt) {
             if (Math.hypot(player.x - f.x, player.y - f.y) < f.radius + 10) hurtPlayer(8, f.x, f.y, 0.5);
             continue;
         }
-        const damage = getAtkDamage() * f.dps * tickSeconds;
+        const damage = getSpellDamage() * f.dps * tickSeconds;
         for (const e of state.enemies) {
             if (Math.hypot(e.x - f.x, e.y - f.y) < f.radius + e.radius) dealDamage(e, damage, { noCrit: true, quiet: true });
         }
@@ -111,7 +120,7 @@ function updateGroundFires(dt) {
 // --- RAIO EM CADEIA ---
 function strikeChain(startX, startY, level, first = null) {
     const M = POWER_MODELS.chainLightning;
-    const damage = getAtkDamage() * level.damage;
+    const damage = getSpellDamage() * level.damage;
     const struck = new Set();
     let current = first ?? nearestEnemy(startX, startY, M.range);
     if (!current) return false;
@@ -153,7 +162,7 @@ function jaggedPath(points) {
 function updateChainLightning(dt) {
     const level = getPowerLevel(powers.chainLightning);
     if (!level) return;
-    if (ready('chainLightning', dt, level.cooldown)) strikeChain(player.x, player.y, level);
+    if (ready('chainLightning', dt, getSpellCooldown(level.cooldown)) && strikeChain(player.x, player.y, level)) startCast();
 }
 
 // Wrath of Heaven: todo crítico chama um raio
@@ -168,11 +177,11 @@ export function onCritical(e) {
 // --- PULSO DE ALMA ---
 function updateSoulNova(dt) {
     const level = getPowerLevel(powers.soulNova);
-    if (!level || !ready('soulNova', dt, level.cooldown)) return;
+    if (!level || !ready('soulNova', dt, getSpellCooldown(level.cooldown))) return;
     const M = POWER_MODELS.soulNova;
     const evolved = powers.soulNova.evolved;
     const color = evolved ? '#a5f3fc' : '#c4b5fd';
-    const damage = getAtkDamage() * level.damage;
+    const damage = getSpellDamage() * level.damage;
 
     state.enemies.forEach(e => {
         if (Math.hypot(e.x - player.x, e.y - player.y) > level.radius + e.radius) return;
@@ -183,6 +192,7 @@ function updateSoulNova(dt) {
     addShockwave(player.x, player.y, { radius: level.radius, color, width: 9, seconds: 0.45 });
     addShockwave(player.x, player.y, { radius: level.radius * 0.6, color: '#ffffff', width: 3, seconds: 0.3 });
     shakeScreen(4);
+    startCast();
     audio.playNova();
 }
 
@@ -191,7 +201,7 @@ function updateChillAura(dt) {
     const level = getPowerLevel(powers.chillAura);
     if (!level) return;
     const tick = ready('chillTick', dt, 0.5);
-    const damage = getAtkDamage() * level.dps * 0.5;
+    const damage = getSpellDamage() * level.dps * 0.5;
     for (const e of state.enemies) {
         if (Math.hypot(e.x - player.x, e.y - player.y) > level.radius + e.radius) continue;
         e.slow = Math.max(e.slow ?? 0, level.slow);
@@ -202,7 +212,8 @@ function updateChillAura(dt) {
 // --- CHUVA DE ESTRELAS ---
 function updateStarfall(dt) {
     const level = getPowerLevel(powers.starfall);
-    if (level && ready('starfall', dt, level.cooldown) && state.enemies.length > 0) {
+    if (level && ready('starfall', dt, getSpellCooldown(level.cooldown)) && state.enemies.length > 0) {
+        startCast();
         for (let i = 0; i < level.count; i++) {
             const target = state.enemies[Math.floor(Math.random() * state.enemies.length)];
             state.stars.push({
@@ -221,14 +232,14 @@ function updateStarfall(dt) {
         if (s.age < s.seconds) continue;
         state.stars.splice(i, 1);
         state.blastBudget++;
-        blast(s.x, s.y, s.radius, getAtkDamage() * s.damage, POWER_MODELS.starfall.knockback, '#fde68a');
+        blast(s.x, s.y, s.radius, getSpellDamage() * s.damage, POWER_MODELS.starfall.knockback, '#fde68a');
     }
 }
 
 // --- SENTINELA DA CHAMA ---
 function updateTorchBolts(dt) {
     const level = getPowerLevel(powers.torchBolts);
-    if (level && ready('torchBolts', dt, level.cooldown)) {
+    if (level && ready('torchBolts', dt, getSpellCooldown(level.cooldown))) {
         const M = POWER_MODELS.torchBolts;
         const skip = new Set();
         for (let i = 0; i < level.count; i++) {
@@ -240,7 +251,7 @@ function updateTorchBolts(dt) {
                 x: state.coreX, y: state.coreY,
                 vx: Math.cos(a) * M.speed, vy: Math.sin(a) * M.speed,
                 target,
-                damage: getAtkDamage() * level.damage,
+                damage: getSpellDamage() * level.damage,
                 life: 1.6
             });
         }
@@ -257,9 +268,11 @@ function updateTorchBolts(dt) {
             let diff = Math.atan2(b.target.y - b.y, b.target.x - b.x) - current;
             while (diff > Math.PI) diff -= TAU;
             while (diff < -Math.PI) diff += TAU;
-            const turned = current + Math.max(-M.turnRate * dt, Math.min(M.turnRate * dt, diff));
-            b.vx = Math.cos(turned) * M.speed;
-            b.vy = Math.sin(turned) * M.speed;
+            const turn = (b.turnRate ?? M.turnRate) * dt;
+            const speed = b.speed ?? M.speed;
+            const turned = current + Math.max(-turn, Math.min(turn, diff));
+            b.vx = Math.cos(turned) * speed;
+            b.vy = Math.sin(turned) * speed;
         }
         b.x += b.vx * dt;
         b.y += b.vy * dt;
@@ -267,8 +280,8 @@ function updateTorchBolts(dt) {
         const hit = state.enemies.find(e => e.hp > 0 && Math.hypot(e.x - b.x, e.y - b.y) < e.radius + M.radius);
         if (hit) {
             const a = Math.atan2(b.vy, b.vx);
-            dealDamage(hit, b.damage, { kbX: Math.cos(a) * 90, kbY: Math.sin(a) * 90 });
-            createExplosion(b.x, b.y, '#fb923c', 6);
+            dealDamage(hit, b.damage, { kbX: Math.cos(a) * 90, kbY: Math.sin(a) * 90, style: b.soul ? 'shadow' : null });
+            createExplosion(b.x, b.y, b.soul ? '#c084fc' : '#fb923c', 6);
         }
         if (hit || b.life <= 0) state.bolts.splice(i, 1);
     }
@@ -277,11 +290,14 @@ function updateTorchBolts(dt) {
 // --- GATILHOS DE MORTE ---
 export function onEnemyKilled(e) {
     const blood = getPowerLevel(powers.bloodEdge);
-    if (blood) player.hp = Math.min(player.maxHp, player.hp + blood.heal);
+    const heal = (blood?.heal ?? 0) + mod('killHeal');
+    if (heal > 0) player.hp = Math.min(player.maxHp, player.hp + heal);
+    feedBloodlust();
+    spreadHex(e);
 
     const burst = getPowerLevel(powers.corpseBurst);
     if (burst && Math.random() < burst.chance) {
-        blast(e.x, e.y, burst.radius, getAtkDamage() * burst.damage, POWER_MODELS.corpseBurst.knockback, '#fb7185');
+        blast(e.x, e.y, burst.radius, getSpellDamage() * burst.damage, POWER_MODELS.corpseBurst.knockback, '#fb7185');
         if (powers.corpseBurst.evolved) player.hp = Math.min(player.maxHp, player.hp + 1);
     }
 }

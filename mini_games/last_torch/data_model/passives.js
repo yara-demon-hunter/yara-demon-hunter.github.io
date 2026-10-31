@@ -51,9 +51,101 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 60,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Every Perfect Dodge steals a handful of gold.',
-        gold: 12
+        desc: 'Dash through monsters to pick their pockets. A Perfect Dodge steals a fistful of gold.'
     },
+    warCry: {
+        name: 'War Cry',
+        icon: '📣',
+        cost: 90,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'Surrounded by 5 monsters, you roar: they are thrown back and stunned, and your blade hits 30% harder for 4s.'
+    },
+    executioner: {
+        name: 'Executioner',
+        icon: '🪓',
+        cost: 90,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'Your blade finishes off monsters under 20% health in one brutal cut. Elites under 10%. Bosses are immune.'
+    },
+    smokeBomb: {
+        name: 'Smoke Bomb',
+        icon: '🌫️',
+        cost: 70,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'Every dash leaves smoke that slows monsters, and the next dagger you throw is a sure critical hit.'
+    },
+    vigil: {
+        name: 'Vigil',
+        icon: '⚜️',
+        cost: 90,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'Stand still for a moment to raise a flame shield. It stops one hit and bursts, burning what is near. Returns after 6s.'
+    },
+    backdraft: {
+        name: 'Backdraft',
+        icon: '🎆',
+        cost: 70,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'Every monster that reaches the torch sets off a blast of fire around it.'
+    },
+    phoenixPact: {
+        name: 'Phoenix Pact',
+        icon: '🦅',
+        cost: 130,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'Once per hour, when you fall, the torch burns 30 of its health to raise you in a storm of fire.'
+    },
+
+    // --- JURAMENTOS ---
+    // oath: true = só um por noite (js/systems/tree.js). Um modo de jogar inteiro, com bônus e um preço.
+    // gear: forma do herói (data_model/visuals/characters/oath_visual.js)
+    oathSlaughter: {
+        name: 'Oath of Slaughter',
+        icon: '☠️',
+        cost: 200,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        oath: true, gear: 'slaughter', tagline: 'Blood answers blood',
+        desc: '+35% blade damage, +10% attack speed, +40% Fury charge, every kill heals 1 and monsters come for you from farther away. The price: the warmth of the torch no longer heals you, and you can no longer throw daggers.',
+        mods: { bladeDamage: 0.35, attackSpeed: 0.1, furyCharge: 0.4, killHeal: 1, provoke: 0.5, noWarmthHeal: 1, noKnives: 1 }
+    },
+    oathWhispers: {
+        name: 'Oath of Whispers',
+        icon: '🤫',
+        cost: 200,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        oath: true, gear: 'whispers', tagline: 'Never where they strike',
+        desc: '+1 dash charge, 20% shorter dash cooldown, +15% move speed, +10% crit and +50% dagger damage. The price: -25% max health.',
+        mods: { dashCharges: 1, dashCooldown: 0.2, moveSpeed: 0.15, critChance: 0.1, knifeDamage: 0.5, maxHp: -0.25 }
+    },
+    oathHearth: {
+        name: 'Oath of the Hearth',
+        icon: '🛡️',
+        cost: 200,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        oath: true, gear: 'hearth', tagline: 'The flame will not die',
+        desc: 'The torch takes 35% less damage, +30% max health, its warmth reaches twice as far and burns monsters inside it. The price: -15% move speed.',
+        mods: { torchGuard: 0.35, maxHp: 0.3, warmth: 1, warmthBurn: 0.4, moveSpeed: -0.15 }
+    },
+    oathRuin: {
+        name: 'Oath of Ruin',
+        icon: '📕',
+        cost: 200,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        oath: true, gear: 'ruin', tagline: 'The dark pays in kind',
+        desc: 'Spells deal 20% more damage and recharge 12% faster. The price: your blade deals 40% less damage.',
+        mods: { spellDamage: 0.2, spellHaste: 0.12, bladeDamage: -0.4 }
+    },
+
     greedyIdol: {
         name: 'Greedy Idol',
         icon: '🗿',
@@ -192,6 +284,68 @@ export const MIRROR_WARD = {
     damageMultiplier: 2.5,      // dano do tiro original (vira dano no monstro)
     minimumDamage: 40,
     homingTurnRate: 4           // rad/s: o tiro rebatido curva suave até o alvo
+};
+
+// War Cry: cercado por `monsters` monstros a menos de triggerRadius, o herói ruge
+export const WAR_CRY = {
+    monsters: 5,
+    triggerRadius: 110,
+    radius: 190,                // alcance do rugido
+    cooldownSeconds: 14,
+    knockback: 620,
+    stunSeconds: 1,
+    damage: 1.2,
+    bladeBonus: 0.3,            // dano extra da lâmina depois do rugido
+    bonusSeconds: 4
+};
+
+// Executioner: fração da vida abaixo da qual a lâmina termina o serviço
+export const EXECUTIONER = {
+    threshold: 0.2,
+    eliteThreshold: 0.1,
+    furyCharge: 4
+};
+
+// Smoke Bomb: nuvem deixada no ponto de partida do dash
+export const SMOKE_BOMB = {
+    seconds: 2.4,
+    radius: 78,
+    slow: 0.65,
+    maxClouds: 3,
+    ambushSeconds: 3            // tempo para a adaga crítica depois do dash
+};
+
+// Master Thief: dash atravessando monstros rouba ouro (uma vez de cada monstro, por dash)
+export const MASTER_THIEF = {
+    stealBase: 2,
+    stealPerHour: 0.6,
+    perfectDodgeGold: 14
+};
+
+// Vigil: parado por stillSeconds, ergue um escudo que para um golpe e estoura
+export const VIGIL = {
+    stillSeconds: 0.9,
+    rechargeSeconds: 6,
+    burstRadius: 120,
+    burstDamage: 1.5,
+    burstKnockback: 420
+};
+
+// Backdraft: explosão quando um monstro alcança a tocha
+export const BACKDRAFT = {
+    radius: 125,
+    damage: 2,
+    knockback: 420
+};
+
+// Phoenix Pact: a tocha paga com a própria vida para levantar o herói, uma vez por hora
+export const PHOENIX_PACT = {
+    torchCost: 30,
+    healRatio: 0.6,
+    invulnerableSeconds: 2.5,
+    radius: 300,
+    damage: 3,
+    knockback: 760
 };
 
 export function createPassives() {

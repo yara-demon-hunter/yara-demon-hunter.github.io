@@ -227,6 +227,89 @@ export class SoundEngine {
         });
     }
 
+    // --- SKILLS DOS RAMOS ---
+    // Earthbreaker: pancada grave com pedras. scale < 1 nos abalos seguintes
+    playSlam(scale = 1) {
+        if (!this.ctx) return;
+        this.tone({ type: 'sine', freq: 130, to: 34, decay: 0.42, gain: 0.5 * scale });
+        this.burst({ filter: 'lowpass', freq: 900, to: 120, decay: 0.34, gain: 0.5 * scale });
+        this.burst({ filter: 'bandpass', freq: 2400, to: 500, q: 1, at: 0.03, decay: 0.16, gain: 0.14 * scale });
+    }
+
+    // War Cry: grito rouco que sobe e cai
+    playRoar() {
+        if (!this.ctx) return;
+        this.tone({ type: 'sawtooth', freq: 120, to: 240, attack: 0.08, decay: 0.3, gain: 0.2 });
+        this.tone({ type: 'sawtooth', freq: 181, to: 330, attack: 0.08, decay: 0.3, gain: 0.14 });
+        this.burst({ filter: 'bandpass', freq: 500, to: 1400, q: 0.8, attack: 0.06, decay: 0.42, gain: 0.3 });
+    }
+
+    // Executioner: corte seco
+    playExecute() {
+        if (!this.ctx || this.throttled('execute', 0.06)) return;
+        this.burst({ filter: 'highpass', freq: 2600, to: 900, decay: 0.08, gain: 0.3 });
+        this.tone({ type: 'square', freq: 220, to: 70, decay: 0.09, gain: 0.14 });
+    }
+
+    // Death Mark: "ting" seco; com o dash, mais alto e com um brilho depois
+    playMark(big = false) {
+        if (!this.ctx || this.throttled('mark', 0.05)) return;
+        this.tone({ type: 'triangle', freq: big ? 1760 : 1320, to: 660, decay: 0.16, gain: 0.16 });
+        if (big) this.tone({ type: 'sine', freq: 2637, at: 0.05, decay: 0.24, gain: 0.1 });
+        this.burst({ filter: 'highpass', freq: 3200, decay: 0.05, gain: 0.16 });
+    }
+
+    playSmoke() {
+        if (!this.ctx) return;
+        this.burst({ filter: 'lowpass', freq: 1400, to: 300, attack: 0.02, decay: 0.3, gain: 0.16 });
+    }
+
+    // Vigil: escudo sobe e estoura
+    playShield() {
+        if (!this.ctx) return;
+        this.tone({ type: 'sine', freq: 330, to: 660, decay: 0.26, gain: 0.12 });
+        this.tone({ type: 'sine', freq: 495, to: 990, at: 0.04, decay: 0.26, gain: 0.08 });
+    }
+
+    playShieldBreak() {
+        if (!this.ctx) return;
+        this.burst({ filter: 'bandpass', freq: 3000, to: 700, q: 0.8, decay: 0.22, gain: 0.34 });
+        this.tone({ type: 'triangle', freq: 880, to: 220, decay: 0.2, gain: 0.16 });
+    }
+
+    playPhoenix() {
+        if (!this.ctx) return;
+        this.burst({ filter: 'bandpass', freq: 300, to: 3200, q: 0.7, attack: 0.05, decay: 0.7, gain: 0.34 });
+        [392, 523, 784].forEach((freq, i) => this.tone({ type: 'triangle', freq, at: i * 0.1, decay: 0.5, gain: 0.14 }));
+    }
+
+    // Maldição pulando: sussurro que desce
+    playHex() {
+        if (!this.ctx || this.throttled('hex', 0.09)) return;
+        this.tone({ type: 'sawtooth', freq: 620, to: 180, decay: 0.16, gain: 0.05 });
+        this.burst({ filter: 'bandpass', freq: 1800, to: 700, q: 2, decay: 0.14, gain: 0.08 });
+    }
+
+    // Void Rift: sucção subindo e, depois, o colapso
+    playRift() {
+        if (!this.ctx) return;
+        this.tone({ type: 'sine', freq: 70, to: 240, attack: 0.3, decay: 0.7, gain: 0.26 });
+        this.burst({ filter: 'bandpass', freq: 300, to: 1400, q: 2.4, attack: 0.3, decay: 0.7, gain: 0.2 });
+    }
+
+    playRiftCollapse() {
+        if (!this.ctx) return;
+        this.tone({ type: 'sine', freq: 240, to: 40, decay: 0.3, gain: 0.42 });
+        this.burst({ filter: 'lowpass', freq: 1800, to: 160, decay: 0.3, gain: 0.36 });
+    }
+
+    // Juramento: acorde grave que abre
+    playOath() {
+        if (!this.ctx) return;
+        [110, 165, 220, 330].forEach((freq, i) => this.tone({ type: 'sawtooth', freq, at: i * 0.06, attack: 0.04, decay: 0.9, gain: 0.08 }));
+        this.burst({ filter: 'bandpass', freq: 200, to: 2400, q: 0.8, attack: 0.06, decay: 0.7, gain: 0.26 });
+    }
+
     // --- PODERES ---
     playZap() {
         if (!this.ctx || this.throttled('zap', 0.08)) return;

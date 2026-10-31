@@ -35,7 +35,9 @@ export function createHeroAnim(throwsKnives = true) {
         swingFrom: 0,
         swingTo: 0,
         swingSeconds: 0.2,
-        swingBlend: 0
+        swingBlend: 0,
+        dash: 0,            // 0 a 1: pose do dash
+        vigil: 0            // 0 a 1: pose do Vigil
     };
 }
 const anim = createHeroAnim();
@@ -154,6 +156,8 @@ function updateAnim(a = anim, body = player) {
     const blendTarget = a.swingActive && a.swingElapsed < a.swingSeconds + V.recoverSeconds * 0.4 ? 1 : 0;
     a.swingBlend += (blendTarget - a.swingBlend) * Math.min(1, dt * V.swingBlendRate);
     if (a.swingBlend < 0.001) a.swingBlend = 0;
+    a.dash += ((body.dashTimer > 0 ? 1 : 0) - a.dash) * Math.min(1, dt * V.dashBlendRate);
+    a.vigil += ((body.vigilStance ? 1 : 0) - a.vigil) * Math.min(1, dt * V.vigilBlendRate);
 }
 
 // Rastro de sombra escura, quase imperceptível

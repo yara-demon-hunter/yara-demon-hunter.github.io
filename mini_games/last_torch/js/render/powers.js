@@ -1,5 +1,6 @@
 import { getPowerLevel } from '../../data_model/powers.js';
 import { POWERS_VISUALS as V } from '../../data_model/visuals/effects/powers_visual.js';
+import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
 import { ctx, player, powers, state } from '../core/state.js';
 import { drawGlow } from './fx/glow.js';
 import { getDashedRing } from './fx/rings.js';
@@ -82,16 +83,17 @@ export function renderLightning() {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     state.lightning.forEach(bolt => {
+        const look = bolt.hex ? SKILLS_VISUALS.hex.beam : L;
         ctx.globalAlpha = Math.min(1, (bolt.life / bolt.maxLife) * 1.6);
         ctx.beginPath();
         bolt.points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
-        ctx.strokeStyle = L.glow;
+        ctx.strokeStyle = look.glow;
         ctx.lineWidth = L.glowWidth;
         ctx.stroke();
-        ctx.strokeStyle = L.color;
+        ctx.strokeStyle = look.color;
         ctx.lineWidth = L.width;
         ctx.stroke();
-        ctx.strokeStyle = L.core;
+        ctx.strokeStyle = look.core;
         ctx.lineWidth = L.coreWidth;
         ctx.stroke();
     });
@@ -103,10 +105,11 @@ export function renderBolts() {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     state.bolts.forEach(b => {
+        const look = b.soul ? SKILLS_VISUALS.soulBolt : B;
         const speed = Math.hypot(b.vx, b.vy) || 1;
         const bx = -b.vx / speed;
         const by = -b.vy / speed;
-        ctx.fillStyle = B.mid;
+        ctx.fillStyle = look.mid;
         for (let i = 1; i <= B.trail; i++) {
             ctx.globalAlpha = 0.7 * (1 - i / (B.trail + 1));
             ctx.beginPath();
@@ -114,8 +117,8 @@ export function renderBolts() {
             ctx.fill();
         }
         ctx.globalAlpha = 1;
-        drawGlow(ctx, B.glow, b.x, b.y, B.radius * 3, 0.8);
-        ctx.fillStyle = B.core;
+        drawGlow(ctx, look.glow, b.x, b.y, B.radius * 3, 0.8);
+        ctx.fillStyle = look.core;
         ctx.beginPath();
         ctx.arc(b.x, b.y, B.radius * 0.7, 0, TAU);
         ctx.fill();
@@ -151,18 +154,29 @@ export function renderStars() {
     ctx.restore();
 }
 
-// Rastro do dash: silhuetas de sombra pelo caminho
+// Rastro do dash: silhuetas de sombra pelo caminho, com a capa esticada para trás
+// (dark: a sombra do Night Reaper correndo atrás do herói)
 export function renderDashGhosts() {
     const G = V.dashGhost;
+    const E = SKILLS_VISUALS.echo;
     ctx.save();
     state.dashGhosts.forEach(g => {
         const k = 1 - g.age / g.seconds;
+        const color = g.dark ? E.color : G.color;
+        const backX = -Math.cos(g.angle ?? 0) * G.radius * 2.6;
+        const backY = -Math.sin(g.angle ?? 0) * G.radius * 2.6;
         ctx.globalAlpha = k * 0.75;
-        ctx.fillStyle = G.color;
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.ellipse(g.x, g.y - 14, G.radius * 0.8, G.radius * 1.5, 0, 0, TAU);
         ctx.fill();
-        ctx.fillStyle = G.core;
+        ctx.beginPath();
+        ctx.moveTo(g.x - G.radius * 0.7, g.y - 24);
+        ctx.lineTo(g.x + backX, g.y - 8 + backY);
+        ctx.lineTo(g.x + G.radius * 0.7, g.y - 24);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = g.dark ? E.core : G.core;
         ctx.beginPath();
         ctx.arc(g.x, g.y - 30, G.radius * 0.5, 0, TAU);
         ctx.fill();

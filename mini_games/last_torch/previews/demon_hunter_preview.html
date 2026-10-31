@@ -10,15 +10,16 @@
     </style>
 </head>
 <body>
-    <!-- Página de desenvolvimento: tudo do herói (corrida, golpes, dash, efeitos, heróis alternativos, clone e adaga)
+    <!-- Página de desenvolvimento: tudo do herói (corrida, golpes, dash, efeitos, heróis alternativos, clone, Juramentos,
+         golpes especiais, skills dos quatro ramos e adaga)
          usando o código real do jogo. Como abrir: previews/README.md -->
-    <canvas id="gameCanvas" width="1200" height="2120"></canvas>
+    <canvas id="gameCanvas" width="1200" height="5460"></canvas>
     <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
     <script>
         if (location.protocol === 'file:') {
             const g = document.getElementById('gameCanvas').getContext('2d');
             g.fillStyle = '#050b16';
-            g.fillRect(0, 0, 1200, 2120);
+            g.fillRect(0, 0, 1200, 5460);
             g.textAlign = 'center';
             g.fillStyle = '#fbbf24';
             g.font = '600 26px system-ui, sans-serif';
@@ -34,24 +35,32 @@
         import { HEROES } from '../data_model/heroes.js';
         import { KNIFE_SKILL } from '../data_model/skills.js';
         import { HERO_25D_VISUALS } from '../data_model/visuals/characters/hero25d_visual.js';
+        import { OATH_VISUALS } from '../data_model/visuals/characters/oath_visual.js';
         import { SHADOW_CLONE_VISUALS } from '../data_model/visuals/characters/shadow_clone_visual.js';
         import { KNIFE_VISUALS as K } from '../data_model/visuals/effects/knife_visual.js';
         import { SLASH_VISUALS } from '../data_model/visuals/effects/slash_visual.js';
         import { LEVEL_UP_VISUALS } from '../data_model/visuals/effects/level_up_visual.js';
-        import { ctx, passives, player, state } from '../js/core/state.js';
+        import { ctx, passives, player, powers, state } from '../js/core/state.js';
+        import { addCracks } from '../js/systems/skills_blade.js';
+        import { renderShockwaves } from '../js/render/effects.js';
         import { renderBladeSlashes, renderKnives } from '../js/render/entities.js';
         import { drawGlow } from '../js/render/fx/glow.js';
         import { setWorldView } from '../js/render/fx/stamp.js';
+        import { getOathPalette } from '../js/render/hero_gear.js';
         import { drawDagger } from '../js/render/knife.js';
         import { renderLevelUpBack, renderLevelUpFront } from '../js/render/level_up.js';
         import { createHeroAnim, heroAnim, updateHeroAnim } from '../js/render/player.js';
         import { renderPlayer25D } from '../js/render/player25d.js';
-        import { renderDashGhosts } from '../js/render/powers.js';
+        import { renderBolts, renderDashGhosts, renderLightning } from '../js/render/powers.js';
         import { renderReflectWard } from '../js/render/reflect.js';
+        import {
+            renderCracks, renderCrescents, renderFireRing, renderMonsterCurses, renderPhoenix, renderRifts,
+            renderShield, renderSkillAuras, renderSkillHits, renderSmokes, renderWisp
+        } from '../js/render/skills.js';
 
         state.gameState = 'PLAYING';     // o herói só anima durante a partida
         const WIDTH = 1200;
-        const HEIGHT = 2120;
+        const HEIGHT = 5460;
         const start = performance.now();
         let last = start;
 
@@ -78,15 +87,61 @@
         // Ela anda de verdade, com a câmera seguindo, para a corrida, a capa e a passada funcionarem.
         function scene(opts = {}) {
             return {
-                body: { x: 0, y: 0, angle: 0, comboStep: 1, hitTime: -100000, hitDirX: 0, hitDirY: 0, iFrames: 0, reflectTimer: 0, reflectTime: -100000 },
+                body: {
+                    x: 0, y: 0, angle: 0, comboStep: 1, hitTime: -100000, hitDirX: 0, hitDirY: 0, iFrames: 0, reflectTimer: 0, reflectTime: -100000,
+                    move: null, castAge: -1, dashTimer: 0, vigilStance: false, shield: 0
+                },
                 anim: createHeroAnim(opts.throwsKnives ?? false),
                 slashes: [],
                 ghosts: [],
                 colors: HERO_25D_VISUALS.colors,
                 speed: 0,
                 heading: 0,
+                gear: null,
+                fx: createFx(),
+                levels: {},             // poderes ligados só nesta cena: { chave: nível }
+                evolved: [],
                 ...opts
             };
+        }
+
+        // Cena virada para a câmera: é de onde os golpes se leem melhor
+        function front(opts = {}) {
+            const s = scene(opts);
+            s.anim.facing = opts.facing ?? 1.15;
+            return s;
+        }
+
+        // Listas de efeitos que o jogo guarda em `state`: cada cena tem as suas
+        function createFx() {
+            return { cracks: [], shockwaves: [], crescents: [], executions: [], markBursts: [], smokes: [], rifts: [], enemies: [], bolts: [], lightning: [] };
+        }
+
+        // Liga e desliga os poderes da cena em volta do desenho
+        function withLevels(s, draw) {
+            Object.entries(s.levels).forEach(([key, lvl]) => { powers[key].lvl = lvl; });
+            s.evolved.forEach(key => { powers[key].evolved = true; });
+            draw();
+            Object.keys(s.levels).forEach(key => { powers[key].lvl = 0; });
+            s.evolved.forEach(key => { powers[key].evolved = false; });
+        }
+
+        // Efeitos andam sozinhos na prévia: idade, sumiço e voo
+        function ageFx(fx, dt) {
+            const aged = (list) => list.filter(item => (item.age += dt) < item.seconds);
+            fx.shockwaves = aged(fx.shockwaves);
+            fx.executions = aged(fx.executions);
+            fx.markBursts = aged(fx.markBursts);
+            fx.smokes = aged(fx.smokes);
+            fx.rifts = aged(fx.rifts);
+            fx.cracks = fx.cracks.filter(c => (c.life -= dt) > 0);
+            fx.crescents = fx.crescents.filter(w => {
+                w.age += dt;
+                w.x += w.vx * dt;
+                w.y += w.vy * dt;
+                return w.age < 0.6;
+            });
+            fx.lightning = fx.lightning.filter(b => (b.life -= dt) > 0);
         }
 
         function renderScene(s, dt) {
@@ -107,18 +162,52 @@
             state.frenzyActiveTimer = s.frenzy ? 1 : 0;
             state.levelUpFx = s.levelUp ?? null;
             passives.mirrorWard.lvl = s.ward ? 1 : 0;
+            ageFx(s.fx, dt);
+            Object.assign(state, s.fx);
+            state.oath = s.oath ?? null;
+            state.coreX = s.body.x;
+            state.coreY = s.body.y;
 
-            s.behind?.();
-            renderDashGhosts();
-            renderLevelUpBack();
-            renderPlayer25D(player, s.anim, s.colors);
-            renderBladeSlashes();
-            renderReflectWard();
-            renderLevelUpFront();
+            withLevels(s, () => {
+                renderCracks();
+                renderFireRing();
+                renderRifts();
+                s.behind?.(s);
+                // Monstro de mentira: só um alvo para os efeitos
+                state.enemies.forEach(e => {
+                    ctx.fillStyle = '#475569';
+                    ctx.beginPath();
+                    ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                renderMonsterCurses();
+                renderDashGhosts();
+                renderLevelUpBack();
+                renderSkillAuras();
+                renderPlayer25D(player, s.anim, s.colors, s.gear);
+                renderShield();
+                renderWisp();
+                renderBladeSlashes();
+                renderBolts();
+                renderLightning();
+                renderReflectWard();
+                renderCrescents();
+                renderSkillHits();
+                renderSmokes();
+                renderPhoenix();
+                renderShockwaves();
+                renderLevelUpFront();
+            });
             state.frenzyActiveTimer = 0;
             state.bladeSlashes = [];
             state.dashGhosts = [];
             state.levelUpFx = null;
+            state.knifeCharge = 0;
+            state.bloodlust.stacks = 0;
+            state.warCryTimer = 0;
+            state.phoenixFx = null;
+            state.oath = null;
+            Object.assign(state, createFx());
         }
 
         // Quadro de 1 cena: amplia e centraliza a câmera no herói
@@ -159,7 +248,7 @@
             ['1º golpe', scene({ before: slashEvery(1, 1) })],
             ['2º golpe', scene({ before: slashEvery(1, 2) })],
             ['3º golpe', scene({ before: slashEvery(1, 3) })],
-            ['Shadow Whirl (360°)', scene({ before: slashEvery(1, 3, true) })]
+            ['Whirlwind (360°)', scene({ before: slashEvery(1, 3, true) })]
         ];
 
         // Dash: arranque rápido, com os fantasmas que ficam para trás, e volta ao início
@@ -202,6 +291,216 @@
             speed: 120, heading: 0.5, colors: SHADOW_CLONE_VISUALS.colors,
             behind: () => drawGlow(ctx, SHADOW_CLONE_VISUALS.auraColor, player.x, player.y, SHADOW_CLONE_VISUALS.auraRadius, 1)
         });
+
+        // --- JURAMENTOS ---
+        const OATHS = [
+            ['slaughter', 'Oath of Slaughter'], ['whispers', 'Oath of Whispers'],
+            ['hearth', 'Oath of the Hearth'], ['ruin', 'Oath of Ruin']
+        ];
+        const OATH_KEYS = { slaughter: 'oathSlaughter', whispers: 'oathWhispers', hearth: 'oathHearth', ruin: 'oathRuin' };
+        const oathScene = (gear, opts) => front({ gear, oath: OATH_KEYS[gear], colors: getOathPalette(gear, HERO_25D_VISUALS.colors), ...opts });
+        const oathIdle = OATHS.map(([gear, name]) => [name, oathScene(gear, {})]);
+        const oathRun = OATHS.map(([gear, name], i) => [`${name}: correndo`, oathScene(gear, { speed: 150, heading: 0.5 + i * 1.6 })]);
+        const oathSwing = OATHS.map(([gear, name]) => [`${name}: golpe`, oathScene(gear, { before: slashEvery(0.9, 2) })]);
+
+        // --- GOLPES ESPECIAIS ---
+        // Golpe em loop com o relógio da própria cena, como em js/systems/moves.js
+        function moveLoop(kind, pause, onImpact) {
+            const { seconds, impactAt } = HERO_25D_VISUALS.moves[kind];
+            let wait = 0.4;
+            return (s, dt) => {
+                const move = s.body.move;
+                if (move) {
+                    move.age += dt;
+                    if (!move.hit && move.age >= seconds * impactAt) {
+                        move.hit = true;
+                        onImpact?.(s);
+                    }
+                    if (move.age >= seconds) {
+                        s.body.move = null;
+                        wait = pause;
+                    }
+                    return;
+                }
+                wait -= dt;
+                if (wait <= 0) s.body.move = { kind, age: 0, seconds, impactAt };
+            };
+        }
+
+        function wave(s, radius, color, width = 8, seconds = 0.4) {
+            s.fx.shockwaves.push({ x: s.body.x, y: s.body.y, radius, color, width, age: 0, seconds });
+        }
+
+        function slamImpactFx(molten) {
+            return (s) => {
+                state.cracks = s.fx.cracks;
+                addCracks(s.body.x, s.body.y, 120, molten);
+                wave(s, 110, '#e7e0cf', 12);
+                wave(s, 70, '#fb923c', 6, 0.3);
+            };
+        }
+
+        // Dash contínuo: a pose e os fantasmas, voltando ao início do quadro
+        function dashPose(s, dt) {
+            s.body.dashTimer = 1;
+            s.speed = 170;
+            s.heading = 0;
+            if (Math.random() < 0.35) s.ghosts.push({ x: s.body.x - 30, y: s.body.y, age: 0, seconds: 0.3, angle: 0 });
+            if (s.body.x > 60) {
+                s.body.x = -60;
+                s.anim.lastX = -60;
+            }
+        }
+
+        function chargeLoop(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 2;
+            state.knifeCharge = Math.min(1.2, s.clock * 0.9);
+        }
+
+        function castLoop(s, dt) {
+            s.clock = (s.clock ?? 0) + dt;
+            if (s.clock > 1) {
+                s.clock = 0;
+                s.body.castAge = 0;
+            }
+            if (s.body.castAge >= 0) s.body.castAge = s.body.castAge + dt >= HERO_25D_VISUALS.moves.cast.seconds ? -1 : s.body.castAge + dt;
+        }
+
+        const heroMoves = [
+            ['Earthbreaker: salto', front({ before: moveLoop('slam', 0.7, slamImpactFx(false)) })],
+            ['War Cry', front({ before: moveLoop('roar', 0.8, (s) => { wave(s, 110, '#ef4444', 10); wave(s, 70, '#fecaca', 5, 0.3); }) })],
+            ['Juramento: ajoelha e ergue', front({ before: moveLoop('oath', 0.8) })],
+            ['Vigil: ajoelhado', front({ before: (s) => { s.body.vigilStance = true; s.body.shield = 1; } })]
+        ];
+
+        // Quadro a quadro: o golpe congelado em instantes escolhidos (fração da animação)
+        function frozenMove(kind, k) {
+            const { seconds, impactAt } = HERO_25D_VISUALS.moves[kind];
+            return front({ before: (s) => { s.body.move = { kind, age: seconds * k, seconds, impactAt }; } });
+        }
+        const slamFrames = [[0.12, 'agacha'], [0.3, 'sobe'], [0.46, 'no alto'], [0.56, 'desce'], [0.63, 'crava'], [0.8, 'levanta']]
+            .map(([k, name]) => [name, frozenMove('slam', k)]);
+        const oathFrames = [[0.18, 'ajoelha'], [0.32, 'ajoelhado'], [0.45, 'levanta'], [0.7, 'espada erguida']]
+            .map(([k, name]) => [name, frozenMove('oath', k)]);
+        const heroMoves2 = [
+            ['Dash: corpo baixo', scene({ before: dashPose })],
+            ['Soul Lance: carregando', front({ levels: { soulLance: 5 }, before: chargeLoop })],
+            ['Feitiço: mão erguida', front({ before: castLoop })],
+            ['Earthbreaker sob Slaughter', oathScene('slaughter', { before: moveLoop('slam', 0.7, slamImpactFx(true)) })]
+        ];
+
+        // --- SKILLS DOS RAMOS ---
+        function dummy(dx, dy, extra = {}) {
+            return { x: dx, y: dy, radius: 14, hp: 1, maxHp: 1, ...extra };
+        }
+
+        function bloodlustLoop(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 3;
+            state.bloodlust.stacks = Math.ceil(s.clock / 3 * 11);
+        }
+
+        function crescentLoop(s, dt) {
+            s.clock = (s.clock ?? 0) + dt;
+            state.bloodlust.stacks = 14;
+            if (s.clock < 0.5) return;
+            s.clock = 0;
+            s.body.comboStep = s.body.comboStep === 1 ? 2 : 1;
+            s.anim.lastComboStep = s.body.comboStep === 1 ? 2 : 1;
+            s.fx.crescents.push({ x: s.body.x, y: s.body.y, angle: 0, vx: 300, vy: 0, age: 0 });
+        }
+
+        function executeLoop(s, dt) {
+            s.clock = (s.clock ?? 0) + dt;
+            if (s.clock < 0.9) return;
+            s.clock = 0;
+            s.fx.executions.push({ x: 40, y: 0, angle: 0.5, age: 0, seconds: 0.26, radius: 14 });
+        }
+
+        function markLoop(s, dt) {
+            s.clock = (s.clock ?? 0) + dt;
+            s.fx.enemies[0].marked = s.clock < 1.4 ? 1 : 0;
+            if (s.clock > 1.8) {
+                s.clock = 0;
+                s.fx.markBursts.push({ x: 44, y: 0, age: 0, seconds: 0.3, radius: 14, big: true });
+            }
+        }
+
+        function smokeLoop(s, dt) {
+            s.clock = (s.clock ?? 2) + dt;
+            if (s.clock < 2.6) return;
+            s.clock = 0;
+            s.fx.smokes.push({ x: -10, y: 0, age: 0, seconds: 2.4, radius: 78, seed: 1 });
+        }
+
+        function echoLoop(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 1.2;
+            if (s.clock < 0.3 && Math.random() < 0.6) {
+                const x = -70 + s.clock / 0.3 * 140;
+                s.ghosts.push({ x, y: 0, age: 0, seconds: 0.3, angle: 0, dark: true });
+            }
+        }
+
+        function phoenixLoop(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 2.2;
+            if (s.clock < 1.3) state.phoenixFx = { x: s.body.x, y: s.body.y, age: s.clock, seconds: 1.3 };
+        }
+
+        function wispLoop(s, dt) {
+            s.clock = (s.clock ?? 0) + dt;
+            state.wisp.x = -26 + Math.cos(s.clock * 1.7) * 6;
+            state.wisp.y = -40 + Math.sin(s.clock * 2.3) * 5;
+            state.wisp.placed = true;
+            state.wisp.flash = (s.clock % 1.2) < 0.16 ? 0.1 : 0;
+            if (s.clock % 1.2 < dt) s.fx.bolts.push({ x: state.wisp.x, y: state.wisp.y, vx: 380, vy: 40, soul: true, age: 0 });
+            s.fx.bolts = s.fx.bolts.filter(b => {
+                b.age += dt;
+                b.x += b.vx * dt;
+                b.y += b.vy * dt;
+                return b.age < 0.5;
+            });
+        }
+
+        function hexLoop(s, dt) {
+            s.clock = (s.clock ?? 0) + dt;
+            s.fx.enemies.forEach(e => { e.hexTimer = 1; });
+            if (s.clock < 1) return;
+            s.clock = 0;
+            const [a, b] = s.fx.enemies;
+            s.fx.lightning.push({ points: [{ x: a.x, y: a.y }, { x: b.x, y: b.y }], life: 0.26, maxLife: 0.26, hex: true });
+        }
+
+        function riftLoop(s, dt) {
+            s.clock = (s.clock ?? 2) + dt;
+            if (s.clock < 2) return;
+            s.clock = 0;
+            const evolved = s.evolved.length > 0;
+            s.fx.rifts.push({ x: 0, y: 0, age: 0, seconds: 1.5, radius: evolved ? 100 : 74, evolved });
+        }
+
+        const bladeFx = [
+            ['Bloodlust: fome subindo', scene({ levels: { bloodlust: 5 }, before: bloodlustLoop })],
+            ['Crimson Tide', scene({ levels: { bloodlust: 5 }, evolved: ['bloodlust'], before: crescentLoop })],
+            ['Cataclysm: rachaduras em lava', scene({ before: moveLoop('slam', 0.5, slamImpactFx(true)) })],
+            ['Executioner', front({ fx: { ...createFx(), enemies: [dummy(40, 0, { stunned: 1 })] }, before: executeLoop })]
+        ];
+        const shadowFx = [
+            ['Death Mark', scene({ fx: { ...createFx(), enemies: [dummy(44, 0)] }, before: markLoop })],
+            ['Smoke Bomb', scene({ before: smokeLoop })],
+            ['Night Reaper: sombra', scene({ before: echoLoop })],
+            ['Oath of Whispers: combate', oathScene('whispers', { fx: { ...createFx(), enemies: [dummy(44, 0, { marked: 1 })] }, before: slashEvery(0.8, 1) })]
+        ];
+        const flameFx = [
+            ['Hearth Ring', scene({ levels: { fireRing: 1 }, heading: 0 })],
+            ['Solar Wall', scene({ levels: { fireRing: 5 }, evolved: ['fireRing'] })],
+            ['Vigil: escudo', front({ before: (s) => { s.body.vigilStance = true; s.body.shield = 1; } })],
+            ['Phoenix Pact', scene({ before: phoenixLoop })]
+        ];
+        const curseFx = [
+            ['Grave Wisp', scene({ levels: { graveWisp: 1 }, before: wispLoop })],
+            ['Creeping Hex', scene({ fx: { ...createFx(), enemies: [dummy(40, -18), dummy(70, 24)] }, before: hexLoop })],
+            ['Void Rift', scene({ before: riftLoop })],
+            ['Event Horizon', scene({ levels: { voidRift: 5 }, evolved: ['voidRift'], before: riftLoop })]
+        ];
 
         function gallery(title, top, items, zoom = 2.3) {
             text(title, 24, top, 17, '#67e8f9', 700);
@@ -328,13 +627,25 @@
                 text(OCTANT_NAMES[i], 30 + i * 145, 266, 12);
             });
 
-            [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone]].forEach(([, s]) => { s.dt = dt; });
+            [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing,
+                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...flameFx, ...curseFx].forEach(([, s]) => { s.dt = dt; });
             gallery('Poses', 300, poses);
             gallery('Golpes (com a marca do corte)', 570, swings, 1.7);
             gallery('Dash, dano, nível e Mirror Ward', 840, effects, 1.9);
             gallery('Heróis e Shadow Clone', 1110, [...heroes, ['Shadow Clone', clone]], 2);
 
-            drawKnifeSection(now, 1000 + 400);
+            gallery('Juramentos: as quatro formas', 1380, oathIdle, 2.5);
+            gallery('Juramentos em movimento', 1650, oathRun, 2);
+            gallery('Juramentos em combate', 1920, oathSwing, 2);
+            gallery('Golpes especiais', 2190, heroMoves, 1.45);
+            gallery('Earthbreaker quadro a quadro', 2460, slamFrames, 1.7);
+            gallery('Juramento quadro a quadro', 2730, oathFrames, 1.8);
+            gallery('Mais poses', 3000, heroMoves2, 1.45);
+            gallery('Skills de Blade', 3270, bladeFx, 1.05);
+            gallery('Skills de Shadow', 3540, shadowFx, 1.05);
+            gallery('Skills de Flame', 3810, flameFx, 0.52);
+            gallery('Skills de Curse', 4080, curseFx, 0.82);
+            drawKnifeSection(now, 4350);
             requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);

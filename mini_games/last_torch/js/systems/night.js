@@ -34,6 +34,7 @@ export function startHour() {
     state.lastStand = false;
     state.hourHit = false;
     state.clearWaveRadius = 0;
+    state.phoenixSpent = false;
     resetFieldForNewTurn();
 
     const plan = state.hourPlan;

@@ -71,7 +71,7 @@ function createTreeView(cfg) {
             const pos = nodePosition(node);
             const info = getNodeInfo(node);
             const button = document.createElement('button');
-            button.className = `tnode tnode-${node.kind}`;
+            button.className = `tnode tnode-${node.oath ? 'oath' : node.kind}`;
             button.dataset.node = node.id;
             button.setAttribute('aria-label', info.name);
             button.style.setProperty('--x', pos.x);
@@ -118,6 +118,7 @@ function createTreeView(cfg) {
     function levelText(node, st) {
         if (node.kind === 'evolve') return st.maxed ? 'EVOLVED' : 'EVOLUTION';
         if (node.kind === 'relic') return st.maxed ? 'OWNED' : 'RELIC';
+        if (node.oath) return st.maxed ? 'SWORN' : 'OATH';
         if (node.kind === 'passive') return st.maxed ? 'LEARNED' : 'PASSIVE SKILL';
         return `Lv. ${st.level}/${st.max}`;
     }

@@ -48,6 +48,12 @@ export function createPlayerState() {
         // Dash: cargas, recarga, tempo restante do avanço e direção
         dashCharges: 0, dashRecharge: 0, dashTimer: 0, dashX: 0, dashY: 0,
         hidden: false,              // morto: o boneco some na explosão de sombra
+        // Golpe especial em andamento e feitiço saindo (js/systems/moves.js)
+        move: null, castAge: -1,
+        // De onde partiu o dash e até quando a próxima adaga é crítica (Smoke Bomb)
+        dashFromX: 0, dashFromY: 0, ambushTimer: 0,
+        // Vigil: tempo parado, postura, escudo erguido e recarga
+        stillTime: 0, vigilStance: false, shield: 0, shieldCooldown: 0,
         mouseFollow: true           // herói anda até o cursor (desliga ao usar o teclado)
     };
 }

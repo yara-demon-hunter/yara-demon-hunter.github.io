@@ -17,6 +17,7 @@ import { updatePickups } from './systems/pickups.js';
 import { updatePlayer } from './systems/player.js';
 import { updatePowers } from './systems/powers.js';
 import { updateShadowClone } from './systems/shadow_clone.js';
+import { updateSkills } from './systems/skills.js';
 import { updateSpawner } from './systems/spawner.js';
 import { updateStreak } from './systems/streak.js';
 import { updateTorch } from './systems/torch.js';
@@ -81,6 +82,7 @@ export function update(dt) {
     updateShadowClone(dt);
     updateKnives(dt);
     updatePowers(dt);
+    updateSkills(dt);
     updateSpawner(dt);
 
     updateEnemies(dt);

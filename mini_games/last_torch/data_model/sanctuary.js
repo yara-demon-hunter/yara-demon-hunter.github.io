@@ -21,6 +21,11 @@ export const ACHIEVEMENTS = [
     { id: 'countess', group: 'trophy', icon: '🧛', name: 'Sunlight', desc: 'Slay the Blood Countess.', stat: 'boss_BLOOD_COUNTESS', target: 1, hero: 'warden' },
     { id: 'dawn', group: 'trophy', icon: '🌅', name: 'Dawn', desc: 'Survive until dawn.', stat: 'victories', target: 1 },
     { id: 'darkness3', group: 'trophy', icon: '🌑', name: 'Deeper Still', desc: 'Win a night on Darkness 3.', stat: 'bestDarknessWon', target: 3 },
+    // Um troféu por Juramento: stat = maior hora alcançada sob ele (js/systems/sanctuary.js)
+    { id: 'sworn1', group: 'trophy', icon: '☠️', name: 'Blood Answers Blood', desc: 'Reach Hour 8 under the Oath of Slaughter.', stat: 'oath_oathSlaughter', target: 8 },
+    { id: 'sworn2', group: 'trophy', icon: '🤫', name: 'Never Where They Strike', desc: 'Reach Hour 8 under the Oath of Whispers.', stat: 'oath_oathWhispers', target: 8 },
+    { id: 'sworn3', group: 'trophy', icon: '🛡️', name: 'The Flame Will Not Die', desc: 'Reach Hour 8 under the Oath of the Hearth.', stat: 'oath_oathHearth', target: 8 },
+    { id: 'sworn4', group: 'trophy', icon: '📕', name: 'The Dark Pays in Kind', desc: 'Reach Hour 8 under the Oath of Ruin.', stat: 'oath_oathRuin', target: 8 },
     { id: 'hour20', group: 'trophy', icon: '♾️', name: 'Endless Dark', desc: 'Reach Hour 20 in the endless night.', stat: 'bestHour', target: 20 },
     { id: 'darkness8', group: 'trophy', icon: '👑', name: 'Lightbringer', desc: 'Win a night on Darkness 8.', stat: 'bestDarknessWon', target: 8 },
 

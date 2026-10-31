@@ -9,6 +9,7 @@ import { showBanner, showToast } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { addShockwave, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { mod } from './modifiers.js';
+import { clearSkillEffects } from './skills.js';
 
 const MIN_HORDE = 3;
 
@@ -208,6 +209,7 @@ export function resetFieldForNewTurn() {
     state.lightning.length = 0;
     state.bolts.length = 0;
     state.stars.length = 0;
+    clearSkillEffects();
     state.currentBoss = null;
     state.spawnTimer = TURN_DIFFICULTY.turnStartGraceSeconds;
 }

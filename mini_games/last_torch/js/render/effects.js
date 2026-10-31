@@ -26,9 +26,10 @@ export function renderStains() {
     ctx.globalAlpha = 1;
 }
 
-// Calor da tocha: anel fraco no chão, só visível quando o herói precisa de cura
+// Calor da tocha: anel fraco no chão, visível quando o herói precisa de cura ou quando dá bônus (Sacred Ground, Juramento)
 export function renderWarmth() {
-    if (player.hp >= player.maxHp) return;
+    const heals = player.hp < player.maxHp && mod('noWarmthHeal') <= 0;
+    if (!heals && mod('warmthDamage') <= 0 && mod('warmthBurn') <= 0) return;
     const reach = CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
     ctx.strokeStyle = J.warmth.ringColor;
     ctx.lineWidth = 1.5;

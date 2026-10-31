@@ -72,5 +72,24 @@ export const HERO_25D_VISUALS = {
     bladeWidth: 2,
     swingRadius: 7,
     swingHeight: 11.5,
-    restBladeDrop: 0.45
+    restBladeDrop: 0.45,
+
+    // Golpes especiais. seconds: duração; impactAt: fração em que o golpe acontece (js/systems/moves.js)
+    moves: {
+        // Salto do Earthbreaker: agacha, sobe com a espada erguida, desce fincando
+        slam: { seconds: 0.68, impactAt: 0.64, crouchEnd: 0.2, riseEnd: 0.46, height: 30, crouch: 4, recoverAt: 0.84 },
+        // War Cry: peito aberto, cabeça para trás, braços abertos
+        roar: { seconds: 0.72, impactAt: 0.2, leanBack: 3.4, armReach: 10.5 },
+        // Juramento: ajoelha e ergue a espada
+        oath: { seconds: 1.15, impactAt: 0.4, kneelEnd: 0.32, raiseEnd: 0.62, crouch: 5 },
+        // Feitiço: a mão livre sobe com um brilho
+        cast: { seconds: 0.34 }
+    },
+    // Dash: corpo abaixado e jogado para a frente, braços para trás
+    dashLean: 7,
+    dashCrouch: 3,
+    // Vigil: um joelho no chão, espada fincada à frente
+    vigilCrouch: 3.6,
+    // Mão da adaga carregando (Soul Lance)
+    chargeGlow: 13
 };

@@ -14,7 +14,7 @@ python3 -m http.server 8000 --directory mini_games/last_torch/standalone-build
 
 Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o herói vivo e a tocha acesa.
 
-- **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 1 ponto de skill. O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos (Blade, Shadow, Flame, Curse) com stats, poderes, efeitos, evoluções e skills passivas (Shadow Clone, Fan of Knives, Long Throw, Mirror Ward, Whirlwind, Master Thief). Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
+- **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 2 pontos de skill. O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos, um para cada jeito de jogar (Blade agressivo, Shadow técnico, Flame defensivo, Curse estratégico), com stats, poderes, efeitos, evoluções, skills passivas e um Juramento no fim de cada ramo: só um por noite, com bônus e preço, e que transforma o herói. Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
 - **Uma hora (~45 s):** fechada a cota de pontos (ou morto o boss), para de nascer monstro e o jogador mata o que sobrou. Com a tela limpa, uma onda de fogo sai da tocha, o ouro do chão voa até o herói, sobra um tempo curto para pegar os itens e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha. As horas 4, 8 e 12 têm boss.
 - **Entre partidas:** a árvore recomeça a cada noite e está toda aberta desde a primeira partida. Cada nó pede só o que aparece na árvore: nível mínimo de outras skills e, em alguns, quantos monstros de um tipo você matou na partida inteira, somando todas as horas (por exemplo, 10 Witches). A contagem só zera ao começar uma partida nova. O painel do nó mostra a lista inteira de pedidos de uma vez. O que persiste entre noites fica no **Santuário** (botão na tela inicial): troféus (marcos da jornada), façanhas (matar vários de uma vez, esquivar no último instante, terminar uma hora sem levar dano, sequências de mortes) e o bestiário, que mostra cada monstro e boss depois do primeiro abatido. Algumas conquistas liberam heróis, escolhidos na tela de escolha do herói, também na tela inicial. As moedas do jogo são só o ouro e os pontos de skill, e valem para a noite atual. Vencer abre a noite sem fim e os níveis de Escuridão.
 
@@ -62,9 +62,9 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   elites.js                       modificadores de elite
   difficulty.js                   crescimento por hora: vida, dano, spawn, cota de pontos
   night.js                        a noite: horas, hordas, presságios, Escuridão
-  skills.js                       stats, lâmina, Fúria, adaga e dash
+  skills.js                       stats, lâmina, Fúria, feitiços, adaga e dash
   powers.js                       poderes (aprendidos na árvore) e evoluções
-  passives.js                     skills passivas (type 'skill', na árvore de pontos) e relíquias (preço base em ouro), e preços do acampamento
+  passives.js                     skills passivas e Juramentos (type 'skill', na árvore de pontos), relíquias (preço base em ouro) e preços do acampamento
   tree.js                         árvore de skills: nós, ramos, posições e pontos por nível
   relics.js                       árvore de relíquias (acampamento): nós, ramos e pré-requisitos
   streak.js                       sequência de mortes
@@ -73,12 +73,12 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   sanctuary.js                    conquistas (troféus e façanhas), janela de mortes simultâneas e bestiário
   world.js                        tamanho padronizado do mundo e zoom (areaScale) por perfil desktop/mobile
   visuals/                        cores, tamanhos e ritmos das animações (arte procedural)
-    characters/                   herói e Shadow Clone
+    characters/                   herói, formas dos Juramentos (oath_visual.js) e Shadow Clone
     monsters/                     um arquivo por monstro (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, headless_knight) e sprites_visual.js (quadros dos sprites)
     bosses/                       Demon Lord e paletas de quem reaproveita arte (palettes_visual.js)
     scenery/                      cenário (forest_visual.js, torch_visual.js)
     items/gold_visual.js          ouro
-    effects/                      golpes, level up, adaga, rebate, juice_visual.js (impacto) e powers_visual.js (poderes e itens)
+    effects/                      golpes, level up, adaga, rebate, juice_visual.js (impacto), powers_visual.js (poderes e itens) e skills_visual.js (skills dos ramos)
     index.js                      reexporta tudo
 js/
   game.js                         ponto de entrada: loop do jogo e qualidade adaptativa
@@ -97,6 +97,12 @@ js/
   systems/knives.js               adaga de arremesso e Ricochet
   systems/dash.js                 dash e esquiva perfeita
   systems/powers.js               poderes do level up
+  systems/skills.js               skills dos ramos: ponto único (atualiza, limpa entre horas, cerimônia do Juramento)
+  systems/skills_blade.js         Bloodlust, Crimson Tide, Earthbreaker, Cataclysm, War Cry, Executioner
+  systems/skills_shadow.js        Death Mark, caminho do dash, Master Thief, Smoke Bomb, Night Reaper
+  systems/skills_flame.js         Hearth Ring, Solar Wall, Vigil, Backdraft, Phoenix Pact
+  systems/skills_curse.js         Grave Wisp, Creeping Hex, Void Rift, Event Horizon
+  systems/moves.js                golpes especiais do herói (salto, rugido, juramento) e gesto de feitiço
   systems/tree.js                 regras das duas árvores: nível, custo (pontos ou ouro), pré-requisitos, travas, compra
   systems/player.js               movimentação e dano no herói
   systems/torch.js                vida da tocha e calor que cura
@@ -113,11 +119,13 @@ js/
   render/entities.js              inimigos, projéteis, golpes e moedas
   render/effects.js               manchas, pedaços, ondas de choque, avisos no chão, números, amanhecer
   render/powers.js                desenho dos poderes
+  render/skills.js                desenho das skills dos ramos (rachaduras, fendas, anel de fogo, marcas, escudo...)
   render/pickups.js               itens e baús
   render/monster_sprites.js       gera os sprites dos monstros e dos tiros a partir da arte procedural
   render/moth.js, bloater.js, wraith.js, zombie_wolf.js, headless_knight.js ...   arte de cada monstro (usada para gerar os sprites)
   render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
-  render/player25d.js             herói 2.5D (padrão)
+  render/player25d.js             herói 2.5D (padrão) e posturas dos golpes especiais
+  render/hero_gear.js             equipamento e paleta dos Juramentos, peças do mesmo boneco 2.5D
   render/shadow_clone.js          Shadow Clone: herói 2.5D com paleta de sombra
   render/fx/                      glow, carimbos (stamp), sprites pequenos, atlas de números, anéis, relógio do desenho, easing, barra de vida
   ui/hud.js                       atualização do HUD
@@ -146,8 +154,8 @@ draft/                            versões anteriores mantidas como referência
 
 ## Controles
 
-- **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente (ao usar o teclado, o mouse passa a servir só para mirar). Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria). `Espaço`, `Shift` ou o botão direito dão o dash. `Esc` ou `P` pausam. `Enter` recomeça.
-- **Celular:** jogado **de lado (paisagem)**, com os dois polegares. Ao começar, o jogo entra em tela cheia e trava em paisagem (Android); onde não dá para travar (iOS), um aviso pede para virar o aparelho de lado e a partida fica pausada enquanto ele estiver em pé. O joystick (canto inferior esquerdo) move o herói. O botão menor, acima da adaga, dá o dash. O botão da adaga (canto inferior direito) mira enquanto está pressionado, com uma linha tracejada saindo do herói: sem arrastar mira no monstro mais perto; arrastando mira na direção do arraste. A adaga só é arremessada ao **soltar** o botão, uma vez, se a recarga (anel em volta do botão) já terminou. Tocar na tela não arremessa. Os ataques corpo a corpo são automáticos.
+- **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente (ao usar o teclado, o mouse passa a servir só para mirar). Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria) ou, com Soul Lance, para carregar e soltar. `Espaço`, `Shift` ou o botão direito dão o dash. `Esc` ou `P` pausam. `Enter` recomeça.
+- **Celular:** jogado **de lado (paisagem)**, com os dois polegares. Ao começar, o jogo entra em tela cheia e trava em paisagem (Android); onde não dá para travar (iOS), um aviso pede para virar o aparelho de lado e a partida fica pausada enquanto ele estiver em pé. O joystick (canto inferior esquerdo) move o herói. O botão menor, acima da adaga, dá o dash. O botão da adaga (canto inferior direito) mira enquanto está pressionado, com uma linha tracejada saindo do herói: sem arrastar mira no monstro mais perto; arrastando mira na direção do arraste. A adaga só é arremessada ao **soltar** o botão, uma vez, se a recarga (anel em volta do botão) já terminou; com Soul Lance, quanto mais tempo segurar, mais forte ela sai. Tocar na tela não arremessa. Os ataques corpo a corpo são automáticos.
 
 O jogo usa a mesma lógica e progressão em todas as telas; apenas a disposição da interface e o controle de movimento se adaptam ao dispositivo.
 

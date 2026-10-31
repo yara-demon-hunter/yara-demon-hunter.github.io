@@ -46,6 +46,12 @@ export const FRENZY_NOVA_SKILL = {
     burstKnockback: 460
 };
 
+// Feitiços: tudo que age sozinho (Flame e Curse). Custam mais pontos que os golpes da lâmina (data_model/tree.js),
+// e por isso batem mais forte que o dano da lâmina em que se baseiam.
+export const SPELL_SKILL = {
+    damageMultiplier: 1.1
+};
+
 // Faca de arremesso: golpe separado da lâmina, com recarga própria. Anda enquanto arremessa.
 export const KNIFE_SKILL = {
     cooldownSeconds: 0.9,

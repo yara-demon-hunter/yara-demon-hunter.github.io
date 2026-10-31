@@ -1,5 +1,6 @@
 import { tryDash } from '../systems/dash.js';
 import { screenToWorld } from './resize.js';
+import { mod } from '../systems/modifiers.js';
 import { audio, canvas, joystick, keys, player, state } from './state.js';
 
 const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
@@ -59,7 +60,7 @@ function setupKnifeButton() {
         stick.y = v.y;
     };
     base.addEventListener('pointerdown', (e) => {
-        if (pointerId !== null || state.gameState !== 'PLAYING') return;
+        if (pointerId !== null || state.gameState !== 'PLAYING' || mod('noKnives') > 0) return;
         pointerId = e.pointerId;
         base.setPointerCapture(e.pointerId);
         audio.init();

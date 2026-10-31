@@ -5,7 +5,7 @@ Páginas de desenvolvimento para analisar a arte com o código real do jogo. O j
 | Arquivo | O que mostra |
 |---|---|
 | `monsters_preview.html` | Todos os monstros e bosses: quatro direções, levando dano e no tamanho do jogo |
-| `demon_hunter_preview.html` | Tudo do herói: corrida, poses, golpes, dash, efeitos, os heróis alternativos, o Shadow Clone e a adaga |
+| `demon_hunter_preview.html` | Tudo do herói: corrida, poses, golpes, dash, efeitos, os heróis alternativos, o Shadow Clone, as formas dos Juramentos, os golpes especiais quadro a quadro, as skills dos quatro ramos e a adaga |
 
 ## Como abrir
 

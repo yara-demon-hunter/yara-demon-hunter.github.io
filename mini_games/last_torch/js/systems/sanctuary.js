@@ -32,6 +32,7 @@ export function pushStats() {
     stats.bestHour = Math.max(stats.bestHour, state.turn);
     stats.bestStreak = Math.max(stats.bestStreak, state.run.bestStreak);
     stats.bestScore = Math.max(stats.bestScore, state.totalScore);
+    if (state.oath) stats[`oath_${state.oath}`] = Math.max(stats[`oath_${state.oath}`] ?? 0, state.turn);
 }
 
 export function bumpStat(key, amount = 1) {

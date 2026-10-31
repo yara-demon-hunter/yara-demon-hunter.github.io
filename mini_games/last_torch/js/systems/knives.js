@@ -6,12 +6,18 @@ import { audio, joystick, passives, player, powers, state } from '../core/state.
 import { dealDamage } from './damage.js';
 import { createExplosion } from './effects.js';
 import { mod } from './modifiers.js';
+import { markEnemy } from './skills_shadow.js';
 import { getAtkDamage, getKnifeCooldown, getKnockback } from './stats.js';
 
 // --- ADAGA DE ARREMESSO (golpe separado da lâmina, com recarga própria) ---
 // Começa o arremesso na direção da mira (mouse ou dedo): a mão esquerda recua e a adaga
 // só sai no instante em que é solta (KNIFE_VISUALS.letGoFraction da animação).
 export function throwKnife(aimX, aimY) {
+    // Oath of Slaughter: a mão que lançava adagas só empunha a espada
+    if (mod('noKnives') > 0) {
+        state.knifeCharge = 0;
+        return;
+    }
     let angle = Math.atan2(aimY - player.y, aimX - player.x);
     if (Math.hypot(aimX - player.x, aimY - player.y) < 1) angle = player.angle;
 
@@ -39,9 +45,13 @@ function releaseKnife(thrower = player) {
     const ricochet = getPowerLevel(powers.ricochet);
     const lance = getPowerLevel(powers.soulLance);
     const power = state.knifeThrowPower >= POWER_MODELS.soulLance.minCharge ? state.knifeThrowPower : 0;
+    // A carga da Soul Lance se divide entre as adagas do leque
     const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0))
-        * (1 + power * (lance?.damage ?? 0));
+        * (1 + power * (lance?.damage ?? 0) / count);
     const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
+    // Smoke Bomb: a primeira adaga depois do dash é um crítico certo
+    const ambush = player.ambushTimer > 0;
+    player.ambushTimer = 0;
 
     for (let i = 0; i < count; i++) {
         const angle = aim + (i - (count - 1) / 2) * spread;
@@ -54,7 +64,8 @@ function releaseKnife(thrower = player) {
             bounces: ricochet?.bounces ?? 0,
             pierces: Math.round(power * (lance?.pierces ?? 0)),
             scale: 1 + power * (POWER_MODELS.soulLance.maxScale - 1),
-            struck: null                // monstros já atingidos por esta adaga (Ricochet)
+            struck: null,               // monstros já atingidos por esta adaga (Ricochet)
+            crit: ambush
         });
     }
 
@@ -128,7 +139,7 @@ export function updateKnives(dt) {
     const lance = getPowerLevel(powers.soulLance);
     const ready = state.knifeTimer <= 0 && state.knifePending === null;
     // Soul Lance: segurar carrega (só com a adaga pronta) em vez de repetir o arremesso
-    if (lance && ready && (held || stick.active)) state.knifeCharge = Math.min(lance.seconds, state.knifeCharge + dt);
+    if (lance && ready && (held || stick.active) && mod('noKnives') <= 0) state.knifeCharge = Math.min(lance.seconds, state.knifeCharge + dt);
 
     if (stick.active || stick.fire) aimWithStick(stick);
     if (stick.fire) {
@@ -162,7 +173,9 @@ export function updateKnives(dt) {
         const hit = enemies.find(e => e.hp > 0 && !k.struck?.has(e)
             && Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius * k.scale);
         if (hit) {
-            dealDamage(hit, k.damage, { kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
+            dealDamage(hit, k.damage, { kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback, crit: k.crit });
+            k.crit = false;
+            markEnemy(hit);
             createExplosion(k.x, k.y, hit.color, 6);
             audio.playHit(1);
             if (k.pierces > 0) {

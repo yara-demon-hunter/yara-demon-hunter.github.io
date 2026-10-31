@@ -22,6 +22,7 @@ export const JUICE_VISUALS = {
         normal: { font: '800 15px Inter, sans-serif', size: 15, color: '#f1f5f9' },
         crit: { font: '900 22px Cinzel, serif', size: 22, color: '#fde047' },
         storm: { font: '800 15px Inter, sans-serif', size: 15, color: '#bae6fd' },
+        shadow: { font: '800 15px Inter, sans-serif', size: 15, color: '#c4b5fd' },
         hurt: { font: '800 14px Inter, sans-serif', size: 14, color: '#fb7185' },
         heal: { font: '800 14px Inter, sans-serif', size: 14, color: '#86efac' },
         torch: { font: '800 14px Inter, sans-serif', size: 14, color: '#fb923c' }
@@ -54,6 +55,7 @@ export const JUICE_VISUALS = {
         ZOMBIE_WOLF: { count: 6, colors: ['#2b2744', '#a78bfa', '#0d0b17'], shape: 'shard', stain: 'rgba(20, 10, 40, 0.55)' },
         HEADLESS_KNIGHT: { count: 9, colors: ['#4f576b', '#2b3140', '#a5f3fc'], shape: 'shard', stain: 'rgba(10, 12, 20, 0.6)' },
         NECROMANCER: { count: 6, colors: ['#86efac', '#14532d', '#e7e0cf'], shape: 'bone', stain: 'rgba(6, 30, 16, 0.55)' },
+        ROCK: { count: 9, colors: ['#78716c', '#57534e', '#a8a29e'], shape: 'shard', stain: 'rgba(12, 10, 8, 0.4)' },
         HERO: { count: 20, colors: ['#07222d', '#0b2f3c', '#38bdf8', '#e8eef2'], shape: 'shard', stain: 'rgba(4, 14, 20, 0.6)' },
         BOSS: { count: 28, colors: ['#fde047', '#f97316', '#dc2626', '#f1f5f9'], shape: 'shard', stain: 'rgba(44, 6, 8, 0.7)' }
     },

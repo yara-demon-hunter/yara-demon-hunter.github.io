@@ -20,6 +20,7 @@ export function getTorchMaxHp() {
 
 export function hurtTorch(amount, x, y) {
     if (state.phase !== 'HUNT') return;
+    amount *= 1 - mod('torchGuard');
     state.coreHp = Math.max(0, state.coreHp - amount);
     shakeScreen(8);
     audio.playTorchHit();
@@ -62,7 +63,8 @@ export function updateTorch(dt) {
 
     // Calor: cura o herói que fica perto da chama
     const reach = CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
-    if (Math.hypot(player.x - state.coreX, player.y - state.coreY) < reach && player.hp < player.maxHp) {
+    const warmed = mod('noWarmthHeal') <= 0 && Math.hypot(player.x - state.coreX, player.y - state.coreY) < reach;
+    if (warmed && player.hp < player.maxHp) {
         const heal = CHARACTER_MODEL.warmthHealPerSecond * (1 + mod('warmth')) * dt;
         player.hp = Math.min(player.maxHp, player.hp + heal);
         warmthFloat += heal;
