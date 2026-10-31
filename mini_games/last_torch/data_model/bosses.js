@@ -6,13 +6,17 @@ import { createEnemy } from './monsters.js';
 // renderAs: arte reaproveitada (js/render/entities.js); palette: troca a paleta dessa arte.
 // patterns: sequência de ataques, repetida em ciclo (js/systems/boss_ai.js). Abaixo de enrageRatio de
 // vida o boss enfurece: pausas menores e mais velocidade.
+// Vida: o boss já sobe com o multiplicador de dificuldade da hora (0.65 + 0.17 por hora), então hpPerTurn fica em 0
+// e o hpBase é a vida da primeira aparição dividida por esse multiplicador. Duração alvo da luta com o dano que o
+// herói faz de fato (já descontando o tempo desviando): Demon Lord ~1 min (35/s), Blood Countess ~2 min (70/s),
+// The Long Night ~5 min (100/s). Mudou o ritmo do herói? Ajuste o hpBase na mesma proporção.
 export const BOSS_MODELS = {
     DEMON_LORD: {
         name: 'Demon Lord',
         title: 'Lord of the First Fire',
         renderAs: 'DEMON_LORD',
-        hpBase: 900,
-        hpPerTurn: 230,
+        hpBase: 1810,
+        hpPerTurn: 0,
         speedMin: 28,
         speedMax: 28,
         radius: 32,
@@ -53,8 +57,8 @@ export const BOSS_MODELS = {
         title: 'She Who Drinks the Light',
         renderAs: 'VAMPIRE',
         palette: 'countess',
-        hpBase: 2000,
-        hpPerTurn: 900,
+        hpBase: 4565,
+        hpPerTurn: 0,
         speedMin: 46,
         speedMax: 46,
         radius: 30,
@@ -90,8 +94,8 @@ export const BOSS_MODELS = {
         title: 'The Dark Itself',
         renderAs: 'DEMON_LORD',
         palette: 'longNight',
-        hpBase: 3000,
-        hpPerTurn: 1400,
+        hpBase: 11900,
+        hpPerTurn: 0,
         speedMin: 32,
         speedMax: 32,
         radius: 42,
