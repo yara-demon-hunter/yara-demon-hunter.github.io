@@ -3,7 +3,7 @@ import { audio, joystick, keys, player, state } from '../core/state.js';
 import { chargeUlt } from './combat.js';
 import { addFloater, hitStop, slowMotion } from './effects.js';
 import { bumpStat } from './sanctuary.js';
-import { onDashEnd, onDashStart, stealOnPerfectDodge, strikeDashPath } from './skills_shadow.js';
+import { leaveSmokeTrail, onDashEnd, onDashStart, stealOnPerfectDodge, strikeDashPath } from './skills_shadow.js';
 import { getDashCharges, getDashCooldown } from './stats.js';
 
 // --- DASH ---
@@ -100,6 +100,7 @@ export function moveDash(dt) {
 
     // Phantom Rush, Death Mark e Master Thief: o que o dash faz ao atravessar um monstro
     strikeDashPath();
+    leaveSmokeTrail();
     if (player.dashTimer <= 0) onDashEnd(player.dashFromX, player.dashFromY);
 }
 

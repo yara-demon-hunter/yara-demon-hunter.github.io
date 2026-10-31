@@ -19,7 +19,7 @@ export const TREE_POINTS = {
 // Pontos por nível: quanto mais habilidade o ramo exige do jogador, mais barato ele é.
 // basic = stats e efeitos simples; power = poderes; special = passivas e evoluções
 export const TREE_COSTS = {
-    shadow: { basic: 1, power: 1, special: 2 },
+    shadow: { basic: 1, power: 1, special: 1 },
     blade: { basic: 1, power: 2, special: 3 },
     flame: { basic: 1, power: 3, special: 4 },
     curse: { basic: 1, power: 3, special: 4 }
@@ -84,19 +84,17 @@ export const TREE_NODES = [
       name: 'Dagger Mastery', icon: '🔪', desc: 'Thrown daggers cut deeper.', levelText: '+15% dagger damage', mods: { knifeDamage: 0.15 } },
     { id: 'longThrow', branch: 'shadow', kind: 'passive', key: 'longThrow', x: 4, y: 0, requires: [req('daggerMastery', 2)] },
     { id: 'fanOfKnives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 5, y: 0, requires: [req('longThrow')] },
-    // Linha da técnica: marcar, carregar, sumir
+    // Linha da técnica: marcar e carregar
     { id: 'deathMark', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
     { id: 'soulLance', branch: 'shadow', kind: 'power', key: 'soulLance', x: 2, y: 1, requires: [req('deathMark', 2)] },
     { id: 'lanceEvolve', branch: 'shadow', kind: 'evolve', key: 'soulLance', x: 3, y: 1, requires: [req('soulLance', 5)] },
-    { id: 'smokeBomb', branch: 'shadow', kind: 'passive', key: 'smokeBomb', x: 4, y: 1, requires: [req('phantomDash', 2)] },
-    // Linha da esquiva
-    { id: 'fleetFoot', branch: 'shadow', kind: 'mod', x: 1, y: 2, requires: [req('moveSpeed')],
+    // Linha da esquiva: Move Speed -> Phantom Rush -> Shadow Clone -> Smoke Bomb -> Fleet Foot
+    { id: 'phantomDash', branch: 'shadow', kind: 'power', key: 'phantomDash', x: 1, y: 2, requires: [req('moveSpeed', 2)] },
+    { id: 'phantomEvolve', branch: 'shadow', kind: 'evolve', key: 'phantomDash', x: 0, y: 3, requires: [req('phantomDash', 5)] },
+    { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 2, y: 2, requires: [req('phantomDash', 2)] },
+    { id: 'smokeBomb', branch: 'shadow', kind: 'passive', key: 'smokeBomb', x: 4, y: 1, requires: [req('shadowClone')] },
+    { id: 'fleetFoot', branch: 'shadow', kind: 'mod', x: 5, y: 1, requires: [req('smokeBomb')],
       name: 'Fleet Foot', icon: '💨', desc: 'The dash recharges faster.', levelText: '-7% dash recharge', mods: { dashCooldown: 0.07 } },
-    { id: 'phantomDash', branch: 'shadow', kind: 'power', key: 'phantomDash', x: 2, y: 2, requires: [req('fleetFoot', 2)],
-      kills: { type: 'BAT', count: 15, label: 'Bats' } },
-    { id: 'phantomEvolve', branch: 'shadow', kind: 'evolve', key: 'phantomDash', x: 3, y: 2, requires: [req('phantomDash', 5)] },
-    { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 5, y: 2, requires: [req('smokeBomb')],
-      kills: { type: 'VAMPIRE', count: 8, label: 'Vampires' } },
     // Linha do ladrão
     { id: 'lightFingers', branch: 'shadow', kind: 'mod', x: 1, y: 3, requires: [req('moveSpeed')], maxLvl: 3,
       name: 'Light Fingers', icon: '🧤', desc: 'Coins and loot find their way to your hands.', levelText: '+60% pickup range', mods: { magnet: 0.6 } },
@@ -107,7 +105,7 @@ export const TREE_NODES = [
     { id: 'treasureNose', branch: 'shadow', kind: 'mod', x: 4, y: 3, requires: [req('coinRush', 2)],
       name: "Thief's Nose", icon: '👃', desc: 'You sniff out what others miss. Monsters drop items more often.', levelText: '+10% item drops', mods: { pickupRate: 0.1 } },
     { id: 'masterThief', branch: 'shadow', kind: 'passive', key: 'masterThief', x: 5, y: 3, requires: [req('treasureNose')] },
-    { id: 'oathWhispers', branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, x: 6, y: 1.5, requires: [req('fanOfKnives'), req('masterThief')] },
+    { id: 'oathWhispers', branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, cost: 5, x: 6, y: 1.5, requires: [req('fanOfKnives'), req('shadowClone')] },
 
     // --- CHAMA: o guardião. Paciência, a tocha, muralhas de fogo ---
     { id: 'torchKeeper', branch: 'flame', kind: 'mod', x: 0, y: 1.5, requires: [],

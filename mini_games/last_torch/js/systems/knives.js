@@ -49,9 +49,6 @@ function releaseKnife(thrower = player) {
     const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0))
         * (1 + power * (lance?.damage ?? 0) / count);
     const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
-    // Smoke Bomb: a primeira adaga depois do dash é um crítico certo
-    const ambush = player.ambushTimer > 0;
-    player.ambushTimer = 0;
 
     for (let i = 0; i < count; i++) {
         const angle = aim + (i - (count - 1) / 2) * spread;
@@ -64,8 +61,7 @@ function releaseKnife(thrower = player) {
             bounces: ricochet?.bounces ?? 0,
             pierces: Math.round(power * (lance?.pierces ?? 0)),
             scale: 1 + power * (POWER_MODELS.soulLance.maxScale - 1),
-            struck: null,               // monstros já atingidos por esta adaga (Ricochet)
-            crit: ambush
+            struck: null                // monstros já atingidos por esta adaga (Ricochet)
         });
     }
 
@@ -173,8 +169,7 @@ export function updateKnives(dt) {
         const hit = enemies.find(e => e.hp > 0 && !k.struck?.has(e)
             && Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius * k.scale);
         if (hit) {
-            dealDamage(hit, k.damage, { kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback, crit: k.crit });
-            k.crit = false;
+            dealDamage(hit, k.damage, { kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
             markEnemy(hit);
             createExplosion(k.x, k.y, hit.color, 6);
             audio.playHit(1);

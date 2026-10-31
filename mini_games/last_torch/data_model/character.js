@@ -50,8 +50,8 @@ export function createPlayerState() {
         hidden: false,              // morto: o boneco some na explosão de sombra
         // Golpe especial em andamento e feitiço saindo (js/systems/moves.js)
         move: null, castAge: -1,
-        // De onde partiu o dash e até quando a próxima adaga é crítica (Smoke Bomb)
-        dashFromX: 0, dashFromY: 0, ambushTimer: 0,
+        // De onde partiu o dash e onde ficou a última nuvem do rasto de fumaça (Smoke Bomb)
+        dashFromX: 0, dashFromY: 0, smokeX: 0, smokeY: 0,
         // Vigil: tempo parado, postura, escudo erguido e recarga
         stillTime: 0, vigilStance: false, shield: 0, shieldCooldown: 0,
         mouseFollow: true           // herói anda até o cursor (desliga ao usar o teclado)

@@ -31,7 +31,7 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 | Oath of Ruin | Curse | +20% dano e -12% recarga dos feitiços | -40% dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
 
 Regras: abre ao aprender **as duas skills que chegam nele** (as ligações do mapa) e fica na coluna 6, sempre na mesma posição.
-Slaughter pede Cataclysm e Executioner; Whispers, Fan of Knives e Master Thief; Hearth, Phoenix Pact e Solar Wall;
+Slaughter pede Cataclysm e Executioner; Whispers, Fan of Knives e Shadow Clone (o caminho do ouro, até Master Thief, fica de fora); Hearth, Phoenix Pact e Solar Wall;
 Ruin, Wrath of Heaven e Event Horizon. Os dados ficam em `data_model/passives.js`, e a arte
 em `data_model/visuals/characters/oath_visual.js` e `js/render/hero_gear.js`.
 
@@ -44,13 +44,15 @@ O custo vem do ramo e do tipo do nó, nunca só do fato de ser evolução. A reg
 |---|---|---|---|---|
 | Básico (stats e efeitos simples) | 1 | 1 | 1 | 1 |
 | Poder | 1 | 2 | 3 | 3 |
-| Especial (passiva, evolução, Juramento) | 2 | 3 | 4 | 4 |
+| Especial (passiva, evolução, Juramento) | 1 (Juramento: 5) | 3 | 4 | 4 |
 
 - A linha Básico é igual em todos os ramos porque 1 é o menor custo possível, e assim o primeiro ponto
   pode ser gasto em qualquer ramo.
 - Cada nível do herói dá **2 pontos** (`TREE_POINTS`). Uma noite completa rende cerca de 70 pontos, contando os baús.
   Com 1 ponto por nível, o primeiro feitiço de Flame ou Curse só viria na hora 2 ou 3.
 - O preço mais alto de Flame e Curse paga uma força maior: feitiços batem 10% acima da lâmina (`SPELL_SKILL`).
+- Em Shadow tudo custa 1, exceto o Juramento (5, via `cost` no nó): o ramo é o mais barato porque exige habilidade, e o
+  Juramento é a única decisão cara.
 - Os valores ficam em `TREE_COSTS` (`data_model/tree.js`).
 - `cost` no próprio nó sobrescreve a tabela. Use só para uma exceção justificada.
 
@@ -78,8 +80,9 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Oath of Slaughter*
 - **Shadow** (raiz: Move Speed)
   - Adagas: Ricochet, Quick Hands, Dagger Mastery, Long Throw, Fan of Knives
-  - Técnica: Death Mark*, Soul Lance, Soul Spear, Smoke Bomb*
-  - Esquiva: Fleet Foot, Phantom Rush, Night Reaper*, Shadow Clone
+  - Técnica: Death Mark*, Soul Lance, Soul Spear
+  - Esquiva: Phantom Rush, Night Reaper*, Shadow Clone, Smoke Bomb*, Fleet Foot. A cadeia é
+    Move Speed, Phantom Rush, Shadow Clone, Smoke Bomb; Night Reaper sai de Phantom Rush e Fleet Foot fecha a linha
   - Ladrão: Light Fingers, Pickpocket, Coin Rush*, Thief's Nose, Master Thief
   - Oath of Whispers*
 - **Flame** (raiz: Torch Keeper)
@@ -107,7 +110,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | War Cry | Passiva | Cercado por 5, ruge: joga longe, atordoa e dá +30% na lâmina por 4s | Braços abertos, cabeça para trás |
 | Executioner | Passiva | A lâmina termina monstros abaixo de 20% da vida (elites 10%, bosses não) | X vermelho |
 | Death Mark | Poder | A adaga marca. A lâmina detona; o dash detona mais forte e devolve a carga. Toda detonação recarrega a adaga | Mira girando, X violeta |
-| Smoke Bomb | Passiva | O dash deixa fumaça que freia monstros, e a adaga seguinte é crítico certo | Nuvem |
+| Smoke Bomb | Passiva | O dash deixa um rasto longo de fumaça por 7s: freia monstros e todo golpe que eles levam ali, de lâmina ou adaga, é crítico | Rasto de nuvens |
 | Night Reaper | Evolução | Uma sombra refaz o caminho do dash, cortando de novo | Silhueta violeta |
 | Coin Rush | Efeito | Cada moeda adianta o dash e a adaga | - |
 | Master Thief | Passiva | Atravessar monstros com o dash rouba ouro; Perfect Dodge rouba um punhado | Moedas saltando |

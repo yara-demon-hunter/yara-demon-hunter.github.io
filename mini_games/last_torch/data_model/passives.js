@@ -75,7 +75,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 70,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Every dash leaves smoke that slows monsters, and the next dagger you throw is a sure critical hit.'
+        desc: 'Every dash leaves a long trail of smoke that lingers for 7 seconds. Monsters inside it slow down, and every hit they take, from blade or dagger, is a critical hit.'
     },
     vigil: {
         name: 'Vigil',
@@ -306,13 +306,13 @@ export const EXECUTIONER = {
     furyCharge: 4
 };
 
-// Smoke Bomb: nuvem deixada no ponto de partida do dash
+// Smoke Bomb: o dash deixa um rasto de fumaça. Quem está nela anda devagar e todo golpe que recebe é crítico
 export const SMOKE_BOMB = {
-    seconds: 2.4,
-    radius: 78,
+    seconds: 7,                 // quanto tempo cada nuvem fica
+    radius: 58,
+    spacing: 34,                // distância entre uma nuvem e a seguinte ao longo do dash
     slow: 0.65,
-    maxClouds: 3,
-    ambushSeconds: 3            // tempo para a adaga crítica depois do dash
+    maxClouds: 14
 };
 
 // Master Thief: dash atravessando monstros rouba ouro (uma vez de cada monstro, por dash)

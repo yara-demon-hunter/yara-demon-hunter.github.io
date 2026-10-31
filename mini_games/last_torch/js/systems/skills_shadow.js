@@ -72,17 +72,30 @@ export function stealOnPerfectDodge() {
 }
 
 // --- SMOKE BOMB ---
-export function onDashStart(x, y) {
-    if (passives.smokeBomb.lvl <= 0) return;
+function addSmoke(x, y) {
     const { smokes } = state;
     if (smokes.length >= SMOKE_BOMB.maxClouds) smokes.shift();
     smokes.push({ x, y, age: 0, seconds: SMOKE_BOMB.seconds, radius: SMOKE_BOMB.radius, seed: Math.random() * 6 });
-    player.ambushTimer = SMOKE_BOMB.ambushSeconds;
+}
+
+export function onDashStart(x, y) {
+    if (passives.smokeBomb.lvl <= 0) return;
+    player.smokeX = x;
+    player.smokeY = y;
+    addSmoke(x, y);
     audio.playSmoke();
 }
 
+// Durante o avanço: uma nuvem a cada `spacing`, formando o rasto
+export function leaveSmokeTrail() {
+    if (passives.smokeBomb.lvl <= 0) return;
+    if (Math.hypot(player.x - player.smokeX, player.y - player.smokeY) < SMOKE_BOMB.spacing) return;
+    player.smokeX = player.x;
+    player.smokeY = player.y;
+    addSmoke(player.x, player.y);
+}
+
 function updateSmokes(dt) {
-    if (player.ambushTimer > 0) player.ambushTimer -= dt;
     const { smokes } = state;
     for (let i = smokes.length - 1; i >= 0; i--) {
         const s = smokes[i];

@@ -426,10 +426,11 @@
         }
 
         function smokeLoop(s, dt) {
-            s.clock = (s.clock ?? 2) + dt;
-            if (s.clock < 2.6) return;
+            s.clock = (s.clock ?? 7) + dt;
+            if (s.clock < 7.4) return;
             s.clock = 0;
-            s.fx.smokes.push({ x: -10, y: 0, age: 0, seconds: 2.4, radius: 78, seed: 1 });
+            // O rasto de um dash: uma nuvem a cada 34, como em js/systems/skills_shadow.js
+            for (let i = 0; i < 5; i++) s.fx.smokes.push({ x: -60 + i * 34, y: 0, age: 0, seconds: 7, radius: 58, seed: i * 1.7 });
         }
 
         function echoLoop(s, dt) {

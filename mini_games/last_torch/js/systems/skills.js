@@ -46,7 +46,8 @@ export function resetSkills() {
     player.vigilStance = false;
     player.shield = 0;
     player.shieldCooldown = 0;
-    player.ambushTimer = 0;
+    player.smokeX = 0;
+    player.smokeY = 0;
 }
 
 // --- JURAMENTO ---
