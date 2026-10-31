@@ -51,7 +51,7 @@ export const MULTI_KILL = {
 
 // --- BESTIÁRIO ---
 // A ordem é a da primeira aparição. A arte dos monstros vem dos sprites da própria partida
-// (js/render/monster_sprites.js); sem sprite pronto (bosses), vale o ícone.
+// (js/render/monster_sprites.js); sem sprite pronto (bosses têm retrato próprio, getBossPortrait), vale o ícone.
 const MONSTER_ENTRIES = [
     { key: 'SKELETON', name: 'Skeleton', icon: '💀' },
     { key: 'BAT', name: 'Bat', icon: '🦇' },

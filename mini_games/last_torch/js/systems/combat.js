@@ -78,15 +78,14 @@ export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, a
 }
 
 export function chargeUlt(amount) {
-    if (state.ultEnergy < maxUltEnergy) {
-        state.ultEnergy = Math.min(maxUltEnergy, state.ultEnergy + amount);
-        updateHUD();
+    // Com a Fúria ativa a barra mostra o tempo restante e não carrega: a próxima se ganha depois que esta acabar
+    if (state.frenzyActiveTimer > 0) return;
 
-        // Ativação Automática do Especial ao Carregar
-        if (state.ultEnergy >= maxUltEnergy && state.frenzyActiveTimer <= 0) {
-            triggerFrenzyUlt();
-        }
-    }
+    state.ultEnergy = Math.min(maxUltEnergy, state.ultEnergy + amount);
+    updateHUD();
+
+    // Ativação Automática do Especial ao Carregar
+    if (state.ultEnergy >= maxUltEnergy) triggerFrenzyUlt();
 }
 
 // Ativação Automática da Skill Frenzy Nova

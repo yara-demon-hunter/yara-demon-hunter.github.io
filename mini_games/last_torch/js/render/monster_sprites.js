@@ -1,4 +1,6 @@
+import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { MONSTER_MODELS } from '../../data_model/monsters.js';
+import { DEMON_LORD_VISUALS } from '../../data_model/visuals/bosses/demon_lord_visual.js';
 import { BAT_VISUALS } from '../../data_model/visuals/monsters/bat_visual.js';
 import { BLOATER_VISUALS } from '../../data_model/visuals/monsters/bloater_visual.js';
 import { MOTH_VISUALS } from '../../data_model/visuals/monsters/moth_visual.js';
@@ -11,11 +13,11 @@ import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js
 import { ZOMBIE_WOLF_VISUALS } from '../../data_model/visuals/monsters/zombie_wolf_visual.js';
 import { HEADLESS_KNIGHT_VISUALS } from '../../data_model/visuals/monsters/headless_knight_visual.js';
 import { WRAITH_VISUALS } from '../../data_model/visuals/monsters/wraith_visual.js';
-import { NECROMANCER_COLORS } from '../../data_model/visuals/bosses/palettes_visual.js';
+import { BOSS_PALETTES, NECROMANCER_COLORS } from '../../data_model/visuals/bosses/palettes_visual.js';
 import { ctx, setDrawTarget, state } from '../core/state.js';
 import { renderBat } from './bat.js';
 import { renderBloater } from './bloater.js';
-import { renderDemonFireball } from './demon_lord.js';
+import { renderDemonFireball, renderDemonLord } from './demon_lord.js';
 import { setRenderClock } from './fx/clock.js';
 import { drawGlow, getGlowSprite } from './fx/glow.js';
 import { makeCanvas } from './fx/sprites.js';
@@ -180,6 +182,44 @@ export function ensureMonsterSprites() {
 
 export function getMonsterSprite(type) {
     return sprites[type];
+}
+
+// --- RETRATOS DOS BOSSES ---
+// Bosses são desenhados direto em campo (animações de ataque próprias), então não há atlas. Para o
+// bestiário, um único quadro parado vira um retrato, no mesmo formato de getMonsterSprite.
+const PORTRAIT_PIXELS = 224;
+const BOSS_PORTRAITS = {
+    // extent: metade do quadro, em raios desenhados (asas e cauda do Demon Lord pedem mais espaço)
+    // shift: desloca o corpo no quadro, em frações dele, para centralizar o que a arte estende para trás
+    DEMON_LORD: { visual: DEMON_LORD_VISUALS, extent: 2.7, shift: 0.25, draw: renderDemonLord },
+    VAMPIRE: { visual: VAMPIRE_VISUALS, extent: 1.05, shift: 0.1, draw: renderVampire }
+};
+const portraits = {};
+
+function bakeBossPortrait(key) {
+    const model = BOSS_MODELS[key];
+    const { visual, extent, shift, draw } = BOSS_PORTRAITS[model.renderAs];
+    const worldSize = model.radius * visual.scale * extent * 2;
+    const pixels = PORTRAIT_PIXELS / worldSize;
+    const atlas = makeCanvas(PORTRAIT_PIXELS, PORTRAIT_PIXELS);
+    const target = atlas.getContext('2d');
+
+    const e = {
+        x: 0, y: 0, vx: 0, vy: 0, angle: 0, phase: 0,
+        hp: 1, maxHp: 1, shootTimer: 99, radius: model.radius, color: model.color, type: key,
+        baking: true
+    };
+    const previous = setDrawTarget(target);
+    target.setTransform(pixels, 0, 0, pixels, PORTRAIT_PIXELS * (0.5 + shift), PORTRAIT_PIXELS / 2);
+    withColors(visual, BOSS_PALETTES[model.palette], () => draw(e));
+    setDrawTarget(previous);
+    return { atlas, cell: PORTRAIT_PIXELS };
+}
+
+// Chave do BOSS_MODELS (DEMON_LORD, BLOOD_COUNTESS, LONG_NIGHT). Gera na primeira vez.
+export function getBossPortrait(key) {
+    if (!BOSS_MODELS[key]) return undefined;
+    return portraits[key] ??= bakeBossPortrait(key);
 }
 
 // --- PROJÉTEIS ---

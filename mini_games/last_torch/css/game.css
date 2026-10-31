@@ -1,10 +1,7 @@
 /* --- LAST TORCH: DEMON HUNTER ---
    Ponto de entrada dos estilos: importa cada arquivo por funcionalidade.
    A responsividade (mobile/paisagem) fica dentro de cada componente, em media queries no fim do arquivo. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap');
-
+@import url('./base/fonts.css');
 @import url('./base/base.css');
 @import url('./components/hud.css');
 @import url('./components/shop.css');

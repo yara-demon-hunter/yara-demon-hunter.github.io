@@ -139,7 +139,8 @@ function updateAttacks(e, model, angle, dt, distToTarget) {
     else if (!state.lastStand) raiseDead(e, model);
 }
 
-// Inchado: estoura ferindo o herói e os monstros em volta
+// Inchado: estoura ferindo o herói e os monstros em volta. O boss fica de fora: o dano é uma fração da
+// vida máxima, e dois estouros bastariam para matá-lo de vida cheia.
 function burst(e, model) {
     const X = model.explosion;
     const scale = e.radius / model.radius;
@@ -148,7 +149,7 @@ function burst(e, model) {
         hurtPlayer(X.damage * (e.damage / model.damage), e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
     }
     state.enemies.forEach(o => {
-        if (o !== e && Math.hypot(o.x - e.x, o.y - e.y) < radius + o.radius) {
+        if (o !== e && !o.isBoss && Math.hypot(o.x - e.x, o.y - e.y) < radius + o.radius) {
             const a = Math.atan2(o.y - e.y, o.x - e.x);
             dealDamage(o, o.maxHp * X.monsterDamageRatio, { kbX: Math.cos(a) * 320, kbY: Math.sin(a) * 320, noCrit: true });
         }

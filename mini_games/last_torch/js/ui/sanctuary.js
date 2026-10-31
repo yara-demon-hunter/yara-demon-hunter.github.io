@@ -2,7 +2,7 @@ import { ACHIEVEMENTS, getBestiary } from '../../data_model/sanctuary.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { save } from '../core/save.js';
 import { audio } from '../core/state.js';
-import { getMonsterSprite } from '../render/monster_sprites.js';
+import { getBossPortrait, getMonsterSprite } from '../render/monster_sprites.js';
 import { renderStartScreen } from './screens.js';
 
 // --- SANTUÁRIO (tela) ---
@@ -59,7 +59,7 @@ function renderRecords(list) {
 // Sprite pronto da partida (primeiro quadro); sem ele, o ícone
 function beastArt(info) {
     const box = el('span', 'beast-art');
-    const sprite = getMonsterSprite(info.key);
+    const sprite = info.kind === 'boss' ? getBossPortrait(info.key) : getMonsterSprite(info.key);
     if (!sprite) {
         box.textContent = info.icon;
         return box;

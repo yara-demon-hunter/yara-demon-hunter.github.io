@@ -1,0 +1,16 @@
+/* --- FONTES ---
+   Arquivos locais e variáveis (um arquivo cobre todos os pesos): o jogo não depende de rede externa nem dentro do iframe de um portal. */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+    src: url('../fonts/inter-latin.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Cinzel';
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+    src: url('../fonts/cinzel-latin.woff2') format('woff2');
+}
