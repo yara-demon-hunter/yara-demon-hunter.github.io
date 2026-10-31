@@ -68,6 +68,7 @@ export const TREE_NODES = [
     { id: 'fleetFoot', branch: 'shadow', kind: 'mod', x: 4, y: 1, requires: [req('shadowClone')],
       name: 'Fleet Foot', icon: '💨', desc: 'The dash recharges faster.', levelText: '-7% dash recharge', mods: { dashCooldown: 0.07 } },
     { id: 'fanOfKnives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 5, y: 0, requires: [req('longThrow')], cost: 3 },
+    { id: 'soulLance', branch: 'shadow', kind: 'power', key: 'soulLance', x: 5, y: 1, requires: [req('longThrow')] },
 
     // --- CHAMA ---
     { id: 'frenzyNova', branch: 'flame', kind: 'stat', key: 'frenzyNova', x: 0, y: 1, requires: [] },

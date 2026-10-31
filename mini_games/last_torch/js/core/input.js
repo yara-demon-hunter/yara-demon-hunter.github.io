@@ -48,6 +48,7 @@ function setupKnifeButton() {
         } else {
             stick.x = 0;
             stick.y = 0;
+            state.knifeCharge = 0;
         }
         knob.style.transform = 'translate(-50%, -50%)';
     };

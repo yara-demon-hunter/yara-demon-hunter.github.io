@@ -4,7 +4,7 @@ import { attributes, audio, passives, state } from '../core/state.js';
 import { getOwnedPowers } from '../systems/tree.js';
 import { skillTree } from './tree.js';
 import {
-    getAtkCooldown, getAtkDamage, getAtkRadius, getCritChance, getKnockback,
+    getAtkCooldown, getAtkDamage, getAtkRadius, getCritChance, getFrenzyDamageBonus, getFrenzyDuration, getKnockback,
     getMaxPlayerHp, getPlayerMaxSpeed, getSlashArcDegree
 } from '../systems/stats.js';
 import { getHero } from '../systems/modifiers.js';
@@ -18,7 +18,7 @@ const STAT_VALUES = {
     slashArc: () => `${getSlashArcDegree()}°`,
     atkSpeed: () => `${getAtkCooldown().toFixed(2)}s`,
     moveSpeed: () => Math.round(getPlayerMaxSpeed()),
-    frenzyNova: () => `Lv. ${attributes.frenzyNova.lvl}`,
+    frenzyNova: () => `${getFrenzyDuration().toFixed(1)}s, +${Math.round(getFrenzyDamageBonus() * 100)}% dmg`,
     playerHp: () => getMaxPlayerHp(),
     knockback: () => Math.round(getKnockback())
 };

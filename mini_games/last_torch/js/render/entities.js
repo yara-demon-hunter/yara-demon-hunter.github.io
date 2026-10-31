@@ -19,7 +19,7 @@ import { knightHeadPosition } from './headless_knight.js';
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { FAN_OF_KNIVES } from '../../data_model/passives.js';
 import { ctx, passives, player, state } from '../core/state.js';
-import { getKnifeRange } from '../systems/knives.js';
+import { getKnifeChargeRatio, getKnifeRange } from '../systems/knives.js';
 import { renderDemonLord } from './demon_lord.js';
 import { easeOutCubic } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
@@ -337,9 +337,25 @@ export function renderEnemies() {
     renderEnemyOverlays(t);
 }
 
+// Soul Lance: anel que se fecha em volta do herói enquanto a adaga carrega
+function renderKnifeCharge() {
+    const ratio = getKnifeChargeRatio();
+    if (ratio <= 0 || state.gameState !== 'PLAYING') return;
+    if (ratio >= 1) drawGlow(ctx, K.colors.glow, player.x, player.y, 46, 0.8);
+    ctx.save();
+    ctx.strokeStyle = K.colors.edge;
+    ctx.lineWidth = ratio >= 1 ? 4 : 2.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, 30, -Math.PI / 2, -Math.PI / 2 + TAU * ratio);
+    ctx.stroke();
+    ctx.restore();
+}
+
 // Mira do botão da adaga (toque): linhas tracejadas saindo do herói, uma por adaga do leque.
 // Mais apagada enquanto a adaga recarrega.
 export function renderKnifeAim() {
+    renderKnifeCharge();
     const { stick } = state.knifeInput;
     if (!stick.active || state.gameState !== 'PLAYING') return;
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
@@ -367,9 +383,9 @@ export function renderKnifeAim() {
 export function renderKnives() {
     if (state.knives.length === 0) return;
     const dagger = getDaggerSprite();
-    const width = DAGGER_LENGTH * K.flightScale;
-    const height = DAGGER_WIDTH * K.flightScale;
     for (const k of state.knives) {
+        const width = DAGGER_LENGTH * K.flightScale * k.scale;
+        const height = DAGGER_WIDTH * K.flightScale * k.scale;
         const y = k.y - K.flightHeight;
         const trail = Math.min(1, k.travelled / 40);
         const dx = Math.cos(k.angle);

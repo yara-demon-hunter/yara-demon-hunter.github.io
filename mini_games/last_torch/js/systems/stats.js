@@ -9,7 +9,7 @@ import { mod } from './modifiers.js';
 export function getAtkDamage() {
     let base = (BLADE_SKILL.baseDamage
         + (attributes.damage.lvl - 1) * BLADE_SKILL.damagePerUpgrade) * (1 + mod('damage'));
-    if (state.frenzyActiveTimer > 0) base *= 1 + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;
+    if (state.frenzyActiveTimer > 0) base *= 1 + getFrenzyDamageBonus();
     if (mod('lowHpDamage') > 0 && player.hp < player.maxHp * 0.35) base *= 1 + mod('lowHpDamage');
     return base;
 }
@@ -56,6 +56,9 @@ export function getMaxPlayerHp() {
     return Math.round((CHARACTER_MODEL.baseHp
         + (attributes.playerHp.lvl - 1) * CHARACTER_MODEL.hpPerUpgrade
         + mod('maxHpFlat')) * (1 + mod('maxHp')));
+}
+export function getFrenzyDamageBonus() {
+    return attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;
 }
 export function getFrenzyDuration() {
     return FRENZY_NOVA_SKILL.baseDurationSeconds

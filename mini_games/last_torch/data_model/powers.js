@@ -54,6 +54,21 @@ export const POWER_MODELS = {
         ],
         bounceRange: 240
     },
+    soulLance: {
+        name: 'Soul Lance', icon: '🌟', maxLvl: 5,
+        desc: 'Hold the dagger button to charge. The longer you hold, the harder it hits and the more monsters it pierces.',
+        upgrades: ['Up to +100% damage, pierces 2', '+50% charged damage', 'Pierces 3', 'Charges faster', '+100% damage, pierces 5'],
+        // seconds = tempo até a carga cheia; damage = bônus de dano na carga cheia; pierces = monstros atravessados
+        levels: [
+            { seconds: 1.2, damage: 1, pierces: 2 },
+            { seconds: 1.2, damage: 1.5, pierces: 2 },
+            { seconds: 1.2, damage: 1.5, pierces: 3 },
+            { seconds: 0.85, damage: 1.5, pierces: 3 },
+            { seconds: 0.85, damage: 2.5, pierces: 5 }
+        ],
+        minCharge: 0.25,        // abaixo desta fração é um arremesso normal (toque rápido)
+        maxScale: 1.7           // tamanho da adaga na carga cheia
+    },
     soulMagnet: {
         name: 'Soul Lure', icon: '🧲', maxLvl: 5,
         desc: 'Gold rushes to you from farther away. +7% XP per level.',

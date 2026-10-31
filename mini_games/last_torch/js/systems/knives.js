@@ -18,6 +18,8 @@ export function throwKnife(aimX, aimY) {
     state.knifeTimer = getKnifeCooldown();
     state.knifeThrowTime = performance.now();
     state.knifeThrowAngle = angle;
+    state.knifeThrowPower = getKnifeChargeRatio();
+    state.knifeCharge = 0;
     state.knifePending = K.throwSeconds * K.letGoFraction;
 }
 
@@ -35,7 +37,10 @@ function releaseKnife(thrower = player) {
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
     const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
     const ricochet = getPowerLevel(powers.ricochet);
-    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0));
+    const lance = getPowerLevel(powers.soulLance);
+    const power = state.knifeThrowPower >= POWER_MODELS.soulLance.minCharge ? state.knifeThrowPower : 0;
+    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0))
+        * (1 + power * (lance?.damage ?? 0));
     const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
 
     for (let i = 0; i < count; i++) {
@@ -47,6 +52,8 @@ function releaseKnife(thrower = player) {
             angle, speed, maxRange, damage, knockback,
             travelled: 0,
             bounces: ricochet?.bounces ?? 0,
+            pierces: Math.round(power * (lance?.pierces ?? 0)),
+            scale: 1 + power * (POWER_MODELS.soulLance.maxScale - 1),
             struck: null                // monstros já atingidos por esta adaga (Ricochet)
         });
     }
@@ -58,6 +65,12 @@ function releaseKnife(thrower = player) {
 // Alcance atual da adaga (com Long Throw)
 export function getKnifeRange() {
     return KNIFE_SKILL.maxRange * (passives.longThrow.lvl > 0 ? LONG_THROW.rangeMultiplier : 1);
+}
+
+// Soul Lance: fração da carga atual (0 a 1)
+export function getKnifeChargeRatio() {
+    const lance = getPowerLevel(powers.soulLance);
+    return lance ? Math.min(1, state.knifeCharge / lance.seconds) : 0;
 }
 
 // Botão da adaga (toque): arrastando mira na direção do arraste; sem arrastar, no monstro
@@ -111,7 +124,12 @@ export function updateKnives(dt) {
 
     // Botão da adaga (toque): segurando só mira (linha tracejada); ao soltar arremessa uma vez na
     // direção mirada, se a recarga já terminou
-    const { stick } = state.knifeInput;
+    const { stick, held, x, y } = state.knifeInput;
+    const lance = getPowerLevel(powers.soulLance);
+    const ready = state.knifeTimer <= 0 && state.knifePending === null;
+    // Soul Lance: segurar carrega (só com a adaga pronta) em vez de repetir o arremesso
+    if (lance && ready && (held || stick.active)) state.knifeCharge = Math.min(lance.seconds, state.knifeCharge + dt);
+
     if (stick.active || stick.fire) aimWithStick(stick);
     if (stick.fire) {
         stick.fire = false;
@@ -128,8 +146,11 @@ export function updateKnives(dt) {
         }
     }
 
-    const { held, x, y } = state.knifeInput;
-    if (held && state.knifeTimer <= 0 && state.knifePending === null) throwKnife(x, y);
+    if (lance) {
+        if (!held && !stick.active && state.knifeCharge > 0) throwKnife(x, y);
+    } else if (held && state.knifeTimer <= 0 && state.knifePending === null) {
+        throwKnife(x, y);
+    }
 
     const { knives, enemies } = state;
     for (let i = knives.length - 1; i >= 0; i--) {
@@ -139,12 +160,17 @@ export function updateKnives(dt) {
         k.travelled += k.speed * dt;
 
         const hit = enemies.find(e => e.hp > 0 && !k.struck?.has(e)
-            && Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius);
+            && Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius * k.scale);
         if (hit) {
             dealDamage(hit, k.damage, { kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
             createExplosion(k.x, k.y, hit.color, 6);
             audio.playHit(1);
-            if (!bounceKnife(k, hit)) knives.splice(i, 1);
+            if (k.pierces > 0) {
+                k.pierces--;
+                (k.struck ??= new Set()).add(hit);
+            } else if (!bounceKnife(k, hit)) {
+                knives.splice(i, 1);
+            }
             continue;
         }
 

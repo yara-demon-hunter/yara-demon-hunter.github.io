@@ -70,6 +70,7 @@ export function startGame() {
     state.knives = [];
     state.knifeTimer = 0;
     state.knifePending = null;
+    state.knifeCharge = 0;
     state.knifeInput.stick.fire = false;
     state.goldDrops = [];
     state.pickups = [];
