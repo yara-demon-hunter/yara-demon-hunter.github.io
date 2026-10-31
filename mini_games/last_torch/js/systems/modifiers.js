@@ -13,7 +13,8 @@ import { passives, powers, state } from '../core/state.js';
 //          gold, xp, magnet, luck, knifeDamage, knifeCooldown, furyCharge, furyDuration (segundos),
 //          dashCharges (cargas), dashCooldown, lowHpDamage, thorns (x dano da lâmina), warmth, warmthDamage,
 //          bladeDamage, spellDamage, spellHaste, stillAttack (parado), coinHaste (segundos por moeda), killHeal (pontos),
-//          provoke (distância em que os monstros largam a tocha), noWarmthHeal e noKnives (travas)
+//          provoke (distância em que os monstros largam a tocha), noWarmthHeal e noKnives (travas),
+//          killGold (ouro extra por morte)
 //   tocha: torchHp (pontos), torchRegen (pontos por segundo), torchGuard, warmthBurn (x dano de feitiço por segundo)
 //   pontos de skill: levelPoints (por nível, fração acumula), chestPoints (por baú)
 //   vida extra: revives

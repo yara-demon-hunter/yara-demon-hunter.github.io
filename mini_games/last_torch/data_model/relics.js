@@ -26,6 +26,12 @@ export const RELIC_NODES = [
     { id: 'coinPurse', branch: 'fortune', kind: 'relic', key: 'coinPurse', x: 0, y: 1, requires: [] },
     { id: 'hunterLore', branch: 'fortune', kind: 'relic', key: 'hunterLore', x: 1, y: 1, requires: [req('coinPurse')] },
     { id: 'treasureSense', branch: 'fortune', kind: 'relic', key: 'treasureSense', x: 2, y: 1, requires: [req('hunterLore')] },
+    // Mãos de ladrão: o ouro do chão vem até você, cada morte rende mais, cada moeda acelera, e o dash rouba
+    { id: 'lightFingers', branch: 'fortune', kind: 'relic', key: 'lightFingers', x: 0, y: 2, requires: [] },
+    { id: 'pickpocket', branch: 'fortune', kind: 'relic', key: 'pickpocket', x: 1, y: 2, requires: [req('lightFingers')] },
+    { id: 'coinRush', branch: 'fortune', kind: 'relic', key: 'coinRush', x: 2, y: 2, requires: [req('pickpocket')] },
+    { id: 'thiefNose', branch: 'fortune', kind: 'relic', key: 'thiefNose', x: 3, y: 2, requires: [req('coinRush')] },
+    { id: 'masterThief', branch: 'fortune', kind: 'relic', key: 'masterThief', x: 3, y: 1, requires: [req('thiefNose')] },
 
     // --- PROTEÇÃO ---
     { id: 'emberFlask', branch: 'ward', kind: 'relic', key: 'emberFlask', x: 0, y: 0, requires: [] },

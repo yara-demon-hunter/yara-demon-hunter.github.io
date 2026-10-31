@@ -55,7 +55,7 @@
 
 /* Skills: um ramo por vez, trocado pelas abas ao lado do mapa */
 .tree-tabs { grid-template-columns: auto minmax(0, 1fr) minmax(11rem, 17rem); }
-.tree-tabs .tree-map { --cell: min(100cqw / var(--tiers), 100cqh / var(--rows), 5.6rem); }
+.tree-tabs .tree-map { --cell: min(100cqw / var(--tiers), 100cqh / var(--rows-active, var(--rows)), 5.6rem); }
 .tree-tabs .tree-branch { background: none; }
 .tree-tabs .tree-branch:not(.is-active), .tree-tabs .tree-band { display: none; }
 
@@ -101,7 +101,7 @@
     .tree-tabs { grid-template-columns: minmax(0, 1fr) 17rem; }
     .tree-rail { display: none; }
     .tree-tabs .tree-map {
-        --cell: min(100cqw / (2 * var(--w) + var(--gap)), 100cqh / (2 * var(--rows) + var(--gap)), 4.6rem);
+        --cell: min(100cqw / (2 * var(--w) + var(--gap)), 100cqh / (var(--rows-sum) + var(--gap)), 4.6rem);
         display: grid;
         grid-template-columns: repeat(2, auto);
     }

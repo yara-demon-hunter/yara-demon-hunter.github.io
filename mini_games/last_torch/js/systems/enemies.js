@@ -194,7 +194,7 @@ function killEnemy(i, e, model) {
 
     // XP é direto; o ouro cai em moedas no chão
     gainXp((model.xpRewardBase + state.turn * model.xpRewardPerTurn) * (e.elite ? 5 : 1) * (1 + mod('xp')));
-    const gold = rollMonsterGold(model) * (e.elite ? 6 : 1) * (1 + mod('gold')) * (1 + getStreakGoldBonus());
+    const gold = (rollMonsterGold(model) + mod('killGold')) * (e.elite ? 6 : 1) * (1 + mod('gold')) * (1 + getStreakGoldBonus());
     dropGold(e.x, e.y, Math.max(1, Math.round(gold)));
 
     if (model.explosion) burst(e, model);

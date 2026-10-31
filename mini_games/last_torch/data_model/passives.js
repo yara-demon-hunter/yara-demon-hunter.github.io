@@ -45,14 +45,6 @@ export const PASSIVE_SKILL_MODELS = {
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'A shadow keeps watch near the torch and walks out to cut down whatever comes close. Monsters ignore it, but a stray hit can still bring it down. It returns after a while.'
     },
-    masterThief: {
-        name: 'Master Thief',
-        icon: '🦝',
-        cost: 60,
-        maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Dash through monsters to pick their pockets. A Perfect Dodge steals a fistful of gold.'
-    },
     warCry: {
         name: 'War Cry',
         icon: '📣',
@@ -146,6 +138,18 @@ export const PASSIVE_SKILL_MODELS = {
         mods: { spellDamage: 0.2, spellHaste: 0.12, bladeDamage: -0.4 }
     },
 
+    // Mãos de ladrão (ramo Fortune da árvore de relíquias)
+    lightFingers: { name: 'Light Fingers', icon: '🧤', cost: 50, maxLvl: 1, desc: 'Coins and loot leap into your hands: your pickup range doubles.', mods: { magnet: 1 } },
+    pickpocket: { name: 'Pickpocket', icon: '👛', cost: 70, maxLvl: 1, desc: 'Every monster you kill drops 2 extra gold.', mods: { killGold: 2 } },
+    coinRush: { name: 'Coin Rush', icon: '💰', cost: 80, maxLvl: 1, desc: 'Every coin you grab shaves 0.05s off your dagger and dash recharge. Gold buys speed.', mods: { coinHaste: 0.05 } },
+    thiefNose: { name: "Thief's Nose", icon: '👃', cost: 85, maxLvl: 1, desc: 'You smell what others miss: monsters drop items 60% more often.', mods: { pickupRate: 0.6 } },
+    masterThief: {
+        name: 'Master Thief',
+        icon: '🦝',
+        cost: 100,
+        maxLvl: 1,
+        desc: 'Dash through monsters to pick their pockets. A Perfect Dodge steals a fistful of gold.'
+    },
     greedyIdol: {
         name: 'Greedy Idol',
         icon: '🗿',

@@ -74,7 +74,7 @@ export const TREE_NODES = [
     { id: 'warCry', branch: 'blade', kind: 'passive', key: 'warCry', x: 4, y: 3, requires: [req('bloodEdge')] },
     { id: 'oathSlaughter', branch: 'blade', kind: 'passive', key: 'oathSlaughter', oath: true, x: 6, y: 1.5, requires: [req('executioner'), req('earthbreakerEvolve')] },
 
-    // --- SOMBRA: o ladrão. Técnica, combos, esquiva e ouro. Barato: o preço é saber jogar ---
+    // --- SOMBRA: o ladrão. Técnica, combos, esquiva e ouro. Barato: o preço é saber jogar. Cinco linhas (y de 0 a 4) ---
     { id: 'moveSpeed', branch: 'shadow', kind: 'stat', key: 'moveSpeed', x: 0, y: 1.5, requires: [] },
     // Linha das adagas
     { id: 'ricochet', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 0, requires: [req('moveSpeed')] },
@@ -88,25 +88,14 @@ export const TREE_NODES = [
     { id: 'deathMark', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
     { id: 'soulLance', branch: 'shadow', kind: 'power', key: 'soulLance', x: 2, y: 1, requires: [req('deathMark', 2)] },
     { id: 'lanceEvolve', branch: 'shadow', kind: 'evolve', key: 'soulLance', x: 3, y: 1, requires: [req('soulLance', 5)] },
-    // Linha da esquiva: Move Speed -> Phantom Rush -> Shadow Clone -> Smoke Bomb -> Fleet Foot
-    { id: 'phantomDash', branch: 'shadow', kind: 'power', key: 'phantomDash', x: 1, y: 2, requires: [req('moveSpeed', 2)] },
-    { id: 'phantomEvolve', branch: 'shadow', kind: 'evolve', key: 'phantomDash', x: 0, y: 3, requires: [req('phantomDash', 5)] },
-    { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 2, y: 2, requires: [req('phantomDash', 2)] },
-    { id: 'shadowCloneEvolve', branch: 'shadow', kind: 'evolve', key: 'shadowClone', x: 3, y: 2, requires: [req('shadowClone')] },
-    { id: 'smokeBomb', branch: 'shadow', kind: 'passive', key: 'smokeBomb', x: 4, y: 1, requires: [req('shadowClone')] },
-    { id: 'fleetFoot', branch: 'shadow', kind: 'mod', x: 5, y: 1, requires: [req('smokeBomb')],
-      name: 'Fleet Foot', icon: '💨', desc: 'The dash recharges faster.', levelText: '-7% dash recharge', mods: { dashCooldown: 0.07 } },
-    // Linha do ladrão
-    { id: 'lightFingers', branch: 'shadow', kind: 'mod', x: 1, y: 3, requires: [req('moveSpeed')], maxLvl: 3,
-      name: 'Light Fingers', icon: '🧤', desc: 'Coins and loot find their way to your hands.', levelText: '+60% pickup range', mods: { magnet: 0.6 } },
-    { id: 'pickpocket', branch: 'shadow', kind: 'mod', x: 2, y: 3, requires: [req('lightFingers')],
-      name: 'Pickpocket', icon: '👛', desc: 'Every corpse has something worth taking.', levelText: '+8% gold', mods: { gold: 0.08 } },
-    { id: 'coinRush', branch: 'shadow', kind: 'mod', x: 3, y: 3, requires: [req('pickpocket', 2)],
-      name: 'Coin Rush', icon: '💰', desc: 'Picking up coins speeds up your dash and daggers.', levelText: '-0.04s recharge per coin', mods: { coinHaste: 0.04 } },
-    { id: 'treasureNose', branch: 'shadow', kind: 'mod', x: 4, y: 3, requires: [req('coinRush', 2)],
-      name: "Thief's Nose", icon: '👃', desc: 'You sniff out what others miss. Monsters drop items more often.', levelText: '+10% item drops', mods: { pickupRate: 0.1 } },
-    { id: 'masterThief', branch: 'shadow', kind: 'passive', key: 'masterThief', x: 5, y: 3, requires: [req('treasureNose')] },
-    { id: 'oathWhispers', branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, cost: 5, x: 6, y: 1.5, requires: [req('fanOfKnives'), req('shadowCloneEvolve')] },
+    // Caminho das sombras: Move Speed -> Shadow Clone -> Shadow Legion -> Juramento
+    { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 1, y: 2, requires: [req('moveSpeed', 2)] },
+    { id: 'shadowCloneEvolve', branch: 'shadow', kind: 'evolve', key: 'shadowClone', x: 2, y: 2, requires: [req('shadowClone')] },
+    // Caminho da esquiva: Move Speed -> Phantom Rush -> Night Reaper -> Smoke Bomb -> Juramento
+    { id: 'phantomDash', branch: 'shadow', kind: 'power', key: 'phantomDash', x: 1, y: 3, requires: [req('moveSpeed', 2)] },
+    { id: 'phantomEvolve', branch: 'shadow', kind: 'evolve', key: 'phantomDash', x: 2, y: 3, requires: [req('phantomDash', 5)] },
+    { id: 'smokeBomb', branch: 'shadow', kind: 'passive', key: 'smokeBomb', x: 3, y: 3, requires: [req('phantomEvolve')] },
+    { id: 'oathWhispers', branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, cost: 5, x: 6, y: 1.5, requires: [req('shadowCloneEvolve'), req('smokeBomb')] },
 
     // --- CHAMA: o guardião. Paciência, a tocha, muralhas de fogo ---
     { id: 'torchKeeper', branch: 'flame', kind: 'mod', x: 0, y: 1.5, requires: [],

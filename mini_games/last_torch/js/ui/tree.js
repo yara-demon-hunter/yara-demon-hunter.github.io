@@ -108,6 +108,10 @@ function createTreeView(cfg) {
         map.style.setProperty('--gap', branchGap);
         map.style.setProperty('--w', labelWidth + tiers);
         map.style.setProperty('--rows', Math.max(...rows));
+        // Grade 2 x 2: a altura de cada fileira é a do maior ramo dela
+        const pairs = [];
+        for (let i = 0; i < rows.length; i += 2) pairs.push(Math.max(...rows.slice(i, i + 2)));
+        map.style.setProperty('--rows-sum', pairs.reduce((sum, n) => sum + n, 0));
         map.style.setProperty('--h', rows.reduce((sum, n) => sum + n, 0) + (branchKeys.length - 1) * branchGap);
         branchKeys.forEach(buildBranch);
         if (rail) branchKeys.forEach(buildTab);
@@ -171,6 +175,8 @@ function createTreeView(cfg) {
     }
 
     function renderBranches() {
+        // Abas: o mapa cabe só o ramo da vez, então o tamanho das células segue a altura dele
+        if (rail) map.style.setProperty('--rows-active', branchRows(activeBranch));
         blocks.forEach((block, key) => block.classList.toggle('is-active', key === activeBranch));
         tabs.forEach((tab, key) => {
             const ready = branchNodes(key).filter(node => getNodeState(node).canBuy).length;
