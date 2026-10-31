@@ -2,7 +2,7 @@ import { FAN_OF_KNIVES, LONG_THROW } from '../../data_model/passives.js';
 import { KNIFE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
-import { audio, passives, player, powers, state } from '../core/state.js';
+import { audio, joystick, passives, player, powers, state } from '../core/state.js';
 import { dealDamage } from './damage.js';
 import { createExplosion } from './effects.js';
 import { mod } from './modifiers.js';
@@ -61,9 +61,9 @@ export function getKnifeRange() {
 }
 
 // Botão da adaga (toque): arrastando mira na direção do arraste; sem arrastar, no monstro
-// mais perto dentro do alcance (ou para onde o herói está virado)
+// mais perto dentro do alcance (ou na última direção do joystick)
 function aimWithStick(stick) {
-    let angle = player.angle;
+    let angle = joystick.lastX || joystick.lastY ? Math.atan2(joystick.lastY, joystick.lastX) : player.angle;
     if (stick.x || stick.y) {
         angle = Math.atan2(stick.y, stick.x);
     } else {
