@@ -11,7 +11,7 @@ import { passives, powers, state } from '../core/state.js';
 // Chaves (0.1 = +10%, exceto onde indicado):
 //   herói: damage, maxHp, maxHpFlat (pontos), moveSpeed, attackSpeed, critChance, critDamage, damageTaken,
 //          gold, xp, magnet, luck, knifeDamage, knifeCooldown, furyCharge, furyDuration (segundos),
-//          dashCharges (cargas), dashCooldown, lowHpDamage, thorns (x dano da lâmina), warmth
+//          dashCharges (cargas), dashCooldown, lowHpDamage, thorns (x dano da lâmina), warmth, warmthDamage
 //   tocha: torchHp (pontos), torchRegen (pontos por segundo)
 //   pontos de skill: levelPoints (por nível, fração acumula), chestPoints (por baú)
 //   vida extra: revives

@@ -69,13 +69,6 @@ export const POWER_MODELS = {
         minCharge: 0.25,        // abaixo desta fração é um arremesso normal (toque rápido)
         maxScale: 1.7           // tamanho da adaga na carga cheia
     },
-    soulMagnet: {
-        name: 'Soul Lure', icon: '🧲', maxLvl: 5,
-        desc: 'Gold rushes to you from farther away. +7% XP per level.',
-        upgrades: ['+60% pickup range', '+60% pickup range', '+60% pickup range', '+60% pickup range', 'Everything comes to you'],
-        levels: [{}, {}, {}, {}, {}],
-        mods: { magnet: 0.6, xp: 0.07 }
-    },
     torchBolts: {
         name: 'Flame Sentinel', icon: '🔥', maxLvl: 5,
         desc: 'The torch itself fires at whatever comes close.',
@@ -179,6 +172,11 @@ export const EVOLUTIONS = {
         name: 'Hellwalker', icon: '☄️',
         desc: 'Great pillars of fire rise from every step you take.',
         levels: { dps: 1.3, life: 4.5, radius: 42 }
+    },
+    soulLance: {
+        name: 'Soul Spear', icon: '✨',
+        desc: 'Charges in a blink. A full charge pierces everything in its path.',
+        levels: { seconds: 0.6, damage: 3.5, pierces: 99 }
     },
     corpseBurst: {
         name: 'Red Harvest', icon: '🥀',

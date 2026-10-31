@@ -1,7 +1,7 @@
 import { CAMP } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
 import { RELIC_BY_ID } from '../../data_model/relics.js';
-import { TREE_BY_ID, TREE_NODES } from '../../data_model/tree.js';
+import { TREE_BY_ID, TREE_COSTS, TREE_NODES } from '../../data_model/tree.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, powers, state } from '../core/state.js';
 import { updateBuildStrip, updateHUD } from '../ui/hud.js';
@@ -17,7 +17,6 @@ import { syncMaxHp, syncTorchMax } from './torch.js';
 // resto do jogo continua lendo `attributes`, `powers` e `passives` como antes.
 const NODE_BY_ID = { ...TREE_BY_ID, ...RELIC_BY_ID };
 const DEFAULT_MAX = 5;
-const EVOLVE_COST = 3;
 
 export function getOwnedPowers() {
     return Object.values(powers).filter(p => p.lvl > 0);
@@ -51,7 +50,10 @@ export function getRelicPrice(node) {
 
 export function getNodeCost(node) {
     if (node.kind === 'relic') return getRelicPrice(node);
-    return node.cost ?? (node.kind === 'evolve' ? EVOLVE_COST : 1);
+    if (node.cost) return node.cost;
+    const costs = TREE_COSTS[node.branch];
+    if (node.kind === 'power') return costs.power;
+    return node.kind === 'passive' || node.kind === 'evolve' ? costs.special : costs.basic;
 }
 
 // Nome, ícone e descrição de um nó, vindos de onde ele mora

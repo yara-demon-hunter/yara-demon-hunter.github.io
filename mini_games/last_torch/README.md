@@ -1,5 +1,7 @@
 # Last Torch: Demon Hunter
 
+Conceito dos ramos de skill, formatos dos nós e regras de custo: [SKILLS.md](SKILLS.md).
+
 ## Gerar standalone version
 ```bash
 ruby mini_games/last_torch/build-standalone.rb
@@ -12,7 +14,7 @@ python3 -m http.server 8000 --directory mini_games/last_torch/standalone-build
 
 Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o herói vivo e a tocha acesa.
 
-- **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 1 ponto de skill. O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos (Blade, Shadow, Flame, Curse) com stats, poderes, efeitos, evoluções e skills passivas (Shadow Clone, Fan of Knives, Long Throw, Mirror Ward, Shadow Whirl). Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
+- **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 1 ponto de skill. O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos (Blade, Shadow, Flame, Curse) com stats, poderes, efeitos, evoluções e skills passivas (Shadow Clone, Fan of Knives, Long Throw, Mirror Ward, Whirlwind, Master Thief). Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
 - **Uma hora (~45 s):** fechada a cota de pontos (ou morto o boss), para de nascer monstro e o jogador mata o que sobrou. Com a tela limpa, uma onda de fogo sai da tocha, o ouro do chão voa até o herói, sobra um tempo curto para pegar os itens e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha. As horas 4, 8 e 12 têm boss.
 - **Entre partidas:** a árvore recomeça a cada noite e está toda aberta desde a primeira partida. Cada nó pede só o que aparece na árvore: nível mínimo de outras skills e, em alguns, quantos monstros de um tipo você matou na partida inteira, somando todas as horas (por exemplo, 10 Witches). A contagem só zera ao começar uma partida nova. O painel do nó mostra a lista inteira de pedidos de uma vez. O que persiste entre noites fica no **Santuário** (botão na tela inicial): troféus (marcos da jornada), façanhas (matar vários de uma vez, esquivar no último instante, terminar uma hora sem levar dano, sequências de mortes) e o bestiário, que mostra cada monstro e boss depois do primeiro abatido. Algumas conquistas liberam heróis, escolhidos na tela de escolha do herói, também na tela inicial. As moedas do jogo são só o ouro e os pontos de skill, e valem para a noite atual. Vencer abre a noite sem fim e os níveis de Escuridão.
 

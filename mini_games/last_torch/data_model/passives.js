@@ -6,7 +6,7 @@
 
 export const PASSIVE_SKILL_MODELS = {
     shadowWhirl: {
-        name: 'Shadow Whirl',
+        name: 'Whirlwind',
         icon: '🌀',
         cost: 80,
         maxLvl: 1,
@@ -44,6 +44,15 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'A shadow reflection walks with you and slashes any monster that enters its own circle. If it falls, it returns after a while.'
+    },
+    masterThief: {
+        name: 'Master Thief',
+        icon: '🦝',
+        cost: 60,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'Every Perfect Dodge steals a handful of gold.',
+        gold: 12
     },
     greedyIdol: {
         name: 'Greedy Idol',

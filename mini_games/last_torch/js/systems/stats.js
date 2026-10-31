@@ -11,6 +11,9 @@ export function getAtkDamage() {
         + (attributes.damage.lvl - 1) * BLADE_SKILL.damagePerUpgrade) * (1 + mod('damage'));
     if (state.frenzyActiveTimer > 0) base *= 1 + getFrenzyDamageBonus();
     if (mod('lowHpDamage') > 0 && player.hp < player.maxHp * 0.35) base *= 1 + mod('lowHpDamage');
+    if (mod('warmthDamage') > 0 && Math.hypot(player.x - state.coreX, player.y - state.coreY) < getWarmthRadius()) {
+        base *= 1 + mod('warmthDamage');
+    }
     return base;
 }
 export function getCritChance() {
@@ -56,6 +59,9 @@ export function getMaxPlayerHp() {
     return Math.round((CHARACTER_MODEL.baseHp
         + (attributes.playerHp.lvl - 1) * CHARACTER_MODEL.hpPerUpgrade
         + mod('maxHpFlat')) * (1 + mod('maxHp')));
+}
+function getWarmthRadius() {
+    return CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
 }
 export function getFrenzyDamageBonus() {
     return attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;

@@ -144,6 +144,7 @@ function createTreeView(cfg) {
             detail('Name').textContent = cfg.emptyTitle;
             detail('Level').textContent = '';
             detail('Desc').textContent = cfg.emptyHint;
+            if (detail('Branch')) detail('Branch').textContent = '';
             detail('Next').textContent = '';
             detail('Note').replaceChildren();
             buy.classList.add('hidden');
@@ -156,13 +157,15 @@ function createTreeView(cfg) {
         detail('Name').textContent = info.name;
         detail('Level').textContent = levelText(node, st);
         detail('Desc').textContent = info.desc;
+        if (detail('Branch')) detail('Branch').textContent = branches[node.branch].style;
         detail('Next').textContent = next ? `Next: ${next}` : '';
         renderNote(st);
         buy.classList.toggle('hidden', st.maxed);
         buy.disabled = !st.canBuy;
         const symbol = st.currency === 'gold' ? '🪙' : '⚡';
         const verb = st.currency === 'gold' ? 'BUY' : 'LEARN';
-        buy.textContent = st.open ? `${verb}  ${symbol} ${st.cost}` : 'LOCKED';
+        // Bloqueado também mostra o custo, para dar para planejar
+        buy.textContent = `${st.open ? verb : 'LOCKED'}  ${symbol} ${st.cost}`;
         buy.classList.toggle('is-short', st.open && !st.canBuy);
     }
 

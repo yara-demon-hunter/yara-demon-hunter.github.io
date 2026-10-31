@@ -137,7 +137,8 @@
     color: #e2e8f0;
     transition: transform 0.12s, border-color 0.12s;
 }
-.tnode-power { border-radius: 50%; }
+/* Formato = tipo: quadrado sobe de nível, círculo é compra única, losango é evolução (SKILLS.md) */
+.tnode-passive, .tnode-relic { border-radius: 50%; }
 /* O losango da evolução é menor para a ponta não passar da célula */
 .tnode-evolve {
     width: calc(var(--cell) * 0.62);
@@ -192,6 +193,10 @@
 .tnode-evolve.is-chained::after { right: auto; left: -0.1rem; top: -0.1rem; transform: rotate(-45deg); }
 .tnode.is-selected { border-color: #fff; }
 .tnode:not(.tnode-evolve):hover { transform: translate(-50%, -50%) scale(1.07); }
+
+.tdetail-branch { color: #94a3b8; font-size: 0.66rem; line-height: 1.3; font-style: italic; }
+.tdetail-branch:empty { display: none; }
+.tdetail-legend { color: #64748b; font-size: 0.6rem; line-height: 1.3; white-space: nowrap; }
 
 /* Detalhe do nó selecionado: coluna ao lado do mapa, com a compra sempre no mesmo lugar */
 .tree-detail {
@@ -257,4 +262,6 @@
     .tdetail-name > em { font-size: 0.58rem; }
     .tdetail-text > span { font-size: 0.64rem; line-height: 1.25; }
     .tdetail-buy { min-height: 2.3rem; font-size: 0.74rem; }
+    .tdetail-branch { display: none; }
+    .tdetail-legend { font-size: 0.5rem; }
 }
