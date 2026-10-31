@@ -27,13 +27,13 @@ FileUtils.rm_rf(build_output) if build_output.exist?
 FileUtils.mkdir_p(build_output)
 FileUtils.cp(site_output, build_output.join("index.html"))
 
-%w[js css images audio].each do |directory|
+%w[js css images audio scenes].each do |directory|
   FileUtils.cp_r(source_game.join(directory), build_output.join(directory))
 end
 
 # Keep documentation and site-only styles out of the upload package.
 Dir.glob(build_output.join("**/*.md")).each { |path| FileUtils.rm_f(path) }
-%w[css/game.css css/embedded-rpg.css images/cover.webp].each do |path|
+%w[css/game.css css/embedded-rpg.css images/cover.webp scenes/preview.html].each do |path|
   FileUtils.rm_f(build_output.join(path))
 end
 

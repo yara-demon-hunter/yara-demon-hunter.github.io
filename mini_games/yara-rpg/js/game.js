@@ -253,6 +253,19 @@ function startAdventure({ character, equipment }) {
     startGameMusic();
 }
 
+// A abertura roda antes da jornada, para o sino tocar sozinho e a música entrar depois.
+function playOpeningScene(choice) {
+    if (!window.YaraScenes) {
+        startAdventure(choice);
+        return;
+    }
+    window.YaraScenes.play('bell-too-late', {
+        fullscreen: true,
+        language: gameLanguage,
+        onEnd: () => startAdventure(choice),
+    });
+}
+
 function checkLevelUp() {
     while (hero.xp >= hero.maxXp) {
         const growth = selectedCharacterProgression;
@@ -297,7 +310,7 @@ window.onload = function () {
         translate: t,
         describeEquipment: getItemBonusText,
         isUnlocked: isCharacterUnlocked,
-        onStart: startAdventure,
+        onStart: playOpeningScene,
     });
     showContinueOption();
     document.getElementById("continue-adventure-button").addEventListener("click", () => loadSavedGame());

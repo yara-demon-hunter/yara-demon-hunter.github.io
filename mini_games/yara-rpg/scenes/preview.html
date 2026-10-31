@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cenas do Yara RPG</title>
+    <link rel="stylesheet" href="../css/fonts.css">
+    <link rel="stylesheet" href="scenes.css">
+    <style>
+        body { margin: 0; padding: 1rem; background: #0c0d0f; color: #e7e0cf; font-family: 'Inter', system-ui, sans-serif; }
+        main { max-width: 960px; margin: 0 auto; }
+        h1 { margin: 0 0 .75rem; color: #e5b956; font-family: 'Cinzel', Georgia, serif; font-size: 1.3rem; }
+        #stage { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid #3a3425; border-radius: .6rem; background: #05070a; }
+        .controls { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+        select, button { padding: .45rem .8rem; border: 1px solid #5c5137; border-radius: .5rem; background: #17191f; color: inherit; font: inherit; }
+        button { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Cenas do Yara RPG</h1>
+        <div id="stage"></div>
+        <div class="controls">
+            <select id="scene" aria-label="Cena"></select>
+            <select id="language" aria-label="Idioma"><option value="pt">PT</option><option value="en">EN</option></select>
+            <button id="play" type="button">▶ Tocar</button>
+        </div>
+    </main>
+    <script src="engine.js"></script>
+    <!-- Cena nova: acrescente o script dela aqui. -->
+    <script src="library/bell-too-late.js"></script>
+    <script>
+        // ?scene=id&t=5 congela um instante, útil para revisar a arte.
+        const params = new URLSearchParams(location.search);
+        const stage = document.getElementById('stage');
+        const sceneSelect = document.getElementById('scene');
+        const languageSelect = document.getElementById('language');
+        let current = null;
+
+        YaraScenes.list().forEach((scene) => sceneSelect.add(new Option(scene.title.pt, scene.id)));
+        if (params.get('scene')) sceneSelect.value = params.get('scene');
+        if (params.get('lang')) languageSelect.value = params.get('lang');
+
+        function start(options = {}) {
+            current?.stop();
+            stage.replaceChildren();
+            current = YaraScenes.play(sceneSelect.value, { container: stage, language: languageSelect.value, ...options });
+        }
+
+        document.getElementById('play').addEventListener('click', () => start());
+        start({ frozenAt: params.has('t') ? Number(params.get('t')) : 4.2 });
+    </script>
+</body>
+</html>
