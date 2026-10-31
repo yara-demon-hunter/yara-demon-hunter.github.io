@@ -4,7 +4,7 @@ title: Atualizações do Projeto
 lang: pt
 translation_id: updates
 description: Acompanhe novidades, mudanças e novas páginas do projeto Yara, Caçadora de Demônios.
-last_updated: 2026-10-12
+last_updated: 2026-10-31
 hide_recent_updates: true
 ---
 

@@ -4,7 +4,7 @@ title: Gudran's Village
 lang: en
 book_id: book-1
 translation_id: location-gudran-village
-last_updated: 2026-09-27
+last_updated: 2026-10-31
 location:
   name: Gudran's Village
   alternate_name: Village of the Blue Flames
@@ -41,3 +41,9 @@ The forest is part of everyday life, but it is not safe. The weather can turn, t
 Everyone knows to respect the bell. When it sounds, those working in the forest are expected to return. Lord Gudran's orders forbid anyone from entering the woods after the bell has rung.
 
 For the people of the village, the bell marks the boundary between the work of the day and the dangers waiting in the forest after dark.
+
+## The blue torches
+
+The village is also known for its blue-flamed torches, and its people speak of magic torches for walking into the dark. In [Yara, Demon Hunter: Lost in the Mist - Mini RPG]({{ '/en/mini-games/yara-rpg/' | relative_url }}) this place appears as the Village of Blue Torches, where the streets are too quiet and signs of invaders still mark the walls.
+
+![The Village of Blue Torches in the mini RPG]({{ '/mini_games/yara-rpg/images/regions/blue-torch-village.webp' | relative_url }})

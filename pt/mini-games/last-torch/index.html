@@ -1,0 +1,165 @@
+---
+layout: default
+title: "Last Torch: Demon Hunter - Jogo grátis de sobrevivência no navegador"
+description: "Veja Last Torch em ação: partida real, todos os monstros e chefes, os golpes do caçador, a noite de 12 horas e os heróis para liberar. Grátis no navegador."
+lang: pt
+translation_id: last-torch-guide
+mini_games_hub: true
+hide_recent_updates: true
+last_updated: 2026-10-31
+image: /assets/images/common/mini-game/last_torch_cover.jpeg
+permalink: /pt/mini-games/last-torch/
+---
+
+{% assign art = '/assets/images/common/mini-game/last_torch/' | relative_url %}
+{% assign play = '/mini_games/last_torch/last_torch.html' | relative_url %}
+
+<article class="game-guide">
+    <header class="game-guide__hero">
+        <figure class="game-guide__cover">
+            <img src="{{ art }}cover.webp" alt="O Demon Hunter protege uma tocha na floresta sombria enquanto bruxas o cercam" width="1280" height="720">
+        </figure>
+        <p class="section-label">Mini game · Ação</p>
+        <h1>Last Torch: Demon Hunter</h1>
+        <p class="game-guide__lead">
+            Um caçador, uma chama e doze horas de escuridão. Mantenha você e a tocha vivos até o amanhecer.
+            Um jogo derivado de <a href="{{ '/pt/books/book-1/' | relative_url }}">Yara, Caçadora de Demônios</a>.
+        </p>
+        <div class="game-guide__actions">
+            <a class="mini-game-card__button" href="{{ play }}">Jogar agora</a>
+            <a class="game-guide__ghost" href="{{ '/pt/mini-games/' | relative_url }}">Todos os mini games</a>
+        </div>
+        <dl class="game-guide__facts">
+            <div><dt>Gênero</dt><dd>Ação roguelite</dd></div>
+            <div><dt>Uma noite</dt><dd>12 horas, 3 chefes</dd></div>
+            <div><dt>Onde jogar</dt><dd>Computador ou celular</dd></div>
+            <div><dt>Texto do jogo</dt><dd>Inglês</dd></div>
+        </dl>
+    </header>
+
+    <nav class="game-guide__toc" aria-label="Conteúdo da página">
+        <a href="#partida">Partida</a>
+        <a href="#noite">A noite</a>
+        <a href="#cacador">O caçador</a>
+        <a href="#monstros">Monstros</a>
+        <a href="#chefes">Chefes</a>
+        <a href="#habilidades">Habilidades</a>
+        <a href="#herois">Heróis</a>
+        <a href="#controles">Controles</a>
+    </nav>
+
+    <section id="partida" class="game-guide__section">
+        <h2>Veja o jogo em ação</h2>
+        <figure class="game-clip game-clip--wide">
+            <video autoplay muted loop playsinline preload="metadata" poster="{{ art }}gameplay.webp" aria-label="O caçador circula a tocha enquanto os monstros se aproximam">
+                <source src="{{ art }}gameplay.mp4" type="video/mp4">
+            </video>
+            <figcaption>Hora 7: o caçador defende a chama enquanto a floresta se fecha.</figcaption>
+        </figure>
+    </section>
+
+    <section id="noite" class="game-guide__section">
+        <h2>Como funciona uma noite</h2>
+        <ol class="game-guide__steps game-guide__steps--cards">
+            <li><strong>Caçada</strong> Mate monstros por XP, ouro e a cota da hora.</li>
+            <li><strong>Últimos monstros</strong> Cota fechada? Limpe a tela para encerrar a hora.</li>
+            <li><strong>Acampamento</strong> Compre relíquias, alimente a tocha ou descanse.</li>
+            <li><strong>Sobreviva</strong> Há chefes nas horas 4, 8 e 12. Depois, o amanhecer.</li>
+        </ol>
+        <p>Você perde se o caçador <em>ou</em> a tocha morrer, então nunca dá para simplesmente fugir.</p>
+    </section>
+
+    <section id="cacador" class="game-guide__section">
+        <h2>Os golpes do caçador</h2>
+        <div class="game-guide__gallery">
+            <figure><img src="{{ art }}hero-slash.webp" alt="Animação do combo de lâmina" width="200" height="200" loading="lazy"><figcaption><strong>Lâmina</strong> Ataca sozinha</figcaption></figure>
+            <figure><img src="{{ art }}hero-whirl.webp" alt="Animação do Shadow Whirl" width="200" height="200" loading="lazy"><figcaption><strong>Shadow Whirl</strong> Giro de 360°</figcaption></figure>
+            <figure><img src="{{ art }}hero-dash.webp" alt="Animação do dash" width="200" height="200" loading="lazy"><figcaption><strong>Dash</strong> Intocável por um instante</figcaption></figure>
+            <figure><img src="{{ art }}hero-fury.webp" alt="Animação da Fúria" width="200" height="200" loading="lazy"><figcaption><strong>Fúria</strong> Dispara com a barra cheia</figcaption></figure>
+            <figure><img src="{{ art }}hero-levelup.webp" alt="Animação de subida de nível" width="200" height="200" loading="lazy"><figcaption><strong>Subir de nível</strong> Um ponto de habilidade</figcaption></figure>
+            <figure><img src="{{ art }}hero-clone.webp" alt="Animação do Shadow Clone" width="200" height="200" loading="lazy"><figcaption><strong>Shadow Clone</strong> Uma segunda lâmina</figcaption></figure>
+        </div>
+    </section>
+
+    <section id="monstros" class="game-guide__section">
+        <h2>Monstros da floresta</h2>
+        <div class="game-guide__bestiary">
+            <article class="bestiary-card"><img src="{{ art }}skeleton.webp" alt="Esqueleto andando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 1</p><h3>Esqueleto</h3><p>Comum, e pode brotar do chão.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}bat.webp" alt="Morcego voando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 1</p><h3>Morcego</h3><p>Rápido, frágil e mortal em círculos.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}vampire.webp" alt="Vampiro andando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 2</p><h3>Vampiro</h3><p>Vira dois morcegos ao morrer.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}witch.webp" alt="Bruxa lançando feitiço" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 3</p><h3>Bruxa</h3><p>Ataca de longe. Use a adaga.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}zombie-wolf.webp" alt="Lobo Zumbi correndo" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 4</p><h3>Lobo Zumbi</h3><p>Matilhas que avançam em linha reta.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}moth.webp" alt="Mariposa voando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 5</p><h3>Mariposa</h3><p>Ignora você e voa para a chama.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}bloater.webp" alt="Inchado andando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 6</p><h3>Inchado</h3><p>Explode. Estoure no meio da multidão.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}wraith.webp" alt="Espectro flutuando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 7</p><h3>Espectro</h3><p>Mira e dispara para a frente. Dash!</p></article>
+            <article class="bestiary-card"><img src="{{ art }}headless-knight.webp" alt="Cavaleiro Sem Cabeça marchando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 8</p><h3>Cavaleiro Sem Cabeça</h3><p>Tanque cuja cabeça flutuante atira.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}necromancer.webp" alt="Necromante lançando feitiço" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 9</p><h3>Necromante</h3><p>Levanta esqueletos até você alcançá-lo.</p></article>
+        </div>
+        <p><strong>Elites:</strong> a partir da Hora 2, monstros Brute, Swift e Blazing chegam com aura colorida e soltam baús cheios de pontos de habilidade.</p>
+    </section>
+
+    <section id="chefes" class="game-guide__section">
+        <h2>Chefes</h2>
+        <div class="game-guide__clips">
+            <figure class="game-clip">
+                <video autoplay muted loop playsinline preload="metadata" poster="{{ art }}demon-lord-fight.webp" aria-label="Luta contra o Demon Lord">
+                    <source src="{{ art }}demon-lord-fight.mp4" type="video/mp4">
+                </video>
+                <figcaption>Demon Lord: bolas de fogo e chão marcado.</figcaption>
+            </figure>
+            <figure class="game-clip">
+                <video autoplay muted loop playsinline preload="metadata" poster="{{ art }}blood-countess-fight.webp" aria-label="Luta contra a Blood Countess">
+                    <source src="{{ art }}blood-countess-fight.mp4" type="video/mp4">
+                </video>
+                <figcaption>Blood Countess: teleportes e espirais de sangue.</figcaption>
+            </figure>
+        </div>
+        <div class="game-guide__bosses">
+            <article class="boss-card"><img src="{{ art }}demon-lord.webp" alt="Demon Lord" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Hora 4</p><h3>Demon Lord</h3><p class="boss-card__title">Lord of the First Fire</p></div></article>
+            <article class="boss-card"><img src="{{ art }}blood-countess.webp" alt="Blood Countess" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Hora 8</p><h3>Blood Countess</h3><p class="boss-card__title">She Who Drinks the Light</p></div></article>
+            <article class="boss-card"><img src="{{ art }}long-night.webp" alt="The Long Night" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Hora 12</p><h3>The Long Night</h3><p class="boss-card__title">The Dark Itself</p></div></article>
+        </div>
+    </section>
+
+    <section id="habilidades" class="game-guide__section">
+        <h2>Habilidades, relíquias e presságios</h2>
+        <div class="game-guide__columns game-guide__columns--four">
+            <div class="game-guide__panel"><h3>Blade</h3><p>Força da lâmina, Spectral Blades e Corpse Burst.</p></div>
+            <div class="game-guide__panel"><h3>Shadow</h3><p>Velocidade, adagas, Fan of Knives e Shadow Clone.</p></div>
+            <div class="game-guide__panel"><h3>Flame</h3><p>Fúria, vida e uma tocha que revida.</p></div>
+            <div class="game-guide__panel"><h3>Curse</h3><p>XP, ouro, Storm Sigil e Starfall.</p></div>
+        </div>
+        <p>
+            A árvore de habilidades recomeça a cada noite. Poderes no máximo podem evoluir, como Spectral Blades em
+            <strong>Blade Tempest</strong> ou Flame Sentinel em <strong>Sun Spire</strong>. No acampamento, o ouro compra 22 relíquias,
+            e a partir da Hora 3 presságios como <strong>Blood Moon</strong> trocam mais perigo por mais recompensa.
+        </p>
+    </section>
+
+    <section id="herois" class="game-guide__section">
+        <h2>Quatro caçadores para liberar</h2>
+        <div class="game-guide__gallery game-guide__gallery--four">
+            <figure><img src="{{ art }}hero-hunter.webp" alt="Demon Hunter" width="200" height="200" loading="lazy"><figcaption><strong>Demon Hunter</strong> Equilibrado, desde o início</figcaption></figure>
+            <figure><img src="{{ art }}hero-reaver.webp" alt="Ash Reaver" width="200" height="200" loading="lazy"><figcaption><strong>Ash Reaver</strong> Mate o Demon Lord</figcaption></figure>
+            <figure><img src="{{ art }}hero-warden.webp" alt="Torch Warden" width="200" height="200" loading="lazy"><figcaption><strong>Torch Warden</strong> Mate a Blood Countess</figcaption></figure>
+            <figure><img src="{{ art }}hero-shade.webp" alt="The Shade" width="200" height="200" loading="lazy"><figcaption><strong>The Shade</strong> Faça 70 mortes em sequência</figcaption></figure>
+        </div>
+        <p>Vencer abre a noite sem fim e oito níveis de Escuridão. Troféus, façanhas e bestiário ficam guardados no Santuário.</p>
+    </section>
+
+    <section id="controles" class="game-guide__section game-guide__section--last">
+        <h2>Controles</h2>
+        <div class="game-guide__columns">
+            <div class="game-guide__panel">
+                <h3>Computador</h3>
+                <p>Mova com o mouse ou WASD. O botão esquerdo arremessa adagas. Espaço, Shift ou botão direito dão o dash.</p>
+            </div>
+            <div class="game-guide__panel">
+                <h3>Celular</h3>
+                <p>Deite o aparelho. Joystick para mover. Segure o botão da adaga para mirar e solte para arremessar.</p>
+            </div>
+        </div>
+        <p>Grátis, sem instalar nada, e o progresso fica salvo no seu navegador.</p>
+        <a class="mini-game-card__button" href="{{ play }}">Jogar agora</a>
+    </section>
+</article>

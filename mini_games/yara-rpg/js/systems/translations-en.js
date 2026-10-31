@@ -8,7 +8,7 @@ window.YaraRpgTranslations.en = {
         musicPause: "Pause music",
         backToSite: "Back to website",
         gameLabel: "Mini RPG · Dark Forest",
-        title: "YARA, Demon Hunter: Lost in the Mist",
+        title: "YARA, Demon Hunter: Lost in the Mist - Mini RPG",
         setupKicker: "Prepare for the journey",
         selectCharacter: "Character",
         characterLocked: "Beat the game to unlock",

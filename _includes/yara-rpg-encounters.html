@@ -1,0 +1,161 @@
+{% assign rpg = site.data.yara_rpg %}
+{% assign lang = page.lang %}
+{% assign pt = false %}{% if lang == 'pt' %}{% assign pt = true %}{% endif %}
+{% assign base = '/mini_games/yara-rpg/' | relative_url %}
+
+<nav class="game-guide__toc" aria-label="{% if pt %}Conteúdo da página{% else %}Page contents{% endif %}">
+    <a href="#characters">{% if pt %}Personagens{% else %}Characters{% endif %}</a>
+    <a href="#regions">{% if pt %}Regiões e monstros{% else %}Regions and monsters{% endif %}</a>
+    <a href="#bosses">{% if pt %}Chefes{% else %}Bosses{% endif %}</a>
+    <a href="#vendor">{% if pt %}Vendedor{% else %}Vendor{% endif %}</a>
+    <a href="#contacts">{% if pt %}Contatos da névoa{% else %}Mist contacts{% endif %}</a>
+    <a href="#companions">{% if pt %}Companheiros{% else %}Companions{% endif %}</a>
+    <a href="#equipment">{% if pt %}Equipamentos{% else %}Equipment{% endif %}</a>
+    <a href="#powers">{% if pt %}Poderes e pactos{% else %}Powers and pacts{% endif %}</a>
+    <a href="#soul">{% if pt %}Alma{% else %}Soul{% endif %}</a>
+</nav>
+
+<section id="characters" class="game-guide__section">
+    <h2>{% if pt %}Escolha quem entra na floresta{% else %}Choose who enters the forest{% endif %}</h2>
+    <div class="game-guide__gallery game-guide__gallery--four game-guide__gallery--five">
+        {% for character in rpg.characters %}
+            <figure>
+                <img src="{{ base }}{{ character.image }}" alt="{{ character.name }}" loading="lazy">
+                <figcaption>
+                    <strong>{{ character.name }}</strong>
+                    {{ character.about[lang] }}
+                    <em>{{ character.passive[lang] }}: {{ character.passive_text[lang] }}</em>
+                    {% if character.locked %}<span class="game-guide__lock">{% if pt %}Libera ao vencer Gudran{% else %}Unlock by beating Gudran{% endif %}</span>{% endif %}
+                </figcaption>
+            </figure>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="regions" class="game-guide__section">
+    <h2>{% if pt %}Regiões e seus monstros{% else %}Regions and their monsters{% endif %}</h2>
+    {% for region in rpg.regions %}
+        <figure class="game-region">
+            <img src="{{ base }}{{ region.cover }}" alt="{{ region.name[lang] }}" loading="lazy">
+            <figcaption><strong>{{ region.name[lang] }}</strong> {{ region.about[lang] }}</figcaption>
+        </figure>
+        {% if region.monsters.size > 0 %}
+            <div class="game-guide__gallery game-guide__gallery--four game-guide__gallery--dense">
+                {% for monster in region.monsters %}
+                    <figure>
+                        <img src="{{ base }}{{ monster.image }}" alt="{{ monster.name[lang] }}" loading="lazy">
+                        <figcaption><strong>{{ monster.name[lang] }}</strong> <em>“{{ monster.line[lang] }}”</em></figcaption>
+                    </figure>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</section>
+
+<section id="bosses" class="game-guide__section">
+    <h2>{% if pt %}Chefes e monstros especiais{% else %}Bosses and special monsters{% endif %}</h2>
+    <div class="game-guide__gallery game-guide__gallery--four game-guide__gallery--dense">
+        {% for boss in rpg.bosses %}
+            <figure>
+                <img src="{{ base }}{{ boss.image }}" alt="{{ boss.name[lang] }}" loading="lazy">
+                <figcaption><strong>{{ boss.name[lang] }}</strong> {% if pt %}Nível{% else %}Level{% endif %} {{ boss.level }}+ <em>“{{ boss.line[lang] }}”</em></figcaption>
+            </figure>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="vendor" class="game-guide__section">
+    <h2>{{ rpg.vendor.name[lang] }}</h2>
+    <div class="game-spotlight">
+        <img src="{{ base }}{{ rpg.vendor.image }}" alt="{{ rpg.vendor.name[lang] }}" loading="lazy">
+        <div>
+            <p><em>{{ rpg.vendor.about[lang] }}</em></p>
+            <p>{% if pt %}Ele aparece durante a exploração, vende quatro mercadorias sorteadas por visita e compra itens da sua mochila.{% else %}He appears while you explore, offers four random wares per visit and buys items from your bag.{% endif %}</p>
+        </div>
+    </div>
+    <div class="game-guide__chips">
+        {% for offer in rpg.vendor.offers %}
+            <div class="game-chip">
+                <span aria-hidden="true">{{ offer.icon }}</span>
+                <div><strong>{{ offer.name[lang] }}</strong> {{ offer.about[lang] }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="contacts" class="game-guide__section">
+    <h2>{% if pt %}Contatos da névoa{% else %}Mist contacts{% endif %}</h2>
+    <p>
+        {% if pt %}
+            Durante a exploração, figuras surgem na névoa com ofertas. Aceitar pode trazer uma luta, ouro em troca de vida ou um poder permanente.
+        {% else %}
+            While you explore, figures step out of the mist with offers. Accepting may bring a fight, gold for your health or a permanent power.
+        {% endif %}
+    </p>
+    <div class="game-guide__contacts">
+        {% for contact in rpg.contacts %}
+            <figure>
+                <img src="{{ base }}{{ contact.image }}" alt="{{ contact.name[lang] }}" loading="lazy">
+                <figcaption><strong>{{ contact.name[lang] }}</strong> <em>{{ contact.line[lang] }}</em></figcaption>
+            </figure>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="companions" class="game-guide__section">
+    <h2>{% if pt %}Companheiros{% else %}Companions{% endif %}</h2>
+    <div class="game-guide__contacts">
+        {% for pet in rpg.companions %}
+            <figure>
+                <img src="{{ base }}{{ pet.image }}" alt="{{ pet.name[lang] }}" loading="lazy">
+                <figcaption><strong>{{ pet.name[lang] }}</strong> {{ pet.command[lang] }}: {{ pet.command_text[lang] }} <em>{% if pt %}Na exploração{% else %}While exploring{% endif %}: {{ pet.scout[lang] }}</em> <em>{{ pet.stats[lang] }}</em></figcaption>
+            </figure>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="equipment" class="game-guide__section">
+    <h2>{% if pt %}Todos os equipamentos{% else %}All the equipment{% endif %}</h2>
+    {% for group in rpg.gear %}
+        <h3>{{ group.title[lang] }}</h3>
+        <div class="game-guide__gallery">
+            {% for item in group.items %}
+                <figure>
+                    <img src="{{ base }}{{ item.image }}" alt="{{ item.name[lang] }}" loading="lazy">
+                    <figcaption><strong>{{ item.name[lang] }}</strong> <em>{{ item.stats[lang] }}</em></figcaption>
+                </figure>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    <h3>{% if pt %}Achados da exploração{% else %}Found while exploring{% endif %}</h3>
+    <div class="game-guide__gallery">
+        {% for find in rpg.finds %}
+            <figure>
+                <img src="{{ base }}{{ find.image }}" alt="{{ find.name[lang] }}" loading="lazy">
+                <figcaption><strong>{{ find.name[lang] }}</strong> <em>{{ find.about[lang] }}</em></figcaption>
+            </figure>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="powers" class="game-guide__section">
+    <h2>{% if pt %}Poderes e pactos{% else %}Powers and pacts{% endif %}</h2>
+    <div class="game-guide__chips">
+        {% for power in rpg.powers %}
+            <div class="game-chip"><span aria-hidden="true">{{ power.icon }}</span><div><strong>{{ power.name[lang] }}</strong> {{ power.about[lang] }}</div></div>
+        {% endfor %}
+        {% for pact in rpg.pacts %}
+            <div class="game-chip game-chip--pact"><span aria-hidden="true">{{ pact.icon }}</span><div><strong>{{ pact.name[lang] }}</strong> {{ pact.about[lang] }}</div></div>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="soul" class="game-guide__section">
+    <h2>{% if pt %}Os sete níveis da alma{% else %}The seven levels of the soul{% endif %}</h2>
+    <p>{% if pt %}Cada escolha moral puxa sua alma para a sombra ou para a luz, e cada nível muda sua força.{% else %}Each moral choice pulls your soul toward shadow or light, and each level changes your strength.{% endif %}</p>
+    <div class="game-guide__chips">
+        {% for tier in rpg.soul %}
+            <div class="game-chip game-chip--soul"><div><strong>{{ tier.name[lang] }}</strong> {{ tier.about[lang] }}</div></div>
+        {% endfor %}
+    </div>
+</section>

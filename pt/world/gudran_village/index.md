@@ -4,7 +4,7 @@ title: Aldeia do Gudran
 lang: pt
 book_id: book-1
 translation_id: location-gudran-village
-last_updated: 2026-09-27
+last_updated: 2026-10-31
 location:
   name: Aldeia do Gudran
   alternate_name: Aldeia das Chamas Azuladas
@@ -41,3 +41,9 @@ A floresta faz parte da vida cotidiana, mas não é segura. O tempo pode mudar, 
 Todos sabem que é preciso respeitar o sino. Quando ele toca, quem está na floresta deve voltar. As ordens do Lorde Gudran são claras: ninguém deve entrar na mata depois que o sino soar.
 
 Para os moradores, o sino marca a fronteira entre o trabalho do dia e os perigos que esperam na floresta depois do anoitecer.
+
+## As tochas azuladas
+
+A aldeia também é conhecida por suas tochas de chama azulada, e seu povo fala de tochas mágicas para enfrentar o escuro. Em [Yara, Demon Hunter: Perdidos na Névoa - Mini RPG]({{ '/pt/mini-games/yara-rpg/' | relative_url }}), este lugar aparece como a Aldeia das Tochas Azuladas, onde as ruas estão quietas demais e sinais de invasores ainda marcam as paredes.
+
+![A Aldeia das Tochas Azuladas no mini RPG]({{ '/mini_games/yara-rpg/images/regions/blue-torch-village.webp' | relative_url }})

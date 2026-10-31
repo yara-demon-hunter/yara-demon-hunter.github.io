@@ -5,8 +5,8 @@ fighters; the other two are controlled by a basic local opponent. Each side
 has 20 seconds to act. The match runs only in the current browser and does not
 create an online room or save match state.
 
-The fighter stats, attack rules, and recovery amount reuse data from
-`mini_games/yara-rpg/js/data/hero.js`, `game-rules.js`, and `monsters.js`.
+The fighter stats, attack rules, and recovery amount live in `js/arena.js`, so
+the game does not depend on any file from another mini game.
 
 ## Future multiplayer seam
 

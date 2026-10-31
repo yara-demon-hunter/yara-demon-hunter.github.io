@@ -8,7 +8,7 @@ window.YaraRpgTranslations.pt = {
         musicPause: "Pausar música",
         backToSite: "Voltar ao site",
         gameLabel: "Mini RPG · Floresta Sombria",
-        title: "YARA, Demon Hunter: Perdidos na Névoa",
+        title: "YARA, Demon Hunter: Perdidos na Névoa - Mini RPG",
         setupKicker: "Prepare sua jornada",
         selectCharacter: "Personagem",
         characterLocked: "Zere o jogo para desbloquear",

@@ -1,3 +1,80 @@
+- date: "2026-10-31"
+  title:
+    en: "The World Atlas grows"
+    pt: "O Atlas do Mundo cresceu"
+  summary:
+    en: "Four new places join the atlas: the Misty Forest, the River Crossing, Gudran Castle and the Spirit World, with art from the mini RPG and notes from the story."
+    pt: "Quatro novos lugares entram no atlas: a Floresta da Névoa, a Travessia do Rio, o Castelo de Gudran e o Mundo Espiritual, com artes do mini RPG e detalhes da história."
+  url:
+    en: "/en/world/"
+    pt: "/pt/world/"
+
+- date: "2026-10-31"
+  title:
+    en: "New game pages, and the Arena is back"
+    pt: "Novas páginas dos jogos e a volta da Arena"
+  summary:
+    en: "Each mini game now has its own page with gameplay, characters and rules. Dark Forest Arena is playable again, and Last Torch skills and boss health were rebalanced."
+    pt: "Cada mini game agora tem sua própria página, com partidas, personagens e regras. A Arena da Floresta voltou a funcionar, e as habilidades e a vida dos chefes de Last Torch foram rebalanceadas."
+  url:
+    en: "/en/mini-games/"
+    pt: "/pt/mini-games/"
+
+- date: "2026-10-30"
+  title:
+    en: "Last Torch: the Demon Lord and Shadow Clone"
+    pt: "Last Torch: o Demon Lord e o Shadow Clone"
+  summary:
+    en: "The first boss arrives, along with a shadow reflection of the hunter that fights by your side."
+    pt: "O primeiro chefe chega, junto com um reflexo de sombra do caçador que luta ao seu lado."
+  url:
+    en: "/en/mini-games/last-torch/#bosses"
+    pt: "/pt/mini-games/last-torch/#chefes"
+
+- date: "2026-10-30"
+  title:
+    en: "Last Torch version 2: the twelve-hour night"
+    pt: "Last Torch versão 2: a noite de doze horas"
+  summary:
+    en: "The biggest update so far: a full night with camps and omens, two new bosses, four new monsters, power evolutions, unlockable heroes and Darkness levels."
+    pt: "A maior atualização até aqui: uma noite inteira com acampamentos e presságios, dois chefes novos, quatro monstros novos, evolução de poderes, heróis para liberar e níveis de Escuridão."
+  url:
+    en: "/en/mini-games/last-torch/#night"
+    pt: "/pt/mini-games/last-torch/#noite"
+
+- date: "2026-10-30"
+  title:
+    en: "Last Torch: skill tree and relic tree"
+    pt: "Last Torch: árvore de habilidades e de relíquias"
+  summary:
+    en: "Upgrades became two trees: four skill branches paid with points, and three relic branches paid with gold at camp."
+    pt: "As melhorias viraram duas árvores: quatro ramos de habilidades pagos com pontos e três ramos de relíquias pagos com ouro no acampamento."
+  url:
+    en: "/en/mini-games/last-torch/#skills"
+    pt: "/pt/mini-games/last-torch/#habilidades"
+
+- date: "2026-10-30"
+  title:
+    en: "Last Torch: Zombie Wolf, Headless Knight and the Sanctuary"
+    pt: "Last Torch: Lobo Zumbi, Cavaleiro Sem Cabeça e o Santuário"
+  summary:
+    en: "Wolf packs and an armored knight join the hunt. The new Sanctuary keeps your trophies, feats and bestiary between nights."
+    pt: "Matilhas de lobos e um cavaleiro blindado entram na caçada. O novo Santuário guarda troféus, façanhas e bestiário entre as noites."
+  url:
+    en: "/en/mini-games/last-torch/#monsters"
+    pt: "/pt/mini-games/last-torch/#monstros"
+
+- date: "2026-10-29"
+  title:
+    en: "Last Torch: new monsters, new hunter and phone controls"
+    pt: "Last Torch: monstros novos, caçador novo e controles no celular"
+  summary:
+    en: "Witches, bats, skeletons and vampires enter the forest, the hunter gets a 2.5D look, daggers gain new skills and the game can now be played in landscape on phones."
+    pt: "Bruxas, morcegos, esqueletos e vampiros entram na floresta, o caçador ganha visual 2.5D, as adagas ganham habilidades novas e o jogo agora roda em paisagem no celular."
+  url:
+    en: "/en/mini-games/last-torch/#controls"
+    pt: "/pt/mini-games/last-torch/#controles"
+
 - date: "2026-10-12"
   title:
     en: "Chapters update (book-1)"

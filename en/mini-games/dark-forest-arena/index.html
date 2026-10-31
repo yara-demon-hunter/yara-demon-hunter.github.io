@@ -1,0 +1,70 @@
+---
+layout: default
+title: "Dark Forest Arena - Free Turn-Based Duel Game"
+description: "Pick two fighters and duel a rival team in Dark Forest Arena, a free turn-based browser game from the world of Yara, Demon Hunter."
+lang: en
+translation_id: dark-forest-arena-page
+mini_games_hub: true
+hide_recent_updates: true
+last_updated: 2026-10-31
+image: /assets/images/common/characters/mysterious_creature/mysterious_creature.jpeg
+permalink: /en/mini-games/dark-forest-arena/
+---
+
+{% assign shots = '/assets/images/common/mini-game/dark_forest_arena/' | relative_url %}
+{% assign chars = '/assets/images/common/' | relative_url %}
+{% assign play = '/mini_games/yara-arena/?lang=en' | relative_url %}
+
+<article class="game-guide">
+    <header class="game-guide__hero">
+        <figure class="game-guide__cover game-guide__cover--portrait">
+            <img src="{{ chars }}characters/mysterious_creature/mysterious_creature.jpeg" alt="A hooded figure from the Dark Forest">
+        </figure>
+        <p class="section-label">Mini game · Local prototype</p>
+        <h1>Dark Forest Arena</h1>
+        <p class="game-guide__lead">
+            Two fighters, twenty seconds per turn and one rival team between you and victory.
+            A quick tactical duel from the world of <a href="{{ '/en/books/book-1/' | relative_url }}">Yara, Demon Hunter</a>.
+        </p>
+        <div class="game-guide__actions">
+            <a class="mini-game-card__button" href="{{ play }}">Play now</a>
+            <a class="game-guide__ghost" href="{{ '/en/mini-games/' | relative_url }}">All mini games</a>
+        </div>
+        <dl class="game-guide__facts">
+            <div><dt>Genre</dt><dd>Turn-based duel</dd></div>
+            <div><dt>Teams</dt><dd>2 against 2</dd></div>
+            <div><dt>Opponent</dt><dd>Computer, offline</dd></div>
+            <div><dt>Languages</dt><dd>English, Portuguese</dd></div>
+        </dl>
+    </header>
+
+    <section class="game-guide__section">
+        <h2>See the game</h2>
+        <div class="game-guide__shots">
+            <figure><img src="{{ shots }}pick-en.webp" alt="Team selection screen" loading="lazy"><figcaption>Pick two of the four fighters.</figcaption></figure>
+            <figure><img src="{{ shots }}battle-en.webp" alt="Battle screen" loading="lazy"><figcaption>The other two become your rivals.</figcaption></figure>
+        </div>
+    </section>
+
+    <section class="game-guide__section">
+        <h2>The fighters</h2>
+        <div class="game-guide__gallery game-guide__gallery--four">
+            <figure><img src="{{ chars }}characters/yara/yara_portrait.jpeg" alt="Yara" loading="lazy"><figcaption><strong>Yara</strong> The strongest human blade</figcaption></figure>
+            <figure><img src="{{ chars }}books/book-1/chapters/002.jpeg" alt="Zeph" loading="lazy"><figcaption><strong>Zeph</strong> A sturdier defense</figcaption></figure>
+            <figure><img src="{{ chars }}characters/possessed_wolf/possessed_wolf.jpeg" alt="Possessed Wolf" loading="lazy"><figcaption><strong>Possessed Wolf</strong> Fragile, with a hard bite</figcaption></figure>
+            <figure><img src="{{ chars }}characters/mysterious_creature/mysterious_creature.jpeg" alt="Corrupted Specter" loading="lazy"><figcaption><strong>Corrupted Specter</strong> The hardest hitter</figcaption></figure>
+        </div>
+    </section>
+
+    <section class="game-guide__section game-guide__section--last">
+        <h2>Four moves, one decision</h2>
+        <div class="game-guide__columns game-guide__columns--four">
+            <div class="game-guide__panel"><h3>⚔ Quick strike</h3><p>Reliable damage at no cost.</p></div>
+            <div class="game-guide__panel"><h3>✦ Heavy strike</h3><p>Bigger damage for 15 focus.</p></div>
+            <div class="game-guide__panel"><h3>◈ Focus</h3><p>Recover focus for later.</p></div>
+            <div class="game-guide__panel"><h3>⬡ Guard</h3><p>Halve the next hit.</p></div>
+        </div>
+        <p>This is a local prototype: matches run only in your browser, with no online play yet.</p>
+        <a class="mini-game-card__button" href="{{ play }}">Play now</a>
+    </section>
+</article>

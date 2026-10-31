@@ -1,0 +1,165 @@
+---
+layout: default
+title: "Last Torch: Demon Hunter - Free Browser Survival Game"
+description: "See Last Torch in action: real gameplay, every monster and boss, the hunter's moves, the 12-hour night and unlockable heroes. Free to play in your browser."
+lang: en
+translation_id: last-torch-guide
+mini_games_hub: true
+hide_recent_updates: true
+last_updated: 2026-10-31
+image: /assets/images/common/mini-game/last_torch_cover.jpeg
+permalink: /en/mini-games/last-torch/
+---
+
+{% assign art = '/assets/images/common/mini-game/last_torch/' | relative_url %}
+{% assign play = '/mini_games/last_torch/last_torch.html' | relative_url %}
+
+<article class="game-guide">
+    <header class="game-guide__hero">
+        <figure class="game-guide__cover">
+            <img src="{{ art }}cover.webp" alt="The Demon Hunter guards a torch in a dark forest while witches circle" width="1280" height="720">
+        </figure>
+        <p class="section-label">Mini game · Action</p>
+        <h1>Last Torch: Demon Hunter</h1>
+        <p class="game-guide__lead">
+            One hunter, one flame and twelve hours of darkness. Keep yourself and the torch alive until dawn.
+            A companion game to <a href="{{ '/en/books/book-1/' | relative_url }}">Yara, Demon Hunter</a>.
+        </p>
+        <div class="game-guide__actions">
+            <a class="mini-game-card__button" href="{{ play }}">Play now</a>
+            <a class="game-guide__ghost" href="{{ '/en/mini-games/' | relative_url }}">All mini games</a>
+        </div>
+        <dl class="game-guide__facts">
+            <div><dt>Genre</dt><dd>Action roguelite</dd></div>
+            <div><dt>One night</dt><dd>12 hours, 3 bosses</dd></div>
+            <div><dt>Plays on</dt><dd>Computer or phone</dd></div>
+            <div><dt>Game text</dt><dd>English</dd></div>
+        </dl>
+    </header>
+
+    <nav class="game-guide__toc" aria-label="Page contents">
+        <a href="#gameplay">Gameplay</a>
+        <a href="#night">The night</a>
+        <a href="#hunter">The hunter</a>
+        <a href="#monsters">Monsters</a>
+        <a href="#bosses">Bosses</a>
+        <a href="#skills">Skills</a>
+        <a href="#heroes">Heroes</a>
+        <a href="#controls">Controls</a>
+    </nav>
+
+    <section id="gameplay" class="game-guide__section">
+        <h2>See it in action</h2>
+        <figure class="game-clip game-clip--wide">
+            <video autoplay muted loop playsinline preload="metadata" poster="{{ art }}gameplay.webp" aria-label="The hunter circles the torch while monsters close in">
+                <source src="{{ art }}gameplay.mp4" type="video/mp4">
+            </video>
+            <figcaption>Hour 7: the hunter defends the flame as the forest closes in.</figcaption>
+        </figure>
+    </section>
+
+    <section id="night" class="game-guide__section">
+        <h2>How a night works</h2>
+        <ol class="game-guide__steps game-guide__steps--cards">
+            <li><strong>Hunt</strong> Kill monsters for XP, gold and the hour's quota.</li>
+            <li><strong>Finish them</strong> Quota met? Clear the screen to end the hour.</li>
+            <li><strong>Camp</strong> Buy relics, feed the torch or rest.</li>
+            <li><strong>Survive</strong> Bosses wait at hours 4, 8 and 12. Then, dawn.</li>
+        </ol>
+        <p>You lose if the hunter <em>or</em> the torch dies, so you can never just run away.</p>
+    </section>
+
+    <section id="hunter" class="game-guide__section">
+        <h2>The hunter's moves</h2>
+        <div class="game-guide__gallery">
+            <figure><img src="{{ art }}hero-slash.webp" alt="Blade combo animation" width="200" height="200" loading="lazy"><figcaption><strong>Blade</strong> Attacks on its own</figcaption></figure>
+            <figure><img src="{{ art }}hero-whirl.webp" alt="Shadow Whirl animation" width="200" height="200" loading="lazy"><figcaption><strong>Shadow Whirl</strong> A 360° spin</figcaption></figure>
+            <figure><img src="{{ art }}hero-dash.webp" alt="Dash animation" width="200" height="200" loading="lazy"><figcaption><strong>Dash</strong> Briefly untouchable</figcaption></figure>
+            <figure><img src="{{ art }}hero-fury.webp" alt="Fury animation" width="200" height="200" loading="lazy"><figcaption><strong>Fury</strong> Fires when the bar fills</figcaption></figure>
+            <figure><img src="{{ art }}hero-levelup.webp" alt="Level up animation" width="200" height="200" loading="lazy"><figcaption><strong>Level up</strong> One skill point</figcaption></figure>
+            <figure><img src="{{ art }}hero-clone.webp" alt="Shadow Clone animation" width="200" height="200" loading="lazy"><figcaption><strong>Shadow Clone</strong> A second blade</figcaption></figure>
+        </div>
+    </section>
+
+    <section id="monsters" class="game-guide__section">
+        <h2>Monsters of the forest</h2>
+        <div class="game-guide__bestiary">
+            <article class="bestiary-card"><img src="{{ art }}skeleton.webp" alt="Skeleton walking" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 1</p><h3>Skeleton</h3><p>Common, and can rise from the ground.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}bat.webp" alt="Bat flying" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 1</p><h3>Bat</h3><p>Fast, fragile, deadly in rings.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}vampire.webp" alt="Vampire walking" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 2</p><h3>Vampire</h3><p>Breaks into two bats when killed.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}witch.webp" alt="Witch casting" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 3</p><h3>Witch</h3><p>Casts from afar. Use the dagger.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}zombie-wolf.webp" alt="Zombie Wolf running" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 4</p><h3>Zombie Wolf</h3><p>Packs that lunge in straight lines.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}moth.webp" alt="Moth flying" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 5</p><h3>Moth</h3><p>Ignores you and flies at the flame.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}bloater.webp" alt="Bloater walking" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 6</p><h3>Bloater</h3><p>Explodes. Pop it inside the crowd.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}wraith.webp" alt="Wraith floating" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 7</p><h3>Wraith</h3><p>Aims, then shoots forward. Dash!</p></article>
+            <article class="bestiary-card"><img src="{{ art }}headless-knight.webp" alt="Headless Knight marching" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 8</p><h3>Headless Knight</h3><p>A tank whose floating head shoots.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}necromancer.webp" alt="Necromancer casting" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hour 9</p><h3>Necromancer</h3><p>Raises skeletons until you reach it.</p></article>
+        </div>
+        <p><strong>Elites:</strong> from Hour 2, Brute, Swift and Blazing monsters arrive with a colored aura and drop chests full of skill points.</p>
+    </section>
+
+    <section id="bosses" class="game-guide__section">
+        <h2>Bosses</h2>
+        <div class="game-guide__clips">
+            <figure class="game-clip">
+                <video autoplay muted loop playsinline preload="metadata" poster="{{ art }}demon-lord-fight.webp" aria-label="Fight against the Demon Lord">
+                    <source src="{{ art }}demon-lord-fight.mp4" type="video/mp4">
+                </video>
+                <figcaption>Demon Lord: fireballs and marked ground.</figcaption>
+            </figure>
+            <figure class="game-clip">
+                <video autoplay muted loop playsinline preload="metadata" poster="{{ art }}blood-countess-fight.webp" aria-label="Fight against the Blood Countess">
+                    <source src="{{ art }}blood-countess-fight.mp4" type="video/mp4">
+                </video>
+                <figcaption>Blood Countess: blinks and spirals of blood.</figcaption>
+            </figure>
+        </div>
+        <div class="game-guide__bosses">
+            <article class="boss-card"><img src="{{ art }}demon-lord.webp" alt="Demon Lord" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Hour 4</p><h3>Demon Lord</h3><p class="boss-card__title">Lord of the First Fire</p></div></article>
+            <article class="boss-card"><img src="{{ art }}blood-countess.webp" alt="Blood Countess" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Hour 8</p><h3>Blood Countess</h3><p class="boss-card__title">She Who Drinks the Light</p></div></article>
+            <article class="boss-card"><img src="{{ art }}long-night.webp" alt="The Long Night" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Hour 12</p><h3>The Long Night</h3><p class="boss-card__title">The Dark Itself</p></div></article>
+        </div>
+    </section>
+
+    <section id="skills" class="game-guide__section">
+        <h2>Skills, relics and omens</h2>
+        <div class="game-guide__columns game-guide__columns--four">
+            <div class="game-guide__panel"><h3>Blade</h3><p>Melee power, Spectral Blades and Corpse Burst.</p></div>
+            <div class="game-guide__panel"><h3>Shadow</h3><p>Speed, daggers, Fan of Knives and Shadow Clone.</p></div>
+            <div class="game-guide__panel"><h3>Flame</h3><p>Fury, health and a torch that fights back.</p></div>
+            <div class="game-guide__panel"><h3>Curse</h3><p>XP, gold, Storm Sigil and Starfall.</p></div>
+        </div>
+        <p>
+            The skill tree resets every night. Maxed powers can evolve, like Spectral Blades into <strong>Blade Tempest</strong>
+            or Flame Sentinel into <strong>Sun Spire</strong>. At camp, gold buys 22 relics, and from Hour 3 omens such as
+            <strong>Blood Moon</strong> trade extra danger for extra rewards.
+        </p>
+    </section>
+
+    <section id="heroes" class="game-guide__section">
+        <h2>Four hunters to unlock</h2>
+        <div class="game-guide__gallery game-guide__gallery--four">
+            <figure><img src="{{ art }}hero-hunter.webp" alt="Demon Hunter" width="200" height="200" loading="lazy"><figcaption><strong>Demon Hunter</strong> Balanced, from the start</figcaption></figure>
+            <figure><img src="{{ art }}hero-reaver.webp" alt="Ash Reaver" width="200" height="200" loading="lazy"><figcaption><strong>Ash Reaver</strong> Slay the Demon Lord</figcaption></figure>
+            <figure><img src="{{ art }}hero-warden.webp" alt="Torch Warden" width="200" height="200" loading="lazy"><figcaption><strong>Torch Warden</strong> Slay the Blood Countess</figcaption></figure>
+            <figure><img src="{{ art }}hero-shade.webp" alt="The Shade" width="200" height="200" loading="lazy"><figcaption><strong>The Shade</strong> Reach a 70 kill streak</figcaption></figure>
+        </div>
+        <p>Winning opens the endless night and eight Darkness levels. Your trophies, feats and bestiary stay in the Sanctuary.</p>
+    </section>
+
+    <section id="controls" class="game-guide__section game-guide__section--last">
+        <h2>Controls</h2>
+        <div class="game-guide__columns">
+            <div class="game-guide__panel">
+                <h3>Computer</h3>
+                <p>Move with the mouse or WASD. Left click throws daggers. Space, Shift or right click dashes.</p>
+            </div>
+            <div class="game-guide__panel">
+                <h3>Phone</h3>
+                <p>Hold it sideways. Joystick to move. Hold the dagger button to aim and release to throw.</p>
+            </div>
+        </div>
+        <p>Free, nothing to install, and your progress is saved in your browser.</p>
+        <a class="mini-game-card__button" href="{{ play }}">Play now</a>
+    </section>
+</article>

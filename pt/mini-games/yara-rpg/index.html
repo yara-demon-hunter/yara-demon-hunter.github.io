@@ -1,0 +1,62 @@
+---
+layout: default
+title: "Yara, Demon Hunter: Perdidos na Névoa - Mini RPG"
+description: "Explore a névoa, lute em batalhas por turnos e molde sua alma em Perdidos na Névoa, mini RPG grátis no navegador do mundo de Yara, Caçadora de Demônios."
+lang: pt
+translation_id: yara-rpg-page
+mini_games_hub: true
+hide_recent_updates: true
+last_updated: 2026-10-31
+image: /mini_games/yara-rpg/covers/cover_1920_1080.png
+permalink: /pt/mini-games/yara-rpg/
+---
+
+{% assign img = '/mini_games/yara-rpg/images/' | relative_url %}
+{% assign shots = '/assets/images/common/mini-game/yara_rpg/' | relative_url %}
+{% assign play = '/mini_games/yara-rpg/game.html?lang=pt' | relative_url %}
+
+<article class="game-guide">
+    <header class="game-guide__hero">
+        <figure class="game-guide__cover">
+            <img src="{{ img }}cover.webp" alt="Zeph caminha pela névoa segurando um machado" width="1292" height="832">
+        </figure>
+        <p class="section-label">Mini game · RPG</p>
+        <h1>Yara, Demon Hunter: Perdidos na Névoa - Mini RPG</h1>
+        <p class="game-guide__lead">
+            Atravesse a floresta, enfrente o que vive na névoa e decida que alma chega ao outro lado.
+            Um mini RPG para um jogador no mundo de <a href="{{ '/pt/books/book-1/' | relative_url }}">Yara, Caçadora de Demônios</a>.
+        </p>
+        <div class="game-guide__actions">
+            <a class="mini-game-card__button" href="{{ play }}">Jogar agora</a>
+            <a class="game-guide__ghost" href="{{ '/pt/mini-games/' | relative_url }}">Todos os mini games</a>
+        </div>
+        <dl class="game-guide__facts">
+            <div><dt>Gênero</dt><dd>RPG por turnos</dd></div>
+            <div><dt>Jogadores</dt><dd>Um jogador</dd></div>
+            <div><dt>Onde jogar</dt><dd>Computador ou celular</dd></div>
+            <div><dt>Idiomas</dt><dd>Português, inglês</dd></div>
+        </dl>
+    </header>
+
+    <section class="game-guide__section">
+        <h2>Veja o jogo</h2>
+        <div class="game-guide__shots">
+            <figure><img src="{{ shots }}setup-pt.webp" alt="Tela de seleção de personagem" width="960" height="600" loading="lazy"><figcaption>Escolha seu personagem e os pontos fortes dele.</figcaption></figure>
+            <figure><img src="{{ shots }}play-pt.webp" alt="Tela de exploração na Floresta da Névoa" width="960" height="675" loading="lazy"><figcaption>Explore, junte equipamentos e veja sua alma mudar.</figcaption></figure>
+        </div>
+    </section>
+
+    {% include yara-rpg-encounters.html %}
+
+    <section class="game-guide__section game-guide__section--last">
+        <h2>Como se joga</h2>
+        <div class="game-guide__columns game-guide__columns--four">
+            <div class="game-guide__panel"><h3>Explore</h3><p>Encontre ouro, baús, eventos e monstros em cada região.</p></div>
+            <div class="game-guide__panel"><h3>Lute</h3><p>Escolha seus golpes por turno. Ataque durante o aviso para interromper o inimigo.</p></div>
+            <div class="game-guide__panel"><h3>Equipe</h3><p>Preencha dez espaços com equipamentos e leve um companheiro para a luta.</p></div>
+            <div class="game-guide__panel"><h3>Escolha</h3><p>Cada decisão moral puxa sua alma para a luz ou para a sombra.</p></div>
+        </div>
+        <p>Espíritos podem abordar você na névoa com ofertas, e o que você conquista no Santuário sobrevive até à morte.</p>
+        <a class="mini-game-card__button" href="{{ play }}">Jogar agora</a>
+    </section>
+</article>

@@ -4,7 +4,7 @@ title: Atlas do Mundo
 lang: pt
 book_id: book-1
 translation_id: world
-last_updated: 2026-09-27
+last_updated: 2026-10-31
 ---
 
 <section class="location-directory">

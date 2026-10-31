@@ -1,0 +1,70 @@
+---
+layout: default
+title: "Arena da Floresta - Jogo grátis de duelos por turnos"
+description: "Escolha dois lutadores e enfrente uma equipe rival na Arena da Floresta, jogo grátis por turnos no navegador do mundo de Yara, Caçadora de Demônios."
+lang: pt
+translation_id: dark-forest-arena-page
+mini_games_hub: true
+hide_recent_updates: true
+last_updated: 2026-10-31
+image: /assets/images/common/characters/mysterious_creature/mysterious_creature.jpeg
+permalink: /pt/mini-games/dark-forest-arena/
+---
+
+{% assign shots = '/assets/images/common/mini-game/dark_forest_arena/' | relative_url %}
+{% assign chars = '/assets/images/common/' | relative_url %}
+{% assign play = '/mini_games/yara-arena/?lang=pt' | relative_url %}
+
+<article class="game-guide">
+    <header class="game-guide__hero">
+        <figure class="game-guide__cover game-guide__cover--portrait">
+            <img src="{{ chars }}characters/mysterious_creature/mysterious_creature.jpeg" alt="Uma figura encapuzada da Floresta Sombria">
+        </figure>
+        <p class="section-label">Mini game · Protótipo local</p>
+        <h1>Arena da Floresta</h1>
+        <p class="game-guide__lead">
+            Dois lutadores, vinte segundos por turno e uma equipe rival entre você e a vitória.
+            Um duelo tático rápido do mundo de <a href="{{ '/pt/books/book-1/' | relative_url }}">Yara, Caçadora de Demônios</a>.
+        </p>
+        <div class="game-guide__actions">
+            <a class="mini-game-card__button" href="{{ play }}">Jogar agora</a>
+            <a class="game-guide__ghost" href="{{ '/pt/mini-games/' | relative_url }}">Todos os mini games</a>
+        </div>
+        <dl class="game-guide__facts">
+            <div><dt>Gênero</dt><dd>Duelo por turnos</dd></div>
+            <div><dt>Equipes</dt><dd>2 contra 2</dd></div>
+            <div><dt>Oponente</dt><dd>Computador, offline</dd></div>
+            <div><dt>Idiomas</dt><dd>Português, inglês</dd></div>
+        </dl>
+    </header>
+
+    <section class="game-guide__section">
+        <h2>Veja o jogo</h2>
+        <div class="game-guide__shots">
+            <figure><img src="{{ shots }}pick-pt.webp" alt="Tela de escolha da equipe" loading="lazy"><figcaption>Escolha dois dos quatro lutadores.</figcaption></figure>
+            <figure><img src="{{ shots }}battle-pt.webp" alt="Tela de batalha" loading="lazy"><figcaption>Os outros dois viram seus rivais.</figcaption></figure>
+        </div>
+    </section>
+
+    <section class="game-guide__section">
+        <h2>Os lutadores</h2>
+        <div class="game-guide__gallery game-guide__gallery--four">
+            <figure><img src="{{ chars }}characters/yara/yara_portrait.jpeg" alt="Yara" loading="lazy"><figcaption><strong>Yara</strong> A lâmina humana mais forte</figcaption></figure>
+            <figure><img src="{{ chars }}books/book-1/chapters/002.jpeg" alt="Zeph" loading="lazy"><figcaption><strong>Zeph</strong> Defesa mais firme</figcaption></figure>
+            <figure><img src="{{ chars }}characters/possessed_wolf/possessed_wolf.jpeg" alt="Lobo Possuído" loading="lazy"><figcaption><strong>Lobo Possuído</strong> Frágil, com mordida forte</figcaption></figure>
+            <figure><img src="{{ chars }}characters/mysterious_creature/mysterious_creature.jpeg" alt="Espectro Corrompido" loading="lazy"><figcaption><strong>Espectro Corrompido</strong> O ataque mais forte</figcaption></figure>
+        </div>
+    </section>
+
+    <section class="game-guide__section game-guide__section--last">
+        <h2>Quatro golpes, uma decisão</h2>
+        <div class="game-guide__columns game-guide__columns--four">
+            <div class="game-guide__panel"><h3>⚔ Golpe rápido</h3><p>Dano garantido, sem custo.</p></div>
+            <div class="game-guide__panel"><h3>✦ Golpe pesado</h3><p>Mais dano por 15 de foco.</p></div>
+            <div class="game-guide__panel"><h3>◈ Recuperar foco</h3><p>Guarde força para depois.</p></div>
+            <div class="game-guide__panel"><h3>⬡ Defender</h3><p>Reduza o próximo golpe à metade.</p></div>
+        </div>
+        <p>Este é um protótipo local: as partidas rodam só no seu navegador e ainda não há modo online.</p>
+        <a class="mini-game-card__button" href="{{ play }}">Jogar agora</a>
+    </section>
+</article>

@@ -1,6 +1,10 @@
-const GAME_DATA = window.YaraRpgData;
-const GAME_RULES = GAME_DATA.rules;
-const DARK_FOREST_MONSTERS = GAME_DATA.monsters.byRegion['dark-forest'];
+const ARENA_RULES = {
+    quickAttack: { attackMultiplier: 0.8, minimumDamage: 4, randomBonusRange: 4 },
+    heavyAttack: { focusCost: 15, attackMultiplier: 1.5, minimumDamage: 8, randomBonusRange: 6 },
+    guardDamageMultiplier: 0.5,
+    focusRecovery: 25
+};
+const HERO_BASE = { hp: 100, focus: 50, atk: 10, def: 5, stunChance: 5 };
 const TURN_DURATION_SECONDS = 20;
 const MAX_TEAM_SIZE = 2;
 const selectedFighters = new Set();
@@ -154,11 +158,8 @@ const roster = [
         role: 'roleHunter',
         portrait: '/assets/images/common/characters/yara/yara_portrait.jpeg',
         icon: '⚔',
-        hp: GAME_DATA.hero.initial.maxHp,
-        focus: GAME_DATA.hero.initial.maxFoco,
-        atk: GAME_DATA.hero.initial.atk + 2,
-        def: GAME_DATA.hero.initial.def,
-        stunChance: GAME_DATA.hero.initial.stunChance
+        ...HERO_BASE,
+        atk: HERO_BASE.atk + 2
     },
     {
         id: 'zeph',
@@ -166,34 +167,31 @@ const roster = [
         role: 'roleScout',
         portrait: '/assets/images/common/books/book-1/chapters/002.jpeg',
         icon: '🗡',
-        hp: GAME_DATA.hero.initial.maxHp,
-        focus: GAME_DATA.hero.initial.maxFoco,
-        atk: GAME_DATA.hero.initial.atk,
-        def: GAME_DATA.hero.initial.def + 1,
-        stunChance: GAME_DATA.hero.initial.stunChance
+        ...HERO_BASE,
+        def: HERO_BASE.def + 1
     },
     {
         id: 'possessed-wolf',
         name: { pt: 'Lobo Possuído', en: 'Possessed Wolf' },
         role: 'roleBeast',
         portrait: '/assets/images/common/characters/possessed_wolf/possessed_wolf.jpeg',
-        icon: DARK_FOREST_MONSTERS[0].icon,
+        icon: '🐺',
         hp: 80,
         focus: 35,
-        atk: DARK_FOREST_MONSTERS[0].atk + 2,
-        def: DARK_FOREST_MONSTERS[0].def + 1,
+        atk: 12,
+        def: 3,
         stunChance: 8
     },
     {
         id: 'river-spirit',
-        name: { pt: DARK_FOREST_MONSTERS[1].name.pt, en: DARK_FOREST_MONSTERS[1].name.en },
+        name: { pt: 'Espectro Corrompido', en: 'Corrupted Specter' },
         role: 'roleSpirit',
         portrait: '/assets/images/common/characters/mysterious_creature/mysterious_creature.jpeg',
-        icon: DARK_FOREST_MONSTERS[1].icon,
+        icon: '👻',
         hp: 90,
         focus: 55,
-        atk: DARK_FOREST_MONSTERS[1].atk + 1,
-        def: DARK_FOREST_MONSTERS[1].def,
+        atk: 13,
+        def: 3,
         stunChance: 6
     }
 ];
@@ -402,7 +400,7 @@ document.querySelectorAll('[data-move]').forEach((button) => {
         const fighter = playerTeam.find((unit) => unit.id === activeFighterId);
         if (!fighter || fighter.currentHp <= 0) return;
         const move = button.dataset.move;
-        if (move === 'heavy' && fighter.currentFocus < GAME_RULES.combat.heavyAttack.focoCost) return;
+        if (move === 'heavy' && fighter.currentFocus < ARENA_RULES.heavyAttack.focusCost) return;
         if (fighter.stunned) {
             fighter.stunned = false;
             appendLog(t('skipped', { fighter: fighter.name }));
@@ -413,7 +411,7 @@ document.querySelectorAll('[data-move]').forEach((button) => {
             const previousFocus = fighter.currentFocus;
             fighter.currentFocus = Math.min(
                 fighter.maxFocus,
-                fighter.currentFocus + GAME_RULES.camp.focoRecovery
+                fighter.currentFocus + ARENA_RULES.focusRecovery
             );
             appendLog(t('recoverLog', {
                 fighter: fighter.name,
@@ -465,10 +463,10 @@ function executeAttack(attacker, target, move) {
     }
 
     const rules = move === 'heavy'
-        ? GAME_RULES.combat.heavyAttack
-        : GAME_RULES.combat.quickAttack;
+        ? ARENA_RULES.heavyAttack
+        : ARENA_RULES.quickAttack;
     if (move === 'heavy') {
-        const focusCost = GAME_RULES.combat.heavyAttack.focoCost;
+        const focusCost = ARENA_RULES.heavyAttack.focusCost;
         if (attacker.currentFocus < focusCost) return;
         attacker.currentFocus -= focusCost;
     }
@@ -480,7 +478,7 @@ function executeAttack(attacker, target, move) {
     let damage = Math.max(rules.minimumDamage, rawDamage);
     let message = '';
     if (target.guarding) {
-        damage = Math.max(1, Math.ceil(damage * GAME_RULES.combat.monsterParryDamageMultiplier));
+        damage = Math.max(1, Math.ceil(damage * ARENA_RULES.guardDamageMultiplier));
         target.guarding = false;
         message = t('guarded', { target: target.name });
     }
@@ -583,7 +581,7 @@ function playCpuTurn() {
     }
 
     activeFighterId = attacker.id;
-    const move = attacker.currentFocus >= GAME_RULES.combat.heavyAttack.focoCost
+    const move = attacker.currentFocus >= ARENA_RULES.heavyAttack.focusCost
         ? 'heavy'
         : 'quick';
     executeAttack(attacker, target, move);

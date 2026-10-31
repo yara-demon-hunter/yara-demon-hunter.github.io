@@ -1,0 +1,62 @@
+---
+layout: default
+title: "Yara, Demon Hunter: Lost in the Mist - Mini RPG"
+description: "Explore the mist, fight turn-based battles and shape your soul in Lost in the Mist, a free browser mini RPG set in the world of Yara, Demon Hunter."
+lang: en
+translation_id: yara-rpg-page
+mini_games_hub: true
+hide_recent_updates: true
+last_updated: 2026-10-31
+image: /mini_games/yara-rpg/covers/cover_1920_1080.png
+permalink: /en/mini-games/yara-rpg/
+---
+
+{% assign img = '/mini_games/yara-rpg/images/' | relative_url %}
+{% assign shots = '/assets/images/common/mini-game/yara_rpg/' | relative_url %}
+{% assign play = '/mini_games/yara-rpg/game.html?lang=en' | relative_url %}
+
+<article class="game-guide">
+    <header class="game-guide__hero">
+        <figure class="game-guide__cover">
+            <img src="{{ img }}cover.webp" alt="Zeph walks through the mist holding an axe" width="1292" height="832">
+        </figure>
+        <p class="section-label">Mini game · RPG</p>
+        <h1>Yara, Demon Hunter: Lost in the Mist - Mini RPG</h1>
+        <p class="game-guide__lead">
+            Cross the forest, face what lives in the mist and decide what kind of soul comes out the other side.
+            A single-player mini RPG set in the world of <a href="{{ '/en/books/book-1/' | relative_url }}">Yara, Demon Hunter</a>.
+        </p>
+        <div class="game-guide__actions">
+            <a class="mini-game-card__button" href="{{ play }}">Play now</a>
+            <a class="game-guide__ghost" href="{{ '/en/mini-games/' | relative_url }}">All mini games</a>
+        </div>
+        <dl class="game-guide__facts">
+            <div><dt>Genre</dt><dd>Turn-based RPG</dd></div>
+            <div><dt>Players</dt><dd>Single-player</dd></div>
+            <div><dt>Plays on</dt><dd>Computer or phone</dd></div>
+            <div><dt>Languages</dt><dd>English, Portuguese</dd></div>
+        </dl>
+    </header>
+
+    <section class="game-guide__section">
+        <h2>See the game</h2>
+        <div class="game-guide__shots">
+            <figure><img src="{{ shots }}setup-en.webp" alt="Character selection screen" width="960" height="600" loading="lazy"><figcaption>Choose your character and their strengths.</figcaption></figure>
+            <figure><img src="{{ shots }}play-en.webp" alt="Exploration screen in the Misty Forest" width="960" height="675" loading="lazy"><figcaption>Explore, gather gear and watch your soul shift.</figcaption></figure>
+        </div>
+    </section>
+
+    {% include yara-rpg-encounters.html %}
+
+    <section class="game-guide__section game-guide__section--last">
+        <h2>How it plays</h2>
+        <div class="game-guide__columns game-guide__columns--four">
+            <div class="game-guide__panel"><h3>Explore</h3><p>Find gold, chests, events and monsters in each region.</p></div>
+            <div class="game-guide__panel"><h3>Fight</h3><p>Pick your moves by turn. Strike during a warning to interrupt the enemy.</p></div>
+            <div class="game-guide__panel"><h3>Equip</h3><p>Fill ten slots with gear and bring a companion to battle.</p></div>
+            <div class="game-guide__panel"><h3>Choose</h3><p>Every moral choice pulls your soul toward light or shadow.</p></div>
+        </div>
+        <p>Spirits may approach you in the mist with offers, and what you earn in the Sanctuary survives even death.</p>
+        <a class="mini-game-card__button" href="{{ play }}">Play now</a>
+    </section>
+</article>

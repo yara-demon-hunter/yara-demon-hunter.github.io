@@ -329,3 +329,11 @@
         font-size: 2.4rem;
     }
 }
+
+
+.location-content img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+}
