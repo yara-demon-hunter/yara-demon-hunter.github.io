@@ -91,6 +91,10 @@ function setupJoystick() {
         const v = readStick(base, knob, e, 0.12);
         joystick.x = v.x;
         joystick.y = v.y;
+        if (v.x || v.y) {
+            joystick.lastX = v.x;
+            joystick.lastY = v.y;
+        }
     };
     base.addEventListener('pointerdown', (e) => {
         if (pointerId !== null) return;

@@ -12,11 +12,14 @@ import { getAtkDamage, getDashCharges, getDashCooldown } from './stats.js';
 // o mouse aponta ou o herói olha. Esquivar no último instante recompensa com Fúria.
 const PERFECT_DISTANCE = 48;
 const PERFECT_FURY = 14;
+const HAS_JOYSTICK = window.matchMedia('(pointer: coarse)').matches;
 
 export function resetDash() {
     player.dashCharges = getDashCharges();
     player.dashRecharge = 0;
     player.dashTimer = 0;
+    joystick.lastX = 0;
+    joystick.lastY = 0;
 }
 
 function getDashDirection() {
@@ -28,11 +31,16 @@ function getDashDirection() {
         if (keys['KeyA'] || keys['ArrowLeft']) x -= 1;
         if (keys['KeyD'] || keys['ArrowRight']) x += 1;
     }
-    if (!x && !y) {
+    if (!x && !y && HAS_JOYSTICK) {
+        // Sem mouse no toque: joystick solto segue a última direção em que o herói andou
+        x = joystick.lastX;
+        y = joystick.lastY;
+    } else if (!x && !y) {
         x = state.knifeInput.x - player.x;
         y = state.knifeInput.y - player.y;
+        if (Math.hypot(x, y) < 1) x = y = 0;
     }
-    if (Math.hypot(x, y) < 1) {
+    if (!x && !y) {
         x = Math.cos(player.angle);
         y = Math.sin(player.angle);
     }
