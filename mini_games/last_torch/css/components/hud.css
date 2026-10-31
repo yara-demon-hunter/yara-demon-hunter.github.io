@@ -151,45 +151,6 @@
 #nightPips i.is-now { background: #fde68a; box-shadow: 0 0 6px #fbbf24; }
 #nightPips i.is-boss.is-now { background: #f87171; box-shadow: 0 0 6px #ef4444; }
 
-/* Poderes e relíquias da partida */
-#buildStrip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.2rem;
-    width: min(100%, 64rem);
-    margin: 0.25rem auto 0;
-    max-height: 3.4rem;
-    overflow: hidden;
-}
-.build-item {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.6rem;
-    height: 1.6rem;
-    font-size: 0.85rem;
-    border-radius: 0.35rem;
-    background: rgba(8, 13, 26, 0.55);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-}
-.build-item i {
-    position: absolute;
-    right: -0.14rem;
-    bottom: -0.14rem;
-    min-width: 0.72rem;
-    padding: 0 0.12rem;
-    border-radius: 0.2rem;
-    background: #0f172a;
-    color: #fbbf24;
-    font-size: 0.5rem;
-    font-weight: 800;
-    font-style: normal;
-    line-height: 0.72rem;
-    text-align: center;
-}
-.build-item.is-evolved { border-color: #fde047; box-shadow: 0 0 8px rgba(253, 224, 71, 0.6); }
-
 /* Pontuação */
 #hudScore {
     position: absolute;
@@ -398,9 +359,6 @@
     .hud-btn { padding: 0.22rem 0.4rem; font-size: 0.75rem; border-radius: 0.5rem; }
     #nightPips { margin-top: 0.12rem; }
     #nightPips i { height: 0.14rem; }
-    #buildStrip { max-height: 1.2rem; gap: 0.12rem; margin-top: 0.15rem; }
-    .build-item { width: 1.05rem; height: 1.05rem; font-size: 0.56rem; border-radius: 0.22rem; }
-    .build-item i { min-width: 0.5rem; font-size: 0.38rem; line-height: 0.5rem; right: -0.08rem; bottom: -0.08rem; }
     #hudScore { top: 2.1rem; font-size: 0.68rem; }
     #hudStreak { top: 3.1rem; }
     #hudStreak b { font-size: 1.6rem; }

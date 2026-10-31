@@ -2,7 +2,7 @@ import { audio, state } from '../core/state.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
 import { chooseHero, closeHeroes, openHeroes } from './heroes.js';
 import { beginDeath } from '../systems/night.js';
-import { lockLandscape } from './orientation.js';
+import { lockLandscape, showIosHint } from './orientation.js';
 import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
 import { changeDarkness, keepHunting, returnToMenu, shareResult, startGame } from './screens.js';
 import { openSettings, toggleSetting } from './settings.js';
@@ -17,6 +17,8 @@ export function setupButtons() {
         e.currentTarget.blur();     // Espaço é o dash: não pode reacionar o botão focado
         openSettings();
     });
+
+    showIosHint();
 
     // No celular: tela cheia travada de lado, em paisagem (precisa de um toque do jogador para ser permitido).
     // Também ao voltar da pausa, caso o jogador tenha saído da tela cheia (a trava se perde junto).

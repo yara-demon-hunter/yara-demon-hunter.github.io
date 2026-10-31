@@ -14,6 +14,14 @@ export function isPhonePortrait() {
     return phonePortrait.matches;
 }
 
+// iPhone (Safari) não tem a API de tela cheia: o jeito é abrir pela Tela de Início
+const isIphone = /iPhone|iPod/.test(navigator.userAgent);
+const isStandalone = () => window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+export function showIosHint() {
+    document.getElementById('iosHint')?.classList.toggle('hidden', !isIphone || isStandalone());
+}
+
 export async function lockLandscape() {
     if (!window.matchMedia('(pointer: coarse)').matches) return;
     try {

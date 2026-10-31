@@ -1,4 +1,5 @@
 import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES } from '../../data_model/tree.js';
+import { TREE_IMAGES } from '../../data_model/tree_images.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { state } from '../core/state.js';
 import { buyNode, getNextText, getNodeInfo, getNodeState } from '../systems/tree.js';
@@ -26,6 +27,14 @@ function createTreeView(cfg) {
     let activeBranch = Object.keys(branches)[0];
     let built = false;
     const view = { onChange: null };
+
+    // Skill com arte mostra a imagem; as demais, o emoji
+    function setIcon(target, node, info) {
+        const image = TREE_IMAGES[node.id];
+        target.classList.toggle('has-image', Boolean(image));
+        target.style.setProperty('--icon-image', image ? `url("${new URL(image, document.baseURI).href}")` : 'none');
+        target.textContent = image ? '' : info.icon;
+    }
 
     const detail = (name) => el(`${prefix}${name}`);
 
@@ -77,7 +86,7 @@ function createTreeView(cfg) {
             button.style.setProperty('--x', pos.x);
             button.style.setProperty('--y', pos.y);
             button.innerHTML = '<span class="tnode-icon"></span><i class="tnode-level"></i>';
-            button.querySelector('.tnode-icon').textContent = info.icon;
+            setIcon(button.querySelector('.tnode-icon'), node, info);
             grid.appendChild(button);
             buttons.set(node.id, button);
         });
@@ -158,7 +167,7 @@ function createTreeView(cfg) {
         const st = getNodeState(node);
         const info = getNodeInfo(node);
         const next = st.maxed ? '' : getNextText(node);
-        detail('Icon').textContent = info.icon;
+        setIcon(detail('Icon'), node, info);
         detail('Name').textContent = info.name;
         detail('Level').textContent = levelText(node, st);
         detail('Desc').textContent = info.desc;

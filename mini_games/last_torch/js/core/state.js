@@ -146,6 +146,7 @@ export const state = {
     // Skills dos ramos (js/systems/skills*.js, desenhadas em js/render/skills.js)
     oath: null,                 // Juramento da noite: chave em data_model/passives.js (ou null)
     oathCeremony: null,         // Juramento recém-feito, esperando a volta à partida para acontecer
+    whisperKills: 0,            // mortes sob o Oath of Whispers nesta noite (uma sombra nova a cada 5)
     oathAnnounced: false,       // o aviso de Juramento disponível já apareceu nesta noite
     bloodlust: { stacks: 0, timer: 0 },
     warCryTimer: 0,             // bônus de dano depois do rugido

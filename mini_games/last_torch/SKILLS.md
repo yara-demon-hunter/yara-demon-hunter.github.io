@@ -26,7 +26,7 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 | Juramento | Ramo | Bônus | Preço | Forma do herói |
 |---|---|---|---|---|
 | Oath of Slaughter | Blade | +35% dano da lâmina, +10% ataque, +40% Fúria, matar cura 1, provoca de mais longe | O calor da tocha não cura mais, e não lança mais adagas | Chifres, ombreiras com espinhos, espada enorme |
-| Oath of Whispers | Shadow | +1 dash, -20% recarga do dash, +15% velocidade, +10% crítico, +50% adaga | -25% vida | Cachecol ao vento, adagas nas costas |
+| Oath of Whispers | Shadow | +1 dash, -20% recarga do dash, +15% velocidade, +10% crítico, +50% adaga, uma sombra nova a cada 5 mortes (até 8) | -25% vida | Cachecol ao vento, adagas nas costas |
 | Oath of the Hearth | Flame | Tocha leva -35% de dano, +30% vida, calor dobrado que queima | -15% velocidade | Ombreiras douradas, peitoral, lanterna |
 | Oath of Ruin | Curse | +20% dano e -12% recarga dos feitiços | -40% dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
 
@@ -87,7 +87,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Corpo: Hero Health, Iron Skin, Blood Edge, War Cry*
   - Oath of Slaughter*
 - **Shadow** (raiz: Move Speed)
-  - Adagas: Ricochet, Quick Hands, Dagger Mastery (dano, alcance e velocidade), Fan of Knives
+  - Adagas: Ricochet, Dagger Mastery (dano, alcance, velocidade e recarga), Fan of Knives
   - Técnica: Death Mark*, Soul Lance, Soul Spear
   - Sombras: Shadow Clone*, Shadow Legion*. Move Speed, Shadow Clone, Shadow Legion, Juramento
   - Esquiva: Phantom Rush, Night Reaper*, Smoke Bomb*. Move Speed, Phantom Rush, Night Reaper, Smoke Bomb, Juramento
@@ -119,6 +119,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Death Mark | Poder | A adaga marca. A lâmina detona; o dash detona mais forte e devolve a carga. Toda detonação recarrega a adaga | Mira girando, X violeta |
 | Shadow Clone | Passiva | Uma sombra guarda uma área em volta da tocha (raio 200) e não sai dela. Espera no posto; quando um monstro chega perto, anda em linha reta até ele, golpeia com o combo do herói e volta. Os monstros não correm atrás dela, mas quem esbarra ou acerta um tiro a machuca; ela tem vida e volta depois de 10s | Sombra violeta, barra de vida e área tracejada no chão |
 | Shadow Legion | Evolução | Três sombras em vez de uma, cada uma cuidando de um monstro | Três sombras no anel |
+| Explosão da sombra | Efeito do Shadow Clone | A sombra que cai explode em 8 adagas para todos os lados (12 com Fan of Knives). Valem o dano, alcance e velocidade do Dagger Mastery e o Ricochet | Adagas violeta em círculo |
 | Smoke Bomb | Passiva | O dash deixa um rasto longo de fumaça por 7s: freia monstros e todo golpe que eles levam ali, de lâmina ou adaga, é crítico | Rasto de nuvens |
 | Night Reaper | Evolução | Uma sombra refaz o caminho do dash, cortando de novo | Silhueta violeta |
 | Coin Rush | Relíquia | Cada moeda adianta o dash e a adaga em 0,05s | 🧤 Fortune |

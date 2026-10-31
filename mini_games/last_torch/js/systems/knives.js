@@ -1,4 +1,4 @@
-import { FAN_OF_KNIVES } from '../../data_model/passives.js';
+import { FAN_OF_KNIVES, SHADOW_CLONE } from '../../data_model/passives.js';
 import { KNIFE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
@@ -67,6 +67,34 @@ function releaseKnife(thrower = player) {
 
     createExplosion(x, y - K.flightHeight, K.colors.edge, 5 + count * 2);
     if (thrower === player) audio.playSwordSlash(1);
+}
+
+// A sombra que cai explode em adagas para todos os lados: valem Dagger Mastery, Ricochet e Fan of Knives
+export function burstKnives(x, y) {
+    if (mod('noKnives') > 0) return;
+    const B = SHADOW_CLONE.burst;
+    const count = B.knives + (passives.fanOfKnives.lvl > 0 ? B.fanBonus : 0);
+    const speed = KNIFE_SKILL.speed * (1 + mod('knifeSpeed'));
+    const maxRange = getKnifeRange();
+    const ricochet = getPowerLevel(powers.ricochet);
+    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0)) * B.damageMultiplier;
+    const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
+    const offset = Math.random() * Math.PI * 2;
+    for (let i = 0; i < count; i++) {
+        const angle = offset + (i / count) * Math.PI * 2;
+        state.knives.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            angle, speed, maxRange, damage, knockback,
+            travelled: 0,
+            bounces: ricochet?.bounces ?? 0,
+            pierces: 0,
+            scale: 1,
+            struck: null
+        });
+    }
+    createExplosion(x, y - K.flightHeight, K.colors.edge, 10 + count);
 }
 
 // Alcance atual da adaga (com Dagger Mastery)

@@ -15,7 +15,7 @@ import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_
 import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
 import { startHints } from './hints.js';
-import { updateBuildStrip, updateHUD } from './hud.js';
+import { updateHUD } from './hud.js';
 
 // --- INÍCIO DE PARTIDA ---
 export function startGame() {
@@ -122,7 +122,6 @@ export function startGame() {
         document.getElementById(id).classList.add('hidden');
     });
     startHour();
-    updateBuildStrip();
     updateHUD();
     startHints();
 }

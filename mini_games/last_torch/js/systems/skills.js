@@ -36,6 +36,7 @@ export function resetSkills() {
     state.oath = null;
     state.oathCeremony = null;
     state.oathAnnounced = false;
+    state.whisperKills = 0;
     shadowClones.length = 0;
     state.bloodlust.stacks = 0;
     state.bloodlust.timer = 0;

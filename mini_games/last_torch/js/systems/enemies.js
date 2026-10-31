@@ -190,6 +190,7 @@ function killEnemy(i, e, model) {
     state.scoreTurn += pts;
     state.totalScore += Math.round(pts * getScoreMultiplier());
     state.run.kills++;
+    if (state.oath === 'oathWhispers') state.whisperKills++;
     state.run.killsByType[e.type] = (state.run.killsByType[e.type] ?? 0) + 1;
 
     // XP é direto; o ouro cai em moedas no chão

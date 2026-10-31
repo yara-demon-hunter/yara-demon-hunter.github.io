@@ -1,10 +1,9 @@
 import { mod } from '../systems/modifiers.js';
-import { EVOLUTIONS } from '../../data_model/powers.js';
 import { NIGHT, getHourName } from '../../data_model/night.js';
 import { STREAK } from '../../data_model/streak.js';
 import { isBossTurn } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
-import { passives, player, powers, state } from '../core/state.js';
+import { player, state } from '../core/state.js';
 import { getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
 import { hasBuyableNode } from '../systems/tree.js';
 
@@ -162,26 +161,6 @@ function updateNightPips() {
 // Barra de vida do boss: acompanha cada golpe (js/systems/damage.js), no ritmo do HUD
 export function syncBossBar() {
     dirty = true;
-}
-
-// --- BARRA DE PODERES E RELÍQUIAS ---
-// Faixa de ícones abaixo do cartão do herói: a build crescendo durante a partida.
-export function updateBuildStrip() {
-    const strip = el('buildStrip');
-    strip.textContent = '';
-    const add = (icon, level, evolved) => {
-        const item = document.createElement('span');
-        item.className = evolved ? 'build-item is-evolved' : 'build-item';
-        item.textContent = icon;
-        if (level) {
-            const lv = document.createElement('i');
-            lv.textContent = level;
-            item.appendChild(lv);
-        }
-        strip.appendChild(item);
-    };
-    Object.values(powers).forEach(p => { if (p.lvl > 0) add(p.evolved ? EVOLUTIONS[p.key].icon : p.icon, p.lvl, p.evolved); });
-    Object.values(passives).forEach(p => { if (p.lvl > 0) add(p.evolved ? EVOLUTIONS[p.key].icon : p.icon, 0, p.evolved); });
 }
 
 export function updateHUD() {

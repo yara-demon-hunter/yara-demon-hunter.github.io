@@ -8,6 +8,12 @@ permalink: /mini_games/last_torch/last_torch.html
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <!-- Google Analytics, AdSense e Bing (mesmo include das demais páginas do site) -->
     {% include head-resources.html %}
+    <!-- iPhone não tem tela cheia no Safari: salvo na Tela de Início, o jogo abre sem as barras -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Last Torch">
+    <meta name="theme-color" content="#020617">
     <title>Last Torch: Demon Hunter</title>
     <link rel="stylesheet" href="./css/game.css">
 </head>
@@ -63,9 +69,6 @@ permalink: /mini_games/last_torch/last_torch.html
         </div>
     </div>
 
-    <!-- Poderes e relíquias da partida -->
-    <div id="buildStrip" aria-hidden="true"></div>
-
     <!-- Pontuação da partida -->
     <div id="hudScore" aria-hidden="true">0</div>
 
@@ -117,6 +120,7 @@ permalink: /mini_games/last_torch/last_torch.html
         </div>
 
         <button id="btnStart" class="start-btn">LIGHT THE TORCH</button>
+        <p id="iosHint" class="hidden">Full screen on iPhone: tap Share, then <b>Add to Home Screen</b>, and open it from there.</p>
         <!-- Herói e Santuário lado a lado: um toque cada, sem gastar altura -->
         <div class="start-links">
             <button id="btnHeroes" class="start-btn-small">

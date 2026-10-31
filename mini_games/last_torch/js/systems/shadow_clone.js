@@ -6,6 +6,7 @@ import { createHeroAnim } from '../render/player.js';
 import { audio, passives, shadowClones as clones, state } from '../core/state.js';
 import { executeBladeSlash, findNearestEnemy, hitEnemiesInArc } from './combat.js';
 import { createExplosion } from './effects.js';
+import { burstKnives } from './knives.js';
 import { getAtkCooldown, getAtkDamage, getAtkRadius, getKnockback, getMaxPlayerHp, getSlashArcRadian } from './stats.js';
 
 // --- SHADOW CLONE (passiva) ---
@@ -14,12 +15,17 @@ import { getAtkCooldown, getAtkDamage, getAtkRadius, getKnockback, getMaxPlayerH
 // área, a sombra mais livre anda em linha reta até ele (à velocidade dela, sem atalhos), golpeia com o combo do herói
 // (js/systems/combat.js) e volta ao posto. Cada monstro chama uma sombra só, então as três da evolução
 // espalham o serviço. Os monstros não correm atrás delas, mas quem esbarra nelas ou acerta um tiro nelas as machuca
-// (js/systems/enemies.js chama damageShadowClone); caída, a sombra volta ao posto depois de SHADOW_CLONE.respawnSeconds.
+// (js/systems/enemies.js chama damageShadowClone); caída, a sombra explode em adagas (burstKnives) e volta ao posto depois
+// de SHADOW_CLONE.respawnSeconds. Com o Oath of Whispers surge uma sombra nova a cada 5 mortes, até 8.
 const TAU = Math.PI * 2;
 
 export function getCloneCount() {
     if (passives.shadowClone.lvl <= 0) return 0;
-    return passives.shadowClone.evolved ? EVOLUTIONS.shadowClone.levels.count : 1;
+    const base = passives.shadowClone.evolved ? EVOLUTIONS.shadowClone.levels.count : 1;
+    // Oath of Whispers: uma sombra nova a cada tantas mortes, até o máximo
+    const { killsPerShadow, maxShadows } = SHADOW_CLONE.whispers;
+    const extra = state.oath === 'oathWhispers' ? Math.floor(state.whisperKills / killsPerShadow) : 0;
+    return Math.min(maxShadows, base + extra);
 }
 
 // Posto de cada sombra: espalhadas em volta da tocha, a primeira acima dela
@@ -85,6 +91,7 @@ export function damageShadowClone(c, amount, fromX, fromY, invulnerableSeconds) 
         c.active = false;
         c.respawnTimer = SHADOW_CLONE.respawnSeconds;
         createExplosion(c.x, c.y, SHADOW_CLONE_VISUALS.deathBurstColor, 26);
+        burstKnives(c.x, c.y);
         audio.playExplode();
     } else {
         createExplosion(c.x, c.y, SHADOW_CLONE_VISUALS.deathBurstColor, 8);

@@ -106,7 +106,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         oath: true, gear: 'whispers', tagline: 'Never where they strike',
-        desc: '+1 dash charge, 20% shorter dash cooldown, +15% move speed, +10% crit and +50% dagger damage. The price: -25% max health.',
+        desc: '+1 dash charge, 20% shorter dash cooldown, +15% move speed, +10% crit and +50% dagger damage. Every 5 kills a new shadow joins the torch (up to 8). The price: -25% max health.',
         mods: { dashCharges: 1, dashCooldown: 0.2, moveSpeed: 0.15, critChance: 0.1, knifeDamage: 0.5, maxHp: -0.25 }
     },
     oathHearth: {
@@ -361,5 +361,16 @@ export const SHADOW_CLONE = {
     // VIDA DA SOMBRA: fração da vida máxima do herói (sobe junto com o upgrade Hero Health)
     hpRatio: 0.5,
     // TEMPO PARA VOLTAR depois de cair (segundos)
-    respawnSeconds: 10
+    respawnSeconds: 10,
+    // EXPLOSÃO ao cair: adagas em todas as direções, com o dano, o alcance, a velocidade e o Ricochet do herói
+    burst: {
+        knives: 8,
+        fanBonus: 4,            // adagas a mais com Fan of Knives
+        damageMultiplier: 1     // x o dano de uma adaga do herói
+    },
+    // OATH OF WHISPERS: uma sombra nova a cada tantas mortes na noite, até o total máximo (as caídas renascem)
+    whispers: {
+        killsPerShadow: 5,
+        maxShadows: 8
+    }
 };

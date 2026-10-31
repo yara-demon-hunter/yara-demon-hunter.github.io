@@ -5,7 +5,7 @@ import { TREE_BY_ID, TREE_COSTS, TREE_NODES } from '../../data_model/tree.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, powers, state } from '../core/state.js';
 import { showToast } from '../ui/banner.js';
-import { updateBuildStrip, updateHUD } from '../ui/hud.js';
+import { updateHUD } from '../ui/hud.js';
 import { getStatText } from '../ui/status.js';
 import { refreshModifiers } from './modifiers.js';
 import { celebrateEvolution } from './powers.js';
@@ -187,7 +187,6 @@ export function buyNode(id) {
     syncMaxHp();
     syncTorchMax();
     announceOath();
-    updateBuildStrip();
     updateHUD();
     if (st.currency === 'gold') audio.playPurchase();
     else audio.playCardPick(node.kind === 'evolve' ? 'evolution' : node.kind === 'power' || node.kind === 'passive' ? 'rare' : 'common');

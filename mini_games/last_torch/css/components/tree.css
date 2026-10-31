@@ -301,3 +301,14 @@
     .tdetail-branch { display: none; }
     .tdetail-legend { font-size: 0.5rem; }
 }
+
+/* Arte da skill no lugar do emoji (data_model/tree_images.js) */
+.has-image { background: var(--icon-image) center / contain no-repeat; }
+.tnode-icon.has-image { width: 100%; height: 100%; }
+/* Nó com arte é maior e a arte o preenche: é ela que identifica a skill */
+.tnode:has(.tnode-icon.has-image) { width: calc(var(--cell) * 0.94); height: calc(var(--cell) * 0.94); border-width: 1.5px; }
+.tnode-evolve:has(.tnode-icon.has-image) { width: calc(var(--cell) * 0.74); height: calc(var(--cell) * 0.74); }
+.tnode.is-open:not(.is-owned) .tnode-icon.has-image, .tnode.is-chained .tnode-icon.has-image { opacity: 0.62; filter: grayscale(0.45); }
+.tnode-oath .tnode-icon.has-image { width: auto; height: auto; background: var(--icon-image) center / 100% no-repeat, var(--fill); }
+.tdetail-icon.has-image { width: 2.6rem; height: 2.6rem; }
+@media (max-height: 520px) { .tdetail-icon.has-image { width: 1.9rem; height: 1.9rem; } }
