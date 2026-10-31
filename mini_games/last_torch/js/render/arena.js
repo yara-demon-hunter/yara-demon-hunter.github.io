@@ -3,7 +3,7 @@ import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { HERO_VISUALS } from '../../data_model/visuals/characters/hero_visual.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
-import { ctx, maxUltEnergy, player, shadowClone, state } from '../core/state.js';
+import { ctx, maxUltEnergy, player, shadowClones, state } from '../core/state.js';
 import { getAtkRadius } from '../systems/stats.js';
 import { drawGlow } from './fx/glow.js';
 import { drawHpBar } from './fx/hp_bar.js';
@@ -108,10 +108,10 @@ function drawRangeCircle(x, y, radius, alpha = 1) {
 
 // Raio de Alcance do herói e do Shadow Clone (o do clone um pouco mais apagado)
 export function renderAttackRange() {
-    if (shadowClone.active) {
-        const appear = Math.min(1, (performance.now() - shadowClone.spawnTime) / 1000 / SHADOW_CLONE_VISUALS.spawnSeconds);
-        drawRangeCircle(shadowClone.x, shadowClone.y, getAtkRadius() * SHADOW_CLONE.radiusMultiplier,
-            SHADOW_CLONE_VISUALS.rangeAlpha * appear);
+    for (const c of shadowClones) {
+        if (!c.active) continue;
+        const appear = Math.min(1, (performance.now() - c.spawnTime) / 1000 / SHADOW_CLONE_VISUALS.spawnSeconds);
+        drawRangeCircle(c.x, c.y, getAtkRadius() * SHADOW_CLONE.radiusMultiplier, SHADOW_CLONE_VISUALS.rangeAlpha * appear);
     }
     if (!player.hidden) drawRangeCircle(player.x, player.y, getAtkRadius());
 }

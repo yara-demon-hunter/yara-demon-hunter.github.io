@@ -19,6 +19,11 @@ import { syncMaxHp, syncTorchMax } from './torch.js';
 const NODE_BY_ID = { ...TREE_BY_ID, ...RELIC_BY_ID };
 const DEFAULT_MAX = 5;
 
+// Quem evolui: um poder, ou uma passiva (Shadow Clone). Os dois guardam `evolved`
+function evolvable(node) {
+    return powers[node.key] ?? passives[node.key];
+}
+
 export function getOwnedPowers() {
     return Object.values(powers).filter(p => p.lvl > 0);
 }
@@ -27,7 +32,7 @@ export function getNodeLevel(node) {
     if (node.kind === 'passive' || node.kind === 'relic') return passives[node.key].lvl;
     if (node.kind === 'stat') return attributes[node.key].lvl - 1;
     if (node.kind === 'power') return powers[node.key].lvl;
-    if (node.kind === 'evolve') return powers[node.key].evolved ? 1 : 0;
+    if (node.kind === 'evolve') return evolvable(node).evolved ? 1 : 0;
     return state.tree[node.id] ?? 0;
 }
 
@@ -82,7 +87,7 @@ export function getNodeInfo(node) {
 export function getNextText(node) {
     if (node.kind === 'passive' || node.kind === 'relic') return '';
     if (node.kind === 'power') return POWER_MODELS[node.key].upgrades[powers[node.key].lvl] ?? '';
-    if (node.kind === 'evolve') return `${POWER_MODELS[node.key].name} evolves`;
+    if (node.kind === 'evolve') return `${evolvable(node).name} evolves`;
     if (node.kind === 'mod') return node.levelText;
     const attr = attributes[node.key];
     const before = getStatText(node.key);
@@ -171,7 +176,7 @@ export function buyNode(id) {
     else if (node.kind === 'power') powers[node.key].lvl++;
     else if (node.kind === 'mod') state.tree[node.id] = st.level + 1;
     else {
-        powers[node.key].evolved = true;
+        evolvable(node).evolved = true;
         state.run.evolutions++;
         save.stats.evolutions++;
         persist();

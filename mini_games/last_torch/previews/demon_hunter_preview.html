@@ -13,13 +13,13 @@
     <!-- Página de desenvolvimento: tudo do herói (corrida, golpes, dash, efeitos, heróis alternativos, clone, Juramentos,
          golpes especiais, skills dos quatro ramos e adaga)
          usando o código real do jogo. Como abrir: previews/README.md -->
-    <canvas id="gameCanvas" width="1200" height="5730"></canvas>
+    <canvas id="gameCanvas" width="1200" height="6000"></canvas>
     <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
     <script>
         if (location.protocol === 'file:') {
             const g = document.getElementById('gameCanvas').getContext('2d');
             g.fillStyle = '#050b16';
-            g.fillRect(0, 0, 1200, 5730);
+            g.fillRect(0, 0, 1200, 6000);
             g.textAlign = 'center';
             g.fillStyle = '#fbbf24';
             g.font = '600 26px system-ui, sans-serif';
@@ -41,7 +41,10 @@
         import { KNIFE_VISUALS as K } from '../data_model/visuals/effects/knife_visual.js';
         import { SLASH_VISUALS } from '../data_model/visuals/effects/slash_visual.js';
         import { LEVEL_UP_VISUALS } from '../data_model/visuals/effects/level_up_visual.js';
-        import { ctx, passives, player, powers, state } from '../js/core/state.js';
+        import { ctx, passives, player, powers, shadowClones, state } from '../js/core/state.js';
+        import { updateShadowClone } from '../js/systems/shadow_clone.js';
+        import { renderCore } from '../js/render/arena.js';
+        import { renderShadowClone } from '../js/render/shadow_clone.js';
         import { addCracks } from '../js/systems/skills_blade.js';
         import { renderShockwaves } from '../js/render/effects.js';
         import { renderBladeSlashes, renderKnives } from '../js/render/entities.js';
@@ -61,7 +64,7 @@
 
         state.gameState = 'PLAYING';     // o herói só anima durante a partida
         const WIDTH = 1200;
-        const HEIGHT = 5730;
+        const HEIGHT = 6000;
         const start = performance.now();
         let last = start;
 
@@ -104,6 +107,43 @@
                 evolved: [],
                 ...opts
             };
+        }
+
+        // Cena do Shadow Clone: roda o sistema de verdade (js/systems/shadow_clone.js) em volta de uma tocha. As sombras
+        // são uma lista global do jogo, então cada cena guarda as suas e as devolve depois de desenhar.
+        function loadGuard(s) {
+            shadowClones.splice(0, shadowClones.length, ...(s.clones ?? []));
+            passives.shadowClone.lvl = 1;
+            passives.shadowClone.evolved = s.legion ?? false;
+            state.coreX = s.body.x;
+            state.coreY = s.body.y;
+            state.coreHpMax = 100;
+            state.coreHp = 100;
+            state.enemies = s.fx.enemies;
+            state.bladeSlashes = s.slashes;
+        }
+
+        function unloadGuard(s) {
+            s.clones = [...shadowClones];
+            shadowClones.length = 0;
+            passives.shadowClone.lvl = 0;
+            passives.shadowClone.evolved = false;
+        }
+
+        // Monstros que se aproximam da tocha em ângulos diferentes; as sombras os recebem no anel
+        function guardLoop(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 2.4;
+            const r = 215 - (s.clock / 2.4) * 165;
+            s.fx.enemies.forEach((e, i) => {
+                const a = e.angle + (s.clock / 2.4) * 0.5;
+                e.x = s.body.x + Math.cos(a) * r;
+                e.y = s.body.y + Math.sin(a) * r;
+            });
+            updateShadowClone(dt);
+        }
+
+        function guardMonsters(angles) {
+            return angles.map(angle => ({ x: 0, y: 0, vx: 0, vy: 0, radius: 14, hp: 1e9, maxHp: 1e9, color: '#94a3b8', angle }));
         }
 
         // Cena virada para a câmera: é de onde os golpes se leem melhor
@@ -152,6 +192,7 @@
             b.x += Math.cos(s.heading) * s.speed * dt;
             b.y += Math.sin(s.heading) * s.speed * dt;
             Object.assign(player, b);
+            if (s.guard) loadGuard(s);
             s.before?.(s, dt);
             Object.assign(player, b);
             updateHeroAnim(s.anim, player);
@@ -187,7 +228,11 @@
                 renderDashGhosts();
                 renderLevelUpBack();
                 renderSkillAuras();
-                renderPlayer25D(player, s.anim, s.colors, s.gear);
+                if (s.guard) {
+                    renderCore();
+                    renderShadowClone();
+                }
+                if (!s.noHero) renderPlayer25D(player, s.anim, s.colors, s.gear);
                 renderShield();
                 renderWisp();
                 renderBladeSlashes();
@@ -201,6 +246,7 @@
                 renderShockwaves();
                 renderLevelUpFront();
             });
+            if (s.guard) unloadGuard(s);
             state.frenzyActiveTimer = 0;
             state.bladeSlashes = [];
             state.dashGhosts = [];
@@ -500,6 +546,10 @@
             ['Cataclysm: rachaduras em lava', scene({ before: moveLoop('slam', 0.5, slamImpactFx(true)) })],
             ['Executioner', front({ fx: { ...createFx(), enemies: [dummy(40, 0, { stunned: 1 })] }, before: executeLoop })]
         ];
+        const guardFx = [
+            ['Shadow Clone: guarda (1)', scene({ guard: true, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4]) }, before: guardLoop })],
+            ['Shadow Legion: guarda (3)', scene({ guard: true, legion: true, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4, 2.5, 4.6]) }, before: guardLoop })]
+        ];
         const shadowFx = [
             ['Death Mark', scene({ fx: { ...createFx(), enemies: [dummy(44, 0)] }, before: markLoop })],
             ['Smoke Bomb: rasto', scene({ fx: { ...createFx(), enemies: [dummy(30, 26)] }, before: smokeLoop })],
@@ -629,7 +679,7 @@
         }
         const everyScene = new Map([
             ...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
-            ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...flameFx, ...curseFx
+            ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...curseFx
         ]);
 
         function gallery(title, top, items, zoom = 2.3) {
@@ -763,7 +813,7 @@
             });
 
             [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
-                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...flameFx, ...curseFx].forEach(([, s]) => { s.dt = dt; });
+                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...curseFx].forEach(([, s]) => { s.dt = dt; });
             gallery('Poses', 300, poses);
             gallery('Golpes (com a marca do corte)', 570, swings, 1.7);
             gallery('Dash, dano, nível e Mirror Ward', 840, effects, 1.9);
@@ -779,9 +829,10 @@
             gallery('Mais poses', 3270, heroMoves2, 1.45);
             gallery('Skills de Blade', 3540, bladeFx, 1.05);
             gallery('Skills de Shadow', 3810, shadowFx, 1.05);
-            gallery('Skills de Flame', 4080, flameFx, 0.52);
-            gallery('Skills de Curse', 4350, curseFx, 0.82);
-            drawKnifeSection(now, 4620);
+            gallery('Shadow Clone e Shadow Legion (guarda da tocha)', 4080, guardFx, 1.1);
+            gallery('Skills de Flame', 4350, flameFx, 0.52);
+            gallery('Skills de Curse', 4620, curseFx, 0.82);
+            drawKnifeSection(now, 4890);
             requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);

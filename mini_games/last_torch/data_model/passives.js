@@ -43,7 +43,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 150,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'A shadow reflection walks with you and slashes any monster that enters its own circle. If it falls, it returns after a while.'
+        desc: 'A shadow keeps watch near the torch and walks out to cut down whatever comes close. Monsters ignore it, but a stray hit can still bring it down. It returns after a while.'
     },
     masterThief: {
         name: 'Master Thief',
@@ -350,26 +350,26 @@ export const PHOENIX_PACT = {
 
 export function createPassives() {
     return Object.fromEntries(
-        Object.entries(PASSIVE_SKILL_MODELS).map(([key, model]) => [key, { ...model, lvl: 0 }])
+        Object.entries(PASSIVE_SKILL_MODELS).map(([key, model]) => [key, { ...model, key, lvl: 0, evolved: false }])
     );
 }
 
-// Shadow Clone: reflexo de sombra do herói. Fica sempre na mesma posição em relação a ele, anda junto,
-// solta as lâminas da Fúria junto. A espada é dele: golpeia
-// sozinho quando um monstro entra no círculo dele. Usa os stats do herói com os multiplicadores abaixo.
-// Leva dano de monstros e tiros como o herói; se morrer, volta depois de respawnSeconds. Não carrega a Fúria.
+// Shadow Clone: uma sombra que guarda a tocha. Tem uma área em volta da chama (areaRadius) onde anda livremente, e
+// nunca sai dela. Espera parada no posto, a postRadius da chama. Quando um monstro chega perto da área, ela anda em
+// linha reta até ele, golpeia com a espada do herói (os multiplicadores abaixo) e volta ao posto quando acaba. Os monstros não correm atrás dela, mas quem esbarra nela ou acerta um tiro
+// nela a machuca. Cai, e volta depois de respawnSeconds. Evoluída (Shadow Legion), são três sombras, cada uma cuidando
+// de um monstro. Solta as lâminas da Fúria junto com o herói. Não carrega a Fúria.
 export const SHADOW_CLONE = {
-    // DISTÂNCIA ENTRE O HERÓI E O CLONE (unidades do mundo). Maior = mais longe.
-    // Com ~80 os círculos de alcance dos dois quase se encostam.
-    followDistance: 150,
-    // LADO EM QUE O CLONE FICA (graus): 0 = direita, 90 = abaixo, 180 = esquerda, 270 = acima
-    offsetAngleDegrees: 180,
-    damageMultiplier: 0.3,      // golpes do clone
+    areaRadius: 200,            // área em volta da tocha onde as sombras se movem (unidades do mundo)
+    postRadius: 110,            // distância da tocha em que cada sombra espera, dentro da área
+    moveSpeed: 165,             // px/s: indo até o monstro (um pouco mais devagar que o herói)
+    returnSpeed: 120,           // px/s: voltando ao posto
+    damageMultiplier: 0.35,     // golpes da sombra
     knockbackMultiplier: 0.3,
-    radiusMultiplier: 0.9,      // alcance da lâmina do clone (círculo vermelho dele)
+    radiusMultiplier: 0.9,      // alcance da lâmina da sombra
     cooldownMultiplier: 1,      // x recarga do golpe do herói (maior = golpeia mais devagar)
-    // VIDA DO CLONE: fração da vida máxima do herói (sobe junto com o upgrade Hero Health)
+    // VIDA DA SOMBRA: fração da vida máxima do herói (sobe junto com o upgrade Hero Health)
     hpRatio: 0.5,
-    // TEMPO PARA VOLTAR depois de morrer (segundos)
-    respawnSeconds: 12
+    // TEMPO PARA VOLTAR depois de cair (segundos)
+    respawnSeconds: 10
 };

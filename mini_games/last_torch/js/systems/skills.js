@@ -1,6 +1,6 @@
 import { PASSIVE_SKILL_MODELS } from '../../data_model/passives.js';
 import { OATH_VISUALS } from '../../data_model/visuals/characters/oath_visual.js';
-import { audio, player, state } from '../core/state.js';
+import { audio, player, shadowClones, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { startMove, updateCast, updateMove } from './moves.js';
@@ -36,6 +36,7 @@ export function resetSkills() {
     state.oath = null;
     state.oathCeremony = null;
     state.oathAnnounced = false;
+    shadowClones.length = 0;
     state.bloodlust.stacks = 0;
     state.bloodlust.timer = 0;
     state.warCryTimer = 0;

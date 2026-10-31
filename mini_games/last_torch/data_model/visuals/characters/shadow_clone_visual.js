@@ -13,9 +13,11 @@ export const SHADOW_CLONE_VISUALS = {
     slashFrenzyColor: '#c026d3',
     spawnBurstColor: '#7c3aed',
     deathBurstColor: '#a855f7',
+    // A área da tocha onde as sombras se movem
+    area: { fill: 'rgba(124, 58, 237, 0.05)', edge: 'rgba(167, 139, 250, 0.32)', width: 1.6, dash: 10 },
     // Barra de vida em cima da cabeça
     hpBar: { width: 26, height: 3.5, offsetY: 46, back: 'rgba(15, 23, 42, 0.85)', fill: '#a855f7', border: 'rgba(196, 181, 253, 0.5)' },
-    // Morto: anel no lugar do clone que enche até ele voltar
+    // Caída: anel no posto dela que enche até ela voltar
     respawnRing: { radius: 11, width: 3, color: 'rgba(168, 85, 247, 0.75)', back: 'rgba(168, 85, 247, 0.15)' },
     // Mesmas chaves de HERO_VISUALS.colors: tons de roxo quase preto, olhos e lâmina violeta
     colors: {

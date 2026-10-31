@@ -121,7 +121,9 @@ export function openStatus() {
     renderHeader();
     renderStats();
     const skills = Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0)
-        .map(p => ({ icon: p.icon, name: p.name, desc: p.desc, level: 0 }));
+        .map(p => (p.evolved
+            ? { icon: EVOLUTIONS[p.key].icon, name: `${EVOLUTIONS[p.key].name} ✦`, desc: EVOLUTIONS[p.key].desc, level: 0 }
+            : { icon: p.icon, name: p.name, desc: EVOLUTIONS[p.key] ? `${p.desc} Can evolve in the skill tree.` : p.desc, level: 0 }));
     renderBuildList('powerList', [...getOwnedPowers().map(p => ({
         icon: p.evolved ? EVOLUTIONS[p.key].icon : p.icon,
         name: p.evolved ? `${EVOLUTIONS[p.key].name} ✦` : p.name,

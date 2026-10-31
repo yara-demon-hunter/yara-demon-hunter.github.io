@@ -92,6 +92,7 @@ export const TREE_NODES = [
     { id: 'phantomDash', branch: 'shadow', kind: 'power', key: 'phantomDash', x: 1, y: 2, requires: [req('moveSpeed', 2)] },
     { id: 'phantomEvolve', branch: 'shadow', kind: 'evolve', key: 'phantomDash', x: 0, y: 3, requires: [req('phantomDash', 5)] },
     { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 2, y: 2, requires: [req('phantomDash', 2)] },
+    { id: 'shadowCloneEvolve', branch: 'shadow', kind: 'evolve', key: 'shadowClone', x: 3, y: 2, requires: [req('shadowClone')] },
     { id: 'smokeBomb', branch: 'shadow', kind: 'passive', key: 'smokeBomb', x: 4, y: 1, requires: [req('shadowClone')] },
     { id: 'fleetFoot', branch: 'shadow', kind: 'mod', x: 5, y: 1, requires: [req('smokeBomb')],
       name: 'Fleet Foot', icon: '💨', desc: 'The dash recharges faster.', levelText: '-7% dash recharge', mods: { dashCooldown: 0.07 } },
@@ -105,7 +106,7 @@ export const TREE_NODES = [
     { id: 'treasureNose', branch: 'shadow', kind: 'mod', x: 4, y: 3, requires: [req('coinRush', 2)],
       name: "Thief's Nose", icon: '👃', desc: 'You sniff out what others miss. Monsters drop items more often.', levelText: '+10% item drops', mods: { pickupRate: 0.1 } },
     { id: 'masterThief', branch: 'shadow', kind: 'passive', key: 'masterThief', x: 5, y: 3, requires: [req('treasureNose')] },
-    { id: 'oathWhispers', branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, cost: 5, x: 6, y: 1.5, requires: [req('fanOfKnives'), req('shadowClone')] },
+    { id: 'oathWhispers', branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, cost: 5, x: 6, y: 1.5, requires: [req('fanOfKnives'), req('shadowCloneEvolve')] },
 
     // --- CHAMA: o guardião. Paciência, a tocha, muralhas de fogo ---
     { id: 'torchKeeper', branch: 'flame', kind: 'mod', x: 0, y: 1.5, requires: [],

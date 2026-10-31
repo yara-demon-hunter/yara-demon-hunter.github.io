@@ -3,7 +3,7 @@ import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, createVampireBat, rollMonsterGold } from '../../data_model/monsters.js';
 import { MIRROR_WARD } from '../../data_model/passives.js';
-import { audio, passives, player, shadowClone, state } from '../core/state.js';
+import { audio, passives, player, shadowClones, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { updateBossAI } from './boss_ai.js';
 import { dealDamage } from './damage.js';
@@ -13,10 +13,10 @@ import { mod } from './modifiers.js';
 import { checkHourEnd, onBossKilled } from './night.js';
 import { dropChest, maybeDropPickup } from './pickups.js';
 import { hurtPlayer } from './player.js';
+import { damageShadowClone } from './shadow_clone.js';
 import { addHostileFire, onEnemyKilled } from './powers.js';
 import { onTorchTouched } from './skills_flame.js';
 import { gainXp } from './progression.js';
-import { damageShadowClone } from './shadow_clone.js';
 
 import { recordBeast } from './sanctuary.js';
 import { addStreakKill, getScoreMultiplier, getStreakGoldBonus } from './streak.js';
@@ -334,13 +334,15 @@ export function updateEnemies(dt) {
             if (mod('thorns') > 0) dealDamage(e, getAtkDamage() * mod('thorns'), { noCrit: true });
         }
 
-        // Colisão com o Shadow Clone (passiva): ele também se machuca
-        if (hunting && shadowClone.active && shadowClone.iFrames <= 0
-            && Math.hypot(shadowClone.x - e.x, shadowClone.y - e.y) < e.radius + CHARACTER_MODEL.collisionRadius) {
-            damageShadowClone(e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
-            const pushAngle = Math.atan2(e.y - shadowClone.y, e.x - shadowClone.x);
-            e.vx += Math.cos(pushAngle) * MONSTER_SPAWNING.contactKnockback;
-            e.vy += Math.sin(pushAngle) * MONSTER_SPAWNING.contactKnockback;
+        // Sombras do Shadow Clone: o monstro não corre atrás delas, mas quem esbarra nelas as machuca
+        if (hunting) {
+            for (const c of shadowClones) {
+                if (!c.active || c.iFrames > 0 || Math.hypot(c.x - e.x, c.y - e.y) >= e.radius + CHARACTER_MODEL.collisionRadius) continue;
+                damageShadowClone(c, e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+                const pushAngle = Math.atan2(e.y - c.y, e.x - c.x);
+                e.vx += Math.cos(pushAngle) * MONSTER_SPAWNING.contactKnockback;
+                e.vy += Math.sin(pushAngle) * MONSTER_SPAWNING.contactKnockback;
+            }
         }
 
         // Morte
@@ -456,9 +458,10 @@ export function updateEnemyProjectiles(dt) {
             continue;
         }
 
-        if (shadowClone.active && shadowClone.iFrames <= 0
-            && Math.hypot(shadowClone.x - p.x, shadowClone.y - p.y) < p.radius + CHARACTER_MODEL.collisionRadius) {
-            damageShadowClone(p.damage, p.x - p.vx * 0.05, p.y - p.vy * 0.05, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
+        const hitClone = shadowClones.find(c => c.active && c.iFrames <= 0
+            && Math.hypot(c.x - p.x, c.y - p.y) < p.radius + CHARACTER_MODEL.collisionRadius);
+        if (hitClone) {
+            damageShadowClone(hitClone, p.damage, p.x - p.vx * 0.05, p.y - p.vy * 0.05, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
             enemyProjectiles.splice(i, 1);
             continue;
         }

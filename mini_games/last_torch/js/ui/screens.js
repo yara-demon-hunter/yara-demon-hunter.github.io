@@ -56,7 +56,7 @@ export function startGame() {
     state.pickupPity = 0;
 
     Object.keys(attributes).forEach(k => attributes[k].lvl = 1);
-    Object.keys(passives).forEach(k => passives[k].lvl = 0);
+    Object.keys(passives).forEach(k => { passives[k].lvl = 0; passives[k].evolved = false; });
     Object.values(powers).forEach(p => {
         p.lvl = 0;
         p.evolved = false;

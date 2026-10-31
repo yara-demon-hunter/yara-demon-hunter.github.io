@@ -1,6 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { WORLD } from '../../data_model/world.js';
-import { canvas, ctx, player, shadowClone, state } from './state.js';
+import { canvas, ctx, player, shadowClones, state } from './state.js';
 
 // Resolução interna do canvas: segue a tela até o teto do perfil. Telas 2x/3x têm 4x/9x mais pixels
 // para pintar e, numa cena escura e em movimento, quase não mostram a diferença.
@@ -92,7 +92,7 @@ export function resize() {
         // Janela redimensionada no meio da partida: desloca tudo junto com o centro
         const dx = state.coreX - oldCoreX;
         const dy = state.coreY - oldCoreY;
-        [player, shadowClone, ...state.enemies, ...state.enemyProjectiles, ...state.goldDrops, ...state.pickups, ...state.particles].forEach(o => {
+        [player, ...shadowClones, ...state.enemies, ...state.enemyProjectiles, ...state.goldDrops, ...state.pickups, ...state.particles].forEach(o => {
             o.x += dx;
             o.y += dy;
         });

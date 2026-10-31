@@ -181,7 +181,7 @@ export function updateBuildStrip() {
         strip.appendChild(item);
     };
     Object.values(powers).forEach(p => { if (p.lvl > 0) add(p.evolved ? EVOLUTIONS[p.key].icon : p.icon, p.lvl, p.evolved); });
-    Object.values(passives).forEach(p => { if (p.lvl > 0) add(p.icon, 0, false); });
+    Object.values(passives).forEach(p => { if (p.lvl > 0) add(p.evolved ? EVOLUTIONS[p.key].icon : p.icon, 0, p.evolved); });
 }
 
 export function updateHUD() {

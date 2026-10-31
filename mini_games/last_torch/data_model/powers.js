@@ -256,6 +256,12 @@ export const POWER_MODELS = {
 // --- EVOLUÇÕES ---
 // Poder no nível máximo + requisitos do nó de evolução (data_model/tree.js) = transforma o poder.
 export const EVOLUTIONS = {
+    // Passiva que evolui (passives.shadowClone.evolved): count = sombras em guarda
+    shadowClone: {
+        name: 'Shadow Legion', icon: '🥷',
+        desc: 'Three shadows guard the torch instead of one, each one watching a different monster.',
+        levels: { count: 3 }
+    },
     orbitBlades: {
         name: 'Blade Tempest', icon: '🌪️',
         desc: 'Eight blades in a wide storm, and they hit far harder.',

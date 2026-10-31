@@ -31,7 +31,7 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 | Oath of Ruin | Curse | +20% dano e -12% recarga dos feitiços | -40% dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
 
 Regras: abre ao aprender **as duas skills que chegam nele** (as ligações do mapa) e fica na coluna 6, sempre na mesma posição.
-Slaughter pede Cataclysm e Executioner; Whispers, Fan of Knives e Shadow Clone (o caminho do ouro, até Master Thief, fica de fora); Hearth, Phoenix Pact e Solar Wall;
+Slaughter pede Cataclysm e Executioner; Whispers, Fan of Knives e Shadow Legion (a evolução do Shadow Clone; o caminho do ouro, até Master Thief, fica de fora); Hearth, Phoenix Pact e Solar Wall;
 Ruin, Wrath of Heaven e Event Horizon. Os dados ficam em `data_model/passives.js`, e a arte
 em `data_model/visuals/characters/oath_visual.js` e `js/render/hero_gear.js`.
 
@@ -81,7 +81,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 - **Shadow** (raiz: Move Speed)
   - Adagas: Ricochet, Quick Hands, Dagger Mastery, Long Throw, Fan of Knives
   - Técnica: Death Mark*, Soul Lance, Soul Spear
-  - Esquiva: Phantom Rush, Night Reaper*, Shadow Clone, Smoke Bomb*, Fleet Foot. A cadeia é
+  - Esquiva: Phantom Rush, Night Reaper*, Shadow Clone*, Shadow Legion*, Smoke Bomb*, Fleet Foot. A cadeia é
     Move Speed, Phantom Rush, Shadow Clone, Smoke Bomb; Night Reaper sai de Phantom Rush e Fleet Foot fecha a linha
   - Ladrão: Light Fingers, Pickpocket, Coin Rush*, Thief's Nose, Master Thief
   - Oath of Whispers*
@@ -110,6 +110,8 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | War Cry | Passiva | Cercado por 5, ruge: joga longe, atordoa e dá +30% na lâmina por 4s | Braços abertos, cabeça para trás |
 | Executioner | Passiva | A lâmina termina monstros abaixo de 20% da vida (elites 10%, bosses não) | X vermelho |
 | Death Mark | Poder | A adaga marca. A lâmina detona; o dash detona mais forte e devolve a carga. Toda detonação recarrega a adaga | Mira girando, X violeta |
+| Shadow Clone | Passiva | Uma sombra guarda uma área em volta da tocha (raio 200) e não sai dela. Espera no posto; quando um monstro chega perto, anda em linha reta até ele, golpeia com o combo do herói e volta. Os monstros não correm atrás dela, mas quem esbarra ou acerta um tiro a machuca; ela tem vida e volta depois de 10s | Sombra violeta, barra de vida e área tracejada no chão |
+| Shadow Legion | Evolução | Três sombras em vez de uma, cada uma cuidando de um monstro | Três sombras no anel |
 | Smoke Bomb | Passiva | O dash deixa um rasto longo de fumaça por 7s: freia monstros e todo golpe que eles levam ali, de lâmina ou adaga, é crítico | Rasto de nuvens |
 | Night Reaper | Evolução | Uma sombra refaz o caminho do dash, cortando de novo | Silhueta violeta |
 | Coin Rush | Efeito | Cada moeda adianta o dash e a adaga | - |
@@ -130,6 +132,8 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 
 1. Escolha o ramo pela pergunta acima e a linha pelo tema.
 2. Crie os dados: `powers.js` (poder ou evolução), `passives.js` (passiva) ou direto no nó (efeito simples).
+   Uma passiva também pode evoluir: o nó `evolve` aponta para a passiva (`key`), os dados ficam em `EVOLUTIONS` e o
+   flag `evolved` mora na própria passiva (como no Shadow Clone).
 3. Mecânica própria: em `js/systems/skills_blade.js`, `skills_shadow.js`, `skills_flame.js` ou `skills_curse.js`.
    Golpe do herói com impacto: `startMove` em `js/systems/moves.js`, com a pose em `js/render/player25d.js`.
    Efeito na tela: `js/render/skills.js`, com as medidas em `data_model/visuals/effects/skills_visual.js`.
