@@ -1,3 +1,36 @@
+- date: "2026-11-01"
+  title:
+    en: "Last Torch: Flaming Sword and Fireballs"
+    pt: "Last Torch: Flaming Sword e Fireballs"
+  summary:
+    en: "Two new Flame skills set your weapons alight: every cut leaves monsters burning, and daggers become fireballs that grow in your hand and burst on impact."
+    pt: "Duas novas habilidades de Flame incendeiam suas armas: cada corte deixa os monstros em chamas, e as adagas viram bolas de fogo que crescem na mão e explodem ao acertar."
+  url:
+    en: "/en/mini-games/last-torch/#skills"
+    pt: "/pt/mini-games/last-torch/#habilidades"
+
+- date: "2026-11-01"
+  title:
+    en: "Last Torch: shadows that guard the torch"
+    pt: "Last Torch: sombras que guardam a tocha"
+  summary:
+    en: "Shadow Clone was rebuilt: shadows defend the torch, and each one bursts into daggers when it falls. Shadow Legion brings three, and the Oath of Whispers can raise up to eight."
+    pt: "O Shadow Clone foi refeito: as sombras defendem a tocha, e cada uma explode em adagas ao cair. A Shadow Legion traz três, e o Oath of Whispers pode reunir até oito."
+  url:
+    en: "/en/mini-games/last-torch/#skills"
+    pt: "/pt/mini-games/last-torch/#habilidades"
+
+- date: "2026-11-01"
+  title:
+    en: "Last Torch: four ways to play and the Oaths"
+    pt: "Last Torch: quatro jeitos de jogar e os Juramentos"
+  summary:
+    en: "Each skill branch is now its own playstyle, with new skills and a powerful Oath at the end that transforms the hero, at a price."
+    pt: "Cada ramo de habilidades agora é um estilo de jogo próprio, com novas habilidades e um Juramento poderoso no fim, que transforma o herói e cobra um preço."
+  url:
+    en: "/en/mini-games/last-torch/#oaths"
+    pt: "/pt/mini-games/last-torch/#juramentos"
+
 - date: "2026-10-31"
   title:
     en: "The World Atlas grows"
