@@ -561,6 +561,7 @@
         ];
         const guardFx = [
             ['Shadow Clone: guarda (1)', scene({ guard: true, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4]) }, before: guardLoop })],
+            ['Umbral Bond 5: guarda (3)', scene({ guard: true, legion: true, levels: { shadowBond: 5 }, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4, 2.5, 4.6]) }, before: guardLoop })],
             ['Shadow Legion: guarda (3)', scene({ guard: true, legion: true, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4, 2.5, 4.6]) }, before: guardLoop })]
         ];
         const shadowFx = [

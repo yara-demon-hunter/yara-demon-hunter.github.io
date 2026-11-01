@@ -69,6 +69,19 @@ export const POWER_MODELS = {
         ],
         dashMultiplier: 1.6     // detonar com o dash em vez da lâmina
     },
+    shadowBond: {
+        name: 'Umbral Bond', icon: '🖤', maxLvl: 5,
+        desc: 'Your bond with the shadows grows. They are tougher, hit harder and guard a wider area around the torch.',
+        upgrades: ['+25% shadow health, +30% damage, +25 area', '+50% health, +60% damage, +50 area', '+75% health, +90% damage, +75 area', '+100% health, +120% damage, +100 area', '+125% health, +150% damage, +125 area'],
+        // Valores acumulados: hp e damage são bônus (fração), area soma ao raio de guarda (unidades do mundo)
+        levels: [
+            { hp: 0.25, damage: 0.3, area: 25 },
+            { hp: 0.5, damage: 0.6, area: 50 },
+            { hp: 0.75, damage: 0.9, area: 75 },
+            { hp: 1, damage: 1.2, area: 100 },
+            { hp: 1.25, damage: 1.5, area: 125 }
+        ]
+    },
     chargedThrow: {
         name: 'Charged Dagger Throw', icon: '🌟', maxLvl: 5,
         desc: 'Hold the dagger button to charge. The longer you hold, the harder it hits and the more monsters it pierces. At the top it charges in a blink and pierces everything in its path.',

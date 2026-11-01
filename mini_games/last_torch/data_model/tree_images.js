@@ -17,6 +17,7 @@ export const TREE_IMAGES = {
     deathMark: img('death-mark'),
     shadowClone: img('shadow-clone'),
     shadowCloneEvolve: img('shadow-legion'),
+    shadowBond: img('umbral-bond'),
     phantomDash: img('phantom-rush'),
     smokeBomb: img('smoke-bomb'),
     oathSlaughter: img('oath-of-slaughter'),
@@ -33,6 +34,7 @@ export const TREE_IMAGES = {
     phoenixPact: img('phoenix-pact'),
     vigil: img('vigil'),
     backdraft: img('backdraft'),
+    fireRing: img('hearth-ring'),
     fireRingEvolve: img('solar-wall'),
     emberEvolve: img('hellwalker'),
     flameBlade: img('flaming-sword'),
@@ -45,7 +47,8 @@ export const TREE_IMAGES = {
 export const BRANCH_IMAGES = {
     blade: img('blade-path'),
     shadow: img('shadow-path'),
-    flame: img('flame-path')
+    flame: img('flame-path'),
+    curse: img('curse-path')
 };
 
 // Imagem da skill pela chave do poder, passiva ou atributo (evolved: a evolução tem a própria arte)

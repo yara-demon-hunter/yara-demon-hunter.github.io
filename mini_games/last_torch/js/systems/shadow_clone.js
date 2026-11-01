@@ -1,9 +1,9 @@
 import { SHADOW_CLONE } from '../../data_model/passives.js';
-import { EVOLUTIONS } from '../../data_model/powers.js';
+import { EVOLUTIONS, getPowerLevel } from '../../data_model/powers.js';
 import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { createHeroAnim } from '../render/player.js';
-import { audio, passives, shadowClones as clones, state } from '../core/state.js';
+import { audio, passives, powers, shadowClones as clones, state } from '../core/state.js';
 import { executeBladeSlash, findNearestEnemy, hitEnemiesInArc } from './combat.js';
 import { createExplosion } from './effects.js';
 import { burstKnives } from './knives.js';
@@ -35,8 +35,18 @@ function setPost(c, index, count) {
     c.postY = state.coreY + Math.sin(angle) * SHADOW_CLONE.postRadius;
 }
 
+// Umbral Bond: bônus de vida, dano e área das sombras (zeros sem o poder)
+function bond() {
+    return getPowerLevel(powers.shadowBond) ?? { hp: 0, damage: 0, area: 0 };
+}
+
+// Raio da área de guarda em volta da tocha
+export function getCloneArea() {
+    return SHADOW_CLONE.areaRadius + bond().area;
+}
+
 function getCloneMaxHp() {
-    return Math.round(getMaxPlayerHp() * SHADOW_CLONE.hpRatio);
+    return Math.round(getMaxPlayerHp() * SHADOW_CLONE.hpRatio * (1 + bond().hp));
 }
 
 function reviveClone(c) {
@@ -120,7 +130,7 @@ function updateCloneAttack(c, dt) {
     c.y = y;
 
     const combo = step === 3;
-    const dmg = getAtkDamage() * SHADOW_CLONE.damageMultiplier * (combo ? BLADE_SKILL.comboDamageMultiplier : 1);
+    const dmg = getAtkDamage() * SHADOW_CLONE.damageMultiplier * (1 + bond().damage) * (combo ? BLADE_SKILL.comboDamageMultiplier : 1);
     const kbForce = getKnockback() * SHADOW_CLONE.knockbackMultiplier * (combo ? BLADE_SKILL.comboKnockbackMultiplier : 1);
     // Não carrega a Fúria (sem onHit)
     hitEnemiesInArc(x, y, angle, radius, getSlashArcRadian() / 2, dmg, kbForce, whirl);
@@ -150,9 +160,10 @@ function walkTo(c, x, y, speed, stop, dt) {
     const fromTorchX = c.x - state.coreX;
     const fromTorchY = c.y - state.coreY;
     const out = Math.hypot(fromTorchX, fromTorchY);
-    if (out > SHADOW_CLONE.areaRadius) {
-        c.x = state.coreX + (fromTorchX / out) * SHADOW_CLONE.areaRadius;
-        c.y = state.coreY + (fromTorchY / out) * SHADOW_CLONE.areaRadius;
+    const area = getCloneArea();
+    if (out > area) {
+        c.x = state.coreX + (fromTorchX / out) * area;
+        c.y = state.coreY + (fromTorchY / out) * area;
     }
 }
 
@@ -185,7 +196,7 @@ export function updateShadowClone(dt) {
 
         // O monstro mais perto da tocha que ainda não tem sombra e que a lâmina alcança a partir da área
         let target = null;
-        let best = SHADOW_CLONE.areaRadius + reach * 0.8;
+        let best = getCloneArea() + reach * 0.8;
         for (const e of state.enemies) {
             if (e.hp <= 0 || claimed.has(e)) continue;
             const d = Math.hypot(e.x - state.coreX, e.y - state.coreY);

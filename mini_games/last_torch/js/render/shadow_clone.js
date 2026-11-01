@@ -1,3 +1,4 @@
+import { getCloneArea } from '../systems/shadow_clone.js';
 import { SHADOW_CLONE_VISUALS as V } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { ctx, passives, shadowClones, state } from '../core/state.js';
@@ -44,12 +45,12 @@ function renderRespawnRing(c) {
 function renderArea() {
     ctx.fillStyle = V.area.fill;
     ctx.beginPath();
-    ctx.arc(state.coreX, state.coreY, SHADOW_CLONE.areaRadius, 0, Math.PI * 2);
+    ctx.arc(state.coreX, state.coreY, getCloneArea(), 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = V.area.edge;
     ctx.lineWidth = V.area.width;
     ctx.translate(state.coreX, state.coreY);
-    ctx.stroke(getDashedRing(SHADOW_CLONE.areaRadius, V.area.dash));
+    ctx.stroke(getDashedRing(getCloneArea(), V.area.dash));
     ctx.translate(-state.coreX, -state.coreY);
 }
 

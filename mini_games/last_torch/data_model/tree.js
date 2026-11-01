@@ -32,7 +32,7 @@ export const TREE_LAYOUT = {
 };
 
 export const TREE_BRANCHES = {
-    blade: { name: 'BLADE', path: 'BLADE PATH', icon: '🤺', color: '#67e8f9', style: 'Warrior: raw strength, kill everything.' },
+    blade: { name: 'BLADE', path: 'BLADE PATH', icon: '🤺', color: '#f87171', style: 'Warrior: raw strength, kill everything.' },
     shadow: { name: 'SHADOW', path: 'SHADOW PATH', icon: '🌑', color: '#a5b4fc', style: 'Thief: technical and cheap, takes skill.' },
     flame: { name: 'FLAME', path: 'FLAME PATH', icon: '🕯️', color: '#fb923c', style: 'Keeper: defensive, calm and cautious.' },
     curse: { name: 'CURSE', path: 'CURSE PATH', icon: '🌙', color: '#e879f9', style: 'Sorcerer: spells, area and distance.' }
@@ -84,14 +84,15 @@ export const TREE_NODES = [
     // Linha da técnica: marcar e carregar
     { id: 'deathMark', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
     { id: 'chargedThrow', branch: 'shadow', kind: 'power', key: 'chargedThrow', x: 2, y: 1, requires: [req('deathMark', 2)] },
-    // Caminho das sombras: Move Speed -> Shadow Clone -> Shadow Legion -> Juramento
+    // Caminho das sombras: Move Speed -> Shadow Clone -> Shadow Legion -> Umbral Bond -> Juramento
     { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 1, y: 2, requires: [req('moveSpeed', 2)] },
     { id: 'shadowCloneEvolve', branch: 'shadow', kind: 'evolve', key: 'shadowClone', x: 2, y: 2, requires: [req('shadowClone')] },
     // Caminho da esquiva: Move Speed -> Phantom Rush -> Night Reaper -> Smoke Bomb -> Juramento
     { id: 'phantomDash', branch: 'shadow', kind: 'power', key: 'phantomDash', x: 1, y: 3, requires: [req('moveSpeed', 2)] },
     { id: 'phantomEvolve', branch: 'shadow', kind: 'evolve', key: 'phantomDash', x: 2, y: 3, requires: [req('phantomDash', 5)] },
     { id: 'smokeBomb', branch: 'shadow', kind: 'passive', key: 'smokeBomb', x: 3, y: 3, requires: [req('phantomEvolve')] },
-    { id: 'oathWhispers', branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, cost: 5, x: 6, y: 1.5, requires: [req('shadowCloneEvolve'), req('smokeBomb')] },
+    { id: 'shadowBond', branch: 'shadow', kind: 'power', key: 'shadowBond', x: 3, y: 2, requires: [req('shadowCloneEvolve')] },
+    { id: 'oathWhispers', branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, cost: 5, x: 6, y: 1.5, requires: [req('shadowBond', 5), req('smokeBomb')] },
 
     // --- CHAMA: o guardião. Paciência, a tocha, muralhas de fogo ---
     { id: 'torchKeeper', branch: 'flame', kind: 'mod', x: 0, y: 1.5, requires: [],
