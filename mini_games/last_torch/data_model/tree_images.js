@@ -8,7 +8,12 @@ const img = (name) => `${dir}/${name}-small.webp`;
 export const TREE_IMAGES = {
     damage: img('blade'),
     frenzyNova: img('fury'),
+    atkSpeed: img('attack-speed'),
     keenEye: img('keen-eye'),
+    bloodlust: img('bloodlust'),
+    bloodlustEvolve: img('crimson-tide'),
+    executioner: img('executioner'),
+    earthbreaker: img('earthbreaker'),
     shadowWhirl: img('shadow-whirl'),
     moveSpeed: img('move-speed'),
     ricochet: img('ricochet'),
