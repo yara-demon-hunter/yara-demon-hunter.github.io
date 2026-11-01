@@ -88,7 +88,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Oath of Slaughter*
 - **Shadow** (raiz: Move Speed)
   - Adagas: Ricochet, Dagger Mastery (dano, alcance, velocidade e recarga), Fan of Knives
-  - Técnica: Death Mark*, Soul Lance, Soul Spear
+  - Técnica: Death Mark*, Charged Dagger Throw (Soul Lance e Soul Spear unidos)
   - Sombras: Shadow Clone*, Shadow Legion*. Move Speed, Shadow Clone, Shadow Legion, Juramento
   - Esquiva: Phantom Rush, Night Reaper*, Smoke Bomb*. Move Speed, Phantom Rush, Night Reaper, Smoke Bomb, Juramento
   - Oath of Whispers*
@@ -117,6 +117,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | War Cry | Passiva | Cercado por 5, ruge: joga longe, atordoa e dá +30% na lâmina por 4s | Braços abertos, cabeça para trás |
 | Executioner | Passiva | A lâmina termina monstros abaixo de 20% da vida (elites 10%, bosses não) | X vermelho |
 | Death Mark | Poder | A adaga marca. A lâmina detona; o dash detona mais forte e devolve a carga. Toda detonação recarrega a adaga | Mira girando, X violeta |
+| Charged Dagger Throw | Poder | Segure o botão da adaga para carregar: quanto mais tempo, mais dano e mais monstros atravessados. No nível 5 carrega num piscar e atravessa tudo (o antigo Soul Spear) | Anel que se fecha, adaga brilhando |
 | Shadow Clone | Passiva | Uma sombra guarda uma área em volta da tocha (raio 200) e não sai dela. Espera no posto; quando um monstro chega perto, anda em linha reta até ele, golpeia com o combo do herói e volta. Os monstros não correm atrás dela, mas quem esbarra ou acerta um tiro a machuca; ela tem vida e volta depois de 10s | Sombra violeta, barra de vida e área tracejada no chão |
 | Shadow Legion | Evolução | Três sombras em vez de uma, cada uma cuidando de um monstro | Três sombras no anel |
 | Explosão da sombra | Efeito do Shadow Clone | A sombra que cai explode em 8 adagas para todos os lados (12 com Fan of Knives). Valem o dano, alcance e velocidade do Dagger Mastery e o Ricochet | Adagas violeta em círculo |

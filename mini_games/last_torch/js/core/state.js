@@ -174,7 +174,7 @@ export const state = {
     knifeThrowTime: -100000,
     knifeThrowAngle: 0,
     knifePending: null,
-    knifeCharge: 0,             // segundos segurando a adaga (Soul Lance)
+    knifeCharge: 0,             // segundos segurando a adaga (Charged Dagger Throw)
     knifeThrowPower: 0,         // carga do arremesso em andamento (0 a 1)
 
     spawnTimer: 0

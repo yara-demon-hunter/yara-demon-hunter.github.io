@@ -90,6 +90,6 @@ export const HERO_25D_VISUALS = {
     dashCrouch: 3,
     // Vigil: um joelho no chão, espada fincada à frente
     vigilCrouch: 3.6,
-    // Mão da adaga carregando (Soul Lance)
+    // Mão da adaga carregando (Charged Dagger Throw)
     chargeGlow: 13
 };

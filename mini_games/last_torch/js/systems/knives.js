@@ -43,9 +43,9 @@ function releaseKnife(thrower = player) {
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
     const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
     const ricochet = getPowerLevel(powers.ricochet);
-    const lance = getPowerLevel(powers.soulLance);
-    const power = state.knifeThrowPower >= POWER_MODELS.soulLance.minCharge ? state.knifeThrowPower : 0;
-    // A carga da Soul Lance se divide entre as adagas do leque
+    const lance = getPowerLevel(powers.chargedThrow);
+    const power = state.knifeThrowPower >= POWER_MODELS.chargedThrow.minCharge ? state.knifeThrowPower : 0;
+    // A carga da Charged Dagger Throw se divide entre as adagas do leque
     const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0))
         * (1 + power * (lance?.damage ?? 0) / count);
     const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
@@ -60,7 +60,7 @@ function releaseKnife(thrower = player) {
             travelled: 0,
             bounces: ricochet?.bounces ?? 0,
             pierces: Math.round(power * (lance?.pierces ?? 0)),
-            scale: 1 + power * (POWER_MODELS.soulLance.maxScale - 1),
+            scale: 1 + power * (POWER_MODELS.chargedThrow.maxScale - 1),
             struck: null                // monstros já atingidos por esta adaga (Ricochet)
         });
     }
@@ -102,9 +102,9 @@ export function getKnifeRange() {
     return KNIFE_SKILL.maxRange * (1 + mod('knifeRange'));
 }
 
-// Soul Lance: fração da carga atual (0 a 1)
+// Charged Dagger Throw: fração da carga atual (0 a 1)
 export function getKnifeChargeRatio() {
-    const lance = getPowerLevel(powers.soulLance);
+    const lance = getPowerLevel(powers.chargedThrow);
     return lance ? Math.min(1, state.knifeCharge / lance.seconds) : 0;
 }
 
@@ -160,9 +160,9 @@ export function updateKnives(dt) {
     // Botão da adaga (toque): segurando só mira (linha tracejada); ao soltar arremessa uma vez na
     // direção mirada, se a recarga já terminou
     const { stick, held, x, y } = state.knifeInput;
-    const lance = getPowerLevel(powers.soulLance);
+    const lance = getPowerLevel(powers.chargedThrow);
     const ready = state.knifeTimer <= 0 && state.knifePending === null;
-    // Soul Lance: segurar carrega (só com a adaga pronta) em vez de repetir o arremesso
+    // Charged Dagger Throw: segurar carrega (só com a adaga pronta) em vez de repetir o arremesso
     if (lance && ready && (held || stick.active) && mod('noKnives') <= 0) state.knifeCharge = Math.min(lance.seconds, state.knifeCharge + dt);
 
     if (stick.active || stick.fire) aimWithStick(stick);

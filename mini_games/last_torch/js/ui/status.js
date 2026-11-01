@@ -1,6 +1,7 @@
 import { EVOLUTIONS } from '../../data_model/powers.js';
 import { attributes, audio, passives, state } from '../core/state.js';
 import { getOwnedPowers } from '../systems/tree.js';
+import { treeImageFor, paintIcon } from '../../data_model/tree_images.js';
 import { skillTree } from './tree.js';
 import {
     getAtkCooldown, getAtkDamage, getAtkRadius, getCritChance, getFrenzyDamageBonus, getFrenzyDuration, getKnockback,
@@ -36,9 +37,10 @@ function renderStats() {
         item.title = attr.desc;
         item.dataset.note = `${attr.name}: ${attr.desc}`;
         item.innerHTML = `
-            <span class="shop-row-name"><span>${attr.icon}</span><span>${attr.name}</span><em>Lv. ${attr.lvl}</em></span>
+            <span class="shop-row-name"><span class="stat-icon"></span><span>${attr.name}</span><em>Lv. ${attr.lvl}</em></span>
             <b class="shop-row-value">${getStatText(key)}</b>
         `;
+        paintIcon(item.querySelector('.stat-icon'), treeImageFor(key), attr.icon);
         list.appendChild(item);
     });
     const crit = document.createElement('div');
@@ -57,12 +59,12 @@ function renderBuildList(id, items, emptyText) {
         empty.textContent = emptyText;
         list.appendChild(empty);
     }
-    items.forEach(({ icon, name, desc, level }) => {
+    items.forEach(({ icon, name, desc, level, key, evolved }) => {
         const item = document.createElement('div');
         item.className = 'build-row';
         item.dataset.note = `${name}: ${desc}`;
         item.innerHTML = '<span class="build-row-icon"></span><div><b></b><span></span></div><em></em>';
-        item.querySelector('.build-row-icon').textContent = icon;
+        paintIcon(item.querySelector('.build-row-icon'), key ? treeImageFor(key, evolved) : null, icon);
         item.querySelector('b').textContent = name;
         item.querySelector('b + span').textContent = desc;
         item.querySelector('em').textContent = level ? `Lv. ${level}` : '';
@@ -114,9 +116,10 @@ export function openStatus() {
     renderStats();
     const skills = Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0)
         .map(p => (p.evolved
-            ? { icon: EVOLUTIONS[p.key].icon, name: `${EVOLUTIONS[p.key].name} ✦`, desc: EVOLUTIONS[p.key].desc, level: 0 }
-            : { icon: p.icon, name: p.name, desc: EVOLUTIONS[p.key] ? `${p.desc} Can evolve in the skill tree.` : p.desc, level: 0 }));
+            ? { key: p.key, evolved: true, icon: EVOLUTIONS[p.key].icon, name: `${EVOLUTIONS[p.key].name} ✦`, desc: EVOLUTIONS[p.key].desc, level: 0 }
+            : { key: p.key, icon: p.icon, name: p.name, desc: EVOLUTIONS[p.key] ? `${p.desc} Can evolve in the skill tree.` : p.desc, level: 0 }));
     renderBuildList('powerList', [...getOwnedPowers().map(p => ({
+        key: p.key, evolved: p.evolved,
         icon: p.evolved ? EVOLUTIONS[p.key].icon : p.icon,
         name: p.evolved ? `${EVOLUTIONS[p.key].name} ✦` : p.name,
         desc: !p.evolved && EVOLUTIONS[p.key] ? `${p.desc} Can evolve in the skill tree at max level.` : p.desc,

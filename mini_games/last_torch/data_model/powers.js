@@ -68,17 +68,17 @@ export const POWER_MODELS = {
         ],
         dashMultiplier: 1.6     // detonar com o dash em vez da lâmina
     },
-    soulLance: {
-        name: 'Soul Lance', icon: '🌟', maxLvl: 5,
-        desc: 'Hold the dagger button to charge. The longer you hold, the harder it hits and the more monsters it pierces.',
-        upgrades: ['Up to +100% damage, pierces 2', '+50% charged damage', 'Pierces 3', 'Charges faster', '+100% damage, pierces 5'],
+    chargedThrow: {
+        name: 'Charged Dagger Throw', icon: '🌟', maxLvl: 5,
+        desc: 'Hold the dagger button to charge. The longer you hold, the harder it hits and the more monsters it pierces. At the top it charges in a blink and pierces everything in its path.',
+        upgrades: ['Up to +100% damage, pierces 2', '+50% charged damage', 'Pierces 3', 'Charges faster', 'Charges in a blink, +160% damage, pierces everything'],
         // seconds = tempo até a carga cheia; damage = bônus de dano na carga cheia; pierces = monstros atravessados
         levels: [
             { seconds: 1.2, damage: 1, pierces: 2 },
             { seconds: 1.2, damage: 1.5, pierces: 2 },
             { seconds: 1.2, damage: 1.5, pierces: 3 },
             { seconds: 0.85, damage: 1.5, pierces: 3 },
-            { seconds: 0.85, damage: 2.5, pierces: 5 }
+            { seconds: 0.6, damage: 2.6, pierces: 99 }
         ],
         minCharge: 0.25,        // abaixo desta fração é um arremesso normal (toque rápido)
         maxScale: 1.7           // tamanho da adaga na carga cheia
@@ -302,11 +302,6 @@ export const EVOLUTIONS = {
         desc: 'Your shadow runs after every dash and cuts the same path again.',
         levels: { damage: 3 },
         echo: { delaySeconds: 0.28, seconds: 0.16, damage: 0.8, hitRadius: 26 }
-    },
-    soulLance: {
-        name: 'Soul Spear', icon: '✨',
-        desc: 'Charges in a blink. A full charge pierces everything in its path.',
-        levels: { seconds: 0.6, damage: 2.6, pierces: 99 }
     },
     corpseBurst: {
         name: 'Red Harvest', icon: '🥀',

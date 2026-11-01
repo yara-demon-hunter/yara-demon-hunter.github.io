@@ -251,3 +251,8 @@
     }
     .status-panel .screen-link { padding: 0 0.7rem; min-height: 2.2rem; font-size: 0.66rem; }
 }
+
+/* Arte da skill nas listas de Build e Stats (data_model/tree_images.js); sem arte, fica o emoji */
+.build-row-icon.has-image { width: 1.7rem; height: 1.7rem; }
+.stat-icon.has-image { display: inline-block; width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
+@media (max-height: 520px) { .build-row-icon.has-image { width: 1.3rem; height: 1.3rem; } .stat-icon.has-image { width: 1rem; height: 1rem; } }

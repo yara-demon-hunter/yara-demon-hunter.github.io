@@ -83,8 +83,7 @@ export const TREE_NODES = [
     { id: 'fanOfKnives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 3, y: 0, requires: [req('daggerMastery', 2)] },
     // Linha da técnica: marcar e carregar
     { id: 'deathMark', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
-    { id: 'soulLance', branch: 'shadow', kind: 'power', key: 'soulLance', x: 2, y: 1, requires: [req('deathMark', 2)] },
-    { id: 'lanceEvolve', branch: 'shadow', kind: 'evolve', key: 'soulLance', x: 3, y: 1, requires: [req('soulLance', 5)] },
+    { id: 'chargedThrow', branch: 'shadow', kind: 'power', key: 'chargedThrow', x: 2, y: 1, requires: [req('deathMark', 2)] },
     // Caminho das sombras: Move Speed -> Shadow Clone -> Shadow Legion -> Juramento
     { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 1, y: 2, requires: [req('moveSpeed', 2)] },
     { id: 'shadowCloneEvolve', branch: 'shadow', kind: 'evolve', key: 'shadowClone', x: 2, y: 2, requires: [req('shadowClone')] },

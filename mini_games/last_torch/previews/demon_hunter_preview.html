@@ -435,7 +435,7 @@
             .map(([k, name]) => [name, frozenMove('oath', k)]);
         const heroMoves2 = [
             ['Dash: corpo baixo', scene({ before: dashPose })],
-            ['Soul Lance: carregando', front({ levels: { soulLance: 5 }, before: chargeLoop })],
+            ['Charged Dagger Throw: carregando', front({ levels: { chargedThrow: 5 }, before: chargeLoop })],
             ['Feitiço: mão erguida', front({ before: castLoop })],
             ['Earthbreaker sob Slaughter', oathScene('slaughter', { before: moveLoop('slam', 0.7, slamImpactFx(true)) })]
         ];

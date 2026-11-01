@@ -415,7 +415,7 @@ function freeArmPart(pose, body) {
     const shoulder = [pose.lean, -V.chest.B, pose.shoulderZ - 0.5];
     const restHand = [pose.lean * 0.5 + 0.6 + swing * (1 - pose.blend) - pose.blend * 1.2, -V.chest.B - 0.6 + pose.blend * 1.5, V.handHeight - pose.crouch + pose.blend * 2];
     const throwK = throwProgress();
-    // Soul Lance: a mão fica para trás com a adaga brilhando enquanto carrega
+    // Charged Dagger Throw: a mão fica para trás com a adaga brilhando enquanto carrega
     const charge = throwsKnives && throwK < 0 ? getKnifeChargeRatio() : 0;
     // Feitiço: a mão sobe à frente do corpo por um instante
     const cast = body.castAge >= 0 && throwK < 0 && charge <= 0 ? Math.sin(Math.PI * body.castAge / V.moves.cast.seconds) : 0;

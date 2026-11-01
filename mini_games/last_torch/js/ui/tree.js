@@ -1,5 +1,5 @@
 import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES } from '../../data_model/tree.js';
-import { TREE_IMAGES } from '../../data_model/tree_images.js';
+import { TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { state } from '../core/state.js';
 import { buyNode, getNextText, getNodeInfo, getNodeState } from '../systems/tree.js';
@@ -30,10 +30,7 @@ function createTreeView(cfg) {
 
     // Skill com arte mostra a imagem; as demais, o emoji
     function setIcon(target, node, info) {
-        const image = TREE_IMAGES[node.id];
-        target.classList.toggle('has-image', Boolean(image));
-        target.style.setProperty('--icon-image', image ? `url("${new URL(image, document.baseURI).href}")` : 'none');
-        target.textContent = image ? '' : info.icon;
+        paintIcon(target, TREE_IMAGES[node.id], info.icon);
     }
 
     const detail = (name) => el(`${prefix}${name}`);

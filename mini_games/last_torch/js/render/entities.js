@@ -342,7 +342,7 @@ export function renderEnemies() {
     renderEnemyOverlays(t);
 }
 
-// Soul Lance: anel que se fecha em volta do herói enquanto a adaga carrega
+// Charged Dagger Throw: anel que se fecha em volta do herói enquanto a adaga carrega
 function renderKnifeCharge() {
     const ratio = getKnifeChargeRatio();
     if (ratio <= 0 || state.gameState !== 'PLAYING') return;
