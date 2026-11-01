@@ -1,7 +1,8 @@
 import { HERO_VISUALS as H } from '../../data_model/visuals/characters/hero_visual.js';
 import { HERO_25D_VISUALS as V } from '../../data_model/visuals/characters/hero25d_visual.js';
 import { KNIFE_VISUALS } from '../../data_model/visuals/effects/knife_visual.js';
-import { ctx, player, powers, state } from '../core/state.js';
+import { ctx, passives, player, powers, state } from '../core/state.js';
+import { drawFireOrb, drawFlameTongue } from './fire.js';
 import { easeOutCubic, easeOutQuad, lerpAngle } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
 import { drawGearGround, gearParts } from './hero_gear.js';
@@ -10,7 +11,7 @@ import { heroAnim, heroCapeJag as capeJag, heroSwingAngleAt as swingAngleAt } fr
 import { OATH_VISUALS } from '../../data_model/visuals/characters/oath_visual.js';
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
 import { getPowerLevel } from '../../data_model/powers.js';
-import { getKnifeChargeRatio } from '../systems/knives.js';
+import { getFireCastRatio, getKnifeChargeRatio } from '../systems/knives.js';
 
 // --- HERÓI 2.5D ---
 // O mesmo herói de player.js, montado como um boneco 3D simples: pernas, tronco, braços, capuz,
@@ -419,8 +420,10 @@ function freeArmPart(pose, body) {
     const charge = throwsKnives && throwK < 0 ? getKnifeChargeRatio() : 0;
     // Feitiço: a mão sobe à frente do corpo por um instante
     const cast = body.castAge >= 0 && throwK < 0 && charge <= 0 ? Math.sin(Math.PI * body.castAge / V.moves.cast.seconds) : 0;
+    // Fireballs: a mão recua e a bola cresce nela, como na do Lorde Demônio
+    const fireHold = throwsKnives && throwK < 0 ? getFireCastRatio() : 0;
     let hand = throwK >= 0 ? throwHand(restHand, pose, throwK) : restHand;
-    if (charge > 0) hand = mix(hand, throwBack(pose), Math.min(1, charge * 4));
+    if (charge > 0 || fireHold > 0) hand = mix(hand, throwBack(pose), Math.min(1, Math.max(charge, fireHold) * 4));
     if (cast > 0) hand = mix(hand, [pose.lean + 5.5, -V.chest.B - 0.5, pose.shoulderZ + 3], cast);
     if (pose.free) hand = mix(hand, pose.free.hand, pose.free.w);
     const elbow = [(shoulder[0] + hand[0]) / 2 - 0.4, -V.chest.B - 1, (shoulder[2] + hand[2]) / 2 + (throwK >= 0 ? 0.8 : 0)];
@@ -430,7 +433,13 @@ function freeArmPart(pose, body) {
             if (throwK >= 0) drawThrowArc(restHand, pose, throwK);
             ball(shoulder, V.shoulderRadius, C.sleeve);
             limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
-            if ((throwK >= 0 && throwK < KNIFE_VISUALS.letGoFraction) || charge > 0) drawHeldDagger(shoulder, hand, pose.t);
+            if ((throwK >= 0 && throwK < KNIFE_VISUALS.letGoFraction) || charge > 0 || fireHold > 0) {
+                if (passives.fireballs.lvl > 0) {
+                    const orb = project(...hand);
+                    const grow = fireHold > 0 ? easeOutCubic(fireHold) : 1;
+                    drawFireOrb(orb.x, orb.y - 2, SKILLS_VISUALS.fire.orbRadius * (0.3 + 0.7 * grow) * (1 + charge * 0.7), pose.t);
+                } else drawHeldDagger(shoulder, hand, pose.t);
+            }
             ball(hand, V.handRadius, C.glove);
             if (charge > 0 || cast > 0) {
                 const glow = project(...hand);
@@ -543,8 +552,39 @@ function swordPart(pose, frenzy, body) {
             ctx.restore();
 
             bladeShape(hand, dir, t, 1);
+            if (body === player && passives.flameBlade.lvl > 0) drawBladeFire(hand, dir, t);
         }
     };
+}
+
+// Flaming Sword: línguas de fogo ao longo da lâmina; sob o Oath of the Hearth, maiores e douradas
+function drawBladeFire(hand, dir, t) {
+    const F = SKILLS_VISUALS.fire;
+    const hot = state.oath === 'oathHearth';
+    const scale = hot ? F.swordOathScale : 1;
+    for (let i = 0; i < F.swordTongues; i++) {
+        const k = 0.14 + (0.86 * i) / (F.swordTongues - 1);
+        const p = project(hand[0] + dir[0] * bladeLength * k, hand[1] + dir[1] * bladeLength * k, hand[2] + dir[2] * bladeLength * k);
+        drawFlameTongue(p.x, p.y, F.swordSize * scale * (1.15 - k * 0.5), t, i, hot);
+    }
+}
+
+// Espada de perfil, com a mão na origem e a ponta em +x (previews/weapon_previews.html). Desenha com a mesma
+// bladeShape do jogo; quem chama posiciona e amplia com ctx.translate e ctx.scale.
+export function renderSwordDetail({ colors = V.colors, oathGear = null, fire = false, frenzy = false }) {
+    C = colors;
+    gear = oathGear;
+    bladeLength = V.bladeLength * (gear ? OATH_VISUALS[gear].bladeLength : 1);
+    bladeWidth = V.bladeWidth * (gear ? OATH_VISUALS[gear].bladeWidth : 1);
+    cosF = 1;
+    sinF = 0;
+    const t = performance.now() / 1000;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    drawGlow(ctx, frenzy ? C.bladeGlowSoftFrenzy : C.bladeGlowSoft, bladeLength / 2, 0, bladeLength * 0.7, 0.5);
+    ctx.restore();
+    bladeShape([0, 0, 0], [1, 0, 0], t, 1);
+    if (fire) drawBladeFire([0, 0, 0], [1, 0, 0], t);
 }
 
 // Capuz (esfera + ponta caindo para trás) e máscara de osso na frente

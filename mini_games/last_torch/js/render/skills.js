@@ -3,6 +3,7 @@ import { WAR_CRY } from '../../data_model/passives.js';
 import { SKILLS_VISUALS as V } from '../../data_model/visuals/effects/skills_visual.js';
 import { ctx, player, powers, state } from '../core/state.js';
 import { easeOutBack, easeOutCubic } from './fx/easing.js';
+import { drawFlameTongue } from './fire.js';
 import { drawGlow } from './fx/glow.js';
 import { getDashedRing } from './fx/rings.js';
 
@@ -173,6 +174,12 @@ export function renderMonsterCurses() {
     const H = V.hex;
     const S = V.stun;
     for (const e of state.enemies) {
+        if (e.burnTimer > 0) {
+            drawGlow(ctx, V.fire.glow, e.x, e.y, e.radius * 1.6, 0.5);
+            for (let i = 0; i < 3; i++) {
+                drawFlameTongue(e.x + (i - 1) * e.radius * 0.6, e.y - e.radius * 0.2, e.radius * 0.34, t, i + e.x * 0.01);
+            }
+        }
         if (e.hexTimer > 0) {
             drawGlow(ctx, H.glow, e.x, e.y, e.radius * 1.7, 0.45 + 0.2 * Math.sin(t * 8 + e.x));
             ctx.fillStyle = H.spark;

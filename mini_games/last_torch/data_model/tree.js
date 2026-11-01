@@ -117,6 +117,9 @@ export const TREE_NODES = [
     // Linha da brasa
     { id: 'emberTrail', branch: 'flame', kind: 'power', key: 'emberTrail', x: 1, y: 3, requires: [req('torchKeeper')] },
     { id: 'emberEvolve', branch: 'flame', kind: 'evolve', key: 'emberTrail', x: 2, y: 3, requires: [req('emberTrail', 5)] },
+    // As armas pegam fogo: saem do Hearth Ring
+    { id: 'flameBlade', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('fireRing', 2)] },
+    { id: 'fireballs', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
     { id: 'oathHearth', branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('phoenixPact'), req('fireRingEvolve')] },
 
     // --- MALDIÇÃO: o feiticeiro. Magia, área e distância ---

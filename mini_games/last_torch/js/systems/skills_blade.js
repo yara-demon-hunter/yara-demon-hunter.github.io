@@ -1,5 +1,6 @@
 import { EXECUTIONER, WAR_CRY } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
+import { isFireCasting } from './knives.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { chargeUlt } from './combat.js';
 import { blast, dealDamage } from './damage.js';
@@ -147,7 +148,7 @@ function updateEarthbreaker(dt) {
     const timers = state.powerTimers;
     timers.earthbreaker = (timers.earthbreaker ?? level.cooldown * 0.4) - dt;
     // Pronto, espera ter alguém perto: o golpe nunca é gasto no vazio
-    if (timers.earthbreaker > 0 || player.move || player.dashTimer > 0) return;
+    if (timers.earthbreaker > 0 || player.move || player.dashTimer > 0 || isFireCasting()) return;
     const near = state.enemies.some(e => Math.hypot(e.x - player.x, e.y - player.y) < level.radius * 0.8 + e.radius);
     if (!near) return;
     timers.earthbreaker = level.cooldown;
@@ -182,7 +183,7 @@ function updateWarCry(dt) {
         timers.warCry -= dt;
         return;
     }
-    if (player.move || state.phase !== 'HUNT') return;
+    if (player.move || state.phase !== 'HUNT' || isFireCasting()) return;
     let around = 0;
     for (const e of state.enemies) {
         if (Math.hypot(e.x - player.x, e.y - player.y) < WAR_CRY.triggerRadius + e.radius) around++;

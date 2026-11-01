@@ -5,7 +5,8 @@ Páginas de desenvolvimento para analisar a arte com o código real do jogo. O j
 | Arquivo | O que mostra |
 |---|---|
 | `monsters_preview.html` | Todos os monstros e bosses: quatro direções, levando dano e no tamanho do jogo |
-| `demon_hunter_preview.html` | Tudo do herói: corrida, poses, golpes, dash, efeitos, os heróis alternativos, o Shadow Clone, as formas dos Juramentos, os golpes especiais quadro a quadro, as skills dos quatro ramos e a adaga |
+| `weapon_previews.html` | A adaga e a espada em detalhe, com as partes legendadas, e as formas de cada uma (carga, bola de fogo, Fúria, Flaming Sword, Juramentos e heróis) |
+| `demon_hunter_preview.html` | Tudo do herói: corrida, poses, golpes, dash, efeitos, os heróis alternativos, o Shadow Clone, as formas dos Juramentos, os golpes especiais quadro a quadro, as skills dos quatro ramos e o arremesso da adaga |
 
 ## Como abrir
 
@@ -22,6 +23,7 @@ As páginas usam módulos ES, e o navegador os bloqueia em arquivos abertos dire
 
    - <http://localhost:8000/previews/monsters_preview.html>
    - <http://localhost:8000/previews/demon_hunter_preview.html>
+   - <http://localhost:8000/previews/weapon_previews.html>
 
 3. Para parar o servidor, volte ao terminal e aperte `Ctrl+C`.
 
@@ -45,5 +47,6 @@ Com o site rodando pelo Jekyll (`bundle exec jekyll serve`, na raiz do repositó
 
 - <http://localhost:4000/mini_games/last_torch/previews/monsters_preview.html>
 - <http://localhost:4000/mini_games/last_torch/previews/demon_hunter_preview.html>
+- <http://localhost:4000/mini_games/last_torch/previews/weapon_previews.html>
 
 O `last_torch.html` (o jogo) só funciona pelo Jekyll, porque usa um include do site. As prévias funcionam nos dois.

@@ -47,6 +47,7 @@
     gap: 0.25rem;
     font-size: 1rem;
 }
+#finalBuild .has-image { display: block; width: 1.9rem; height: 1.9rem; }
 .unlock-row {
     padding: 0.35rem 0.6rem;
     margin-bottom: 0.3rem;

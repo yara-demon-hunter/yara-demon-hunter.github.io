@@ -1,10 +1,10 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { BACKDRAFT, PHOENIX_PACT, VIGIL } from '../../data_model/passives.js';
+import { BACKDRAFT, FIREBALLS, PHOENIX_PACT, VIGIL } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
-import { blast, dealDamage } from './damage.js';
+import { blast, dealDamage, ignite } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { mod } from './modifiers.js';
 import { ready } from './powers.js';
@@ -118,7 +118,35 @@ function updateWarmthBurn(dt) {
     }
 }
 
+// Monstros em chamas (Flaming Sword e Fireballs)
+const BURN_TICK = 0.5;
+function updateBurns(dt) {
+    for (const e of state.enemies) {
+        if (!(e.burnTimer > 0)) continue;
+        e.burnTimer -= dt;
+        e.burnTick = (e.burnTick ?? 0) + dt;
+        if (e.burnTick < BURN_TICK) continue;
+        e.burnTick -= BURN_TICK;
+        dealDamage(e, e.burnDps * BURN_TICK, { noCrit: true, quiet: true });
+    }
+}
+
+// Fireballs: a adaga acertou. O alvo pega fogo e a explosão alcança os vizinhos
+export function burstFireball(k, hit) {
+    const radius = FIREBALLS.splashRadius * k.scale;
+    const dps = k.damage * FIREBALLS.burnRatio;
+    ignite(hit, dps, FIREBALLS.burnSeconds);
+    for (const e of state.enemies) {
+        if (e === hit || e.hp <= 0 || Math.hypot(e.x - k.x, e.y - k.y) > radius + e.radius) continue;
+        dealDamage(e, k.damage * FIREBALLS.splashRatio, { noCrit: true, quiet: true });
+        ignite(e, dps, FIREBALLS.burnSeconds);
+    }
+    addShockwave(k.x, k.y, { radius, color: '#fb923c', width: 4, seconds: 0.26 });
+    createExplosion(k.x, k.y, '#fb923c', 9);
+}
+
 export function updateFlameSkills(dt) {
+    updateBurns(dt);
     updateFireRing(dt);
     updateVigil(dt);
     updateWarmthBurn(dt);

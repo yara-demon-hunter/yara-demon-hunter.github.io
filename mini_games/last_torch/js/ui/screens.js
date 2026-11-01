@@ -1,5 +1,7 @@
 import { CHARACTER_MODEL, getXpToNextLevel } from '../../data_model/character.js';
 import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
+import { EVOLUTIONS } from '../../data_model/powers.js';
+import { treeImageFor, paintIcon } from '../../data_model/tree_images.js';
 import { DARKNESS, getHourName } from '../../data_model/night.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
@@ -218,9 +220,9 @@ export function triggerGameOver(reason) {
 
     const build = document.getElementById('finalBuild');
     build.innerHTML = '';
-    [...getOwnedPowers().map(p => p.icon), ...Object.values(passives).filter(p => p.lvl > 0).map(p => p.icon)].forEach(icon => {
+    [...getOwnedPowers(), ...Object.values(passives).filter(p => p.lvl > 0)].forEach(p => {
         const item = document.createElement('span');
-        item.textContent = icon;
+        paintIcon(item, treeImageFor(p.key, p.evolved), p.evolved && EVOLUTIONS[p.key] ? EVOLUTIONS[p.key].icon : p.icon);
         build.appendChild(item);
     });
 

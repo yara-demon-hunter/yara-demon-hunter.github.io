@@ -1,4 +1,4 @@
-import { FAN_OF_KNIVES, SHADOW_CLONE } from '../../data_model/passives.js';
+import { FAN_OF_KNIVES, FIREBALLS, SHADOW_CLONE } from '../../data_model/passives.js';
 import { KNIFE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
@@ -6,8 +6,11 @@ import { audio, joystick, passives, player, powers, state } from '../core/state.
 import { dealDamage } from './damage.js';
 import { createExplosion } from './effects.js';
 import { mod } from './modifiers.js';
+import { burstFireball } from './skills_flame.js';
 import { markEnemy } from './skills_shadow.js';
 import { getAtkDamage, getKnifeCooldown, getKnockback } from './stats.js';
+
+const KNIFE_RELEASE_SECONDS = K.throwSeconds * K.letGoFraction;
 
 // --- ADAGA DE ARREMESSO (golpe separado da lâmina, com recarga própria) ---
 // Começa o arremesso na direção da mira (mouse ou dedo): a mão esquerda recua e a adaga
@@ -22,11 +25,25 @@ export function throwKnife(aimX, aimY) {
     if (Math.hypot(aimX - player.x, aimY - player.y) < 1) angle = player.angle;
 
     state.knifeTimer = getKnifeCooldown();
-    state.knifeThrowTime = performance.now();
+    // Fireballs: antes do arremesso a bola cresce na mão (getFireCastRatio); a animação só começa depois disso
+    const hold = passives.fireballs.lvl > 0 ? FIREBALLS.castSeconds : 0;
+    state.knifeThrowTime = performance.now() + hold * 1000;
     state.knifeThrowAngle = angle;
     state.knifeThrowPower = getKnifeChargeRatio();
     state.knifeCharge = 0;
-    state.knifePending = K.throwSeconds * K.letGoFraction;
+    state.knifePending = hold + KNIFE_RELEASE_SECONDS;
+}
+
+// Fireballs: do começo da conjuração até a bola sair o herói não anda, não golpeia e não dá dash
+export function isFireCasting() {
+    return passives.fireballs.lvl > 0 && state.knifePending !== null;
+}
+
+// Quanto a bola já cresceu na mão (0 a 1); depois disso vem o movimento do arremesso
+export function getFireCastRatio() {
+    if (!isFireCasting()) return 0;
+    const hold = state.knifePending - KNIFE_RELEASE_SECONDS;
+    return hold > 0 ? 1 - hold / FIREBALLS.castSeconds : 0;
 }
 
 // A adaga deixa a mão esquerda: nasce à frente e à esquerda do herói. Cada adaga para no primeiro inimigo atingido.
@@ -61,11 +78,12 @@ function releaseKnife(thrower = player) {
             bounces: ricochet?.bounces ?? 0,
             pierces: Math.round(power * (lance?.pierces ?? 0)),
             scale: 1 + power * (POWER_MODELS.chargedThrow.maxScale - 1),
+            fire: passives.fireballs.lvl > 0,
             struck: null                // monstros já atingidos por esta adaga (Ricochet)
         });
     }
 
-    createExplosion(x, y - K.flightHeight, K.colors.edge, 5 + count * 2);
+    createExplosion(x, y - K.flightHeight, passives.fireballs.lvl > 0 ? '#fb923c' : K.colors.edge, 5 + count * 2);
     if (thrower === player) audio.playSwordSlash(1);
 }
 
@@ -91,10 +109,11 @@ export function burstKnives(x, y) {
             bounces: ricochet?.bounces ?? 0,
             pierces: 0,
             scale: 1,
+            fire: passives.fireballs.lvl > 0,
             struck: null
         });
     }
-    createExplosion(x, y - K.flightHeight, K.colors.edge, 10 + count);
+    createExplosion(x, y - K.flightHeight, passives.fireballs.lvl > 0 ? '#fb923c' : K.colors.edge, 10 + count);
 }
 
 // Alcance atual da adaga (com Dagger Mastery)
@@ -199,6 +218,7 @@ export function updateKnives(dt) {
         if (hit) {
             dealDamage(hit, k.damage, { kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
             markEnemy(hit);
+            if (k.fire) burstFireball(k, hit);
             createExplosion(k.x, k.y, hit.color, 6);
             audio.playHit(1);
             if (k.pierces > 0) {

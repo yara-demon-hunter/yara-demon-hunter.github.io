@@ -69,6 +69,22 @@ export const PASSIVE_SKILL_MODELS = {
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'Stand still for a moment to raise a flame shield. It stops one hit and bursts, burning what is near. Returns after 6s.'
     },
+    flameBlade: {
+        name: 'Flaming Sword',
+        icon: '⚔️',
+        cost: 90,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'Your sword catches fire. Every cut sets monsters ablaze, and they keep burning for 3s. Under the Oath of the Hearth the fire burns twice as hot.'
+    },
+    fireballs: {
+        name: 'Fireballs',
+        icon: '☄️',
+        cost: 90,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby and setting it ablaze. Everything that improves your daggers still counts. The price: you stand still for a moment, unable to do anything, while the fire grows in your hand.'
+    },
     backdraft: {
         name: 'Backdraft',
         icon: '🎆',
@@ -313,6 +329,22 @@ export const MASTER_THIEF = {
 };
 
 // Vigil: parado por stillSeconds, ergue um escudo que para um golpe e estoura
+// Flaming Sword: o corte deixa o monstro queimando (fração do dano do golpe, por segundo)
+export const FLAME_BLADE = {
+    burnRatio: 0.3,
+    burnSeconds: 3,
+    oathMultiplier: 2           // sob o Oath of the Hearth
+};
+
+// Fireballs: a adaga continua sendo adaga (dano, alcance, Death Mark, carga, Ricochet); ao acertar, explode
+export const FIREBALLS = {
+    castSeconds: 0.55,          // a bola cresce na mão e o herói fica parado, sem golpear nem dar dash
+    splashRadius: 62,           // cresce com o tamanho da adaga carregada
+    splashRatio: 0.5,           // dano nos vizinhos, em fração do dano da adaga
+    burnRatio: 0.25,            // queimadura por segundo, em fração do dano da adaga
+    burnSeconds: 3
+};
+
 export const VIGIL = {
     stillSeconds: 0.9,
     rechargeSeconds: 6,

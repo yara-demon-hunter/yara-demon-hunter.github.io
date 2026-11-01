@@ -9,6 +9,16 @@ export const SKILLS_VISUALS = {
     execution: { color: '#ef4444', core: '#fff1f2', glow: 'rgba(220, 38, 38, 0.85)', length: 34 },
     stun: { color: '#fde047', orbit: 11, dots: 3 },
 
+    // Fogo: Flaming Sword, Fireballs e monstros em chamas (js/render/fire.js)
+    fire: {
+        outer: '#ea580c', mid: '#fb923c', core: '#fef3c7',
+        hotOuter: '#f59e0b', hotMid: '#fde047',
+        glow: 'rgba(249, 115, 22, 0.55)',
+        slash: ['#f97316', '#fb923c', '#fbbf24'],
+        orbRadius: 6.5, orbTail: 6,
+        swordTongues: 7, swordSize: 2.2, swordOathScale: 1.45
+    },
+
     // Shadow
     mark: { color: '#c4b5fd', core: '#f5f3ff', glow: 'rgba(139, 92, 246, 0.5)', gap: 8 },
     markBurst: { color: '#a78bfa', core: '#ffffff', length: 26 },

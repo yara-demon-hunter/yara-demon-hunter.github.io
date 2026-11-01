@@ -43,6 +43,12 @@ export function dealDamage(e, amount, o = {}) {
     return dmg;
 }
 
+// Queimadura: dano por segundo até o tempo acabar. Vale a mais forte, sem somar (js/systems/skills_flame.js)
+export function ignite(e, dps, seconds) {
+    e.burnDps = e.burnTimer > 0 ? Math.max(e.burnDps, dps) : dps;
+    e.burnTimer = Math.max(e.burnTimer ?? 0, seconds);
+}
+
 // Explosão a favor do herói: fere e empurra todos os monstros no raio. Tem um limite por quadro para
 // reações em cadeia não travarem o jogo.
 export function blast(x, y, radius, damage, knockback, color = '#fb923c') {

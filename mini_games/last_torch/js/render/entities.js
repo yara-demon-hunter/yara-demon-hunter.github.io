@@ -18,6 +18,8 @@ import { WRAITH_VISUALS } from '../../data_model/visuals/monsters/wraith_visual.
 import { knightHeadPosition } from './headless_knight.js';
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { FAN_OF_KNIVES } from '../../data_model/passives.js';
+import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
+import { drawFireOrb } from './fire.js';
 import { ctx, passives, player, state } from '../core/state.js';
 import { getKnifeChargeRatio, getKnifeRange } from '../systems/knives.js';
 import { OATH_VISUALS } from '../../data_model/visuals/characters/oath_visual.js';
@@ -116,6 +118,7 @@ export function renderBladeSlashes() {
     // Sob um Juramento o corte tem a cor dele
     const gear = getHeroGear();
     const oathSlash = gear ? OATH_VISUALS[gear].slash : null;
+    const fireSlash = passives.flameBlade.lvl > 0 ? SKILLS_VISUALS.fire.slash : null;
 
     state.bladeSlashes.forEach(s => {
         const look = s.spin ? SLASH_VISUALS.whirl : (SLASH_VISUALS[s.comboStep] || SLASH_VISUALS[1]);
@@ -129,10 +132,11 @@ export function renderBladeSlashes() {
         const head = start + (end - start) * progress;
         const tail = start + (end - start) * Math.max(0, progress - look.tail);
 
+        const slashIndex = s.spin ? 2 : s.comboStep - 1;
         // Golpes do Shadow Clone em violeta escuro
         const color = s.shadow
             ? (frenzyActive ? SHADOW_CLONE_VISUALS.slashFrenzyColor : SHADOW_CLONE_VISUALS.slashColor)
-            : (frenzyActive ? SLASH_VISUALS.frenzyColor : oathSlash?.[s.spin ? 2 : s.comboStep - 1] ?? look.color);
+            : (frenzyActive ? SLASH_VISUALS.frenzyColor : oathSlash?.[slashIndex] ?? fireSlash?.[slashIndex] ?? look.color);
         const width = look.lineWidth + (frenzyActive ? SLASH_VISUALS.frenzyExtraWidth : 0);
 
         ctx.save();
@@ -388,7 +392,12 @@ export function renderKnifeAim() {
 export function renderKnives() {
     if (state.knives.length === 0) return;
     const dagger = getDaggerSprite();
+    const now = performance.now() / 1000;
     for (const k of state.knives) {
+        if (k.fire) {
+            drawFireOrb(k.x, k.y - K.flightHeight, SKILLS_VISUALS.fire.orbRadius * k.scale, now + k.x * 0.01, k.angle, Math.min(1, k.travelled / 40));
+            continue;
+        }
         const width = DAGGER_LENGTH * K.flightScale * k.scale;
         const height = DAGGER_WIDTH * K.flightScale * k.scale;
         const y = k.y - K.flightHeight;

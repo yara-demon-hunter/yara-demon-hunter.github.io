@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prévia das Armas</title>
+    <style>
+        body { margin: 0; background: #050b16; }
+        canvas { display: block; margin: 0 auto; max-width: 100%; }
+    </style>
+</head>
+<body>
+    <!-- Página de desenvolvimento: a adaga e a espada em detalhe, com o código real do jogo. Como abrir: previews/README.md -->
+    <canvas id="gameCanvas" width="1200" height="1600"></canvas>
+    <script>
+        if (location.protocol === 'file:') {
+            const g = document.getElementById('gameCanvas').getContext('2d');
+            g.fillStyle = '#fbbf24';
+            g.font = '600 24px system-ui, sans-serif';
+            g.textAlign = 'center';
+            g.fillText('Esta página precisa de um servidor local: veja previews/README.md', 600, 130);
+        }
+    </script>
+    <script type="module">
+        import { HEROES } from '../data_model/heroes.js';
+        import { HERO_25D_VISUALS } from '../data_model/visuals/characters/hero25d_visual.js';
+        import { KNIFE_VISUALS as K } from '../data_model/visuals/effects/knife_visual.js';
+        import { SKILLS_VISUALS } from '../data_model/visuals/effects/skills_visual.js';
+        import { ctx, state } from '../js/core/state.js';
+        import { drawFireOrb } from '../js/render/fire.js';
+        import { getOathPalette } from '../js/render/hero_gear.js';
+        import { drawDagger } from '../js/render/knife.js';
+        import { renderSwordDetail } from '../js/render/player25d.js';
+
+        const WIDTH = 1200;
+        const HEIGHT = 1600;
+        const BASE = HERO_25D_VISUALS.colors;
+        const S = K.shape;
+
+        function text(str, x, y, size = 13, color = '#cbd5e1', weight = 400) {
+            ctx.fillStyle = color;
+            ctx.font = `${weight} ${size}px system-ui, sans-serif`;
+            ctx.fillText(str, x, y);
+        }
+
+        function panel(x, y, w, h, draw) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#0b1424';
+            ctx.fillRect(0, 0, w, h);
+            ctx.beginPath();
+            ctx.rect(0, 0, w, h);
+            ctx.clip();
+            draw();
+            ctx.restore();
+        }
+
+        // Linhas de legenda de uma arma ampliada. notes: [x, y na arma, texto, -1 acima / 1 abaixo, alinhamento]
+        function drawNotes(cx, cy, zoom, notes) {
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+            ctx.lineWidth = 1;
+            notes.forEach(([x, y, label, dir, align]) => {
+                const px = cx + x * zoom;
+                const py = cy + y * zoom;
+                const ly = cy + dir * 105;
+                ctx.beginPath();
+                ctx.moveTo(px, py);
+                ctx.lineTo(px, ly);
+                ctx.stroke();
+                ctx.font = '13px system-ui, sans-serif';
+                const w = ctx.measureText(label).width;
+                text(label, align === 'right' ? px - w + 4 : px - 4, ly + (dir < 0 ? -6 : 16));
+            });
+        }
+
+        function zoomed(x, y, zoom, draw) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(zoom, zoom);
+            draw();
+            ctx.restore();
+        }
+
+        function daggerDetail(top, now) {
+            text('Adaga em detalhe', 24, top, 18, '#67e8f9', 700);
+            const cx = 480;
+            const cy = top + 170;
+            const zoom = 26;
+            panel(24, top + 14, WIDTH - 48, 300, () => {});
+            zoomed(cx, cy, zoom, () => drawDagger(ctx, now));
+            drawNotes(cx, cy, zoom, [
+                [S.pommelX, 0.6, 'pomo dourado + gema', 1, 'right'],
+                [(S.gripStart + S.gripEnd) / 2, 0.8, 'cabo de couro com tiras', 1, 'left'],
+                [S.guardX + 0.4, -2.4, 'guarda curva', -1, 'right'],
+                [S.bladeStart + 2.8, -0.6, 'runas', -1, 'left'],
+                [6.5, 0, 'nervura central', 1, 'left'],
+                [9, -0.6, 'fio brilhante', -1, 'left']
+            ]);
+        }
+
+        function daggerForms(top, now) {
+            text('Adaga: formas', 24, top, 18, '#67e8f9', 700);
+            const F = SKILLS_VISUALS.fire;
+            const forms = [
+                ['Adaga', (x, y) => zoomed(x - 30, y, 6, () => drawDagger(ctx, now))],
+                ['Charged Dagger Throw (cheia)', (x, y) => zoomed(x - 50, y, 10, () => drawDagger(ctx, now))],
+                ['Fireballs', (x, y) => zoomed(x, y, 3, () => drawFireOrb(0, 0, F.orbRadius, now, 0, 1))],
+                ['Fireballs + carga cheia', (x, y) => zoomed(x, y, 3, () => drawFireOrb(0, 0, F.orbRadius * 1.7, now, 0, 1))]
+            ];
+            const w = (WIDTH - 48 - 36) / 4;
+            forms.forEach(([label, draw], i) => {
+                const x = 24 + i * (w + 12);
+                panel(x, top + 14, w, 170, () => {});
+                draw(x + w / 2, top + 99);
+                text(label, x + 8, top + 204);
+            });
+        }
+
+        function swordDetail(top) {
+            text('Espada em detalhe', 24, top, 18, '#67e8f9', 700);
+            const cx = 360;
+            const cy = top + 170;
+            const zoom = 34;
+            panel(24, top + 14, WIDTH - 48, 300, () => zoomed(cx - 24, cy - top - 14, zoom, () => renderSwordDetail({})));
+            const L = HERO_25D_VISUALS.bladeLength;
+            drawNotes(cx, cy, zoom, [
+                [-1.5, 0.4, 'cabo', 1, 'right'],
+                [0.8, -1.1, 'guarda', -1, 'right'],
+                [3, -0.3, 'runas em onda', -1, 'left'],
+                [L * 0.5, 0.2, 'nervura central', 1, 'left'],
+                [L - 3, -0.6, 'ombro da lâmina', -1, 'left'],
+                [L, 0, 'ponta', 1, 'left']
+            ]);
+        }
+
+        function swordForms(top) {
+            text('Espada: formas', 24, top, 18, '#67e8f9', 700);
+            const heroes = Object.values(HEROES).filter(h => h.colors).map(h => [h.name, { colors: { ...BASE, ...h.colors } }]);
+            const oath = (gear, name) => [name, { oathGear: gear, colors: getOathPalette(gear, BASE) }];
+            const forms = [
+                ['Demon Hunter', {}],
+                ['Fúria ativa', { frenzy: true }],
+                ['Flaming Sword', { fire: true }],
+                ['Flaming Sword sob o Oath of the Hearth', { ...oath('hearth')[1], fire: true, oath: 'oathHearth' }],
+                oath('slaughter', 'Oath of Slaughter'),
+                oath('whispers', 'Oath of Whispers'),
+                oath('hearth', 'Oath of the Hearth'),
+                oath('ruin', 'Oath of Ruin'),
+                ...heroes
+            ];
+            const w = (WIDTH - 48 - 36) / 4;
+            forms.forEach(([label, opts], i) => {
+                const x = 24 + (i % 4) * (w + 12);
+                const y = top + 14 + Math.floor(i / 4) * 190;
+                state.oath = opts.oath ?? null;
+                panel(x, y, w, 150, () => zoomed(34, 84, 11, () => renderSwordDetail(opts)));
+                state.oath = null;
+                text(label, x + 8, y + 170);
+            });
+        }
+
+        function frame() {
+            const now = performance.now() / 1000;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#050b16';
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+            text('Armas do herói', 24, 40, 26, '#fbbf24', 700);
+            daggerDetail(80, now);
+            daggerForms(420, now);
+            swordDetail(660);
+            swordForms(1000);
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    </script>
+</body>
+</html>

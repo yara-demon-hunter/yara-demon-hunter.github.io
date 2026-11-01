@@ -97,6 +97,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Guarda: Steady Stance*, Vigil*, Backdraft*
   - Muralha: Flame Sentinel, Sun Spire, Hearth Ring*, Solar Wall*
   - Brasa: Ember Steps, Hellwalker
+  - Armas: Flaming Sword*, Fireballs* (saem do Hearth Ring)
   - Oath of the Hearth*
 - **Curse** (raiz: Arcane Study)
   - Gelo e força: Cold Moon, Soul Nova, Absolute Zero, Starfall, Mirror Ward
@@ -128,6 +129,8 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Steady Stance | Efeito | Parado, ataca mais rápido | - |
 | Vigil | Passiva | Parado, ergue um escudo que para um golpe e estoura em fogo | Ajoelhado, espada fincada, redoma |
 | Backdraft | Passiva | Monstro que alcança a tocha causa uma explosão em volta dela | Explosão |
+| Flaming Sword | Passiva | A espada pega fogo: todo corte, inclusive das sombras, deixa o monstro queimando por 3s (30% do golpe por segundo; o dobro sob o Oath of the Hearth, com chama dourada maior) | Línguas de fogo na lâmina, corte laranja |
+| Fireballs | Passiva | As adagas viram bolas de fogo: o herói para por 0,55s com a bola crescendo na mão, como o Lorde Demônio, sem andar, golpear nem dar dash; ao acertar, ela explode, fere os vizinhos com 50% do dano e deixa todos em chamas. Por baixo continuam adagas, então Dagger Mastery, Fan of Knives, Ricochet, Death Mark, Charged Dagger Throw e a explosão das sombras valem igual. O Oath of Slaughter também as bloqueia | Bola de fogo com cauda |
 | Phoenix Pact | Passiva | Uma vez por hora, ao cair, a tocha paga 30 de vida para levantar o herói | Asas de fogo |
 | Hearth Ring | Poder | Anel de fogo em volta da tocha que queima e freia quem cruza | Anel de chamas |
 | Solar Wall | Evolução | O anel vira muralha branca que sobe de tempos em tempos, jogando monstros longe | Labareda |

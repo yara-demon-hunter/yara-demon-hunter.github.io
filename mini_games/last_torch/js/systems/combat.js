@@ -1,10 +1,12 @@
+import { FLAME_BLADE } from '../../data_model/passives.js';
 import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { audio, maxUltEnergy, passives, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
-import { blast, dealDamage } from './damage.js';
+import { blast, dealDamage, ignite } from './damage.js';
 import { addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
 import { mod } from './modifiers.js';
+import { isFireCasting } from './knives.js';
 import { launchCrescent, tryExecute } from './skills_blade.js';
 import { detonateMark } from './skills_shadow.js';
 import {
@@ -71,6 +73,10 @@ export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, a
             // Aplica dano se o inimigo está dentro da abertura angular atual do corte
             if (diffAngle <= arcHalf + 0.1 || state.frenzyActiveTimer > 0 || allAround) {
                 dealDamage(e, dmg, { kbX: Math.cos(enemyAngle) * kbForce, kbY: Math.sin(enemyAngle) * kbForce });
+                if (passives.flameBlade.lvl > 0) {
+                    const oath = state.oath === 'oathHearth' ? FLAME_BLADE.oathMultiplier : 1;
+                    ignite(e, dmg * FLAME_BLADE.burnRatio * oath, FLAME_BLADE.burnSeconds);
+                }
                 if (onHit) onHit(e);
                 createExplosion(e.x, e.y, e.color, 4);
                 hits++;
@@ -129,7 +135,7 @@ export function updateAutoAttack(dt) {
     const attackRad = getAtkRadius();
     const currentArcHalf = getSlashArcRadian() / 2;
 
-    if (player.attackTimer > 0) return;
+    if (player.attackTimer > 0 || isFireCasting()) return;
 
     const targetEnemy = findNearestEnemy(player.x, player.y, attackRad);
     if (!targetEnemy) return;
