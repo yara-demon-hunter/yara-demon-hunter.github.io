@@ -19,7 +19,7 @@ export const CHARACTER_MODEL = {
     levelUpHealRatio: 0.12,
     // Calor da tocha: perto dela o herói se recupera aos poucos
     warmthRadius: 92,
-    warmthHealPerSecond: 3,
+    warmthHealPerSecond: 5,
     // Ouro no chão só vem até o herói dentro deste raio (no fim da hora vem tudo)
     magnetRadius: 105
 };

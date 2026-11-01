@@ -80,8 +80,8 @@
     transform: translateX(-50%);
     pointer-events: none;
 }
-/* Acampamento: sobem para a linha do título, para não cobrir o botão de compra */
-body:has(#campScreen:not(.hidden)) #toasts { top: 0.3rem; bottom: auto; flex-direction: row; }
+/* Acampamento: ficam sobre a árvore de relíquias, sem cobrir título, compra ou saída */
+body:has(#campScreen:not(.hidden)) #toasts { left: 26%; }
 .toast {
     display: flex;
     align-items: center;
@@ -102,6 +102,7 @@ body:has(#campScreen:not(.hidden)) #toasts { top: 0.3rem; bottom: auto; flex-dir
 .toast-icon { font-size: 1.1rem; }
 .toast b { display: block; color: #fde4c8; font-size: 0.76rem; white-space: nowrap; }
 .toast div span { display: block; color: #94a3b8; font-size: 0.66rem; }
+.toast div span:empty { display: none; }
 
 /* Efeitos de tela: bordas coloridas, baratas para a GPU */
 #screenFx {

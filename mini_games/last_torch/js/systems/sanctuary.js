@@ -53,6 +53,7 @@ export function recordBeast(type) {
     entry.kills++;
     if (entry.kills > 1) return;
     const info = getBestiary().find(b => b.key === type);
-    if (info) showToast(info.icon, 'New in the bestiary', info.name);
+    // Na primeira noite o jogador ainda não conhece o Santuário: o aviso só disputaria espaço com as dicas
+    if (info && save.stats.runs > 0) showToast(info.icon, 'New in the bestiary', info.name);
     persist();
 }

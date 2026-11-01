@@ -150,7 +150,7 @@ export function setupInput() {
     });
 
     // Botão direito: dash na direção do cursor
-    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    window.addEventListener('contextmenu', (e) => e.preventDefault());
     canvas.addEventListener('mousedown', (e) => {
         if (e.button !== 2 || state.gameState !== 'PLAYING') return;
         aimKnife(e.clientX, e.clientY);

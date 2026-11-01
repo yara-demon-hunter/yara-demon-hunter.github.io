@@ -106,12 +106,19 @@ function renderHeader() {
 
 skillTree.onChange = renderHeader;
 
-export function openStatus() {
-    if (state.gameState !== 'PLAYING') return;
+// De onde a tela foi aberta: a caçada ou o acampamento (from = 'CAMP', com onBack para redesenhar o acampamento)
+let returnState = 'PLAYING';
+let afterReturn = null;
+
+export function openStatus(from = 'PLAYING', onBack = null) {
+    if (state.gameState !== from) return;
+    returnState = from;
+    afterReturn = onBack;
     state.gameState = 'PAUSED';
     document.getElementById('statusLevel').innerText = `LEVEL ${state.playerLevel}`;
     document.getElementById('statusHour').innerText = `Hour ${state.turn} · ${getHourName(state.turn)}`;
     document.getElementById('statusHero').innerText = ` · ${getHero().name}`;
+    document.getElementById('btnResume').innerText = from === 'CAMP' ? 'BACK TO THE CAMP ▶' : 'BACK TO THE HUNT ▶';
     renderHeader();
     renderStats();
     const skills = Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0)
@@ -137,9 +144,13 @@ export function openStatus() {
 export function resumeGame() {
     if (state.gameState !== 'PAUSED') return;
     document.getElementById('shopScreen').classList.add('hidden');
+    document.getElementById('pickScreen').classList.add('hidden');
     document.getElementById('settingsScreen').classList.add('hidden');
     // Um dedo solto do botão da adaga enquanto a tela estava aberta não arremessa ao voltar
     state.knifeInput.stick.fire = false;
-    state.gameState = 'PLAYING';
+    state.gameState = returnState;
+    returnState = 'PLAYING';
     audio.setPaused(false);
+    afterReturn?.();
+    afterReturn = null;
 }

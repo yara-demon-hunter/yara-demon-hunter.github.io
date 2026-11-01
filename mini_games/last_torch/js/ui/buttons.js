@@ -2,7 +2,8 @@ import { audio, state } from '../core/state.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
 import { chooseHero, closeHeroes, openHeroes } from './heroes.js';
 import { beginDeath } from '../systems/night.js';
-import { lockLandscape, showIosHint } from './orientation.js';
+import { inPortal, lockLandscape, showIosHint } from './orientation.js';
+import { choosePick, isPicking, setupQuickPick } from './quick_pick.js';
 import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
 import { changeDarkness, keepHunting, returnToMenu, shareResult, startGame } from './screens.js';
 import { openSettings, toggleSetting } from './settings.js';
@@ -19,6 +20,7 @@ export function setupButtons() {
     });
 
     showIosHint();
+    document.getElementById('btnShare').classList.toggle('hidden', inPortal);
 
     // No celular: tela cheia travada de lado, em paisagem (precisa de um toque do jogador para ser permitido).
     // Também ao voltar da pausa, caso o jogador tenha saído da tela cheia (a trava se perde junto).
@@ -83,6 +85,7 @@ export function setupButtons() {
     on('btnDarkUp', () => changeDarkness(1));
 
     skillTree.setup();
+    setupQuickPick();
     setupCamp();
     document.getElementById('statusTabs').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-status-tab]');
@@ -101,13 +104,15 @@ export function setupButtons() {
     const menuScreenOpen = () => ['sanctuaryScreen', 'heroScreen'].some(id => !document.getElementById(id).classList.contains('hidden'));
     window.addEventListener('keydown', (e) => {
         if (e.repeat) return;
+        const pickKey = ['Digit1', 'Digit2', 'Digit3'].indexOf(e.code);
+        if (pickKey >= 0 && isPicking()) choosePick(pickKey);
         if (e.code === 'Escape' || e.code === 'KeyP') {
             if (state.gameState === 'START' && menuScreenOpen()) {
                 closeSanctuary();
                 closeHeroes();
             } else if (state.gameState === 'PLAYING') openStatus();
             else if (state.gameState === 'PAUSED') resumeGame();
-        } else if (e.code === 'Enter') {
+        } else if (e.code === 'Enter' && !e.target.closest?.('button')) {
             if (state.gameState === 'GAMEOVER') start();
             else if (state.gameState === 'CAMP') leaveCamp();
             else if (state.gameState === 'START' && !menuScreenOpen()) start();
@@ -115,8 +120,13 @@ export function setupButtons() {
     });
 
     // Saiu da aba no meio da caçada: pausa sozinho
+    const pauseHunt = () => {
+        if (state.gameState === 'PLAYING' && state.phase === 'HUNT') openStatus();
+    };
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden && state.gameState === 'PLAYING' && state.phase === 'HUNT') openStatus();
+        if (document.hidden) pauseHunt();
         audio.setHidden(document.hidden);
     });
+    // Clicou fora do jogo (iframe do portal, outra janela): a aba continua visível, mas o jogador saiu
+    window.addEventListener('blur', pauseHunt);
 }

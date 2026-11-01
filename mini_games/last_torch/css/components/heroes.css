@@ -18,7 +18,7 @@
 .hero-card:hover:not(:disabled) { border-color: rgba(251, 146, 60, 0.7); }
 .hero-card:active:not(:disabled) { transform: scale(0.97); }
 .hero-card.is-picked { border-color: rgba(253, 224, 71, 0.75); box-shadow: 0 0 16px rgba(253, 224, 71, 0.2); }
-.hero-card.is-locked { opacity: 0.6; cursor: default; }
+.hero-card.is-locked { opacity: 0.85; cursor: default; }
 .hero-card .hero-portrait { width: 3.8rem; height: 3.8rem; }
 .hero-card.is-locked .hero-portrait { filter: brightness(0.15); }
 .hero-card b { color: #e7e0cf; font-family: 'Cinzel', Georgia, serif; font-size: 0.88rem; }
@@ -42,3 +42,7 @@
     .hero-trait { font-size: 0.58rem; line-height: 1.25; }
     .hero-tag { padding-top: 0.15rem; font-size: 0.56rem; }
 }
+
+/* Progresso da conquista que libera o herói (só nos bloqueados) */
+.hero-progress { font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 800; color: #fdba74; }
+.hero-progress:empty { display: none; }

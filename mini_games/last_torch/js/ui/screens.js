@@ -6,7 +6,7 @@ import { DARKNESS, getHourName } from '../../data_model/night.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
 import { checkAchievements, pushStats, rewardText } from '../systems/sanctuary.js';
-import { getOwnedPowers } from '../systems/tree.js';
+import { getOwnedPowers, hasBuyableNode } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
 import { continueEndless, startHour } from '../systems/night.js';
@@ -17,6 +17,7 @@ import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_
 import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
 import { startHints } from './hints.js';
+import { resetQuickPick } from './quick_pick.js';
 import { updateHUD } from './hud.js';
 
 // --- INÍCIO DE PARTIDA ---
@@ -95,6 +96,7 @@ export function startGame() {
     state.currentBoss = null;
     state.levelUpFx = null;
     resetSkills();
+    resetQuickPick();
 
     refreshModifiers();
     state.revives = mod('revives');
@@ -120,7 +122,7 @@ export function startGame() {
     document.getElementById('heroPortrait').style.filter = hero.portrait;
 
     state.gameState = 'PLAYING';
-    ['startScreen', 'gameOverScreen', 'shopScreen', 'campScreen', 'sanctuaryScreen', 'heroScreen'].forEach(id => {
+    ['startScreen', 'gameOverScreen', 'shopScreen', 'pickScreen', 'campScreen', 'sanctuaryScreen', 'heroScreen'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
     startHour();
@@ -175,8 +177,8 @@ function renderGoal() {
 }
 
 const END_TEXTS = {
-    PLAYER: { title: 'THE HUNTER FELL', sub: 'The fog closes over the clearing.' },
-    CORE: { title: 'THE LAST LIGHT DIED', sub: 'The torch went out, and the dark came in.' },
+    PLAYER: { title: 'THE HUNTER FELL', sub: 'Tip: dash out of trouble, and stand by the fire to heal.' },
+    CORE: { title: 'THE LAST LIGHT DIED', sub: 'Tip: kill monsters before they reach the flame.' },
     DAWN: { title: 'DAWN', sub: 'You kept the flame alive through the long night.' }
 };
 
@@ -208,7 +210,8 @@ export function triggerGameOver(reason) {
     const screen = document.getElementById('gameOverScreen');
     screen.classList.toggle('is-victory', reason === 'DAWN');
     document.getElementById('gameOverTitle').innerText = text.title;
-    document.getElementById('gameOverSub').innerText = text.sub;
+    const unspent = reason !== 'DAWN' && hasBuyableNode();
+    document.getElementById('gameOverSub').innerText = unspent ? `Tip: ${state.skillPoints} skill points went unused. Tap the medal at the top to spend them.` : text.sub;
     document.getElementById('finalHour').innerText = `Hour ${state.turn}`;
     document.getElementById('finalHourName').innerText = getHourName(state.turn);
     document.getElementById('finalLevel').innerText = state.playerLevel;
@@ -269,12 +272,11 @@ export function keepHunting() {
 // --- TELA INICIAL ---
 export function renderStartScreen() {
     const { stats } = save;
-    const veteran = stats.runs > 0;
-    document.getElementById('startTips').classList.toggle('hidden', veteran);
-    document.getElementById('startRecords').classList.toggle('hidden', !veteran);
-    document.getElementById('recordHour').innerText = stats.bestHour;
-    document.getElementById('recordScore').innerText = stats.bestScore.toLocaleString('en-US');
-    document.getElementById('recordStreak').innerText = stats.bestStreak;
+    // Recorde ainda sem dado aparece como "-"
+    const record = (value) => (value > 0 ? value.toLocaleString('en-US') : '-');
+    document.getElementById('recordHour').innerText = record(stats.bestHour);
+    document.getElementById('recordScore').innerText = record(stats.bestScore);
+    document.getElementById('recordStreak').innerText = record(stats.bestStreak);
 
     const hero = getHero();
     document.getElementById('startSanctuaryCount').innerText = `${ACHIEVEMENTS.filter(a => save.achievements[a.id]).length}/${ACHIEVEMENTS.length} earned`;

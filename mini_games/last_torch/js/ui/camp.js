@@ -7,8 +7,10 @@ import { collectAllGold } from '../systems/gold.js';
 import { startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { feedTorch } from '../systems/torch.js';
+import { hasBuyableNode } from '../systems/tree.js';
 import { updateHUD } from './hud.js';
 import { reportProgress } from './screens.js';
+import { openStatus } from './status.js';
 import { relicTree } from './tree.js';
 
 // --- ACAMPAMENTO ---
@@ -47,6 +49,8 @@ function renderServices() {
 // Ouro e serviços (a árvore se redesenha sozinha)
 function renderWallet() {
     document.getElementById('campCoins').innerText = state.coins;
+    document.getElementById('campPoints').innerText = state.skillPoints;
+    document.getElementById('btnCampSkills').classList.toggle('hidden', !hasBuyableNode());
     renderServices();
 }
 
@@ -58,6 +62,7 @@ function renderCamp() {
 export function setupCamp() {
     relicTree.setup();
     relicTree.onChange = renderWallet;
+    document.getElementById('btnCampSkills').addEventListener('click', () => openStatus('CAMP', renderCamp));
 }
 
 // O que vem na próxima hora
@@ -77,6 +82,7 @@ function renderNext() {
 export function openCamp() {
     state.gameState = 'CAMP';
     collectAllGold();
+    feedTorch(CAMP.freeTorchHeal);
     fuelUses = 0;
     restUses = 0;
     document.getElementById('campEyebrow').innerText = `HOUR ${state.turn - 1} SURVIVED`;

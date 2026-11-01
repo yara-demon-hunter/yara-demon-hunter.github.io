@@ -33,6 +33,7 @@ function renderHeroes() {
             el('b', '', owned ? hero.name : '???'),
             el('em', '', owned ? hero.tagline : ''),
             el('span', 'hero-trait', owned ? hero.trait : `${trial?.icon ?? '🔒'} ${trial?.name ?? ''}: ${trial?.desc ?? ''}`),
+            el('span', 'hero-progress', owned || !trial ? '' : `${Math.min(save.stats[trial.stat] ?? 0, trial.target)}/${trial.target}`),
             el('span', 'hero-tag', picked ? 'IN USE' : owned ? 'CHOOSE' : '🔒 LOCKED')
         );
         roster.appendChild(card);

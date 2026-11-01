@@ -150,6 +150,11 @@ function announceOath() {
     showToast('⬢', 'An oath can be sworn', `${getNodeInfo(open).name}. Only one per night.`);
 }
 
+// Nós que dá para comprar agora
+export function getBuyableNodes() {
+    return TREE_NODES.filter(node => getNodeState(node).canBuy);
+}
+
 // Algum nó que o jogador pode comprar agora? Faz o medalhão pulsar
 export function hasBuyableNode() {
     if (state.skillPoints <= 0) return false;

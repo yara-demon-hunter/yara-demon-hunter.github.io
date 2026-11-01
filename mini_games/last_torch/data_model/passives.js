@@ -272,6 +272,7 @@ export const PASSIVE_SKILL_MODELS = {
 export const CAMP = {
     costMultiplier: 1.35,
     costGrowthPerHour: 0.15,        // relíquias ficam mais caras a cada hora
+    freeTorchHeal: 25,              // a tocha recupera isto de graça ao chegar no acampamento
     fuel: { heal: 30, cost: 40, costPerHour: 12, costPerUse: 25 },
     rest: { healRatio: 0.5, cost: 30, costPerHour: 9, costPerUse: 20 }
 };

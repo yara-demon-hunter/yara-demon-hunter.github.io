@@ -1,4 +1,4 @@
-# Last Torch: Demon Hunter
+# Last Torch
 
 Conceito dos ramos de skill, formatos dos nós e regras de custo: [SKILLS.md](SKILLS.md).
 
@@ -14,8 +14,8 @@ python3 -m http.server 8000 --directory mini_games/last_torch/standalone-build
 
 Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o herói vivo e a tocha acesa.
 
-- **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 2 pontos de skill. O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos, um para cada jeito de jogar (Blade agressivo, Shadow técnico, Flame defensivo, Curse estratégico), com stats, poderes, efeitos, evoluções, skills passivas e um Juramento no fim de cada ramo: só um por noite, com bônus e preço, e que transforma o herói. Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
-- **Uma hora (~45 s):** fechada a cota de pontos (ou morto o boss), para de nascer monstro e o jogador mata o que sobrou. Com a tela limpa, uma onda de fogo sai da tocha, o ouro do chão voa até o herói, sobra um tempo curto para pegar os itens e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha. As horas 4, 8 e 12 têm boss.
+- **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 2 pontos de skill. A escolha rápida (`js/ui/quick_pick.js`) vem sempre desligada ao abrir o jogo; ligada em Settings, ela pausa ao ganhar pontos e mostra três skills da árvore, de ramos diferentes: um toque gasta os pontos ali e a caça volta (as teclas 1, 2 e 3 escolhem; Esc guarda os pontos para depois). O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos, um para cada jeito de jogar (Blade agressivo, Shadow técnico, Flame defensivo, Curse estratégico), com stats, poderes, efeitos, evoluções, skills passivas e um Juramento no fim de cada ramo: só um por noite, com bônus e preço, e que transforma o herói. Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
+- **Uma hora (~45 s):** fechada a cota de pontos (ou morto o boss), para de nascer monstro e o jogador mata o que sobrou. Com a tela limpa, uma onda de fogo sai da tocha, o ouro do chão voa até o herói, sobra um tempo curto para pegar os itens e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha, que também recupera um pouco de graça a cada hora (`CAMP.freeTorchHeal`). As horas 4, 8 e 12 têm boss.
 - **Entre partidas:** a árvore recomeça a cada noite e está toda aberta desde a primeira partida. Cada nó pede só o que aparece na árvore: nível mínimo de outras skills e, em alguns, quantos monstros de um tipo você matou na partida inteira, somando todas as horas (por exemplo, 10 Witches). A contagem só zera ao começar uma partida nova. O painel do nó mostra a lista inteira de pedidos de uma vez. O que persiste entre noites fica no **Santuário** (botão na tela inicial): troféus (marcos da jornada), façanhas (matar vários de uma vez, esquivar no último instante, terminar uma hora sem levar dano, sequências de mortes) e o bestiário, que mostra cada monstro e boss depois do primeiro abatido. Algumas conquistas liberam heróis, escolhidos na tela de escolha do herói, também na tela inicial. As moedas do jogo são só o ouro e os pontos de skill, e valem para a noite atual. Vencer abre a noite sem fim e os níveis de Escuridão.
 
 Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
@@ -49,6 +49,7 @@ css/
   components/sanctuary.css        Santuário: troféus, façanhas e bestiário
   components/heroes.css           escolha do herói
   components/shop.css             tela de status (pausa, abas, build em colunas)
+  components/quick-pick.css       escolha rápida ao subir de nível
   components/tree.css             árvores: cada ramo é um bloco; abas em tela pequena, 2 x 2 em tela grande, célula calculada para caber sem rolar
   components/joystick.css         controles de toque: joystick, adaga e dash
   components/start-screen.css     tela inicial
@@ -137,6 +138,7 @@ js/
   ui/heroes.js                    escolha do herói
   ui/screens.js                   início de partida, fim da noite e tela inicial
   ui/hints.js                     dicas da primeira partida
+  ui/quick_pick.js                escolha rápida: três nós da árvore ao ganhar pontos
   ui/orientation.js               celular de lado (paisagem): trava de orientação e pausa com o aparelho em pé
   ui/buttons.js                   eventos dos botões e atalhos de teclado
   audio/sound-engine.js           efeitos sintetizados (Web Audio API), mixagem e volumes
@@ -154,7 +156,7 @@ draft/                            versões anteriores mantidas como referência
 
 ## Controles
 
-- **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente (ao usar o teclado, o mouse passa a servir só para mirar). Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria) ou, com Charged Dagger Throw, para carregar e soltar. `Espaço`, `Shift` ou o botão direito dão o dash. `Esc` ou `P` pausam. `Enter` recomeça.
+- **Desktop:** mova o mouse para direcionar o herói ou use `WASD`/setas para movimentar diretamente (ao apertar uma delas, o mouse passa a servir só para mirar até a próxima partida; desliga em Settings). Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria) ou, com Charged Dagger Throw, para carregar e soltar. `Espaço`, `Shift` ou o botão direito dão o dash. `Esc` ou `P` pausam. `Enter` recomeça.
 - **Celular:** jogado **de lado (paisagem)**, com os dois polegares. Ao começar, o jogo entra em tela cheia e trava em paisagem (Android); onde não dá para travar (iOS), um aviso pede para virar o aparelho de lado e a partida fica pausada enquanto ele estiver em pé. O joystick (canto inferior esquerdo) move o herói. O botão menor, acima da adaga, dá o dash. O botão da adaga (canto inferior direito) mira enquanto está pressionado, com uma linha tracejada saindo do herói: sem arrastar mira no monstro mais perto; arrastando mira na direção do arraste. A adaga só é arremessada ao **soltar** o botão, uma vez, se a recarga (anel em volta do botão) já terminou; com Charged Dagger Throw, quanto mais tempo segurar, mais forte ela sai. Tocar na tela não arremessa. Os ataques corpo a corpo são automáticos.
 
 O jogo usa a mesma lógica e progressão em todas as telas; apenas a disposição da interface e o controle de movimento se adaptam ao dispositivo.

@@ -46,7 +46,9 @@ export function startHour() {
         audio.setMood('silent');
     } else {
         spawnOpening();
-        showBanner(`HOUR ${hour}`, getHourName(hour).toUpperCase(), state.omen ? `${state.omen.icon} ${state.omen.name}` : '', 'hour');
+        // A primeira faixa da noite diz o objetivo; as outras, a hora e o presságio
+        if (hour === 1) showBanner(`HOUR 1 OF ${NIGHT.hours}`, 'PROTECT THE TORCH', 'Survive until dawn', 'hour');
+        else showBanner(`HOUR ${hour} OF ${NIGHT.hours}`, getHourName(hour).toUpperCase(), state.omen ? `${state.omen.icon} ${state.omen.name}` : '', 'hour');
         audio.setMood('hunt');
     }
     audio.setIntensity(Math.min(1, (hour - 1) / (NIGHT.hours - 1)));

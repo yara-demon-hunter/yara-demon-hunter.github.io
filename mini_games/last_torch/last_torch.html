@@ -14,7 +14,8 @@ permalink: /mini_games/last_torch/last_torch.html
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Last Torch">
     <meta name="theme-color" content="#020617">
-    <title>Last Torch: Demon Hunter</title>
+    <title>Last Torch</title>
+    <link rel="icon" href="images/characters/demon-hunter-small.webp">
     <link rel="stylesheet" href="./css/game.css">
 </head>
 <body>
@@ -95,23 +96,16 @@ permalink: /mini_games/last_torch/last_torch.html
     <div class="start-torch" aria-hidden="true"></div>
 
     <div class="start-content">
-        <p class="start-eyebrow">DEMON HUNTER</p>
         <h1 class="start-title">LAST TORCH</h1>
-        <p class="start-tagline">Survive twelve hours of night. Keep the flame alive until dawn.</p>
+        <p class="start-tagline">Protect the torch until dawn.</p>
 
-        <!-- Primeira partida: dicas. Depois: recordes -->
-        <ul id="startTips" class="start-tips">
-            <li><span>🔥</span><p><b>Guard the torch.</b> Its light holds back the fog. If it dies, the night is over.</p></li>
-            <li><span>⚔️</span><p><b>Hunt what comes.</b> Your blade strikes on its own. Throw daggers and dash to stay alive.</p></li>
-            <li><span>🃏</span><p><b>Grow with every level.</b> Pick one of three powers, and build something terrible.</p></li>
-            <li><span>🌅</span><p><b>Every night counts.</b> Trophies and feats fill the Sanctuary and unlock new heroes.</p></li>
-        </ul>
-        <div id="startRecords" class="start-records hidden">
-            <div><span>Best hour</span><b id="recordHour">0</b></div>
-            <div><span>Best score</span><b id="recordScore">0</b></div>
-            <div><span>Best streak</span><b id="recordStreak">0</b></div>
+        <div id="startRecords" class="start-records">
+            <div><span>Best hour</span><b id="recordHour">-</b></div>
+            <div><span>Best score</span><b id="recordScore">-</b></div>
+            <div><span>Best streak</span><b id="recordStreak">-</b></div>
         </div>
 
+        <!-- Escuridão: só depois de vencer a noite -->
         <div id="darknessPicker" class="darkness-picker hidden">
             <span>DARKNESS</span>
             <button id="btnDarkDown" aria-label="Lower darkness">◀</button>
@@ -119,10 +113,9 @@ permalink: /mini_games/last_torch/last_torch.html
             <button id="btnDarkUp" aria-label="Raise darkness">▶</button>
         </div>
 
-        <button id="btnStart" class="start-btn">LIGHT THE TORCH</button>
+        <button id="btnStart" class="start-btn">PLAY</button>
         <p id="iosHint" class="hidden">Full screen on iPhone: tap Share, then <b>Add to Home Screen</b>, and open it from there.</p>
-        <!-- Herói e Santuário lado a lado: um toque cada, sem gastar altura -->
-        <div class="start-links">
+                <div class="start-links">
             <button id="btnHeroes" class="start-btn-small">
                 <span id="startHeroPortrait" class="hero-portrait" aria-hidden="true"></span>
                 <span class="link-text"><span>HUNTER</span><em id="startHeroName">Demon Hunter</em></span>
@@ -153,6 +146,15 @@ permalink: /mini_games/last_torch/last_torch.html
     <span>Last Torch is played in landscape, with both thumbs. The hunt is paused.</span>
 </div>
 
+<!-- ESCOLHA DO NÍVEL: três skills da árvore, um toque e volta à caça. Styles in css/components/quick-pick.css -->
+<div id="pickScreen" class="game-screen hidden" role="dialog" aria-label="Choose a skill">
+    <div class="pick-panel">
+        <h2 id="pickTitle" class="screen-title">LEVEL UP</h2>
+        <div id="pickCards"></div>
+        <button id="btnPickTree" class="screen-link">FULL SKILL TREE</button>
+    </div>
+</div>
+
 <!-- ACAMPAMENTO (fim de cada hora). Styles in css/components/camp.css -->
 <div id="campScreen" class="game-screen hidden" role="dialog" aria-label="Camp">
     <div class="camp-panel">
@@ -161,7 +163,10 @@ permalink: /mini_games/last_torch/last_torch.html
                 <p id="campEyebrow" class="screen-eyebrow">HOUR 1 SURVIVED</p>
                 <h2 class="screen-title">THE FIRE HOLDS</h2>
             </div>
-            <div class="camp-gold">🪙 <b id="campCoins">0</b></div>
+            <div class="camp-wallet">
+                <button id="btnCampSkills" class="points-chip hidden" title="Skill tree">⚡ <b id="campPoints">0</b> SKILLS</button>
+                <div class="camp-gold">🪙 <b id="campCoins">0</b></div>
+            </div>
         </header>
         <!-- Árvore à esquerda; relíquia escolhida, fogueira e saída à direita (mesma ideia no celular e no desktop) -->
         <div class="camp-body tree-view">
@@ -296,6 +301,7 @@ permalink: /mini_games/last_torch/last_torch.html
                     <button data-setting="sfx" class="setting-toggle">🔊 Effects</button>
                     <button data-setting="shake" class="setting-toggle">📳 Screen shake</button>
                     <button data-setting="numbers" class="setting-toggle">🔢 Damage numbers</button>
+                    <button data-setting="quickPick" class="setting-toggle">⚡ Level-up choices</button>
                 </div>
             </section>
             <section class="shop-panel desktop-only">
@@ -303,7 +309,7 @@ permalink: /mini_games/last_torch/last_torch.html
                 <div class="settings-row">
                     <button data-setting="keyboard" class="setting-toggle">⌨️ Move with arrow keys / WASD</button>
                 </div>
-                <p class="settings-hint">Off: the hero follows the mouse. On: the keys walk and the mouse only aims. Space and Shift dash either way.</p>
+                <p class="settings-hint">The hero follows the mouse until you press a move key; then the keys walk and the mouse only aims. Space and Shift dash either way.</p>
             </section>
             <button id="btnAbandon" class="screen-link">Abandon this night</button>
         </div>

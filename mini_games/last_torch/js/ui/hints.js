@@ -7,10 +7,9 @@ import { showToast } from './banner.js';
 const touch = () => window.matchMedia('(pointer: coarse)').matches;
 
 const HINTS = [
-    { at: 1.5, icon: '🕹️', title: () => (touch() ? 'Left thumb moves' : 'WASD or mouse to move'), sub: 'Your blade strikes on its own.' },
-    { at: 9, icon: '🗡️', title: () => (touch() ? 'Right button throws a dagger' : 'Click to throw a dagger'), sub: 'Hit what your blade cannot reach.' },
-    { at: 17, icon: '💨', title: () => (touch() ? 'Small button dashes' : 'Space or right-click to dash'), sub: 'You cannot be hurt while dashing.' },
-    { at: 28, icon: '🔥', title: () => 'Guard the torch', sub: 'If the flame dies, the night is over. Stand close to heal.' }
+    { at: 1.8, icon: '🕹️', title: () => (touch() ? 'Left thumb moves' : 'Move with the mouse or WASD'), sub: 'Your blade strikes on its own' },
+    { at: 8, icon: '🗡️', title: () => (touch() ? 'Right button throws a dagger' : 'Click to throw a dagger'), sub: '' },
+    { at: 15, icon: '💨', title: () => (touch() ? 'Small button dashes' : 'Space to dash'), sub: '' }
 ];
 
 let timers = [];

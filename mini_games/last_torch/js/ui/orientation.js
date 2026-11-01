@@ -18,8 +18,11 @@ export function isPhonePortrait() {
 const isIphone = /iPhone|iPod/.test(navigator.userAgent);
 const isStandalone = () => window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
+// Dentro do iframe de um portal não dá para salvar na Tela de Início nem compartilhar o próprio endereço
+export const inPortal = window.self !== window.top;
+
 export function showIosHint() {
-    document.getElementById('iosHint')?.classList.toggle('hidden', !isIphone || isStandalone());
+    document.getElementById('iosHint')?.classList.toggle('hidden', !isIphone || isStandalone() || inPortal);
 }
 
 export async function lockLandscape() {

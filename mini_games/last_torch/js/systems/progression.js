@@ -6,6 +6,7 @@ import { mod } from './modifiers.js';
 import { save, persist } from '../core/save.js';
 import { TREE_POINTS } from '../../data_model/tree.js';
 import { addShockwave } from './effects.js';
+import { requestQuickPick } from '../ui/quick_pick.js';
 
 // Pontos de um nível: o básico mais a fração das relíquias, que acumula até virar ponto inteiro
 function grantLevelPoints() {
@@ -20,7 +21,8 @@ function grantLevelPoints() {
 // Aviso em cima do herói; na primeira vez, uma dica de onde gastar
 export function announcePoints(points) {
     state.levelUpFx = { age: 0, label: `+${points} SKILL POINT${points === 1 ? '' : 'S'}` };
-    if (save.seenTreeHint) return;
+    requestQuickPick();
+    if (save.seenTreeHint || save.settings.quickPick) return;
     save.seenTreeHint = true;
     persist();
     showToast('⚡', 'You earned a skill point', 'Tap the medal at the top to spend it');

@@ -283,7 +283,9 @@ export function updateEnemies(dt) {
             e.angle = toTargetAngle;
             e.facing = lerpAngle(e.facing ?? e.angle, e.angle, Math.min(1, dt * FACING_SMOOTHING));
             const lunging = model.lunge && hunting && updateLunge(e, model.lunge, distToTarget, toTargetAngle, dt);
-            const holdsDistance = model.keepDistance && distToTarget < model.keepDistance;
+            // Só mantém distância dentro do campo e antes da reta final: parado fora do mapa, ninguém o alcançaria e a hora não fecharia
+            const inField = e.x > e.radius && e.x < state.width - e.radius && e.y > e.radius && e.y < state.height - e.radius;
+            const holdsDistance = model.keepDistance && inField && !state.lastStand && distToTarget < model.keepDistance;
             const blockedByTorch = e.isBoss && distCore < CORE_MODEL.bossStopDistance + e.radius;
 
             if (!lunging && !holdsDistance && !blockedByTorch) {

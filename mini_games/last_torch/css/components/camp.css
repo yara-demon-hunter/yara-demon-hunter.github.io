@@ -14,6 +14,8 @@
     justify-content: space-between;
     gap: 1rem;
 }
+.camp-wallet { display: flex; flex-shrink: 0; align-items: center; gap: 0.5rem; }
+#btnCampSkills { font-weight: 800; }
 .camp-gold {
     flex-shrink: 0;
     padding: 0.35rem 0.8rem;
@@ -87,7 +89,7 @@
     .camp-head > div:first-child { display: flex; align-items: baseline; gap: 0.6rem; min-width: 0; }
     .camp-head .screen-title { font-size: 0.95rem; white-space: nowrap; }
     .camp-head .screen-eyebrow { font-size: 0.5rem; letter-spacing: 0.2em; text-indent: 0; white-space: nowrap; }
-    .camp-head .camp-gold { padding: 0.1rem 0.5rem; font-size: 0.8rem; }
+    .camp-head .camp-gold, #btnCampSkills { padding: 0.1rem 0.5rem; font-size: 0.8rem; }
     .camp-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .camp-section-title { display: none; }
     .camp-side { gap: 0.25rem; }

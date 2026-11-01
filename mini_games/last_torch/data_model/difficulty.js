@@ -4,8 +4,8 @@
 // Os multiplicadores se somam ao crescimento próprio de cada monstro (hpPerTurn em MONSTER_MODELS).
 export const TURN_DIFFICULTY = {
     // Vida: multiplicador do turno 1 e quanto sobe a cada turno seguinte
-    hpMultiplierFirstTurn: 0.65,
-    hpMultiplierPerTurn: 0.17,
+    hpMultiplierFirstTurn: 0.55,
+    hpMultiplierPerTurn: 0.18,
 
     // Velocidade de movimento
     speedMultiplierFirstTurn: 0.75,
@@ -13,13 +13,13 @@ export const TURN_DIFFICULTY = {
     maxSpeedMultiplier: 1.1,
 
     // Dano (contato e tiros)
-    damageMultiplierFirstTurn: 0.8,
-    damageMultiplierPerTurn: 0.08,
+    damageMultiplierFirstTurn: 0.55,
+    damageMultiplierPerTurn: 0.103,
     maxDamageMultiplier: 2.6,
 
     // Tempo entre um monstro e o próximo
-    spawnIntervalFirstTurnSeconds: 1.45,
-    spawnIntervalReductionPerTurnSeconds: 0.085,
+    spawnIntervalFirstTurnSeconds: 1.75,
+    spawnIntervalReductionPerTurnSeconds: 0.112,
     minimumSpawnIntervalSeconds: 0.55,
     bossSpawnIntervalMultiplier: 3.6,   // com o boss em campo nascem menos monstros
 

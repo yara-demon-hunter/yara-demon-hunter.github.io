@@ -5,6 +5,7 @@
 }
 html { line-height: 1.5; -webkit-text-size-adjust: 100%; }
 body, h1, h2, h3, p, ul { margin: 0; }
+body { user-select: none; -webkit-user-select: none; }
 h1, h2, h3 { font-size: inherit; font-weight: inherit; }
 ul { padding: 0; list-style: none; }
 b { font-weight: bolder; }

@@ -24,6 +24,7 @@ import { updateTorch } from './systems/torch.js';
 import { setupButtons } from './ui/buttons.js';
 import { flushHud, updateDashButton, updateKnifeButton } from './ui/hud.js';
 import { isPhonePortrait } from './ui/orientation.js';
+import { updateQuickPick } from './ui/quick_pick.js';
 import { setupScreens } from './ui/screens.js';
 
 const MIN_FRAME_MS = 12;
@@ -97,6 +98,7 @@ export function update(dt) {
     updateKnifeButton();
     updateDashButton();
     updateEffects(dt);
+    updateQuickPick();
 }
 
 // --- GAME LOOP ---
