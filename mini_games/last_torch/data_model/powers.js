@@ -18,14 +18,15 @@ export const POWER_MODELS = {
     },
     emberTrail: {
         name: 'Ember Steps', icon: '👣', maxLvl: 5,
-        desc: 'Your footsteps catch fire. Monsters that cross them burn.',
-        upgrades: ['Burning footprints', '+40% burn', 'Fires last longer', '+40% burn', 'Wider flames'],
+        desc: 'Your footsteps catch fire. Monsters that cross them burn. The fire also lends you strength: every level makes you hit 8% harder inside the warmth of the torch.',
+        upgrades: ['Burning footprints, +8% damage in the warmth', '+40% burn, +16% in the warmth', 'Fires last longer, +24% in the warmth', '+40% burn, +32% in the warmth', 'Wider flames, +40% in the warmth'],
+        // warmthDamage = bônus de dano do herói dentro do calor da tocha (antigo Sacred Ground)
         levels: [
-            { dps: 0.35, life: 2.2, radius: 20 },
-            { dps: 0.5, life: 2.2, radius: 20 },
-            { dps: 0.5, life: 3.2, radius: 22 },
-            { dps: 0.7, life: 3.2, radius: 22 },
-            { dps: 0.7, life: 3.6, radius: 30 }
+            { dps: 0.35, life: 2.2, radius: 20, warmthDamage: 0.08 },
+            { dps: 0.5, life: 2.2, radius: 20, warmthDamage: 0.16 },
+            { dps: 0.5, life: 3.2, radius: 22, warmthDamage: 0.24 },
+            { dps: 0.7, life: 3.2, radius: 22, warmthDamage: 0.32 },
+            { dps: 0.7, life: 3.6, radius: 30, warmthDamage: 0.4 }
         ],
         dropEvery: 34, tickSeconds: 0.3, maxFires: 22
     },

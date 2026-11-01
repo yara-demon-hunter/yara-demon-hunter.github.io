@@ -75,7 +75,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Your sword catches fire. Every cut sets monsters ablaze, and they keep burning for 3s. Under the Oath of the Hearth the fire burns twice as hot.'
+        desc: 'Your sword catches fire. Every cut sets monsters ablaze, and they keep burning for 3s. A burning monster that dies passes the fire to the ones around it. Under the Oath of the Hearth the fire burns twice as hot.'
     },
     fireballs: {
         name: 'Fireballs',
@@ -83,7 +83,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby and setting it ablaze. Everything that improves your daggers still counts. The price: you stand still for a moment, unable to do anything, while the fire grows in your hand.'
+        desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby, setting it ablaze and leaving the ground burning. Everything that improves your daggers still counts. The price: you stand still for a moment, unable to do anything, while the fire grows in your hand.'
     },
     backdraft: {
         name: 'Backdraft',
@@ -132,8 +132,8 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         oath: true, gear: 'hearth', tagline: 'The flame will not die',
-        desc: 'The torch takes 35% less damage, +30% max health, its warmth reaches twice as far and burns monsters inside it. The price: -15% move speed.',
-        mods: { torchGuard: 0.35, maxHp: 0.3, warmth: 1, warmthBurn: 0.4, moveSpeed: -0.15 }
+        desc: 'The torch takes 35% less damage, +30% max health, its warmth reaches twice as far and burns monsters inside it. The price: -25% move speed.',
+        mods: { torchGuard: 0.35, maxHp: 0.3, warmth: 1, warmthBurn: 0.4, moveSpeed: -0.25 }
     },
     oathRuin: {
         name: 'Oath of Ruin',
@@ -331,18 +331,21 @@ export const MASTER_THIEF = {
 // Vigil: parado por stillSeconds, ergue um escudo que para um golpe e estoura
 // Flaming Sword: o corte deixa o monstro queimando (fração do dano do golpe, por segundo)
 export const FLAME_BLADE = {
-    burnRatio: 0.3,
+    burnRatio: 0.4,
     burnSeconds: 3,
-    oathMultiplier: 2           // sob o Oath of the Hearth
+    oathMultiplier: 2,          // sob o Oath of the Hearth
+    spreadRadius: 90            // monstro em chamas que morre passa o fogo (com o mesmo dano) a quem está perto
 };
 
 // Fireballs: a adaga continua sendo adaga (dano, alcance, Death Mark, carga, Ricochet); ao acertar, explode
 export const FIREBALLS = {
     castSeconds: 0.55,          // a bola cresce na mão e o herói fica parado, sem golpear nem dar dash
-    splashRadius: 62,           // cresce com o tamanho da adaga carregada
-    splashRatio: 0.5,           // dano nos vizinhos, em fração do dano da adaga
+    splashRadius: 70,           // cresce com o tamanho da adaga carregada
+    splashRatio: 0.6,           // dano nos vizinhos, em fração do dano da adaga
     burnRatio: 0.25,            // queimadura por segundo, em fração do dano da adaga
-    burnSeconds: 3
+    burnSeconds: 3,
+    patchSeconds: 2,            // o chão queima onde a bola explodiu (dano em fração do feitiço, por segundo)
+    patchDps: 0.5
 };
 
 export const VIGIL = {

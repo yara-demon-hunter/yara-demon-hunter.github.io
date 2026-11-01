@@ -27,7 +27,7 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 |---|---|---|---|---|
 | Oath of Slaughter | Blade | +35% dano da lâmina, +10% ataque, +40% Fúria, matar cura 1, provoca de mais longe | O calor da tocha não cura mais, e não lança mais adagas | Chifres, ombreiras com espinhos, espada enorme |
 | Oath of Whispers | Shadow | +1 dash, -20% recarga do dash, +15% velocidade, +10% crítico, +50% adaga, uma sombra nova a cada 5 mortes (até 8) | -25% vida | Cachecol ao vento, adagas nas costas |
-| Oath of the Hearth | Flame | Tocha leva -35% de dano, +30% vida, calor dobrado que queima | -15% velocidade | Ombreiras douradas, peitoral, lanterna |
+| Oath of the Hearth | Flame | Tocha leva -35% de dano, +30% vida, calor dobrado que queima | -25% velocidade | Ombreiras douradas, peitoral, lanterna |
 | Oath of Ruin | Curse | +20% dano e -12% recarga dos feitiços | -40% dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
 
 Regras: abre ao aprender **as duas skills que chegam nele** (as ligações do mapa) e fica na coluna 6, sempre na mesma posição.
@@ -93,11 +93,11 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Esquiva: Phantom Rush, Night Reaper*, Smoke Bomb*. Move Speed, Phantom Rush, Night Reaper, Smoke Bomb, Juramento
   - Oath of Whispers*
 - **Flame** (raiz: Torch Keeper)
-  - Calor: Warm Hearth, Sacred Ground, Undying Flame, Phoenix Pact*
+  - Calor: Warm Hearth, Undying Flame, Phoenix Pact*
   - Guarda: Steady Stance*, Vigil*, Backdraft*
   - Muralha: Flame Sentinel, Sun Spire, Hearth Ring*, Solar Wall*
-  - Brasa: Ember Steps, Hellwalker
-  - Armas: Flaming Sword*, Fireballs* (saem do Hearth Ring)
+  - Brasa: Ember Steps (fogo nos passos e dano dentro do calor da tocha), Hellwalker
+  - Armas: Flaming Sword*, Fireballs* (saem do Hellwalker)
   - Oath of the Hearth*
 - **Curse** (raiz: Arcane Study)
   - Gelo e força: Cold Moon, Soul Nova, Absolute Zero, Starfall, Mirror Ward
@@ -129,8 +129,8 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Steady Stance | Efeito | Parado, ataca mais rápido | - |
 | Vigil | Passiva | Parado, ergue um escudo que para um golpe e estoura em fogo | Ajoelhado, espada fincada, redoma |
 | Backdraft | Passiva | Monstro que alcança a tocha causa uma explosão em volta dela | Explosão |
-| Flaming Sword | Passiva | A espada pega fogo: todo corte, inclusive das sombras, deixa o monstro queimando por 3s (30% do golpe por segundo; o dobro sob o Oath of the Hearth, com chama dourada maior) | Línguas de fogo na lâmina, corte laranja |
-| Fireballs | Passiva | As adagas viram bolas de fogo: o herói para por 0,55s com a bola crescendo na mão, como o Lorde Demônio, sem andar, golpear nem dar dash; ao acertar, ela explode, fere os vizinhos com 50% do dano e deixa todos em chamas. Por baixo continuam adagas, então Dagger Mastery, Fan of Knives, Ricochet, Death Mark, Charged Dagger Throw e a explosão das sombras valem igual. O Oath of Slaughter também as bloqueia | Bola de fogo com cauda |
+| Flaming Sword | Passiva | A espada pega fogo: todo corte, inclusive das sombras, deixa o monstro queimando por 3s (40% do golpe por segundo; o dobro sob o Oath of the Hearth, com chama dourada maior). Monstro em chamas que morre passa o fogo a quem está num raio de 90 | Línguas de fogo na lâmina, corte laranja |
+| Fireballs | Passiva | As adagas viram bolas de fogo: o herói para por 0,55s (tempo fixo) com a bola crescendo na mão, como o Lorde Demônio, sem andar, golpear nem dar dash; ao acertar, ela explode, fere os vizinhos com 60% do dano, deixa todos em chamas e o chão queimando por 2s. Por baixo continuam adagas, então Dagger Mastery, Fan of Knives, Ricochet, Death Mark, Charged Dagger Throw e a explosão das sombras valem igual. O Oath of Slaughter também as bloqueia | Bola de fogo com cauda |
 | Phoenix Pact | Passiva | Uma vez por hora, ao cair, a tocha paga 30 de vida para levantar o herói | Asas de fogo |
 | Hearth Ring | Poder | Anel de fogo em volta da tocha que queima e freia quem cruza | Anel de chamas |
 | Solar Wall | Evolução | O anel vira muralha branca que sobe de tempos em tempos, jogando monstros longe | Labareda |

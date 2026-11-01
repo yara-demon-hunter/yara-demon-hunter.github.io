@@ -11,7 +11,7 @@ import { passives, powers, state } from '../core/state.js';
 // Chaves (0.1 = +10%, exceto onde indicado):
 //   herói: damage, maxHp, maxHpFlat (pontos), moveSpeed, attackSpeed, critChance, critDamage, damageTaken,
 //          gold, xp, magnet, luck, knifeDamage, knifeCooldown, furyCharge, furyDuration (segundos),
-//          dashCharges (cargas), dashCooldown, lowHpDamage, thorns (x dano da lâmina), warmth, warmthDamage,
+//          dashCharges (cargas), dashCooldown, lowHpDamage, thorns (x dano da lâmina), warmth, warmthDamage (também vem do Ember Steps),
 //          bladeDamage, spellDamage, spellHaste, stillAttack (parado), coinHaste (segundos por moeda), killHeal (pontos),
 //          provoke (distância em que os monstros largam a tocha), noWarmthHeal e noKnives (travas),
 //          killGold (ouro extra por morte), knifeRange e knifeSpeed (alcance e velocidade da adaga)

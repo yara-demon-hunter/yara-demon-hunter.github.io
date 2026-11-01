@@ -32,10 +32,10 @@ export const TREE_LAYOUT = {
 };
 
 export const TREE_BRANCHES = {
-    blade: { name: 'BLADE', icon: '🤺', color: '#67e8f9', style: 'Warrior: raw strength, kill everything.' },
-    shadow: { name: 'SHADOW', icon: '🌑', color: '#a5b4fc', style: 'Thief: technical and cheap, takes skill.' },
-    flame: { name: 'FLAME', icon: '🕯️', color: '#fb923c', style: 'Keeper: defensive, calm and cautious.' },
-    curse: { name: 'CURSE', icon: '🌙', color: '#e879f9', style: 'Sorcerer: spells, area and distance.' }
+    blade: { name: 'BLADE', path: 'BLADE PATH', icon: '🤺', color: '#67e8f9', style: 'Warrior: raw strength, kill everything.' },
+    shadow: { name: 'SHADOW', path: 'SHADOW PATH', icon: '🌑', color: '#a5b4fc', style: 'Thief: technical and cheap, takes skill.' },
+    flame: { name: 'FLAME', path: 'FLAME PATH', icon: '🕯️', color: '#fb923c', style: 'Keeper: defensive, calm and cautious.' },
+    curse: { name: 'CURSE', path: 'CURSE PATH', icon: '🌙', color: '#e879f9', style: 'Sorcerer: spells, area and distance.' }
 };
 
 // req(id) = nível 1 do nó; req(id, 3) = nível 3
@@ -99,11 +99,9 @@ export const TREE_NODES = [
     // Linha do calor: a tocha não morre
     { id: 'warmHearth', branch: 'flame', kind: 'mod', x: 1, y: 0, requires: [req('torchKeeper')],
       name: 'Warm Hearth', icon: '♨️', desc: 'The fire warms you and mends itself.', levelText: '+20% warmth, torch heals 0.2/s', mods: { warmth: 0.2, torchRegen: 0.2 } },
-    { id: 'sacredGround', branch: 'flame', kind: 'mod', x: 2, y: 0, requires: [req('warmHearth', 2)],
-      name: 'Sacred Ground', icon: '🔥', desc: 'You hit harder inside the warmth of the torch.', levelText: '+8% damage in the warmth', mods: { warmthDamage: 0.08 } },
-    { id: 'undyingFlame', branch: 'flame', kind: 'mod', x: 3, y: 0, requires: [req('sacredGround', 2)],
+    { id: 'undyingFlame', branch: 'flame', kind: 'mod', x: 2, y: 0, requires: [req('warmHearth', 2)],
       name: 'Undying Flame', icon: '🕯️', desc: 'The torch refuses to go out.', levelText: '+20 torch health, heals 0.3/s', mods: { torchHp: 20, torchRegen: 0.3 } },
-    { id: 'phoenixPact', branch: 'flame', kind: 'passive', key: 'phoenixPact', x: 4, y: 0, requires: [req('undyingFlame', 2)] },
+    { id: 'phoenixPact', branch: 'flame', kind: 'passive', key: 'phoenixPact', x: 3, y: 0, requires: [req('undyingFlame', 2)] },
     // Linha da guarda: quem fica parado é recompensado
     { id: 'steadyStance', branch: 'flame', kind: 'mod', x: 1, y: 1, requires: [req('torchKeeper')],
       name: 'Steady Stance', icon: '⛰️', desc: 'Your blade is faster while you stand your ground.', levelText: '+8% attack speed standing still', mods: { stillAttack: 0.08 } },
@@ -112,13 +110,13 @@ export const TREE_NODES = [
     // Linha da muralha
     { id: 'torchBolts', branch: 'flame', kind: 'power', key: 'torchBolts', x: 1, y: 2, requires: [req('torchKeeper', 2)] },
     { id: 'sunEvolve', branch: 'flame', kind: 'evolve', key: 'torchBolts', x: 2, y: 2, requires: [req('torchBolts', 5)] },
-    { id: 'fireRing', branch: 'flame', kind: 'power', key: 'fireRing', x: 3, y: 2, requires: [req('steadyStance', 2)] },
+    { id: 'fireRing', branch: 'flame', kind: 'power', key: 'fireRing', x: 3, y: 2, requires: [req('sunEvolve')] },
     { id: 'fireRingEvolve', branch: 'flame', kind: 'evolve', key: 'fireRing', x: 4, y: 2, requires: [req('fireRing', 5)] },
     // Linha da brasa
     { id: 'emberTrail', branch: 'flame', kind: 'power', key: 'emberTrail', x: 1, y: 3, requires: [req('torchKeeper')] },
     { id: 'emberEvolve', branch: 'flame', kind: 'evolve', key: 'emberTrail', x: 2, y: 3, requires: [req('emberTrail', 5)] },
-    // As armas pegam fogo: saem do Hearth Ring
-    { id: 'flameBlade', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('fireRing', 2)] },
+    // As armas pegam fogo: saem do Hellwalker
+    { id: 'flameBlade', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
     { id: 'fireballs', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
     { id: 'oathHearth', branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('phoenixPact'), req('fireRingEvolve')] },
 

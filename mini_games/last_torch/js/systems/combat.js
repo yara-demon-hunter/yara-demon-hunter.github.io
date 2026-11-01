@@ -78,7 +78,7 @@ export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, a
                     ignite(e, dmg * FLAME_BLADE.burnRatio * oath, FLAME_BLADE.burnSeconds);
                 }
                 if (onHit) onHit(e);
-                createExplosion(e.x, e.y, e.color, 4);
+                createExplosion(e.x, e.y, passives.flameBlade.lvl > 0 ? '#fb923c' : e.color, passives.flameBlade.lvl > 0 ? 7 : 4);
                 hits++;
             }
         }

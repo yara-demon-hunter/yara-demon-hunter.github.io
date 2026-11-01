@@ -1,5 +1,5 @@
 import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES } from '../../data_model/tree.js';
-import { TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
+import { BRANCH_IMAGES, TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { state } from '../core/state.js';
 import { buyNode, getNextText, getNodeInfo, getNodeState } from '../systems/tree.js';
@@ -48,8 +48,8 @@ function createTreeView(cfg) {
         block.style.setProperty('--tone', b.color);
         block.style.setProperty('--branch-rows', rows);
         block.innerHTML = '<div class="tree-band"><span class="tree-band-icon"></span><span class="tree-band-name"></span></div><div class="tree-grid"></div>';
-        block.querySelector('.tree-band-icon').textContent = b.icon;
-        block.querySelector('.tree-band-name').textContent = b.name;
+        paintIcon(block.querySelector('.tree-band-icon'), BRANCH_IMAGES[key], b.icon);
+        block.querySelector('.tree-band-name').textContent = b.path ?? b.name;
         const grid = block.querySelector('.tree-grid');
 
         const svg = document.createElementNS(NS, 'svg');
@@ -98,8 +98,8 @@ function createTreeView(cfg) {
         tab.dataset.branch = key;
         tab.style.setProperty('--tone', b.color);
         tab.innerHTML = '<span class="tree-band-icon"></span><span class="tree-band-name"></span><i></i>';
-        tab.querySelector('.tree-band-icon').textContent = b.icon;
-        tab.querySelector('.tree-band-name').textContent = b.name;
+        paintIcon(tab.querySelector('.tree-band-icon'), BRANCH_IMAGES[key], b.icon);
+        tab.querySelector('.tree-band-name').textContent = b.path ?? b.name;
         rail.appendChild(tab);
         tabs.set(key, tab);
     }

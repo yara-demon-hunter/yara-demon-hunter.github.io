@@ -27,7 +27,25 @@ export const TREE_IMAGES = {
     chargedThrow: img('charged-dagger-throw'),
     corpseBurst: img('corpse-burst'),
     orbitBlades: img('spectral-blades'),
-    orbitEvolve: img('balde-tempest')
+    orbitEvolve: img('balde-tempest'),
+    warmHearth: img('warm-hearth'),
+    undyingFlame: img('undying-flame'),
+    phoenixPact: img('phoenix-pact'),
+    vigil: img('vigil'),
+    backdraft: img('backdraft'),
+    fireRingEvolve: img('solar-wall'),
+    emberEvolve: img('hellwalker'),
+    flameBlade: img('flaming-sword'),
+    fireballs: img('fireballs'),
+    graveWisp: img('grave-wisp'),
+    wrathEvolve: img('wrath-of-heaven')
+};
+
+// Arte de cada ramo. Ramo sem imagem usa o emoji de TREE_BRANCHES.
+export const BRANCH_IMAGES = {
+    blade: img('blade-path'),
+    shadow: img('shadow-path'),
+    flame: img('flame-path')
 };
 
 // Imagem da skill pela chave do poder, passiva ou atributo (evolved: a evolução tem a própria arte)

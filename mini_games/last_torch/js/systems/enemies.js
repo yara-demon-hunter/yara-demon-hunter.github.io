@@ -15,7 +15,7 @@ import { dropChest, maybeDropPickup } from './pickups.js';
 import { hurtPlayer } from './player.js';
 import { damageShadowClone } from './shadow_clone.js';
 import { addHostileFire, onEnemyKilled } from './powers.js';
-import { onTorchTouched } from './skills_flame.js';
+import { onTorchTouched, spreadBurn } from './skills_flame.js';
 import { gainXp } from './progression.js';
 
 import { recordBeast } from './sanctuary.js';
@@ -181,6 +181,7 @@ function removeEnemy(i, e) {
 
 // Morte com recompensa: pontos, XP, ouro, itens e os gatilhos dos poderes
 function killEnemy(i, e, model) {
+    spreadBurn(e);
     deathEffects(e, model);
     addStreakKill();
     recordBeast(e.type);

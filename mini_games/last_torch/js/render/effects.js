@@ -3,6 +3,7 @@ import { CORE_MODEL } from '../../data_model/core.js';
 import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
 import { ctx, player, state } from '../core/state.js';
 import { mod } from '../systems/modifiers.js';
+import { getWarmthDamage } from '../systems/stats.js';
 import { easeOutBack, easeOutCubic } from './fx/easing.js';
 import { drawNumber } from './fx/numbers.js';
 import { getDashedRing } from './fx/rings.js';
@@ -26,10 +27,10 @@ export function renderStains() {
     ctx.globalAlpha = 1;
 }
 
-// Calor da tocha: anel fraco no chão, visível quando o herói precisa de cura ou quando dá bônus (Sacred Ground, Juramento)
+// Calor da tocha: anel fraco no chão, visível quando o herói precisa de cura ou quando dá bônus (Ember Steps, Juramento)
 export function renderWarmth() {
     const heals = player.hp < player.maxHp && mod('noWarmthHeal') <= 0;
-    if (!heals && mod('warmthDamage') <= 0 && mod('warmthBurn') <= 0) return;
+    if (!heals && getWarmthDamage() <= 0 && mod('warmthBurn') <= 0) return;
     const reach = CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
     ctx.strokeStyle = J.warmth.ringColor;
     ctx.lineWidth = 1.5;

@@ -26,12 +26,17 @@ export function throwKnife(aimX, aimY) {
 
     state.knifeTimer = getKnifeCooldown();
     // Fireballs: antes do arremesso a bola cresce na mão (getFireCastRatio); a animação só começa depois disso
-    const hold = passives.fireballs.lvl > 0 ? FIREBALLS.castSeconds : 0;
+    const hold = passives.fireballs.lvl > 0 ? getFireCastSeconds() : 0;
     state.knifeThrowTime = performance.now() + hold * 1000;
     state.knifeThrowAngle = angle;
     state.knifeThrowPower = getKnifeChargeRatio();
     state.knifeCharge = 0;
     state.knifePending = hold + KNIFE_RELEASE_SECONDS;
+}
+
+// Fireballs: o tempo de conjuração é fixo, nada o encurta
+export function getFireCastSeconds() {
+    return FIREBALLS.castSeconds;
 }
 
 // Fireballs: do começo da conjuração até a bola sair o herói não anda, não golpeia e não dá dash
@@ -43,7 +48,7 @@ export function isFireCasting() {
 export function getFireCastRatio() {
     if (!isFireCasting()) return 0;
     const hold = state.knifePending - KNIFE_RELEASE_SECONDS;
-    return hold > 0 ? 1 - hold / FIREBALLS.castSeconds : 0;
+    return hold > 0 ? 1 - hold / getFireCastSeconds() : 0;
 }
 
 // A adaga deixa a mão esquerda: nasce à frente e à esquerda do herói. Cada adaga para no primeiro inimigo atingido.

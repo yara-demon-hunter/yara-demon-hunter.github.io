@@ -312,3 +312,9 @@
 .tnode-oath .tnode-icon.has-image { width: auto; height: auto; background: var(--icon-image) center / 100% no-repeat, var(--fill); }
 .tdetail-icon.has-image { width: 2.6rem; height: 2.6rem; }
 @media (max-height: 520px) { .tdetail-icon.has-image { width: 1.9rem; height: 1.9rem; } }
+
+/* Arte do ramo no lugar do emoji; o nome (BLADE PATH) quebra em duas linhas se a coluna for estreita */
+.tree-band-icon.has-image { width: 3.4rem; height: 3.4rem; }
+.tree-tab .tree-band-icon.has-image { width: 2.6rem; height: 2.6rem; }
+.tree-band-name { text-align: center; line-height: 1.15; }
+@media (max-height: 520px) { .tree-tab .tree-band-icon.has-image { width: 1.9rem; height: 1.9rem; } }

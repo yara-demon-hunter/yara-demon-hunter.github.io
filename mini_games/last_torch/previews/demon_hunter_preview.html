@@ -49,6 +49,7 @@
         import { addCracks } from '../js/systems/skills_blade.js';
         import { renderShockwaves } from '../js/render/effects.js';
         import { renderBladeSlashes, renderKnives } from '../js/render/entities.js';
+        import { renderGroundFires } from '../js/render/powers.js';
         import { drawGlow } from '../js/render/fx/glow.js';
         import { setWorldView } from '../js/render/fx/stamp.js';
         import { getOathPalette } from '../js/render/hero_gear.js';
@@ -155,7 +156,7 @@
 
         // Listas de efeitos que o jogo guarda em `state`: cada cena tem as suas
         function createFx() {
-            return { cracks: [], shockwaves: [], crescents: [], executions: [], markBursts: [], smokes: [], rifts: [], enemies: [], bolts: [], lightning: [], knives: [] };
+            return { cracks: [], shockwaves: [], crescents: [], executions: [], markBursts: [], smokes: [], rifts: [], enemies: [], bolts: [], lightning: [], knives: [], groundFires: [] };
         }
 
         // Liga e desliga os poderes da cena em volta do desenho
@@ -187,6 +188,7 @@
                 return w.age < 0.6;
             });
             fx.lightning = fx.lightning.filter(b => (b.life -= dt) > 0);
+            fx.groundFires = fx.groundFires.filter(f => (f.life -= dt) > 0);
             fx.knives.forEach(k => {
                 k.x += k.vx * dt;
                 k.y += k.vy * dt;
@@ -222,6 +224,7 @@
             withLevels(s, () => {
                 renderCracks();
                 renderFireRing();
+                renderGroundFires();
                 renderRifts();
                 s.behind?.(s);
                 // Monstro de mentira: só um alvo para os efeitos
@@ -579,7 +582,8 @@
             if (k && k.x >= s.fx.enemies[0].x) {
                 s.fx.knives = [];
                 s.fx.enemies.forEach(e => { e.burnTimer = 1.1; });
-                s.fx.shockwaves.push({ x: k.x, y: k.y, radius: 62, color: '#fb923c', width: 4, seconds: 0.26, age: 0 });
+                s.fx.shockwaves.push({ x: k.x, y: k.y, radius: 70, color: '#fb923c', width: 4, seconds: 0.26, age: 0 });
+                s.fx.groundFires.push({ x: k.x, y: k.y, life: 1.6, maxLife: 1.6, radius: 49, dps: 0, tick: 0, evolved: false });
             }
             const release = K.throwSeconds * K.letGoFraction;
             s.wait = (s.wait ?? 0.3) - dt;

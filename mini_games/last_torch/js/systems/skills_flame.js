@@ -1,5 +1,5 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { BACKDRAFT, FIREBALLS, PHOENIX_PACT, VIGIL } from '../../data_model/passives.js';
+import { BACKDRAFT, FIREBALLS, FLAME_BLADE, PHOENIX_PACT, VIGIL } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
@@ -7,7 +7,7 @@ import { updateHUD } from '../ui/hud.js';
 import { blast, dealDamage, ignite } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { mod } from './modifiers.js';
-import { ready } from './powers.js';
+import { addGroundFire, ready } from './powers.js';
 import { getSpellDamage } from './stats.js';
 
 // --- SKILLS DA CHAMA ---
@@ -141,8 +141,21 @@ export function burstFireball(k, hit) {
         dealDamage(e, k.damage * FIREBALLS.splashRatio, { noCrit: true, quiet: true });
         ignite(e, dps, FIREBALLS.burnSeconds);
     }
+    addGroundFire(k.x, k.y, { life: FIREBALLS.patchSeconds, radius: radius * 0.7, dps: FIREBALLS.patchDps, evolved: false });
     addShockwave(k.x, k.y, { radius, color: '#fb923c', width: 4, seconds: 0.26 });
     createExplosion(k.x, k.y, '#fb923c', 9);
+}
+
+// Flaming Sword: monstro em chamas que morre passa o fogo a quem está perto
+export function spreadBurn(dead) {
+    if (passives.flameBlade.lvl <= 0 || !(dead.burnTimer > 0)) return;
+    let any = false;
+    for (const e of state.enemies) {
+        if (e === dead || e.hp <= 0 || Math.hypot(e.x - dead.x, e.y - dead.y) > FLAME_BLADE.spreadRadius + e.radius) continue;
+        ignite(e, dead.burnDps, FLAME_BLADE.burnSeconds);
+        any = true;
+    }
+    if (any) addShockwave(dead.x, dead.y, { radius: FLAME_BLADE.spreadRadius, color: '#fb923c', width: 3, seconds: 0.3 });
 }
 
 export function updateFlameSkills(dt) {

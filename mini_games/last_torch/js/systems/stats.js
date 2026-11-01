@@ -13,10 +13,14 @@ export function getAtkDamage() {
         + (attributes.damage.lvl - 1) * BLADE_SKILL.damagePerUpgrade) * (1 + mod('damage'));
     if (state.frenzyActiveTimer > 0) base *= 1 + getFrenzyDamageBonus();
     if (mod('lowHpDamage') > 0 && player.hp < player.maxHp * 0.35) base *= 1 + mod('lowHpDamage');
-    if (mod('warmthDamage') > 0 && Math.hypot(player.x - state.coreX, player.y - state.coreY) < getWarmthRadius()) {
-        base *= 1 + mod('warmthDamage');
+    if (getWarmthDamage() > 0 && Math.hypot(player.x - state.coreX, player.y - state.coreY) < getWarmthRadius()) {
+        base *= 1 + getWarmthDamage();
     }
     return base;
+}
+// Bônus de dano dentro do calor da tocha: vem do Ember Steps (e de quem mais der warmthDamage)
+export function getWarmthDamage() {
+    return mod('warmthDamage') + (getPowerLevel(powers.emberTrail)?.warmthDamage ?? 0);
 }
 // Golpes da lâmina: o dano base com o que só vale para ela (Juramentos, Bloodlust, War Cry)
 export function getBladeDamage() {
