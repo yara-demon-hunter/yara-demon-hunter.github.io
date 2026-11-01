@@ -202,7 +202,7 @@ export const POWER_MODELS = {
     },
     fireRing: {
         name: 'Hearth Ring', icon: '🔆', maxLvl: 5,
-        desc: 'A circle of fire guards the torch. Monsters that cross it burn and slow down.',
+        desc: 'A ring of fire found deep in the darkness creates a circle of fire around the torch to protect its user',
         upgrades: ['Burns and slows 30%', '+50% burn', 'Wider, slows 40%', '+45% burn', 'Widest, slows 50%'],
         levels: [
             { radius: 150, dps: 0.35, slow: 0.3 },

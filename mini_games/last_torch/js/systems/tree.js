@@ -94,7 +94,7 @@ export function getNextText(node) {
     attr.lvl++;
     const after = getStatText(node.key);
     attr.lvl--;
-    return `${before} → ${after}`;
+    return node.levelText ? `${before} → ${after}; ${node.levelText}` : `${before} → ${after}`;
 }
 
 const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || node.kind === 'evolve';

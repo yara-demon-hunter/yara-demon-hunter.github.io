@@ -6,6 +6,7 @@
 // passive (skill passiva única de data_model/passives.js; com `oath: true` é um Juramento: só um por noite, e abre com as duas skills que chegam nele).
 // Conceito de cada ramo, formatos e regras de custo: SKILLS.md.
 // x = coluna (0 a 6, da esquerda para a direita), y = linha dentro do ramo (0 a 3; 1.5 = entre duas linhas).
+// stat com `mods` e `levelText`: além de subir o atributo, cada nível soma esses efeitos (Fury e Hero Health).
 // requires: o nó anterior na árvore, como req(id, nível mínimo). O pré-requisito vem SEMPRE do nó anterior
 // (a linha que chega nele): quem já cumpriu a cadeia até ali não esbarra em exigências de nós mais atrás.
 // Se um nó mais atrás precisa ter mais nível, suba o nível pedido no nó do meio. O painel de detalhe mostra
@@ -45,33 +46,29 @@ export const TREE_NODES = [
     // --- LÂMINA: o guerreiro. Força bruta, matar tudo, ser cercado de propósito ---
     { id: 'damage', branch: 'blade', kind: 'stat', key: 'damage', x: 0, y: 1.5, requires: [] },
     // Linha da Fúria: matar alimenta matar
-    { id: 'frenzyNova', branch: 'blade', kind: 'stat', key: 'frenzyNova', x: 1, y: 0, requires: [req('damage')] },
-    { id: 'emberHeart', branch: 'blade', kind: 'mod', x: 2, y: 0, requires: [req('frenzyNova', 2)],
-      name: 'Battle Rage', icon: '💢', desc: 'Fury charges faster.', levelText: '+12% Fury charge', mods: { furyCharge: 0.12 } },
-    { id: 'bloodlust', branch: 'blade', kind: 'power', key: 'bloodlust', x: 3, y: 0, requires: [req('emberHeart', 2)] },
-    { id: 'bloodlustEvolve', branch: 'blade', kind: 'evolve', key: 'bloodlust', x: 4, y: 0, requires: [req('bloodlust', 5)] },
+    { id: 'frenzyNova', branch: 'blade', kind: 'stat', key: 'frenzyNova', x: 1, y: 0, requires: [req('damage')],
+      levelText: '+12% Fury charge', mods: { furyCharge: 0.12 } },
+    { id: 'bloodlust', branch: 'blade', kind: 'power', key: 'bloodlust', x: 2, y: 0, requires: [req('frenzyNova', 2)] },
+    { id: 'bloodlustEvolve', branch: 'blade', kind: 'evolve', key: 'bloodlust', x: 3, y: 0, requires: [req('bloodlust', 5)] },
     // Linha do aço: o golpe cada vez mais largo e mortal
     { id: 'atkSpeed', branch: 'blade', kind: 'stat', key: 'atkSpeed', x: 1, y: 1, requires: [req('damage')] },
     { id: 'keenEye', branch: 'blade', kind: 'power', key: 'keenEye', x: 2, y: 1, requires: [req('atkSpeed', 2)] },
     { id: 'slashArc', branch: 'blade', kind: 'stat', key: 'slashArc', x: 3, y: 1, requires: [req('keenEye', 2)] },
     { id: 'shadowWhirl', branch: 'blade', kind: 'passive', key: 'shadowWhirl', x: 4, y: 1, requires: [req('slashArc', 2)],
       kills: { type: 'BAT', count: 15, label: 'Bats' } },
-    { id: 'executioner', branch: 'blade', kind: 'passive', key: 'executioner', x: 5, y: 1, requires: [req('shadowWhirl')] },
+    { id: 'executioner', branch: 'blade', kind: 'passive', key: 'executioner', x: 4, y: 0, requires: [req('bloodlustEvolve')] },
     // Linha da força: quebrar o chão
     { id: 'radius', branch: 'blade', kind: 'stat', key: 'radius', x: 1, y: 2, requires: [req('damage')] },
-    { id: 'provoke', branch: 'blade', kind: 'mod', x: 2, y: 2, requires: [req('radius')],
-      name: 'Provoke', icon: '🗯️', desc: 'Monsters leave the torch and come for you from farther away.', levelText: '+25% provoke range', mods: { provoke: 0.25 } },
-    { id: 'knockback', branch: 'blade', kind: 'stat', key: 'knockback', x: 3, y: 2, requires: [req('provoke')] },
-    { id: 'earthbreaker', branch: 'blade', kind: 'power', key: 'earthbreaker', x: 4, y: 2, requires: [req('knockback', 2)],
+    { id: 'knockback', branch: 'blade', kind: 'stat', key: 'knockback', x: 2, y: 2, requires: [req('radius')] },
+    { id: 'earthbreaker', branch: 'blade', kind: 'power', key: 'earthbreaker', x: 3, y: 2, requires: [req('knockback', 2)],
       kills: { type: 'SKELETON', count: 20, label: 'Skeletons' } },
-    { id: 'earthbreakerEvolve', branch: 'blade', kind: 'evolve', key: 'earthbreaker', x: 5, y: 2, requires: [req('earthbreaker', 5)] },
+    { id: 'earthbreakerEvolve', branch: 'blade', kind: 'evolve', key: 'earthbreaker', x: 4, y: 2, requires: [req('earthbreaker', 5)] },
     // Linha do corpo: aguentar o cerco
-    { id: 'playerHp', branch: 'blade', kind: 'stat', key: 'playerHp', x: 1, y: 3, requires: [req('damage')] },
-    { id: 'ironSkin', branch: 'blade', kind: 'mod', x: 2, y: 3, requires: [req('playerHp', 2)],
-      name: 'Iron Skin', icon: '🪨', desc: 'Blows land softer.', levelText: '-4% damage taken', mods: { damageTaken: -0.04 } },
-    { id: 'bloodEdge', branch: 'blade', kind: 'power', key: 'bloodEdge', x: 3, y: 3, requires: [req('ironSkin', 2)],
+    { id: 'playerHp', branch: 'blade', kind: 'stat', key: 'playerHp', x: 1, y: 3, requires: [req('damage')], cost: 2,
+      levelText: '-4% damage taken, monsters come from +25% farther', mods: { damageTaken: -0.04, provoke: 0.25 } },
+    { id: 'bloodEdge', branch: 'blade', kind: 'power', key: 'bloodEdge', x: 2, y: 3, requires: [req('playerHp', 2)],
       kills: { type: 'ANY', count: 40, label: 'monsters' } },
-    { id: 'warCry', branch: 'blade', kind: 'passive', key: 'warCry', x: 4, y: 3, requires: [req('bloodEdge')] },
+    { id: 'warCry', branch: 'blade', kind: 'passive', key: 'warCry', x: 3, y: 3, requires: [req('bloodEdge')] },
     { id: 'oathSlaughter', branch: 'blade', kind: 'passive', key: 'oathSlaughter', oath: true, x: 6, y: 1.5, requires: [req('executioner'), req('earthbreakerEvolve')] },
 
     // --- SOMBRA: o ladrão. Técnica, combos, esquiva e ouro. Barato: o preço é saber jogar. Cinco linhas (y de 0 a 4) ---
@@ -114,8 +111,8 @@ export const TREE_NODES = [
     { id: 'fireRing', branch: 'flame', kind: 'power', key: 'fireRing', x: 3, y: 2, requires: [req('sunEvolve')] },
     { id: 'fireRingEvolve', branch: 'flame', kind: 'evolve', key: 'fireRing', x: 4, y: 2, requires: [req('fireRing', 5)] },
     // Linha da brasa
-    { id: 'emberTrail', branch: 'flame', kind: 'power', key: 'emberTrail', x: 1, y: 3, requires: [req('torchKeeper')] },
-    { id: 'emberEvolve', branch: 'flame', kind: 'evolve', key: 'emberTrail', x: 2, y: 3, requires: [req('emberTrail', 5)] },
+    { id: 'emberTrail', branch: 'flame', kind: 'power', key: 'emberTrail', x: 1, y: 3, cost: 2, requires: [req('torchKeeper')] },
+    { id: 'emberEvolve', branch: 'flame', kind: 'evolve', key: 'emberTrail', x: 2, y: 3, cost: 3, requires: [req('emberTrail', 5)] },
     // As armas pegam fogo: saem do Hellwalker
     { id: 'flameBlade', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
     { id: 'fireballs', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },

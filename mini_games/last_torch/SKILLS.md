@@ -63,6 +63,7 @@ O custo vem do ramo e do tipo do nó, nunca só do fato de ser evolução. A reg
   Juramento é a única decisão cara.
 - Os valores ficam em `TREE_COSTS` (`data_model/tree.js`).
 - `cost` no próprio nó sobrescreve a tabela. Use só para uma exceção justificada.
+  Exceções atuais: Oath of Whispers (5), Hero Health (2 por nível) e, no Flame, Ember Steps (2) e Hellwalker (3), por serem mais simples que os outros poderes do ramo.
 
 ## Formatos
 
@@ -81,10 +82,10 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 `*` marca o que entrou com o conceito dos 4 estilos.
 
 - **Blade** (raiz: Blade Damage)
-  - Fúria: Fury, Battle Rage, Bloodlust*, Crimson Tide*
-  - Aço: Attack Speed, Keen Eye, Slash Width, Whirlwind, Executioner*
-  - Força: Attack Range, Provoke*, Knockback, Earthbreaker*, Cataclysm*
-  - Corpo: Hero Health, Iron Skin, Blood Edge, War Cry*
+  - Fúria: Fury (duração, dano e carga da barra), Bloodlust*, Crimson Tide*, Executioner*
+  - Aço: Attack Speed, Keen Eye, Slash Width, Whirlwind
+  - Força: Attack Range, Knockback, Earthbreaker*, Cataclysm*
+  - Corpo: Hero Health (vida, -4% de dano recebido e provocar de mais longe; 2 pontos por nível), Blood Edge, War Cry*
   - Oath of Slaughter*
 - **Shadow** (raiz: Move Speed)
   - Adagas: Ricochet, Dagger Mastery (dano, alcance, velocidade e recarga), Fan of Knives
@@ -114,7 +115,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Crimson Tide | Evolução | Com a fome alta, cada golpe joga uma meia-lua de sangue que atravessa a horda | Meia-lua |
 | Earthbreaker | Poder | Com monstros perto, salta e crava a espada: fere e atordoa em volta; no ar, nada encosta | Salto com espada erguida, rachaduras |
 | Cataclysm | Evolução | Abalos saem do impacto e lava brota das rachaduras | Rachaduras em lava |
-| Provoke | Efeito | Monstros largam a tocha e vêm atrás do herói de mais longe: é assim que o guerreiro a protege | - |
+| Provoke (dentro do Hero Health) | Efeito | A cada nível de Hero Health, +25% na distância em que os monstros largam a tocha e vêm atrás do herói: é assim que o guerreiro a protege | - |
 | War Cry | Passiva | Cercado por 5, ruge: joga longe, atordoa e dá +30% na lâmina por 4s | Braços abertos, cabeça para trás |
 | Executioner | Passiva | A lâmina termina monstros abaixo de 20% da vida (elites 10%, bosses não) | X vermelho |
 | Death Mark | Poder | A adaga marca. A lâmina detona; o dash detona mais forte e devolve a carga. Toda detonação recarrega a adaga | Mira girando, X violeta |
@@ -133,7 +134,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Flaming Sword | Passiva | A espada pega fogo: todo corte, inclusive das sombras, deixa o monstro queimando por 3s (40% do golpe por segundo; o dobro sob o Oath of the Hearth, com chama dourada maior). Monstro em chamas que morre passa o fogo a quem está num raio de 90 | Línguas de fogo na lâmina, corte laranja |
 | Fireballs | Passiva | As adagas viram bolas de fogo: o herói para por 0,55s (tempo fixo) com a bola crescendo na mão, como o Lorde Demônio, sem andar, golpear nem dar dash; ao acertar, ela explode, fere os vizinhos com 60% do dano, deixa todos em chamas e o chão queimando por 2s. Por baixo continuam adagas, então Dagger Mastery, Fan of Knives, Ricochet, Death Mark, Charged Dagger Throw e a explosão das sombras valem igual. O Oath of Slaughter também as bloqueia | Bola de fogo com cauda |
 | Phoenix Pact | Passiva | Uma vez por hora, ao cair, a tocha paga 30 de vida para levantar o herói | Asas de fogo |
-| Hearth Ring | Poder | Anel de fogo em volta da tocha que queima e freia quem cruza | Anel de chamas |
+| Hearth Ring | Poder | Um anel de fogo achado no fundo da escuridão cria um círculo de fogo em volta da tocha para proteger quem o usa; quem cruza queima e anda mais devagar | Anel de chamas |
 | Solar Wall | Evolução | O anel vira muralha branca que sobe de tempos em tempos, jogando monstros longe | Labareda |
 | Grave Wisp | Poder | Caveira em chamas no ombro que atira de longe | Caveira, tiros violeta |
 | Creeping Hex | Poder | Maldição que corrói e pula para os vizinhos quando o monstro morre | Chama violeta, raio entre monstros |

@@ -1,9 +1,9 @@
 import { HEROES } from '../../data_model/heroes.js';
-import { TREE_BY_ID } from '../../data_model/tree.js';
+import { TREE_BY_ID, TREE_NODES } from '../../data_model/tree.js';
 import { DARKNESS } from '../../data_model/night.js';
 import { getPowerLevel } from '../../data_model/powers.js';
 import { save } from '../core/save.js';
-import { passives, powers, state } from '../core/state.js';
+import { attributes, passives, powers, state } from '../core/state.js';
 
 // --- MODIFICADORES ---
 // Herói, relíquias, poderes, presságios e Escuridão mudam o jogo pelo mesmo caminho: cada um
@@ -41,6 +41,7 @@ export function refreshModifiers() {
     addAll(getHero().mods);
     Object.values(passives).forEach(p => { if (p.lvl > 0) addAll(p.mods); });
     Object.entries(state.tree).forEach(([id, lvl]) => addAll(TREE_BY_ID[id]?.mods, lvl));
+    TREE_NODES.forEach(n => { if (n.kind === 'stat' && n.mods) addAll(n.mods, attributes[n.key].lvl - 1); });
     Object.values(powers).forEach(p => {
         if (p.lvl <= 0) return;
         addAll(p.mods, p.lvl);

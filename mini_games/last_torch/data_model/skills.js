@@ -2,12 +2,12 @@
 // Melhorados na árvore de skills (data_model/tree.js): cada ponto gasto sobe um nível.
 export const UPGRADE_MODELS = {
     damage: { name: 'Blade Damage', icon: '⚔️', lvl: 1, maxLvl: 99, desc: 'Increases the base damage of each hit.' },
-    radius: { name: 'Attack Range', icon: '⭕', lvl: 1, maxLvl: 99, desc: 'Increases the radius that detects targets.' },
-    slashArc: { name: 'Slash Width', icon: '📐', lvl: 1, maxLvl: 6, desc: 'Widens the slash (Lv. 1: 40° up to Max Lv.: 180°).' },
+    radius: { name: 'Attack Range', icon: '🎯', lvl: 1, maxLvl: 99, desc: 'Increases the radius that detects targets.' },
+    slashArc: { name: 'Slash Width', icon: '🌙', lvl: 1, maxLvl: 6, desc: 'Widens the slash (Lv. 1: 40° up to Max Lv.: 180°).' },
     atkSpeed: { name: 'Attack Speed', icon: '⏱️', lvl: 1, maxLvl: 99, desc: 'Reduces the cooldown between hits.' },
     moveSpeed: { name: 'Move Speed', icon: '🥾', lvl: 1, maxLvl: 99, desc: 'Makes the character move faster.' },
-    frenzyNova: { name: 'Fury (Skill)', icon: '😡', lvl: 1, maxLvl: 99, desc: 'Increases the duration and damage of Fury, which fires on its own when the bar fills.' },
-    playerHp: { name: 'Hero Health', icon: '❤️', lvl: 1, maxLvl: 99, desc: 'Increases max health and heals the character.' },
+    frenzyNova: { name: 'Fury (Skill)', icon: '😡', lvl: 1, maxLvl: 99, desc: 'Increases the duration and damage of Fury, which fires on its own when the bar fills, and makes the bar fill faster.' },
+    playerHp: { name: 'Hero Health', icon: '❤️', lvl: 1, maxLvl: 99, desc: 'Increases max health and heals the character. Blows land softer, and monsters leave the torch to come for you from farther away.' },
     knockback: { name: 'Knockback', icon: '👊', lvl: 1, maxLvl: 99, desc: 'Increases the push when hitting targets.' }
 };
 

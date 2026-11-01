@@ -192,7 +192,7 @@ export const PASSIVE_SKILL_MODELS = {
     },
     witchEye: {
         name: "Witch's Eye",
-        icon: '🔮',
+        icon: '👁️',
         cost: 130,
         maxLvl: 1,
         desc: 'Every third level grants an extra skill point.',
