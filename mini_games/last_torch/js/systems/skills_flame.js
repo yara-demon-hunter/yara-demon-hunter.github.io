@@ -7,8 +7,9 @@ import { updateHUD } from '../ui/hud.js';
 import { blast, dealDamage, ignite } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { mod } from './modifiers.js';
-import { addGroundFire, ready } from './powers.js';
-import { getSpellDamage } from './stats.js';
+import { phoenixBeak } from '../render/phoenix.js';
+import { addGroundFire, nearestEnemy, ready } from './powers.js';
+import { getSpellCooldown, getSpellDamage } from './stats.js';
 
 // --- SKILLS DA CHAMA ---
 // O guardião ganha com paciência: fica perto da tocha, firme, e deixa o fogo trabalhar.
@@ -83,14 +84,89 @@ export function onTorchTouched() {
 }
 
 // --- PHOENIX PACT ---
-// Devolve true se a tocha pagou para o herói levantar
+// A fênix voa no ombro do herói, do lado de trás de quem anda, e olha para o alvo ao atirar
+export function updatePhoenix(dt) {
+    const bird = state.phoenix;
+    if (passives.phoenixPact.lvl <= 0 || state.phoenixSpent) {
+        bird.placed = false;
+        return;
+    }
+    const P = PHOENIX_PACT;
+    const t = state.runTime;
+    const moved = player.x - (bird.heroX ?? player.x);
+    bird.heroX = player.x;
+    if (Math.abs(moved) > 0.3) bird.side = moved > 0 ? -1 : 1;
+    const homeX = player.x + bird.side * P.shoulderX + Math.cos(t * 1.3) * 5;
+    const homeY = player.y + P.shoulderY + Math.sin(t * 2.1) * 5;
+    if (!bird.placed) {
+        bird.x = homeX;
+        bird.y = homeY;
+        bird.placed = true;
+        bird.rise = 0;
+        bird.facing = -bird.side;
+        createExplosion(homeX, homeY, '#fde047', 10);
+        addShockwave(homeX, homeY, { radius: 44, color: '#fb923c', width: 4, seconds: 0.4 });
+        audio.playPhoenixRise();
+    }
+    const pull = Math.min(1, dt * P.followSpeed);
+    const vx = (homeX - bird.x) * pull;
+    bird.x += vx;
+    bird.y += (homeY - bird.y) * pull;
+    bird.tilt += (Math.max(-0.3, Math.min(0.3, vx * 0.05)) - bird.tilt) * Math.min(1, dt * 8);
+    bird.rise = Math.min(1, bird.rise + dt / P.riseSeconds);
+    if (bird.flash > 0) bird.flash -= dt;
+    if (bird.look > 0) bird.look -= dt;
+    else bird.facing = -bird.side;
+
+    if (bird.rise < 1 || !ready('phoenixFire', dt, getSpellCooldown(P.cooldownSeconds))) return;
+    const target = nearestEnemy(player.x, player.y, P.range);
+    if (!target) return;
+    bird.facing = target.x >= bird.x ? 1 : -1;
+    bird.look = 0.6;
+    bird.flash = 0.16;
+    const from = phoenixBeak(bird.x, bird.y, bird.facing);
+    const a = Math.atan2(target.y - from.y, target.x - from.x);
+    state.bolts.push({
+        x: from.x, y: from.y,
+        vx: Math.cos(a) * P.speed, vy: Math.sin(a) * P.speed,
+        speed: P.speed, turnRate: P.turnRate,
+        target, fire: true,
+        damage: getSpellDamage() * P.boltDamage,
+        life: 1.8,
+        onHit: burstPhoenixFire
+    });
+    // Recua com o tiro, como quem cospe o fogo
+    bird.x -= Math.cos(a) * 6;
+    bird.y -= Math.sin(a) * 6;
+    audio.playBolt();
+}
+
+// A bola de fogo acertou: o alvo queima e a explosão alcança os vizinhos
+function burstPhoenixFire(b, hit) {
+    const P = PHOENIX_PACT;
+    ignite(hit, b.damage * P.burnRatio, P.burnSeconds);
+    for (const e of state.enemies) {
+        if (e === hit || e.hp <= 0 || Math.hypot(e.x - b.x, e.y - b.y) > P.splashRadius + e.radius) continue;
+        dealDamage(e, b.damage * P.splashRatio, { noCrit: true, quiet: true });
+        ignite(e, b.damage * P.burnRatio, P.burnSeconds);
+    }
+    addShockwave(b.x, b.y, { radius: P.splashRadius, color: '#fb923c', width: 3, seconds: 0.24 });
+}
+
+// Devolve true se a fênix morreu para o herói levantar
 export function tryPhoenix() {
-    if (passives.phoenixPact.lvl <= 0 || state.phoenixSpent || state.coreHp <= PHOENIX_PACT.torchCost) return false;
+    if (passives.phoenixPact.lvl <= 0 || state.phoenixSpent) return false;
+    const bird = state.phoenix;
     state.phoenixSpent = true;
-    state.coreHp -= PHOENIX_PACT.torchCost;
+    // A ave mergulha no herói e vira as asas de fogo em volta dele (js/render/skills.js)
+    state.phoenixFx = { x: player.x, y: player.y, age: 0, seconds: 1.3 };
+    if (bird.placed) {
+        Object.assign(state.phoenixFx, { fromX: bird.x, fromY: bird.y, facing: bird.facing });
+        createExplosion(bird.x, bird.y, '#fde047', 16);
+    }
+    bird.placed = false;
     player.hp = player.maxHp * PHOENIX_PACT.healRatio;
     player.iFrames = PHOENIX_PACT.invulnerableSeconds;
-    state.phoenixFx = { x: player.x, y: player.y, age: 0, seconds: 1.3 };
     state.enemyProjectiles.length = 0;
     state.blastBudget++;
     blast(player.x, player.y, PHOENIX_PACT.radius, getSpellDamage() * PHOENIX_PACT.damage, PHOENIX_PACT.knockback, '#fb923c');
@@ -99,7 +175,7 @@ export function tryPhoenix() {
     slowMotion(0.3, 0.7);
     screenFlash('#fb923c', 0.6);
     shakeScreen(14);
-    showBanner('', 'REBORN', 'The torch paid for you', 'gold');
+    showBanner('', 'REBORN', 'The phoenix gave its life', 'gold');
     audio.playPhoenix();
     updateHUD();
     return true;
@@ -163,6 +239,7 @@ export function updateFlameSkills(dt) {
     updateFireRing(dt);
     updateVigil(dt);
     updateWarmthBurn(dt);
+    updatePhoenix(dt);
     const fx = state.phoenixFx;
     if (fx) {
         fx.age += dt;

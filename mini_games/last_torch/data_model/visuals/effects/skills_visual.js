@@ -35,7 +35,7 @@ export const SKILLS_VISUALS = {
         line: 'rgba(253, 186, 116, 0.55)'
     },
     shield: { fill: 'rgba(251, 191, 36, 0.07)', ring: 'rgba(253, 230, 138, 0.8)', glow: 'rgba(245, 158, 11, 0.4)', tongue: 'rgba(251, 146, 60, 0.75)', radius: 32 },
-    phoenix: { colors: ['rgba(249, 115, 22, 0.8)', 'rgba(253, 224, 71, 0.85)', 'rgba(220, 38, 38, 0.75)'], feathers: 8, span: 150 },
+    phoenix: { colors: ['rgba(249, 115, 22, 0.8)', 'rgba(253, 224, 71, 0.85)', 'rgba(220, 38, 38, 0.75)'], feathers: 8, span: 150, dive: 0.2 },
 
     // Curse
     rift: {

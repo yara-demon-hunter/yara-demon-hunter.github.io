@@ -11,15 +11,15 @@
 </head>
 <body>
     <!-- Página de desenvolvimento: tudo do herói (corrida, golpes, dash, efeitos, heróis alternativos, clone, Juramentos,
-         golpes especiais, skills dos quatro ramos e o arremesso da adaga; as armas em detalhe ficam em weapon_previews.html)
+         golpes especiais, skills dos quatro ramos, a fênix do Phoenix Pact e o arremesso da adaga; as armas em detalhe ficam em weapon_previews.html)
          usando o código real do jogo. Como abrir: previews/README.md -->
-    <canvas id="gameCanvas" width="1200" height="6000"></canvas>
+    <canvas id="gameCanvas" width="1200" height="6800"></canvas>
     <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
     <script>
         if (location.protocol === 'file:') {
             const g = document.getElementById('gameCanvas').getContext('2d');
             g.fillStyle = '#050b16';
-            g.fillRect(0, 0, 1200, 6000);
+            g.fillRect(0, 0, 1200, 6800);
             g.textAlign = 'center';
             g.fillStyle = '#fbbf24';
             g.font = '600 26px system-ui, sans-serif';
@@ -39,7 +39,8 @@
         import { OATH_VISUALS } from '../data_model/visuals/characters/oath_visual.js';
         import { SHADOW_CLONE_VISUALS } from '../data_model/visuals/characters/shadow_clone_visual.js';
         import { KNIFE_VISUALS as K } from '../data_model/visuals/effects/knife_visual.js';
-        import { FIREBALLS } from '../data_model/passives.js';
+        import { FIREBALLS, PHOENIX_PACT } from '../data_model/passives.js';
+        import { PHOENIX_VISUALS } from '../data_model/visuals/effects/phoenix_visual.js';
         import { SLASH_VISUALS } from '../data_model/visuals/effects/slash_visual.js';
         import { LEVEL_UP_VISUALS } from '../data_model/visuals/effects/level_up_visual.js';
         import { ctx, passives, player, powers, shadowClones, state } from '../js/core/state.js';
@@ -47,6 +48,7 @@
         import { renderCore } from '../js/render/arena.js';
         import { renderShadowClone } from '../js/render/shadow_clone.js';
         import { addCracks } from '../js/systems/skills_blade.js';
+        import { updatePhoenix } from '../js/systems/skills_flame.js';
         import { renderShockwaves } from '../js/render/effects.js';
         import { renderBladeSlashes, renderKnives } from '../js/render/entities.js';
         import { renderGroundFires } from '../js/render/powers.js';
@@ -55,6 +57,7 @@
         import { getOathPalette } from '../js/render/hero_gear.js';
         import { renderLevelUpBack, renderLevelUpFront } from '../js/render/level_up.js';
         import { createHeroAnim, heroAnim, updateHeroAnim } from '../js/render/player.js';
+        import { drawPhoenixArt, renderPhoenixBird } from '../js/render/phoenix.js';
         import { renderPlayer25D } from '../js/render/player25d.js';
         import { renderBolts, renderDashGhosts, renderLightning } from '../js/render/powers.js';
         import { renderReflectWard } from '../js/render/reflect.js';
@@ -65,7 +68,7 @@
 
         state.gameState = 'PLAYING';     // o herói só anima durante a partida
         const WIDTH = 1200;
-        const HEIGHT = 6000;
+        const HEIGHT = 6800;
         const start = performance.now();
         let last = start;
 
@@ -245,6 +248,7 @@
                 if (!s.noHero) renderPlayer25D(player, s.anim, s.colors, s.gear);
                 renderShield();
                 renderWisp();
+                renderPhoenixBird();
                 renderBladeSlashes();
                 renderKnives();
                 renderBolts();
@@ -516,9 +520,54 @@
             }
         }
 
-        function phoenixLoop(s, dt) {
-            s.clock = ((s.clock ?? 0) + dt) % 2.2;
-            if (s.clock < 1.3) state.phoenixFx = { x: s.body.x, y: s.body.y, age: s.clock, seconds: 1.3 };
+        // --- FÊNIX ---
+        // Roda o voo de verdade (updatePhoenix): cada cena guarda a própria ave e os próprios tiros
+        function flyPhoenix(s, dt) {
+            s.bird ??= { x: 0, y: 0, placed: false, side: 1, facing: -1, look: 0, tilt: 0, flash: 0, rise: 1 };
+            state.phoenix = s.bird;
+            state.phoenixSpent = s.spent ?? false;
+            state.enemies = s.fx.enemies;
+            state.bolts = s.fx.bolts;
+            state.runTime = (performance.now() - start) / 1000;
+            passives.phoenixPact.lvl = 1;
+            updatePhoenix(dt);
+            s.fx.bolts = state.bolts.filter(b => {
+                b.x += b.vx * dt;
+                b.y += b.vy * dt;
+                const hit = s.fx.enemies.find(e => Math.hypot(e.x - b.x, e.y - b.y) < e.radius + 7);
+                if (hit) s.fx.shockwaves.push({ x: b.x, y: b.y, radius: PHOENIX_PACT.splashRadius, color: '#fb923c', width: 3, seconds: 0.24, age: 0 });
+                return !hit && (b.life -= dt) > 0;
+            });
+            state.bolts = s.fx.bolts;
+        }
+
+        // Herói indo e voltando: a ave troca de lado, sempre atrás de quem anda
+        function phoenixWalk(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 3.2;
+            s.speed = 90;
+            s.heading = s.clock < 1.6 ? 0 : Math.PI;
+            flyPhoenix(s, dt);
+        }
+
+        // O herói cai: a ave mergulha nele, as asas de fogo abrem, a explosão empurra tudo e ela renasce depois
+        function phoenixDeath(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 4;
+            const fall = 1.2;
+            const seconds = 1.3;
+            s.spent = s.clock >= fall && s.clock < fall + seconds + 0.5;
+            if (s.clock >= fall && s.clock < fall + dt) {
+                s.from = { fromX: s.bird?.x ?? 0, fromY: s.bird?.y ?? -46, facing: s.bird?.facing ?? -1 };
+                wave(s, 150, '#fde047', 10, 0.7);
+            }
+            if (s.clock >= fall && s.clock < fall + seconds) state.phoenixFx = { x: s.body.x, y: s.body.y, age: s.clock - fall, seconds, ...s.from };
+            flyPhoenix(s, dt);
+        }
+
+        // Começo da hora: renasce de uma brasa
+        function phoenixRise(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 2.4;
+            s.spent = s.clock < 0.4;
+            flyPhoenix(s, dt);
         }
 
         function wispLoop(s, dt) {
@@ -574,7 +623,14 @@
             ['Hearth Ring', scene({ levels: { fireRing: 1 }, heading: 0 })],
             ['Solar Wall', scene({ levels: { fireRing: 5 }, evolved: ['fireRing'] })],
             ['Vigil: escudo', front({ before: (s) => { s.body.vigilStance = true; s.body.shield = 1; } })],
-            ['Phoenix Pact', scene({ before: phoenixLoop })]
+            ['Phoenix Pact', scene({ skills: ['phoenixPact'], before: phoenixDeath })]
+        ];
+        const phoenixFx = [
+            ['Fênix: pairando no ombro', scene({ skills: ['phoenixPact'], before: flyPhoenix })],
+            ['Fênix: acompanhando o herói', scene({ skills: ['phoenixPact'], before: phoenixWalk })],
+            ['Fênix: bolas de fogo', scene({ skills: ['phoenixPact'], fx: { ...createFx(), enemies: [dummy(-92, -6), dummy(-84, 32)] }, before: flyPhoenix })],
+            ['Fênix: morre e levanta o herói', scene({ skills: ['phoenixPact'], before: phoenixDeath })],
+            ['Fênix: renasce na hora seguinte', scene({ skills: ['phoenixPact'], before: phoenixRise })]
         ];
         // Bola de fogo em loop: voa até o primeiro alvo, explode e deixa os vizinhos em chamas
         function fireballLoop(s, dt) {
@@ -728,7 +784,7 @@
         }
         const everyScene = new Map([
             ...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
-            ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...flameArms, ...curseFx
+            ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...flameArms, ...curseFx
         ]);
 
         function gallery(title, top, items, zoom = 2.3) {
@@ -803,6 +859,28 @@
             });
         }
 
+        // Arte da fênix ampliada, desenhada direto (no jogo ela sai de um atlas): ao vivo e nos quadros da batida de asa
+        function drawPhoenixSection(now, base) {
+            text('Fênix em detalhe: batida de asa ao vivo e quadro a quadro', 24, base, 17, '#67e8f9', 700);
+            const phase = ((now - start) / 1000 * PHOENIX_VISUALS.framesPerSecond / PHOENIX_VISUALS.frames) % 1;
+            panel(24, base + 12, 372, 500, () => {
+                ctx.translate(232, 214);
+                ctx.scale(1.95, 1.95);
+                drawPhoenixArt(ctx, phase);
+            });
+            text('ao vivo', 30, base + 530);
+            ['asa no alto', 'desce', 'meio da descida', 'quase embaixo', 'embaixo', 'recolhe', 'sobe', 'volta ao alto'].forEach((name, i) => {
+                const x = 408 + (i % 4) * 194;
+                const y = base + 12 + Math.floor(i / 4) * 256;
+                panel(x, y, 188, 226, () => {
+                    ctx.translate(122, 94);
+                    ctx.scale(0.9, 0.9);
+                    drawPhoenixArt(ctx, i / 8);
+                });
+                text(`${i + 1}. ${name}`, x + 6, y + 243);
+            });
+        }
+
         function frame() {
             const now = performance.now();
             const dt = Math.min(0.05, (now - last) / 1000);
@@ -826,7 +904,7 @@
             });
 
             [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
-                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...flameArms, ...curseFx].forEach(([, s]) => { s.dt = dt; });
+                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...flameArms, ...curseFx].forEach(([, s]) => { s.dt = dt; });
             gallery('Poses', 300, poses);
             gallery('Golpes (com a marca do corte)', 570, swings, 1.7);
             gallery('Dash, dano, nível e Mirror Ward', 840, effects, 1.9);
@@ -846,7 +924,9 @@
             gallery('Skills de Flame', 4350, flameFx, 0.52);
             gallery('Skills de Curse', 4620, curseFx, 0.82);
             gallery('Flame: espada e adagas em chamas', 4890, flameArms, 1.05);
-            drawKnifeSection(now, 5160);
+            gallery('Phoenix Pact: a fênix em ação', 5160, phoenixFx, 1.02);
+            drawPhoenixSection(now, 5430);
+            drawKnifeSection(now, 5990);
             requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);

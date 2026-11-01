@@ -277,6 +277,13 @@ export class SoundEngine {
         [392, 523, 784].forEach((freq, i) => this.tone({ type: 'triangle', freq, at: i * 0.1, decay: 0.5, gain: 0.14 }));
     }
 
+    // Fênix renascendo: canto curto que sobe
+    playPhoenixRise() {
+        if (!this.ctx) return;
+        this.burst({ filter: 'bandpass', freq: 500, to: 2200, q: 1.2, attack: 0.04, decay: 0.35, gain: 0.14 });
+        [659, 880, 1175].forEach((freq, i) => this.tone({ type: 'triangle', freq, to: freq * 1.12, at: i * 0.08, decay: 0.3, gain: 0.08 }));
+    }
+
     // Maldição pulando: sussurro que desce
     playHex() {
         if (!this.ctx || this.throttled('hex', 0.09)) return;

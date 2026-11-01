@@ -5,6 +5,7 @@ import { ctx, player, powers, state } from '../core/state.js';
 import { easeOutBack, easeOutCubic } from './fx/easing.js';
 import { drawFlameTongue } from './fire.js';
 import { drawGlow } from './fx/glow.js';
+import { drawPhoenixSprite } from './phoenix.js';
 import { getDashedRing } from './fx/rings.js';
 
 // --- SKILLS DOS RAMOS (desenho) ---
@@ -353,7 +354,7 @@ export function renderShield() {
     ctx.restore();
 }
 
-// Asas de fogo do Phoenix Pact: abrem, batem uma vez e somem
+// Morte da fênix: ela mergulha no herói e as asas de fogo abrem, batem uma vez e somem
 export function renderPhoenix() {
     const fx = state.phoenixFx;
     if (!fx) return;
@@ -361,6 +362,11 @@ export function renderPhoenix() {
     const p = fx.age / fx.seconds;
     const open = easeOutBack(Math.min(1, p * 2.6));
     const flap = Math.sin(p * Math.PI * 1.4) * 0.35;
+    // A fênix mergulha no herói antes de as asas de fogo abrirem
+    if (fx.fromX !== undefined && p < P.dive) {
+        const k = easeOutCubic(p / P.dive);
+        drawPhoenixSprite(fx.fromX + (fx.x - fx.fromX) * k, fx.fromY + (fx.y - 24 - fx.fromY) * k, 1 - k * 0.55, fx.facing, 0, 1 - k * 0.3);
+    }
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.lineCap = 'round';

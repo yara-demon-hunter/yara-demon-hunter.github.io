@@ -18,6 +18,7 @@ export * from './monsters/wraith_visual.js';
 export * from './effects/juice_visual.js';
 export * from './effects/powers_visual.js';
 export * from './effects/skills_visual.js';
+export * from './effects/phoenix_visual.js';
 export * from './monsters/sprites_visual.js';
 export * from './monsters/zombie_wolf_visual.js';
 export * from './monsters/headless_knight_visual.js';

@@ -282,6 +282,7 @@ function updateTorchBolts(dt) {
             const a = Math.atan2(b.vy, b.vx);
             dealDamage(hit, b.damage, { kbX: Math.cos(a) * 90, kbY: Math.sin(a) * 90, style: b.soul ? 'shadow' : null });
             createExplosion(b.x, b.y, b.soul ? '#c084fc' : '#fb923c', 6);
+            b.onHit?.(b, hit);
         }
         if (hit || b.life <= 0) state.bolts.splice(i, 1);
     }

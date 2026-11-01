@@ -6,7 +6,7 @@ Páginas de desenvolvimento para analisar a arte com o código real do jogo. O j
 |---|---|
 | `monsters_preview.html` | Todos os monstros e bosses: quatro direções, levando dano e no tamanho do jogo |
 | `weapon_previews.html` | A adaga e a espada em detalhe, com as partes legendadas, e as formas de cada uma (carga, bola de fogo, Fúria, Flaming Sword, Juramentos e heróis) |
-| `demon_hunter_preview.html` | Tudo do herói: corrida, poses, golpes, dash, efeitos, os heróis alternativos, o Shadow Clone, as formas dos Juramentos, os golpes especiais quadro a quadro, as skills dos quatro ramos e o arremesso da adaga |
+| `demon_hunter_preview.html` | Tudo do herói: corrida, poses, golpes, dash, efeitos, os heróis alternativos, o Shadow Clone, as formas dos Juramentos, os golpes especiais quadro a quadro, as skills dos quatro ramos, a fênix do Phoenix Pact (voo, bolas de fogo, morte, renascimento e a batida de asa quadro a quadro) e o arremesso da adaga |
 
 ## Como abrir
 

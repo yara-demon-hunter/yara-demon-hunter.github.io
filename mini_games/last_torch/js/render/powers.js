@@ -2,6 +2,7 @@ import { getPowerLevel } from '../../data_model/powers.js';
 import { POWERS_VISUALS as V } from '../../data_model/visuals/effects/powers_visual.js';
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
 import { ctx, player, powers, state } from '../core/state.js';
+import { drawFireOrb } from './fire.js';
 import { drawGlow } from './fx/glow.js';
 import { getDashedRing } from './fx/rings.js';
 import { DAGGER_LENGTH, DAGGER_WIDTH, getDaggerSprite } from './fx/sprites.js';
@@ -105,6 +106,7 @@ export function renderBolts() {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     state.bolts.forEach(b => {
+        if (b.fire) return;
         const look = b.soul ? SKILLS_VISUALS.soulBolt : B;
         const speed = Math.hypot(b.vx, b.vy) || 1;
         const bx = -b.vx / speed;
@@ -124,6 +126,11 @@ export function renderBolts() {
         ctx.fill();
     });
     ctx.restore();
+    // Bolas de fogo da fênix: a mesma das Fireballs, com cauda
+    const t = performance.now() / 1000;
+    for (const b of state.bolts) {
+        if (b.fire) drawFireOrb(b.x, b.y, SKILLS_VISUALS.fire.orbRadius, t, Math.atan2(b.vy, b.vx), 1);
+    }
 }
 
 export function renderStars() {

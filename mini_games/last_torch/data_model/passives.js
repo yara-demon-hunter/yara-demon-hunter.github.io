@@ -99,7 +99,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Once per hour, when you fall, the torch burns 30 of its health to raise you in a storm of fire.'
+        desc: 'A phoenix flies at your shoulder and hurls fireballs. When you fall, it gives its life to raise you in a storm of fire, and is reborn the next hour.'
     },
 
     // --- JURAMENTOS ---
@@ -364,14 +364,29 @@ export const BACKDRAFT = {
     knockback: 420
 };
 
-// Phoenix Pact: a tocha paga com a própria vida para levantar o herói, uma vez por hora
+// Phoenix Pact: a fênix voa no ombro do herói e atira bolas de fogo. Quando ele cai, ela morre para levantá-lo
+// (uma vez por hora) e renasce na hora seguinte.
 export const PHOENIX_PACT = {
-    torchCost: 30,
     healRatio: 0.6,
     invulnerableSeconds: 2.5,
     radius: 300,
     damage: 3,
-    knockback: 760
+    knockback: 760,
+    // Voo
+    shoulderX: 28,              // ao lado do herói, sempre do lado de trás de quem anda
+    shoulderY: -42,
+    followSpeed: 6,
+    riseSeconds: 0.9,           // tempo para renascer da brasa
+    // Bola de fogo
+    cooldownSeconds: 1.5,
+    range: 340,
+    speed: 330,
+    turnRate: 8,
+    boltDamage: 1.4,            // x dano de feitiço
+    splashRadius: 52,
+    splashRatio: 0.5,           // dano nos vizinhos, em relação ao golpe
+    burnRatio: 0.35,            // queimadura por segundo, em relação ao golpe
+    burnSeconds: 2
 };
 
 export function createPassives() {

@@ -42,6 +42,7 @@ export function resetSkills() {
     state.bloodlust.timer = 0;
     state.warCryTimer = 0;
     state.phoenixSpent = false;
+    state.phoenix.placed = false;
     player.move = null;
     player.castAge = -1;
     player.stillTime = 0;
