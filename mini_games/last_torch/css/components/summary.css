@@ -95,12 +95,12 @@
     .summary-col { gap: 0.25rem; }
     .summary-stat { padding: 0.15rem 0.3rem; }
     .summary-stat-main { grid-column: span 3; }
-    .summary-stat span { font-size: 0.48rem; }
+    .summary-stat span { font-size: 0.56rem; }
     .summary-stat b { font-size: 0.8rem; }
     .summary-stat-main b { font-size: 0.95rem; }
     .summary-stat em { display: none; }
-    .goal-row span { font-size: 0.56rem; }
-    .goal-row b { font-size: 0.52rem; }
+    .goal-row span { font-size: 0.62rem; }
+    .goal-row b { font-size: 0.58rem; }
     .summary-actions .start-btn { padding: 0.45rem 1rem; font-size: 0.85rem; }
     .summary-actions .start-btn-small { padding: 0.3rem 0.6rem; font-size: 0.66rem; }
     .summary-actions { grid-template-columns: 1.8fr 1fr 1fr 1fr; }

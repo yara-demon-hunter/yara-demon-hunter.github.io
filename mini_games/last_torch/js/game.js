@@ -27,7 +27,8 @@ import { isPhonePortrait } from './ui/orientation.js';
 import { updateQuickPick } from './ui/quick_pick.js';
 import { setupScreens } from './ui/screens.js';
 
-const MIN_FRAME_MS = 12;
+// Teto de ~60 FPS em 120/144 Hz. Fica abaixo de 11 ms para telas de 90 Hz não caírem para 45 FPS (um quadro sim, um não)
+const MIN_FRAME_MS = 10.5;
 // Nível de detalhe mínimo: 30 FPS estáveis são melhores que 45 irregulares, e gastam menos bateria
 const LOWEST_DETAIL_FRAME_MS = 30;
 let lastTime = performance.now();

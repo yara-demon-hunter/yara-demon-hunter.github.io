@@ -1,7 +1,7 @@
 import { CHARACTER_MODEL, getXpToNextLevel } from '../../data_model/character.js';
 import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
 import { EVOLUTIONS } from '../../data_model/powers.js';
-import { treeImageFor, paintIcon } from '../../data_model/tree_images.js';
+import { preloadTreeImages, treeImageFor, paintIcon } from '../../data_model/tree_images.js';
 import { DARKNESS, getHourName } from '../../data_model/night.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
@@ -326,4 +326,8 @@ export function setupScreens() {
     audio.applySettings();
     renderStartScreen();
     scheduleMonsterSprites();
+    preloadTreeImages();
+    const play = document.getElementById('btnStart');
+    play.textContent = 'PLAY';
+    play.disabled = false;
 }

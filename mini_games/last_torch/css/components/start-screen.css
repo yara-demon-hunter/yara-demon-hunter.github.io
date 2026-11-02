@@ -98,6 +98,13 @@
 }
 .start-btn:hover { filter: brightness(1.2); box-shadow: 0 0 34px rgba(234, 88, 12, 0.6), inset 0 1px 0 rgba(253, 186, 116, 0.3); }
 .start-btn:active { transform: scale(0.97); }
+/* Ainda carregando: pulsa devagar, e nada na tela inicial finge que já responde */
+#btnStart:disabled { filter: saturate(0.6); cursor: progress; animation: loadingPulse 1.1s ease-in-out infinite; }
+#btnStart:disabled ~ .start-links { opacity: 0.45; pointer-events: none; }
+@keyframes loadingPulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+}
 
 /* Recordes: sempre na tela inicial */
 .start-records {

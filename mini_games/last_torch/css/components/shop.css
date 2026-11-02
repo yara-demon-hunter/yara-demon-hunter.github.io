@@ -74,7 +74,7 @@
 /* --- STATUS: build em colunas lado a lado, cada uma rola sozinha se a lista crescer --- */
 #tabBuild {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2.2fr);
     grid-template-rows: minmax(0, 1fr);
 }
 #tabBuild.hidden { display: none; }
@@ -92,7 +92,17 @@
 .shop-panel-amber .shop-panel-title { color: #fcd34d; }
 .shop-panel-violet .shop-panel-title { color: #c4b5fd; }
 #statusLevel { margin-left: auto; color: #fbbf24; }
-.stat-list { display: grid; gap: 0.25rem; }
+.stat-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: 0.2rem; }
+/* Ficha de stats (js/ui/stat_sheet.js): um título por grupo, ocupando a linha toda */
+.stat-group {
+    grid-column: 1 / -1;
+    padding: 0.3rem 0.2rem 0.05rem;
+    color: #fbbf24;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+}
+.stat-group:first-child { padding-top: 0; }
 .shop-panel-title {
     min-height: 36px;
     display: flex;
@@ -112,8 +122,8 @@
     align-items: center;
     gap: 0.35rem;
     min-width: 0;
-    min-height: 1.75rem;
-    padding: 0.15rem 0.35rem;
+    min-height: 1.55rem;
+    padding: 0.05rem 0.35rem;
     border: 1px solid rgba(51, 65, 85, 0.7);
     border-radius: 0.5rem;
     background: rgba(15, 23, 42, 0.6);
@@ -129,13 +139,15 @@
     white-space: nowrap;
 }
 .shop-row-name > span:last-of-type { overflow: hidden; text-overflow: ellipsis; }
-.shop-row-name > em { color: #fbbf24; font-size: 0.6rem; font-style: normal; }
+.shop-row-name > em { flex-shrink: 0; color: #fbbf24; font-size: 0.6rem; font-style: normal; }
 .shop-row-value {
     justify-self: end;
     color: #67e8f9;
     font-size: 0.78rem;
     white-space: nowrap;
 }
+/* Zerado: ainda não ganhou nada disso. Fica no lugar, para a ficha não mudar de forma */
+.shop-row.is-empty { opacity: 0.42; }
 .shop-row-btn {
     padding: 0.15rem 0.5rem;
     border-radius: 0.4rem;
@@ -246,9 +258,9 @@
     #btnResume { display: none; }
     .quit-btn { padding: 0 0.8rem; font-size: 0.72rem; }
 
-    /* Build: mais espaço para os poderes (duas colunas) e só o nome em cada linha */
-    #tabBuild { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; gap: 0.3rem; }
-    .shop-panel { padding: 0 0.3rem 0.3rem; }
+    /* Build: a ficha de stats fica com a maior parte da largura, e cada linha mostra só o nome */
+    #tabBuild { grid-template-columns: minmax(0, 0.75fr) minmax(0, 0.75fr) minmax(0, 2fr); grid-template-rows: minmax(0, 1fr) auto; gap: 0.3rem; overflow-y: visible; }
+    .shop-panel { padding: 0 0.3rem 0.3rem; overflow-y: auto; }
     .shop-panel-title { min-height: 1.5rem; padding: 0 0.15rem; font-size: 0.62rem; }
     .build-list { grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 0.2rem; }
     .build-row { min-height: 1.75rem; padding: 0.1rem 0.35rem; gap: 0.3rem; }
@@ -256,8 +268,12 @@
     .build-row b { overflow: hidden; font-size: 0.64rem; text-overflow: ellipsis; white-space: nowrap; }
     .build-row em { font-size: 0.56rem; }
     .build-row span:not(.build-row-icon) { display: none; }
-    .stat-list { gap: 0.15rem; }
-    .shop-row { min-height: 1.6rem; }
+    .stat-list { grid-template-columns: repeat(auto-fill, minmax(8.6rem, 1fr)); gap: 0.15rem; }
+    .stat-group { padding: 0.15rem 0.15rem 0; font-size: 0.54rem; }
+    .shop-row { min-height: 1.3rem; padding: 0 0.3rem; }
+    .shop-row.is-empty { display: none; }
+    .shop-row-name { font-size: 0.6rem; }
+    .shop-row-value { font-size: 0.64rem; }
     .shop-row-name > em { display: none; }
     #buildNote {
         display: block;

@@ -2,12 +2,11 @@ import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers
 import { audio, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen } from './effects.js';
-import { mod } from './modifiers.js';
 import { startCast } from './moves.js';
 import { hurtPlayer } from './player.js';
 import { feedBloodlust } from './skills_blade.js';
 import { spreadHex } from './skills_curse.js';
-import { getSpellCooldown, getSpellDamage } from './stats.js';
+import { getKillHeal, getSpellCooldown, getSpellDamage } from './stats.js';
 
 // --- PODERES ---
 // Cada poder lê os dados do nível atual com getPowerLevel (data_model/powers.js).
@@ -290,8 +289,7 @@ function updateTorchBolts(dt) {
 
 // --- GATILHOS DE MORTE ---
 export function onEnemyKilled(e) {
-    const blood = getPowerLevel(powers.bloodEdge);
-    const heal = (blood?.heal ?? 0) + mod('killHeal');
+    const heal = getKillHeal();
     if (heal > 0) player.hp = Math.min(player.maxHp, player.hp + heal);
     feedBloodlust();
     spreadHex(e);

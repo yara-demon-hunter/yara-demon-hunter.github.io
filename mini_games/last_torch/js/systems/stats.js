@@ -83,8 +83,19 @@ export function getMaxPlayerHp() {
         + (attributes.playerHp.lvl - 1) * CHARACTER_MODEL.hpPerUpgrade
         + mod('maxHpFlat')) * (1 + mod('maxHp')));
 }
-function getWarmthRadius() {
+// Fração do golpe que chega no herói
+export function getDamageTakenRatio() {
+    return Math.max(0.1, 1 + mod('damageTaken'));
+}
+export function getKillHeal() {
+    return (getPowerLevel(powers.bloodEdge)?.heal ?? 0) + mod('killHeal');
+}
+export function getWarmthRadius() {
     return CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
+}
+// Pontos por segundo; zero sob o Oath of Slaughter
+export function getWarmthHeal() {
+    return mod('noWarmthHeal') > 0 ? 0 : CHARACTER_MODEL.warmthHealPerSecond * (1 + mod('warmth'));
 }
 export function getFrenzyDamageBonus() {
     return attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;
@@ -93,6 +104,11 @@ export function getFrenzyDuration() {
     return FRENZY_NOVA_SKILL.baseDurationSeconds
         + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.durationPerUpgradeLevelSeconds
         + mod('furyDuration');
+}
+// Dano de uma adaga, antes da carga do Charged Dagger Throw
+export function getKnifeDamage() {
+    const ricochet = getPowerLevel(powers.ricochet);
+    return getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0));
 }
 export function getKnifeCooldown() {
     return KNIFE_SKILL.cooldownSeconds * (1 - mod('knifeCooldown'));

@@ -18,7 +18,9 @@ function addPickup(type, x, y) {
         x: Math.max(30, Math.min(state.width - 30, x)),
         y: Math.max(60, Math.min(state.height - 30, y)),
         age: 0,
-        phase: Math.random() * Math.PI * 2
+        phase: Math.random() * Math.PI * 2,
+        attracted: false,
+        speed: 0
     });
 }
 
@@ -46,7 +48,7 @@ function collect(p) {
         addNumber(state.coreX, state.coreY - 72, model.torchHeal, 1, 'torch');
         addShockwave(state.coreX, state.coreY, { radius: 70, color: '#fdba74', width: 4, seconds: 0.4 });
     } else if (p.type === 'MAGNET') {
-        state.magnetTimer = 1.6;
+        state.magnetTimer = D.magnetSeconds;
         addFloater(player.x, player.y - 40, 'MAGNET', model.color);
     } else if (p.type === 'NOVA') {
         state.blastBudget++;
@@ -66,15 +68,28 @@ function collect(p) {
     updateHUD();
 }
 
+// Ímã: o item voa até o herói e não some no caminho, mesmo que o ímã acabe antes de ele chegar
+function pullToHero(p, dt) {
+    const dx = player.x - p.x;
+    const dy = player.y - p.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    p.speed = Math.min(D.magnetMaxSpeed, p.speed + D.magnetAcceleration * dt);
+    const step = Math.min(dist, p.speed * dt);
+    p.x += (dx / dist) * step;
+    p.y += (dy / dist) * step;
+}
+
 export function updatePickups(dt) {
     const reach = D.radius + CHARACTER_MODEL.collisionRadius;
     for (let i = state.pickups.length - 1; i >= 0; i--) {
         const p = state.pickups[i];
         p.age += dt;
+        if (state.magnetTimer > 0) p.attracted = true;
+        if (p.attracted) pullToHero(p, dt);
         if (Math.hypot(player.x - p.x, player.y - p.y) < reach) {
             state.pickups.splice(i, 1);
             collect(p);
-        } else if (p.age >= D.lifeSeconds && p.type !== 'CHEST') {
+        } else if (p.age >= D.lifeSeconds && p.type !== 'CHEST' && !p.attracted) {
             state.pickups.splice(i, 1);
         }
     }

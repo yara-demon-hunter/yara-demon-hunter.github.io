@@ -6,8 +6,8 @@ import { mod } from './modifiers.js';
 import { getMagnetRadius } from './stats.js';
 
 // --- OURO DROPADO ---
-// Moeda: pula para o lado (pop) e fica no chão. Perto do herói é atraída com aceleração crescente;
-// com o ímã ou no fim da hora, todas vêm juntas.
+// Moeda: pula para o lado (pop), fica um tempo no chão e some. Perto do herói é atraída com aceleração crescente
+// (a que já voa até ele não some mais); com o ímã ou no fim da hora, todas vêm juntas.
 export function dropGold(x, y, amount) {
     const coinCount = Math.max(1, Math.min(D.maxCoinsPerKill, amount));
     // Muitas moedas na tela: entra direto para não pesar
@@ -89,6 +89,8 @@ export function updateGold(dt) {
 
         if (Math.hypot(player.x - c.x, player.y - c.y) < pickup && c.age >= D.popSeconds * 0.6) {
             collectGold(c.value);
+            state.goldDrops.splice(i, 1);
+        } else if (c.age >= D.lifeSeconds && !c.attracted) {
             state.goldDrops.splice(i, 1);
         }
     }

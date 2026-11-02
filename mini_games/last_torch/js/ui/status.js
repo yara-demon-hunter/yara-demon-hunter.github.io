@@ -4,21 +4,22 @@ import { getOwnedPowers } from '../systems/tree.js';
 import { treeImageFor, paintIcon } from '../../data_model/tree_images.js';
 import { skillTree } from './tree.js';
 import {
-    getAtkCooldown, getAtkDamage, getAtkRadius, getCritChance, getFrenzyDamageBonus, getFrenzyDuration, getKnockback,
+    getAtkCooldown, getAtkRadius, getBladeDamage, getFrenzyDamageBonus, getFrenzyDuration, getKnockback,
     getMaxPlayerHp, getPlayerMaxSpeed, getSlashArcDegree
 } from '../systems/stats.js';
 import { getHero } from '../systems/modifiers.js';
 import { getHourName } from '../../data_model/night.js';
+import { STAT_GROUPS } from './stat_sheet.js';
 
 // --- STATUS ---
 // O medalhão pausa a partida e mostra a build: stats, poderes e relíquias. Som, efeitos e controles ficam em settings.js.
 const STAT_VALUES = {
-    damage: () => Math.round(getAtkDamage()),
+    damage: () => Math.round(getBladeDamage()),
     radius: () => `${Math.round(getAtkRadius())}px`,
     slashArc: () => `${getSlashArcDegree()}°`,
     atkSpeed: () => `${getAtkCooldown().toFixed(2)}s`,
     moveSpeed: () => Math.round(getPlayerMaxSpeed()),
-    frenzyNova: () => `${getFrenzyDuration().toFixed(1)}s, +${Math.round(getFrenzyDamageBonus() * 100)}% dmg`,
+    frenzyNova: () => `${getFrenzyDuration().toFixed(1)}s +${Math.round(getFrenzyDamageBonus() * 100)}%`,
     playerHp: () => getMaxPlayerHp(),
     knockback: () => Math.round(getKnockback())
 };
@@ -27,27 +28,36 @@ export function getStatText(key) {
     return STAT_VALUES[key] ? STAT_VALUES[key]() : '';
 }
 
+function createStatRow({ name, note, level, value, empty }) {
+    const item = document.createElement('div');
+    item.className = `shop-row${empty ? ' is-empty' : ''}`;
+    item.title = note;
+    item.dataset.note = `${name}: ${note}`;
+    item.innerHTML = '<span class="shop-row-name"><span class="stat-icon"></span><span></span></span><b class="shop-row-value"></b>';
+    item.querySelector('.stat-icon + span').textContent = name;
+    if (level) item.querySelector('.shop-row-name').insertAdjacentHTML('beforeend', `<em>Lv. ${level}</em>`);
+    item.querySelector('.shop-row-value').textContent = value;
+    return item;
+}
+
 function renderStats() {
     const list = document.getElementById('shopList');
     list.innerHTML = '';
-    Object.keys(attributes).forEach(key => {
-        const attr = attributes[key];
-        const item = document.createElement('div');
-        item.className = 'shop-row';
-        item.title = attr.desc;
-        item.dataset.note = `${attr.name}: ${attr.desc}`;
-        item.innerHTML = `
-            <span class="shop-row-name"><span class="stat-icon"></span><span>${attr.name}</span><em>Lv. ${attr.lvl}</em></span>
-            <b class="shop-row-value">${getStatText(key)}</b>
-        `;
-        paintIcon(item.querySelector('.stat-icon'), treeImageFor(key), attr.icon);
-        list.appendChild(item);
+    STAT_GROUPS.forEach(({ title, rows }) => {
+        const heading = document.createElement('h3');
+        heading.className = 'stat-group';
+        heading.textContent = title;
+        list.appendChild(heading);
+        rows.forEach(row => {
+            const attr = attributes[row.attr];
+            const amount = attr ? null : row.amount();
+            const item = createStatRow(attr
+                ? { name: attr.name, note: attr.desc, level: attr.lvl, value: getStatText(row.attr) }
+                : { name: row.name, note: row.note, value: amount === 0 ? '—' : row.format(amount), empty: amount === 0 });
+            paintIcon(item.querySelector('.stat-icon'), attr ? treeImageFor(row.attr) : null, attr?.icon ?? row.icon);
+            list.appendChild(item);
+        });
     });
-    const crit = document.createElement('div');
-    crit.className = 'shop-row';
-    crit.dataset.note = 'Crit Chance: how often a hit lands as a critical.';
-    crit.innerHTML = `<span class="shop-row-name"><span>🎲</span><span>Crit Chance</span></span><b class="shop-row-value">${Math.round(getCritChance() * 100)}%</b>`;
-    list.appendChild(crit);
 }
 
 function renderBuildList(id, items, emptyText) {

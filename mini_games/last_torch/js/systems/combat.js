@@ -45,11 +45,13 @@ export function executeBladeSlash(x, y, angle, radius, comboStep, spin = false, 
 }
 
 // Monstro mais perto de (x, y) a menos de maxDist (ou null)
+// Mede até a borda do monstro, como o dano (hitEnemiesInArc): um monstro grande entra no alcance pela ponta,
+// e não só quando o centro dele chega perto
 export function findNearestEnemy(x, y, maxDist) {
     let target = null;
     let minDist = maxDist;
     state.enemies.forEach(e => {
-        const d = Math.hypot(e.x - x, e.y - y);
+        const d = Math.hypot(e.x - x, e.y - y) - e.radius;
         if (d < minDist) {
             minDist = d;
             target = e;

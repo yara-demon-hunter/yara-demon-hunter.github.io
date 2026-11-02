@@ -16,6 +16,8 @@ permalink: /mini_games/last_torch/last_torch.html
     <meta name="theme-color" content="#020617">
     <title>Last Torch</title>
     <link rel="icon" href="images/characters/demon-hunter-small.webp">
+    <link rel="preload" href="./css/fonts/cinzel-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./css/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="./css/game.css">
 </head>
 <body>
@@ -113,7 +115,8 @@ permalink: /mini_games/last_torch/last_torch.html
             <button id="btnDarkUp" aria-label="Raise darkness">▶</button>
         </div>
 
-        <button id="btnStart" class="start-btn">PLAY</button>
+        <!-- O PLAY nasce desligado: js/ui/screens.js o acende quando o jogo termina de chegar pela rede -->
+        <button id="btnStart" class="start-btn" disabled>LOADING</button>
         <p id="iosHint" class="hidden">Full screen on iPhone: tap Share, then <b>Add to Home Screen</b>, and open it from there.</p>
                 <div class="start-links">
             <button id="btnHeroes" class="start-btn-small">

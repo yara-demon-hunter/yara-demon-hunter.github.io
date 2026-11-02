@@ -5,6 +5,7 @@ import { save } from './save.js';
 import { audio, canvas, joystick, keys, player, state } from './state.js';
 
 const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+const SCROLL_KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'];
 
 // --- INPUTS CONTROLS ---
 // Recebe coordenadas da janela e converte para o mundo
@@ -202,7 +203,9 @@ export function setupInput() {
     canvas.addEventListener('pointercancel', releaseKnife);
 
     window.addEventListener('keydown', (e) => {
-        if (state.gameState === 'PLAYING' && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+        // Dentro do iframe de um portal, setas e Espaço rolariam a página em volta do jogo.
+        // Num botão focado o Espaço segue valendo, menos na caçada, onde ele é o dash.
+        if (SCROLL_KEYS.includes(e.code) && (state.gameState === 'PLAYING' || !e.target.closest?.('button'))) {
             e.preventDefault();
         }
         keys[e.code] = true;
@@ -221,4 +224,9 @@ export function setupInput() {
     window.addEventListener('touchstart', (e) => {
         if (e.touches.length > 0) audio.init();
     }, { passive: true });
+
+    // Mesmo motivo para a roda do mouse na caçada; as listas das telas de pausa continuam rolando
+    window.addEventListener('wheel', (e) => {
+        if (state.gameState === 'PLAYING') e.preventDefault();
+    }, { passive: false });
 }

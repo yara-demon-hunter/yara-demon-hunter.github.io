@@ -199,7 +199,7 @@ export function updateShadowClone(dt) {
         let best = getCloneArea() + reach * 0.8;
         for (const e of state.enemies) {
             if (e.hp <= 0 || claimed.has(e)) continue;
-            const d = Math.hypot(e.x - state.coreX, e.y - state.coreY);
+            const d = Math.hypot(e.x - state.coreX, e.y - state.coreY) - e.radius;
             if (d < best) {
                 best = d;
                 target = e;

@@ -7,10 +7,9 @@ import { updateHUD } from '../ui/hud.js';
 import { moveDash } from './dash.js';
 import { isFireCasting } from './knives.js';
 import { addNumber, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion } from './effects.js';
-import { mod } from './modifiers.js';
 import { beginDeath } from './night.js';
 import { absorbHit, tryPhoenix } from './skills_flame.js';
-import { getPlayerMaxSpeed } from './stats.js';
+import { getDamageTakenRatio, getPlayerMaxSpeed } from './stats.js';
 
 // Ponto (x, y) empurrado para a borda da área bloqueada da tocha, se estiver dentro dela.
 // Empurrar só para fora faz o herói deslizar em volta da tocha em vez de travar.
@@ -44,7 +43,7 @@ export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
         player.iFrames = invulnerableSeconds;
         return false;
     }
-    const damage = amount * Math.max(0.1, 1 + mod('damageTaken'));
+    const damage = amount * getDamageTakenRatio();
     player.hp -= damage;
     player.iFrames = invulnerableSeconds;
     state.hourHit = true;

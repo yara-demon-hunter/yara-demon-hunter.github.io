@@ -1,4 +1,3 @@
-import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
@@ -6,7 +5,7 @@ import { updateHUD } from '../ui/hud.js';
 import { addNumber, createExplosion, screenFlash, shakeScreen } from './effects.js';
 import { mod } from './modifiers.js';
 import { beginDeath } from './night.js';
-import { getMaxPlayerHp } from './stats.js';
+import { getMaxPlayerHp, getWarmthHeal, getWarmthRadius } from './stats.js';
 
 // --- TOCHA ---
 // A segunda vida da partida: apagou, acabou. Regenera com relíquias, óleo e no acampamento.
@@ -62,10 +61,9 @@ export function updateTorch(dt) {
     if (regen > 0 && state.coreHp < state.coreHpMax) feedTorch(regen * dt);
 
     // Calor: cura o herói que fica perto da chama
-    const reach = CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
-    const warmed = mod('noWarmthHeal') <= 0 && Math.hypot(player.x - state.coreX, player.y - state.coreY) < reach;
+    const warmed = Math.hypot(player.x - state.coreX, player.y - state.coreY) < getWarmthRadius();
     if (warmed && player.hp < player.maxHp) {
-        const heal = CHARACTER_MODEL.warmthHealPerSecond * (1 + mod('warmth')) * dt;
+        const heal = getWarmthHeal() * dt;
         player.hp = Math.min(player.maxHp, player.hp + heal);
         warmthFloat += heal;
         if (warmthFloat >= 4) {

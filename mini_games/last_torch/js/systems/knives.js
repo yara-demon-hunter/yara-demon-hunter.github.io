@@ -8,7 +8,7 @@ import { createExplosion } from './effects.js';
 import { mod } from './modifiers.js';
 import { burstFireball } from './skills_flame.js';
 import { markEnemy } from './skills_shadow.js';
-import { getAtkDamage, getKnifeCooldown, getKnockback } from './stats.js';
+import { getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
 
 const KNIFE_RELEASE_SECONDS = K.throwSeconds * K.letGoFraction;
 
@@ -68,8 +68,7 @@ function releaseKnife(thrower = player) {
     const lance = getPowerLevel(powers.chargedThrow);
     const power = state.knifeThrowPower >= POWER_MODELS.chargedThrow.minCharge ? state.knifeThrowPower : 0;
     // A carga da Charged Dagger Throw se divide entre as adagas do leque
-    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0))
-        * (1 + power * (lance?.damage ?? 0) / count);
+    const damage = getKnifeDamage() * (1 + power * (lance?.damage ?? 0) / count);
     const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
 
     for (let i = 0; i < count; i++) {
@@ -100,7 +99,7 @@ export function burstKnives(x, y) {
     const speed = KNIFE_SKILL.speed * (1 + mod('knifeSpeed'));
     const maxRange = getKnifeRange();
     const ricochet = getPowerLevel(powers.ricochet);
-    const damage = getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0)) * B.damageMultiplier;
+    const damage = getKnifeDamage() * B.damageMultiplier;
     const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
     const offset = Math.random() * Math.PI * 2;
     for (let i = 0; i < count; i++) {

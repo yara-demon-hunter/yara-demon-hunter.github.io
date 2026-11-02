@@ -1,6 +1,6 @@
 // --- OURO (GOLD) DROPADO PELOS MONSTROS ---
-// Ao morrer, o monstro solta moedas que pulam para os lados e ficam no chão. Dentro do raio de atração
-// do herói elas voam até ele; no fim da hora todas voam de uma vez.
+// Ao morrer, o monstro solta moedas que pulam para os lados e ficam um tempo no chão, depois somem. Dentro do
+// raio de atração do herói elas voam até ele; no fim da hora as que restam voam de uma vez.
 export const GOLD_DROP = {
     maxCoinsPerKill: 2,          // quantidade máxima de moedas visuais por monstro (o valor total é dividido entre elas)
     maxActiveCoins: 48,          // limite de moedas na tela (acima disso, o valor entra direto)
@@ -8,6 +8,8 @@ export const GOLD_DROP = {
     scatterSpeedMax: 150,
     scatterDamping: 0.9,         // freio do pulo (por quadro)
     popSeconds: 0.32,            // tempo parada/pulando antes de ser atraída
+    lifeSeconds: 12,             // some depois disso, se ninguém veio buscar
+    blinkSeconds: 3,             // pisca nos últimos segundos
     homingAcceleration: 1400,    // aceleração em direção ao herói (px/s²)
     homingMaxSpeed: 650,
     vacuumAcceleration: 3200,    // fim da hora ou ímã: todas as moedas voando juntas

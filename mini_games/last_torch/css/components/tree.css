@@ -291,12 +291,14 @@
 /* Celular de lado: cada pixel de altura conta */
 @media (max-height: 520px) and (orientation: landscape) {
     .tree-view { gap: 0.3rem; }
-    .tree-tabs { grid-template-columns: auto minmax(0, 1fr) 12.5rem; }
+    /* Vale também abaixo de 620px de largura: desfaz a coluna única da janela estreita, aqui a altura é que falta */
+    .tree-tabs { grid-template-columns: auto minmax(0, 1fr) clamp(10.5rem, 30vw, 12.5rem); grid-template-rows: minmax(0, 1fr); }
+    .tree-rail { flex-direction: column; }
     .tree-band-icon { font-size: 1rem; }
-    .tree-band-name { font-size: 0.46rem; }
-    .tree-tab { min-width: 3.1rem; }
-    .tree-tab .tree-band-name { font-size: 0.46rem; }
-    .tnode-level { min-width: 1.2rem; font-size: 0.5rem; line-height: 0.8rem; }
+    .tree-band-name { font-size: 0.54rem; }
+    .tree-tab { min-width: 3.1rem; padding: 0.2rem; }
+    .tree-tab .tree-band-name { font-size: 0.54rem; letter-spacing: 0.06em; }
+    .tnode-level { min-width: 1.2rem; font-size: 0.56rem; line-height: 0.8rem; }
     .tree-detail { gap: 0.25rem; padding: 0.35rem 0.45rem; }
     .tdetail-icon { font-size: 1.35rem; }
     .tdetail-name { font-size: 0.74rem; }
@@ -304,7 +306,9 @@
     .tdetail-text > span { font-size: 0.64rem; line-height: 1.25; }
     .tdetail-buy { min-height: 2.3rem; font-size: 0.74rem; }
     .tdetail-branch { display: none; }
-    .tdetail-legend { font-size: 0.5rem; }
+    .tdetail-legend { font-size: clamp(0.46rem, 1.45vw, 0.54rem); }
+    /* Relíquias ficam pequenas em tela baixa: o toque vale um pouco além do círculo, sem chegar no vizinho */
+    .tnode-relic::before { content: ''; position: absolute; inset: -0.25rem; }
 }
 
 /* Arte da skill no lugar do emoji (data_model/tree_images.js) */

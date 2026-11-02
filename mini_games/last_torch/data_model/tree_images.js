@@ -69,6 +69,11 @@ export function treeImageFor(key, evolved = false) {
     return node ? TREE_IMAGES[node.id] ?? null : null;
 }
 
+// Baixa a arte com antecedência: sem isso, em rede lenta, a árvore abre com os ícones chegando um a um
+export function preloadTreeImages() {
+    [...Object.values(TREE_IMAGES), ...Object.values(BRANCH_IMAGES)].forEach(src => { new Image().src = src; });
+}
+
 // Mostra a imagem no elemento, ou o emoji se não houver. A URL é absoluta porque o CSS a resolveria a partir da própria pasta
 export function paintIcon(target, image, emoji) {
     target.classList.toggle('has-image', Boolean(image));

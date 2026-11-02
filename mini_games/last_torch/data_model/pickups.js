@@ -1,21 +1,27 @@
 // --- ITENS NO CHÃO ---
-// Soltos pelos monstros. O herói pega ao passar por cima (ou no fim da hora, junto com o ouro).
+// Soltos pelos monstros. O herói pega ao passar por cima (ou no fim da hora, junto com o ouro). O ímã puxa tudo
+// da tela: moedas, itens e baús.
 export const PICKUP_MODELS = {
     MEAT: { label: 'Roast', color: '#fca5a5', weight: 0.42, healRatio: 0.3 },
-    OIL: { label: 'Torch Oil', color: '#fdba74', weight: 0.3, torchHeal: 14 },
+    OIL: { label: 'Torch Oil', color: '#fdba74', weight: 0.1, torchHeal: 14 },
     MAGNET: { label: 'Magnet', color: '#7dd3fc', weight: 0.16 },
     NOVA: { label: 'Holy Flare', color: '#fef08a', weight: 0.12, damageRatio: 5, knockback: 420 },
     CHEST: { label: 'Treasure', color: '#fbbf24', weight: 0 }      // só de elites e bosses
 };
 
 export const PICKUP_DROP = {
-    chancePerKill: 0.04,
-    pityKills: 30,              // sem nenhum item há tantas mortes: o próximo cai com certeza
+    // Óleo é raro: a tocha se cura na compra do acampamento (CAMP.fuel). Os pesos são relativos, então ao mexer no
+    // óleo ajuste também chancePerKill e pityKills, senão carne, ímã e flare passam a cair mais
+    chancePerKill: 0.032,
+    pityKills: 36,              // sem nenhum item há tantas mortes: o próximo cai com certeza
     lifeSeconds: 16,            // some depois disso (pisca nos últimos segundos)
     blinkSeconds: 4,
     radius: 15,                 // distância extra para pegar (somada ao raio do herói)
     bobHeight: 3,
-    maxOnGround: 6
+    maxOnGround: 6,
+    magnetSeconds: 1.6,
+    magnetAcceleration: 2600,   // item puxado pelo ímã (px/s²)
+    magnetMaxSpeed: 1300
 };
 
 // Baú: pontos de skill para a árvore (sorteio com pesos)

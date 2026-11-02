@@ -10,12 +10,14 @@ ruby mini_games/last_torch/build-standalone.rb
 python3 -m http.server 8000 --directory mini_games/last_torch/standalone-build
 ```
 
+O pacote leva só as imagens `-small` (as versões de 1024px ficam para páginas e prévias) e lista todos os módulos em `modulepreload`.
+
 ## O jogo
 
 Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o herói vivo e a tocha acesa.
 
 - **30 segundos:** matar monstros dá XP e ouro, e cada nível dá 2 pontos de skill. A escolha rápida (`js/ui/quick_pick.js`) vem sempre desligada ao abrir o jogo; ligada em Settings, ela pausa ao ganhar pontos e mostra três skills da árvore, de ramos diferentes: um toque gasta os pontos ali e a caça volta (as teclas 1, 2 e 3 escolhem; Esc guarda os pontos para depois). O medalhão no topo pulsa em vermelho quando há algo para aprender; a árvore de skills (SKILL TREE, na tela de status) tem 4 ramos, um para cada jeito de jogar (Blade agressivo, Shadow técnico, Flame defensivo, Curse estratégico), com stats, poderes, efeitos, evoluções, skills passivas e um Juramento no fim de cada ramo: só um por noite, com bônus e preço, e que transforma o herói. Baús dão pontos extras. Sequências de mortes multiplicam pontos e ouro.
-- **Uma hora (~45 s):** fechada a cota de pontos (ou morto o boss), para de nascer monstro e o jogador mata o que sobrou. Com a tela limpa, uma onda de fogo sai da tocha, o ouro do chão voa até o herói, sobra um tempo curto para pegar os itens e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha, que também recupera um pouco de graça a cada hora (`CAMP.freeTorchHeal`). As horas 4, 8 e 12 têm boss.
+- **Uma hora (~45 s):** fechada a cota de pontos (ou morto o boss), para de nascer monstro e o jogador mata o que sobrou. Com a tela limpa, uma onda de fogo sai da tocha, o ouro do chão voa até o herói, sobra um tempo curto para pegar os itens e o jogo vai ao acampamento, onde o ouro compra relíquias na **árvore de relíquias** (3 ramos: Fortune, Ward, Wrath, cada relíquia abre a próxima) ou alimenta a tocha, que não se recupera de graça entre as horas (`CAMP.freeTorchHeal`). Durante a caçada, moedas e itens somem do chão depois de um tempo (`GOLD_DROP.lifeSeconds`, `PICKUP_DROP.lifeSeconds`); o ímã puxa tudo o que está na tela, baús inclusive. As horas 4, 8 e 12 têm boss.
 - **Entre partidas:** a árvore recomeça a cada noite e está toda aberta desde a primeira partida. Cada nó pede só o que aparece na árvore: nível mínimo de outras skills e, em alguns, quantos monstros de um tipo você matou na partida inteira, somando todas as horas (por exemplo, 10 Witches). A contagem só zera ao começar uma partida nova. O painel do nó mostra a lista inteira de pedidos de uma vez. O que persiste entre noites fica no **Santuário** (botão na tela inicial): troféus (marcos da jornada), façanhas (matar vários de uma vez, esquivar no último instante, terminar uma hora sem levar dano, sequências de mortes) e o bestiário, que mostra cada monstro e boss depois do primeiro abatido. Algumas conquistas liberam heróis, escolhidos na tela de escolha do herói, também na tela inicial. As moedas do jogo são só o ouro e os pontos de skill, e valem para a noite atual. Vencer abre a noite sem fim e os níveis de Escuridão.
 
 Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
@@ -32,6 +34,7 @@ O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça co
 - **Detalhe adaptativo:** `state.quality` vai de 0 a 2. O celular começa em 1 e `js/game.js` desce sozinho se o aparelho não sustentar ~42 FPS; o nível 2 trava em ~30 FPS.
 - **Sem lixo de memória:** partículas, pedaços e números são reaproveitados (`js/systems/effects.js`).
 - **Fora da partida o canvas não é redesenhado.**
+- **Carregamento:** o PLAY nasce desligado (`LOADING`) e `setupScreens` o acende quando os módulos terminam de chegar; assim ele nunca parece travado em rede lenta. A arte da árvore é baixada logo depois.
 - Limite de monstros vivos: `maxAliveEnemies` em `data_model/difficulty.js`.
 
 ## Estrutura
@@ -137,6 +140,7 @@ js/
   ui/tree.js                      desenho das árvores (ramos, nós, ligações e abas de ramo) e painel de detalhe; uma fábrica monta a de skills e a de relíquias
   ui/camp.js                      acampamento: árvore de relíquias, tocha e descanso
   ui/status.js                    tela de status: abas Skill Tree e Build; ui/settings.js: som, efeitos e controles (🎮)
+  ui/stat_sheet.js                ficha de stats da aba Build: tudo o que se acumula na noite, já somado
   ui/sanctuary.js                 Santuário: abas de troféus, façanhas e bestiário
   ui/heroes.js                    escolha do herói
   ui/screens.js                   início de partida, fim da noite e tela inicial

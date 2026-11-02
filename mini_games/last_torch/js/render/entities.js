@@ -1,3 +1,4 @@
+import { GOLD_DROP } from '../../data_model/gold.js';
 import { DEMON_LORD_VISUALS } from '../../data_model/visuals/bosses/demon_lord_visual.js';
 import { BOSS_PALETTES } from '../../data_model/visuals/bosses/palettes_visual.js';
 import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
@@ -45,7 +46,10 @@ export function renderGoldDrops() {
     const { canvas, cell, frames } = getCoinAtlas();
     const t = performance.now() / 1000;
     const half = COIN_SIZE / 2;
+    const blinkOff = Math.floor(t * 8) % 2 === 0;
     for (const c of state.goldDrops) {
+        // Pisca nos últimos segundos
+        if (blinkOff && !c.attracted && GOLD_DROP.lifeSeconds - c.age < GOLD_DROP.blinkSeconds) continue;
         const frame = Math.floor(t * 12 + c.phase * 3) % frames;
         ctx.drawImage(canvas, frame * cell, 0, cell, cell, c.x - half, c.y - half, COIN_SIZE, COIN_SIZE);
     }
