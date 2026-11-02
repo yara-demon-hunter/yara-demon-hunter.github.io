@@ -311,9 +311,24 @@ permalink: /mini_games/last_torch/last_torch.html
                 </div>
                 <p class="settings-hint">The hero follows the mouse until you press a move key; then the keys walk and the mouse only aims. Space and Shift dash either way.</p>
             </section>
-            <button id="btnAbandon" class="screen-link">Abandon this night</button>
         </div>
-        <button id="btnResumeSettings" class="start-btn">BACK TO THE HUNT ▶</button>
+        <!-- Voltar à caçada e sair para o menu, lado a lado -->
+        <div class="settings-actions">
+            <button id="btnResumeSettings" class="start-btn">BACK TO THE HUNT ▶</button>
+            <button id="btnQuit" class="quit-btn" aria-label="Quit to menu">🚪 QUIT</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRMAÇÃO DE SAÍDA (abre por cima das configurações). Styles in css/components/confirm.css -->
+<div id="confirmScreen" class="game-screen hidden" role="alertdialog" aria-labelledby="confirmTitle">
+    <div class="confirm-box">
+        <h2 id="confirmTitle" class="screen-title">QUIT TO MENU?</h2>
+        <p>This night ends here. Your records and kills are kept, but the hunt will be lost.</p>
+        <div class="confirm-actions">
+            <button id="btnConfirmStay" class="start-btn">KEEP PLAYING</button>
+            <button id="btnConfirmQuit" class="start-btn start-btn-dark">YES, QUIT</button>
+        </div>
     </div>
 </div>
 

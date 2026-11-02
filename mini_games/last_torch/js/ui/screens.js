@@ -182,19 +182,35 @@ const END_TEXTS = {
     DAWN: { title: 'DAWN', sub: 'You kept the flame alive through the long night.' }
 };
 
-// --- FIM DA NOITE ---
-export function triggerGameOver(reason) {
-    state.gameState = 'GAMEOVER';
+// Soma a partida no histórico: a noite sem fim continua a mesma partida, então conta uma vez só
+function bankRun() {
     const { run } = state;
-    const newRecord = state.totalScore > save.stats.bestScore && save.stats.bestScore > 0;
-
-    // A noite sem fim continua a mesma partida: conta uma vez só
     if (!run.counted) save.stats.runs++;
     run.counted = true;
     save.stats.kills += run.kills - (run.killsBanked ?? 0);
     save.stats.elites += run.elites - (run.elitesBanked ?? 0);
     run.killsBanked = run.kills;
     run.elitesBanked = run.elites;
+}
+
+// Sair para o menu no meio da noite: o que foi feito fica guardado, a caçada se perde
+export function quitToMenu() {
+    bankRun();
+    pushStats();
+    checkAchievements({ toast: false });
+    persist();
+    ['settingsScreen', 'shopScreen', 'pickScreen', 'confirmScreen'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    state.knifeInput.stick.fire = false;
+    returnToMenu();
+}
+
+// --- FIM DA NOITE ---
+export function triggerGameOver(reason) {
+    state.gameState = 'GAMEOVER';
+    const { run } = state;
+    const newRecord = state.totalScore > save.stats.bestScore && save.stats.bestScore > 0;
+
+    bankRun();
     if (reason === 'DAWN') {
         save.stats.victories++;
         save.stats.bestDarknessWon = Math.max(save.stats.bestDarknessWon, save.darkness);

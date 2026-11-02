@@ -1,11 +1,10 @@
 import { audio, state } from '../core/state.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
 import { chooseHero, closeHeroes, openHeroes } from './heroes.js';
-import { beginDeath } from '../systems/night.js';
 import { inPortal, lockLandscape, showIosHint } from './orientation.js';
 import { choosePick, isPicking, setupQuickPick } from './quick_pick.js';
 import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
-import { changeDarkness, keepHunting, returnToMenu, shareResult, startGame } from './screens.js';
+import { changeDarkness, keepHunting, quitToMenu, returnToMenu, shareResult, startGame } from './screens.js';
 import { openSettings, toggleSetting } from './settings.js';
 import { openStatus, resumeGame, setStatusTab, showBuildNote } from './status.js';
 import { skillTree } from './tree.js';
@@ -46,9 +45,14 @@ export function setupButtons() {
         lockLandscape();
         keepHunting();
     });
-    on('btnAbandon', () => {
-        resumeGame();
-        beginDeath('PLAYER');
+    // Sair para o menu pede confirmação: um toque sem querer não pode jogar a noite fora
+    const confirmBox = document.getElementById('confirmScreen');
+    const closeConfirm = () => confirmBox.classList.add('hidden');
+    on('btnQuit', () => confirmBox.classList.remove('hidden'));
+    on('btnConfirmStay', closeConfirm);
+    on('btnConfirmQuit', () => {
+        closeConfirm();
+        quitToMenu();
     });
 
     // Acampamento
@@ -106,6 +110,10 @@ export function setupButtons() {
         if (e.repeat) return;
         const pickKey = ['Digit1', 'Digit2', 'Digit3'].indexOf(e.code);
         if (pickKey >= 0 && isPicking()) choosePick(pickKey);
+        if (!confirmBox.classList.contains('hidden')) {
+            if (e.code === 'Escape' || e.code === 'KeyP') closeConfirm();
+            return;
+        }
         if (e.code === 'Escape' || e.code === 'KeyP') {
             if (state.gameState === 'START' && menuScreenOpen()) {
                 closeSanctuary();

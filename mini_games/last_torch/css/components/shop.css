@@ -194,6 +194,26 @@
 .settings-panel { max-width: 40rem; height: auto; max-height: 100%; }
 .settings-panel > * { flex-shrink: 0; }
 .settings-panel .screen-close { margin-left: auto; }
+/* Voltar à caçada ocupa o espaço que sobra; sair é um botão menor ao lado, em vermelho para não ser tocado sem querer */
+.settings-actions { display: flex; gap: 0.6rem; width: 100%; }
+.settings-actions .start-btn { flex: 1; min-width: 0; }
+.quit-btn {
+    flex: none;
+    padding: 0 1.2rem;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #fecaca;
+    white-space: nowrap;
+    background: linear-gradient(180deg, #7f1d1d, #3b0a0a);
+    border: 1px solid rgba(248, 113, 113, 0.55);
+    border-radius: 0.75rem;
+    box-shadow: 0 0 16px rgba(220, 38, 38, 0.25), inset 0 1px 0 rgba(254, 202, 202, 0.2);
+    transition: transform 0.12s, filter 0.2s;
+}
+.quit-btn:hover { filter: brightness(1.25); }
+.quit-btn:active { transform: scale(0.96); }
 .settings-body { display: flex; flex-direction: column; gap: 0.6rem; min-height: 0; flex-shrink: 1; }
 .settings-hint { margin-top: 0.45rem; color: #94a3b8; font-size: 0.68rem; line-height: 1.35; }
 /* Telas de toque só têm o joystick: sem escolha de teclado */
@@ -224,6 +244,7 @@
     .status-panel .camp-gold { padding: 0.15rem 0.5rem; font-size: 0.8rem; }
     #btnCloseShop { min-width: 2.4rem; min-height: 2.1rem; padding-block: 0; }
     #btnResume { display: none; }
+    .quit-btn { padding: 0 0.8rem; font-size: 0.72rem; }
 
     /* Build: mais espaço para os poderes (duas colunas) e só o nome em cada linha */
     #tabBuild { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; gap: 0.3rem; }
