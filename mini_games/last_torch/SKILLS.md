@@ -31,7 +31,7 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 | Oath of Ruin | Curse | +20% dano e -12% recarga dos feitiços | -40% dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
 
 Regras: abre ao aprender **as duas skills que chegam nele** (as ligações do mapa) e fica na coluna 6, sempre na mesma posição.
-Slaughter pede Cataclysm e Executioner; Whispers, Shadow Legion e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Phoenix Pact e Solar Wall;
+Slaughter pede Cataclysm e Executioner; Whispers, Shadow Legion e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Fireballs e Solar Wall;
 Ruin, Wrath of Heaven e Event Horizon. Os dados ficam em `data_model/passives.js`, e a arte
 em `data_model/visuals/characters/oath_visual.js` e `js/render/hero_gear.js`.
 
@@ -59,11 +59,11 @@ O custo vem do ramo e do tipo do nó, nunca só do fato de ser evolução. A reg
 - Cada nível do herói dá **2 pontos** (`TREE_POINTS`). Uma noite completa rende cerca de 70 pontos, contando os baús.
   Com 1 ponto por nível, o primeiro feitiço de Flame ou Curse só viria na hora 2 ou 3.
 - O preço mais alto de Flame e Curse paga uma força maior: feitiços batem 10% acima da lâmina (`SPELL_SKILL`).
-- Em Shadow tudo custa 1, exceto o Juramento (5, via `cost` no nó): o ramo é o mais barato porque exige habilidade, e o
-  Juramento é a única decisão cara.
+- Em Shadow quase tudo custa 1: o ramo é o mais barato porque exige habilidade. As decisões caras, via `cost` no nó, são
+  o Juramento (5), a Smoke Bomb (4) e o Shadow Shackle (3).
 - Os valores ficam em `TREE_COSTS` (`data_model/tree.js`).
 - `cost` no próprio nó sobrescreve a tabela. Use só para uma exceção justificada.
-  Exceções atuais: Oath of Whispers (5), Hero Health (2 por nível) e, no Flame, Ember Steps (2) e Hellwalker (3), por serem mais simples que os outros poderes do ramo.
+  Exceções atuais: Oath of Whispers (5), Smoke Bomb (4), Shadow Shackle (3), Hero Health (2 por nível) e, no Flame, Ember Steps (2) e Hellwalker (3), por serem mais simples que os outros poderes do ramo.
 
 ## Formatos
 
@@ -88,20 +88,20 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Corpo: Hero Health (vida, -4% de dano recebido e provocar de mais longe; 2 pontos por nível), Blood Edge, War Cry*
   - Oath of Slaughter*
 - **Shadow** (raiz: Move Speed)
-  - Adagas: Ricochet, Dagger Mastery (dano, alcance, velocidade e recarga), Fan of Knives
+  - Adagas: Ricochet, Return Fire (o antigo Mirror Ward, rebate o tiro inimigo), Dagger Mastery (dano, alcance, velocidade e recarga), Fan of Knives
   - Técnica: Death Mark*, Charged Dagger Throw (Soul Lance e Soul Spear unidos)
   - Sombras: Shadow Clone*, Umbral Bond*, Shadow Legion*. Move Speed, Shadow Clone, Umbral Bond (5/5), Shadow Legion (3 pontos), Juramento
-  - Esquiva: Phantom Rush, Night Reaper*, Smoke Bomb*. Move Speed, Phantom Rush, Night Reaper, Smoke Bomb, Juramento
+  - Esquiva: Phantom Rush, Night Reaper*, Shadow Shackle*, Smoke Bomb*. Move Speed, Phantom Rush, Night Reaper, Shadow Shackle, Smoke Bomb, Juramento
   - Oath of Whispers*
 - **Flame** (raiz: Torch Keeper)
-  - Calor: Warm Hearth, Undying Flame, Phoenix Pact*
+  - Calor: Warm Hearth, Undying Flame, Phoenix Pact*, Fireballs*
   - Guarda: Steady Stance*, Vigil*, Backdraft*
   - Muralha: Flame Sentinel, Sun Spire, Hearth Ring*, Solar Wall*
   - Brasa: Ember Steps (fogo nos passos e dano dentro do calor da tocha), Hellwalker
-  - Armas: Flaming Sword*, Fireballs* (saem do Hellwalker)
+  - Armas: Flaming Sword* (sai do Hellwalker)
   - Oath of the Hearth*
 - **Curse** (raiz: Arcane Study)
-  - Gelo e força: Cold Moon, Soul Nova, Absolute Zero, Starfall, Mirror Ward
+  - Gelo e força: Cold Moon, Soul Nova, Absolute Zero, Starfall
   - Distância: Grave Wisp*, Occult Focus*, Storm Sigil, Wrath of Heaven
   - Vazio: Creeping Hex*, Dark Knowledge*, Void Rift*, Event Horizon*
   - Morte: Corpse Burst, Red Harvest, Spectral Blades, Blade Tempest
@@ -125,6 +125,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Shadow Raven | Passiva | Abre com Death Mark 2/2. Um corvo pequeno voa no ombro do herói e, a cada 2,4s, mergulha no monstro mais perto (até 300), bica com 110% do dano da lâmina e volta. O monstro bicado fica 2s numa mira vermelha e leva 25% a mais de dano em todo golpe (lâmina, adaga, feitiço, sombras) enquanto ela durar | Corvo violeta-escuro; mira vermelha tracejada com cruz |
 | Explosão da sombra | Efeito do Shadow Clone | A sombra que cai explode em 8 adagas para todos os lados (12 com Fan of Knives). Valem o dano, alcance e velocidade do Dagger Mastery e o Ricochet | Adagas violeta em círculo |
 | Umbral Bond | Poder | 5 níveis que fortalecem as sombras: a cada nível +25% de vida, +30% de dano e +25 de raio na área de guarda (no 5º, +125%, +150% e +125). Vale para o Shadow Clone, a Legion e as sombras do Oath of Whispers | Área de guarda maior |
+| Shadow Shackle | Passiva | Automática, recarga de 15s: uma corrente voa até o monstro mais forte ao alcance da adaga e o prende naquele ponto por 10s, boss inclusive. Só tira o andar: ele continua atacando, e o boss que se teleporta fica preso no ponto novo | Corrente voando; estacas no chão com correntes até o monstro |
 | Smoke Bomb | Passiva | O dash deixa um rasto longo de fumaça por 7s: freia monstros e todo golpe que eles levam ali, de lâmina ou adaga, tem 25% de chance extra de ser crítico (sorteada à parte da chance normal do herói) | Rasto de nuvens |
 | Night Reaper | Evolução | Uma sombra refaz o caminho do dash, cortando de novo | Silhueta violeta |
 | Coin Rush | Relíquia | Cada moeda adianta o dash e a adaga em 0,05s | 🧤 Fortune |

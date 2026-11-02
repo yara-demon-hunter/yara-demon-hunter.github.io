@@ -277,6 +277,17 @@ export class SoundEngine {
         [392, 523, 784].forEach((freq, i) => this.tone({ type: 'triangle', freq, at: i * 0.1, decay: 0.5, gain: 0.14 }));
     }
 
+    // Corrente: chicote metálico ao lançar; ao prender, um baque seco com tilintar
+    playShackle(bound) {
+        if (!this.ctx) return;
+        if (!bound) {
+            this.burst({ filter: 'bandpass', freq: 1800, to: 3600, q: 1.4, decay: 0.2, gain: 0.14 });
+            return;
+        }
+        this.burst({ filter: 'lowpass', freq: 500, to: 160, q: 0.8, decay: 0.2, gain: 0.26 });
+        [1760, 2350].forEach((freq, i) => this.tone({ type: 'triangle', freq, at: 0.03 + i * 0.05, decay: 0.16, gain: 0.05 }));
+    }
+
     // Corvo bicando: grasnido curto e áspero
     playCaw() {
         if (!this.ctx || this.throttled('caw', 0.25)) return;

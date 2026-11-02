@@ -40,12 +40,13 @@ export const TURN_DIFFICULTY = {
         BAT: 1,
         VAMPIRE: 2,
         WITCH: 3,
-        MOTH: 5,
-        BLOATER: 6,
-        WRAITH: 7,
-        NECROMANCER: 9,
+        MOTH: 3,
         ZOMBIE_WOLF: 4,
-        HEADLESS_KNIGHT: 8
+        BLOATER: 4,
+        WRAITH: 5,
+        NECROMANCER: 6,
+        HEADLESS_KNIGHT: 7,
+        BONE_COLOSSUS: 1
     }
 };
 

@@ -7,7 +7,7 @@ import { req } from './tree.js';
 
 export const RELIC_LAYOUT = {
     labelWidth: 1.5,
-    tiers: 4,
+    tiers: 5,
     branchGap: 0.15
 };
 
@@ -23,6 +23,9 @@ export const RELIC_NODES = [
     { id: 'luckyCoin', branch: 'fortune', kind: 'relic', key: 'luckyCoin', x: 1, y: 0, requires: [req('greedyIdol')] },
     { id: 'witchEye', branch: 'fortune', kind: 'relic', key: 'witchEye', x: 2, y: 0, requires: [req('luckyCoin')] },
     { id: 'huntersNotes', branch: 'fortune', kind: 'relic', key: 'huntersNotes', x: 3, y: 0, requires: [req('witchEye')] },
+    // Mais ouro e itens, seguindo a linha para a direita
+    { id: 'merchantSeal', branch: 'fortune', kind: 'relic', key: 'merchantSeal', x: 4, y: 0, requires: [req('huntersNotes')] },
+    { id: 'gildedSignet', branch: 'fortune', kind: 'relic', key: 'gildedSignet', x: 3, y: 1, requires: [req('treasureSense')] },
     { id: 'coinPurse', branch: 'fortune', kind: 'relic', key: 'coinPurse', x: 0, y: 1, requires: [] },
     { id: 'hunterLore', branch: 'fortune', kind: 'relic', key: 'hunterLore', x: 1, y: 1, requires: [req('coinPurse')] },
     { id: 'treasureSense', branch: 'fortune', kind: 'relic', key: 'treasureSense', x: 2, y: 1, requires: [req('hunterLore')] },
@@ -31,7 +34,7 @@ export const RELIC_NODES = [
     { id: 'pickpocket', branch: 'fortune', kind: 'relic', key: 'pickpocket', x: 1, y: 2, requires: [req('lightFingers')] },
     { id: 'coinRush', branch: 'fortune', kind: 'relic', key: 'coinRush', x: 2, y: 2, requires: [req('pickpocket')] },
     { id: 'thiefNose', branch: 'fortune', kind: 'relic', key: 'thiefNose', x: 3, y: 2, requires: [req('coinRush')] },
-    { id: 'masterThief', branch: 'fortune', kind: 'relic', key: 'masterThief', x: 3, y: 1, requires: [req('thiefNose')] },
+    { id: 'masterThief', branch: 'fortune', kind: 'relic', key: 'masterThief', x: 4, y: 2, requires: [req('thiefNose')] },
 
     // --- PROTEÇÃO ---
     { id: 'emberFlask', branch: 'ward', kind: 'relic', key: 'emberFlask', x: 0, y: 0, requires: [] },
@@ -41,6 +44,10 @@ export const RELIC_NODES = [
     { id: 'hearthstone', branch: 'ward', kind: 'relic', key: 'hearthstone', x: 0, y: 1, requires: [] },
     { id: 'oldScars', branch: 'ward', kind: 'relic', key: 'oldScars', x: 1, y: 1, requires: [req('hearthstone')] },
     { id: 'lastPrayer', branch: 'ward', kind: 'relic', key: 'lastPrayer', x: 2, y: 1, requires: [req('oldScars')] },
+    // Por classe, para a direita: Blade (aguentar), Flame (a tocha) e Shadow (esquiva)
+    { id: 'stoneHeart', branch: 'ward', kind: 'relic', key: 'stoneHeart', x: 4, y: 0, requires: [req('secondPrayer')] },
+    { id: 'emberLantern', branch: 'ward', kind: 'relic', key: 'emberLantern', x: 3, y: 1, requires: [req('lastPrayer')] },
+    { id: 'phantomVeil', branch: 'ward', kind: 'relic', key: 'phantomVeil', x: 4, y: 1, requires: [req('emberLantern')] },
 
     // --- FÚRIA ---
     { id: 'berserkDraught', branch: 'wrath', kind: 'relic', key: 'berserkDraught', x: 0, y: 0, requires: [] },
@@ -50,7 +57,14 @@ export const RELIC_NODES = [
     { id: 'whetstone', branch: 'wrath', kind: 'relic', key: 'whetstone', x: 0, y: 1, requires: [] },
     { id: 'hunterMark', branch: 'wrath', kind: 'relic', key: 'hunterMark', x: 1, y: 1, requires: [req('whetstone')] },
     { id: 'boneCharm', branch: 'wrath', kind: 'relic', key: 'boneCharm', x: 2, y: 1, requires: [req('hunterMark')] },
-    { id: 'wornBoots', branch: 'wrath', kind: 'relic', key: 'wornBoots', x: 3, y: 1, requires: [req('boneCharm')] }
+    { id: 'wornBoots', branch: 'wrath', kind: 'relic', key: 'wornBoots', x: 3, y: 1, requires: [req('boneCharm')] },
+    // Por classe, para a direita: Blade, Shadow e Curse
+    { id: 'sharpenedEdge', branch: 'wrath', kind: 'relic', key: 'sharpenedEdge', x: 4, y: 0, requires: [req('smolderingRage')] },
+    { id: 'shadeQuiver', branch: 'wrath', kind: 'relic', key: 'shadeQuiver', x: 4, y: 1, requires: [req('wornBoots')] },
+    // Terceira fileira, para magos: começa do zero, sem depender do Shadow
+    { id: 'occultTome', branch: 'wrath', kind: 'relic', key: 'occultTome', x: 0, y: 2, requires: [] },
+    { id: 'wizardsWand', branch: 'wrath', kind: 'relic', key: 'wizardsWand', x: 1, y: 2, requires: [req('occultTome')] },
+    { id: 'owlsWisdom', branch: 'wrath', kind: 'relic', key: 'owlsWisdom', x: 2, y: 2, requires: [req('wizardsWand')] }
 ];
 
 export const RELIC_BY_ID = Object.fromEntries(RELIC_NODES.map(node => [node.id, node]));

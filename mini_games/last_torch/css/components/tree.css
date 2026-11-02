@@ -182,15 +182,20 @@
 .tnode.is-chained .tnode-icon { opacity: 0.45; filter: grayscale(0.85); }
 .tnode.is-chained .tnode-level { display: none; }
 .tnode.is-chained::after {
+    /* O cadeado fica na borda esquerda do nó, no meio da altura: ali é a ponta da ligação que chega, e longe
+       do nó de cima e do de baixo, que não parecem mais trancados */
     content: '🔒';
     position: absolute;
-    right: -0.35rem;
-    top: -0.35rem;
-    font-size: min(calc(var(--cell) * 0.24), 0.9rem);
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: min(calc(var(--cell) * 0.3), 1.1rem);
     line-height: 1;
+    filter: drop-shadow(0 0 2px #020617);
     pointer-events: none;
 }
-.tnode-evolve.is-chained::after { right: auto; left: -0.1rem; top: -0.1rem; transform: rotate(-45deg); }
+/* O losango está girado 45°: a ponta da esquerda é o canto de baixo à esquerda do quadrado */
+.tnode-evolve.is-chained::after { top: 100%; transform: translate(-50%, -50%) rotate(-45deg); }
 .tnode.is-selected { border-color: #fff; }
 /* Juramento: hexágono maior no fim do ramo. A borda é a peça de trás e o miolo é o ícone, os dois recortados */
 .tnode.tnode-oath {

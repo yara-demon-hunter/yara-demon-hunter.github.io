@@ -6,6 +6,7 @@ import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, powers, state } from '../core/state.js';
 import { prepareRaven } from '../render/raven.js';
 import { preparePhoenix } from '../render/phoenix.js';
+import { prepareShackle } from '../render/shackle.js';
 import { showToast } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { getStatText } from '../ui/status.js';
@@ -176,6 +177,7 @@ export function buyNode(id) {
         // O sprite da fênix leva um instante para montar: melhor agora, com a tela de skills aberta, do que no meio da luta
         if (node.key === 'phoenixPact') preparePhoenix();
         if (node.key === 'shadowRaven') prepareRaven();
+        if (node.key === 'shadowShackle') prepareShackle();
         state.revives += passives[node.key].mods?.revives ?? 0;
         state.skillPoints += passives[node.key].grantPoints ?? 0;
         if (node.oath) {

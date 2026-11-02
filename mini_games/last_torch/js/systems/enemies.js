@@ -52,8 +52,8 @@ function separateEnemies(dt) {
             const force = ((min - dist) / min) * strength;
             const nx = (dx / dist) * force;
             const ny = (dy / dist) * force;
-            if (!a.isBoss) { a.x -= nx; a.y -= ny; }
-            if (!b.isBoss) { b.x += nx; b.y += ny; }
+            if (!a.isBoss && !a.immovable) { a.x -= nx; a.y -= ny; }
+            if (!b.isBoss && !b.immovable) { b.x += nx; b.y += ny; }
         }
     }
 }
@@ -92,6 +92,54 @@ function updateLunge(e, L, dist, angle, dt) {
         return true;
     }
     return false;
+}
+
+// O golpe do Colosso varre um leque: da direita dele até a frente, na direção da tocha
+function inSlamSweep(e, sweep, x, y) {
+    if (Math.hypot(x - e.x, y - e.y) > sweep.radius + CHARACTER_MODEL.collisionRadius) return false;
+    const a = Math.atan2(y - e.y, x - e.x) - Math.atan2(state.coreY - e.y, state.coreX - e.x);
+    const relative = Math.atan2(Math.sin(a), Math.cos(a));
+    return relative >= sweep.fromAngle && relative <= sweep.toAngle;
+}
+
+// Colosso de Ossos: para perto da tocha, prepara o golpe (slamState 1), desce a espada (2) e o dano sai quando
+// a lâmina chega na chama. true = plantado, golpeando.
+function updateTorchSlam(e, S, distCore, dt) {
+    if (e.slamRecover > 0) e.slamRecover -= dt;
+    if (e.slamState) {
+        e.slamTimer -= dt;
+        if (e.slamTimer > 0) return true;
+        if (e.slamState === 1) {
+            e.slamState = 2;
+            e.slamTimer = S.strikeSeconds;
+            audio.playDash();
+            return true;
+        }
+        e.slamState = 0;
+        e.slamTimer = S.cooldownSeconds;
+        e.slamRecover = S.recoverSeconds;
+        const ratio = e.slams ? S.repeatRatio : S.firstRatio;
+        e.slams = (e.slams ?? 0) + 1;
+        addShockwave(state.coreX, state.coreY, { radius: 200, color: e.color, width: 10, seconds: 0.6 });
+        createExplosion(state.coreX, state.coreY, e.color, 16);
+        hitStop(0.12);
+        shakeScreen(22);
+        if (inSlamSweep(e, S.sweep, player.x, player.y)) hurtPlayer(e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+        for (const c of shadowClones) {
+            if (c.active && inSlamSweep(e, S.sweep, c.x, c.y)) damageShadowClone(c, e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+        }
+        hurtTorch(state.coreHpMax * ratio, state.coreX, state.coreY);
+        return true;
+    }
+    e.planted = distCore <= S.range + e.radius;
+    if (!e.planted) return false;
+    e.slamTimer = (e.slamTimer ?? 0) - dt;
+    if (e.slamTimer <= 0) {
+        e.slamState = 1;
+        e.slamTimer = S.windupSeconds;
+        audio.playHorn();
+    }
+    return true;
 }
 
 // Bruxa: tiro no alvo; acerta a tocha também
@@ -283,13 +331,15 @@ export function updateEnemies(dt) {
         } else {
             e.angle = toTargetAngle;
             e.facing = lerpAngle(e.facing ?? e.angle, e.angle, Math.min(1, dt * FACING_SMOOTHING));
-            const lunging = model.lunge && hunting && updateLunge(e, model.lunge, distToTarget, toTargetAngle, dt);
+            const lunging = model.lunge && hunting && !e.chained && updateLunge(e, model.lunge, distToTarget, toTargetAngle, dt);
             // Só mantém distância dentro do campo e antes da reta final: parado fora do mapa, ninguém o alcançaria e a hora não fecharia
             const inField = e.x > e.radius && e.x < state.width - e.radius && e.y > e.radius && e.y < state.height - e.radius;
             const holdsDistance = model.keepDistance && inField && !state.lastStand && distToTarget < model.keepDistance;
+            const slamming = model.torchSlam && hunting && updateTorchSlam(e, model.torchSlam, distCore, dt);
+            if (state.phase !== 'HUNT' && hunting) return;
             const blockedByTorch = e.isBoss && distCore < CORE_MODEL.bossStopDistance + e.radius;
 
-            if (!lunging && !holdsDistance && !blockedByTorch) {
+            if (!lunging && !holdsDistance && !blockedByTorch && !slamming) {
                 const speed = e.speed * (1 - slow);
                 e.x += Math.cos(toTargetAngle) * speed * dt;
                 e.y += Math.sin(toTargetAngle) * speed * dt;
@@ -311,11 +361,20 @@ export function updateEnemies(dt) {
         }
 
         // Boss andando: o chão treme de tempos em tempos (não a cada passo)
-        if (e.isBoss && model.walkShakeIntensity) {
+        if (e.isBoss && model.walkShakeIntensity && !e.chained) {
             e.walkShakeTimer = (e.walkShakeTimer ?? model.walkShakeIntervalSeconds) - dt;
             if (e.walkShakeTimer <= 0) {
                 e.walkShakeTimer = model.walkShakeIntervalSeconds;
                 shakeScreen(model.walkShakeIntensity);
+            }
+        }
+
+        // Monstro pesado: cada passo faz o chão tremer
+        if (model.stepShake && !e.chained) {
+            e.stepTimer = (e.stepTimer ?? model.stepShake.intervalSeconds) - dt;
+            if (e.stepTimer <= 0) {
+                e.stepTimer = model.stepShake.intervalSeconds;
+                shakeScreen(model.stepShake.intensity);
             }
         }
 
@@ -366,7 +425,7 @@ export function updateEnemies(dt) {
         }
 
         // Colisão com Núcleo: o monstro se consome na chama e leva um pedaço dela
-        if (hunting && !e.isBoss && touchesCore && !huntsPlayer) {
+        if (hunting && !e.isBoss && !model.torchSlam && touchesCore && !huntsPlayer) {
             const damage = (model.torchDamage ?? CORE_MODEL.damageTakenPerMonster) * (e.elite ? 2 : 1);
             if (model.explosion) burst(e, model);
             createExplosion(e.x, e.y, e.color, 8);
@@ -374,6 +433,15 @@ export function updateEnemies(dt) {
             hurtTorch(damage, e.x, e.y);
             if (state.phase !== 'HUNT') return;
             onTorchTouched();
+            continue;
+        }
+
+        // Shadow Shackle: vale por último para desfazer tudo que tentou mover o monstro (passos, empurrões, Rift, separação)
+        if (e.chained) {
+            e.x = e.chainX;
+            e.y = e.chainY;
+            e.vx = 0;
+            e.vy = 0;
         }
     }
 }

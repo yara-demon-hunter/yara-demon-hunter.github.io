@@ -50,7 +50,14 @@ function spawnRegular() {
     // Alguns tipos têm limite em campo (o cavaleiro): passado dele, nasce um esqueleto
     const cap = MONSTER_MODELS[type].maxAlive;
     if (cap && state.enemies.filter(e => e.type === type).length >= cap) type = 'SKELETON';
-    addMonster(type, x, y);
+    const e = addMonster(type, x, y);
+    const arrival = MONSTER_MODELS[type].arrival;
+    if (arrival) {
+        showBanner('', arrival.title, arrival.sub, 'danger');
+        audio.playBossRoar();
+        shakeScreen(10);
+    }
+    return e;
 }
 
 // Elite: maior, mais duro, solta um baú ao morrer

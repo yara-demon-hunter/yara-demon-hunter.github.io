@@ -42,6 +42,8 @@ export const TREE_IMAGES = {
     undyingFlame: img('undying-flame'),
     phoenixPact: img('phoenix-pact'),
     shadowRaven: img('shadow-raven'),
+    mirrorWard: img('return-fire'),
+    shadowShackle: img('shadow-shackle'),
     vigil: img('vigil'),
     backdraft: img('backdraft'),
     fireRing: img('hearth-ring'),

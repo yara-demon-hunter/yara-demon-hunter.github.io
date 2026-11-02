@@ -75,9 +75,10 @@ export const TREE_NODES = [
     { id: 'moveSpeed', branch: 'shadow', kind: 'stat', key: 'moveSpeed', x: 0, y: 1.5, requires: [] },
     // Linha das adagas
     { id: 'ricochet', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 0, requires: [req('moveSpeed')] },
-    { id: 'daggerMastery', branch: 'shadow', kind: 'mod', x: 2, y: 0, requires: [req('ricochet', 2)],
+    { id: 'mirrorWard', branch: 'shadow', kind: 'passive', key: 'mirrorWard', x: 2, y: 0, requires: [req('ricochet', 2)] },
+    { id: 'daggerMastery', branch: 'shadow', kind: 'mod', x: 3, y: 0, requires: [req('mirrorWard')],
       name: 'Dagger Mastery', icon: '🔪', desc: 'Your daggers cut deeper, fly farther and faster, and recharge sooner.', levelText: '+15% dagger damage, +12% range, +5% speed, -6% recharge', mods: { knifeDamage: 0.15, knifeRange: 0.12, knifeSpeed: 0.05, knifeCooldown: 0.06 } },
-    { id: 'fanOfKnives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 3, y: 0, requires: [req('daggerMastery', 2)] },
+    { id: 'fanOfKnives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 4, y: 0, requires: [req('daggerMastery', 2)] },
     // Linha da técnica: marcar e carregar
     { id: 'deathMark', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
     { id: 'chargedThrow', branch: 'shadow', kind: 'power', key: 'chargedThrow', x: 3, y: 1, requires: [req('deathMark', 2)] },
@@ -86,10 +87,11 @@ export const TREE_NODES = [
     { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 1, y: 2, requires: [req('moveSpeed', 2)] },
     { id: 'shadowBond', branch: 'shadow', kind: 'power', key: 'shadowBond', x: 2, y: 2, requires: [req('shadowClone')] },
     { id: 'shadowCloneEvolve', branch: 'shadow', kind: 'evolve', key: 'shadowClone', cost: 3, x: 3, y: 2, requires: [req('shadowBond', 5)] },
-    // Caminho da esquiva: Move Speed -> Phantom Rush -> Night Reaper -> Smoke Bomb -> Juramento
+    // Caminho da esquiva: Move Speed -> Phantom Rush -> Night Reaper -> Shadow Shackle -> Smoke Bomb -> Juramento
     { id: 'phantomDash', branch: 'shadow', kind: 'power', key: 'phantomDash', x: 1, y: 3, requires: [req('moveSpeed', 2)] },
     { id: 'phantomEvolve', branch: 'shadow', kind: 'evolve', key: 'phantomDash', x: 2, y: 3, requires: [req('phantomDash', 5)] },
-    { id: 'smokeBomb', branch: 'shadow', kind: 'passive', key: 'smokeBomb', x: 3, y: 3, requires: [req('phantomEvolve')] },
+    { id: 'shadowShackle', branch: 'shadow', kind: 'passive', key: 'shadowShackle', cost: 3, x: 3, y: 3, requires: [req('phantomEvolve')] },
+    { id: 'smokeBomb', branch: 'shadow', kind: 'passive', key: 'smokeBomb', cost: 4, x: 4, y: 3, requires: [req('shadowShackle')] },
     { id: 'oathWhispers', branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, cost: 5, x: 6, y: 1.5, requires: [req('shadowCloneEvolve'), req('smokeBomb')] },
 
     // --- CHAMA: o guardião. Paciência, a tocha, muralhas de fogo ---
@@ -116,8 +118,8 @@ export const TREE_NODES = [
     { id: 'emberEvolve', branch: 'flame', kind: 'evolve', key: 'emberTrail', x: 2, y: 3, cost: 3, requires: [req('emberTrail', 5)] },
     // As armas pegam fogo: saem do Hellwalker
     { id: 'flameBlade', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
-    { id: 'fireballs', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
-    { id: 'oathHearth', branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('phoenixPact'), req('fireRingEvolve')] },
+    { id: 'fireballs', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 0, requires: [req('phoenixPact')] },
+    { id: 'oathHearth', branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('fireballs'), req('fireRingEvolve')] },
 
     // --- MALDIÇÃO: o feiticeiro. Magia, área e distância ---
     { id: 'arcaneStudy', branch: 'curse', kind: 'mod', x: 0, y: 1.5, requires: [],
@@ -129,7 +131,6 @@ export const TREE_NODES = [
     { id: 'novaEvolve', branch: 'curse', kind: 'evolve', key: 'soulNova', x: 3, y: 0, requires: [req('soulNova', 5)] },
     { id: 'starfall', branch: 'curse', kind: 'power', key: 'starfall', x: 4, y: 0, requires: [req('chainLightning', 2)],
       kills: { type: 'VAMPIRE', count: 15, label: 'Vampires' } },
-    { id: 'mirrorWard', branch: 'curse', kind: 'passive', key: 'mirrorWard', x: 5, y: 0, requires: [req('starfall')] },
     // Linha da tempestade: à distância
     { id: 'graveWisp', branch: 'curse', kind: 'power', key: 'graveWisp', x: 1, y: 1, requires: [req('arcaneStudy')] },
     { id: 'occultFocus', branch: 'curse', kind: 'mod', x: 2, y: 1, requires: [req('graveWisp')],

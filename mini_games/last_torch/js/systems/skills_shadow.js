@@ -1,11 +1,13 @@
-import { MASTER_THIEF, SHADOW_RAVEN, SMOKE_BOMB } from '../../data_model/passives.js';
+import { MASTER_THIEF, SHADOW_RAVEN, SHADOW_SHACKLE, SMOKE_BOMB } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
-import { addFloater, createExplosion, hitStop, shakeScreen } from './effects.js';
+import { addFloater, addShockwave, createExplosion, hitStop, shakeScreen } from './effects.js';
 import { dropGold } from './gold.js';
+import { getKnifeRange } from './knives.js';
 import { followRate, wander } from './companions.js';
 import { mod } from './modifiers.js';
+import { startCast } from './moves.js';
 import { nearestEnemy } from './powers.js';
 import { getAtkDamage, getDashCharges } from './stats.js';
 
@@ -250,8 +252,70 @@ function peck(e, dirX, dirY) {
     audio.playCaw();
 }
 
+// --- SHADOW SHACKLE ---
+// Sozinha, a cada recarga: a corrente sai do herói, voa até o monstro mais forte ao alcance da adaga e o prende ao
+// chão. Quem trava a posição é js/systems/enemies.js, pelo e.chained. Desenho em js/render/shackle.js.
+function shackleTarget() {
+    const range = getKnifeRange();
+    let best = null;
+    for (const e of state.enemies) {
+        if (e.hp <= 0 || e.chained || Math.hypot(e.x - player.x, e.y - player.y) > range) continue;
+        if (!best || e.maxHp > best.maxHp) best = e;
+    }
+    return best;
+}
+
+function releaseShackle() {
+    const s = state.shackle;
+    state.shackle = null;
+    if (s?.held) s.target.chained = false;
+}
+
+function bindShackle(s) {
+    const e = s.target;
+    s.held = true;
+    s.age = 0;
+    e.chained = true;
+    e.chainX = e.x;
+    e.chainY = e.y;
+    createExplosion(e.x, e.y, '#a78bfa', 10);
+    addShockwave(e.x, e.y, { radius: e.radius + 34, color: '#a78bfa', width: 4, seconds: 0.3 });
+    shakeScreen(3);
+    audio.playShackle(true);
+}
+
+export function updateShackle(dt) {
+    if (passives.shadowShackle.lvl <= 0) return;
+    if (state.shackleTimer > 0) state.shackleTimer -= dt;
+    const s = state.shackle;
+    if (s) {
+        const e = s.target;
+        if (e.hp <= 0 || !state.enemies.includes(e)) {
+            releaseShackle();
+        } else if (s.held) {
+            s.age += dt;
+            if (s.age >= SHADOW_SHACKLE.holdSeconds) {
+                createExplosion(e.x, e.y, '#a78bfa', 8);
+                releaseShackle();
+            }
+        } else {
+            s.reach += SHADOW_SHACKLE.speed * dt;
+            if (s.reach >= Math.hypot(e.x - player.x, e.y - player.y)) bindShackle(s);
+        }
+        return;
+    }
+    if (state.shackleTimer > 0) return;
+    const target = shackleTarget();
+    if (!target) return;
+    state.shackleTimer = SHADOW_SHACKLE.cooldownSeconds;
+    state.shackle = { target, reach: 0, held: false, age: 0 };
+    startCast();
+    audio.playShackle(false);
+}
+
 export function updateShadowSkills(dt) {
     updateRaven(dt);
+    updateShackle(dt);
     updateSmokes(dt);
     updateEchoes(dt);
     for (let i = state.markBursts.length - 1; i >= 0; i--) {
@@ -261,6 +325,7 @@ export function updateShadowSkills(dt) {
 }
 
 export function clearShadowSkills() {
+    releaseShackle();
     state.smokes.length = 0;
     state.echoes.length = 0;
     state.markBursts.length = 0;

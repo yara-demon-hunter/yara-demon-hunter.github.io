@@ -23,5 +23,8 @@ export const MONSTER_SPRITES = {
     BLOATER: { extent: 1.25, bakeSeconds: 1 / 1.6, playSeconds: 0.7, speed: 33 },
     WRAITH: { extent: 1.9, bakeSeconds: 1 / 2.4, playSeconds: 0.5, speed: 60, floatAmount: 0.06, floatHz: 1.1 },
     ZOMBIE_WOLF: { extent: 2.2, bakeSeconds: 1 / 2.6, playSeconds: 0.4, speed: 85 },
-    HEADLESS_KNIGHT: { extent: 2.3, bakeSeconds: 1, playSeconds: 1, speed: 26 }
+    HEADLESS_KNIGHT: { extent: 2.3, bakeSeconds: 1, playSeconds: 1, speed: 26 },
+    // Passada do esqueleto a 22 de velocidade: 1,8 Hz x 22/70 = ~0,57 ciclos por segundo
+    // live: em campo é desenhado ao vivo (o golpe mexe braço, tronco e espada); o sprite serve ao bestiário e à sombra
+    BONE_COLOSSUS: { extent: 2.6, bakeSeconds: 1 / 0.566, playSeconds: 1.8, speed: 22, live: true }
 };

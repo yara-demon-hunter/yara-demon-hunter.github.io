@@ -43,6 +43,7 @@
         import { WITCH_VISUALS } from '../data_model/visuals/monsters/witch_visual.js';
         import { canvas, ctx, player, state } from '../js/core/state.js';
         import { renderBat } from '../js/render/bat.js';
+        import { COLOSSUS_ATTACK_SECONDS, colossusCharge, renderBoneColossus, setColossusAttackClock } from '../js/render/bone_colossus.js';
         import { renderBloater } from '../js/render/bloater.js';
         import { renderDemonFireball, renderDemonLord } from '../js/render/demon_lord.js';
         import { drawGlow } from '../js/render/fx/glow.js';
@@ -80,7 +81,8 @@
             ['BLOATER', 'Bloater', renderBloater],
             ['WRAITH', 'Wraith', renderWraith],
             ['ZOMBIE_WOLF', 'Zombie Wolf', renderZombieWolf],
-            ['HEADLESS_KNIGHT', 'Headless Knight', renderHeadlessKnight]
+            ['HEADLESS_KNIGHT', 'Headless Knight', renderHeadlessKnight],
+            ['BONE_COLOSSUS', 'Bone Colossus', renderBoneColossus]
         ].map(([key, name, draw]) => ({ key, name, draw, model: MONSTER_MODELS[key], note: `hora ${TURN_DIFFICULTY.monsterUnlockTurn[key]}+` }));
         const bosses = Object.entries(BOSS_MODELS).map(([key, model]) => ({ key, name: model.name, draw: boss(model), model, isBoss: true, note: `boss, hora ${bossHour(key)}` }));
 
@@ -103,7 +105,9 @@
         });
 
         // Destaques vindos das prévias antigas, seguidos de uma linha por monstro
-        const HERO_HEIGHT = 560;
+        const COLOSSUS_TOP = 560;
+        const COLOSSUS_HEIGHT = 600;
+        const HERO_HEIGHT = COLOSSUS_TOP + COLOSSUS_HEIGHT;
         const ROW_HEIGHT = 38 + CELL + 14;
         const WIDTH = 1200;
         const HEIGHT = HERO_HEIGHT + rows.length * ROW_HEIGHT + 16;
@@ -122,6 +126,7 @@
             nav.appendChild(button);
         };
         jump('Destaques', 0);
+        jump('Golpe do Colosso', COLOSSUS_TOP);
         rows.forEach(row => jump(row.name, row.top));
 
         function text(str, x, y, size = 13, color = '#cbd5e1', weight = 400) {
@@ -207,9 +212,60 @@
         const W = MONSTER_MODELS.WITCH;
         const bolt = { x: 0, y: 20, vx: W.projectileSpeed, vy: 0, radius: W.projectileRadius, color: W.color };
 
+        // Golpe do Colosso: em tamanho grande, na distância real da tocha, e os momentos-chave lado a lado
+        const colossusRow = rows.find(r => r.key === 'BONE_COLOSSUS');
+        const colossusGap = MONSTER_MODELS.BONE_COLOSSUS.torchSlam.range + MONSTER_MODELS.BONE_COLOSSUS.radius;
+        const colossusLive = make(colossusRow, 0, 0.5);
+        const COLOSSUS_REST_SECONDS = 0.8;
+        const S = MONSTER_MODELS.BONE_COLOSSUS.torchSlam;
+        const colossusFrames = [
+            ['Início', 0.12],
+            ['Recuando', 0.45],
+            ['Braço atrás', S.windupSeconds - 0.05],
+            ['Indo à frente', S.windupSeconds + S.strikeSeconds * 0.7],
+            ['Impacto', S.windupSeconds + S.strikeSeconds + 0.03],
+            ['Voltando', S.windupSeconds + S.strikeSeconds + S.recoverSeconds * 0.65]
+        ].map(([label, seconds], i) => ({ label, seconds, e: make(colossusRow, 0, i) }));
+
+        function drawColossusScene(e, charge) {
+            const torchX = e.x + colossusGap;
+            drawGlow(ctx, '#ef4444', torchX, e.y, 50 + charge * 90, charge * 0.85);
+            drawGlow(ctx, '#fb923c', torchX, e.y, 34, 0.9);
+            ctx.fillStyle = '#fef3c7';
+            ctx.beginPath();
+            ctx.arc(torchX, e.y, 9, 0, Math.PI * 2);
+            ctx.fill();
+            renderBoneColossus(e);
+        }
+
+        function drawColossusAttack(now) {
+            const y = COLOSSUS_TOP;
+            text('Golpe do Colosso na tocha (ciclo real, na distância em que ele para)', 24, y + 22, 15, '#fde68a', 700);
+            const cycle = COLOSSUS_ATTACK_SECONDS + COLOSSUS_REST_SECONDS;
+            const clock = (now / 1000) % cycle;
+            setColossusAttackClock(colossusLive, Math.min(clock, COLOSSUS_ATTACK_SECONDS));
+            const zoom = 0.95;
+            panel(24, y + 34, 1152, 340, zoom, () => {
+                colossusLive.x = 480;
+                colossusLive.y = 180;
+                drawColossusScene(colossusLive, colossusCharge(colossusLive));
+            });
+            colossusFrames.forEach((f, i) => {
+                const x = 24 + i * (CELL + GAP);
+                setColossusAttackClock(f.e, f.seconds);
+                panel(x, y + 386, CELL, CELL, 0.4, () => {
+                    f.e.x = 150;
+                    f.e.y = 232;
+                    drawColossusScene(f.e, colossusCharge(f.e));
+                });
+                text(f.label, x + 4, y + 386 + CELL + 16, 12, '#64748b');
+            });
+        }
+
         function drawHighlights(dt, now) {
             ctx.fillStyle = '#050b16';
             ctx.fillRect(0, 0, WIDTH, HERO_HEIGHT);
+            drawColossusAttack(now);
             text('Destaques', 24, 32, 20, '#f87171', 700);
 
             demon.shootTimer = D.patternGapSeconds - ((now / 1000) % D.patternGapSeconds);

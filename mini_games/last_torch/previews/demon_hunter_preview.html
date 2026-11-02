@@ -11,15 +11,15 @@
 </head>
 <body>
     <!-- Página de desenvolvimento: tudo do herói (corrida, golpes, dash, efeitos, heróis alternativos, clone, Juramentos,
-         golpes especiais, skills dos quatro ramos, a fênix do Phoenix Pact, o corvo do Shadow Raven e o arremesso da adaga; as armas em detalhe ficam em weapon_previews.html)
+         golpes especiais, skills dos quatro ramos, a fênix do Phoenix Pact, o corvo do Shadow Raven, a corrente do Shadow Shackle e o arremesso da adaga; as armas em detalhe ficam em weapon_previews.html)
          usando o código real do jogo. Como abrir: previews/README.md -->
-    <canvas id="gameCanvas" width="1200" height="7700"></canvas>
+    <canvas id="gameCanvas" width="1200" height="7970"></canvas>
     <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
     <script>
         if (location.protocol === 'file:') {
             const g = document.getElementById('gameCanvas').getContext('2d');
             g.fillStyle = '#050b16';
-            g.fillRect(0, 0, 1200, 7700);
+            g.fillRect(0, 0, 1200, 7970);
             g.textAlign = 'center';
             g.fillStyle = '#fbbf24';
             g.font = '600 26px system-ui, sans-serif';
@@ -39,7 +39,7 @@
         import { OATH_VISUALS } from '../data_model/visuals/characters/oath_visual.js';
         import { SHADOW_CLONE_VISUALS } from '../data_model/visuals/characters/shadow_clone_visual.js';
         import { KNIFE_VISUALS as K } from '../data_model/visuals/effects/knife_visual.js';
-        import { FIREBALLS, PHOENIX_PACT } from '../data_model/passives.js';
+        import { FIREBALLS, PHOENIX_PACT, SHADOW_SHACKLE } from '../data_model/passives.js';
         import { PHOENIX_VISUALS } from '../data_model/visuals/effects/phoenix_visual.js';
         import { RAVEN_VISUALS } from '../data_model/visuals/effects/raven_visual.js';
         import { SLASH_VISUALS } from '../data_model/visuals/effects/slash_visual.js';
@@ -50,7 +50,7 @@
         import { renderShadowClone } from '../js/render/shadow_clone.js';
         import { addCracks } from '../js/systems/skills_blade.js';
         import { updatePhoenix } from '../js/systems/skills_flame.js';
-        import { updateRaven } from '../js/systems/skills_shadow.js';
+        import { updateRaven, updateShackle } from '../js/systems/skills_shadow.js';
         import { renderShockwaves } from '../js/render/effects.js';
         import { renderBladeSlashes, renderKnives } from '../js/render/entities.js';
         import { renderGroundFires } from '../js/render/powers.js';
@@ -61,6 +61,7 @@
         import { createHeroAnim, heroAnim, updateHeroAnim } from '../js/render/player.js';
         import { drawPhoenixArt, renderPhoenixBird } from '../js/render/phoenix.js';
         import { drawRavenArt, renderRavenBird } from '../js/render/raven.js';
+        import { renderShackle } from '../js/render/shackle.js';
         import { renderPlayer25D } from '../js/render/player25d.js';
         import { renderBolts, renderDashGhosts, renderLightning } from '../js/render/powers.js';
         import { renderReflectWard } from '../js/render/reflect.js';
@@ -71,7 +72,7 @@
 
         state.gameState = 'PLAYING';     // o herói só anima durante a partida
         const WIDTH = 1200;
-        const HEIGHT = 7700;
+        const HEIGHT = 7970;
         const start = performance.now();
         let last = start;
 
@@ -208,6 +209,8 @@
             b.y += Math.sin(s.heading) * s.speed * dt;
             Object.assign(player, b);
             if (s.guard) loadGuard(s);
+            // A corrente é uma só no estado do jogo: só as cenas dela a colocam de volta (shackleLoop)
+            state.shackle = null;
             s.before?.(s, dt);
             Object.assign(player, b);
             updateHeroAnim(s.anim, player);
@@ -241,6 +244,7 @@
                     ctx.fill();
                 });
                 renderMonsterCurses();
+                renderShackle();
                 renderDashGhosts();
                 renderLevelUpBack();
                 renderSkillAuras();
@@ -355,7 +359,7 @@
             ['dash', scene({ heading: 0, before: dashLoop })],
             ['levando dano', scene({ before: hurtLoop })],
             ['subindo de nível', scene({ before: levelLoop })],
-            ['Mirror Ward (pronto)', scene({ ward: true })]
+            ['Return Fire (pronto)', scene({ ward: true })]
         ];
 
         const heroes = Object.values(HEROES).map(hero => [hero.name, scene({ speed: 150, heading: 0.5, colors: hero.colors ?? HERO_25D_VISUALS.colors })]);
@@ -687,6 +691,34 @@
             ['Corvo: dois alvos', scene({ skills: ['shadowRaven'], fx: { ...createFx(), enemies: [target(86, -14), target(-92, 30)] }, before: flyRaven })]
         ];
 
+        // --- CORRENTE ---
+        // Roda a skill de verdade (updateShackle), encurtando a espera: cada cena guarda a própria corrente
+        function shackleLoop(s, dt) {
+            s.clock = (s.clock ?? 0) + dt;
+            state.shackle = s.shackle ?? null;
+            state.shackleTimer = s.shackleTimer ?? 0.5;
+            state.enemies = s.fx.enemies;
+            s.fx.enemies.forEach(e => { e.x = e.chained ? e.chainX : e.homeX; e.y = e.chained ? e.chainY : e.homeY; });
+            passives.shadowShackle.lvl = 1;
+            // Pula do começo direto para os últimos 2,5s presos, para o ciclo inteiro caber na prévia
+            if (s.clock > 2 && state.shackle?.held && state.shackle.age < SHADOW_SHACKLE.holdSeconds - 2.5) state.shackle.age = SHADOW_SHACKLE.holdSeconds - 2.5;
+            updateShackle(dt);
+            if (!state.shackle && s.shackle) {
+                s.clock = 0;
+                state.shackleTimer = 0.7;
+            }
+            s.shackle = state.shackle;
+            s.shackleTimer = state.shackleTimer;
+        }
+
+        const chainTarget = (dx, dy, extra) => dummy(dx, dy, { hp: 1e9, maxHp: 1e9, homeX: dx, homeY: dy, vx: 0, vy: 0, ...extra });
+        const shackleFx = [
+            ['Corrente: lança e prende', scene({ skills: ['shadowShackle'], fx: { ...createFx(), enemies: [chainTarget(118, -18)] }, before: shackleLoop })],
+            ['Corrente: boss', scene({ skills: ['shadowShackle'], fx: { ...createFx(), enemies: [chainTarget(-120, 16, { radius: 34 })] }, before: shackleLoop })],
+            ['Corrente: escolhe o mais forte', scene({ skills: ['shadowShackle'], fx: { ...createFx(), enemies: [chainTarget(70, 44, { maxHp: 10 }), chainTarget(122, -34, { maxHp: 2e9 })] }, before: shackleLoop })],
+            ['Corrente: de perto', scene({ skills: ['shadowShackle'], fx: { ...createFx(), enemies: [chainTarget(66, -6)] }, before: shackleLoop })]
+        ];
+
         // Bola de fogo em loop: voa até o primeiro alvo, explode e deixa os vizinhos em chamas
         function fireballLoop(s, dt) {
             s.fx.enemies.forEach(e => { e.burnTimer = Math.max(0, (e.burnTimer ?? 0) - dt); });
@@ -839,7 +871,7 @@
         }
         const everyScene = new Map([
             ...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
-            ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...ravenFx, ...ravenTeam, ...flameArms, ...curseFx
+            ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...ravenFx, ...ravenTeam, ...shackleFx, ...flameArms, ...curseFx
         ]);
 
         function gallery(title, top, items, zoom = 2.3) {
@@ -981,10 +1013,10 @@
             });
 
             [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
-                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...ravenFx, ...ravenTeam, ...flameArms, ...curseFx].forEach(([, s]) => { s.dt = dt; });
+                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...ravenFx, ...ravenTeam, ...shackleFx, ...flameArms, ...curseFx].forEach(([, s]) => { s.dt = dt; });
             gallery('Poses', 300, poses);
             gallery('Golpes (com a marca do corte)', 570, swings, 1.7);
-            gallery('Dash, dano, nível e Mirror Ward', 840, effects, 1.9);
+            gallery('Dash, dano, nível e Return Fire', 840, effects, 1.9);
             gallery('Heróis e Shadow Clone', 1110, [...heroes, ['Shadow Clone', clone]], 2);
 
             gallery('Juramentos: as quatro formas', 1380, oathIdle, 2.5);
@@ -1006,7 +1038,8 @@
             gallery('Shadow Raven: o corvo em ação', 5990, ravenFx, 1.02);
             gallery('Shadow Raven: com a fênix e o Grave Wisp', 6260, ravenTeam, 1.02);
             drawRavenSection(now, 6530);
-            drawKnifeSection(now, 6860);
+            gallery('Shadow Shackle: a corrente em ação', 6860, shackleFx, 0.8);
+            drawKnifeSection(now, 7130);
             requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);

@@ -25,6 +25,7 @@ import { setWorldView } from './fx/stamp.js';
 import { renderRavenBird } from './raven.js';
 import { renderPhoenixBird } from './phoenix.js';
 import { renderPickups } from './pickups.js';
+import { renderShackle } from './shackle.js';
 import { heroAnim } from './player.js';
 import {
     renderBolts, renderChillAura, renderDashGhosts, renderGroundFires, renderLightning,
@@ -143,6 +144,7 @@ export function render() {
     renderEnemyProjectiles();
     renderEnemies();
     renderMonsterCurses();
+    renderShackle();
     renderSmokes();
     renderGibs();
     renderKnifeAim();

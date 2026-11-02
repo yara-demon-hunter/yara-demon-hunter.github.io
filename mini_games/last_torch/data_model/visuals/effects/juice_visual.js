@@ -54,6 +54,7 @@ export const JUICE_VISUALS = {
         WRAITH: { count: 5, colors: ['#a5f3fc', '#0e7490', '#ecfeff'], shape: 'shard', stain: 'rgba(6, 30, 38, 0.42)' },
         ZOMBIE_WOLF: { count: 6, colors: ['#2b2744', '#a78bfa', '#0d0b17'], shape: 'shard', stain: 'rgba(20, 10, 40, 0.55)' },
         HEADLESS_KNIGHT: { count: 9, colors: ['#4f576b', '#2b3140', '#a5f3fc'], shape: 'shard', stain: 'rgba(10, 12, 20, 0.6)' },
+        BONE_COLOSSUS: { count: 16, colors: ['#c9bfa3', '#8a806a', '#fb923c'], shape: 'bone', stain: 'rgba(30, 24, 14, 0.6)' },
         NECROMANCER: { count: 6, colors: ['#86efac', '#14532d', '#e7e0cf'], shape: 'bone', stain: 'rgba(6, 30, 16, 0.55)' },
         ROCK: { count: 9, colors: ['#78716c', '#57534e', '#a8a29e'], shape: 'shard', stain: 'rgba(12, 10, 8, 0.4)' },
         HERO: { count: 20, colors: ['#07222d', '#0b2f3c', '#38bdf8', '#e8eef2'], shape: 'shard', stain: 'rgba(4, 14, 20, 0.6)' },

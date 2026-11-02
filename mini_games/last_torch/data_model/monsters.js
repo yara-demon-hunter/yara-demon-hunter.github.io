@@ -197,6 +197,36 @@ export const MONSTER_MODELS = {
         xpRewardBase: 26,
         xpRewardPerTurn: 3
     },
+    // Colosso de Ossos: esqueleto gigante com um montante pesado. Não liga para o herói (não dá para provocar),
+    // marcha reto para a tocha e a golpeia com a espada: metade da vida máxima dela no primeiro golpe. Lento, enorme e muito resistente.
+    BONE_COLOSSUS: {
+        spawnWeight: 0.03,
+        maxAlive: 1,                     // no máximo um em campo
+        hpBase: 1600,
+        hpPerTurn: 180,
+        speedMin: 22,
+        speedMax: 22,
+        radius: 54,
+        color: '#c9bfa3',
+        damage: 40,
+        knockbackResist: 0.95,
+        immovable: true,                 // os outros monstros não o empurram
+        ignoresPlayer: true,
+        // Para perto da tocha, levanta a espada (aviso) e desce: o 1º golpe arranca metade da vida máxima dela,
+        // os seguintes uma fração menor. Segue em campo até morrer: dá tempo de matá-lo.
+        // A espada vem da direita para a frente: quem estiver nesse leque (sweep) leva o dano de contato dele.
+        // Ângulos em radianos a partir da direção da tocha; positivo é a direita dele.
+        torchSlam: { range: 125, windupSeconds: 1.1, strikeSeconds: 0.16, recoverSeconds: 0.7, cooldownSeconds: 3.5, firstRatio: 0.5, repeatRatio: 0.2, sweep: { radius: 200, fromAngle: -0.4, toAngle: 1.35 } },
+        stepShake: { intensity: 5, intervalSeconds: 0.9 },   // um tremor por passo (2 passos por ciclo da animação)
+        arrival: { title: 'THE BONE COLOSSUS', sub: 'It marches for the torch' },
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 150,
+        goldBase: 45,
+        goldVariance: 0.5,
+        xpRewardBase: 60,
+        xpRewardPerTurn: 5
+    },
     // Necromante: fica longe e levanta esqueletos até alguém ir buscá-lo.
     NECROMANCER: {
         spawnWeight: 0.06,
@@ -229,7 +259,7 @@ export const MONSTER_SPAWNING = {
     separationStrength: 60
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];
@@ -252,6 +282,7 @@ export function createEnemy(model, type, turn, x, y, random = Math.random) {
         hp, maxHp: hp,
         speed, radius: model.radius, color: model.color, type, damage: model.damage * difficulty.damageMultiplier,
         knockbackResist: model.knockbackResist,
+        immovable: model.immovable,
         shootTimer: model.initialShootCooldownSeconds,
         angle: 0,                        // direção do movimento (usada só no desenho)
         phase: random() * Math.PI * 2    // defasagem das animações (cada monstro bate asa/pulsa diferente)

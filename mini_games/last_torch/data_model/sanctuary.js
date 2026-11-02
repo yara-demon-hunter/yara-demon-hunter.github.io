@@ -67,6 +67,7 @@ const MONSTER_ENTRIES = [
     { key: 'ZOMBIE_WOLF', name: 'Zombie Wolf', icon: '🐺' },
     { key: 'WRAITH', name: 'Wraith', icon: '👻' },
     { key: 'HEADLESS_KNIGHT', name: 'Headless Knight', icon: '🛡️' },
+    { key: 'BONE_COLOSSUS', name: 'Bone Colossus', icon: '🦴' },
     { key: 'NECROMANCER', name: 'Necromancer', icon: '☠️' }
 ];
 const BOSS_ICONS = { DEMON_LORD: '😈', BLOOD_COUNTESS: '🩸', LONG_NIGHT: '🌑' };

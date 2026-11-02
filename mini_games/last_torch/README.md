@@ -75,7 +75,7 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   world.js                        tamanho padronizado do mundo e zoom (areaScale) por perfil desktop/mobile
   visuals/                        cores, tamanhos e ritmos das animações (arte procedural)
     characters/                   herói, formas dos Juramentos (oath_visual.js) e Shadow Clone
-    monsters/                     um arquivo por monstro (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, headless_knight) e sprites_visual.js (quadros dos sprites)
+    monsters/                     um arquivo por monstro (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, headless_knight, bone_colossus) e sprites_visual.js (quadros dos sprites)
     bosses/                       Demon Lord e paletas de quem reaproveita arte (palettes_visual.js)
     scenery/                      cenário (forest_visual.js, torch_visual.js)
     items/gold_visual.js          ouro
@@ -122,6 +122,7 @@ js/
   render/powers.js                desenho dos poderes
   render/skills.js                desenho das skills dos ramos (rachaduras, fendas, anel de fogo, marcas, escudo...)
   render/phoenix.js               fênix do Phoenix Pact: arte procedural guardada em atlas e voo em campo
+  render/shackle.js                corrente do Shadow Shackle: elos e estacas em sprites prontos
   render/raven.js                  corvo do Shadow Raven: arte procedural em atlas e voo em campo
   render/pickups.js               itens e baús
   render/monster_sprites.js       gera os sprites dos monstros e dos tiros a partir da arte procedural

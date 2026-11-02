@@ -4,9 +4,10 @@ Páginas de desenvolvimento para analisar a arte com o código real do jogo. O j
 
 | Arquivo | O que mostra |
 |---|---|
+| `index.html` | Página inicial: um botão para cada prévia abaixo |
 | `monsters_preview.html` | Todos os monstros e bosses: quatro direções, levando dano e no tamanho do jogo |
 | `weapon_previews.html` | A adaga e a espada em detalhe, com as partes legendadas, e as formas de cada uma (carga, bola de fogo, Fúria, Flaming Sword, Juramentos e heróis) |
-| `demon_hunter_preview.html` | Tudo do herói: corrida, poses, golpes, dash, efeitos, os heróis alternativos, o Shadow Clone, as formas dos Juramentos, os golpes especiais quadro a quadro, as skills dos quatro ramos, a fênix do Phoenix Pact (voo, bolas de fogo, morte, renascimento e a batida de asa quadro a quadro) e o arremesso da adaga |
+| `demon_hunter_preview.html` | Tudo do herói: corrida, poses, golpes, dash, efeitos, os heróis alternativos, o Shadow Clone, as formas dos Juramentos, os golpes especiais quadro a quadro, as skills dos quatro ramos, a fênix do Phoenix Pact (voo, bolas de fogo, morte, renascimento e a batida de asa quadro a quadro), o corvo do Shadow Raven, a corrente do Shadow Shackle e o arremesso da adaga |
 
 ## Como abrir
 
@@ -19,12 +20,10 @@ As páginas usam módulos ES, e o navegador os bloqueia em arquivos abertos dire
    python3 -m http.server 8000
    ```
 
-2. No navegador, abra:
-
-   - <http://localhost:8000/previews/monsters_preview.html>
-   - <http://localhost:8000/previews/demon_hunter_preview.html>
-   - <http://localhost:8000/previews/weapon_previews.html>
-
+2. No navegador, abra a página inicial
+   ```bash
+   http://localhost:8000/previews/
+   ```
 3. Para parar o servidor, volte ao terminal e aperte `Ctrl+C`.
 
 Se a porta 8000 estiver ocupada, troque o número nos dois lugares (por exemplo, `python3 -m http.server 8001` e `localhost:8001`).

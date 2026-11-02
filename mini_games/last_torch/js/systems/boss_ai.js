@@ -90,6 +90,9 @@ const ACTIONS = {
         const d = 240 + Math.random() * 160;
         e.x = Math.max(70, Math.min(state.width - 70, player.x + Math.cos(a) * d));
         e.y = Math.max(90, Math.min(state.height - 70, player.y + Math.sin(a) * d));
+        // Shadow Shackle: o teleporte funciona, e a corrente segue o boss até o ponto novo
+        e.chainX = e.x;
+        e.chainY = e.y;
         createExplosion(e.x, e.y, model.color, 26);
         addShockwave(e.x, e.y, { radius: 110, color: model.color, width: 5, seconds: 0.35 });
         audio.playDash();

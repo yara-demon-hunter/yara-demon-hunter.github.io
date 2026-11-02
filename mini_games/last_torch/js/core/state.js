@@ -156,6 +156,9 @@ export const state = {
     phoenix: { x: 0, y: 0, placed: false, side: 1, facing: -1, look: 0, tilt: 0, flash: 0, rise: 1 },
     // Corvo em campo. mode: 'home' (em volta do herói) ou 'dive' (indo bicar); dive: 0 a 1, para o desenho; rise: 0 a 1 ao surgir
     raven: { x: 0, y: 0, placed: false, side: 1, facing: -1, tilt: 0, mode: 'home', target: null, timer: 1, diveTime: 0, dive: 0, rise: 1 },
+    // Corrente do Shadow Shackle: recarga e a corrente em campo { target, reach, held, age }. Só existe uma: a recarga é maior que o tempo preso
+    shackleTimer: 0,
+    shackle: null,
     crescents: [],
     cracks: [],
     aftershocks: [],

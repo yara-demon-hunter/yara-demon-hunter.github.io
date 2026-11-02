@@ -46,6 +46,7 @@ export function resetSkills() {
     state.phoenixSpent = false;
     state.phoenix.placed = false;
     state.raven.placed = false;
+    state.shackleTimer = 0;
     player.move = null;
     player.castAge = -1;
     player.stillTime = 0;

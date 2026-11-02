@@ -11,6 +11,7 @@ import {
 import { VAMPIRE_VISUALS } from '../../data_model/visuals/monsters/vampire_visual.js';
 import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
 import { ZOMBIE_WOLF_VISUALS } from '../../data_model/visuals/monsters/zombie_wolf_visual.js';
+import { BONE_COLOSSUS_VISUALS } from '../../data_model/visuals/monsters/bone_colossus_visual.js';
 import { HEADLESS_KNIGHT_VISUALS } from '../../data_model/visuals/monsters/headless_knight_visual.js';
 import { WRAITH_VISUALS } from '../../data_model/visuals/monsters/wraith_visual.js';
 import { BOSS_PALETTES, NECROMANCER_COLORS } from '../../data_model/visuals/bosses/palettes_visual.js';
@@ -26,6 +27,7 @@ import { renderSkeleton } from './skeleton.js';
 import { renderVampire } from './vampire.js';
 import { renderWitch, renderWitchBolt } from './witch.js';
 import { renderZombieWolf } from './zombie_wolf.js';
+import { renderBoneColossus } from './bone_colossus.js';
 import { renderHeadlessKnight } from './headless_knight.js';
 import { renderWraith } from './wraith.js';
 
@@ -59,7 +61,8 @@ const ART = {
     BLOATER: { visual: BLOATER_VISUALS, draw: renderBloater },
     WRAITH: { visual: WRAITH_VISUALS, draw: renderWraith },
     ZOMBIE_WOLF: { visual: ZOMBIE_WOLF_VISUALS, draw: renderZombieWolf },
-    HEADLESS_KNIGHT: { visual: HEADLESS_KNIGHT_VISUALS, draw: renderHeadlessKnight }
+    HEADLESS_KNIGHT: { visual: HEADLESS_KNIGHT_VISUALS, draw: renderHeadlessKnight },
+    BONE_COLOSSUS: { visual: BONE_COLOSSUS_VISUALS, draw: renderBoneColossus }
 };
 
 const sprites = {};

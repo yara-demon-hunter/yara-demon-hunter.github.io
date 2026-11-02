@@ -24,14 +24,15 @@ function getAnim(e) {
             stride: e.phase,
             facing: e.angle,
             lastHp: e.hp,
-            rattle: 0           // 1 ao levar dano, cai até 0
+            rattle: 0,          // 1 ao levar dano, cai até 0
+            walking: 1          // 0 com os pés plantados: some o cambaleio
         };
         animBySkeleton.set(e, a);
     }
     return a;
 }
 
-function updateAnim(e, a) {
+function updateAnim(e, a, planted) {
     const now = renderNow();
     const dt = Math.min((now - a.lastTime) / 1000, 0.05);
     a.lastTime = now;
@@ -48,7 +49,8 @@ function updateAnim(e, a) {
 
     const speed = Math.min(600, Math.hypot(dx, dy) / dt);
     a.speed += (speed - a.speed) * Math.min(1, dt * 6);
-    a.stride += dt * V.walkHz * Math.PI * 2 * Math.max(0.3, a.speed / V.walkReferenceSpeed);
+    a.walking += ((planted ? 0 : 1) - a.walking) * Math.min(1, dt * 6);
+    if (!planted) a.stride += dt * V.walkHz * Math.PI * 2 * Math.max(0.3, a.speed / V.walkReferenceSpeed);
     a.facing = lerpAngle(a.facing, e.angle, Math.min(1, dt * V.turnSmoothing));
     a.rattle = Math.max(0, a.rattle - dt / V.rattleSeconds);
 }
@@ -185,13 +187,17 @@ function drawRibsAndCollarbones(r, boneColor) {
     bone([[sx, -spread], [sx + r * 0.07, 0], [sx, spread]], r * 0.075, boneColor);
 }
 
-// Braços esticados à frente, balançando ao contrário das pernas; mãos com 3 garras
-function drawArms(r, a, boneColor, shake) {
+// Braços esticados à frente, balançando ao contrário das pernas; mãos com 3 garras.
+// held (Colosso de Ossos): move o braço direito (reach à frente, spread para fora, em raios) e desenha o que a mão segura
+function drawArms(r, a, boneColor, shake, held) {
     for (const side of [-1, 1]) {
         const swing = Math.sin(a.stride + (side > 0 ? Math.PI : 0)) * r * V.armSwing;
+        const pushX = side > 0 && held ? held.reach * r : 0;
+        const pushY = side > 0 && held ? held.spread * r : 0;
         const shoulder = [r * V.shoulderX, side * r * V.shoulderSpread];
-        const elbow = [r * V.elbowX + swing * 0.5 + shake(side), side * r * V.elbowSpread];
-        const hand = [r * V.handX + swing + shake(side + 1), side * r * V.handSpread + shake(side + 2)];
+        const elbow = [r * V.elbowX + swing * 0.5 + pushX * 0.5 + shake(side), side * r * V.elbowSpread + pushY * 0.5];
+        const hand = [r * V.handX + swing + pushX + shake(side + 1), side * r * V.handSpread + pushY + shake(side + 2)];
+        if (side > 0) held?.draw(hand, r);
         bone([shoulder, elbow, hand], r * V.boneWidth, boneColor);
         joint(shoulder[0], shoulder[1], r * V.jointRadius * 1.3, boneColor);
         joint(elbow[0], elbow[1], r * V.jointRadius, boneColor);
@@ -286,14 +292,15 @@ function drawSkull(r, t, phase, pulse, boneColor, shake) {
     ctx.restore();
 }
 
-export function renderSkeleton(e) {
+// pose (Colosso de Ossos): planted para a passada e held é o braço direito com a espada (ver drawArms)
+export function renderSkeleton(e, pose = {}) {
     const c = V.colors;
     const t = renderNow() / 1000;
     const r = e.radius * V.scale;
     const a = getAnim(e);
-    updateAnim(e, a);
+    updateAnim(e, a, pose.planted);
 
-    const sway = Math.sin(a.stride) * V.swayAmount;
+    const sway = Math.sin(a.stride) * V.swayAmount * a.walking;
     const pulse = 0.5 + 0.5 * Math.sin(t * V.soulPulseHz * Math.PI * 2 + e.phase);
     const boneColor = a.rattle > 0.5 ? c.hurtFlash : c.bone;
     // Chacoalhar ao levar dano: cada osso treme desencontrado
@@ -316,7 +323,7 @@ export function renderSkeleton(e) {
     drawPelvisAndSpine(r, boneColor);
     drawSoul(r, pulse);
     drawRibsAndCollarbones(r, boneColor);
-    drawArms(r, a, boneColor, shake);
+    drawArms(r, a, boneColor, shake, pose.held);
     drawSkull(r, t, e.phase, pulse, boneColor, shake);
 
     ctx.restore();
