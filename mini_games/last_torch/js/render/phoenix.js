@@ -275,8 +275,13 @@ function buildAtlas() {
     return atlas;
 }
 
+// Monta o atlas e o desenha uma vez fora da tela: o navegador sobe a imagem para a placa de vídeo no primeiro
+// desenho, e é melhor que isso aconteça aqui do que no primeiro quadro em que a ave aparece
 export function preparePhoenix() {
-    return atlas ?? buildAtlas();
+    if (atlas) return atlas;
+    buildAtlas();
+    makeCanvas(1, 1).getContext('2d').drawImage(atlas.canvas, 0, 0, atlas.cellW, atlas.cellH, 0, 0, 1, 1);
+    return atlas;
 }
 
 // Ave em (x, y) no mundo. size multiplica o tamanho normal; facing: 1 = direita, -1 = esquerda.

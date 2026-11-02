@@ -4,6 +4,7 @@ import { RELIC_BY_ID } from '../../data_model/relics.js';
 import { TREE_BY_ID, TREE_COSTS, TREE_NODES } from '../../data_model/tree.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, powers, state } from '../core/state.js';
+import { preparePhoenix } from '../render/phoenix.js';
 import { showToast } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { getStatText } from '../ui/status.js';
@@ -171,6 +172,8 @@ export function buyNode(id) {
 
     if (node.kind === 'passive' || node.kind === 'relic') {
         passives[node.key].lvl++;
+        // O sprite da fênix leva um instante para montar: melhor agora, com a tela de skills aberta, do que no meio da luta
+        if (node.key === 'phoenixPact') preparePhoenix();
         state.revives += passives[node.key].mods?.revives ?? 0;
         state.skillPoints += passives[node.key].grantPoints ?? 0;
         if (node.oath) {
