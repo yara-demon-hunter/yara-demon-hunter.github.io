@@ -143,6 +143,13 @@
     border-color: rgba(196, 181, 253, 0.85);
     box-shadow: 0 0 14px rgba(139, 92, 246, 0.45);
 }
+#dashButton img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    pointer-events: none;
+}
 #dashButton b {
     position: absolute;
     right: -0.1rem;

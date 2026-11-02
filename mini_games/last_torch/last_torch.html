@@ -81,6 +81,8 @@ permalink: /mini_games/last_torch/last_torch.html
         <span>STREAK</span>
         <i><u id="streakBar"></u></i>
     </div>
+    <!-- Lembrete dos botões do mouse, sempre discreto (só no computador) -->
+    <p id="mouseHint" class="desktop-only">🖱️ Left click: dagger · Right click: dash</p>
 </div>
 
 <!-- Avisos: faixa central, grito de sequência e notificações -->
@@ -140,7 +142,7 @@ permalink: /mini_games/last_torch/last_torch.html
     <div id="knifeButtonKnob">🗡️</div>
 </div>
 <!-- Botão do dash -->
-<div id="dashButton" aria-label="Dash">💨<b id="dashCharges"></b></div>
+<div id="dashButton" aria-label="Dash"><img src="images/buttons/phantom-rush-small.webp" alt="" draggable="false"><b id="dashCharges"></b></div>
 
 <!-- AVISO DE VIRAR O APARELHO (celular em pé; o jogo é jogado de lado). Styles in css/components/orientation.css -->
 <div id="rotateNotice" role="alert">
@@ -318,7 +320,7 @@ permalink: /mini_games/last_torch/last_torch.html
                 <div class="settings-row">
                     <button data-setting="keyboard" class="setting-toggle">⌨️ Move with arrow keys / WASD</button>
                 </div>
-                <p class="settings-hint">The hero follows the mouse until you press a move key; then the keys walk and the mouse only aims. Space and Shift dash either way.</p>
+                <p class="settings-hint">The hero follows the mouse until you press a move key; then the keys walk and the mouse only aims. Left click throws a dagger. Right click, Space and Shift dash either way.</p>
             </section>
         </div>
         <!-- Voltar à caçada e sair para o menu, lado a lado -->

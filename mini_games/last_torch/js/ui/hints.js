@@ -8,8 +8,8 @@ const touch = () => window.matchMedia('(pointer: coarse)').matches;
 
 const HINTS = [
     { at: 1.8, icon: '🕹️', title: () => (touch() ? 'Left thumb moves' : 'Move with the mouse or WASD'), sub: 'Your blade strikes on its own' },
-    { at: 8, icon: '🗡️', title: () => (touch() ? 'Right button throws a dagger' : 'Click to throw a dagger'), sub: '' },
-    { at: 15, icon: '💨', title: () => (touch() ? 'Small button dashes' : 'Space to dash'), sub: '' }
+    { at: 8, icon: '🗡️', title: () => (touch() ? 'Right button throws a dagger' : 'Left click throws a dagger'), sub: '' },
+    { at: 15, icon: '💨', title: () => (touch() ? 'Small button dashes' : 'Right click or Space to dash'), sub: '' }
 ];
 
 let timers = [];
