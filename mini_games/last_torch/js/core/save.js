@@ -16,7 +16,7 @@ function createSave() {
             elites: 0, evolutions: 0, bestDarknessWon: 0, bosses: 0, chests: 0,
             bestMultiKill: 0, perfectDodges: 0, flawlessHours: 0
         },
-        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, keyboard: true, quickPick: false },
+        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, keyboard: true, quickPick: false, touch: { scale: 1, positions: {} } },
         seenTutorial: false,
         seenTreeHint: false
     };

@@ -6,6 +6,7 @@ import { choosePick, isPicking, setupQuickPick } from './quick_pick.js';
 import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
 import { changeDarkness, keepHunting, quitToMenu, returnToMenu, shareResult, startGame } from './screens.js';
 import { openSettings, toggleSetting } from './settings.js';
+import { setupTouchLayout } from './touch_layout.js';
 import { openStatus, resumeGame, setStatusTab, showBuildNote } from './status.js';
 import { skillTree } from './tree.js';
 
@@ -18,6 +19,7 @@ export function setupButtons() {
         openSettings();
     });
 
+    setupTouchLayout();
     showIosHint();
     document.getElementById('btnShare').classList.toggle('hidden', inPortal);
 

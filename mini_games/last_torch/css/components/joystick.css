@@ -3,9 +3,13 @@
    Os dois usam as mesmas medidas (variáveis abaixo): mesmo tamanho, mesma altura e mesma
    distância da borda, então ficam sempre alinhados. */
 :root {
-    --touch-size: 7rem;                                  /* diâmetro dos dois controles */
-    --touch-knob: 3.3rem;                                /* bolinha de dentro */
-    --touch-icon: 1.6rem;                                /* emoji da adaga */
+    --touch-scale: 1;                                    /* tamanho escolhido em Settings (js/ui/touch_layout.js) */
+    --touch-base: 7rem;                                  /* diâmetro dos dois controles */
+    --touch-base-knob: 3.3rem;                           /* bolinha de dentro */
+    --touch-base-icon: 1.6rem;                           /* emoji da adaga */
+    --touch-size: calc(var(--touch-base) * var(--touch-scale));
+    --touch-knob: calc(var(--touch-base-knob) * var(--touch-scale));
+    --touch-icon: calc(var(--touch-base-icon) * var(--touch-scale));
     --touch-ring: 7px;                                   /* anel de recarga, fora do botão da adaga */
     --touch-bottom: max(1.5rem, env(safe-area-inset-bottom));
     --touch-left: max(1.25rem, env(safe-area-inset-left));
@@ -159,9 +163,9 @@
    (nem na barra de gestos do celular). O % do bottom é da altura da tela. */
 @media (pointer: coarse) and (max-height: 520px) and (orientation: landscape) {
     :root {
-        --touch-size: 3.5rem;
-        --touch-knob: 1.75rem;
-        --touch-icon: 0.95rem;
+        --touch-base: 3.5rem;
+        --touch-base-knob: 1.75rem;
+        --touch-base-icon: 0.95rem;
         --touch-ring: 5px;
         --touch-bottom: max(24%, calc(env(safe-area-inset-bottom) + 3rem));
         --touch-left: max(3rem, calc(env(safe-area-inset-left) + 1.25rem));
@@ -171,3 +175,45 @@
 
 /* Oath of Slaughter: a adaga está selada */
 #knifeButton.is-sealed { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
+
+/* Editor dos controles: fica abaixo deles (z-15), e cada um ganha um contorno de "pode arrastar" */
+#touchEditor {
+    position: absolute;
+    inset: 0;
+    z-index: 14;
+    background: rgba(2, 6, 23, 0.72);
+}
+#touchEditor.hidden { display: none; }
+.touch-editor-bar {
+    position: absolute;
+    top: max(0.5rem, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.8rem;
+    width: max-content;
+    max-width: calc(100% - 1rem);
+    padding: 0.4rem 0.7rem;
+    border: 1px solid rgba(51, 65, 85, 0.9);
+    border-radius: 0.6rem;
+    background: rgba(15, 23, 42, 0.95);
+    color: #e2e8f0;
+    font-size: 0.8rem;
+}
+.touch-editor-hint { color: #94a3b8; }
+.touch-editor-bar label { display: flex; align-items: center; gap: 0.4rem; }
+.touch-editor-bar b { min-width: 2.6rem; }
+#touchSize { width: 7.5rem; accent-color: #22d3ee; }
+.is-editing-touch #joystick,
+.is-editing-touch #knifeButton,
+.is-editing-touch #dashButton {
+    outline: 2px dashed #fde68a;
+    outline-offset: 3px;
+    opacity: 1;
+    filter: none;
+    pointer-events: auto;
+    cursor: grab;
+}

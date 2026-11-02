@@ -307,6 +307,12 @@ permalink: /mini_games/last_torch/last_torch.html
                     <button data-setting="quickPick" class="setting-toggle">⚡ Level-up choices</button>
                 </div>
             </section>
+            <section class="shop-panel touch-only">
+                <div class="shop-panel-title"><span>🕹️ TOUCH CONTROLS</span></div>
+                <div class="settings-row">
+                    <button id="btnTouchEdit" class="setting-toggle">🕹️ Move and resize buttons</button>
+                </div>
+            </section>
             <section class="shop-panel desktop-only">
                 <div class="shop-panel-title"><span>⌨️ CONTROLS</span></div>
                 <div class="settings-row">
@@ -320,6 +326,16 @@ permalink: /mini_games/last_torch/last_torch.html
             <button id="btnResumeSettings" class="start-btn">BACK TO THE HUNT ▶</button>
             <button id="btnQuit" class="quit-btn" aria-label="Quit to menu">🚪 QUIT</button>
         </div>
+    </div>
+</div>
+
+<!-- EDITOR DOS CONTROLES DE TOQUE: os próprios controles ficam por cima e são arrastados. Styles in css/components/joystick.css -->
+<div id="touchEditor" class="hidden" role="dialog" aria-label="Edit touch controls">
+    <div class="touch-editor-bar">
+        <span class="touch-editor-hint">Drag the buttons</span>
+        <label>Size <input id="touchSize" type="range" min="0.7" max="1.6" step="0.05"> <b id="touchSizeValue"></b></label>
+        <button id="btnTouchReset" class="setting-toggle">↺ Reset</button>
+        <button id="btnTouchDone" class="setting-toggle is-on">✓ Done</button>
     </div>
 </div>
 

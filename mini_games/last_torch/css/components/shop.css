@@ -232,6 +232,7 @@
 .settings-hint { margin-top: 0.45rem; color: #94a3b8; font-size: 0.68rem; line-height: 1.35; }
 /* Telas de toque só têm o joystick: sem escolha de teclado */
 @media (pointer: coarse) { .desktop-only { display: none; } }
+@media not (pointer: coarse) { .touch-only { display: none; } }
 
 /* Janela estreita: abas em linha própria, build em uma coluna */
 @media (max-width: 760px) {

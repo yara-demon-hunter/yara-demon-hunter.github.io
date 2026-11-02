@@ -153,7 +153,7 @@ export function openStatus(from = 'PLAYING', onBack = null) {
 }
 
 export function resumeGame() {
-    if (state.gameState !== 'PAUSED') return;
+    if (state.gameState !== 'PAUSED' || document.body.classList.contains('is-editing-touch')) return;
     document.getElementById('shopScreen').classList.add('hidden');
     document.getElementById('pickScreen').classList.add('hidden');
     document.getElementById('settingsScreen').classList.add('hidden');
