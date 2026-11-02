@@ -11,15 +11,15 @@
 </head>
 <body>
     <!-- Página de desenvolvimento: tudo do herói (corrida, golpes, dash, efeitos, heróis alternativos, clone, Juramentos,
-         golpes especiais, skills dos quatro ramos, a fênix do Phoenix Pact e o arremesso da adaga; as armas em detalhe ficam em weapon_previews.html)
+         golpes especiais, skills dos quatro ramos, a fênix do Phoenix Pact, o corvo do Shadow Raven e o arremesso da adaga; as armas em detalhe ficam em weapon_previews.html)
          usando o código real do jogo. Como abrir: previews/README.md -->
-    <canvas id="gameCanvas" width="1200" height="6800"></canvas>
+    <canvas id="gameCanvas" width="1200" height="7700"></canvas>
     <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
     <script>
         if (location.protocol === 'file:') {
             const g = document.getElementById('gameCanvas').getContext('2d');
             g.fillStyle = '#050b16';
-            g.fillRect(0, 0, 1200, 6800);
+            g.fillRect(0, 0, 1200, 7700);
             g.textAlign = 'center';
             g.fillStyle = '#fbbf24';
             g.font = '600 26px system-ui, sans-serif';
@@ -41,6 +41,7 @@
         import { KNIFE_VISUALS as K } from '../data_model/visuals/effects/knife_visual.js';
         import { FIREBALLS, PHOENIX_PACT } from '../data_model/passives.js';
         import { PHOENIX_VISUALS } from '../data_model/visuals/effects/phoenix_visual.js';
+        import { RAVEN_VISUALS } from '../data_model/visuals/effects/raven_visual.js';
         import { SLASH_VISUALS } from '../data_model/visuals/effects/slash_visual.js';
         import { LEVEL_UP_VISUALS } from '../data_model/visuals/effects/level_up_visual.js';
         import { ctx, passives, player, powers, shadowClones, state } from '../js/core/state.js';
@@ -49,6 +50,7 @@
         import { renderShadowClone } from '../js/render/shadow_clone.js';
         import { addCracks } from '../js/systems/skills_blade.js';
         import { updatePhoenix } from '../js/systems/skills_flame.js';
+        import { updateRaven } from '../js/systems/skills_shadow.js';
         import { renderShockwaves } from '../js/render/effects.js';
         import { renderBladeSlashes, renderKnives } from '../js/render/entities.js';
         import { renderGroundFires } from '../js/render/powers.js';
@@ -58,6 +60,7 @@
         import { renderLevelUpBack, renderLevelUpFront } from '../js/render/level_up.js';
         import { createHeroAnim, heroAnim, updateHeroAnim } from '../js/render/player.js';
         import { drawPhoenixArt, renderPhoenixBird } from '../js/render/phoenix.js';
+        import { drawRavenArt, renderRavenBird } from '../js/render/raven.js';
         import { renderPlayer25D } from '../js/render/player25d.js';
         import { renderBolts, renderDashGhosts, renderLightning } from '../js/render/powers.js';
         import { renderReflectWard } from '../js/render/reflect.js';
@@ -68,7 +71,7 @@
 
         state.gameState = 'PLAYING';     // o herói só anima durante a partida
         const WIDTH = 1200;
-        const HEIGHT = 6800;
+        const HEIGHT = 7700;
         const start = performance.now();
         let last = start;
 
@@ -249,6 +252,7 @@
                 renderShield();
                 renderWisp();
                 renderPhoenixBird();
+                renderRavenBird();
                 renderBladeSlashes();
                 renderKnives();
                 renderBolts();
@@ -573,7 +577,7 @@
         function wispLoop(s, dt) {
             s.clock = (s.clock ?? 0) + dt;
             state.wisp.x = -26 + Math.cos(s.clock * 1.7) * 6;
-            state.wisp.y = -40 + Math.sin(s.clock * 2.3) * 5;
+            state.wisp.y = -14 + Math.sin(s.clock * 2.3) * 5;
             state.wisp.placed = true;
             state.wisp.flash = (s.clock % 1.2) < 0.16 ? 0.1 : 0;
             if (s.clock % 1.2 < dt) s.fx.bolts.push({ x: state.wisp.x, y: state.wisp.y, vx: 380, vy: 40, soul: true, age: 0 });
@@ -610,8 +614,8 @@
         ];
         const guardFx = [
             ['Shadow Clone: guarda (1)', scene({ guard: true, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4]) }, before: guardLoop })],
-            ['Umbral Bond 5: guarda (3)', scene({ guard: true, legion: true, levels: { shadowBond: 5 }, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4, 2.5, 4.6]) }, before: guardLoop })],
-            ['Shadow Legion: guarda (3)', scene({ guard: true, legion: true, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4, 2.5, 4.6]) }, before: guardLoop })]
+            ['Umbral Bond 5: guarda (1)', scene({ guard: true, levels: { shadowBond: 5 }, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4]) }, before: guardLoop })],
+            ['Shadow Legion (após Bond 5): guarda (3)', scene({ guard: true, legion: true, levels: { shadowBond: 5 }, noHero: true, fx: { ...createFx(), enemies: guardMonsters([0.4, 2.5, 4.6]) }, before: guardLoop })]
         ];
         const shadowFx = [
             ['Death Mark', scene({ fx: { ...createFx(), enemies: [dummy(44, 0)] }, before: markLoop })],
@@ -632,6 +636,57 @@
             ['Fênix: morre e levanta o herói', scene({ skills: ['phoenixPact'], before: phoenixDeath })],
             ['Fênix: renasce na hora seguinte', scene({ skills: ['phoenixPact'], before: phoenixRise })]
         ];
+        // --- CORVO ---
+        // Roda o voo de verdade (updateRaven): cada cena guarda o próprio corvo e os próprios alvos
+        function flyRaven(s, dt) {
+            s.raven ??= { x: 0, y: 0, placed: false, side: 1, facing: -1, tilt: 0, mode: 'home', target: null, timer: 0.4, diveTime: 0, dive: 0, rise: 1 };
+            s.fx.enemies.forEach(e => { e.x = e.homeX; e.y = e.homeY; e.vx = 0; e.vy = 0; });
+            state.raven = s.raven;
+            state.enemies = s.fx.enemies;
+            state.runTime = (performance.now() - start) / 1000;
+            passives.shadowRaven.lvl = 1;
+            updateRaven(dt);
+        }
+
+        // Herói indo e voltando: o corvo troca de lado, sempre atrás de quem anda
+        function ravenWalk(s, dt) {
+            s.clock = ((s.clock ?? 0) + dt) % 3.2;
+            s.speed = 90;
+            s.heading = s.clock < 1.6 ? 0 : Math.PI;
+            flyRaven(s, dt);
+        }
+
+        function target(dx, dy) {
+            return dummy(dx, dy, { hp: 1e9, maxHp: 1e9, homeX: dx, homeY: dy, vx: 0, vy: 0 });
+        }
+        // Com a fênix e o Grave Wisp em volta do herói: o corvo escolhe um pouso livre para não sobrepor ninguém
+        function ravenCompany(withPhoenix, withWisp) {
+            return (s, dt) => {
+                if (withPhoenix) flyPhoenix(s, dt);
+                else state.phoenixSpent = true;
+                if (withWisp) {
+                    s.clock = (s.clock ?? 0) + dt;
+                    state.wisp.x = -26 + Math.cos(s.clock * 1.7) * 6;
+                    state.wisp.y = -14 + Math.sin(s.clock * 2.3) * 5;
+                    state.wisp.placed = true;
+                    state.wisp.flash = 0;
+                }
+                flyRaven(s, dt);
+                if (!withPhoenix) state.phoenixSpent = false;
+            };
+        }
+        const ravenTeam = [
+            ['Corvo + fênix', scene({ skills: ['shadowRaven', 'phoenixPact'], before: ravenCompany(true, false) })],
+            ['Corvo + Grave Wisp', scene({ skills: ['shadowRaven'], levels: { graveWisp: 1 }, before: ravenCompany(false, true) })],
+            ['Corvo + fênix + Wisp', scene({ skills: ['shadowRaven', 'phoenixPact'], levels: { graveWisp: 1 }, before: ravenCompany(true, true) })]
+        ];
+        const ravenFx = [
+            ['Corvo: voando no ombro', scene({ skills: ['shadowRaven'], before: flyRaven })],
+            ['Corvo: acompanhando o herói', scene({ skills: ['shadowRaven'], before: ravenWalk })],
+            ['Corvo: mergulho e bicada', scene({ skills: ['shadowRaven'], fx: { ...createFx(), enemies: [target(-88, 4)] }, before: flyRaven })],
+            ['Corvo: dois alvos', scene({ skills: ['shadowRaven'], fx: { ...createFx(), enemies: [target(86, -14), target(-92, 30)] }, before: flyRaven })]
+        ];
+
         // Bola de fogo em loop: voa até o primeiro alvo, explode e deixa os vizinhos em chamas
         function fireballLoop(s, dt) {
             s.fx.enemies.forEach(e => { e.burnTimer = Math.max(0, (e.burnTimer ?? 0) - dt); });
@@ -741,7 +796,7 @@
             const k = s.clock;
             state.wisp.placed = true;
             state.wisp.x = -26 + Math.cos(k * Math.PI) * 6;
-            state.wisp.y = -40 + Math.sin(k * 4.7) * 5;
+            state.wisp.y = -14 + Math.sin(k * 4.7) * 5;
             state.wisp.flash = 0;
             if (k < dt) s.fx.rifts.push({ x: 78, y: 8, age: 0, seconds: 1.5, radius: 70, evolved: true });
             if (k >= 0.3 && k < 0.3 + dt) s.fx.bolts.push({ x: state.wisp.x, y: state.wisp.y, vx: 380, vy: 30, soul: true, age: 0 });
@@ -784,7 +839,7 @@
         }
         const everyScene = new Map([
             ...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
-            ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...flameArms, ...curseFx
+            ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...ravenFx, ...ravenTeam, ...flameArms, ...curseFx
         ]);
 
         function gallery(title, top, items, zoom = 2.3) {
@@ -881,6 +936,28 @@
             });
         }
 
+        // Arte do corvo ampliada, desenhada direto (no jogo ele sai de um atlas): ao vivo e nos quadros da batida de asa
+        function drawRavenSection(now, base) {
+            text('Corvo em detalhe: batida de asa ao vivo e quadro a quadro', 24, base, 17, '#67e8f9', 700);
+            const phase = ((now - start) / 1000 * RAVEN_VISUALS.framesPerSecond / RAVEN_VISUALS.frames) % 1;
+            panel(24, base + 12, 372, 250, () => {
+                ctx.translate(150, 130);
+                ctx.scale(3.4, 3.4);
+                drawRavenArt(ctx, phase);
+            });
+            text('ao vivo', 30, base + 280);
+            for (let i = 0; i < 8; i++) {
+                const x = 408 + (i % 4) * 194;
+                const y = base + 12 + Math.floor(i / 4) * 130;
+                panel(x, y, 188, 122, () => {
+                    ctx.translate(80, 66);
+                    ctx.scale(1.55, 1.55);
+                    drawRavenArt(ctx, i / 8);
+                });
+                text(`${i + 1}/8`, x + 6, y + 118, 11);
+            }
+        }
+
         function frame() {
             const now = performance.now();
             const dt = Math.min(0.05, (now - last) / 1000);
@@ -904,7 +981,7 @@
             });
 
             [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
-                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...flameArms, ...curseFx].forEach(([, s]) => { s.dt = dt; });
+                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...ravenFx, ...ravenTeam, ...flameArms, ...curseFx].forEach(([, s]) => { s.dt = dt; });
             gallery('Poses', 300, poses);
             gallery('Golpes (com a marca do corte)', 570, swings, 1.7);
             gallery('Dash, dano, nível e Mirror Ward', 840, effects, 1.9);
@@ -926,7 +1003,10 @@
             gallery('Flame: espada e adagas em chamas', 4890, flameArms, 1.05);
             gallery('Phoenix Pact: a fênix em ação', 5160, phoenixFx, 1.02);
             drawPhoenixSection(now, 5430);
-            drawKnifeSection(now, 5990);
+            gallery('Shadow Raven: o corvo em ação', 5990, ravenFx, 1.02);
+            gallery('Shadow Raven: com a fênix e o Grave Wisp', 6260, ravenTeam, 1.02);
+            drawRavenSection(now, 6530);
+            drawKnifeSection(now, 6860);
             requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);

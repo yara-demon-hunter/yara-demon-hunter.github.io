@@ -1,10 +1,11 @@
-import { MASTER_THIEF, SMOKE_BOMB } from '../../data_model/passives.js';
+import { MASTER_THIEF, SHADOW_RAVEN, SMOKE_BOMB } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
 import { addFloater, createExplosion, hitStop, shakeScreen } from './effects.js';
 import { dropGold } from './gold.js';
 import { mod } from './modifiers.js';
+import { nearestEnemy } from './powers.js';
 import { getAtkDamage, getDashCharges } from './stats.js';
 
 // --- SKILLS DA SOMBRA ---
@@ -146,7 +147,109 @@ function updateEchoes(dt) {
     }
 }
 
+// --- SHADOW RAVEN ---
+// O corvo voa no ombro do herói, do lado de trás de quem anda. De tempos em tempos mergulha no monstro mais perto,
+// bica e volta. Desenho em js/render/raven.js.
+// Onde o corvo pousa: quem já voa em volta do herói (a fênix e o Grave Wisp) tem a vez, e ele escolhe o primeiro
+// pouso livre. Troca só quando o atual fica ocupado, para não pular de um lado a outro.
+function companionSpots() {
+    const spots = [];
+    if (passives.phoenixPact.lvl > 0 && !state.phoenixSpent) spots.push({ x: state.phoenix.x - player.x, y: state.phoenix.y - player.y });
+    if (powers.graveWisp.lvl > 0) spots.push({ x: -26, y: -14 });
+    return spots;
+}
+
+function pickSpot(bird) {
+    const C = SHADOW_RAVEN;
+    const others = companionSpots();
+    const free = (spot, clearance) => others.every(o => Math.hypot(o.x - bird.side * spot.side * spot.x, o.y - spot.y) >= clearance);
+    const current = C.spots[bird.spot ?? 0];
+    if (free(current, C.spotClearance * 0.7)) return current;
+    bird.spot = Math.max(0, C.spots.findIndex(spot => free(spot, C.spotClearance)));
+    return C.spots[bird.spot];
+}
+
+export function updateRaven(dt) {
+    const bird = state.raven;
+    if (passives.shadowRaven.lvl <= 0) {
+        bird.placed = false;
+        return;
+    }
+    const C = SHADOW_RAVEN;
+    const t = state.runTime;
+    const moved = player.x - (bird.heroX ?? player.x);
+    bird.heroX = player.x;
+    if (Math.abs(moved) > 0.3) bird.side = moved > 0 ? -1 : 1;
+    const spot = pickSpot(bird);
+    const homeX = player.x + bird.side * spot.side * spot.x + Math.cos(t * 1.7) * C.drift;
+    const homeY = player.y + spot.y + Math.sin(t * 2.6) * C.drift;
+    if (!bird.placed) {
+        bird.x = homeX;
+        bird.y = homeY;
+        bird.placed = true;
+        bird.rise = 0;
+        bird.mode = 'home';
+        bird.target = null;
+        bird.timer = C.cooldownSeconds * 0.5;
+        bird.facing = -bird.side;
+        createExplosion(homeX, homeY, '#8b5cf6', 8);
+    }
+    bird.rise = Math.min(1, bird.rise + dt / C.riseSeconds);
+
+    if (bird.mode === 'dive') {
+        const e = bird.target;
+        bird.diveTime += dt;
+        if (!e || e.hp <= 0 || !state.enemies.includes(e) || bird.diveTime > C.maxDiveSeconds) {
+            bird.mode = 'home';
+        } else {
+            const dx = e.x - bird.x;
+            const dy = e.y - bird.y;
+            const dist = Math.hypot(dx, dy) || 1;
+            if (dist <= e.radius + C.reach) {
+                peck(e, dx / dist, dy / dist);
+                bird.mode = 'home';
+            } else {
+                const step = Math.min(dist, C.diveSpeed * dt);
+                bird.x += (dx / dist) * step;
+                bird.y += (dy / dist) * step;
+                bird.facing = dx >= 0 ? 1 : -1;
+                bird.tilt = bird.facing * Math.atan2(dy, Math.abs(dx)) * 0.85;
+            }
+        }
+        bird.dive = bird.mode === 'dive' ? 1 : 0;
+        return;
+    }
+
+    // Em casa: segue o ombro (mais depressa quando está longe, na volta do mergulho)
+    const far = Math.hypot(homeX - bird.x, homeY - bird.y) > 60 ? 2.4 : 1;
+    const pull = Math.min(1, dt * C.followSpeed * far);
+    const vx = (homeX - bird.x) * pull;
+    bird.x += vx;
+    bird.y += (homeY - bird.y) * pull;
+    bird.tilt += (Math.max(-0.3, Math.min(0.3, vx * 0.05)) - bird.tilt) * Math.min(1, dt * 8);
+    bird.facing = -bird.side;
+    bird.dive = Math.max(0, bird.dive - dt * 5);
+
+    bird.timer -= dt;
+    if (bird.rise < 1 || bird.timer > 0) return;
+    const target = nearestEnemy(player.x, player.y, C.range);
+    if (!target) return;
+    bird.timer = C.cooldownSeconds;
+    bird.mode = 'dive';
+    bird.target = target;
+    bird.diveTime = 0;
+}
+
+function peck(e, dirX, dirY) {
+    const C = SHADOW_RAVEN;
+    dealDamage(e, getAtkDamage() * C.damage, { kbX: dirX * C.knockback, kbY: dirY * C.knockback, style: 'shadow' });
+    e.ravenMark = C.markSeconds;
+    createExplosion(e.x, e.y, '#f87171', 5);
+    audio.playCaw();
+}
+
 export function updateShadowSkills(dt) {
+    updateRaven(dt);
     updateSmokes(dt);
     updateEchoes(dt);
     for (let i = state.markBursts.length - 1; i >= 0; i--) {

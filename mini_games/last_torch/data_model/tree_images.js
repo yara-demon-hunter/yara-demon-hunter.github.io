@@ -41,6 +41,7 @@ export const TREE_IMAGES = {
     warmHearth: img('warm-hearth'),
     undyingFlame: img('undying-flame'),
     phoenixPact: img('phoenix-pact'),
+    shadowRaven: img('shadow-raven'),
     vigil: img('vigil'),
     backdraft: img('backdraft'),
     fireRing: img('hearth-ring'),

@@ -277,6 +277,13 @@ export class SoundEngine {
         [392, 523, 784].forEach((freq, i) => this.tone({ type: 'triangle', freq, at: i * 0.1, decay: 0.5, gain: 0.14 }));
     }
 
+    // Corvo bicando: grasnido curto e áspero
+    playCaw() {
+        if (!this.ctx || this.throttled('caw', 0.25)) return;
+        this.burst({ filter: 'bandpass', freq: 1100, to: 520, q: 1.6, attack: 0.01, decay: 0.16, gain: 0.12 });
+        this.tone({ type: 'sawtooth', freq: 540, to: 300, decay: 0.15, gain: 0.05 });
+    }
+
     // Fênix renascendo: canto curto que sobe
     playPhoenixRise() {
         if (!this.ctx) return;

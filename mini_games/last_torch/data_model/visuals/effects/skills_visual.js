@@ -21,6 +21,7 @@ export const SKILLS_VISUALS = {
 
     // Shadow
     mark: { color: '#c4b5fd', core: '#f5f3ff', glow: 'rgba(139, 92, 246, 0.5)', gap: 8 },
+    ravenMark: { color: '#f87171', core: '#fee2e2', glow: 'rgba(220, 38, 38, 0.55)', gap: 6 },
     markBurst: { color: '#a78bfa', core: '#ffffff', length: 26 },
     smoke: { color: 'rgba(203, 213, 225, 0.5)', dark: 'rgba(100, 116, 139, 0.62)', puffs: 4 },
     echo: { color: 'rgba(124, 58, 237, 0.55)', core: 'rgba(233, 213, 255, 0.5)' },

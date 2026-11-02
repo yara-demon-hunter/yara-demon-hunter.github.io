@@ -31,7 +31,7 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 | Oath of Ruin | Curse | +20% dano e -12% recarga dos feitiços | -40% dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
 
 Regras: abre ao aprender **as duas skills que chegam nele** (as ligações do mapa) e fica na coluna 6, sempre na mesma posição.
-Slaughter pede Cataclysm e Executioner; Whispers, Umbral Bond no nível 5 e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Phoenix Pact e Solar Wall;
+Slaughter pede Cataclysm e Executioner; Whispers, Shadow Legion e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Phoenix Pact e Solar Wall;
 Ruin, Wrath of Heaven e Event Horizon. Os dados ficam em `data_model/passives.js`, e a arte
 em `data_model/visuals/characters/oath_visual.js` e `js/render/hero_gear.js`.
 
@@ -90,7 +90,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 - **Shadow** (raiz: Move Speed)
   - Adagas: Ricochet, Dagger Mastery (dano, alcance, velocidade e recarga), Fan of Knives
   - Técnica: Death Mark*, Charged Dagger Throw (Soul Lance e Soul Spear unidos)
-  - Sombras: Shadow Clone*, Shadow Legion*, Umbral Bond*. Move Speed, Shadow Clone, Shadow Legion, Umbral Bond, Juramento
+  - Sombras: Shadow Clone*, Umbral Bond*, Shadow Legion*. Move Speed, Shadow Clone, Umbral Bond (5/5), Shadow Legion (3 pontos), Juramento
   - Esquiva: Phantom Rush, Night Reaper*, Smoke Bomb*. Move Speed, Phantom Rush, Night Reaper, Smoke Bomb, Juramento
   - Oath of Whispers*
 - **Flame** (raiz: Torch Keeper)
@@ -121,10 +121,11 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Death Mark | Poder | A adaga marca. A lâmina detona; o dash detona mais forte e devolve a carga. Toda detonação recarrega a adaga | Mira girando, X violeta |
 | Charged Dagger Throw | Poder | Segure o botão da adaga para carregar: quanto mais tempo, mais dano e mais monstros atravessados. No nível 5 carrega num piscar e atravessa tudo (o antigo Soul Spear) | Anel que se fecha, adaga brilhando |
 | Shadow Clone | Passiva | Uma sombra guarda uma área em volta da tocha (raio 200) e não sai dela. Espera no posto; quando um monstro chega perto, anda em linha reta até ele, golpeia com o combo do herói e volta. Os monstros não correm atrás dela, mas quem esbarra ou acerta um tiro a machuca; ela tem vida e volta depois de 10s | Sombra violeta, barra de vida e área tracejada no chão |
-| Shadow Legion | Evolução | Três sombras em vez de uma, cada uma cuidando de um monstro | Três sombras no anel |
+| Shadow Legion | Evolução | Abre com Umbral Bond 5/5 e custa 3 pontos. Três sombras em vez de uma, cada uma cuidando de um monstro | Três sombras no anel |
+| Shadow Raven | Passiva | Abre com Death Mark 2/2. Um corvo pequeno voa no ombro do herói e, a cada 2,4s, mergulha no monstro mais perto (até 300), bica com 110% do dano da lâmina e volta. O monstro bicado fica 2s numa mira vermelha e leva 25% a mais de dano em todo golpe (lâmina, adaga, feitiço, sombras) enquanto ela durar | Corvo violeta-escuro; mira vermelha tracejada com cruz |
 | Explosão da sombra | Efeito do Shadow Clone | A sombra que cai explode em 8 adagas para todos os lados (12 com Fan of Knives). Valem o dano, alcance e velocidade do Dagger Mastery e o Ricochet | Adagas violeta em círculo |
 | Umbral Bond | Poder | 5 níveis que fortalecem as sombras: a cada nível +25% de vida, +30% de dano e +25 de raio na área de guarda (no 5º, +125%, +150% e +125). Vale para o Shadow Clone, a Legion e as sombras do Oath of Whispers | Área de guarda maior |
-| Smoke Bomb | Passiva | O dash deixa um rasto longo de fumaça por 7s: freia monstros e todo golpe que eles levam ali, de lâmina ou adaga, é crítico | Rasto de nuvens |
+| Smoke Bomb | Passiva | O dash deixa um rasto longo de fumaça por 7s: freia monstros e todo golpe que eles levam ali, de lâmina ou adaga, tem 25% de chance extra de ser crítico (sorteada à parte da chance normal do herói) | Rasto de nuvens |
 | Night Reaper | Evolução | Uma sombra refaz o caminho do dash, cortando de novo | Silhueta violeta |
 | Coin Rush | Relíquia | Cada moeda adianta o dash e a adaga em 0,05s | 🧤 Fortune |
 | Master Thief | Relíquia | Atravessar monstros com o dash rouba ouro; Perfect Dodge rouba um punhado | Moedas saltando |

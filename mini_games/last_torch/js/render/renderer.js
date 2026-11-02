@@ -22,6 +22,7 @@ import {
     renderShockwaves, renderStains, renderTelegraphs, renderTorchAlarm, renderWarmth
 } from './effects.js';
 import { setWorldView } from './fx/stamp.js';
+import { renderRavenBird } from './raven.js';
 import { renderPhoenixBird } from './phoenix.js';
 import { renderPickups } from './pickups.js';
 import { heroAnim } from './player.js';
@@ -159,6 +160,7 @@ export function render() {
         renderShield();
         renderWisp();
         renderPhoenixBird();
+        renderRavenBird();
     }
     renderReflectWard();
     renderCrescents();

@@ -18,7 +18,7 @@ function updateGraveWisp(dt) {
     const wisp = state.wisp;
     const t = state.runTime;
     const homeX = player.x - 26 + Math.cos(t * 1.7) * 6;
-    const homeY = player.y - 40 + Math.sin(t * 2.3) * 5;
+    const homeY = player.y - 14 + Math.sin(t * 2.3) * 5;
     if (!wisp.placed) {
         wisp.x = homeX;
         wisp.y = homeY;

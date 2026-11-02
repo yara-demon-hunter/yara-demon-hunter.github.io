@@ -122,6 +122,7 @@ js/
   render/powers.js                desenho dos poderes
   render/skills.js                desenho das skills dos ramos (rachaduras, fendas, anel de fogo, marcas, escudo...)
   render/phoenix.js               fênix do Phoenix Pact: arte procedural guardada em atlas e voo em campo
+  render/raven.js                  corvo do Shadow Raven: arte procedural em atlas e voo em campo
   render/pickups.js               itens e baús
   render/monster_sprites.js       gera os sprites dos monstros e dos tiros a partir da arte procedural
   render/moth.js, bloater.js, wraith.js, zombie_wolf.js, headless_knight.js ...   arte de cada monstro (usada para gerar os sprites)

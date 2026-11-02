@@ -59,7 +59,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 70,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Every dash leaves a long trail of smoke that lingers for 7 seconds. Monsters inside it slow down, and every hit they take, from blade or dagger, is a critical hit.'
+        desc: 'Every dash leaves a long trail of smoke that lingers for 7 seconds. Monsters inside it slow down, and every hit they take, from blade or dagger, has a 25% chance to be a critical hit.'
     },
     vigil: {
         name: 'Vigil',
@@ -100,6 +100,15 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'A phoenix flies at your shoulder and hurls fireballs. When you fall, it gives its life to raise you in a storm of fire, and is reborn the next hour.'
+    },
+
+    shadowRaven: {
+        name: 'Shadow Raven',
+        icon: '🐦‍⬛',
+        cost: 90,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        desc: 'A small raven circles at your shoulder. Every 2.4 seconds it dives at the nearest monster, pecks it and flies back. The pecked monster is locked in a red crosshair for 2 seconds: every hit it takes, from your blade, daggers, spells or shadows, deals 25% more damage.'
     },
 
     // --- JURAMENTOS ---
@@ -313,12 +322,13 @@ export const EXECUTIONER = {
     furyCharge: 4
 };
 
-// Smoke Bomb: o dash deixa um rasto de fumaça. Quem está nela anda devagar e todo golpe que recebe é crítico
+// Smoke Bomb: o dash deixa um rasto de fumaça. Quem está nela anda devagar e cada golpe que recebe tem uma chance extra de ser crítico
 export const SMOKE_BOMB = {
     seconds: 7,                 // quanto tempo cada nuvem fica
     radius: 58,
     spacing: 34,                // distância entre uma nuvem e a seguinte ao longo do dash
     slow: 0.65,
+    critChance: 0.25,           // chance extra de crítico em quem está na fumaça
     maxClouds: 14
 };
 
@@ -387,6 +397,33 @@ export const PHOENIX_PACT = {
     splashRatio: 0.5,           // dano nos vizinhos, em relação ao golpe
     burnRatio: 0.35,            // queimadura por segundo, em relação ao golpe
     burnSeconds: 2
+};
+
+// Shadow Raven: um corvo pequeno voa em volta do herói, mergulha no monstro mais perto, bica e volta
+export const SHADOW_RAVEN = {
+    // Pousos em volta do herói, do preferido ao último. side: 1 = do lado de trás de quem anda, -1 = do lado da frente,
+    // 0 = em cima. Ele fica no primeiro que não está colado em outro companheiro (fênix, Grave Wisp)
+    spots: [
+        { side: 1, x: 30, y: -46 },
+        { side: 0, x: 0, y: -84 },
+        { side: -1, x: 30, y: -46 },
+        { side: 1, x: 48, y: -14 },
+        { side: -1, x: 48, y: -14 }
+    ],
+    spotClearance: 48,          // distância mínima de outro companheiro (unidades do mundo)
+    drift: 6,                   // quanto ele balança no lugar
+    followSpeed: 7,
+    riseSeconds: 0.7,           // tempo para surgir da sombra
+    // Mergulho
+    cooldownSeconds: 2.4,
+    range: 300,                 // monstro mais perto do herói dentro deste raio
+    diveSpeed: 540,
+    reach: 6,                   // distância da borda do monstro para a bicada
+    maxDiveSeconds: 1,          // desiste se o alvo escapar
+    damage: 1.1,                // x dano da lâmina
+    knockback: 140,
+    markSeconds: 2,             // o monstro bicado fica em mira vermelha
+    markDamage: 0.25            // e leva este bônus em todo golpe (lâmina, adaga, feitiço, sombras) enquanto a mira durar
 };
 
 export function createPassives() {

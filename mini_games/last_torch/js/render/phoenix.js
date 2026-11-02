@@ -12,14 +12,14 @@ const TAU = Math.PI * 2;
 const mix = (a, b, k) => a + (b - a) * k;
 
 // Degradê ao longo de um segmento
-function ramp(g, x0, y0, x1, y1, colors) {
+export function ramp(g, x0, y0, x1, y1, colors) {
     const grad = g.createLinearGradient(x0, y0, x1, y1);
     colors.forEach((color, i) => grad.addColorStop(i / (colors.length - 1), color));
     return grad;
 }
 
 // Pena: uma folha de (x, y) na direção `angle`, curvada por `bend`, com a nervura no meio
-function feather(g, x, y, angle, length, width, bend, colors, vein = true) {
+export function feather(g, x, y, angle, length, width, bend, colors, vein = true) {
     const dx = Math.cos(angle);
     const dy = Math.sin(angle);
     const tipX = x + dx * length - dy * bend;

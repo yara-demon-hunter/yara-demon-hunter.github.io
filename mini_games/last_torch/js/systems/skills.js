@@ -43,6 +43,7 @@ export function resetSkills() {
     state.warCryTimer = 0;
     state.phoenixSpent = false;
     state.phoenix.placed = false;
+    state.raven.placed = false;
     player.move = null;
     player.castAge = -1;
     player.stillTime = 0;

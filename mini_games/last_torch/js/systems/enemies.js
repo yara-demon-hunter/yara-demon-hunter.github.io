@@ -258,6 +258,7 @@ export function updateEnemies(dt) {
         if (e.hitFlash > 0) e.hitFlash -= dt;
         if (e.orbitCd > 0) e.orbitCd -= dt;
         if (e.marked > 0) e.marked -= dt;
+        if (e.ravenMark > 0) e.ravenMark -= dt;
 
         e.x += e.vx * dt;
         e.y += e.vy * dt;

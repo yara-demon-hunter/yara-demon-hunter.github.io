@@ -154,6 +154,8 @@ export const state = {
     phoenixFx: null,
     // Fênix em campo. side: de que lado do herói ela voa; look: tempo olhando para o alvo; rise: 0 a 1 ao renascer
     phoenix: { x: 0, y: 0, placed: false, side: 1, facing: -1, look: 0, tilt: 0, flash: 0, rise: 1 },
+    // Corvo em campo. mode: 'home' (em volta do herói) ou 'dive' (indo bicar); dive: 0 a 1, para o desenho; rise: 0 a 1 ao surgir
+    raven: { x: 0, y: 0, placed: false, side: 1, facing: -1, tilt: 0, mode: 'home', target: null, timer: 1, diveTime: 0, dive: 0, rise: 1 },
     crescents: [],
     cracks: [],
     aftershocks: [],

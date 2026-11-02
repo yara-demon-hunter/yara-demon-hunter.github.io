@@ -213,6 +213,34 @@ export function renderMonsterCurses() {
             ctx.rotate(-a - Math.PI * 2);
             ctx.translate(-e.x, -e.y);
         }
+        if (e.ravenMark > 0) {
+            // Mira vermelha, como a do Death Mark: anel tracejado girando para o outro lado, com cruz e setas
+            const R = V.ravenMark;
+            const r = e.radius + R.gap;
+            const a = -t * 3;
+            ctx.globalAlpha = Math.min(1, e.ravenMark * 3);
+            drawGlow(ctx, R.glow, e.x, e.y, r * 1.3, 0.6);
+            ctx.strokeStyle = R.color;
+            ctx.lineWidth = 2;
+            ctx.translate(e.x, e.y);
+            ctx.rotate(a);
+            ctx.stroke(getDashedRing(r, 5));
+            ctx.rotate(-a);
+            ctx.beginPath();
+            for (let i = 0; i < 4; i++) {
+                const c = Math.cos(i * Math.PI / 2);
+                const s = Math.sin(i * Math.PI / 2);
+                ctx.moveTo(c * (r - 5), s * (r - 5));
+                ctx.lineTo(c * (r + 8), s * (r + 8));
+            }
+            ctx.stroke();
+            ctx.fillStyle = R.core;
+            ctx.beginPath();
+            ctx.arc(0, 0, 2, 0, TAU);
+            ctx.fill();
+            ctx.translate(-e.x, -e.y);
+            ctx.globalAlpha = 1;
+        }
         if (e.stunned > 0) {
             ctx.fillStyle = S.color;
             for (let i = 0; i < S.dots; i++) {
