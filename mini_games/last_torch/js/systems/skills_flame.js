@@ -6,6 +6,7 @@ import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { blast, dealDamage, ignite } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen, slowMotion } from './effects.js';
+import { wander, followRate } from './companions.js';
 import { mod } from './modifiers.js';
 import { phoenixBeak } from '../render/phoenix.js';
 import { addGroundFire, nearestEnemy, ready } from './powers.js';
@@ -96,8 +97,9 @@ export function updatePhoenix(dt) {
     const moved = player.x - (bird.heroX ?? player.x);
     bird.heroX = player.x;
     if (Math.abs(moved) > 0.3) bird.side = moved > 0 ? -1 : 1;
-    const homeX = player.x + bird.side * P.shoulderX + Math.cos(t * 1.3) * 5;
-    const homeY = player.y + P.shoulderY + Math.sin(t * 2.1) * 5;
+    const drift = wander(t, 0);
+    const homeX = player.x + bird.side * P.shoulderX + drift.x;
+    const homeY = player.y + P.shoulderY + drift.y;
     if (!bird.placed) {
         bird.x = homeX;
         bird.y = homeY;
@@ -108,7 +110,7 @@ export function updatePhoenix(dt) {
         addShockwave(homeX, homeY, { radius: 44, color: '#fb923c', width: 4, seconds: 0.4 });
         audio.playPhoenixRise();
     }
-    const pull = Math.min(1, dt * P.followSpeed);
+    const pull = Math.min(1, dt * followRate(P.followSpeed));
     const vx = (homeX - bird.x) * pull;
     bird.x += vx;
     bird.y += (homeY - bird.y) * pull;

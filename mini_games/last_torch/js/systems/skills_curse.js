@@ -1,5 +1,6 @@
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, player, powers, state } from '../core/state.js';
+import { followRate, wander } from './companions.js';
 import { blast, dealDamage } from './damage.js';
 import { addShockwave, createExplosion, shakeScreen } from './effects.js';
 import { startCast } from './moves.js';
@@ -17,15 +18,17 @@ function updateGraveWisp(dt) {
     if (!level) return;
     const wisp = state.wisp;
     const t = state.runTime;
-    const homeX = player.x - 26 + Math.cos(t * 1.7) * 6;
-    const homeY = player.y - 14 + Math.sin(t * 2.3) * 5;
+    const drift = wander(t, 1);
+    const homeX = player.x - 26 + drift.x;
+    const homeY = player.y - 14 + drift.y;
     if (!wisp.placed) {
         wisp.x = homeX;
         wisp.y = homeY;
         wisp.placed = true;
     }
-    wisp.x += (homeX - wisp.x) * Math.min(1, dt * 7);
-    wisp.y += (homeY - wisp.y) * Math.min(1, dt * 7);
+    const pull = Math.min(1, dt * followRate(7));
+    wisp.x += (homeX - wisp.x) * pull;
+    wisp.y += (homeY - wisp.y) * pull;
 
     if (wisp.flash > 0) wisp.flash -= dt;
 

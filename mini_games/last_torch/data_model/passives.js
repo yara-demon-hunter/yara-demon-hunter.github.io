@@ -399,6 +399,13 @@ export const PHOENIX_PACT = {
     burnSeconds: 2
 };
 
+// Companheiros em voo (fênix, Grave Wisp, Shadow Raven): rodeiam devagar o ponto onde ficam e demoram mais para
+// alcançar o herói depois do dash (js/systems/companions.js)
+export const COMPANIONS = {
+    wander: { radius: 9, sway: 4, speed: 0.7 },     // volta lenta (raio, rad/s) e balanço extra, em unidades do mundo
+    dashLag: { follow: 0.3, afterSeconds: 0.35, recover: 1.6 }   // fração da velocidade no dash, tempo de atraso depois dele, ritmo da volta
+};
+
 // Shadow Raven: um corvo pequeno voa em volta do herói, mergulha no monstro mais perto, bica e volta
 export const SHADOW_RAVEN = {
     // Pousos em volta do herói, do preferido ao último. side: 1 = do lado de trás de quem anda, -1 = do lado da frente,
@@ -411,7 +418,6 @@ export const SHADOW_RAVEN = {
         { side: -1, x: 48, y: -14 }
     ],
     spotClearance: 48,          // distância mínima de outro companheiro (unidades do mundo)
-    drift: 6,                   // quanto ele balança no lugar
     followSpeed: 7,
     riseSeconds: 0.7,           // tempo para surgir da sombra
     // Mergulho

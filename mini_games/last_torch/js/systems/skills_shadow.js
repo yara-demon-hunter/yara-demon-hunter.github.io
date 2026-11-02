@@ -4,6 +4,7 @@ import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
 import { addFloater, createExplosion, hitStop, shakeScreen } from './effects.js';
 import { dropGold } from './gold.js';
+import { followRate, wander } from './companions.js';
 import { mod } from './modifiers.js';
 import { nearestEnemy } from './powers.js';
 import { getAtkDamage, getDashCharges } from './stats.js';
@@ -181,8 +182,9 @@ export function updateRaven(dt) {
     bird.heroX = player.x;
     if (Math.abs(moved) > 0.3) bird.side = moved > 0 ? -1 : 1;
     const spot = pickSpot(bird);
-    const homeX = player.x + bird.side * spot.side * spot.x + Math.cos(t * 1.7) * C.drift;
-    const homeY = player.y + spot.y + Math.sin(t * 2.6) * C.drift;
+    const drift = wander(t, 2);
+    const homeX = player.x + bird.side * spot.side * spot.x + drift.x;
+    const homeY = player.y + spot.y + drift.y;
     if (!bird.placed) {
         bird.x = homeX;
         bird.y = homeY;
@@ -222,7 +224,7 @@ export function updateRaven(dt) {
 
     // Em casa: segue o ombro (mais depressa quando está longe, na volta do mergulho)
     const far = Math.hypot(homeX - bird.x, homeY - bird.y) > 60 ? 2.4 : 1;
-    const pull = Math.min(1, dt * C.followSpeed * far);
+    const pull = Math.min(1, dt * followRate(C.followSpeed) * far);
     const vx = (homeX - bird.x) * pull;
     bird.x += vx;
     bird.y += (homeY - bird.y) * pull;

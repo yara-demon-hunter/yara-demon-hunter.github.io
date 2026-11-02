@@ -3,6 +3,7 @@ import { OATH_VISUALS } from '../../data_model/visuals/characters/oath_visual.js
 import { audio, player, shadowClones, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen, slowMotion } from './effects.js';
+import { updateCompanions } from './companions.js';
 import { startMove, updateCast, updateMove } from './moves.js';
 import { clearBladeSkills, updateBladeSkills, updateCracks } from './skills_blade.js';
 import { clearCurseSkills, updateCurseSkills } from './skills_curse.js';
@@ -12,6 +13,7 @@ import { clearShadowSkills, updateShadowSkills } from './skills_shadow.js';
 // --- SKILLS DOS QUATRO RAMOS ---
 // Ponto único: o que anda a cada quadro (cada ramo no seu arquivo), o que limpa entre as horas e o Juramento.
 export function updateSkills(dt) {
+    updateCompanions(dt);
     updateMove(dt);
     updateCast(dt);
     updateBladeSkills(dt);
