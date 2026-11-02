@@ -210,7 +210,7 @@ export function setupInput() {
         }
         keys[e.code] = true;
         // Quem escolheu andar pelo teclado usa o mouse só para mirar: o herói para de seguir o cursor
-        if (save.settings.keyboard && MOVE_KEYS.includes(e.code)) player.mouseFollow = false;
+        if (save.settings.moveKeys && MOVE_KEYS.includes(e.code)) player.mouseFollow = false;
         if (!e.repeat && (e.code === 'Space' || e.code === 'ShiftLeft' || e.code === 'ShiftRight')) tryDash();
     });
     window.addEventListener('keyup', (e) => {

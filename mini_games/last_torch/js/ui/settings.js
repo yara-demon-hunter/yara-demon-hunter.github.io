@@ -22,7 +22,7 @@ export function openSettings() {
 
 export function toggleSetting(key) {
     save.settings[key] = !save.settings[key];
-    if (key === 'keyboard') {
+    if (key === 'moveKeys') {
         // Voltou ao mouse: o herói volta a seguir o cursor e nenhuma tecla fica presa
         Object.keys(keys).forEach((code) => { keys[code] = false; });
         player.mouseFollow = true;

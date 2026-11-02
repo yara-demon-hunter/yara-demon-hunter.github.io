@@ -16,7 +16,7 @@ function createSave() {
             elites: 0, evolutions: 0, bestDarknessWon: 0, bosses: 0, chests: 0,
             bestMultiKill: 0, perfectDodges: 0, flawlessHours: 0
         },
-        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, keyboard: true, quickPick: false, touch: { scale: 1, positions: {} } },
+        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, moveKeys: false, quickPick: false, touch: { scale: 1, positions: {} } },
         seenTutorial: false,
         seenTreeHint: false
     };
@@ -30,11 +30,13 @@ function load() {
         // Saves antigos: brasas e melhorias do Hearth não existem mais (o Hearth virou o Santuário)
         delete saved.embers;
         delete saved.upgrades;
+        if (saved.settings) delete saved.settings.keyboard;
         // Campos novos em versões futuras entram com o valor padrão
         return {
             ...fresh, ...saved,
             stats: { ...fresh.stats, ...saved.stats },
             bestiary: { ...saved.bestiary },
+            // moveKeys substituiu keyboard, que vinha ligado: quem já jogou também começa só com o mouse
             // Escolha ao subir de nível: sempre começa desligada, quem quiser liga em Settings
             settings: { ...fresh.settings, ...saved.settings, quickPick: false }
         };

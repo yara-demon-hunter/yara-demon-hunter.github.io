@@ -95,7 +95,7 @@ export function updatePlayer(dt) {
     let moveY = 0;
 
     // Teclas de direção só andam se o jogador ligou em Settings; o padrão é o mouse
-    if (save.settings.keyboard) {
+    if (save.settings.moveKeys) {
         if (keys['KeyW'] || keys['ArrowUp']) moveY -= 1;
         if (keys['KeyS'] || keys['ArrowDown']) moveY += 1;
         if (keys['KeyA'] || keys['ArrowLeft']) moveX -= 1;

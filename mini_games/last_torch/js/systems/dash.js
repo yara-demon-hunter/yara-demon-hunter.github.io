@@ -26,7 +26,7 @@ export function resetDash() {
 function getDashDirection() {
     let x = joystick.x;
     let y = joystick.y;
-    if (!x && !y && save.settings.keyboard) {
+    if (!x && !y && save.settings.moveKeys) {
         if (keys['KeyW'] || keys['ArrowUp']) y -= 1;
         if (keys['KeyS'] || keys['ArrowDown']) y += 1;
         if (keys['KeyA'] || keys['ArrowLeft']) x -= 1;
