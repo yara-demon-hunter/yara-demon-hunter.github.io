@@ -1,0 +1,12 @@
+---
+layout: null
+permalink: /sitemap.txt
+---
+{%- assign entries = site.pages | concat: site.documents -%}
+{%- for entry in entries -%}
+  {%- comment -%} As telas cruas em /mini_games/ abrem pelas páginas de cada jogo em /en e /pt, que têm o texto para a busca {%- endcomment -%}
+  {%- unless entry.sitemap == false or entry.noindex or entry.url contains ".xml" or entry.url contains ".txt" or entry.url contains "404" or entry.url contains "assets" or entry.url contains "/mini_games/" -%}
+    {%- assign lastmod = entry.last_updated | default: entry.sitemap_lastmod | default: entry.last_modified_at | default: entry.date | default: site.time %}
+{{ entry.url | absolute_url }}
+{%- endunless -%}
+{%- endfor %}
