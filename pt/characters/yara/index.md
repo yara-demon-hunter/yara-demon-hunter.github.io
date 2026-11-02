@@ -4,11 +4,12 @@ title: Yara
 lang: pt
 book_id: book-1
 translation_id: character-yara
-last_updated: 2026-09-26
+last_updated: 2026-11-02
 character:
   name: Yara
   role: Protagonista
   directory: true
+  order: 1
   book_url: /pt/books/book-1/
   summary: Uma jovem caçadora de demônios que percorre um mundo marcado por criaturas sobrenaturais, perigos antigos e segredos que ainda aguardam para vir à tona.
   portrait_alt: Retrato de Yara
@@ -66,4 +67,24 @@ character:
       category: Rascunhos
       caption: Um rascunho da Yara entrando no modo demoníaco.
       size: standard
+    - src: /assets/images/common/characters/yara/yara_rpg.webp
+      alt: Retrato de Yara no mini RPG.
+      category: Jogo
+      caption: Yara no mini RPG.
+      size: standard
+  curiosities:
+    - text: "O nome de Yara aparece muito antes dela. No capítulo 2, Zeph conta a Oskar que, se o bebê for menina, vai se chamar Yara."
+      refs:
+        - label: "Capítulo 2"
+          url: /pt/books/book-1/chapters/002/
+    - text: "Zeph explica que o nome significa \"senhora das águas\"."
+      refs:
+        - label: "Capítulo 2"
+          url: /pt/books/book-1/chapters/002/
+    - text: "Ela pode ser jogada em dois mini games: o mini RPG e a Arena da Floresta."
+      refs:
+        - label: "Mini RPG"
+          url: /pt/mini-games/yara-rpg/
+        - label: "Arena da Floresta"
+          url: /pt/mini-games/dark-forest-arena/
 ---

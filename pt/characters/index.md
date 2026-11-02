@@ -4,7 +4,7 @@ title: Arquivo de Personagens
 lang: pt
 book_id: book-1
 translation_id: characters-index
-last_updated: 2026-09-26
+last_updated: 2026-11-02
 ---
 
 <section class="character-directory">
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
     <p class="character-directory__intro">Conheça quem dá forma à história.</p>
 
     <div class="character-directory__list">
-        {% assign character_pages = site.pages | where: "layout", "character" | where: "lang", page.lang %}
+        {% assign character_pages = site.pages | where: "layout", "character" | where: "lang", page.lang| sort: "character.order" %}
         {% for profile_page in character_pages %}
             {% if profile_page.character.directory %}
                 {% include character-card.html profile_page=profile_page %}

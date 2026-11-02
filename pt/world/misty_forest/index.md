@@ -5,14 +5,14 @@ lang: pt
 book_id: book-1
 translation_id: location-misty-forest
 last_updated: 2026-10-31
-image: /mini_games/yara-rpg/images/regions/dark-forest.webp
+image: /assets/images/common/world/misty_forest/misty_forest.webp
 location:
   name: "Floresta da Névoa"
   alternate_name: "A Floresta Proibida"
   category: "Região selvagem"
   directory: true
   summary: "A mata em volta da Aldeia do Gudran sustenta seu povo de dia e se torna proibida assim que o sino toca."
-  portrait: /mini_games/yara-rpg/images/regions/dark-forest.webp
+  portrait: /assets/images/common/world/misty_forest/misty_forest.webp
   portrait_alt: "Floresta da Névoa"
   labels:
     open: "Explorar local"

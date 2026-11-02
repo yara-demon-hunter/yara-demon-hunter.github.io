@@ -5,14 +5,14 @@ lang: en
 book_id: book-1
 translation_id: location-gudran-castle
 last_updated: 2026-10-31
-image: /mini_games/yara-rpg/images/regions/gudran-castle.webp
+image: /assets/images/common/world/gudran_castle/gudran_castle.webp
 location:
   name: "Gudran Castle"
   alternate_name: "The Lord's Seat"
   category: "Stronghold"
   directory: true
   summary: "The small castle at the heart of the village, from which Lord Gudran enforces the rule of the bell."
-  portrait: /mini_games/yara-rpg/images/regions/gudran-castle.webp
+  portrait: /assets/images/common/world/gudran_castle/gudran_castle.webp
   portrait_alt: "Gudran Castle"
   labels:
     open: "Explore location"

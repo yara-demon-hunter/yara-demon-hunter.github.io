@@ -5,13 +5,13 @@ lang: en
 book_id: book-1
 translation_id: location-river-crossing
 last_updated: 2026-10-31
-image: /mini_games/yara-rpg/images/regions/river-crossing.webp
+image: /assets/images/common/world/river_crossing/river_crossing.webp
 location:
   name: "The River Crossing"
   category: "Waterway"
   directory: true
   summary: "The current that cuts through the forest gives the fishermen their living and divides the safe path from the unknown."
-  portrait: /mini_games/yara-rpg/images/regions/river-crossing.webp
+  portrait: /assets/images/common/world/river_crossing/river_crossing.webp
   portrait_alt: "The River Crossing"
   labels:
     open: "Explore location"

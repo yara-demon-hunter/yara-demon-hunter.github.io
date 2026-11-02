@@ -5,14 +5,14 @@ lang: pt
 book_id: book-1
 translation_id: location-gudran-castle
 last_updated: 2026-10-31
-image: /mini_games/yara-rpg/images/regions/gudran-castle.webp
+image: /assets/images/common/world/gudran_castle/gudran_castle.webp
 location:
   name: "Castelo de Gudran"
   alternate_name: "A Sede do Lorde"
   category: "Fortaleza"
   directory: true
   summary: "O pequeno castelo no coração da aldeia, de onde o Lorde Gudran faz cumprir a regra do sino."
-  portrait: /mini_games/yara-rpg/images/regions/gudran-castle.webp
+  portrait: /assets/images/common/world/gudran_castle/gudran_castle.webp
   portrait_alt: "Castelo de Gudran"
   labels:
     open: "Explorar local"

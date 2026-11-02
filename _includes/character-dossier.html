@@ -31,6 +31,7 @@
     </div>
 </header>
 
+{% unless character.no_gallery %}
 <section class="character-gallery" aria-labelledby="character-gallery-title">
     <div class="character-section-heading">
         <p class="character-section-heading__label">{{ character.labels.gallery_eyebrow }}</p>
@@ -55,3 +56,4 @@
         </div>
     {% endif %}
 </section>
+{% endunless %}

@@ -4,11 +4,12 @@ title: Yara
 lang: en
 book_id: book-1
 translation_id: character-yara
-last_updated: 2026-09-26
+last_updated: 2026-11-02
 character:
   name: Yara
   role: Protagonist
   directory: true
+  order: 1
   book_url: /en/books/book-1/
   summary: A young demon hunter who wanders a world scarred by supernatural creatures, ancient dangers, and secrets yet to come to light.
   portrait_alt: Portrait of Yara
@@ -66,6 +67,26 @@ character:
       category: Sketches
       caption: A sketch of Yara entering demon mode.
       size: standard
+    - src: /assets/images/common/characters/yara/yara_rpg.webp
+      alt: Portrait of Yara in the mini RPG.
+      category: Game
+      caption: Yara in the mini RPG.
+      size: standard
+  curiosities:
+    - text: "Yara's name appears long before she does. In chapter 2, Zeph tells Oskar that if his baby is a girl, she will be called Yara."
+      refs:
+        - label: "Chapter 2"
+          url: /en/books/book-1/chapters/002/
+    - text: "Zeph explains that the name means \"lady of the waters\"."
+      refs:
+        - label: "Chapter 2"
+          url: /en/books/book-1/chapters/002/
+    - text: "She is playable in two mini games: the mini RPG and Dark Forest Arena."
+      refs:
+        - label: "Mini RPG"
+          url: /en/mini-games/yara-rpg/
+        - label: "Dark Forest Arena"
+          url: /en/mini-games/dark-forest-arena/
 ---
 <!-- 
 ## At a glance

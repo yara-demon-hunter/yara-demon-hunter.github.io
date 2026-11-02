@@ -5,14 +5,14 @@ lang: en
 book_id: book-1
 translation_id: location-misty-forest
 last_updated: 2026-10-31
-image: /mini_games/yara-rpg/images/regions/dark-forest.webp
+image: /assets/images/common/world/misty_forest/misty_forest.webp
 location:
   name: "The Misty Forest"
   alternate_name: "The Forbidden Forest"
   category: "Wilderness"
   directory: true
   summary: "The woods around Gudran's Village feed its people by day and become forbidden the moment the bell rings."
-  portrait: /mini_games/yara-rpg/images/regions/dark-forest.webp
+  portrait: /assets/images/common/world/misty_forest/misty_forest.webp
   portrait_alt: "The Misty Forest"
   labels:
     open: "Explore location"

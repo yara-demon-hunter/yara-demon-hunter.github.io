@@ -5,14 +5,14 @@ lang: en
 book_id: book-1
 translation_id: location-spirit-world
 last_updated: 2026-10-31
-image: /mini_games/yara-rpg/images/regions/spirit-world.webp
+image: /assets/images/common/world/spirit_world/spirit_world.webp
 location:
   name: "The Spirit World"
   alternate_name: "Between the Mist and the Stars"
   category: "Otherworld"
   directory: true
   summary: "A hidden place that only appears beyond the spiritual eye, where the mist meets the stars."
-  portrait: /mini_games/yara-rpg/images/regions/spirit-world.webp
+  portrait: /assets/images/common/world/spirit_world/spirit_world.webp
   portrait_alt: "The Spirit World"
   labels:
     open: "Explore location"

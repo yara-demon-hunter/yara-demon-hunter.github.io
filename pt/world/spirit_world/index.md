@@ -5,14 +5,14 @@ lang: pt
 book_id: book-1
 translation_id: location-spirit-world
 last_updated: 2026-10-31
-image: /mini_games/yara-rpg/images/regions/spirit-world.webp
+image: /assets/images/common/world/spirit_world/spirit_world.webp
 location:
   name: "Mundo Espiritual"
   alternate_name: "Entre a Névoa e as Estrelas"
   category: "Outro plano"
   directory: true
   summary: "Um lugar oculto que só surge além do olho espiritual, onde a névoa encontra as estrelas."
-  portrait: /mini_games/yara-rpg/images/regions/spirit-world.webp
+  portrait: /assets/images/common/world/spirit_world/spirit_world.webp
   portrait_alt: "Mundo Espiritual"
   labels:
     open: "Explorar local"

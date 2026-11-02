@@ -2,7 +2,7 @@
   "characters": [
     {
       "name": "Zeph",
-      "image": "images/characters/zeph.webp",
+      "image": "characters/zeph.webp",
       "about": {
         "pt": "Sobrevivente atento, acostumado a resistir aos perigos da floresta.",
         "en": "A watchful survivor, used to enduring the forest's dangers."
@@ -19,7 +19,7 @@
     },
     {
       "name": "Oskar",
-      "image": "images/characters/oskar.webp",
+      "image": "characters/oskar.webp",
       "about": {
         "pt": "Caçador implacável que prefere encerrar uma luta com um golpe forte.",
         "en": "A relentless hunter who prefers to end a fight with a powerful blow."
@@ -36,7 +36,7 @@
     },
     {
       "name": "Yara",
-      "image": "images/characters/yara.webp",
+      "image": "characters/yara.webp",
       "about": {
         "pt": "Caçadora de demônios mestiça, dividida entre sua natureza humana e o poder demoníaco.",
         "en": "A half-demon hunter, caught between her human nature and demonic power."
@@ -53,7 +53,7 @@
     },
     {
       "name": "Demon Hunter",
-      "image": "images/characters/demon-hunter.webp",
+      "image": "characters/demon-hunter.webp",
       "about": {
         "pt": "Caçador lendário que transforma a força dos demônios contra eles mesmos.",
         "en": "A legendary hunter who turns demonic strength against the demons themselves."
@@ -70,7 +70,7 @@
     },
     {
       "name": "Mysterious Creature",
-      "image": "images/characters/mysterious_creature.webp",
+      "image": "characters/mysterious_creature.webp",
       "about": {
         "pt": "Uma criatura enigmática que canaliza energia espiritual em sua espada.",
         "en": "An enigmatic creature that channels spirit energy through its sword."
@@ -96,14 +96,14 @@
         "en": "The bell rang too late. The mist hides hungry beasts and ancient secrets.",
         "pt": "O sino tocou tarde demais. A névoa esconde feras famintas e segredos antigos."
       },
-      "cover": "images/regions/dark-forest.webp",
+      "cover": "regions/dark-forest.webp",
       "monsters": [
         {
           "name": {
             "pt": "Lobo Sombriço",
             "en": "Shadow Wolf"
           },
-          "image": "images/monsters/shadow-wolf.webp",
+          "image": "monsters/shadow-wolf.webp",
           "line": {
             "en": "Awooooo!",
             "pt": "Auuuuuu!"
@@ -114,7 +114,7 @@
             "pt": "Espectro Corrompido",
             "en": "Corrupted Specter"
           },
-          "image": "images/monsters/corrupted-spirit.webp",
+          "image": "monsters/corrupted-spirit.webp",
           "line": {
             "en": "Your light will fade...",
             "pt": "Sua luz vai se apagar..."
@@ -125,7 +125,7 @@
             "pt": "Bruxa",
             "en": "Witch"
           },
-          "image": "images/monsters/witch.webp",
+          "image": "monsters/witch.webp",
           "line": {
             "en": "I've prepared a spell just for you.",
             "pt": "Já preparei um feitiço para você."
@@ -136,7 +136,7 @@
             "pt": "Esqueleto",
             "en": "Skeleton"
           },
-          "image": "images/monsters/squeleton.webp",
+          "image": "monsters/squeleton.webp",
           "line": {
             "en": "My bones find no rest...",
             "pt": "Meus ossos não descansam..."
@@ -153,14 +153,14 @@
         "en": "The current cuts through the forest. Cross the river to reach the far side, where the mist still hides danger.",
         "pt": "A correnteza corta a floresta. Atravesse o rio e encontre o caminho para o outro lado, onde a névoa ainda esconde perigos."
       },
-      "cover": "images/regions/river-crossing.webp",
+      "cover": "regions/river-crossing.webp",
       "monsters": [
         {
           "name": {
             "pt": "Demônio do Rio",
             "en": "River Demon"
           },
-          "image": "images/monsters/river-demon.webp",
+          "image": "monsters/river-demon.webp",
           "line": {
             "en": "The river will take you!",
             "pt": "O rio vai levar você!"
@@ -171,7 +171,7 @@
             "pt": "Golem do Rio",
             "en": "River Golem"
           },
-          "image": "images/monsters/river-golem.webp",
+          "image": "monsters/river-golem.webp",
           "line": {
             "en": "Stone feels no pain.",
             "pt": "Pedra não sente dor."
@@ -182,7 +182,7 @@
             "pt": "Criatura das Sombras",
             "en": "Shadow Creature"
           },
-          "image": "images/monsters/shadow-creature.webp",
+          "image": "monsters/shadow-creature.webp",
           "line": {
             "en": "I am the fear you hide.",
             "pt": "Eu sou o medo que você esconde."
@@ -193,7 +193,7 @@
             "pt": "Vampiro",
             "en": "Vampire"
           },
-          "image": "images/monsters/vampire.webp",
+          "image": "monsters/vampire.webp",
           "line": {
             "en": "Your blood smells of courage...",
             "pt": "Seu sangue tem cheiro de coragem..."
@@ -210,14 +210,14 @@
         "en": "Blue-flamed torches light the village homes. The streets are too quiet, and signs of invaders still mark the walls.",
         "pt": "Tochas de chama azulada iluminam as casas da aldeia. As ruas estão quietas demais, e sinais de invasores ainda marcam as paredes."
       },
-      "cover": "images/regions/blue-torch-village.webp",
+      "cover": "regions/blue-torch-village.webp",
       "monsters": [
         {
           "name": {
             "pt": "Saqueador da Névoa",
             "en": "Mist Marauder"
           },
-          "image": "images/monsters/mist-maruader.webp",
+          "image": "monsters/mist-maruader.webp",
           "line": {
             "en": "Hand over your gold and I may spare you.",
             "pt": "Entregue seu ouro e talvez eu poupe você."
@@ -228,7 +228,7 @@
             "pt": "Cavaleiro Possuído",
             "en": "Possessed Knight"
           },
-          "image": "images/monsters/possessed-knight.webp",
+          "image": "monsters/possessed-knight.webp",
           "line": {
             "en": "My will is no longer my own.",
             "pt": "Minha vontade já não me pertence."
@@ -239,7 +239,7 @@
             "pt": "Cavaleiro sem Cabeça",
             "en": "Headless Horseman"
           },
-          "image": "images/monsters/headless-horseman.webp",
+          "image": "monsters/headless-horseman.webp",
           "line": {
             "en": "The gallop heralds your end.",
             "pt": "O galope anuncia seu fim."
@@ -256,14 +256,14 @@
         "en": "Gudran's walls conceal ancient creatures and knights who suffer no intruders.",
         "pt": "As muralhas de Gudran guardam criaturas antigas e cavaleiros que não aceitam intrusos."
       },
-      "cover": "images/regions/gudran-castle.webp",
+      "cover": "regions/gudran-castle.webp",
       "monsters": [
         {
           "name": {
             "pt": "Soldado de Gudran",
             "en": "Gudran's Soldier"
           },
-          "image": "images/monsters/gudran-soldier.webp",
+          "image": "monsters/gudran-soldier.webp",
           "line": {
             "en": "The castle will not fall while I draw breath.",
             "pt": "O castelo não cairá enquanto eu respirar."
@@ -274,7 +274,7 @@
             "pt": "Criatura Corrompida",
             "en": "Corrupted Creature"
           },
-          "image": "images/monsters/corrupted-creature.webp",
+          "image": "monsters/corrupted-creature.webp",
           "line": {
             "en": "The corruption made me stronger.",
             "pt": "A corrupção me tornou mais forte."
@@ -285,7 +285,7 @@
             "pt": "Golem",
             "en": "Golem"
           },
-          "image": "images/monsters/golem.webp",
+          "image": "monsters/golem.webp",
           "line": {
             "en": "The castle is my stone.",
             "pt": "O castelo é minha rocha."
@@ -302,7 +302,7 @@
         "en": "Beyond the castle doors, Gudran waits at the heart of his domain. Even the mist seems to hold its breath.",
         "pt": "Além das portas do castelo, Gudran aguarda no coração de seu domínio. A névoa parece prender a respiração."
       },
-      "cover": "images/regions/gudran-throne.webp",
+      "cover": "regions/gudran-throne.webp",
       "monsters": []
     },
     {
@@ -314,7 +314,7 @@
         "en": "Beyond the spiritual eye, a hidden place emerges between the mist and the stars.",
         "pt": "Por trás do olho espiritual, um lugar oculto se revela entre a névoa e as estrelas."
       },
-      "cover": "images/regions/spirit-world.webp",
+      "cover": "regions/spirit-world.webp",
       "monsters": []
     }
   ],
@@ -324,7 +324,7 @@
         "pt": "Arauto Menor do Abismo",
         "en": "Lesser Abyssal Herald"
       },
-      "image": "images/special_monsters/abyssal-demon.webp",
+      "image": "special_monsters/abyssal-demon.webp",
       "line": {
         "en": "The Abyss already knows your soul.",
         "pt": "O Abismo já conhece sua alma."
@@ -336,7 +336,7 @@
         "pt": "Morte",
         "en": "Death"
       },
-      "image": "images/special_monsters/death.webp",
+      "image": "special_monsters/death.webp",
       "line": {
         "en": "Your time has come.",
         "pt": "Chegou a sua hora."
@@ -348,7 +348,7 @@
         "pt": "Morto-Vivo",
         "en": "Undead"
       },
-      "image": "images/special_monsters/undead.webp",
+      "image": "special_monsters/undead.webp",
       "line": {
         "en": "Death would not keep me.",
         "pt": "A morte não me quis."
@@ -360,7 +360,7 @@
         "pt": "Dragão da Névoa",
         "en": "Mist Dragon"
       },
-      "image": "images/special_monsters/mist-dragon.webp",
+      "image": "special_monsters/mist-dragon.webp",
       "line": {
         "en": "My wings shadow the sky.",
         "pt": "Minhas asas cobrem o céu."
@@ -372,7 +372,7 @@
         "pt": "Demônio do Abismo",
         "en": "Abyssal Demon"
       },
-      "image": "images/special_monsters/abyssal-demon.webp",
+      "image": "special_monsters/abyssal-demon.webp",
       "line": {
         "en": "I am the voice of the Abyss.",
         "pt": "Eu sou a voz do Abismo."
@@ -384,7 +384,7 @@
         "pt": "Brutos",
         "en": "Brutos"
       },
-      "image": "images/special_monsters/brutos.webp",
+      "image": "special_monsters/brutos.webp",
       "line": {
         "en": "Brutos smash!",
         "pt": "Brutos esmaga!"
@@ -396,7 +396,7 @@
         "pt": "Lorde Demônio",
         "en": "Demon Lord"
       },
-      "image": "images/special_monsters/demon-lord.webp",
+      "image": "special_monsters/demon-lord.webp",
       "line": {
         "en": "All demons bow before me.",
         "pt": "Todos os demônios curvam-se diante de mim."
@@ -408,7 +408,7 @@
         "pt": "Gudran, Senhor do Castelo",
         "en": "Gudran, Lord of the Castle"
       },
-      "image": "images/special_monsters/gudran.webp",
+      "image": "special_monsters/gudran.webp",
       "line": {
         "en": "This kingdom will always be mine.",
         "pt": "Este reino sempre será meu."
@@ -421,7 +421,7 @@
       "en": "Wandering Vendor",
       "pt": "Vendedor Ambulante"
     },
-    "image": "images/mist_contacts/wandering-vendor.webp",
+    "image": "mist_contacts/wandering-vendor.webp",
     "about": {
       "pt": "Um vendedor encapuzado surge da névoa puxando uma carroça cheia de tralhas. \"Ouro por sobrevivência, caçador. Dê uma olhada.\"",
       "en": "A hooded vendor steps out of the mist pulling a cart full of odds and ends. \"Gold for survival, hunter. Have a look.\""
@@ -543,7 +543,7 @@
         "pt": "Espírito do Rio",
         "en": "River Spirit"
       },
-      "image": "images/mist_contacts/river-spirit.webp",
+      "image": "mist_contacts/river-spirit.webp",
       "line": {
         "pt": "Uma voz úmida sussurra entre as árvores: “Viajante, aceite minha oferenda. A névoa sempre cobra algo em troca...”",
         "en": "A damp voice whispers through the trees: “Traveler, accept my offering. The mist always asks for something in return...”"
@@ -554,7 +554,7 @@
         "pt": "Batedor Perdido",
         "en": "Lost Scout"
       },
-      "image": "images/mist_contacts/lost-scout.webp",
+      "image": "mist_contacts/lost-scout.webp",
       "line": {
         "pt": "Uma silhueta ferida aponta para a trilha: “Posso mostrar o caminho... mas algo está caçando quem atravessa a névoa.”",
         "en": "A wounded silhouette points down the trail: “I can show you the way... but something is hunting everyone who crosses the mist.”"
@@ -565,7 +565,7 @@
         "pt": "Espectro",
         "en": "Specter"
       },
-      "image": "images/mist_contacts/specter.webp",
+      "image": "mist_contacts/specter.webp",
       "line": {
         "pt": "O som de um sino ecoa sem origem. Um espectro oferece um pacto: “Prossiga e prove que merece sair daqui.”",
         "en": "A bell rings from nowhere. A specter offers a pact: “Go on and prove you deserve to leave this place.”"
@@ -576,7 +576,7 @@
         "pt": "Bruxa Caçadora",
         "en": "Hunter Witch"
       },
-      "image": "images/mist_contacts/witch-hunter.webp",
+      "image": "mist_contacts/witch-hunter.webp",
       "line": {
         "pt": "Uma bruxa ergue o cajado: “Derrote o morto-vivo que ronda estas árvores e provarei que você merece minha ajuda.”",
         "en": "A witch raises her staff: “Defeat the undead stalking these woods, and I will prove you deserve my help.”"
@@ -587,7 +587,7 @@
         "pt": "Bruxa Velha",
         "en": "Old Witch"
       },
-      "image": "images/mist_contacts/old-witch.webp",
+      "image": "mist_contacts/old-witch.webp",
       "line": {
         "pt": "Uma velha bruxa oferece uma bebida escura: “Beba tudo. Vai custar sua força, mas pagarei muito bem.”",
         "en": "An old witch offers a dark drink: “Drink it all. It will drain your strength, but I will pay you well.”"
@@ -598,7 +598,7 @@
         "pt": "Negociante de Pactos",
         "en": "Pact Broker"
       },
-      "image": "images/mist_contacts/pact-broker.webp",
+      "image": "mist_contacts/pact-broker.webp",
       "line": {
         "pt": "A figura oferece um pacto: você receberá uma penalidade aleatória — ficar com 1 HP, perder todo o Foco, perder os itens da mochila ou um equipamento vestido — e, em troca, ganhará uma skill passiva que enfraquece todos os monstros. Aceitar é permanente.",
         "en": "The figure offers a pact: you will receive a random penalty — be left at 1 HP, lose all Focus, lose your backpack items, or lose one equipped item — and in return gain a passive skill that weakens every monster. Accepting is permanent."
@@ -609,7 +609,7 @@
         "pt": "Cirurgião Espiritual",
         "en": "Spirit Surgeon"
       },
-      "image": "images/mist_contacts/spirit-surgeon.webp",
+      "image": "mist_contacts/spirit-surgeon.webp",
       "line": {
         "pt": "O Cirurgião Espiritual faz uma proposta misteriosa. Ninguém sabe o que acontecerá se você aceitar.",
         "en": "The Spirit Surgeon makes a mysterious offer. No one knows what will happen if you accept."
@@ -620,7 +620,7 @@
         "pt": "Espírito Purificador",
         "en": "Purifying Spirit"
       },
-      "image": "images/mist_contacts/spirit-purifier.webp",
+      "image": "mist_contacts/spirit-purifier.webp",
       "line": {
         "pt": "Um espírito toca sua testa e purifica sua alma. Você sente que pode aperfeiçoar uma habilidade: recebe 1 Ponto de Habilidade para distribuir.",
         "en": "A spirit touches your forehead and purifies your soul. You feel able to improve a skill: gain 1 Skill Point to spend."
@@ -633,7 +633,7 @@
         "pt": "Cão da Trilha",
         "en": "Trail Hound"
       },
-      "image": "images/items/forest-dog.webp",
+      "image": "items/forest-dog.webp",
       "stats": {
         "en": "+1 ATK · +2 Evasion · +1 Parry",
         "pt": "+1 ATQ · +2 Esquiva · +1 Aparo"
@@ -656,7 +656,7 @@
         "pt": "Gato Sombrio",
         "en": "Shadow Cat"
       },
-      "image": "images/items/shadow-cat.webp",
+      "image": "items/shadow-cat.webp",
       "stats": {
         "en": "+3 Evasion · +1 Stun",
         "pt": "+3 Esquiva · +1 Stun"
@@ -679,7 +679,7 @@
         "pt": "Cavalo Selvagem",
         "en": "Wild Horse"
       },
-      "image": "images/items/wild-horse.webp",
+      "image": "items/wild-horse.webp",
       "stats": {
         "en": "+20 HP · +10 Focus · +1 Evasion",
         "pt": "+20 HP · +10 Foco · +1 Esquiva"
@@ -702,7 +702,7 @@
         "pt": "Corvo",
         "en": "Raven"
       },
-      "image": "images/items/raven.webp",
+      "image": "items/raven.webp",
       "stats": {
         "en": "+2 Evasion · +2 Stun",
         "pt": "+2 Esquiva · +2 Stun"
@@ -725,7 +725,7 @@
         "pt": "Lobo da Floresta",
         "en": "Forest Wolf"
       },
-      "image": "images/items/forest-wolf.webp",
+      "image": "items/forest-wolf.webp",
       "stats": {
         "en": "+3 ATK · +1 Evasion",
         "pt": "+3 ATQ · +1 Esquiva"
@@ -748,7 +748,7 @@
         "pt": "Águia Vigilante",
         "en": "Watchful Eagle"
       },
-      "image": "images/items/watchful-eagle.webp",
+      "image": "items/watchful-eagle.webp",
       "stats": {
         "en": "+1 Evasion · +1 Parry · +2 Stun",
         "pt": "+1 Esquiva · +1 Aparo · +2 Stun"
@@ -779,7 +779,7 @@
             "pt": "Espada de Ferro",
             "en": "Iron Sword"
           },
-          "image": "images/items/iron-sword.webp",
+          "image": "items/iron-sword.webp",
           "stats": {
             "en": "+3 ATK · +1 DEF · +2 Evasion",
             "pt": "+3 ATQ · +1 DEF · +2 Esquiva"
@@ -790,7 +790,7 @@
             "pt": "Machado do Caçador",
             "en": "Hunter's Axe"
           },
-          "image": "images/items/hunter-axe.webp",
+          "image": "items/hunter-axe.webp",
           "stats": {
             "en": "+5 ATK · +1 Parry · +1 Crit",
             "pt": "+5 ATQ · +1 Aparo · +1 Crítico"
@@ -801,7 +801,7 @@
             "pt": "Arco e Flecha",
             "en": "Bow and Arrows"
           },
-          "image": "images/items/hunter-bow.webp",
+          "image": "items/hunter-bow.webp",
           "stats": {
             "en": "+1 ATK · +2 Evasion · +1 Stun · -5 Max Fury",
             "pt": "+1 ATQ · +2 Esquiva · +1 Stun · -5 Fúria máx."
@@ -812,7 +812,7 @@
             "pt": "Faca do Caçador",
             "en": "Hunter's Dagger"
           },
-          "image": "images/items/hunter-dagger.webp",
+          "image": "items/hunter-dagger.webp",
           "stats": {
             "en": "+1 ATK · +4 Evasion · +3 Crit",
             "pt": "+1 ATQ · +4 Esquiva · +3 Crítico"
@@ -823,7 +823,7 @@
             "pt": "Lâmina Deslumbrante",
             "en": "Stunning Blade"
           },
-          "image": "images/items/stunning-blade.webp",
+          "image": "items/stunning-blade.webp",
           "stats": {
             "en": "+2 ATK · +2 Stun",
             "pt": "+2 ATQ · +2 Stun"
@@ -834,7 +834,7 @@
             "pt": "Machado de Duas Lâminas",
             "en": "Double Headed Axe"
           },
-          "image": "images/items/double-headed-axe.webp",
+          "image": "items/double-headed-axe.webp",
           "stats": {
             "en": "+9 ATK · +3 Parry · +5 Crit",
             "pt": "+9 ATQ · +3 Aparo · +5 Crítico"
@@ -845,7 +845,7 @@
             "pt": "Espada Demon Hunter",
             "en": "Demon Hunter Sword"
           },
-          "image": "images/items/demon-hunter-sword.webp",
+          "image": "items/demon-hunter-sword.webp",
           "stats": {
             "en": "+5 ATK · +2 Crit · -10 Max Fury",
             "pt": "+5 ATQ · +2 Crítico · -10 Fúria máx."
@@ -856,7 +856,7 @@
             "pt": "Espada Espiritual",
             "en": "Spirit Sword"
           },
-          "image": "images/items/spirit-sword.webp",
+          "image": "items/spirit-sword.webp",
           "stats": {
             "en": "+5 ATK · +2 Crit · +3 Stun",
             "pt": "+5 ATQ · +2 Crítico · +3 Stun"
@@ -875,7 +875,7 @@
             "pt": "Escudo de Madeira",
             "en": "Wooden Shield"
           },
-          "image": "images/items/wooden-shield.webp",
+          "image": "items/wooden-shield.webp",
           "stats": {
             "en": "+5 DEF · +5 Parry",
             "pt": "+5 DEF · +5 Aparo"
@@ -886,7 +886,7 @@
             "pt": "Escudo de Ferro",
             "en": "Iron Shield"
           },
-          "image": "images/items/iron-shield.webp",
+          "image": "items/iron-shield.webp",
           "stats": {
             "en": "+7 DEF · +60 HP",
             "pt": "+7 DEF · +60 HP"
@@ -905,7 +905,7 @@
             "pt": "Capuz de Couro",
             "en": "Leather Hood"
           },
-          "image": "images/items/leather-cap.webp",
+          "image": "items/leather-cap.webp",
           "stats": {
             "en": "+1 DEF · +3 Evasion",
             "pt": "+1 DEF · +3 Esquiva"
@@ -916,7 +916,7 @@
             "pt": "Elmo de Ferro",
             "en": "Iron Helm"
           },
-          "image": "images/items/iron-helmet.webp",
+          "image": "items/iron-helmet.webp",
           "stats": {
             "en": "+3 DEF · +10 HP",
             "pt": "+3 DEF · +10 HP"
@@ -927,7 +927,7 @@
             "pt": "Máscara Demon Hunter",
             "en": "Demon Hunter Mask"
           },
-          "image": "images/items/demon-hunter-mask.webp",
+          "image": "items/demon-hunter-mask.webp",
           "stats": {
             "en": "+1 ATK · +2 Crit · -5 Max Fury",
             "pt": "+1 ATQ · +2 Crítico · -5 Fúria máx."
@@ -938,7 +938,7 @@
             "pt": "Bandana Misteriosa",
             "en": "Mysterious Bandana"
           },
-          "image": "images/items/bandana.webp",
+          "image": "items/bandana.webp",
           "stats": {
             "en": "+30 Focus · +5 Stun",
             "pt": "+30 Foco · +5 Stun"
@@ -957,7 +957,7 @@
             "pt": "Armadura de Couro",
             "en": "Leather Armor"
           },
-          "image": "images/items/leather-armor.webp",
+          "image": "items/leather-armor.webp",
           "stats": {
             "en": "+1 DEF · +30 HP",
             "pt": "+1 DEF · +30 HP"
@@ -968,7 +968,7 @@
             "pt": "Capa Noturna",
             "en": "Night Cloak"
           },
-          "image": "images/items/night-cloak.webp",
+          "image": "items/night-cloak.webp",
           "stats": {
             "en": "+3 Evasion · +1 Parry",
             "pt": "+3 Esquiva · +1 Aparo"
@@ -979,7 +979,7 @@
             "pt": "Capa Demon Hunter",
             "en": "Demon Hunter Cloak"
           },
-          "image": "images/items/demon-hunter-cloak.webp",
+          "image": "items/demon-hunter-cloak.webp",
           "stats": {
             "en": "+5 Evasion · +2 Stun · -10 Max Fury",
             "pt": "+5 Esquiva · +2 Stun · -10 Fúria máx."
@@ -990,7 +990,7 @@
             "pt": "Calças de Trilha",
             "en": "Trail Trousers"
           },
-          "image": "images/items/trail-trousers.webp",
+          "image": "items/trail-trousers.webp",
           "stats": {
             "en": "+1 DEF · +30 HP",
             "pt": "+1 DEF · +30 HP"
@@ -1001,7 +1001,7 @@
             "pt": "Grevas de Ferro",
             "en": "Iron Greaves"
           },
-          "image": "images/items/iron-leggings.webp",
+          "image": "items/iron-leggings.webp",
           "stats": {
             "en": "+3 DEF · +10 Focus",
             "pt": "+3 DEF · +10 Foco"
@@ -1012,7 +1012,7 @@
             "pt": "Botas Ligeiras",
             "en": "Swift Boots"
           },
-          "image": "images/items/swift-boots.webp",
+          "image": "items/swift-boots.webp",
           "stats": {
             "en": "+4 Evasion",
             "pt": "+4 Esquiva"
@@ -1023,7 +1023,7 @@
             "pt": "Botas de Ferro",
             "en": "Iron Boots"
           },
-          "image": "images/items/iron-boots.webp",
+          "image": "items/iron-boots.webp",
           "stats": {
             "en": "+3 DEF · +1 Evasion",
             "pt": "+3 DEF · +1 Esquiva"
@@ -1042,7 +1042,7 @@
             "pt": "Anel da Floresta",
             "en": "Forest Ring"
           },
-          "image": "images/items/forest-ring.webp",
+          "image": "items/forest-ring.webp",
           "stats": {
             "en": "+2 ATK · +2 Evasion",
             "pt": "+2 ATQ · +2 Esquiva"
@@ -1053,7 +1053,7 @@
             "pt": "Anel da Névoa",
             "en": "Mist Ring"
           },
-          "image": "images/items/mist-ring.webp",
+          "image": "items/mist-ring.webp",
           "stats": {
             "en": "+1 ATK · +5 Evasion · +1 Stun",
             "pt": "+1 ATQ · +5 Esquiva · +1 Stun"
@@ -1064,7 +1064,7 @@
             "pt": "Amuleto do Rio",
             "en": "River Charm"
           },
-          "image": "images/items/river-charm.webp",
+          "image": "items/river-charm.webp",
           "stats": {
             "en": "+30 Focus · +1 Parry",
             "pt": "+30 Foco · +1 Aparo"
@@ -1075,7 +1075,7 @@
             "pt": "Colar Reluzente",
             "en": "Lumen Necklace"
           },
-          "image": "images/items/lumen-necklace.webp",
+          "image": "items/lumen-necklace.webp",
           "stats": {
             "en": "+1 DEF · +3 Parry · +2 Stun",
             "pt": "+1 DEF · +3 Aparo · +2 Stun"
@@ -1094,7 +1094,7 @@
             "pt": "Selo da Fúria",
             "en": "Fury Seal"
           },
-          "image": "images/items/fury-seal.webp",
+          "image": "items/fury-seal.webp",
           "stats": {
             "en": "-10 Max Fury · +5 Crit",
             "pt": "-10 Fúria máx. · +5 Crítico"
@@ -1105,7 +1105,7 @@
             "pt": "Flauta Demoníaca",
             "en": "Demonic Flute"
           },
-          "image": "images/items/demonic-flute.webp",
+          "image": "items/demonic-flute.webp",
           "stats": {
             "en": "+1 ATK · +3 Stun",
             "pt": "+1 ATQ · +3 Stun"
@@ -1116,7 +1116,7 @@
             "pt": "Runa do Impacto",
             "en": "Impact Rune"
           },
-          "image": "images/items/rune-of-impact.webp",
+          "image": "items/rune-of-impact.webp",
           "stats": {
             "en": "+20 Focus · +2 Stun",
             "pt": "+20 Foco · +2 Stun"
@@ -1127,7 +1127,7 @@
             "pt": "Corda",
             "en": "Rope"
           },
-          "image": "images/items/rope.webp",
+          "image": "items/rope.webp",
           "stats": {
             "en": "+3 Stun · +2 Evasion",
             "pt": "+3 Stun · +2 Esquiva"
@@ -1361,7 +1361,7 @@
         "en": "Treasure chest",
         "pt": "Baú do tesouro"
       },
-      "image": "images/items/chest.webp",
+      "image": "items/chest.webp",
       "about": {
         "en": "May hide equipment for your bag.",
         "pt": "Pode esconder equipamentos para a mochila."
@@ -1372,7 +1372,7 @@
         "en": "Treasure map",
         "pt": "Mapa do tesouro"
       },
-      "image": "images/exploration_items/map.webp",
+      "image": "exploration_items/map.webp",
       "about": {
         "pt": "+10% de chance de baú na próxima descoberta",
         "en": "+10% chest chance on the next discovery"
@@ -1383,7 +1383,7 @@
         "pt": "Olho Espiritual",
         "en": "Spirit Eye"
       },
-      "image": "images/exploration_icons/spirit-eye-open.webp",
+      "image": "exploration_icons/spirit-eye-open.webp",
       "about": {
         "pt": "+5 pontos percentuais na chance de encontrar um baú.",
         "en": "+5 percentage points to the chance of finding a chest."

@@ -5,13 +5,13 @@ lang: pt
 book_id: book-1
 translation_id: location-river-crossing
 last_updated: 2026-10-31
-image: /mini_games/yara-rpg/images/regions/river-crossing.webp
+image: /assets/images/common/world/river_crossing/river_crossing.webp
 location:
   name: "Travessia do Rio"
   category: "Curso d’água"
   directory: true
   summary: "A correnteza que corta a floresta sustenta os pescadores e separa o caminho seguro do desconhecido."
-  portrait: /mini_games/yara-rpg/images/regions/river-crossing.webp
+  portrait: /assets/images/common/world/river_crossing/river_crossing.webp
   portrait_alt: "Travessia do Rio"
   labels:
     open: "Explorar local"

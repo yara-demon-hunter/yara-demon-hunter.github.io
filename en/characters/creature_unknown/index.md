@@ -4,13 +4,14 @@ title: The Mysterious Creature
 lang: en
 book_id: book-1
 translation_id: character-creature-unknown
-last_updated: 2026-09-27
+last_updated: 2026-11-02
 noindex: true
 sitemap: false
 character:
   name: The Mysterious Creature
   role: Antagonist
   directory: true
+  order: 2
   book_url: /en/books/book-1/
   summary: An antagonistic creature whose identity, backstory, and motivations are still being revealed.
   portrait_alt: Portrait of the Mysterious Creature
@@ -33,6 +34,42 @@ character:
       value: The Mysterious Creature
     - label: Role in the story
       value: Antagonist
+  gallery:
+    - src: /assets/images/common/characters/mysterious_creature/mysterious_creature_rpg.webp
+      alt: Portrait of the Mysterious Creature in the mini RPG.
+      category: Game
+      caption: The creature in the mini RPG.
+      size: standard
+  curiosities:
+    - text: "It is the first presence in the book, fighting a masked hunter in the prologue, then watching the valley from the mountain in chapter 1."
+      image: /assets/images/common/books/book-1/chapters/00-prologue.jpeg
+      refs:
+        - label: "Prologue"
+          url: /en/books/book-1/chapters/prologue/
+        - label: "Chapter 1"
+          url: /en/books/book-1/chapters/001/
+        - label: "Chapter 2"
+          url: /en/books/book-1/chapters/002/
+        - label: "Chapter 5"
+          url: /en/books/book-1/chapters/005/
+    - text: "The small flute with a dragon head from chapter 5 has a game version: the Demonic Flute, one of the three items this character starts with in the mini RPG."
+      image: /assets/images/common/mini-game/yara_rpg/items/demonic-flute.webp
+      refs:
+        - label: "Chapter 5"
+          url: /en/books/book-1/chapters/005/
+        - label: "Mini RPG"
+          url: /en/mini-games/yara-rpg/
+    - text: "In the prologue it shapes swords of spectral energy. In the mini RPG it starts with the Spirit Sword."
+      image: /assets/images/common/mini-game/yara_rpg/items/spirit-sword.webp
+      refs:
+        - label: "Prologue"
+          url: /en/books/book-1/chapters/prologue/
+        - label: "Mini RPG"
+          url: /en/mini-games/yara-rpg/
+    - text: "Its hooded portrait is also used by the Corrupted Specter in Dark Forest Arena."
+      refs:
+        - label: "Dark Forest Arena"
+          url: /en/mini-games/dark-forest-arena/
 ---
 
 ## Overview

@@ -4,7 +4,7 @@ title: Character Archive
 lang: en
 book_id: book-1
 translation_id: characters-index
-last_updated: 2026-09-26
+last_updated: 2026-11-02
 ---
 
 <section class="character-directory">
@@ -13,7 +13,7 @@ last_updated: 2026-09-26
 	<p class="character-directory__intro">Meet the people whose choices shape the story.</p>
 
 	<div class="character-directory__list">
-		{% assign character_pages = site.pages | where: "layout", "character" | where: "lang", page.lang %}
+		{% assign character_pages = site.pages | where: "layout", "character" | where: "lang", page.lang| sort: "character.order" %}
 		{% for profile_page in character_pages %}
 			{% if profile_page.character.directory %}
 				{% include character-card.html profile_page=profile_page %}

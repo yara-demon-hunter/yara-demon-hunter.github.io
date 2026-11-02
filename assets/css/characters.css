@@ -611,3 +611,67 @@
         margin-top: 4px;
     }
 }
+
+.character-curiosities {
+    width: min(100%, 980px);
+    margin: 28px auto 0;
+}
+
+.character-curiosities__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.character-curiosity {
+    padding: 14px;
+    border: 1px solid rgba(195, 164, 102, 0.25);
+    border-radius: 12px;
+    background: #16181a;
+}
+
+.character-curiosity--image {
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.character-curiosity img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.character-curiosity p {
+    margin: 0 0 8px;
+    color: #cfcabf;
+    font-size: 0.96rem;
+    line-height: 1.5;
+}
+
+.character-curiosity__refs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.character-curiosity__refs a {
+    padding: 2px 9px;
+    border: 1px solid rgba(195, 164, 102, 0.4);
+    border-radius: 999px;
+    color: #f1d28e;
+    font-size: 0.78rem;
+    text-decoration: none;
+}
+
+@media (max-width: 720px) {
+    .character-curiosities__list {
+        grid-template-columns: 1fr;
+    }
+}

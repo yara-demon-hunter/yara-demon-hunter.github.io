@@ -46,4 +46,4 @@ Para os moradores, o sino marca a fronteira entre o trabalho do dia e os perigos
 
 A aldeia também é conhecida por suas tochas de chama azulada, e seu povo fala de tochas mágicas para enfrentar o escuro. Em [Yara, Demon Hunter: Perdidos na Névoa - Mini RPG]({{ '/pt/mini-games/yara-rpg/' | relative_url }}), este lugar aparece como a Aldeia das Tochas Azuladas, onde as ruas estão quietas demais e sinais de invasores ainda marcam as paredes.
 
-![A Aldeia das Tochas Azuladas no mini RPG]({{ '/mini_games/yara-rpg/images/regions/blue-torch-village.webp' | relative_url }})
+![A Aldeia das Tochas Azuladas no mini RPG]({{ '/assets/images/common/world/gudran_village/blue_torches.webp' | relative_url }})

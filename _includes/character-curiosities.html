@@ -1,0 +1,22 @@
+{% assign curiosities = page.character.curiosities %}
+{% if curiosities and curiosities.size > 0 %}
+<section class="character-curiosities" aria-labelledby="character-curiosities-title">
+    <div class="character-section-heading">
+        <p class="character-section-heading__label">{% if page.lang == 'pt' %}Você sabia?{% else %}Did you know?{% endif %}</p>
+        <h2 id="character-curiosities-title">{% if page.lang == 'pt' %}Curiosidades{% else %}Curiosities{% endif %}</h2>
+    </div>
+    <ul class="character-curiosities__list">
+        {% for curiosity in curiosities %}
+            <li class="character-curiosity{% if curiosity.image %} character-curiosity--image{% endif %}">
+                {% if curiosity.image %}<img src="{{ curiosity.image | relative_url }}" alt="" loading="lazy">{% endif %}
+                <div>
+                    <p>{{ curiosity.text }}</p>
+                    <div class="character-curiosity__refs">
+                        {% for ref in curiosity.refs %}<a href="{{ ref.url | relative_url }}">{{ ref.label }}</a>{% endfor %}
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}

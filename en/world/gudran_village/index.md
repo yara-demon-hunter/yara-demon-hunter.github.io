@@ -46,4 +46,4 @@ For the people of the village, the bell marks the boundary between the work of t
 
 The village is also known for its blue-flamed torches, and its people speak of magic torches for walking into the dark. In [Yara, Demon Hunter: Lost in the Mist - Mini RPG]({{ '/en/mini-games/yara-rpg/' | relative_url }}) this place appears as the Village of Blue Torches, where the streets are too quiet and signs of invaders still mark the walls.
 
-![The Village of Blue Torches in the mini RPG]({{ '/mini_games/yara-rpg/images/regions/blue-torch-village.webp' | relative_url }})
+![The Village of Blue Torches in the mini RPG]({{ '/assets/images/common/world/gudran_village/blue_torches.webp' | relative_url }})
