@@ -229,6 +229,11 @@
 .quit-btn:hover { filter: brightness(1.25); }
 .quit-btn:active { transform: scale(0.96); }
 .settings-body { display: flex; flex-direction: column; gap: 0.6rem; min-height: 0; flex-shrink: 1; }
+.mouse-guide { display: flex; justify-content: center; gap: 1.4rem; margin-top: 0.5rem; }
+.mouse-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.3rem 0.5rem; width: 6.5rem; }
+.mouse-card .mouse-figure { width: 1.9rem; }
+.mouse-card-icon { width: 2.4rem; height: 2.4rem; border-radius: 50%; font-size: 1.7rem; line-height: 2.4rem; text-align: center; }
+.mouse-card b { flex-basis: 100%; text-align: center; font-size: 0.75rem; }
 .settings-hint { margin-top: 0.45rem; color: #94a3b8; font-size: 0.68rem; line-height: 1.35; }
 /* Telas de toque só têm o joystick: sem escolha de teclado */
 @media (pointer: coarse) { .desktop-only { display: none; } }
