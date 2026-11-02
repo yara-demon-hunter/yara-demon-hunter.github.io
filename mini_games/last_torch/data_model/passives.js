@@ -91,7 +91,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby, setting it ablaze and leaving the ground burning. Everything that improves your daggers still counts, while the burning ground scales with your magic damage. The price: you stand still for a moment, unable to do anything, while the fire grows in your hand.'
+        desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby, setting it ablaze and leaving the ground burning. Everything that improves your daggers still counts, and your magic damage multiplies the fireball on top (its hits show in blue). The price: you stand still for a moment, unable to do anything, while the fire grows in your hand.'
     },
     backdraft: {
         name: 'Backdraft',

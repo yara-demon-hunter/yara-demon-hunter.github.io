@@ -220,7 +220,7 @@ export function updateKnives(dt) {
         const hit = enemies.find(e => e.hp > 0 && !k.struck?.has(e)
             && Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius * k.scale);
         if (hit) {
-            dealDamage(hit, k.damage, { kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
+            dealDamage(hit, k.damage, { style: k.fire ? 'spell' : null, kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
             markEnemy(hit);
             if (k.fire) burstFireball(k, hit);
             createExplosion(k.x, k.y, hit.color, 6);

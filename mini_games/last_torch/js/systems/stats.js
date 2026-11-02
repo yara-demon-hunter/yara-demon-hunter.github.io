@@ -2,7 +2,7 @@ import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { BLADE_SKILL, DASH_SKILL, FRENZY_NOVA_SKILL, KNIFE_SKILL, SPELL_SKILL } from '../../data_model/skills.js';
 import { WAR_CRY } from '../../data_model/passives.js';
 import { getPowerLevel } from '../../data_model/powers.js';
-import { attributes, player, powers, state } from '../core/state.js';
+import { attributes, passives, player, powers, state } from '../core/state.js';
 import { mod } from './modifiers.js';
 
 // --- FÓRMULAS DE ATRIBUTOS ---
@@ -106,9 +106,11 @@ export function getFrenzyDuration() {
         + mod('furyDuration');
 }
 // Dano de uma adaga, antes da carga do Charged Dagger Throw
+// Com Fireballs a adaga vira magia: tudo da adaga continua valendo e o dano mágico entra por cima
 export function getKnifeDamage() {
     const ricochet = getPowerLevel(powers.ricochet);
-    return getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0));
+    const magic = passives.fireballs.lvl > 0 ? 1 + mod('spellDamage') : 1;
+    return getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0)) * magic;
 }
 export function getKnifeCooldown() {
     return KNIFE_SKILL.cooldownSeconds * (1 - mod('knifeCooldown'));
