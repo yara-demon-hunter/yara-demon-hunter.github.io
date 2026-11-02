@@ -172,7 +172,7 @@ function updateVoidRift(dt) {
 
         rifts.splice(i, 1);
         state.blastBudget++;
-        blast(r.x, r.y, r.radius, getSpellDamage() * r.damage, M.knockback, '#a855f7');
+        blast(r.x, r.y, r.radius, getSpellDamage() * r.damage, M.knockback, '#a855f7', 'spell');
         addShockwave(r.x, r.y, { radius: r.radius * 1.3, color: '#7c3aed', width: 10, seconds: 0.4 });
         createExplosion(r.x, r.y, '#c084fc', 16);
         shakeScreen(8);

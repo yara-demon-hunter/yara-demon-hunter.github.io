@@ -146,6 +146,8 @@
     font-size: 0.78rem;
     white-space: nowrap;
 }
+/* Mesma cor dos números de dano na caçada (data_model/visuals/effects/juice_visual.js) */
+.shop-row-value.tone-spell { color: #60a5fa; }
 /* Zerado: ainda não ganhou nada disso. Fica no lugar, para a ficha não mudar de forma */
 .shop-row.is-empty { opacity: 0.42; }
 .shop-row-btn {

@@ -21,11 +21,13 @@ export const JUICE_VISUALS = {
     numberStyles: {
         normal: { font: '800 15px Inter, sans-serif', size: 15, color: '#f1f5f9' },
         crit: { font: '900 22px Cinzel, serif', size: 22, color: '#fde047' },
-        storm: { font: '800 15px Inter, sans-serif', size: 15, color: '#bae6fd' },
+        // Uma cor por tipo de dano: branco = lâmina e adaga, azul = tudo o que usa o dano mágico (Curse, fênix, Vigil),
+        // amarelo = o que a tocha dispara, roxo = sombras. O crítico ganha a cor dourada de crit, qualquer que seja o tipo
+        spell: { font: '800 15px Inter, sans-serif', size: 15, color: '#60a5fa' },
         shadow: { font: '800 15px Inter, sans-serif', size: 15, color: '#c4b5fd' },
         hurt: { font: '800 14px Inter, sans-serif', size: 14, color: '#fb7185' },
         heal: { font: '800 14px Inter, sans-serif', size: 14, color: '#86efac' },
-        torch: { font: '800 14px Inter, sans-serif', size: 14, color: '#fb923c' }
+        torch: { font: '800 14px Inter, sans-serif', size: 14, color: '#facc15' }
     },
 
     // Textos que sobem (ouro, cura, avisos)

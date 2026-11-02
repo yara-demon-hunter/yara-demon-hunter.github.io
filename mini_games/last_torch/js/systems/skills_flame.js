@@ -43,7 +43,7 @@ function updateSolarFlare(dt, level) {
         const d = Math.hypot(dx, dy) || 1;
         if (Math.abs(d - level.radius) > F.reach + e.radius) continue;
         const push = e.isBoss ? 0 : F.knockback;
-        dealDamage(e, damage, { kbX: (dx / d) * push, kbY: (dy / d) * push, noCrit: true });
+        dealDamage(e, damage, { kbX: (dx / d) * push, kbY: (dy / d) * push, noCrit: true, style: 'torch' });
     }
     addShockwave(state.coreX, state.coreY, { radius: level.radius + F.reach, color: '#fef08a', width: 10, seconds: 0.4 });
     audio.playNova();
@@ -70,7 +70,7 @@ export function absorbHit() {
     player.shield = 0;
     player.shieldCooldown = VIGIL.rechargeSeconds;
     state.blastBudget++;
-    blast(player.x, player.y, VIGIL.burstRadius, getSpellDamage() * VIGIL.burstDamage, VIGIL.burstKnockback, '#fb923c');
+    blast(player.x, player.y, VIGIL.burstRadius, getSpellDamage() * VIGIL.burstDamage, VIGIL.burstKnockback, '#fb923c', 'spell');
     addShockwave(player.x, player.y, { radius: VIGIL.burstRadius, color: '#fde68a', width: 8, seconds: 0.35 });
     audio.playShieldBreak();
     return true;
@@ -81,7 +81,7 @@ export function absorbHit() {
 export function onTorchTouched() {
     if (passives.backdraft.lvl <= 0) return;
     state.blastBudget++;
-    blast(state.coreX, state.coreY, BACKDRAFT.radius, getSpellDamage() * BACKDRAFT.damage, BACKDRAFT.knockback, '#fb923c');
+    blast(state.coreX, state.coreY, BACKDRAFT.radius, getSpellDamage() * BACKDRAFT.damage, BACKDRAFT.knockback, '#fb923c', 'torch');
 }
 
 // --- PHOENIX PACT ---
@@ -132,7 +132,7 @@ export function updatePhoenix(dt) {
         x: from.x, y: from.y,
         vx: Math.cos(a) * P.speed, vy: Math.sin(a) * P.speed,
         speed: P.speed, turnRate: P.turnRate,
-        target, fire: true,
+        target, fire: true, style: 'spell',
         damage: getSpellDamage() * P.boltDamage,
         life: 1.8,
         onHit: burstPhoenixFire
@@ -171,7 +171,7 @@ export function tryPhoenix() {
     player.iFrames = PHOENIX_PACT.invulnerableSeconds;
     state.enemyProjectiles.length = 0;
     state.blastBudget++;
-    blast(player.x, player.y, PHOENIX_PACT.radius, getSpellDamage() * PHOENIX_PACT.damage, PHOENIX_PACT.knockback, '#fb923c');
+    blast(player.x, player.y, PHOENIX_PACT.radius, getSpellDamage() * PHOENIX_PACT.damage, PHOENIX_PACT.knockback, '#fb923c', 'spell');
     addShockwave(player.x, player.y, { radius: PHOENIX_PACT.radius * 1.3, color: '#fde047', width: 12, seconds: 0.7 });
     createExplosion(player.x, player.y, '#fb923c', 30);
     slowMotion(0.3, 0.7);

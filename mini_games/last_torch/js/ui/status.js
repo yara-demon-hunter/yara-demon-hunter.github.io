@@ -28,7 +28,7 @@ export function getStatText(key) {
     return STAT_VALUES[key] ? STAT_VALUES[key]() : '';
 }
 
-function createStatRow({ name, note, level, value, empty }) {
+function createStatRow({ name, note, level, value, empty, tone }) {
     const item = document.createElement('div');
     item.className = `shop-row${empty ? ' is-empty' : ''}`;
     item.title = note;
@@ -37,6 +37,7 @@ function createStatRow({ name, note, level, value, empty }) {
     item.querySelector('.stat-icon + span').textContent = name;
     if (level) item.querySelector('.shop-row-name').insertAdjacentHTML('beforeend', `<em>Lv. ${level}</em>`);
     item.querySelector('.shop-row-value').textContent = value;
+    if (tone) item.querySelector('.shop-row-value').classList.add(`tone-${tone}`);
     return item;
 }
 
@@ -53,7 +54,7 @@ function renderStats() {
             const amount = attr ? null : row.amount();
             const item = createStatRow(attr
                 ? { name: attr.name, note: attr.desc, level: attr.lvl, value: getStatText(row.attr) }
-                : { name: row.name, note: row.note, value: amount === 0 ? '—' : row.format(amount), empty: amount === 0 });
+                : { name: row.name, note: row.note, value: amount === 0 ? '—' : row.format(amount), empty: amount === 0, tone: row.tone });
             paintIcon(item.querySelector('.stat-icon'), attr ? treeImageFor(row.attr) : null, attr?.icon ?? row.icon);
             list.appendChild(item);
         });

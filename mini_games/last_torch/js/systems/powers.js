@@ -51,7 +51,7 @@ function updateOrbitBlades(dt) {
         for (const e of state.enemies) {
             if (e.orbitCd > 0 || Math.hypot(e.x - x, e.y - y) > e.radius + M.bladeRadius) continue;
             e.orbitCd = M.hitCooldown;
-            dealDamage(e, damage, { kbX: Math.cos(a) * M.knockback, kbY: Math.sin(a) * M.knockback });
+            dealDamage(e, damage, { kbX: Math.cos(a) * M.knockback, kbY: Math.sin(a) * M.knockback, style: 'spell' });
             createExplosion(x, y, '#a5f3fc', 3);
             audio.playHit(1);
         }
@@ -129,7 +129,7 @@ function strikeChain(startX, startY, level, first = null) {
     while (current && jumps > 0) {
         struck.add(current);
         points.push({ x: current.x, y: current.y });
-        dealDamage(current, damage, { noCrit: true, style: 'storm' });
+        dealDamage(current, damage, { noCrit: true, style: 'spell' });
         createExplosion(current.x, current.y, '#7dd3fc', 4);
         jumps--;
         current = nearestEnemy(current.x, current.y, M.jumpRange, struck);
@@ -185,7 +185,7 @@ function updateSoulNova(dt) {
     state.enemies.forEach(e => {
         if (Math.hypot(e.x - player.x, e.y - player.y) > level.radius + e.radius) return;
         const a = Math.atan2(e.y - player.y, e.x - player.x);
-        dealDamage(e, damage, { kbX: Math.cos(a) * M.knockback, kbY: Math.sin(a) * M.knockback, noCrit: true });
+        dealDamage(e, damage, { kbX: Math.cos(a) * M.knockback, kbY: Math.sin(a) * M.knockback, noCrit: true, style: 'spell' });
         if (evolved && !e.isBoss) e.frozen = EVOLUTIONS.soulNova.freezeSeconds;
     });
     addShockwave(player.x, player.y, { radius: level.radius, color, width: 9, seconds: 0.45 });
@@ -231,7 +231,7 @@ function updateStarfall(dt) {
         if (s.age < s.seconds) continue;
         state.stars.splice(i, 1);
         state.blastBudget++;
-        blast(s.x, s.y, s.radius, getSpellDamage() * s.damage, POWER_MODELS.starfall.knockback, '#fde68a');
+        blast(s.x, s.y, s.radius, getSpellDamage() * s.damage, POWER_MODELS.starfall.knockback, '#fde68a', 'spell');
     }
 }
 
@@ -251,6 +251,7 @@ function updateTorchBolts(dt) {
                 vx: Math.cos(a) * M.speed, vy: Math.sin(a) * M.speed,
                 target,
                 damage: getSpellDamage() * level.damage,
+                style: 'torch',
                 life: 1.6
             });
         }
@@ -279,7 +280,7 @@ function updateTorchBolts(dt) {
         const hit = state.enemies.find(e => e.hp > 0 && Math.hypot(e.x - b.x, e.y - b.y) < e.radius + M.radius);
         if (hit) {
             const a = Math.atan2(b.vy, b.vx);
-            dealDamage(hit, b.damage, { kbX: Math.cos(a) * 90, kbY: Math.sin(a) * 90, style: b.soul ? 'shadow' : null });
+            dealDamage(hit, b.damage, { kbX: Math.cos(a) * 90, kbY: Math.sin(a) * 90, style: b.style ?? (b.soul ? 'spell' : null) });
             createExplosion(b.x, b.y, b.soul ? '#c084fc' : '#fb923c', 6);
             b.onHit?.(b, hit);
         }
@@ -296,7 +297,7 @@ export function onEnemyKilled(e) {
 
     const burst = getPowerLevel(powers.corpseBurst);
     if (burst && Math.random() < burst.chance) {
-        blast(e.x, e.y, burst.radius, getSpellDamage() * burst.damage, POWER_MODELS.corpseBurst.knockback, '#fb7185');
+        blast(e.x, e.y, burst.radius, getSpellDamage() * burst.damage, POWER_MODELS.corpseBurst.knockback, '#fb7185', 'spell');
         if (powers.corpseBurst.evolved) player.hp = Math.min(player.maxHp, player.hp + 1);
     }
 }

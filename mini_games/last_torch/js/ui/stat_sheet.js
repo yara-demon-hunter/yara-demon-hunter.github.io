@@ -29,7 +29,7 @@ export const STAT_GROUPS = [
         title: 'ATTACK',
         rows: [
             { attr: 'damage' },
-            { icon: '🔮', name: 'Magic Damage', note: 'What each spell starts from, before the power that casts it.', amount: getSpellDamage, format: whole },
+            { icon: '🔮', name: 'Magic Damage', note: 'What each spell starts from, before the power that casts it. Its numbers show in blue.', amount: getSpellDamage, format: whole, tone: 'spell' },
             { icon: '🔪', name: 'Dagger Damage', note: 'One dagger, before any charge.', amount: getKnifeDamage, format: whole },
             { attr: 'atkSpeed' },
             { icon: '⏳', name: 'Spell Recharge', note: 'How much faster spells return.', amount: () => 1 - getSpellCooldown(1), format: reduction },

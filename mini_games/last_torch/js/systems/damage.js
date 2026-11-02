@@ -9,7 +9,8 @@ import { getCritChance, getCritMultiplier } from './stats.js';
 // --- DANO NOS MONSTROS ---
 // Todo golpe do herói passa por aqui: crítico, clarão, número na tela, recuo e estatísticas.
 // A morte em si é tratada em js/systems/enemies.js, no mesmo quadro ou no próximo.
-// o: { kbX, kbY } empurrão; noCrit; crit = crítico certo; quiet = sem número (dano contínuo); style = estilo do número
+// o: { kbX, kbY } empurrão; noCrit; crit = crítico certo; quiet = sem número (dano contínuo);
+// style = cor do número pelo tipo de dano (spell, torch, shadow; sem style = lâmina e adaga, branco)
 // Smoke Bomb: quem está dentro de uma nuvem leva cada golpe com uma chance extra de ser crítico
 // (sorteada à parte da chance normal do herói)
 function inSmoke(e) {
@@ -53,7 +54,7 @@ export function ignite(e, dps, seconds) {
 
 // Explosão a favor do herói: fere e empurra todos os monstros no raio. Tem um limite por quadro para
 // reações em cadeia não travarem o jogo.
-export function blast(x, y, radius, damage, knockback, color = '#fb923c') {
+export function blast(x, y, radius, damage, knockback, color = '#fb923c', style = null) {
     if (state.blastBudget <= 0) return;
     state.blastBudget--;
 
@@ -61,7 +62,7 @@ export function blast(x, y, radius, damage, knockback, color = '#fb923c') {
         const d = Math.hypot(e.x - x, e.y - y);
         if (d > radius + e.radius) return;
         const a = Math.atan2(e.y - y, e.x - x);
-        dealDamage(e, damage, { kbX: Math.cos(a) * knockback, kbY: Math.sin(a) * knockback, noCrit: true });
+        dealDamage(e, damage, { kbX: Math.cos(a) * knockback, kbY: Math.sin(a) * knockback, noCrit: true, style });
     });
     addShockwave(x, y, { radius, color, width: 5, seconds: 0.3 });
     createExplosion(x, y, color, 10);
