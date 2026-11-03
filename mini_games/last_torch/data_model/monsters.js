@@ -67,7 +67,7 @@ export const MONSTER_MODELS = {
         projectileSpeed: 160,
         projectileRadius: 5,
         projectileDamageMultiplier: 0.8,
-        projectileTorchDamage: 2,
+        projectileTorchDamage: 5,
         keepDistance: 165,               // para de andar a esta distância do alvo e atira
         scoreReward: 30,
         goldBase: 10,
@@ -189,7 +189,7 @@ export const MONSTER_MODELS = {
         projectileSpeed: 170,
         projectileRadius: 6,
         projectileDamageMultiplier: 0.45,
-        projectileTorchDamage: 3,
+        projectileTorchDamage: 6,
         projectileColor: '#7dd3fc',
         scoreReward: 60,
         goldBase: 20,

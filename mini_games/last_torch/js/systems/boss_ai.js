@@ -1,8 +1,10 @@
+import { CORE_MODEL } from '../../data_model/core.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { addShockwave, createExplosion, hitStop, screenFlash, shakeScreen } from './effects.js';
 import { hurtPlayer } from './player.js';
 import { addMonster } from './spawner.js';
+import { hurtTorch } from './torch.js';
 
 // --- ATAQUES DOS BOSSES ---
 // Cada boss repete em ciclo a lista model.patterns. Entre um ataque e outro, e.shootTimer conta a
@@ -27,8 +29,8 @@ function aimAngle(e) {
 }
 
 // Círculo no chão que estoura depois de delay segundos
-export function addSlam(x, y, radius, delay, damage, color = null) {
-    state.telegraphs.push({ kind: 'circle', x, y, radius, age: 0, seconds: delay, damage, color });
+export function addSlam(x, y, radius, delay, damage, color = null, torchDamage = 0) {
+    state.telegraphs.push({ kind: 'circle', x, y, radius, age: 0, seconds: delay, damage, color, torchDamage });
 }
 
 const ACTIONS = {
@@ -70,7 +72,9 @@ const ACTIONS = {
                 Math.max(40, Math.min(state.height - 40, player.y + Math.sin(a) * d)),
                 model.slamRadius,
                 model.slamDelaySeconds + i * 0.14,
-                e.damage * model.slamDamageMultiplier
+                e.damage * model.slamDamageMultiplier,
+                null,
+                model.slamTorchDamage ?? 0
             );
         }
         audio.playBossAttack();
@@ -153,6 +157,10 @@ export function updateTelegraphs(dt) {
             shakeScreen(5);
             audio.playBlast();
             if (Math.hypot(player.x - t.x, player.y - t.y) < t.radius) hurtPlayer(t.damage, t.x, t.y, 0.5);
+            // Boss lutando perto da tocha: o círculo que pega a chama também a fere
+            if (t.torchDamage && Math.hypot(state.coreX - t.x, state.coreY - t.y) < t.radius + CORE_MODEL.collisionRadius) {
+                hurtTorch(t.torchDamage, state.coreX, state.coreY);
+            }
         } else if (t.kind === 'grave') {
             if (state.phase === 'HUNT') addMonster(t.monsterType, t.x, t.y);
             createExplosion(t.x, t.y, '#a8a29e', 10);
