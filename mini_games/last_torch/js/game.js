@@ -1,7 +1,7 @@
 // --- LAST TORCH: DEMON HUNTER ---
 // Ponto de entrada: importa os motores e roda o game loop.
 // Dados (balanceamento) ficam em ../data_model/; o estado da partida em ./core/state.js.
-import { setupInput } from './core/input.js';
+import { releaseTouchControls, setupInput } from './core/input.js';
 import { resize, setupResize } from './core/resize.js';
 import { state } from './core/state.js';
 import { render } from './render/renderer.js';
@@ -32,6 +32,7 @@ const MIN_FRAME_MS = 10.5;
 // Nível de detalhe mínimo: 30 FPS estáveis são melhores que 45 irregulares, e gastam menos bateria
 const LOWEST_DETAIL_FRAME_MS = 30;
 let lastTime = performance.now();
+let wasPlaying = false;
 
 // Detalhe adaptativo: abaixo de ~42 FPS por um tempo, troca detalhe por fluidez. Só desce, nunca sobe:
 // oscilar entre níveis é pior que ficar em um.
@@ -110,6 +111,11 @@ function gameLoop(timestamp) {
     if (timestamp - lastTime < minFrame) return;
     const dt = (timestamp - lastTime) / 1000;
     lastTime = timestamp;
+
+    // A caçada parou (cartas, inventário, pausa): joystick e adaga são soltos para o herói não sair andando ao voltar
+    const playing = state.gameState === 'PLAYING';
+    if (wasPlaying && !playing) releaseTouchControls();
+    wasPlaying = playing;
 
     const idle = isIdle();
     if (idle) {

@@ -4,9 +4,9 @@
    distância da borda, então ficam sempre alinhados. */
 :root {
     --touch-scale: 1;                                    /* tamanho escolhido em Settings (js/ui/touch_layout.js) */
-    --touch-base: 7rem;                                  /* diâmetro dos dois controles */
-    --touch-base-knob: 3.3rem;                           /* bolinha de dentro */
-    --touch-base-icon: 1.6rem;                           /* emoji da adaga */
+    --touch-base: 7.75rem;                               /* diâmetro dos dois controles */
+    --touch-base-knob: 3.6rem;                           /* bolinha de dentro */
+    --touch-base-icon: 1.75rem;                          /* emoji da adaga */
     --touch-size: calc(var(--touch-base) * var(--touch-scale));
     --touch-knob: calc(var(--touch-base-knob) * var(--touch-scale));
     --touch-icon: calc(var(--touch-base-icon) * var(--touch-scale));
@@ -170,9 +170,9 @@
    (nem na barra de gestos do celular). O % do bottom é da altura da tela. */
 @media (pointer: coarse) and (max-height: 520px) and (orientation: landscape) {
     :root {
-        --touch-base: 3.5rem;
-        --touch-base-knob: 1.75rem;
-        --touch-base-icon: 0.95rem;
+        --touch-base: 4rem;
+        --touch-base-knob: 2rem;
+        --touch-base-icon: 1.1rem;
         --touch-ring: 5px;
         --touch-bottom: max(24%, calc(env(safe-area-inset-bottom) + 3rem));
         --touch-left: max(3rem, calc(env(safe-area-inset-left) + 1.25rem));

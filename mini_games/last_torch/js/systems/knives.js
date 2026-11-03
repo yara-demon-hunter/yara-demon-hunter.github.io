@@ -11,6 +11,9 @@ import { markEnemy } from './skills_shadow.js';
 import { getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
 
 const KNIFE_RELEASE_SECONDS = K.throwSeconds * K.letGoFraction;
+// Toque no botão da adaga quase no fim da recarga: guarda o arremesso e solta assim que ficar pronta,
+// em vez de ignorar o toque (parecia que o botão tinha travado)
+const KNIFE_TAP_BUFFER_SECONDS = 0.35;
 
 // --- ADAGA DE ARREMESSO (golpe separado da lâmina, com recarga própria) ---
 // Começa o arremesso na direção da mira (mouse ou dedo): a mão esquerda recua e a adaga
@@ -131,21 +134,30 @@ export function getKnifeChargeRatio() {
     return lance ? Math.min(1, state.knifeCharge / lance.seconds) : 0;
 }
 
-// Botão da adaga (toque): arrastando mira na direção do arraste; sem arrastar, no monstro
-// mais perto dentro do alcance (ou na última direção do joystick)
+// Botão da adaga (toque): arrastando mira na direção do arraste. Num toque rápido a mira é automática:
+// o monstro mais perto dentro do alcance; sem nenhum, a direção em que o herói anda; parado, o monstro
+// mais perto em qualquer lugar; sem monstros, a última direção do joystick
 function aimWithStick(stick) {
-    let angle = joystick.lastX || joystick.lastY ? Math.atan2(joystick.lastY, joystick.lastX) : player.angle;
+    let angle;
     if (stick.x || stick.y) {
         angle = Math.atan2(stick.y, stick.x);
     } else {
-        let best = getKnifeRange();
+        const range = getKnifeRange();
+        let nearest = null;
+        let best = Infinity;
         state.enemies.forEach(e => {
+            if (e.hp <= 0) return;
             const d = Math.hypot(e.x - player.x, e.y - player.y);
             if (d < best) {
                 best = d;
-                angle = Math.atan2(e.y - player.y, e.x - player.x);
+                nearest = e;
             }
         });
+        const moving = joystick.x || joystick.y;
+        if (nearest && (best <= range || !moving)) angle = Math.atan2(nearest.y - player.y, nearest.x - player.x);
+        else if (moving) angle = Math.atan2(joystick.y, joystick.x);
+        else if (joystick.lastX || joystick.lastY) angle = Math.atan2(joystick.lastY, joystick.lastX);
+        else angle = player.angle;
     }
     stick.aimAngle = angle;
     state.knifeInput.x = player.x + Math.cos(angle) * 100;
@@ -190,10 +202,13 @@ export function updateKnives(dt) {
 
     if (stick.active || stick.fire) aimWithStick(stick);
     if (stick.fire) {
-        stick.fire = false;
-        stick.x = 0;
-        stick.y = 0;
-        if (state.knifeTimer <= 0 && state.knifePending === null) throwKnife(state.knifeInput.x, state.knifeInput.y);
+        const almostReady = state.knifeTimer <= KNIFE_TAP_BUFFER_SECONDS;
+        if (ready) throwKnife(state.knifeInput.x, state.knifeInput.y);
+        if (ready || !almostReady) {
+            stick.fire = false;
+            stick.x = 0;
+            stick.y = 0;
+        }
     }
 
     if (state.knifePending !== null) {

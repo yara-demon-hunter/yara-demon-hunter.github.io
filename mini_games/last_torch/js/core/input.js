@@ -16,13 +16,15 @@ function setTarget(clientX, clientY) {
     player.targetY = y;
 }
 
-// Posição do dedo em relação ao centro de um botão circular: move o "knob" junto e devolve
-// x, y de -1 a 1 (0, 0 dentro da zona morta)
-function readStick(base, knob, e, deadZone) {
+// Posição do dedo em relação a um ponto (por padrão o centro de um botão circular): move o "knob" junto
+// e devolve x, y de -1 a 1 (0, 0 dentro da zona morta)
+function readStick(base, knob, e, deadZone, origin = null) {
     const rect = base.getBoundingClientRect();
     const radius = rect.width / 2;
-    let dx = e.clientX - (rect.left + radius);
-    let dy = e.clientY - (rect.top + radius);
+    const fromX = origin ? origin.x : rect.left + radius;
+    const fromY = origin ? origin.y : rect.top + radius;
+    let dx = e.clientX - fromX;
+    let dy = e.clientY - fromY;
     const dist = Math.hypot(dx, dy);
     if (dist > radius) { dx = dx / dist * radius; dy = dy / dist * radius; }
     knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
@@ -30,9 +32,19 @@ function readStick(base, knob, e, deadZone) {
     return mag < deadZone ? { x: 0, y: 0 } : { x: dx / radius, y: dy / radius };
 }
 
+// Soltam os controles de toque quando a caçada para (cartas, inventário, pausa): ao voltar o herói
+// fica parado, e o dedo que ainda estava na tela só volta a valer depois de ser levantado
+const touchReleases = [];
+export function releaseTouchControls() {
+    touchReleases.forEach(release => release());
+    player.targetX = player.x;
+    player.targetY = player.y;
+}
+
 // --- BOTÃO DA ADAGA (telas de toque, canto oposto ao joystick) ---
-// Segurando, só mira: sem arrastar, no monstro mais perto; arrastando, na direção do arraste,
-// como um segundo joystick. Ao soltar o dedo a adaga é arremessada na direção mirada (js/systems/knives.js).
+// Toque rápido: mira automática (monstro mais perto ou direção do movimento, js/systems/knives.js).
+// Arrastando, mira na direção do arraste, contada a partir de onde o dedo encostou (não do centro do
+// botão: tocar um pouco fora do centro não vira mira torta). Ao soltar o dedo a adaga é arremessada.
 function setupKnifeButton() {
     const base = document.getElementById('knifeButton');
     const knob = document.getElementById('knifeButtonKnob');
@@ -40,40 +52,48 @@ function setupKnifeButton() {
 
     const { stick } = state.knifeInput;
     let pointerId = null;
+    let origin = null;
     // fire = true só quando o dedo é solto sobre a tela; cancelar (ou sair da janela) não arremessa
     const release = (e, fire) => {
         if (e && e.pointerId !== pointerId) return;
         if (pointerId === null) return;
         pointerId = null;
         stick.active = false;
-        if (fire) {
+        if (fire && state.gameState === 'PLAYING') {
             stick.fire = true;
         } else {
             stick.x = 0;
             stick.y = 0;
+            stick.fire = false;
             state.knifeCharge = 0;
         }
         knob.style.transform = 'translate(-50%, -50%)';
     };
     const drag = (e) => {
-        // Zona morta maior: um toque rápido sem arrastar fica na mira automática
-        const v = readStick(base, knob, e, 0.3);
+        if (state.gameState !== 'PLAYING') return release(null, false);
+        // Zona morta grande: um toque com o dedo tremendo um pouco fica na mira automática
+        const v = readStick(base, knob, e, 0.35, origin);
         stick.x = v.x;
         stick.y = v.y;
     };
     base.addEventListener('pointerdown', (e) => {
-        if (pointerId !== null || state.gameState !== 'PLAYING' || mod('noKnives') > 0) return;
+        if (state.gameState !== 'PLAYING' || mod('noKnives') > 0) return;
+        // Um dedo novo sempre assume o botão: se o anterior se perdeu sem "soltar", o botão não trava
         pointerId = e.pointerId;
+        origin = { x: e.clientX, y: e.clientY };
         base.setPointerCapture(e.pointerId);
         audio.init();
         stick.active = true;
+        stick.fire = false;
         drag(e);
         e.preventDefault();
     });
     base.addEventListener('pointermove', (e) => { if (e.pointerId === pointerId) drag(e); });
     base.addEventListener('pointerup', (e) => release(e, true));
     base.addEventListener('pointercancel', (e) => release(e, false));
+    base.addEventListener('lostpointercapture', (e) => release(e, false));
     window.addEventListener('blur', () => release(null, false));
+    touchReleases.push(() => release(null, false));
 }
 
 // --- JOYSTICK VIRTUAL (telas de toque) ---
@@ -91,6 +111,8 @@ function setupJoystick() {
         knob.style.transform = 'translate(-50%, -50%)';
     };
     const drag = (e) => {
+        // Fora da caçada o dedo não guarda direção: senão o herói sai andando sozinho ao voltar
+        if (state.gameState !== 'PLAYING') return release();
         // Zona morta pequena para o dedo parado não escorregar o herói
         const v = readStick(base, knob, e, 0.12);
         joystick.x = v.x;
@@ -101,7 +123,9 @@ function setupJoystick() {
         }
     };
     base.addEventListener('pointerdown', (e) => {
-        if (pointerId !== null) return;
+        if (state.gameState !== 'PLAYING') return;
+        // Um dedo novo sempre assume o joystick: se o anterior se perdeu sem "soltar"
+        // (menu abrindo por cima, gesto do sistema), o joystick não fica travado
         pointerId = e.pointerId;
         base.setPointerCapture(e.pointerId);
         audio.init();
@@ -111,8 +135,10 @@ function setupJoystick() {
     base.addEventListener('pointermove', (e) => { if (e.pointerId === pointerId) drag(e); });
     base.addEventListener('pointerup', release);
     base.addEventListener('pointercancel', release);
+    base.addEventListener('lostpointercapture', release);
     // Abrir a loja ou perder o jogo não pode deixar o joystick preso
     window.addEventListener('blur', () => release());
+    touchReleases.push(() => release());
 }
 
 // --- BOTÃO DO DASH (telas de toque) ---
