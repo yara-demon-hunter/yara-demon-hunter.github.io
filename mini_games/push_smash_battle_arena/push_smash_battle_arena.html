@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Push & Smash - Battle Arena</title>
+    <link rel="stylesheet" href="./css/game.css">
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="gameCanvas" width="800" height="450"></canvas>
+
+    <div class="ui-layer">
+        <div class="scoreboard">
+            <span class="p1-score"><span class="p-name">P1</span><span class="pips" id="winsP1">○○○</span>🪙 <span id="scoreP1">0</span></span>
+            <span class="p2-score">🪙 <span id="scoreP2">0</span><span class="pips" id="winsP2">○○○</span><span class="p-name" id="nameP2">P2</span></span>
+        </div>
+        <div class="timer-display" id="timerDisplay">60</div>
+        <div class="round-label" id="roundLabel">ROUND 1</div>
+        <div id="comboBanner" class="combo-banner">SMASH!</div>
+        <div class="coins-display">🪙 <span id="coinsCount">0</span></div>
+        <div class="controls-hint">
+            <span>P1: [W] Jump | [A/D] Move | [E] Dash | [S] SMASH in air | [Q] Taunt</span>
+            <span id="hintP2">P2: [↑] Jump | [←/→] Move | [/] Dash | [↓] SMASH in air | [Right Shift] Taunt</span>
+        </div>
+    </div>
+
+    <!-- Tela Inicial / Game Over -->
+    <div id="screenMenu" class="overlay">
+        <h1 id="menuTitle">PUSH & SMASH</h1>
+        <p id="menuSub">Best of 5 rounds! Drop on your rival to SQUASH them and eat the mass they lose.</p>
+        <div class="btn-group">
+            <button id="btn1Player" class="btn">1 PLAYER (VS AI BOT)</button>
+            <button id="btn2Players" class="btn btn-p2">2 PLAYERS (1 KEYBOARD)</button>
+        </div>
+        <button id="btnReward" class="btn btn-reward hidden">📺 WATCH AD (+50 COINS)</button>
+    </div>
+    <button id="btnGear" class="gear-btn" aria-label="Settings" title="Settings (Esc)">🎮</button>
+
+    <!-- Settings -->
+    <div id="screenSettings" class="overlay settings hidden">
+        <h2>🎮 SETTINGS</h2>
+        <div class="set-row touch-only"><span>Button size</span>
+            <input type="range" id="setSize" min="0.6" max="1.6" step="0.05" value="1"></div>
+        <div class="set-row touch-only"><span>Distance from edge</span>
+            <input type="range" id="setOffX" min="0" max="220" step="2" value="14"></div>
+        <div class="set-row touch-only"><span>Button height</span>
+            <input type="range" id="setOffY" min="0" max="260" step="2" value="14"></div>
+        <div class="set-row touch-only" id="rowSwap"><span>Joystick side (1 player)</span>
+            <button class="toggle" id="setSwap">LEFT</button></div>
+        <div class="set-row"><span>🎵 Music</span><button class="toggle" id="setMusic">ON</button></div>
+        <div class="set-row"><span>🔊 Sound effects</span><button class="toggle" id="setSfx">ON</button></div>
+        <div class="btn-group">
+            <button class="btn" id="btnResume">RESUME</button>
+            <button class="btn btn-ghost" id="btnRestart">RESTART MATCH</button>
+            <button class="btn btn-danger" id="btnQuit">GIVE UP</button>
+        </div>
+    </div>
+</div>
+
+<div id="touchControls" class="touch hidden">
+    <div class="pad" id="padLeft"></div>
+    <div class="pad" id="padRight"></div>
+</div>
+
+<script type="module" src="./js/game.js"></script>
+</body>
+</html>

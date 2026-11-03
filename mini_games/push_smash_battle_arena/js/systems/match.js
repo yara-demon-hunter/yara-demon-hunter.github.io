@@ -1,0 +1,65 @@
+import { ARENA, MATCH, SPAWN } from '../../data_model/match.js';
+import { PLAYERS } from '../../data_model/players.js';
+import { TEXTS } from '../../data_model/texts.js';
+import { syncMusic } from '../audio/music.js';
+import { platform } from '../core/arena.js';
+import { W } from '../core/canvas.js';
+import { keys } from '../core/input.js';
+import { state } from '../core/state.js';
+import { players } from '../entities/player.js';
+import { updateScoreHUD, updateWinsHUD } from '../ui/hud.js';
+import { btnReward, hintP2, hintP2Human, menuSub, menuTitle, screenMenu } from '../ui/menu.js';
+import { buildTouchControls } from '../ui/touch_controls.js';
+
+export function startMatch(isBot) {
+    state.isBotMatch = isBot;
+    players.forEach(p => p.resetMatch());
+    state.roundNumber = 1;
+    updateWinsHUD();
+    players[1].controls.isBot = isBot;
+    players[1].name = isBot ? PLAYERS[1].botName : PLAYERS[1].name;
+    document.getElementById('nameP2').innerText = players[1].name;
+    hintP2.innerText = isBot ? TEXTS.botHint : hintP2Human;
+    buildTouchControls();
+    screenMenu.classList.add('hidden');
+    startRound();
+    syncMusic();
+}
+
+export function startRound() {
+    platform.width = ARENA.platform.fullWidth;
+    platform.x = (W - platform.width) / 2;
+    state.airDrops = [];
+    state.spawnableCoins = [];
+    state.massBlobs = [];
+    state.particles = [];
+    state.popups = [];
+    state.history = [];
+    state.bombHolder = null;
+    state.coinSpawnTimer = 0;
+    state.dropSpawnTimer = SPAWN.dropEveryFrames - SPAWN.firstDropFrames;
+    state.hitCooldown = 0;
+    state.hitStop = 0;
+    state.matchTimer = MATCH.roundTime;
+    state.roundFrames = 0;
+    Object.keys(keys).forEach(k => keys[k] = false);
+    document.querySelectorAll('.tbtn.on').forEach(b => b.classList.remove('on'));
+    document.getElementById('timerDisplay').innerText = state.matchTimer;
+    document.getElementById('roundLabel').innerText = TEXTS.roundLabel(state.roundNumber);
+    players.forEach(p => p.reset());
+    updateScoreHUD();
+    state.countdownFrames = MATCH.countdownFrames;
+    state.lastCount = 0;
+    state.gameState = 'COUNTDOWN';
+}
+
+export function showGameOverMenu(winnerText, subText) {
+    state.gameState = 'MENU';
+    syncMusic();
+    menuTitle.innerText = winnerText;
+    menuSub.innerText = subText;
+    btnReward.classList.remove('hidden');
+    screenMenu.classList.remove('hidden');
+}
+
+
