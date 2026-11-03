@@ -695,3 +695,116 @@
         margin-top: 35px;
     }
 }
+
+.home-hub {
+    width: min(100% - 32px, 1040px);
+    margin: 0 auto;
+    padding: clamp(32px, 6vw, 64px) 0;
+    color: #cfcabf;
+    line-height: 1.65;
+}
+
+.home-hub h2 {
+    margin: 6px 0 14px;
+    color: #f3e8d0;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: clamp(1.5rem, 3.4vw, 2.2rem);
+}
+
+.home-hub__intro {
+    max-width: 780px;
+    margin-bottom: 28px;
+}
+
+.home-hub__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 36px;
+}
+
+.home-card {
+    overflow: hidden;
+    border: 1px solid rgba(195, 164, 102, 0.25);
+    border-radius: 12px;
+    background: #16181a;
+}
+
+.home-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: center 25%;
+}
+
+.home-card__body {
+    padding: 12px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.home-card__body h3 {
+    margin: 0 0 6px;
+    color: #f3e8d0;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1.1rem;
+}
+
+.home-card__body p {
+    margin: 0 0 6px;
+}
+
+.home-card__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.home-card__links a {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    padding: 0 10px;
+    border: 1px solid rgba(195, 164, 102, 0.4);
+    border-radius: 999px;
+    color: #f1d28e;
+    font-size: 0.84rem;
+    text-decoration: none;
+}
+
+.home-hub__updates ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.home-hub__updates li {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    padding: 9px 0;
+    border-top: 1px solid rgba(195, 164, 102, 0.18);
+    font-size: 0.92rem;
+}
+
+.home-hub__updates time {
+    color: #d3ad60;
+    font-size: 0.82rem;
+}
+
+.home-hub__updates li a {
+    color: #f1d28e;
+}
+
+@media (max-width: 860px) {
+    .home-hub__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-hub__updates li {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+}

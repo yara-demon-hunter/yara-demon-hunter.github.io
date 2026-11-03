@@ -35,9 +35,7 @@
             {% if page.lang == "pt" %}Pular para o conteúdo{% else %}Skip to content{% endif %}
         </a>
 
-        {% unless page.url == "/" %}
-            {% include header.html %}
-        {% endunless %}
+        {% include header.html %}
 
         <div class="site-content-layout{% if page.hide_recent_updates %} site-content-layout--no-sidebar{% endif %}">
             <main id="main-content"{% if page.full_width %} class="main--full-width"{% endif %}>

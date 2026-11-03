@@ -4,7 +4,7 @@ title: Sobre
 lang: pt
 book_id: book-1
 translation_id: about
-last_updated: 2026-09-23
+last_updated: 2026-11-03
 ---
 
 <div class="page-content about-page">
@@ -46,6 +46,43 @@ last_updated: 2026-09-23
         <p>
             Mas nem todos os segredos foram feitos para serem descobertos.
         </p>
+
+    </section>
+
+
+<section class="about-section">
+
+        <h2>
+            O autor
+        </h2>
+
+        <p>
+            Yara foi criada por Miguel Amaral. A ideia ganhou forma durante a pandemia, entre 2020 e 2021, e cresceu aos poucos, de uma única história para um universo de personagens, lugares e acontecimentos.
+        </p>
+
+        <p>
+            Miguel escreve o livro e constrói este site e os mini games, então tudo o que você encontra aqui é uma criação original do projeto.
+        </p>
+
+    </section>
+
+
+    <section class="about-section">
+
+        <h2>
+            O universo da história
+        </h2>
+
+        <p>
+            Tudo neste site faz parte do mesmo universo:
+        </p>
+
+        <ul>
+            <li><a href="{{ '/pt/books/' | relative_url }}">O livro</a>: publicado capítulo a capítulo, com leitura gratuita.</li>
+            <li><a href="{{ '/pt/mini-games/' | relative_url }}">Os mini games</a>: um RPG, uma arena de duelos e um jogo de sobrevivência.</li>
+            <li><a href="{{ '/pt/characters/' | relative_url }}">O arquivo de personagens</a>: perfis, artes e curiosidades.</li>
+            <li><a href="{{ '/pt/world/' | relative_url }}">O atlas do mundo</a>: os lugares da história.</li>
+        </ul>
 
     </section>
 

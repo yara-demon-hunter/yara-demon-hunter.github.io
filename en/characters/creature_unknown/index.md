@@ -4,9 +4,7 @@ title: The Mysterious Creature
 lang: en
 book_id: book-1
 translation_id: character-creature-unknown
-last_updated: 2026-11-02
-noindex: true
-sitemap: false
+last_updated: 2026-11-03
 character:
   name: The Mysterious Creature
   role: Antagonist
@@ -74,16 +72,16 @@ character:
 
 ## Overview
 
-This profile is a starting point for documenting the Mysterious Creature. Add confirmed details from the story as the character develops.
+The Mysterious Creature is the first presence the reader meets. In the prologue, set many years before the main story, it faces a masked hunter in a graveyard. It claims to have killed many hunters, and that night neither of them truly wins.
 
 ## Appearance
 
-Add a description of the creature's appearance and distinctive features here.
+Under a dark, torn cloak and a hood, its skin is pale with a faint blue tone, cut by old marks. Light strands of hair escape the hood, its long fangs show when it smiles, and bandages cover one of its arms, hiding old burn scars.
 
-## History and motivations
+## Powers
 
-Add the character's background, goals, and motivations here.
+It draws a sword of restless spectral energy out of nothing. Frightened faces surface in the blade like flames, as if trapped souls were trying to escape.
 
-## Connections
+## In the story so far
 
-Add the creature's relationships with other characters and places here.
+In chapter 1 it watches the valley from a mountain cliff, after a long wait. In chapter 2, Zeph meets it in the mist. In chapter 5 it makes a deal with an old witch, paying with a small flute shaped like a dragon's head. Its name and its goals have not been revealed.

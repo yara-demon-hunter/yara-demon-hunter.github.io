@@ -4,9 +4,7 @@ title: A Criatura Misteriosa
 lang: pt
 book_id: book-1
 translation_id: character-creature-unknown
-last_updated: 2026-11-02
-noindex: true
-sitemap: false
+last_updated: 2026-11-03
 character:
   name: A Criatura Misteriosa
   role: Antagonista
@@ -71,3 +69,19 @@ character:
         - label: "Arena da Floresta"
           url: /pt/mini-games/dark-forest-arena/
 ---
+
+## Visão geral
+
+A Criatura Misteriosa é a primeira presença que o leitor encontra. No prólogo, ambientado muitos anos antes da história principal, ela enfrenta um caçador mascarado em um cemitério. Diz já ter matado diversos caçadores, e naquela noite nenhum dos dois vence de verdade.
+
+## Aparência
+
+Sob um manto escuro e rasgado e um capuz, sua pele é pálida, de um tom levemente azulado, cortada por marcas antigas. Fios de cabelo muito claros escapam do capuz, presas longas aparecem quando ela sorri, e ataduras cobrem um de seus braços, escondendo antigas queimaduras.
+
+## Poderes
+
+Ela saca do nada uma espada de energia espectral inquieta. Rostos assustados surgem na lâmina como chamas, como se almas tentassem escapar.
+
+## Na história até agora
+
+No capítulo 1, ela observa o vale do alto de um penhasco, depois de uma longa espera. No capítulo 2, Zeph a encontra na névoa. No capítulo 5, faz um acordo com uma velha bruxa, pagando com uma pequena flauta em forma de cabeça de dragão. Seu nome e seus objetivos ainda não foram revelados.

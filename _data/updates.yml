@@ -1,3 +1,14 @@
+- date: "2026-11-03"
+  title:
+    en: "A new home for the project"
+    pt: "Uma nova entrada para o projeto"
+  summary:
+    en: "The home page now presents the book, mini games, characters and atlas. The About page and the Mysterious Creature's profile were expanded."
+    pt: "A página inicial agora apresenta o livro, os mini games, os personagens e o atlas. A página Sobre e o perfil da Criatura Misteriosa foram ampliados."
+  url:
+    en: "/en/about/"
+    pt: "/pt/about/"
+
 - date: "2026-11-02"
   title:
     en: "New faces in the Character Archive"
