@@ -3,7 +3,7 @@
 // (js/render/character_sprites.js). Em campo, cada lutador custa 1 drawImage.
 // Unidades do desenho: 1 = raio do corpo, olhando para a direita. Nada aqui muda a física.
 //
-// style: 'fluffy' = esfera de pelo sem membros (js/render/character_fluffy.js); 'frog' = esfera lisa (character_frog.js); 'cat' = gato preto (character_cat.js); 'dog' = cachorro (character_dog.js); 'mouse' = rato (character_mouse.js); 'penguin' = pinguim (character_penguin.js); 'elephant' = elefante (character_elephant.js); 'bunny' = coelho (character_bunny.js); 'pig' = porco (character_pig.js); sem style = desenho com contorno
+// style: 'fluffy' = esfera de pelo sem membros (js/render/character_fluffy.js); 'frog' = esfera lisa (character_frog.js); 'cat' = gato preto (character_cat.js); 'dog' = cachorro (character_dog.js); 'mouse' = rato (character_mouse.js); 'penguin' = pinguim (character_penguin.js); 'elephant' = elefante (character_elephant.js); 'bunny' = coelho (character_bunny.js); 'pig' = porco (character_pig.js); 'crow' = corvo (character_crow.js); sem style = desenho com contorno
 // ears:  pointy | round | floppy | mouse | elephant | bunny | pig | none
 // tail:  bushy | thin | mouse | stub | curly | cotton | none
 // snout: muzzle (cachorro) | pig | trunk | beak | null
@@ -67,6 +67,14 @@ export const CHARACTER_ART = {
         style: 'frog',
         body: '#5a9a46', bodyLight: '#7bb75c', bodyDark: '#2f6a2c', lid: '#8cc86d', spots: '#9ed17f',
         iris: '#e0a91d', irisLight: '#ffd75e', irisEdge: '#b57f10', pupil: '#1b1a10', mouth: '#2a3a22',
+        liveEyes: false
+    },
+    crow: {  // segue art_reference/crow: esfera preta com brilho azulado, bico cinza, topete e asinhas que abrem ao planar
+        style: 'crow',
+        body: '#262a3d', bodyLight: '#4b5378', bodyDark: '#0d0f18', rim: '#5a6390',
+        wing: '#1b1e2c', wingLight: '#3b4262', chest: '#33384f',
+        beak: '#5c606c', beakLight: '#9a9eab', beakDark: '#2e3038', mouth: '#3a1418',
+        eye: '#0b0b10',
         liveEyes: false
     }
 };

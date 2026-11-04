@@ -1,3 +1,4 @@
+import { BOT_LEVEL_ORDER, BOT_LEVELS, DEFAULT_BOT_LEVEL } from '../../data_model/bot.js';
 import { DEFAULT_PICKS, effectiveSpeed, ROSTER } from '../../data_model/characters.js';
 import { KEYS } from '../../data_model/controls.js';
 import { PLAYERS } from '../../data_model/players.js';
@@ -13,11 +14,12 @@ import { drawStagePreview } from '../render/scenery.js';
 // --- MENU: CARROSSEL DE PERSONAGENS E ESCOLHA DA ARENA ---
 // As setas (ou A/D e ←/→) trocam o bicho, que cai do alto no lugar do anterior.
 // No menu o desenho é ao vivo (são só dois bonecos), sem atlas.
-const selection = { chars: [...DEFAULT_PICKS], stage: DEFAULT_STAGE };
+const selection = { chars: [...DEFAULT_PICKS], stage: DEFAULT_STAGE, level: DEFAULT_BOT_LEVEL };
 try {
     const saved = JSON.parse(localStorage.getItem(SELECTION_STORAGE_KEY) || '{}');
     if (Array.isArray(saved.chars)) saved.chars.forEach((c, i) => { if (ROSTER[c]) selection.chars[i] = c; });
     if (STAGES[saved.stage]) selection.stage = saved.stage;
+    if (BOT_LEVELS[saved.level]) selection.level = saved.level;
 } catch (e) {}
 
 function save() {
@@ -49,6 +51,7 @@ const pickers = [0, 1].map((i) => {
             <div class="picker-name"></div>
             ${Object.keys(RANGES).map(k => `<div class="stat"><span>${TEXTS.statLabels[k]}</span><div class="bar"><i data-stat="${k}"></i></div></div>`).join('')}
             <div class="dash-skill"><strong class="dash-name"></strong><span class="dash-description"></span></div>
+            <div class="dash-skill passive-skill"><strong class="dash-name passive-name"></strong><span class="dash-description passive-description"></span></div>
         </div>`;
     root.querySelectorAll('.arrow').forEach(b => b.addEventListener('click', () => cycle(i, +b.dataset.dir)));
     return {
@@ -56,7 +59,10 @@ const pickers = [0, 1].map((i) => {
         canvas: root.querySelector('canvas'),
         name: root.querySelector('.picker-name'),
         dashName: root.querySelector('.dash-name'),
-        dashDescription: root.querySelector('.dash-description')
+        dashDescription: root.querySelector('.dash-description'),
+        passive: root.querySelector('.passive-skill'),
+        passiveName: root.querySelector('.passive-name'),
+        passiveDescription: root.querySelector('.passive-description')
     };
 });
 
@@ -80,6 +86,12 @@ function renderPicker(i, drop) {
     p.name.innerText = char.name;
     p.dashName.innerText = `${TEXTS.dashLabel}: ${char.dash.name}`;
     p.dashDescription.innerText = char.dash.description;
+    // Passivo extra (só alguns bichos, como o planar do corvo)
+    p.passive.classList.toggle('hidden', !char.glide);
+    if (char.glide) {
+        p.passiveName.innerText = char.glide.name;
+        p.passiveDescription.innerText = char.glide.description;
+    }
     Object.entries(RANGES).forEach(([k, [lo, hi]]) => {
         const t = hi > lo ? (STAT[k](char) - lo) / (hi - lo) : 1;
         p.root.querySelector(`[data-stat="${k}"]`).style.width = `${Math.round(15 + t * 85)}%`;
@@ -121,6 +133,27 @@ function selectStage(i) {
     playSound('coin');
 }
 
+// Dificuldade do bot: coluna ao lado das arenas (no celular não sobra altura para mais uma linha)
+const levelCol = document.createElement('div');
+levelCol.className = 'level-col';
+levelCol.innerHTML = `<span class="level-label">${TEXTS.botLevelLabel}</span>`;
+const levelButtons = BOT_LEVEL_ORDER.map((level) => {
+    const b = document.createElement('button');
+    b.className = `level-btn level-${level}`;
+    b.innerText = TEXTS.botLevels[level];
+    b.addEventListener('click', () => selectLevel(level));
+    levelCol.appendChild(b);
+    return b;
+});
+stageRow.appendChild(levelCol);
+
+function selectLevel(level, silent) {
+    selection.level = level;
+    save();
+    levelButtons.forEach((b, k) => b.classList.toggle('sel', BOT_LEVEL_ORDER[k] === level));
+    if (!silent) playSound('coin');
+}
+
 // No menu: A/D trocam o P1 e ←/→ o P2
 export function handleSelectKey(code) {
     KEYS.forEach((k, i) => {
@@ -133,6 +166,7 @@ let step = 0;
 renderPicker(0, false);
 renderPicker(1, false);
 stageCards.forEach((c, k) => c.classList.toggle('sel', k === selection.stage));
+selectLevel(selection.level, true);
 setInterval(() => {
     if (document.getElementById('screenMenu').classList.contains('hidden')) return;
     step++;

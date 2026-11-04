@@ -34,10 +34,13 @@ export const POSES = {
     taunt: (i) => ({ bob: i % 2 ? -0.05 : 0, footA: 0, footB: 0, tuck: 0, armSwing: i % 2 ? -0.6 : 0.6, armUp: 1.2,
         ear: 0, tail: i % 2 ? 1.0 : -0.6, eye: i % 2 ? 'blink' : 'open', mouth: 'tongue' }),
     scared: (i) => ({ bob: i ? 0.03 : -0.03, footA: 0, footB: 0, tuck: 0.2, armSwing: i ? 0.3 : -0.3, armUp: 1.0,
-        ear: 0.9, tail: i ? 0.5 : 0.2, eye: 'wide', mouth: 'frown', sweat: true })
+        ear: 0.9, tail: i ? 0.5 : 0.2, eye: 'wide', mouth: 'frown', sweat: true }),
+    // Planando (só o corvo): asas abertas batendo devagar; wings = abertura, flap = batida
+    glide: (i) => ({ bob: 0, footA: 0, footB: 0, tuck: 0, armSwing: 0, armUp: 1, ear: 0.3, tail: i ? 0.3 : -0.1,
+        eye: 'open', mouth: 'smile', wings: 1, flap: i ? -1 : 1 })
 };
 // Animações cujos olhos ficam abertos: a pupila é desenhada ao vivo para acompanhar o movimento
-const LIVE_PUPILS = new Set(['idle', 'run', 'jump', 'pound', 'dash', 'scared']);
+const LIVE_PUPILS = new Set(['idle', 'run', 'jump', 'pound', 'dash', 'scared', 'glide']);
 
 const frames = Object.entries(A.anims).flatMap(([anim, count]) =>
     Array.from({ length: count }, (_, i) => ({ anim, i, count })));

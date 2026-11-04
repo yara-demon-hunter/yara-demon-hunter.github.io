@@ -1,4 +1,3 @@
-import { BOT } from '../../data_model/bot.js';
 import { BOUNCE } from '../../data_model/bounce.js';
 import { DEFAULT_PICKS, ROSTER } from '../../data_model/characters.js';
 import { STAGES } from '../../data_model/stages.js';
@@ -16,6 +15,7 @@ import { arcs, flatRange, groundYAt, ledges, leftWall, platform, rightWall, terr
 import { H, W } from '../core/canvas.js';
 import { keys } from '../core/input.js';
 import { state } from '../core/state.js';
+import { botInput } from '../systems/bot_ai.js';
 import { addBurst, addPopup, addRing, createDust, createParticles, rocketTrail } from '../systems/effects.js';
 import { triggerKO } from '../systems/replay.js';
 
@@ -60,6 +60,7 @@ export class Player {
         this.poundWindup = 0;
         this.poundLag = 0;
         this.upHeld = false;
+        this.isGliding = false;
         this.runPhase = 0;
         this.onSlope = false;
         this.onLedge = false;
@@ -75,6 +76,7 @@ export class Player {
         this.dashWasHeld = false;
         this.tauntWasHeld = false;
         this.wantTaunt = false;
+        this.ai = null;            // memória do bot (zera a cada round)
         this.hearts = MATCH.hearts;
         this.skyDrop = 0;          // SKY DROP: frames restantes lá no alto (0 = fora dele)
         this.skyAge = 0;
@@ -113,59 +115,6 @@ export class Player {
         return input;
     }
 
-    // IA do Jogador 2
-    botInput() {
-        const input = { left: false, right: false, up: false, downPressed: false, dashPressed: false, tauntPressed: false };
-        const opp = players.find(p => p !== this);
-        if (this.skyDrop > 0) {
-            // Lá no alto: alinha a mira com o rival e solta
-            const dx = opp.x - this.x;
-            input.left = dx < -BOT.deadZone;
-            input.right = dx > BOT.deadZone;
-            input.downPressed = this.skyAge >= BOT.skyDropMinHover && Math.abs(dx) < BOT.skyDropAim;
-            return input;
-        }
-        const platEnd = platform.x + platform.width;
-        const overPlatform = this.x > platform.x + 10 && this.x < platEnd - 10;
-        let targetX = opp.isAlive ? opp.x : W / 2;
-
-
-        targetX = Math.max(platform.x + BOT.edgeMargin, Math.min(platEnd - BOT.edgeMargin, targetX));
-        if (!overPlatform && !this.isGrounded) targetX = W / 2; // voltar pra arena
-
-        if (targetX < this.x - BOT.deadZone) input.left = true;
-        else if (targetX > this.x + BOT.deadZone) input.right = true;
-
-        const dx = opp.x - this.x;
-        if (this.isTouchingWall) input.up = true; // wall jump sempre joga pro centro
-        else if (this.isGrounded && (Math.random() < BOT.jumpChance ||
-            (Math.abs(dx) < BOT.nearRivalDistance && Math.random() < BOT.jumpChanceNearRival))) input.up = true;
-        // Rival atordoado: pula na cabeça dele para lançar outro SKY DROP
-        const stompStunned = opp.isAlive && opp.stunTimer > 0;
-        if (stompStunned && this.isGrounded && Math.abs(dx) < BOT.stompStunnedDistance &&
-            Math.random() < BOT.stompStunnedChance) input.up = true;
-
-        // SMASH: caindo por cima do rival
-        if (!this.isGrounded && opp.isAlive && opp.stunTimer === 0 && Math.abs(dx) < this.radius + opp.radius &&
-            this.y < opp.y - BOT.smashAbove && this.vy > -2) {
-            input.downPressed = true;
-        }
-
-        // Dash de ataque
-        if (!stompStunned && this.dashCooldown === 0 && Math.abs(dx) < BOT.dashDistance &&
-            Math.abs(opp.y - this.y) < BOT.dashVerticalTolerance && Math.random() < BOT.dashChance) {
-            input.dashPressed = true;
-            input.left = dx < 0;
-            input.right = dx > 0;
-        }
-
-        if (this.wantTaunt) {
-            input.tauntPressed = true;
-            this.wantTaunt = false;
-        }
-        return input;
-    }
-
     update() {
         if (!this.isAlive) return;
         if (this.dashCooldown > 0) this.dashCooldown--;
@@ -175,7 +124,7 @@ export class Player {
         if (this.poundLag > 0) this.poundLag--;
         if (this.dropTimer > 0) this.dropTimer--;
 
-        const input = this.controls.isBot ? this.botInput() : this.humanInput();
+        const input = this.controls.isBot ? botInput(this, otherPlayer(this)) : this.humanInput();
         if (this.skyFalling && !this.isPounding) this.skyFalling = false;
         if (this.skyDrop > 0) return this.updateSkyDrop(input);
         const canAct = this.stunTimer === 0 && this.poundLag === 0 && !this.isPounding;
@@ -235,6 +184,17 @@ export class Player {
             }
         } else {
             this.vy = Math.min(this.vy + PHYSICS.gravity, PHYSICS.maxFallSpeed);
+        }
+
+        // Planar (corvo): segurando ↑ no ar e já caindo, freia a queda até fallSpeed e ganha controle lateral
+        const glide = this.character.glide;
+        this.isGliding = !!glide && canAct && input.up && !this.isGrounded && !this.isTouchingWall &&
+            !this.isDashing && this.vy > 0;
+        if (this.isGliding) {
+            if (this.vy > glide.fallSpeed) this.vy += (glide.fallSpeed - this.vy) * glide.brake;
+            const steer = accel * (glide.airControl - 1);
+            if (input.left) this.vx -= steer;
+            if (input.right) this.vx += steer;
         }
         if (this.isPounding && this.poundWindup === 0) this.squash(0.7, 1.35);
 

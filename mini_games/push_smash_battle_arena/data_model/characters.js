@@ -1,6 +1,7 @@
 // --- PERSONAGENS (jogabilidade) ---
 // Cada personagem tem atributos e uma habilidade de dash próprios.
 // A massa também afeta a aceleração do dash; a barra SPEED do menu mostra a velocidade normal.
+// Alguns têm um passivo extra (glide: o corvo plana segurando ↑ no ar).
 // A arte de cada um fica em visuals/characters.js.
 export const ROSTER = [
     { id: 'fox',      name: 'FOX',      mass: 1.0,  speed: 1.0,  jump: 1.0,
@@ -20,7 +21,12 @@ export const ROSTER = [
     { id: 'penguin',  name: 'PENGUIN',  mass: 1.15, speed: 0.98, jump: 0.95,
         dash: { name: 'BELLY SLIDE', description: 'Keep your speed while sliding on the ground.', speed: 17, frames: 18, cooldown: 50, groundFriction: 0.99 } },
     { id: 'frog',     name: 'FROG',     mass: 0.85, speed: 1.0,  jump: 1.3,
-        dash: { name: 'DIVE KICK', description: 'Dive downward to catch airborne rivals.', speed: 17, frames: 11, cooldown: 42, airVerticalSpeed: 5.5 } }
+        dash: { name: 'DIVE KICK', description: 'Dive downward to catch airborne rivals.', speed: 17, frames: 11, cooldown: 42, airVerticalSpeed: 5.5 } },
+    // glide: segurando ↑ no ar, a queda fica lenta (fallSpeed = queda máxima; brake = quão rápido freia;
+    // airControl = multiplica o controle lateral enquanto plana)
+    { id: 'crow',     name: 'CROW',     mass: 0.75, speed: 1.0,  jump: 1.0,
+        dash: { name: 'WING GUST', description: 'A quick swoop with a short cooldown.', speed: 19, frames: 10, cooldown: 36 },
+        glide: { name: 'GLIDE', description: 'Hold ▲ in the air to float down slowly.', fallSpeed: 1.6, brake: 0.3, airControl: 1.4 } }
 ];
 
 export const DEFAULT_PICKS = [0, 1];       // P1 raposa, P2 gato

@@ -12,7 +12,7 @@ export function snap(p) {
     return {
         char: p.charIndex, x: p.x, y: p.y, r: p.radius, sx: p.sx, sy: p.sy, vx: p.vx, vy: p.vy,
         alive: p.isAlive, stun: p.stunTimer, taunt: p.tauntTimer,
-        facing: p.facing, pound: p.isPounding, dashing: p.isDashing, grounded: p.isGrounded,
+        facing: p.facing, pound: p.isPounding, dashing: p.isDashing, grounded: p.isGrounded, glide: p.isGliding,
         runPhase: p.runPhase, color: p.color, t: state.frameCount,
         aim: p.skyDrop > 0 || p.skyFalling
     };
@@ -27,6 +27,7 @@ function pickFrame(s) {
     else if (s.pound) anim = 'pound';
     else if (s.taunt > 0) { anim = 'taunt'; i = Math.floor(s.t / 5) % count('taunt'); }
     else if (s.dashing) anim = 'dash';
+    else if (s.glide) { anim = 'glide'; i = Math.floor(s.t / 7) % count('glide'); }
     else if (!s.grounded) { anim = 'jump'; i = s.vy < 0 ? 0 : 1; }
     else if (Math.abs(s.vx) > 1) { anim = 'run'; i = Math.floor(s.runPhase) % count('run'); }
     else { anim = 'idle'; i = Math.floor(s.t / A.idleFrameFrames) % count('idle'); }

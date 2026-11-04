@@ -361,6 +361,25 @@ body { height: 100dvh; }
     -webkit-tap-highlight-color: transparent;
 }
 .stage-card canvas { display: block; width: 112px; height: 63px; border-radius: 7px; margin-bottom: 2px; }
+.level-col { display: flex; flex-direction: column; justify-content: center; gap: 4px; margin-left: 4px; }
+.level-label { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: #1e90ff; text-align: center; }
+.level-btn {
+    background: transparent;
+    border: 2px solid #2c3440;
+    border-radius: 8px;
+    padding: 3px 10px;
+    cursor: pointer;
+    color: #c5c6c7;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    -webkit-tap-highlight-color: transparent;
+}
+.level-btn.sel { color: #0b0c10; }
+.level-easy.sel { background: #2ed573; border-color: #2ed573; }
+.level-normal.sel { background: #ffd32a; border-color: #ffd32a; }
+.level-hard.sel { background: #ff4757; border-color: #ff4757; color: #fff; box-shadow: 0 0 12px rgba(255, 71, 87, 0.5); }
 .stage-card.sel { border-color: #45f3df; color: #fff; box-shadow: 0 0 12px rgba(69, 243, 223, 0.5); }
 .overlay.menu .btn { padding: 11px 26px; font-size: 16px; }
 /* Sem backdrop-filter no menu: o blur atrás dos canvases dos bichos borrava um quadrado escuro */

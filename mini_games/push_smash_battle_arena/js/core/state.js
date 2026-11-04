@@ -5,6 +5,7 @@ export const state = {
     // MENU | COUNTDOWN | PLAYING | KO | REPLAY | ROUND_END
     gameState: 'MENU',
     isBotMatch: true,
+    botLevel: 'normal', // easy | normal | hard (data_model/bot.js)
     paused: false,
     roundNumber: 1,
     stage: 0,          // índice em STAGES

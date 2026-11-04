@@ -14,7 +14,7 @@ Tudo o que é número, texto ou som do jogo fica em `data_model/`. Para testar o
 | `bounce.js` | Elasticidade: restituição e impulso extra no chão, paredes, rival e cabeça; cadeia de quiques (x2, x3, x4) |
 | `combat.js` | Força das batidas, hit stop, tremor de câmera, smash (atordoamento), SKY DROP (altura, tempo no ar, velocidade da mira), K.O. e replay |
 | `match.js` | Rounds e tempos, corações por round, arena (paredes e plataforma) |
-| `characters.js` | Elenco: massa, velocidade, pulo e habilidade exclusiva de dash de cada bicho |
+| `characters.js` | Elenco: massa, velocidade, pulo e habilidade exclusiva de dash de cada bicho; passivos extras (o corvo plana segurando ▲ no ar: `glide`) |
 | `stages.js` | Arenas (Night Forest, Desert, Snow Peak) e o atrito do chão de cada uma (a neve escorrega) |
 | `bot.js` | Comportamento do bot (chances de pular e dar dash, distâncias) |
 | `controls.js` | Teclas, joystick, valores padrão das configurações |
@@ -33,6 +33,7 @@ Unidades: pixels e frames (60 passos por segundo).
 - **Quique:** a velocidade que volta é `entrada × restituição`. Segurando o direcional no sentido do quique, soma um impulso extra, que cresce a cada batida seguida no mesmo eixo (cadeia X para paredes e rival, cadeia Y para o chão).
 - **Entre as bolas:** o choque é elástico ao longo da linha entre os centros, e quem ataca (dash, massa) dá um chute extra nessa mesma linha.
 - **No ar** o atrito é menor que no chão (o embalo dura mais) e o controle é reduzido.
+- **Planar (corvo):** segurando ▲ no ar depois que começa a cair, a queda é freada até `glide.fallSpeed` e o controle lateral aumenta (`glide.airControl`). Encostado na parede ou no dash não plana.
 - **Dash:** cada personagem tem uma habilidade própria, com velocidade, duração e recarga individuais; alguns também saltam, causam mais impacto, resistem a empurrões ou deslizam melhor. O seletor mostra o efeito de cada dash.
 
 ## Como a arte é desenhada

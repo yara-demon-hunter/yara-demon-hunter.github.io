@@ -6,7 +6,7 @@ export const CHARACTER_ATLAS = {
     extent: 2.6,               // metade do quadro, em raios do corpo (precisa caber a cauda balançando, orelhas de coelho e estrelas)
     columns: 6,
     // Quadros de cada animação, na ordem em que entram no atlas
-    anims: { idle: 6, run: 6, jump: 2, pound: 1, dash: 1, stun: 4, taunt: 4, scared: 2 },
+    anims: { idle: 6, run: 6, jump: 2, pound: 1, dash: 1, stun: 4, taunt: 4, scared: 2, glide: 2 },   // glide: só o corvo usa
     idleFrameFrames: 9,        // quantos frames do jogo dura cada quadro do idle
     runPhasePerPixel: 0.045    // quanto o ciclo de corrida avança por pixel andado
 };

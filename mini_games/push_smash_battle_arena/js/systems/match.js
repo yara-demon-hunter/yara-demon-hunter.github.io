@@ -20,6 +20,7 @@ export function startMatch(isBot) {
     players.forEach((p, i) => p.setCharacter(pick.chars[i]));
     keepCharacterAtlases(pick.chars);
     state.stage = pick.stage;
+    state.botLevel = pick.level;
     setTerrain(STAGES[pick.stage].terrain);
     players.forEach(p => p.resetMatch());
     state.roundNumber = 1;

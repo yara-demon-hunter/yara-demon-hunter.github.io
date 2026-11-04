@@ -4,6 +4,8 @@ export const TEXTS = {
     menuIntro: 'Best of 5 rounds! 3 hearts each. SMASH your rival from above, or stomp their head to SKY DROP!',
     botHint: 'P2: CONTROLLED BY AI (BOT)',
     roundLabel: n => `ROUND ${n}`,
+    botLevelLabel: 'BOT',
+    botLevels: { easy: 'EASY', normal: 'NORMAL', hard: 'HARD' },
     pickerTags: ['P1', 'P2 / BOT'],
     statLabels: { mass: 'MASS', speed: 'SPEED', jump: 'JUMP' },
     dashLabel: 'DASH',
