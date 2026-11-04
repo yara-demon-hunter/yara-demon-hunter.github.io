@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Push & Smash - Battle Arena</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Wild Push &amp; Smash</title>
     <link rel="stylesheet" href="./css/game.css">
 </head>
 <body>
@@ -27,18 +27,28 @@
 
     <!-- Tela Inicial / Game Over -->
     <div id="screenMenu" class="overlay menu">
-        <h1 id="menuTitle">PUSH & SMASH</h1>
-        <p id="menuSub">Best of 5 rounds! 3 hearts each. SMASH your rival from above, or stomp their head to SKY DROP!</p>
-        <div class="select-row">
-            <div class="picker" id="picker0"></div>
-            <span class="vs">VS</span>
-            <div class="picker" id="picker1"></div>
-        </div>
-        <div class="stage-row" id="stageRow"></div>
-        <div class="btn-group">
-            <button id="btn1Player" class="btn">1 PLAYER (VS AI BOT)</button>
-            <button id="btn2Players" class="btn btn-p2">2 PLAYERS (1 KEYBOARD)</button>
-        </div>
+        <!-- Coluna 1: quem luta -->
+        <section class="menu-fighters">
+            <h1 id="menuTitle">WILD PUSH & SMASH</h1>
+            <p id="menuSub">Best of 5 rounds! 3 hearts each. SMASH your rival from above, or stomp their head to SKY DROP!</p>
+            <div class="select-row">
+                <div class="picker" id="picker0"></div>
+                <span class="vs">VS</span>
+                <div class="picker" id="picker1"></div>
+            </div>
+        </section>
+        <!-- Coluna 2: onde luta e como começar -->
+        <section class="menu-side">
+            <div class="side-block">
+                <span class="side-label">ARENA</span>
+                <div class="stage-row" id="stageRow"></div>
+            </div>
+            <div class="side-block" id="levelRow"></div>
+            <div class="btn-group">
+                <button id="btn1Player" class="btn">1 PLAYER<small>VS AI BOT</small></button>
+                <button id="btn2Players" class="btn btn-p2">2 PLAYERS<small>1 KEYBOARD</small></button>
+            </div>
+        </section>
     </div>
     <button id="btnGear" class="gear-btn" aria-label="Settings" title="Settings (Esc)">🎮</button>
 
@@ -66,6 +76,13 @@
 <div id="touchControls" class="touch hidden">
     <div class="pad" id="padLeft"></div>
     <div class="pad" id="padRight"></div>
+</div>
+
+<!-- AVISO DE VIRAR O APARELHO (celular em pé; o jogo é jogado de lado) -->
+<div id="rotateNotice" role="alert">
+    <div class="rotate-phone" aria-hidden="true"></div>
+    <p>TURN YOUR PHONE SIDEWAYS</p>
+    <span>Wild Push &amp; Smash is played in landscape, with both thumbs. The match is paused.</span>
 </div>
 
 <script type="module" src="./js/game.js"></script>

@@ -1,4 +1,5 @@
 import { initAudio } from '../audio/sound.js';
+import { lockLandscape } from './orientation.js';
 import { startMatch } from '../systems/match.js';
 
 // --- MENU ---
@@ -11,7 +12,7 @@ export const hintP2 = document.getElementById('hintP2');
 export const hintP2Human = hintP2.innerText;
 
 
-btn1Player.addEventListener('click', () => { initAudio(); startMatch(true); });
-btn2Players.addEventListener('click', () => { initAudio(); startMatch(false); });
+btn1Player.addEventListener('click', () => { initAudio(); lockLandscape(); startMatch(true); });
+btn2Players.addEventListener('click', () => { initAudio(); lockLandscape(); startMatch(false); });
 
 

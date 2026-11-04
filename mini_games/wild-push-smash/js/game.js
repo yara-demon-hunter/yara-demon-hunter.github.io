@@ -13,13 +13,15 @@ import { startReplay, stepReplay } from './systems/replay.js';
 import { afterRoundEnd, updateRoundTimer } from './systems/round.js';
 import { updateHeartsHUD, updateWinsHUD } from './ui/hud.js';
 import { applySettings } from './ui/settings_panel.js';
+import { isPhonePortrait } from './ui/orientation.js';
 import { isTouch, touchControls } from './ui/touch_controls.js';
 
 // --- LOOP PRINCIPAL (passo fixo de 60 fps) ---
 export function step() {
     state.frameCount++;
     if (state.paused || state.gameState !== 'PLAYING') stopAllLoops(); // assobio do SKY DROP
-    if (state.paused) return;
+    // Celular em pé: o aviso de virar o aparelho cobre a tela e a partida fica parada
+    if (state.paused || isPhonePortrait()) return;
     if (state.hitStop > 0) { state.hitStop--; return; }
     if (state.hitCooldown > 0) state.hitCooldown--;
     updateEffects();

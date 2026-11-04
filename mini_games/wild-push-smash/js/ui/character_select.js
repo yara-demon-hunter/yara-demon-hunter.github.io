@@ -133,7 +133,7 @@ function selectStage(i) {
     playSound('coin');
 }
 
-// Dificuldade do bot: coluna ao lado das arenas (no celular não sobra altura para mais uma linha)
+// Dificuldade do bot: uma linha própria na coluna da direita, entre as arenas e os botões de jogar
 const levelCol = document.createElement('div');
 levelCol.className = 'level-col';
 levelCol.innerHTML = `<span class="level-label">${TEXTS.botLevelLabel}</span>`;
@@ -145,7 +145,7 @@ const levelButtons = BOT_LEVEL_ORDER.map((level) => {
     levelCol.appendChild(b);
     return b;
 });
-stageRow.appendChild(levelCol);
+document.getElementById('levelRow').appendChild(levelCol);
 
 function selectLevel(level, silent) {
     selection.level = level;

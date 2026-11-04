@@ -1,10 +1,10 @@
 // --- TEXTOS DO JOGO (para traduzir, edite aqui) ---
 export const TEXTS = {
-    menuTitle: 'PUSH & SMASH',
+    menuTitle: 'WILD PUSH & SMASH',
     menuIntro: 'Best of 5 rounds! 3 hearts each. SMASH your rival from above, or stomp their head to SKY DROP!',
     botHint: 'P2: CONTROLLED BY AI (BOT)',
     roundLabel: n => `ROUND ${n}`,
-    botLevelLabel: 'BOT',
+    botLevelLabel: 'BOT LEVEL',
     botLevels: { easy: 'EASY', normal: 'NORMAL', hard: 'HARD' },
     pickerTags: ['P1', 'P2 / BOT'],
     statLabels: { mass: 'MASS', speed: 'SPEED', jump: 'JUMP' },

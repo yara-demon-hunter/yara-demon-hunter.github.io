@@ -1,4 +1,4 @@
-# Referências de Arte: Push & Smash
+# Referências de Arte: Wild Push & Smash
 
 Pasta de **referência** para transformar cada personagem em animações desenhadas em código (Canvas 2D), no mesmo método do last_torch. As imagens daqui **nunca são carregadas pelo jogo**: servem só para entender a forma, as cores e o movimento e recriar tudo proceduralmente (`js/render/character_art.js`), que depois vira atlas (`character_sprites.js`).
 

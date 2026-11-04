@@ -1,4 +1,4 @@
-# Push & Smash - Battle Arena
+# Wild Push & Smash
 
 Battle arena local de 2 jogadores (ou 1 contra o bot): empurre, quique nas paredes e amasse o rival caindo na cabeça dele. Na tela inicial cada jogador escolhe o bicho num carrossel (setas, ou A/D e ←/→) e, embaixo, a arena. Cada lutador tem 3 corações por round: cada SMASH sofrido tira um, e quem perde os 3 (ou cai da arena) toma K.O. Melhor de 5 rounds de 60 segundos: ganha o round quem der K.O. no rival ou tiver mais corações no fim do tempo, e quem vencer 3 leva a partida. Não caem itens nem moedas, e ninguém perde massa: o tamanho de cada bicho é fixo.
 
@@ -48,7 +48,7 @@ Mesma ideia do last_torch: a arte é procedural, mas **desenhada uma vez** e dep
 ## Estrutura
 
 ```
-push_smash_battle_arena.html   página (HTML)
+wild-push-smash.html           página (HTML)
 css/game.css                   estilos
 data_model/                    números, textos e sons (veja acima)
 js/
@@ -69,7 +69,7 @@ O estado mutável da partida fica em `js/core/state.js` (um `import` não reatri
 O jogo usa módulos ES, então precisa de um servidor (não abre direto pelo arquivo):
 
 ```bash
-python3 -m http.server 8000 --directory mini_games/push_smash_battle_arena
+python3 -m http.server 8000 --directory mini_games/wild-push-smash
 ```
 
-Depois abra `http://localhost:8000/push_smash_battle_arena.html`.
+Depois abra `http://localhost:8000/wild-push-smash.html`.
