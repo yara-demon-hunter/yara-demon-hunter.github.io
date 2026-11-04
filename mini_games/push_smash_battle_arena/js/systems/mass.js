@@ -1,7 +1,7 @@
 import { MASS, PHYSICS } from '../../data_model/physics.js';
 import { TEXTS } from '../../data_model/texts.js';
 import { playSound } from '../audio/sound.js';
-import { platform } from '../core/arena.js';
+import { groundYAt } from '../core/arena.js';
 import { H } from '../core/canvas.js';
 import { state } from '../core/state.js';
 import { players } from '../entities/player.js';
@@ -32,15 +32,16 @@ export function updateMassBlobs() {
         const b = state.massBlobs[i];
         b.life--;
         b.age++;
-        const overPlatform = b.x > platform.x && b.x < platform.x + platform.width;
+        const ground = groundYAt(b.x);
+        const overPlatform = ground !== null;
         if (b.grounded && !overPlatform) b.grounded = false;
         if (!b.grounded) {
             b.vy += PHYSICS.gravity;
             b.vx *= MASS.blobAirDrag;
             b.x += b.vx;
             b.y += b.vy;
-            if (overPlatform && b.vy > 0 && b.y + b.r * 0.6 >= platform.y && b.y < platform.y + platform.height) {
-                b.y = platform.y - b.r * 0.6;
+            if (overPlatform && b.vy > 0 && b.y + b.r * 0.6 >= ground) {
+                b.y = ground - b.r * 0.6;
                 b.vx = 0;
                 b.vy = 0;
                 b.grounded = true;

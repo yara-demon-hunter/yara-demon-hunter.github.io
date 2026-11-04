@@ -41,7 +41,7 @@ export function drawEffects() {
     });
     ctx.globalAlpha = 1;
     ctx.textAlign = 'center';
-    ctx.font = 'bold 16px "Segoe UI", sans-serif';
+    ctx.font = 'bold 26px "Segoe UI", sans-serif';
     state.popups.forEach(p => {
         ctx.globalAlpha = Math.min(1, p.life / 20);
         ctx.fillStyle = p.color;

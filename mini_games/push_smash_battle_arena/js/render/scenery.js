@@ -2,7 +2,7 @@ import { ARENA } from '../../data_model/match.js';
 import { PLAYERS } from '../../data_model/players.js';
 import { STAGES } from '../../data_model/stages.js';
 import { SCENERY as C, STAGE_VISUALS } from '../../data_model/visuals/arena.js';
-import { leftWall, platform, rightWall } from '../core/arena.js';
+import { leftWall, platform, rightWall, terrain } from '../core/arena.js';
 import { H, W, ctx } from '../core/canvas.js';
 import { state } from '../core/state.js';
 import { drawGlow, getGlowSprite, makeCanvas } from './fx/sprites.js';
@@ -10,12 +10,15 @@ import { drawGlow, getGlowSprite, makeCanvas } from './fx/sprites.js';
 // --- CENÁRIO ---
 // Cada arena tem fundo, plataforma e paredes desenhados uma vez; por quadro só há drawImage.
 // O que se mexe (vaga-lumes, areia, neve) é só glow sprite.
+const K = ARENA.scale;
+
 function rng(seed) {
     let s = seed;
     return () => (s = (s * 16807) % 2147483647) / 2147483647;
 }
 
 function ridgeY(hill, x) {
+    x /= K;     // a forma dos morros foi pensada para 800 de largura
     switch (hill.shape) {
         case 'dunes':
             return hill.base - (Math.sin(x * 0.008 + hill.seed) * 0.5 + 0.5) * hill.amplitude;
@@ -235,17 +238,17 @@ function drawAmbient(a, f) {
         let size = a.size;
         let alpha = 0.75;
         if (a.type === 'snow') {
-            y = (seed * 3.1 + f * (0.6 + (i % 4) * 0.25)) % (H + 20) - 10;
-            x = (seed * 7.7) % W + Math.sin(f * 0.02 + seed) * 14;
+            y = (seed * 3.1 * K + f * (0.6 + (i % 4) * 0.25)) % (H + 20) - 10;
+            x = (seed * 7.7 * K) % W + Math.sin(f * 0.02 + seed) * 14;
             size = a.size * (0.6 + (i % 3) * 0.3);
             alpha = 0.9;
         } else if (a.type === 'sand') {
             x = (seed * 5.3 + f * (1.4 + (i % 3) * 0.6)) % (W + 40) - 20;
-            y = 180 + (seed * 2.9) % 220 + Math.sin(f * 0.03 + seed) * 8;
+            y = (180 + (seed * 2.9) % 220) * K + Math.sin(f * 0.03 + seed) * 8;
             alpha = 0.55;
         } else {
-            x = (i * 137) % W + Math.sin(f * 0.012 + i * 1.7) * (20 + (i % 5) * 8);
-            y = 80 + ((i * 71) % 260) + Math.cos(f * 0.0156 + i * 1.7) * (12 + (i % 5) * 5);
+            x = ((i * 137) % 800) * K + Math.sin(f * 0.012 + i * 1.7) * (20 + (i % 5) * 8);
+            y = (80 + ((i * 71) % 260)) * K + Math.cos(f * 0.0156 + i * 1.7) * (12 + (i % 5) * 5);
             size = a.size * (0.7 + 0.3 * Math.sin(f * 0.05 + i));
             alpha = 0.7;
         }
@@ -264,6 +267,61 @@ function drawPlatformParts(g, parts, x, y, width, scale = 1) {
     g.drawImage(parts.right, x + (width - C.capWidth) * scale, y, C.capWidth * scale, h * scale);
 }
 
+// Rampa em U (halfpipe): casca de gelo com a espessura do terreno, seguindo os arcos. Desenhada por caminho
+// (poucos pontos), sem gradiente novo por quadro.
+function uPath(g, x, y, width, R, T, scale) {
+    const left = x + R;
+    const right = x + width - R;
+    const cy = y - R;
+    const steps = 16;
+    const pt = (cx, a, r) => [(cx + Math.cos(a) * r) * scale, (cy + Math.sin(a) * r) * scale];
+    g.beginPath();
+    // Superfície de cima: da ponta esquerda, descendo o arco, pelo meio reto, e subindo a direita
+    for (let i = 0; i <= steps; i++) g.lineTo(...pt(left, Math.PI - (Math.PI / 2) * (i / steps), R));
+    for (let i = 0; i <= steps; i++) g.lineTo(...pt(right, Math.PI / 2 - (Math.PI / 2) * (i / steps), R));
+    // Por baixo, voltando com o raio maior (a espessura do gelo)
+    for (let i = steps; i >= 0; i--) g.lineTo(...pt(right, Math.PI / 2 - (Math.PI / 2) * (i / steps), R + T));
+    for (let i = steps; i >= 0; i--) g.lineTo(...pt(left, Math.PI - (Math.PI / 2) * (i / steps), R + T));
+    g.closePath();
+}
+
+function surfacePath(g, x, y, width, R, scale) {
+    const left = x + R;
+    const right = x + width - R;
+    const cy = y - R;
+    const steps = 16;
+    g.beginPath();
+    for (let i = 0; i <= steps; i++) {
+        const a = Math.PI - (Math.PI / 2) * (i / steps);
+        g.lineTo((left + Math.cos(a) * R) * scale, (cy + Math.sin(a) * R) * scale);
+    }
+    for (let i = 0; i <= steps; i++) {
+        const a = Math.PI / 2 - (Math.PI / 2) * (i / steps);
+        g.lineTo((right + Math.cos(a) * R) * scale, (cy + Math.sin(a) * R) * scale);
+    }
+}
+
+function drawHalfpipe(g, P, edgeColor, x, y, width, scale = 1) {
+    const R = terrain.radius;
+    const T = terrain.thickness;
+    uPath(g, x, y, width, R, T, scale);
+    g.fillStyle = P.stone;
+    g.fill();
+    g.strokeStyle = P.stoneDark;
+    g.lineWidth = 3 * scale;
+    g.lineJoin = 'round';
+    g.stroke();
+    // Faixa clara de gelo logo abaixo da superfície e brilho neon na borda
+    surfacePath(g, x, y + 7, width, R, scale);
+    g.strokeStyle = P.stoneLight;
+    g.lineWidth = 8 * scale;
+    g.stroke();
+    surfacePath(g, x, y, width, R, scale);
+    g.strokeStyle = edgeColor;
+    g.lineWidth = 3.5 * scale;
+    g.stroke();
+}
+
 export function drawArena() {
     const art = getStageArt(STAGES[state.stage].id);
     ctx.drawImage(art.background, 0, 0);
@@ -275,13 +333,17 @@ export function drawArena() {
     ctx.drawImage(art.walls[0], leftWall.x, leftWall.y);
     ctx.drawImage(art.walls[1], rightWall.x, rightWall.y);
 
-    drawPlatformParts(ctx, art.platform, platform.x, platform.y, platform.width);
-
     // Borda neon: muda de cor conforme a plataforma encolhe
     const danger = 1 - (platform.width - ARENA.platform.minWidth) / (ARENA.platform.fullWidth - ARENA.platform.minWidth);
     const e = C.edge;
     const color = danger > e.dangerAt ? e.danger : danger > e.warnAt ? e.warn : e.safe;
     drawGlow(ctx, color, platform.x + platform.width / 2, platform.y, platform.width * 0.55, 0.12);
+
+    if (terrain.type === 'halfpipe') {
+        drawHalfpipe(ctx, art.v.platform, color, platform.x, platform.y, platform.width);
+        return;
+    }
+    drawPlatformParts(ctx, art.platform, platform.x, platform.y, platform.width);
     ctx.fillStyle = color;
     ctx.fillRect(platform.x + 4, platform.y, platform.width - 8, 3);
 }
@@ -293,5 +355,14 @@ export function drawStagePreview(g, stageIndex, width, height) {
     g.drawImage(art.background, 0, 0, width, height);
     g.drawImage(art.walls[0], leftWall.x * s, leftWall.y * s, leftWall.width * s, leftWall.height * s);
     g.drawImage(art.walls[1], rightWall.x * s, rightWall.y * s, rightWall.width * s, rightWall.height * s);
+    const stage = STAGES[stageIndex];
+    if (stage.terrain?.type === 'halfpipe') {
+        // A miniatura usa o mesmo caminho da arena, com o terreno dessa fase
+        const saved = { ...terrain };
+        terrain.type = stage.terrain.type; terrain.radius = stage.terrain.radius; terrain.thickness = stage.terrain.thickness;
+        drawHalfpipe(g, art.v.platform, C.edge.safe, (W - ARENA.platform.fullWidth) / 2, ARENA.platform.y, ARENA.platform.fullWidth, s);
+        Object.assign(terrain, saved);
+        return;
+    }
     drawPlatformParts(g, art.platform, (W - ARENA.platform.fullWidth) / 2 * s, ARENA.platform.y * s, ARENA.platform.fullWidth, s);
 }

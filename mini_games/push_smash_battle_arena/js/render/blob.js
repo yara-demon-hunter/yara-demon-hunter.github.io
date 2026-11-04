@@ -1,6 +1,6 @@
 import { CHARACTER_STYLE as S } from '../../data_model/visuals/characters.js';
 import { CHARACTER_ATLAS as A, FX } from '../../data_model/visuals/sprites.js';
-import { platform } from '../core/arena.js';
+import { groundYAt } from '../core/arena.js';
 import { ctx } from '../core/canvas.js';
 import { state } from '../core/state.js';
 import { ANIM_START, artFor, CELL_UNITS, frameRect, getCharacterAtlas, hasLivePupils } from './character_sprites.js';
@@ -55,13 +55,14 @@ export function drawGhost(s, t) {
 }
 
 function drawShadow(s) {
-    const height = platform.y - (s.y + s.r);
-    const over = s.x > platform.x && s.x < platform.x + platform.width;
-    if (!over || height < -6) return;
+    const ground = groundYAt(s.x);
+    if (ground === null) return;
+    const height = ground - (s.y + s.r);
+    if (height < -6) return;
     const alpha = FX.shadow.alpha * Math.max(0, 1 - height / FX.shadow.fadeHeight);
     const w = s.r * 2 * FX.shadow.widthRatio * (1 - Math.min(0.5, height / 500));
     ctx.globalAlpha = alpha;
-    ctx.drawImage(getShadowSprite(), s.x - w / 2, platform.y - 2, w, w * FX.shadow.heightRatio * 2);
+    ctx.drawImage(getShadowSprite(), s.x - w / 2, ground - 2, w, w * FX.shadow.heightRatio * 2);
     ctx.globalAlpha = 1;
 }
 

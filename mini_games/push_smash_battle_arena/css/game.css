@@ -41,7 +41,7 @@ canvas {
 .scoreboard {
     display: flex;
     justify-content: space-between;
-    font-size: 32px;
+    font-size: 60px;
     font-weight: 900;
     text-shadow: 0 4px 12px rgba(0,0,0,0.8);
 }
@@ -50,10 +50,10 @@ canvas {
 
 .combo-banner {
     position: absolute;
-    top: 92px;
+    top: 170px;
     width: 100%;
     text-align: center;
-    font-size: 24px;
+    font-size: 44px;
     font-weight: 900;
     font-style: italic;
     color: #ffd32a;
@@ -69,9 +69,9 @@ canvas {
 
 .coins-display {
     position: absolute;
-    top: 65px;
-    left: 20px;
-    font-size: 18px;
+    top: 100px;
+    left: 28px;
+    font-size: 32px;
     font-weight: bold;
     color: #ffd32a;
     text-shadow: 0 2px 4px rgba(0,0,0,0.8);
@@ -79,10 +79,10 @@ canvas {
 
 .timer-display {
     position: absolute;
-    top: 20px;
+    top: 24px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 36px;
+    font-size: 68px;
     font-weight: 900;
     color: #45f3df;
     text-shadow: 0 0 12px rgba(69, 243, 223, 0.7);
@@ -160,7 +160,7 @@ canvas {
     display: flex;
     justify-content: space-between;
     padding: 0 30px;
-    font-size: 12px;
+    font-size: 20px;
     color: rgba(255,255,255,0.6);
     left: 0;
 }
@@ -169,20 +169,20 @@ body { height: 100dvh; }
 #game-container { transform-origin: center center; flex-shrink: 0; }
 
 .p-name { margin-right: 6px; }
-.pips { font-size: 20px; letter-spacing: 3px; vertical-align: middle; margin: 0 8px; }
+.pips { font-size: 36px; letter-spacing: 5px; vertical-align: middle; margin: 0 12px; }
 .round-label {
     position: absolute;
-    top: 64px;
+    top: 100px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 13px;
+    font-size: 24px;
     font-weight: 900;
     letter-spacing: 3px;
     color: rgba(255,255,255,0.65);
 }
 .combo-banner.big {
-    top: 140px;
-    font-size: 84px;
+    top: 230px;
+    font-size: 150px;
     font-style: normal;
 }
 
@@ -253,15 +253,15 @@ body { height: 100dvh; }
 /* --- SETTINGS --- */
 .gear-btn {
     position: absolute;
-    top: 65px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
+    top: 100px;
+    right: 28px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     border: 2px solid #45f3df;
     background: rgba(31, 40, 51, 0.8);
     color: #fff;
-    font-size: 20px;
+    font-size: 30px;
     cursor: pointer;
     z-index: 20;
     pointer-events: auto;
@@ -383,3 +383,13 @@ body { height: 100dvh; }
 /* Sem backdrop-filter no menu: o blur atrás dos canvases dos bichos borrava um quadrado escuro */
 .overlay.menu { backdrop-filter: none; background: rgba(11, 12, 16, 0.92); }
 .picker-view canvas, .stage-card canvas { background: transparent; }
+
+/* --- ARENA MAIOR: menu e configurações ganham zoom para acompanhar o palco (1120x630) e as letras ficam maiores --- */
+.overlay.menu > *, .overlay.settings > * { zoom: 1.4; }
+.stat { font-size: 11.5px; }
+.dash-skill { font-size: 11px; }
+.stage-card { font-size: 12px; }
+.picker-tag { font-size: 13px; }
+.controls-hint { gap: 24px; padding: 0 28px; }
+.controls-hint span { flex: 1; }
+.controls-hint span:last-child { text-align: right; }

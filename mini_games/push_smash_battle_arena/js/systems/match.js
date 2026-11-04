@@ -1,8 +1,9 @@
 import { ARENA, MATCH, SPAWN } from '../../data_model/match.js';
 import { PLAYERS } from '../../data_model/players.js';
+import { STAGES } from '../../data_model/stages.js';
 import { TEXTS } from '../../data_model/texts.js';
 import { syncMusic } from '../audio/music.js';
-import { platform } from '../core/arena.js';
+import { platform, setTerrain } from '../core/arena.js';
 import { W } from '../core/canvas.js';
 import { keys } from '../core/input.js';
 import { state } from '../core/state.js';
@@ -19,6 +20,7 @@ export function startMatch(isBot) {
     players.forEach((p, i) => p.setCharacter(pick.chars[i]));
     keepCharacterAtlases(pick.chars);
     state.stage = pick.stage;
+    setTerrain(STAGES[pick.stage].terrain);
     players.forEach(p => p.resetMatch());
     state.roundNumber = 1;
     updateWinsHUD();

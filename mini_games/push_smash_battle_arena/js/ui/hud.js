@@ -8,7 +8,7 @@ export function updateScoreHUD() {
 }
 
 export function updateWinsHUD() {
-    const pips = w => '●'.repeat(w) + '○'.repeat(MATCH.roundsToWin - w);
+    const pips = w => '●'.repeat(w) + '○'.repeat(Math.max(0, MATCH.roundsToWin - w));
     document.getElementById('winsP1').innerText = pips(players[0].roundWins);
     document.getElementById('winsP2').innerText = pips(players[1].roundWins);
 }

@@ -1,4 +1,8 @@
+import { ARENA } from '../match.js';
+
 // --- DADOS VISUAIS: arenas ---
+// As posições abaixo foram pensadas para 800x450; `k` ajusta para o tamanho real da arena (ARENA.scale).
+const k = ARENA.scale;
 // O fundo, a plataforma e as paredes de cada arena são desenhados uma vez (js/render/scenery.js) e carimbados.
 // hills.shape: rolling (colinas) | dunes (dunas lisas) | peaks (montanhas)
 // decor: silhuetas em cima da primeira camada de morros (cactus | pine | null)
@@ -7,11 +11,11 @@
 export const STAGE_VISUALS = {
     night: {
         sky: ['#161a33', '#0d1022', '#07080f'],
-        celestial: { x: 640, y: 92, radius: 34, color: '#e8f0ff', glow: '#7c8cff', craters: true },
+        celestial: { x: 640 * k, y: 92 * k, radius: 34 * k, color: '#e8f0ff', glow: '#7c8cff', craters: true },
         stars: { count: 70, seed: 7, color: '#cfd8ff' },
         hills: [
-            { color: '#10142b', base: 330, amplitude: 46, seed: 3, shape: 'rolling' },
-            { color: '#0b0e20', base: 372, amplitude: 38, seed: 11, shape: 'rolling' }
+            { color: '#10142b', base: 330 * k, amplitude: 46 * k, seed: 3, shape: 'rolling' },
+            { color: '#0b0e20', base: 372 * k, amplitude: 38 * k, seed: 11, shape: 'rolling' }
         ],
         decor: null,
         fog: 'rgba(75, 91, 214, 0.22)',
@@ -24,11 +28,11 @@ export const STAGE_VISUALS = {
     },
     desert: {
         sky: ['#3b2a6b', '#d9576b', '#ffb36b'],
-        celestial: { x: 600, y: 170, radius: 48, color: '#ffe08a', glow: '#ff9a3c', craters: false },
+        celestial: { x: 600 * k, y: 170 * k, radius: 48 * k, color: '#ffe08a', glow: '#ff9a3c', craters: false },
         stars: { count: 14, seed: 21, color: '#ffe6f0' },
         hills: [
-            { color: '#c9824a', base: 336, amplitude: 40, seed: 5, shape: 'dunes' },
-            { color: '#a3603a', base: 380, amplitude: 30, seed: 17, shape: 'dunes' }
+            { color: '#c9824a', base: 336 * k, amplitude: 40 * k, seed: 5, shape: 'dunes' },
+            { color: '#a3603a', base: 380 * k, amplitude: 30 * k, seed: 17, shape: 'dunes' }
         ],
         decor: { type: 'cactus', color: '#6b3826', count: 5, seed: 4 },
         fog: 'rgba(255, 170, 90, 0.18)',
@@ -41,11 +45,11 @@ export const STAGE_VISUALS = {
     },
     snow: {
         sky: ['#1d3a6e', '#3f6fb0', '#a9c9f0'],
-        celestial: { x: 170, y: 110, radius: 30, color: '#fffbe8', glow: '#cfe6ff', craters: false },
+        celestial: { x: 170 * k, y: 110 * k, radius: 30 * k, color: '#fffbe8', glow: '#cfe6ff', craters: false },
         stars: { count: 24, seed: 33, color: '#ffffff' },
         hills: [
-            { color: '#d7e5f5', base: 330, amplitude: 90, seed: 9, shape: 'peaks' },
-            { color: '#b2c8e2', base: 382, amplitude: 40, seed: 13, shape: 'rolling' }
+            { color: '#d7e5f5', base: 330 * k, amplitude: 90 * k, seed: 9, shape: 'peaks' },
+            { color: '#b2c8e2', base: 382 * k, amplitude: 40 * k, seed: 13, shape: 'rolling' }
         ],
         decor: { type: 'pine', color: '#284766', count: 9, seed: 8 },
         fog: 'rgba(255, 255, 255, 0.28)',

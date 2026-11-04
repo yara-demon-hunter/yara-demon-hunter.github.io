@@ -3,7 +3,7 @@
 // (js/render/character_sprites.js). Em campo, cada lutador custa 1 drawImage.
 // Unidades do desenho: 1 = raio do corpo, olhando para a direita. Nada aqui muda a física.
 //
-// style: 'fluffy' = esfera de pelo sem membros (js/render/character_fluffy.js); 'frog' = esfera lisa (character_frog.js); 'cat' = gato preto (character_cat.js); 'dog' = cachorro (character_dog.js); 'mouse' = rato (character_mouse.js); 'penguin' = pinguim (character_penguin.js); 'elephant' = elefante (character_elephant.js); 'bunny' = coelho (character_bunny.js); sem style = desenho com contorno
+// style: 'fluffy' = esfera de pelo sem membros (js/render/character_fluffy.js); 'frog' = esfera lisa (character_frog.js); 'cat' = gato preto (character_cat.js); 'dog' = cachorro (character_dog.js); 'mouse' = rato (character_mouse.js); 'penguin' = pinguim (character_penguin.js); 'elephant' = elefante (character_elephant.js); 'bunny' = coelho (character_bunny.js); 'pig' = porco (character_pig.js); sem style = desenho com contorno
 // ears:  pointy | round | floppy | mouse | elephant | bunny | pig | none
 // tail:  bushy | thin | mouse | stub | curly | cotton | none
 // snout: muzzle (cachorro) | pig | trunk | beak | null
@@ -22,11 +22,13 @@ export const CHARACTER_ART = {
         iris: '#e6c82e', pupil: '#0b0b10', nose: '#ff8fab', mouth: '#0b0b10',
         liveEyes: false
     },
-    dog: {   // segue art_reference/dog/images/dog_new.jpeg: caramelo de pelo curtinho, em 3/4, focinho creme, nariz vermelho grande
+    dog: {   // BEAGLE, segue art_reference/dog/images/dog_beagle.webp: marrom, faixa e focinho brancos, mancha preta nas costas
         style: 'dog',
-        body: '#c48a5c', bodyLight: '#dcab80', bodyDark: '#94643f', earInner: '#a87048',
-        cream: '#f0d2ac', creamShade: '#d9ae84', iris: '#5a3018',
-        nose: '#b3121f', noseLight: '#e0404a', noseDark: '#5e0a11', mouth: '#4a2a1c',
+        body: '#c9843f', bodyLight: '#e3a560', bodyDark: '#8f5a26',
+        patch: '#1d1816', cream: '#fbf7f0', creamShade: '#e6ddd0',
+        ear: '#9a6532', earDark: '#6b4220', earLight: '#c28a54', earInner: '#9a6532',
+        iris: '#141010',
+        nose: '#3a2a2b', noseLight: '#6e5658', noseDark: '#140c0c', mouth: '#4a2a1c', tongueLine: '#d9566e', blush: '#ff9aa2',
         liveEyes: false
     },
     mouse: { // art_reference/mouse em versão fofa: cinza liso (sem pelo), orelha interna e barriga rosa, cauda rosa pelada
@@ -48,9 +50,11 @@ export const CHARACTER_ART = {
         iris: '#5b5b60', eye: '#1a1a1e', mouth: '#3a3a40',
         liveEyes: false
     },
-    pig: {
-        body: '#ff9fbf', belly: '#ffd3e2', earInner: '#ff7aa6', cheek: '#ff7aa6',
-        ears: 'pig', tail: 'curly', snout: 'pig', snoutColor: '#ff7aa6', arms: 'paw'
+    pig: {   // segue art_reference/pig: rosa liso, orelhas triangulares, focinho grande com narinas, rabinho enrolado
+        style: 'pig',
+        body: '#f6b6bd', bodyLight: '#ffd6da', bodyDark: '#d68991', earInner: '#ea8c97', blush: '#f2848f',
+        snout: '#c94a5c', snoutLight: '#e2717f', snoutDark: '#8f2a3a', eye: '#1c1012', mouth: '#6a2030',
+        liveEyes: false
     },
     penguin: { // segue art_reference/penguin: preto felpudo em 3/4, máscara branca, bico amarelo, sem asas soltas
         style: 'penguin',

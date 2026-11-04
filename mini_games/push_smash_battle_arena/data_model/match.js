@@ -12,20 +12,26 @@ export const MATCH = {
     shrinkPerSecondLast: 10
 };
 
+// O palco é 1,4x maior que o original (800x450): os bichos, moedas e itens não mudam de tamanho,
+// então ficam proporcionalmente menores e a arena ganha espaço. Para mexer no zoom, mude só ARENA_SCALE.
+const ARENA_SCALE = 1.4;
+const px = (v) => Math.round(v * ARENA_SCALE);
+
 export const ARENA = {
-    width: 800,
-    height: 450,
-    wall: { width: 18, height: 280, y: 50 },
-    platform: { y: 350, height: 22, fullWidth: 500, minWidth: 200 },
+    scale: ARENA_SCALE,
+    width: px(800),
+    height: px(450),
+    wall: { width: 18, height: px(280), y: px(50) },
+    platform: { y: px(350), height: 22, fullWidth: px(500), minWidth: px(200) },
     startOffsetY: 60,
-    startX: [280, 520]         // P1, P2
+    startX: [px(280), px(520)]         // P1, P2
 };
 
 export const SPAWN = {
     coinEveryFrames: 150,
     maxCoins: 5,
     coinRadius: 9,
-    coinArea: { x: 160, width: 480, y: 100, height: 180 },
+    coinArea: { x: px(160), width: px(480), y: px(100), height: px(180) },
     dropEveryFrames: 360,
     firstDropFrames: 240,      // quanto de espera extra no início do round
     dropRadius: 14,

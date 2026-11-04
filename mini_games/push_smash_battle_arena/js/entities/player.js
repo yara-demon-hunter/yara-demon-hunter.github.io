@@ -11,7 +11,7 @@ import { CHARACTER_ATLAS as A } from '../../data_model/visuals/sprites.js';
 import { PLAYERS } from '../../data_model/players.js';
 import { TEXTS } from '../../data_model/texts.js';
 import { playSound } from '../audio/sound.js';
-import { leftWall, platform, rightWall } from '../core/arena.js';
+import { arcs, flatRange, leftWall, platform, rightWall, terrain } from '../core/arena.js';
 import { H, W } from '../core/canvas.js';
 import { keys } from '../core/input.js';
 import { state } from '../core/state.js';
@@ -62,6 +62,7 @@ export class Player {
         this.poundLag = 0;
         this.upHeld = false;
         this.runPhase = 0;
+        this.onSlope = false;
         this.hold = { x: 0, y: 0 };
         this.chain = { x: 0, y: 0 };       // cadeias de quiques, uma por eixo
         this.chainTimer = { x: 0, y: 0 };
@@ -241,7 +242,8 @@ export class Player {
         const friction = this.isGrounded && this.isDashing && dashGroundFriction !== undefined
             ? dashGroundFriction
             : (this.isGrounded ? groundFriction : PHYSICS.airDrag);
-        this.vx *= friction;
+        // Na parte inclinada da rampa quase não há atrito: é o que dá o embalo de skate
+        this.vx *= this.onSlope ? 1 : friction;
         this.vx = Math.max(-PHYSICS.maxSpeedX, Math.min(PHYSICS.maxSpeedX, this.vx));
         this.x += this.vx;
         this.y += this.vy;
@@ -283,22 +285,25 @@ export class Player {
 
         // Colisão Plataforma Central
         const wasGrounded = this.isGrounded;
-        if (
-            this.x + this.radius > platform.x &&
-            this.x - this.radius < platform.x + platform.width &&
-            this.y + this.radius >= platform.y &&
-            this.y - this.radius < platform.y + platform.height &&
-            this.vy > 0
-        ) {
+        const flat = flatRange();
+        const overFlat = terrain.type === 'flat'
+            ? this.x + this.radius > flat.l && this.x - this.radius < flat.r
+            : this.x > flat.l && this.x < flat.r;
+        let grounded = false;
+        if (overFlat && this.y + this.radius >= platform.y && this.y - this.radius < platform.y + platform.height && this.vy > 0) {
             const impactVy = this.vy;
             this.y = platform.y - this.radius;
             this.vy = 0;
-            this.isGrounded = true;
+            grounded = true;
+            this.onSlope = false;
             if (this.isPounding) this.landPound();
             else if (!wasGrounded && impactVy > BOUNCE.floor.minImpact) this.landBounce(impactVy);
+        } else if (!overFlat) {
+            grounded = this.collideRamp();
         } else {
-            this.isGrounded = false;
+            this.onSlope = false;
         }
+        this.isGrounded = grounded;
 
         // Coletar Moedas na Arena
         for (let i = state.spawnableCoins.length - 1; i >= 0; i--) {
@@ -333,6 +338,67 @@ export class Player {
             this.isAlive = false;
             triggerKO(this);
         }
+    }
+
+    // Rampa em U: a casca de gelo é sólida dos dois lados.
+    //  - Dentro do U: o lutador fica dentro do círculo do arco (raio do arco - raio dele). Ao passar, volta e perde
+    //    só a velocidade que ia contra a parede; o resto desliza (quem desce pega velocidade e sobe do outro lado).
+    //  - Na borda (topo das pontas do U): dá para pousar em cima, como numa plataforma estreita.
+    //  - Por fora do U: bate na casca e é empurrado para fora (antes atravessava ou era puxado para dentro).
+    collideRamp() {
+        this.onSlope = false;
+        const T = terrain.thickness;
+        for (const a of arcs()) {
+            // Borda de cima da ponta: faixa de largura T logo depois do fim do arco
+            const rimIn = a.cx + a.side * a.r;
+            const rimOut = a.cx + a.side * (a.r + T);
+            const rimL = Math.min(rimIn, rimOut) - this.radius * 0.5;
+            const rimR = Math.max(rimIn, rimOut) + this.radius * 0.5;
+            if (this.x > rimL && this.x < rimR && this.y < a.cy && this.y + this.radius >= a.cy && this.vy >= 0) {
+                this.y = a.cy - this.radius;
+                if (this.isPounding) this.landPound();
+                this.vy = 0;
+                return true;
+            }
+
+            // Região do arco: do lado de fora do centro e abaixo da altura do centro
+            if ((this.x - a.cx) * a.side <= 0 || this.y <= a.cy) continue;
+            const dx = a.cx - this.x;
+            const dy = a.cy - this.y;
+            const dist = Math.hypot(dx, dy) || 1;
+            const nx = dx / dist;      // aponta para o centro do arco (para dentro do U)
+            const ny = dy / dist;
+
+            if (dist > a.r + T * 0.5) {
+                // Por fora da casca: empurra para fora e tira a velocidade que ia para dentro dela
+                const outside = a.r + T + this.radius;
+                if (dist >= outside) continue;
+                this.x = a.cx - nx * outside;
+                this.y = a.cy - ny * outside;
+                const inward = this.vx * nx + this.vy * ny;
+                if (inward > 0) {
+                    this.vx -= nx * inward;
+                    this.vy -= ny * inward;
+                }
+                return false;
+            }
+
+            const limit = a.r - this.radius;
+            if (dist <= limit) continue;
+            this.x = a.cx - nx * limit;
+            this.y = a.cy - ny * limit;
+            const into = -(this.vx * nx + this.vy * ny);     // velocidade indo contra o chão
+            if (into > 0) {
+                if (this.isPounding) this.landPound();
+                this.vx += nx * into;
+                this.vy += ny * into;
+            }
+            this.onSlope = true;
+            this.vx *= terrain.slopeDamping;
+            this.vy *= terrain.slopeDamping;
+            return ny < -0.35;         // chão virado para cima o bastante para contar como "no chão"
+        }
+        return false;
     }
 
     // Sobe a cadeia de quiques de um eixo ('x' parede/rival, 'y' chão/cabeça)

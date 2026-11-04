@@ -7,6 +7,7 @@ import { drawMouse } from './character_mouse.js';
 import { drawPenguin } from './character_penguin.js';
 import { drawElephant } from './character_elephant.js';
 import { drawBunny } from './character_bunny.js';
+import { drawPig } from './character_pig.js';
 
 // --- ARTE PROCEDURAL DOS LUTADORES ---
 // Desenha um lutador em unidades de "raio do corpo" (origem no centro, olhando para a direita).
@@ -402,6 +403,7 @@ export function drawCharacter(g, spec, pose) {
     if (spec.style === 'penguin') return drawPenguin(g, spec, pose);
     if (spec.style === 'elephant') return drawElephant(g, spec, pose);
     if (spec.style === 'bunny') return drawBunny(g, spec, pose);
+    if (spec.style === 'pig') return drawPig(g, spec, pose);
     g.save();
     g.translate(0, pose.bob);
     tail(g, spec, pose);

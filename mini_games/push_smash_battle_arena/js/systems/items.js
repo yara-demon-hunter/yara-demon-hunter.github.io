@@ -1,5 +1,5 @@
 import { ITEMS, SPAWN } from '../../data_model/match.js';
-import { platform } from '../core/arena.js';
+import { groundYAt, platform } from '../core/arena.js';
 import { H } from '../core/canvas.js';
 import { state } from '../core/state.js';
 
@@ -30,9 +30,9 @@ export function spawnCoin() {
 
 export function updateItems() {
     state.airDrops.forEach(p => {
-        const overPlatform = p.x > platform.x && p.x < platform.x + platform.width;
-        if (!overPlatform) p.y += 3;
-        else if (p.y < platform.y - 15) p.y += p.vy;
+        const ground = groundYAt(p.x);
+        if (ground === null) p.y += 3;
+        else if (p.y < ground - 15) p.y += p.vy;
     });
     state.airDrops = state.airDrops.filter(p => p.y < H + 30);
 
