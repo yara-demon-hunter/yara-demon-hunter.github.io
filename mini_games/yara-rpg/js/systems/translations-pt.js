@@ -28,6 +28,8 @@ window.YaraRpgTranslations.pt = {
         maximumPotions: "Máximo de poções",
         beginAdventure: "Iniciar aventura",
         continueAdventure: "Continuar",
+        saveUnavailable: "Não foi possível acessar o salvamento. Sua jornada continua nesta página, mas não será preservada se você sair ou recarregar.",
+        saveInvalid: "O salvamento está corrompido ou não é compatível com esta versão. Inicie uma nova jornada para continuar.",
         storyEventKicker: "Escolha seu caminho",
         enemyTelegraph: "⚠️ {monster} prepara um golpe devastador!",
         lifeStealHealed: "🩸 A criatura drenou {amount} HP do inimigo.",

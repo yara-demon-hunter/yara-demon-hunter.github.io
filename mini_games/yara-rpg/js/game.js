@@ -66,7 +66,7 @@ const POTION_HEAL_AMOUNT_FOCO    = ITEM_DATA.healingPotion.healFoco;
 const UPGRADE_COST               = GAME_RULES.upgrades.goldCost; // legado (não usado)
 const UPGRADE_COST_PER_POINT     = GAME_RULES.upgrades.costPerPoint ?? 1;
 // ── Pontos de Habilidade: controle central em js/data/progression-rules.js ──
-//    startingSkillPoints = com quantos PH/SP o herói começa (você pediu 3)
+//    startingSkillPoints = com quantos PH/SP o herói começa
 //    skillPointsPerLevel = quantos ganha por level up
 const STARTING_SKILL_POINTS      = GAME_RULES.progression.startingSkillPoints ?? 3;
 const SKILL_POINTS_PER_LEVEL     = GAME_RULES.progression.skillPointsPerLevel ?? 3;
@@ -312,7 +312,15 @@ window.onload = function () {
         isUnlocked: isCharacterUnlocked,
         onStart: playOpeningScene,
     });
-    showContinueOption();
+    const savedGame = readSavedGame();
+    document.getElementById("continue-adventure-button").hidden = !savedGame;
+    const shouldResumeAdventure = new URLSearchParams(window.location.search).get("resume") === "1";
+    if (shouldResumeAdventure && savedGame) loadSavedGame(savedGame);
+    const currentUrl = new URL(window.location.href);
+    if (currentUrl.searchParams.has("resume")) {
+        currentUrl.searchParams.delete("resume");
+        window.history.replaceState(null, "", currentUrl);
+    }
     document.getElementById("continue-adventure-button").addEventListener("click", () => loadSavedGame());
 };
 

@@ -3,6 +3,52 @@
 
 const CHARACTER_UNLOCK_KEY = 'yara-rpg-campaign-complete-v1';
 
+function showSaveStatus(messageKey) {
+    const status = document.getElementById('save-status');
+    if (!status) {
+        console.error('Save status element is missing; the player cannot be notified about save errors.');
+        return;
+    }
+    status.textContent = t(messageKey);
+    status.hidden = false;
+}
+
+function clearSaveStatus() {
+    const status = document.getElementById('save-status');
+    if (status) {
+        status.textContent = '';
+        status.hidden = true;
+    }
+}
+
+function isRecord(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isSavedGameSnapshot(snapshot) {
+    if (!isRecord(snapshot) || snapshot.version !== 1
+        || !GAME_DATA.characters.some((character) => character.id === snapshot.characterId)
+        || !isRecord(snapshot.hero)) return false;
+
+    const requiredHeroStats = ['hp', 'maxHp', 'foco', 'maxFoco', 'atk', 'def', 'level', 'xp', 'maxXp', 'gold'];
+    if (!requiredHeroStats.every((stat) => Number.isFinite(snapshot.hero[stat]))) return false;
+    if (typeof snapshot.inCombat !== 'boolean') return false;
+
+    const optionalArrays = [
+        snapshot.hero.equipmentInventory,
+        snapshot.hero.passiveSkills,
+        snapshot.hero.monsterPacts,
+        snapshot.hero.soulHistory,
+        snapshot.discoveredRegions,
+        snapshot.storyEventSeen,
+        snapshot.seenStoryEvents,
+        snapshot.seenMistContacts
+    ];
+    if (optionalArrays.some((value) => value !== undefined && !Array.isArray(value))) return false;
+
+    return snapshot.hero.equipment === undefined || isRecord(snapshot.hero.equipment);
+}
+
 function isCharacterUnlocked(character) {
     if (character?.unlocked === true) return true;
     try {
@@ -17,29 +63,61 @@ function unlockCharactersAfterCampaign() {
 }
 
 function saveGame() {
-    if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return;
-    const snapshot = {
-        version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)), inCombat,
-        currentRegion, isInSpiritWorld, currentSpiritRegionId, spiritWorldReturnRegionId, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
-        explorationsSinceStoryEvent,
-        storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
-        seenStoryEvents: [...seenStoryEvents], seenMistContacts: [...seenMistContacts], pendingChest,
-        foundMapsByRegion,
-        pendingEquipment, equipmentInstanceId
-    };
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot)); } catch {}
+    if (!selectedCharacter || document.getElementById('game-main').hidden || campaignComplete) return false;
+    try {
+        const snapshot = {
+            version: 1, characterId: selectedCharacter.id, hero: JSON.parse(JSON.stringify(hero)), inCombat,
+            currentRegion, isInSpiritWorld, currentSpiritRegionId, spiritWorldReturnRegionId, discoveredRegions, regionEntryLevels, completedRegionObjectives, explorationsSinceMistContact, explorationCount,
+            explorationsSinceStoryEvent,
+            storyEventSeen: [...storyEventSeen], pendingStoryEvent, pendingMistContact,
+            seenStoryEvents: [...seenStoryEvents], seenMistContacts: [...seenMistContacts], pendingChest,
+            foundMapsByRegion,
+            pendingEquipment, equipmentInstanceId
+        };
+        localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot));
+        clearSaveStatus();
+        return true;
+    } catch (error) {
+        console.error('Unable to save the Yara RPG adventure.', error);
+        showSaveStatus('saveUnavailable');
+        return false;
+    }
 }
 
 function readSavedGame() {
+    let storedSnapshot;
     try {
-        const snapshot = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-        if (!snapshot || snapshot.version !== 1 || !GAME_DATA.characters.some((character) => character.id === snapshot.characterId)) return null;
-        return snapshot;
-    } catch { return null; }
+        storedSnapshot = localStorage.getItem(SAVE_KEY);
+    } catch (error) {
+        console.error('Unable to read the saved Yara RPG adventure.', error);
+        showSaveStatus('saveUnavailable');
+        return null;
+    }
+    if (storedSnapshot === null) return null;
+
+    let snapshot;
+    try {
+        snapshot = JSON.parse(storedSnapshot);
+    } catch (error) {
+        console.error('The saved Yara RPG adventure contains invalid JSON.', error);
+        showSaveStatus('saveInvalid');
+        return null;
+    }
+    if (!isSavedGameSnapshot(snapshot)) {
+        showSaveStatus('saveInvalid');
+        return null;
+    }
+    return snapshot;
 }
 
-function loadSavedGame(snapshot = readSavedGame()) {
-    if (!snapshot) return false;
+function loadSavedGame(snapshot) {
+    const savedSnapshot = snapshot === undefined ? readSavedGame() : snapshot;
+    if (!savedSnapshot) return false;
+    if (!isSavedGameSnapshot(savedSnapshot)) {
+        showSaveStatus('saveInvalid');
+        return false;
+    }
+    snapshot = savedSnapshot;
     selectedCharacter = GAME_DATA.characters.find((character) => character.id === snapshot.characterId);
     selectedCharacterProgression = selectedCharacter.progression;
     Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
@@ -185,7 +263,8 @@ function loadSavedGame(snapshot = readSavedGame()) {
     updateUI();
     startCharacterDialogues();
     if (isInSpiritWorld) advanceSpiritRegionIfComplete();
-    saveGame(); startGameMusic();
+    saveGame();
+    startGameMusic();
     return true;
 }
 

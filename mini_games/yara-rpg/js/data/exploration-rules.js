@@ -16,14 +16,14 @@ window.YaraRpgData.exploration = Object.freeze({
     },
     outcomes: Object.freeze([
         { type: "monster", weight: 38 },
-        { type: "gold", weight: 17 },
+        { type: "gold", weight: 15 },
         { type: "safeTrail", weight: 12 },
         { type: "potion", weight: 8 },
         { type: "trap", weight: 6 },
         { type: "focus", weight: 6 },
         { type: "supplies", weight: 6 },
-        { type: "chest", weight: 2 },
-        { type: "map", weight: 5 }
+        { type: "chest", weight: 5 },
+        { type: "map", weight: 4 }
     ]),
     map: {
         image: "images/exploration_items/map.webp",

@@ -28,6 +28,8 @@ window.YaraRpgTranslations.en = {
         maximumPotions: "Maximum potions",
         beginAdventure: "Begin adventure",
         continueAdventure: "Continue",
+        saveUnavailable: "The save could not be accessed. Your journey can continue on this page, but it will not be preserved if you leave or reload.",
+        saveInvalid: "This save is corrupted or incompatible with this version. Start a new journey to continue.",
         storyEventKicker: "Choose your path",
         enemyTelegraph: "⚠️ {monster} is preparing a devastating strike!",
         lifeStealHealed: "🩸 The creature drained {amount} HP from its enemy.",

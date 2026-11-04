@@ -10,11 +10,13 @@ Com o site local iniciado na raiz do repositório:
 bundle exec jekyll serve
 ```
 
-Abra `/mini_games/yara-rpg/game.html`. A página também pode ser aberta diretamente, mas Tailwind CSS e as fontes Cinzel/Inter são carregadas de CDNs e precisam de conexão com a internet.
+Abra `/mini_games/yara-rpg/game.html`. A página integrada ao site carrega Tailwind CSS e as fontes Cinzel/Inter de CDNs e precisa de conexão com a internet. O pacote independente usa CSS Tailwind compilado e fontes locais.
 
-Os menus do site abrem o jogo no idioma da página (`?lang=pt` ou `?lang=en`). O seletor PT/EN no jogo também permite trocar o idioma; a troca reinicia a partida.
+Os menus do site abrem o jogo no idioma da página (`?lang=pt` ou `?lang=en`). O seletor PT/EN também permite trocar o idioma durante a jornada; o progresso é salvo e restaurado após a troca.
 
 Ao abrir o mini game, escolha um personagem. Cada personagem já começa com seu próprio equipamento inicial (`startingEquipment` em `js/data/characters.js`). Zeph começa com mais HP máximo; Oskar começa com mais ataque.
+
+Os objetivos de monstros sobem gradualmente entre as regiões (4, 6, 8 e 10 derrotas), e o peso de baús na exploração é 5%. A suíte de navegador inclui uma simulação determinística para detectar regressões no tempo estimado de campanha.
 
 A página do jogo usa o layout base do site, que centraliza a verificação do Bing, o Google Analytics 4 e o Google AdSense para todas as páginas.
 
@@ -41,7 +43,20 @@ python3 -m http.server 8000 --directory mini_games/yara-rpg/standalone-build
 
 Mantenha esse comando rodando e abra `http://localhost:8000/` no navegador. O servidor precisa continuar ativo enquanto você joga. Se a porta 8000 já estiver ocupada, troque `8000` por `8001` no comando e abra `http://localhost:8001/`.
 
-Esta primeira versão ainda carrega Tailwind e as fontes Cinzel/Inter de CDNs, assim como a página atual. Antes de uma submissão final, compile Tailwind para CSS local e decida se quer empacotar as fontes ou usar alternativas locais. A integração da SDK, seleção de idioma pela configuração da plataforma e o fluxo de início rápido também são etapas separadas ainda necessárias para preparar o lançamento.
+O pacote independente já inclui CSS Tailwind compilado e fontes locais. Integração com SDK de plataforma, seleção de idioma pela configuração da plataforma e fluxo de início rápido são etapas separadas, caso o jogo seja preparado para distribuição em uma plataforma de terceiros.
+
+## Testes
+
+A suíte de regressão roda em um navegador, sem dependências adicionais. Ela verifica a distribuição de exploração, uma simulação de ritmo dos objetivos regionais, cálculo de dano, validação e restauração de saves, falha de armazenamento, acessibilidade básica e continuidade ao trocar o idioma. Os arquivos de teste são excluídos do site publicado.
+
+```sh
+bundle exec jekyll build
+mkdir -p _site/yara-rpg-tests
+cp mini_games/yara-rpg/tests/* _site/yara-rpg-tests/
+bundle exec jekyll serve --skip-initial-build
+```
+
+Abra `http://localhost:4000/yara-rpg-tests/` e selecione **Executar testes**. O runner salva e restaura os dados `yara-rpg-*` do navegador ao terminar.
 
 ## Estrutura
 

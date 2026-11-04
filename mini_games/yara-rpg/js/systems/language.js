@@ -41,8 +41,16 @@ function applyLanguage() {
 document.querySelectorAll("[data-game-language]").forEach((button) => {
     button.addEventListener("click", () => {
         if (button.dataset.gameLanguage === gameLanguage) return;
+        const gameIsActive = !document.getElementById("game-main")?.hidden;
+        if (gameIsActive && !saveGame()) return;
+
         const nextUrl = new URL(window.location.href);
         nextUrl.searchParams.set("lang", button.dataset.gameLanguage);
+        if (gameIsActive) {
+            nextUrl.searchParams.set("resume", "1");
+        } else {
+            nextUrl.searchParams.delete("resume");
+        }
         window.location.assign(nextUrl);
     });
 });

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Yara RPG browser regression tests</title>
+    <style>
+        body { max-width: 48rem; margin: 3rem auto; padding: 0 1rem; background: #101216; color: #eee; font: 1rem/1.5 system-ui, sans-serif; }
+        button { padding: .7rem 1rem; border: 1px solid #9a7b3d; border-radius: .5rem; background: #473614; color: #fff3d4; font: inherit; cursor: pointer; }
+        #test-results { padding-left: 1.5rem; }
+        .pass { color: #86efac; }
+        .fail { color: #fca5a5; }
+        iframe { position: absolute; top: 0; left: -1400px; width: 1280px; height: 900px; border: 0; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Yara RPG browser regression tests</h1>
+        <p>These tests use the real game page and restore this browser's saved Yara RPG data when they finish.</p>
+        <button id="run-tests" type="button" disabled>Loading game…</button>
+        <p id="test-summary" role="status" aria-live="polite"></p>
+        <ol id="test-results" aria-live="polite"></ol>
+    </main>
+    <iframe id="game-under-test" title="Yara RPG test instance" src="/mini_games/yara-rpg/game.html?lang=pt&amp;test=1"></iframe>
+    <script src="browser-tests.js"></script>
+</body>
+</html>
