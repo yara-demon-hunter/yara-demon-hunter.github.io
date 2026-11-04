@@ -1,10 +1,8 @@
 // --- BATIDAS, SMASH E K.O. ---
 export const COMBAT = {
     hitCooldownFrames: 12,     // a mesma batida não conta duas vezes
-    hitForce: 6,               // chute extra de quem ataca, somado ao quique elástico entre as bolas
-    dashHitForce: 16,
-    stunnedVictimMultiplier: 1.3,
-    maxForce: 36,
+    dashMomentumTransfer: 0.35, // fração do momento do dash transferida como impulso extra
+    maxDashImpulse: 24,         // limite para o bônus de impulso do dash
     hitStopFrames: { normal: 2, dash: 5, headBounce: 4, smash: 9 },
     shake: { normal: 7, dash: 14, headBounce: 8, smash: 18, ko: 20 },
     platformShrinkOnHit: 1.5,

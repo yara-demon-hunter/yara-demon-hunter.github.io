@@ -1,6 +1,7 @@
 // --- PERSONAGENS (jogabilidade) ---
 // Cada personagem tem atributos e uma habilidade de dash próprios.
-// A massa também afeta a aceleração do dash; a barra SPEED do menu mostra a velocidade normal.
+// Cada dash.speed é a velocidade efetiva do dash e não depende da massa ou da velocidade normal.
+// A barra SPEED do menu mostra a aceleração de corrida normal.
 // Alguns têm um passivo extra (glide: o corvo plana segurando ↑ no ar).
 // A arte de cada um fica em visuals/characters.js.
 export const ROSTER = [
@@ -12,7 +13,7 @@ export const ROSTER = [
         dash: { name: 'BULLDOG CHARGE', description: 'A charge that hits harder.', speed: 16, frames: 16, cooldown: 52, hitForceMultiplier: 1.35 } },
     { id: 'mouse',    name: 'MOUSE',    mass: 0.62, speed: 1.05, jump: 1.08,
         dash: { name: 'QUICKSTEP', description: 'A quick dash with a short cooldown.', speed: 20, frames: 8, cooldown: 28 } },
-    { id: 'elephant', name: 'ELEPHANT', mass: 1.85, speed: 0.95, jump: 0.88,
+    { id: 'elephant', name: 'ELEPHANT', mass: 5.0, speed: 0.95, jump: 0.88,
         dash: { name: 'BULLDOZER', description: 'A heavy, high-impact charge.', speed: 14, frames: 14, cooldown: 58, hitForceMultiplier: 1.65 } },
     { id: 'bunny',    name: 'BUNNY',    mass: 0.8,  speed: 1.05, jump: 1.2,
         dash: { name: 'SPRING DASH', description: 'A spring-loaded dash that leaps up.', speed: 16, frames: 11, cooldown: 38, verticalSpeed: -7 } },
@@ -31,5 +32,5 @@ export const ROSTER = [
 
 export const DEFAULT_PICKS = [0, 1];       // P1 raposa, P2 gato
 
-// Velocidade que o jogador sente (a mesma conta do movimento em js/entities/player.js)
-export const effectiveSpeed = (c) => c.speed / Math.sqrt(c.mass);
+// Aceleração horizontal efetiva, proporcional à força de corrida dividida pela massa.
+export const effectiveSpeed = (c) => c.speed / c.mass;

@@ -128,7 +128,7 @@ export class Player {
         if (this.skyFalling && !this.isPounding) this.skyFalling = false;
         if (this.skyDrop > 0) return this.updateSkyDrop(input);
         const canAct = this.stunTimer === 0 && this.poundLag === 0 && !this.isPounding;
-        const accel = MOVEMENT.runAccel * this.speedMul / Math.sqrt(this.effMass) * (this.isGrounded ? 1 : PHYSICS.airControl);
+        const accel = MOVEMENT.runAccel * this.speedMul / this.effMass * (this.isGrounded ? 1 : PHYSICS.airControl);
         this.upHeld = canAct && input.up;
         this.hold = canAct ? { x: (input.right ? 1 : 0) - (input.left ? 1 : 0), y: input.up ? -1 : 0 } : { x: 0, y: 0 };
         ['x', 'y'].forEach(axis => {
@@ -563,7 +563,7 @@ export class Player {
         this.dashTimer = skill.frames;
         this.dashCooldown = skill.cooldown;
         this.facing = dir;
-        this.vx = dir * skill.speed / Math.sqrt(this.effMass);
+        this.vx = dir * skill.speed;
         if (skill.verticalSpeed !== undefined) this.vy = skill.verticalSpeed;
         else if (!this.isGrounded && skill.airVerticalSpeed !== undefined) this.vy = skill.airVerticalSpeed;
         this.squash(1.35, 0.75);

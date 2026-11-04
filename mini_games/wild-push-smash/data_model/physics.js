@@ -15,7 +15,7 @@ export const PHYSICS = {
 };
 
 export const MOVEMENT = {
-    runAccel: 0.9,
+    runAccel: 0.9,             // força de corrida por unidade de massa
     jumpSpeed: 11,
     wallJumpKick: 12,          // empurrão lateral do wall jump
     dash: {

@@ -9,12 +9,27 @@ import { addBurst, addPopup, addRing, createDust, createParticles, showBanner } 
 import { triggerKO } from './replay.js';
 import { updateHeartsHUD } from '../ui/hud.js';
 
-export function impactForce(attacker, victim) {
-    let f = (attacker.isDashing ? COMBAT.dashHitForce : COMBAT.hitForce) *
-        Math.sqrt(attacker.effMass / victim.effMass);
-    if (attacker.isDashing) f *= attacker.character.dash.hitForceMultiplier ?? 1;
-    if (victim.stunTimer > 0) f *= COMBAT.stunnedVictimMultiplier; // amassado voa mais longe
-    return Math.min(f, COMBAT.maxForce);
+function applyRivalBounce(p1, p2, nx, ny, attackImpulse = 0) {
+    const approach = (p1.vx - p2.vx) * nx + (p1.vy - p2.vy) * ny;
+    const bounceImpulse = approach > 0
+        ? (1 + BOUNCE.restitution.rival) * approach / (1 / p1.effMass + 1 / p2.effMass)
+        : 0;
+    const j = bounceImpulse + attackImpulse;
+    if (j === 0) return;
+    p1.vx -= j / p1.effMass * nx;
+    p1.vy -= j / p1.effMass * ny;
+    p2.vx += j / p2.effMass * nx;
+    p2.vy += j / p2.effMass * ny;
+}
+
+function dashImpulse(attacker, victim, directionToVictim) {
+    const forwardSpeed = attacker.vx * directionToVictim;
+    if (!attacker.isDashing || forwardSpeed <= 0) return 0;
+    const skill = attacker.character.dash;
+    const brace = victim.isDashing ? victim.character.dash.incomingForceMultiplier ?? 1 : 1;
+    const impulse = attacker.effMass * forwardSpeed * COMBAT.dashMomentumTransfer *
+        (skill.hitForceMultiplier ?? 1) * brace;
+    return Math.min(impulse, COMBAT.maxDashImpulse);
 }
 
 export function isSmash(attacker, victim) {
@@ -45,7 +60,11 @@ export function resolvePlayerCollisions() {
     p2.x += nx * overlap * (p1.effMass / total);
     p2.y += ny * overlap * (p1.effMass / total);
 
-    if (state.hitCooldown > 0) return;
+    if (state.hitCooldown > 0) {
+        // A janela evita golpes repetidos, mas o contato ainda respeita massa e restituição.
+        applyRivalBounce(p1, p2, nx, ny);
+        return;
+    }
     state.hitCooldown = COMBAT.hitCooldownFrames;
 
     if (isSmash(p1, p2)) return doSmash(p1, p2);
@@ -60,25 +79,10 @@ export function resolvePlayerCollisions() {
     state.cameraShake = Math.max(state.cameraShake, anyDash ? COMBAT.shake.dash : COMBAT.shake.normal);
     state.hitStop = anyDash ? COMBAT.hitStopFrames.dash : COMBAT.hitStopFrames.normal;
 
-    // Quique elástico: só a componente da velocidade ao longo da linha entre as bolas é trocada
-    const approach = (p1.vx - p2.vx) * nx + (p1.vy - p2.vy) * ny;
-    if (approach > 0) {
-        const j = (1 + BOUNCE.restitution.rival) * approach / (1 / p1.effMass + 1 / p2.effMass);
-        p1.vx -= j / p1.effMass * nx;
-        p1.vy -= j / p1.effMass * ny;
-        p2.vx += j / p2.effMass * nx;
-        p2.vy += j / p2.effMass * ny;
-    }
-
-    // Chute extra de quem ataca (dash, massa), também ao longo da linha entre as bolas
-    let forceP1 = impactForce(p2, p1);
-    let forceP2 = impactForce(p1, p2);
-    if (p1.isDashing) forceP1 *= p1.character.dash.incomingForceMultiplier ?? 1;
-    if (p2.isDashing) forceP2 *= p2.character.dash.incomingForceMultiplier ?? 1;
-    p1.vx -= nx * forceP1;
-    p1.vy -= ny * forceP1;
-    p2.vx += nx * forceP2;
-    p2.vy += ny * forceP2;
+    // O quique e o impulso de dash aplicam o mesmo impulso em sentidos opostos:
+    // o momento total se conserva e a massa maior sofre menor variação de velocidade.
+    const attackImpulse = dashImpulse(p1, p2, nx) - dashImpulse(p2, p1, -nx);
+    applyRivalBounce(p1, p2, nx, ny, attackImpulse);
     p1.squash(0.75, 1.25);
     p2.squash(0.75, 1.25);
 
@@ -153,4 +157,3 @@ export function doSmash(attacker, victim) {
     showBanner(TEXTS.smash, attacker.color, 800);
     if (attacker.controls.isBot && Math.random() < COMBAT.smash.botTauntChance) attacker.wantTaunt = true;
 }
-

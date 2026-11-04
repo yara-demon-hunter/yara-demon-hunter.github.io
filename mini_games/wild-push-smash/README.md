@@ -31,10 +31,11 @@ Unidades: pixels e frames (60 passos por segundo).
 
 - **Cada eixo é independente.** Bater no chão só muda a velocidade vertical; bater na parede só a horizontal. Um ganho num eixo nunca vira ganho no outro.
 - **Quique:** a velocidade que volta é `entrada × restituição`. Segurando o direcional no sentido do quique, soma um impulso extra, que cresce a cada batida seguida no mesmo eixo (cadeia X para paredes e rival, cadeia Y para o chão).
-- **Entre as bolas:** o choque é elástico ao longo da linha entre os centros, e quem ataca (dash, massa) dá um chute extra nessa mesma linha.
+- **Entre as bolas:** o choque é resolvido ao longo da linha entre os centros. O impulso é aplicado igual e em sentidos opostos; por isso, com a mesma colisão, o personagem mais pesado muda menos de velocidade.
+- **Momento e aceleração:** a força de corrida é dividida pela massa, e a velocidade acumulada vira momento (`massa × velocidade`). Um dash transfere parte do momento que o atacante já tem, sem criar empurrões independentes para cada lutador.
 - **No ar** o atrito é menor que no chão (o embalo dura mais) e o controle é reduzido.
 - **Planar (corvo):** segurando ▲ no ar depois que começa a cair, a queda é freada até `glide.fallSpeed` e o controle lateral aumenta (`glide.airControl`). Encostado na parede ou no dash não plana.
-- **Dash:** cada personagem tem uma habilidade própria, com velocidade, duração e recarga individuais; alguns também saltam, causam mais impacto, resistem a empurrões ou deslizam melhor. O seletor mostra o efeito de cada dash.
+- **Dash:** cada personagem tem uma habilidade própria, com velocidade efetiva (`dash.speed`), duração e recarga individuais, independentes da massa e da velocidade de corrida. A massa continua contando no momento do dash e nas colisões; alguns também saltam, causam mais impacto, resistem a empurrões ou deslizam melhor. O seletor mostra o efeito de cada dash.
 
 ## Como a arte é desenhada
 
