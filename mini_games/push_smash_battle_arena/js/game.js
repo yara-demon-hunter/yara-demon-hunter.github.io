@@ -1,4 +1,5 @@
 import './core/resize.js';
+import './ui/character_select.js';
 import { MATCH } from '../data_model/match.js';
 import { TEXTS } from '../data_model/texts.js';
 import { playSound } from './audio/sound.js';

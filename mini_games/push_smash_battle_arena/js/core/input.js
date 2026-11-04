@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { finishReplay } from '../systems/replay.js';
+import { handleSelectKey } from '../ui/character_select.js';
 
 export const keys = {};
 window.addEventListener('keydown', e => {
@@ -8,6 +9,7 @@ window.addEventListener('keydown', e => {
     if (e.repeat) return;
     if (state.paused) return;
     if (state.gameState === 'REPLAY') finishReplay();
+    else if (state.gameState === 'MENU') handleSelectKey(e.code);
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; });
 

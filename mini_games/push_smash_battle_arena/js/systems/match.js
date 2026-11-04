@@ -10,9 +10,15 @@ import { players } from '../entities/player.js';
 import { updateScoreHUD, updateWinsHUD } from '../ui/hud.js';
 import { btnReward, hintP2, hintP2Human, menuSub, menuTitle, screenMenu } from '../ui/menu.js';
 import { buildTouchControls } from '../ui/touch_controls.js';
+import { getSelection } from '../ui/character_select.js';
+import { keepCharacterAtlases } from '../render/character_sprites.js';
 
 export function startMatch(isBot) {
     state.isBotMatch = isBot;
+    const pick = getSelection();
+    players.forEach((p, i) => p.setCharacter(pick.chars[i]));
+    keepCharacterAtlases(pick.chars);
+    state.stage = pick.stage;
     players.forEach(p => p.resetMatch());
     state.roundNumber = 1;
     updateWinsHUD();
@@ -33,6 +39,8 @@ export function startRound() {
     state.spawnableCoins = [];
     state.massBlobs = [];
     state.particles = [];
+    state.bursts = [];
+    state.rings = [];
     state.popups = [];
     state.history = [];
     state.bombHolder = null;

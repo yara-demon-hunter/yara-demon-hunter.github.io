@@ -303,3 +303,80 @@ body { height: 100dvh; }
 .settings .btn { padding: 10px 22px; font-size: 15px; }
 .btn-danger { background: #ff4757; color: #fff; box-shadow: 0 4px 20px rgba(255, 71, 87, 0.4); }
 .btn-ghost { background: #2c3440; color: #fff; box-shadow: none; }
+
+/* --- MENU: ESCOLHA DE PERSONAGEM E ARENA --- */
+.overlay.menu { justify-content: flex-start; padding: 12px 16px; gap: 8px; }
+.overlay.menu h1 { font-size: 34px; margin-bottom: 0; }
+.overlay.menu p { font-size: 12.5px; margin-bottom: 0; }
+.select-row { display: flex; align-items: center; gap: 14px; }
+.select-row .vs { font-weight: 900; font-size: 24px; color: #ffd32a; text-shadow: 0 0 12px rgba(255, 211, 42, 0.7); font-style: italic; }
+.picker {
+    position: relative;
+    width: 250px;
+    display: grid;
+    grid-template-columns: 34px 1fr 34px;
+    align-items: center;
+    background: rgba(31, 40, 51, 0.6);
+    border: 2px solid var(--pc);
+    border-radius: 14px;
+    padding: 8px 8px 6px;
+}
+.picker-tag {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: var(--pc);
+    color: #fff;
+    font-weight: 900;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 1px 8px;
+    border-radius: 20px;
+}
+.arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--pc);
+    background: transparent;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.arrow:hover, .arrow:active { background: var(--pc); }
+.picker-view { height: 104px; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; }
+.picker-view.flip { transform: scaleX(-1); }
+.picker-view canvas { width: 104px; height: 104px; }
+.picker-view canvas.drop { animation: drop-in 0.45s cubic-bezier(0.3, 1.4, 0.5, 1); }
+@keyframes drop-in {
+    0% { transform: translateY(-100px) scaleY(1.15); opacity: 0; }
+    55% { transform: translateY(6px) scale(1.12, 0.82); opacity: 1; }
+    100% { transform: none; }
+}
+.picker-info { grid-column: 1 / -1; text-align: center; }
+.picker-name { font-weight: 900; letter-spacing: 2px; font-size: 15px; }
+.stat { display: grid; grid-template-columns: 50px 1fr; align-items: center; gap: 6px; font-size: 9.5px; font-weight: 800; color: #c5c6c7; margin-top: 3px; text-align: left; }
+.bar { height: 6px; background: #0b0c10; border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--pc); border-radius: 4px; transition: width 0.25s; }
+.stage-row { display: flex; gap: 10px; }
+.stage-card {
+    background: transparent;
+    border: 2px solid #2c3440;
+    border-radius: 10px;
+    padding: 3px 3px 2px;
+    cursor: pointer;
+    color: #c5c6c7;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    -webkit-tap-highlight-color: transparent;
+}
+.stage-card canvas { display: block; width: 112px; height: 63px; border-radius: 7px; margin-bottom: 2px; }
+.stage-card.sel { border-color: #45f3df; color: #fff; box-shadow: 0 0 12px rgba(69, 243, 223, 0.5); }
+.overlay.menu .btn { padding: 11px 26px; font-size: 16px; }
+.overlay.menu .btn-reward { position: absolute; bottom: 10px; right: 12px; margin: 0; padding: 7px 14px; font-size: 12px; }
+/* Sem backdrop-filter no menu: o blur atrás dos canvases dos bichos borrava um quadrado escuro */
+.overlay.menu { backdrop-filter: none; background: rgba(11, 12, 16, 0.92); }
+.picker-view canvas, .stage-card canvas { background: transparent; }

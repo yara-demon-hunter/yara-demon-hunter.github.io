@@ -1,9 +1,13 @@
 import { BOT } from '../../data_model/bot.js';
 import { BOUNCE } from '../../data_model/bounce.js';
+import { DEFAULT_PICKS, ROSTER } from '../../data_model/characters.js';
+import { STAGES } from '../../data_model/stages.js';
+import { CHARACTER_ART } from '../../data_model/visuals/characters.js';
 import { COMBAT } from '../../data_model/combat.js';
 import { KEYS } from '../../data_model/controls.js';
 import { ARENA, ITEMS } from '../../data_model/match.js';
 import { MASS, MOVEMENT, PHYSICS } from '../../data_model/physics.js';
+import { CHARACTER_ATLAS as A } from '../../data_model/visuals/sprites.js';
 import { PLAYERS } from '../../data_model/players.js';
 import { TEXTS } from '../../data_model/texts.js';
 import { playSound } from '../audio/sound.js';
@@ -12,7 +16,7 @@ import { H, W } from '../core/canvas.js';
 import { keys } from '../core/input.js';
 import { state } from '../core/state.js';
 import { giveBomb } from '../systems/bomb.js';
-import { addPopup, createParticles } from '../systems/effects.js';
+import { addBurst, addPopup, addRing, createDust, createParticles } from '../systems/effects.js';
 import { triggerKO } from '../systems/replay.js';
 import { updateScoreHUD } from '../ui/hud.js';
 
@@ -23,8 +27,16 @@ export class Player {
         this.name = name;
         this.color = color;
         this.controls = controls;
+        this.setCharacter(DEFAULT_PICKS[id - 1]);
         this.resetMatch();
         this.reset();
+    }
+
+    // Personagem escolhido no menu: muda massa, velocidade e pulo
+    setCharacter(index) {
+        this.charIndex = index;
+        this.character = ROSTER[index];
+        this.bodyColor = CHARACTER_ART[this.character.id].body;
     }
 
     resetMatch() {
@@ -36,7 +48,7 @@ export class Player {
         this.y = platform.y - ARENA.startOffsetY;
         this.vx = 0;
         this.vy = 0;
-        this.mass = 1;
+        this.mass = this.character.mass;
         this.radius = PHYSICS.baseRadius * Math.sqrt(this.mass);
         this.isGrounded = false;
         this.isTouchingWall = false;
@@ -49,6 +61,7 @@ export class Player {
         this.poundWindup = 0;
         this.poundLag = 0;
         this.upHeld = false;
+        this.runPhase = 0;
         this.hold = { x: 0, y: 0 };
         this.chain = { x: 0, y: 0 };       // cadeias de quiques, uma por eixo
         this.chainTimer = { x: 0, y: 0 };
@@ -70,7 +83,7 @@ export class Player {
 
     get isDashing() { return this.dashTimer > 0; }
     get effMass() { return this.mass * (this.heavyTimer > 0 ? MASS.heavyMultiplier : 1); }
-    get speedMul() { return this.speedTimer > 0 ? ITEMS.SPEED.multiplier : 1; }
+    get speedMul() { return this.character.speed * (this.speedTimer > 0 ? ITEMS.SPEED.multiplier : 1); }
 
     addMass(d) {
         this.mass = Math.min(PHYSICS.maxMass, Math.max(PHYSICS.minMass, this.mass + d));
@@ -178,13 +191,14 @@ export class Player {
             // Pulo Normal e Wall Jump
             if (input.up) {
                 if (this.isGrounded) {
-                    this.vy = -MOVEMENT.jumpSpeed;
+                    this.vy = -MOVEMENT.jumpSpeed * this.character.jump;
                     this.chain.y = 0;
                     this.isGrounded = false;
                     this.squash(0.75, 1.3);
                     playSound('jump');
+                    createDust(this.x, this.y + this.radius, 4, 2.5);
                 } else if (this.isTouchingWall) {
-                    this.vy = -MOVEMENT.jumpSpeed;
+                    this.vy = -MOVEMENT.jumpSpeed * this.character.jump;
                     this.vx = -this.wallDir * MOVEMENT.wallJumpKick; // Quicar da parede
                     this.isTouchingWall = false;
                     this.squash(0.75, 1.3);
@@ -222,10 +236,12 @@ export class Player {
         if (this.isPounding && this.poundWindup === 0) this.squash(0.7, 1.35);
 
         // Aplicação de Física: cada eixo é independente (atrito só no horizontal, gravidade só no vertical)
-        this.vx *= this.isGrounded ? PHYSICS.groundFriction : PHYSICS.airDrag;
+        const groundFriction = STAGES[state.stage].groundFriction ?? PHYSICS.groundFriction;
+        this.vx *= this.isGrounded ? groundFriction : PHYSICS.airDrag;
         this.vx = Math.max(-PHYSICS.maxSpeedX, Math.min(PHYSICS.maxSpeedX, this.vx));
         this.x += this.vx;
         this.y += this.vy;
+        if (this.isGrounded) this.runPhase += Math.abs(this.vx) * A.runPhasePerPixel;
 
         // Massa muda o tamanho aos poucos
         const targetR = PHYSICS.baseRadius * Math.sqrt(this.effMass);
@@ -289,6 +305,7 @@ export class Player {
                 updateScoreHUD();
                 createParticles(c.x, c.y, '#ffd32a', 10);
                 addPopup(c.x, c.y - 10, '+1', '#ffd32a');
+                addBurst(c.x, c.y, 22, '#fff3b0');
                 state.spawnableCoins.splice(i, 1);
             }
         }
@@ -343,6 +360,7 @@ export class Player {
             if (impactVy < BOUNCE.floor.settleBelow) out = 0;
             this.squash(1.3, 0.72);
         }
+        createDust(this.x, this.y + this.radius, 3 + Math.min(6, Math.round(impactVy / 4)), 3);
         if (out > 0.5) {
             this.vy = -Math.min(out, BOUNCE.floor.maxSpeed);
             this.isGrounded = false;
@@ -361,6 +379,7 @@ export class Player {
         }
         this.vx = nx * Math.min(out, BOUNCE.wall.maxSpeed);
         this.squash(0.65, 1.3);
+        addBurst(this.x - nx * this.radius, this.y, 20 + this.radius * 0.5, '#ffffff');
         playSound('land');
     }
 
@@ -389,6 +408,8 @@ export class Player {
         state.cameraShake = Math.max(state.cameraShake, COMBAT.shake.headBounce);
         playSound('land');
         createParticles(this.x, this.y + this.radius, '#45f3df', 14);
+        createDust(this.x, this.y + this.radius, 8, 5);
+        addRing(this.x, this.y + this.radius, 70, '#45f3df');
         // Onda de choque empurra quem estiver perto no chão
         const opp = players.find(p => p !== this);
         const dx = opp.x - this.x;

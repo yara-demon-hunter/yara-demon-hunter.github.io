@@ -2,17 +2,44 @@ import { TEXTS } from '../../data_model/texts.js';
 import { H, W, ctx } from '../core/canvas.js';
 import { state } from '../core/state.js';
 import { players } from '../entities/player.js';
-import { drawArena, drawPickups } from './arena.js';
-import { drawBlob, snap } from './blob.js';
+import { FX } from '../../data_model/visuals/sprites.js';
+import { drawPickups } from './arena.js';
+import { drawBlob, drawGhost, snap } from './blob.js';
+import { drawGlow, getDustSprite, getStarSprite } from './fx/sprites.js';
+import { drawArena } from './scenery.js';
 import { isTouch } from '../ui/touch_controls.js';
 
 export function drawEffects() {
     state.particles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, Math.max(0, p.radius * p.life), 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
+        const size = Math.max(0, p.radius * p.life) * FX.particleGlowScale;
+        if (p.kind === 'dust') {
+            ctx.globalAlpha = 0.6 * p.life;
+            ctx.drawImage(getDustSprite(), p.x - size, p.y - size, size * 2, size * 2);
+            ctx.globalAlpha = 1;
+        } else {
+            drawGlow(ctx, p.color, p.x, p.y, size, Math.min(1, p.life * 1.4));
+        }
     });
+    state.rings.forEach(r => {
+        const t = 1 - r.life / FX.ring.life;
+        ctx.globalAlpha = 1 - t;
+        ctx.strokeStyle = r.color;
+        ctx.lineWidth = FX.ring.width * (1 - t * 0.7);
+        ctx.beginPath();
+        ctx.ellipse(r.x, r.y, r.maxRadius * t, r.maxRadius * t * 0.35, 0, 0, Math.PI * 2);
+        ctx.stroke();
+    });
+    state.bursts.forEach(b => {
+        const t = b.life / FX.star.life;
+        const size = b.size * (1.3 - t * 0.5);
+        ctx.globalAlpha = Math.min(1, t * 1.5);
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(b.rot);
+        ctx.drawImage(getStarSprite(b.color), -size / 2, -size / 2, size, size);
+        ctx.restore();
+    });
+    ctx.globalAlpha = 1;
     ctx.textAlign = 'center';
     ctx.font = 'bold 16px "Segoe UI", sans-serif';
     state.popups.forEach(p => {
@@ -22,7 +49,6 @@ export function drawEffects() {
     });
     ctx.globalAlpha = 1;
 }
-
 
 export function render() {
     ctx.save();
@@ -41,14 +67,8 @@ export function render() {
         drawArena();
         drawPickups();
         players.forEach(p => {
-            p.trail.forEach(t => {
-                ctx.beginPath();
-                ctx.arc(t.x, t.y, p.radius * 0.9, 0, Math.PI * 2);
-                ctx.fillStyle = p.color;
-                ctx.globalAlpha = t.alpha * 0.4;
-                ctx.fill();
-                ctx.globalAlpha = 1.0;
-            });
+            const shot = snap(p);
+            p.trail.forEach(t => drawGhost(shot, t));
         });
         players.forEach(p => drawBlob(snap(p)));
     }

@@ -8,6 +8,7 @@ export const state = {
     isBotMatch: true,
     paused: false,
     roundNumber: 1,
+    stage: 0,          // índice em STAGES
     frameCount: 0,
     cameraShake: 0,
     hitStop: 0,        // congela o jogo por alguns frames no impacto
@@ -31,6 +32,8 @@ export const state = {
     bombTimer: 0,
     bombPassCd: 0,
     particles: [],
+    bursts: [],        // estrelas de impacto
+    rings: [],         // ondas de choque
     popups: [],
 
     // Replay do K.O.

@@ -7,7 +7,7 @@ import { playSound } from '../audio/sound.js';
 import { shrinkPlatform } from '../core/arena.js';
 import { state } from '../core/state.js';
 import { otherPlayer, players } from '../entities/player.js';
-import { addPopup, createParticles, showBanner } from './effects.js';
+import { addBurst, addPopup, addRing, createDust, createParticles, showBanner } from './effects.js';
 import { spawnMassBlobs } from './mass.js';
 
 export function impactForce(attacker, victim) {
@@ -107,6 +107,7 @@ export function resolvePlayerCollisions() {
     // Plataforma reduz levemente no choque
     shrinkPlatform(COMBAT.platformShrinkOnHit);
     createParticles((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, '#ffd32a', anyDash ? 22 : 12);
+    addBurst((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, anyDash ? 52 : 36, anyDash ? '#ffffff' : '#ffd32a');
 }
 
 export function isHeadStomp(a, v) {
@@ -132,6 +133,7 @@ export function doHeadBounce(a, v) {
     playSound('hit');
     addPopup(a.x, a.y - a.radius - 14, a.upHeld && a.chain.y >= 2 ? `${TEXTS.bop} x${a.chain.y}` : TEXTS.bop, a.color);
     createParticles((a.x + v.x) / 2, v.y - v.radius, '#ffffff', 10);
+    addBurst((a.x + v.x) / 2, v.y - v.radius, 34, '#ffffff');
 }
 
 // SMASH: cair do alto no rival amassa ele e arranca massa
@@ -163,6 +165,9 @@ export function doSmash(attacker, victim) {
     showBanner(TEXTS.smash, attacker.color, 800);
     addPopup(victim.x, victim.y - victim.radius - 12, TEXTS.splat, '#ffffff');
     createParticles(victim.x, victim.y, victim.color, 24, 14);
+    addBurst(victim.x, victim.y, 78, '#ffffff');
+    addRing(victim.x, victim.y + victim.radius, 110, victim.color);
+    createDust(victim.x, victim.y + victim.radius, 8, 6);
     shrinkPlatform(COMBAT.smash.platformShrink);
     if (attacker.controls.isBot && Math.random() < COMBAT.smash.botTauntChance) attacker.wantTaunt = true;
 }

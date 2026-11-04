@@ -4,6 +4,8 @@ export const TEXTS = {
     menuIntro: 'Best of 5 rounds! Drop on your rival to SQUASH them and eat the mass they lose.',
     botHint: 'P2: CONTROLLED BY AI (BOT)',
     roundLabel: n => `ROUND ${n}`,
+    pickerTags: ['P1', 'P2 / BOT'],
+    statLabels: { mass: 'MASS', speed: 'SPEED', jump: 'JUMP' },
     taunts: ['HAHA!', 'HEHE!', 'WEAK!', '😜'],
     go: 'SMASH!',
     smash: 'SMASH!',

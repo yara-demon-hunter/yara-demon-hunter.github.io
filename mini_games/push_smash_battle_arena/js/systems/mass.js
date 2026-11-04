@@ -18,7 +18,7 @@ export function spawnMassBlobs(p, amount) {
             vy: -4 - Math.random() * 5,
             amount: amount / n,
             r: MASS.blobBaseRadius + (amount / n) * MASS.blobRadiusPerMass,
-            color: p.color,
+            color: p.bodyColor,
             life: MASS.blobLifeFrames,
             age: 0,
             grounded: false,
