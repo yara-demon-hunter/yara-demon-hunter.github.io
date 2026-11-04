@@ -6,6 +6,7 @@ export const TEXTS = {
     roundLabel: n => `ROUND ${n}`,
     pickerTags: ['P1', 'P2 / BOT'],
     statLabels: { mass: 'MASS', speed: 'SPEED', jump: 'JUMP' },
+    dashLabel: 'DASH',
     taunts: ['HAHA!', 'HEHE!', 'WEAK!', '😜'],
     go: 'SMASH!',
     smash: 'SMASH!',

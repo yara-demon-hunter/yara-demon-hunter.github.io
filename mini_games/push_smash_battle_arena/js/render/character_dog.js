@@ -26,31 +26,30 @@ function tail(g, spec, pose) {
     g.restore();
 }
 
-// Orelhas pontudas nos cantos de cima, com o interior mais escuro
+// Orelhas dobradas para fora nos cantos de cima
 function ears(g, spec, pose) {
-    [[-1, 0.5, 0.9], [1, 0.62, 1]].forEach(([side, x, size]) => {
+    [[-1, 0.5, 0.9], [1, 0.66, 1]].forEach(([side, x, size]) => {
         g.save();
-        g.translate(side * x + 0.1, -0.76);
+        g.translate(side * x + 0.1, -0.72);
         g.scale(side * size, size);
-        g.rotate(0.35 + pose.ear * 0.4);
-        // Orelha: triângulo de pontas arredondadas
+        g.rotate(0.15 + pose.ear * 0.45);
         g.beginPath();
-        g.moveTo(-0.26, 0.22);
-        g.quadraticCurveTo(-0.16, -0.25, 0.02, -0.52);
-        g.quadraticCurveTo(0.2, -0.24, 0.28, 0.22);
+        g.moveTo(-0.3, -0.05);
+        g.quadraticCurveTo(-0.05, -0.32, 0.3, -0.22);
+        g.quadraticCurveTo(0.5, -0.1, 0.44, 0.24);
+        g.quadraticCurveTo(0.38, 0.42, 0.22, 0.34);
+        g.quadraticCurveTo(0, 0.2, -0.3, -0.05);
         g.closePath();
         g.fillStyle = spec.bodyLight;
         g.fill();
         g.strokeStyle = spec.bodyDark;
         g.lineWidth = 0.035;
         g.stroke();
-        // Dentro da orelha, mais escuro
         g.fillStyle = spec.earInner;
         g.beginPath();
-        g.moveTo(-0.12, 0.18);
-        g.quadraticCurveTo(-0.06, -0.12, 0.03, -0.3);
-        g.quadraticCurveTo(0.12, -0.1, 0.14, 0.18);
-        g.closePath();
+        g.moveTo(-0.08, -0.1);
+        g.quadraticCurveTo(0.12, -0.16, 0.24, -0.05);
+        g.quadraticCurveTo(0.08, 0.02, -0.08, -0.1);
         g.fill();
         g.restore();
     });
@@ -68,7 +67,7 @@ function body(g, spec) {
     g.arc(0, 0, 1, 0, TAU);
     g.fill();
     g.stroke();
-    // Barriga um pouco mais clara embaixo e pelinho curto nas bordas
+    // Barriga um pouco mais clara embaixo
     g.fillStyle = 'rgba(255, 235, 210, 0.18)';
     g.beginPath();
     g.ellipse(0.1, 0.62, 0.55, 0.3, 0, 0, TAU);

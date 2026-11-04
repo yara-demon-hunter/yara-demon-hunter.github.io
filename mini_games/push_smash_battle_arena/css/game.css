@@ -357,6 +357,9 @@ body { height: 100dvh; }
 .picker-info { grid-column: 1 / -1; text-align: center; }
 .picker-name { font-weight: 900; letter-spacing: 2px; font-size: 15px; }
 .stat { display: grid; grid-template-columns: 50px 1fr; align-items: center; gap: 6px; font-size: 9.5px; font-weight: 800; color: #c5c6c7; margin-top: 3px; text-align: left; }
+.dash-skill { display: grid; gap: 2px; margin-top: 6px; font-size: 9px; }
+.dash-name { color: var(--pc); font-weight: 900; letter-spacing: 0.5px; }
+.dash-description { color: #c5c6c7; line-height: 1.2; }
 .bar { height: 6px; background: #0b0c10; border-radius: 4px; overflow: hidden; }
 .bar i { display: block; height: 100%; background: var(--pc); border-radius: 4px; transition: width 0.25s; }
 .stage-row { display: flex; gap: 10px; }

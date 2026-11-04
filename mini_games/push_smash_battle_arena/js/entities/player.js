@@ -237,7 +237,11 @@ export class Player {
 
         // Aplicação de Física: cada eixo é independente (atrito só no horizontal, gravidade só no vertical)
         const groundFriction = STAGES[state.stage].groundFriction ?? PHYSICS.groundFriction;
-        this.vx *= this.isGrounded ? groundFriction : PHYSICS.airDrag;
+        const dashGroundFriction = this.character.dash.groundFriction;
+        const friction = this.isGrounded && this.isDashing && dashGroundFriction !== undefined
+            ? dashGroundFriction
+            : (this.isGrounded ? groundFriction : PHYSICS.airDrag);
+        this.vx *= friction;
         this.vx = Math.max(-PHYSICS.maxSpeedX, Math.min(PHYSICS.maxSpeedX, this.vx));
         this.x += this.vx;
         this.y += this.vy;
@@ -384,10 +388,13 @@ export class Player {
     }
 
     triggerDash(dir) {
-        this.dashTimer = MOVEMENT.dash.frames;
-        this.dashCooldown = MOVEMENT.dash.cooldown;
+        const skill = this.character.dash;
+        this.dashTimer = skill.frames;
+        this.dashCooldown = skill.cooldown;
         this.facing = dir;
-        this.vx = dir * MOVEMENT.dash.speed / Math.sqrt(this.effMass);
+        this.vx = dir * skill.speed / Math.sqrt(this.effMass);
+        if (skill.verticalSpeed !== undefined) this.vy = skill.verticalSpeed;
+        else if (!this.isGrounded && skill.airVerticalSpeed !== undefined) this.vy = skill.airVerticalSpeed;
         this.squash(1.35, 0.75);
         playSound('dash');
         createParticles(this.x, this.y, this.color, 10);

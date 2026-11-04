@@ -13,6 +13,7 @@ import { spawnMassBlobs } from './mass.js';
 export function impactForce(attacker, victim) {
     let f = (attacker.isDashing ? COMBAT.dashHitForce : COMBAT.hitForce) * (attacker.knockTimer > 0 ? COMBAT.knockbackBuff : 1) *
         Math.sqrt(attacker.effMass / victim.effMass);
+    if (attacker.isDashing) f *= attacker.character.dash.hitForceMultiplier ?? 1;
     if (victim.stunTimer > 0) f *= COMBAT.stunnedVictimMultiplier; // amassado voa mais longe
     return Math.min(f, COMBAT.maxForce);
 }
@@ -81,7 +82,9 @@ export function resolvePlayerCollisions() {
     let forceP1 = impactForce(p2, p1);
     let forceP2 = impactForce(p1, p2);
     if (p1.hasShield) { forceP1 = COMBAT.shieldedForce; p1.hasShield = false; }
+    else if (p1.isDashing) forceP1 *= p1.character.dash.incomingForceMultiplier ?? 1;
     if (p2.hasShield) { forceP2 = COMBAT.shieldedForce; p2.hasShield = false; }
+    else if (p2.isDashing) forceP2 *= p2.character.dash.incomingForceMultiplier ?? 1;
     p1.vx -= nx * forceP1;
     p1.vy -= ny * forceP1;
     p2.vx += nx * forceP2;
@@ -171,5 +174,4 @@ export function doSmash(attacker, victim) {
     shrinkPlatform(COMBAT.smash.platformShrink);
     if (attacker.controls.isBot && Math.random() < COMBAT.smash.botTauntChance) attacker.wantTaunt = true;
 }
-
 

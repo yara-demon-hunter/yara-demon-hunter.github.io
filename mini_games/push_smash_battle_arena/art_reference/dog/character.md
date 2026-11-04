@@ -9,7 +9,7 @@ Regras gerais em `../README.md`: esfera, sem braços e sem pernas. Referência: 
 
 - **Silhueta / forma geral:** esfera caramelo de **pelo curtinho, quase lisa**, vista em **3/4**: o rosto fica virado para o lado em que ele olha.
 - **Cabeça e rosto:** **focinho creme saltado** para a frente com **nariz vermelho grande** (narinas e brilho), sorriso largo que sobe para a bochecha, queixinho creme. Olhos menores, brancos com íris castanha, pupila e brilho. Testa com dois calombinhos claros acima dos olhos.
-- **Orelhas:** **pontudas**, nos cantos de cima da cabeça, com o interior mais escuro; balançam.
+- **Orelhas:** dobradas para fora nos cantos de cima da cabeça, por cima dela, com a parte de dentro mais escura aparecendo; balançam.
 - **Barriga / marcas:** barriga só um pouco mais clara embaixo; focinho e queixo cremes.
 - **Cauda:** tufinho curto e curvado para cima, jogado para trás, abanando.
 - **Partes que se movem separadamente:** orelhas, cauda (o corpo todo faz squash & stretch).

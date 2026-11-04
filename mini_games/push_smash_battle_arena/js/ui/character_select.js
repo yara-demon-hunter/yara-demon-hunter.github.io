@@ -48,9 +48,16 @@ const pickers = [0, 1].map((i) => {
         <div class="picker-info">
             <div class="picker-name"></div>
             ${Object.keys(RANGES).map(k => `<div class="stat"><span>${TEXTS.statLabels[k]}</span><div class="bar"><i data-stat="${k}"></i></div></div>`).join('')}
+            <div class="dash-skill"><strong class="dash-name"></strong><span class="dash-description"></span></div>
         </div>`;
     root.querySelectorAll('.arrow').forEach(b => b.addEventListener('click', () => cycle(i, +b.dataset.dir)));
-    return { root, canvas: root.querySelector('canvas'), name: root.querySelector('.picker-name') };
+    return {
+        root,
+        canvas: root.querySelector('canvas'),
+        name: root.querySelector('.picker-name'),
+        dashName: root.querySelector('.dash-name'),
+        dashDescription: root.querySelector('.dash-description')
+    };
 });
 
 function drawPicker(i, step) {
@@ -71,6 +78,8 @@ function renderPicker(i, drop) {
     const p = pickers[i];
     const char = ROSTER[selection.chars[i]];
     p.name.innerText = char.name;
+    p.dashName.innerText = `${TEXTS.dashLabel}: ${char.dash.name}`;
+    p.dashDescription.innerText = char.dash.description;
     Object.entries(RANGES).forEach(([k, [lo, hi]]) => {
         const t = hi > lo ? (STAT[k](char) - lo) / (hi - lo) : 1;
         p.root.querySelector(`[data-stat="${k}"]`).style.width = `${Math.round(15 + t * 85)}%`;
