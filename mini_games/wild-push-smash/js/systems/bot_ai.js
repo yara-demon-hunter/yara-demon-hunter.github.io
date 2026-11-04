@@ -1,4 +1,5 @@
 import { BOT_LEVELS, DEFAULT_BOT_LEVEL } from '../../data_model/bot.js';
+import { COMBAT } from '../../data_model/combat.js';
 import { MOVEMENT } from '../../data_model/physics.js';
 import { platform } from '../core/arena.js';
 import { W } from '../core/canvas.js';
@@ -31,6 +32,13 @@ function brainOf(self) {
 function steer(input, fromX, toX, deadZone) {
     if (toX < fromX - deadZone) input.left = true;
     else if (toX > fromX + deadZone) input.right = true;
+}
+
+function dashInput(input, self, dir) {
+    input.dashPressed = true;
+    input.left = dir < 0;
+    input.right = dir > 0;
+    return input;
 }
 
 function dash(input, self, dir) {
@@ -152,8 +160,11 @@ export function botInput(self, opp) {
     }
 
     // Dash de ataque: só quando empurra o rival para a beirada (no fácil, a qualquer hora)
-    if (self.dashCooldown === 0 && o.isAlive && o.skyDrop === 0 && Math.abs(dx) < L.dashRange &&
+    // Com o medidor cheio o alcance cresce e o bot vai direto no rival (o turbo vale um coração)
+    const turboReady = self.special >= COMBAT.special.max;
+    if (self.dashCooldown === 0 && o.isAlive && o.skyDrop === 0 && Math.abs(dx) < L.dashRange * (turboReady ? 1.5 : 1) &&
         Math.abs(o.y - self.y) < 40) {
+        if (turboReady && o.stunTimer === 0 && Math.random() < L.turboChance) return finish(dashInput(input, self, Math.sign(dx) || self.facing), self);
         const pushesOut = !L.smartPositioning || Math.sign(dx) === outOf(o.x);
         const rivalNearEdge = (o.x >= cx ? right - o.x : o.x - left) < 120;
         const chance = L.dashChance * (L.smartPositioning && rivalNearEdge ? 2 : 1);

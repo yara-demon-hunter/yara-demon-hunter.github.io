@@ -5,7 +5,7 @@ export const MATCH = {
     hearts: 3,                 // vidas por round: cada SMASH sofrido tira um coração; sem corações é K.O.
     countdownFrames: 135,      // 3-2-1
     countdownStep: 45,
-    koFrames: 50,              // pausa antes do replay
+    koFrames: 40,              // pausa antes do replay
     roundEndFrames: 110,       // pausa mostrando o vencedor do round, antes do próximo
     shrinkStartSeconds: 30,    // a plataforma começa a fechar
     shrinkLastSeconds: 15,

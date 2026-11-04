@@ -11,7 +11,7 @@ import { resolvePlayerCollisions } from './systems/collisions.js';
 import { showBanner, updateEffects } from './systems/effects.js';
 import { startReplay, stepReplay } from './systems/replay.js';
 import { afterRoundEnd, updateRoundTimer } from './systems/round.js';
-import { updateHeartsHUD, updateWinsHUD } from './ui/hud.js';
+import { updateHeartsHUD, updateSpecialHUD, updateWinsHUD } from './ui/hud.js';
 import { applySettings } from './ui/settings_panel.js';
 import { isPhonePortrait } from './ui/orientation.js';
 import { isTouch, touchControls } from './ui/touch_controls.js';
@@ -44,6 +44,7 @@ export function step() {
         players.forEach(p => p.update());
         resolvePlayerCollisions();
         if (state.gameState === 'PLAYING') updateRoundTimer();
+        updateSpecialHUD();
         state.history.push(players.map(snap));
         if (state.history.length > 150) state.history.shift();
     } else if (state.gameState === 'KO') {

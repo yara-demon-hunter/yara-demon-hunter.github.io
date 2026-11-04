@@ -16,8 +16,11 @@ import { H, W } from '../core/canvas.js';
 import { keys } from '../core/input.js';
 import { state } from '../core/state.js';
 import { botInput } from '../systems/bot_ai.js';
-import { addBurst, addPopup, addRing, createDust, createParticles, rocketTrail } from '../systems/effects.js';
+import { addBlast, addBurst, addPopup, addRing, comicImpact, createDebris, createDust, groundWave, createParticles, rocketTrail } from '../systems/effects.js';
 import { triggerKO } from '../systems/replay.js';
+
+// Cores do fogo do DASH TURBO
+const FIRE = ['#ffd32a', '#ff8a00', '#ff4d1f'];
 
 export class Player {
     constructor(id, x, name, color, controls) {
@@ -56,6 +59,8 @@ export class Player {
         this.isAlive = true;
         this.dashCooldown = 0;
         this.dashTimer = 0;
+        this.special = 0;          // medidor de especial (0 a COMBAT.special.max)
+        this.turbo = false;        // o dash em andamento é o DASH TURBO
         this.isPounding = false;
         this.poundWindup = 0;
         this.poundLag = 0;
@@ -119,6 +124,9 @@ export class Player {
         if (!this.isAlive) return;
         if (this.dashCooldown > 0) this.dashCooldown--;
         if (this.dashTimer > 0) this.dashTimer--;
+        if (this.dashTimer === 0) this.turbo = false;
+        else if (this.turbo) createParticles(this.x, this.y, FIRE[Math.floor(Math.random() * FIRE.length)], 3, 5);
+        this.addSpecial(COMBAT.special.passivePerFrame);
         if (this.stunTimer > 0) this.stunTimer--;
         if (this.tauntTimer > 0) this.tauntTimer--;
         if (this.poundLag > 0) this.poundLag--;
@@ -558,12 +566,31 @@ export class Player {
         playSound('dash');
     }
 
+    // Enche o medidor; ao chegar no máximo avisa que o DASH TURBO está pronto
+    addSpecial(amount) {
+        const max = COMBAT.special.max;
+        const was = this.special;
+        this.special = Math.min(max, was + amount);
+        if (was < max && this.special >= max) {
+            playSound('coin');
+            addPopup(this.x, this.y - this.radius - 30, TEXTS.turboReady, '#ffd32a');
+        }
+    }
+
     triggerDash(dir) {
         const skill = this.character.dash;
-        this.dashTimer = skill.frames;
-        this.dashCooldown = skill.cooldown;
+        const T = COMBAT.special.turbo;
+        this.turbo = this.special >= COMBAT.special.max;
+        this.dashTimer = Math.round(skill.frames * (this.turbo ? T.framesMul : 1));
+        this.dashCooldown = this.turbo ? T.cooldown : skill.cooldown;
         this.facing = dir;
-        this.vx = dir * skill.speed;
+        this.vx = dir * skill.speed * (this.turbo ? T.speedMul : 1);
+        if (this.turbo) {
+            this.special = 0;
+            playSound('rocket');
+            addRing(this.x, this.y, 80, '#ff8a00');
+            addBurst(this.x, this.y, 60, '#ffd32a');
+        }
         if (skill.verticalSpeed !== undefined) this.vy = skill.verticalSpeed;
         else if (!this.isGrounded && skill.airVerticalSpeed !== undefined) this.vy = skill.airVerticalSpeed;
         this.squash(1.35, 0.75);
@@ -579,7 +606,35 @@ export class Player {
         playSound('jump');
     }
 
+    // Pouso do SKY DROP: onda de choque proporcional à massa que atira o rival para fora, acertando ou não
+    skyDropImpact() {
+        const S = COMBAT.skyDrop.shock;
+        const power = Math.sqrt(this.mass);
+        const reach = S.range * power;
+        const gx = this.x, gy = this.y + this.radius;
+        state.cameraShake = Math.max(state.cameraShake, S.shake * (0.7 + power * 0.3));
+        state.hitStop = Math.max(state.hitStop, S.hitStopFrames);
+        groundWave(gx, gy, reach);
+        addRing(gx, gy, reach, '#ffffff');
+        addRing(gx, gy, reach * 0.65, '#ffd32a');
+        addRing(gx, gy, reach * 0.35, '#ff8a00');
+        addBlast(gx, gy - 10, 90 + power * 40);
+        comicImpact(gx, gy - 20, 'smash', 80 + power * 30);
+        createDebris(gx, gy, 6 + Math.round(power * 3), 10 + power * 2);
+        const opp = players.find(p => p !== this);
+        const dx = opp.x - this.x;
+        if (!opp.isAlive || Math.abs(dx) > reach) return;
+        const near = 1 - (1 - S.falloff) * Math.abs(dx) / reach;
+        const dir = dx === 0 ? -this.facing : Math.sign(dx);
+        opp.vx += dir * S.push * power / Math.sqrt(opp.effMass) * near;
+        opp.vy = Math.min(opp.vy, -S.lift * near);
+        opp.isGrounded = false;
+        opp.stunTimer = Math.max(opp.stunTimer, S.stunFrames);
+        opp.squash(1.5, 0.6);
+    }
+
     landPound() {
+        const fromSky = this.skyFalling;
         this.isPounding = false;
         this.poundLag = MOVEMENT.pound.missLagFrames; // errou o smash: fica preso um instante
         this.squash(1.5, 0.6);
@@ -588,6 +643,8 @@ export class Player {
         createParticles(this.x, this.y + this.radius, '#45f3df', 14);
         createDust(this.x, this.y + this.radius, 8, 5);
         addRing(this.x, this.y + this.radius, 70, '#45f3df');
+        if (!fromSky) comicImpact(this.x, this.y + this.radius, 'land', 50);
+        if (fromSky) return this.skyDropImpact();
         // Onda de choque empurra quem estiver perto no chão
         const opp = players.find(p => p !== this);
         const dx = opp.x - this.x;

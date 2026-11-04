@@ -9,7 +9,8 @@ import { keys } from '../core/input.js';
 import { state } from '../core/state.js';
 import { players } from '../entities/player.js';
 import { updateHeartsHUD, updateWinsHUD } from '../ui/hud.js';
-import { hintP2, hintP2Human, menuSub, menuTitle, screenMenu } from '../ui/menu.js';
+import { setBotHint } from '../ui/controls_hint.js';
+import { menuSub, menuTitle, screenMenu } from '../ui/menu.js';
 import { buildTouchControls } from '../ui/touch_controls.js';
 import { getSelection } from '../ui/character_select.js';
 import { keepCharacterAtlases } from '../render/character_sprites.js';
@@ -27,7 +28,7 @@ export function startMatch(isBot) {
     updateWinsHUD();
     players[1].controls.isBot = isBot;
     players[1].name = isBot ? PLAYERS[1].botName : PLAYERS[1].name;
-    hintP2.innerText = isBot ? TEXTS.botHint : hintP2Human;
+    setBotHint(isBot);
     buildTouchControls();
     screenMenu.classList.add('hidden');
     startRound();
@@ -41,6 +42,8 @@ export function startRound() {
     state.bursts = [];
     state.rings = [];
     state.popups = [];
+    state.blasts = [];
+    state.comics = [];
     state.history = [];
     state.hitCooldown = 0;
     state.hitStop = 0;

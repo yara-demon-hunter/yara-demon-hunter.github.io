@@ -4,6 +4,13 @@ export const KEYS = [
     { up: 'ArrowUp', left: 'ArrowLeft', right: 'ArrowRight', down: 'ArrowDown', dash: 'Slash', taunt: 'ShiftRight' }
 ];
 
+// Dica de teclas no rodapé (só no computador): cada jogador vê um bloco de teclas desenhadas
+// na posição real do teclado (QWE/ASD e / ↑ ⇧ / ← ↓ →). Os nomes são as ações de KEYS.
+export const HINT_LAYOUT = [
+    [['taunt', 'up', 'dash'], ['left', 'down', 'right']],
+    [['dash', 'up', 'taunt'], ['left', 'down', 'right']]
+];
+
 export const JOYSTICK = {
     sideThreshold: 0.3,        // fração do raio para contar esquerda/direita
     verticalThreshold: 0.5     // ... e para cima/baixo

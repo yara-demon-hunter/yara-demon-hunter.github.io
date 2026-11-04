@@ -17,6 +17,20 @@ export const FX = {
     dustPixels: 48,
     particleGlowScale: 2.2,
     star: { life: 18, spin: 0.15 },
+    // Estilo quadrinho (capa do jogo): explosão em estrela, palavra de impacto, pedras e estrelinhas coloridas
+    comic: {
+        wordLife: 36,                 // quadros que a palavra fica na tela
+        blastLife: 16,
+        blastPixels: 256,
+        wordPixels: 160,              // altura do sprite da palavra (é esticado ao tamanho do evento)
+        wordFont: '900 italic 96px "Arial Black", Impact, "Segoe UI", sans-serif',
+        outline: '#5a2300',
+        wordGradient: ['#fff3a0', '#ffc61a', '#ff8a00'],
+        badge: ['#ff4d1f', '#ff8a00'],
+        blast: { outer: '#ff7a1a', mid: '#ffb21a', inner: '#fff1a8', core: '#ffffff' },
+        rocks: ['#8a5a36', '#a8723f', '#6f4527'],
+        stars: ['#ffd32a', '#4cc3ff', '#ff6b3d', '#5ee06a', '#ffffff']
+    },
     ring: { life: 20, width: 5 },
     shadow: { alpha: 0.4, widthRatio: 1.1, heightRatio: 0.28, fadeHeight: 260 },
     // Mira do SKY DROP no chão: anel achatado com marcas girando; acende quando o rival está embaixo

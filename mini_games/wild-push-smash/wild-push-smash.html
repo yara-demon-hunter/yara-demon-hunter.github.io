@@ -16,13 +16,14 @@
             <span class="p1-score"><span class="hearts" id="heartsP1">♥♥♥</span><span class="pips" id="winsP1">○○○</span></span>
             <span class="p2-score"><span class="hearts" id="heartsP2">♥♥♥</span><span class="pips" id="winsP2">○○○</span></span>
         </div>
+        <!-- Medidor de especial: cheio, o próximo DASH vira o DASH TURBO (tira um coração) -->
+        <div class="special special-p1" id="specialP1"><i></i><span>TURBO</span></div>
+        <div class="special special-p2" id="specialP2"><i></i><span>TURBO</span></div>
         <div class="timer-display" id="timerDisplay">60</div>
         <div class="round-label" id="roundLabel">ROUND 1</div>
         <div id="comboBanner" class="combo-banner">SMASH!</div>
-        <div class="controls-hint">
-            <span>P1: [W] Jump | [A/D] Move | [E] Dash | [S] SMASH in air | [Q] Taunt</span>
-            <span id="hintP2">P2: [↑] Jump | [←/→] Move | [/] Dash | [↓] SMASH in air | [Right Shift] Taunt</span>
-        </div>
+        <!-- Teclas desenhadas de cada jogador (montadas por js/ui/controls_hint.js) -->
+        <div class="controls-hint" id="controlsHint"></div>
     </div>
 
     <!-- Tela Inicial / Game Over -->

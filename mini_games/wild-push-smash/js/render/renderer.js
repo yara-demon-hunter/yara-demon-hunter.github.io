@@ -4,12 +4,46 @@ import { state } from '../core/state.js';
 import { players } from '../entities/player.js';
 import { FX } from '../../data_model/visuals/sprites.js';
 import { drawBlob, drawGhost, drawReticle, snap } from './blob.js';
-import { drawGlow, getDustSprite, getStarSprite } from './fx/sprites.js';
+import { drawGlow, getBlastSprite, getDustSprite, getRockSprite, getStarSprite, getWordSprite } from './fx/sprites.js';
 import { drawArena } from './scenery.js';
 import { isTouch } from '../ui/touch_controls.js';
 
+// Palavra de impacto: estoura com um pulo exagerado, assenta e some no fim
+function wordScale(life) {
+    const age = FX.comic.wordLife - life;
+    const pop = 7;
+    if (age < pop) {
+        const k = age / pop;
+        return 1.2 * Math.sin(k * Math.PI * 0.5);
+    }
+    if (age < pop + 6) return 1.2 - 0.2 * ((age - pop) / 6);
+    return Math.min(1, life / 10);
+}
+
 export function drawEffects() {
+    state.blasts.forEach(b => {
+        const t = b.life / FX.comic.blastLife;
+        const size = b.size * (1.25 - t * 0.45);
+        ctx.globalAlpha = Math.min(1, t * 2);
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(b.rot);
+        ctx.drawImage(getBlastSprite(), -size / 2, -size / 2, size, size);
+        ctx.restore();
+    });
+    ctx.globalAlpha = 1;
     state.particles.forEach(p => {
+        if (p.kind === 'rock' || p.kind === 'cstar') {
+            const s = p.radius * 2.4;
+            ctx.globalAlpha = Math.min(1, p.life * 1.5);
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.drawImage(p.kind === 'rock' ? getRockSprite(p.color) : getStarSprite(p.color), -s / 2, -s / 2, s, s);
+            ctx.restore();
+            ctx.globalAlpha = 1;
+            return;
+        }
         const size = Math.max(0, p.radius * p.life) * FX.particleGlowScale;
         if (p.kind === 'dust') {
             ctx.globalAlpha = 0.6 * p.life;
@@ -45,6 +79,20 @@ export function drawEffects() {
         ctx.globalAlpha = Math.min(1, p.life / 20);
         ctx.fillStyle = p.color;
         ctx.fillText(p.text, p.x, p.y);
+    });
+    ctx.globalAlpha = 1;
+    // Palavras de impacto por cima de tudo
+    state.comics.forEach(c => {
+        const sprite = getWordSprite(c.word);
+        const s = wordScale(c.life);
+        const w = c.size * (sprite.width / sprite.height) * s;
+        const h = c.size * s;
+        ctx.globalAlpha = Math.min(1, c.life / 10);
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.rot);
+        ctx.drawImage(sprite, -w / 2, -h / 2, w, h);
+        ctx.restore();
     });
     ctx.globalAlpha = 1;
 }

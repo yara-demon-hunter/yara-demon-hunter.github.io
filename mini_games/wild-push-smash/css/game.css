@@ -138,14 +138,14 @@ canvas {
 
 .controls-hint {
     position: absolute;
-    bottom: 12px;
+    bottom: 14px;
+    left: 0;
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 0 30px;
-    font-size: 20px;
-    color: rgba(255,255,255,0.6);
-    left: 0;
+    align-items: flex-end;
+    padding: 0 28px;
+    pointer-events: none;
 }
 
 body { height: 100dvh; }
@@ -238,7 +238,7 @@ body { height: 100dvh; }
 /* --- SETTINGS --- */
 .gear-btn {
     position: absolute;
-    top: 100px;
+    top: 124px;
     right: 28px;
     width: 60px;
     height: 60px;
@@ -406,9 +406,6 @@ body { height: 100dvh; }
 .dash-skill { font-size: 11px; }
 .stage-card { font-size: 12px; }
 .picker-tag { font-size: 13px; }
-.controls-hint { gap: 24px; padding: 0 28px; }
-.controls-hint span { flex: 1; }
-.controls-hint span:last-child { text-align: right; }
 
 /* --- AVISO DE VIRAR O APARELHO: celular em pé. Mesma condição de js/ui/orientation.js --- */
 #rotateNotice {
@@ -442,3 +439,76 @@ body { height: 100dvh; }
 @media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) {
     #rotateNotice { display: flex; }
 }
+
+/* --- MEDIDOR DE ESPECIAL (DASH TURBO) --- */
+.special {
+    position: absolute;
+    top: 92px;
+    width: 190px;
+    height: 14px;
+    background: rgba(11, 12, 16, 0.75);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 9px;
+    overflow: hidden;
+}
+.special-p1 { left: 28px; --pc: #ff4757; }
+.special-p2 { right: 28px; --pc: #1e90ff; }
+.special i { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--pc), #ffd32a); transition: width 0.12s; }
+.special span { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; letter-spacing: 2px; color: #0b0c10; }
+.special.ready { border-color: #e3a6ff; animation: turbo-glow 0.6s ease-in-out infinite alternate; }
+/* Cheia: roxo brilhante com um brilho correndo pela barra */
+.special.ready i {
+    background: linear-gradient(90deg, #7b1fd6, #c45bff 40%, #f3d4ff 50%, #c45bff 60%, #7b1fd6) 0 0 / 200% 100%;
+    animation: turbo-shine 1.1s linear infinite;
+}
+.special.ready span { display: flex; color: #fff; text-shadow: 0 0 4px #4a0a8a, 0 0 2px #4a0a8a; }
+@keyframes turbo-glow { from { box-shadow: 0 0 6px #b14bff; } to { box-shadow: 0 0 22px #c45bff, 0 0 6px #fff; } }
+@keyframes turbo-shine { to { background-position: -200% 0; } }
+
+/* --- TECLAS DESENHADAS NO RODAPÉ (js/ui/controls_hint.js): bloco 3x2 no lugar real do teclado --- */
+.kc-cluster { display: grid; grid-template-columns: repeat(3, 46px); gap: 6px; opacity: 0.8; }
+.kc {
+    height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border-radius: 8px;
+    background: linear-gradient(#2a3040, #171b24);
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    border-bottom: 4px solid var(--pc);
+    color: #fff;
+    transition: transform 0.06s, background 0.06s, box-shadow 0.06s;
+}
+.kc b { font-size: 18px; line-height: 1; font-weight: 900; }
+.kc.kc-word b { font-size: 10px; letter-spacing: 0.5px; }
+.kc small { font-size: 8.5px; line-height: 1; font-weight: 800; letter-spacing: 0.8px; color: rgba(255, 255, 255, 0.6); }
+.kc-dash small { color: #45f3df; }
+/* Tecla apertada: afunda e acende na cor do jogador */
+.kc.kc-pressed {
+    background: var(--pc);
+    border-bottom-width: 1.5px;
+    transform: translateY(3px);
+    box-shadow: 0 0 14px var(--pc);
+}
+.kc.kc-pressed small { color: #fff; }
+.kc-bot {
+    align-self: flex-end;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(30, 144, 255, 0.6);
+    background: rgba(11, 12, 16, 0.6);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+/* --- TURBO CARREGADO: roxo brilhante, na barra e na tecla de DASH --- */
+.kc.kc-turbo {
+    border-color: #d58cff;
+    background: linear-gradient(#9b30ff, #5a12a8);
+    animation: turbo-glow 0.6s ease-in-out infinite alternate;
+}
+.kc.kc-turbo small { color: #fff; }

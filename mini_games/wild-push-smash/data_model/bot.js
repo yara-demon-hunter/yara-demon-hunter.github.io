@@ -19,6 +19,7 @@ export const BOT_LEVELS = {
         smashAbove: 30,            // quanto acima do rival precisa estar para tentar o smash
         dashRange: 100,
         dashChance: 0.03,          // por frame, em posição de dash
+        turboChance: 0.04,         // por frame, com o medidor cheio e o rival ao alcance
         edgeMargin: 25,
         deadZone: 12,
         skyDropMinHover: 45,       // SKY DROP: frames lá no alto antes de poder soltar (dá tempo do rival fugir)
@@ -42,6 +43,7 @@ export const BOT_LEVELS = {
         smashAbove: 30,
         dashRange: 140,
         dashChance: 0.08,
+        turboChance: 0.1,
         edgeMargin: 30,
         deadZone: 10,
         skyDropMinHover: 34,
@@ -65,6 +67,7 @@ export const BOT_LEVELS = {
         smashAbove: 30,
         dashRange: 170,
         dashChance: 0.3,
+        turboChance: 0.25,
         edgeMargin: 35,
         deadZone: 8,
         skyDropMinHover: 26,

@@ -62,6 +62,23 @@
                 {% endif %}
             </div>
         </article>
+
+        <article class="mini-game-card mini-game-card--wild-push-smash">
+            <div class="mini-game-card__art" role="img" aria-label="{% if page.lang == 'pt' %}Arena de Wild Push & Smash{% else %}Wild Push & Smash arena{% endif %}"></div>
+            <div class="mini-game-card__body">
+                {% if page.lang == "pt" %}
+                    <p class="mini-game-card__eyebrow">Jogo 4 · Arena</p>
+                    <h2>Wild Push &amp; Smash</h2>
+                    <p>Escolha seu personagem, use habilidades únicas e empurre o rival para fora da arena.</p>
+                    <a class="mini-game-card__button" href="{{ '/mini_games/wild-push-smash/wild-push-smash.html' | relative_url }}">Jogar agora</a>
+                {% else %}
+                    <p class="mini-game-card__eyebrow">Game 4 · Arena</p>
+                    <h2>Wild Push &amp; Smash</h2>
+                    <p>Pick your fighter, use unique skills, and push your rival out of the arena.</p>
+                    <a class="mini-game-card__button" href="{{ '/mini_games/wild-push-smash/wild-push-smash.html' | relative_url }}">Play now</a>
+                {% endif %}
+            </div>
+        </article>
     </div>
 
 </section>

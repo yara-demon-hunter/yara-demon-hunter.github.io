@@ -17,7 +17,7 @@ Tudo o que é número, texto ou som do jogo fica em `data_model/`. Para testar o
 | `characters.js` | Elenco: massa, velocidade, pulo e habilidade exclusiva de dash de cada bicho; passivos extras (o corvo plana segurando ▲ no ar: `glide`) |
 | `stages.js` | Arenas (Night Forest, Desert, Snow Peak) e o atrito do chão de cada uma (a neve escorrega) |
 | `bot.js` | Comportamento do bot (chances de pular e dar dash, distâncias) |
-| `controls.js` | Teclas, joystick, valores padrão das configurações |
+| `controls.js` | Teclas, layout das teclas desenhadas no rodapé, joystick, valores padrão das configurações |
 | `players.js` | Nome e cor dos lutadores |
 | `audio.js` | Efeitos sonoros (inclui o foguete e o assobio do SKY DROP) e a música (notas e andamento) |
 | `texts.js` | Todos os textos (para traduzir) |
@@ -59,7 +59,8 @@ js/
   systems/                     batidas, smash (corações) e SKY DROP, fim de round, replay, efeitos
   render/                      desenho: arte procedural dos lutadores (character_art), atlas (character_sprites),
                                cenário (scenery), sprites pequenos (fx/sprites) e o desenho de cada quadro
-  ui/                          HUD (corações e rounds), menu, escolha de personagem e arena (character_select), painel de configurações, joysticks de toque
+  ui/                          HUD (corações e rounds), menu, escolha de personagem e arena (character_select), painel de configurações, joysticks de toque,
+                               teclas desenhadas no rodapé do computador (controls_hint)
   audio/                       sons e música sintetizados
 ```
 

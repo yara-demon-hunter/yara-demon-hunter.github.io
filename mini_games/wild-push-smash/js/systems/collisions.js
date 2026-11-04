@@ -5,7 +5,7 @@ import { playSound } from '../audio/sound.js';
 import { shrinkPlatform } from '../core/arena.js';
 import { state } from '../core/state.js';
 import { players } from '../entities/player.js';
-import { addBurst, addPopup, addRing, createDust, createParticles, showBanner } from './effects.js';
+import { addBurst, addPopup, addRing, comicImpact, createDust, createParticles, showBanner } from './effects.js';
 import { triggerKO } from './replay.js';
 import { updateHeartsHUD } from '../ui/hud.js';
 
@@ -27,9 +27,10 @@ function dashImpulse(attacker, victim, directionToVictim) {
     if (!attacker.isDashing || forwardSpeed <= 0) return 0;
     const skill = attacker.character.dash;
     const brace = victim.isDashing ? victim.character.dash.incomingForceMultiplier ?? 1 : 1;
+    const T = COMBAT.special.turbo;
     const impulse = attacker.effMass * forwardSpeed * COMBAT.dashMomentumTransfer *
-        (skill.hitForceMultiplier ?? 1) * brace;
-    return Math.min(impulse, COMBAT.maxDashImpulse);
+        (skill.hitForceMultiplier ?? 1) * brace * (attacker.turbo ? T.forceMul : 1);
+    return Math.min(impulse, COMBAT.maxDashImpulse * (attacker.turbo ? T.maxImpulseMul : 1));
 }
 
 export function isSmash(attacker, victim) {
@@ -105,6 +106,37 @@ export function resolvePlayerCollisions() {
     shrinkPlatform(COMBAT.platformShrinkOnHit);
     createParticles((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, '#ffd32a', anyDash ? 22 : 12);
     addBurst((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, anyDash ? 52 : 36, anyDash ? '#ffffff' : '#ffd32a');
+    comicImpact((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, anyDash ? 'dash' : 'hit', anyDash ? 80 : 56);
+
+    // Medidor de especial: quem bate com dash e quem apanha enchem; DASH TURBO que acerta tira um coração
+    const G = COMBAT.special.gain;
+    [[p1, p2], [p2, p1]].forEach(([a, v]) => {
+        if (a.turbo && a.isDashing && a.facing * (v.x - a.x) > 0) return turboHit(a, v);
+        if (a.isDashing && a.facing * (v.x - a.x) > 0) { a.addSpecial(G.dashHit); v.addSpecial(G.takeHit); }
+    });
+    if (!anyDash) { p1.addSpecial(G.hit); p2.addSpecial(G.hit); }
+}
+
+// DASH TURBO acertou: tira um coração (K.O. se era o último), atordoa e arremessa. Quem está atordoado não toma dano.
+export function turboHit(attacker, victim) {
+    const T = COMBAT.special.turbo;
+    attacker.turbo = false;
+    attacker.dashTimer = 0;
+    state.hitStop = T.hitStopFrames;
+    state.cameraShake = Math.max(state.cameraShake, T.shake);
+    playSound('smash');
+    comicImpact(victim.x, victim.y, 'turbo', 130);
+    addRing(victim.x, victim.y + victim.radius, 130, '#ff8a00');
+    addPopup(victim.x, victim.y - victim.radius - 40, TEXTS.heartLost, victim.color);
+    if (victim.stunTimer > 0) return;
+    victim.hearts = Math.max(0, victim.hearts - 1);
+    updateHeartsHUD();
+    victim.stunTimer = T.stunFrames;
+    victim.squash(1.6, 0.55);
+    victim.addSpecial(COMBAT.special.gain.takeSmash);
+    shrinkPlatform(COMBAT.smash.platformShrink);
+    if (victim.hearts === 0) return triggerKO(victim);
+    showBanner(TEXTS.turbo, attacker.color, 800);
 }
 
 export function isHeadStomp(a, v) {
@@ -118,12 +150,14 @@ export function doHeadStomp(a, v) {
     v.vy = Math.max(v.vy, 0) + a.vy * BOUNCE.head.victimMomentum * (a.effMass / v.effMass);
     v.squash(1.4, 0.65);
     a.startSkyDrop();
+    a.addSpecial(COMBAT.special.gain.stomp);
     state.hitStop = COMBAT.hitStopFrames.headBounce;
     state.cameraShake = Math.max(state.cameraShake, COMBAT.shake.headBounce);
     playSound('hit');
     addPopup(a.x, a.y - a.radius - 14, TEXTS.skyDrop, a.color);
     createParticles((a.x + v.x) / 2, v.y - v.radius, '#ffffff', 10);
     addBurst((a.x + v.x) / 2, v.y - v.radius, 34, '#ffffff');
+    comicImpact((a.x + v.x) / 2, v.y - v.radius, 'stomp', 60);
 }
 
 // SMASH: cair do alto no rival amassa ele e tira um coração (sem corações é K.O.)
@@ -145,11 +179,14 @@ export function doSmash(attacker, victim) {
 
     victim.hearts = Math.max(0, victim.hearts - 1);
     updateHeartsHUD();
+    attacker.addSpecial(COMBAT.special.gain.smash);
+    victim.addSpecial(COMBAT.special.gain.takeSmash);
 
     addPopup(victim.x, victim.y - victim.radius - 12, TEXTS.splat, '#ffffff');
     addPopup(victim.x, victim.y - victim.radius - 40, TEXTS.heartLost, victim.color);
     createParticles(victim.x, victim.y, victim.color, 24, 14);
     addBurst(victim.x, victim.y, 78, '#ffffff');
+    comicImpact(victim.x, victim.y, 'smash', 120);
     addRing(victim.x, victim.y + victim.radius, 110, victim.color);
     createDust(victim.x, victim.y + victim.radius, 8, 6);
     shrinkPlatform(COMBAT.smash.platformShrink);

@@ -27,6 +27,8 @@ export const state = {
     bursts: [],        // estrelas de impacto
     rings: [],         // ondas de choque
     popups: [],
+    blasts: [],        // explosões em estrela (estilo quadrinho)
+    comics: [],        // palavras de impacto: BAM!, CRASH!...
 
     // Replay do K.O.
     history: [],
