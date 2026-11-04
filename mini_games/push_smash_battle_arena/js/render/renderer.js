@@ -3,8 +3,7 @@ import { H, W, ctx } from '../core/canvas.js';
 import { state } from '../core/state.js';
 import { players } from '../entities/player.js';
 import { FX } from '../../data_model/visuals/sprites.js';
-import { drawPickups } from './arena.js';
-import { drawBlob, drawGhost, snap } from './blob.js';
+import { drawBlob, drawGhost, drawReticle, snap } from './blob.js';
 import { drawGlow, getDustSprite, getStarSprite } from './fx/sprites.js';
 import { drawArena } from './scenery.js';
 import { isTouch } from '../ui/touch_controls.js';
@@ -62,10 +61,13 @@ export function render() {
         ctx.scale(state.replayCam.z, state.replayCam.z);
         ctx.translate(-state.replayCam.x, -state.replayCam.y);
         drawArena();
-        state.replayFrames[Math.floor(state.replayIndex)].forEach(drawBlob);
+        const frame = state.replayFrames[Math.floor(state.replayIndex)];
+        frame.forEach((s, i) => drawReticle(s, frame[1 - i]));
+        frame.forEach(drawBlob);
     } else {
         drawArena();
-        drawPickups();
+        const shots = players.map(snap);
+        shots.forEach((s, i) => drawReticle(s, shots[1 - i]));
         players.forEach(p => {
             const shot = snap(p);
             p.trail.forEach(t => drawGhost(shot, t));

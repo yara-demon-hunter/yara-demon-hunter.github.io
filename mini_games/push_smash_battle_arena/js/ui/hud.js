@@ -1,10 +1,11 @@
 import { MATCH } from '../../data_model/match.js';
 import { players } from '../entities/player.js';
 
-// --- HUD ---
-export function updateScoreHUD() {
-    document.getElementById('scoreP1').innerText = players[0].matchCoins;
-    document.getElementById('scoreP2').innerText = players[1].matchCoins;
+// --- HUD: corações do round (♥ cheio, ♡ perdido) e rounds vencidos, na cor de cada jogador ---
+export function updateHeartsHUD() {
+    const hearts = p => '♥'.repeat(p.hearts) + '♡'.repeat(Math.max(0, MATCH.hearts - p.hearts));
+    document.getElementById('heartsP1').innerText = hearts(players[0]);
+    document.getElementById('heartsP2').innerText = hearts(players[1]);
 }
 
 export function updateWinsHUD() {

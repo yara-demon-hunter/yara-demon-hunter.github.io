@@ -32,6 +32,35 @@ export function createDust(x, y, count = 6, spread = 3) {
     }
 }
 
+// Foguete do SKY DROP: chamas descendo e fumaça por baixo de quem sobe
+export function rocketTrail(x, y) {
+    const R = FX.rocket;
+    for (let i = 0; i < R.flamesPerFrame; i++) {
+        state.particles.push({
+            x: x + (Math.random() - 0.5) * 10,
+            y,
+            vx: (Math.random() - 0.5) * 2.5,
+            vy: R.flameSpeed * (0.6 + Math.random() * 0.6),
+            radius: 3 + Math.random() * 4,
+            color: R.flames[Math.floor(Math.random() * R.flames.length)],
+            kind: 'glow',
+            life: 0.8
+        });
+    }
+    for (let i = 0; i < R.smokePerFrame; i++) {
+        state.particles.push({
+            x: x + (Math.random() - 0.5) * 14,
+            y: y + 6,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: 1 + Math.random() * 1.5,
+            radius: 6 + Math.random() * 6,
+            color: '#ffffff',
+            kind: 'dust',
+            life: 0.9
+        });
+    }
+}
+
 // Estrela de impacto: aparece grande, gira e some
 export function addBurst(x, y, size, color = '#ffd32a') {
     state.bursts.push({ x, y, size, color, life: FX.star.life, rot: Math.random() * Math.PI });

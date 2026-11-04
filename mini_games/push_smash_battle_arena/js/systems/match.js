@@ -1,4 +1,4 @@
-import { ARENA, MATCH, SPAWN } from '../../data_model/match.js';
+import { ARENA, MATCH } from '../../data_model/match.js';
 import { PLAYERS } from '../../data_model/players.js';
 import { STAGES } from '../../data_model/stages.js';
 import { TEXTS } from '../../data_model/texts.js';
@@ -8,8 +8,8 @@ import { W } from '../core/canvas.js';
 import { keys } from '../core/input.js';
 import { state } from '../core/state.js';
 import { players } from '../entities/player.js';
-import { updateScoreHUD, updateWinsHUD } from '../ui/hud.js';
-import { btnReward, hintP2, hintP2Human, menuSub, menuTitle, screenMenu } from '../ui/menu.js';
+import { updateHeartsHUD, updateWinsHUD } from '../ui/hud.js';
+import { hintP2, hintP2Human, menuSub, menuTitle, screenMenu } from '../ui/menu.js';
 import { buildTouchControls } from '../ui/touch_controls.js';
 import { getSelection } from '../ui/character_select.js';
 import { keepCharacterAtlases } from '../render/character_sprites.js';
@@ -26,7 +26,6 @@ export function startMatch(isBot) {
     updateWinsHUD();
     players[1].controls.isBot = isBot;
     players[1].name = isBot ? PLAYERS[1].botName : PLAYERS[1].name;
-    document.getElementById('nameP2').innerText = players[1].name;
     hintP2.innerText = isBot ? TEXTS.botHint : hintP2Human;
     buildTouchControls();
     screenMenu.classList.add('hidden');
@@ -37,17 +36,11 @@ export function startMatch(isBot) {
 export function startRound() {
     platform.width = ARENA.platform.fullWidth;
     platform.x = (W - platform.width) / 2;
-    state.airDrops = [];
-    state.spawnableCoins = [];
-    state.massBlobs = [];
     state.particles = [];
     state.bursts = [];
     state.rings = [];
     state.popups = [];
     state.history = [];
-    state.bombHolder = null;
-    state.coinSpawnTimer = 0;
-    state.dropSpawnTimer = SPAWN.dropEveryFrames - SPAWN.firstDropFrames;
     state.hitCooldown = 0;
     state.hitStop = 0;
     state.matchTimer = MATCH.roundTime;
@@ -57,7 +50,7 @@ export function startRound() {
     document.getElementById('timerDisplay').innerText = state.matchTimer;
     document.getElementById('roundLabel').innerText = TEXTS.roundLabel(state.roundNumber);
     players.forEach(p => p.reset());
-    updateScoreHUD();
+    updateHeartsHUD();
     state.countdownFrames = MATCH.countdownFrames;
     state.lastCount = 0;
     state.gameState = 'COUNTDOWN';
@@ -68,7 +61,6 @@ export function showGameOverMenu(winnerText, subText) {
     syncMusic();
     menuTitle.innerText = winnerText;
     menuSub.innerText = subText;
-    btnReward.classList.remove('hidden');
     screenMenu.classList.remove('hidden');
 }
 

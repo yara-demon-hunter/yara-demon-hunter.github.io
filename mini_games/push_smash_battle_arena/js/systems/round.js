@@ -1,4 +1,3 @@
-import { COINS_STORAGE_KEY } from '../../data_model/controls.js';
 import { MATCH } from '../../data_model/match.js';
 import { TEXTS } from '../../data_model/texts.js';
 import { shrinkPlatform } from '../core/arena.js';
@@ -23,9 +22,9 @@ export function updateRoundTimer() {
 export function endRoundByTimer() {
     const [p1, p2] = players;
     let winner = null;
-    if (p1.matchCoins > p2.matchCoins) winner = p1;
-    else if (p2.matchCoins > p1.matchCoins) winner = p2;
-    endRound(winner, 'coins');
+    if (p1.hearts > p2.hearts) winner = p1;
+    else if (p2.hearts > p1.hearts) winner = p2;
+    endRound(winner, 'hearts');
 }
 
 
@@ -34,14 +33,9 @@ export function endRound(winner, reason) {
     if (winner) winner.roundWins++;
     updateWinsHUD();
 
-    // Salvar Moedas Totais
-    state.coins += players[0].matchCoins;
-    localStorage.setItem(COINS_STORAGE_KEY, state.coins);
-    document.getElementById('coinsCount').innerText = state.coins;
-
     const text = !winner ? TEXTS.draw
         : reason === 'ko' ? TEXTS.winRoundKo(winner.name)
-        : TEXTS.winRoundCoins(winner.name);
+        : TEXTS.winRoundHearts(winner.name);
     showBanner(text, winner ? winner.color : '#c5c6c7', 1800);
     state.roundResult = winner;
     state.stateFrames = MATCH.roundEndFrames;

@@ -8,6 +8,7 @@ const k = ARENA.scale;
 // decor: silhuetas em cima da primeira camada de morros (cactus | pine | null)
 // ambient: partículas vivas no ar (fireflies | sand | snow)
 // platform.underside: o que pende embaixo da plataforma (crystals | rocks | icicles)
+// edge: cores da borda do chão desta arena (substitui as de SCENERY.edge; warn/danger continuam avisando)
 export const STAGE_VISUALS = {
     night: {
         sky: ['#161a33', '#0d1022', '#07080f'],
@@ -35,6 +36,7 @@ export const STAGE_VISUALS = {
             { color: '#a3603a', base: 380 * k, amplitude: 30 * k, seed: 17, shape: 'dunes' }
         ],
         decor: { type: 'cactus', color: '#6b3826', count: 5, seed: 4 },
+        edge: { safe: '#7a4a24' },     // borda do chão marrom (o azul neon não combina com a areia)
         fog: 'rgba(255, 170, 90, 0.18)',
         ambient: { type: 'sand', count: 26, color: '#ffd9a0', size: 4 },
         platform: {

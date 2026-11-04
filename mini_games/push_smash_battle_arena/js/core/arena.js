@@ -23,7 +23,7 @@ export function shrinkPlatform(px) {
 // --- FORMATO DO CHÃO ---
 // Plataforma reta (padrão) ou rampa em U (halfpipe). Na rampa, `platform` é a largura total do U: o meio é
 // reto e cada ponta sobe num arco de raio `radius`, tangente ao chão (por isso não há quina).
-export const terrain = { type: 'flat', radius: 0, thickness: 0, slopeDamping: 1 };
+export const terrain = { type: 'flat', radius: 0, thickness: 0, slopeDamping: 1, wavelength: 0, height: 0, ledges: [] };
 const MIN_HALFPIPE_FLAT = 120;     // px de chão reto que sempre sobra no meio do U
 
 export function setTerrain(config) {
@@ -31,10 +31,14 @@ export function setTerrain(config) {
     terrain.radius = config?.radius ?? 0;
     terrain.thickness = config?.thickness ?? 0;
     terrain.slopeDamping = config?.slopeDamping ?? 1;
+    terrain.wavelength = config?.wavelength ?? 0;
+    terrain.height = config?.height ?? 0;
+    terrain.ledges = config?.ledges ?? [];
 }
 
 // Parte reta do chão (a plataforma inteira, ou só o meio do U)
 export function flatRange() {
+    if (terrain.type === 'zigzag') return { l: 0, r: 0 };          // não tem parte reta
     if (terrain.type !== 'halfpipe') return { l: platform.x, r: platform.x + platform.width };
     return { l: platform.x + terrain.radius, r: platform.x + platform.width - terrain.radius };
 }
@@ -50,9 +54,30 @@ export function arcs() {
 // Altura do chão em x (null = não há chão ali, é o vazio)
 export function groundYAt(x) {
     if (x < platform.x || x > platform.x + platform.width) return null;
+    if (terrain.type === 'zigzag') return zigzagY(x, platform.x, platform.width, platform.y);
     for (const a of arcs()) {
         const dx = x - a.cx;
         if (dx * a.side > 0) return a.cy + Math.sqrt(Math.max(0, a.r * a.r - dx * dx));
     }
     return platform.y;
+}
+
+// Chão em "WWW": pico pontudo no centro e a cada `wavelength`, vales redondos entre eles
+export function zigzagY(x, left, width, baseY) {
+    const u = x - (left + width / 2);
+    return baseY - terrain.height * (1 - Math.abs(Math.sin(Math.PI * u / terrain.wavelength)));
+}
+
+// Plataformas no alto (só em arenas que têm)
+export function ledges() {
+    return terrain.ledges;
+}
+
+// Superfície mais alta logo abaixo de (x, y): plataforma no alto ou chão (null = vazio)
+export function surfaceBelow(x, y) {
+    let best = groundYAt(x);
+    for (const l of terrain.ledges) {
+        if (x >= l.x && x <= l.x + l.width && l.y >= y && (best === null || l.y < best)) best = l.y;
+    }
+    return best;
 }

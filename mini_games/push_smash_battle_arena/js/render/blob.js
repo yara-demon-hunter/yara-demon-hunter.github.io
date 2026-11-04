@@ -1,20 +1,20 @@
 import { CHARACTER_STYLE as S } from '../../data_model/visuals/characters.js';
 import { CHARACTER_ATLAS as A, FX } from '../../data_model/visuals/sprites.js';
-import { groundYAt } from '../core/arena.js';
+import { platform, surfaceBelow } from '../core/arena.js';
 import { ctx } from '../core/canvas.js';
 import { state } from '../core/state.js';
 import { ANIM_START, artFor, CELL_UNITS, frameRect, getCharacterAtlas, hasLivePupils } from './character_sprites.js';
-import { drawGlow, getShadowSprite } from './fx/sprites.js';
+import { getShadowSprite } from './fx/sprites.js';
 
 // --- DESENHO DOS LUTADORES ---
 // Guarda só o que o desenho precisa (o replay do K.O. repete esses instantâneos).
 export function snap(p) {
     return {
         char: p.charIndex, x: p.x, y: p.y, r: p.radius, sx: p.sx, sy: p.sy, vx: p.vx, vy: p.vy,
-        alive: p.isAlive, stun: p.stunTimer, taunt: p.tauntTimer, shield: p.hasShield,
+        alive: p.isAlive, stun: p.stunTimer, taunt: p.tauntTimer,
         facing: p.facing, pound: p.isPounding, dashing: p.isDashing, grounded: p.isGrounded,
-        runPhase: p.runPhase, bomb: state.bombHolder === p, color: p.color, t: state.frameCount,
-        speed: p.speedTimer > 0, knock: p.knockTimer > 0
+        runPhase: p.runPhase, color: p.color, t: state.frameCount,
+        aim: p.skyDrop > 0 || p.skyFalling
     };
 }
 
@@ -25,7 +25,6 @@ function pickFrame(s) {
     let i = 0;
     if (s.stun > 0) { anim = 'stun'; i = Math.floor(s.t / 6) % count('stun'); }
     else if (s.pound) anim = 'pound';
-    else if (s.bomb) { anim = 'scared'; i = Math.floor(s.t / 6) % count('scared'); }
     else if (s.taunt > 0) { anim = 'taunt'; i = Math.floor(s.t / 5) % count('taunt'); }
     else if (s.dashing) anim = 'dash';
     else if (!s.grounded) { anim = 'jump'; i = s.vy < 0 ? 0 : 1; }
@@ -55,7 +54,7 @@ export function drawGhost(s, t) {
 }
 
 function drawShadow(s) {
-    const ground = groundYAt(s.x);
+    const ground = surfaceBelow(s.x, s.y);
     if (ground === null) return;
     const height = ground - (s.y + s.r);
     if (height < -6) return;
@@ -71,24 +70,9 @@ export function drawBlob(s) {
     const r = s.r;
     drawShadow(s);
 
-    // Brilho dos buffs (sem shadowBlur)
-    if (s.knock) drawGlow(ctx, '#a55eea', s.x, s.y, r * 2.3, 0.55 + 0.15 * Math.sin(s.t * 0.3));
-    else if (s.speed) drawGlow(ctx, '#ffd32a', s.x, s.y, r * 2.1, 0.5 + 0.15 * Math.sin(s.t * 0.3));
-
     ctx.save();
     ctx.translate(s.x, s.y + r * (1 - s.sy)); // mantém os "pés" no chão ao achatar
     ctx.scale(s.sx, s.sy);
-
-    // Escudo
-    if (s.shield) {
-        ctx.beginPath();
-        ctx.arc(0, 0, r + 7, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(38, 222, 129, 0.12)';
-        ctx.fill();
-        ctx.strokeStyle = '#26de81';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-    }
 
     // Lutador: um drawImage do atlas, espelhado para o lado em que olha
     const { anim, i, k } = pickFrame(s);
@@ -131,21 +115,47 @@ export function drawBlob(s) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Bomba na cabeça
-    if (s.bomb) {
-        const bx = s.x;
-        const by = top - m.size - 14;
-        ctx.beginPath();
-        ctx.arc(bx, by, 10, 0, Math.PI * 2);
-        ctx.fillStyle = state.bombTimer < 90 && state.frameCount % 10 < 5 ? '#ff4757' : '#2f3542';
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        drawGlow(ctx, '#ff7f50', bx + 6, by - 11, 6 + Math.random() * 3, 0.9);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 11px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(Math.ceil(state.bombTimer / 60), bx, by + 4);
+}
+
+// Mira do SKY DROP: no chão, logo abaixo de quem está lá no alto. Acende quando o rival está embaixo;
+// fica vermelha quando não há chão embaixo (cair ali é cair da arena).
+export function drawReticle(s, rival) {
+    if (!s.aim) return;
+    const R = FX.reticle;
+    const ground = surfaceBelow(s.x, s.y + s.r);
+    const gy = ground ?? platform.y;
+    const locked = ground !== null && rival && rival.alive && Math.abs(rival.x - s.x) < rival.r + s.r * 0.5;
+    const color = ground === null ? R.voidColor : locked ? R.lockColor : s.color;
+    const pulse = 1 + 0.12 * Math.sin(s.t * (locked ? R.pulse * 2 : R.pulse));
+    const closing = s.pound ? 0.55 + 0.45 * Math.min(1, Math.max(0, gy - s.y) / 500) : 1; // fecha enquanto ele cai
+    const rx = R.radius * pulse * closing;
+    const ry = rx * R.flatten;
+
+    ctx.fillStyle = color;
+    ctx.globalAlpha = locked ? 0.35 : 0.18;
+    ctx.beginPath();
+    ctx.ellipse(s.x, gy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Anel + quatro marcas girando
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = R.width;
+    ctx.beginPath();
+    ctx.ellipse(s.x, gy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    const spin = s.t * R.spin;
+    ctx.beginPath();
+    for (let k = 0; k < 4; k++) {
+        const a = spin + k * Math.PI / 2;
+        const c = Math.cos(a);
+        const n = Math.sin(a);
+        ctx.moveTo(s.x + c * rx * 0.45, gy + n * ry * 0.45);
+        ctx.lineTo(s.x + c * rx * 1.35, gy + n * ry * 1.35);
     }
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(s.x, gy, 3, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
 }

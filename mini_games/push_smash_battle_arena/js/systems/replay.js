@@ -7,7 +7,6 @@ import { state } from '../core/state.js';
 import { otherPlayer, players } from '../entities/player.js';
 import { showBanner } from './effects.js';
 import { endRound } from './round.js';
-import { updateScoreHUD } from '../ui/hud.js';
 
 export function triggerKO(loser) {
     if (state.gameState !== 'PLAYING') return;
@@ -15,8 +14,6 @@ export function triggerKO(loser) {
     state.cameraShake = COMBAT.shake.ko;
     state.koWinner = otherPlayer(loser);
     state.koLoserIndex = players.indexOf(loser);
-    state.koWinner.matchCoins += COMBAT.koBonusCoins;
-    updateScoreHUD();
     showBanner(TEXTS.ko, '#ff4757', 900, true);
     state.replayFrames = state.history.slice(-COMBAT.replayFrames);
     state.gameState = 'KO';

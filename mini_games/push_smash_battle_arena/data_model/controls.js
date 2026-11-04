@@ -11,5 +11,3 @@ export const JOYSTICK = {
 
 export const SETTINGS_DEFAULTS = { size: 1, offX: 14, offY: 14, swap: false, music: true, sfx: true };
 export const SETTINGS_STORAGE_KEY = 'pushsmash_settings';
-export const COINS_STORAGE_KEY = 'mda_coins';
-export const AD_REWARD_COINS = 50;

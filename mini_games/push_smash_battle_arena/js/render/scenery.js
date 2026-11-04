@@ -2,7 +2,7 @@ import { ARENA } from '../../data_model/match.js';
 import { PLAYERS } from '../../data_model/players.js';
 import { STAGES } from '../../data_model/stages.js';
 import { SCENERY as C, STAGE_VISUALS } from '../../data_model/visuals/arena.js';
-import { leftWall, platform, rightWall, terrain } from '../core/arena.js';
+import { leftWall, platform, rightWall, setTerrain, terrain, zigzagY } from '../core/arena.js';
 import { H, W, ctx } from '../core/canvas.js';
 import { state } from '../core/state.js';
 import { drawGlow, getGlowSprite, makeCanvas } from './fx/sprites.js';
@@ -322,6 +322,64 @@ function drawHalfpipe(g, P, edgeColor, x, y, width, scale = 1) {
     g.stroke();
 }
 
+// Chão em "WWW": arenito com camadas, picos pontudos e borda neon seguindo o desenho
+function drawZigzag(g, P, edgeColor, x, y, width, scale = 1) {
+    const T = terrain.thickness;
+    const surface = (dy) => {
+        g.beginPath();
+        for (let px = x; px <= x + width; px += 4) g.lineTo(px * scale, (zigzagY(px, x, width, y) + dy) * scale);
+        g.lineTo((x + width) * scale, (zigzagY(x + width, x, width, y) + dy) * scale);
+    };
+    surface(0);
+    g.lineTo((x + width) * scale, (y + T) * scale);
+    g.lineTo(x * scale, (y + T) * scale);
+    g.closePath();
+    g.fillStyle = P.stone;
+    g.fill();
+    g.strokeStyle = P.stoneDark;
+    g.lineWidth = 3 * scale;
+    g.lineJoin = 'round';
+    g.stroke();
+    // Camadas do arenito
+    g.globalAlpha = 0.5;
+    g.strokeStyle = P.crack;
+    g.lineWidth = 2 * scale;
+    [16, 28].forEach((dy) => { surface(dy); g.stroke(); });
+    g.globalAlpha = 1;
+    surface(6);
+    g.strokeStyle = P.stoneLight;
+    g.lineWidth = 6 * scale;
+    g.stroke();
+    surface(0);
+    g.strokeStyle = edgeColor;
+    g.lineWidth = 3.5 * scale;
+    g.stroke();
+}
+
+// Plataformas no alto: lajes de pedra com a borda de cima clara
+function drawLedges(g, P, edgeColor, scale = 1) {
+    terrain.ledges.forEach((l) => {
+        const x = l.x * scale;
+        const y = l.y * scale;
+        const w = l.width * scale;
+        const h = 16 * scale;
+        g.fillStyle = P.stoneDark;
+        g.beginPath();
+        g.roundRect(x, y + 2 * scale, w, h, 6 * scale);
+        g.fill();
+        g.fillStyle = P.stone;
+        g.beginPath();
+        g.roundRect(x, y, w, h - 3 * scale, 6 * scale);
+        g.fill();
+        g.fillStyle = P.stoneLight;
+        g.fillRect(x + 4 * scale, y + 2 * scale, w - 8 * scale, 3 * scale);
+        g.fillStyle = edgeColor;
+        g.globalAlpha = 0.8;
+        g.fillRect(x + 6 * scale, y, w - 12 * scale, 2 * scale);
+        g.globalAlpha = 1;
+    });
+}
+
 export function drawArena() {
     const art = getStageArt(STAGES[state.stage].id);
     ctx.drawImage(art.background, 0, 0);
@@ -335,12 +393,17 @@ export function drawArena() {
 
     // Borda neon: muda de cor conforme a plataforma encolhe
     const danger = 1 - (platform.width - ARENA.platform.minWidth) / (ARENA.platform.fullWidth - ARENA.platform.minWidth);
-    const e = C.edge;
+    const e = { ...C.edge, ...art.v.edge };
     const color = danger > e.dangerAt ? e.danger : danger > e.warnAt ? e.warn : e.safe;
     drawGlow(ctx, color, platform.x + platform.width / 2, platform.y, platform.width * 0.55, 0.12);
 
+    drawLedges(ctx, art.v.platform, color);
     if (terrain.type === 'halfpipe') {
         drawHalfpipe(ctx, art.v.platform, color, platform.x, platform.y, platform.width);
+        return;
+    }
+    if (terrain.type === 'zigzag') {
+        drawZigzag(ctx, art.v.platform, color, platform.x, platform.y, platform.width);
         return;
     }
     drawPlatformParts(ctx, art.platform, platform.x, platform.y, platform.width);
@@ -356,11 +419,14 @@ export function drawStagePreview(g, stageIndex, width, height) {
     g.drawImage(art.walls[0], leftWall.x * s, leftWall.y * s, leftWall.width * s, leftWall.height * s);
     g.drawImage(art.walls[1], rightWall.x * s, rightWall.y * s, rightWall.width * s, rightWall.height * s);
     const stage = STAGES[stageIndex];
-    if (stage.terrain?.type === 'halfpipe') {
-        // A miniatura usa o mesmo caminho da arena, com o terreno dessa fase
+    if (stage.terrain) {
+        // A miniatura usa o mesmo desenho da arena, com o terreno dessa fase
         const saved = { ...terrain };
-        terrain.type = stage.terrain.type; terrain.radius = stage.terrain.radius; terrain.thickness = stage.terrain.thickness;
-        drawHalfpipe(g, art.v.platform, C.edge.safe, (W - ARENA.platform.fullWidth) / 2, ARENA.platform.y, ARENA.platform.fullWidth, s);
+        setTerrain(stage.terrain);
+        const x = (W - ARENA.platform.fullWidth) / 2;
+        drawLedges(g, art.v.platform, (art.v.edge?.safe ?? C.edge.safe), s);
+        if (terrain.type === 'halfpipe') drawHalfpipe(g, art.v.platform, (art.v.edge?.safe ?? C.edge.safe), x, ARENA.platform.y, ARENA.platform.fullWidth, s);
+        else if (terrain.type === 'zigzag') drawZigzag(g, art.v.platform, (art.v.edge?.safe ?? C.edge.safe), x, ARENA.platform.y, ARENA.platform.fullWidth, s);
         Object.assign(terrain, saved);
         return;
     }

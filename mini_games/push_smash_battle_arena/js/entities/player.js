@@ -5,20 +5,19 @@ import { STAGES } from '../../data_model/stages.js';
 import { CHARACTER_ART } from '../../data_model/visuals/characters.js';
 import { COMBAT } from '../../data_model/combat.js';
 import { KEYS } from '../../data_model/controls.js';
-import { ARENA, ITEMS } from '../../data_model/match.js';
-import { MASS, MOVEMENT, PHYSICS } from '../../data_model/physics.js';
+import { ARENA, MATCH } from '../../data_model/match.js';
+import { MOVEMENT, PHYSICS } from '../../data_model/physics.js';
 import { CHARACTER_ATLAS as A } from '../../data_model/visuals/sprites.js';
 import { PLAYERS } from '../../data_model/players.js';
 import { TEXTS } from '../../data_model/texts.js';
-import { playSound } from '../audio/sound.js';
-import { arcs, flatRange, leftWall, platform, rightWall, terrain } from '../core/arena.js';
+import { WHISTLE } from '../../data_model/audio.js';
+import { playSound, setLoop, stopLoop } from '../audio/sound.js';
+import { arcs, flatRange, groundYAt, ledges, leftWall, platform, rightWall, terrain } from '../core/arena.js';
 import { H, W } from '../core/canvas.js';
 import { keys } from '../core/input.js';
 import { state } from '../core/state.js';
-import { giveBomb } from '../systems/bomb.js';
-import { addBurst, addPopup, addRing, createDust, createParticles } from '../systems/effects.js';
+import { addBurst, addPopup, addRing, createDust, createParticles, rocketTrail } from '../systems/effects.js';
 import { triggerKO } from '../systems/replay.js';
-import { updateScoreHUD } from '../ui/hud.js';
 
 export class Player {
     constructor(id, x, name, color, controls) {
@@ -63,32 +62,32 @@ export class Player {
         this.upHeld = false;
         this.runPhase = 0;
         this.onSlope = false;
+        this.onLedge = false;
+        this.dropTimer = 0;
         this.hold = { x: 0, y: 0 };
         this.chain = { x: 0, y: 0 };       // cadeias de quiques, uma por eixo
         this.chainTimer = { x: 0, y: 0 };
         this.stunTimer = 0;
         this.tauntTimer = 0;
-        this.speedTimer = 0;
-        this.knockTimer = 0;
-        this.heavyTimer = 0;
-        this.hasShield = false;
         this.sx = 1; // squash & stretch
         this.sy = 1;
         this.downWasHeld = false;
         this.dashWasHeld = false;
         this.tauntWasHeld = false;
         this.wantTaunt = false;
-        this.matchCoins = 0;
+        this.hearts = MATCH.hearts;
+        this.skyDrop = 0;          // SKY DROP: frames restantes lá no alto (0 = fora dele)
+        this.skyAge = 0;
+        this.skyRising = false;    // ainda subindo como foguete
+        this.skyDropQueued = false; // apertou ▼ durante a subida: solta assim que chegar lá em cima
+        this.smashBounce = false;  // quicando depois de um smash (não vale como pisão até pousar)
+        this.skyFalling = false;   // caindo do SKY DROP (a mira continua no chão até pousar)
         this.trail = [];
     }
 
     get isDashing() { return this.dashTimer > 0; }
-    get effMass() { return this.mass * (this.heavyTimer > 0 ? MASS.heavyMultiplier : 1); }
-    get speedMul() { return this.character.speed * (this.speedTimer > 0 ? ITEMS.SPEED.multiplier : 1); }
-
-    addMass(d) {
-        this.mass = Math.min(PHYSICS.maxMass, Math.max(PHYSICS.minMass, this.mass + d));
-    }
+    get effMass() { return this.mass; }
+    get speedMul() { return this.character.speed; }
 
     squash(sx, sy) {
         this.sx = sx;
@@ -118,20 +117,18 @@ export class Player {
     botInput() {
         const input = { left: false, right: false, up: false, downPressed: false, dashPressed: false, tauntPressed: false };
         const opp = players.find(p => p !== this);
+        if (this.skyDrop > 0) {
+            // Lá no alto: alinha a mira com o rival e solta
+            const dx = opp.x - this.x;
+            input.left = dx < -BOT.deadZone;
+            input.right = dx > BOT.deadZone;
+            input.downPressed = this.skyAge >= BOT.skyDropMinHover && Math.abs(dx) < BOT.skyDropAim;
+            return input;
+        }
         const platEnd = platform.x + platform.width;
         const overPlatform = this.x > platform.x + 10 && this.x < platEnd - 10;
         let targetX = opp.isAlive ? opp.x : W / 2;
 
-        if (state.bombHolder === opp) {
-            // Fugir de quem está com a bomba
-            targetX = this.x < opp.x ? opp.x - BOT.bombFleeDistance : opp.x + BOT.bombFleeDistance;
-        } else if (state.bombHolder !== this) {
-            // Comer massa no chão, depois moedas se o rival estiver longe
-            const blob = nearest(this, state.massBlobs.filter(b => b.age > MASS.blobEatDelayFrames), BOT.blobSearchRadius);
-            const coin = nearest(this, state.spawnableCoins, BOT.coinSearchRadius);
-            if (blob) targetX = blob.x;
-            else if (coin && Math.abs(opp.x - this.x) > BOT.coinIgnoreWhenRivalWithin) targetX = coin.x;
-        }
 
         targetX = Math.max(platform.x + BOT.edgeMargin, Math.min(platEnd - BOT.edgeMargin, targetX));
         if (!overPlatform && !this.isGrounded) targetX = W / 2; // voltar pra arena
@@ -143,6 +140,10 @@ export class Player {
         if (this.isTouchingWall) input.up = true; // wall jump sempre joga pro centro
         else if (this.isGrounded && (Math.random() < BOT.jumpChance ||
             (Math.abs(dx) < BOT.nearRivalDistance && Math.random() < BOT.jumpChanceNearRival))) input.up = true;
+        // Rival atordoado: pula na cabeça dele para lançar outro SKY DROP
+        const stompStunned = opp.isAlive && opp.stunTimer > 0;
+        if (stompStunned && this.isGrounded && Math.abs(dx) < BOT.stompStunnedDistance &&
+            Math.random() < BOT.stompStunnedChance) input.up = true;
 
         // SMASH: caindo por cima do rival
         if (!this.isGrounded && opp.isAlive && opp.stunTimer === 0 && Math.abs(dx) < this.radius + opp.radius &&
@@ -151,7 +152,7 @@ export class Player {
         }
 
         // Dash de ataque
-        if (this.dashCooldown === 0 && Math.abs(dx) < BOT.dashDistance &&
+        if (!stompStunned && this.dashCooldown === 0 && Math.abs(dx) < BOT.dashDistance &&
             Math.abs(opp.y - this.y) < BOT.dashVerticalTolerance && Math.random() < BOT.dashChance) {
             input.dashPressed = true;
             input.left = dx < 0;
@@ -169,14 +170,14 @@ export class Player {
         if (!this.isAlive) return;
         if (this.dashCooldown > 0) this.dashCooldown--;
         if (this.dashTimer > 0) this.dashTimer--;
-        if (this.speedTimer > 0) this.speedTimer--;
-        if (this.knockTimer > 0) this.knockTimer--;
-        if (this.heavyTimer > 0) this.heavyTimer--;
         if (this.stunTimer > 0) this.stunTimer--;
         if (this.tauntTimer > 0) this.tauntTimer--;
         if (this.poundLag > 0) this.poundLag--;
+        if (this.dropTimer > 0) this.dropTimer--;
 
         const input = this.controls.isBot ? this.botInput() : this.humanInput();
+        if (this.skyFalling && !this.isPounding) this.skyFalling = false;
+        if (this.skyDrop > 0) return this.updateSkyDrop(input);
         const canAct = this.stunTimer === 0 && this.poundLag === 0 && !this.isPounding;
         const accel = MOVEMENT.runAccel * this.speedMul / Math.sqrt(this.effMass) * (this.isGrounded ? 1 : PHYSICS.airControl);
         this.upHeld = canAct && input.up;
@@ -213,6 +214,7 @@ export class Player {
                 this.triggerDash(input.right ? 1 : (input.left ? -1 : this.facing));
             }
             if (input.downPressed && !this.isGrounded) this.startPound();
+            else if (input.downPressed && this.onLedge) this.dropTimer = 14;     // desce da plataforma do alto
 
             if (input.tauntPressed && this.tauntTimer === 0) {
                 this.tauntTimer = MOVEMENT.tauntFrames;
@@ -299,45 +301,109 @@ export class Player {
             if (this.isPounding) this.landPound();
             else if (!wasGrounded && impactVy > BOUNCE.floor.minImpact) this.landBounce(impactVy);
         } else if (!overFlat) {
-            grounded = this.collideRamp();
+            grounded = terrain.type === 'zigzag' ? this.collideHeightfield() : this.collideRamp();
         } else {
             this.onSlope = false;
         }
-        this.isGrounded = grounded;
-
-        // Coletar Moedas na Arena
-        for (let i = state.spawnableCoins.length - 1; i >= 0; i--) {
-            const c = state.spawnableCoins[i];
-            if (Math.hypot(this.x - c.x, this.y - c.y) < this.radius + c.radius) {
-                playSound('coin');
-                this.matchCoins++;
-                updateScoreHUD();
-                createParticles(c.x, c.y, '#ffd32a', 10);
-                addPopup(c.x, c.y - 10, '+1', '#ffd32a');
-                addBurst(c.x, c.y, 22, '#fff3b0');
-                state.spawnableCoins.splice(i, 1);
+        // Plataformas no alto: mão única, só segura quem vem de cima
+        this.onLedge = false;
+        if (!grounded && this.dropTimer === 0) {
+            for (const l of ledges()) {
+                const prevBottom = this.y - this.vy + this.radius;
+                if (this.x > l.x - this.radius * 0.3 && this.x < l.x + l.width + this.radius * 0.3 &&
+                    this.vy >= 0 && prevBottom <= l.y + 2 && this.y + this.radius >= l.y) {
+                    const impactVy = this.vy;
+                    this.y = l.y - this.radius;
+                    this.vy = 0;
+                    grounded = true;
+                    this.onLedge = true;
+                    this.onSlope = false;
+                    if (this.isPounding) this.landPound();
+                    else if (!wasGrounded && impactVy > BOUNCE.floor.minImpact) this.landBounce(impactVy);
+                    break;
+                }
             }
         }
-
-        // Coletar Power-ups
-        for (let i = state.airDrops.length - 1; i >= 0; i--) {
-            const p = state.airDrops[i];
-            if (Math.hypot(this.x - p.x, this.y - p.y) >= this.radius + p.radius) continue;
-            playSound('dash');
-            createParticles(p.x, p.y, p.color, 18);
-            if (p.type === 'SPEED') this.speedTimer = ITEMS.SPEED.frames;
-            else if (p.type === 'KNOCKBACK') this.knockTimer = ITEMS.KNOCKBACK.frames;
-            else if (p.type === 'SHIELD') this.hasShield = true;
-            else if (p.type === 'HEAVY') this.heavyTimer = ITEMS.HEAVY.frames;
-            else if (p.type === 'BOMB') giveBomb(this);
-            state.airDrops.splice(i, 1);
-        }
+        this.isGrounded = grounded;
+        if (grounded || this.isTouchingWall) this.smashBounce = false;
 
         // Queda na Morte (K.O.)
         if ((this.y > H + PHYSICS.fallOutBottom || this.x < -PHYSICS.fallOutSides || this.x > W + PHYSICS.fallOutSides) && this.isAlive) {
             this.isAlive = false;
             triggerKO(this);
         }
+    }
+
+    // Chão em "WWW" (ou qualquer chão desenhado por uma função de altura): procura o ponto do chão mais perto
+    // do centro e empurra o lutador para fora dele. Só perde a velocidade que ia contra o chão, então escorrega
+    // dos picos para os vales.
+    collideHeightfield() {
+        this.onSlope = false;
+        const r = this.radius;
+        let best = null;
+        let bestD = Infinity;
+        for (let i = -8; i <= 8; i++) {
+            const px = this.x + (i * r) / 8;
+            const py = groundYAt(px);
+            if (py === null) continue;
+            const d = Math.hypot(this.x - px, this.y - py);
+            if (d < bestD) { bestD = d; best = [px, py]; }
+        }
+        if (!best) return false;
+        const gy = groundYAt(this.x);
+        // Veio pela lateral ou por baixo do bloco de areia (no quadro anterior já estava abaixo da superfície,
+        // ex.: caindo depois de bater na parede): não pode ser puxado para cima da rampa, tem que cair.
+        if (gy !== null && this.y > gy + r * 0.5) {
+            const prevX = this.x - this.vx;
+            const prevY = this.y - this.vy;
+            const prevGround = groundYAt(prevX);
+            const cameFromAbove = prevGround !== null && prevY <= prevGround + r * 0.5;
+            if (!cameFromAbove) {
+                if (this.y - r < platform.y + terrain.thickness) {
+                    // Ainda na altura do bloco: empurra para fora pela lateral mais próxima
+                    const leftSide = this.x < platform.x + platform.width / 2;
+                    this.x = leftSide ? platform.x - r : platform.x + platform.width + r;
+                    if (leftSide ? this.vx > 0 : this.vx < 0) this.vx = 0;
+                }
+                return false;
+            }
+        }
+        const sunk = gy !== null && this.y > gy;      // o centro passou para dentro do chão
+        if (!sunk && bestD >= r) return false;
+        let nx;
+        let ny;
+        if (sunk || bestD < 1e-6) {
+            const m = ((groundYAt(this.x + 1) ?? gy) - (groundYAt(this.x - 1) ?? gy)) / 2;   // inclinação
+            const len = Math.hypot(m, 1);
+            nx = m / len;
+            ny = -1 / len;
+            this.x = this.x + nx * r;
+            this.y = gy + ny * r;
+        } else {
+            nx = (this.x - best[0]) / bestD;
+            ny = (this.y - best[1]) / bestD;
+            this.x = best[0] + nx * r;
+            this.y = best[1] + ny * r;
+        }
+        const vn = this.vx * nx + this.vy * ny;      // negativo = indo contra o chão
+        if (vn < 0) {
+            if (this.isPounding) this.landPound();
+            this.vx -= nx * vn;
+            this.vy -= ny * vn;
+        }
+        this.onSlope = Math.abs(nx) > 0.12;
+        if (this.onSlope) {
+            this.vx *= terrain.slopeDamping;
+            this.vy *= terrain.slopeDamping;
+        }
+        // Em cima da ponta de um pico não dá para ficar: o chão desce dos dois lados, então escorrega
+        const yl = groundYAt(this.x - r * 0.5);
+        const yr = groundYAt(this.x + r * 0.5);
+        const top = groundYAt(this.x);
+        if (yl !== null && yr !== null && yl > top + 2 && yr > top + 2 && Math.abs(this.vx) < 1) {
+            this.vx += (this.vx === 0 ? this.facing : Math.sign(this.vx)) * 0.35;
+        }
+        return ny < -0.35;
     }
 
     // Rampa em U: a casca de gelo é sólida dos dois lados.
@@ -453,6 +519,85 @@ export class Player {
         playSound('land');
     }
 
+    // SKY DROP: lançado como um foguete depois de pisar na cabeça do rival
+    startSkyDrop() {
+        const s = COMBAT.skyDrop;
+        this.skyDrop = s.hoverFrames;
+        this.skyAge = 0;
+        this.skyRising = true;
+        this.skyDropQueued = false;
+        this.isPounding = false;
+        this.poundWindup = 0;
+        this.dashTimer = 0;
+        this.vy = -s.launchSpeed;
+        this.chain.y = 0;
+        playSound('rocket');
+        addRing(this.x, this.y + this.radius, 90, '#ffa502');
+        createDust(this.x, this.y + this.radius, 10, 5);
+    }
+
+    // Sobe acelerando até sair da tela; lá em cima anda pros lados (a mira no chão acompanha) com o assobio de queda
+    updateSkyDrop(input) {
+        const s = COMBAT.skyDrop;
+        this.skyAge++;
+        const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        if (dir) this.facing = dir;
+        this.vx += (dir * s.moveSpeed * this.character.speed - this.vx) * s.moveLerp;
+        this.x += this.vx;
+        const minX = leftWall.x + leftWall.width + this.radius;
+        const maxX = rightWall.x - this.radius;
+        if (this.x < minX || this.x > maxX) {
+            this.x = Math.max(minX, Math.min(maxX, this.x));
+            this.vx = 0;
+        }
+        this.isGrounded = false;
+        this.isTouchingWall = false;
+        this.onLedge = false;
+        this.onSlope = false;
+        if (input.downPressed) this.skyDropQueued = true;
+
+        if (this.skyRising) {
+            this.vy = Math.max(this.vy - s.rocketAccel, -s.rocketMaxSpeed);
+            this.y += this.vy;
+            this.sx = 0.72;
+            this.sy = 1.45;
+            rocketTrail(this.x, this.y + this.radius);
+            this.trail.push({ x: this.x, y: this.y, alpha: 0.6 });
+            if (this.trail.length > 6) this.trail.shift();
+            if (this.y <= s.hoverY) {
+                this.y = s.hoverY;
+                this.skyRising = false;
+            }
+            return;
+        }
+
+        this.vy = 0;
+        this.skyDrop--;
+        this.sx += (1 - this.sx) * MOVEMENT.squashRecover;
+        this.sy += (1 - this.sy) * MOVEMENT.squashRecover;
+        if (this.trail.length > 0) this.trail.shift();
+        const w = WHISTLE;
+        const k = 1 - this.skyDrop / s.hoverFrames;
+        setLoop('whistle' + this.id, w.wave, w.from * Math.pow(w.to / w.from, k),
+            w.volumeFrom + (w.volumeTo - w.volumeFrom) * k, w.vibratoHz, w.vibratoDepth);
+        if (this.skyDrop === 0 || this.skyDropQueued) this.dropFromSky();
+    }
+
+    // Despenca em linha reta em cima da mira: é um SMASH (acerta o rival = tira coração; errou = fica preso)
+    dropFromSky() {
+        stopLoop('whistle' + this.id);
+        this.skyDrop = 0;
+        this.skyRising = false;
+        this.skyDropQueued = false;
+        this.skyFalling = true;
+        this.isPounding = true;
+        this.poundWindup = 0;
+        this.vx = 0;
+        this.vy = COMBAT.skyDrop.fallSpeed;
+        this.squash(0.7, 1.35);
+        playSound('dash');
+    }
+
     triggerDash(dir) {
         const skill = this.character.dash;
         this.dashTimer = skill.frames;
@@ -491,16 +636,6 @@ export class Player {
             opp.vy = -MOVEMENT.pound.shockLift;
         }
     }
-}
-
-export function nearest(from, list, maxDist) {
-    let best = null;
-    let bestD = maxDist;
-    list.forEach(o => {
-        const d = Math.hypot(o.x - from.x, o.y - from.y);
-        if (d < bestD) { best = o; bestD = d; }
-    });
-    return best;
 }
 
 // Os dois lutadores

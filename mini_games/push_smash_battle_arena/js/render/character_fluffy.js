@@ -114,8 +114,9 @@ function tail(g, spec, pose) {
         const [x2, y2] = at(t + 0.02);
         const a = Math.atan2(y2 - y, x2 - x) + Math.PI / 2;
         g.beginPath();
-        g.moveTo(x - Math.cos(a) * 0.22, y - Math.sin(a) * 0.22);
-        g.lineTo(x + Math.cos(a) * 0.22, y + Math.sin(a) * 0.22);
+        // Curtas o bastante para ficar dentro da cauda (a cauda tem ~0,39 de meia largura, menos a borda)
+        g.moveTo(x - Math.cos(a) * 0.14, y - Math.sin(a) * 0.14);
+        g.lineTo(x + Math.cos(a) * 0.14, y + Math.sin(a) * 0.14);
         g.stroke();
     });
     line(0.8, 1, 0.78, spec.tailTip);

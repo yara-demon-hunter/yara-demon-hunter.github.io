@@ -62,6 +62,11 @@ function bake(rosterIndex) {
     const canvas = makeCanvas(cell * A.columns, cell * rows, (g) => {
         frames.forEach((f, k) => {
             g.save();
+            // Cada quadro fica preso na própria célula: nada vaza para o quadro vizinho (o vazamento aparecia
+            // em campo como um risquinho na beira do lutador)
+            g.beginPath();
+            g.rect((k % A.columns) * cell, Math.floor(k / A.columns) * cell, cell, cell);
+            g.clip();
             g.translate(((k % A.columns) + 0.5) * cell, (Math.floor(k / A.columns) + 0.5) * cell);
             g.scale(unit, unit);
             drawCharacter(g, spec, POSES[f.anim](f.i, f.count));

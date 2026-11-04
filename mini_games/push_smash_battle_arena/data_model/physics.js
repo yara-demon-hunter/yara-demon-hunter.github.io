@@ -8,8 +8,6 @@ export const PHYSICS = {
     maxSpeedX: 22,
     maxFallSpeed: 26,
     baseRadius: 20,            // raio da bola com massa 1
-    minMass: 0.45,
-    maxMass: 3.2,
     radiusLerp: 0.15,          // quão rápido o tamanho acompanha a massa
     wallSlideFactor: 0.6,      // cair colado na parede desacelera
     fallOutBottom: 60,         // K.O. quando passa disso abaixo da tela
@@ -37,14 +35,4 @@ export const MOVEMENT = {
     tauntFrames: 45,
     squashRecover: 0.18,
     stunSquash: { x: 1.7, y: 0.35 }
-};
-
-export const MASS = {
-    heavyMultiplier: 2,        // item HEAVY
-    blobCount: 3,              // pedaços que caem quando alguém perde massa
-    blobBaseRadius: 6,
-    blobRadiusPerMass: 25,
-    blobLifeFrames: 600,
-    blobEatDelayFrames: 20,
-    blobAirDrag: 0.98
 };

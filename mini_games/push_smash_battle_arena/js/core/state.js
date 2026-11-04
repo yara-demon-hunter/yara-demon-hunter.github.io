@@ -2,7 +2,6 @@
 import { H, W } from './canvas.js';
 
 export const state = {
-    coins: parseInt(localStorage.getItem('mda_coins') || '0'),
     // MENU | COUNTDOWN | PLAYING | KO | REPLAY | ROUND_END
     gameState: 'MENU',
     isBotMatch: true,
@@ -23,14 +22,6 @@ export const state = {
     roundResult: null,
 
     // Arena
-    airDrops: [],
-    spawnableCoins: [],
-    massBlobs: [],
-    coinSpawnTimer: 0,
-    dropSpawnTimer: 0,
-    bombHolder: null,
-    bombTimer: 0,
-    bombPassCd: 0,
     particles: [],
     bursts: [],        // estrelas de impacto
     rings: [],         // ondas de choque

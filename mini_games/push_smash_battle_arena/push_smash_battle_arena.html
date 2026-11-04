@@ -13,13 +13,12 @@
 
     <div class="ui-layer">
         <div class="scoreboard">
-            <span class="p1-score"><span class="p-name">P1</span><span class="pips" id="winsP1">○○○</span>🪙 <span id="scoreP1">0</span></span>
-            <span class="p2-score">🪙 <span id="scoreP2">0</span><span class="pips" id="winsP2">○○○</span><span class="p-name" id="nameP2">P2</span></span>
+            <span class="p1-score"><span class="hearts" id="heartsP1">♥♥♥</span><span class="pips" id="winsP1">○○○</span></span>
+            <span class="p2-score"><span class="hearts" id="heartsP2">♥♥♥</span><span class="pips" id="winsP2">○○○</span></span>
         </div>
         <div class="timer-display" id="timerDisplay">60</div>
         <div class="round-label" id="roundLabel">ROUND 1</div>
         <div id="comboBanner" class="combo-banner">SMASH!</div>
-        <div class="coins-display">🪙 <span id="coinsCount">0</span></div>
         <div class="controls-hint">
             <span>P1: [W] Jump | [A/D] Move | [E] Dash | [S] SMASH in air | [Q] Taunt</span>
             <span id="hintP2">P2: [↑] Jump | [←/→] Move | [/] Dash | [↓] SMASH in air | [Right Shift] Taunt</span>
@@ -29,7 +28,7 @@
     <!-- Tela Inicial / Game Over -->
     <div id="screenMenu" class="overlay menu">
         <h1 id="menuTitle">PUSH & SMASH</h1>
-        <p id="menuSub">Best of 5 rounds! Drop on your rival to SQUASH them and eat the mass they lose.</p>
+        <p id="menuSub">Best of 5 rounds! 3 hearts each. SMASH your rival from above, or stomp their head to SKY DROP!</p>
         <div class="select-row">
             <div class="picker" id="picker0"></div>
             <span class="vs">VS</span>
@@ -40,7 +39,6 @@
             <button id="btn1Player" class="btn">1 PLAYER (VS AI BOT)</button>
             <button id="btn2Players" class="btn btn-p2">2 PLAYERS (1 KEYBOARD)</button>
         </div>
-        <button id="btnReward" class="btn btn-reward hidden">📺 WATCH AD (+50 COINS)</button>
     </div>
     <button id="btnGear" class="gear-btn" aria-label="Settings" title="Settings (Esc)">🎮</button>
 

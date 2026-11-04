@@ -1,17 +1,16 @@
 import { BOUNCE } from '../../data_model/bounce.js';
 import { COMBAT } from '../../data_model/combat.js';
-import { BOMB } from '../../data_model/match.js';
-import { PHYSICS } from '../../data_model/physics.js';
 import { TEXTS } from '../../data_model/texts.js';
 import { playSound } from '../audio/sound.js';
 import { shrinkPlatform } from '../core/arena.js';
 import { state } from '../core/state.js';
-import { otherPlayer, players } from '../entities/player.js';
+import { players } from '../entities/player.js';
 import { addBurst, addPopup, addRing, createDust, createParticles, showBanner } from './effects.js';
-import { spawnMassBlobs } from './mass.js';
+import { triggerKO } from './replay.js';
+import { updateHeartsHUD } from '../ui/hud.js';
 
 export function impactForce(attacker, victim) {
-    let f = (attacker.isDashing ? COMBAT.dashHitForce : COMBAT.hitForce) * (attacker.knockTimer > 0 ? COMBAT.knockbackBuff : 1) *
+    let f = (attacker.isDashing ? COMBAT.dashHitForce : COMBAT.hitForce) *
         Math.sqrt(attacker.effMass / victim.effMass);
     if (attacker.isDashing) f *= attacker.character.dash.hitForceMultiplier ?? 1;
     if (victim.stunTimer > 0) f *= COMBAT.stunnedVictimMultiplier; // amassado voa mais longe
@@ -27,6 +26,7 @@ export function resolvePlayerCollisions() {
     const p1 = players[0];
     const p2 = players[1];
     if (!p1.isAlive || !p2.isAlive) return;
+    if (p1.skyDrop > 0 || p2.skyDrop > 0) return; // lá no alto do SKY DROP ninguém se toca
 
     const dx = p2.x - p1.x;
     const dy = p2.y - p1.y;
@@ -48,20 +48,12 @@ export function resolvePlayerCollisions() {
     if (state.hitCooldown > 0) return;
     state.hitCooldown = COMBAT.hitCooldownFrames;
 
-    // Passar a bomba quente
-    if (state.bombHolder && state.bombPassCd === 0) {
-        state.bombHolder = otherPlayer(state.bombHolder);
-        state.bombPassCd = BOMB.passCooldownFrames;
-        addPopup(state.bombHolder.x, state.bombHolder.y - state.bombHolder.radius - 30, TEXTS.passed, '#ff7f50');
-        playSound('beep');
-    }
-
     if (isSmash(p1, p2)) return doSmash(p1, p2);
     if (isSmash(p2, p1)) return doSmash(p2, p1);
 
-    // Pisou na cabeça: quem caiu quica pra cima (mais alto segurando pra cima)
-    if (isHeadStomp(p1, p2)) return doHeadBounce(p1, p2);
-    if (isHeadStomp(p2, p1)) return doHeadBounce(p2, p1);
+    // Pisou na cabeça: SKY DROP (quem pisou é lançado lá pro alto e mira a queda)
+    if (isHeadStomp(p1, p2)) return doHeadStomp(p1, p2);
+    if (isHeadStomp(p2, p1)) return doHeadStomp(p2, p1);
 
     const anyDash = p1.isDashing || p2.isDashing;
     playSound('hit');
@@ -78,13 +70,11 @@ export function resolvePlayerCollisions() {
         p2.vy += j / p2.effMass * ny;
     }
 
-    // Chute extra de quem ataca (dash, item KNOCKBACK, massa), também ao longo da linha entre as bolas
+    // Chute extra de quem ataca (dash, massa), também ao longo da linha entre as bolas
     let forceP1 = impactForce(p2, p1);
     let forceP2 = impactForce(p1, p2);
-    if (p1.hasShield) { forceP1 = COMBAT.shieldedForce; p1.hasShield = false; }
-    else if (p1.isDashing) forceP1 *= p1.character.dash.incomingForceMultiplier ?? 1;
-    if (p2.hasShield) { forceP2 = COMBAT.shieldedForce; p2.hasShield = false; }
-    else if (p2.isDashing) forceP2 *= p2.character.dash.incomingForceMultiplier ?? 1;
+    if (p1.isDashing) forceP1 *= p1.character.dash.incomingForceMultiplier ?? 1;
+    if (p2.isDashing) forceP2 *= p2.character.dash.incomingForceMultiplier ?? 1;
     p1.vx -= nx * forceP1;
     p1.vy -= ny * forceP1;
     p2.vx += nx * forceP2;
@@ -114,34 +104,28 @@ export function resolvePlayerCollisions() {
 }
 
 export function isHeadStomp(a, v) {
-    return !a.isPounding && a.vy > BOUNCE.head.minFallSpeed && a.y < v.y - v.radius * BOUNCE.head.aboveRatio;
+    // Vale pisar no rival atordoado (lança outro SKY DROP), mas não no quique automático logo depois do smash:
+    // tem que pousar e pular de novo, senão todo smash viraria SKY DROP sozinho
+    return !a.isPounding && !a.smashBounce && a.vy > BOUNCE.head.minFallSpeed && a.y < v.y - v.radius * BOUNCE.head.aboveRatio;
 }
 
-// Pisar na cabeça: só o eixo vertical muda. O rival leva parte da queda (momento) e quem pisou quica
-export function doHeadBounce(a, v) {
-    const h = BOUNCE.head;
-    let out = a.vy * BOUNCE.restitution.head;
-    if (a.upHeld) {
-        a.chainUp('y');
-        out += h.pumpHeld + a.chain.y * h.pumpPerChain;
-    } else {
-        out += h.pumpBase;
-    }
-    v.vy = Math.max(v.vy, 0) + a.vy * h.victimMomentum * (a.effMass / v.effMass);
-    a.vy = -Math.min(out, h.maxSpeed);
-    a.squash(0.7, 1.4);
+// Pisar na cabeça: o rival leva parte da queda (momento) e quem pisou começa o SKY DROP
+export function doHeadStomp(a, v) {
+    v.vy = Math.max(v.vy, 0) + a.vy * BOUNCE.head.victimMomentum * (a.effMass / v.effMass);
     v.squash(1.4, 0.65);
+    a.startSkyDrop();
     state.hitStop = COMBAT.hitStopFrames.headBounce;
     state.cameraShake = Math.max(state.cameraShake, COMBAT.shake.headBounce);
     playSound('hit');
-    addPopup(a.x, a.y - a.radius - 14, a.upHeld && a.chain.y >= 2 ? `${TEXTS.bop} x${a.chain.y}` : TEXTS.bop, a.color);
+    addPopup(a.x, a.y - a.radius - 14, TEXTS.skyDrop, a.color);
     createParticles((a.x + v.x) / 2, v.y - v.radius, '#ffffff', 10);
     addBurst((a.x + v.x) / 2, v.y - v.radius, 34, '#ffffff');
 }
 
-// SMASH: cair do alto no rival amassa ele e arranca massa
+// SMASH: cair do alto no rival amassa ele e tira um coração (sem corações é K.O.)
 export function doSmash(attacker, victim) {
     attacker.isPounding = false;
+    attacker.smashBounce = true;
     attacker.vy = -COMBAT.smash.attackerBounce;
     attacker.vx *= 0.5;
     attacker.squash(1.4, 0.7);
@@ -149,29 +133,24 @@ export function doSmash(attacker, victim) {
     state.cameraShake = COMBAT.shake.smash;
     playSound('smash');
 
-    if (victim.hasShield) {
-        victim.hasShield = false;
-        addPopup(victim.x, victim.y - victim.radius - 12, TEXTS.blocked, '#26de81');
-        return;
-    }
-
     victim.stunTimer = COMBAT.smash.stunFrames;
     victim.isPounding = false;
     victim.dashTimer = 0;
     victim.vx += (victim.x - attacker.x) * COMBAT.smash.pushX;
     victim.vy = victim.isGrounded ? COMBAT.smash.victimFallOnGround : COMBAT.smash.victimFallInAir; // no ar vira meteoro pra baixo
 
-    const loss = Math.min(COMBAT.smash.massLoss, victim.mass - PHYSICS.minMass);
-    victim.addMass(-loss);
-    if (loss > 0.01) spawnMassBlobs(victim, loss);
+    victim.hearts = Math.max(0, victim.hearts - 1);
+    updateHeartsHUD();
 
-    showBanner(TEXTS.smash, attacker.color, 800);
     addPopup(victim.x, victim.y - victim.radius - 12, TEXTS.splat, '#ffffff');
+    addPopup(victim.x, victim.y - victim.radius - 40, TEXTS.heartLost, victim.color);
     createParticles(victim.x, victim.y, victim.color, 24, 14);
     addBurst(victim.x, victim.y, 78, '#ffffff');
     addRing(victim.x, victim.y + victim.radius, 110, victim.color);
     createDust(victim.x, victim.y + victim.radius, 8, 6);
     shrinkPlatform(COMBAT.smash.platformShrink);
+    if (victim.hearts === 0) return triggerKO(victim);
+    showBanner(TEXTS.smash, attacker.color, 800);
     if (attacker.controls.isBot && Math.random() < COMBAT.smash.botTauntChance) attacker.wantTaunt = true;
 }
 
