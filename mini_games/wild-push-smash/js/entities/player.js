@@ -43,6 +43,9 @@ export class Player {
 
     resetMatch() {
         this.roundWins = 0;
+        // Medidor de especial (0 a COMBAT.special.max): só zera na partida nova, passa de um round
+        // para o outro — quem apanhou muito chega no round seguinte com o TURBO perto para virar o jogo
+        this.special = 0;
     }
 
     reset() {
@@ -59,7 +62,6 @@ export class Player {
         this.isAlive = true;
         this.dashCooldown = 0;
         this.dashTimer = 0;
-        this.special = 0;          // medidor de especial (0 a COMBAT.special.max)
         this.turbo = false;        // o dash em andamento é o DASH TURBO
         this.isPounding = false;
         this.poundWindup = 0;
@@ -573,7 +575,7 @@ export class Player {
         this.special = Math.min(max, was + amount);
         if (was < max && this.special >= max) {
             playSound('coin');
-            addPopup(this.x, this.y - this.radius - 30, TEXTS.turboReady, '#ffd32a');
+            addPopup(this.x, this.y - this.radius - 30, TEXTS.turboReady, '#c45bff');
         }
     }
 

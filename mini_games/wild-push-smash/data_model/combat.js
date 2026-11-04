@@ -41,6 +41,7 @@ export const COMBAT = {
     },
     // MEDIDOR DE ESPECIAL: enche batendo e apanhando; cheio, o próximo DASH vira o DASH TURBO,
     // que tira um coração de quem acertar (K.O. se for o último). Errar gasta o medidor do mesmo jeito.
+    // O medidor passa de um round para o outro (só zera na partida nova): ajuda quem está perdendo a virar.
     special: {
         max: 100,
         passivePerFrame: 0.02,       // ~1,2 por segundo: mesmo sem bater, o medidor chega lá com o tempo
