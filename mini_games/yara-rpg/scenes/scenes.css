@@ -33,18 +33,33 @@
 .yara-scene-caption-visible { opacity: 1; }
 .yara-scene-skip {
     position: absolute;
-    top: .6rem;
-    right: .6rem;
-    padding: .3rem .7rem;
-    border: 1px solid rgba(243, 231, 198, .35);
-    border-radius: 999px;
-    background: rgba(5, 7, 10, .55);
-    color: #d8ceb3;
+    z-index: 2;
+    top: max(1rem, env(safe-area-inset-top));
+    right: max(1rem, env(safe-area-inset-right));
+    min-width: 7.5rem;
+    min-height: 2.75rem;
+    padding: .65rem 1rem;
+    border: 2px solid #ffe6a3;
+    border-radius: .75rem;
+    background: linear-gradient(135deg, #f3d78e, #d99a2b);
+    box-shadow: 0 3px 14px rgba(0, 0, 0, .8), 0 0 0 2px rgba(5, 7, 10, .72);
+    color: #17120a;
     font: inherit;
-    font-size: .75rem;
+    font-size: .9rem;
+    font-weight: 800;
     cursor: pointer;
 }
-.yara-scene-skip:hover { border-color: #e5b956; color: #fff; }
+.yara-scene-skip:hover {
+    border-color: #fff3cc;
+    background: linear-gradient(135deg, #ffe8a6, #edb548);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .9), 0 0 0 3px rgba(5, 7, 10, .78);
+    transform: translateY(-1px);
+}
+.yara-scene-skip:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 4px;
+}
+.yara-scene-skip:active { transform: translateY(0); }
 
 /* Em tela de pé a imagem ocupa uma faixa central: a legenda fica logo abaixo dela. */
 @media (orientation: portrait) {

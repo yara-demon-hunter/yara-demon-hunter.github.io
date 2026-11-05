@@ -60,17 +60,8 @@
     place-items: center;
     background-image:
         radial-gradient(circle at 50% 42%, rgba(255, 211, 42, 0.38), transparent 25%),
-        linear-gradient(135deg, #152e50, #45284c 55%, #a8434b);
-}
-
-.mini-game-card--wild-push-smash .mini-game-card__art::after {
-    content: "WILD PUSH & SMASH";
-    color: #fff3b0;
-    font-size: clamp(1.1rem, 2vw, 1.7rem);
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    text-align: center;
-    text-shadow: 0 3px 14px rgba(0, 0, 0, 0.8);
+        linear-gradient(135deg, rgba(21, 46, 80, 0.42), rgba(69, 40, 76, 0.38) 55%, rgba(168, 67, 75, 0.34)),
+        url('/assets/images/common/mini-game/wild_push_smash/covers/cover.jpeg');
 }
 
 .mini-game-card__body {

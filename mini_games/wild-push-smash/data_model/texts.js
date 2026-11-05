@@ -1,8 +1,11 @@
 // --- TEXTOS DO JOGO (para traduzir, edite aqui) ---
 export const TEXTS = {
     menuTitle: 'WILD PUSH & SMASH',
-    menuIntro: 'Best of 5 rounds! 3 hearts each. SMASH your rival from above, or stomp their head to SKY DROP!',
+    // Faixa curta sob o logo (regras em uma linha, estilo jogo)
+    menuIntro: 'BEST OF 5  ·  3 ♥ EACH  ·  SMASH FROM ABOVE  ·  STOMP TO SKY DROP',
     botHint: 'P2: CONTROLLED BY AI (BOT)',
+    // Dica de cada metade da tela no modo 2 jogadores do celular
+    zoneHint: 'DRAG = MOVE\nDOUBLE TAP = DASH',
     // Nome da ação embaixo de cada tecla desenhada no rodapé
     keyLabels: { up: 'JUMP', left: 'MOVE', right: 'MOVE', down: 'SMASH', dash: 'DASH', taunt: 'TAUNT', turbo: 'TURBO' },
     roundLabel: n => `ROUND ${n}`,

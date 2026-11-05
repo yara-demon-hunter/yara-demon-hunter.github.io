@@ -240,19 +240,21 @@ export class Player {
         }
 
         // Colisão com Paredes Laterais (Wall Slide / Wall Jump / rebote)
+        // SMASH e SKY DROP despencam direto: encostar na parede não freia a queda
+        const wallSlide = this.isPounding ? 1 : PHYSICS.wallSlideFactor;
         this.isTouchingWall = false;
         if (this.x - this.radius <= leftWall.x + leftWall.width && this.y >= leftWall.y && this.y <= leftWall.y + leftWall.height) {
             this.x = leftWall.x + leftWall.width + this.radius;
             if (this.vx < -BOUNCE.wall.minSpeed) this.bounceOffWall(1);
             this.isTouchingWall = true;
             this.wallDir = -1;
-            if (this.vy > 0) this.vy *= PHYSICS.wallSlideFactor; // Deslizar devagar na parede
+            if (this.vy > 0) this.vy *= wallSlide; // Deslizar devagar na parede
         } else if (this.x + this.radius >= rightWall.x && this.y >= rightWall.y && this.y <= rightWall.y + rightWall.height) {
             this.x = rightWall.x - this.radius;
             if (this.vx > BOUNCE.wall.minSpeed) this.bounceOffWall(-1);
             this.isTouchingWall = true;
             this.wallDir = 1;
-            if (this.vy > 0) this.vy *= PHYSICS.wallSlideFactor;
+            if (this.vy > 0) this.vy *= wallSlide;
         }
 
         // Colisão Plataforma Central

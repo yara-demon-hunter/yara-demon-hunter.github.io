@@ -1,5 +1,6 @@
 import { initAudio } from '../audio/sound.js';
 import { lockLandscape } from './orientation.js';
+import { TEXTS } from '../../data_model/texts.js';
 import { startMatch } from '../systems/match.js';
 
 // --- MENU ---
@@ -8,6 +9,8 @@ export const menuTitle = document.getElementById('menuTitle');
 export const menuSub = document.getElementById('menuSub');
 export const btn1Player = document.getElementById('btn1Player');
 export const btn2Players = document.getElementById('btn2Players');
+menuTitle.innerText = TEXTS.menuTitle;
+menuSub.innerText = TEXTS.menuIntro;
 
 
 btn1Player.addEventListener('click', () => { initAudio(); lockLandscape(); startMatch(true); });

@@ -45,7 +45,7 @@ const pickers = [0, 1].map((i) => {
     root.innerHTML = `
         <span class="picker-tag">${TEXTS.pickerTags[i]}</span>
         <button class="arrow" data-dir="-1" aria-label="Previous">◀</button>
-        <div class="picker-view${i === 1 ? ' flip' : ''}"><canvas width="140" height="140"></canvas></div>
+        <div class="picker-view${i === 1 ? ' flip' : ''}"><canvas width="220" height="220"></canvas></div>
         <button class="arrow" data-dir="1" aria-label="Next">▶</button>
         <div class="picker-info">
             <div class="picker-name"></div>
@@ -111,8 +111,12 @@ function cycle(i, dir) {
     playSound('jump');
 }
 
-// Arenas: miniaturas desenhadas uma vez a partir do mesmo cenário do jogo
+// Arenas: fileira de miniaturas desenhadas uma vez a partir do mesmo cenário do jogo;
+// o nome da escolhida aparece embaixo
 const stageRow = document.getElementById('stageRow');
+const stageName = document.createElement('div');
+stageName.className = 'stage-name';
+stageRow.after(stageName);
 const stageCards = STAGES.map((stage, i) => {
     const card = document.createElement('button');
     card.className = 'stage-card';
@@ -120,7 +124,9 @@ const stageCards = STAGES.map((stage, i) => {
     canvas.width = SCENERY.preview.width;
     canvas.height = SCENERY.preview.height;
     drawStagePreview(canvas.getContext('2d'), i, canvas.width, canvas.height);
-    card.append(canvas, document.createTextNode(stage.name));
+    card.title = stage.name;
+    card.setAttribute('aria-label', stage.name);
+    card.append(canvas);
     card.addEventListener('click', () => selectStage(i));
     stageRow.appendChild(card);
     return card;
@@ -129,14 +135,21 @@ const stageCards = STAGES.map((stage, i) => {
 function selectStage(i) {
     selection.stage = i;
     save();
-    stageCards.forEach((c, k) => c.classList.toggle('sel', k === i));
+    showStage();
     playSound('coin');
 }
 
-// Dificuldade do bot: uma linha própria na coluna da direita, entre as arenas e os botões de jogar
+function showStage() {
+    stageCards.forEach((c, k) => c.classList.toggle('sel', k === selection.stage));
+    stageName.innerText = STAGES[selection.stage].name;
+}
+
+// Dificuldade do bot: seletor de três posições na coluna da direita, entre as arenas e os botões de jogar
+const levelRow = document.getElementById('levelRow');
+levelRow.innerHTML = `<span class="side-label">${TEXTS.botLevelLabel}</span>`;
 const levelCol = document.createElement('div');
 levelCol.className = 'level-col';
-levelCol.innerHTML = `<span class="level-label">${TEXTS.botLevelLabel}</span>`;
+levelRow.appendChild(levelCol);
 const levelButtons = BOT_LEVEL_ORDER.map((level) => {
     const b = document.createElement('button');
     b.className = `level-btn level-${level}`;
@@ -145,7 +158,6 @@ const levelButtons = BOT_LEVEL_ORDER.map((level) => {
     levelCol.appendChild(b);
     return b;
 });
-document.getElementById('levelRow').appendChild(levelCol);
 
 function selectLevel(level, silent) {
     selection.level = level;
@@ -165,7 +177,7 @@ export function handleSelectKey(code) {
 let step = 0;
 renderPicker(0, false);
 renderPicker(1, false);
-stageCards.forEach((c, k) => c.classList.toggle('sel', k === selection.stage));
+showStage();
 selectLevel(selection.level, true);
 setInterval(() => {
     if (document.getElementById('screenMenu').classList.contains('hidden')) return;

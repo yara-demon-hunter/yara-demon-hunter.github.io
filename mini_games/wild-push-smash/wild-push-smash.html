@@ -30,8 +30,9 @@
     <div id="screenMenu" class="overlay menu">
         <!-- Coluna 1: quem luta -->
         <section class="menu-fighters">
-            <h1 id="menuTitle">WILD PUSH & SMASH</h1>
-            <p id="menuSub">Best of 5 rounds! 3 hearts each. SMASH your rival from above, or stomp their head to SKY DROP!</p>
+            <!-- Textos vêm de data_model/texts.js (no fim da partida viram o placar) -->
+            <h1 id="menuTitle"></h1>
+            <p id="menuSub"></p>
             <div class="select-row">
                 <div class="picker" id="picker0"></div>
                 <span class="vs">VS</span>
@@ -46,8 +47,8 @@
             </div>
             <div class="side-block" id="levelRow"></div>
             <div class="btn-group">
-                <button id="btn1Player" class="btn">1 PLAYER<small>VS AI BOT</small></button>
-                <button id="btn2Players" class="btn btn-p2">2 PLAYERS<small>1 KEYBOARD</small></button>
+                <button id="btn1Player" class="btn btn-play"><span>1 PLAYER</span><small>VS AI BOT</small></button>
+                <button id="btn2Players" class="btn btn-play btn-p2"><span>2 PLAYERS</span><small>1 KEYBOARD</small></button>
             </div>
         </section>
     </div>

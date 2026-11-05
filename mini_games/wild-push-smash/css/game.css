@@ -291,121 +291,286 @@ body { height: 100dvh; }
 .btn-danger { background: #ff4757; color: #fff; box-shadow: 0 4px 20px rgba(255, 71, 87, 0.4); }
 .btn-ghost { background: #2c3440; color: #fff; box-shadow: none; }
 
-/* --- MENU: ESCOLHA DE PERSONAGEM E ARENA --- */
-.overlay.menu { flex-direction: row; justify-content: center; align-items: center; padding: 70px 20px 16px; gap: 28px; }
-.overlay.menu h1 { font-size: 34px; margin-bottom: 0; }
-.overlay.menu p { font-size: 12.5px; margin-bottom: 0; max-width: 480px; }
-.menu-fighters { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.menu-fighters .select-row { margin-top: 12px; }
-.menu-side { width: 214px; display: flex; flex-direction: column; gap: 14px; }
-.side-label, .level-label { display: block; margin-bottom: 5px; font-size: 10px; font-weight: 900; letter-spacing: 2px; color: #8b98a8; text-align: left; }
-.menu-side .btn-group { flex-direction: column; flex-wrap: nowrap; gap: 8px; }
-.menu-side .btn { width: 100%; display: flex; flex-direction: column; align-items: center; line-height: 1.15; }
-.menu-side .btn small { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; opacity: 0.75; }
-.select-row { display: flex; align-items: center; gap: 14px; }
-.select-row .vs { font-weight: 900; font-size: 24px; color: #ffd32a; text-shadow: 0 0 12px rgba(255, 211, 42, 0.7); font-style: italic; }
+/* --- MENU: ESCOLHA DE PERSONAGEM E ARENA (tela de seleção estilo jogo de luta) ---
+   Medidas no tamanho do palco (1120x630): o jogo inteiro escala junto no celular,
+   então nenhum texto fica abaixo de ~12px aqui. */
+.overlay.menu {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 34px;
+    padding: 22px 36px;
+    /* Sem backdrop-filter no menu: o blur atrás dos canvases dos bichos borrava um quadrado escuro */
+    backdrop-filter: none;
+    background:
+        radial-gradient(ellipse 34% 60% at 17% 62%, rgba(255, 71, 87, 0.17), transparent 70%),
+        radial-gradient(ellipse 34% 60% at 53% 62%, rgba(30, 144, 255, 0.17), transparent 70%),
+        repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.022) 0 2px, transparent 2px 16px),
+        rgba(11, 12, 16, 0.98);
+}
+.overlay.settings > * { zoom: 1.4; }
+.menu-fighters { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+/* Logo: itálico inclinado, vermelho do P1 para o azul do P2, com sombra dura embaixo */
+.overlay.menu h1 {
+    margin: 0;
+    font-size: 46px;
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: 1px;
+    line-height: 1.05;
+    transform: skew(-6deg);
+    background: linear-gradient(90deg, #ff4757 0%, #ff7a8a 42%, #6cb4ff 58%, #1e90ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 4px 0 #05060a) drop-shadow(0 0 22px rgba(255, 255, 255, 0.1));
+}
+/* Faixa de regras em uma linha (no fim da partida mostra o placar) */
+.overlay.menu #menuSub {
+    margin: 0;
+    max-width: none;
+    padding: 5px 16px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #c5c6c7;
+    background: rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.select-row { display: flex; align-items: center; gap: 16px; margin-top: 18px; }
+.select-row .vs {
+    font-size: 46px;
+    font-weight: 900;
+    font-style: italic;
+    color: #ffd32a;
+    transform: skew(-8deg);
+    text-shadow: 0 4px 0 #8a6a00, 0 0 18px rgba(255, 211, 42, 0.6);
+}
+
+/* Cartão do lutador: o bicho é a estrela, com um brilho da cor do jogador atrás */
 .picker {
     position: relative;
-    width: 232px;
+    width: 288px;
     display: grid;
-    grid-template-columns: 34px 1fr 34px;
+    grid-template-columns: 40px 1fr 40px;
     align-items: center;
-    background: rgba(31, 40, 51, 0.6);
+    padding: 12px 12px 12px;
     border: 2px solid var(--pc);
-    border-radius: 14px;
-    padding: 8px 8px 6px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(31, 40, 51, 0.35), rgba(16, 19, 26, 0.92) 60%);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 10px 24px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.35);
 }
 .picker-tag {
     position: absolute;
-    top: -10px;
-    left: 12px;
+    top: -13px;
+    left: 14px;
+    padding: 2px 12px;
+    border-radius: 4px;
     background: var(--pc);
     color: #fff;
+    font-size: 14px;
     font-weight: 900;
-    font-size: 11px;
+    font-style: italic;
     letter-spacing: 1px;
-    padding: 1px 8px;
-    border-radius: 20px;
+    transform: skew(-10deg);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
 }
 .arrow {
-    width: 32px;
-    height: 32px;
+    position: relative;
+    z-index: 1;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     border: 2px solid var(--pc);
-    background: transparent;
+    background: rgba(11, 12, 16, 0.55);
     color: #fff;
-    font-size: 14px;
+    font-size: 15px;
     cursor: pointer;
+    transition: transform 0.1s, background 0.15s;
     -webkit-tap-highlight-color: transparent;
 }
-.arrow:hover, .arrow:active { background: var(--pc); }
-.picker-view { height: 104px; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; }
+.arrow:hover { background: var(--pc); transform: scale(1.1); }
+.arrow:active { transform: scale(0.92); }
+.picker-view {
+    position: relative;
+    height: 170px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+/* Brilho de holofote atrás e sombra no chão */
+.picker-view::before {
+    content: '';
+    position: absolute;
+    inset: 6px -30px 0;
+    background: radial-gradient(ellipse 50% 55% at 50% 62%, var(--pc), transparent 72%);
+    opacity: 0.33;
+}
+.picker-view::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    width: 120px;
+    height: 16px;
+    margin-left: -60px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0, 0, 0, 0.55), transparent 70%);
+}
 .picker-view.flip { transform: scaleX(-1); }
-.picker-view canvas { width: 104px; height: 104px; }
+.picker-view canvas { position: relative; z-index: 1; width: 170px; height: 170px; background: transparent; }
 .picker-view canvas.drop { animation: drop-in 0.45s cubic-bezier(0.3, 1.4, 0.5, 1); }
 @keyframes drop-in {
-    0% { transform: translateY(-100px) scaleY(1.15); opacity: 0; }
+    0% { transform: translateY(-110px) scaleY(1.15); opacity: 0; }
     55% { transform: translateY(6px) scale(1.12, 0.82); opacity: 1; }
     100% { transform: none; }
 }
-.picker-info { grid-column: 1 / -1; text-align: center; }
-.picker-name { font-weight: 900; letter-spacing: 2px; font-size: 15px; }
-.stat { display: grid; grid-template-columns: 50px 1fr; align-items: center; gap: 6px; font-size: 9.5px; font-weight: 800; color: #c5c6c7; margin-top: 3px; text-align: left; }
-.dash-skill { display: grid; gap: 2px; margin-top: 6px; font-size: 9px; }
-.dash-name { color: var(--pc); font-weight: 900; letter-spacing: 0.5px; }
-.dash-description { color: #c5c6c7; line-height: 1.2; }
-.bar { height: 6px; background: #0b0c10; border-radius: 4px; overflow: hidden; }
-.bar i { display: block; height: 100%; background: var(--pc); border-radius: 4px; transition: width 0.25s; }
-.stage-row { display: flex; flex-direction: column; gap: 6px; }
-.stage-card {
-    background: transparent;
-    border: 2px solid #2c3440;
-    border-radius: 10px;
-    padding: 3px;
-    display: flex;
+.picker-info { grid-column: 1 / -1; }
+.picker-name {
+    margin: 2px 0 8px;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: 3px;
+    text-shadow: 0 3px 0 rgba(0, 0, 0, 0.6);
+}
+/* Atributos em blocos (5 gomos), como barra de jogo */
+.stat {
+    display: grid;
+    grid-template-columns: 62px 1fr;
     align-items: center;
-    gap: 10px;
-    text-align: left;
-    cursor: pointer;
-    color: #c5c6c7;
-    font: inherit;
-    font-size: 10px;
+    gap: 8px;
+    margin-top: 5px;
+    font-size: 12px;
     font-weight: 900;
     letter-spacing: 1px;
-    -webkit-tap-highlight-color: transparent;
+    color: #8b98a8;
 }
-.stage-card canvas { display: block; width: 72px; height: 40px; border-radius: 6px; flex-shrink: 0; }
-.level-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-.level-col .level-label { grid-column: 1 / -1; margin-bottom: 1px; }
-.level-btn {
-    background: transparent;
+.bar {
+    position: relative;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.07);
+    transform: skew(-14deg);
+    overflow: hidden;
+}
+.bar i { display: block; height: 100%; background: var(--pc); box-shadow: 0 0 8px var(--pc); transition: width 0.25s; }
+.bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0 calc(20% - 3px), #12151c calc(20% - 3px) 20%);
+}
+/* Golpe especial: etiqueta com a borda na cor do jogador */
+.dash-skill {
+    display: grid;
+    gap: 2px;
+    margin-top: 10px;
+    padding: 6px 10px;
+    border-left: 3px solid var(--pc);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.32);
+    font-size: 12px;
+    text-align: left;
+}
+.passive-skill { margin-top: 5px; }
+.dash-name { color: var(--pc); font-size: 13px; font-weight: 900; letter-spacing: 1px; }
+.dash-description { color: #aab3bf; line-height: 1.25; }
+
+/* Coluna da direita: arena, nível do bot e os botões de jogar */
+.menu-side { width: 300px; display: flex; flex-direction: column; gap: 18px; margin-top: 64px; }
+.side-label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: #8b98a8;
+}
+.stage-row { display: flex; gap: 8px; }
+.stage-card {
+    flex: 1;
+    aspect-ratio: 16 / 9;
+    padding: 0;
+    overflow: hidden;
     border: 2px solid #2c3440;
     border-radius: 8px;
-    padding: 5px 0;
+    background: transparent;
     cursor: pointer;
-    color: #c5c6c7;
-    font: inherit;
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: 1px;
+    transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
     -webkit-tap-highlight-color: transparent;
 }
+.stage-card canvas { display: block; width: 100%; height: 100%; background: transparent; filter: saturate(0.55) brightness(0.65); transition: filter 0.15s; }
+.stage-card:hover canvas { filter: none; }
+.stage-card.sel { border-color: #45f3df; transform: translateY(-3px); box-shadow: 0 0 14px rgba(69, 243, 223, 0.55); }
+.stage-card.sel canvas { filter: none; }
+.stage-name { margin-top: 8px; text-align: center; font-size: 15px; font-weight: 900; font-style: italic; letter-spacing: 2px; color: #45f3df; }
+.level-col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    padding: 3px;
+    border: 2px solid #2c3440;
+    border-radius: 9px;
+    background: rgba(0, 0, 0, 0.3);
+}
+.level-btn {
+    padding: 7px 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #8b98a8;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.level-btn:hover { color: #fff; }
 .level-btn.sel { color: #0b0c10; }
-.level-easy.sel { background: #2ed573; border-color: #2ed573; }
-.level-normal.sel { background: #ffd32a; border-color: #ffd32a; }
-.level-hard.sel { background: #ff4757; border-color: #ff4757; color: #fff; box-shadow: 0 0 12px rgba(255, 71, 87, 0.5); }
-.stage-card.sel { border-color: #45f3df; color: #fff; box-shadow: 0 0 12px rgba(69, 243, 223, 0.5); }
-.overlay.menu .btn { padding: 9px 20px; font-size: 16px; }
-/* Sem backdrop-filter no menu: o blur atrás dos canvases dos bichos borrava um quadrado escuro */
-.overlay.menu { backdrop-filter: none; background: rgba(11, 12, 16, 0.98); }
-.picker-view canvas, .stage-card canvas { background: transparent; }
+.level-easy.sel { background: #2ed573; }
+.level-normal.sel { background: #ffd32a; }
+.level-hard.sel { background: #ff4757; color: #fff; box-shadow: 0 0 12px rgba(255, 71, 87, 0.5); }
 
-/* --- ARENA MAIOR: menu e configurações ganham zoom para acompanhar o palco (1120x630) e as letras ficam maiores --- */
-.overlay.menu > section, .overlay.settings > * { zoom: 1.4; }
-.stat { font-size: 11.5px; }
-.dash-skill { font-size: 11px; }
-.stage-card { font-size: 12px; }
-.picker-tag { font-size: 13px; }
+/* Botões de jogar: angulares, com degrau embaixo que afunda ao apertar */
+.menu-side .btn-group { flex-direction: column; flex-wrap: nowrap; gap: 14px; margin-top: 2px; }
+.btn-play {
+    --edge: #18a493;
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 11px 18px;
+    border-radius: 7px;
+    overflow: hidden;
+    font-size: 22px;
+    font-style: italic;
+    letter-spacing: 1px;
+    text-align: left;
+    transform: skew(-8deg);
+    box-shadow: 0 5px 0 var(--edge), 0 10px 20px rgba(0, 0, 0, 0.45);
+    transition: transform 0.1s, box-shadow 0.1s, filter 0.15s;
+}
+.btn-play::before { content: '▶'; font-size: 14px; font-style: normal; }
+.btn-play small { margin-left: auto; font-size: 12px; font-weight: 900; letter-spacing: 1.5px; opacity: 0.75; }
+.btn-play.btn-p2 { --edge: #b3202f; }
+.btn-play:hover { transform: skew(-8deg) translateY(-2px); filter: brightness(1.1); box-shadow: 0 7px 0 var(--edge), 0 12px 22px rgba(0, 0, 0, 0.45); }
+.btn-play:active { transform: skew(-8deg) translateY(4px); box-shadow: 0 1px 0 var(--edge), 0 4px 10px rgba(0, 0, 0, 0.45); }
+/* Brilho que passa de tempos em tempos no botão principal */
+#btn1Player::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -40%;
+    width: 30%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    animation: btn-shine 3.2s ease-in-out infinite;
+}
+@keyframes btn-shine { 0%, 60% { left: -40%; } 100% { left: 130%; } }
 
 /* --- AVISO DE VIRAR O APARELHO: celular em pé. Mesma condição de js/ui/orientation.js --- */
 #rotateNotice {
@@ -512,3 +677,51 @@ body { height: 100dvh; }
     animation: turbo-glow 0.6s ease-in-out infinite alternate;
 }
 .kc.kc-turbo small { color: #fff; }
+
+/* --- 2 JOGADORES NO CELULAR: metade da tela para cada um (js/ui/touch_controls.js) --- */
+.touch-zone {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    pointer-events: auto;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.zone-left { left: 0; border-right: 1px dashed rgba(255, 255, 255, 0.07); }
+.zone-right { right: 0; }
+/* Joystick que nasce embaixo do dedo: invisível até o toque */
+.stick.float {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.12s;
+    pointer-events: none;
+}
+.stick.float.on { opacity: 0.75; }
+.stick.float.dash { animation: zone-dash 0.35s ease-out; }
+/* Anel que estoura no segundo toque: mostra que o DASH saiu */
+@keyframes zone-dash {
+    from { box-shadow: 0 0 0 0 var(--pc); }
+    to { box-shadow: 0 0 0 36px transparent; }
+}
+.zone-hint {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 7px 14px;
+    text-align: center;
+    line-height: 1.5;
+    border: 1.5px solid var(--pc);
+    border-radius: 8px;
+    background: rgba(11, 12, 16, 0.6);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    white-space: pre;
+    pointer-events: none;
+    transition: opacity 0.6s;
+}
+.zone-hint.gone { opacity: 0; }

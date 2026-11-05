@@ -73,7 +73,7 @@ window.YaraScenes = (() => {
         const skip = document.createElement('button');
         skip.type = 'button';
         skip.className = 'yara-scene-skip';
-        skip.textContent = language === 'en' ? 'Skip ›' : 'Pular ›';
+        skip.textContent = language === 'en' ? 'Skip story ›' : 'Pular história ›';
         root.append(canvas, caption, skip);
         container.append(root);
 
