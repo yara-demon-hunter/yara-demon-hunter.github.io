@@ -25,7 +25,7 @@ export const AZAEL_VISUALS = {
         bladeCore: '#ffffff',
         runes: '#ffffff',
         bladeGlow: '#bfe3ff',
-        bladeGlowSoft: 'rgba(191, 227, 255, 0.55)',
+        bladeGlowSoft: 'rgba(191, 227, 255, 0.4)',
         bladeGlowFrenzy: '#ff4d4d',
         bladeGlowSoftFrenzy: 'rgba(255, 77, 77, 0.7)',
         buckle: '#a88b4a',
@@ -48,6 +48,7 @@ export const AZAEL_VISUALS = {
         bandageLine: '#2a221a',
         claw: '#1f2328',
         scabbard: '#141414',
+        scabbardShine: '#3a3a40',
         hilt: '#2a2420',
         tsuba: '#a88b4a'
     },
@@ -68,8 +69,18 @@ export const AZAEL_VISUALS = {
     hairWidth: 1,
     hairWaveSpeed: 6,
     hairWave: 0.9,
-    // Pontas da bandana atrás da cabeça
-    bandanaTailLength: 5,
+    // Pontas da bandana amarradas atrás da cabeça: caem paradas, esvoaçam para trás na corrida
+    bandanaTailLength: 6.5,
+
+    // Capa de pano: ondula da raiz até a barra (mais na corrida) e cede no meio com o peso
+    capeRipple: 0.35,
+    capeRippleRun: 1.1,
+    capeRippleSpeed: 7,
+    capeSag: 1.6,
+
+    // Corrida: o corpo sobe e desce a cada passo e vai um pouco agachado (postura de espadachim)
+    runBob: 0.7,
+    runCrouch: 0.6,
 
     // Pernas: calça larga e pé descalço de 3 dedos com garras
     legWidth: 3.3,
@@ -87,6 +98,8 @@ export const AZAEL_VISUALS = {
     scabbardDir: [-0.86, -0.12, -0.48],
     scabbardLength: 12,
     hiltLength: 3.6,
-    // Abaixo deste swingBlend a lâmina está guardada (e a mão volta para o cabo)
-    sheathBelow: 0.18
+    // A lâmina aparece aos poucos enquanto a mão sai do cabo (fração do swingBlend até ficar inteira)
+    drawBlend: 0.25,
+    // Brilho em volta da katana (menor que o da espada rúnica do herói: é aço, não magia)
+    glowScale: 0.75
 };

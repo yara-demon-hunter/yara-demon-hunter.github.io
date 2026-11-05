@@ -14,7 +14,7 @@ import { getPowerLevel } from '../../data_model/powers.js';
 import { getFireCastRatio, getKnifeChargeRatio } from '../systems/knives.js';
 import { AZAEL_VISUALS as AZ } from '../../data_model/visuals/characters/azael_visual.js';
 import {
-    azaelHairPart, azaelHeadPart, azaelScabbardPart, drawAzaelArm, drawAzaelLeg, drawAzaelTorso, drawKatana, scabbardFrame
+    azaelHairPart, azaelHeadPart, azaelScabbardPart, drawAzaelArm, drawAzaelCape, drawAzaelLeg, drawAzaelTorso, drawKatana, scabbardFrame
 } from './azael25d.js';
 
 // --- HERÓI 2.5D ---
@@ -191,16 +191,18 @@ function buildPose(t, body) {
     applyStance(stance, body, blend);
     const lean = V.runLean * run + (throwK >= 0 ? KNIFE_VISUALS.throwLean * Math.sin(Math.PI * throwK) : 0) + stance.lean;
     const breath = Math.sin((t / H.breathPeriodSeconds) * Math.PI * 2) * V.breathAmount * (1 - run);
+    // Azael: o corpo sobe e desce duas vezes por passada (um pé de cada vez) e anda mais agachado
+    const bob = azael ? (0.5 - 0.5 * Math.cos(anim.stride * 2)) * AZ.runBob * run - AZ.runCrouch * run : 0;
     return {
         ...stance,
         t,
         run,
         lean,
-        hipZ: V.hipHeight - stance.crouch,
-        sashZ: V.sashHeight - stance.crouch,
-        shoulderZ: V.shoulderHeight + breath - run * 0.8 - stance.crouch + stance.rise,
+        hipZ: V.hipHeight - stance.crouch + bob,
+        sashZ: V.sashHeight - stance.crouch + bob,
+        shoulderZ: V.shoulderHeight + breath - run * 0.8 - stance.crouch + stance.rise + bob,
         headA: 0.8 + lean - stance.headBack,
-        headZ: V.headHeight + breath - run * 1.4 - stance.crouch + stance.rise * 1.3,
+        headZ: V.headHeight + breath - run * 1.4 - stance.crouch + stance.rise * 1.3 + bob,
         blend
     };
 }
@@ -335,6 +337,10 @@ function capePart(pose) {
                 ], 1.3, C.sash);
             }
 
+            if (azael) {
+                drawAzaelCape(rig, pose, anchors, hem);
+                return;
+            }
             ctx.beginPath();
             anchors.forEach((p, i) => {
                 const s = project(...p);
@@ -505,9 +511,11 @@ function azaelSwordRest(pose, swingAngle, blend) {
     return { hand: mix(sheath.grip, swingHand, blend), dir: d.map(v => v / size) };
 }
 
-// Azael: katana guardada quando não há golpe nem postura segurando a espada
-function azaelSheathed(pose) {
-    return !anim.swingActive && Math.max(pose.blend, pose.sword?.w ?? 0) < AZ.sheathBelow;
+// Azael: quanto a katana está fora da bainha (0 = guardada, 1 = na mão). Sobe e desce junto com a mão indo
+// do cabo para o golpe, então a lâmina desliza para fora e para dentro da bainha em vez de piscar.
+function azaelDrawn(pose) {
+    const k = Math.max(pose.blend, pose.sword?.w ?? 0);
+    return Math.max(0, Math.min(1, (k - 0.02) / AZ.drawBlend));
 }
 
 function swordArmPart(pose) {
@@ -573,11 +581,13 @@ function swordPart(pose, frenzy, body) {
     // Bloodlust: a lâmina fica mais vermelha conforme a fome sobe
     const hungerLevel = body === player ? getPowerLevel(powers.bloodlust) : null;
     const hunger = hungerLevel ? state.bloodlust.stacks / hungerLevel.stacks : 0;
-    const sheathed = azael && azaelSheathed(pose);
+    const drawn = azael ? azaelDrawn(pose) : 1;
     return {
         depth: project(...mid).depth,
         draw() {
-            if (sheathed) return;
+            if (drawn <= 0) return;
+            ctx.save();
+            ctx.globalAlpha *= drawn;
             const t = pose.t;
             // Rastro fantasma do corte: lâminas em instantes anteriores
             if (anim.swingActive && anim.swingElapsed < anim.swingSeconds + 0.05) {
@@ -594,13 +604,14 @@ function swordPart(pose, frenzy, body) {
             ctx.save();
             ctx.globalCompositeOperation = 'lighter';
             drawGlow(ctx, frenzy ? C.bladeGlowSoftFrenzy : C.bladeGlowSoft, glow.x, glow.y,
-                (H.bladeGlowMin + (H.bladeGlowMax - H.bladeGlowMin) * pulse) * 0.8 * (1 + pose.blend * 0.7 + (pose.sword?.w ?? 0) * 0.6) * (bladeLength / V.bladeLength),
+                (H.bladeGlowMin + (H.bladeGlowMax - H.bladeGlowMin) * pulse) * 0.8 * (1 + pose.blend * 0.7 + (pose.sword?.w ?? 0) * 0.6) * (azael ? AZ.glowScale : bladeLength / V.bladeLength),
                 0.32 + 0.2 * pulse);
             if (hunger > 0) drawGlow(ctx, SKILLS_VISUALS.bloodlust.blade, glow.x, glow.y, 8 + hunger * 13, 0.3 + hunger * 0.5);
             ctx.restore();
 
             bladeShape(hand, dir, t, 1);
             if (body === player && passives.flameBlade.lvl > 0) drawBladeFire(hand, dir, t);
+            ctx.restore();
         }
     };
 }
@@ -793,7 +804,7 @@ export function renderPlayer25D(body = player, bodyAnim = heroAnim, colors = V.c
         swordArmPart(pose),
         swordPart(pose, frenzy, body),
         ...(azael
-            ? [azaelHeadPart(pose, rig), azaelHairPart(pose, rig), azaelScabbardPart(pose, rig, azaelSheathed(pose))]
+            ? [azaelHeadPart(pose, rig), azaelHairPart(pose, rig), azaelScabbardPart(pose, rig, 1 - azaelDrawn(pose))]
             : [headPart(pose)]),
         ...gearParts(gear, pose, rig)
     ];

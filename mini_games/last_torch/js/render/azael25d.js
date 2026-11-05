@@ -11,69 +11,191 @@ import { drawGlow } from './fx/glow.js';
 const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 const add = (p, d, k) => [p[0] + d[0] * k, p[1] + d[1] * k, p[2] + d[2] * k];
 
-// --- CABEÇA ---
-// Mechas e pontas da bandana: atrás da cabeça, voam com a capa (mesma física de player.js)
-export function azaelHairPart(pose, rig) {
-    const { project, limb, anim, C } = rig;
+// --- PANO E CABELO QUE ONDULAM ---
+// Corrente de pontos que sai de root: parada cai na direção hang, correndo vai na direção stream (para trás),
+// atrasa com a capa (anim.capeX/capeY, física de player.js) e ondula com uma onda que corre da raiz até a ponta.
+const norm = (v) => {
+    const l = Math.hypot(...v) || 1;
+    return v.map(x => x / l);
+};
+
+function flowChain(root, pose, anim, o) {
     const { t, run } = pose;
+    const dir = norm(mix(o.hang, o.stream, run));
+    const amp = o.amp + o.ampRun * run;
+    const speed = o.speed + o.speedRun * run;
+    const bounce = Math.sin(anim.stride * 2) * 0.35 * run;
+    const pts = [];
+    for (let j = 0; j <= o.segs; j++) {
+        const k = j / o.segs;
+        const w = t * speed - k * o.waveLength + o.phase;
+        const p = add(root, dir, o.len * k);
+        // Atraso cresce para a ponta (k²): a raiz segue o corpo, a ponta fica para trás
+        p[0] += anim.capeX * o.lag * k * k;
+        p[1] += anim.capeY * o.lag * k * k + Math.sin(w) * amp * k;
+        p[2] += (Math.cos(w * 0.9) * amp * 0.55 + bounce) * k + (o.droop ?? 0) * Math.sin(Math.PI * k) * run;
+        pts.push(p);
+    }
+    return pts;
+}
+
+// Caminho suave pelos pontos já projetados (curvas pelos pontos médios)
+function smoothThrough(pts, moveFirst = true) {
+    if (moveFirst) ctx.moveTo(pts[0].x, pts[0].y);
+    else ctx.lineTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length - 1; i++) {
+        ctx.quadraticCurveTo(pts[i].x, pts[i].y, (pts[i].x + pts[i + 1].x) / 2, (pts[i].y + pts[i + 1].y) / 2);
+    }
+    const last = pts[pts.length - 1];
+    ctx.lineTo(last.x, last.y);
+}
+
+function strokeSmooth(rig, chain, width, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    smoothThrough(chain.map(p => rig.project(...p)));
+    ctx.stroke();
+}
+
+// Fita (pontas da bandana, mechas): larga na raiz, fina na ponta; forked = ponta rasgada em V
+function drawRibbon(rig, chain, w0, w1, fill, edge, forked = true) {
+    const pts = chain.map(p => rig.project(...p));
+    const left = [];
+    const right = [];
+    pts.forEach((p, i) => {
+        const a = pts[Math.max(0, i - 1)];
+        const b = pts[Math.min(pts.length - 1, i + 1)];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const l = Math.hypot(dx, dy) || 1;
+        const w = w0 + (w1 - w0) * (i / (pts.length - 1));
+        left.push({ x: p.x - (dy / l) * w, y: p.y + (dx / l) * w });
+        right.push({ x: p.x + (dy / l) * w, y: p.y - (dx / l) * w });
+    });
+    const tip = pts[pts.length - 1];
+    const prev = pts[pts.length - 2];
+    const notch = forked ? { x: tip.x + (prev.x - tip.x) * 0.45, y: tip.y + (prev.y - tip.y) * 0.45 } : tip;
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = 0.25;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    smoothThrough(left);
+    ctx.lineTo(notch.x, notch.y);
+    smoothThrough([...right].reverse(), false);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+}
+
+// --- CABEÇA ---
+// Atrás da cabeça: a massa do cabelo branco, a parte de trás da bandana com o nó e as duas pontas soltas.
+// Tudo ondula e fica para trás na corrida; parado, balança devagar.
+export function azaelHairPart(pose, rig) {
+    const { project, ball, anim, C } = rig;
+    const { run } = pose;
     const R = A.headRadius;
     const n = A.hairStrands;
+    const bandZ = pose.headZ + 0.8;
     const strands = [];
     for (let i = 0; i < n; i++) {
         const k = i / (n - 1);
-        const psi = Math.PI * (0.62 + 0.76 * k);       // arco das costas da cabeça
-        const jag = 0.8 + 0.25 * Math.sin(i * 2.3);
-        const flutter = Math.sin(t * A.hairWaveSpeed + i * 1.7) * A.hairWave * (1 + run);
-        const len = (A.hairLength + A.hairRunLength * run) * jag;
-        const root = [pose.headA + R * 0.75 * Math.cos(psi), R * 0.85 * Math.sin(psi), pose.headZ + 1.1];
-        const tip = [
-            pose.headA - R - len * (0.3 + 0.45 * run) + anim.capeX * 0.12,
-            Math.sin(psi) * (R * 1.05 + run * 0.6) + anim.capeY * 0.25 + flutter * 0.5,
-            pose.headZ - len * (0.95 - 0.45 * run) + flutter * 0.4
-        ];
-        const mid = [(root[0] + tip[0]) / 2 - 0.4 * run, (root[1] + tip[1]) / 2 + flutter * 0.3, (root[2] + tip[2]) / 2 + 0.6];
-        strands.push({ root, mid, tip });
+        const psi = Math.PI * (0.6 + 0.8 * k);         // arco das costas da cabeça
+        const side = Math.sin(psi);
+        const jag = 0.82 + 0.22 * Math.sin(i * 2.3 + 0.7);
+        const root = [pose.headA + R * 0.9 * Math.cos(psi), R * 0.92 * side, bandZ - 0.2];
+        strands.push(flowChain(root, pose, anim, {
+            len: (A.hairLength + A.hairRunLength * run) * jag,
+            segs: 5,
+            hang: [-0.42, side * 0.32, -1],
+            stream: [-1, side * 0.35, -0.3],
+            lag: 0.14,
+            amp: A.hairWave * 0.35,
+            ampRun: A.hairWave,
+            speed: A.hairWaveSpeed * 0.5,
+            speedRun: A.hairWaveSpeed,
+            waveLength: 3.6,
+            phase: i * 1.1,
+            droop: -0.6
+        }));
     }
-    const tails = [-1, 1].map(side => {
-        const flutter = Math.sin(t * 8 + side * 1.4) * (0.8 + run * 1.4);
-        const knot = [pose.headA - R * 0.95, side * 0.5, pose.headZ + 0.9];
-        const tip = [
-            knot[0] - A.bandanaTailLength * (0.5 + 0.6 * run) + anim.capeX * 0.2,
-            side * (1.6 + run) + anim.capeY * 0.3 + flutter * 0.5,
-            knot[2] - 2.6 + run * 2.2 + flutter * 0.4
-        ];
-        return { knot, tip, mid: [(knot[0] + tip[0]) / 2, (knot[1] + tip[1]) / 2 + flutter * 0.3, (knot[2] + tip[2]) / 2 + 0.3] };
-    });
+    // Pontas da bandana: saem do nó, uma mais longa que a outra, e esvoaçam mais rápido que o cabelo
+    const knot = [pose.headA - R, 0, bandZ];
+    const tails = [-1, 1].map(side => flowChain([knot[0], side * 0.3, bandZ], pose, anim, {
+        len: A.bandanaTailLength * (side > 0 ? 1 : 0.78) * (1 + 0.35 * run),
+        segs: 6,
+        hang: [-0.55, side * 0.16, -1],
+        stream: [-1, side * 0.22, 0.12],
+        lag: 0.2,
+        amp: 0.45,
+        ampRun: 1.35,
+        speed: 4.5,
+        speedRun: 11,
+        waveLength: 4.8,
+        phase: side * 1.4
+    }));
     return {
         depth: project(pose.headA - R - 1.5, 0, pose.headZ - 1).depth,
         draw() {
-            for (const b of tails) limb([b.knot, b.mid, b.tip], 0.7, C.bandana);
-            // Massa do cabelo: raízes no arco da cabeça, pontas soltas (de volta pelas pontas, com entalhes)
-            const pts = strands.map(s => project(...s.root));
-            for (let i = n - 1; i >= 0; i--) {
-                pts.push(project(...strands[i].tip));
-                if (i > 0) pts.push(project(...mix(mix(strands[i].mid, strands[i - 1].mid, 0.5), mix(strands[i].tip, strands[i - 1].tip, 0.5), 0.6)));
-            }
+            // Massa do cabelo: borda pelas mechas de fora, pontas soltas com entalhes entre elas
+            const P = strands.map(ch => ch.map(p => project(...p)));
             ctx.fillStyle = C.hair;
             ctx.strokeStyle = C.hairShade;
             ctx.lineWidth = 0.45;
             ctx.lineJoin = 'round';
             ctx.beginPath();
-            pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+            smoothThrough(P[0]);
+            for (let i = 1; i < n; i++) {
+                const a = strands[i - 1];
+                const b = strands[i];
+                const last = a.length - 1;
+                const notch = project(...mix(mix(a[last - 1], b[last - 1], 0.5), mix(a[last], b[last], 0.5), 0.35));
+                ctx.lineTo(notch.x, notch.y);
+                ctx.lineTo(P[i][last].x, P[i][last].y);
+            }
+            smoothThrough([...P[n - 1]].reverse(), false);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
-            // Fios: linhas finas da raiz à ponta
-            for (let i = 1; i < n - 1; i++) limb([strands[i].root, strands[i].mid, strands[i].tip], 0.3, C.hairShade);
+            // Fios e sombra entre as mechas
+            for (let i = 1; i < n - 1; i++) strokeSmooth(rig, strands[i], 0.3, C.hairShade);
+
+            // Parte de trás da bandana (por cima do cabelo) e o nó
+            const back = [];
+            for (let j = 0; j <= 10; j++) {
+                const psi = Math.PI / 2 + (j / 10) * Math.PI;
+                back.push([pose.headA + R * 0.98 * Math.cos(psi), R * 0.98 * Math.sin(psi), bandZ]);
+            }
+            strokeSmooth(rig, back, 1, C.bandana);
+            for (const tail of tails) drawRibbon(rig, tail, 0.62, 0.32, C.bandana, C.bandanaShade);
+            ball(knot, 0.85, C.bandanaShade);
+            ball([knot[0] + 0.1, 0, knot[2] + 0.15], 0.55, C.bandana);
         }
     };
 }
 
 // Rosto branco-prateado, orelhas pontudas, cabelo no alto, bandana na testa e olhos vermelhos
 export function azaelHeadPart(pose, rig) {
-    const { project, projectVec, limb, ball, disk, C, sinF, cosF } = rig;
+    const { project, projectVec, limb, ball, disk, anim, C, sinF, cosF } = rig;
     const R = A.headRadius;
     const center = [pose.headA, 0, pose.headZ];
+    // Mechas da frente: caem dos dois lados do rosto e vão para trás na corrida
+    const locks = [-1, 1].map(side => flowChain([pose.headA + 0.6, side * 2.6, pose.headZ + 1.3], pose, anim, {
+        len: 3.8,
+        segs: 4,
+        hang: [0.1, side * 0.22, -1],
+        stream: [-1, side * 0.12, -0.5],
+        lag: 0.08,
+        amp: 0.12,
+        ampRun: 0.45,
+        speed: 2.6,
+        speedRun: 9,
+        waveLength: 3,
+        phase: side
+    }));
     return {
         depth: project(...center).depth,
         draw() {
@@ -108,7 +230,18 @@ export function azaelHeadPart(pose, rig) {
 
             // Cabelo cobrindo o alto e a parte de trás da cabeça (o rosto fica à mostra)
             ball([pose.headA - 1.5, 0, pose.headZ + 1.2], R * 0.94, C.hairShade);
-            ball([pose.headA - 1.3, 0, pose.headZ + 1.6], R * 0.82, C.hair);
+            ball([pose.headA - 1.3, 0, pose.headZ + 1.6], R * 0.84, C.hair);
+            // Risca no meio e uns poucos fios penteados para trás (traço fino, mais claro que a sombra)
+            ctx.save();
+            ctx.globalAlpha *= 0.55;
+            for (const b of [-1.5, 0, 1.1]) {
+                limb([
+                    [pose.headA + 0.7, b * 0.5, pose.headZ + 2.3],
+                    [pose.headA - 1.2, b * 0.9, pose.headZ + 2.75],
+                    [pose.headA - 2.9, b * 1.1, pose.headZ + 1.5]
+                ], 0.2, C.hairShade);
+            }
+            ctx.restore();
 
             // Rosto: um "ovo" na frente da cabeça, como a máscara do Caçador (de frente fica largo; de perfil,
             // estreito), para ler de cima. Some quando ele está de costas para a câmera.
@@ -120,19 +253,20 @@ export function azaelHeadPart(pose, rig) {
                 ctx.globalAlpha = baseAlpha * vis;
                 const fw = Math.hypot(A.faceDepth * cosF, A.faceWidth * sinF);
                 const fh = A.faceHeight * 0.62 + 0.5;
+                // Contorno suave (o preto fazia o rosto parecer um visor)
                 ctx.fillStyle = C.skin;
-                ctx.strokeStyle = C.outline;
-                ctx.lineWidth = 0.4;
+                ctx.strokeStyle = C.skinShade;
+                ctx.lineWidth = 0.3;
                 ctx.beginPath();
                 ctx.ellipse(f.x, f.y, fw, fh, 0, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.stroke();
-                // Lado do rosto na sombra do cabelo
-                const back = projectVec(-1, 0, 0);
-                ctx.fillStyle = C.skinShade;
-                ctx.globalAlpha = baseAlpha * vis * 0.35;
+                // Maçãs do rosto pegando luz e o queixo um pouco mais escuro
+                const down = projectVec(0, 0, -1);
+                ctx.fillStyle = C.skinLight;
+                ctx.globalAlpha = baseAlpha * vis * 0.6;
                 ctx.beginPath();
-                ctx.ellipse(f.x + back.x * 0.6, f.y + back.y * 0.6, fw * 0.55, fh * 0.85, 0, 0, Math.PI * 2);
+                ctx.ellipse(f.x - down.x * 0.4, f.y - down.y * 0.4, fw * 0.6, fh * 0.45, 0, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.globalAlpha = baseAlpha;
             }
@@ -146,7 +280,7 @@ export function azaelHeadPart(pose, rig) {
             ctx.clip();
             disk(bandC, [A.faceForward + A.faceDepth - 0.4, 0, 0], [0, R * 1.04, 0]);
             ctx.strokeStyle = C.bandana;
-            ctx.lineWidth = 1.3;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
             ctx.restore();
 
@@ -158,6 +292,10 @@ export function azaelHeadPart(pose, rig) {
                     if (e.depth < f.depth - 0.3) continue;
                     // Pintura de guerra: traço preto descendo do olho até o queixo
                     limb([[eye[0], eye[1], eye[2] - 0.5], [eye[0] - 0.4, eye[1] * 1.08, eye[2] - 2.4]], side < 0 ? 0.5 : 0.38, C.warPaint);
+                    // Sobrancelha franzida: desce para o meio da testa
+                    limb([[eye[0] + 0.05, side * 0.35, eye[2] + 0.45], [eye[0] - 0.15, side * 1.5, eye[2] + 0.9]], 0.3, C.outline);
+                    // Boca: traço curto e sério
+                    limb([[eye[0] + 0.05, 0, eye[2] - 1.9], [eye[0] - 0.05, side * 0.55, eye[2] - 1.85]], 0.2, C.skinShade);
                     ctx.fillStyle = C.eye;
                     ctx.beginPath();
                     ctx.ellipse(e.x, e.y, 0.25 + 0.4 * Math.abs(sinF), 0.38, 0, 0, Math.PI * 2);
@@ -171,16 +309,59 @@ export function azaelHeadPart(pose, rig) {
             }
 
             // Mechas da frente caindo dos dois lados do rosto
-            for (const side of [-1, 1]) {
-                const sway = Math.sin(t * 2.6 + side) * 0.3;
-                limb([
-                    [pose.headA + 0.8, side * 2.5, pose.headZ + 1.6],
-                    [pose.headA + 1.3, side * 3.1, pose.headZ - 0.6],
-                    [pose.headA + 0.7 + sway, side * 3.3, pose.headZ - 3.2]
-                ], 0.55, C.hair);
-            }
+            for (const lock of locks) drawRibbon(rig, lock, 0.5, 0.05, C.hair, C.hairShade, false);
         }
     };
+}
+
+// --- CAPA ---
+// A mesma capa do herói (âncoras nos ombros e barra rasgada com a física de player.js), mas de pano: cada tira
+// vira uma curva que ondula da raiz até a barra, e no meio ela cede um pouco com o peso quando ele corre.
+export function drawAzaelCape(rig, pose, anchors, hem) {
+    const { project, C } = rig;
+    const { t, run } = pose;
+    const n = anchors.length - 1;
+    const segs = 5;
+    const amp = A.capeRipple + A.capeRippleRun * run;
+    const speed = A.capeRippleSpeed * (0.5 + run);
+    const strips = anchors.map((root, i) => {
+        const pts = [];
+        for (let j = 0; j <= segs; j++) {
+            const k = j / segs;
+            const w = t * speed - k * 3.6 + i * 0.85;
+            const p = mix(root, hem[i], k);
+            p[1] += Math.sin(w) * amp * k;
+            p[2] += Math.cos(w * 0.8) * amp * 0.7 * k - Math.sin(Math.PI * k) * A.capeSag * run;
+            pts.push(p);
+        }
+        return pts;
+    });
+    const P = strips.map(ch => ch.map(p => project(...p)));
+
+    ctx.beginPath();
+    smoothThrough(P[0]);
+    for (let i = 1; i <= n; i++) {
+        const a = strips[i - 1][segs];
+        const b = strips[i][segs];
+        const before = mix(strips[i - 1][segs - 1], strips[i][segs - 1], 0.5);
+        const notch = project(...mix(before, mix(a, b, 0.5), 0.55));
+        ctx.lineTo(notch.x, notch.y);
+        ctx.lineTo(P[i][segs].x, P[i][segs].y);
+    }
+    smoothThrough([...P[n]].reverse(), false);
+    for (let i = n - 1; i > 0; i--) ctx.lineTo(P[i][0].x, P[i][0].y);
+    ctx.closePath();
+    ctx.fillStyle = C.cape;
+    ctx.fill();
+    ctx.strokeStyle = C.capeEdge;
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+
+    // Dobras: curvas escuras entre as tiras e um brilho fraco ao lado de cada uma
+    for (let i = 1; i < n; i += 2) {
+        strokeSmooth(rig, strips[i], 0.9, C.capeFold);
+        strokeSmooth(rig, strips[i].map(p => [p[0], p[1] + 0.45, p[2] + 0.1]), 0.35, C.capeEdge);
+    }
 }
 
 // --- KATANA ---
@@ -239,7 +420,8 @@ export function scabbardFrame(pose) {
     return { mouth, grip: add(mouth, A.scabbardDir, -A.hiltLength * 0.55), dir: A.scabbardDir };
 }
 
-// Bainha preta na cintura; com a katana guardada, o cabo e a guarda saem da boca
+// Bainha preta na cintura; com a katana guardada (sheathed = 1), o cabo e a guarda saem da boca.
+// Enquanto ela sai ou volta, o cabo da bainha some no mesmo ritmo em que a lâmina aparece.
 export function azaelScabbardPart(pose, rig, sheathed) {
     const { project, limb, ball, C } = rig;
     const { mouth, dir } = scabbardFrame(pose);
@@ -247,11 +429,16 @@ export function azaelScabbardPart(pose, rig, sheathed) {
     return {
         depth: project(...add(mouth, dir, A.scabbardLength * 0.4)).depth - 0.2,
         draw() {
-            limb([mouth, end], 1.5, C.scabbard);
-            limb([add(mouth, dir, 0.4), add(mouth, dir, 1.4)], 1.7, C.bandageLine);
-            if (sheathed) {
+            limb([mouth, end], 1.3, C.scabbard);
+            // Brilho fraco no lacado da bainha e a amarração perto da boca
+            limb([add(mouth, dir, 2), add(mouth, dir, A.scabbardLength - 1)].map(p => [p[0], p[1], p[2] + 0.35]), 0.25, C.scabbardShine);
+            limb([add(mouth, dir, 0.4), add(mouth, dir, 1.4)], 1.5, C.bandageLine);
+            if (sheathed > 0) {
+                ctx.save();
+                ctx.globalAlpha *= sheathed;
                 ball(add(mouth, dir, -0.3), 0.85, C.tsuba);
                 limb([add(mouth, dir, -0.7), add(mouth, dir, -A.hiltLength)], 1.1, C.hilt);
+                ctx.restore();
             }
         }
     };
@@ -261,7 +448,7 @@ export function azaelScabbardPart(pose, rig, sheathed) {
 // Braço nu, com faixas no bíceps e no antebraço e garras na mão
 export function drawAzaelArm(rig, shoulder, elbow, hand, armWidth, handRadius) {
     const { limb, ball, C } = rig;
-    ball(shoulder, 2, C.skin);
+    ball(shoulder, 1.7, C.skin);
     limb([shoulder, elbow, hand], armWidth, C.skin);
     limb([mix(shoulder, elbow, 0.45), mix(shoulder, elbow, 0.68)], armWidth + 0.25, C.bandage);
     limb([mix(elbow, hand, 0.2), mix(elbow, hand, 0.92)], armWidth + 0.2, C.bandage);
@@ -270,6 +457,9 @@ export function drawAzaelArm(rig, shoulder, elbow, hand, armWidth, handRadius) {
     const d = [hand[0] - elbow[0], hand[1] - elbow[1], hand[2] - elbow[2]];
     const len = Math.hypot(...d) || 1;
     limb([add(hand, d, 0.8 / len), add(hand, d, 1.7 / len)], 0.5, C.claw);
+    // O pano do cachecol cai sobre o ombro (sem ele, o ombro nu parecia uma ombreira branca)
+    ball([shoulder[0] - 0.2, shoulder[1], shoulder[2] + 0.3], 2.1, C.capeFold);
+    ball([shoulder[0], shoulder[1] * 0.96, shoulder[2] + 0.65], 1.7, C.cape);
 }
 
 // Perna: calça larga, faixas na canela e pé descalço de 3 dedos (2 para a frente, 1 para trás) com garras

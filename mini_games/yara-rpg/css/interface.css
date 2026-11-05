@@ -74,10 +74,12 @@ button:disabled .game-icon { filter: grayscale(.85) brightness(.7); }
 }
 @media (prefers-reduced-motion: reduce) { .game-icon { transition: none; } }
 
-/* Palco de ação acima do log (js/systems/stage.js) */
+/* Palco 2.5D acima do log (js/stage/): proporção fixa, sem passar de ~45% da altura da tela */
 .action-stage {
     position: relative;
-    height: 112px;
+    aspect-ratio: 5 / 2;
+    max-height: 45vh;
+    min-height: 130px;
     margin-bottom: .75rem;
     overflow: hidden;
     border: 1px solid rgba(92, 81, 55, .55);
@@ -87,5 +89,5 @@ button:disabled .game-icon { filter: grayscale(.85) brightness(.7); }
 .action-stage canvas { display: block; width: 100%; height: 100%; }
 body:has(#campaign-ending-card:not([hidden])) .action-stage { display: none; }
 @media (max-width: 640px) {
-    .action-stage { height: 92px; margin-bottom: .5rem; }
+    .action-stage { margin-bottom: .5rem; }
 }

@@ -921,7 +921,7 @@
             ctx.canvas.height = captureSize;
         }
         const everyScene = new Map([
-            ...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
+            ...running.map((s, i) => [`correndo: ${OCTANT_NAMES[i]}`, s]), ...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
             ...heroMoves, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...ravenFx, ...ravenTeam, ...shackleFx, ...flameArms, ...curseFx
         ]);
 

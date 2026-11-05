@@ -79,3 +79,18 @@ Mesmos estados do herói jogável (ver `art_reference/hero/character.md`), com o
 - `images/azael-em-cima-pedra.png` — corpo inteiro em pé numa pedra, mão na katana (pose principal / idle)
 - `images/azael-profile.png` — close do rosto: olhos, pintura de guerra, bandana, orelhas
 - `images/azael_different_poses.png` — 4 poses: agachado, sacando a espada, meditando, golpe com as duas mãos
+
+## Detalhes implementados no jogo
+
+Código em `js/render/azael25d.js`; cores e medidas em `data_model/visuals/characters/azael_visual.js`.
+
+- Pano e cabelo em "correntes" de pontos: parados caem e balançam devagar; correndo vão para trás, atrasam com a
+  física da capa (inclusive ao virar) e ondulam com uma onda que corre da raiz até a ponta.
+- Bandana: faixa na testa, volta por cima do cabelo até o nó atrás da cabeça e duas pontas de comprimentos diferentes,
+  com a ponta rasgada em V, que esvoaçam mais rápido que o cabelo.
+- Cabelo: massa branca com pontas soltas e fios, risca no meio no alto da cabeça e duas mechas finas emoldurando o rosto.
+- Rosto: projetado para a frente (para ler visto de cima), olhos vermelhos brilhando, sobrancelhas franzidas, boca séria
+  e pintura de guerra.
+- Capa de pano: cada tira ondula e o meio cede com o peso na corrida; o cachecol cobre os ombros.
+- Corrida: corpo sobe e desce a cada passo, postura um pouco agachada; pés de 3 dedos com garras.
+- Katana: guardada na bainha com a mão no cabo; no golpe a lâmina desliza para fora e volta para a bainha aos poucos.
