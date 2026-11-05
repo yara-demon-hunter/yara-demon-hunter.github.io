@@ -73,3 +73,19 @@ button:disabled .game-icon { filter: grayscale(.85) brightness(.7); }
     #controls-combat .game-icon { width: 1.3rem; height: 1.3rem; }
 }
 @media (prefers-reduced-motion: reduce) { .game-icon { transition: none; } }
+
+/* Palco de ação acima do log (js/systems/stage.js) */
+.action-stage {
+    position: relative;
+    height: 112px;
+    margin-bottom: .75rem;
+    overflow: hidden;
+    border: 1px solid rgba(92, 81, 55, .55);
+    border-radius: .75rem;
+    background: #0d1517;
+}
+.action-stage canvas { display: block; width: 100%; height: 100%; }
+body:has(#campaign-ending-card:not([hidden])) .action-stage { display: none; }
+@media (max-width: 640px) {
+    .action-stage { height: 92px; margin-bottom: .5rem; }
+}

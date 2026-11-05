@@ -114,6 +114,9 @@
                 <button type="button" onclick="restartGame()" class="start-primary-button" data-i18n="restartCampaign">Começar nova jornada</button>
             </section>
 
+            <!-- Palco de ação: mostra o herói explorando, descansando e lutando (js/systems/stage.js) -->
+            <div id="action-stage" class="action-stage" aria-hidden="true"><canvas id="action-stage-canvas"></canvas></div>
+
             <!-- Log de Acontecimentos -->
             <div id="rpg-log" class="rpg-scroll bg-forest-950/90 border border-fantasy-border rounded-xl p-3 h-44 sm:h-48 overflow-y-auto space-y-2 text-xs sm:text-sm mb-4 font-mono">
                 <div class="text-emerald-400/90 border-l-2 border-emerald-500 pl-2 py-0.5">
