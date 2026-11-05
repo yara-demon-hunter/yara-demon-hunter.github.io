@@ -2,7 +2,12 @@ import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { save, persist } from '../core/save.js';
 import { audio } from '../core/state.js';
-import { renderStartScreen } from './screens.js';
+import { paintHeroPortrait, renderStartScreen } from './screens.js';
+
+// Herói liberado: por conquista do Santuário ou de graça (free em data_model/heroes.js)
+function isOwned(key) {
+    return HEROES[key].free === true || save.unlockedHeroes.includes(key);
+}
 
 // --- ESCOLHA DO HERÓI ---
 // Uma fileira de cartões, tudo à vista. Tocar num herói liberado escolhe e já volta para a tela inicial.
@@ -19,7 +24,7 @@ function renderHeroes() {
     const roster = document.getElementById('heroRoster');
     roster.replaceChildren();
     Object.entries(HEROES).forEach(([key, hero]) => {
-        const owned = save.unlockedHeroes.includes(key);
+        const owned = isOwned(key);
         const picked = save.hero === key;
         const trial = ACHIEVEMENTS.find(a => a.hero === key);
         const card = el('button', `hero-card${picked ? ' is-picked' : ''}${owned ? '' : ' is-locked'}`);
@@ -27,7 +32,7 @@ function renderHeroes() {
         card.disabled = !owned;
 
         const portrait = el('span', 'hero-portrait');
-        portrait.style.filter = owned ? hero.portrait : '';
+        if (owned) paintHeroPortrait(portrait, hero);
         card.append(
             portrait,
             el('b', '', owned ? hero.name : '???'),
@@ -52,7 +57,7 @@ export function closeHeroes() {
 }
 
 export function chooseHero(key) {
-    if (!save.unlockedHeroes.includes(key)) return;
+    if (!HEROES[key] || !isOwned(key)) return;
     save.hero = key;
     persist();
     renderHeroes();

@@ -1,8 +1,11 @@
 import { HERO_VISUALS } from './visuals/characters/hero_visual.js';
+import { AZAEL_VISUALS } from './visuals/characters/azael_visual.js';
 
 // --- HERÓIS ---
 // Liberados por conquistas do Santuário (data_model/sanctuary.js). mods: mesmas chaves de js/systems/modifiers.js.
 // colors: troca só o que muda na paleta do herói 2.5D; portrait: filtro CSS aplicado no retrato.
+// model: boneco 2.5D ('hunter' se ausente; 'azael' usa js/render/azael25d.js); portraitImage: arte própria do retrato.
+// free: já vem liberado, sem conquista.
 export const HEROES = {
     hunter: {
         name: 'Demon Hunter',
@@ -54,6 +57,19 @@ export const HEROES = {
             bladeGlowSoft: 'rgba(124, 58, 237, 0.8)'
         },
         portrait: 'hue-rotate(70deg) saturate(1.3)'
+    },
+    azael: {
+        name: 'Azael',
+        tagline: 'A demon who hunts his own kind.',
+        trait: 'Katana drawn from the sheath. (Stats still to be defined.)',
+        mods: {},
+        startPower: null,
+        model: 'azael',
+        colors: AZAEL_VISUALS.colors,
+        portrait: '',
+        portraitImage: 'images/characters/azael-small.webp',
+        // Liberado para teste
+        free: true
     }
 };
 

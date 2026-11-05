@@ -156,4 +156,4 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 4. Adicione o nó em `TREE_NODES`. O pré-requisito vem sempre do nó anterior na linha. Evolução fica logo depois do
    poder; o que continua a linha depois dela sai do poder em diagonal, para a ligação não passar por cima do losango.
 5. Não defina `cost`: deixe a tabela decidir.
-6. Mostre a skill em `previews/demon_hunter_preview.html` e atualize o mapa acima.
+6. Mostre a skill em `previews/characters_preview.html` e atualize o mapa acima.

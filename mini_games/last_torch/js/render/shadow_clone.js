@@ -6,6 +6,7 @@ import { drawGlow } from './fx/glow.js';
 import { getDashedRing } from './fx/rings.js';
 import { updateHeroAnim } from './player.js';
 import { renderPlayer25D } from './player25d.js';
+import { getHero } from '../systems/modifiers.js';
 
 // --- SHADOW CLONE (passiva) ---
 // O mesmo boneco 2.5D do herói, com animação própria (anda, vira e golpeia por conta) e a paleta de sombra de
@@ -69,7 +70,9 @@ export function renderShadowClone() {
         ctx.save();
         drawGlow(ctx, V.auraColor, c.x, c.y, V.auraRadius, appear);
         ctx.globalAlpha = V.alpha * appear;
-        renderPlayer25D(c, c.anim, V.colors);
+        // Mesmo boneco do herói escolhido (Demon Hunter ou Azael), pintado de sombra
+        const model = getHero().model;
+        renderPlayer25D(c, c.anim, model === 'azael' ? V.azaelColors : V.colors, null, model);
         ctx.globalAlpha = appear;
         renderHpBar(c);
         ctx.restore();

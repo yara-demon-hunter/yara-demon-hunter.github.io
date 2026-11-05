@@ -3,16 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prévia do Demon Hunter</title>
+    <title>Prévia dos Personagens</title>
     <style>
-        body { margin: 0; background: #050b16; }
+        body { margin: 0; background: #050b16; color: #cbd5e1; font-family: system-ui, sans-serif; }
         canvas { display: block; margin: 0 auto; max-width: 100%; }
+        /* Escolha do personagem: uma foto para cada boneco; a página inteira mostra só o escolhido */
+        #picker {
+            position: sticky; top: 0; z-index: 2; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+            padding: 12px 16px; background: rgba(5, 11, 22, 0.94); border-bottom: 1px solid #1e2b45;
+        }
+        #picker a {
+            display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border: 1px solid #1e2b45;
+            border-radius: 12px; background: #0b1424; color: #94a3b8; text-decoration: none; font-weight: 700;
+            transition: border-color .15s, transform .15s;
+        }
+        #picker a:hover, #picker a:focus-visible { border-color: #67e8f9; transform: translateY(-2px); outline: none; }
+        #picker a.is-picked { border-color: #fbbf24; color: #fde68a; box-shadow: 0 0 14px rgba(251, 191, 36, 0.25); }
+        #picker .face {
+            width: 52px; height: 52px; border-radius: 9px; border: 1px solid rgba(103, 232, 249, 0.4);
+            background-color: #0b1120; background-repeat: no-repeat;
+        }
+        #picker.hidden { display: none; }
     </style>
 </head>
 <body>
-    <!-- Página de desenvolvimento: tudo do herói (corrida, golpes, dash, efeitos, heróis alternativos, clone, Juramentos,
+    <!-- Página de desenvolvimento: tudo de um personagem jogável, escolhido no topo (?hero=hunter ou ?hero=azael) (corrida, golpes, dash, efeitos, heróis alternativos, clone, Juramentos,
          golpes especiais, skills dos quatro ramos, a fênix do Phoenix Pact, o corvo do Shadow Raven, a corrente do Shadow Shackle e o arremesso da adaga; as armas em detalhe ficam em weapon_previews.html)
          usando o código real do jogo. Como abrir: previews/README.md -->
+    <nav id="picker" aria-label="Escolha o personagem"></nav>
     <canvas id="gameCanvas" width="1200" height="7970"></canvas>
     <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
     <script>
@@ -28,7 +46,7 @@
             g.font = '400 18px system-ui, sans-serif';
             g.fillText('O navegador bloqueia módulos abertos direto do disco.', 600, 170);
             g.fillText('No terminal:  cd mini_games/last_torch && python3 -m http.server 8000', 600, 220);
-            g.fillText('Depois abra:  http://localhost:8000/previews/demon_hunter_preview.html', 600, 255);
+            g.fillText('Depois abra:  http://localhost:8000/previews/characters_preview.html', 600, 255);
         }
     </script>
     <script type="module">
@@ -45,6 +63,7 @@
         import { SLASH_VISUALS } from '../data_model/visuals/effects/slash_visual.js';
         import { LEVEL_UP_VISUALS } from '../data_model/visuals/effects/level_up_visual.js';
         import { ctx, passives, player, powers, shadowClones, state } from '../js/core/state.js';
+        import { save } from '../js/core/save.js';
         import { updateShadowClone } from '../js/systems/shadow_clone.js';
         import { renderCore } from '../js/render/arena.js';
         import { renderShadowClone } from '../js/render/shadow_clone.js';
@@ -71,6 +90,34 @@
         } from '../js/render/skills.js';
 
         state.gameState = 'PLAYING';     // o herói só anima durante a partida
+
+        // --- PERSONAGEM ---
+        // Cada boneco 2.5D (model) é um personagem: o Demon Hunter (com as variações de cor dele) e o Azael.
+        // ?hero=<chave em HEROES> escolhe; a página inteira usa o boneco e a paleta dele.
+        const modelOf = (hero) => hero.model ?? 'hunter';
+        // O primeiro herói de cada boneco é o personagem (os outros do mesmo boneco são variações dele)
+        const CHARACTERS = Object.entries(HEROES).filter(([key, hero], i, all) => all.findIndex(([, h]) => modelOf(h) === modelOf(hero)) === i);
+        const pickedKey = new URLSearchParams(location.search).get('hero');
+        const HERO_KEY = HEROES[pickedKey] ? pickedKey : 'hunter';
+        const HERO = HEROES[HERO_KEY];
+        const MODEL = modelOf(HERO);
+        const HERO_COLORS = HERO.colors ?? HERO_25D_VISUALS.colors;
+        save.hero = HERO_KEY;            // o Shadow Clone segue o herói do save (só na memória, não grava)
+
+        // Uma foto por personagem: arte própria (portraitImage) ou o recorte do rosto na arte do Demon Hunter
+        const picker = document.getElementById('picker');
+        CHARACTERS.forEach(([key, hero]) => {
+            const link = document.createElement('a');
+            link.href = `?hero=${key}`;
+            link.className = key === HERO_KEY || modelOf(hero) === MODEL ? 'is-picked' : '';
+            const face = document.createElement('span');
+            face.className = 'face';
+            face.style.backgroundImage = `url('../${hero.portraitImage ?? 'images/characters/demon-hunter-small.webp'}')`;
+            face.style.backgroundSize = hero.portraitImage ? 'cover' : '220%';
+            face.style.backgroundPosition = hero.portraitImage ? 'center' : '26% 8%';
+            link.append(face, hero.name);
+            picker.appendChild(link);
+        });
         const WIDTH = 1200;
         const HEIGHT = 7970;
         const start = performance.now();
@@ -106,7 +153,8 @@
                 anim: createHeroAnim(opts.throwsKnives ?? false),
                 slashes: [],
                 ghosts: [],
-                colors: HERO_25D_VISUALS.colors,
+                colors: HERO_COLORS,
+                model: MODEL,
                 speed: 0,
                 heading: 0,
                 gear: null,
@@ -252,7 +300,7 @@
                     renderCore();
                     renderShadowClone();
                 }
-                if (!s.noHero) renderPlayer25D(player, s.anim, s.colors, s.gear);
+                if (!s.noHero) renderPlayer25D(player, s.anim, s.colors, s.gear, s.model);
                 renderShield();
                 renderWisp();
                 renderPhoenixBird();
@@ -362,9 +410,11 @@
             ['Return Fire (pronto)', scene({ ward: true })]
         ];
 
-        const heroes = Object.values(HEROES).map(hero => [hero.name, scene({ speed: 150, heading: 0.5, colors: hero.colors ?? HERO_25D_VISUALS.colors })]);
+        // Só as variações do personagem escolhido (o Demon Hunter tem as versões de cor; o Azael, só ele)
+        const heroes = Object.values(HEROES).filter(hero => modelOf(hero) === MODEL)
+            .map(hero => [hero.name, scene({ speed: 150, heading: 0.5, colors: hero.colors ?? HERO_25D_VISUALS.colors })]);
         const clone = scene({
-            speed: 120, heading: 0.5, colors: SHADOW_CLONE_VISUALS.colors,
+            speed: 120, heading: 0.5, colors: MODEL === 'azael' ? SHADOW_CLONE_VISUALS.azaelColors : SHADOW_CLONE_VISUALS.colors,
             behind: () => drawGlow(ctx, SHADOW_CLONE_VISUALS.auraColor, player.x, player.y, SHADOW_CLONE_VISUALS.auraRadius, 1)
         });
 
@@ -374,7 +424,7 @@
             ['hearth', 'Oath of the Hearth'], ['ruin', 'Oath of Ruin']
         ];
         const OATH_KEYS = { slaughter: 'oathSlaughter', whispers: 'oathWhispers', hearth: 'oathHearth', ruin: 'oathRuin' };
-        const oathScene = (gear, opts) => front({ gear, oath: OATH_KEYS[gear], colors: getOathPalette(gear, HERO_25D_VISUALS.colors), ...opts });
+        const oathScene = (gear, opts) => front({ gear, oath: OATH_KEYS[gear], colors: getOathPalette(gear, HERO_COLORS), ...opts });
         const oathIdle = OATHS.map(([gear, name]) => [name, oathScene(gear, {})]);
         const oathRun = OATHS.map(([gear, name], i) => [`${name}: correndo`, oathScene(gear, { speed: 150, heading: 0.5 + i * 1.6 })]);
         const oathSwing = OATHS.map(([gear, name]) => [`${name}: golpe`, oathScene(gear, { before: slashEvery(0.9, 2) })]);
@@ -866,6 +916,7 @@
         const captureLabel = params.get('capture');
         const captureSize = Number(params.get('size') ?? 400);
         if (captureLabel) {
+            picker.classList.add('hidden');
             ctx.canvas.width = captureSize;
             ctx.canvas.height = captureSize;
         }
@@ -917,7 +968,7 @@
             const m = ctx.getTransform();
             setWorldView(m.a, m.e, m.f);    // os carimbos usam a transformação do mundo
             renderKnives();
-            renderPlayer25D();
+            renderPlayer25D(undefined, undefined, HERO_COLORS, null, MODEL);
             state.knifeThrowTime = -100000;
         }
 
@@ -1004,7 +1055,7 @@
             ctx.fillStyle = '#050b16';
             ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-            text('DEMON HUNTER: tudo do herói', 24, 34, 20, '#fde68a', 700);
+            text(`${HERO.name.toUpperCase()}: tudo do personagem`, 24, 34, 20, '#fde68a', 700);
 
             text('Correndo nas oito direções', 24, 66, 17, '#67e8f9', 700);
             running.forEach((s, i) => {

@@ -46,7 +46,8 @@ const HERO_25D = new URLSearchParams(window.location.search).get('hero') !== 'to
 // Herói com a forma do Juramento da noite, se houver
 function renderHero() {
     const gear = getHeroGear();
-    renderPlayer25D(player, heroAnim, getOathPalette(gear, getHero().colors ?? HERO_25D_VISUALS.colors), gear);
+    const hero = getHero();
+    renderPlayer25D(player, heroAnim, getOathPalette(gear, hero.colors ?? HERO_25D_VISUALS.colors), gear, hero.model);
 }
 
 // Funde a borda do mundo com as faixas laterais/superiores (se existirem) para não haver corte seco.

@@ -2,6 +2,15 @@
 // O clone é o mesmo boneco 2.5D do herói (js/render/player25d.js) pintado com esta paleta de sombra.
 // Lido por js/render/shadow_clone.js e pelo golpe em js/render/entities.js. Só afeta o desenho.
 import { HERO_VISUALS } from './hero_visual.js';
+import { AZAEL_VISUALS } from './azael_visual.js';
+
+// Tons de sombra que o clone do Azael usa nas peças só dele (pele, cabelo, faixas, bainha)
+const AZAEL_SHADOW = {
+    skin: '#2a1846', skinShade: '#170c2a', skinLight: '#3b2363', outline: '#000000',
+    hair: '#4c2f80', hairShade: '#2a1846', eye: '#c084fc', eyeGlow: 'rgba(192, 132, 252, 0.7)',
+    warPaint: '#000000', bandana: '#1e1035', bandanaShade: '#110a20', bandage: '#140a24', bandageLine: '#07030d',
+    claw: '#05020a', scabbard: '#05020a', hilt: '#07030d', tsuba: '#4c1d95'
+};
 
 export const SHADOW_CLONE_VISUALS = {
     alpha: 0.82,                // transparência do corpo
@@ -48,3 +57,5 @@ export const SHADOW_CLONE_VISUALS = {
         bladeGlowSoftFrenzy: 'rgba(192, 38, 211, 0.85)'
     }
 };
+// Clone do Azael: o boneco dele (js/render/azael25d.js) com a mesma paleta de sombra
+SHADOW_CLONE_VISUALS.azaelColors = { ...AZAEL_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors, ...AZAEL_SHADOW };

@@ -12,6 +12,10 @@ import { OATH_VISUALS } from '../../data_model/visuals/characters/oath_visual.js
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
 import { getPowerLevel } from '../../data_model/powers.js';
 import { getFireCastRatio, getKnifeChargeRatio } from '../systems/knives.js';
+import { AZAEL_VISUALS as AZ } from '../../data_model/visuals/characters/azael_visual.js';
+import {
+    azaelHairPart, azaelHeadPart, azaelScabbardPart, drawAzaelArm, drawAzaelLeg, drawAzaelTorso, drawKatana, scabbardFrame
+} from './azael25d.js';
 
 // --- HERÓI 2.5D ---
 // O mesmo herói de player.js, montado como um boneco 3D simples: pernas, tronco, braços, capuz,
@@ -28,6 +32,8 @@ let anim = heroAnim;
 let gear = null;
 let bladeLength = V.bladeLength;
 let bladeWidth = V.bladeWidth;
+// Boneco do Azael (js/render/azael25d.js) em vez do Caçador: cabeça, braços, pernas, tronco e katana próprios
+let azael = false;
 
 // Direção do herói no quadro atual (atualizada em renderPlayer25D)
 let cosF = 1;
@@ -158,7 +164,8 @@ function applyStance(stance, body, blend) {
         const w = anim.dash;
         stance.lean += V.dashLean * w;
         stance.crouch += V.dashCrouch * w;
-        stance.sword = { hand: [-3.5, 6, 11], dir: [-0.92, 0.3, -0.24], w: w * 0.9 };
+        // O Azael avança com a katana guardada e a mão no cabo
+        if (!azael) stance.sword = { hand: [-3.5, 6, 11], dir: [-0.92, 0.3, -0.24], w: w * 0.9 };
         stance.free = { hand: [-3.5, -5.5, 11.5], w: w * 0.9 };
     }
     if (anim.vigil > 0.01) {
@@ -220,6 +227,10 @@ function legPart(pose, side) {
     return {
         depth: project(...knee).depth,
         draw() {
+            if (azael) {
+                drawAzaelLeg(rig, hip, knee, ankle, [reach + 0.4, side * V.footSpread, 0.9 + lift]);
+                return;
+            }
             limb([hip, knee, ankle], V.legWidth, C.body);
             limb([ankle, toe], V.bootWidth, C.boots);
             // Faixa no cano da bota
@@ -238,6 +249,10 @@ function torsoPart(pose) {
             const pt = project(top.a, 0, top.z);
             const wb = sectionHalfWidth(bottom.A, bottom.B);
             const wt = sectionHalfWidth(top.A, top.B);
+            if (azael) {
+                drawAzaelTorso(rig, pose, bottom, top, wb, wt);
+                return;
+            }
 
             // Quadril, corpo entre quadril e ombros, e o topo dos ombros (mais claro, pega luz de cima)
             ctx.fillStyle = C.body;
@@ -431,8 +446,11 @@ function freeArmPart(pose, body) {
         depth: project(...elbow).depth + 0.1,
         draw() {
             if (throwK >= 0) drawThrowArc(restHand, pose, throwK);
-            ball(shoulder, V.shoulderRadius, C.sleeve);
-            limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
+            if (azael) drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+            else {
+                ball(shoulder, V.shoulderRadius, C.sleeve);
+                limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
+            }
             if ((throwK >= 0 && throwK < KNIFE_VISUALS.letGoFraction) || charge > 0 || fireHold > 0) {
                 if (passives.fireballs.lvl > 0) {
                     const orb = project(...hand);
@@ -440,7 +458,7 @@ function freeArmPart(pose, body) {
                     drawFireOrb(orb.x, orb.y - 2, SKILLS_VISUALS.fire.orbRadius * (0.3 + 0.7 * grow) * (1 + charge * 0.7), pose.t);
                 } else drawHeldDagger(shoulder, hand, pose.t);
             }
-            ball(hand, V.handRadius, C.glove);
+            if (!azael) ball(hand, V.handRadius, C.glove);
             if (charge > 0 || cast > 0) {
                 const glow = project(...hand);
                 ctx.save();
@@ -458,6 +476,7 @@ function swordArmPose(pose) {
     let swingAngle = restAngle;
     if (anim.swingActive || pose.blend > 0) swingAngle = swingAngleAt(Math.min(anim.swingElapsed, anim.swingSeconds), anim);
     const blend = pose.blend;
+    if (azael) return holdSword(pose, azaelSwordRest(pose, swingAngle, blend));
     const restHand = [pose.lean * 0.5 + 1.6 + Math.sin(anim.stride + Math.PI) * V.armSwing * 0.4 * pose.run, V.chest.B + 0.8, V.handHeight - pose.crouch];
     const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
     const hand = restHand.map((v, i) => v + (swingHand[i] - v) * blend);
@@ -465,11 +484,30 @@ function swordArmPose(pose) {
     const drop = V.restBladeDrop * (1 - blend);
     const len = Math.hypot(1, drop);
     const dir = [Math.cos(angle) / len, Math.sin(angle) / len, -drop / len];
+    return holdSword(pose, { hand, dir });
+}
+
+// Postura segurando a espada num lugar (golpes especiais, dash, Vigil)
+function holdSword(pose, { hand, dir }) {
     if (!pose.sword) return { hand, dir };
     const { w } = pose.sword;
     const held = mix(dir, pose.sword.dir, w);
     const size = Math.hypot(...held) || 1;
     return { hand: mix(hand, pose.sword.hand, w), dir: held.map(v => v / size) };
+}
+
+// Azael: em repouso a mão fica no cabo da katana guardada; no golpe ela sai da bainha e varre
+function azaelSwordRest(pose, swingAngle, blend) {
+    const sheath = scabbardFrame(pose);
+    const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
+    const d = mix(sheath.dir, [Math.cos(swingAngle), Math.sin(swingAngle), 0], blend);
+    const size = Math.hypot(...d) || 1;
+    return { hand: mix(sheath.grip, swingHand, blend), dir: d.map(v => v / size) };
+}
+
+// Azael: katana guardada quando não há golpe nem postura segurando a espada
+function azaelSheathed(pose) {
+    return !anim.swingActive && Math.max(pose.blend, pose.sword?.w ?? 0) < AZ.sheathBelow;
 }
 
 function swordArmPart(pose) {
@@ -479,6 +517,10 @@ function swordArmPart(pose) {
     return {
         depth: project(...elbow).depth + 0.1,
         draw() {
+            if (azael) {
+                drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+                return;
+            }
             ball(shoulder, V.shoulderRadius, C.sleeve);
             limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
             ball(hand, V.handRadius, C.glove);
@@ -488,6 +530,10 @@ function swordArmPart(pose) {
 
 // Lâmina 3D: plana na horizontal, com cabo, guarda, fio brilhante e runas
 function bladeShape(hand, dir, t, alpha) {
+    if (azael) {
+        drawKatana(rig, hand, dir, alpha);
+        return;
+    }
     const at = (d) => [hand[0] + dir[0] * d, hand[1] + dir[1] * d, hand[2] + dir[2] * d];
     const flat = Math.hypot(dir[0], dir[1]) || 1;
     const w = [-dir[1] / flat * bladeWidth / 2, dir[0] / flat * bladeWidth / 2, 0];
@@ -527,9 +573,11 @@ function swordPart(pose, frenzy, body) {
     // Bloodlust: a lâmina fica mais vermelha conforme a fome sobe
     const hungerLevel = body === player ? getPowerLevel(powers.bloodlust) : null;
     const hunger = hungerLevel ? state.bloodlust.stacks / hungerLevel.stacks : 0;
+    const sheathed = azael && azaelSheathed(pose);
     return {
         depth: project(...mid).depth,
         draw() {
+            if (sheathed) return;
             const t = pose.t;
             // Rastro fantasma do corte: lâminas em instantes anteriores
             if (anim.swingActive && anim.swingElapsed < anim.swingSeconds + 0.05) {
@@ -680,19 +728,23 @@ function headPart(pose) {
 
 // Ferramentas do boneco para o equipamento dos Juramentos (js/render/hero_gear.js)
 const rig = {
-    project, limb, ball, disk,
-    get anim() { return anim; }
+    project, projectVec, limb, ball, disk,
+    get anim() { return anim; },
+    get C() { return C; },
+    get sinF() { return sinF; },
+    get cosF() { return cosF; }
 };
 
 // body: herói (padrão) ou Shadow Clone, com o seu estado de animação e a sua paleta.
-// oathGear: forma do Juramento (colors já vem com a paleta dele)
-export function renderPlayer25D(body = player, bodyAnim = heroAnim, colors = V.colors, oathGear = null) {
+// oathGear: forma do Juramento (colors já vem com a paleta dele). model: 'hunter' (padrão) ou 'azael'
+export function renderPlayer25D(body = player, bodyAnim = heroAnim, colors = V.colors, oathGear = null, model = 'hunter') {
     anim = bodyAnim;
     throwsKnives = bodyAnim.throwsKnives !== false;
     C = colors;
     gear = oathGear;
-    bladeLength = V.bladeLength * (gear ? OATH_VISUALS[gear].bladeLength : 1);
-    bladeWidth = V.bladeWidth * (gear ? OATH_VISUALS[gear].bladeWidth : 1);
+    azael = model === 'azael';
+    bladeLength = (azael ? AZ.bladeLength : V.bladeLength) * (gear ? OATH_VISUALS[gear].bladeLength : 1);
+    bladeWidth = (azael ? AZ.bladeWidth : V.bladeWidth) * (gear ? OATH_VISUALS[gear].bladeWidth : 1);
     const t = performance.now() / 1000;
     const frenzy = state.frenzyActiveTimer > 0;
     cosF = Math.cos(anim.facing);
@@ -740,7 +792,9 @@ export function renderPlayer25D(body = player, bodyAnim = heroAnim, colors = V.c
         freeArmPart(pose, body),
         swordArmPart(pose),
         swordPart(pose, frenzy, body),
-        headPart(pose),
+        ...(azael
+            ? [azaelHeadPart(pose, rig), azaelHairPart(pose, rig), azaelScabbardPart(pose, rig, azaelSheathed(pose))]
+            : [headPart(pose)]),
         ...gearParts(gear, pose, rig)
     ];
     parts.sort((p, q) => p.depth - q.depth).forEach(p => p.draw());

@@ -24,6 +24,7 @@ Use this page to find the smallest relevant files before changing the game.
 | Narrative choices and gamble events | `js/data/extra-events.js` |
 | Short procedural scenes, opening scene | `scenes/` (see `scenes/README.md`); wiring in `js/game.js` |
 | Pet commands (combat button, exploration scout, companion on the portrait) | `js/systems/pets.js`; abilities in `js/data/pets.js`; styles in `css/pets.css` |
+| 3D characters in Blender (poses, renders; not loaded by the game) | `blender/` (see `blender/CLAUDE.md`) |
 | Browser regression tests | `tests/` (copy to `_site/yara-rpg-tests/` after a Jekyll build; excluded from published output) |
 
 ## Loading model

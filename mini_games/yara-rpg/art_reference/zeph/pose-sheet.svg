@@ -1,0 +1,434 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1550" height="1910" viewBox="0 0 1550 1910" font-family="Arial, sans-serif">
+<rect width="1550" height="1910" fill="#ffffff"/>
+<text x="30" y="52" font-size="30" font-weight="700" fill="#222">Yara RPG — Folha de poses</text>
+<text x="30" y="84" font-size="16" fill="#555">Personagem: ______________________   Arma: ______________   Mão da arma: ( ) direita ( ) esquerda   Altura relativa: ( ) baixo ( ) médio ( ) alto</text>
+<text x="30" y="112" font-size="14" fill="#777">Regras: personagem SEMPRE de perfil olhando para a DIREITA → (o inimigo fica à direita) · pés na linha do chão · topo da cabeça na linha H · rabisco vale! setas = movimento · marque a faísca/rastro do golpe em vermelho</text>
+<rect x="20" y="150" width="200" height="230" rx="10" fill="#f3efe6" stroke="#c9bfa6"/>
+<text x="34" y="190" font-size="24" font-weight="700" fill="#3a2f1c">IDLE</text>
+<text x="34" y="214" font-size="13" fill="#6b5d43">parado · loop</text>
+<text x="34" y="260" font-size="13" fill="#555">duração total:</text><text x="34" y="284" font-size="13" fill="#555">______ ms</text>
+<text x="34" y="320" font-size="13" fill="#555">notas:</text><line x1="34" y1="346" x2="206" y2="346" stroke="#bbb"/><line x1="34" y1="370" x2="206" y2="370" stroke="#bbb"/>
+<rect x="230" y="150" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="240" y="172" font-size="13" font-weight="700" fill="#333">K1</text><text x="268" y="172" font-size="12" fill="#555">neutro</text>
+<line x1="238" y1="188" x2="530" y2="188" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="528" y="185" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="238" y1="216" x2="530" y2="216" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="238" y1="239" x2="530" y2="239" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="236" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="238" y1="278" x2="530" y2="278" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="275" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="238" y1="344" x2="530" y2="344" stroke="#555" stroke-width="2"/>
+<text x="238" y="358" font-size="10" fill="#555">chão</text>
+<line x1="359" y1="180" x2="359" y2="344" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="526" y="368" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="240" y="370" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="550" y="150" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="560" y="172" font-size="13" font-weight="700" fill="#333">K2</text><text x="588" y="172" font-size="12" fill="#555">inspira (sobe)</text>
+<line x1="558" y1="188" x2="850" y2="188" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="848" y="185" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="558" y1="216" x2="850" y2="216" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="558" y1="239" x2="850" y2="239" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="236" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="558" y1="278" x2="850" y2="278" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="275" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="558" y1="344" x2="850" y2="344" stroke="#555" stroke-width="2"/>
+<text x="558" y="358" font-size="10" fill="#555">chão</text>
+<line x1="679" y1="180" x2="679" y2="344" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="846" y="368" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="560" y="370" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="870" y="150" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="880" y="172" font-size="13" font-weight="700" fill="#333">K3</text><text x="908" y="172" font-size="12" fill="#555">expira (desce)</text>
+<line x1="878" y1="188" x2="1170" y2="188" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1168" y="185" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="878" y1="216" x2="1170" y2="216" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="878" y1="239" x2="1170" y2="239" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="236" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="878" y1="278" x2="1170" y2="278" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="275" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="878" y1="344" x2="1170" y2="344" stroke="#555" stroke-width="2"/>
+<text x="878" y="358" font-size="10" fill="#555">chão</text>
+<line x1="999" y1="180" x2="999" y2="344" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1166" y="368" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="880" y="370" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="1190" y="150" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="1200" y="172" font-size="13" font-weight="700" fill="#333">K4</text><text x="1228" y="172" font-size="12" fill="#555">detalhe (piscar, capa)</text>
+<line x1="1198" y1="188" x2="1490" y2="188" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1488" y="185" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="1198" y1="216" x2="1490" y2="216" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="1198" y1="239" x2="1490" y2="239" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="236" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="1198" y1="278" x2="1490" y2="278" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="275" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="1198" y1="344" x2="1490" y2="344" stroke="#555" stroke-width="2"/>
+<text x="1198" y="358" font-size="10" fill="#555">chão</text>
+<line x1="1319" y1="180" x2="1319" y2="344" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1486" y="368" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="1200" y="370" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="20" y="390" width="200" height="230" rx="10" fill="#f3efe6" stroke="#c9bfa6"/>
+<text x="34" y="430" font-size="24" font-weight="700" fill="#3a2f1c">EXPLORAR</text>
+<text x="34" y="454" font-size="13" fill="#6b5d43">andando · loop</text>
+<text x="34" y="500" font-size="13" fill="#555">duração total:</text><text x="34" y="524" font-size="13" fill="#555">______ ms</text>
+<text x="34" y="560" font-size="13" fill="#555">notas:</text><line x1="34" y1="586" x2="206" y2="586" stroke="#bbb"/><line x1="34" y1="610" x2="206" y2="610" stroke="#bbb"/>
+<rect x="230" y="390" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="240" y="412" font-size="13" font-weight="700" fill="#333">K1</text><text x="268" y="412" font-size="12" fill="#555">contato (pé da frente toca)</text>
+<line x1="238" y1="428" x2="530" y2="428" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="528" y="425" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="238" y1="456" x2="530" y2="456" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="238" y1="479" x2="530" y2="479" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="476" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="238" y1="518" x2="530" y2="518" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="515" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="238" y1="584" x2="530" y2="584" stroke="#555" stroke-width="2"/>
+<text x="238" y="598" font-size="10" fill="#555">chão</text>
+<line x1="359" y1="420" x2="359" y2="584" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="526" y="608" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="240" y="610" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="550" y="390" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="560" y="412" font-size="13" font-weight="700" fill="#333">K2</text><text x="588" y="412" font-size="12" fill="#555">passagem (pernas cruzam)</text>
+<line x1="558" y1="428" x2="850" y2="428" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="848" y="425" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="558" y1="456" x2="850" y2="456" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="558" y1="479" x2="850" y2="479" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="476" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="558" y1="518" x2="850" y2="518" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="515" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="558" y1="584" x2="850" y2="584" stroke="#555" stroke-width="2"/>
+<text x="558" y="598" font-size="10" fill="#555">chão</text>
+<line x1="679" y1="420" x2="679" y2="584" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="846" y="608" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="560" y="610" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="870" y="390" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="880" y="412" font-size="13" font-weight="700" fill="#333">K3</text><text x="908" y="412" font-size="12" fill="#555">contato oposto</text>
+<line x1="878" y1="428" x2="1170" y2="428" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1168" y="425" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="878" y1="456" x2="1170" y2="456" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="878" y1="479" x2="1170" y2="479" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="476" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="878" y1="518" x2="1170" y2="518" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="515" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="878" y1="584" x2="1170" y2="584" stroke="#555" stroke-width="2"/>
+<text x="878" y="598" font-size="10" fill="#555">chão</text>
+<line x1="999" y1="420" x2="999" y2="584" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1166" y="608" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="880" y="610" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="1190" y="390" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="1200" y="412" font-size="13" font-weight="700" fill="#333">K4</text><text x="1228" y="412" font-size="12" fill="#555">passagem oposta</text>
+<line x1="1198" y1="428" x2="1490" y2="428" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1488" y="425" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="1198" y1="456" x2="1490" y2="456" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="1198" y1="479" x2="1490" y2="479" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="476" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="1198" y1="518" x2="1490" y2="518" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="515" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="1198" y1="584" x2="1490" y2="584" stroke="#555" stroke-width="2"/>
+<text x="1198" y="598" font-size="10" fill="#555">chão</text>
+<line x1="1319" y1="420" x2="1319" y2="584" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1486" y="608" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="1200" y="610" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="20" y="630" width="200" height="230" rx="10" fill="#f3efe6" stroke="#c9bfa6"/>
+<text x="34" y="670" font-size="24" font-weight="700" fill="#3a2f1c">ATAQUE</text>
+<text x="34" y="694" font-size="13" fill="#6b5d43">golpe rápido</text>
+<text x="34" y="740" font-size="13" fill="#555">duração total:</text><text x="34" y="764" font-size="13" fill="#555">______ ms</text>
+<text x="34" y="800" font-size="13" fill="#555">notas:</text><line x1="34" y1="826" x2="206" y2="826" stroke="#bbb"/><line x1="34" y1="850" x2="206" y2="850" stroke="#bbb"/>
+<rect x="230" y="630" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="240" y="652" font-size="13" font-weight="700" fill="#333">K1</text><text x="268" y="652" font-size="12" fill="#555">guarda</text>
+<line x1="238" y1="668" x2="530" y2="668" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="528" y="665" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="238" y1="696" x2="530" y2="696" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="238" y1="719" x2="530" y2="719" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="716" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="238" y1="758" x2="530" y2="758" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="755" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="238" y1="824" x2="530" y2="824" stroke="#555" stroke-width="2"/>
+<text x="238" y="838" font-size="10" fill="#555">chão</text>
+<line x1="359" y1="660" x2="359" y2="824" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="526" y="848" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="240" y="850" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="550" y="630" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="560" y="652" font-size="13" font-weight="700" fill="#333">K2</text><text x="588" y="652" font-size="12" fill="#555">antecipação (recua)</text>
+<line x1="558" y1="668" x2="850" y2="668" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="848" y="665" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="558" y1="696" x2="850" y2="696" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="558" y1="719" x2="850" y2="719" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="716" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="558" y1="758" x2="850" y2="758" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="755" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="558" y1="824" x2="850" y2="824" stroke="#555" stroke-width="2"/>
+<text x="558" y="838" font-size="10" fill="#555">chão</text>
+<line x1="679" y1="660" x2="679" y2="824" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="846" y="848" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="560" y="850" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="870" y="630" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="880" y="652" font-size="13" font-weight="700" fill="#333">K3</text><text x="908" y="652" font-size="12" fill="#555">IMPACTO</text>
+<line x1="878" y1="668" x2="1170" y2="668" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1168" y="665" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="878" y1="696" x2="1170" y2="696" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="878" y1="719" x2="1170" y2="719" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="716" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="878" y1="758" x2="1170" y2="758" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="755" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="878" y1="824" x2="1170" y2="824" stroke="#555" stroke-width="2"/>
+<text x="878" y="838" font-size="10" fill="#555">chão</text>
+<line x1="999" y1="660" x2="999" y2="824" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1166" y="848" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="880" y="850" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="1190" y="630" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="1200" y="652" font-size="13" font-weight="700" fill="#333">K4</text><text x="1228" y="652" font-size="12" fill="#555">recuperação</text>
+<line x1="1198" y1="668" x2="1490" y2="668" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1488" y="665" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="1198" y1="696" x2="1490" y2="696" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="1198" y1="719" x2="1490" y2="719" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="716" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="1198" y1="758" x2="1490" y2="758" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="755" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="1198" y1="824" x2="1490" y2="824" stroke="#555" stroke-width="2"/>
+<text x="1198" y="838" font-size="10" fill="#555">chão</text>
+<line x1="1319" y1="660" x2="1319" y2="824" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1486" y="848" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="1200" y="850" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="20" y="870" width="200" height="230" rx="10" fill="#f3efe6" stroke="#c9bfa6"/>
+<text x="34" y="910" font-size="24" font-weight="700" fill="#3a2f1c">ESPECIAL</text>
+<text x="34" y="934" font-size="13" fill="#6b5d43">golpe pesado / poder</text>
+<text x="34" y="980" font-size="13" fill="#555">duração total:</text><text x="34" y="1004" font-size="13" fill="#555">______ ms</text>
+<text x="34" y="1040" font-size="13" fill="#555">notas:</text><line x1="34" y1="1066" x2="206" y2="1066" stroke="#bbb"/><line x1="34" y1="1090" x2="206" y2="1090" stroke="#bbb"/>
+<rect x="230" y="870" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="240" y="892" font-size="13" font-weight="700" fill="#333">K1</text><text x="268" y="892" font-size="12" fill="#555">carga (energia)</text>
+<line x1="238" y1="908" x2="530" y2="908" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="528" y="905" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="238" y1="936" x2="530" y2="936" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="238" y1="959" x2="530" y2="959" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="956" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="238" y1="998" x2="530" y2="998" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="995" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="238" y1="1064" x2="530" y2="1064" stroke="#555" stroke-width="2"/>
+<text x="238" y="1078" font-size="10" fill="#555">chão</text>
+<line x1="359" y1="900" x2="359" y2="1064" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="526" y="1088" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="240" y="1090" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="550" y="870" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="560" y="892" font-size="13" font-weight="700" fill="#333">K2</text><text x="588" y="892" font-size="12" fill="#555">antecipação máxima</text>
+<line x1="558" y1="908" x2="850" y2="908" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="848" y="905" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="558" y1="936" x2="850" y2="936" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="558" y1="959" x2="850" y2="959" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="956" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="558" y1="998" x2="850" y2="998" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="995" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="558" y1="1064" x2="850" y2="1064" stroke="#555" stroke-width="2"/>
+<text x="558" y="1078" font-size="10" fill="#555">chão</text>
+<line x1="679" y1="900" x2="679" y2="1064" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="846" y="1088" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="560" y="1090" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="870" y="870" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="880" y="892" font-size="13" font-weight="700" fill="#333">K3</text><text x="908" y="892" font-size="12" fill="#555">IMPACTO</text>
+<line x1="878" y1="908" x2="1170" y2="908" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1168" y="905" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="878" y1="936" x2="1170" y2="936" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="878" y1="959" x2="1170" y2="959" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="956" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="878" y1="998" x2="1170" y2="998" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="995" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="878" y1="1064" x2="1170" y2="1064" stroke="#555" stroke-width="2"/>
+<text x="878" y="1078" font-size="10" fill="#555">chão</text>
+<line x1="999" y1="900" x2="999" y2="1064" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1166" y="1088" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="880" y="1090" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="1190" y="870" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="1200" y="892" font-size="13" font-weight="700" fill="#333">K4</text><text x="1228" y="892" font-size="12" fill="#555">recuperação</text>
+<line x1="1198" y1="908" x2="1490" y2="908" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1488" y="905" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="1198" y1="936" x2="1490" y2="936" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="1198" y1="959" x2="1490" y2="959" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="956" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="1198" y1="998" x2="1490" y2="998" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="995" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="1198" y1="1064" x2="1490" y2="1064" stroke="#555" stroke-width="2"/>
+<text x="1198" y="1078" font-size="10" fill="#555">chão</text>
+<line x1="1319" y1="900" x2="1319" y2="1064" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1486" y="1088" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="1200" y="1090" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="20" y="1110" width="200" height="230" rx="10" fill="#f3efe6" stroke="#c9bfa6"/>
+<text x="34" y="1150" font-size="24" font-weight="700" fill="#3a2f1c">APARO</text>
+<text x="34" y="1174" font-size="13" fill="#6b5d43">defesa com a arma</text>
+<text x="34" y="1220" font-size="13" fill="#555">duração total:</text><text x="34" y="1244" font-size="13" fill="#555">______ ms</text>
+<text x="34" y="1280" font-size="13" fill="#555">notas:</text><line x1="34" y1="1306" x2="206" y2="1306" stroke="#bbb"/><line x1="34" y1="1330" x2="206" y2="1330" stroke="#bbb"/>
+<rect x="230" y="1110" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="240" y="1132" font-size="13" font-weight="700" fill="#333">K1</text><text x="268" y="1132" font-size="12" fill="#555">guarda</text>
+<line x1="238" y1="1148" x2="530" y2="1148" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="528" y="1145" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="238" y1="1176" x2="530" y2="1176" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="238" y1="1199" x2="530" y2="1199" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="1196" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="238" y1="1238" x2="530" y2="1238" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="1235" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="238" y1="1304" x2="530" y2="1304" stroke="#555" stroke-width="2"/>
+<text x="238" y="1318" font-size="10" fill="#555">chão</text>
+<line x1="359" y1="1140" x2="359" y2="1304" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="526" y="1328" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="240" y="1330" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="550" y="1110" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="560" y="1132" font-size="13" font-weight="700" fill="#333">K2</text><text x="588" y="1132" font-size="12" fill="#555">bloqueio (faísca)</text>
+<line x1="558" y1="1148" x2="850" y2="1148" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="848" y="1145" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="558" y1="1176" x2="850" y2="1176" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="558" y1="1199" x2="850" y2="1199" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="1196" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="558" y1="1238" x2="850" y2="1238" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="1235" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="558" y1="1304" x2="850" y2="1304" stroke="#555" stroke-width="2"/>
+<text x="558" y="1318" font-size="10" fill="#555">chão</text>
+<line x1="679" y1="1140" x2="679" y2="1304" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="846" y="1328" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="560" y="1330" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="870" y="1110" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="880" y="1132" font-size="13" font-weight="700" fill="#333">K3</text><text x="908" y="1132" font-size="12" fill="#555">empurrão (recua)</text>
+<line x1="878" y1="1148" x2="1170" y2="1148" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1168" y="1145" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="878" y1="1176" x2="1170" y2="1176" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="878" y1="1199" x2="1170" y2="1199" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="1196" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="878" y1="1238" x2="1170" y2="1238" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="1235" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="878" y1="1304" x2="1170" y2="1304" stroke="#555" stroke-width="2"/>
+<text x="878" y="1318" font-size="10" fill="#555">chão</text>
+<line x1="999" y1="1140" x2="999" y2="1304" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1166" y="1328" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="880" y="1330" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="1190" y="1110" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="1200" y="1132" font-size="13" font-weight="700" fill="#333">K4</text><text x="1228" y="1132" font-size="12" fill="#555">volta à guarda</text>
+<line x1="1198" y1="1148" x2="1490" y2="1148" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1488" y="1145" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="1198" y1="1176" x2="1490" y2="1176" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="1198" y1="1199" x2="1490" y2="1199" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="1196" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="1198" y1="1238" x2="1490" y2="1238" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="1235" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="1198" y1="1304" x2="1490" y2="1304" stroke="#555" stroke-width="2"/>
+<text x="1198" y="1318" font-size="10" fill="#555">chão</text>
+<line x1="1319" y1="1140" x2="1319" y2="1304" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1486" y="1328" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="1200" y="1330" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="20" y="1350" width="200" height="230" rx="10" fill="#f3efe6" stroke="#c9bfa6"/>
+<text x="34" y="1390" font-size="24" font-weight="700" fill="#3a2f1c">ESQUIVA</text>
+<text x="34" y="1414" font-size="13" fill="#6b5d43">salto para trás</text>
+<text x="34" y="1460" font-size="13" fill="#555">duração total:</text><text x="34" y="1484" font-size="13" fill="#555">______ ms</text>
+<text x="34" y="1520" font-size="13" fill="#555">notas:</text><line x1="34" y1="1546" x2="206" y2="1546" stroke="#bbb"/><line x1="34" y1="1570" x2="206" y2="1570" stroke="#bbb"/>
+<rect x="230" y="1350" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="240" y="1372" font-size="13" font-weight="700" fill="#333">K1</text><text x="268" y="1372" font-size="12" fill="#555">agacha</text>
+<line x1="238" y1="1388" x2="530" y2="1388" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="528" y="1385" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="238" y1="1416" x2="530" y2="1416" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="238" y1="1439" x2="530" y2="1439" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="1436" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="238" y1="1478" x2="530" y2="1478" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="1475" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="238" y1="1544" x2="530" y2="1544" stroke="#555" stroke-width="2"/>
+<text x="238" y="1558" font-size="10" fill="#555">chão</text>
+<line x1="359" y1="1380" x2="359" y2="1544" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="526" y="1568" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="240" y="1570" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="550" y="1350" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="560" y="1372" font-size="13" font-weight="700" fill="#333">K2</text><text x="588" y="1372" font-size="12" fill="#555">no ar (mais alto)</text>
+<line x1="558" y1="1388" x2="850" y2="1388" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="848" y="1385" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="558" y1="1416" x2="850" y2="1416" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="558" y1="1439" x2="850" y2="1439" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="1436" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="558" y1="1478" x2="850" y2="1478" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="1475" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="558" y1="1544" x2="850" y2="1544" stroke="#555" stroke-width="2"/>
+<text x="558" y="1558" font-size="10" fill="#555">chão</text>
+<line x1="679" y1="1380" x2="679" y2="1544" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="846" y="1568" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="560" y="1570" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="870" y="1350" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="880" y="1372" font-size="13" font-weight="700" fill="#333">K3</text><text x="908" y="1372" font-size="12" fill="#555">aterrissa</text>
+<line x1="878" y1="1388" x2="1170" y2="1388" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1168" y="1385" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="878" y1="1416" x2="1170" y2="1416" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="878" y1="1439" x2="1170" y2="1439" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="1436" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="878" y1="1478" x2="1170" y2="1478" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="1475" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="878" y1="1544" x2="1170" y2="1544" stroke="#555" stroke-width="2"/>
+<text x="878" y="1558" font-size="10" fill="#555">chão</text>
+<line x1="999" y1="1380" x2="999" y2="1544" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1166" y="1568" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="880" y="1570" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="1190" y="1350" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="1200" y="1372" font-size="13" font-weight="700" fill="#333">K4</text><text x="1228" y="1372" font-size="12" fill="#555">volta à guarda</text>
+<line x1="1198" y1="1388" x2="1490" y2="1388" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1488" y="1385" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="1198" y1="1416" x2="1490" y2="1416" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="1198" y1="1439" x2="1490" y2="1439" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="1436" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="1198" y1="1478" x2="1490" y2="1478" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="1475" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="1198" y1="1544" x2="1490" y2="1544" stroke="#555" stroke-width="2"/>
+<text x="1198" y="1558" font-size="10" fill="#555">chão</text>
+<line x1="1319" y1="1380" x2="1319" y2="1544" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1486" y="1568" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="1200" y="1570" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="20" y="1590" width="200" height="230" rx="10" fill="#f3efe6" stroke="#c9bfa6"/>
+<text x="34" y="1630" font-size="24" font-weight="700" fill="#3a2f1c">HIT</text>
+<text x="34" y="1654" font-size="13" fill="#6b5d43">tomando dano</text>
+<text x="34" y="1700" font-size="13" fill="#555">duração total:</text><text x="34" y="1724" font-size="13" fill="#555">______ ms</text>
+<text x="34" y="1760" font-size="13" fill="#555">notas:</text><line x1="34" y1="1786" x2="206" y2="1786" stroke="#bbb"/><line x1="34" y1="1810" x2="206" y2="1810" stroke="#bbb"/>
+<rect x="230" y="1590" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="240" y="1612" font-size="13" font-weight="700" fill="#333">K1</text><text x="268" y="1612" font-size="12" fill="#555">impacto (cabeça vai)</text>
+<line x1="238" y1="1628" x2="530" y2="1628" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="528" y="1625" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="238" y1="1656" x2="530" y2="1656" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="238" y1="1679" x2="530" y2="1679" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="1676" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="238" y1="1718" x2="530" y2="1718" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="528" y="1715" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="238" y1="1784" x2="530" y2="1784" stroke="#555" stroke-width="2"/>
+<text x="238" y="1798" font-size="10" fill="#555">chão</text>
+<line x1="359" y1="1620" x2="359" y2="1784" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="526" y="1808" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="240" y="1810" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="550" y="1590" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="560" y="1612" font-size="13" font-weight="700" fill="#333">K2</text><text x="588" y="1612" font-size="12" fill="#555">recuo máximo</text>
+<line x1="558" y1="1628" x2="850" y2="1628" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="848" y="1625" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="558" y1="1656" x2="850" y2="1656" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="558" y1="1679" x2="850" y2="1679" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="1676" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="558" y1="1718" x2="850" y2="1718" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="848" y="1715" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="558" y1="1784" x2="850" y2="1784" stroke="#555" stroke-width="2"/>
+<text x="558" y="1798" font-size="10" fill="#555">chão</text>
+<line x1="679" y1="1620" x2="679" y2="1784" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="846" y="1808" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="560" y="1810" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="870" y="1590" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="880" y="1612" font-size="13" font-weight="700" fill="#333">K3</text><text x="908" y="1612" font-size="12" fill="#555">recupera</text>
+<line x1="878" y1="1628" x2="1170" y2="1628" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1168" y="1625" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="878" y1="1656" x2="1170" y2="1656" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="878" y1="1679" x2="1170" y2="1679" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="1676" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="878" y1="1718" x2="1170" y2="1718" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1168" y="1715" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="878" y1="1784" x2="1170" y2="1784" stroke="#555" stroke-width="2"/>
+<text x="878" y="1798" font-size="10" fill="#555">chão</text>
+<line x1="999" y1="1620" x2="999" y2="1784" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1166" y="1808" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="880" y="1810" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<rect x="1190" y="1590" width="308" height="230" rx="8" fill="#fff" stroke="#999"/>
+<text x="1200" y="1612" font-size="13" font-weight="700" fill="#333">K4</text><text x="1228" y="1612" font-size="12" fill="#555">—</text>
+<line x1="1198" y1="1628" x2="1490" y2="1628" stroke="#7aa7c7" stroke-dasharray="4 4"/>
+<text x="1488" y="1625" font-size="10" fill="#7aa7c7" text-anchor="end">H</text>
+<line x1="1198" y1="1656" x2="1490" y2="1656" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<line x1="1198" y1="1679" x2="1490" y2="1679" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="1676" font-size="10" fill="#7aa7c7" text-anchor="end">ombro</text>
+<line x1="1198" y1="1718" x2="1490" y2="1718" stroke="#d6e4ee" stroke-dasharray="4 4"/>
+<text x="1488" y="1715" font-size="10" fill="#7aa7c7" text-anchor="end">quadril</text>
+<line x1="1198" y1="1784" x2="1490" y2="1784" stroke="#555" stroke-width="2"/>
+<text x="1198" y="1798" font-size="10" fill="#555">chão</text>
+<line x1="1319" y1="1620" x2="1319" y2="1784" stroke="#eab3b3" stroke-dasharray="2 5"/>
+<text x="1486" y="1808" font-size="16" fill="#c44" text-anchor="end">inimigo →</text>
+<text x="1200" y="1810" font-size="11" fill="#888">tempo até a próxima: ____ ms</text>
+<text x="30" y="1880" font-size="13" fill="#888">Opcional (outra folha igual): MORTE, VITÓRIA, BEBER POÇÃO, DESCANSAR (sentado). Coluna vazia = não precisa.</text>
+</svg>

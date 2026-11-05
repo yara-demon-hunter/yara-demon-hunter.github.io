@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prévia de animações</title>
+<style>
+    :root { color-scheme: dark; }
+    body { margin: 0; padding: 16px; background: #111417; color: #d6d3cb; font: 14px system-ui, sans-serif; }
+    header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+    h1 { margin: 0 12px 0 0; font-size: 20px; }
+    select, button, label { font: inherit; }
+    select, button { background: #1e2428; color: inherit; border: 1px solid #3a444b; border-radius: 6px; padding: 6px 10px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .card { background: #181d21; border: 1px solid #2b3338; border-radius: 10px; padding: 10px; }
+    .card h2 { margin: 0 0 6px; font-size: 15px; display: flex; justify-content: space-between; }
+    .card h2 small { color: #8a949b; font-weight: 400; }
+    canvas { display: block; width: 100%; background: linear-gradient(#22303a, #12181c 82%, #0b0e10 82%); border-radius: 6px; }
+    .keys { margin-top: 6px; }
+    .ref { margin-top: 6px; max-width: 100%; max-height: 160px; display: block; background: #222; border-radius: 6px; }
+    p.hint { color: #8a949b; margin: 4px 0 0; }
+</style>
+</head>
+<body>
+<header>
+    <h1>Prévia de animações</h1>
+    <label>Personagem <select id="who"></select></label>
+    <label>Velocidade
+        <select id="speed"><option value="1">normal</option><option value="0.5">½</option><option value="0.25">¼ (câmera lenta)</option></select>
+    </label>
+    <label><input type="checkbox" id="bones"> mostrar esqueleto</label>
+</header>
+<p class="hint">Em cima: a animação rodando. Embaixo: as poses-chave lado a lado. Ao lado, a referência do autor (se existir em <code>&lt;id&gt;/images</code>).</p>
+<div class="grid" id="grid"></div>
+
+<script src="../js/systems/rig.js"></script>
+<script src="../js/data/rig/zeph.js"></script>
+<script>
+const characters = window.YaraRpgData.rig;
+const who = document.getElementById('who');
+Object.keys(characters).forEach((id) => who.add(new Option(id, id)));
+const REFS = { idle: 'idle', walk: 'walking', attack: 'axe_attack' };
+let cards = [];
+
+function build() {
+    const id = who.value, C = characters[id];
+    const grid = document.getElementById('grid');
+    grid.replaceChildren();
+    cards = Object.entries(C.animations).map(([name, animation]) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const total = YaraRig.duration(C, name);
+        card.innerHTML = `<h2>${name}<small>${total} ms${animation.loop ? ' · loop' : ''}</small></h2>`;
+        const live = document.createElement('canvas');
+        live.width = 520; live.height = 380;
+        const keys = document.createElement('canvas');
+        keys.className = 'keys';
+        keys.width = 520; keys.height = 150;
+        card.append(live, keys);
+        if (REFS[name]) {
+            const img = new Image();
+            img.className = 'ref';
+            img.src = `${id}/images/${id}_${REFS[name]}.webp`;
+            img.onerror = () => img.remove();
+            card.append(img);
+        }
+        grid.append(card);
+        drawKeys(keys, C, name);
+        return { live, name, C, state: {} };
+    });
+}
+
+function drawBones(g, J) {
+    const pt = (p) => { const q = J.project(p); return [q.x, q.y]; };
+    g.strokeStyle = '#ff4d6d'; g.fillStyle = '#ff4d6d'; g.lineWidth = 2;
+    const seg = (a, b) => { g.beginPath(); g.moveTo(...pt(a)); g.lineTo(...pt(b)); g.stroke(); };
+    seg(J.hip, J.neck); seg(J.neck, J.head);
+    [J.armF, J.armB].forEach((a) => { seg(a.s, a.e); seg(a.e, a.h); });
+    [J.legF, J.legB].forEach((l) => { seg(l.hip, l.k); seg(l.k, l.a); });
+    [J.hip, J.neck, J.head, J.armF.e, J.armF.h, J.armB.e, J.armB.h, J.legF.k, J.legF.a, J.legB.k, J.legB.a]
+        .forEach((p) => { g.beginPath(); g.arc(...pt(p), 3, 0, Math.PI * 2); g.fill(); });
+}
+
+function drawKeys(canvas, C, name) {
+    const g = canvas.getContext('2d');
+    const list = C.animations[name].keys;
+    const cell = canvas.width / list.length;
+    const H = Math.min(cell * .8, canvas.height * .62);
+    g.clearRect(0, 0, canvas.width, canvas.height);
+    list.forEach((key, i) => {
+        const pose = { ...C.base, ...key.pose };
+        YaraRig.render(g, C, pose, cell * i + cell * .45, canvas.height - 16, H);
+        g.fillStyle = '#8a949b'; g.font = '11px system-ui';
+        g.fillText(`${key.t}ms`, cell * i + 4, 12);
+    });
+}
+
+const start = performance.now();
+function frame(now) {
+    requestAnimationFrame(frame);
+    const speed = Number(document.getElementById('speed').value);
+    const bones = document.getElementById('bones').checked;
+    cards.forEach(({ live, name, C, state }) => {
+        const g = live.getContext('2d');
+        g.clearRect(0, 0, live.width, live.height);
+        const ms = (now - start) * speed;
+        const total = YaraRig.duration(C, name);
+        // animações sem loop: tocam, esperam meio segundo e repetem
+        const t = C.animations[name].loop ? ms : ms % (total + 500);
+        const pose = YaraRig.sample(C, name, t);
+        const H = 280, x = live.width * .42, gy = live.height * .9;
+        const J = YaraRig.render(g, C, pose, x, gy, H, { state });
+        if (bones) { g.save(); g.translate(x, gy); drawBones(g, J); g.restore(); }
+    });
+}
+who.onchange = build;
+build();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

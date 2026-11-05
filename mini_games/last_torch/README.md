@@ -132,6 +132,7 @@ js/
   render/moth.js, bloater.js, wraith.js, zombie_wolf.js, headless_knight.js ...   arte de cada monstro (usada para gerar os sprites)
   render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
   render/player25d.js             herói 2.5D (padrão) e posturas dos golpes especiais
+  render/azael25d.js              peças do Azael no mesmo boneco 2.5D (rosto, cabelo, katana, bainha, pés)
   render/hero_gear.js             equipamento e paleta dos Juramentos, peças do mesmo boneco 2.5D
   render/shadow_clone.js          Shadow Clone: herói 2.5D com paleta de sombra
   render/fx/                      glow, carimbos (stamp), sprites pequenos, atlas de números, anéis, relógio do desenho, easing, barra de vida

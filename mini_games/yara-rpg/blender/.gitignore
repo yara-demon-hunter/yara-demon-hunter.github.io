@@ -1,0 +1,5 @@
+renders/
+assets/**
+!assets/README.md
+*.blend1
+__pycache__/

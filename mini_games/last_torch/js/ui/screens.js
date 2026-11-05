@@ -20,6 +20,15 @@ import { startHints } from './hints.js';
 import { resetQuickPick } from './quick_pick.js';
 import { updateHUD } from './hud.js';
 
+// Retrato do herói: arte própria (portraitImage) ou a do Caçador com o filtro de cor dele
+export function paintHeroPortrait(node, hero) {
+    const image = hero.portraitImage;
+    node.style.filter = image ? '' : hero.portrait;
+    node.style.backgroundImage = image ? `url('${image}')` : '';
+    node.style.backgroundSize = image ? 'cover' : '';
+    node.style.backgroundPosition = image ? 'center' : '';
+}
+
 // --- INÍCIO DE PARTIDA ---
 export function startGame() {
     audio.init();
@@ -119,7 +128,7 @@ export function startGame() {
     player.comboStep = 1;
 
     document.querySelector('#heroName span').innerText = hero.name.toUpperCase();
-    document.getElementById('heroPortrait').style.filter = hero.portrait;
+    paintHeroPortrait(document.getElementById('heroPortrait'), hero);
 
     state.gameState = 'PLAYING';
     ['startScreen', 'gameOverScreen', 'shopScreen', 'pickScreen', 'campScreen', 'sanctuaryScreen', 'heroScreen'].forEach(id => {
@@ -297,11 +306,11 @@ export function renderStartScreen() {
     const hero = getHero();
     document.getElementById('startSanctuaryCount').innerText = `${ACHIEVEMENTS.filter(a => save.achievements[a.id]).length}/${ACHIEVEMENTS.length} earned`;
     document.getElementById('startHeroName').innerText = hero.name;
-    document.getElementById('startHeroPortrait').style.filter = hero.portrait;
+    paintHeroPortrait(document.getElementById('startHeroPortrait'), hero);
     const dark = document.getElementById('darknessPicker');
     dark.classList.toggle('hidden', save.maxDarkness <= 1);
     document.getElementById('darknessValue').innerText = save.darkness;
-    document.getElementById('heroPortrait').style.filter = hero.portrait;
+    paintHeroPortrait(document.getElementById('heroPortrait'), hero);
 }
 
 export function changeDarkness(step) {

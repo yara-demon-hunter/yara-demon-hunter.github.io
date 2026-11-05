@@ -3,7 +3,8 @@
 // avança contra o monstro ao atacar etc. O monstro usa a própria imagem, esfumada na névoa.
 // Só descreve: não muda nenhuma regra. Liga-se ao jogo embrulhando as ações globais
 // (exploreForest, combatQuickAttack…) e observando HP/combate a cada quadro.
-// Classic browser script; carregar depois de combat.js, combat-outcomes.js e pets.js.
+// Personagens com esqueleto (js/data/rig/<id>.js) usam js/systems/rig.js; os demais, a silhueta abaixo.
+// Classic browser script; carregar depois de combat.js, combat-outcomes.js, pets.js e rig.js.
 window.YaraStage = (() => {
     const canvas = document.getElementById('action-stage-canvas');
     if (!canvas) return null;
@@ -441,6 +442,61 @@ window.YaraStage = (() => {
         return { pose, dx };
     }
 
+    // --- PERSONAGEM NO ESQUELETO (js/systems/rig.js + js/data/rig/<id>.js) ---
+    // Cada ação do palco vira uma animação do personagem; quem não tem rig usa a silhueta acima.
+    const BASE_SECONDS = { ...ANIM_SECONDS };
+    const RIG_ANIMATION = {
+        walk: 'walk', attack: 'attack', heavy: 'special', parry: 'parry', dodge: 'dodge',
+        rest: 'rest', potion: 'potion', flee: 'walk', fleeFail: 'walk'
+    };
+
+    const rigState = {};                 // molas do cabelo/jaqueta/bolsa entre um quadro e outro
+
+    function rigCharacter() {
+        const id = typeof selectedCharacter !== 'undefined' ? selectedCharacter?.id : null;
+        return (window.YaraRig && window.YaraRpgData.rig?.[id]) || null;
+    }
+
+    // As ações duram o mesmo que as animações do personagem.
+    function syncDurations(character) {
+        Object.assign(ANIM_SECONDS, BASE_SECONDS);
+        if (!character) return;
+        Object.entries(RIG_ANIMATION).forEach(([type, name]) => {
+            if (!['flee', 'fleeFail', 'walk'].includes(type) && character.animations[name]) {
+                ANIM_SECONDS[type] = window.YaraRig.duration(character, name) / 1000;
+            }
+        });
+    }
+
+    // Instante de impacto (0–1) da ação, para o rastro do golpe sair junto com o machado.
+    function impactAt(character, type) {
+        const name = RIG_ANIMATION[type];
+        const animation = character?.animations[name];
+        return animation?.impact ? animation.impact / window.YaraRig.duration(character, name) : null;
+    }
+
+    function drawRigHero(character, t, x, gy, H, fighting, hurt) {
+        let name = fighting ? 'guard' : 'idle';
+        let ms = t * 1000;
+        let flip = false;
+        if (anim && RIG_ANIMATION[anim.type]) {
+            name = RIG_ANIMATION[anim.type];
+            ms = (t - anim.start) * 1000;
+            const p = clamp((t - anim.start) / ANIM_SECONDS[anim.type]);
+            if (anim.type === 'flee') { flip = p < .6; ms *= 1.4; }
+            if (anim.type === 'fleeFail') { flip = p < .5; ms *= 1.4; }
+        }
+        if (t - heroHurt < .4 && character.animations.hit) {
+            name = 'hit';
+            ms = (t - heroHurt) * 1000;
+        }
+        const pose = window.YaraRig.sample(character, name, ms);
+        const special = anim?.type === 'heavy' ? bump(clamp((t - anim.start) / ANIM_SECONDS.heavy), 0, .6) : 0;
+        window.YaraRig.render(g, character, pose, x, gy, H, { flip, tint: hurt, glow: special, state: rigState });
+        return true;
+    }
+
+    let lastRig;
     let prev = now();
     function frame() {
         requestAnimationFrame(frame);
@@ -453,6 +509,8 @@ window.YaraStage = (() => {
         let region = null;
         try { region = getCurrentRegionData(); } catch { /* jogo ainda carregando */ }
         try { watchGame(t); } catch { /* idem */ }
+        const rig = rigCharacter();
+        if (rig !== lastRig) { syncDurations(rig); lastRig = rig; }
         if (anim && t - anim.start > ANIM_SECONDS[anim.type]) anim = null;
         if (anim?.type === 'walk' && !reduceMotion.matches) scroll += dt * width * .55;
 
@@ -485,8 +543,11 @@ window.YaraStage = (() => {
             if (!(anim?.type === 'flee' && pose.flip)) drawPet(petX, gy, H * .7, moving ? t * 13 : 0, t);
         }
 
-        drawHero(heroX, gy, H, pose, t);
-        if (hurt) {
+        // cabeça grande e membros finos: o personagem do rig fica um pouco maior que a silhueta
+        const rigH = H * 1.22;
+        const drewRig = rig && drawRigHero(rig, t, heroX + (hurt ? Math.sin(t * 80) * H * .02 : 0), gy, rigH, fighting, hurt);
+        if (!drewRig) drawHero(heroX, gy, H, pose, t);
+        if (hurt && !drewRig) {
             g.save();
             g.globalAlpha = hurt * .4;
             g.fillStyle = '#ff3b3b';
@@ -498,7 +559,11 @@ window.YaraStage = (() => {
         if (anim && (anim.type === 'attack' || anim.type === 'heavy')) {
             const p = clamp((t - anim.start) / ANIM_SECONDS[anim.type]);
             const heavy = anim.type === 'heavy';
-            const show = heavy ? bump(p, .4, .85) : bump(p, .25, .7);
+            // com rig, o rastro sai no instante de impacto da animação
+            const hitAt = impactAt(rig, anim.type);
+            const show = hitAt !== null
+                ? bump(p, hitAt - .08, hitAt + .25)
+                : (heavy ? bump(p, .4, .85) : bump(p, .25, .7));
             slashArc(monsterX - H * .1, gy - H * .55, H * (heavy ? .5 : .32), -1.9, heavy ? 1.2 : .2, heavy ? '#ff8a5c' : '#e6f3f5', show * .9);
         }
         if (anim?.type === 'parry') {
@@ -513,7 +578,8 @@ window.YaraStage = (() => {
             const p = clamp((t - anim.start) / ANIM_SECONDS.dodge);
             g.save();
             g.globalAlpha = bump(p, 0, 1) * .3;
-            drawHero(baseX, gy, H, { arm: .9, sword: -1.9 }, t);
+            if (drewRig) window.YaraRig.render(g, rig, window.YaraRig.sample(rig, 'guard', 0), baseX, gy, rigH, { alpha: .25 });
+            else drawHero(baseX, gy, H, { arm: .9, sword: -1.9 }, t);
             g.restore();
         }
         drawParticles(dt);

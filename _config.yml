@@ -16,3 +16,4 @@ exclude:
   - README.md
   - mini_games/yara-rpg/components/yara-rpg.html
   - mini_games/yara-rpg/tests
+  - mini_games/yara-rpg/blender
