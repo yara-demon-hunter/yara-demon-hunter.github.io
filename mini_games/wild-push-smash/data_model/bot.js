@@ -73,8 +73,36 @@ export const BOT_LEVELS = {
         skyDropMinHover: 26,
         skyDropAim: 10,
         skyLead: 12
+    },
+    // INSANE: números achados por evolução (algoritmo genético), milhares de rounds simulados contra o HARD
+    // com bichos e arenas sorteados. Vence ~68% dos rounds contra o HARD. Mesma reação do HARD (3 frames):
+    // ganha na estratégia, não no reflexo. Quase não usa o dash normal: vive pulando em cima do rival
+    // e guarda o medidor para o TURBO.
+    insane: {
+        reaction: 3,
+        aimError: 5,
+        hesitateChance: 0,
+        hesitateFrames: [6, 16],
+        dodgeChance: 1,
+        dodgeDash: true,
+        smartPositioning: true,
+        predict: true,
+        recoverDash: true,
+        jumpAttackRange: 260,
+        jumpAttackChance: 0.15,
+        randomJumpChance: 0.021,
+        smashChance: 1,
+        smashAbove: 41,
+        dashRange: 239,
+        dashChance: 0,
+        turboChance: 0.64,
+        edgeMargin: 44,
+        deadZone: 2,
+        skyDropMinHover: 1,
+        skyDropAim: 0,
+        skyLead: 0
     }
 };
 
-export const BOT_LEVEL_ORDER = ['easy', 'normal', 'hard'];
+export const BOT_LEVEL_ORDER = ['easy', 'normal', 'hard', 'insane'];
 export const DEFAULT_BOT_LEVEL = 'normal';

@@ -14,6 +14,8 @@ Abra `/mini_games/yara-rpg/game.html`. A página integrada ao site carrega Tailw
 
 Os menus do site abrem o jogo no idioma da página (`?lang=pt` ou `?lang=en`). O seletor PT/EN também permite trocar o idioma durante a jornada; o progresso é salvo e restaurado após a troca.
 
+O botão de configurações no cabeçalho permite trocar o idioma e ligar/desligar música e efeitos sonoros. As preferências de áudio ficam salvas localmente no navegador.
+
 Ao abrir o mini game, escolha um personagem. Cada personagem já começa com seu próprio equipamento inicial (`startingEquipment` em `js/data/characters.js`). Zeph começa com mais HP máximo; Oskar começa com mais ataque.
 
 Os objetivos de monstros sobem gradualmente entre as regiões (4, 6, 8 e 10 derrotas), e o peso de baús na exploração é 5%. A suíte de navegador inclui uma simulação determinística para detectar regressões no tempo estimado de campanha.
@@ -106,15 +108,9 @@ Abra `http://localhost:4000/yara-rpg-tests/` e selecione **Executar testes**. O 
 - Telegrafia: o aviso aparece no monstro; atacar durante o aviso **interrompe** o golpe e dá fúria (`telegraphInterruptFury` em `combat-rules.js`).
 - Eventos de aposta (efeito `gamble`) ficam em `js/data/extra-events.js`.
 
-## Alma do herói
+## Escolhas narrativas
 
-Toda decisão moral desloca `hero.soul`, de -100 (maligno) a +100 (divino). Valores opostos se anulam: quem alterna luz e sombra volta para o equilíbrio, e a aura some. Os botões mostram antes da escolha para onde ela puxa (`✦ +8` ou `☾ −8`).
-
-- Medidor no painel do herói; ao tocar, mostra os efeitos do nível atual e as últimas escolhas.
-- Aura no retrato, vinheta na tela e cor do retrato crescem com a força da alma. Mudar de lado faz as duas energias se chocarem.
-- Sete níveis em `js/data/soul-rules.js`: o lado maligno dá ataque e ouro em troca de cura; o divino dá defesa e cura em troca de ouro; o equilíbrio dá XP.
-- Consequências: escolhas trancadas por nível (`requires` na escolha), eventos que só aparecem para um lado (`requires` no evento), frases das regiões (`soulEcho`), falas do herói, reação dos chefes, texto do portão de Gudran, final da campanha e conquistas.
-- Para dar peso a uma escolha, some `soul: N` nela; contatos da névoa aceitam o mesmo campo. O efeito `deal` aplica ganhos e custos descritos nos dados, sem código novo.
+As escolhas dos eventos podem conceder recompensas ou aplicar custos sem alterar atributos de alinhamento. O efeito `deal` em `js/data/extra-events.js` continua aplicando valores como ouro, HP, foco, poções, pontos de habilidade e atributos; requisitos de recursos, como entregar uma poção, continuam bloqueando a opção quando não podem ser pagos.
 
 ## Companheiros
 

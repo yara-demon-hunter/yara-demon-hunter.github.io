@@ -59,7 +59,7 @@ export function step() {
     touchControls.classList.toggle('hidden', !showTouch);
 }
 
-export const STEP_MS = 1000 / 60;
+export const STEP_MS = 1000 / (60 * MATCH.gameSpeed);
 export let lastTime = performance.now();
 export let acc = 0;
 export function gameLoop(now) {

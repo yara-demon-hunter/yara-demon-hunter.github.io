@@ -7,6 +7,7 @@ import { TEXTS } from '../../data_model/texts.js';
 import { CHARACTER_ATLAS as A } from '../../data_model/visuals/sprites.js';
 import { SCENERY } from '../../data_model/visuals/arena.js';
 import { playSound } from '../audio/sound.js';
+import { starsOf, totalStars } from '../core/progress.js';
 import { drawCharacter } from '../render/character_art.js';
 import { artFor, CELL_UNITS, POSES } from '../render/character_sprites.js';
 import { drawStagePreview } from '../render/scenery.js';
@@ -49,6 +50,7 @@ const pickers = [0, 1].map((i) => {
         <button class="arrow" data-dir="1" aria-label="Next">▶</button>
         <div class="picker-info">
             <div class="picker-name"></div>
+            <div class="picker-stars${i === 0 ? '' : ' ghost'}" title="${TEXTS.starsHint}">${BOT_LEVEL_ORDER.map(l => `<b class="star-${l}">★</b>`).join('')}</div>
             ${Object.keys(RANGES).map(k => `<div class="stat"><span>${TEXTS.statLabels[k]}</span><div class="bar"><i data-stat="${k}"></i></div></div>`).join('')}
             <div class="dash-skill"><strong class="dash-name"></strong><span class="dash-description"></span></div>
             <div class="dash-skill passive-skill"><strong class="dash-name passive-name"></strong><span class="dash-description passive-description"></span></div>
@@ -92,6 +94,7 @@ function renderPicker(i, drop) {
         p.passiveName.innerText = char.glide.name;
         p.passiveDescription.innerText = char.glide.description;
     }
+    if (i === 0) refreshStars();
     Object.entries(RANGES).forEach(([k, [lo, hi]]) => {
         const t = hi > lo ? (STAT[k](char) - lo) / (hi - lo) : 1;
         p.root.querySelector(`[data-stat="${k}"]`).style.width = `${Math.round(15 + t * 85)}%`;
@@ -146,7 +149,7 @@ function showStage() {
 
 // Dificuldade do bot: seletor de três posições na coluna da direita, entre as arenas e os botões de jogar
 const levelRow = document.getElementById('levelRow');
-levelRow.innerHTML = `<span class="side-label">${TEXTS.botLevelLabel}</span>`;
+levelRow.innerHTML = `<span class="side-label">${TEXTS.botLevelLabel}<b class="star-total" title="${TEXTS.starsHint}"></b></span>`;
 const levelCol = document.createElement('div');
 levelCol.className = 'level-col';
 levelRow.appendChild(levelCol);
@@ -164,6 +167,15 @@ function selectLevel(level, silent) {
     save();
     levelButtons.forEach((b, k) => b.classList.toggle('sel', BOT_LEVEL_ORDER[k] === level));
     if (!silent) playSound('coin');
+}
+
+// Estrelas do bicho do P1 (uma por nível do bot já vencido com ele) e o total de todas
+export function refreshStars() {
+    const earned = starsOf(ROSTER[selection.chars[0]].id);
+    pickers[0].root.querySelectorAll('.picker-stars b').forEach((star, k) =>
+        star.classList.toggle('got', earned.includes(BOT_LEVEL_ORDER[k])));
+    const total = levelRow.querySelector('.star-total');
+    if (total) total.innerText = `★ ${totalStars()}/${ROSTER.length * BOT_LEVEL_ORDER.length}`;
 }
 
 // No menu: A/D trocam o P1 e ←/→ o P2

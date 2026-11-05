@@ -25,21 +25,24 @@ window.YaraPets = (() => {
         return item.name[gameLanguage];
     }
 
+    // Foto do pet (ou o emoji do item, se a imagem faltar) dentro de `holder`.
+    function fillPetImage(holder, item) {
+        holder.replaceChildren();
+        if (!item.image) { holder.textContent = item.icon; return; }
+        const image = document.createElement('img');
+        image.src = item.image;
+        image.alt = '';
+        image.addEventListener('error', () => { holder.textContent = item.icon; }, { once: true });
+        holder.append(image);
+    }
+
     function playSprite(item, targetId) {
         const target = document.getElementById(targetId);
         if (!target) return;
         const sprite = document.createElement('span');
         sprite.className = 'pet-strike-sprite';
         sprite.setAttribute('aria-hidden', 'true');
-        if (item.image) {
-            const image = document.createElement('img');
-            image.src = item.image;
-            image.alt = '';
-            image.addEventListener('error', () => { image.replaceWith(document.createTextNode(item.icon)); }, { once: true });
-            sprite.append(image);
-        } else {
-            sprite.textContent = item.icon;
-        }
+        fillPetImage(sprite, item);
         target.append(sprite);
         window.setTimeout(() => sprite.remove(), 800);
     }
@@ -211,17 +214,12 @@ window.YaraPets = (() => {
         if (key === lastPetInstance) return;
         const isNewCompanion = Boolean(pet && lastPetInstance !== undefined);
         lastPetInstance = key;
+        const avatar = document.getElementById('pet-command-avatar');
         companion.replaceChildren();
+        avatar.replaceChildren();
         if (!pet) return;
-        if (pet.image) {
-            const image = document.createElement('img');
-            image.src = pet.image;
-            image.alt = '';
-            image.addEventListener('error', () => { companion.textContent = pet.icon; }, { once: true });
-            companion.append(image);
-        } else {
-            companion.textContent = pet.icon;
-        }
+        fillPetImage(companion, pet);
+        fillPetImage(avatar, pet);
         if (isNewCompanion) logMessage(t('petJoined', { pet: petName(pet) }), 'special');
     }
 
@@ -232,14 +230,22 @@ window.YaraPets = (() => {
         const abilities = abilityOf(pet);
         const exploring = !document.getElementById('controls-explore').classList.contains('hidden') && !isInSpiritWorld;
         const ability = inCombat ? abilities?.command : exploring ? abilities?.scout : null;
+        // O botão entra na grade ativa (exploração ou luta), logo antes da poção
+        const grid = document.getElementById(inCombat ? 'controls-combat' : 'controls-explore');
+        if (ability && button.parentElement !== grid) grid.insertBefore(button, grid.querySelector('.potion-action-button'));
         button.hidden = !ability;
+        document.getElementById('controls-explore').classList.toggle('has-pet', Boolean(ability) && !inCombat);
+        document.getElementById('controls-combat').classList.toggle('has-pet', Boolean(ability) && inCombat);
         if (!ability) return;
 
         const cooldown = inCombat ? combat.cooldown : Number(hero.petScoutCooldown) || 0;
         button.onclick = inCombat ? command : scout;
         button.disabled = cooldown > 0 || (inCombat && combatActionLocked);
         button.classList.toggle('pet-command-ready', !button.disabled);
-        document.getElementById('pet-command-icon').textContent = ability.icon;
+        const badge = document.getElementById('pet-command-cooldown');
+        badge.hidden = cooldown <= 0;
+        badge.textContent = cooldown;
+        button.title = `${petName(pet)} — ${localized(ability.name)}: ${inCombat ? localized(ability.description) : ''}`.replace(/: $/, '');
         document.getElementById('pet-command-name').textContent = localized(ability.name);
         document.getElementById('pet-command-detail').textContent = inCombat
             ? localized(ability.description)

@@ -10,9 +10,9 @@ import { state } from '../core/state.js';
 import { players } from '../entities/player.js';
 import { updateHeartsHUD, updateWinsHUD } from '../ui/hud.js';
 import { setBotHint } from '../ui/controls_hint.js';
-import { menuSub, menuTitle, screenMenu } from '../ui/menu.js';
+import { btnRematch, menuSub, menuTitle, screenMenu } from '../ui/menu.js';
 import { buildTouchControls } from '../ui/touch_controls.js';
-import { getSelection } from '../ui/character_select.js';
+import { getSelection, refreshStars } from '../ui/character_select.js';
 import { keepCharacterAtlases } from '../render/character_sprites.js';
 
 export function startMatch(isBot) {
@@ -65,6 +65,8 @@ export function showGameOverMenu(winnerText, subText) {
     syncMusic();
     menuTitle.innerText = winnerText;
     menuSub.innerText = subText;
+    btnRematch.classList.remove('hidden');
+    refreshStars();
     screenMenu.classList.remove('hidden');
 }
 

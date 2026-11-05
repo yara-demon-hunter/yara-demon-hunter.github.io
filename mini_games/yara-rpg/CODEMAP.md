@@ -21,10 +21,9 @@ Use this page to find the smallest relevant files before changing the game.
 | New run, global state, level growth, startup | `js/game.js` |
 | Achievements, bestiary, collection, powers, records, run summary | `js/systems/meta.js`, `js/data/achievements.js`, `css/meta.css` |
 | Wandering vendor (event, shop, selling bag items) | `js/systems/vendor.js`; catalog and prices in `js/data/vendor.js`; frequency in `js/data/exploration-rules.js` |
-| Gamble and moral story events | `js/data/extra-events.js` |
-| Soul meter, aura, tiers, choice tags, endings | `js/systems/soul.js`; values and tiers in `js/data/soul-rules.js`; styles in `css/soul.css` |
+| Narrative choices and gamble events | `js/data/extra-events.js` |
 | Short procedural scenes, opening scene | `scenes/` (see `scenes/README.md`); wiring in `js/game.js` |
-| Pet commands (combat button, exploration scout, companion on the portrait) | `js/systems/pets.js`; abilities in `js/data/pets.js`; styles in `css/soul.css` |
+| Pet commands (combat button, exploration scout, companion on the portrait) | `js/systems/pets.js`; abilities in `js/data/pets.js`; styles in `css/pets.css` |
 | Browser regression tests | `tests/` (copy to `_site/yara-rpg-tests/` after a Jekyll build; excluded from published output) |
 
 ## Loading model

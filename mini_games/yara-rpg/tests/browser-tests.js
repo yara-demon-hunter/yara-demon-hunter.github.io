@@ -165,6 +165,144 @@ async function runTests() {
             assert(restoredGold === 432, `Expected restored gold to be 432, received ${restoredGold}.`);
         });
 
+        test("Soul alignment UI and state are removed from legacy saves", () => {
+            const result = evaluateInGame(`(() => {
+                const alignmentUiRemoved = !document.getElementById("soul-meter")
+                    && !document.getElementById("soul-dialog")
+                    && typeof window.YaraSoul === "undefined";
+                saveGame();
+                const snapshot = JSON.parse(localStorage.getItem(SAVE_KEY));
+                snapshot.hero.soul = 80;
+                snapshot.hero.soulHistory = [{ amount: 10 }];
+                delete hero.soul;
+                delete hero.soulHistory;
+                const loaded = loadSavedGame(snapshot);
+                return {
+                    alignmentUiRemoved,
+                    legacySaveLoads: loaded,
+                    soulStateRemoved: !("soul" in hero) && !("soulHistory" in hero)
+                };
+            })()`);
+            assert(result.alignmentUiRemoved && result.legacySaveLoads && result.soulStateRemoved,
+                `Alignment was not fully removed or legacy save migration failed: ${JSON.stringify(result)}.`);
+        });
+
+        test("Story deals and resource requirements still work", () => {
+            const result = evaluateInGame(`(() => {
+                const original = { ...hero };
+                try {
+                    Object.assign(hero, {
+                        hp: 40, maxHp: 100, foco: 10, maxFoco: 50, gold: 5,
+                        potions: 0, maxPotions: 3, skillPoints: 0, atk: 10, def: 5,
+                        chestChanceBonus: 0
+                    });
+                    const unavailableWithoutPotion = !isStoryChoiceAvailable({ requires: { potions: 1 } });
+                    hero.potions = 1;
+                    const availableWithPotion = isStoryChoiceAvailable({ requires: { potions: 1 } });
+                    applyStoryDeal({
+                        gold: 30, hp: 10, foco: 10, potions: 1, skillPoints: 2,
+                        atk: 3, def: 4, maxHp: 20, chest: true,
+                        log: { pt: "Teste", en: "Test" }
+                    });
+                    return {
+                        unavailableWithoutPotion, availableWithPotion,
+                        hp: hero.hp, maxHp: hero.maxHp, foco: hero.foco,
+                        potions: hero.potions, gold: hero.gold, skillPoints: hero.skillPoints,
+                        atk: hero.atk, def: hero.def,
+                        chestChanceBonus: hero.chestChanceBonus
+                    };
+                } finally {
+                    Object.assign(hero, original);
+                }
+            })()`);
+            assert(result.unavailableWithoutPotion && result.availableWithPotion,
+                "A choice did not keep its potion requirement.");
+            assert(result.hp === 50 && result.maxHp === 120 && result.foco === 20
+                && result.potions === 2 && result.gold === 35 && result.skillPoints === 2
+                && result.atk === 13 && result.def === 9
+                && result.chestChanceBonus === evaluateInGame("EXPLORATION_RULES.map.treasureChanceBonus"),
+            `Story deal rewards were not preserved: ${JSON.stringify(result)}.`);
+        });
+
+        test("Pet companion and command controls remain styled and available", () => {
+            const result = evaluateInGame(`(() => {
+                const previousPet = hero.equipment.pet;
+                try {
+                    const template = ITEM_DATA.equipment.find((item) => item.id === "forest-wolf");
+                    hero.equipment.pet = createEquipmentInstance(
+                        template,
+                        GAME_RULES.loot.equipmentRarities[0]
+                    );
+                    updateUI();
+                    const companion = document.getElementById("hero-pet-companion");
+                    const command = document.getElementById("pet-command-button");
+                    return {
+                        companionVisible: !companion.hidden,
+                        companionPositioned: getComputedStyle(companion).position === "absolute",
+                        scoutAvailable: !command.hidden,
+                        commandStyled: getComputedStyle(command).display === "flex"
+                    };
+                } finally {
+                    hero.equipment.pet = previousPet;
+                    updateUI();
+                }
+            })()`);
+            assert(Object.values(result).every(Boolean),
+                `Pet UI was affected by alignment removal: ${JSON.stringify(result)}.`);
+        });
+
+        test("Settings persist music and sound-effect preferences", () => {
+            const result = evaluateInGame(`(() => {
+                const originalPreferences = {
+                    music: musicEnabled,
+                    soundEffects: soundEffectsEnabled,
+                    stored: localStorage.getItem("yara-rpg-settings-v1")
+                };
+                localStorage.removeItem("yara-rpg-settings-v1");
+                const defaultsPreserveAudio = readAudioSettings().music
+                    && readAudioSettings().soundEffects;
+                if (originalPreferences.stored !== null) {
+                    localStorage.setItem("yara-rpg-settings-v1", originalPreferences.stored);
+                }
+                const dialog = document.getElementById("settings-dialog");
+                const music = document.getElementById("settings-music-toggle");
+                const sfx = document.getElementById("settings-sfx-toggle");
+                const settingsButton = document.getElementById("open-settings");
+                musicEnabled = false;
+                soundEffectsEnabled = true;
+                renderAudioSettings();
+                settingsButton.click();
+                const opensSettings = dialog.open;
+                music.click();
+                sfx.click();
+                const saved = JSON.parse(localStorage.getItem("yara-rpg-settings-v1"));
+                const controlsReflectState = music.getAttribute("aria-pressed") === "true"
+                    && sfx.getAttribute("aria-pressed") === "false"
+                    && sfx.textContent === t("settingsOff")
+                    && soundEffectsEnabled === false;
+                document.querySelector("[data-settings-close]").click();
+                musicEnabled = originalPreferences.music;
+                soundEffectsEnabled = originalPreferences.soundEffects;
+                renderAudioSettings();
+                if (originalPreferences.stored === null) {
+                    localStorage.removeItem("yara-rpg-settings-v1");
+                } else {
+                    localStorage.setItem("yara-rpg-settings-v1", originalPreferences.stored);
+                }
+                return {
+                    opensSettings, controlsReflectState,
+                    defaultsPreserveAudio,
+                    musicSaved: saved.music === true,
+                    soundEffectsSaved: saved.soundEffects === false,
+                    closesSettings: !dialog.open,
+                    languageChoicesInSettings: Boolean(dialog.querySelector('[data-game-language="pt"]'))
+                        && Boolean(dialog.querySelector('[data-game-language="en"]'))
+                };
+            })()`);
+            assert(Object.values(result).every(Boolean),
+                `Settings did not persist or render correctly: ${JSON.stringify(result)}.`);
+        });
+
         test("Malformed saves are rejected with a visible status", () => {
             const result = evaluateInGame(`(() => {
                 localStorage.setItem(SAVE_KEY, "{");

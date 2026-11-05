@@ -1,5 +1,9 @@
 // --- PARTIDA, ROUNDS E ARENA ---
 export const MATCH = {
+    // Velocidade do jogo inteiro (1 = original, 60 passos por segundo). Menor = luta mais lenta e pensada:
+    // tudo é contado em frames (física, dash, reação do bot), então tudo desacelera junto e o equilíbrio não muda.
+    // O relógio do round continua em segundos de verdade.
+    gameSpeed: 0.95,
     roundTime: 60,             // segundos
     roundsToWin: 3,            // melhor de 5
     hearts: 3,                 // vidas por round: cada SMASH sofrido tira um coração; sem corações é K.O.
@@ -12,6 +16,9 @@ export const MATCH = {
     shrinkPerSecond: 5,
     shrinkPerSecondLast: 10
 };
+
+// Estrelas por bicho e sequência de vitórias contra o bot (js/core/progress.js)
+export const PROGRESS_STORAGE_KEY = 'pushsmash_progress';
 
 // O palco é 1,4x maior que o original (800x450): os bichos não mudam de tamanho,
 // então ficam proporcionalmente menores e a arena ganha espaço. Para mexer no zoom, mude só ARENA_SCALE.

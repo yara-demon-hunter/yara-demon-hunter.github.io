@@ -38,7 +38,6 @@ function isSavedGameSnapshot(snapshot) {
         snapshot.hero.equipmentInventory,
         snapshot.hero.passiveSkills,
         snapshot.hero.monsterPacts,
-        snapshot.hero.soulHistory,
         snapshot.discoveredRegions,
         snapshot.storyEventSeen,
         snapshot.seenStoryEvents,
@@ -120,15 +119,16 @@ function loadSavedGame(snapshot) {
     snapshot = savedSnapshot;
     selectedCharacter = GAME_DATA.characters.find((character) => character.id === snapshot.characterId);
     selectedCharacterProgression = selectedCharacter.progression;
-    Object.assign(hero, DEFAULT_CHARACTER.baseStats, snapshot.hero);
+    const restoredHero = { ...snapshot.hero };
+    delete restoredHero.soul;
+    delete restoredHero.soulHistory;
+    Object.assign(hero, DEFAULT_CHARACTER.baseStats, restoredHero);
     hero.passiveSkills = Array.isArray(snapshot.hero?.passiveSkills)
         ? snapshot.hero.passiveSkills
         : Array.isArray(snapshot.hero?.mistPowers) ? snapshot.hero.mistPowers : [];
     hero.monsterPacts = Array.isArray(snapshot.hero?.monsterPacts) ? snapshot.hero.monsterPacts : [];
     delete hero.mistPowers;
-    // Migração: saves antigos não têm alma nem recarga de faro do pet
-    hero.soul = Number(snapshot.hero?.soul) || 0;
-    hero.soulHistory = Array.isArray(snapshot.hero?.soulHistory) ? snapshot.hero.soulHistory : [];
+    // Migração: saves antigos não têm recarga de faro do pet.
     hero.petScoutCooldown = Number(snapshot.hero?.petScoutCooldown) || 0;
     if (snapshot.hero?.criticalChance === undefined) {
         hero.criticalChance = DEFAULT_CHARACTER.baseStats.criticalChance

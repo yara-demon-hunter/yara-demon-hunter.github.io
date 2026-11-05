@@ -4,7 +4,7 @@ export const PHYSICS = {
     gravity: 0.45,
     groundFriction: 0.88,      // perda de velocidade horizontal por frame no chão
     airDrag: 0.975,            // ... e no ar (o embalo dura bem mais)
-    airControl: 0.5,           // fração da aceleração de corrida que vale no ar
+    airControl: 0.6,           // fração da aceleração de corrida que vale no ar (mais = mais fácil voltar para a arena)
     maxSpeedX: 22,
     maxFallSpeed: 26,
     baseRadius: 20,            // raio da bola com massa 1
@@ -17,6 +17,7 @@ export const PHYSICS = {
 export const MOVEMENT = {
     runAccel: 0.9,             // força de corrida por unidade de massa
     jumpSpeed: 11,
+    coyoteFrames: 8,           // saiu da beira andando: ainda pode pular por esses frames (perdoa o pulo atrasado)
     wallJumpKick: 12,          // empurrão lateral do wall jump
     dash: {
         speed: 18,

@@ -32,7 +32,6 @@ function exploreForest() {
     const regionEvents = Array.isArray(regionData.event) ? regionData.event : [regionData.event].filter(Boolean);
     const unseenEvents = regionEvents.filter((event) =>
         !seenStoryEvents.has(`${regionData.id}:${event.id || event.title.pt}`)
-        && window.YaraSoul?.meets(event.requires) !== false
     );
     if (unseenEvents.length
         && explorationsSinceStoryEvent >= EXPLORATION_RULES.storyEvents.cooldownExplorations
@@ -334,16 +333,55 @@ function toggleSpiritWorld() {
     showRegionArrival(getCurrentRegionData());
 }
 
+function unmetStoryChoiceRequirement(choice) {
+    const requirement = choice.requires;
+    if (requirement?.potions !== undefined && hero.potions < requirement.potions) {
+        return t('requiresPotion', { count: requirement.potions });
+    }
+    if (requirement?.gold !== undefined && hero.gold < requirement.gold) {
+        return t('requiresGold', { gold: requirement.gold });
+    }
+    return '';
+}
+
+function isStoryChoiceAvailable(choice) {
+    return !unmetStoryChoiceRequirement(choice);
+}
+
+function decorateStoryChoice(button, choice) {
+    const requirementMessage = unmetStoryChoiceRequirement(choice);
+    if (!requirementMessage) return;
+    button.disabled = true;
+    const hint = document.createElement('span');
+    hint.className = 'choice-requirement';
+    hint.textContent = `🔒 ${requirementMessage}`;
+    button.append(hint);
+}
+
+function applyStoryDeal(deal) {
+    hero.atk += Number(deal.atk) || 0;
+    hero.def += Number(deal.def) || 0;
+    hero.maxHp += Number(deal.maxHp) || 0;
+    hero.skillPoints = (Number(hero.skillPoints) || 0) + (Number(deal.skillPoints) || 0);
+    hero.gold = Math.max(0, hero.gold + (Number(deal.gold) || 0));
+    hero.potions = Math.max(0, Math.min(hero.maxPotions, hero.potions + (Number(deal.potions) || 0)));
+    hero.hp = Math.max(1, Math.min(getEffectiveStat('maxHp'), hero.hp + (Number(deal.hp) || 0)));
+    hero.foco = Math.max(0, Math.min(getEffectiveStat('maxFoco'), hero.foco + (Number(deal.foco) || 0)));
+    if (deal.chest) {
+        hero.chestChanceBonus = Math.max(hero.chestChanceBonus, EXPLORATION_RULES.map.treasureChanceBonus);
+    }
+    logMessage(deal.log?.[gameLanguage] ?? deal.log?.pt ?? '', deal.tone || 'special');
+}
+
 function resolveStoryEvent(choiceIndex) {
     if (!pendingStoryEvent || inCombat || gameOver || campaignComplete) return;
     const event = pendingStoryEvent;
     const choice = event.choices[choiceIndex];
-    if (!choice || window.YaraSoul?.meets(choice.requires) === false) return;
+    if (!choice || !isStoryChoiceAvailable(choice)) return;
     const effect = choice.effect;
     const eventSeenKey = `${getCurrentRegionData().id}:${event.id || event.title.pt}`;
     pendingStoryEvent = null;
     completeRegionObjective('story', true);
-    if (choice.soul) window.YaraSoul?.shift(choice.soul, event.title);
     if (effect === 'spirit-message') {
         logMessage(t(choice.messageKey), 'spirit-message');
         completeRegionObjective('story');
@@ -564,7 +602,7 @@ function resolveStoryEvent(choiceIndex) {
             logMessage(t('metaGambleLose', { hp }), 'combat-monster');
         }
     } else if (effect === 'deal') {
-        window.YaraSoul?.applyDeal(choice.deal);
+        applyStoryDeal(choice.deal);
     } else if (effect === 'vendor') {
         window.YaraVendor?.open();
     } else if (effect === 'vendor-leave') {
@@ -773,10 +811,7 @@ function showRegionArrival(regionData, { kicker = null, durationMs = 5000 } = {}
             : 'regionArrivalKicker')
     );
     document.getElementById('region-arrival-title').textContent = regionData.title[gameLanguage];
-    const soulEcho = window.YaraSoul?.regionEcho(regionData);
-    document.getElementById('region-arrival-description').textContent = soulEcho
-        ? `${regionData.description[gameLanguage]} ${soulEcho}`
-        : regionData.description[gameLanguage];
+    document.getElementById('region-arrival-description').textContent = regionData.description[gameLanguage];
     const closeButton = document.getElementById('region-arrival-close');
     closeButton.setAttribute('aria-label', t('regionArrivalClose'));
     transition.hidden = false;
@@ -788,13 +823,12 @@ function showRegionArrival(regionData, { kicker = null, durationMs = 5000 } = {}
 // Apresentação de chefe: reaproveita a cena de chegada com a arte do monstro.
 function showBossIntro(monster) {
     const line = monster.dialogues?.[gameLanguage]?.[0];
-    const taunt = window.YaraSoul?.bossTaunt();
     showRegionArrival({
         id: GAME_DATA.regions[currentRegion].id,
         sceneImage: monster.image,
         sceneIcon: monster.icon,
         title: { [gameLanguage]: monster.name },
-        description: { [gameLanguage]: [line && `“${line}”`, taunt].filter(Boolean).join(' ') }
+        description: { [gameLanguage]: line ? `“${line}”` : '' }
     }, { kicker: 'bossIntroKicker', durationMs: 3500 });
 }
 
@@ -1050,8 +1084,6 @@ function acceptMistContact() {
     const contact = pendingMistContact;
     pendingMistContact = null;
     logMessage(t('mistContactAccepted', { contact: contact.name[gameLanguage] }), 'special');
-    if (contact.soul) window.YaraSoul?.shift(contact.soul, contact.name);
-
     if (contact.onAccept?.type === 'spirit-surgery') {
         performSpiritEyeSurgery();
         return;

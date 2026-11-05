@@ -29,9 +29,6 @@ window.YaraMeta = (() => {
         runMinutes: (c, v) => c.run.playMs >= v * MINUTE,
         totalMinutes: (c, v) => c.meta.totals.playMs >= v * MINUTE,
         spiritEye: (c) => Boolean(c.hero.spiritWorldUnlocked),
-        soulDark: (c, v) => c.meta.best.soulDark >= v,
-        soulLight: (c, v) => c.meta.best.soulLight >= v,
-        balancedWins: (c, v) => c.meta.totals.balancedWins >= v,
         petCommands: (c, v) => c.meta.totals.petCommands >= v,
     });
 
@@ -42,8 +39,8 @@ window.YaraMeta = (() => {
     function blankMeta() {
         return {
             v: 1, runs: 0, wins: 0,
-            best: { region: 1, level: 1, time: 0, soulDark: 0, soulLight: 0 },
-            totals: { kills: 0, bosses: 0, chests: 0, spared: 0, interrupts: 0, playMs: 0, balancedWins: 0, petCommands: 0 },
+            best: { region: 1, level: 1, time: 0 },
+            totals: { kills: 0, bosses: 0, chests: 0, spared: 0, interrupts: 0, playMs: 0, petCommands: 0 },
             bestiary: {}, items: {}, passives: {}, pacts: {}, achievements: {}, run: blankRun()
         };
     }
@@ -53,8 +50,21 @@ window.YaraMeta = (() => {
         try {
             const saved = JSON.parse(localStorage.getItem(META_KEY) || 'null');
             if (saved && saved.v === 1) {
-                return { ...base, ...saved, best: { ...base.best, ...saved.best }, totals: { ...base.totals, ...saved.totals },
-                    run: { ...base.run, ...saved.run } };
+                const migrated = {
+                    ...base,
+                    ...saved,
+                    best: { ...base.best, ...saved.best },
+                    totals: { ...base.totals, ...saved.totals },
+                    achievements: { ...base.achievements, ...saved.achievements },
+                    run: { ...base.run, ...saved.run }
+                };
+                delete migrated.best.soulDark;
+                delete migrated.best.soulLight;
+                delete migrated.totals.balancedWins;
+                delete migrated.achievements['soul-abyssal'];
+                delete migrated.achievements['soul-divine'];
+                delete migrated.achievements['soul-balance'];
+                return migrated;
             }
         } catch {}
         return base;
@@ -218,11 +228,6 @@ window.YaraMeta = (() => {
     function onChest() { meta.totals.chests++; run().chests++; save(); check(); }
     function onInterrupt() { meta.totals.interrupts++; run().interrupts++; save(); check(); }
     function onLevelUp() { trackBest(); save(); check(); }
-    function onSoul(soul) {
-        meta.best.soulDark = Math.max(meta.best.soulDark, -soul);
-        meta.best.soulLight = Math.max(meta.best.soulLight, soul);
-        save(); check();
-    }
     function onPetCommand() { meta.totals.petCommands++; save(); check(); }
     function onRegionChange() { trackBest(); save(); check(); }
 
@@ -263,12 +268,9 @@ window.YaraMeta = (() => {
         trackBest();
         r.finished = true;
         if (won) meta.wins++;
-        const soulTier = window.YaraSoul?.currentTier();
-        if (won && soulTier?.side === 'neutral') meta.totals.balancedWins++;
         const summary = {
             kills: r.kills, bosses: r.bosses, chests: r.chests, spared: r.spared, interrupts: r.interrupts,
             level: hero.level, region: (currentRegion || 0) + 1, time: r.playMs,
-            soul: soulTier ? `${soulTier.icon} ${localized(soulTier.name)}` : '',
             record: (currentRegion || 0) + 1 > before.region || hero.level > before.level || r.playMs > before.time
         };
         save();
@@ -285,7 +287,7 @@ window.YaraMeta = (() => {
         const list = el('ul');
         [['summaryTime', formatDuration(summary.time)], ['summaryLevel', summary.level], ['summaryRegion', summary.region],
          ['summaryKills', summary.kills], ['summaryBosses', summary.bosses], ['summaryChests', summary.chests],
-         ['summarySpared', summary.spared], ['summaryInterrupts', summary.interrupts], ['summarySoul', summary.soul]]
+         ['summarySpared', summary.spared], ['summaryInterrupts', summary.interrupts]]
             .filter(([, value]) => value !== '')
             .forEach(([key, value]) => { const li = el('li'); li.append(el('span', '', m(key)), el('b', '', String(value))); list.append(li); });
         box.append(list);
@@ -446,7 +448,7 @@ window.YaraMeta = (() => {
 
     return {
         beginRun, onEncounter, onVictory, onSpare, onChest, onInterrupt, onLevelUp, onRegionChange, onItem,
-        onDefeat, onCampaignComplete, onSoul, onPetCommand, sync, openSanctuary, closeSanctuary, check,
+        onDefeat, onCampaignComplete, onPetCommand, sync, openSanctuary, closeSanctuary, check,
         notify: pushToast,
         get data() { return meta; }
     };

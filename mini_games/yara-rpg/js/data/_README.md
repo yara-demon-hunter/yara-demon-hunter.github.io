@@ -17,9 +17,8 @@ Os arquivos desta pasta guardam conteúdo e valores de balanceamento. A lógica 
 - `combat-rules.js`: dano, custos, defesa, fuga e tempos dos turnos.
 - `progression-rules.js`: multiplicador de XP e melhorias compradas.
 - `exploration-rules.js`: chance de descobrir áreas e eventos, intervalo entre eventos narrativos, pesos dos resultados de exploração, recompensas, chance de obter item ao abrir baú e chance de poupar um monstro derrotado.
-- `extra-events.js`: eventos morais (efeito `deal`, campos `soul` e `requires`) e eventos de aposta (efeito `gamble`) acrescentados aos eventos de cada região em `regions.js`; usam as mesmas escolhas e a mesma execução em `resolveStoryEvent`.
+- `extra-events.js`: eventos narrativos de escolha e eventos de aposta (efeito `gamble`) acrescentados aos eventos de cada região em `regions.js`; o efeito `deal` aplica recompensas e custos, e `requires` pode exigir recursos como poções.
 - `vendor.js`: vendedor ambulante. Define o evento de apresentação (`event`), o catálogo de mercadorias (`offers`, com nome, descrição, preço, estoque e `effect`), quantas mercadorias são sorteadas por visita, a variação de preço por região e a tabela de venda de itens da mochila por raridade. A frequência com que ele aparece fica em `exploration-rules.js` (campo `vendor`).
-- `soul-rules.js`: alma do herói (de -100 a +100). Define os níveis com nome, descrição e efeitos percentuais, quanto poupar ou finalizar um monstro desloca a alma, falas extras, provocações de chefes e finais.
 - `pets.js`: comando de combate e faro de exploração de cada companheiro, indexados pelo `id` do item em `items.js`, com recargas e potência por raridade.
 - `achievements.js`: conquistas do Santuário. Cada uma tem `id`, `icon`, `name`, `description` (PT/EN) e uma `condition` com `type` e `value`; os tipos aceitos e a avaliação estão em `CONDITIONS` no topo de `../systems/meta.js`.
 

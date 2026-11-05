@@ -51,8 +51,8 @@ window.YaraRpgData.regions = Object.freeze([
                 title: { pt: "Um ruído no mato", en: "A sound in the brush" },
                 description: { pt: "Você ouve um farfalhar entre os arbustos. Parece haver um animal assustado escondido ali.", en: "You hear rustling in the brush. A frightened animal seems to be hiding there." },
                 choices: [
-                    { label: { pt: "Atacar o mato (+ouro)", en: "Strike the brush (+gold)" }, effect: "animal-event-gold", soul: -4 },
-                    { label: { pt: "Verificar com cuidado (pet)", en: "Investigate carefully (pet)" }, effect: "animal-event-pet", soul: 5 }
+                    { label: { pt: "Atacar o mato (+ouro)", en: "Strike the brush (+gold)" }, effect: "animal-event-gold" },
+                    { label: { pt: "Verificar com cuidado (pet)", en: "Investigate carefully (pet)" }, effect: "animal-event-pet" }
                 ]
             },
             {
@@ -69,10 +69,6 @@ window.YaraRpgData.regions = Object.freeze([
     },
     {
         id: "river-crossing",
-        soulEcho: {
-            dark: { pt: "A água recua dos seus pés, como se não quisesse tocar você.", en: "The water draws back from your feet, as if it would rather not touch you." },
-            light: { pt: "Por um instante, a correnteza se acalma para você passar.", en: "For a moment, the current calms to let you pass." }
-        },
         sceneIcon: "🌊",
         sceneImage: "images/regions/river-crossing.webp",
         title: { pt: "Travessia do Rio", en: "River Crossing" },
@@ -121,8 +117,8 @@ window.YaraRpgData.regions = Object.freeze([
                 title: { pt: "Um ruído entre as pedras", en: "A sound among the stones" },
                 description: { pt: "Um animal pequeno está preso entre as pedras da margem e parece precisar de ajuda.", en: "A small animal is trapped among the riverbank stones and seems to need help." },
                 choices: [
-                    { label: { pt: "Atacar o esconderijo (+ouro)", en: "Strike the hiding place (+gold)" }, effect: "animal-event-gold", soul: -4 },
-                    { label: { pt: "Verificar e ajudar (pet)", en: "Investigate and help (pet)" }, effect: "animal-event-pet", soul: 5 }
+                    { label: { pt: "Atacar o esconderijo (+ouro)", en: "Strike the hiding place (+gold)" }, effect: "animal-event-gold" },
+                    { label: { pt: "Verificar e ajudar (pet)", en: "Investigate and help (pet)" }, effect: "animal-event-pet" }
                 ]
             },
             {
@@ -139,10 +135,6 @@ window.YaraRpgData.regions = Object.freeze([
     },
     {
         id: "blue-torch-village",
-        soulEcho: {
-            dark: { pt: "As tochas azuis tremem, e as janelas se fecham quando você passa.", en: "The blue torches tremble, and shutters close as you pass." },
-            light: { pt: "Uma vela é acesa em uma janela. Alguém reconheceu você.", en: "A candle is lit in a window. Someone has recognized you." }
-        },
         sceneIcon: "🕯️",
         sceneImage: "images/regions/blue-torch-village.webp",
         title: { pt: "Aldeia das Tochas Azuladas", en: "Village of Blue Torches" },
@@ -166,16 +158,16 @@ window.YaraRpgData.regions = Object.freeze([
                 title: { pt: "O abrigo dos sobreviventes", en: "The survivors' shelter" },
                 description: { pt: "Uma família se esconde no porão de uma casa. O pouco que têm pode ajudar sua jornada.", en: "A family hides in a cellar. The little they have could help your journey." },
                 choices: [
-                    { label: { pt: "Dividir uma poção", en: "Share a potion" }, effect: "heal", soul: 6 },
-                    { label: { pt: "Trocar provisões por ouro", en: "Trade supplies for gold" }, effect: "gold", soul: -5 }
+                    { label: { pt: "Dividir uma poção", en: "Share a potion" }, effect: "heal" },
+                    { label: { pt: "Trocar provisões por ouro", en: "Trade supplies for gold" }, effect: "gold" }
                 ]
             },
             {
                 title: { pt: "A carroça tombada", en: "The overturned cart" },
                 description: { pt: "Uma carroça de mercadores bloqueia a rua. Há moedas espalhadas, mas algo se move sob os destroços.", en: "A merchant cart blocks the street. Coins are scattered around, but something moves beneath the wreckage." },
                 choices: [
-                    { label: { pt: "Recolher as moedas", en: "Gather the coins" }, effect: "gold", soul: -2 },
-                    { label: { pt: "Erguer os destroços", en: "Lift the wreckage" }, effect: "combat", soul: 3 }
+                    { label: { pt: "Recolher as moedas", en: "Gather the coins" }, effect: "gold" },
+                    { label: { pt: "Erguer os destroços", en: "Lift the wreckage" }, effect: "combat" }
                 ]
             },
             {
@@ -191,8 +183,8 @@ window.YaraRpgData.regions = Object.freeze([
                 title: { pt: "Ruído sob os escombros", en: "A sound beneath the rubble" },
                 description: { pt: "Um ruído ecoa entre as casas destruídas. Um animal está escondido sob uma viga caída e parece precisar de ajuda.", en: "A sound echoes among the ruined houses. An animal is hiding beneath a fallen beam and seems to need help." },
                 choices: [
-                    { label: { pt: "Atacar os escombros (+ouro)", en: "Strike the rubble (+gold)" }, effect: "animal-event-gold", soul: -4 },
-                    { label: { pt: "Afastar a viga e ajudar (pet)", en: "Move the beam and help (pet)" }, effect: "animal-event-pet", soul: 5 }
+                    { label: { pt: "Atacar os escombros (+ouro)", en: "Strike the rubble (+gold)" }, effect: "animal-event-gold" },
+                    { label: { pt: "Afastar a viga e ajudar (pet)", en: "Move the beam and help (pet)" }, effect: "animal-event-pet" }
                 ]
             },
             {
@@ -209,10 +201,6 @@ window.YaraRpgData.regions = Object.freeze([
     },
     {
         id: "gudran-castle",
-        soulEcho: {
-            dark: { pt: "As sombras das muralhas se curvam, como se reconhecessem uma das suas.", en: "The shadows on the walls bow, as if greeting one of their own." },
-            light: { pt: "Os cavaleiros mortos hesitam antes de erguer as espadas.", en: "The dead knights hesitate before raising their swords." }
-        },
         sceneIcon: "🏰",
         sceneImage: "images/regions/gudran-castle.webp",
         title: { pt: "Castelo de Gudran", en: "Gudran Castle" },
@@ -252,9 +240,9 @@ window.YaraRpgData.regions = Object.freeze([
                 title: { pt: "O juramento dos guardas", en: "The guards' oath" },
                 description: { pt: "As estátuas dos guardas despertam e oferecem uma última bênção a quem jurar proteger a floresta.", en: "The guards' statues awaken and offer one last blessing to anyone who vows to protect the forest." },
                 choices: [
-                    { label: { pt: "Fazer o juramento (+ATQ)", en: "Take the oath (+ATK)" }, effect: "power", soul: 8 },
-                    { label: { pt: "Recusar o pacto", en: "Refuse the pact" }, effect: "gold", soul: -3 },
-                    { label: { pt: "Consagrar a lâmina", en: "Consecrate your blade" }, effect: "deal", soul: 4, requires: { soulMin: 40 }, deal: { atk: 7, log: { pt: "As estátuas reconhecem sua luz e abençoam sua lâmina. +7 de ataque.", en: "The statues recognize your light and bless your blade. +7 attack." } } }
+                    { label: { pt: "Fazer o juramento (+ATQ)", en: "Take the oath (+ATK)" }, effect: "power" },
+                    { label: { pt: "Recusar o pacto", en: "Refuse the pact" }, effect: "gold" },
+                    { label: { pt: "Consagrar a lâmina", en: "Consecrate your blade" }, effect: "deal", deal: { atk: 7, log: { pt: "As estátuas reconhecem sua luz e abençoam sua lâmina. +7 de ataque.", en: "The statues recognize your light and bless your blade. +7 attack." } } }
                 ]
             },
             {
@@ -272,8 +260,8 @@ window.YaraRpgData.regions = Object.freeze([
                 title: { pt: "Um ruído na torre", en: "A sound in the tower" },
                 description: { pt: "Um ruído vem das vigas acima do salão. Um animal se debate preso entre os estandartes rasgados.", en: "A sound comes from the rafters above the hall. An animal is tangled in the torn banners." },
                 choices: [
-                    { label: { pt: "Atacar as vigas (+ouro)", en: "Strike the rafters (+gold)" }, effect: "animal-event-gold", soul: -4 },
-                    { label: { pt: "Soltar o animal (pet)", en: "Free the animal (pet)" }, effect: "animal-event-pet", soul: 5 }
+                    { label: { pt: "Atacar as vigas (+ouro)", en: "Strike the rafters (+gold)" }, effect: "animal-event-gold" },
+                    { label: { pt: "Soltar o animal (pet)", en: "Free the animal (pet)" }, effect: "animal-event-pet" }
                 ]
             },
             {
@@ -290,10 +278,6 @@ window.YaraRpgData.regions = Object.freeze([
     },
     {
         id: "gudran-throne",
-        soulEcho: {
-            dark: { pt: "Gudran sorri: “Finalmente, alguém digno de herdar isto.”", en: "Gudran smiles: “At last, someone worthy of inheriting all this.”" },
-            light: { pt: "Gudran desvia o olhar da sua luz. Pela primeira vez, ele parece cansado.", en: "Gudran looks away from your light. For the first time, he seems tired." }
-        },
         sceneIcon: "👑",
         sceneImage: "images/regions/gudran-throne.webp",
         title: { pt: "Câmara do Trono", en: "Throne Chamber" },

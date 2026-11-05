@@ -508,7 +508,7 @@ body { height: 100dvh; }
 .stage-name { margin-top: 8px; text-align: center; font-size: 15px; font-weight: 900; font-style: italic; letter-spacing: 2px; color: #45f3df; }
 .level-col {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 3px;
     padding: 3px;
     border: 2px solid #2c3440;
@@ -533,6 +533,7 @@ body { height: 100dvh; }
 .level-easy.sel { background: #2ed573; }
 .level-normal.sel { background: #ffd32a; }
 .level-hard.sel { background: #ff4757; color: #fff; box-shadow: 0 0 12px rgba(255, 71, 87, 0.5); }
+.level-insane.sel { background: linear-gradient(90deg, #7b1fd6, #c45bff); color: #fff; box-shadow: 0 0 14px rgba(196, 91, 255, 0.7); }
 
 /* Botões de jogar: angulares, com degrau embaixo que afunda ao apertar */
 .menu-side .btn-group { flex-direction: column; flex-wrap: nowrap; gap: 14px; margin-top: 2px; }
@@ -555,7 +556,7 @@ body { height: 100dvh; }
     transition: transform 0.1s, box-shadow 0.1s, filter 0.15s;
 }
 .btn-play::before { content: '▶'; font-size: 14px; font-style: normal; }
-.btn-play small { margin-left: auto; font-size: 12px; font-weight: 900; letter-spacing: 1.5px; opacity: 0.75; }
+.btn-play small { white-space: nowrap; margin-left: auto; font-size: 12px; font-weight: 900; letter-spacing: 1.5px; opacity: 0.75; }
 .btn-play.btn-p2 { --edge: #b3202f; }
 .btn-play:hover { transform: skew(-8deg) translateY(-2px); filter: brightness(1.1); box-shadow: 0 7px 0 var(--edge), 0 12px 22px rgba(0, 0, 0, 0.45); }
 .btn-play:active { transform: skew(-8deg) translateY(4px); box-shadow: 0 1px 0 var(--edge), 0 4px 10px rgba(0, 0, 0, 0.45); }
@@ -725,3 +726,16 @@ body { height: 100dvh; }
     transition: opacity 0.6s;
 }
 .zone-hint.gone { opacity: 0; }
+
+/* --- ESTRELAS (uma por nível do bot vencido com o bicho) E REVANCHE --- */
+.picker-stars { display: flex; justify-content: center; gap: 6px; margin: -4px 0 6px; font-size: 17px; line-height: 1; }
+.picker-stars.ghost { visibility: hidden; }   /* P2: só guarda o espaço, para os cartões ficarem da mesma altura */
+.picker-stars b { color: #2c3440; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5); }
+.picker-stars b.got.star-easy { color: #2ed573; }
+.picker-stars b.got.star-normal { color: #ffd32a; }
+.picker-stars b.got.star-hard { color: #ff4757; }
+.picker-stars b.got.star-insane { color: #c45bff; text-shadow: 0 0 8px #c45bff; }
+.picker-stars b.got { animation: star-pop 0.4s cubic-bezier(0.3, 1.6, 0.5, 1); }
+@keyframes star-pop { from { transform: scale(0.3); } }
+.star-total { float: right; color: #ffd32a; letter-spacing: 1px; font-weight: 900; }
+.btn-play.btn-rematch { --edge: #a88a00; background: #ffd32a; color: #0b0c10; box-shadow: 0 5px 0 var(--edge), 0 0 22px rgba(255, 211, 42, 0.45); }

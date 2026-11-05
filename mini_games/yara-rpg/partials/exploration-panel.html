@@ -125,7 +125,7 @@
             <div id="action-controls">
                 <!-- Comando do companheiro: faro na exploração, ação gratuita no combate -->
                 <button id="pet-command-button" type="button" class="pet-command" hidden>
-                    <span id="pet-command-icon" class="pet-command-icon" aria-hidden="true"></span>
+                    <span class="pet-command-portrait" aria-hidden="true"><span id="pet-command-avatar" class="pet-command-avatar"></span><span id="pet-command-cooldown" class="pet-command-cooldown" hidden></span></span>
                     <span class="pet-command-copy"><span id="pet-command-name" class="pet-command-name"></span><span id="pet-command-detail" class="pet-command-detail"></span></span>
                     <span id="pet-command-status" class="pet-command-status"></span>
                 </button>
@@ -133,13 +133,13 @@
                 <!-- Ações de Exploração -->
                 <div id="controls-explore" class="grid grid-cols-3 gap-2">
                     <button onclick="exploreForest()" class="bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 active:scale-[0.98] text-white font-semibold py-3 px-3 rounded-xl shadow-lg border border-emerald-500/50 flex items-center justify-center gap-2 transition text-sm">
-                        <span aria-hidden="true">🧭</span> <span data-i18n="explore">Explorar</span>
+                        <span data-icon="compass" aria-hidden="true">🧭</span> <span data-i18n="explore">Explorar</span>
                     </button>
                     <button id="camp-button" onclick="restAtCamp()" class="bg-forest-800 hover:bg-forest-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-emerald-200 font-semibold py-3 px-3 rounded-xl shadow border border-forest-700 flex items-center justify-center gap-2 transition text-sm">
-                        <span aria-hidden="true">⛺</span> <span data-i18n="camp">Descansar</span> <span data-i18n="campCost">(🪙50)</span>
+                        <span data-icon="campfire" aria-hidden="true">⛺</span> <span data-i18n="camp">Descansar</span> <span data-i18n="campCost">(🪙50)</span>
                     </button>
                     <button id="potion-button" type="button" onclick="usePotion()" class="potion-action-button action-potion-button flex items-center justify-center gap-2 rounded-xl" data-i18n-aria="potionActionAria">
-                        <span aria-hidden="true">🧪</span>
+                        <span data-icon="potion" aria-hidden="true">🧪</span>
                         <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
                     </button>
                 </div>
@@ -147,22 +147,22 @@
                 <!-- Novos Golpes e Ações de Combate -->
                 <div id="controls-combat" class="hidden grid grid-cols-6 gap-2">
                     <button id="quick-attack-button" onclick="combatQuickAttack()" class="bg-stone-800 hover:bg-stone-700 active:scale-[0.98] text-amber-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span id="quick-attack-icon">🗡️</span> <span id="quick-attack-label" data-i18n="quickAttack">Ataque Rápido</span>
+                        <span id="quick-attack-icon" data-icon="quickAttack" aria-hidden="true">🗡️</span> <span id="quick-attack-label" data-i18n="quickAttack">Ataque Rápido</span>
                     </button>
                     <button id="heavy-attack-button" onclick="combatHeavyAttack()" class="combat-skill-button bg-red-900/80 hover:bg-red-800 active:scale-[0.98] text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-red-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>🗡️</span> <span data-i18n="heavyAttack">Pesado</span> <span id="heavy-attack-cost" class="combat-cost-badge">15</span>
+                        <span data-icon="heavyAttack" aria-hidden="true">🗡️</span> <span data-i18n="heavyAttack">Pesado</span> <span id="heavy-attack-cost" class="combat-cost-badge">15</span>
                     </button>
                     <button id="parry-button" onclick="combatDefend()" class="combat-skill-button combat-buff-button bg-blue-900/80 hover:bg-blue-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-blue-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>⚔️</span> <span data-i18n="defend">Aparo</span> <span id="parry-cost" class="combat-cost-badge">10</span>
+                        <span data-icon="parry" aria-hidden="true">⚔️</span> <span data-i18n="defend">Aparo</span> <span id="parry-cost" class="combat-cost-badge">10</span>
                     </button>
                     <button id="dodge-button" onclick="combatDodge()" class="combat-skill-button combat-buff-button bg-emerald-900/80 hover:bg-emerald-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-white font-semibold py-2.5 px-2 rounded-xl shadow border border-emerald-600 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>💨</span> <span data-i18n="dodge">Esquiva</span> <span id="dodge-cost" class="combat-cost-badge">15</span>
+                        <span data-icon="dodge" aria-hidden="true">💨</span> <span data-i18n="dodge">Esquiva</span> <span id="dodge-cost" class="combat-cost-badge">15</span>
                     </button>
                     <button id="run-button" onclick="combatRun()" class="bg-stone-900 hover:bg-stone-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 text-stone-300 font-semibold py-2.5 px-2 rounded-xl shadow border border-stone-700 flex flex-col items-center justify-center gap-1 transition text-xs">
-                        <span>🏃</span> <span data-i18n="run">Fugir na Névoa</span>
+                        <span data-icon="flee" aria-hidden="true">🏃</span> <span data-i18n="run">Fugir na Névoa</span>
                     </button>
                     <button type="button" onclick="usePotion()" class="potion-action-button action-potion-button flex flex-col items-center justify-center gap-1 rounded-xl" data-i18n-aria="potionActionAria">
-                        <span aria-hidden="true">🧪</span>
+                        <span data-icon="potion" aria-hidden="true">🧪</span>
                         <span class="potion-count"><span class="hero-potions-count">1</span>/<span class="hero-potions-max">1</span></span>
                     </button>
                 </div>

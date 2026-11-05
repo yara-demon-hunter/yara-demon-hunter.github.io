@@ -54,7 +54,8 @@ css/game.css                   estilos
 data_model/                    números, textos e sons (veja acima)
 js/
   game.js                      ponto de entrada e game loop (passo fixo de 60 fps)
-  core/                        estado compartilhado, canvas, arena, entrada de teclado, configurações
+  core/                        estado compartilhado, canvas, arena, entrada de teclado, configurações,
+                               progresso contra o bot (progress: estrelas por bicho e sequência de vitórias)
   entities/player.js           o lutador (movimento, quiques, dash, smash) e o bot
   systems/                     batidas, smash (corações) e SKY DROP, fim de round, replay, efeitos
   render/                      desenho: arte procedural dos lutadores (character_art), atlas (character_sprites),
@@ -65,6 +66,13 @@ js/
 ```
 
 O estado mutável da partida fica em `js/core/state.js` (um `import` não reatribui variável, então tudo passa por `state`).
+
+## Pronto para portais (CrazyGames)
+
+- Aba escondida (trocar de aba, minimizar, anúncio): a luta pausa no painel de configurações e o som cala.
+- As teclas do jogo não chegam à página (setas/espaço não rolam o iframe; a "/" não abre a busca do Firefox) e todas soltam quando a janela perde o foco.
+- Celular: o primeiro toque no menu entra em tela cheia e trava em paisagem (Android); no iPhone só adicionando à tela de início.
+- Retenção: cada bicho ganha uma estrela por nível do bot vencido com ele (★ x/30 no menu), sequência de vitórias e botão REMATCH no fim da partida.
 
 ## Testar
 

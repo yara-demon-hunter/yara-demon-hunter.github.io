@@ -6,7 +6,6 @@ window.YaraRpgData.mistContacts = Object.freeze({
     contacts: [
         {
             id: "river-spirit",
-            soul: -3,
             chancePercent: 15,
             icon: "🌊",
             image: "images/mist_contacts/river-spirit.webp",
@@ -22,7 +21,6 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "lost-scout",
-            soul: 2,
             chancePercent: 12,
             icon: "💀",
             image: "images/mist_contacts/lost-scout.webp",
@@ -38,7 +36,6 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "specter",
-            soul: -4,
             chancePercent: 12,
             icon: "🔔",
             image: "images/mist_contacts/specter.webp",
@@ -54,7 +51,6 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "witch-hunter",
-            soul: 4,
             chancePercent: 10,
             icon: "🧙‍♀️",
             image: "images/mist_contacts/witch-hunter.webp",
@@ -75,7 +71,6 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "old-witch",
-            soul: -4,
             chancePercent: 16,
             icon: "👵",
             image: "images/mist_contacts/old-witch.webp",
@@ -96,7 +91,6 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "pact-broker",
-            soul: -15,
             chancePercent: 12,
             icon: "🩸",
             image: "images/mist_contacts/pact-broker.webp",
@@ -124,14 +118,13 @@ window.YaraRpgData.mistContacts = Object.freeze({
         },
         {
             id: "spirit-purifier",
-            soul: 10,
             chancePercent: 12,
             icon: "✨",
             image: "images/mist_contacts/spirit-purifier.webp",
             name: { pt: "Espírito Purificador", en: "Purifying Spirit" },
             message: {
-                pt: "Um espírito toca sua testa e purifica sua alma. Você sente que pode aperfeiçoar uma habilidade: recebe 1 Ponto de Habilidade para distribuir.",
-                en: "A spirit touches your forehead and purifies your soul. You feel able to improve a skill: gain 1 Skill Point to spend."
+                pt: "Um espírito toca sua testa e restaura suas forças. Você sente que pode aperfeiçoar uma habilidade: recebe 1 Ponto de Habilidade para distribuir.",
+                en: "A spirit touches your forehead and restores your strength. You feel able to improve a skill: gain 1 Skill Point to spend."
             },
             minLevel: 1,
             onAccept: { type: "skill-point", amount: 1 }

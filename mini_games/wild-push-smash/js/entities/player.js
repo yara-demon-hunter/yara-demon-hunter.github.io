@@ -56,6 +56,7 @@ export class Player {
         this.mass = this.character.mass;
         this.radius = PHYSICS.baseRadius * Math.sqrt(this.mass);
         this.isGrounded = false;
+        this.coyote = 0;           // frames que ainda dá para pular depois de sair da beira
         this.isTouchingWall = false;
         this.wallDir = 0; // -1 left, 1 right
         this.facing = this.id === 1 ? 1 : -1;
@@ -151,7 +152,8 @@ export class Player {
 
             // Pulo Normal e Wall Jump
             if (input.up) {
-                if (this.isGrounded) {
+                if (this.isGrounded || this.coyote > 0) {
+                    this.coyote = 0;
                     this.vy = -MOVEMENT.jumpSpeed * this.character.jump;
                     this.chain.y = 0;
                     this.isGrounded = false;
@@ -297,6 +299,7 @@ export class Player {
             }
         }
         this.isGrounded = grounded;
+        this.coyote = grounded ? MOVEMENT.coyoteFrames : Math.max(0, this.coyote - 1);
         if (grounded || this.isTouchingWall) this.smashBounce = false;
 
         // Queda na Morte (K.O.)

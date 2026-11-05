@@ -17,7 +17,7 @@ export const STAGES = [
           type: 'zigzag', wavelength: 125 * k, height: 50 * k, thickness: 34, slopeDamping: 0.996,
           ledges: [
               { x: 75, y: 180, width: 80 }, { x: 645, y: 180, width: 80 },     // alto, perto das paredes
-              { x: 350, y: 160, width: 100 }                                   // topo, no centro
+              { x: 350, y: 228, width: 100 }                                   // no centro: alcança pulando do morro (menos o elefante)
           ].map(l => ({ x: l.x * k, y: l.y * k, width: l.width * k }))
       } },
     { id: 'snow',   name: 'SNOW PEAK',    groundFriction: 0.985,     // gelo: escorrega (pouco atrito, para a rampa render)

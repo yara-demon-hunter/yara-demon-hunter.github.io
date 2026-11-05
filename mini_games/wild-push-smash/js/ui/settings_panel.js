@@ -72,6 +72,16 @@ document.getElementById('btnQuit').addEventListener('click', () => {
     closeSettings();
     showGameOverMenu(TEXTS.quitTitle, TEXTS.quitSub);
 });
+// Aba escondida (trocou de aba, minimizou o app, anúncio na frente): a luta pausa no painel e o som cala.
+// Ao voltar, o som volta e o jogador decide quando continuar (RESUME).
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        if (state.gameState !== 'MENU') openSettings();
+        state.audioCtx?.suspend();
+    } else {
+        state.audioCtx?.resume();
+    }
+});
 window.addEventListener('keydown', e => {
     if (e.code === 'Escape' && state.gameState !== 'MENU') state.paused ? closeSettings() : openSettings();
 });

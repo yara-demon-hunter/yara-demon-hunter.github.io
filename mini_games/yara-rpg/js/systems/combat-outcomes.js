@@ -23,8 +23,7 @@ function usePotion() {
     }
 
     hero.potions--;
-    const heal = window.YaraSoul?.scaleHealing(POTION_HEAL_AMOUNT_HP) ?? POTION_HEAL_AMOUNT_HP;
-    const hpRecovered = Math.min(heal, getEffectiveStat('maxHp') - hero.hp);
+    const hpRecovered = Math.min(POTION_HEAL_AMOUNT_HP, getEffectiveStat('maxHp') - hero.hp);
     hero.hp += hpRecovered;
     const foco = POTION_HEAL_AMOUNT_FOCO;
     const focusRecovered = Math.min(foco, getEffectiveStat('maxFoco') - hero.foco);
@@ -58,8 +57,7 @@ function restAtCamp() {
     hero.gold -= CAMP_COST;
     const hpRecovery = Math.max(
         1,
-        window.YaraSoul?.scaleHealing(Math.floor(maxHp * CAMP_HP_RECOVERY_PERCENT / GAME_RULES.probabilityScale))
-            ?? Math.floor(maxHp * CAMP_HP_RECOVERY_PERCENT / GAME_RULES.probabilityScale)
+        Math.floor(maxHp * CAMP_HP_RECOVERY_PERCENT / GAME_RULES.probabilityScale)
     );
     const focusRecovery = Math.max(
         1,
@@ -160,7 +158,6 @@ function createMonsterFateEvent(monster) {
                     en: translateForLanguage('en', 'monsterFateFinish')
                 },
                 effect: 'monster-final-blow',
-                soul: window.YaraSoul?.shifts.monsterFinalBlow
             },
             {
                 label: {
@@ -168,7 +165,6 @@ function createMonsterFateEvent(monster) {
                     en: translateForLanguage('en', 'monsterFateSpare')
                 },
                 effect: 'monster-spared',
-                soul: window.YaraSoul?.shifts.monsterSpared
             }
         ]
     };
@@ -178,8 +174,8 @@ function awardCombatVictory(monster) {
     window.YaraMeta?.onVictory(monster);
     const challengeRewardRarities = monster.challengeRewardRarities;
     logMessage(t("victory", { monster: monster.name }), "discovery");
-    const goldReward = window.YaraSoul?.scaleGold(monster.goldReward) ?? monster.goldReward;
-    const xpReward = window.YaraSoul?.scaleXp(monster.xpReward) ?? monster.xpReward;
+    const goldReward = monster.goldReward;
+    const xpReward = monster.xpReward;
     logMessage(t("rewards", { xp: xpReward, gold: goldReward }), "loot");
 
     hero.gold += goldReward;

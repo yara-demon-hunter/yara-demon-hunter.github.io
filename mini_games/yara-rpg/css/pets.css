@@ -1,0 +1,126 @@
+/* Companheiros e efeitos de seus comandos. */
+.hero-portrait-anchor .hero-portrait { position: relative; z-index: 1; }
+.hero-pet-companion {
+    position: absolute;
+    z-index: 2;
+    right: -.55rem;
+    bottom: -.4rem;
+    display: grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    overflow: hidden;
+    border: 1px solid rgba(229, 185, 86, .8);
+    border-radius: 50%;
+    background: #12161a;
+    font-size: .8rem;
+    line-height: 1;
+    animation: pet-companion-bob 2.6s ease-in-out infinite;
+}
+.hero-pet-companion[hidden] { display: none; }
+.hero-pet-companion img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@keyframes pet-companion-bob {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -.12rem; }
+}
+
+/* Botão do pet: mais um botão da grade de exploração/luta, com a foto do pet como ícone */
+#controls-explore.has-pet { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#controls-combat.has-pet { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.pet-command {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+    min-width: 0;
+    padding: .35rem .25rem;
+    border: 1px solid rgba(229, 185, 86, .55);
+    border-radius: .75rem;
+    background: linear-gradient(180deg, rgba(58, 44, 16, .92), rgba(23, 25, 31, .92));
+    color: #f3e7c6;
+    font: inherit;
+    font-size: .72rem;
+    font-weight: 600;
+    line-height: 1.1;
+    text-align: center;
+    cursor: pointer;
+    transition: transform .1s, border-color .15s;
+}
+.pet-command[hidden] { display: none; }
+.pet-command:active:not(:disabled) { transform: scale(.98); }
+.pet-command:disabled { opacity: .7; cursor: not-allowed; }
+.pet-command-ready { box-shadow: 0 0 .7rem rgba(250, 204, 21, .35); }
+.pet-command-ready:hover { border-color: #e5b956; }
+.pet-command-copy { display: flex; flex-direction: column; min-width: 0; max-width: 100%; }
+.pet-command-name { overflow-wrap: anywhere; }
+.pet-command-detail, .pet-command-status { display: none; }
+.pet-command-portrait { position: relative; flex: 0 0 auto; width: 2.4rem; height: 2.4rem; }
+.pet-command-avatar {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border: 2px solid #e5b956;
+    border-radius: 50%;
+    background: #12161a;
+    font-size: 1.3rem;
+    line-height: 1;
+}
+.pet-command-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pet-command:disabled .pet-command-avatar { border-color: #57534e; filter: grayscale(.85) brightness(.75); }
+.pet-command-cooldown {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, .45);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    text-shadow: 0 1px 2px #000;
+}
+.pet-command-cooldown[hidden] { display: none; }
+
+.pet-strike-sprite {
+    position: absolute;
+    z-index: 15;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    overflow: hidden;
+    border: 2px solid #fde68a;
+    border-radius: 50%;
+    background: #12161a;
+    box-shadow: 0 0 1rem rgba(253, 230, 138, .85);
+    font-size: 1.7rem;
+    pointer-events: none;
+    animation: pet-strike .75s cubic-bezier(.2, .8, .2, 1) both;
+}
+.pet-strike-sprite img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@keyframes pet-strike {
+    0% { opacity: 0; transform: translate(-190%, 40%) scale(.5) rotate(-18deg); }
+    45% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(6deg); }
+    75% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-30%, -60%) scale(.8); }
+}
+
+.floating-damage-pet { color: #fbbf24; }
+.floating-damage-bleed { color: #f43f5e; }
+
+@media (max-width: 640px) {
+    .pet-command { gap: 2px; padding: 4px 2px; border-radius: 7px; font-size: .6rem; }
+    #controls-combat .pet-command { font-size: .5rem; }
+    .pet-command-portrait { width: 1.7rem; height: 1.7rem; }
+    #controls-combat .pet-command-portrait { width: 1.45rem; height: 1.45rem; }
+    .pet-command-cooldown { font-size: .8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-pet-companion { animation: none; }
+}

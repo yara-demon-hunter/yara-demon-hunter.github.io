@@ -98,8 +98,6 @@ const hero = {
     passiveSkills: [],
     monsterPacts: [],
     spiritWorldUnlocked: false,
-    soul: 0,
-    soulHistory: [],
     petScoutCooldown: 0,
     equipment: createEmptyEquipmentMap(),
     equipmentInventory: [],
@@ -201,8 +199,6 @@ function startAdventure({ character, equipment }) {
         passiveSkills: [],
         monsterPacts: [],
         spiritWorldUnlocked: false,
-        soul: 0,
-        soulHistory: [],
         petScoutCooldown: 0,
         equipment: createEmptyEquipmentMap(),
         equipmentInventory: [],
@@ -305,6 +301,7 @@ function checkLevelUp() {
 
 // ---------- 5) Bootstrap ----------
 window.onload = function () {
+    initializeAudioSettings();
     applyLanguage();
     window.YaraRpgCharacterSetup.initialize({
         translate: t,

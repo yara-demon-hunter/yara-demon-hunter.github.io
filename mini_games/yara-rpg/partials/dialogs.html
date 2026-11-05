@@ -1,3 +1,32 @@
+<dialog id="settings-dialog" class="item-drop-dialog settings-dialog" aria-labelledby="settings-title">
+    <div class="item-drop-content">
+        <div class="equipment-bag-heading">
+            <h2 id="settings-title" class="text-lg font-bold text-amber-300" data-i18n="settingsTitle">Configurações</h2>
+            <button type="button" class="dialog-close-button" data-settings-close data-i18n-aria="settingsClose" aria-label="Fechar configurações">×</button>
+        </div>
+        <div class="settings-section">
+            <h3 data-i18n="settingsLanguage">Idioma</h3>
+            <div class="game-language" role="group" aria-label="Idioma do jogo" data-i18n-aria="languageLabel">
+                <button type="button" data-game-language="pt" aria-label="Português">PT</button>
+                <button type="button" data-game-language="en" aria-label="English">EN</button>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h3 data-i18n="settingsAudio">Áudio</h3>
+            <div class="settings-option">
+                <span id="settings-music-label" data-i18n="settingsMusic">Música</span>
+                <button id="settings-music-toggle" type="button" class="settings-toggle" aria-pressed="false" aria-labelledby="settings-music-label">Off</button>
+            </div>
+            <div class="settings-option">
+                <span id="settings-sfx-label" data-i18n="settingsSfx">Efeitos sonoros</span>
+                <button id="settings-sfx-toggle" type="button" class="settings-toggle" aria-pressed="true" aria-labelledby="settings-sfx-label">On</button>
+            </div>
+        </div>
+        <p id="settings-status" class="settings-status" role="status" aria-live="polite" hidden></p>
+        <button type="button" class="story-event-choice settings-close-action" data-settings-close data-i18n="settingsClose">Fechar</button>
+    </div>
+</dialog>
+
 <dialog id="region-objectives-dialog" class="item-drop-dialog region-objectives-dialog" aria-labelledby="region-objectives-title" aria-describedby="region-objectives-description">
     <div class="item-drop-content">
         <div class="equipment-bag-heading">
@@ -35,19 +64,6 @@
             <span id="passive-detail-icon" class="passive-detail-icon" aria-hidden="true"></span>
             <p id="passive-detail-description" class="passive-detail-description"></p>
         </div>
-    </div>
-</dialog>
-
-<dialog id="soul-dialog" class="item-drop-dialog passive-detail-dialog" aria-labelledby="soul-dialog-title" aria-describedby="soul-dialog-description">
-    <div class="item-drop-content">
-        <div class="equipment-bag-heading">
-            <h2 id="soul-dialog-title" class="text-lg font-bold text-amber-300"></h2>
-            <button type="button" class="dialog-close-button" onclick="YaraSoul?.closeDialog()" data-i18n-aria="metaClose" aria-label="Fechar">×</button>
-        </div>
-        <p id="soul-dialog-description" class="soul-dialog-description"></p>
-        <h3 class="soul-dialog-heading" data-i18n="soulHistoryTitle">Últimas escolhas</h3>
-        <p id="soul-dialog-empty" class="soul-dialog-empty" data-i18n="soulHistoryEmpty">Nenhuma escolha pesou na sua alma ainda.</p>
-        <ul id="soul-dialog-history" class="soul-dialog-history"></ul>
     </div>
 </dialog>
 
