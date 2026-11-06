@@ -109,8 +109,8 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         shadowColor: 'rgba(0, 0, 0, 0.42)',
 
         // Pernas e botas
-        hipHeight: 9.6,
-        hipSpread: 1.99,
+        hipHeight: 10.1,
+        hipSpread: 1.995,
         footSpread: 2.74,
         kneeForward: 0.85,
         ankleHeight: 2.45,
@@ -125,11 +125,11 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         chest: { A: 2.8, B: 4.6 },
         shoulderHeight: 17.2,
         sashHeight: 10.8,
-        runLean: 0.5,                   // tronco e cabeça vão para a frente na corrida
+        runLean: 0.97,                   // tronco e cabeça vão para a frente na corrida
         breathAmount: -0.19,
 
         // Braços
-        shoulderRadius: 1.71,
+        shoulderRadius: 1.255,
         armWidth: 2.2,
         handRadius: 1.2,
         handHeight: 10,
@@ -371,7 +371,7 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         },
 
         // Cabeça: um pouco menor que a do Azael; mesmo truque de levantar e virar o rosto para a câmera
-        headRadius: 2.87,
+        headRadius: 3.055,
         faceTilt: 0.45,
         faceTiltFront: 0.45,
         faceTurn: 0.45,
@@ -379,25 +379,25 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         face: [[1.95, 0.7], [2.3, 0], [2.15, -1.1], [1.55, -2.15], [0.75, -2.8], [0, -2.95]],
         jawForward: 2.04,
         faceOut: -1.65,
-        bandHeight: 1.22,
-        bandWidth: 1.22,
+        bandHeight: 1.07,
+        bandWidth: 0.76,
         earLength: 2.75,
         // Maria-chiquinhas: presas no alto, dos lados, caem até o meio das costas e voam na corrida
-        tailLength: 3.5,
-        tailRunLength: 2.4,
-        tailWidth: 0.88,
-        tailWave: 2.4,
+        tailLength: 6.03,
+        tailRunLength: 4.28,
+        tailWidth: -1.51,
+        tailWave: 1.48,
         // Ritmo das passadas deste personagem (maior = passos mais rápidos); sem ele, vale o strideSpeed geral do herói
         strideSpeed: 11.6,
         // Ponta do cachecol: sai do ombro esquerdo e voa para trás
-        scarfTailLength: 15.7,
+        scarfTailLength: 9.45,
 
         // Corpo feminino: ombros mais estreitos, cintura fina, quadril largo, braços finos
-        shoulderScale: 0.64,
-        waistScale: 0.6,
-        hipScale: 1.03,
-        armScale: 0.65,
-        legWidth: 3.57,
+        shoulderScale: 0.62,
+        waistScale: 0.51,
+        hipScale: 1.07,
+        armScale: 0.7,
+        legWidth: 2.925,
         bootHeight: 5,
 
         // Espada curta, reta e larga
