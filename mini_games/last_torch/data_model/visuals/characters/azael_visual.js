@@ -106,13 +106,14 @@ export const AZAEL_VISUALS = {
     scabbardMouth: [0.87, 3.94, 10.4],
     scabbardDir: [-1.23, 0.53, -0.43],
     scabbardLength: 9.6,
-    // Mão esquerda na bainha: distância da boca da bainha (para trás, ao longo dela)
+    // Mão ESQUERDA (a que saca e ataca): em repouso fica no cabo, a esta distância da boca da bainha, ao longo dela
+    // (negativo = para o lado do cabo). No golpe ela sai da bainha e varre.
     sheathHand: -4,
     // Ajustes dos braços em repouso (a = frente, b = lado: + direita, z = altura). Somem no golpe.
-    // Mão direita (no cabo da katana) e cotovelo direito
+    // Mão DIREITA e cotovelo direito: ficam na bainha, parados (não acompanham o golpe)
     rightHandOffset: [-1.92, 2, -0.16],
     rightElbowOffset: [-2, -0.05, 0.28],
-    // Mão esquerda (na bainha) e cotovelo esquerdo
+    // Mão ESQUERDA (a da espada, no cabo) e cotovelo esquerdo
     leftHandOffset: [0.67, -0.67, 0.05],
     leftElbowOffset: [-0.67, 0.5, -0.44],
     hiltLength: 3.6,

@@ -434,7 +434,7 @@ function drawThrowArc(start, pose, k) {
 // Braço livre (esquerdo): balança contra a passada; recolhe durante o golpe e arremessa a adaga
 function freeArmPart(pose, body) {
     const swing = Math.sin(anim.stride) * V.armSwing * pose.run;
-    const shoulder = [pose.lean, -V.chest.B, pose.shoulderZ - 0.5];
+    let shoulder = [pose.lean, -V.chest.B, pose.shoulderZ - 0.5];
     const restHand = [pose.lean * 0.5 + 0.6 + swing * (1 - pose.blend) - pose.blend * 1.2, -V.chest.B - 0.6 + pose.blend * 1.5, V.handHeight - pose.crouch + pose.blend * 2];
     const throwK = throwProgress();
     // Charged Dagger Throw: a mão fica para trás com a adaga brilhando enquanto carrega
@@ -447,21 +447,30 @@ function freeArmPart(pose, body) {
     if (charge > 0 || fireHold > 0) hand = mix(hand, throwBack(pose), Math.min(1, Math.max(charge, fireHold) * 4));
     if (cast > 0) hand = mix(hand, [pose.lean + 5.5, -V.chest.B - 0.5, pose.shoulderZ + 3], cast);
     if (pose.free) hand = mix(hand, pose.free.hand, pose.free.w);
-    // Azael: com a katana guardada, a mão esquerda segura a bainha logo atrás da boca (a direita fica no cabo)
-    const holdSheath = azael && throwK < 0 && charge <= 0 && cast <= 0 && fireHold <= 0 ? 1 - azaelDrawn(pose) : 0;
-    if (holdSheath > 0) {
+    // Azael ataca com a mão ESQUERDA (azaelLeftArmPart); este braço (o direito) fica sempre na bainha. Lançar adaga,
+    // feitiço, bola de fogo e poção usam posições do lado esquerdo: aqui elas são espelhadas para o lado direito.
+    let elbow;
+    if (azael) {
+        shoulder = [pose.lean, V.chest.B, pose.shoulderZ - 0.5];
         const sheath = scabbardFrame(pose);
-        hand = mix(hand, sheath.mouth.map((v, i) => v + sheath.dir[i] * AZ.sheathHand + AZ.leftHandOffset[i]), holdSheath);
+        const rest = sheath.grip.map((v, i) => v + AZ.rightHandOffset[i]);
+        const act = Math.max(
+            throwK >= 0 ? Math.min(1, Math.sin(Math.PI * throwK) * 4) : 0,
+            charge > 0 || fireHold > 0 ? Math.min(1, Math.max(charge, fireHold) * 4) : 0,
+            cast,
+            pose.free ? pose.free.w : 0
+        );
+        hand = mix(rest, [hand[0], -hand[1], hand[2]], act);
+        const eo = AZ.rightElbowOffset.map(v => v * (1 - act));
+        elbow = [(shoulder[0] + hand[0]) / 2 + 0.6 + eo[0], (shoulder[1] + hand[1]) / 2 + 1 + eo[1], (shoulder[2] + hand[2]) / 2 + (throwK >= 0 ? 0.8 : 0) + eo[2]];
+    } else {
+        elbow = [(shoulder[0] + hand[0]) / 2 - 0.4, -V.chest.B - 1, (shoulder[2] + hand[2]) / 2 + (throwK >= 0 ? 0.8 : 0)];
     }
-    // Segurando a bainha, o braço cruza na frente da barriga (cotovelo à frente) e é desenhado na frente do corpo
-    const leo = azael ? AZ.leftElbowOffset.map(v => v * holdSheath) : [0, 0, 0];
-    const elbow = [(shoulder[0] + hand[0]) / 2 - 0.4 + holdSheath * 2.2 + leo[0], -V.chest.B - 1 + holdSheath * 2.6 + leo[1], (shoulder[2] + hand[2]) / 2 + (throwK >= 0 ? 0.8 : 0) + leo[2]];
     const armDepth = project(...elbow).depth + 0.1;
     return {
-        // (na frente do corpo, mas sempre atrás da cabeça: senão o pano do ombro cobre o rosto)
-        depth: holdSheath > 0.5 ? Math.min(Math.max(armDepth, project(...hand).depth + 0.2), project(pose.headA, 0, pose.headZ).depth - 0.05) : armDepth,
+        depth: armDepth,
         draw() {
-            if (throwK >= 0) drawThrowArc(restHand, pose, throwK);
+            if (throwK >= 0 && !azael) drawThrowArc(restHand, pose, throwK);
             if (azael) drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
             else {
                 ball(shoulder, V.shoulderRadius, C.sleeve);
@@ -492,7 +501,11 @@ function swordArmPose(pose) {
     let swingAngle = restAngle;
     if (anim.swingActive || pose.blend > 0) swingAngle = swingAngleAt(Math.min(anim.swingElapsed, anim.swingSeconds), anim);
     const blend = pose.blend;
-    if (azael) return holdSword(pose, azaelSwordRest(pose, swingAngle, blend));
+    if (azael) {
+        const r = holdSword(pose, azaelSwordRest(pose, swingAngle, blend));
+        r.armHand = azaelArmHand(pose, swingAngle, blend);
+        return r;
+    }
     const restHand = [pose.lean * 0.5 + 1.6 + Math.sin(anim.stride + Math.PI) * V.armSwing * 0.4 * pose.run, V.chest.B + 0.8, V.handHeight - pose.crouch];
     const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
     const hand = restHand.map((v, i) => v + (swingHand[i] - v) * blend);
@@ -518,9 +531,18 @@ function azaelSwordRest(pose, swingAngle, blend) {
     const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
     const d = mix(sheath.dir, [Math.cos(swingAngle), Math.sin(swingAngle), 0], blend);
     const size = Math.hypot(...d) || 1;
-    // rightHandOffset: ajuste da mão direita em repouso (some no golpe)
-    const grip = sheath.grip.map((v, i) => v + AZ.rightHandOffset[i]);
-    return { hand: mix(grip, swingHand, blend), dir: d.map(v => v / size) };
+    return { hand: mix(sheath.grip, swingHand, blend), dir: d.map(v => v / size) };
+}
+
+// Azael: posição da mão esquerda (a da espada): em repouso no cabo (boca da bainha + sheathHand ao longo dela +
+// leftHandOffset); no golpe vai para a varredura
+function azaelArmHand(pose, swingAngle, blend) {
+    const sheath = scabbardFrame(pose);
+    const rest = sheath.mouth.map((v, i) => v + sheath.dir[i] * AZ.sheathHand + AZ.leftHandOffset[i]);
+    const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
+    let h = mix(rest, swingHand, blend);
+    if (pose.sword) h = mix(h, pose.sword.hand, pose.sword.w);
+    return h;
 }
 
 // Azael: quanto a katana está fora da bainha (0 = guardada, 1 = na mão). Sobe e desce junto com a mão indo
@@ -530,19 +552,33 @@ function azaelDrawn(pose) {
     return Math.max(0, Math.min(1, (k - 0.02) / AZ.drawBlend));
 }
 
+// Azael: o braço esquerdo é o da espada. Em repouso a mão fica no cabo; no golpe ela sai da bainha e varre, e o
+// cotovelo volta ao movimento normal.
+function azaelLeftArmPart(pose) {
+    const { armHand: hand } = swordArmPose(pose);
+    const shoulder = [pose.lean, -V.chest.B, pose.shoulderZ - 0.5];
+    const hold = 1 - azaelDrawn(pose);
+    const leo = AZ.leftElbowOffset.map(v => v * hold);
+    // Segurando o cabo, o braço cruza na frente da barriga (cotovelo à frente) e é desenhado na frente do corpo
+    const elbow = [(shoulder[0] + hand[0]) / 2 - 0.4 + hold * 2.2 + leo[0], -V.chest.B - 1 + hold * 2.6 + leo[1], (shoulder[2] + hand[2]) / 2 + leo[2]];
+    const armDepth = project(...elbow).depth + 0.1;
+    return {
+        // (na frente do corpo, mas sempre atrás da cabeça: senão o pano do ombro cobre o rosto)
+        depth: hold > 0.5 ? Math.min(Math.max(armDepth, project(...hand).depth + 0.2), project(pose.headA, 0, pose.headZ).depth - 0.05) : armDepth,
+        draw() {
+            drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+        }
+    };
+}
+
 function swordArmPart(pose) {
+    if (azael) return azaelLeftArmPart(pose);
     const { hand } = swordArmPose(pose);
     const shoulder = [pose.lean, V.chest.B, pose.shoulderZ - 0.5];
-    // Azael: rightElbowOffset dobra/abre o cotovelo direito em repouso (some no golpe)
-    const eo = azael ? AZ.rightElbowOffset.map(v => v * (1 - pose.blend)) : [0, 0, 0];
-    const elbow = [(shoulder[0] + hand[0]) / 2 + 0.6 + eo[0], (shoulder[1] + hand[1]) / 2 + 1 + eo[1], (shoulder[2] + hand[2]) / 2 + eo[2]];
+    const elbow = [(shoulder[0] + hand[0]) / 2 + 0.6, (shoulder[1] + hand[1]) / 2 + 1, (shoulder[2] + hand[2]) / 2];
     return {
         depth: project(...elbow).depth + 0.1,
         draw() {
-            if (azael) {
-                drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
-                return;
-            }
             ball(shoulder, V.shoulderRadius, C.sleeve);
             limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
             ball(hand, V.handRadius, C.glove);

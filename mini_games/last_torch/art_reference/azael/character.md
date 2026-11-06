@@ -53,7 +53,7 @@ Seguir o mesmo esquema do herói 2.5D: corpo montado com medidas em 3D (frente, 
 - **Capa:** marrom e esfarrapada, saindo de um ombro, com a mesma física da capa do Caçador (para trás ao correr, abre ao virar).
 - **Pernas:** calça larga escura, bandagens nas canelas, postura mais baixa e base mais larga que a do Caçador.
 - **Pés:** descalços, com **3 dedos (2 para a frente e 1 para trás)** e garras pretas. Na passada, os dedos da frente apontam para a direção do movimento.
-- **Katana:** a bainha preta fica sempre presa no lado direito da cintura, do lado da mão da katana (de lado dá para ver as duas mãos e a bainha). Parado e correndo, a mão direita fica no cabo e a esquerda segura a bainha logo atrás da boca, com o braço cruzando na frente da barriga (postura de saque); no golpe a esquerda solta a bainha. No golpe, a lâmina prateada sai da bainha e deixa um rastro branco-azulado; depois volta à bainha.
+- **Katana:** a bainha preta fica sempre presa no lado direito da cintura, do lado da mão da katana (de lado dá para ver as duas mãos e a bainha). Ele saca e ataca com a **mão esquerda**: parado e correndo, a esquerda fica no cabo, com o braço cruzando na frente da barriga (postura de saque), e a **direita fica na bainha, parada, sem acompanhar o golpe**; no golpe só o braço esquerdo se mexe. No golpe, a lâmina prateada sai da bainha e deixa um rastro branco-azulado; depois volta à bainha.
 - **Contorno:** contorno escuro (#1a1d22) em tudo, para a pele e o cabelo claros não se misturarem com o chão.
 
 ## Animações
