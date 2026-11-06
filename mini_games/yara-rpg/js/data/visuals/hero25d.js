@@ -99,24 +99,24 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
     // Medidas do corpo (unidades; a = frente, b = direita, z = altura)
     const BODY = {
         // Câmera padrão do Last Torch (quase de cima). O palco usa a sua (data/visuals/stage.js → camera).
-        heightScale: 0.62,
-        groundSquash: 0.86,
-        depthHeightWeight: 0.6,       // peso da altura na ordem de desenho (o que fica na frente)
+        heightScale: 0.54,
+        groundSquash: 1.08,
+        depthHeightWeight: 0.25,       // peso da altura na ordem de desenho (o que fica na frente)
 
         // Sombra no chão
-        shadowRadiusFront: 6.5,
+        shadowRadiusFront: 3.3,
         shadowRadiusSide: 5.5,
         shadowColor: 'rgba(0, 0, 0, 0.42)',
 
         // Pernas e botas
-        hipHeight: 10,
-        hipSpread: 2,
-        footSpread: 2.4,
-        kneeForward: 1.2,
-        ankleHeight: 2.6,
-        legWidth: 2.6,
-        bootWidth: 3,
-        bootLength: 2,
+        hipHeight: 9.6,
+        hipSpread: 1.99,
+        footSpread: 2.54,
+        kneeForward: 0.49,
+        ankleHeight: 2.45,
+        legWidth: 3.77,
+        bootWidth: 2.81,
+        bootLength: 2.21,
         strideLength: 4.5,
         footLift: 2.5,
 
@@ -125,15 +125,15 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         chest: { A: 2.8, B: 4.6 },
         shoulderHeight: 17,
         sashHeight: 10.8,
-        runLean: 5,                   // tronco e cabeça vão para a frente na corrida
-        breathAmount: 0.35,
+        runLean: 3.3,                   // tronco e cabeça vão para a frente na corrida
+        breathAmount: -0.19,
 
         // Braços
         shoulderRadius: 2,
         armWidth: 2.2,
         handRadius: 1.2,
         handHeight: 10,
-        armSwing: 2.6,
+        armSwing: 2.46,
 
         // Capuz e máscara
         headHeight: 21,
@@ -234,19 +234,19 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         headRadius: 3.3,
         // A câmera vê quase de cima: a cabeça "olha" um pouco para cima para o rosto aparecer (radianos).
         // faceTilt de perfil; faceTiltFront a mais quando ele está virado para a câmera.
-        faceTilt: 0.45,
-        faceTiltFront: 0.45,
+        faceTilt: 0.46,
+        faceTiltFront: 0.32,
         // De lado, a cabeça vira um pouco para a câmera (radianos), senão o rosto vira uma faixa fina na borda
-        faceTurn: 0.5,
+        faceTurn: 0.49,
         // Rosto em coordenadas da cabeça (s = lado, u = altura): contorno do rosto da bandana até o queixo
         face: [[2.1, 0.75], [2.45, 0], [2.35, -1.1], [1.85, -2.3], [1, -3.2], [0, -3.55]],
-        jawForward: 1.2,          // o queixo sai um pouco da esfera
-        faceOut: 0.6,             // o rosto fica um pouco à frente do volume do cabelo (lê de perfil)
+        jawForward: 1.84,        // quanto o queixo sai da esfera
+        faceOut: -1.62,          // rosto para fora (+) ou para dentro (-) do volume do cabelo
         // Bandana: altura do meio da faixa (u) e largura
         bandHeight: 0.75,
         bandWidth: 1.25,
         // Orelhas pontudas para os lados, para trás e para cima
-        earLength: 2.4,
+        earLength: 3.13,
         // Cabelo: mechas presas no alto da cabeça que caem até o meio das costas e voam com a capa
         hairStrands: 6,
         hairLength: 6.5,
@@ -274,9 +274,9 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         clawLength: 0.8,
 
         // Katana: mais longa e fina que a espada do herói, levemente curva
-        bladeLength: 15,
+        bladeLength: 17.2,
         bladeWidth: 1.3,
-        bladeCurve: 0.5,
+        bladeCurve: 0.04,
         // Bainha presa no lado esquerdo da cintura, boca à frente, ponta para trás e para baixo
         scabbardMouth: [1.6, -3.7, 11],
         scabbardDir: [-0.86, -0.12, -0.48],
@@ -355,38 +355,143 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         },
 
         // Cabeça: um pouco menor que a do Azael; mesmo truque de levantar e virar o rosto para a câmera
-        headRadius: 3.05,
+        headRadius: 2.87,
         faceTilt: 0.45,
         faceTiltFront: 0.45,
-        faceTurn: 0.5,
+        faceTurn: 0.45,
         // Rosto mais delicado: queixo fino e arredondado
         face: [[1.95, 0.7], [2.3, 0], [2.15, -1.1], [1.55, -2.15], [0.75, -2.8], [0, -2.95]],
-        jawForward: 1,
-        faceOut: 0.55,
-        bandHeight: 0.8,
-        bandWidth: 1.15,
-        earLength: 1.1,
+        jawForward: 2.04,
+        faceOut: -1.65,
+        bandHeight: 1.22,
+        bandWidth: 1.22,
+        earLength: 2.75,
         // Maria-chiquinhas: presas no alto, dos lados, caem até o meio das costas e voam na corrida
-        tailLength: 8,
-        tailRunLength: 0.8,
-        tailWidth: 1.35,
-        tailWave: 0.8,
+        tailLength: 3.5,
+        tailRunLength: 2.4,
+        tailWidth: 0.88,
+        tailWave: 2.4,
         // Ponta do cachecol: sai do ombro esquerdo e voa para trás
-        scarfTailLength: 8.5,
+        scarfTailLength: 15.7,
 
         // Corpo feminino: ombros mais estreitos, cintura fina, quadril largo, braços finos
-        shoulderScale: 0.82,
-        waistScale: 0.7,
-        hipScale: 1.06,
-        armScale: 0.78,
-        legWidth: 3.1,
+        shoulderScale: 0.64,
+        waistScale: 0.6,
+        hipScale: 1.03,
+        armScale: 0.65,
+        legWidth: 3.57,
         bootHeight: 5,
 
         // Espada curta, reta e larga
-        bladeLength: 8.5,
-        bladeWidth: 1.6,
-        glowScale: 0.7
+        bladeLength: 13,
+        bladeWidth: 2.85,
+        glowScale: 0.37
     };
 
-    window.YaraRpgData.visuals.hero25d = Object.freeze({ hero: HERO, body: BODY, azael: AZAEL, yara: YARA });
+    // --- ZEPH (js/stage/zeph25d.js). Referência: art_reference/zeph ---
+    // Rapaz jovem e magro da floresta: cabelo castanho bagunçado, jaqueta verde de gola alta com remendos, alça de
+    // couro cruzando o peito com a bolsa no quadril esquerdo, cinto, calça verde enfiada em botas marrons e uma adaga.
+    const ZEPH = {
+        colors: {
+            ...HERO_COLORS,
+            cape: '#4b6236',
+            capeFold: '#33452a',
+            capeEdge: '#637a48',
+            capeInner: '#33452a',
+            body: '#3b4a2e',
+            sleeve: '#4b6236',
+            glove: '#d9a476',
+            sash: '#7a4f2c',
+            boots: '#7a4f2c',
+            // Adaga de aço, sem brilho mágico (só um reflexo frio)
+            blade: '#c9d0d6',
+            bladeCore: '#f1f4f6',
+            runes: '#f1f4f6',
+            bladeGlow: '#cbd5e1',
+            bladeGlowSoft: 'rgba(203, 213, 225, 0.25)',
+            bladeGlowFrenzy: '#60a5fa',
+            bladeGlowSoftFrenzy: 'rgba(96, 165, 250, 0.7)',
+            buckle: '#9aa3ad',
+            eyeGlint: '#cbd5e1',
+
+            skin: '#d9a476',
+            skinShade: '#a8744c',
+            skinLight: '#f0c49a',
+            outline: '#1a1410',
+            mouth: '#7a3f2e',
+            hair: '#4a2e1a',
+            hairShade: '#2e1c10',
+            hairLight: '#6b4528',
+            eyeWhite: '#ece6d6',
+            eye: '#5f7a55',
+            jacket: '#4b6236',
+            jacketShade: '#33452a',
+            jacketLight: '#637a48',
+            patch: '#3a4c2c',
+            pants: '#3b4a2e',
+            pantsShade: '#283320',
+            leather: '#7a4f2c',
+            leatherShade: '#523319',
+            leatherLight: '#9a6a40',
+            guard: '#5d646b',
+            grip: '#6b4423'
+        },
+
+        // Cabeça: rosto jovem, queixo reto; o mesmo truque de levantar e virar o rosto para a câmera
+        headRadius: 2.97,
+        faceTilt: 0.45,
+        faceTiltFront: 0.45,
+        faceTurn: 0.54,
+        face: [[2, 0.9], [2.3, 0], [2.1, -1.1], [1.55, -2.1], [0.8, -2.7], [0, -2.85]],
+        jawForward: -10,
+        faceOut: -0.69,
+        earLength: 1.79,
+        // Linha do cabelo na testa (altura u onde a franja começa)
+        hairline: 0.86,
+        // Volume do cabelo: a massa fica maior que a cabeça (o rosto continua no tamanho da cabeça)
+        hairPuff: 1.16,
+        // Cabelo bagunçado: ondulação do volume no alto (fração do raio)
+        hairBumps: 0.07,
+        // Franja: quantas pontas (por meia volta) e quanto descem na testa (radianos)
+        bangSpikes: 19.1,
+        bangDepth: 0.43,
+        // Costeletas na frente das orelhas (radianos a mais para baixo)
+        sideburn: 0.37,
+
+        // Posições do rosto (coordenadas de uma cabeça de raio 3: s = para o lado, u = para cima; 0 = centro).
+        // Olhos: centro, meia largura, abertura e tamanho da íris
+        eyeX: 0.98,
+        eyeY: -0.36,
+        eyeWidth: 0.53,
+        eyeOpen: 0.36,
+        irisSize: 0.27,
+        // Sobrancelhas: altura acima do olho, meia largura, quanto o lado de dentro desce (franzido) e espessura
+        browY: 0.7,
+        browWidth: 0.57,
+        browTilt: 0.12,
+        browThickness: 0.26,
+        // Nariz (centro e comprimento) e boca (altura e meia largura)
+        noseY: -0.97,
+        noseLength: 0.8,
+        mouthY: -2.1,
+        mouthWidth: 0.4,
+        // Orelhas: para a frente (+) ou para trás (-), altura do centro, meia altura e espessura
+        earX: 1,
+        earY: 0.14,
+        earSize: 0.15,
+        earWidth: 0.69,
+
+        // Corpo magro de rapaz: ombros um pouco estreitos, braços finos
+        shoulderScale: 0.84,
+        waistScale: 0.77,
+        armScale: 0.85,
+        legWidth: 2.57,
+
+        // Adaga: lâmina curta e reta
+        bladeLength: 7.7,
+        bladeWidth: 2.06,
+        glowScale: 0.48
+    };
+
+    window.YaraRpgData.visuals.hero25d = Object.freeze({ hero: HERO, body: BODY, azael: AZAEL, yara: YARA, zeph: ZEPH });
 })();

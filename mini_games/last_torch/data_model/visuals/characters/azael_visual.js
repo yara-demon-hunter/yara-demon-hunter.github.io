@@ -58,19 +58,19 @@ export const AZAEL_VISUALS = {
     headRadius: 3.3,
     // A câmera vê quase de cima: a cabeça "olha" um pouco para cima para o rosto aparecer (radianos).
     // faceTilt de perfil; faceTiltFront a mais quando ele está virado para a câmera.
-    faceTilt: 0.45,
-    faceTiltFront: 0.45,
+    faceTilt: 0.46,
+    faceTiltFront: 0.32,
     // De lado, a cabeça vira um pouco para a câmera (radianos), senão o rosto vira uma faixa fina na borda
-    faceTurn: 0.5,
+    faceTurn: 0.49,
     // Rosto em coordenadas da cabeça (s = lado, u = altura): contorno do rosto da bandana até o queixo
     face: [[2.1, 0.75], [2.45, 0], [2.35, -1.1], [1.85, -2.3], [1, -3.2], [0, -3.55]],
-    jawForward: 1.2,          // o queixo sai um pouco da esfera
-    faceOut: 0.6,            // o rosto fica um pouco à frente do volume do cabelo (lê de perfil)
+    jawForward: 1.84,        // quanto o queixo sai da esfera
+    faceOut: -1.62,          // rosto para fora (+) ou para dentro (-) do volume do cabelo
     // Bandana: altura do meio da faixa (u) e largura
     bandHeight: 0.75,
     bandWidth: 1.25,
     // Orelhas pontudas para os lados, para trás e para cima
-    earLength: 2.4,
+    earLength: 3.13,
     // Cabelo: mechas presas no alto da cabeça que caem até o meio das costas e voam com a capa
     hairStrands: 6,
     hairLength: 6.5,
@@ -99,9 +99,9 @@ export const AZAEL_VISUALS = {
     clawLength: 0.8,
 
     // Katana: mais longa e fina que a espada do herói, levemente curva
-    bladeLength: 15,
+    bladeLength: 17.2,
     bladeWidth: 1.3,
-    bladeCurve: 0.5,
+    bladeCurve: 0.04,
     // Bainha presa no lado esquerdo da cintura, boca à frente, ponta para trás e para baixo
     scabbardMouth: [1.6, -3.7, 11],
     scabbardDir: [-0.86, -0.12, -0.48],

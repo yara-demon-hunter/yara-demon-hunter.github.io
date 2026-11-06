@@ -15,6 +15,8 @@
     const AZP = NS.azael;
     const YA = VIS.yara;
     const YP = NS.yara;
+    const ZE = VIS.zeph;
+    const ZP = NS.zeph;
 
     // Estado do boneco sendo desenhado (render troca antes de montar as peças)
     let ctx = null;
@@ -23,6 +25,8 @@
     let azael = false;
     // Boneco da Yara (js/stage/yara25d.js): cabeça, cachecol, braços, pernas, tronco e espada curta próprios
     let yara = false;
+    // Boneco do Zeph (js/stage/zeph25d.js): cabeça, jaqueta, bolsa, braços, pernas e adaga próprios
+    let zeph = false;
     let bladeLength = V.bladeLength;
     let bladeWidth = V.bladeWidth;
     // Câmera: quanto 1 unidade de altura sobe na tela e o achatamento do chão
@@ -358,6 +362,10 @@
                     YP.drawYaraLeg(rig, hip, knee, ankle, toe);
                     return;
                 }
+                if (zeph) {
+                    ZP.drawZephLeg(rig, hip, knee, ankle, toe);
+                    return;
+                }
                 limb([hip, knee, ankle], V.legWidth, C.body);
                 limb([ankle, toe], V.bootWidth, C.boots);
                 // Faixa no cano da bota
@@ -382,6 +390,10 @@
                 }
                 if (yara) {
                     YP.drawYaraTorso(rig, pose, bottom, top, wb, wt);
+                    return;
+                }
+                if (zeph) {
+                    ZP.drawZephTorso(rig, pose, bottom, top, wb, wt);
                     return;
                 }
 
@@ -462,6 +474,8 @@
                     YP.drawYaraScarfTail(rig, pose);
                     return;
                 }
+                // Zeph também não tem capa (a bolsa e a alça ficam no tronco)
+                if (zeph) return;
                 // Pontas da faixa da cintura: penduradas paradas, esvoaçam para trás na corrida
                 for (const side of [-1, 1]) {
                     const flutter = Math.sin(t * 7 + side) * (1 + run * 1.5);
@@ -534,7 +548,7 @@
     // Yara parada: os braços não ficam travados. Respiram junto com o corpo, balançam devagar (cada um no seu ritmo)
     // e ficam um pouco abertos e dobrados. Some ao correr e durante golpes e posturas (idle = 0).
     function yaraIdle(pose, side) {
-        if (!yara) return { hand: [0, 0, 0], elbow: [0, 0, 0], angle: 0 };
+        if (!yara && !zeph) return { hand: [0, 0, 0], elbow: [0, 0, 0], shoulder: [0, 0, 0], angle: 0 };
         const idle = (1 - pose.run) * (1 - pose.blend) * (1 - (pose.sword?.w ?? 0));
         const t = pose.t;
         const ph = side > 0 ? 0 : 2.1;
@@ -545,6 +559,13 @@
                 (Math.sin(t * 2.1 + ph + 0.8) * 0.5 + (side > 0 ? 2.4 : 1.6)) * idle
             ],
             elbow: [-1 * idle, side * (1.5 + Math.sin(t * 1.1 + ph) * 0.25) * idle, 0.2 * idle],
+            // Ombro: o direito (da espada) rola para a frente e para trás e sobe e desce com a respiração;
+            // o esquerdo mexe bem menos
+            shoulder: [
+                Math.sin(t * 1.7 + ph) * (side > 0 ? 0.55 : 0.2) * idle,
+                side * Math.sin(t * 1.7 + ph + 1.2) * (side > 0 ? 0.25 : 0.1) * idle,
+                Math.sin(t * 1.7 + ph + 0.6) * (side > 0 ? 0.6 : 0.2) * idle
+            ],
             angle: (Math.sin(t * 1.3) * 0.2 - 0.55) * idle
         };
     }
@@ -552,7 +573,7 @@
     // Braço livre (esquerdo): balança contra a passada e recolhe durante o golpe
     function freeArmPart(pose) {
         const swing = Math.sin(anim.stride) * V.armSwing * pose.run;
-        const shoulder = [pose.lean, -V.chest.B, pose.shoulderZ - 0.5];
+        const shoulder = add3([pose.lean, -V.chest.B, pose.shoulderZ - 0.5], yaraIdle(pose, -1).shoulder);
         const ya = yaraIdle(pose, -1);
         const restHand = add3([pose.lean * 0.5 + 0.6 + swing * (1 - pose.blend) - pose.blend * 1.2, -V.chest.B - 0.6 + pose.blend * 1.5, V.handHeight - pose.crouch + pose.blend * 2], ya.hand);
         const hand = pose.free ? mix(restHand, pose.free.hand, pose.free.w) : restHand;
@@ -562,6 +583,7 @@
             draw() {
                 if (azael) AZP.drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
                 else if (yara) YP.drawYaraArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+                else if (zeph) ZP.drawZephArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
                 else {
                     ball(shoulder, V.shoulderRadius, C.sleeve);
                     limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
@@ -589,9 +611,10 @@
         let dir = [Math.cos(angle) / len, Math.sin(angle) / len, -drop / len];
         // Yara: em repouso segura a espada curta em pé, com a ponta para cima e um pouco para a frente (guarda),
         // balançando de leve; no golpe volta para a varredura normal
-        if (yara) {
+        if (yara || zeph) {
             const k = 1 - blend;
-            const up = [0.35 + Math.sin(pose.t * 1.3) * 0.08, 0.15, 0.92];
+            // Zeph: adaga baixa à frente do quadril, ponta para a frente (guarda de faca)
+            const up = zeph ? [0.95, 0.12 + Math.sin(pose.t * 1.3) * 0.06, 0.12] : [0.35 + Math.sin(pose.t * 1.3) * 0.08, 0.15, 0.92];
             const m = mix(dir, up, k);
             const size = Math.hypot(...m) || 1;
             dir = m.map(v => v / size);
@@ -626,7 +649,7 @@
 
     function swordArmPart(pose) {
         const { hand } = swordArmPose(pose);
-        const shoulder = [pose.lean, V.chest.B, pose.shoulderZ - 0.5];
+        const shoulder = add3([pose.lean, V.chest.B, pose.shoulderZ - 0.5], yaraIdle(pose, 1).shoulder);
         const elbow = add3([(shoulder[0] + hand[0]) / 2 + 0.6, (shoulder[1] + hand[1]) / 2 + 1, (shoulder[2] + hand[2]) / 2], yaraIdle(pose, 1).elbow);
         return {
             depth: project(...elbow).depth + 0.1,
@@ -637,6 +660,10 @@
                 }
                 if (yara) {
                     YP.drawYaraArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+                    return;
+                }
+                if (zeph) {
+                    ZP.drawZephArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
                     return;
                 }
                 ball(shoulder, V.shoulderRadius, C.sleeve);
@@ -654,6 +681,10 @@
         }
         if (yara) {
             YP.drawYaraSword(rig, hand, dir, alpha);
+            return;
+        }
+        if (zeph) {
+            ZP.drawZephDagger(rig, hand, dir, alpha);
             return;
         }
         const at = (d) => [hand[0] + dir[0] * d, hand[1] + dir[1] * d, hand[2] + dir[2] * d];
@@ -715,7 +746,7 @@
                 ctx.save();
                 ctx.globalCompositeOperation = 'lighter';
                 drawGlow(ctx, frenzy ? C.bladeGlowSoftFrenzy : C.bladeGlowSoft, glow.x, glow.y,
-                    (H.bladeGlowMin + (H.bladeGlowMax - H.bladeGlowMin) * pulse) * 0.8 * (1 + pose.blend * 0.7 + (pose.sword?.w ?? 0) * 0.6) * (azael ? AZ.glowScale : yara ? YA.glowScale : 1) * (frenzy ? 1.4 : 1),
+                    (H.bladeGlowMin + (H.bladeGlowMax - H.bladeGlowMin) * pulse) * 0.8 * (1 + pose.blend * 0.7 + (pose.sword?.w ?? 0) * 0.6) * (azael ? AZ.glowScale : yara ? YA.glowScale : zeph ? ZE.glowScale : 1) * (frenzy ? 1.4 : 1),
                     0.32 + 0.2 * pulse);
                 ctx.restore();
 
@@ -827,19 +858,21 @@
 
     // Desenha o herói com os pés em (opts.x, opts.y) da tela, opts.scale px por unidade.
     // body: { hitTime, hitDirX, hitDirY, move: { kind, age, seconds } }. a: estado de createAnim.
-    // opts: { x, y, scale, model: 'hunter' | 'azael' | 'yara', colors, camera: { heightScale, groundSquash }, frenzy, alpha, time }
+    // opts: { x, y, scale, model: 'hunter' | 'azael' | 'yara' | 'zeph', colors, camera: { heightScale, groundSquash }, frenzy, alpha, time }
     function render(context, body, a, opts) {
         ctx = context;
         AZP.bind(context);
         YP.bind(context);
+        ZP.bind(context);
         anim = a;
         azael = opts.model === 'azael';
         yara = opts.model === 'yara';
-        C = opts.colors || (azael ? AZ.colors : yara ? YA.colors : H.colors);
+        zeph = opts.model === 'zeph';
+        C = opts.colors || (azael ? AZ.colors : yara ? YA.colors : zeph ? ZE.colors : H.colors);
         HS = opts.camera?.heightScale ?? V.heightScale;
         GS = opts.camera?.groundSquash ?? V.groundSquash;
-        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : V.bladeLength;
-        bladeWidth = azael ? AZ.bladeWidth : yara ? YA.bladeWidth : V.bladeWidth;
+        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : zeph ? ZE.bladeLength : V.bladeLength;
+        bladeWidth = azael ? AZ.bladeWidth : yara ? YA.bladeWidth : zeph ? ZE.bladeWidth : V.bladeWidth;
         const t = opts.time ?? performance.now() / 1000;
         cosF = Math.cos(anim.facing);
         sinF = Math.sin(anim.facing);
@@ -887,7 +920,7 @@
             swordPart(pose, !!opts.frenzy),
             ...(azael
                 ? [AZP.azaelHeadPart(pose, rig), AZP.azaelHairPart(pose, rig), AZP.azaelScabbardPart(pose, rig, 1 - azaelDrawn(pose))]
-                : yara ? YP.yaraHeadParts(pose, rig) : [headPart(pose)])
+                : yara ? YP.yaraHeadParts(pose, rig) : zeph ? ZP.zephHeadParts(pose, rig) : [headPart(pose)])
         ];
         parts.sort((p, q) => p.depth - q.depth).forEach(p => p.draw());
         ctx.restore();
@@ -901,9 +934,10 @@
         anim = a;
         azael = opts.model === 'azael';
         yara = opts.model === 'yara';
+        zeph = opts.model === 'zeph';
         HS = opts.camera?.heightScale ?? V.heightScale;
         GS = opts.camera?.groundSquash ?? V.groundSquash;
-        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : V.bladeLength;
+        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : zeph ? ZE.bladeLength : V.bladeLength;
         cosF = Math.cos(a.facing);
         sinF = Math.sin(a.facing);
         const pose = buildPose(opts.time ?? performance.now() / 1000, body);
