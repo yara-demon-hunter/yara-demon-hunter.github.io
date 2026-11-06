@@ -92,3 +92,7 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # Tempo máximo esperando o GitHub Pages confirmar a publicação, em milissegundos (padrão: 10 minutos).
+          # O Pages às vezes demora para terminar do lado dele; com 30 minutos o deploy não é cancelado à toa.
+          timeout: 1800000

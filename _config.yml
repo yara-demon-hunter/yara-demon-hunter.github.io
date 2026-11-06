@@ -17,3 +17,7 @@ exclude:
   - mini_games/yara-rpg/components/yara-rpg.html
   - mini_games/yara-rpg/tests
   - mini_games/yara-rpg/blender
+  # Imagens de referência de arte dos mini games: só guiam o desenho em código, nenhuma página as carrega
+  - mini_games/last_torch/art_reference
+  - mini_games/yara-rpg/art_reference
+  - mini_games/wild-push-smash/art_reference
