@@ -394,8 +394,13 @@ function drawYaraLeg(rig, hip, knee, ankle, toe) {
     // Bota alta
     K.olimb(rig, [mix(knee, ankle, 0.22), ankle], Y.legWidth * 0.72, C.leather);
     for (const q of [0.45, 0.7]) limb([mix(knee, ankle, q - 0.02), mix(knee, ankle, q + 0.02)], Y.legWidth * 0.75, C.leatherShade);
-    K.olimb(rig, [ankle, toe], 1.85, C.leather);
-    ball(toe, 0.85, C.leatherShade);
+    // Pé chato no chão: o cano desce até o calcanhar e a sola vai reta até a ponta, na altura do chão (sem ficar na
+    // ponta dos pés). Os dedos recuam um pouco para o pé não ficar comprido.
+    const heel = [ankle[0] - 0.5, ankle[1], toe[2] + 0.35];
+    const tip = [toe[0] - 0.3, toe[1], toe[2] + 0.35];
+    K.olimb(rig, [ankle, heel], Y.legWidth * 0.68, C.leather);
+    K.olimb(rig, [heel, tip], 1.75, C.leather);
+    limb([[heel[0] - 0.2, heel[1], heel[2] - 0.55], [tip[0] + 0.2, tip[1], tip[2] - 0.55]], 0.5, C.leatherShade);
 }
 
 // --- TRONCO ---
