@@ -115,5 +115,7 @@ Código em `js/stage/yara25d.js` (ligado em `js/stage/hero25d.js` pelo modelo `'
 - Pernas: calça larga escura e botas de couro altas, com o pé chato no chão (calcanhar e sola apoiados).
 - Parada: braços soltos e dobrados, um pouco abertos; respiram e balançam devagar, cada um no seu ritmo, e a espada
   balança junto (`yaraIdle` em `js/stage/hero25d.js`). Some ao correr e nos golpes.
+- Espada em repouso: segurada em pé, ponta para cima e um pouco para a frente (guarda), na altura da cintura;
+  no golpe volta para a varredura normal.
 - Espada curta reta (`bladeLength` 8,5) com cabo de couro, guarda e pomo escuros, fio claro e brilho vermelho; usa os
   golpes, o aparo, o dash e o descanso do boneco do palco.

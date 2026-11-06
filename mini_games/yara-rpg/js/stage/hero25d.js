@@ -542,7 +542,7 @@
             hand: [
                 (Math.sin(t * 1.7 + ph) * 0.6 + (side > 0 ? 1.6 : 0.8)) * idle,
                 side * (1.3 + Math.sin(t * 1.1 + ph) * 0.35) * idle,
-                (Math.sin(t * 2.1 + ph + 0.8) * 0.5 + 1.6) * idle
+                (Math.sin(t * 2.1 + ph + 0.8) * 0.5 + (side > 0 ? 2.4 : 1.6)) * idle
             ],
             elbow: [-1 * idle, side * (1.5 + Math.sin(t * 1.1 + ph) * 0.25) * idle, 0.2 * idle],
             angle: (Math.sin(t * 1.3) * 0.2 - 0.55) * idle
@@ -586,7 +586,16 @@
         const angle = lerpAngle(restAngle, swingAngle, blend);
         const drop = V.restBladeDrop * (1 - blend);
         const len = Math.hypot(1, drop);
-        const dir = [Math.cos(angle) / len, Math.sin(angle) / len, -drop / len];
+        let dir = [Math.cos(angle) / len, Math.sin(angle) / len, -drop / len];
+        // Yara: em repouso segura a espada curta em pé, com a ponta para cima e um pouco para a frente (guarda),
+        // balançando de leve; no golpe volta para a varredura normal
+        if (yara) {
+            const k = 1 - blend;
+            const up = [0.35 + Math.sin(pose.t * 1.3) * 0.08, 0.15, 0.92];
+            const m = mix(dir, up, k);
+            const size = Math.hypot(...m) || 1;
+            dir = m.map(v => v / size);
+        }
         return holdSword(pose, { hand, dir });
     }
 
