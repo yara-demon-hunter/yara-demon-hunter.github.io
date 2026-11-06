@@ -32,13 +32,14 @@ export const AZAEL_VISUALS = {
         eyeGlint: '#ff2a2a',
 
         // Só do Azael
-        // Pele branco-prateada (um pouco mais cinza que o cabelo, para os dois não virarem uma mancha só)
-        skin: '#cfd6de',
-        skinShade: '#8f99a6',
-        skinLight: '#e6ebf0',
+        // Pele cinza-azulada clara, como nas imagens (mais escura que o cabelo, para os dois não virarem uma mancha só)
+        skin: '#c3ccd8',
+        skinShade: '#8792a3',
+        skinLight: '#dde3ec',
         outline: '#1a1d22',
-        hair: '#fafaf7',
-        hairShade: '#aab1bb',
+        hair: '#f1f2f0',
+        hairShade: '#a3abb8',
+        mouth: '#4a5260',
         eye: '#ff2a2a',
         eyeGlow: 'rgba(255, 42, 42, 0.6)',
         warPaint: '#15171a',
@@ -53,15 +54,23 @@ export const AZAEL_VISUALS = {
         tsuba: '#a88b4a'
     },
 
-    // Cabeça (sem capuz): menor que o capuz do herói
-    headRadius: 3.1,
+    // Cabeça (sem capuz): esfera do cabelo, com o rosto desenhado na superfície da frente (não é uma peça colada)
+    headRadius: 3.3,
+    // A câmera vê quase de cima: a cabeça "olha" um pouco para cima para o rosto aparecer (radianos).
+    // faceTilt de perfil; faceTiltFront a mais quando ele está virado para a câmera.
+    faceTilt: 0.45,
+    faceTiltFront: 0.45,
+    // De lado, a cabeça vira um pouco para a câmera (radianos), senão o rosto vira uma faixa fina na borda
+    faceTurn: 0.5,
+    // Rosto em coordenadas da cabeça (s = lado, u = altura): contorno do rosto da bandana até o queixo
+    face: [[2.1, 0.75], [2.45, 0], [2.35, -1.1], [1.85, -2.3], [1, -3.2], [0, -3.55]],
+    jawForward: 1.2,          // o queixo sai um pouco da esfera
+    faceOut: 0.6,            // o rosto fica um pouco à frente do volume do cabelo (lê de perfil)
+    // Bandana: altura do meio da faixa (u) e largura
+    bandHeight: 0.75,
+    bandWidth: 1.25,
+    // Orelhas pontudas para os lados, para trás e para cima
     earLength: 2.4,
-    // Rosto projetado para a frente (como a máscara do herói), para ler bem vindo de cima
-    faceForward: 2.1,
-    faceDepth: 1.3,
-    faceWidth: 2.3,
-    faceHeight: 3.2,
-    faceHeightOffset: -0.7,
     // Cabelo: mechas presas no alto da cabeça que caem até o meio das costas e voam com a capa
     hairStrands: 6,
     hairLength: 6.5,

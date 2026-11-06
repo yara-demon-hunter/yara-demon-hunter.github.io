@@ -6,8 +6,8 @@
 
 ## Aparência
 
-- **Silhueta / forma geral:** demônio humanoide do tamanho de um homem comum, magro e muito musculoso. Na câmera 2.5D (quase de cima, levemente inclinada), lê-se como ombros envoltos num cachecol/capa marrom volumoso, cabelo branco comprido voando atrás, capa esfarrapada tremulando para trás e a katana saindo do lado.
-- **Cabeça e rosto:** rosto sério e frio, testa franzida. **Orelhas pontudas** (élficas), sem chifres. **Olhos vermelhos brilhantes** com pupila em fenda (nas imagens estão verdes, mas no jogo são **vermelhos**). **Pintura de guerra preta:** uma faixa vertical descendo de cada olho até o queixo (como lágrimas pretas), mais grossa no lado esquerdo do rosto.
+- **Silhueta / forma geral:** demônio humanoide do tamanho de um homem comum, magro e musculoso. Na câmera 2.5D (quase de cima, levemente inclinada), lê-se como ombros envoltos num cachecol/capa marrom volumoso, cabelo branco comprido voando atrás, capa esfarrapada tremulando para trás e a katana saindo do lado.
+- **Cabeça e rosto:** rosto sério e frio, testa franzida. **Orelhas pontudas** (élficas), sem chifres. **Olhos vermelhos brilhantes** com pupila em fenda (nas imagens estão verdes, mas no jogo são **vermelhos**). **Pintura de guerra preta:** uma faixa vertical descendo de cada olho até o queixo (como lágrimas pretas)
 - **Faixa na testa:** bandana de pano marrom amarrada na testa, com duas pontas rasgadas compridas que voam ao vento atrás da cabeça.
 - **Cabelo:** longo, liso, **branco** (sombras levemente cinza-azuladas), até o meio das costas, com mechas soltas caindo na frente do rosto. **Esvoaçante:** está sempre voando ao vento, mesmo parado, e chicoteia atrás dele quando corre ou ataca.
 - **Corpo / pele:** pele **branco-prateada** (metálica e fria, com sombras cinza-azuladas), peito nu, abdômen e braços bem definidos.
@@ -86,11 +86,18 @@ Código em `js/render/azael25d.js`; cores e medidas em `data_model/visuals/chara
 
 - Pano e cabelo em "correntes" de pontos: parados caem e balançam devagar; correndo vão para trás, atrasam com a
   física da capa (inclusive ao virar) e ondulam com uma onda que corre da raiz até a ponta.
-- Bandana: faixa na testa, volta por cima do cabelo até o nó atrás da cabeça e duas pontas de comprimentos diferentes,
-  com a ponta rasgada em V, que esvoaçam mais rápido que o cabelo.
-- Cabelo: massa branca com pontas soltas e fios, risca no meio no alto da cabeça e duas mechas finas emoldurando o rosto.
-- Rosto: projetado para a frente (para ler visto de cima), olhos vermelhos brilhando, sobrancelhas franzidas, boca séria
-  e pintura de guerra.
+- Cabeça: uma esfera de cabelo branco; o rosto é uma região pintada na superfície da frente (da bandana até o queixo),
+  sem contorno dos lados, para não parecer máscara. Como a câmera vê quase de cima, a cabeça levanta um pouco o rosto
+  (`faceTilt`) e, de lado, vira um pouco para a câmera (`faceTurn`). Só o que está virado para a câmera é desenhado.
+- Rosto: pele cinza-azulada, olhos vermelhos amendoados e inclinados com brilho, sobrancelhas franzidas, sombra do nariz
+  e das maçãs, boca séria, queixo com contorno e uma faixa de pintura de guerra descendo de cada olho.
+- Cabelo: risca no meio, franja caindo por cima da bandana, mechas finas dos lados do rosto e a massa longa nas costas.
+- Bandana: faixa em volta da cabeça (só a parte visível), nó atrás e duas pontas rasgadas que esvoaçam.
+- Corpo: contorno escuro em braços, pernas e pés; ombro da espada nu com faixa no bíceps, o outro coberto pelo pano;
+  peitoral e abdômen marcados, faixa cruzando o peito e cachecol volumoso com dobras. Sem cinto (obi) e sem bolsinha:
+  no boneco pequeno ficavam ruins.
+- O yara-rpg tem uma cópia idêntica (`yara-rpg/js/stage/azael25d.js` + `azael` em `yara-rpg/js/data/visuals/hero25d.js`):
+  ao mudar o desenho aqui, copie para lá.
 - Capa de pano: cada tira ondula e o meio cede com o peso na corrida; o cachecol cobre os ombros.
 - Corrida: corpo sobe e desce a cada passo, postura um pouco agachada; pés de 3 dedos com garras.
 - Katana: guardada na bainha com a mão no cabo; no golpe a lâmina desliza para fora e volta para a bainha aos poucos.
