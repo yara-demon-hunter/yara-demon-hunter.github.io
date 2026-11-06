@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yara RPG · Prévias</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; padding: 32px 16px 48px;
+            background: radial-gradient(ellipse at 50% 0, #2a2416 0, #0c0a06 60%);
+            color: #d6cfbf; font-family: system-ui, sans-serif;
+        }
+        main { max-width: 980px; margin: 0 auto; }
+        h1 { margin: 0 0 6px; font-size: clamp(26px, 5vw, 40px); color: #fde68a; letter-spacing: 0.02em; }
+        .lead { margin: 0 0 28px; color: #a8a08c; }
+        .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        a.card {
+            display: flex; flex-direction: column; gap: 10px; padding: 22px;
+            background: #17140d; border: 1px solid #3a3322; border-radius: 14px;
+            color: inherit; text-decoration: none; transition: transform .15s, border-color .15s;
+        }
+        a.card:hover, a.card:focus-visible { transform: translateY(-3px); border-color: #fbbf24; outline: none; }
+        .icon { font-size: 40px; line-height: 1; }
+        .name { font-size: 20px; font-weight: 700; color: #f5efe0; }
+        .desc { font-size: 14px; line-height: 1.5; color: #a8a08c; }
+        .file { margin-top: auto; font: 12px ui-monospace, monospace; color: #7a725f; }
+        footer { margin-top: 28px; font-size: 13px; color: #7a725f; }
+    </style>
+</head>
+<body>
+    <!-- Página de desenvolvimento: ponto de partida das prévias. Como abrir: README.md desta pasta -->
+    <main>
+        <h1>🌫️ Yara RPG · Prévias</h1>
+        <p class="lead">Escolha o que analisar. Tudo roda com o código real do palco 2.5D (js/stage).</p>
+        <div class="grid">
+            <a class="card" href="characters_preview.html">
+                <span class="icon">🗡️</span>
+                <span class="name">Personagens</span>
+                <span class="desc">Escolha o personagem pela foto: rosto de perto, golpes, golpe pesado, aparo, poção, descanso, dano, derrota e as oito direções.</span>
+                <span class="file">characters_preview.html</span>
+            </a>
+            <a class="card" href="stage_preview.html">
+                <span class="icon">🎭</span>
+                <span class="name">Palco</span>
+                <span class="desc">O palco do jogo com um estado de mentira: escolha personagem, monstro e região e aperte as ações (explorar, atacar, aparar, fugir...).</span>
+                <span class="file">stage_preview.html</span>
+            </a>
+        </div>
+        <footer>Servidor: <code>python3 -m http.server 8000</code> dentro de <code>mini_games/yara-rpg</code>.</footer>
+    </main>
+</body>
+</html>

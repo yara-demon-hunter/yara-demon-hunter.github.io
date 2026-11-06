@@ -25,6 +25,7 @@ Use this page to find the smallest relevant files before changing the game.
 | Short procedural scenes, opening scene | `scenes/` (see `scenes/README.md`); wiring in `js/game.js` |
 | Pet commands (combat button, exploration scout, companion on the portrait) | `js/systems/pets.js`; abilities in `js/data/pets.js`; styles in `css/pets.css` |
 | 2.5D action stage above the log (hero animations, region scenery) | `js/stage/` (see `js/stage/README.md`); data in `js/data/visuals/` |
+| Dev previews of the stage (characters by photo, live stage with fake state) | `previews/` (see `previews/README.md`) |
 | 3D characters in Blender (poses, renders; not loaded by the game) | `blender/` (see `blender/CLAUDE.md`) |
 | Browser regression tests | `tests/` (copy to `_site/yara-rpg-tests/` after a Jekyll build; excluded from published output) |
 

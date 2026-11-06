@@ -23,7 +23,8 @@ Faixa acima do log que mostra o herói fazendo o que os botões mandam. Só desc
    avança e acerta... Ações seguidas entram na fila e o diretor acelera para alcançar o jogo.
 3. Com o diretor parado, o palco confere o estado (`watch`): monstro que apareceu ou sumiu, baú, subida de nível.
 
-O palco não lê o jogo direto, só pela fonte (`source` em `hooks.js`). Dá para rodá-lo com um estado falso.
+O palco não lê o jogo direto, só pela fonte (`source` em `hooks.js`). Dá para rodá-lo com um estado falso:
+`previews/stage_preview.html` faz isso, e `previews/characters_preview.html` mostra cada boneco em todas as poses.
 
 ## Personagens
 

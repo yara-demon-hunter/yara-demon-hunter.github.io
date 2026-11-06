@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yara RPG · Palco</title>
+    <link rel="stylesheet" href="../css/fonts.css">
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0c0a06; color: #d6cfbf; font-family: system-ui, sans-serif; }
+        main { max-width: 1100px; margin: 0 auto; padding: 16px 16px 48px; }
+        h1 { margin: 8px 0 2px; color: #fde68a; font-size: clamp(22px, 4vw, 30px); }
+        .lead { margin: 0 0 12px; color: #a8a08c; font-size: 14px; }
+        .back { color: #a8a08c; font-size: 13px; }
+        /* Mesmo formato do palco no jogo (css/interface.css: .action-stage) */
+        .action-stage {
+            position: relative; aspect-ratio: 5 / 2; min-height: 130px; overflow: hidden;
+            border: 1px solid rgba(92, 81, 55, .55); border-radius: .75rem; background: #0a0806;
+        }
+        .action-stage canvas { display: block; width: 100%; height: 100%; }
+        .panel { margin-top: 14px; display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+        @media (max-width: 700px) { .panel { grid-template-columns: 1fr; } }
+        fieldset { margin: 0; padding: 10px 12px 12px; border: 1px solid #3a3322; border-radius: 10px; background: #17140d; }
+        legend { padding: 0 6px; color: #fbbf24; font-weight: 700; font-size: 14px; }
+        label { display: inline-flex; align-items: center; gap: 6px; margin: 4px 12px 4px 0; font-size: 14px; }
+        select, input[type=number] {
+            background: #0c0a06; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 6px; padding: 4px 6px; font: inherit;
+        }
+        input[type=number] { width: 64px; }
+        .buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+        button {
+            padding: 8px 12px; border: 1px solid #5c5137; border-radius: 8px; background: #2a2416; color: #f5efe0;
+            font: 600 14px system-ui, sans-serif; cursor: pointer;
+        }
+        button:hover, button:focus-visible { border-color: #fbbf24; outline: none; }
+        button.wide { flex: 1 1 100%; background: #3a2f17; }
+        .note { margin: 6px 0 0; color: #7a725f; font-size: 12px; }
+        .warn { padding: 24px; text-align: center; color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <!-- Página de desenvolvimento: o palco 2.5D do jogo (js/stage/stage.js) com um estado de mentira no lugar do RPG.
+         Os botões chamam stage.play(ação, relatório) como js/stage/hooks.js faz. Como abrir: previews/README.md -->
+    <main>
+        <a class="back" href="index.html">← Prévias</a>
+        <h1>Palco</h1>
+        <p class="lead">O palco do jogo com um estado de mentira: escolha quem está em cena e aperte as ações.</p>
+        <div class="action-stage"><canvas id="stage"></canvas></div>
+
+        <div class="panel">
+            <fieldset>
+                <legend>Cena</legend>
+                <label>Personagem <select id="char"></select></label>
+                <label>Região <select id="region"></select></label>
+                <label>Monstro <select id="monster"></select></label>
+                <label>Pet <select id="pet"></select></label>
+                <label>Nível <input id="level" type="number" min="1" max="99" value="1"></label>
+                <br>
+                <label><input id="fury" type="checkbox"> Fúria pronta</label>
+                <label><input id="telegraph" type="checkbox"> Monstro preparando golpe</label>
+                <label><input id="chest" type="checkbox"> Baú</label>
+                <label><input id="presence" type="checkbox"> Presença na névoa</label>
+                <label><input id="defeated" type="checkbox"> Derrotado</label>
+                <label>Idioma <select id="lang"><option value="pt">PT</option><option value="en">EN</option></select></label>
+            </fieldset>
+            <fieldset>
+                <legend>Resultado do turno</legend>
+                <label>Golpe <select id="hit">
+                    <option value="hit">acerta</option>
+                    <option value="crit">acerta crítico</option>
+                    <option value="stun">acerta e atordoa</option>
+                    <option value="miss">erra</option>
+                    <option value="kill">mata</option>
+                </select></label>
+                <label>Dano <input id="damage" type="number" min="0" value="12"></label>
+                <label>Monstro revida <select id="enemy">
+                    <option value="none">não</option>
+                    <option value="hit">acerta</option>
+                    <option value="parried">é aparado</option>
+                    <option value="evaded">erra (esquiva)</option>
+                </select></label>
+                <label>Dano dele <input id="enemyDamage" type="number" min="0" value="9"></label>
+                <p class="note">Valem para atacar, golpe pesado, crítico, pet, aparar, esquivar, poção e fuga falha.</p>
+            </fieldset>
+        </div>
+
+        <fieldset style="margin-top:14px">
+            <legend>Ações</legend>
+            <div class="buttons" id="actions"></div>
+        </fieldset>
+    </main>
+
+    <script src="../js/data/characters.js"></script>
+    <script src="../js/data/regions.js"></script>
+    <script src="../js/data/monsters.js"></script>
+    <script src="../js/data/special-monsters.js"></script>
+    <script src="../js/data/items.js"></script>
+    <script src="../js/data/visuals/hero25d.js"></script>
+    <script src="../js/data/visuals/stage.js"></script>
+    <script src="../js/stage/fx.js"></script>
+    <script src="../js/stage/azael25d.js"></script>
+    <script src="../js/stage/hero25d.js"></script>
+    <script src="../js/stage/scenery.js"></script>
+    <script src="../js/stage/stage.js"></script>
+    <script>
+        (() => {
+            const DATA = window.YaraRpgData;
+            const NS = window.YaraStage25D;
+            if (!NS?.createStage) {
+                document.querySelector('.action-stage').outerHTML = '<p class="warn">Os scripts do palco não carregaram. Veja previews/README.md.</p>';
+                return;
+            }
+            const $ = (id) => document.getElementById(id);
+            const pt = (v) => (typeof v === 'string' ? v : v?.pt ?? '');
+            // Imagens do jogo estão na pasta do jogo; a prévia fica um nível abaixo
+            const asset = (src) => (src ? `../${src}` : null);
+            const fill = (select, items) => items.forEach(([value, text]) => select.add(new Option(text, value)));
+
+            // --- OPÇÕES ---
+            fill($('char'), DATA.characters.map(c => [c.id, c.name]));
+            $('char').value = new URLSearchParams(location.search).get('char') || 'mysterious-creature';
+            fill($('region'), DATA.regions.map(r => [r.id, pt(r.title)]));
+            const monsters = [];
+            Object.entries(DATA.monsters.byRegion).forEach(([region, list]) => list.forEach(m => monsters.push({ ...m, region, boss: false })));
+            (DATA.specialMonsters || []).forEach(m => monsters.push({ ...m, region: 'especial', boss: true }));
+            fill($('monster'), [['', 'nenhum'], ...monsters.map((m, i) => [String(i), `${pt(m.name)} (${m.region})`])]);
+            const pets = Object.values(DATA.items).flat().filter(i => i && i.slot === 'pet');
+            fill($('pet'), [['', 'nenhum'], ...pets.map((p, i) => [String(i), pt(p.name)])]);
+
+            // --- ESTADO DE MENTIRA ---
+            // Mesmo formato do `source` de js/stage/hooks.js; o palco lê daqui a cada quadro
+            let encounter = 1;
+            const source = {
+                characterId: () => $('char').value,
+                regionId: () => $('region').value,
+                monster: () => {
+                    const m = monsters[$('monster').value];
+                    return $('monster').value !== '' && m
+                        ? { key: String(encounter), image: asset(m.image), boss: m.boss, telegraph: $('telegraph').checked }
+                        : null;
+                },
+                furyReady: () => $('fury').checked,
+                level: () => Number($('level').value) || 1,
+                petImage: () => asset(pets[$('pet').value]?.image),
+                chest: () => $('chest').checked,
+                presence: () => $('presence').checked,
+                defeated: () => $('defeated').checked,
+                language: () => $('lang').value
+            };
+            const stage = NS.createStage($('stage'), source);
+
+            // Relatório do turno (mesmo formato de report em js/stage/hooks.js)
+            function report(action) {
+                const kind = $('hit').value;
+                const damage = Number($('damage').value) || 0;
+                const attacked = ['attack', 'heavy', 'critical', 'pet'].includes(action);
+                const enemy = $('enemy').value;
+                const enemyDamage = Number($('enemyDamage').value) || 0;
+                const killed = attacked && kind === 'kill';
+                return {
+                    hit: attacked && kind !== 'miss' ? { damage, crit: kind === 'crit', stun: kind === 'stun' } : null,
+                    missed: attacked && kind === 'miss',
+                    killed,
+                    enemy: killed || enemy === 'none' ? null
+                        : enemy === 'evaded' ? { result: 'evaded', damage: 0 }
+                        : { result: enemy, damage: enemy === 'parried' ? Math.round(enemyDamage / 2) : enemyDamage },
+                    heal: action === 'potion' ? { hp: 30 } : null
+                };
+            }
+
+            // --- AÇÕES ---
+            const LABELS = {
+                explore: 'Explorar', rest: 'Descansar', potion: 'Poção', attack: 'Atacar', heavy: 'Golpe pesado',
+                critical: 'Crítico (Fúria)', parry: 'Aparar', dodge: 'Esquivar', flee: 'Fugir', fleeFail: 'Fuga falha',
+                pet: 'Pet ataca', openChest: 'Abrir baú'
+            };
+            const actions = $('actions');
+            stage.actions.forEach(action => {
+                const b = document.createElement('button');
+                b.textContent = LABELS[action] || action;
+                b.title = `stage.play('${action}')`;
+                b.addEventListener('click', () => {
+                    const r = report(action);
+                    stage.play(action, r);
+                    // Depois da cena, o estado muda como no jogo: monstro morto ou fuga tiram o monstro; baú aberto some
+                    if (r.killed || action === 'flee') setTimeout(() => { $('monster').value = ''; }, 900);
+                    if (action === 'openChest') setTimeout(() => { $('chest').checked = false; }, 600);
+                });
+                actions.appendChild(b);
+            });
+            const spawn = document.createElement('button');
+            spawn.className = 'wide';
+            spawn.textContent = 'Novo encontro (monstro aleatório da região)';
+            spawn.addEventListener('click', () => {
+                const region = $('region').value;
+                const options = monsters.map((m, i) => [m, i]).filter(([m]) => m.region === region);
+                const pick = options[Math.floor(Math.random() * options.length)] || [null, 0];
+                encounter++;
+                $('monster').value = String(pick[1]);
+            });
+            actions.appendChild(spawn);
+            // Monstro trocado à mão também é um encontro novo
+            $('monster').addEventListener('change', () => { encounter++; });
+            window.previewStage = stage;
+        })();
+    </script>
+</body>
+</html>

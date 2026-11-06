@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yara RPG · Personagens</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0c0a06; color: #d6cfbf; font-family: system-ui, sans-serif; }
+        /* Escolha do personagem: uma foto para cada um; a página inteira mostra só o escolhido */
+        #picker {
+            position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+            padding: 12px 16px; background: rgba(12, 10, 6, 0.94); border-bottom: 1px solid #3a3322;
+        }
+        #picker a {
+            display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border: 1px solid #3a3322;
+            border-radius: 12px; background: #17140d; color: #a8a08c; text-decoration: none; font-weight: 700;
+            transition: border-color .15s, transform .15s;
+        }
+        #picker a:hover, #picker a:focus-visible { border-color: #fde68a; transform: translateY(-2px); outline: none; }
+        #picker a.is-picked { border-color: #fbbf24; color: #fde68a; box-shadow: 0 0 14px rgba(251, 191, 36, 0.25); }
+        #picker img { width: 52px; height: 52px; border-radius: 9px; object-fit: cover; object-position: center 20%; }
+        main { max-width: 1200px; margin: 0 auto; padding: 16px 16px 48px; }
+        h1 { margin: 8px 0 2px; color: #fde68a; font-size: clamp(22px, 4vw, 30px); }
+        .model { margin: 0 0 8px; color: #7a725f; font-size: 14px; }
+        h2 { margin: 26px 0 4px; color: #fbbf24; font-size: 18px; }
+        .hint { margin: 0 0 10px; color: #a8a08c; font-size: 14px; }
+        .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(var(--min, 220px), calc(50% - 6px)), 1fr)); }
+        figure { margin: 0; background: #17140d; border: 1px solid #2a2418; border-radius: 10px; overflow: hidden; }
+        figure canvas { display: block; width: 100%; aspect-ratio: var(--ratio, 1); }
+        figcaption { padding: 6px 10px 8px; font-size: 13px; color: #c9c0aa; }
+        .back { color: #a8a08c; font-size: 13px; }
+        @media (max-width: 600px) {
+            #picker { gap: 6px; padding: 8px; }
+            #picker a { padding: 4px 10px 4px 4px; gap: 6px; font-size: 13px; }
+            #picker img { width: 34px; height: 34px; }
+            .grid { gap: 8px; }
+            figcaption { font-size: 12px; padding: 4px 8px 6px; }
+        }
+        .warn { padding: 24px; text-align: center; color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <!-- Página de desenvolvimento: o boneco 2.5D de cada personagem do RPG (js/stage/hero25d.js e js/stage/azael25d.js),
+         com a câmera do palco. ?char=<id de js/data/characters.js> escolhe o personagem. Como abrir: previews/README.md -->
+    <nav id="picker" aria-label="Escolha o personagem"></nav>
+    <main>
+        <a class="back" href="index.html">← Prévias</a>
+        <h1 id="title"></h1>
+        <p class="model" id="model"></p>
+        <div id="sections"></div>
+    </main>
+
+    <script src="../js/data/characters.js"></script>
+    <script src="../js/data/visuals/hero25d.js"></script>
+    <script src="../js/data/visuals/stage.js"></script>
+    <script src="../js/stage/fx.js"></script>
+    <script src="../js/stage/azael25d.js"></script>
+    <script src="../js/stage/hero25d.js"></script>
+    <script>
+        (() => {
+            const DATA = window.YaraRpgData;
+            const STAGE = DATA.visuals.stage;
+            const HERO = window.YaraStage25D?.hero;
+            if (!HERO) {
+                document.getElementById('sections').innerHTML = '<p class="warn">Os scripts do palco não carregaram. Veja previews/README.md.</p>';
+                return;
+            }
+
+            // --- PERSONAGEM ---
+            const chars = DATA.characters;
+            const pickedId = new URLSearchParams(location.search).get('char');
+            const CHAR = chars.find(c => c.id === pickedId) || chars.find(c => c.id === 'mysterious-creature') || chars[0];
+            const LOOK = STAGE.characters[CHAR.id] || { model: 'hunter' };
+
+            const picker = document.getElementById('picker');
+            chars.forEach(c => {
+                const link = document.createElement('a');
+                link.href = `?char=${c.id}`;
+                link.className = c.id === CHAR.id ? 'is-picked' : '';
+                const img = document.createElement('img');
+                img.src = `../${c.image}`;
+                img.alt = '';
+                link.append(img, c.name);
+                picker.appendChild(link);
+            });
+            document.getElementById('title').textContent = CHAR.name;
+            document.getElementById('model').textContent = `Boneco: ${LOOK.model === 'azael' ? 'Azael (js/stage/azael25d.js)' : 'Demon Hunter (js/stage/hero25d.js)'}`
+                + (LOOK.colors ? ' · cores próprias (js/data/visuals/stage.js)' : '');
+
+            // --- CÂMERAS ---
+            // Palco: a mesma inclinação do jogo (pitchDeg em js/data/visuals/stage.js). De cima: a do Last Torch.
+            const pitch = STAGE.camera.pitchDeg * Math.PI / 180;
+            const CAM_STAGE = { heightScale: Math.cos(pitch), groundSquash: Math.sin(pitch) };
+            const CAM_TOP = undefined;
+            const RIGHT = STAGE.facing.right;
+            const LEFT = STAGE.facing.left;
+            const RUN = STAGE.speed.runPx;
+            const MOVES = HERO.moves;
+
+            // --- CENAS ---
+            // Cada cena é um boneco num quadro, em loop. o: { facing, camera, scale (px/unidade no quadro de 260 px),
+            // footY (fração da altura), loop (s), walk, dash, kneel, frenzy, move, swing, hurt }
+            function scene(label, o) {
+                return { label, o, anim: HERO.createAnim(o.facing ?? RIGHT), body: { hitTime: -99, hitDirX: 0, hitDirY: 0, move: null }, last: -1, t: 0 };
+            }
+
+            function tick(s, dt) {
+                const o = s.o;
+                s.t += dt;
+                const loop = o.loop ?? 1.6;
+                const k = s.t % loop;
+                const lap = Math.floor(s.t / loop);
+                const face = typeof o.facing === 'function' ? o.facing(s.t) : (o.facing ?? RIGHT);
+                if (lap !== s.last) {
+                    s.last = lap;
+                    if (o.swing) HERO.startSwing(s.anim, o.swing);
+                    if (o.hurt) {
+                        s.body.hitTime = s.t + 0.2;
+                        s.body.hitDirX = -Math.sign(Math.cos(face)) || -1;
+                    }
+                }
+                const sec = o.move ? MOVES[o.move].seconds : 0;
+                s.body.move = o.move && k < sec ? { kind: o.move, age: k, seconds: sec } : null;
+                const walking = o.walk === true || (o.walk === 'pulse' && k < loop * 0.6);
+                HERO.updateAnim(s.anim, {
+                    vx: walking ? Math.cos(face) * RUN : 0,
+                    vy: walking ? Math.sin(face) * RUN : 0,
+                    face,
+                    dashing: !!o.dash && k < 0.35,
+                    kneeling: !!o.kneel && k < loop * 0.7
+                }, dt);
+            }
+
+            function draw(s, g, w, h) {
+                const o = s.o;
+                g.fillStyle = '#17140d';
+                g.fillRect(0, 0, w, h);
+                // Chão: elipse de luz onde o boneco pisa
+                const footY = h * (o.footY ?? 0.82);
+                const grd = g.createRadialGradient(w / 2, footY, 0, w / 2, footY, w * 0.45);
+                grd.addColorStop(0, 'rgba(120, 110, 80, 0.22)');
+                grd.addColorStop(1, 'rgba(120, 110, 80, 0)');
+                g.fillStyle = grd;
+                g.fillRect(0, 0, w, h);
+                HERO.render(g, s.body, s.anim, {
+                    x: w / 2 + (o.offsetX ?? 0) * w,
+                    y: footY,
+                    scale: (o.scale ?? 6.5) * (w / 260),
+                    model: LOOK.model,
+                    colors: LOOK.colors,
+                    camera: o.camera === 'top' ? CAM_TOP : CAM_STAGE,
+                    frenzy: !!o.frenzy,
+                    time: s.t
+                });
+            }
+
+            const SECTIONS = [
+                {
+                    title: 'Rosto de perto',
+                    hint: 'A cabeça na câmera do palco, olhando para cada lado e de frente para a câmera.',
+                    min: 260,
+                    scenes: [
+                        scene('olhando para a direita (palco)', { facing: RIGHT, scale: 15, footY: 1.4 }),
+                        scene('olhando para a esquerda (palco)', { facing: LEFT, scale: 15, footY: 1.4 }),
+                        scene('de frente para a câmera', { facing: Math.PI / 2, scale: 15, footY: 1.4 }),
+                        scene('de perfil', { facing: 0, scale: 15, footY: 1.4 })
+                    ]
+                },
+                {
+                    title: 'No palco',
+                    hint: 'Como aparece no jogo: parado, andando (explorar) e com a Fúria pronta.',
+                    scenes: [
+                        scene('parado, para a direita', { facing: RIGHT }),
+                        scene('parado, para a esquerda', { facing: LEFT }),
+                        scene('andando (explorar)', { facing: RIGHT, walk: true }),
+                        scene('Fúria pronta', { facing: RIGHT, frenzy: true }),
+                        scene('tamanho do jogo', { facing: RIGHT, scale: 3.4 })
+                    ]
+                },
+                {
+                    title: 'Golpes',
+                    hint: 'Ataque rápido (combo 1, 2, 3), giro e golpe pesado. Cada quadro repete o golpe.',
+                    scenes: [
+                        scene('1º golpe', { swing: 1, loop: 1 }),
+                        scene('2º golpe', { swing: 2, loop: 1 }),
+                        scene('3º golpe', { swing: 3, loop: 1 }),
+                        scene('giro (crítico)', { swing: 'whirl', loop: 1.1, frenzy: true }),
+                        scene('golpe pesado', { move: 'slam', loop: 1.4 }),
+                        scene('grito da Fúria', { move: 'roar', loop: 1.3, frenzy: true }),
+                        scene('avanço (dash)', { dash: true, loop: 1.1 })
+                    ]
+                },
+                {
+                    title: 'Ações',
+                    hint: 'Aparo, poção, descanso na fogueira, dano e derrota.',
+                    scenes: [
+                        scene('aparo', { move: 'guard', loop: 1.6 }),
+                        scene('poção', { move: 'drink', loop: 1.6 }),
+                        scene('descanso (ajoelhado)', { kneel: true, loop: 3 }),
+                        scene('levando dano', { hurt: true, loop: 1.2 }),
+                        scene('derrota', { move: 'fall', loop: 2.4 }),
+                        scene('fugindo', { facing: LEFT, walk: 'pulse', loop: 1.6 })
+                    ]
+                },
+                {
+                    title: 'Oito direções (vista de cima)',
+                    hint: 'O mesmo boneco com a câmera do Last Torch, correndo. Bom para conferir costas e perfis.',
+                    min: 120,
+                    scenes: [
+                        ['cima', -Math.PI / 2], ['cima-direita', -Math.PI / 4], ['direita', 0], ['baixo-direita', Math.PI / 4],
+                        ['baixo', Math.PI / 2], ['baixo-esquerda', Math.PI * 3 / 4], ['esquerda', Math.PI], ['cima-esquerda', -Math.PI * 3 / 4]
+                    ].map(([label, f]) => scene(label, { facing: f, walk: true, camera: 'top', scale: 5, footY: 0.66 }))
+                },
+                {
+                    title: 'Girando',
+                    hint: 'Uma volta completa, parado, na câmera do palco.',
+                    min: 260,
+                    scenes: [
+                        scene('girando devagar', { facing: (t) => t * 0.9, scale: 9, loop: 99 }),
+                        scene('girando devagar (de cima)', { facing: (t) => t * 0.9, scale: 8, camera: 'top', footY: 0.7, loop: 99 })
+                    ]
+                }
+            ];
+
+            // --- MONTAGEM ---
+            const root = document.getElementById('sections');
+            const all = [];
+            SECTIONS.forEach(sec => {
+                const h2 = document.createElement('h2');
+                h2.textContent = sec.title;
+                const hint = document.createElement('p');
+                hint.className = 'hint';
+                hint.textContent = sec.hint;
+                const grid = document.createElement('div');
+                grid.className = 'grid';
+                if (sec.min) grid.style.setProperty('--min', `${sec.min}px`);
+                sec.scenes.forEach(s => {
+                    const fig = document.createElement('figure');
+                    const canvas = document.createElement('canvas');
+                    const cap = document.createElement('figcaption');
+                    cap.textContent = s.label;
+                    fig.append(canvas, cap);
+                    grid.appendChild(fig);
+                    all.push({ s, canvas, g: canvas.getContext('2d') });
+                });
+                root.append(h2, hint, grid);
+            });
+
+            let last = performance.now();
+            function frame(now) {
+                const dt = Math.min(0.05, (now - last) / 1000);
+                last = now;
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                all.forEach(({ s, canvas, g }) => {
+                    const w = canvas.clientWidth;
+                    const h = canvas.clientHeight;
+                    if (!w || !h) return;
+                    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+                        canvas.width = Math.round(w * dpr);
+                        canvas.height = Math.round(h * dpr);
+                    }
+                    tick(s, dt);
+                    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+                    draw(s, g, w, h);
+                });
+                requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
+            // Para testes automáticos: avança o tempo sem esperar o navegador
+            window.previewStep = (seconds, step = 1 / 60) => {
+                for (let t = 0; t < seconds; t += step) all.forEach(({ s }) => tick(s, step));
+            };
+        })();
+    </script>
+</body>
+</html>
