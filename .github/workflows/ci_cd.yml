@@ -78,21 +78,52 @@ jobs:
     environment:
       name: github-pages
 
-      # Expose the final deployed URL in the GitHub Actions UI.
-      url: ${{ steps.deployment.outputs.page_url }}
+      # Expose the final deployed URL in the GitHub Actions UI (from whichever attempt succeeded).
+      url: ${{ steps.deploy_1.outputs.page_url || steps.deploy_2.outputs.page_url || steps.deploy_3.outputs.page_url }}
 
     runs-on: ubuntu-latest
 
     # The deploy job only starts after the build job succeeds.
     needs: build
 
+    # Tentativas do deploy. O GitHub Pages às vezes demora para confirmar a publicação do lado dele: se uma tentativa
+    # passar do tempo (DEPLOY_TIMEOUT_MS), o job espera RETRY_WAIT_SECONDS e tenta de novo, até 3 tentativas.
+    # Só a última tentativa falha o job.
+    env:
+      RETRY_WAIT_SECONDS: 120
+
     steps:
 
-      # Deploy the generated artifact to GitHub Pages.
-      - name: Deploy to GitHub Pages
-        id: deployment
+      # Tentativa 1
+      - name: Deploy to GitHub Pages (attempt 1)
+        id: deploy_1
+        continue-on-error: true
         uses: actions/deploy-pages@v4
         with:
-          # Tempo máximo esperando o GitHub Pages confirmar a publicação, em milissegundos (padrão: 10 minutos).
-          # O Pages às vezes demora para terminar do lado dele; com 30 minutos o deploy não é cancelado à toa.
+          # Tempo máximo esperando o GitHub Pages confirmar esta tentativa, em milissegundos (30 minutos).
+          timeout: 1800000
+
+      - name: Wait before retry
+        if: steps.deploy_1.outcome == 'failure'
+        run: sleep "$RETRY_WAIT_SECONDS"
+
+      # Tentativa 2 (só roda se a 1 falhou)
+      - name: Deploy to GitHub Pages (attempt 2)
+        id: deploy_2
+        if: steps.deploy_1.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 1800000
+
+      - name: Wait before last retry
+        if: steps.deploy_2.outcome == 'failure'
+        run: sleep "$RETRY_WAIT_SECONDS"
+
+      # Tentativa 3 (só roda se a 2 falhou). Sem continue-on-error: se esta falhar, o job falha.
+      - name: Deploy to GitHub Pages (attempt 3)
+        id: deploy_3
+        if: steps.deploy_2.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        with:
           timeout: 1800000
