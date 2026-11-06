@@ -57,6 +57,7 @@
     <script src="../js/data/visuals/stage.js"></script>
     <script src="../js/stage/fx.js"></script>
     <script src="../js/stage/azael25d.js"></script>
+    <script src="../js/stage/yara25d.js"></script>
     <script src="../js/stage/hero25d.js"></script>
     <script>
         (() => {
@@ -86,7 +87,7 @@
                 picker.appendChild(link);
             });
             document.getElementById('title').textContent = CHAR.name;
-            document.getElementById('model').textContent = `Boneco: ${LOOK.model === 'azael' ? 'Azael (js/stage/azael25d.js)' : 'Demon Hunter (js/stage/hero25d.js)'}`
+            document.getElementById('model').textContent = `Boneco: ${{ azael: 'Azael (js/stage/azael25d.js)', yara: 'Yara (js/stage/yara25d.js)' }[LOOK.model] ?? 'Demon Hunter (js/stage/hero25d.js)'}`
                 + (LOOK.colors ? ' · cores próprias (js/data/visuals/stage.js)' : '');
 
             // --- CÂMERAS ---

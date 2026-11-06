@@ -13,12 +13,16 @@
     const AZ = VIS.azael;
     const { drawGlow, easeOutCubic, easeOutQuad, lerpAngle, clamp } = NS.fx;
     const AZP = NS.azael;
+    const YA = VIS.yara;
+    const YP = NS.yara;
 
     // Estado do boneco sendo desenhado (render troca antes de montar as peças)
     let ctx = null;
     let C = H.colors;
     let anim = null;
     let azael = false;
+    // Boneco da Yara (js/stage/yara25d.js): cabeça, cachecol, braços, pernas, tronco e espada curta próprios
+    let yara = false;
     let bladeLength = V.bladeLength;
     let bladeWidth = V.bladeWidth;
     // Câmera: quanto 1 unidade de altura sobe na tela e o achatamento do chão
@@ -349,6 +353,10 @@
                     AZP.drawAzaelLeg(rig, hip, knee, ankle, [reach + 0.4, side * V.footSpread, 0.9 + lift]);
                     return;
                 }
+                if (yara) {
+                    YP.drawYaraLeg(rig, hip, knee, ankle, toe);
+                    return;
+                }
                 limb([hip, knee, ankle], V.legWidth, C.body);
                 limb([ankle, toe], V.bootWidth, C.boots);
                 // Faixa no cano da bota
@@ -369,6 +377,10 @@
                 const wt = sectionHalfWidth(top.A, top.B);
                 if (azael) {
                     AZP.drawAzaelTorso(rig, pose, bottom, top, wb, wt);
+                    return;
+                }
+                if (yara) {
+                    YP.drawYaraTorso(rig, pose, bottom, top, wb, wt);
                     return;
                 }
 
@@ -444,6 +456,11 @@
         return {
             depth: project(pose.lean - 3.5, 0, 9).depth,
             draw() {
+                // Yara não tem capa: no lugar dela, a ponta do cachecol voando
+                if (yara) {
+                    YP.drawYaraScarfTail(rig, pose);
+                    return;
+                }
                 // Pontas da faixa da cintura: penduradas paradas, esvoaçam para trás na corrida
                 for (const side of [-1, 1]) {
                     const flutter = Math.sin(t * 7 + side) * (1 + run * 1.5);
@@ -524,6 +541,7 @@
             depth: project(...elbow).depth + 0.1,
             draw() {
                 if (azael) AZP.drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+                else if (yara) YP.drawYaraArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
                 else {
                     ball(shoulder, V.shoulderRadius, C.sleeve);
                     limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
@@ -587,6 +605,10 @@
                     AZP.drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
                     return;
                 }
+                if (yara) {
+                    YP.drawYaraArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+                    return;
+                }
                 ball(shoulder, V.shoulderRadius, C.sleeve);
                 limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
                 ball(hand, V.handRadius, C.glove);
@@ -598,6 +620,10 @@
     function bladeShape(hand, dir, t, alpha) {
         if (azael) {
             AZP.drawKatana(rig, hand, dir, alpha);
+            return;
+        }
+        if (yara) {
+            YP.drawYaraSword(rig, hand, dir, alpha);
             return;
         }
         const at = (d) => [hand[0] + dir[0] * d, hand[1] + dir[1] * d, hand[2] + dir[2] * d];
@@ -659,7 +685,7 @@
                 ctx.save();
                 ctx.globalCompositeOperation = 'lighter';
                 drawGlow(ctx, frenzy ? C.bladeGlowSoftFrenzy : C.bladeGlowSoft, glow.x, glow.y,
-                    (H.bladeGlowMin + (H.bladeGlowMax - H.bladeGlowMin) * pulse) * 0.8 * (1 + pose.blend * 0.7 + (pose.sword?.w ?? 0) * 0.6) * (azael ? AZ.glowScale : 1) * (frenzy ? 1.4 : 1),
+                    (H.bladeGlowMin + (H.bladeGlowMax - H.bladeGlowMin) * pulse) * 0.8 * (1 + pose.blend * 0.7 + (pose.sword?.w ?? 0) * 0.6) * (azael ? AZ.glowScale : yara ? YA.glowScale : 1) * (frenzy ? 1.4 : 1),
                     0.32 + 0.2 * pulse);
                 ctx.restore();
 
@@ -771,17 +797,19 @@
 
     // Desenha o herói com os pés em (opts.x, opts.y) da tela, opts.scale px por unidade.
     // body: { hitTime, hitDirX, hitDirY, move: { kind, age, seconds } }. a: estado de createAnim.
-    // opts: { x, y, scale, model: 'hunter' | 'azael', colors, camera: { heightScale, groundSquash }, frenzy, alpha, time }
+    // opts: { x, y, scale, model: 'hunter' | 'azael' | 'yara', colors, camera: { heightScale, groundSquash }, frenzy, alpha, time }
     function render(context, body, a, opts) {
         ctx = context;
         AZP.bind(context);
+        YP.bind(context);
         anim = a;
         azael = opts.model === 'azael';
-        C = opts.colors || (azael ? AZ.colors : H.colors);
+        yara = opts.model === 'yara';
+        C = opts.colors || (azael ? AZ.colors : yara ? YA.colors : H.colors);
         HS = opts.camera?.heightScale ?? V.heightScale;
         GS = opts.camera?.groundSquash ?? V.groundSquash;
-        bladeLength = azael ? AZ.bladeLength : V.bladeLength;
-        bladeWidth = azael ? AZ.bladeWidth : V.bladeWidth;
+        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : V.bladeLength;
+        bladeWidth = azael ? AZ.bladeWidth : yara ? YA.bladeWidth : V.bladeWidth;
         const t = opts.time ?? performance.now() / 1000;
         cosF = Math.cos(anim.facing);
         sinF = Math.sin(anim.facing);
@@ -829,7 +857,7 @@
             swordPart(pose, !!opts.frenzy),
             ...(azael
                 ? [AZP.azaelHeadPart(pose, rig), AZP.azaelHairPart(pose, rig), AZP.azaelScabbardPart(pose, rig, 1 - azaelDrawn(pose))]
-                : [headPart(pose)])
+                : yara ? YP.yaraHeadParts(pose, rig) : [headPart(pose)])
         ];
         parts.sort((p, q) => p.depth - q.depth).forEach(p => p.draw());
         ctx.restore();
@@ -842,9 +870,10 @@
         const prevAnim = anim;
         anim = a;
         azael = opts.model === 'azael';
+        yara = opts.model === 'yara';
         HS = opts.camera?.heightScale ?? V.heightScale;
         GS = opts.camera?.groundSquash ?? V.groundSquash;
-        bladeLength = azael ? AZ.bladeLength : V.bladeLength;
+        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : V.bladeLength;
         cosF = Math.cos(a.facing);
         sinF = Math.sin(a.facing);
         const pose = buildPose(opts.time ?? performance.now() / 1000, body);

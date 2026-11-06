@@ -55,7 +55,7 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         },
 
         // Boneco de cada personagem do RPG (id de js/data/characters.js).
-        // model: 'hunter' (Demon Hunter) ou 'azael'. colors: troca só o que muda na paleta do boneco.
+        // model: 'hunter' (Demon Hunter), 'azael' ou 'yara'. colors: troca só o que muda na paleta do boneco.
         // Quem ainda não tem boneco próprio usa o do Demon Hunter com as cores do seu retrato (provisório).
         characters: {
             'demon-hunter': { model: 'hunter' },
@@ -78,15 +78,7 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
                     bladeGlowSoft: 'rgba(209, 213, 219, 0.35)'
                 }
             },
-            yara: {
-                model: 'hunter',
-                colors: {
-                    cape: '#1e1030', capeFold: '#2a1642', capeEdge: '#3d1f5e', capeInner: '#140a22',
-                    body: '#170c22', sleeve: '#26143a', sash: '#7f1d1d', hood: '#1e1030', hoodFold: '#311a4d',
-                    maskEyes: '#7f1d1d', eyeGlint: '#f87171', blade: '#f87171', bladeCore: '#fee2e2',
-                    runes: '#fee2e2', bladeGlow: '#dc2626', bladeGlowSoft: 'rgba(220, 38, 38, 0.6)'
-                }
-            }
+            yara: { model: 'yara' }
         },
 
         // Cenário de cada região (id de js/data/regions.js). Uma região sem cenário usa o de fallback.

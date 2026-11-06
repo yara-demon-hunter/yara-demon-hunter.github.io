@@ -115,13 +115,14 @@ function viewDir(rig) {
     return d;
 }
 
+// P: medidas da cabeça (as do Azael por padrão; outro boneco pode passar as suas)
 // Eixos da cabeça: f = para onde o rosto olha, s = direita, u = alto da cabeça
-function headFrame(pose, rig) {
-    const R = A.headRadius;
+function headFrame(pose, rig, P = A) {
+    const R = P.headRadius;
     const d = viewDir(rig);
     // De costas a cabeça não precisa levantar o rosto (senão a bandana vira uma auréola)
-    const tilt = (A.faceTilt + A.faceTiltFront * Math.max(0, rig.sinF)) * Math.max(0, Math.min(1, (rig.sinF + 1) / 0.8));
-    const yaw = A.faceTurn * Math.sin(Math.atan2(d[1], d[0]));
+    const tilt = (P.faceTilt + P.faceTiltFront * Math.max(0, rig.sinF)) * Math.max(0, Math.min(1, (rig.sinF + 1) / 0.8));
+    const yaw = P.faceTurn * Math.sin(Math.atan2(d[1], d[0]));
     const ct = Math.cos(tilt);
     const st = Math.sin(tilt);
     const f = [ct * Math.cos(yaw), ct * Math.sin(yaw), st];
@@ -132,7 +133,7 @@ function headFrame(pose, rig) {
     // Ponto na esfera por longitude (lon: 0 = frente, + = direita) e latitude (lat: 0 = altura da bandana... do equador)
     const sphere = (lon, lat, r = R) => at(r * Math.cos(lat) * Math.cos(lon), r * Math.cos(lat) * Math.sin(lon), r * Math.sin(lat));
     // Ponto do rosto (s, u): na superfície da esfera; abaixo dela, o queixo continua um pouco para a frente
-    const face = (sv, uv) => at(Math.max(Math.sqrt(Math.max(0, R * R - sv * sv - uv * uv)), A.jawForward - 0.25 * Math.abs(sv)) + A.faceOut, sv, uv);
+    const face = (sv, uv) => at(Math.max(Math.sqrt(Math.max(0, R * R - sv * sv - uv * uv)), P.jawForward - 0.25 * Math.abs(sv)) + P.faceOut, sv, uv);
     // Quanto um ponto da superfície está virado para a câmera (< 0 = escondido atrás da cabeça)
     const facing = (p) => dot(norm(sub(p, c)), d);
     // Ponto escondido vai para a borda da silhueta (o rosto de perfil se espreme na borda em vez de atravessar)
@@ -176,12 +177,12 @@ function silhouettePath(rig, H, r) {
 }
 
 // Orelha pontuda (side = -1 esquerda, 1 direita): folha que sai do lado da cabeça para trás e para cima
-function drawEar(rig, H, side, C) {
+function drawEar(rig, H, side, C, P = A) {
     const R = H.R;
     const up = rig.project(...H.at(0.4, side * R * 0.93, 0.3));
     const low = rig.project(...H.at(-0.5, side * R * 0.93, -1.1));
-    const tip = rig.project(...H.at(-1.3, side * (R + A.earLength), 1.2));
-    const mid = rig.project(...H.at(-0.2, side * (R + A.earLength * 0.45), 0.25));
+    const tip = rig.project(...H.at(-1.3, side * (R + P.earLength), 1.2));
+    const mid = rig.project(...H.at(-0.2, side * (R + P.earLength * 0.45), 0.25));
     ctx.fillStyle = C.skin;
     ctx.strokeStyle = C.outline;
     ctx.lineWidth = 0.3;
@@ -733,6 +734,8 @@ function drawAzaelTorso(rig, pose, bottom, top, wb, wt) {
 NS.azael = {
     bind(context) { ctx = context; },
     azaelHairPart, azaelHeadPart, drawAzaelCape, drawKatana, scabbardFrame, azaelScabbardPart,
-    drawAzaelArm, drawAzaelLeg, drawAzaelTorso
+    drawAzaelArm, drawAzaelLeg, drawAzaelTorso,
+    // Ferramentas para outros bonecos com rosto (js/stage/yara25d.js): mesma geometria, medidas próprias
+    kit: { mix, add, norm, dot, cross, sub, flowChain, smoothThrough, strokeSmooth, drawRibbon, viewDir, headFrame, strokeVisible, silhouettePath, drawEar, olimb, oball, wrap }
 };
 })();

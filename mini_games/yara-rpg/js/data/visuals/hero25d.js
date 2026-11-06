@@ -288,5 +288,105 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         glowScale: 0.75
     };
 
-    window.YaraRpgData.visuals.hero25d = Object.freeze({ hero: HERO, body: BODY, azael: AZAEL });
+    // --- YARA (js/stage/yara25d.js). Referência: art_reference/yara ---
+    // Moça meio-demônio: cabelo metade preto (lado direito dela, +b) e metade branco (esquerdo, -b) em duas
+    // maria-chiquinhas, bandana e cachecol vermelhos, olhos vermelho (direito) e azul (esquerdo), top curto com a
+    // barriga à mostra, ombreira com pelo no ombro esquerdo, calça larga, botas altas e uma espada curta.
+    const YARA = {
+        colors: {
+            ...HERO_COLORS,
+            // Sem capa: o pano é o cachecol vermelho
+            cape: '#9b1c1c',
+            capeFold: '#6b1212',
+            capeEdge: '#c2412d',
+            capeInner: '#6b1212',
+            body: '#2b211b',          // calça
+            sleeve: '#c98f62',
+            glove: '#5a3a22',
+            sash: '#5a3a22',
+            boots: '#5a3a22',
+            // Espada curta de aço com brilho vermelho
+            blade: '#d9dee5',
+            bladeCore: '#ffffff',
+            runes: '#ffffff',
+            bladeGlow: '#ef4444',
+            bladeGlowSoft: 'rgba(239, 68, 68, 0.45)',
+            bladeGlowFrenzy: '#ff2a2a',
+            bladeGlowSoftFrenzy: 'rgba(255, 42, 42, 0.75)',
+            buckle: '#9aa3ad',
+            eyeGlint: '#ef4444',
+
+            skin: '#c98f62',
+            skinShade: '#9a6440',
+            skinLight: '#e3b48a',
+            outline: '#1f1612',
+            mouth: '#7a2e2a',
+            mouthInner: '#b4534d',
+            blush: 'rgba(232, 110, 110, 0.35)',
+            hairDark: '#1b1a22',
+            hairDarkShade: '#3a3946',
+            hairLight: '#eeeef2',
+            hairLightShade: '#b5b8c4',
+            eyeWhite: '#fbf7f0',
+            eyeRight: '#dc2626',
+            eyeLeft: '#3b82f6',
+            eyeGlowRight: 'rgba(239, 68, 68, 0.45)',
+            eyeGlowLeft: 'rgba(96, 165, 250, 0.45)',
+            warPaint: '#141414',
+            bandana: '#9b1c1c',
+            bandanaShade: '#6b1212',
+            tieRight: '#b91c1c',      // elástico do cabelo preto
+            tieLeft: '#1e3a5f',       // elástico do cabelo branco
+            top: '#2f3530',
+            topShade: '#1e2320',
+            pendant: '#c9ced6',
+            metal: '#6b737c',
+            metalLight: '#a3abb4',
+            fur: '#f1f1ee',
+            furShade: '#c9c9c4',
+            bandage: '#e9e6dc',
+            bandageLine: '#bdb8aa',
+            leather: '#5a3a22',
+            leatherShade: '#3a2414',
+            flap: '#e9e2d0',
+            flapMark: '#9b1c1c',
+            pants: '#2b211b',
+            pantsShade: '#1a1410'
+        },
+
+        // Cabeça: um pouco menor que a do Azael; mesmo truque de levantar e virar o rosto para a câmera
+        headRadius: 3.05,
+        faceTilt: 0.45,
+        faceTiltFront: 0.45,
+        faceTurn: 0.5,
+        // Rosto mais delicado: queixo fino e arredondado
+        face: [[1.95, 0.7], [2.3, 0], [2.15, -1.1], [1.55, -2.15], [0.75, -2.8], [0, -2.95]],
+        jawForward: 1,
+        faceOut: 0.55,
+        bandHeight: 0.8,
+        bandWidth: 1.15,
+        earLength: 1.1,
+        // Maria-chiquinhas: presas no alto, dos lados, caem até o meio das costas e voam na corrida
+        tailLength: 8,
+        tailRunLength: 0.8,
+        tailWidth: 1.35,
+        tailWave: 0.8,
+        // Ponta do cachecol: sai do ombro esquerdo e voa para trás
+        scarfTailLength: 8.5,
+
+        // Corpo feminino: ombros mais estreitos, cintura fina, quadril largo, braços finos
+        shoulderScale: 0.82,
+        waistScale: 0.7,
+        hipScale: 1.06,
+        armScale: 0.78,
+        legWidth: 3.1,
+        bootHeight: 5,
+
+        // Espada curta, reta e larga
+        bladeLength: 8.5,
+        bladeWidth: 1.6,
+        glowScale: 0.7
+    };
+
+    window.YaraRpgData.visuals.hero25d = Object.freeze({ hero: HERO, body: BODY, azael: AZAEL, yara: YARA });
 })();

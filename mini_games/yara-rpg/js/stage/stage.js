@@ -560,7 +560,7 @@
             const cid = source.characterId();
             if (!look || look.id !== cid) {
                 const cfg = DATA.characters[cid] || DATA.characters['demon-hunter'];
-                const base = cfg.model === 'azael' ? HERO_VIS.azael.colors : HERO_VIS.hero.colors;
+                const base = HERO_VIS[cfg.model]?.colors ?? HERO_VIS.hero.colors;
                 look = { id: cid, model: cfg.model, colors: cfg.colors ? { ...base, ...cfg.colors } : base };
                 hero.anim = HERO.createAnim(hero.anim.facing);
             }
