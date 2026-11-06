@@ -112,6 +112,8 @@ Código em `js/stage/yara25d.js` (ligado em `js/stage/hero25d.js` pelo modelo `'
   pingente e faixa de couro embaixo do peito, barriga à mostra com umbigo, cinto com fivela, aba branca com o símbolo
   vermelho e bolsinha no quadril direito.
 - Braços: bandagem branca no direito; ombreira de metal com pelo branco no esquerdo; luvas de couro sem dedos.
-- Pernas: calça larga escura e botas de couro altas.
+- Pernas: calça larga escura e botas de couro altas, com o pé chato no chão (calcanhar e sola apoiados).
+- Parada: braços soltos e dobrados, um pouco abertos; respiram e balançam devagar, cada um no seu ritmo, e a espada
+  balança junto (`yaraIdle` em `js/stage/hero25d.js`). Some ao correr e nos golpes.
 - Espada curta reta (`bladeLength` 8,5) com cabo de couro, guarda e pomo escuros, fio claro e brilho vermelho; usa os
   golpes, o aparo, o dash e o descanso do boneco do palco.

@@ -359,7 +359,7 @@ function drawYaraArm(rig, shoulder, elbow, hand, armWidth, handRadius) {
     const { limb, ball, C } = rig;
     const right = shoulder[1] > 0;
     const sh = [shoulder[0], shoulder[1] * Y.shoulderScale, shoulder[2]];
-    const el = [elbow[0], elbow[1] * 0.88, elbow[2]];
+    const el = [elbow[0], elbow[1] * 0.95, elbow[2]];
     const w = armWidth * Y.armScale;
     K.oball(rig, sh, 1.15, C.skin);
     K.olimb(rig, [sh, el, hand], w, C.skin);

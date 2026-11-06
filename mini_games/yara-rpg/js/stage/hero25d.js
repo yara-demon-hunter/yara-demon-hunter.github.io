@@ -85,6 +85,7 @@
         return Math.hypot(A * cosF, B * sinF);
     }
 
+    const add3 = (p, q) => [p[0] + q[0], p[1] + q[1], p[2] + q[2]];
     const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
     const norm = (v) => {
         const l = Math.hypot(...v) || 1;
@@ -530,13 +531,32 @@
         ctx.globalAlpha = base;
     }
 
+    // Yara parada: os braços não ficam travados. Respiram junto com o corpo, balançam devagar (cada um no seu ritmo)
+    // e ficam um pouco abertos e dobrados. Some ao correr e durante golpes e posturas (idle = 0).
+    function yaraIdle(pose, side) {
+        if (!yara) return { hand: [0, 0, 0], elbow: [0, 0, 0], angle: 0 };
+        const idle = (1 - pose.run) * (1 - pose.blend) * (1 - (pose.sword?.w ?? 0));
+        const t = pose.t;
+        const ph = side > 0 ? 0 : 2.1;
+        return {
+            hand: [
+                (Math.sin(t * 1.7 + ph) * 0.6 + (side > 0 ? 1.6 : 0.8)) * idle,
+                side * (1.3 + Math.sin(t * 1.1 + ph) * 0.35) * idle,
+                (Math.sin(t * 2.1 + ph + 0.8) * 0.5 + 1.6) * idle
+            ],
+            elbow: [-1 * idle, side * (1.5 + Math.sin(t * 1.1 + ph) * 0.25) * idle, 0.2 * idle],
+            angle: (Math.sin(t * 1.3) * 0.2 - 0.55) * idle
+        };
+    }
+
     // Braço livre (esquerdo): balança contra a passada e recolhe durante o golpe
     function freeArmPart(pose) {
         const swing = Math.sin(anim.stride) * V.armSwing * pose.run;
         const shoulder = [pose.lean, -V.chest.B, pose.shoulderZ - 0.5];
-        const restHand = [pose.lean * 0.5 + 0.6 + swing * (1 - pose.blend) - pose.blend * 1.2, -V.chest.B - 0.6 + pose.blend * 1.5, V.handHeight - pose.crouch + pose.blend * 2];
+        const ya = yaraIdle(pose, -1);
+        const restHand = add3([pose.lean * 0.5 + 0.6 + swing * (1 - pose.blend) - pose.blend * 1.2, -V.chest.B - 0.6 + pose.blend * 1.5, V.handHeight - pose.crouch + pose.blend * 2], ya.hand);
         const hand = pose.free ? mix(restHand, pose.free.hand, pose.free.w) : restHand;
-        const elbow = [(shoulder[0] + hand[0]) / 2 - 0.4, -V.chest.B - 1, (shoulder[2] + hand[2]) / 2];
+        const elbow = add3([(shoulder[0] + hand[0]) / 2 - 0.4, -V.chest.B - 1, (shoulder[2] + hand[2]) / 2], ya.elbow);
         return {
             depth: project(...elbow).depth + 0.1,
             draw() {
@@ -554,12 +574,13 @@
 
     // Braço da espada (direito): mistura a pose de repouso com a pose do golpe (swingBlend)
     function swordArmPose(pose) {
-        const restAngle = H.restBladeAngle + Math.sin(anim.stride) * 0.12 * pose.run;
+        const ya = yaraIdle(pose, 1);
+        const restAngle = H.restBladeAngle + Math.sin(anim.stride) * 0.12 * pose.run + ya.angle;
         let swingAngle = restAngle;
         if (anim.swingActive || pose.blend > 0) swingAngle = swingAngleAt(Math.min(anim.swingElapsed, anim.swingSeconds), anim);
         const blend = pose.blend;
         if (azael) return holdSword(pose, azaelSwordRest(pose, swingAngle, blend));
-        const restHand = [pose.lean * 0.5 + 1.6 + Math.sin(anim.stride + Math.PI) * V.armSwing * 0.4 * pose.run, V.chest.B + 0.8, V.handHeight - pose.crouch];
+        const restHand = add3([pose.lean * 0.5 + 1.6 + Math.sin(anim.stride + Math.PI) * V.armSwing * 0.4 * pose.run, V.chest.B + 0.8, V.handHeight - pose.crouch], ya.hand);
         const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
         const hand = restHand.map((v, i) => v + (swingHand[i] - v) * blend);
         const angle = lerpAngle(restAngle, swingAngle, blend);
@@ -597,7 +618,7 @@
     function swordArmPart(pose) {
         const { hand } = swordArmPose(pose);
         const shoulder = [pose.lean, V.chest.B, pose.shoulderZ - 0.5];
-        const elbow = [(shoulder[0] + hand[0]) / 2 + 0.6, (shoulder[1] + hand[1]) / 2 + 1, (shoulder[2] + hand[2]) / 2];
+        const elbow = add3([(shoulder[0] + hand[0]) / 2 + 0.6, (shoulder[1] + hand[1]) / 2 + 1, (shoulder[2] + hand[2]) / 2], yaraIdle(pose, 1).elbow);
         return {
             depth: project(...elbow).depth + 0.1,
             draw() {
