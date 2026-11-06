@@ -1,53 +1,57 @@
 # Oskar
 
 - **id no jogo:** oskar (`js/data/characters.js`; boneco do palco em `js/data/visuals/stage.js` → `characters.oskar`)
-- **Papel:** **personagem jogável** do RPG. Caçador implacável que prefere encerrar uma luta com um golpe forte. Passiva: Força predadora (+5% de Ataque total). Começa com Machado do Caçador, Escudo de Madeira e Armadura de Couro; leva um Machado de Duas Lâminas na bolsa.
-- **Desenho:** **2.5D**, no mesmo esquema da Yara (`js/stage/yara25d.js`): boneco próprio, cabeça com rosto de verdade (geometria de `NS.azael.kit`), sem capuz nem máscara. Hoje ele usa o corpo do Demon Hunter recolorido de marrom (provisório).
-
-> **Como completar:** coloque as imagens em `images/` (veja a lista em **Imagens**) e troque cada `_(a definir)_`.
-> O que já está preenchido vem do retrato do jogo (`images/characters/oskar.webp`) e dos dados em `js/data/characters.js`.
+- **Papel:** **personagem jogável** do RPG. Caçador implacável que prefere encerrar uma luta com um golpe forte. Passiva: Força predadora (+5% de Ataque total). Começa com o **Machado de Duas Lâminas** (`double-headed-axe`), Armadura de Couro e Botas Ligeiras; luta com o machado **nas duas mãos, sem escudo**.
+- **Desenho:** **2.5D**, no mesmo esquema do Zeph (`js/stage/zeph25d.js`): boneco próprio, cabeça de pele com rosto de verdade (geometria de `NS.azael.kit`) e cabelo como uma massa só por cima, sem capuz nem máscara. Boneco feito em `js/stage/oskar25d.js` (ver **Detalhes implementados**).
 
 ## Aparência
 
-- **Silhueta / forma geral:** homem adulto, forte e largo, pescoço grosso e braços musculosos. _(a definir: altura, se é maior que o Demon Hunter)_
-- **Cabeça e rosto:** rosto duro e sério, testa franzida, nariz reto, **barba cheia** castanho-escura aparada, olhos claros.
-- **Pele:** clara/bronzeada, com veias e músculos marcados no pescoço e nos braços.
-- **Cabelo:** castanho-escuro, **curto e raspado** dos lados, com entradas na testa.
+- **Silhueta / forma geral:** homem adulto, **alto** (o mais alto do grupo) e **forte, mais massudo que todos os outros**: ombros bem largos, peito grande e fundo, pescoço grosso, braços e antebraços grossos à mostra, cintura larga. Lê-se como um lenhador/caçador bruto de regata, com um machado enorme seguro nas duas mãos na frente do corpo.
+- **Cabeça e rosto:** cabeça de proporção normal (cerca de 1/6 da altura, não é chibi), mandíbula larga e quadrada. Rosto duro e sério, testa franzida, sobrancelhas grossas e baixas, olhos claros e pequenos, nariz reto e largo. **Barba cheia** castanho-escura, curta e aparada, cobrindo queixo, mandíbula e bigode (é o que mais marca o rosto). Orelhas humanas.
+- **Pele:** clara/bronzeada, com músculos marcados nos braços e no pescoço.
+- **Cabelo:** castanho-escuro, **ralo e curto**: rente à cabeça em toda a volta, fino a ponto de a pele aparecer por baixo, com entradas fundas na testa. Nada de volume nem franja.
 - **Vestuário:**
-  - **Camisa verde-oliva sem mangas**, gasta, com **remendos** costurados e gola aberta amarrada com cordão.
-  - Braços nus.
-  - _(a definir: armadura de couro, calça, cinto, botas)_
-- **Mãos e pés:** _(a definir)_
-- **Arma:** **machado** (Machado do Caçador) de uma mão e **escudo de madeira** na outra. _(a definir: forma do machado e do escudo)_
-- **Partes que se movem separadamente:** braços, machado, escudo, pernas. _(a definir)_
-- **Tamanho relativo:** _(a definir)_
-- **Detalhes que NÃO podem faltar:** barba cheia, cabelo raspado, camisa sem mangas remendada, braços fortes, machado e escudo.
-- **Detalhes que podem ser simplificados:** veias e músculos (manchas de luz), remendos, cordão da gola.
+  - **Camisa regata verde-oliva**: sem mangas, cavas fundas que deixam os ombros e os braços inteiros de fora, comprida até o quadril, gasta, com remendos e gola aberta.
+  - **Corda/alça fina** de couro cruzando o peito na diagonal, do ombro esquerdo para o quadril direito.
+  - **Cinto de couro marrom** com fivela por cima da regata.
+  - **Calça marrom-escura** larga.
+  - **Botas de couro marrom** com faixas enroladas na canela (dos tornozelos até abaixo do joelho).
+  - Braços nus; **munhequeiras** de couro escuro nos pulsos.
+- **Mãos e pés:** mãos grandes e fortes, sem luva; botas de couro.
+- **Arma:** **machado de duas lâminas** (Machado de Duas Lâminas): cabo de madeira comprido (quase da altura das pernas) e cabeça de ferro dupla, larga, em forma de borboleta, com bordas mais claras (fio) e o meio mais escuro, presa ao cabo por uma amarração. Em repouso ele segura o cabo **com as duas mãos na horizontal, na altura da cintura**, com a cabeça do machado para um dos lados (nas imagens aparece dos dois lados). **Sem escudo.**
+- **Partes que se movem separadamente:** braços, machado, peito (respiração), pernas.
+- **Tamanho relativo:** o maior do grupo: cerca de 10% mais alto e bem mais largo que o Demon Hunter, o Zeph e a Yara.
+- **Detalhes que NÃO podem faltar:** corpo alto e massudo, barba cheia, cabelo ralo e curto, regata verde, braços musculosos à mostra, cinto, botas com faixas, machado de duas lâminas sempre nas duas mãos.
+- **Detalhes que podem ser simplificados:** remendos, músculos (manchas de luz), amarração do machado, faixas das botas (listras).
 
 ## Cores
 
-_(estimadas a partir do retrato; completar com as outras imagens)_
+_(estimadas das imagens)_
 
-- **Pele:** #d39a6e, sombra #a46a45, luz #ecb88d, contorno #1a1410
-- **Cabelo e barba:** #4a3020, sombra #2e1d12
+- **Pele:** #c98a5e, sombra #9a5f3c, luz #e0a679, contorno #1a1410
+- **Cabelo e barba:** #4a3020, sombra #2e1d12, brilho #6a4630
 - **Olhos:** #d8d2c0 (claros)
-- **Camisa:** #4a4f33, sombra #33371f, luz #5f6542; remendos #3a3d27
-- **Cordão da gola:** #b89d68
-- **Calça / botas / couro:** _(a definir)_
-- **Machado / escudo:** _(a definir)_
+- **Regata:** #4f5a32, sombra #353d20, luz #66713f; remendos #3d4527
+- **Alça e cinto:** #6b4a2a, sombra #452e18; fivela #9aa3ad
+- **Calça:** #3d2f22, sombra #281e15
+- **Botas e faixas:** #5a3d24, sombra #3b2716, faixas #7a5a3a
+- **Munhequeiras:** #3a2a1c
+- **Machado:** cabeça #7d848b com fio #c9ced3 e meio #4a4f55; cabo #6b4423, sombra #4a2e17; amarração #8a6a44
 
 ## Personalidade e estilo
 
-Caçador bruto e direto: poucos movimentos, golpes pesados. _(a definir: expressão de combate, jeito de andar)_
+Pixel art de RPG, contorno escuro. Caçador bruto, calmo e direto: firme, de pé, pernas afastadas, poucos movimentos; quando ataca, é um golpe só, enorme, com o corpo todo.
 
 ## Desenho em 2.5D
 
-Seguir o esquema da Yara (`js/stage/yara25d.js`): cabeça como esfera com o rosto desenhado na superfície da frente, virando um pouco para a câmera de lado.
+Seguir o esquema do Zeph (`js/stage/zeph25d.js`): cabeça de pele com o rosto na superfície da frente e o cabelo como uma massa só por cima (aqui bem curto, quase colado na cabeça), virando um pouco para a câmera de lado.
 
-- **Cabeça:** cabelo curto e raspado (quase a forma da cabeça), barba cheia cobrindo o queixo e a mandíbula.
-- **Tronco:** largo; camisa sem mangas verde-oliva com remendos.
-- **Braços:** grossos e nus, com músculos marcados.
-- **Arma:** machado na mão direita e escudo de madeira no braço esquerdo. _(a definir: idle e golpes)_
+- **Cabeça:** cabelo ralo e curto, quase colado na cabeça (pouco volume, linha do cabelo alta com entradas, cor do cabelo misturada com a da pele para parecer fino), **barba cheia** desenhada como uma massa na parte de baixo do rosto (queixo, mandíbula e bigode), sobrancelhas grossas.
+- **Tronco:** o mais largo do grupo, peito grande; regata verde-oliva com cavas fundas (ombros à mostra) até o quadril, alça cruzando o peito, cinto com fivela.
+- **Braços:** grossos e nus, com músculos marcados (luz no ombro e no bíceps) e munhequeiras escuras.
+- **Pernas:** calça marrom-escura larga, botas com faixas na canela, pé chato no chão.
+- **Arma:** machado de duas lâminas **sempre nas duas mãos** (parado, andando e golpeando): cabo na horizontal na frente da cintura em repouso; nos golpes, ergue acima da cabeça e desce.
+- **Corpo:** mais alto (escala ~1,1 do boneco) e mais massudo: ombros e peito mais largos (`shoulderScale` > 1), braços e pernas mais grossos que os de todos os outros.
 - **Contorno:** escuro em tudo.
 
 ## Animações
@@ -56,27 +60,53 @@ Mesmos estados do palco do RPG (ver `previews/characters_preview.html`):
 
 | Animação | Quando acontece | O que se move | Duração / ritmo | Imagens |
 |---|---|---|---|---|
-| idle (parado) | sem ação | _(a definir)_ | loop ~1,2s | |
-| andar (explorar) | ao explorar | _(a definir)_ | acompanha a velocidade | |
-| ataques (combo, pesado, crítico) | ao atacar | _(a definir: golpes de machado)_ | ~0,25s | |
-| aparo | ao aparar | _(a definir: bloqueio com o escudo)_ | | |
-| esquiva | ao esquivar | _(a definir)_ | ~0,3s | |
-| poção | ao beber | leva o frasco à boca | ~1,1s | |
+| idle (parado) | sem ação | de pé, pernas afastadas, machado na horizontal na frente da cintura com as duas mãos; respiração lenta e pesada (peito e ombros), machado sobe e desce de leve | loop ~1,4s | images/oskar-idle.webp, images/oskar-idle-2.webp |
+| andar (explorar) | ao explorar | passos pesados e largos; machado nas duas mãos, atravessado na frente do corpo | acompanha a velocidade | |
+| ataque (combo / pesado) | ao atacar | ergue o machado acima da cabeça com as duas mãos, corpo esticado → desce num golpe forte para a frente e para baixo → volta à guarda | ~0,5s | images/oskar-attack.webp (o alto do golpe) |
+| crítico (Fúria) | ataque com a Fúria cheia | o mesmo golpe por cima, mais forte, com impacto no chão | ~0,6s | images/oskar-attack.webp |
+| aparo | ao aparar | cabo do machado atravessado na frente do corpo, segurado com as duas mãos | ~1,1s | |
+| esquiva | ao esquivar | passo pesado para trás | ~0,3s | |
+| poção | ao beber | solta uma mão do machado só para levar o frasco à boca | ~1,1s | |
 | descanso | na fogueira | _(a definir)_ | lento | |
-| levar dano | ao ser atingido | pisca branco e é empurrado | ~0,1s | |
-| derrota | ao perder | ajoelha e tomba | ~1,4s | |
+| levar dano | ao ser atingido | pisca branco e é empurrado (pouco: é pesado) | ~0,1s | |
+| derrota | ao perder | ajoelha apoiado no machado e tomba | ~1,4s | |
 | retrato | seleção de personagem | — | — | `../../images/characters/oskar.webp` |
 
 ## Imagens
 
-_(a adicionar em `images/`; nomes sugeridos, como os da Yara)_
+Imagens paradas (`.webp`, pixel art, 300x300, de frente/3/4):
 
-- `images/oskar-perfil.png`: close do rosto e do busto
-- `images/oskar-body.png`: corpo inteiro (de preferência de frente)
-- `images/oskar-poses.png`: folha de personagem (de frente, de lado, de costas, em combate)
+- `images/oskar-idle.webp` — parado em guarda, machado na horizontal com a cabeça para a direita de quem olha
+- `images/oskar-idle-2.webp` — a mesma pose espelhada (cabeça do machado para a esquerda de quem olha)
+- `images/oskar-attack.webp` — machado erguido acima da cabeça com as duas mãos (o alto do golpe)
 
 ## Observações
 
 - Lados sempre do ponto de vista dele (no boneco 2.5D, direita = lado +b).
-- O retrato é de perfil: a barba e o cabelo raspado precisam ser confirmados nas imagens de frente e de costas.
-- _(a definir)_
+- **Arma: Machado de Duas Lâminas nas duas mãos** (decidido). Bate com o equipamento inicial em `js/data/characters.js` (`double-headed-axe`, sem escudo).
+- O retrato (`images/characters/oskar.webp`) é de perfil e mostra a camisa com gola amarrada por cordão; nas imagens novas é uma regata com uma alça cruzando o peito. No boneco, seguir as imagens novas.
+
+## Detalhes implementados no jogo
+
+Código em `js/stage/oskar25d.js` (ligado em `js/stage/hero25d.js` pelo modelo `'oskar'`); cores, medidas e posições em
+`js/data/visuals/hero25d.js` → `oskar`. Veja em `previews/characters_preview.html?char=oskar` e ajuste ao vivo em
+`previews/tuner.html?model=oskar`.
+
+- Tamanho: o boneco inteiro é 10% maior que os outros (`bodyScale`), com ombros, peito, braços e pernas mais grossos
+  (`shoulderScale`, `waistScale`, `armScale`, `legWidth`).
+- Cabeça: mesmo esquema do Zeph (cabeça de pele, rosto na frente virando para a câmera). Cabelo ralo e curto: malha
+  colada na cabeça e um pouco transparente (`hairOpacity`), linha do cabelo alta com entradas (`hairline`, `recede`) e
+  costeletas que ligam na barba. Orelhas humanas no lado da cabeça.
+- Rosto: barba cheia como uma massa só (das costeletas pela mandíbula até abaixo do queixo, subindo pelas bochechas
+  até o bigode; `beardTop`, `beardChin`, `beardWidth`, `mustacheY`) com um lado mais escuro; sobrancelhas grossas e
+  baixas, olhos claros e pequenos com pálpebra pesada, nariz largo, boca escura no meio da barba, rugas leves na testa.
+  Pisca de vez em quando.
+- Tronco: pele no peito e nos ombros; regata verde-oliva com cavas fundas e alças, lado de lá mais escuro, peitoral
+  marcado, decote, remendo; cinto com fivela; alça de couro do ombro esquerdo ao quadril direito; pescoço grosso.
+- Braços nus e musculosos (luz no ombro e no bíceps), munhequeiras escuras, mãos grandes.
+- Pernas: calça marrom-escura larga; botas com faixas enroladas; pé chato no chão.
+- Machado de duas lâminas: cabo comprido, cabeça dupla em forma de borboleta com o meio escuro e o fio claro,
+  amarração no encaixe (`bladeLength`, `axeHeadSize`). Sempre nas duas mãos: a mão livre fica no cabo, acima da outra
+  (`gripSpread`), menos quando bebe a poção. Em repouso, cabo deitado na frente da cintura com a cabeça para a frente
+  e a esquerda, subindo e descendo com a respiração; nos golpes usa a varredura do palco.
+- Sem capa.

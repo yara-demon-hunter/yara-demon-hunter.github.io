@@ -509,6 +509,22 @@ function drawAzaelCape(rig, pose, anchors, hem) {
 }
 
 // --- KATANA ---
+// Guarda (tsuba): disco perpendicular à espada, no ponto p, com o eixo da espada em dir. A posição ao longo da
+// espada vem de guardOffset (+ para o lado da lâmina) e o tamanho de guardSize; a cor é colors.tsuba.
+function drawGuard(rig, p, dir) {
+    const { disk, C } = rig;
+    const flat = Math.hypot(dir[0], dir[1]) || 1;
+    const w = [-dir[1] / flat, dir[0] / flat, 0];
+    const v = norm(cross(dir, w));
+    const r = A.guardSize;
+    ctx.fillStyle = C.tsuba;
+    ctx.strokeStyle = C.outline;
+    ctx.lineWidth = 0.3;
+    disk(p, w.map(x => x * r), v.map(x => x * r));
+    ctx.fill();
+    ctx.stroke();
+}
+
 // Lâmina curva e fina, com cabo trançado e guarda redonda; hand = mão no cabo, dir = direção da lâmina
 function drawKatana(rig, hand, dir, alpha, color = null) {
     const { project, limb, ball, C } = rig;
@@ -521,7 +537,7 @@ function drawKatana(rig, hand, dir, alpha, color = null) {
 
     if (!color) {
         limb([at(-3.2), at(0.3)], 1.1, C.hilt);
-        ball(at(0.7), 0.85, C.tsuba);
+        drawGuard(rig, at(0.7 + A.guardOffset), dir);
     }
 
     // Costas e fio: a lâmina curva para o lado das costas e afina na ponta
@@ -580,7 +596,7 @@ function azaelScabbardPart(pose, rig, sheathed) {
             if (sheathed > 0) {
                 ctx.save();
                 ctx.globalAlpha *= sheathed;
-                ball(add(mouth, dir, -0.3), 0.85, C.tsuba);
+                drawGuard(rig, add(mouth, dir, -0.3 + A.guardOffset), dir);
                 limb([add(mouth, dir, -0.7), add(mouth, dir, -A.hiltLength)], 1.1, C.hilt);
                 ctx.restore();
             }

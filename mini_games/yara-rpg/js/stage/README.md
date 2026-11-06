@@ -11,6 +11,7 @@ Faixa acima do log que mostra o herói fazendo o que os botões mandam. Só desc
 | `fx.js` | Brilho em cache, easing, aleatório com semente |
 | `hero25d.js` | Boneco 2.5D (Demon Hunter) e as posturas: golpe, salto pesado, aparo, poção, ajoelhar, derrota |
 | `azael25d.js` | Peças do Azael (Mysterious Creature) no mesmo boneco; também exporta `kit`, a geometria de cabeça com rosto usada por outros bonecos |
+| `oskar25d.js` | Peças do Oskar no mesmo boneco, maior (`bodyScale`): barba, cabelo ralo, regata, braços fortes, machado de duas lâminas nas duas mãos |
 | `zeph25d.js` | Peças do Zeph no mesmo boneco (cabeça com rosto, cabelo bagunçado, jaqueta, alça e bolsa, adaga) |
 | `yara25d.js` | Peças da Yara no mesmo boneco (cabeça com rosto, cabelo de duas cores, cachecol, corpo feminino, espada curta) |
 | `scenery.js` | Câmera de diorama e cenário: fundo, fileiras de adereços, trilha, névoa, luz |
@@ -30,8 +31,7 @@ O palco não lê o jogo direto, só pela fonte (`source` em `hooks.js`). Dá par
 
 ## Personagens
 
-`characters` em `../data/visuals/stage.js`: Demon Hunter usa o boneco `hunter`; Mysterious Creature usa `azael`; Yara usa `yara`; Zeph usa `zeph`.
-Oskar usa o corpo do Demon Hunter com as cores do retrato, até ganhar boneco próprio.
+`characters` em `../data/visuals/stage.js`: Demon Hunter usa o boneco `hunter`; Mysterious Creature usa `azael`; Yara usa `yara`; Zeph usa `zeph`; Oskar usa `oskar`. Todos têm boneco próprio.
 
 ## Regiões (aos poucos)
 

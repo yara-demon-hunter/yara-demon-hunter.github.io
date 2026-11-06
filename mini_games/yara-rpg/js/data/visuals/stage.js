@@ -55,22 +55,12 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         },
 
         // Boneco de cada personagem do RPG (id de js/data/characters.js).
-        // model: 'hunter' (Demon Hunter), 'azael', 'yara' ou 'zeph'. colors: troca só o que muda na paleta do boneco.
-        // Quem ainda não tem boneco próprio usa o do Demon Hunter com as cores do seu retrato (provisório).
+        // model: 'hunter' (Demon Hunter), 'azael', 'yara', 'zeph' ou 'oskar'. colors: troca só o que muda na paleta do boneco.
         characters: {
             'demon-hunter': { model: 'hunter' },
             'mysterious-creature': { model: 'azael' },
             zeph: { model: 'zeph' },
-            oskar: {
-                model: 'hunter',
-                colors: {
-                    cape: '#3b2416', capeFold: '#4a2e1c', capeEdge: '#6b4226', capeInner: '#26170d',
-                    body: '#2b1d13', sleeve: '#4a3020', sash: '#7f1d1d', hood: '#3b2416', hoodFold: '#55351f',
-                    boots: '#1f140c', glove: '#2b1d13', strap: '#5c3a22',
-                    blade: '#d1d5db', bladeCore: '#f9fafb', runes: '#f9fafb', bladeGlow: '#9ca3af',
-                    bladeGlowSoft: 'rgba(209, 213, 219, 0.35)'
-                }
-            },
+            oskar: { model: 'oskar' },
             yara: { model: 'yara' }
         },
 

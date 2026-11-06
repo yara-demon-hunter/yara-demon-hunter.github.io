@@ -189,7 +189,7 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
             cape: '#4e4032',
             capeFold: '#2f261d',
             capeEdge: '#6b5a47',
-            capeInner: '#3a3026',
+            capeInner: '#46382b',
             // body: calça larga escura; sleeve/glove: pele (braços nus)
             body: '#2e2822',
             sleeve: '#cfd6de',
@@ -224,9 +224,9 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
             bandage: '#4a3d30',
             bandageLine: '#2a221a',
             claw: '#1f2328',
-            scabbard: '#141414',
-            scabbardShine: '#3a3a40',
-            hilt: '#2a2420',
+            scabbard: '#212121',
+            scabbardShine: '#353536',
+            hilt: '#454545',
             tsuba: '#a88b4a'
         },
 
@@ -277,11 +277,24 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         bladeLength: 17.2,
         bladeWidth: 1.3,
         bladeCurve: 0.04,
-        // Bainha presa no lado esquerdo da cintura, boca à frente, ponta para trás e para baixo
-        scabbardMouth: [1.6, -3.7, 11],
-        scabbardDir: [-0.86, -0.12, -0.48],
-        scabbardLength: 12,
+        // Bainha presa no lado direito da cintura (do lado da mão da katana), boca à frente, ponta para trás e para baixo
+        scabbardMouth: [0.87, 3.94, 10.4],
+        scabbardDir: [-1.23, 0.53, -0.43],
+        scabbardLength: 9.6,
+        // Mão esquerda na bainha: distância da boca da bainha (para trás, ao longo dela)
+        sheathHand: -4,
+        // Ajustes dos braços em repouso (a = frente, b = lado: + direita, z = altura). Somem no golpe.
+        // Mão direita (no cabo da katana) e cotovelo direito
+        rightHandOffset: [-1.92, 2, -0.16],
+        rightElbowOffset: [-2, -0.05, 0.28],
+        // Mão esquerda (na bainha) e cotovelo esquerdo
+        leftHandOffset: [0.67, -0.67, 0.05],
+        leftElbowOffset: [-0.67, 0.5, -0.44],
         hiltLength: 3.6,
+        // Guarda (tsuba): posição ao longo da espada (+ vai para o lado da lâmina, - para o cabo) e tamanho (raio).
+        // A cor é colors.tsuba.
+        guardOffset: -0.88,
+        guardSize: 2.11,
         // A lâmina aparece aos poucos enquanto a mão sai do cabo (fração do swingBlend até ficar inteira)
         drawBlend: 0.25,
         // Brilho em volta da katana (menor que o da espada rúnica: é aço, não magia)
@@ -493,5 +506,125 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         glowScale: 0.48
     };
 
-    window.YaraRpgData.visuals.hero25d = Object.freeze({ hero: HERO, body: BODY, azael: AZAEL, yara: YARA, zeph: ZEPH });
+    // --- OSKAR (js/stage/oskar25d.js). Referência: art_reference/oskar ---
+    // Homem alto e massudo: barba cheia, cabelo ralo e curto, regata verde-oliva, alça cruzando o peito, cinto,
+    // calça marrom-escura, botas com faixas e o machado de duas lâminas sempre nas duas mãos.
+    const OSKAR = {
+        colors: {
+            ...HERO_COLORS,
+            cape: '#4f5a32',
+            capeFold: '#353d20',
+            capeEdge: '#66713f',
+            capeInner: '#353d20',
+            body: '#3d2f22',
+            sleeve: '#c98a5e',
+            glove: '#c98a5e',
+            sash: '#6b4a2a',
+            boots: '#5a3d24',
+            // Machado de ferro, sem brilho mágico (só um reflexo frio)
+            blade: '#7d848b',
+            bladeCore: '#c9ced3',
+            runes: '#c9ced3',
+            bladeGlow: '#cbd5e1',
+            bladeGlowSoft: 'rgba(203, 213, 225, 0.2)',
+            bladeGlowFrenzy: '#f97316',
+            bladeGlowSoftFrenzy: 'rgba(249, 115, 22, 0.65)',
+            buckle: '#9aa3ad',
+            eyeGlint: '#cbd5e1',
+
+            skin: '#c98a5e',
+            skinShade: '#9a5f3c',
+            skinLight: '#e0a679',
+            outline: '#1a1410',
+            mouth: '#24150e',
+            hair: '#4a3020',
+            hairShade: '#2e1d12',
+            hairLight: '#6a4630',
+            beard: '#4a3020',
+            beardShade: '#2e1d12',
+            eyeWhite: '#e6dfcf',
+            eye: '#8a9a92',
+            shirt: '#4f5a32',
+            shirtShade: '#353d20',
+            shirtLight: '#66713f',
+            patch: '#3d4527',
+            leather: '#6b4a2a',
+            leatherShade: '#452e18',
+            pants: '#3d2f22',
+            pantsShade: '#281e15',
+            boot: '#5a3d24',
+            bootShade: '#3b2716',
+            wrap: '#7a5a3a',
+            wristband: '#3a2a1c',
+            axeHead: '#7d848b',
+            axeEdge: '#c9ced3',
+            axeDark: '#4a4f55',
+            haft: '#6b4423',
+            haftShade: '#4a2e17',
+            binding: '#8a6a44'
+        },
+
+        // Tamanho do boneco inteiro em relação aos outros (o mais alto do grupo)
+        bodyScale: 1.1,
+
+        // Cabeça: mandíbula larga; o mesmo truque de levantar e virar o rosto para a câmera
+        headRadius: 2.7,
+        faceTilt: 0.45,
+        faceTiltFront: 0.4,
+        faceTurn: 0.5,
+        face: [[2.15, 0.9], [2.45, 0], [2.4, -1.15], [2.05, -2.25], [1.2, -2.9], [0, -3.05]],
+        jawForward: 1,
+        faceOut: 0.5,
+        earLength: 0.6,
+        // Cabelo ralo e curto: quase colado na cabeça, linha do cabelo alta (entradas), um pouco transparente
+        hairline: 1.35,
+        hairPuff: 1.03,
+        hairBumps: 0.02,
+        hairOpacity: 0.8,
+        bangSpikes: 0,
+        bangDepth: 0,
+        sideburn: 0.45,
+        // Entradas: quanto a linha do cabelo sobe nos cantos da testa (radianos)
+        recede: 0.22,
+
+        // Posições do rosto (coordenadas de uma cabeça de raio 3: s = para o lado, u = para cima; 0 = centro)
+        eyeX: 0.95,
+        eyeY: -0.3,
+        eyeWidth: 0.45,
+        eyeOpen: 0.24,
+        irisSize: 0.2,
+        browY: 0.5,
+        browWidth: 0.6,
+        browTilt: 0.18,
+        browThickness: 0.34,
+        noseY: -1.15,
+        noseLength: 0.9,
+        mouthY: -2.05,
+        mouthWidth: 0.42,
+        earX: 0.15,
+        earY: 0.05,
+        earSize: 0.45,
+        earWidth: 0.9,
+        // Barba: começa nas costeletas (altura u nos lados), cobre mandíbula e queixo; bigode acima da boca
+        beardTop: -0.2,
+        beardChin: -3.45,
+        beardWidth: 2.45,
+        mustacheY: -1.8,
+
+        // Corpo massudo: ombros e peito bem largos, braços e pernas grossos
+        shoulderScale: 1.12,
+        waistScale: 1.05,
+        armScale: 1.3,
+        legWidth: 3.6,
+
+        // Machado de duas lâminas: cabo comprido, cabeça dupla larga
+        bladeLength: 13,
+        bladeWidth: 1,
+        axeHeadSize: 4,
+        // Distância entre as duas mãos no cabo
+        gripSpread: 3.2,
+        glowScale: 0.3
+    };
+
+    window.YaraRpgData.visuals.hero25d = Object.freeze({ hero: HERO, body: BODY, azael: AZAEL, yara: YARA, zeph: ZEPH, oskar: OSKAR });
 })();

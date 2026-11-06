@@ -17,6 +17,8 @@
     const YP = NS.yara;
     const ZE = VIS.zeph;
     const ZP = NS.zeph;
+    const OS = VIS.oskar;
+    const OP = NS.oskar;
 
     // Estado do boneco sendo desenhado (render troca antes de montar as peças)
     let ctx = null;
@@ -27,6 +29,8 @@
     let yara = false;
     // Boneco do Zeph (js/stage/zeph25d.js): cabeça, jaqueta, bolsa, braços, pernas e adaga próprios
     let zeph = false;
+    // Boneco do Oskar (js/stage/oskar25d.js): maior, barba, regata, machado de duas lâminas nas duas mãos
+    let oskar = false;
     let bladeLength = V.bladeLength;
     let bladeWidth = V.bladeWidth;
     // Câmera: quanto 1 unidade de altura sobe na tela e o achatamento do chão
@@ -89,6 +93,7 @@
         return Math.hypot(A * cosF, B * sinF);
     }
 
+    const norm3 = (v) => { const l = Math.hypot(...v) || 1; return v.map(x => x / l); };
     const add3 = (p, q) => [p[0] + q[0], p[1] + q[1], p[2] + q[2]];
     const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
     const norm = (v) => {
@@ -366,6 +371,10 @@
                     ZP.drawZephLeg(rig, hip, knee, ankle, toe);
                     return;
                 }
+                if (oskar) {
+                    OP.drawOskarLeg(rig, hip, knee, ankle, toe);
+                    return;
+                }
                 limb([hip, knee, ankle], V.legWidth, C.body);
                 limb([ankle, toe], V.bootWidth, C.boots);
                 // Faixa no cano da bota
@@ -394,6 +403,10 @@
                 }
                 if (zeph) {
                     ZP.drawZephTorso(rig, pose, bottom, top, wb, wt);
+                    return;
+                }
+                if (oskar) {
+                    OP.drawOskarTorso(rig, pose, bottom, top, wb, wt);
                     return;
                 }
 
@@ -475,7 +488,7 @@
                     return;
                 }
                 // Zeph também não tem capa (a bolsa e a alça ficam no tronco)
-                if (zeph) return;
+                if (zeph || oskar) return;
                 // Pontas da faixa da cintura: penduradas paradas, esvoaçam para trás na corrida
                 for (const side of [-1, 1]) {
                     const flutter = Math.sin(t * 7 + side) * (1 + run * 1.5);
@@ -576,14 +589,31 @@
         const shoulder = add3([pose.lean, -V.chest.B, pose.shoulderZ - 0.5], yaraIdle(pose, -1).shoulder);
         const ya = yaraIdle(pose, -1);
         const restHand = add3([pose.lean * 0.5 + 0.6 + swing * (1 - pose.blend) - pose.blend * 1.2, -V.chest.B - 0.6 + pose.blend * 1.5, V.handHeight - pose.crouch + pose.blend * 2], ya.hand);
-        const hand = pose.free ? mix(restHand, pose.free.hand, pose.free.w) : restHand;
-        const elbow = add3([(shoulder[0] + hand[0]) / 2 - 0.4, -V.chest.B - 1, (shoulder[2] + hand[2]) / 2], ya.elbow);
+        let hand = pose.free ? mix(restHand, pose.free.hand, pose.free.w) : restHand;
+        // Azael: com a katana guardada, a mão esquerda segura a bainha logo atrás da boca (a direita fica no cabo),
+        // menos quando bebe a poção
+        const holdSheath = azael && !(pose.flask > 0) ? 1 - azaelDrawn(pose) : 0;
+        if (holdSheath > 0) {
+            const sheath = AZP.scabbardFrame(pose);
+            hand = mix(hand, add3(add3(sheath.mouth, sheath.dir.map(v => v * AZ.sheathHand)), AZ.leftHandOffset), holdSheath);
+        }
+        // Oskar: a mão livre fica no cabo do machado, acima da outra (duas mãos), menos quando bebe a poção
+        if (oskar && !(pose.flask > 0)) {
+            const grip = swordArmPose(pose);
+            hand = add3(grip.hand, grip.dir.map(v => v * OS.gripSpread));
+        }
+        // Segurando a bainha, o braço cruza na frente da barriga (cotovelo à frente) e é desenhado na frente do corpo
+        const leo = azael ? AZ.leftElbowOffset.map(v => v * holdSheath) : [0, 0, 0];
+        const elbow = add3(add3([(shoulder[0] + hand[0]) / 2 - 0.4 + holdSheath * 2.2, -V.chest.B - 1 + holdSheath * 2.6, (shoulder[2] + hand[2]) / 2], ya.elbow), leo);
+        const armDepth = project(...elbow).depth + 0.1;
         return {
-            depth: project(...elbow).depth + 0.1,
+            // (na frente do corpo, mas sempre atrás da cabeça: senão o pano do ombro cobre o rosto)
+            depth: holdSheath > 0.5 ? Math.min(Math.max(armDepth, project(...hand).depth + 0.2), project(pose.headA, 0, pose.headZ).depth - 0.05) : armDepth,
             draw() {
                 if (azael) AZP.drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
                 else if (yara) YP.drawYaraArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
                 else if (zeph) ZP.drawZephArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+                else if (oskar) OP.drawOskarArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
                 else {
                     ball(shoulder, V.shoulderRadius, C.sleeve);
                     limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
@@ -619,6 +649,17 @@
             const size = Math.hypot(...m) || 1;
             dir = m.map(v => v / size);
         }
+        // Oskar: em repouso segura o machado com as duas mãos, cabo deitado na frente da cintura e a cabeça para a
+        // frente e a esquerda; sobe e desce devagar com a respiração. No golpe vai para a varredura normal.
+        if (oskar) {
+            const k = 1 - blend;
+            const restO = [pose.lean * 0.5 + 2.8, 2.6, V.handHeight + 1.2 - pose.crouch + Math.sin(pose.t * 1.4) * 0.25];
+            const dirO = [0.75 + Math.sin(pose.t * 1.1) * 0.04, -0.65, 0.12];
+            const h2 = mix(hand, restO, k);
+            const m = mix(dir, norm3(dirO), k);
+            const size = Math.hypot(...m) || 1;
+            return holdSword(pose, { hand: h2, dir: m.map(v => v / size) });
+        }
         return holdSword(pose, { hand, dir });
     }
 
@@ -637,7 +678,9 @@
         const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
         const d = mix(sheath.dir, [Math.cos(swingAngle), Math.sin(swingAngle), 0], blend);
         const size = Math.hypot(...d) || 1;
-        return { hand: mix(sheath.grip, swingHand, blend), dir: d.map(v => v / size) };
+        // rightHandOffset: ajuste da mão direita em repouso (some no golpe)
+        const grip = sheath.grip.map((v, i) => v + AZ.rightHandOffset[i]);
+        return { hand: mix(grip, swingHand, blend), dir: d.map(v => v / size) };
     }
 
     // Azael: quanto a katana está fora da bainha (0 = guardada, 1 = na mão). A lâmina desliza para fora e para
@@ -650,7 +693,9 @@
     function swordArmPart(pose) {
         const { hand } = swordArmPose(pose);
         const shoulder = add3([pose.lean, V.chest.B, pose.shoulderZ - 0.5], yaraIdle(pose, 1).shoulder);
-        const elbow = add3([(shoulder[0] + hand[0]) / 2 + 0.6, (shoulder[1] + hand[1]) / 2 + 1, (shoulder[2] + hand[2]) / 2], yaraIdle(pose, 1).elbow);
+        // Azael: rightElbowOffset dobra/abre o cotovelo direito em repouso (some no golpe)
+        const eo = azael ? AZ.rightElbowOffset.map(v => v * (1 - pose.blend)) : [0, 0, 0];
+        const elbow = add3(add3([(shoulder[0] + hand[0]) / 2 + 0.6, (shoulder[1] + hand[1]) / 2 + 1, (shoulder[2] + hand[2]) / 2], yaraIdle(pose, 1).elbow), eo);
         return {
             depth: project(...elbow).depth + 0.1,
             draw() {
@@ -664,6 +709,10 @@
                 }
                 if (zeph) {
                     ZP.drawZephArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+                    return;
+                }
+                if (oskar) {
+                    OP.drawOskarArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
                     return;
                 }
                 ball(shoulder, V.shoulderRadius, C.sleeve);
@@ -685,6 +734,10 @@
         }
         if (zeph) {
             ZP.drawZephDagger(rig, hand, dir, alpha);
+            return;
+        }
+        if (oskar) {
+            OP.drawOskarAxe(rig, hand, dir, alpha);
             return;
         }
         const at = (d) => [hand[0] + dir[0] * d, hand[1] + dir[1] * d, hand[2] + dir[2] * d];
@@ -746,7 +799,7 @@
                 ctx.save();
                 ctx.globalCompositeOperation = 'lighter';
                 drawGlow(ctx, frenzy ? C.bladeGlowSoftFrenzy : C.bladeGlowSoft, glow.x, glow.y,
-                    (H.bladeGlowMin + (H.bladeGlowMax - H.bladeGlowMin) * pulse) * 0.8 * (1 + pose.blend * 0.7 + (pose.sword?.w ?? 0) * 0.6) * (azael ? AZ.glowScale : yara ? YA.glowScale : zeph ? ZE.glowScale : 1) * (frenzy ? 1.4 : 1),
+                    (H.bladeGlowMin + (H.bladeGlowMax - H.bladeGlowMin) * pulse) * 0.8 * (1 + pose.blend * 0.7 + (pose.sword?.w ?? 0) * 0.6) * (azael ? AZ.glowScale : yara ? YA.glowScale : zeph ? ZE.glowScale : oskar ? OS.glowScale : 1) * (frenzy ? 1.4 : 1),
                     0.32 + 0.2 * pulse);
                 ctx.restore();
 
@@ -858,21 +911,23 @@
 
     // Desenha o herói com os pés em (opts.x, opts.y) da tela, opts.scale px por unidade.
     // body: { hitTime, hitDirX, hitDirY, move: { kind, age, seconds } }. a: estado de createAnim.
-    // opts: { x, y, scale, model: 'hunter' | 'azael' | 'yara' | 'zeph', colors, camera: { heightScale, groundSquash }, frenzy, alpha, time }
+    // opts: { x, y, scale, model: 'hunter' | 'azael' | 'yara' | 'zeph' | 'oskar', colors, camera: { heightScale, groundSquash }, frenzy, alpha, time }
     function render(context, body, a, opts) {
         ctx = context;
         AZP.bind(context);
         YP.bind(context);
         ZP.bind(context);
+        OP.bind(context);
         anim = a;
         azael = opts.model === 'azael';
         yara = opts.model === 'yara';
         zeph = opts.model === 'zeph';
-        C = opts.colors || (azael ? AZ.colors : yara ? YA.colors : zeph ? ZE.colors : H.colors);
+        oskar = opts.model === 'oskar';
+        C = opts.colors || (azael ? AZ.colors : yara ? YA.colors : zeph ? ZE.colors : oskar ? OS.colors : H.colors);
         HS = opts.camera?.heightScale ?? V.heightScale;
         GS = opts.camera?.groundSquash ?? V.groundSquash;
-        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : zeph ? ZE.bladeLength : V.bladeLength;
-        bladeWidth = azael ? AZ.bladeWidth : yara ? YA.bladeWidth : zeph ? ZE.bladeWidth : V.bladeWidth;
+        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : zeph ? ZE.bladeLength : oskar ? OS.bladeLength : V.bladeLength;
+        bladeWidth = azael ? AZ.bladeWidth : yara ? YA.bladeWidth : zeph ? ZE.bladeWidth : oskar ? OS.bladeWidth : V.bladeWidth;
         const t = opts.time ?? performance.now() / 1000;
         cosF = Math.cos(anim.facing);
         sinF = Math.sin(anim.facing);
@@ -891,7 +946,9 @@
         ctx.save();
         ctx.globalAlpha *= opts.alpha ?? 1;
         ctx.translate(opts.x, opts.y);
-        ctx.scale(opts.scale, opts.scale);
+        // O Oskar é maior que os outros (o boneco inteiro, com a sombra)
+        const bodyScale = oskar ? OS.bodyScale : 1;
+        ctx.scale(opts.scale * bodyScale, opts.scale * bodyScale);
 
         const ringP = hitAge / K.ringSeconds;
         if (ringP >= 0 && ringP < 1) {
@@ -920,7 +977,7 @@
             swordPart(pose, !!opts.frenzy),
             ...(azael
                 ? [AZP.azaelHeadPart(pose, rig), AZP.azaelHairPart(pose, rig), AZP.azaelScabbardPart(pose, rig, 1 - azaelDrawn(pose))]
-                : yara ? YP.yaraHeadParts(pose, rig) : zeph ? ZP.zephHeadParts(pose, rig) : [headPart(pose)])
+                : yara ? YP.yaraHeadParts(pose, rig) : zeph ? ZP.zephHeadParts(pose, rig) : oskar ? OP.oskarHeadParts(pose, rig) : [headPart(pose)])
         ];
         parts.sort((p, q) => p.depth - q.depth).forEach(p => p.draw());
         ctx.restore();
@@ -935,9 +992,10 @@
         azael = opts.model === 'azael';
         yara = opts.model === 'yara';
         zeph = opts.model === 'zeph';
+        oskar = opts.model === 'oskar';
         HS = opts.camera?.heightScale ?? V.heightScale;
         GS = opts.camera?.groundSquash ?? V.groundSquash;
-        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : zeph ? ZE.bladeLength : V.bladeLength;
+        bladeLength = azael ? AZ.bladeLength : yara ? YA.bladeLength : zeph ? ZE.bladeLength : oskar ? OS.bladeLength : V.bladeLength;
         cosF = Math.cos(a.facing);
         sinF = Math.sin(a.facing);
         const pose = buildPose(opts.time ?? performance.now() / 1000, body);
@@ -945,14 +1003,14 @@
         const tip = project(hand[0] + dir[0] * bladeLength, hand[1] + dir[1] * bladeLength, hand[2] + dir[2] * bladeLength - pose.lift);
         const grip = project(hand[0], hand[1], hand[2] - pose.lift);
         anim = prevAnim;
-        const s = opts.scale;
+        const s = opts.scale * (oskar ? OS.bodyScale : 1);
         return { tip: { x: opts.x + tip.x * s, y: opts.y + tip.y * s }, hand: { x: opts.x + grip.x * s, y: opts.y + grip.y * s } };
     }
 
     // Altura do topo da cabeça na tela (unidades × escala), para pôr números e ícones acima do herói
     function headTop(opts) {
         const hs = opts.camera?.heightScale ?? V.heightScale;
-        return (V.headHeight + V.hoodRadius + 1) * hs * opts.scale;
+        return (V.headHeight + V.hoodRadius + 1) * hs * opts.scale * (opts.model === 'oskar' ? OS.bodyScale : 1);
     }
 
     NS.hero = { createAnim, updateAnim, startSwing, render, bladeTip, headTop, moves: V.moves };

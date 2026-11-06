@@ -13,7 +13,7 @@ export const AZAEL_VISUALS = {
         cape: '#4e4032',
         capeFold: '#2f261d',
         capeEdge: '#6b5a47',
-        capeInner: '#3a3026',
+        capeInner: '#46382b',
         // body: calça larga escura; sleeve/glove: pele (braços nus)
         body: '#2e2822',
         sleeve: '#cfd6de',
@@ -48,9 +48,9 @@ export const AZAEL_VISUALS = {
         bandage: '#4a3d30',
         bandageLine: '#2a221a',
         claw: '#1f2328',
-        scabbard: '#141414',
-        scabbardShine: '#3a3a40',
-        hilt: '#2a2420',
+        scabbard: '#212121',
+        scabbardShine: '#353536',
+        hilt: '#454545',
         tsuba: '#a88b4a'
     },
 
@@ -102,11 +102,24 @@ export const AZAEL_VISUALS = {
     bladeLength: 17.2,
     bladeWidth: 1.3,
     bladeCurve: 0.04,
-    // Bainha presa no lado esquerdo da cintura, boca à frente, ponta para trás e para baixo
-    scabbardMouth: [1.6, -3.7, 11],
-    scabbardDir: [-0.86, -0.12, -0.48],
-    scabbardLength: 12,
+    // Bainha presa no lado direito da cintura (do lado da mão da katana), boca à frente, ponta para trás e para baixo
+    scabbardMouth: [0.87, 3.94, 10.4],
+    scabbardDir: [-1.23, 0.53, -0.43],
+    scabbardLength: 9.6,
+    // Mão esquerda na bainha: distância da boca da bainha (para trás, ao longo dela)
+    sheathHand: -4,
+    // Ajustes dos braços em repouso (a = frente, b = lado: + direita, z = altura). Somem no golpe.
+    // Mão direita (no cabo da katana) e cotovelo direito
+    rightHandOffset: [-1.92, 2, -0.16],
+    rightElbowOffset: [-2, -0.05, 0.28],
+    // Mão esquerda (na bainha) e cotovelo esquerdo
+    leftHandOffset: [0.67, -0.67, 0.05],
+    leftElbowOffset: [-0.67, 0.5, -0.44],
     hiltLength: 3.6,
+    // Guarda (tsuba): posição ao longo da espada (+ vai para o lado da lâmina, - para o cabo) e tamanho (raio).
+    // A cor é colors.tsuba.
+    guardOffset: -0.88,
+    guardSize: 2.11,
     // A lâmina aparece aos poucos enquanto a mão sai do cabo (fração do swingBlend até ficar inteira)
     drawBlend: 0.25,
     // Brilho em volta da katana (menor que o da espada rúnica do herói: é aço, não magia)

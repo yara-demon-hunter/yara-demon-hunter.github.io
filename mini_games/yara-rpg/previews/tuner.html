@@ -21,7 +21,7 @@
         button:hover, button:focus-visible { border-color: #fbbf24; outline: none; }
         button.primary { background: #3a2f17; border-color: #5c5137; }
         label.check { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; }
-        .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 12px; padding: 12px 16px 40px; }
+        .layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 12px; padding: 12px 16px 40px; }
         @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
         .views { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(240px, calc(50% - 5px)), 1fr)); align-content: start; }
         figure { margin: 0; background: #17140d; border: 1px solid #2a2418; border-radius: 10px; overflow: hidden; }
@@ -40,12 +40,12 @@
         }
         details { border-bottom: 1px solid #2a2418; padding: 4px 0 8px; }
         summary { cursor: pointer; color: #fbbf24; font-weight: 700; font-size: 14px; padding: 6px 0; }
-        .row { display: grid; grid-template-columns: 112px 1fr 68px; gap: 6px; align-items: center; margin: 3px 0; font-size: 12px; }
+        .row { display: grid; grid-template-columns: 150px 1fr 68px; gap: 6px; align-items: center; margin: 3px 0; font-size: 12px; }
         .row.changed .name { color: #fde68a; }
         .row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, monospace; }
         .row input[type=range] { width: 100%; accent-color: #fbbf24; }
         .row input[type=number] { width: 68px; padding: 3px 4px; font-size: 12px; }
-        .row.wide { grid-template-columns: 112px 1fr; }
+        .row.wide { grid-template-columns: 150px 1fr; }
         .row input[type=text] { width: 100%; font: 12px ui-monospace, monospace; padding: 3px 5px; }
         .row input[type=text].bad { border-color: #ef4444; }
         .row input[type=color] { width: 100%; height: 24px; padding: 0; border: 1px solid #3a3322; border-radius: 4px; background: none; }
@@ -86,6 +86,7 @@
     <script src="../js/stage/azael25d.js"></script>
     <script src="../js/stage/yara25d.js"></script>
     <script src="../js/stage/zeph25d.js"></script>
+    <script src="../js/stage/oskar25d.js"></script>
     <script src="../js/stage/hero25d.js"></script>
     <script>
         (() => {
@@ -103,6 +104,7 @@
             // Cada boneco tem o seu bloco de dados (cores, medidas, posições); 'hunter' usa as cores do herói.
             // O bloco 'body' (medidas do corpo de todos) entra junto, numa seção à parte.
             const MODELS = [
+                ['oskar', 'Oskar', VIS.oskar],
                 ['zeph', 'Zeph', VIS.zeph],
                 ['yara', 'Yara', VIS.yara],
                 ['azael', 'Azael (Mysterious Creature)', VIS.azael],
@@ -142,10 +144,11 @@
             // --- CONTROLES ---
             const isColor = (v) => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v);
             // Faixa do controle deslizante a partir do valor original
+            // (vai sempre para os dois lados: posições podem ser negativas, ex.: para trás ou para baixo)
             function rangeFor(v) {
                 const a = Math.abs(v);
-                const max = a === 0 ? 1 : a < 1 ? Math.max(1, a * 3) : a * 2.5;
-                const min = v < 0 ? -max : (a < 1 && v !== 0 ? -max : 0);
+                const max = a === 0 ? 2 : a < 1 ? Math.max(2, a * 3) : Math.max(4, a * 2.5);
+                const min = -max;
                 const step = a >= 20 ? 0.5 : a >= 5 ? 0.1 : 0.01;
                 return { min, max, step };
             }
@@ -171,7 +174,8 @@
                 row.dataset.search = `${path}`.toLowerCase();
                 const name = document.createElement('span');
                 name.className = 'name';
-                name.textContent = path.replace(/^colors\./, '');
+                // Eixos dos vetores: a = frente, b = lado (direita +), z = altura
+                name.textContent = path.replace(/^colors\./, '').replace(/\.0$/, ' (a frente)').replace(/\.1$/, ' (b lado)').replace(/\.2$/, ' (z altura)');
                 name.title = path;
                 row.appendChild(name);
                 if (typeof value === 'number') {
@@ -214,10 +218,11 @@
 
             // Agrupa as chaves do bloco por assunto, para achar rápido
             const GROUPS = [
-                ['Rosto: posições', /^(eye|iris|brow|nose|mouth|ear|face|jaw)/],
-                ['Cabeça e cabelo', /^(head|hair|bang|side|tail|band|scarf|faceT)/],
-                ['Corpo', /^(shoulder|waist|hip|arm|leg|boot|toe|heel|claw|run|cape)/],
-                ['Arma', /^(blade|glow|scabbard|hilt|draw)/]
+                ['Rosto: posições', /^(eye|iris|brow|nose|mouth|ear|face|jaw|beard|mustache)/],
+                ['Cabeça e cabelo', /^(head|hair|bang|side|tail|band|scarf|faceT|recede)/],
+                ['Corpo', /^(shoulder|waist|hip|arm|leg|boot|toe|heel|claw|run|cape|bodyScale)/],
+                ['Braços (offsets)', /^(right|left)(Hand|Elbow)/],
+                ['Arma', /^(blade|glow|scabbard|sheath|hilt|guard|draw|axe|grip)/]
             ];
             function sectionFor(path) {
                 if (path.startsWith('colors.')) return 'Cores';
@@ -243,11 +248,14 @@
                     }
                     sections.get(title).appendChild(el);
                 };
-                const order = ['Rosto: posições', 'Cabeça e cabelo', 'Corpo', 'Arma', 'Outros', 'Cores'];
+                const order = ['Rosto: posições', 'Cabeça e cabelo', 'Corpo', 'Braços (offsets)', 'Arma', 'Outros', 'Cores'];
                 const entries = [];
                 Object.entries(block).forEach(([k, v]) => {
                     if (k === 'colors') Object.entries(v).forEach(([c, cv]) => entries.push([`colors.${c}`, cv]));
-                    else if (typeof v === 'number' || Array.isArray(v) || typeof v === 'string') entries.push([k, v]);
+                    // Vetores de posição/direção (até 3 números, ex.: scabbardMouth): um controle por eixo
+                    else if (Array.isArray(v) && v.length <= 3 && v.every(x => typeof x === 'number')) {
+                        v.forEach((x, i) => entries.push([`${k}.${i}`, x]));
+                    } else if (typeof v === 'number' || Array.isArray(v) || typeof v === 'string') entries.push([k, v]);
                 });
                 entries.sort((a, b) => order.indexOf(sectionFor(a[0])) - order.indexOf(sectionFor(b[0])));
                 entries.forEach(([path, v]) => add(sectionFor(path), controlRow(key, path, v), sectionFor(path) !== 'Cores'));
@@ -276,7 +284,19 @@
                     if (!plain.length && !colors.length) return;
                     const blockName = key === 'body' ? 'BODY' : key === 'hunter' ? 'HERO' : key.toUpperCase();
                     lines.push(`// ${blockName} (js/data/visuals/hero25d.js)`);
-                    plain.forEach(([p, v]) => lines.push(`        ${p}: ${JSON.stringify(typeof v === 'number' ? fmt(v) : v).replace(/,/g, ', ')},`));
+                    // Eixos de vetores (scabbardMouth.1) saem como o vetor inteiro: scabbardMouth: [1.6, 3.7, 11]
+                    const vectors = new Set();
+                    plain.forEach(([p, v]) => {
+                        const m = p.match(/^(\w+)\.(\d)$/);
+                        if (m) {
+                            if (vectors.has(m[1])) return;
+                            vectors.add(m[1]);
+                            const arr = blockOf(key)[m[1]].map(fmt);
+                            lines.push(`        ${m[1]}: [${arr.join(', ')}],`);
+                            return;
+                        }
+                        lines.push(`        ${p}: ${JSON.stringify(typeof v === 'number' ? fmt(v) : v).replace(/,/g, ', ')},`);
+                    });
                     if (colors.length) {
                         lines.push('        // colors: { ... }');
                         colors.forEach(([p, v]) => lines.push(`            ${p.slice(7)}: '${v}',`));

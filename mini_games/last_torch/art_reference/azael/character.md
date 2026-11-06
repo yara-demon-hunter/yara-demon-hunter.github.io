@@ -17,7 +17,7 @@
   - **Bandagens:** faixas de pano marrom enroladas nos antebraços (do pulso ao cotovelo), no bíceps e nas canelas (do tornozelo ao joelho).
   - **Bolsinha** de couro pendurada na cintura.
 - **Mãos e pés:** dedos longos terminando em **garras pretas curvas**. **Pés descalços e demoníacos, com 3 dedos: dois para a frente e um para trás** (como pé de ave), cada dedo terminando numa garra preta grande e curva.
-- **Arma:** **katana** com bainha preta, guarda (tsuba) redonda dourada/bronze e cabo trançado. Fica **guardada na bainha, presa na cintura** (lado esquerdo); ele saca para atacar e a lâmina prateada brilha ao cortar.
+- **Arma:** **katana** com bainha preta, guarda (tsuba) redonda dourada/bronze e cabo trançado. Fica **guardada na bainha, presa na cintura** (lado direito, do lado da mão que saca); ele saca para atacar e a lâmina prateada brilha ao cortar.
 - **Partes que se movem separadamente:** capa (tremula/arrasta atrás), pontas da bandana (voam), cabelo (balança/voa), braços (seguram/sacam a espada), katana, pernas (agachado, base larga).
 - **Tamanho relativo:** igual ao herói atual (mesmo raio de colisão e mesma escala do 2.5D); tamanho de um homem comum.
 - **Detalhes que NÃO podem faltar:** pele branco-prateada, cabelo longo branco esvoaçante, olhos vermelhos brilhantes, capa marrom esfarrapada, bandana marrom com pontas voando, katana na bainha na cintura.
@@ -53,7 +53,7 @@ Seguir o mesmo esquema do herói 2.5D: corpo montado com medidas em 3D (frente, 
 - **Capa:** marrom e esfarrapada, saindo de um ombro, com a mesma física da capa do Caçador (para trás ao correr, abre ao virar).
 - **Pernas:** calça larga escura, bandagens nas canelas, postura mais baixa e base mais larga que a do Caçador.
 - **Pés:** descalços, com **3 dedos (2 para a frente e 1 para trás)** e garras pretas. Na passada, os dedos da frente apontam para a direção do movimento.
-- **Katana:** a bainha preta fica sempre presa no lado esquerdo da cintura. Parado e correndo, a mão fica no cabo. No golpe, a lâmina prateada sai da bainha e deixa um rastro branco-azulado; depois volta à bainha.
+- **Katana:** a bainha preta fica sempre presa no lado direito da cintura, do lado da mão da katana (de lado dá para ver as duas mãos e a bainha). Parado e correndo, a mão direita fica no cabo e a esquerda segura a bainha logo atrás da boca, com o braço cruzando na frente da barriga (postura de saque); no golpe a esquerda solta a bainha. No golpe, a lâmina prateada sai da bainha e deixa um rastro branco-azulado; depois volta à bainha.
 - **Contorno:** contorno escuro (#1a1d22) em tudo, para a pele e o cabelo claros não se misturarem com o chão.
 
 ## Animações
@@ -100,4 +100,7 @@ Código em `js/render/azael25d.js`; cores e medidas em `data_model/visuals/chara
   ao mudar o desenho aqui, copie para lá.
 - Capa de pano: cada tira ondula e o meio cede com o peso na corrida; o cachecol cobre os ombros.
 - Corrida: corpo sobe e desce a cada passo, postura um pouco agachada; pés de 3 dedos com garras.
+- Guarda (tsuba): disco perpendicular à espada (não é mais uma bolinha), com posição ao longo da espada em
+  `guardOffset` (+ para a lâmina, - para o cabo), tamanho em `guardSize` e cor em `colors.tsuba`. Acompanha a katana
+  guardada e sacada.
 - Katana: guardada na bainha com a mão no cabo; no golpe a lâmina desliza para fora e volta para a bainha aos poucos.
