@@ -89,6 +89,8 @@ export const AZAEL_VISUALS = {
 
     // Corrida: o corpo sobe e desce a cada passo e vai um pouco agachado (postura de espadachim)
     runBob: 0.7,
+    // Ritmo das passadas deste personagem (maior = passos mais rápidos); sem ele, vale o strideSpeed geral do herói
+    strideSpeed: 11.6,
     runCrouch: 0.6,
 
     // Pernas: calça larga e pé descalço de 3 dedos com garras

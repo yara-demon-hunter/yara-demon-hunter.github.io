@@ -21,7 +21,7 @@
         button:hover, button:focus-visible { border-color: #fbbf24; outline: none; }
         button.primary { background: #3a2f17; border-color: #5c5137; }
         label.check { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; }
-        .layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 12px; padding: 12px 16px 40px; }
+        .layout { display: grid; grid-template-columns: minmax(0, 1fr) 470px; gap: 12px; padding: 12px 16px 40px; }
         @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
         .views { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(240px, calc(50% - 5px)), 1fr)); align-content: start; }
         figure { margin: 0; background: #17140d; border: 1px solid #2a2418; border-radius: 10px; overflow: hidden; }
@@ -40,12 +40,12 @@
         }
         details { border-bottom: 1px solid #2a2418; padding: 4px 0 8px; }
         summary { cursor: pointer; color: #fbbf24; font-weight: 700; font-size: 14px; padding: 6px 0; }
-        .row { display: grid; grid-template-columns: 150px 1fr 68px; gap: 6px; align-items: center; margin: 3px 0; font-size: 12px; }
+        .row { display: grid; grid-template-columns: 215px 1fr 64px; gap: 6px; align-items: center; margin: 3px 0; font-size: 12px; }
         .row.changed .name { color: #fde68a; }
-        .row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, monospace; }
+        .row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, monospace; font-size: 11.5px; }
         .row input[type=range] { width: 100%; accent-color: #fbbf24; }
         .row input[type=number] { width: 68px; padding: 3px 4px; font-size: 12px; }
-        .row.wide { grid-template-columns: 150px 1fr; }
+        .row.wide { grid-template-columns: 215px 1fr; }
         .row input[type=text] { width: 100%; font: 12px ui-monospace, monospace; padding: 3px 5px; }
         .row input[type=text].bad { border-color: #ef4444; }
         .row input[type=color] { width: 100%; height: 24px; padding: 0; border: 1px solid #3a3322; border-radius: 4px; background: none; }
@@ -217,8 +217,8 @@
             const GROUPS = [
                 ['Rosto: posições', /^(eye|iris|brow|nose|mouth|ear|face|jaw|beard|mustache)/],
                 ['Cabeça e cabelo', /^(head|hair|bang|side|tail|band|scarf|faceT|recede)/],
-                ['Corpo', /^(shoulder|waist|hip|arm|leg|boot|toe|heel|claw|run|cape|bodyScale)/],
-                ['Braços (offsets)', /^(right|left)(Hand|Elbow)/],
+                ['Corpo', /^(shoulder|waist|hip|arm|leg|boot|toe|heel|claw|run|cape|bodyScale|stride|foot)/],
+                ['Braços (offsets)', /^(right|left)(Hand|Elbow|Shoulder)/],
                 ['Arma', /^(blade|glow|scabbard|sheath|hilt|guard|draw|axe|grip)/]
             ];
             function sectionFor(path) {

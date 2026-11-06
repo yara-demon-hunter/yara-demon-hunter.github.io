@@ -800,6 +800,7 @@ const rig = {
 // oathGear: forma do Juramento (colors já vem com a paleta dele). model: 'hunter' (padrão) ou 'azael'
 export function renderPlayer25D(body = player, bodyAnim = heroAnim, colors = V.colors, oathGear = null, model = 'hunter') {
     anim = bodyAnim;
+    bodyAnim.model = model;
     throwsKnives = bodyAnim.throwsKnives !== false;
     C = colors;
     gear = oathGear;

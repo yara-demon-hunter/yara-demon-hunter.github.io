@@ -138,7 +138,8 @@
 
         const runTarget = Math.min(1, a.speed / H.runSpeedForFullEffect);
         a.run += (runTarget - a.run) * Math.min(1, dt * H.runSmoothing);
-        a.stride += dt * H.strideSpeed * (0.25 + a.run);
+        // Ritmo das passadas: o do personagem (a.model, guardado no render), ou o geral
+        a.stride += dt * (VIS[a.model]?.strideSpeed ?? H.strideSpeed) * (0.25 + a.run);
 
         // Giro suave para onde o palco manda olhar
         const before = a.facing;
@@ -625,17 +626,21 @@
     function freeArmPart(pose) {
         if (azael) return azaelRightArmPart(pose);
         const swing = Math.sin(anim.stride) * V.armSwing * pose.run;
-        const shoulder = add3([pose.lean, -V.chest.B, pose.shoulderZ - 0.5], yaraIdle(pose, -1).shoulder);
+        let shoulder = add3([pose.lean, -V.chest.B, pose.shoulderZ - 0.5], yaraIdle(pose, -1).shoulder);
+        // Oskar: leftShoulderOffset move o ombro esquerdo (sempre)
+        if (oskar) shoulder = add3(shoulder, OS.leftShoulderOffset);
         const ya = yaraIdle(pose, -1);
         const restHand = add3([pose.lean * 0.5 + 0.6 + swing * (1 - pose.blend) - pose.blend * 1.2, -V.chest.B - 0.6 + pose.blend * 1.5, V.handHeight - pose.crouch + pose.blend * 2], ya.hand);
         let hand = pose.free ? mix(restHand, pose.free.hand, pose.free.w) : restHand;
         // Oskar: a mão livre fica no cabo do machado, acima da outra (duas mãos), menos quando bebe a poção
         if (oskar && !(pose.flask > 0)) {
             const grip = swordArmPose(pose);
-            hand = add3(grip.hand, grip.dir.map(v => v * OS.gripSpread));
+            hand = add3(add3(grip.hand, grip.dir.map(v => v * OS.gripSpread)), OS.leftHandOffset.map(v => v * (1 - pose.blend)));
         }
         // Segurando a bainha, o braço cruza na frente da barriga (cotovelo à frente) e é desenhado na frente do corpo
-        const elbow = add3([(shoulder[0] + hand[0]) / 2 - 0.4, -V.chest.B - 1, (shoulder[2] + hand[2]) / 2], ya.elbow);
+        let elbow = add3([(shoulder[0] + hand[0]) / 2 - 0.4, -V.chest.B - 1, (shoulder[2] + hand[2]) / 2], ya.elbow);
+        // Oskar: leftElbowOffset dobra/abre o cotovelo esquerdo (some no golpe)
+        if (oskar) elbow = add3(elbow, OS.leftElbowOffset.map(v => v * (1 - pose.blend)));
         return {
             depth: project(...elbow).depth + 0.1,
             draw() {
@@ -685,9 +690,15 @@
         // frente e a esquerda; sobe e desce devagar com a respiração. No golpe vai para a varredura normal.
         if (oskar) {
             const k = 1 - blend;
-            const restO = [pose.lean * 0.5 + 2.8, 2.6, V.handHeight + 1.2 - pose.crouch + Math.sin(pose.t * 1.4) * 0.25];
-            const dirO = [0.75 + Math.sin(pose.t * 1.1) * 0.04, -0.65, 0.12];
-            const h2 = mix(hand, restO, k);
+            // Correndo, o machado balança com a passada (sobe e desce a cada passo e gira um pouco), em vez de ficar parado
+            const st = anim.stride;
+            const restO = [
+                pose.lean * 0.5 + 2.8 + Math.sin(st) * 0.35 * pose.run,
+                2.6,
+                V.handHeight + 1.2 - pose.crouch + Math.sin(pose.t * 1.4) * 0.25 * (1 - pose.run) + Math.abs(Math.sin(st)) * 0.6 * pose.run
+            ];
+            const dirO = [0.75 + Math.sin(pose.t * 1.1) * 0.04 + Math.cos(st) * 0.12 * pose.run, -0.65, 0.12 + Math.sin(st) * 0.18 * pose.run];
+            const h2 = add3(mix(hand, restO, k), OS.rightHandOffset.map(v => v * k));
             const m = mix(dir, norm3(dirO), k);
             const size = Math.hypot(...m) || 1;
             return holdSword(pose, { hand: h2, dir: m.map(v => v / size) });
@@ -734,8 +745,12 @@
     function swordArmPart(pose) {
         if (azael) return azaelLeftArmPart(pose);
         const { hand } = swordArmPose(pose);
-        const shoulder = add3([pose.lean, V.chest.B, pose.shoulderZ - 0.5], yaraIdle(pose, 1).shoulder);
-        const elbow = add3([(shoulder[0] + hand[0]) / 2 + 0.6, (shoulder[1] + hand[1]) / 2 + 1, (shoulder[2] + hand[2]) / 2], yaraIdle(pose, 1).elbow);
+        let shoulder = add3([pose.lean, V.chest.B, pose.shoulderZ - 0.5], yaraIdle(pose, 1).shoulder);
+        // Oskar: rightShoulderOffset move o ombro direito (sempre)
+        if (oskar) shoulder = add3(shoulder, OS.rightShoulderOffset);
+        let elbow = add3([(shoulder[0] + hand[0]) / 2 + 0.6, (shoulder[1] + hand[1]) / 2 + 1, (shoulder[2] + hand[2]) / 2], yaraIdle(pose, 1).elbow);
+        // Oskar: rightElbowOffset dobra/abre o cotovelo direito (some no golpe)
+        if (oskar) elbow = add3(elbow, OS.rightElbowOffset.map(v => v * (1 - pose.blend)));
         return {
             depth: project(...elbow).depth + 0.1,
             draw() {
@@ -955,6 +970,7 @@
         ZP.bind(context);
         OP.bind(context);
         anim = a;
+        a.model = opts.model;
         azael = opts.model === 'azael';
         yara = opts.model === 'yara';
         zeph = opts.model === 'zeph';

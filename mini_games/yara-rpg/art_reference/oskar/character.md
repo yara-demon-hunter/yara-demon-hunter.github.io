@@ -92,8 +92,9 @@ Código em `js/stage/oskar25d.js` (ligado em `js/stage/hero25d.js` pelo modelo `
 `js/data/visuals/hero25d.js` → `oskar`. Veja em `previews/characters_preview.html?char=oskar` e ajuste ao vivo em
 `previews/tuner.html?model=oskar`.
 
-- Tamanho: o boneco inteiro é 10% maior que os outros (`bodyScale`), com ombros, peito, braços e pernas mais grossos
-  (`shoulderScale`, `waistScale`, `armScale`, `legWidth`).
+- Tamanho: o boneco inteiro é 10% maior que os outros (`bodyScale`), com braços e pernas mais grossos (`armScale`,
+  `legWidth`). Ombros proporcionais (`shoulderScale` 1): um ombro muito largo virava "ombreira" e fazia cantos do
+  tronco vazarem atrás deles.
 - Cabeça: mesmo esquema do Zeph (cabeça de pele, rosto na frente virando para a câmera). Cabelo ralo e curto: malha
   colada na cabeça e um pouco transparente (`hairOpacity`), linha do cabelo alta com entradas (`hairline`, `recede`) e
   costeletas que ligam na barba. Orelhas humanas no lado da cabeça.
@@ -101,12 +102,17 @@ Código em `js/stage/oskar25d.js` (ligado em `js/stage/hero25d.js` pelo modelo `
   até o bigode; `beardTop`, `beardChin`, `beardWidth`, `mustacheY`) com um lado mais escuro; sobrancelhas grossas e
   baixas, olhos claros e pequenos com pálpebra pesada, nariz largo, boca escura no meio da barba, rugas leves na testa.
   Pisca de vez em quando.
-- Tronco: pele no peito e nos ombros; regata verde-oliva com cavas fundas e alças, lado de lá mais escuro, peitoral
-  marcado, decote, remendo; cinto com fivela; alça de couro do ombro esquerdo ao quadril direito; pescoço grosso.
+- Tronco: contorno arredondado (cintura → peito largo → ombros redondos → trapézio até o pescoço), sem cantos;
+  regata verde-oliva com cavas fundas, alças e decote em U, lado de lá mais escuro, peitoral marcado e remendo; cinto com
+  fivela; alça de couro do ombro esquerdo ao quadril direito; pescoço grosso.
+- Braços: deltoide proporcional, braço grosso afinando até o pulso, cotovelo marcado, mãos fechadas no cabo.
+- Correndo, o machado balança com a passada (sobe e desce a cada passo e gira um pouco).
 - Braços nus e musculosos (luz no ombro e no bíceps), munhequeiras escuras, mãos grandes.
 - Pernas: calça marrom-escura larga; botas com faixas enroladas; pé chato no chão.
 - Machado de duas lâminas: cabo comprido, cabeça dupla em forma de borboleta com o meio escuro e o fio claro,
   amarração no encaixe (`bladeLength`, `axeHeadSize`). Sempre nas duas mãos: a mão livre fica no cabo, acima da outra
-  (`gripSpread`), menos quando bebe a poção. Em repouso, cabo deitado na frente da cintura com a cabeça para a frente
+  (`gripSpread`), menos quando bebe a poção. Ombros e braços ajustáveis: `rightShoulderOffset`, `rightElbowOffset`, `rightHandOffset` e os
+  três da esquerda (eixos a = frente, b = lado, z = altura). A mão direita leva o machado junto; a esquerda fica no cabo e
+  `gripSpread` define a distância entre as duas mãos (menor = braço esquerdo mais recuado). Em repouso, cabo deitado na frente da cintura com a cabeça para a frente
   e a esquerda, subindo e descendo com a respiração; nos golpes usa a varredura do palco.
 - Sem capa.

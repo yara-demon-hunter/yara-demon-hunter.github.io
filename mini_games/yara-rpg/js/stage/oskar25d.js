@@ -243,22 +243,22 @@ function drawOskarArm(rig, shoulder, elbow, hand, armWidth, handRadius) {
     const { limb, ball, C } = rig;
     const sh = [shoulder[0], shoulder[1] * O.shoulderScale, shoulder[2]];
     const w = armWidth * O.armScale;
-    // Ombro (deltoide), braço e antebraço afinando, cotovelo
-    K.oball(rig, sh, w * 0.72, C.skin);
-    K.olimb(rig, [sh, elbow], w * 1.05, C.skin);
-    K.olimb(rig, [elbow, mix(elbow, hand, 0.88)], w * 0.9, C.skin);
-    ball(elbow, w * 0.48, C.skin);
-    // Músculos: luz no ombro e no bíceps, sombra embaixo do antebraço
-    ball([sh[0] + 0.2, sh[1], sh[2] + 0.45], w * 0.38, C.skinLight);
-    limb([mix(sh, elbow, 0.3), mix(sh, elbow, 0.75)].map(p => [p[0] + 0.3, p[1], p[2] + 0.35]), w * 0.32, C.skinLight);
-    limb([mix(elbow, hand, 0.2), mix(elbow, hand, 0.7)].map(p => [p[0], p[1], p[2] - 0.35]), w * 0.28, C.skinShade);
+    // Ombro (deltoide) proporcional ao braço, braço grosso afinando até o pulso, cotovelo marcado
+    K.oball(rig, sh, w * 0.55, C.skin);
+    K.olimb(rig, [sh, elbow], w * 0.95, C.skin);
+    K.olimb(rig, [elbow, mix(elbow, hand, 0.9)], w * 0.78, C.skin);
+    ball(elbow, w * 0.4, C.skin);
+    // Músculos: luz no ombro e no bíceps, sombra embaixo do antebraço (discretas)
+    ball([sh[0] + 0.15, sh[1], sh[2] + 0.35], w * 0.24, C.skinLight);
+    limb([mix(sh, elbow, 0.3), mix(sh, elbow, 0.7)].map(p => [p[0] + 0.25, p[1], p[2] + 0.3]), w * 0.24, C.skinLight);
+    limb([mix(elbow, hand, 0.2), mix(elbow, hand, 0.7)].map(p => [p[0], p[1], p[2] - 0.3]), w * 0.2, C.skinShade);
     // Munhequeira
-    K.olimb(rig, [mix(elbow, hand, 0.74), mix(elbow, hand, 0.9)], w * 0.95, C.wristband);
+    K.olimb(rig, [mix(elbow, hand, 0.74), mix(elbow, hand, 0.9)], w * 0.84, C.wristband);
     // Mão: palma e dedos fechados no cabo
     const d = norm(sub(hand, elbow));
-    K.oball(rig, hand, handRadius * 0.8, C.skin);
-    K.olimb(rig, [add(hand, d, 0.35), add(hand, d, 0.85)], handRadius * 1.05, C.skin);
-    limb([add(hand, d, 0.6), add(hand, d, 0.62)], handRadius * 1.1, C.skinShade);
+    K.oball(rig, hand, handRadius * 0.62, C.skin);
+    K.olimb(rig, [add(hand, d, 0.3), add(hand, d, 0.75)], handRadius * 0.82, C.skin);
+    limb([add(hand, d, 0.52), add(hand, d, 0.54)], handRadius * 0.86, C.skinShade);
 }
 
 // Perna: calça marrom-escura larga até a canela e bota de couro com faixas enroladas; pé chato no chão
@@ -271,16 +271,16 @@ function drawOskarLeg(rig, hip, knee, ankle, toe) {
     // Bota com faixas: cano até abaixo do joelho, com voltas mais claras
     K.olimb(rig, [shin, ankle], O.legWidth * 0.78, C.boot);
     for (const q of [0.15, 0.4, 0.65]) limb([mix(shin, ankle, q - 0.05), mix(shin, ankle, q + 0.05)], O.legWidth * 0.8, C.wrap);
-    const heel = [ankle[0] - 0.55, ankle[1], toe[2] + 0.35];
-    const tip = [toe[0] - 0.1, toe[1], toe[2] + 0.35];
-    K.olimb(rig, [ankle, heel], O.legWidth * 0.72, C.boot);
-    K.olimb(rig, [heel, tip], 1.95, C.boot);
+    const heel = [ankle[0] - 0.45, ankle[1], toe[2] + 0.35];
+    const tip = [toe[0] - 0.45, toe[1], toe[2] + 0.35];
+    K.olimb(rig, [ankle, heel], O.legWidth * 0.68, C.boot);
+    K.olimb(rig, [heel, tip], 1.5, C.boot);
     limb([[heel[0] - 0.2, heel[1], heel[2] - 0.55], [tip[0] + 0.2, tip[1], tip[2] - 0.55]], 0.5, C.bootShade);
 }
 
 // --- TRONCO ---
-// Peito e ombros largos; regata verde-oliva (ombros de fora, alças finas), alça de couro cruzando o peito do ombro
-// esquerdo ao quadril direito, cinto com fivela
+// Peito e costas largos com o contorno arredondado (ombros e trapézio, sem cantos), regata verde-oliva com cavas e
+// decote, alça de couro cruzando o peito do ombro esquerdo ao quadril direito, cinto com fivela e pescoço grosso
 function drawOskarTorso(rig, pose, bottom, top, wb, wt) {
     const { project, limb, disk, C, sinF } = rig;
     const front = Math.max(0, Math.min(1, sinF * 1.5 + 0.4));
@@ -292,65 +292,63 @@ function drawOskarTorso(rig, pose, bottom, top, wb, wt) {
     ctx.fillStyle = C.pants;
     ctx.strokeStyle = C.outline;
     ctx.lineWidth = 0.4;
-    disk([bottom.a, 0, bottom.z], [bottom.A * 1.2, 0, 0], [0, bottom.B * O.waistScale * 1.05, 0]);
+    ctx.lineJoin = 'round';
+    disk([bottom.a, 0, bottom.z], [bottom.A * 1.15, 0, 0], [0, bottom.B * O.waistScale, 0]);
     ctx.fill();
     ctx.stroke();
 
-    const pb = project(at(bottom.z - 0.6), 0, bottom.z - 0.6);
+    // Pontos do contorno na tela: cintura, peito (o mais largo), topo dos ombros
+    const zb = bottom.z - 0.6;
+    const zc = top.z - 2.4;
+    const pb = project(at(zb), 0, zb);
+    const pc = project(at(zc), 0, zc);
     const pt = project(top.a, 0, top.z);
     const hb = wb * O.waistScale;
     const ht = wt * O.shoulderScale;
-    // Pele do peito e dos ombros (aparece em volta da regata)
+    const hc = ht * 0.96;
+    // Corpo de pele: sobe da cintura, abre no peito, arredonda nos ombros e desce pelo trapézio até o pescoço
     ctx.fillStyle = C.skin;
     ctx.beginPath();
     ctx.moveTo(pb.x - hb, pb.y);
-    ctx.lineTo(pt.x - ht, pt.y);
-    ctx.lineTo(pt.x + ht, pt.y);
-    ctx.lineTo(pb.x + hb, pb.y);
+    ctx.quadraticCurveTo(pb.x - hb * 1.06, (pb.y + pc.y) / 2, pc.x - hc, pc.y);
+    ctx.quadraticCurveTo(pt.x - ht * 1.04, pt.y + 0.3, pt.x - ht * 0.66, pt.y - 0.8);
+    ctx.quadraticCurveTo(pt.x, pt.y - 1.5, pt.x + ht * 0.66, pt.y - 0.8);
+    ctx.quadraticCurveTo(pt.x + ht * 1.04, pt.y + 0.3, pc.x + hc, pc.y);
+    ctx.quadraticCurveTo(pb.x + hb * 1.06, (pb.y + pc.y) / 2, pb.x + hb, pb.y);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
-    // Regata: corpo da camisa com cavas fundas (mais estreita no alto) e duas alças até os ombros
-    const zc = top.z - 1.6;
-    const pc = project(at(zc), 0, zc);
-    const hc = hb + (ht - hb) * 0.55;
+
+    // Regata: cobre o tronco, com cavas fundas (ombros de fora), alças e decote em U
+    const shirtPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(pb.x - hb * 1.03, pb.y + 0.2);
+        ctx.quadraticCurveTo(pb.x - hb * 1.07, (pb.y + pc.y) / 2, pc.x - hc * 0.9, pc.y + 0.2);
+        ctx.quadraticCurveTo(pc.x - hc * 0.55, pc.y - 0.4, pt.x - ht * 0.5, pt.y - 0.95);
+        ctx.lineTo(pt.x - ht * 0.28, pt.y - 1.1);
+        ctx.quadraticCurveTo(pt.x, pt.y + 1.5, pt.x + ht * 0.28, pt.y - 1.1);
+        ctx.lineTo(pt.x + ht * 0.5, pt.y - 0.95);
+        ctx.quadraticCurveTo(pc.x + hc * 0.55, pc.y - 0.4, pc.x + hc * 0.9, pc.y + 0.2);
+        ctx.quadraticCurveTo(pb.x + hb * 1.07, (pb.y + pc.y) / 2, pb.x + hb * 1.03, pb.y + 0.2);
+        ctx.closePath();
+    };
+    shirtPath();
     ctx.fillStyle = C.shirt;
-    ctx.beginPath();
-    ctx.moveTo(pb.x - hb * 1.02, pb.y);
-    ctx.quadraticCurveTo(pc.x - hc * 0.95, (pb.y + pc.y) / 2, pc.x - hc * 0.78, pc.y);
-    ctx.lineTo(pt.x - ht * 0.42, pt.y);
-    ctx.lineTo(pt.x + ht * 0.42, pt.y);
-    ctx.lineTo(pc.x + hc * 0.78, pc.y);
-    ctx.quadraticCurveTo(pc.x + hc * 0.95, (pb.y + pc.y) / 2, pb.x + hb * 1.02, pb.y);
-    ctx.closePath();
     ctx.fill();
     ctx.stroke();
-    // Volume: o lado de lá da regata mais escuro, dobras e remendo
+    // Volume: o lado de lá da regata mais escuro (só dentro dela)
     ctx.save();
-    ctx.globalAlpha *= 0.45;
+    shirtPath();
+    ctx.clip();
+    ctx.globalAlpha *= 0.4;
     ctx.fillStyle = C.shirtShade;
-    ctx.beginPath();
-    ctx.moveTo(pb.x + hb * 0.3, pb.y);
-    ctx.lineTo(pt.x + ht * 0.2, pt.y);
-    ctx.lineTo(pt.x + ht * 0.42, pt.y);
-    ctx.lineTo(pc.x + hc * 0.78, pc.y);
-    ctx.lineTo(pb.x + hb * 1.02, pb.y);
-    ctx.closePath();
-    ctx.fill();
+    ctx.fillRect(pt.x + ht * 0.25, pt.y - 3, ht * 2, pb.y - pt.y + 6);
     ctx.restore();
     if (front > 0) {
         ctx.globalAlpha = baseAlpha * front;
-        // Peitoral marcado por baixo da regata e gola aberta (pele no decote)
-        for (const s of [-1, 1]) limb([[fa(top.z - 2.4), s * 0.3, top.z - 2.4], [fa(top.z - 2.6), s * 2.4, top.z - 2.2]], 0.3, C.shirtShade);
-        const nk = project(fa(top.z - 0.5), 0, top.z - 0.5);
-        ctx.fillStyle = C.skin;
-        ctx.beginPath();
-        ctx.moveTo(nk.x - 0.9, nk.y - 0.6);
-        ctx.lineTo(nk.x + 0.9, nk.y - 0.6);
-        ctx.lineTo(nk.x, nk.y + 0.9);
-        ctx.closePath();
-        ctx.fill();
-        limb([[fa(top.z - 4.5), -1.4, top.z - 4.5], [fa(top.z - 4.5) + 0.01, -1.4, top.z - 4.5]], 0.9, C.patch);
+        // Peitoral marcado por baixo da regata e um remendo
+        for (const s of [-1, 1]) limb([[fa(top.z - 2.6), s * 0.3, top.z - 2.6], [fa(top.z - 2.8), s * 2.2, top.z - 2.4]], 0.26, C.shirtShade);
+        limb([[fa(top.z - 4.6), -1.3, top.z - 4.6], [fa(top.z - 4.6) + 0.01, -1.3, top.z - 4.6]], 0.8, C.patch);
         ctx.globalAlpha = baseAlpha;
     }
 
@@ -370,25 +368,25 @@ function drawOskarTorso(rig, pose, bottom, top, wb, wt) {
         ctx.stroke();
         ctx.restore();
     };
-    ringFront(bottom.z + 0.5, bottom.A * 1.2, bottom.B * O.waistScale * 1.05, 0.75, C.leather);
+    ringFront(bottom.z + 0.5, bottom.A * 1.15, bottom.B * O.waistScale, 0.7, C.leather);
     if (front > 0) {
         ctx.globalAlpha = baseAlpha * front;
-        const buckle = project(bottom.a + bottom.A * 1.2, 0.2, bottom.z + 0.5);
+        const buckle = project(bottom.a + bottom.A * 1.15, 0.2, bottom.z + 0.5);
         ctx.fillStyle = C.buckle;
-        ctx.fillRect(buckle.x - 0.5, buckle.y - 0.38, 1, 0.76);
+        ctx.fillRect(buckle.x - 0.45, buckle.y - 0.35, 0.9, 0.7);
         ctx.globalAlpha = baseAlpha;
     }
     // Alça de couro: do ombro esquerdo, cruzando o peito (ou as costas), até o quadril direito
     const sgn = sinF > -0.2 ? 1 : -1;
     K.olimb(rig, [
-        [top.a + sgn * top.A * 0.7, -top.B * O.shoulderScale * 0.55, top.z - 0.2],
-        [at(top.z - 3) + sgn * 2.6, 0.3, top.z - 3],
-        [bottom.a + sgn * bottom.A * 0.6, bottom.B * O.waistScale, bottom.z + 0.3]
-    ], 0.45, C.leather);
+        [top.a + sgn * top.A * 0.6, -top.B * O.shoulderScale * 0.45, top.z - 0.4],
+        [at(top.z - 3) + sgn * 2.5, 0.3, top.z - 3],
+        [bottom.a + sgn * bottom.A * 0.6, bottom.B * O.waistScale * 0.95, bottom.z + 0.3]
+    ], 0.4, C.leather);
 
-    // Pescoço grosso
-    K.olimb(rig, [[top.a + 0.2, 0, top.z - 0.2], [top.a + 0.6, 0, top.z + 2.3]], 2.4, C.skin);
-    limb([[top.a + 0.3, 0.7, top.z + 0.3], [top.a + 0.55, 0.7, top.z + 1.9]], 0.5, C.skinShade);
+    // Pescoço grosso (a cabeça, desenhada depois, cobre o alto)
+    K.olimb(rig, [[top.a + 0.2, 0, top.z - 0.4], [top.a + 0.6, 0, top.z + 2.3]], 2.0, C.skin);
+    limb([[top.a + 0.3, 0.6, top.z + 0.2], [top.a + 0.55, 0.6, top.z + 1.9]], 0.4, C.skinShade);
 }
 
 // --- MACHADO DE DUAS LÂMINAS ---

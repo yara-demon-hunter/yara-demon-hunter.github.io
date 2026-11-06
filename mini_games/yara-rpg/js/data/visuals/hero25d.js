@@ -47,7 +47,7 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         // Suavização dos movimentos (maior = acompanha mais rápido)
         speedSmoothing: 12,
         runSmoothing: 9,
-        strideSpeed: 16,
+        strideSpeed: 11.6,           // ritmo das passadas geral (cada personagem pode ter o seu)
         capeFollow: 7,                // quão rápido a capa "alcança" o corpo
         capeDragPerSpeed: 0.055,      // quanto a capa fica para trás por px/s de velocidade
         capeMaxLag: 14,
@@ -111,8 +111,8 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         // Pernas e botas
         hipHeight: 9.6,
         hipSpread: 1.99,
-        footSpread: 2.54,
-        kneeForward: 0.49,
+        footSpread: 2.74,
+        kneeForward: 0.85,
         ankleHeight: 2.45,
         legWidth: 3.77,
         bootWidth: 2.81,
@@ -123,13 +123,13 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         // Tronco (meio-eixos da seção: A = frente/trás, B = lados)
         waist: { A: 2.5, B: 3.4 },
         chest: { A: 2.8, B: 4.6 },
-        shoulderHeight: 17,
+        shoulderHeight: 17.2,
         sashHeight: 10.8,
-        runLean: 3.3,                   // tronco e cabeça vão para a frente na corrida
+        runLean: 0.5,                   // tronco e cabeça vão para a frente na corrida
         breathAmount: -0.19,
 
         // Braços
-        shoulderRadius: 2,
+        shoulderRadius: 1.71,
         armWidth: 2.2,
         handRadius: 1.2,
         handHeight: 10,
@@ -175,7 +175,7 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
             fall: { seconds: 1.4, crouch: 6 }
         },
         // Dash: corpo abaixado e jogado para a frente, braços para trás
-        dashLean: 7,
+        dashLean: 6.7,
         dashCrouch: 3,
         // Ajoelhado (descanso): um joelho no chão, espada fincada à frente
         vigilCrouch: 3.6
@@ -264,6 +264,8 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
 
         // Corrida: o corpo sobe e desce a cada passo e vai um pouco agachado
         runBob: 0.7,
+        // Ritmo das passadas deste personagem (maior = passos mais rápidos); sem ele, vale o strideSpeed geral do herói
+        strideSpeed: 11.6,
         runCrouch: 0.6,
 
         // Pernas: calça larga e pé descalço de 3 dedos com garras
@@ -385,6 +387,8 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         tailRunLength: 2.4,
         tailWidth: 0.88,
         tailWave: 2.4,
+        // Ritmo das passadas deste personagem (maior = passos mais rápidos); sem ele, vale o strideSpeed geral do herói
+        strideSpeed: 11.6,
         // Ponta do cachecol: sai do ombro esquerdo e voa para trás
         scarfTailLength: 15.7,
 
@@ -500,6 +504,8 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         waistScale: 0.77,
         armScale: 0.85,
         legWidth: 2.57,
+        // Ritmo das passadas deste personagem (maior = passos mais rápidos); sem ele, vale o strideSpeed geral do herói
+        strideSpeed: 11.6,
 
         // Adaga: lâmina curta e reta
         bladeLength: 7.7,
@@ -566,20 +572,20 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         },
 
         // Tamanho do boneco inteiro em relação aos outros (o mais alto do grupo)
-        bodyScale: 1.1,
+        bodyScale: 1.15,
 
         // Cabeça: mandíbula larga; o mesmo truque de levantar e virar o rosto para a câmera
-        headRadius: 2.7,
-        faceTilt: 0.45,
-        faceTiltFront: 0.4,
-        faceTurn: 0.5,
+        headRadius: 2.85,
+        faceTilt: 0.42,
+        faceTiltFront: 0.21,
+        faceTurn: 0.57,
         face: [[2.15, 0.9], [2.45, 0], [2.4, -1.15], [2.05, -2.25], [1.2, -2.9], [0, -3.05]],
-        jawForward: 1,
-        faceOut: 0.5,
-        earLength: 0.6,
+        jawForward: 1.56,
+        faceOut: -0.33,
+        earLength: 0.3,
         // Cabelo ralo e curto: quase colado na cabeça, linha do cabelo alta (entradas), um pouco transparente
         hairline: 1.35,
-        hairPuff: 1.03,
+        hairPuff: 1,
         hairBumps: 0.02,
         hairOpacity: 0.8,
         bangSpikes: 0,
@@ -589,10 +595,10 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         recede: 0.22,
 
         // Posições do rosto (coordenadas de uma cabeça de raio 3: s = para o lado, u = para cima; 0 = centro)
-        eyeX: 0.95,
+        eyeX: 0.87,
         eyeY: -0.3,
         eyeWidth: 0.45,
-        eyeOpen: 0.24,
+        eyeOpen: 0.49,
         irisSize: 0.2,
         browY: 0.5,
         browWidth: 0.6,
@@ -607,24 +613,36 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
         earSize: 0.45,
         earWidth: 0.9,
         // Barba: começa nas costeletas (altura u nos lados), cobre mandíbula e queixo; bigode acima da boca
-        beardTop: -0.2,
-        beardChin: -3.45,
-        beardWidth: 2.45,
-        mustacheY: -1.8,
+        beardTop: 0.59,
+        beardChin: -4.205,
+        beardWidth: 2.925,
+        mustacheY: -1.75,
 
         // Corpo massudo: ombros e peito bem largos, braços e pernas grossos
-        shoulderScale: 1.12,
-        waistScale: 1.05,
-        armScale: 1.3,
-        legWidth: 3.6,
+        shoulderScale: 1.05,
+        waistScale: 1.0,
+        armScale: 1.12,
+        legWidth: 3.2,
+        // Ritmo das passadas deste personagem (maior = passos mais rápidos); sem ele, vale o strideSpeed geral do herói
+        strideSpeed: 11.6,
 
         // Machado de duas lâminas: cabo comprido, cabeça dupla larga
-        bladeLength: 13,
-        bladeWidth: 1,
-        axeHeadSize: 4,
+        bladeLength: 10,
+        bladeWidth: 0.83,
+        axeHeadSize: 5.34,
         // Distância entre as duas mãos no cabo
-        gripSpread: 3.2,
-        glowScale: 0.3
+        gripSpread: 3.97,
+
+        // Ombros e braços (a = frente, b = lado: + direita, z = altura). Os de ombro valem sempre; os de cotovelo e mão
+        // somem no golpe. A mão DIREITA leva o machado junto; a ESQUERDA fica no cabo, a gripSpread da direita, e o
+        // leftHandOffset ajusta a partir daí.
+        rightShoulderOffset: [-1.04, -1.09, -0.32],
+        rightElbowOffset: [0, 0, 0],
+        rightHandOffset: [0, 0, 0],
+        leftShoulderOffset: [-0.59, 0.4, 0.26],
+        leftElbowOffset: [0, 0, 0],
+        leftHandOffset: [0, 0, 0],
+        glowScale: 0.59
     };
 
     window.YaraRpgData.visuals.hero25d = Object.freeze({ hero: HERO, body: BODY, azael: AZAEL, yara: YARA, zeph: ZEPH, oskar: OSKAR });

@@ -1,5 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { HERO_VISUALS as V } from '../../data_model/visuals/characters/hero_visual.js';
+import { AZAEL_VISUALS } from '../../data_model/visuals/characters/azael_visual.js';
 import { KNIFE_VISUALS } from '../../data_model/visuals/effects/knife_visual.js';
 import { ctx, player, state } from '../core/state.js';
 import { easeOutCubic, easeOutQuad, lerpAngle } from './fx/easing.js';
@@ -111,7 +112,8 @@ function updateAnim(a = anim, body = player) {
 
         const runTarget = Math.min(1, a.speed / V.runSpeedForFullEffect);
         a.run += (runTarget - a.run) * Math.min(1, dt * V.runSmoothing);
-        a.stride += dt * V.strideSpeed * (0.25 + a.run);
+        // Ritmo das passadas: o do Azael quando o boneco é ele (a.model, guardado no render), ou o geral
+        a.stride += dt * (a.model === 'azael' ? AZAEL_VISUALS.strideSpeed : V.strideSpeed) * (0.25 + a.run);
 
         // Giro suave para o lado do movimento (não durante o golpe). No arremesso da adaga vira rápido para o alvo.
         const before = a.facing;

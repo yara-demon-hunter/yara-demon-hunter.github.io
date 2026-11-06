@@ -76,7 +76,7 @@ export const HERO_VISUALS = {
     handOffset: 8,
     bootLength: 3.4,
     strideLength: 3,
-    strideSpeed: 16,
+    strideSpeed: 11.6,
 
     // Capa
     capeBaseLength: 11,
