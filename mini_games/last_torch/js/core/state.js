@@ -78,6 +78,7 @@ export const state = {
     omen: null,
     nextOmen: null,
     bossPending: 0,             // segundos até o boss surgir (0 = nenhum a caminho)
+    bossSpawnAt: null,          // onde o boss vai surgir (o círculo de invocação já está lá)
     endless: false,             // jogador escolheu continuar depois do amanhecer
     dawn: 0,                    // 0 a 1: a noite clareando
 

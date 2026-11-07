@@ -12,8 +12,8 @@ import { purgeEnemy } from './enemies.js';
 import { refreshModifiers } from './modifiers.js';
 import { collectAllPickups } from './pickups.js';
 import { bumpStat } from './sanctuary.js';
-import { playDuelDialogue, whenHunting } from '../ui/dialogue.js';
-import { buildHourPlan, resetFieldForNewTurn, spawnOpening } from './spawner.js';
+import { hasBossIntro, playBossIntro, playDuelDialogue, whenHunting } from '../ui/dialogue.js';
+import { buildHourPlan, prepareBossSummon, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
 // --- A NOITE ---
 // Fases de uma hora: HUNT (caçada) -> CLEAR (onda de fogo, ouro vem todo, tempo para pegar os itens) ->
@@ -59,14 +59,34 @@ export function checkHourEnd() {
     else beginLastStand();
 }
 
-// Fim da onda numa hora de boss: aviso, silêncio, e ele surge NIGHT.bossDelaySeconds depois (js/systems/spawner.js)
+// Fim da onda numa hora de boss. Sequência:
+// 1. silêncio e um respiro (o último golpe assenta; nada mais nasce: bossPending fica segurando o spawner);
+// 2. bosses que não são o rival: a caçada congela e o rival provoca (playBossIntro, faixas de cinema);
+// 3. nome do boss na faixa, aviso sonoro e o círculo de invocação crescendo no chão onde ele vai surgir;
+// 4. NIGHT.bossDelaySeconds depois ele surge do círculo (spawnBoss em js/systems/spawner.js).
+// O duelo com o rival tem a própria conversa, depois que ele surge.
 function callBoss(plan) {
-    const boss = BOSS_MODELS[plan.boss];
     plan.bossCalled = true;
+    audio.setMood('silent');
+    updateHUD();
+    if (BOSS_MODELS[plan.boss].renderAs === 'RIVAL' || !hasBossIntro(plan.boss)) {
+        announceBoss(plan);
+        return;
+    }
+    state.bossPending = Infinity;
+    setTimeout(() => whenHunting(() => {
+        if (state.hourPlan !== plan) return;     // a partida mudou no meio do respiro
+        playBossIntro(plan.boss, () => announceBoss(plan));
+    }), BOSS_INTRO_DELAY_MS);
+}
+const BOSS_INTRO_DELAY_MS = 800;
+
+function announceBoss(plan) {
+    const boss = BOSS_MODELS[plan.boss];
     state.bossPending = NIGHT.bossDelaySeconds;
+    prepareBossSummon(boss, NIGHT.bossDelaySeconds);
     showBanner(`HOUR ${state.turn}`, boss.name.toUpperCase(), boss.title, 'danger');
     audio.playBossWarning();
-    audio.setMood('silent');
     updateHUD();
 }
 

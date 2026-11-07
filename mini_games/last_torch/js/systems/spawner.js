@@ -131,13 +131,27 @@ function spawnHorde(h) {
     audio.playHorn();
 }
 
+function bossSpawnPoint() {
+    const a = Math.random() * Math.PI * 2;
+    const spawnDist = Math.max(state.width, state.height) * BOSS_SPAWNING.spawnScreenRatio;
+    return {
+        x: Math.max(60, Math.min(state.width - 60, state.coreX + Math.cos(a) * spawnDist)),
+        y: Math.max(150, Math.min(state.height - 60, state.coreY + Math.sin(a) * spawnDist))   // abaixo do HUD: o círculo de invocação aparece inteiro
+    };
+}
+
+// Escolhe onde o boss vai surgir e marca o chão com o círculo de invocação, que cresce até ele chegar
+export function prepareBossSummon(model, seconds) {
+    const at = bossSpawnPoint();
+    state.bossSpawnAt = at;
+    state.telegraphs.push({ kind: 'summon', x: at.x, y: at.y, radius: model.radius * 2.2, age: 0, seconds, color: model.color });
+}
+
 export function spawnBoss() {
     const type = chooseBossType(state.turn, getHero().model);
     const model = BOSS_MODELS[type];
-    const a = Math.random() * Math.PI * 2;
-    const spawnDist = Math.max(state.width, state.height) * BOSS_SPAWNING.spawnScreenRatio;
-    const x = Math.max(60, Math.min(state.width - 60, state.coreX + Math.cos(a) * spawnDist));
-    const y = Math.max(90, Math.min(state.height - 60, state.coreY + Math.sin(a) * spawnDist));
+    const { x, y } = state.bossSpawnAt ?? bossSpawnPoint();
+    state.bossSpawnAt = null;
 
     state.currentBoss = applyEnemyMods(createBoss(type, state.turn, x, y));
     state.enemies.push(state.currentBoss);

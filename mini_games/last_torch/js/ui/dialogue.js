@@ -1,5 +1,5 @@
-import { DIALOGUE_TYPE_SECONDS, DUEL_DIALOGUES } from '../../data_model/dialogues.js';
-import { BOSS_MODELS } from '../../data_model/bosses.js';
+import { BOSS_INTROS, DIALOGUE_TYPE_SECONDS, DUEL_DIALOGUES } from '../../data_model/dialogues.js';
+import { BOSS_MODELS, RIVAL_OF } from '../../data_model/bosses.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { releaseTouchControls } from '../core/input.js';
 import { state } from '../core/state.js';
@@ -44,12 +44,15 @@ function portrait(hero, side) {
     return box;
 }
 
-function build(rivalHero, playerHero) {
-    root = el('div', 'dlg');
+// intro: provocação antes do boss (tom vermelho de ameaça; ver css/components/dialogue.css)
+function build(rivalHero, playerHero, intro) {
+    root = el('div', intro ? 'dlg dlg-intro' : 'dlg');
     root.id = 'dialogue';
     const box = el('div', 'dlg-box');
     box.append(el('p', 'dlg-speaker'), el('p', 'dlg-text'), el('span', 'dlg-next', '▼'));
-    root.append(portrait(playerHero, 'hero'), portrait(rivalHero, 'rival'), box);
+    // Faixas de cinema: entram por cima e por baixo e marcam que a caçada parou para a cena
+    root.append(el('div', 'dlg-bar dlg-bar-top'), el('div', 'dlg-bar dlg-bar-bottom'),
+        portrait(playerHero, 'hero'), portrait(rivalHero, 'rival'), box);
     root.addEventListener('pointerdown', e => {
         e.preventDefault();
         advance();
@@ -97,7 +100,7 @@ function close() {
     const node = root;
     root = null;
     node.classList.remove('is-open');
-    setTimeout(() => node.remove(), 250);
+    setTimeout(() => node.remove(), 450);   // espera as faixas de cinema saírem
     state.gameState = 'PLAYING';
     const done = finish;
     finish = null;
@@ -117,6 +120,22 @@ export function playDuelDialogue(bossType, moment, onDone) {
     const final = bossType.endsWith('_FINAL');
     const key = final ? bossType.slice(0, -'_FINAL'.length) : bossType;
     const script = DUEL_DIALOGUES[key]?.[final ? 'final' : 'first']?.[moment];
+    play(script, key, false, onDone);
+}
+
+// Provocação antes de um boss que não é o rival: quem fala é o rival do herói (RIVAL_OF). Sem falas, segue direto.
+export function hasBossIntro(bossType) {
+    const rival = RIVAL_OF[getHero().model] ?? RIVAL_OF.hunter;
+    return !!(BOSS_INTROS[rival]?.[bossType] ?? BOSS_INTROS[rival]?.default);
+}
+
+export function playBossIntro(bossType, onDone) {
+    const rival = RIVAL_OF[getHero().model] ?? RIVAL_OF.hunter;
+    play(BOSS_INTROS[rival]?.[bossType] ?? BOSS_INTROS[rival]?.default, rival, true, onDone);
+}
+
+// rivalType: o boss do rival (AZAEL ou DEMON_HUNTER), de onde vem o retrato dele
+function play(script, rivalType, intro, onDone) {
     if (!script || root) {
         onDone();
         return;
@@ -126,7 +145,7 @@ export function playDuelDialogue(bossType, moment, onDone) {
     finish = onDone;
     state.gameState = 'DIALOGUE';
     releaseTouchControls();
-    build(HEROES[BOSS_MODELS[bossType].heroKey], getHero());
+    build(HEROES[BOSS_MODELS[rivalType].heroKey], getHero(), intro);
     document.addEventListener('keydown', onKey, true);
     showLine();
 }

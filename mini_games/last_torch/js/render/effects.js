@@ -5,6 +5,7 @@ import { ctx, player, state } from '../core/state.js';
 import { mod } from '../systems/modifiers.js';
 import { getWarmthDamage } from '../systems/stats.js';
 import { easeOutBack, easeOutCubic } from './fx/easing.js';
+import { drawGlow } from './fx/glow.js';
 import { drawNumber } from './fx/numbers.js';
 import { getDashedRing } from './fx/rings.js';
 
@@ -110,6 +111,10 @@ export function renderTelegraphs() {
             ctx.restore();
             return;
         }
+        if (t.kind === 'summon') {
+            renderSummon(t, p);
+            return;
+        }
         if (t.kind === 'grave') {
             ctx.globalAlpha = Math.min(1, p * 2);
             ctx.fillStyle = 'rgba(28, 25, 23, 0.8)';
@@ -133,6 +138,43 @@ export function renderTelegraphs() {
         ctx.fill();
     });
     ctx.restore();
+}
+
+// Círculo de invocação do boss: o chão escurece, um anel na cor do boss pulsa, runas giram e um anel de fora
+// fecha até o centro. Quando fecha, o boss surge (js/systems/spawner.js, spawnBoss)
+function renderSummon(t, p) {
+    const R = t.radius;
+    const pulse = 0.5 + 0.5 * Math.sin(t.age * (8 + p * 10));
+    ctx.globalCompositeOperation = 'lighter';
+    drawGlow(ctx, t.color, t.x, t.y, R * (1.1 + p * 0.9), 0.25 + p * 0.45);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 0.25 + p * 0.5;
+    ctx.fillStyle = '#05030a';
+    ctx.beginPath();
+    ctx.ellipse(t.x, t.y, R * easeOutCubic(Math.min(1, p * 1.6)), R * 0.92 * easeOutCubic(Math.min(1, p * 1.6)), 0, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = t.color;
+    ctx.globalAlpha = Math.min(1, p * 3) * (0.55 + 0.45 * pulse);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, R, 0, TAU);
+    ctx.stroke();
+    // Runas: três arcos girando por dentro
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 3; i++) {
+        const a = t.age * 2.2 + i * TAU / 3;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, R * 0.72, a, a + 1.2);
+        ctx.stroke();
+    }
+    // Anel que vem de fora e fecha no círculo
+    const close = R * (2.6 - 1.6 * easeOutCubic(p));
+    ctx.globalAlpha = 0.2 + 0.6 * p;
+    ctx.lineWidth = 1.5 + p * 2.5;
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, close, 0, TAU);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
 }
 
 // Números vêm do atlas (js/render/fx/numbers.js); só textos raros usam fillText

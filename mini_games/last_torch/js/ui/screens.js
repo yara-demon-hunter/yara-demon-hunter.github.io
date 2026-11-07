@@ -43,6 +43,7 @@ export function startGame() {
     state.omen = null;
     state.nextOmen = null;
     state.bossPending = 0;
+    state.bossSpawnAt = null;
     state.runTime = 0;
     state.hitStop = 0;
     state.slowMoTimer = 0;

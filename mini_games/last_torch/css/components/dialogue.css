@@ -131,10 +131,51 @@
 .dlg.is-done .dlg-next { opacity: 0.8; animation: dlgBlink 0.9s ease-in-out infinite; }
 @keyframes dlgBlink { 50% { opacity: 0.2; } }
 
+/* Faixas de cinema: entram por cima e por baixo quando a cena começa e saem junto com ela */
+.dlg-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 9vh;
+    background: #000;
+    pointer-events: none;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.dlg-bar-top { top: 0; transform: translateY(-100%); }
+.dlg-bar-bottom { bottom: 0; transform: translateY(100%); }
+.dlg.is-open .dlg-bar { transform: translateY(0); }
+
+/* Provocação antes do boss: a tela escurece mais, com uma borda vermelha pulsando (o perigo que vem aí),
+   e o rival entra deslizando pela direita */
+.dlg-intro {
+    background:
+        radial-gradient(ellipse at center, transparent 35%, rgba(127, 29, 29, 0.45) 100%),
+        linear-gradient(to top, rgba(2, 4, 8, 0.94) 0%, rgba(2, 4, 8, 0.65) 45%, rgba(2, 4, 8, 0.35) 100%);
+    transition: opacity 0.4s ease-out;
+}
+.dlg-intro::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 90px rgba(220, 38, 38, 0.55);
+    pointer-events: none;
+    animation: dlgDanger 1.6s ease-in-out infinite;
+}
+@keyframes dlgDanger { 50% { opacity: 0.35; } }
+.dlg-intro .dlg-rival { transform: translateX(40%) scale(0.94); opacity: 0; }
+.dlg-intro.is-open .dlg-rival { transform: scale(0.94); opacity: 0.9; transition-duration: 0.5s; }
+.dlg-intro.is-open[data-who='rival'] .dlg-rival { transform: scale(1); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+    .dlg-bar, .dlg-intro .dlg-rival { transition: none; }
+    .dlg-intro::before { animation: none; }
+}
+
 /* Celular deitado: pouca altura, então retratos menores e caixa mais baixa no meio */
 @media (max-height: 500px) {
     .dlg { padding: 0 0.75rem 0.6rem; }
     .dlg-portrait { width: 22vw; bottom: 1.3rem; }
     .dlg-box { width: min(46vw, 40rem); padding: 0.6rem 0.9rem 0.8rem; }
     .dlg-text { font-size: 0.9rem; min-height: 2.6em; }
+    .dlg-bar { height: 6vh; }
 }

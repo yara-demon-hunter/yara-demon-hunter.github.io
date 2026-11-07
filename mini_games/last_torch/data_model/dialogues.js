@@ -62,3 +62,56 @@ export const DUEL_DIALOGUES = {
 
 // Segundos por letra no efeito de máquina de escrever
 export const DIALOGUE_TYPE_SECONDS = 0.022;
+
+// --- PROVOCAÇÃO ANTES DE CADA BOSS ---
+// Nas horas de boss que não são o duelo (Demon Lord, Blood Countess, The Long Night e os do modo sem fim), quando a
+// onda fecha, a caçada congela e o rival aparece provocando antes de soltar o monstro (js/ui/dialogue.js, playBossIntro).
+// Chave: quem fala (o rival do herói, RIVAL_OF em bosses.js) e depois o boss que vem. default: boss sem fala própria.
+export const BOSS_INTROS = {
+    // Jogando com o Demon Hunter: o Azael solta os monstros dele
+    AZAEL: {
+        DEMON_LORD: [
+            { who: 'rival', text: 'You seem to be holding up well, hunter...' },
+            { who: 'hero', text: 'Show yourself, Azael. Stop hiding in the dark.' },
+            { who: 'rival', text: 'Not yet. First, let us see if you can destroy my beast.' }
+        ],
+        BLOOD_COUNTESS: [
+            { who: 'rival', text: 'Still standing? The night is growing tired of you.' },
+            { who: 'hero', text: 'Then send whatever you have left.' },
+            { who: 'rival', text: 'Gladly. My Countess is thirsty... try not to bleed too fast.' }
+        ],
+        LONG_NIGHT: [
+            { who: 'rival', text: 'Impressive. But not even you can fight the night itself.' },
+            { who: 'hero', text: 'Dawn is close. I can feel it.' },
+            { who: 'rival', text: 'Then meet the Long Night... and pray the dawn still comes.' }
+        ],
+        default: [
+            { who: 'rival', text: 'Dawn came and went, and still you fight.' },
+            { who: 'hero', text: 'As long as the torch burns.' },
+            { who: 'rival', text: 'Then let us see how long it burns against this one.' }
+        ]
+    },
+    // Jogando com o Azael: o Demon Hunter assiste e desafia
+    DEMON_HUNTER: {
+        DEMON_LORD: [
+            { who: 'rival', text: 'You cut down your own kind well, demon...' },
+            { who: 'hero', text: 'Watching from the shadows now, hunter?' },
+            { who: 'rival', text: 'Their lord is coming for you. Let us see whose side you are really on.' }
+        ],
+        BLOOD_COUNTESS: [
+            { who: 'rival', text: 'Something old is coming, Azael. It can smell your blood.' },
+            { who: 'hero', text: 'Then it will choke on it.' },
+            { who: 'rival', text: 'Prove it. I will be right here, blade ready.' }
+        ],
+        LONG_NIGHT: [
+            { who: 'rival', text: 'The darkness itself is waking. Not even I can stop it.' },
+            { who: 'hero', text: 'Then stand back and watch, hunter.' },
+            { who: 'rival', text: 'If you fall, I will finish what is left of you both.' }
+        ],
+        default: [
+            { who: 'rival', text: 'Another one crawls out of the dark, demon.' },
+            { who: 'hero', text: 'And another one falls.' },
+            { who: 'rival', text: 'We will see. Do not expect my help.' }
+        ]
+    }
+};
