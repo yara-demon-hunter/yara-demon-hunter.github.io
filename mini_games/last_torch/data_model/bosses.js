@@ -54,6 +54,10 @@ const RIVAL_BASE = {
     goldVariance: 0,
     xpRewardBase: 110,
     xpRewardPerTurn: 0,
+    // Ataque 'shadows': invoca shadowCount sombras dele, cada uma com shadowHpRatio da vida máxima do rival.
+    // Só invoca de novo quando as anteriores caírem. O modelo da sombra é a chave do rival + '_SHADOW'.
+    shadowCount: 3,
+    shadowHpRatio: 0.1,
 };
 
 export const BOSS_MODELS = {
@@ -151,7 +155,7 @@ export const BOSS_MODELS = {
         keepRange: 0,
         burstCount: 3,
         patternGapSeconds: 1.9,
-        patterns: ['lunge', 'volley', 'lunge', 'blink', 'lunge', 'ring'],
+        patterns: ['lunge', 'volley', 'shadows', 'lunge', 'blink', 'lunge', 'ring'],
         ringCount: 12,
         projectileSpeed: 190,
         enrageSpeedMultiplier: 1.35,
@@ -172,7 +176,7 @@ export const BOSS_MODELS = {
         strafeSpeed: 70,
         burstCount: 4,
         patternGapSeconds: 2.1,
-        patterns: ['volley', 'lunge', 'slam', 'lunge', 'volley', 'ring'],
+        patterns: ['volley', 'lunge', 'shadows', 'slam', 'lunge', 'volley', 'ring'],
         ringCount: 14,
         slamCount: 3,
         slamRadius: 70,
@@ -234,14 +238,39 @@ function rematch(key, changes) {
 }
 rematch('AZAEL', {
     hpBase: 6000, patternGapSeconds: 1.4, burstCount: 5, ringCount: 16, meleeCooldownSeconds: 0.6,
-    patterns: ['lunge', 'volley', 'lunge', 'blink', 'lunge', 'ring', 'lunge', 'blink'],
+    patterns: ['lunge', 'volley', 'shadows', 'lunge', 'blink', 'lunge', 'ring', 'lunge', 'blink'],
     scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
 });
 rematch('DEMON_HUNTER', {
     hpBase: 6000, patternGapSeconds: 1.6, burstCount: 6, ringCount: 18, slamCount: 5, meleeCooldownSeconds: 0.8,
-    patterns: ['volley', 'lunge', 'slam', 'ring', 'lunge', 'volley', 'slam'],
+    patterns: ['volley', 'lunge', 'shadows', 'slam', 'ring', 'lunge', 'volley', 'slam'],
     scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
 });
+
+// --- SOMBRAS DO RIVAL ---
+// Cópias menores e escuras do rival (mesmo boneco, paleta de sombra): andam em volta do herói e golpeiam de perto,
+// sem tiros nem investidas. A vida vem do rival na hora da invocação (shadowHpRatio); o dano, de shadowDamageRatio.
+// Não são bosses: não seguram a hora e caem todas junto com o rival. hidden: fora do bestiário.
+function shadowOf(key) {
+    const base = BOSS_MODELS[key];
+    BOSS_MODELS[`${key}_SHADOW`] = {
+        ...base,
+        name: `Shadow of ${base.name}`,
+        hidden: true,
+        isShadow: true,
+        renderScale: 1,
+        radius: 18,
+        shadowDamageRatio: 0.5,
+        meleeCooldownSeconds: base.meleeCooldownSeconds * 1.4,
+        knockbackResist: 0,
+        scoreReward: 25,
+        goldBase: 2,
+        xpRewardBase: 12,
+        xpRewardPerTurn: 0
+    };
+}
+shadowOf('AZAEL');
+shadowOf('DEMON_HUNTER');
 
 export const BOSS_SPAWNING = {
     // Hora → boss da noite. RIVAL: o rival do herói (RIVAL_OF); RIVAL_FINAL: a revanche dele, que fecha a noite

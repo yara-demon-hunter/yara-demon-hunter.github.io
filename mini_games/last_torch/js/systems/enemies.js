@@ -5,7 +5,7 @@ import { MONSTER_MODELS, MONSTER_SPAWNING, createVampireBat, rollMonsterGold } f
 import { MIRROR_WARD } from '../../data_model/passives.js';
 import { audio, passives, player, shadowClones, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
-import { updateBossAI } from './boss_ai.js';
+import { updateBossAI, updateShadowAI } from './boss_ai.js';
 import { dealDamage } from './damage.js';
 import { addGibs, addShockwave, addStain, createExplosion, hitStop, shakeScreen, zoomPunch } from './effects.js';
 import { dropGold } from './gold.js';
@@ -171,6 +171,10 @@ function raiseDead(e, model) {
 }
 
 function updateAttacks(e, model, angle, dt, distToTarget) {
+    if (model.isShadow) {
+        updateShadowAI(e, model, dt);
+        return;
+    }
     if (e.isBoss) {
         updateBossAI(e, model, dt);
         return;
@@ -213,6 +217,11 @@ function burst(e, model) {
 function deathEffects(e, model) {
     const scale = e.radius / model.radius;
     createExplosion(e.x, e.y, e.color, 10);
+    // Sombra do rival: some numa nuvem violeta, sem restos no chão
+    if (model.isShadow) {
+        createExplosion(e.x, e.y, '#7c3aed', 14);
+        return;
+    }
     if (e.isBoss) {
         addGibs('BOSS', e.x, e.y);
         addStain('BOSS', e.x, e.y, e.radius * 1.6);
@@ -232,7 +241,7 @@ function killEnemy(i, e, model) {
     spreadBurn(e);
     deathEffects(e, model);
     addStreakKill();
-    recordBeast(e.type);
+    if (!model.isShadow) recordBeast(e.type);
     audio.playKill(state.streak);
 
     const pts = model.scoreReward * (e.elite ? 4 : 1);
@@ -274,6 +283,10 @@ function killEnemy(i, e, model) {
         state.run.bosses++;
         dropChest(e.x, e.y);
         onBossKilled(e, model);
+        // As sombras dele somem junto
+        for (let j = state.enemies.length - 1; j >= 0; j--) {
+            if (state.enemies[j].shadowOwner === e) purgeEnemy(j);
+        }
     }
     updateHUD();
     checkHourEnd();

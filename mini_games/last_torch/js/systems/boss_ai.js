@@ -1,4 +1,6 @@
+import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
+import { createEnemy } from '../../data_model/monsters.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { addShockwave, createExplosion, hitStop, screenFlash, shakeScreen } from './effects.js';
@@ -90,6 +92,28 @@ const ACTIONS = {
             addMonster(model.summonType, e.x + Math.cos(a) * (e.radius + 30), e.y + Math.sin(a) * (e.radius + 30));
         }
         addShockwave(e.x, e.y, { radius: e.radius * 3, color: model.color, width: 4, seconds: 0.4 });
+        audio.playSummon();
+    },
+    // Sombras (rivais): shadowCount cópias dele em volta, cada uma com shadowHpRatio da vida máxima dele.
+    // Enquanto alguma ainda estiver de pé, este ataque passa a vez.
+    shadows(e, model) {
+        if (state.enemies.some(o => o.shadowOwner === e)) return;
+        const type = `${e.type.replace(/_FINAL$/, '')}_SHADOW`;
+        const shadow = BOSS_MODELS[type];
+        for (let i = 0; i < model.shadowCount; i++) {
+            const a = aimAngle(e) + Math.PI + (i - (model.shadowCount - 1) / 2) * 1.1;
+            const x = Math.max(40, Math.min(state.width - 40, e.x + Math.cos(a) * 70));
+            const y = Math.max(70, Math.min(state.height - 40, e.y + Math.sin(a) * 70));
+            const s = createEnemy(shadow, type, state.turn, x, y);
+            s.hp = s.maxHp = Math.max(1, Math.round(e.maxHp * model.shadowHpRatio));
+            s.damage = e.damage * shadow.shadowDamageRatio;
+            s.speed = e.speed;
+            s.shadowOwner = e;
+            s.angle = e.angle;
+            state.enemies.push(s);
+            createExplosion(x, y, '#7c3aed', 12);
+        }
+        addShockwave(e.x, e.y, { radius: 150, color: '#7c3aed', width: 6, seconds: 0.45 });
         audio.playSummon();
     },
     // Investida (rivais): mira uma linha até o herói e depois a atravessa com a espada (updateLunge)
@@ -215,6 +239,11 @@ function updateRival(e, model, ai, dt) {
     if (e.castAge >= 0) e.castAge = e.castAge + dt >= model.castSeconds ? -1 : e.castAge + dt;
     updateRivalMelee(e, model, ai, dt);
     updateRivalMovement(e, model, ai, dt);
+}
+
+// Sombra do rival: só o golpe de perto e o andar de lado do rival, sem a lista de ataques
+export function updateShadowAI(e, model, dt) {
+    updateRival(e, model, e.ai ??= {}, dt);
 }
 
 function enrage(e, model) {

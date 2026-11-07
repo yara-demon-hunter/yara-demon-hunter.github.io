@@ -219,7 +219,7 @@ function drawBoss(e) {
 function renderUnderlays() {
     if (state.quality >= 2) return;
     for (const e of state.enemies) {
-        if (e.isBoss) continue;
+        if (e.isBoss || e.shadowOwner) continue;
         const sprite = getMonsterSprite(e.type);
         if (sprite.spec.live) continue;     // ele desenha a própria sombra
         const size = sprite.underlaySize * (e.radius / sprite.radius);
@@ -336,7 +336,7 @@ function renderEnemyOverlays(t) {
         // Barra de vida simples acima do inimigo (o boss tem a dele no HUD)
         if (e.hp < e.maxHp && !e.isBoss) {
             const bw = e.radius * 2;
-            const barY = e.radius + (HEALTH_BAR_OFFSETS[e.type] ?? 8);
+            const barY = e.shadowOwner ? 50 : e.radius + (HEALTH_BAR_OFFSETS[e.type] ?? 8);
             ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
             ctx.fillRect(e.x - bw / 2, e.y - barY, bw, 4);
             ctx.fillStyle = e.elite ? e.elite.color : e.color;
@@ -353,12 +353,13 @@ export function renderEnemies() {
         if (e.elite) renderEliteMark(e);
     }
     for (const e of state.enemies) {
-        if (!e.isBoss && !getMonsterSprite(e.type).spec.live) stampMonster(e, t);
+        if (!e.isBoss && !e.shadowOwner && !getMonsterSprite(e.type).spec.live) stampMonster(e, t);
     }
     resetWorldView();
 
     for (const e of state.enemies) {
-        if (e.isBoss) drawBoss(e);
+        // Sombras do rival: o mesmo boneco dele (js/render/rival.js)
+        if (e.isBoss || e.shadowOwner) drawBoss(e);
         else if (getMonsterSprite(e.type).spec.live) renderBoneColossus(e);
     }
     renderEnemyOverlays(t);
