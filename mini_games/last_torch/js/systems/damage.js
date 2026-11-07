@@ -1,9 +1,10 @@
 import { SHADOW_RAVEN, SMOKE_BOMB } from '../../data_model/passives.js';
 import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
-import { audio, state } from '../core/state.js';
+import { audio, player, state } from '../core/state.js';
 import { syncBossBar } from '../ui/hud.js';
 import { addDamageNumber, addShockwave, createExplosion, shakeScreen } from './effects.js';
 import { onCritical } from './powers.js';
+import { mod } from './modifiers.js';
 import { getCritChance, getCritMultiplier } from './stats.js';
 
 // --- DANO NOS MONSTROS ---
@@ -28,6 +29,8 @@ export function dealDamage(e, amount, o = {}) {
     e.hp -= dmg;
     e.hitFlash = J.hitFlashSeconds;
     state.run.damage += dmg;
+    // Vampirismo do herói (Azael): parte do dano causado volta como vida. Dano contínuo (quiet) não conta
+    if (!o.quiet && player.hp > 0 && mod('lifeSteal') > 0) player.hp = Math.min(player.maxHp, player.hp + dmg * mod('lifeSteal'));
 
     if (o.kbX || o.kbY) {
         const resist = 1 - (e.knockbackResist ?? 0);

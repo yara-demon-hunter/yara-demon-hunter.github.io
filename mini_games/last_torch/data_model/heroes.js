@@ -10,9 +10,9 @@ import { AZAEL_VISUALS } from './visuals/characters/azael_visual.js';
 export const HEROES = {
     hunter: {
         name: 'Demon Hunter',
-        tagline: 'Balanced. Blade and dagger, nothing more.',
-        trait: 'No weakness, no gift.',
-        mods: {},
+        tagline: 'Patient and strategic. He waits, aims, and lets the torch work.',
+        trait: '+15% health, +20% dagger damage, +25% dagger range, +15% attack speed while standing still, +20% torch warmth, but -5% blade damage.',
+        mods: { maxHp: 0.15, knifeDamage: 0.2, knifeRange: 0.25, stillAttack: 0.15, warmth: 0.2, damage: -0.05 },
         startPower: null,
         colors: null,
         portrait: ''
@@ -64,9 +64,9 @@ export const HEROES = {
     },
     azael: {
         name: 'Azael',
-        tagline: 'A demon who hunts his own kind.',
-        trait: 'Katana drawn from the sheath. (Stats still to be defined.)',
-        mods: {},
+        tagline: 'Aggressive. A demon who hunts his own kind, up close.',
+        trait: '+25% damage and heals 5% of the damage he deals, but -25% health.',
+        mods: { damage: 0.25, lifeSteal: 0.05, maxHp: -0.25 },
         startPower: null,
         model: 'azael',
         colors: AZAEL_VISUALS.colors,

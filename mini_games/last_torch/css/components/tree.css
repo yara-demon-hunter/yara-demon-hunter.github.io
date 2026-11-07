@@ -168,11 +168,22 @@
 /* Requisito cumprido, mas faltam pontos: só apagado (sem cadeado) */
 .tnode.is-open:not(.is-owned) .tnode-icon { opacity: 0.42; filter: grayscale(0.7); }
 /* Dá para aprender agora */
+/* Brilho vermelho pulsante (o mesmo aviso do medalhão), igual em todos os ramos */
 .tnode.is-ready {
-    border-color: var(--tone);
-    box-shadow: 0 0 14px color-mix(in srgb, var(--tone) 65%, transparent);
-    background: color-mix(in srgb, var(--tone) 14%, #0b1220);
+    border-color: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.55);
+    background: color-mix(in srgb, #ef4444 16%, #0b1220);
+    animation: tnode-ready-pulse 2.4s ease-in-out infinite;
 }
+@keyframes tnode-ready-pulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.35); }
+    50% { box-shadow: 0 0 11px rgba(239, 68, 68, 0.7); }
+}
+@keyframes tnode-ready-pulse-oath {
+    0%, 100% { filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6)); }
+    50% { filter: drop-shadow(0 0 7px rgba(239, 68, 68, 0.95)); }
+}
+@media (prefers-reduced-motion: reduce) { .tnode.is-ready, .tnode.tnode-oath.is-ready { animation: none; } }
 .tnode.is-owned { border-color: var(--tone); background: color-mix(in srgb, var(--tone) 18%, #0b1220); }
 .tnode.is-owned .tnode-level { color: var(--tone); }
 .tnode.is-maxed { border-color: #fde047; background: rgba(66, 46, 8, 0.8); box-shadow: 0 0 10px rgba(253, 224, 71, 0.4); }
@@ -219,11 +230,11 @@
 }
 .tnode.tnode-oath.is-open, .tnode.tnode-oath.is-chained { background: none; }
 .tnode.tnode-oath.is-ready {
-    --edge: var(--tone);
-    --fill: color-mix(in srgb, var(--tone) 18%, #0b1220);
+    --edge: #ef4444;
+    --fill: color-mix(in srgb, #ef4444 18%, #0b1220);
     background: none;
     box-shadow: none;
-    filter: drop-shadow(0 0 7px var(--tone));
+    animation: tnode-ready-pulse-oath 2.4s ease-in-out infinite;
 }
 .tnode.tnode-oath.is-maxed {
     --edge: #fde047;

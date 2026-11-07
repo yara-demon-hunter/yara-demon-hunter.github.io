@@ -12,7 +12,7 @@ import { attributes, passives, powers, state } from '../core/state.js';
 //   herói: damage, maxHp, maxHpFlat (pontos), moveSpeed, attackSpeed, critChance, critDamage, damageTaken,
 //          gold, xp, magnet, luck, knifeDamage, knifeCooldown, furyCharge, furyDuration (segundos),
 //          dashCharges (cargas), dashCooldown, lowHpDamage, thorns (x dano da lâmina), warmth, warmthDamage (também vem do Ember Steps),
-//          bladeDamage, spellDamage, spellHaste, stillAttack (parado), coinHaste (segundos por moeda), killHeal (pontos),
+//          bladeDamage, spellDamage, spellHaste, stillAttack (parado), coinHaste (segundos por moeda), killHeal (pontos), lifeSteal (fração do dano causado que volta como vida),
 //          provoke (distância em que os monstros largam a tocha), noWarmthHeal e noKnives (travas),
 //          killGold (ouro extra por morte), knifeRange e knifeSpeed (alcance e velocidade da adaga)
 //   tocha: torchHp (pontos), torchRegen (pontos por segundo), torchGuard, warmthBurn (x dano de feitiço por segundo)

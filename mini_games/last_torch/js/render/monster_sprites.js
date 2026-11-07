@@ -23,6 +23,7 @@ import { renderDemonFireball, renderDemonLord } from './demon_lord.js';
 import { setRenderClock } from './fx/clock.js';
 import { drawGlow, getGlowSprite } from './fx/glow.js';
 import { makeCanvas } from './fx/sprites.js';
+import { drawDagger } from './knife.js';
 import { renderMoth } from './moth.js';
 import { renderRival } from './rival.js';
 import { renderSkeleton } from './skeleton.js';
@@ -259,6 +260,17 @@ function drawOrb(p) {
     ctx.fill();
 }
 
+// Tiro dos rivais: adaga em voo com um brilho na cor dele
+function drawBossDagger(p) {
+    const scale = p.radius * 0.24;
+    drawGlow(ctx, p.color, p.x, p.y, p.radius * 1.6, 0.5);
+    ctx.save();
+    ctx.translate(p.x - 3 * scale, p.y);
+    ctx.scale(scale, scale);
+    drawDagger(ctx, 0);
+    ctx.restore();
+}
+
 function bakeBolt(owner, color, radius) {
     const width = radius * BOLT_LENGTH;
     const height = radius * BOLT_HEIGHT;
@@ -269,6 +281,7 @@ function bakeBolt(owner, color, radius) {
     const previous = setDrawTarget(target);
     if (owner === 'WITCH') renderWitchBolt(p);
     else if (owner === 'DEMON_LORD') renderDemonFireball(p);
+    else if (BOSS_MODELS[owner]?.projectileStyle === 'dagger') drawBossDagger(p);
     else drawOrb(p);
     setDrawTarget(previous);
     return { canvas, radius, width, height, centerShift: width * 0.22 };
