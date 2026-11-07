@@ -48,7 +48,7 @@ function renderAchievements(list, group) {
 function renderRecords(list) {
     const { stats } = save;
     const box = el('div', 'sanc-records');
-    [['Most at once', stats.bestMultiKill], ['Best streak', stats.bestStreak], ['Best hour', stats.bestHour], ['Best score', stats.bestScore]].forEach(([label, value]) => {
+    [['Most at once', stats.bestMultiKill], ['Best streak', stats.bestStreak], ['Best wave', stats.bestHour], ['Best score', stats.bestScore]].forEach(([label, value]) => {
         const chip = el('div', 'sanc-record');
         chip.append(el('span', '', label), el('b', '', number(value ?? 0)));
         box.appendChild(chip);
@@ -79,7 +79,7 @@ function renderBestiary(list) {
         card.append(
             beastArt(info),
             el('b', '', seen ? info.name : '???'),
-            el('span', '', seen ? `${number(kills)} slain` : `${info.kind === 'boss' ? 'Boss · ' : ''}Hour ${info.hour}+`)
+            el('span', '', seen ? `${number(kills)} slain` : `${info.kind === 'boss' ? 'Boss · ' : ''}Wave ${info.hour}+`)
         );
         if (seen && info.subtitle) card.title = info.subtitle;
         list.appendChild(card);

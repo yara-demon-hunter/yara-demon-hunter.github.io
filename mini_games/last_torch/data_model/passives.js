@@ -107,7 +107,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'A phoenix flies at your shoulder and hurls fireballs. When you fall, it gives its life to raise you in a storm of fire, and is reborn the next hour.'
+        desc: 'A phoenix flies at your shoulder and hurls fireballs. When you fall, it gives its life to raise you in a storm of fire, and is reborn the next wave.'
     },
 
     shadowRaven: {

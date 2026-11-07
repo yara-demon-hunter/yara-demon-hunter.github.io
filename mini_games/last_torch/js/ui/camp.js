@@ -69,7 +69,7 @@ export function setupCamp() {
 // O que vem na próxima hora
 function renderNext() {
     const hour = state.turn;
-    document.getElementById('campNextHour').innerText = `HOUR ${hour} · ${getHourName(hour)}`;
+    document.getElementById('campNextHour').innerText = `WAVE ${hour} · ${getHourName(hour)}`;
     const threat = document.getElementById('campNextThreat');
     if (isBossTurn(hour)) {
         threat.innerText = `☠️ ${BOSS_MODELS[chooseBossType(hour, getHero().model)].name} awaits`;
@@ -86,7 +86,7 @@ export function openCamp() {
     feedTorch(CAMP.freeTorchHeal);
     fuelUses = 0;
     restUses = 0;
-    document.getElementById('campEyebrow').innerText = `HOUR ${state.turn - 1} SURVIVED`;
+    document.getElementById('campEyebrow').innerText = `WAVE ${state.turn - 1} SURVIVED`;
     renderWallet();
     renderNext();
     updateHUD();

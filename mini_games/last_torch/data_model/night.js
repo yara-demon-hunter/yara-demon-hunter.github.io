@@ -13,9 +13,9 @@ export const NIGHT = {
 };
 
 export const HOUR_NAMES = [
-    'Dusk', 'First Dark', 'The Hush', 'Blood Hour',
-    'Cold Hour', 'Deep Dark', 'Witching Hour', 'The Long Dark',
-    'Dead Hour', 'Hollow Hour', 'Last Dark', 'Before Dawn'
+    'Dusk', 'First Dark', 'The Hush', 'Blood Moon',
+    'Cold Mist', 'Deep Dark', 'The Witching', 'The Long Dark',
+    'Dead Silence', 'Hollow Dark', 'Last Dark', 'Before Dawn'
 ];
 
 export function getHourName(hour) {

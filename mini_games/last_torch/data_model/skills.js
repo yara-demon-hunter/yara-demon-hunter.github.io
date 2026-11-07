@@ -25,12 +25,12 @@ export const BLADE_SKILL = {
     // metralhadora de empurrões que jogava até boss para longe. Agora ela dá dano (FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel)
     frenzyCooldownMultiplier: 1,
     minimumCooldownSeconds: 0.15,   // teto de ~6,7 golpes por segundo, somando tudo (antes 0.07 = ~14)
-    baseKnockback: 80,
-    knockbackPerUpgrade: 70,
+    baseKnockback: 50,              // empurrão do golpe, igual para todos os heróis (antes 80)
+    knockbackPerUpgrade: 45,        // por nível de Knockback: nível 5 = 230 (antes 70 = 360)
     baseCritChance: 0.06,
     baseCritMultiplier: 2,
     comboDamageMultiplier: 1.5,
-    comboKnockbackMultiplier: 1.4,
+    comboKnockbackMultiplier: 1.25, // 3º golpe do combo (antes 1.4)
     comboDashDistance: 35
 };
 

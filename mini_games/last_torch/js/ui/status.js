@@ -127,7 +127,7 @@ export function openStatus(from = 'PLAYING', onBack = null) {
     afterReturn = onBack;
     state.gameState = 'PAUSED';
     document.getElementById('statusLevel').innerText = `LEVEL ${state.playerLevel}`;
-    document.getElementById('statusHour').innerText = `Hour ${state.turn} · ${getHourName(state.turn)}`;
+    document.getElementById('statusHour').innerText = `Wave ${state.turn} · ${getHourName(state.turn)}`;
     document.getElementById('statusHero').innerText = ` · ${getHero().name}`;
     document.getElementById('btnResume').innerText = from === 'CAMP' ? 'BACK TO THE CAMP ▶' : 'BACK TO THE HUNT ▶';
     renderHeader();
@@ -145,7 +145,7 @@ export function openStatus(from = 'PLAYING', onBack = null) {
     })), ...skills], 'No powers yet. Learn them in the skill tree.');
     renderBuildList('passiveList', Object.values(passives).filter(p => p.type !== 'skill' && p.lvl > 0).map(p => ({
         icon: p.icon, name: p.name, desc: p.desc, level: 0
-    })), 'No relics yet. Buy them at the camp, between hours.');
+    })), 'No relics yet. Buy them at the camp, between waves.');
     showBuildNote(null);
     document.getElementById('shopScreen').classList.remove('hidden');
     showTab(currentTab);

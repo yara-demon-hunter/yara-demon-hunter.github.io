@@ -43,8 +43,8 @@ export function startHour() {
     const bossNote = plan.boss ? `☠️ ${BOSS_MODELS[plan.boss].name} awaits at the end` : '';
     spawnOpening();
     // A primeira faixa da noite diz o objetivo; as outras, a hora e o presságio (ou o boss que espera no fim)
-    if (hour === 1) showBanner(`HOUR 1 OF ${NIGHT.hours}`, 'PROTECT THE TORCH', bossNote || 'Survive until dawn', 'hour');
-    else showBanner(`HOUR ${hour} OF ${NIGHT.hours}`, getHourName(hour).toUpperCase(), bossNote || (state.omen ? `${state.omen.icon} ${state.omen.name}` : ''), 'hour');
+    if (hour === 1) showBanner(`WAVE 1 OF ${NIGHT.hours}`, 'PROTECT THE TORCH', bossNote || 'Survive until dawn', 'hour');
+    else showBanner(`WAVE ${hour} OF ${NIGHT.hours}`, getHourName(hour).toUpperCase(), bossNote || (state.omen ? `${state.omen.icon} ${state.omen.name}` : ''), 'hour');
     audio.setMood('hunt');
     audio.setIntensity(Math.min(1, (hour - 1) / (NIGHT.hours - 1)));
     updateHUD();
@@ -85,7 +85,7 @@ function announceBoss(plan) {
     const boss = BOSS_MODELS[plan.boss];
     state.bossPending = NIGHT.bossDelaySeconds;
     prepareBossSummon(boss, NIGHT.bossDelaySeconds);
-    showBanner(`HOUR ${state.turn}`, boss.name.toUpperCase(), boss.title, 'danger');
+    showBanner(`WAVE ${state.turn}`, boss.name.toUpperCase(), boss.title, 'danger');
     audio.playBossWarning();
     updateHUD();
 }
@@ -124,7 +124,7 @@ function beginClear() {
     const untouched = !state.hourHit;
     if (untouched) bumpStat('flawlessHours');
     const sub = [untouched ? 'Untouched' : '', state.pickups.length > 0 ? 'Grab what is left' : ''].filter(Boolean).join(' · ');
-    showBanner('', `HOUR ${state.turn} SURVIVED`, sub, 'gold');
+    showBanner('', `WAVE ${state.turn} SURVIVED`, sub, 'gold');
     audio.playHourClear();
     updateHUD();
 }

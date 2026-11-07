@@ -238,7 +238,7 @@ export function triggerGameOver(reason) {
     document.getElementById('gameOverTitle').innerText = text.title;
     const unspent = reason !== 'DAWN' && hasBuyableNode();
     document.getElementById('gameOverSub').innerText = unspent ? `Tip: ${state.skillPoints} skill points went unused. Tap the medal at the top to spend them.` : text.sub;
-    document.getElementById('finalHour').innerText = `Hour ${state.turn}`;
+    document.getElementById('finalHour').innerText = `Wave ${state.turn}`;
     document.getElementById('finalHourName').innerText = getHourName(state.turn);
     document.getElementById('finalLevel').innerText = state.playerLevel;
     document.getElementById('finalKills').innerText = run.kills;
@@ -277,7 +277,7 @@ export function triggerGameOver(reason) {
 export async function shareResult() {
     const text = state.run.victory
         ? `I kept the last torch alive until dawn on Last Torch: ${state.totalScore.toLocaleString('en-US')} points. Can you survive the night?`
-        : `I reached Hour ${state.turn} of 12 on Last Torch: ${state.totalScore.toLocaleString('en-US')} points. Can you survive the night?`;
+        : `I reached Wave ${state.turn} of 12 on Last Torch: ${state.totalScore.toLocaleString('en-US')} points. Can you survive the night?`;
     const url = location.href.split('?')[0];
     try {
         if (navigator.share) await navigator.share({ title: 'Last Torch', text, url });
