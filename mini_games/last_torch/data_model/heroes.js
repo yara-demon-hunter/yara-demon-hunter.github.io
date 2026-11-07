@@ -6,6 +6,7 @@ import { AZAEL_VISUALS } from './visuals/characters/azael_visual.js';
 // colors: troca só o que muda na paleta do herói 2.5D; portrait: filtro CSS aplicado no retrato.
 // model: boneco 2.5D ('hunter' se ausente; 'azael' usa js/render/azael25d.js); portraitImage: arte própria do retrato.
 // free: já vem liberado, sem conquista.
+// shelved: guardado por enquanto. Some da tela inicial e das conquistas, mas os dados ficam para voltar depois.
 export const HEROES = {
     hunter: {
         name: 'Demon Hunter',
@@ -18,6 +19,7 @@ export const HEROES = {
     },
     reaver: {
         name: 'Ash Reaver',
+        shelved: true,
         tagline: 'Burns twice as bright.',
         trait: '+30% damage, Fury charges 60% faster, but -35% health.',
         mods: { damage: 0.3, furyCharge: 0.6, maxHp: -0.35 },
@@ -32,6 +34,7 @@ export const HEROES = {
     },
     warden: {
         name: 'Torch Warden',
+        shelved: true,
         tagline: 'The flame answers to you.',
         trait: 'The torch starts with +60 health and fights beside you, but you move 8% slower.',
         mods: { torchHp: 60, moveSpeed: -0.08 },
@@ -46,6 +49,7 @@ export const HEROES = {
     },
     shade: {
         name: 'The Shade',
+        shelved: true,
         tagline: 'Never where they strike.',
         trait: '+1 dash charge, 25% shorter dash cooldown, +12% crit chance, but -20% blade damage.',
         mods: { dashCharges: 1, dashCooldown: 0.25, critChance: 0.12, damage: -0.2 },
@@ -68,10 +72,13 @@ export const HEROES = {
         colors: AZAEL_VISUALS.colors,
         portrait: '',
         portraitImage: 'images/characters/azael-small.webp',
-        // Liberado para teste
-        free: true
+        // Liberado pela conquista Dawn (vencer a noite). unlockHint: aviso no cartão bloqueado
+        unlockHint: 'Beat the game'
     }
 };
+
+// Heróis que aparecem na escolha da tela inicial, na ordem
+export const ACTIVE_HEROES = Object.keys(HEROES).filter(key => !HEROES[key].shelved);
 
 // colors em cada herói traz só o que muda; aqui vira a paleta completa
 Object.values(HEROES).forEach(hero => {

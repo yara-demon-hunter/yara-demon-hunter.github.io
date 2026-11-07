@@ -1,5 +1,5 @@
 import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
-import { HEROES } from '../../data_model/heroes.js';
+import { ACTIVE_HEROES, HEROES } from '../../data_model/heroes.js';
 import { save, persist } from '../core/save.js';
 import { audio } from '../core/state.js';
 import { paintHeroPortrait, renderStartScreen } from './screens.js';
@@ -9,7 +9,40 @@ function isOwned(key) {
     return HEROES[key].free === true || save.unlockedHeroes.includes(key);
 }
 
-// --- ESCOLHA DO HERÓI ---
+// --- ESCOLHA NA TELA INICIAL ---
+// Um cartão por herói ativo, lado a lado. O escolhido fica aceso; tocar em outro troca na hora.
+export function renderHeroPicker() {
+    const picker = document.getElementById('heroPicker');
+    const current = isOwned(save.hero) ? save.hero : 'hunter';
+    picker.replaceChildren(...ACTIVE_HEROES.map(key => {
+        const hero = HEROES[key];
+        const owned = isOwned(key);
+        const picked = owned && key === current;
+        const card = el('button', `hero-pick${picked ? ' is-picked' : ''}${owned ? '' : ' is-locked'}`);
+        card.disabled = !owned;
+        card.dataset.hero = key;
+        card.setAttribute('role', 'radio');
+        card.setAttribute('aria-checked', String(picked));
+        const portrait = el('span', 'hero-portrait');
+        paintHeroPortrait(portrait, hero);
+        card.title = owned ? hero.tagline : `Locked: ${hero.unlockHint ?? ''}`;
+        if (!owned) portrait.append(el('span', 'hero-pick-lock', '🔒'));
+        card.append(portrait, el('span', 'hero-pick-name', hero.name.toUpperCase()));
+        if (!owned && hero.unlockHint) card.append(el('span', 'hero-pick-hint', hero.unlockHint));
+        return card;
+    }));
+}
+
+export function pickHeroOnStart(key) {
+    if (!HEROES[key] || HEROES[key].shelved || !isOwned(key) || save.hero === key) return;
+    save.hero = key;
+    persist();
+    audio.init();
+    audio.playCardPick('rare');
+    renderStartScreen();
+}
+
+// --- ESCOLHA DO HERÓI (tela antiga, guardada: nenhum botão a abre agora) ---
 // Uma fileira de cartões, tudo à vista. Tocar num herói liberado escolhe e já volta para a tela inicial.
 const CLOSE_DELAY_MS = 260;
 

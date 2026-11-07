@@ -19,7 +19,7 @@ export const ACHIEVEMENTS = [
     { id: 'elites10', group: 'trophy', icon: '💀', name: 'Trophy Hunter', desc: 'Slay 10 elites.', stat: 'elites', target: 10 },
     { id: 'kills2000', group: 'trophy', icon: '🪦', name: 'Harvester', desc: 'Slay 1,200 monsters.', stat: 'kills', target: 1200 },
     { id: 'countess', group: 'trophy', icon: '🧛', name: 'Sunlight', desc: 'Slay the Blood Countess.', stat: 'boss_BLOOD_COUNTESS', target: 1, hero: 'warden' },
-    { id: 'dawn', group: 'trophy', icon: '🌅', name: 'Dawn', desc: 'Survive until dawn.', stat: 'victories', target: 1 },
+    { id: 'dawn', group: 'trophy', icon: '🌅', name: 'Dawn', desc: 'Survive until dawn.', stat: 'victories', target: 1, hero: 'azael' },
     { id: 'darkness3', group: 'trophy', icon: '🌑', name: 'Deeper Still', desc: 'Win a night on Darkness 3.', stat: 'bestDarknessWon', target: 3 },
     // Um troféu por Juramento: stat = maior hora alcançada sob ele (js/systems/sanctuary.js)
     { id: 'sworn1', group: 'trophy', icon: '☠️', name: 'Blood Answers Blood', desc: 'Reach Wave 8 under the Oath of Slaughter.', stat: 'oath_oathSlaughter', target: 8 },

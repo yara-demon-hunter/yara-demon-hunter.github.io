@@ -14,7 +14,7 @@ permalink: /mini_games/last_torch/last_torch.html
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Last Torch">
     <meta name="theme-color" content="#020617">
-    <title>Last Torch</title>
+    <title>Demon Hunter: Last Torch</title>
     <link rel="icon" href="images/characters/demon-hunter-small.webp">
     <link rel="preload" href="./css/fonts/cinzel-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="./css/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -50,7 +50,7 @@ permalink: /mini_games/last_torch/last_torch.html
         </div>
 
         <!-- Medalhão de status: pausa e mostra a build -->
-        <button id="btnPause" class="status-btn" title="Skill tree and status (Esc)" aria-label="Skill tree and hero status"><span id="statusBadge" class="hud-badge"></span></button>
+        <button id="btnPause" class="status-btn" title="Skill tree and status (P)" aria-label="Skill tree and hero status"><span id="statusBadge" class="hud-badge"></span></button>
 
         <!-- Hora da noite e boss (a vida da tocha fica em cima da fogueira, no canvas) -->
         <div id="hudWorld" class="hud-panel" style="--tone: #fdba74;">
@@ -108,14 +108,18 @@ permalink: /mini_games/last_torch/last_torch.html
     <div class="start-torch" aria-hidden="true"></div>
 
     <div class="start-content">
-        <h1 class="start-title">LAST TORCH</h1>
+        <h1 class="start-title"><span class="start-title-kicker">DEMON HUNTER:</span>LAST TORCH</h1>
         <p class="start-tagline">Protect the torch until dawn.</p>
 
+        <div class="start-body">
         <div id="startRecords" class="start-records">
             <div><span>Best wave</span><b id="recordHour">-</b></div>
             <div><span>Best score</span><b id="recordScore">-</b></div>
             <div><span>Best streak</span><b id="recordStreak">-</b></div>
         </div>
+
+        <!-- Escolha do herói: só os ativos (ACTIVE_HEROES). Os cartões são montados em js/ui/heroes.js -->
+        <div id="heroPicker" class="hero-picker" role="radiogroup" aria-label="Choose your hunter"></div>
 
         <!-- Escuridão: só depois de vencer a noite -->
         <div id="darknessPicker" class="darkness-picker hidden">
@@ -128,15 +132,12 @@ permalink: /mini_games/last_torch/last_torch.html
         <!-- O PLAY nasce desligado: js/ui/screens.js o acende quando o jogo termina de chegar pela rede -->
         <button id="btnStart" class="start-btn" disabled>LOADING</button>
         <p id="iosHint" class="hidden">Full screen on iPhone: tap Share, then <b>Add to Home Screen</b>, and open it from there.</p>
-                <div class="start-links">
-            <button id="btnHeroes" class="start-btn-small">
-                <span id="startHeroPortrait" class="hero-portrait" aria-hidden="true"></span>
-                <span class="link-text"><span>HUNTER</span><em id="startHeroName">Demon Hunter</em></span>
-            </button>
+        <div class="start-links">
             <button id="btnSanctuary" class="start-btn-small">
                 <span class="link-icon" aria-hidden="true">🏛️</span>
                 <span class="link-text"><span>SANCTUARY</span><em id="startSanctuaryCount">0/0 earned</em></span>
             </button>
+        </div>
         </div>
     </div>
 </div>

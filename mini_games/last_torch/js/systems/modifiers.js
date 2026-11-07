@@ -31,7 +31,11 @@ export function mod(key) {
 }
 
 export function getHero() {
-    return HEROES[save.hero] ?? HEROES.hunter;
+    const key = save.hero;
+    const hero = HEROES[key];
+    // Herói guardado (shelved) ou ainda bloqueado volta para o Demon Hunter
+    const owned = hero && (hero.free || save.unlockedHeroes.includes(key));
+    return owned && !hero.shelved ? hero : HEROES.hunter;
 }
 
 // Recalcula tudo. Chamar sempre que algo que dá modificadores mudar.

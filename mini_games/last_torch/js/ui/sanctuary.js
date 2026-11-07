@@ -30,7 +30,7 @@ function renderAchievements(list, group) {
         const text = el('div', 'sanc-text');
         text.append(
             el('b', '', a.name),
-            el('span', '', a.hero ? `${a.desc} Unlocks ${HEROES[a.hero].name}.` : a.desc)
+            el('span', '', a.hero && !HEROES[a.hero].shelved ? `${a.desc} Unlocks ${HEROES[a.hero].name}.` : a.desc)
         );
         if (!done) {
             const bar = el('i', 'sanc-bar');

@@ -8,7 +8,7 @@ import { showToast } from '../ui/banner.js';
 // Tudo que vale para além da noite: recordes, façanhas e o bestiário. O desenho fica em js/ui/sanctuary.js.
 // Os sistemas do jogo só chamam as funções daqui quando algo digno de nota acontece.
 export function rewardText(a) {
-    return a.hero ? `New hero: ${HEROES[a.hero].name}` : a.desc;
+    return a.hero && !HEROES[a.hero].shelved ? `New hero: ${HEROES[a.hero].name}` : a.desc;
 }
 
 // Conquistas completadas agora. toast: avisa na tela (na tela final elas já aparecem na lista).

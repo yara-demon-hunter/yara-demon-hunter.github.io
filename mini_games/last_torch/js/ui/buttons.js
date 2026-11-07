@@ -1,6 +1,6 @@
 import { audio, state } from '../core/state.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
-import { chooseHero, closeHeroes, openHeroes } from './heroes.js';
+import { chooseHero, closeHeroes, pickHeroOnStart } from './heroes.js';
 import { inPortal, lockLandscape, showIosHint } from './orientation.js';
 import { choosePick, isPicking, setupQuickPick } from './quick_pick.js';
 import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
@@ -80,7 +80,10 @@ export function setupButtons() {
         const button = e.target.closest('button[data-tab]');
         if (button) setSanctuaryTab(button.dataset.tab);
     });
-    on('btnHeroes', openHeroes);
+    document.getElementById('heroPicker').addEventListener('click', (e) => {
+        const card = e.target.closest('.hero-pick');
+        if (card) pickHeroOnStart(card.dataset.hero);
+    });
     on('btnCloseHeroes', closeHeroes);
     document.getElementById('heroRoster').addEventListener('click', (e) => {
         const card = e.target.closest('button[data-hero]');
@@ -106,7 +109,7 @@ export function setupButtons() {
         button.addEventListener('click', () => toggleSetting(button.dataset.setting));
     });
 
-    // Teclado: Esc/P abrem e fecham o status (e as telas do menu), Enter recomeça
+    // Teclado: P abre e fecha o status; Esc só fecha as telas do menu, Enter recomeça
     const menuScreenOpen = () => ['sanctuaryScreen', 'heroScreen'].some(id => !document.getElementById(id).classList.contains('hidden'));
     window.addEventListener('keydown', (e) => {
         if (e.repeat) return;
@@ -116,7 +119,11 @@ export function setupButtons() {
             if (e.code === 'Escape' || e.code === 'KeyP') closeConfirm();
             return;
         }
-        if (e.code === 'Escape' || e.code === 'KeyP') {
+        // Esc só fecha telas do menu: em tela cheia ele também sai da tela cheia, então não pausa nem retoma a caçada
+        if (e.code === 'Escape' && state.gameState === 'START' && menuScreenOpen()) {
+            closeSanctuary();
+            closeHeroes();
+        } else if (e.code === 'KeyP') {
             if (state.gameState === 'START' && menuScreenOpen()) {
                 closeSanctuary();
                 closeHeroes();

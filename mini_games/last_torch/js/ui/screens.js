@@ -17,6 +17,7 @@ import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_
 import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
 import { startHints } from './hints.js';
+import { renderHeroPicker } from './heroes.js';
 import { resetQuickPick } from './quick_pick.js';
 import { updateHUD } from './hud.js';
 
@@ -306,8 +307,7 @@ export function renderStartScreen() {
 
     const hero = getHero();
     document.getElementById('startSanctuaryCount').innerText = `${ACHIEVEMENTS.filter(a => save.achievements[a.id]).length}/${ACHIEVEMENTS.length} earned`;
-    document.getElementById('startHeroName').innerText = hero.name;
-    paintHeroPortrait(document.getElementById('startHeroPortrait'), hero);
+    renderHeroPicker();
     const dark = document.getElementById('darknessPicker');
     dark.classList.toggle('hidden', save.maxDarkness <= 1);
     document.getElementById('darknessValue').innerText = save.darkness;
