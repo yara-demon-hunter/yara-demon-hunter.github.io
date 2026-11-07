@@ -260,8 +260,8 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🧥',
         cost: 55,
         maxLvl: 1,
-        desc: 'The warmth of the torch reaches twice as far and heals twice as fast.',
-        mods: { warmth: 1 }
+        desc: 'The warmth of the torch reaches 40% farther and heals you 20% faster.',
+        mods: { warmth: 0.4 }
     },
     furyStone: {
         name: 'Fury Stone',
@@ -275,7 +275,7 @@ export const PASSIVE_SKILL_MODELS = {
     sharpenedEdge: { name: 'Sharpened Edge', icon: '🪚', cost: 110, maxLvl: 1, desc: 'For blade fighters: +15% blade damage, +8% attack speed.', mods: { bladeDamage: 0.15, attackSpeed: 0.08 } },
     shadeQuiver: { name: 'Shade Quiver', icon: '🪶', cost: 120, maxLvl: 1, desc: 'For shadow stalkers: +20% dagger damage, -8% dagger recharge, +4% critical chance.', mods: { knifeDamage: 0.2, knifeCooldown: 0.08, critChance: 0.04 } },
     occultTome: { name: 'Occult Tome', icon: '🪬', cost: 120, maxLvl: 1, desc: 'For curse casters: +15% spell damage, -8% spell recharge.', mods: { spellDamage: 0.15, spellHaste: 0.08 } },
-    emberLantern: { name: 'Ember Lantern', icon: '🪔', cost: 100, maxLvl: 1, desc: 'For flame keepers: the torch heals 0.5/s and its warmth is 30% stronger.', mods: { torchRegen: 0.5, warmth: 0.3 } },
+    emberLantern: { name: 'Ember Lantern', icon: '🪔', cost: 100, maxLvl: 1, desc: 'For flame keepers: the torch heals 0.5/s and its warmth reaches 30% farther.', mods: { torchRegen: 0.5, warmth: 0.3 } },
     phantomVeil: { name: 'Phantom Veil', icon: '🧣', cost: 110, maxLvl: 1, desc: 'For shadow dodgers: -12% dash recharge, +5% move speed.', mods: { dashCooldown: 0.12, moveSpeed: 0.05 } },
     wizardsWand: { name: "Wizard's Wand", icon: '🪄', cost: 130, maxLvl: 1, desc: 'For curse casters: +20% spell damage, -6% spell recharge.', mods: { spellDamage: 0.2, spellHaste: 0.06 } },
     owlsWisdom: { name: "Owl's Wisdom", icon: '🦉', cost: 140, maxLvl: 1, desc: 'For curse casters: -12% spell recharge, +10% XP.', mods: { spellHaste: 0.12, xp: 0.1 } },

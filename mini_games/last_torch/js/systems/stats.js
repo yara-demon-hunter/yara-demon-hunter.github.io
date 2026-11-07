@@ -94,9 +94,14 @@ export function getKillHeal() {
 export function getWarmthRadius() {
     return CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
 }
-// Pontos por segundo; zero sob o Oath of Slaughter
+// Pontos por segundo; zero sob o Oath of Slaughter. A cura cresce com metade do bônus de alcance
+// (warmthHealShare) e tem teto, para relíquias, ramo da chama e Juramento não a empilharem sem fim
+const WARMTH_HEAL_SHARE = 0.5;
+const WARMTH_HEAL_MAX_MULTIPLIER = 2;
 export function getWarmthHeal() {
-    return mod('noWarmthHeal') > 0 ? 0 : CHARACTER_MODEL.warmthHealPerSecond * (1 + mod('warmth'));
+    if (mod('noWarmthHeal') > 0) return 0;
+    const multiplier = Math.min(WARMTH_HEAL_MAX_MULTIPLIER, 1 + mod('warmth') * WARMTH_HEAL_SHARE);
+    return CHARACTER_MODEL.warmthHealPerSecond * multiplier;
 }
 export function getFrenzyDamageBonus() {
     return attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;
