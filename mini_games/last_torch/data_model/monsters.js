@@ -152,6 +152,24 @@ export const MONSTER_MODELS = {
         xpRewardBase: 20,
         xpRewardPerTurn: 3
     },
+    // Lobo Sombriço (o mesmo do Yara RPG): rápido e fraco, só corre atrás. Aparece desde a hora 1.
+    SHADOW_WOLF: {
+        spawnWeight: 0.16,
+        hpBase: 30,
+        hpPerTurn: 7,
+        speedMin: 92,
+        speedMax: 112,
+        radius: 12,
+        color: '#8ea3bf',
+        damage: 12,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 20,
+        goldBase: 5,
+        goldVariance: 0.5,
+        xpRewardBase: 20,
+        xpRewardPerTurn: 3
+    },
     // Lobo Zumbi: caça em matilha. Circula, mira (aviso curto no chão) e se lança em linha reta.
     ZOMBIE_WOLF: {
         spawnWeight: 0.08,
@@ -259,7 +277,7 @@ export const MONSTER_SPAWNING = {
     separationStrength: 60
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];

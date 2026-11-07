@@ -175,6 +175,7 @@
             monster = {
                 key: info.key,
                 entry: image(info.image),
+                drawn: NS.monsters?.kindFor(info.image) || null,   // desenhado em js/stage/monsters25d.js
                 boss: !!info.boss,
                 homeX: hero.homeX + (L.monster - L.heroCombat),
                 x: hero.homeX + (L.monster - L.heroCombat),
@@ -565,7 +566,7 @@
                 hero.anim = HERO.createAnim(hero.anim.facing);
             }
             const petSrc = source.petImage();
-            if ((pet?.src || null) !== (petSrc || null)) pet = petSrc ? { src: petSrc, entry: image(petSrc), x: hero.x - L.petBehind, charge: null } : null;
+            if ((pet?.src || null) !== (petSrc || null)) pet = petSrc ? { src: petSrc, entry: image(petSrc), look: L.pets?.[String(petSrc).split('/').pop()] || {}, x: hero.x - L.petBehind, charge: null } : null;
             hero.frenzy = source.furyReady();
             const info = source.monster();
             if (monster && info && info.key === monster.key) monster.telegraph = !!info.telegraph;
@@ -640,7 +641,7 @@
             }
 
             if (pet) {
-                let target = hero.x - L.petBehind;
+                let target = hero.x - (pet.look.behind ?? L.petBehind);
                 if (pet.charge && monster) {
                     const k = clamp((clock - pet.charge.t0) / pet.charge.dur);
                     target += bump(k) * (monster.x - 7 - target);
@@ -764,7 +765,15 @@
                 drawGlow(g, 'rgba(239, 68, 68, 0.8)', p.x, p.y - size * 0.55 * s * cam.heightScale, size * 0.75 * s, alpha * (0.35 + 0.25 * Math.sin(t * 9)));
                 g.globalCompositeOperation = 'source-over';
             }
-            if (entry) {
+            if (m.drawn) {
+                const tw = m.tween;
+                const attack = tw && tw.to < tw.from - 2 ? clamp((clock - tw.t0) / tw.dur) : 0;
+                NS.monsters.paint(m.drawn, g, {
+                    x: p.x, y: p.y, s, hs: cam.heightScale, facing: -1, t: t + m.born * 7,
+                    alpha, flash: clamp(1 - (t - m.flashAt) / 0.2) * 0.85, hurt, attack, dying,
+                    telegraph: m.telegraph, scale: m.boss ? 1.3 : 1
+                });
+            } else if (entry) {
                 const w = size * s;
                 const h = size * s;
                 const x = p.x - w / 2;
@@ -792,10 +801,10 @@
             const entry = cutout(pet.entry, 0.7);
             if (!entry) return;
             const moving = Math.abs(pet.speed || 0) > 4;
-            const hop = moving ? Math.abs(Math.sin(clock * 12)) * 1.6 : 0;
+            const hop = moving ? Math.abs(Math.sin(clock * 12)) * 1.6 * (pet.look.size ? 0.6 : 1) : 0;
             const base = cam.project(pet.x, 2.5, 0);
             const p = cam.project(pet.x, 2.5, hop);
-            const size = 11 * p.s;
+            const size = (pet.look.size || L.petSize || 11) * p.s;
             g.globalAlpha = 0.45;
             g.fillStyle = '#000';
             g.beginPath();

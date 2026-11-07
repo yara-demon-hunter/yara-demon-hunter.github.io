@@ -23,6 +23,12 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
             monster: 24,           // monstro
             reach: 19,             // distância do golpe: o herói para a essa distância do monstro
             petBehind: 11,         // pet atrás do herói
+            // Tamanho do pet na tela (altura da imagem, unidades) e quanto ele fica atrás do herói, por imagem.
+            // O herói tem ~25 de altura: um cavalo precisa chegar perto disso, um gato não.
+            petSize: 11,
+            pets: {
+                'wild-horse.webp': { size: 22, behind: 15 }
+            },
             campfire: 13           // fogueira à frente do herói
         },
 

@@ -60,6 +60,7 @@ export const MULTI_KILL = {
 const MONSTER_ENTRIES = [
     { key: 'SKELETON', name: 'Skeleton', icon: '💀' },
     { key: 'BAT', name: 'Bat', icon: '🦇' },
+    { key: 'SHADOW_WOLF', name: 'Shadow Wolf', icon: '🐺' },
     { key: 'VAMPIRE', name: 'Vampire', icon: '🧛' },
     { key: 'WITCH', name: 'Witch', icon: '🧙' },
     { key: 'MOTH', name: 'Moth', icon: '🦋' },

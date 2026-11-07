@@ -13,6 +13,7 @@ import { SKELETON_VISUALS } from '../../data_model/visuals/monsters/skeleton_vis
 import { SPRITE_FRAMES } from '../../data_model/visuals/monsters/sprites_visual.js';
 import { VAMPIRE_VISUALS } from '../../data_model/visuals/monsters/vampire_visual.js';
 import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
+import { SHADOW_WOLF_VISUALS } from '../../data_model/visuals/monsters/shadow_wolf_visual.js';
 import { ZOMBIE_WOLF_VISUALS } from '../../data_model/visuals/monsters/zombie_wolf_visual.js';
 import { BONE_COLOSSUS_VISUALS } from '../../data_model/visuals/monsters/bone_colossus_visual.js';
 import { HEADLESS_KNIGHT_VISUALS } from '../../data_model/visuals/monsters/headless_knight_visual.js';
@@ -287,6 +288,7 @@ const HEALTH_BAR_OFFSETS = {
     MOTH: MOTH_VISUALS.healthBarOffset,
     BLOATER: BLOATER_VISUALS.healthBarOffset,
     WRAITH: WRAITH_VISUALS.healthBarOffset,
+    SHADOW_WOLF: SHADOW_WOLF_VISUALS.healthBarOffset,
     ZOMBIE_WOLF: ZOMBIE_WOLF_VISUALS.healthBarOffset,
     HEADLESS_KNIGHT: HEADLESS_KNIGHT_VISUALS.healthBarOffset,
     BONE_COLOSSUS: BONE_COLOSSUS_VISUALS.healthBarOffset

@@ -55,6 +55,7 @@
         import { renderWitch, renderWitchBolt } from '../js/render/witch.js';
         import { renderWraith } from '../js/render/wraith.js';
         import { renderZombieWolf } from '../js/render/zombie_wolf.js';
+        import { renderShadowWolf } from '../js/render/shadow_wolf.js';
 
         state.gameState = 'PLAYING';     // a arte só anima durante a partida
         player.x = -1e6;                 // herói longe: o vampiro não estica os braços
@@ -80,6 +81,7 @@
             ['MOTH', 'Moth', renderMoth],
             ['BLOATER', 'Bloater', renderBloater],
             ['WRAITH', 'Wraith', renderWraith],
+            ['SHADOW_WOLF', 'Shadow Wolf', renderShadowWolf],
             ['ZOMBIE_WOLF', 'Zombie Wolf', renderZombieWolf],
             ['HEADLESS_KNIGHT', 'Headless Knight', renderHeadlessKnight],
             ['BONE_COLOSSUS', 'Bone Colossus', renderBoneColossus]

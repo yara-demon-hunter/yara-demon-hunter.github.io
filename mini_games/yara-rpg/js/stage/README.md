@@ -14,6 +14,7 @@ Faixa acima do log que mostra o herói fazendo o que os botões mandam. Só desc
 | `oskar25d.js` | Peças do Oskar no mesmo boneco, maior (`bodyScale`): barba, cabelo ralo, regata, braços fortes, machado de duas lâminas nas duas mãos |
 | `zeph25d.js` | Peças do Zeph no mesmo boneco (cabeça com rosto, cabelo bagunçado, jaqueta, alça e bolsa, adaga) |
 | `yara25d.js` | Peças da Yara no mesmo boneco (cabeça com rosto, cabelo de duas cores, cachecol, corpo feminino, espada curta) |
+| `monsters25d.js` | Monstros desenhados (Esqueleto, Bruxa, Lobo Sombriço, Espectro Corrompido), adaptados do Last Torch (o Lobo Sombriço é desenho próprio); os outros monstros usam a imagem recortada |
 | `scenery.js` | Câmera de diorama e cenário: fundo, fileiras de adereços, trilha, névoa, luz |
 | `stage.js` | Atores, efeitos e o diretor: cada ação vira uma sequência com tempo |
 | `hooks.js` | Liga o palco ao RPG: lê o estado do jogo e embrulha as ações dos botões |

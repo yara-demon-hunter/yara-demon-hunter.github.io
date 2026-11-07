@@ -38,6 +38,7 @@ export const TURN_DIFFICULTY = {
     monsterUnlockTurn: {
         SKELETON: 1,
         BAT: 1,
+        SHADOW_WOLF: 1,
         VAMPIRE: 2,
         WITCH: 3,
         MOTH: 4,
