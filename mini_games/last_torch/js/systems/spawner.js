@@ -72,7 +72,7 @@ export function spawnElite() {
     e.speed *= elite.speed;
     e.radius *= elite.radiusScale;
     e.damage *= elite.damage;
-    e.knockbackResist = elite.knockbackResist;
+    e.knockbackResist = Math.max(e.knockbackResist ?? 0, elite.knockbackResist);   // nunca menos do que o monstro já tinha
     showToast('💀', `${elite.label} monster in the fog`, 'It carries treasure');
     audio.playHorn();
 }

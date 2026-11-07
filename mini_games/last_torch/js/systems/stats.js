@@ -27,7 +27,8 @@ export function getBladeDamage() {
     const hunger = getPowerLevel(powers.bloodlust);
     return getAtkDamage() * (1 + mod('bladeDamage'))
         * (1 + (hunger ? state.bloodlust.stacks * hunger.damage : 0))
-        * (1 + (state.warCryTimer > 0 ? WAR_CRY.bladeBonus : 0));
+        * (1 + (state.warCryTimer > 0 ? WAR_CRY.bladeBonus : 0))
+        * (state.frenzyActiveTimer > 0 ? 1 + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel : 1);
 }
 // Feitiços e tudo que a chama faz sozinha
 export function getSpellDamage() {

@@ -274,11 +274,15 @@ export function chooseBossType(turn, heroModel = 'hunter') {
     return rotation[(Math.floor(turn / everyTurns) - 1) % rotation.length];
 }
 
+// Boss segura o empurrão: perde 85% dele (um monstro comum leva o empurrão inteiro). Quem tiver knockbackResist próprio usa o seu
+const BOSS_KNOCKBACK_RESIST = 0.85;
+
 export function createBoss(type, turn, x, y, random = Math.random) {
     const model = BOSS_MODELS[type];
     if (!model) throw new Error(`Unknown boss type: ${type}`);
     return {
         ...createEnemy(model, type, turn, x, y, random),
+        knockbackResist: model.knockbackResist ?? BOSS_KNOCKBACK_RESIST,
         isBoss: true,
         name: model.name
     };

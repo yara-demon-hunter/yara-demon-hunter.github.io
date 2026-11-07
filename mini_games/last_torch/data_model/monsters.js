@@ -200,7 +200,7 @@ export const MONSTER_MODELS = {
         radius: 20,
         color: '#7c8aa5',
         damage: 24,
-        knockbackResist: 0.7,
+        knockbackResist: 0.85,
         initialShootCooldownSeconds: 2.5,
         shootCooldownSeconds: 3.5,
         shootRange: 320,                 // só atira com o alvo a esta distância ou menos
