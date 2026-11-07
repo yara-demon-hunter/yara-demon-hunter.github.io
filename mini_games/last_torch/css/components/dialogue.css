@@ -1,0 +1,140 @@
+/* --- DIÁLOGO DO DUELO (js/ui/dialogue.js) ---
+   Herói (o jogador) à esquerda, rival à direita, caixa de fala embaixo entre os dois. Quem fala acende e cresce; o outro escurece. */
+.dlg {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 1rem 1rem;
+    background: linear-gradient(to top, rgba(2, 4, 8, 0.92) 0%, rgba(2, 4, 8, 0.55) 45%, rgba(2, 4, 8, 0.15) 100%);
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+.dlg.is-open { opacity: 1; }
+
+/* Retrato numa moldura: borda dupla na cor do lado (herói ciano, rival vermelho), cantos marcados e placa com o nome */
+.dlg-portrait {
+    --frame: #67e8f9;
+    position: absolute;
+    bottom: 1.6rem;
+    width: min(26vw, 15rem);
+    aspect-ratio: 3 / 4;
+    padding: 0.35rem;
+    border: 2px solid var(--frame);
+    border-radius: 0.5rem;
+    background: linear-gradient(160deg, #1b2230, #07090e);
+    box-shadow: 0 0 0 1px #000, 0 0 0 4px rgba(8, 10, 16, 0.95), 0 0 0 5px color-mix(in srgb, var(--frame) 45%, transparent),
+        0 10px 30px rgba(0, 0, 0, 0.8), 0 0 26px color-mix(in srgb, var(--frame) 25%, transparent);
+    pointer-events: none;
+    transition: transform 0.25s ease-out, filter 0.25s ease-out, opacity 0.25s ease-out;
+    filter: brightness(0.4) saturate(0.6);
+    opacity: 0.9;
+}
+.dlg-rival { --frame: #f87171; }
+/* Cantos da moldura */
+.dlg-portrait::before,
+.dlg-portrait::after {
+    content: '';
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border: 3px solid var(--frame);
+    z-index: 1;
+}
+.dlg-portrait::before { top: -6px; left: -6px; border-right: 0; border-bottom: 0; }
+.dlg-portrait::after { bottom: -6px; right: -6px; border-left: 0; border-top: 0; }
+.dlg-portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 0.25rem;
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+.dlg-hero { left: 1.2rem; transform: scale(0.94); }
+.dlg-rival { right: 1.2rem; transform: scale(0.94); }
+/* O rival olha para o herói */
+.dlg-rival img { transform: scaleX(-1); }
+.dlg-name {
+    position: absolute;
+    left: 50%;
+    bottom: -0.75rem;
+    transform: translateX(-50%);
+    padding: 0.15rem 0.7rem;
+    white-space: nowrap;
+    border: 1px solid var(--frame);
+    border-radius: 0.3rem;
+    background: #0b0e15;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--frame);
+    z-index: 2;
+}
+
+.dlg[data-who='rival'] .dlg-rival,
+.dlg[data-who='hero'] .dlg-hero {
+    filter: none;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.dlg-box {
+    position: relative;
+    width: min(44vw, 40rem);
+    margin-bottom: 0.5rem;
+    padding: 0.9rem 1.2rem 1.1rem;
+    border: 1px solid rgba(231, 224, 207, 0.25);
+    border-radius: 0.6rem;
+    background: rgba(8, 10, 16, 0.9);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+    transform: translateY(1rem);
+    transition: transform 0.25s ease-out;
+}
+.dlg.is-open .dlg-box { transform: translateY(0); }
+.dlg-speaker {
+    margin: 0 0 0.35rem;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fca5a5;
+}
+.dlg[data-who='hero'] .dlg-speaker { color: #67e8f9; }
+.dlg[data-who='rival'] .dlg-speaker { text-align: right; }
+.dlg-text {
+    margin: 0;
+    min-height: 2.8em;
+    font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+    line-height: 1.4;
+    color: #e7e0cf;
+}
+.dlg-next {
+    position: absolute;
+    right: 0.8rem;
+    bottom: 0.4rem;
+    font-size: 0.7rem;
+    color: #e7e0cf;
+    opacity: 0;
+}
+.dlg.is-done .dlg-next { opacity: 0.8; animation: dlgBlink 0.9s ease-in-out infinite; }
+@keyframes dlgBlink { 50% { opacity: 0.2; } }
+
+/* Celular deitado: pouca altura, então retratos menores e caixa mais baixa no meio */
+@media (max-height: 500px) {
+    .dlg { padding: 0 0.75rem 0.6rem; }
+    .dlg-portrait { width: 22vw; bottom: 1.3rem; }
+    .dlg-box { width: min(46vw, 40rem); padding: 0.6rem 0.9rem 0.8rem; }
+    .dlg-text { font-size: 0.9rem; min-height: 2.6em; }
+}

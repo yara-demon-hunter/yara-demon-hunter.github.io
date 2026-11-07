@@ -1,4 +1,4 @@
-import { BOSS_MODELS, chooseBossType, isBossTurn } from './bosses.js';
+import { BOSS_MODELS, RIVAL_OF, chooseBossType, isBossTurn } from './bosses.js';
 import { TURN_DIFFICULTY } from './difficulty.js';
 import { NIGHT } from './night.js';
 
@@ -70,19 +70,19 @@ const MONSTER_ENTRIES = [
     { key: 'BONE_COLOSSUS', name: 'Bone Colossus', icon: '🦴' },
     { key: 'NECROMANCER', name: 'Necromancer', icon: '☠️' }
 ];
-const BOSS_ICONS = { DEMON_LORD: '😈', BLOOD_COUNTESS: '🩸', LONG_NIGHT: '🌑' };
+const BOSS_ICONS = { DEMON_LORD: '😈', BLOOD_COUNTESS: '🩸', LONG_NIGHT: '🌑', AZAEL: '⚔️', DEMON_HUNTER: '🗡️' };
 
-// Primeira hora (de 1 até o fim da noite) em que o boss aparece
+// Primeira hora (de 1 até o fim da noite) em que o boss aparece, com qualquer um dos heróis (o rival muda com ele)
 function firstBossHour(key) {
     for (let hour = 1; hour <= NIGHT.hours; hour++) {
-        if (isBossTurn(hour) && chooseBossType(hour) === key) return hour;
+        if (isBossTurn(hour) && Object.keys(RIVAL_OF).some(model => chooseBossType(hour, model) === key)) return hour;
     }
     return NIGHT.hours;
 }
 
 export function getBestiary() {
     const monsters = MONSTER_ENTRIES.map(m => ({ ...m, kind: 'monster', hour: TURN_DIFFICULTY.monsterUnlockTurn[m.key] ?? 1 }));
-    const bosses = Object.entries(BOSS_MODELS).map(([key, model]) => ({
+    const bosses = Object.entries(BOSS_MODELS).filter(([, model]) => !model.hidden).map(([key, model]) => ({
         key, kind: 'boss', name: model.name, subtitle: model.title, icon: BOSS_ICONS[key] ?? '☠️', hour: firstBossHour(key)
     }));
     return [...monsters, ...bosses].sort((a, b) => a.hour - b.hour);

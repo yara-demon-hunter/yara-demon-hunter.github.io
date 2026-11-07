@@ -186,7 +186,7 @@ function writeHud() {
     const hour = state.turn;
     setText(ui.turn, hour <= NIGHT.hours ? `HOUR ${hour}/${NIGHT.hours}` : `HOUR ${hour}`);
     setText(ui.hourName, state.lastStand ? `${state.enemies.length} LEFT` : getHourName(hour));
-    setBar(ui.scoreBar, state.hourPlan?.boss ? 1 : state.scoreTurn / Math.max(1, state.targetScore));
+    setBar(ui.scoreBar, state.hourPlan?.bossCalled ? 1 : state.scoreTurn / Math.max(1, state.targetScore));
     updateNightPips();
 
     // Boss HUD

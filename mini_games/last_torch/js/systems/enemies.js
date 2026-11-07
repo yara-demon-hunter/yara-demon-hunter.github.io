@@ -353,6 +353,8 @@ export function updateEnemies(dt) {
                     e.torchHitTimer = (e.torchHitTimer ?? 0) - dt;
                     if (e.torchHitTimer <= 0) {
                         e.torchHitTimer = CORE_MODEL.bossHitSeconds;
+                        // Rival: o boneco golpeia a tocha com a espada
+                        if (e.comboStep) e.comboStep = (e.comboStep % 3) + 1;
                         hurtTorch(CORE_MODEL.bossHitDamage, e.x, e.y);
                         if (state.phase !== 'HUNT') return;
                     }

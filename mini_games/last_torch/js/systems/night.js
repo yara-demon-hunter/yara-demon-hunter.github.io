@@ -12,6 +12,7 @@ import { purgeEnemy } from './enemies.js';
 import { refreshModifiers } from './modifiers.js';
 import { collectAllPickups } from './pickups.js';
 import { bumpStat } from './sanctuary.js';
+import { playDuelDialogue, whenHunting } from '../ui/dialogue.js';
 import { buildHourPlan, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
 // --- A NOITE ---
@@ -37,27 +38,36 @@ export function startHour() {
     state.phoenixSpent = false;
     resetFieldForNewTurn();
 
+    // Hora de boss também começa com a onda normal: o boss só chega quando a cota fecha (callBoss)
     const plan = state.hourPlan;
-    if (plan.boss) {
-        const boss = BOSS_MODELS[plan.boss];
-        state.bossPending = NIGHT.bossDelaySeconds;
-        showBanner(`HOUR ${hour}`, boss.name.toUpperCase(), boss.title, 'danger');
-        audio.playBossWarning();
-        audio.setMood('silent');
-    } else {
-        spawnOpening();
-        // A primeira faixa da noite diz o objetivo; as outras, a hora e o presságio
-        if (hour === 1) showBanner(`HOUR 1 OF ${NIGHT.hours}`, 'PROTECT THE TORCH', 'Survive until dawn', 'hour');
-        else showBanner(`HOUR ${hour} OF ${NIGHT.hours}`, getHourName(hour).toUpperCase(), state.omen ? `${state.omen.icon} ${state.omen.name}` : '', 'hour');
-        audio.setMood('hunt');
-    }
+    const bossNote = plan.boss ? `☠️ ${BOSS_MODELS[plan.boss].name} awaits at the end` : '';
+    spawnOpening();
+    // A primeira faixa da noite diz o objetivo; as outras, a hora e o presságio (ou o boss que espera no fim)
+    if (hour === 1) showBanner(`HOUR 1 OF ${NIGHT.hours}`, 'PROTECT THE TORCH', bossNote || 'Survive until dawn', 'hour');
+    else showBanner(`HOUR ${hour} OF ${NIGHT.hours}`, getHourName(hour).toUpperCase(), bossNote || (state.omen ? `${state.omen.icon} ${state.omen.name}` : ''), 'hour');
+    audio.setMood('hunt');
     audio.setIntensity(Math.min(1, (hour - 1) / (NIGHT.hours - 1)));
     updateHUD();
 }
 
+// Cota fechada: hora comum vai para o fim (lastStand); hora de boss chama o boss, e a hora só fecha com ele morto
 export function checkHourEnd() {
-    if (state.phase !== 'HUNT' || state.lastStand || state.bossPending > 0 || state.hourPlan.boss) return;
-    if (state.scoreTurn >= state.targetScore) beginLastStand();
+    const plan = state.hourPlan;
+    if (state.phase !== 'HUNT' || state.lastStand || plan.bossCalled) return;
+    if (state.scoreTurn < state.targetScore) return;
+    if (plan.boss) callBoss(plan);
+    else beginLastStand();
+}
+
+// Fim da onda numa hora de boss: aviso, silêncio, e ele surge NIGHT.bossDelaySeconds depois (js/systems/spawner.js)
+function callBoss(plan) {
+    const boss = BOSS_MODELS[plan.boss];
+    plan.bossCalled = true;
+    state.bossPending = NIGHT.bossDelaySeconds;
+    showBanner(`HOUR ${state.turn}`, boss.name.toUpperCase(), boss.title, 'danger');
+    audio.playBossWarning();
+    audio.setMood('silent');
+    updateHUD();
 }
 
 function beginLastStand() {
@@ -133,6 +143,20 @@ export function onBossKilled(e, model) {
     save.stats[key] = (save.stats[key] ?? 0) + 1;
     bumpStat('bosses');
 
+    // Rival: os ataques dele somem já, e a conversa entre os dois vem antes de a noite seguir
+    if (model.renderAs === 'RIVAL') {
+        state.enemyProjectiles.length = 0;
+        state.telegraphs.length = 0;
+        setTimeout(() => whenHunting(() => playDuelDialogue(e.type, 'after', afterBoss)), DUEL_DIALOGUE_DELAY_MS);
+        return;
+    }
+    afterBoss();
+}
+
+// O golpe final ainda aparece (câmera lenta, explosão) antes de a conversa congelar a tela
+const DUEL_DIALOGUE_DELAY_MS = 900;
+
+function afterBoss() {
     if (state.turn === NIGHT.hours && !state.endless) {
         beginDawn();
         return;

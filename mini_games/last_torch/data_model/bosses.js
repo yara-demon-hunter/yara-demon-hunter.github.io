@@ -10,6 +10,52 @@ import { createEnemy } from './monsters.js';
 // e o hpBase é a vida da primeira aparição dividida por esse multiplicador. Duração alvo da luta com o dano que o
 // herói faz de fato (já descontando o tempo desviando): Demon Lord ~1 min (35/s), Blood Countess ~2 min (70/s),
 // The Long Night ~5 min (100/s). Mudou o ritmo do herói? Ajuste o hpBase na mesma proporção.
+
+// --- RIVAL (primeiro boss da noite) ---
+// Na primeira hora da noite (BOSS_SPAWNING.schedule) o herói enfrenta o outro herói jogável: quem joga
+// com o Demon Hunter luta com o Azael, e quem joga com o Azael luta com o Demon Hunter (ver chooseBossType).
+// renderAs 'RIVAL' desenha o mesmo boneco 2.5D do herói (js/render/rival.js); heroModel escolhe qual e heroKey a
+// paleta (data_model/heroes.js). renderScale: o tamanho do boneco em relação ao herói.
+// lunge: mira uma linha no chão por lungeWindupSeconds, depois atravessa ela com a espada em lungeSeconds.
+const RIVAL_BASE = {
+    renderAs: 'RIVAL',
+    renderScale: 1.3,
+    // Luta de abertura: o herói ainda está no nível 1, então a vida é bem menor que a do Demon Lord
+    hpBase: 700,
+    hpPerTurn: 0,
+    radius: 26,
+    initialShootCooldownSeconds: 1.5,
+    burstIntervalSeconds: 0.3,
+    // Golpe automático de espada, como o do herói: quando o herói entra em meleeRange, golpeia a cada
+    // meleeCooldownSeconds; o corte acerta meleeHitDelaySeconds depois (o tempo da preparação do boneco)
+    meleeRange: 62,
+    meleeArc: 2.2,                // abertura do corte, em radianos, para a frente
+    meleeHitDelaySeconds: 0.12,
+    meleeDamageMultiplier: 0.8,
+    // Movimento: anda de lado em volta do herói (troca de sentido a cada strafeSwitchSeconds) e, mais perto que
+    // keepRange, recua. castSeconds: o gesto da mão a cada tiro
+    strafeSpeed: 55,
+    strafeSwitchSeconds: 1.6,
+    castSeconds: 0.34,
+    lungeLength: 330,
+    lungeWindupSeconds: 0.75,
+    lungeSeconds: 0.22,
+    lungeHitRadius: 22,
+    lungeDamageMultiplier: 1.1,
+    projectileRadius: 6,
+    projectileDamageMultiplier: 0.7,
+    projectileTorchDamage: 5,
+    enrageRatio: 0.5,
+    enrageGapMultiplier: 0.65,
+    walkShakeIntensity: 0,
+    walkShakeIntervalSeconds: 99,
+    scoreReward: 150,
+    goldBase: 35,
+    goldVariance: 0,
+    xpRewardBase: 110,
+    xpRewardPerTurn: 0,
+};
+
 export const BOSS_MODELS = {
     DEMON_LORD: {
         name: 'Demon Lord',
@@ -90,6 +136,52 @@ export const BOSS_MODELS = {
         xpRewardBase: 320,
         xpRewardPerTurn: 30,
     },
+    // Rival de quem joga com o Demon Hunter: rápido, ataca de perto e some na sombra
+    AZAEL: {
+        ...RIVAL_BASE,
+        name: 'Azael',
+        title: 'The Demon Who Hunts His Kind',
+        heroModel: 'azael',
+        heroKey: 'azael',
+        speedMin: 62,
+        speedMax: 62,
+        color: '#ef4444',
+        damage: 28,
+        meleeCooldownSeconds: 0.85,
+        keepRange: 0,
+        burstCount: 3,
+        patternGapSeconds: 1.9,
+        patterns: ['lunge', 'volley', 'lunge', 'blink', 'lunge', 'ring'],
+        ringCount: 12,
+        projectileSpeed: 190,
+        enrageSpeedMultiplier: 1.35,
+    },
+    // Rival de quem joga com o Azael: mais lento, lança adagas e crava círculos no chão
+    DEMON_HUNTER: {
+        ...RIVAL_BASE,
+        name: 'Demon Hunter',
+        title: 'He Hunts Your Kind',
+        heroModel: 'hunter',
+        heroKey: 'hunter',
+        speedMin: 50,
+        speedMax: 50,
+        color: '#38bdf8',
+        damage: 26,
+        meleeCooldownSeconds: 1.1,
+        keepRange: 170,
+        strafeSpeed: 70,
+        burstCount: 4,
+        patternGapSeconds: 2.1,
+        patterns: ['volley', 'lunge', 'slam', 'lunge', 'volley', 'ring'],
+        ringCount: 14,
+        slamCount: 3,
+        slamRadius: 70,
+        slamDelaySeconds: 1,
+        slamDamageMultiplier: 0.9,
+        slamTorchDamage: 6,
+        projectileSpeed: 210,
+        enrageSpeedMultiplier: 1.3,
+    },
     LONG_NIGHT: {
         name: 'The Long Night',
         title: 'The Dark Itself',
@@ -134,22 +226,52 @@ export const BOSS_MODELS = {
     }
 };
 
+// Revanche na última hora: o mesmo rival, bem mais forte (vida de luta final, pausas menores, mais tiros).
+// Mesma chave + '_FINAL'; hidden tira a revanche do bestiário (o rival já está lá).
+function rematch(key, changes) {
+    const base = BOSS_MODELS[key];
+    BOSS_MODELS[`${key}_FINAL`] = { ...base, title: 'Stronger Than Before', hidden: true, ...changes };
+}
+rematch('AZAEL', {
+    hpBase: 6000, patternGapSeconds: 1.4, burstCount: 5, ringCount: 16, meleeCooldownSeconds: 0.6,
+    patterns: ['lunge', 'volley', 'lunge', 'blink', 'lunge', 'ring', 'lunge', 'blink'],
+    scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
+});
+rematch('DEMON_HUNTER', {
+    hpBase: 6000, patternGapSeconds: 1.6, burstCount: 6, ringCount: 18, slamCount: 5, meleeCooldownSeconds: 0.8,
+    patterns: ['volley', 'lunge', 'slam', 'ring', 'lunge', 'volley', 'slam'],
+    scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
+});
+
 export const BOSS_SPAWNING = {
+    // Hora → boss da noite. RIVAL: o rival do herói (RIVAL_OF); RIVAL_FINAL: a revanche dele, que fecha a noite
+    schedule: { 1: 'RIVAL', 4: 'DEMON_LORD', 8: 'BLOOD_COUNTESS', 11: 'LONG_NIGHT', 12: 'RIVAL_FINAL' },
+    lastScheduledHour: 12,
+    // Modo sem fim (depois da hora 12): um boss a cada everyTurns horas, nesta ordem
     everyTurns: 4,
     spawnScreenRatio: 0.5,
-    // Ordem em que os bosses aparecem (repete do início quando acaba)
     rotation: ['DEMON_LORD', 'BLOOD_COUNTESS', 'LONG_NIGHT']
 };
 
 export function isBossTurn(turn) {
-    return turn % BOSS_SPAWNING.everyTurns === 0;
+    const { schedule, lastScheduledHour, everyTurns } = BOSS_SPAWNING;
+    return turn <= lastScheduledHour ? !!schedule[turn] : turn % everyTurns === 0;
 }
 
-// Escolhe o boss da vez pela ordem de BOSS_SPAWNING.rotation
-export function chooseBossType(turn) {
-    const { rotation, everyTurns } = BOSS_SPAWNING;
-    const appearance = Math.max(0, Math.floor(turn / everyTurns) - 1);
-    return rotation[appearance % rotation.length];
+// Rival de cada boneco de herói: o Demon Hunter (e as variações dele) enfrenta o Azael, e o Azael o Demon Hunter
+export const RIVAL_OF = { hunter: 'AZAEL', azael: 'DEMON_HUNTER' };
+
+// Boss da hora (heroModel: o boneco do herói escolhido, getHero().model, que decide o rival)
+export function chooseBossType(turn, heroModel = 'hunter') {
+    const { schedule, lastScheduledHour, rotation, everyTurns } = BOSS_SPAWNING;
+    const rival = RIVAL_OF[heroModel] ?? RIVAL_OF.hunter;
+    if (turn <= lastScheduledHour) {
+        const slot = schedule[turn];
+        if (slot === 'RIVAL') return rival;
+        if (slot === 'RIVAL_FINAL') return `${rival}_FINAL`;
+        return slot ?? null;
+    }
+    return rotation[(Math.floor(turn / everyTurns) - 1) % rotation.length];
 }
 
 export function createBoss(type, turn, x, y, random = Math.random) {

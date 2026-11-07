@@ -35,6 +35,7 @@ import { resetWorldView, stamp } from './fx/stamp.js';
 import { colossusCharge, renderBoneColossus } from './bone_colossus.js';
 import { getBoltSprite, getMonsterSprite, withColors } from './monster_sprites.js';
 import { renderReflectedBolt } from './reflect.js';
+import { renderRival } from './rival.js';
 import { renderVampire } from './vampire.js';
 
 const TAU = Math.PI * 2;
@@ -208,7 +209,8 @@ export function renderEnemyProjectiles() {
 // Corpo procedural: só bosses, que são poucos e têm animações de ataque próprias
 function drawBoss(e) {
     const model = BOSS_MODELS[e.type];
-    if (model.renderAs === 'VAMPIRE') withColors(VAMPIRE_VISUALS, BOSS_PALETTES[model.palette], () => renderVampire(e));
+    if (model.renderAs === 'RIVAL') renderRival(e);
+    else if (model.renderAs === 'VAMPIRE') withColors(VAMPIRE_VISUALS, BOSS_PALETTES[model.palette], () => renderVampire(e));
     else withColors(DEMON_LORD_VISUALS, BOSS_PALETTES[model.palette], () => renderDemonLord(e));
 }
 

@@ -23,6 +23,7 @@ import { setRenderClock } from './fx/clock.js';
 import { drawGlow, getGlowSprite } from './fx/glow.js';
 import { makeCanvas } from './fx/sprites.js';
 import { renderMoth } from './moth.js';
+import { renderRival } from './rival.js';
 import { renderSkeleton } from './skeleton.js';
 import { renderVampire } from './vampire.js';
 import { renderWitch, renderWitchBolt } from './witch.js';
@@ -195,7 +196,9 @@ const BOSS_PORTRAITS = {
     // extent: metade do quadro, em raios desenhados (asas e cauda do Demon Lord pedem mais espaço)
     // shift: desloca o corpo no quadro, em frações dele, para centralizar o que a arte estende para trás
     DEMON_LORD: { visual: DEMON_LORD_VISUALS, extent: 2.7, shift: 0.25, draw: renderDemonLord },
-    VAMPIRE: { visual: VAMPIRE_VISUALS, extent: 1.05, shift: 0.1, draw: renderVampire }
+    VAMPIRE: { visual: VAMPIRE_VISUALS, extent: 1.05, shift: 0.1, draw: renderVampire },
+    // Rival: o boneco do herói (js/render/rival.js), sem paleta trocável
+    RIVAL: { visual: { scale: 1 }, extent: 1.7, shift: 0.05, draw: renderRival }
 };
 const portraits = {};
 
@@ -219,7 +222,7 @@ function bakeBossPortrait(key) {
     return { atlas, cell: PORTRAIT_PIXELS };
 }
 
-// Chave do BOSS_MODELS (DEMON_LORD, BLOOD_COUNTESS, LONG_NIGHT). Gera na primeira vez.
+// Chave do BOSS_MODELS (DEMON_LORD, BLOOD_COUNTESS, LONG_NIGHT, AZAEL, DEMON_HUNTER). Gera na primeira vez.
 export function getBossPortrait(key) {
     if (!BOSS_MODELS[key]) return undefined;
     return portraits[key] ??= bakeBossPortrait(key);

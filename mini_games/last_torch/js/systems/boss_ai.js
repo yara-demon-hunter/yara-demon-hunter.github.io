@@ -12,6 +12,11 @@ import { hurtTorch } from './torch.js';
 const TAU = Math.PI * 2;
 
 function fireShot(e, model, angle, speedScale = 1) {
+    // Rival: a mão sobe a cada tiro (o mesmo gesto de feitiço do herói) e ele vira para onde atira
+    if (model.castSeconds) {
+        e.castAge = 0;
+        e.castAngle = angle;
+    }
     state.enemyProjectiles.push({
         owner: e.type,
         color: model.color,
@@ -87,6 +92,18 @@ const ACTIONS = {
         addShockwave(e.x, e.y, { radius: e.radius * 3, color: model.color, width: 4, seconds: 0.4 });
         audio.playSummon();
     },
+    // Investida (rivais): mira uma linha até o herói e depois a atravessa com a espada (updateLunge)
+    lunge(e, model, ai) {
+        const angle = aimAngle(e);
+        const toX = Math.max(60, Math.min(state.width - 60, e.x + Math.cos(angle) * model.lungeLength));
+        const toY = Math.max(90, Math.min(state.height - 60, e.y + Math.sin(angle) * model.lungeLength));
+        const line = {
+            kind: 'line', owner: e, x: e.x, y: e.y, angle,
+            length: Math.hypot(toX - e.x, toY - e.y), age: 0, seconds: model.lungeWindupSeconds
+        };
+        state.telegraphs.push(line);
+        ai.lunge = { line, fromX: e.x, fromY: e.y, toX, toY, wait: model.lungeWindupSeconds, t: 0, hit: false };
+    },
     // Some numa nuvem e reaparece longe do herói
     blink(e, model) {
         createExplosion(e.x, e.y, model.color, 26);
@@ -103,6 +120,103 @@ const ACTIONS = {
     }
 };
 
+// Investida em andamento: parado mirando, depois corre a linha em lungeSeconds. Fere o herói uma vez ao passar
+// por ele. Preso pelo Shadow Shackle, desiste da investida.
+function updateLunge(e, model, ai, dt) {
+    const L = ai.lunge;
+    if (e.chained) {
+        const i = state.telegraphs.indexOf(L.line);
+        if (i >= 0) state.telegraphs.splice(i, 1);
+        e.dashTimer = 0;
+        ai.lunge = null;
+        return;
+    }
+    if (L.wait > 0) {
+        L.wait -= dt;
+        e.x = L.fromX;
+        e.y = L.fromY;
+        e.angle = L.line.angle;
+        if (L.wait <= 0) {
+            // Golpe de espada no arranque (o boneco detecta a troca de comboStep)
+            e.comboStep = (e.comboStep % 3) + 1;
+            addShockwave(e.x, e.y, { radius: 70, color: model.color, width: 4, seconds: 0.25 });
+            audio.playDash();
+        }
+        return;
+    }
+    L.t = Math.min(1, L.t + dt / model.lungeSeconds);
+    e.x = L.fromX + (L.toX - L.fromX) * L.t;
+    e.y = L.fromY + (L.toY - L.fromY) * L.t;
+    e.angle = L.line.angle;
+    e.chainX = e.x;
+    e.chainY = e.y;
+    e.dashTimer = model.lungeSeconds * (1 - L.t);
+    if (!L.hit && Math.hypot(player.x - e.x, player.y - e.y) < e.radius + model.lungeHitRadius) {
+        L.hit = hurtPlayer(e.damage * model.lungeDamageMultiplier, e.x, e.y, 0.6);
+    }
+    if (L.t >= 1) {
+        e.dashTimer = 0;
+        ai.lunge = null;
+        createExplosion(e.x, e.y, model.color, 14);
+        e.shootTimer = model.patternGapSeconds * (e.enraged ? model.enrageGapMultiplier : 1);
+    }
+}
+
+// --- RIVAIS: o jeito de lutar do herói ---
+// Golpe automático quando o herói chega perto: troca o comboStep (o boneco faz o corte) e acerta logo depois
+function updateRivalMelee(e, model, ai, dt) {
+    ai.meleeTimer = (ai.meleeTimer ?? 0) - dt;
+    if (ai.meleeHit != null) {
+        ai.meleeHit -= dt;
+        if (ai.meleeHit <= 0) {
+            ai.meleeHit = null;
+            const dx = player.x - e.x;
+            const dy = player.y - e.y;
+            let diff = Math.atan2(dy, dx) - ai.meleeAngle;
+            while (diff > Math.PI) diff -= TAU;
+            while (diff < -Math.PI) diff += TAU;
+            if (Math.hypot(dx, dy) < model.meleeRange + 18 && Math.abs(diff) < model.meleeArc / 2) {
+                hurtPlayer(e.damage * model.meleeDamageMultiplier, e.x, e.y, 0.5);
+            }
+        }
+    }
+    if (ai.meleeTimer > 0 || Math.hypot(player.x - e.x, player.y - e.y) > model.meleeRange) return;
+    ai.meleeTimer = model.meleeCooldownSeconds * (e.enraged ? model.enrageGapMultiplier : 1);
+    ai.meleeAngle = aimAngle(e);
+    ai.meleeHit = model.meleeHitDelaySeconds;
+    e.angle = ai.meleeAngle;
+    e.comboStep = (e.comboStep % 3) + 1;
+    audio.playBossAttack();
+}
+
+// Anda de lado em volta do herói em vez de vir reto; o caçador recua se o herói chega perto demais
+function updateRivalMovement(e, model, ai, dt) {
+    if (e.chained) return;
+    ai.strafeTimer = (ai.strafeTimer ?? 0) - dt;
+    if (ai.strafeTimer <= 0) {
+        ai.strafeTimer = model.strafeSwitchSeconds * (0.7 + Math.random() * 0.6);
+        ai.strafeDir = Math.random() < 0.5 ? -1 : 1;
+    }
+    const a = aimAngle(e);
+    const speed = model.strafeSpeed * (e.enraged ? model.enrageSpeedMultiplier : 1) * dt;
+    let mx = -Math.sin(a) * ai.strafeDir * speed;
+    let my = Math.cos(a) * ai.strafeDir * speed;
+    const dist = Math.hypot(player.x - e.x, player.y - e.y);
+    // Recua dobrado: a perseguição normal (js/systems/enemies.js) já empurrou para a frente neste quadro
+    if (model.keepRange && dist < model.keepRange) {
+        mx -= Math.cos(a) * e.speed * dt * 2;
+        my -= Math.sin(a) * e.speed * dt * 2;
+    }
+    e.x = Math.max(40, Math.min(state.width - 40, e.x + mx));
+    e.y = Math.max(70, Math.min(state.height - 40, e.y + my));
+}
+
+function updateRival(e, model, ai, dt) {
+    if (e.castAge >= 0) e.castAge = e.castAge + dt >= model.castSeconds ? -1 : e.castAge + dt;
+    updateRivalMelee(e, model, ai, dt);
+    updateRivalMovement(e, model, ai, dt);
+}
+
 function enrage(e, model) {
     e.enraged = true;
     e.speed *= model.enrageSpeedMultiplier;
@@ -118,6 +232,12 @@ export function updateBossAI(e, model, dt) {
     const ai = e.ai ?? (e.ai = { step: 0, shots: 0, interval: 0, wait: 0, fire: null });
 
     if (!e.enraged && e.hp < e.maxHp * model.enrageRatio) enrage(e, model);
+
+    if (ai.lunge) {
+        updateLunge(e, model, ai, dt);
+        return;
+    }
+    if (model.renderAs === 'RIVAL') updateRival(e, model, ai, dt);
 
     // Ataque em andamento (rajada, espiral): um tiro por intervalo
     if (ai.shots > 0) {

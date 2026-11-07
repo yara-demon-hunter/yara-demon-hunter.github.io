@@ -6,6 +6,7 @@ import { audio, player, state } from '../core/state.js';
 import { collectAllGold } from '../systems/gold.js';
 import { startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
+import { getHero } from '../systems/modifiers.js';
 import { feedTorch } from '../systems/torch.js';
 import { hasBuyableNode } from '../systems/tree.js';
 import { updateHUD } from './hud.js';
@@ -71,7 +72,7 @@ function renderNext() {
     document.getElementById('campNextHour').innerText = `HOUR ${hour} · ${getHourName(hour)}`;
     const threat = document.getElementById('campNextThreat');
     if (isBossTurn(hour)) {
-        threat.innerText = `☠️ ${BOSS_MODELS[chooseBossType(hour)].name} awaits`;
+        threat.innerText = `☠️ ${BOSS_MODELS[chooseBossType(hour, getHero().model)].name} awaits`;
     } else if (state.nextOmen) {
         threat.innerText = `${state.nextOmen.icon} ${state.nextOmen.name}: ${state.nextOmen.desc}`;
     } else {

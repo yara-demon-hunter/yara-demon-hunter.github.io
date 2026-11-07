@@ -808,7 +808,8 @@ export function renderPlayer25D(body = player, bodyAnim = heroAnim, colors = V.c
     bladeLength = (azael ? AZ.bladeLength : V.bladeLength) * (gear ? OATH_VISUALS[gear].bladeLength : 1);
     bladeWidth = (azael ? AZ.bladeWidth : V.bladeWidth) * (gear ? OATH_VISUALS[gear].bladeWidth : 1);
     const t = performance.now() / 1000;
-    const frenzy = state.frenzyActiveTimer > 0;
+    // Boss rival (js/render/rival.js): a lâmina acende quando ele enfurece, não com a Fúria do herói
+    const frenzy = body.isBoss ? !!body.enraged : state.frenzyActiveTimer > 0;
     cosF = Math.cos(anim.facing);
     sinF = Math.sin(anim.facing);
 

@@ -6,9 +6,10 @@ import { MONSTER_MODELS, MONSTER_SPAWNING, chooseMonsterType, createMonster } fr
 import { isMonsterUnlocked } from '../../data_model/difficulty.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner, showToast } from '../ui/banner.js';
+import { playDuelDialogue, whenHunting } from '../ui/dialogue.js';
 import { updateHUD } from '../ui/hud.js';
 import { addShockwave, screenFlash, shakeScreen, slowMotion } from './effects.js';
-import { mod } from './modifiers.js';
+import { getHero, mod } from './modifiers.js';
 import { clearSkillEffects } from './skills.js';
 
 const MIN_HORDE = 3;
@@ -131,7 +132,7 @@ function spawnHorde(h) {
 }
 
 export function spawnBoss() {
-    const type = chooseBossType(state.turn);
+    const type = chooseBossType(state.turn, getHero().model);
     const model = BOSS_MODELS[type];
     const a = Math.random() * Math.PI * 2;
     const spawnDist = Math.max(state.width, state.height) * BOSS_SPAWNING.spawnScreenRatio;
@@ -147,7 +148,15 @@ export function spawnBoss() {
     addShockwave(x, y, { radius: 260, color: model.color, width: 9, seconds: 0.7 });
     audio.playBossRoar();
     audio.setMood('boss');
+    // Rival: os dois conversam antes da luta (depois da entrada dele aparecer)
+    if (model.renderAs === 'RIVAL') {
+        const boss = state.currentBoss;
+        setTimeout(() => whenHunting(() => {
+            if (state.currentBoss === boss) playDuelDialogue(boss.type, 'before', () => {});
+        }), RIVAL_INTRO_DELAY_MS);
+    }
 }
+const RIVAL_INTRO_DELAY_MS = 700;
 
 export function updateSpawner(dt) {
     if (state.phase !== 'HUNT' || state.lastStand) return;
@@ -182,13 +191,13 @@ export function updateSpawner(dt) {
     }
 }
 
-// Plano da hora: quantas hordas e elites, ou o boss (hora de boss não tem hordas)
+// Plano da hora: quantas hordas e elites e, nas horas de boss, quem chega no fim da onda (bossCalled: já chamado)
 export function buildHourPlan(hour) {
-    if (isBossTurn(hour)) return { boss: chooseBossType(hour), hordes: [], elites: [] };
+    const boss = isBossTurn(hour) ? chooseBossType(hour, getHero().model) : null;
     const elites = [];
     if (hour >= HOUR_EVENTS.firstEliteHour) elites.push({ at: HOUR_EVENTS.eliteMoment, fired: false });
     if (hour >= HOUR_EVENTS.secondEliteHour) elites.push({ at: HOUR_EVENTS.secondEliteMoment, fired: false });
-    return { boss: null, hordes: rollHourHordes(hour), elites };
+    return { boss, bossCalled: false, hordes: rollHourHordes(hour), elites };
 }
 
 // Monstros do início da hora, já perto: a ação começa na hora
