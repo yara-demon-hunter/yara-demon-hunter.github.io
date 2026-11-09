@@ -1,3 +1,47 @@
+- date: "2026-11-09"
+  title:
+    en: "Last Torch: new preview videos and balance pass"
+    pt: "Last Torch: novos vídeos de prévia e ajuste de balanceamento"
+  summary:
+    en: "New 1920x1080 and 1080x1620 preview videos were added, and relic and healing skill values were tuned to make the late game more strategic."
+    pt: "Foram adicionados novos vídeos de prévia em 1920x1080 e 1080x1620, e os valores de relíquias e habilidades de cura foram ajustados para deixar o fim de partida mais estratégico."
+  url:
+    en: "/en/mini-games/last-torch/"
+    pt: "/pt/mini-games/last-torch/"
+
+- date: "2026-11-08"
+  title:
+    en: "Last Torch: bosses tuned to each hero"
+    pt: "Last Torch: bosses ajustados para cada herói"
+  summary:
+    en: "Bosses now scale with the character's stats instead of using flat values, and the hero roster was rebalanced to keep each build feeling distinct."
+    pt: "Os chefes agora escalam com as estatísticas do personagem em vez de usar valores fixos, e a lista de heróis foi reequilibrada para manter cada build com identidade própria."
+  url:
+    en: "/en/mini-games/last-torch/#bosses"
+    pt: "/pt/mini-games/last-torch/#chefes"
+
+- date: "2026-11-07"
+  title:
+    en: "Last Torch: clearer skill upgrades and combat feedback"
+    pt: "Last Torch: melhorias nas habilidades e no feedback de combate"
+  summary:
+    en: "Skill upgrades now highlight what can be improved, preview videos were added, and more visual feedback was introduced during combat and boss encounters."
+    pt: "As melhorias de habilidades agora destacam o que pode ser evoluído, vídeos de prévia foram adicionados e o feedback visual durante o combate e as lutas contra chefes foi ampliado."
+  url:
+    en: "/en/mini-games/last-torch/#skills"
+    pt: "/pt/mini-games/last-torch/#habilidades"
+
+- date: "2026-11-06"
+  title:
+    en: "Last Torch: movement, Azael and character polish"
+    pt: "Last Torch: movimento, Azael e polimento dos personagens"
+  summary:
+    en: "Character stride timing, Azael attack positioning, and the overall hero pass made the combat flow smoother and more readable for every run."
+    pt: "O ritmo dos passos, a posição de ataque do Azael e o ajuste geral dos personagens deixaram o combate mais fluido e legível em cada partida."
+  url:
+    en: "/en/mini-games/last-torch/#characters"
+    pt: "/pt/mini-games/last-torch/#personagens"
+
 - date: "2026-11-03"
   title:
     en: "A new home for the project"
