@@ -6,7 +6,7 @@ import { isFireCasting } from './knives.js';
 import { addFloater, hitStop, slowMotion } from './effects.js';
 import { bumpStat } from './sanctuary.js';
 import { leaveSmokeTrail, onDashEnd, onDashStart, stealOnPerfectDodge, strikeDashPath } from './skills_shadow.js';
-import { getDashCharges, getDashCooldown } from './stats.js';
+import { getDashCharges, getDashCooldown, getDashDistance, getDashSeconds } from './stats.js';
 
 // --- DASH ---
 // Esquiva curta e invulnerável, com cargas. Vai para onde o jogador está indo; parado, para onde
@@ -63,7 +63,7 @@ export function tryDash() {
     const dir = getDashDirection();
     player.dashCharges--;
     if (player.dashRecharge <= 0) player.dashRecharge = getDashCooldown();
-    player.dashTimer = DASH_SKILL.seconds;
+    player.dashTimer = getDashSeconds();
     player.dashX = dir.x;
     player.dashY = dir.y;
     player.dashStruck = null;
@@ -86,7 +86,8 @@ export function tryDash() {
 
 // Avanço do dash (chamado no lugar do movimento normal, em js/systems/player.js)
 export function moveDash(dt) {
-    const speed = DASH_SKILL.distance / DASH_SKILL.seconds;
+    const distance = getDashDistance();
+    const speed = distance / getDashSeconds();
     const step = Math.min(dt, player.dashTimer) * speed;
     player.x += player.dashX * step;
     player.y += player.dashY * step;
@@ -94,7 +95,7 @@ export function moveDash(dt) {
     player.targetX = player.x;
     player.targetY = player.y;
 
-    const spacing = DASH_SKILL.distance / DASH_SKILL.ghosts;
+    const spacing = distance / DASH_SKILL.ghosts;
     const last = state.dashGhosts[state.dashGhosts.length - 1];
     if (!last || Math.hypot(last.x - player.x, last.y - player.y) >= spacing) {
         state.dashGhosts.push({ x: player.x, y: player.y, age: 0, seconds: 0.3, angle: Math.atan2(player.dashY, player.dashX) });

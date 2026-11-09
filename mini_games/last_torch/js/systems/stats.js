@@ -1,9 +1,14 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
+import { getCharacterBase } from '../../data_model/character_bases.js';
 import { BLADE_SKILL, DASH_SKILL, FRENZY_NOVA_SKILL, KNIFE_SKILL, SPELL_SKILL } from '../../data_model/skills.js';
 import { WAR_CRY } from '../../data_model/passives.js';
 import { getPowerLevel } from '../../data_model/powers.js';
 import { attributes, passives, player, powers, state } from '../core/state.js';
-import { mod } from './modifiers.js';
+import { getHero, mod } from './modifiers.js';
+
+function getCurrentCharacterBase() {
+    return getCharacterBase(getHero().model ?? 'hunter');
+}
 
 // --- FÓRMULAS DE ATRIBUTOS ---
 // Só as cartas escolhidas contam; o nível do herói não muda os stats sozinho.
@@ -72,7 +77,7 @@ export function getAtkCooldown() {
     return Math.max(BLADE_SKILL.minimumCooldownSeconds, cd);
 }
 export function getPlayerMaxSpeed() {
-    return (CHARACTER_MODEL.initialMoveSpeed
+    return (getCurrentCharacterBase().player.moveSpeed
         + (attributes.moveSpeed.lvl - 1) * CHARACTER_MODEL.moveSpeedPerUpgrade) * (1 + mod('moveSpeed'));
 }
 export function getKnockback() {
@@ -123,6 +128,12 @@ export function getKnifeCooldown() {
 }
 export function getDashCharges() {
     return DASH_SKILL.charges + mod('dashCharges');
+}
+export function getDashDistance() {
+    return getCurrentCharacterBase().player.dash.distance;
+}
+export function getDashSeconds() {
+    return getCurrentCharacterBase().player.dash.seconds;
 }
 export function getDashCooldown() {
     return DASH_SKILL.cooldownSeconds * Math.max(0.3, 1 - mod('dashCooldown'));

@@ -1,4 +1,5 @@
 import { createEnemy } from './monsters.js';
+import { CHARACTER_BASES } from './character_bases.js';
 
 // --- BOSSES ---
 // Separados dos monstros comuns: não entram no sorteio normal, aparecem a cada `everyTurns`
@@ -37,10 +38,8 @@ const RIVAL_BASE = {
     strafeSpeed: 55,
     strafeSwitchSeconds: 1.6,
     castSeconds: 0.34,
-    lungeLength: 330,
     lungeWindupSeconds: 0.75,
     // A investida é rápida e a área de contato é mais grossa que a linha de aviso (que não mostra a folga extra)
-    lungeSeconds: 0.14,
     lungeHitRadius: 30,
     lungeDamageMultiplier: 1.1,
     // Os rivais atiram adagas (mais rápidas que as bolas de fogo dos outros bosses)
@@ -150,8 +149,10 @@ export const BOSS_MODELS = {
         title: 'The Demon Who Hunts His Kind',
         heroModel: 'azael',
         heroKey: 'azael',
-        speedMin: 62,
-        speedMax: 62,
+        speedMin: CHARACTER_BASES.azael.boss.moveSpeed,
+        speedMax: CHARACTER_BASES.azael.boss.moveSpeed,
+        lungeLength: CHARACTER_BASES.azael.boss.lungeLength,
+        lungeSeconds: CHARACTER_BASES.azael.boss.lungeSeconds,
         color: '#ef4444',
         damage: 31,
         meleeCooldownSeconds: 0.85,
@@ -161,7 +162,6 @@ export const BOSS_MODELS = {
         patterns: ['lunge', 'volley', 'shadows', 'lunge', 'blink', 'lunge', 'ring'],
         ringCount: 12,
         projectileSpeed: 300,
-        lungeSeconds: 0.12,
         enrageSpeedMultiplier: 1.35,
     },
     // Rival de quem joga com o Azael: mais lento, lança adagas e crava círculos no chão
@@ -171,8 +171,10 @@ export const BOSS_MODELS = {
         title: 'He Hunts Your Kind',
         heroModel: 'hunter',
         heroKey: 'hunter',
-        speedMin: 50,
-        speedMax: 50,
+        speedMin: CHARACTER_BASES.hunter.boss.moveSpeed,
+        speedMax: CHARACTER_BASES.hunter.boss.moveSpeed,
+        lungeLength: CHARACTER_BASES.hunter.boss.lungeLength,
+        lungeSeconds: CHARACTER_BASES.hunter.boss.lungeSeconds,
         color: '#38bdf8',
         damage: 26,
         meleeCooldownSeconds: 1.1,
@@ -188,7 +190,6 @@ export const BOSS_MODELS = {
         slamDamageMultiplier: 0.9,
         slamTorchDamage: 6,
         projectileSpeed: 270,
-        lungeSeconds: 0.16,
         enrageSpeedMultiplier: 1.3,
     },
     LONG_NIGHT: {

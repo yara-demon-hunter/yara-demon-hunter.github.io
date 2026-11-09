@@ -75,8 +75,6 @@ export const KNIFE_SKILL = {
 export const DASH_SKILL = {
     charges: 1,
     cooldownSeconds: 2.6,       // tempo para recuperar uma carga
-    seconds: 0.17,              // duração do avanço
-    distance: 150,
     invulnerableSeconds: 0.3,
     ghosts: 6                   // imagens deixadas pelo caminho
 };

@@ -334,6 +334,8 @@ export function returnToMenu() {
 
 export function setupScreens() {
     audio.applySettings();
+    // Reconcilia recompensas antigas antes de montar os cartões do menu.
+    checkAchievements({ toast: false });
     renderStartScreen();
     scheduleMonsterSprites();
     preloadTreeImages();

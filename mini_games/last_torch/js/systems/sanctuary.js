@@ -15,10 +15,20 @@ export function rewardText(a) {
 export function checkAchievements({ toast = true } = {}) {
     const done = [];
     ACHIEVEMENTS.forEach(a => {
-        if (save.achievements[a.id] || (save.stats[a.stat] ?? 0) < a.target) return;
-        save.achievements[a.id] = true;
-        if (a.hero && !save.unlockedHeroes.includes(a.hero)) save.unlockedHeroes.push(a.hero);
-        done.push(a);
+        const earned = save.achievements[a.id] || (save.stats[a.stat] ?? 0) >= a.target;
+        if (!earned) return;
+
+        let changed = false;
+        if (!save.achievements[a.id]) {
+            save.achievements[a.id] = true;
+            changed = true;
+        }
+        // Repara saves em que a conquista já consta como feita, mas a recompensa não foi gravada.
+        if (a.hero && !save.unlockedHeroes.includes(a.hero)) {
+            save.unlockedHeroes.push(a.hero);
+            changed = true;
+        }
+        if (changed) done.push(a);
     });
     if (done.length === 0) return done;
     persist();

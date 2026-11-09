@@ -286,11 +286,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { stacks: 6, damage: 0.025, speed: 0.015, seconds: 3 },
-            { stacks: 8, damage: 0.025, speed: 0.015, seconds: 3 },
-            { stacks: 8, damage: 0.03, speed: 0.015, seconds: 3 },
-            { stacks: 11, damage: 0.03, speed: 0.015, seconds: 4 },
-            { stacks: 11, damage: 0.04, speed: 0.02, seconds: 4 }
+            { stacks: 6, damage: 0.025, speed: 0.015, seconds: 2 },
+            { stacks: 8, damage: 0.025, speed: 0.015, seconds: 2 },
+            { stacks: 8, damage: 0.03, speed: 0.015, seconds: 2 },
+            { stacks: 11, damage: 0.03, speed: 0.015, seconds: 2.5 },
+            { stacks: 11, damage: 0.04, speed: 0.02, seconds: 2.5 }
         ],
         decaySeconds: 0.4       // tempo acabou: perde uma carga a cada decaySeconds
     },
@@ -454,8 +454,8 @@ export const EVOLUTIONS = {
             const { stacks, damage: stackDamage, speed: stackSpeed } = this.levels;
             return `At ${minStacks} or more stacks, every swing throws a blood crescent through the horde. At max level, each crescent deals ${formatMultiplier(damage)} blade damage; each stack grants ${formatPercent(stackDamage)} damage and ${formatPercent(stackSpeed)} attack speed, up to ${stacks} stacks. Range: ${range}.`;
         },
-        levels: { stacks: 14, damage: 0.04, speed: 0.02, seconds: 5 },
-        crescent: { minStacks: 5, damage: 0.7, speed: 560, range: 340, radius: 26 }
+        levels: { stacks: 10, damage: 0.03, speed: 0.015, seconds: 3 },
+        crescent: { minStacks: 5, damage: 0.55, speed: 560, range: 340, radius: 26 }
     },
     earthbreaker: {
         name: 'Cataclysm', icon: '🌋',

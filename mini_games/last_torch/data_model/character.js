@@ -3,7 +3,6 @@ export const CHARACTER_MODEL = {
     name: 'Demon Hunter',
     initialHp: 100,
     initialPositionOffsetY: -60,
-    initialMoveSpeed: 150,
     moveSpeedPerUpgrade: 8,
     baseHp: 100,
     hpPerUpgrade: 10,

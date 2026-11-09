@@ -1,5 +1,6 @@
 import { HERO_VISUALS } from './visuals/characters/hero_visual.js';
 import { AZAEL_VISUALS } from './visuals/characters/azael_visual.js';
+import { CHARACTER_BASES } from './character_bases.js';
 
 // --- HERÓIS ---
 // Liberados por conquistas do Santuário (data_model/sanctuary.js). mods: mesmas chaves de js/systems/modifiers.js.
@@ -12,7 +13,7 @@ export const HEROES = {
         name: 'Demon Hunter',
         tagline: 'Patient and strategic. He waits, aims, and lets the torch work.',
         trait: '+15% health, +20% dagger damage, +25% dagger range, +15% attack speed while standing still, +20% torch warmth, but -5% blade damage.',
-        mods: { maxHp: 0.15, knifeDamage: 0.2, knifeRange: 0.25, stillAttack: 0.15, warmth: 0.2, damage: -0.05 },
+        mods: CHARACTER_BASES.hunter.player.mods,
         startPower: null,
         colors: null,
         portrait: ''
@@ -66,7 +67,7 @@ export const HEROES = {
         name: 'Azael',
         tagline: 'Aggressive. A demon who hunts his own kind, up close.',
         trait: '+25% damage and heals 5% of the damage he deals, but -25% health.',
-        mods: { damage: 0.25, lifeSteal: 0.05, maxHp: -0.25 },
+        mods: CHARACTER_BASES.azael.player.mods,
         startPower: null,
         model: 'azael',
         colors: AZAEL_VISUALS.colors,
