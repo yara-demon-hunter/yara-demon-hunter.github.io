@@ -125,7 +125,8 @@ const ACTIONS = {
             kind: 'line', owner: e, x: e.x, y: e.y, angle,
             length: Math.hypot(toX - e.x, toY - e.y), age: 0, seconds: model.lungeWindupSeconds
         };
-        state.telegraphs.push(line);
+        // A linha de aviso não é mais desenhada (não entra em state.telegraphs): o jogador lê a investida pelo
+        // boneco, que para e mira durante lungeWindupSeconds. `line` só guarda o ângulo e o alcance.
         ai.lunge = { line, fromX: e.x, fromY: e.y, toX, toY, wait: model.lungeWindupSeconds, t: 0, hit: false };
     },
     // Some numa nuvem e reaparece longe do herói
@@ -213,7 +214,14 @@ function updateRivalMelee(e, model, ai, dt) {
     audio.playBossAttack();
 }
 
-// Anda de lado em volta do herói em vez de vir reto; o caçador recua se o herói chega perto demais
+// Anda em volta do herói de forma contínua. A perseguição (js/systems/enemies.js) já empurrou o rival para a frente
+// neste quadro; aqui só se soma a diferença até a velocidade que ele quer. Nada muda de uma vez: a velocidade para
+// frente/trás e a lateral se aproximam do alvo aos poucos (antes, perto do keepRange o chefe vibrava a cada
+// quadro entre avançar e recuar, e o andar de lado trocava de sentido de repente).
+const RIVAL_RADIAL_RESPONSE = 6;        // quão rápido a velocidade para frente/trás segue o alvo (por segundo)
+const RIVAL_STRAFE_RESPONSE = 3;        // idem para a lateral
+const RIVAL_KEEP_BAND = 60;             // faixa em volta do keepRange em que ele desacelera até parar
+
 function updateRivalMovement(e, model, ai, dt) {
     if (e.chained) return;
     ai.strafeTimer = (ai.strafeTimer ?? 0) - dt;
@@ -222,15 +230,23 @@ function updateRivalMovement(e, model, ai, dt) {
         ai.strafeDir = Math.random() < 0.5 ? -1 : 1;
     }
     const a = aimAngle(e);
-    const speed = model.strafeSpeed * (e.enraged ? model.enrageSpeedMultiplier : 1) * dt;
-    let mx = -Math.sin(a) * ai.strafeDir * speed;
-    let my = Math.cos(a) * ai.strafeDir * speed;
     const dist = Math.hypot(player.x - e.x, player.y - e.y);
-    // Recua dobrado: a perseguição normal (js/systems/enemies.js) já empurrou para a frente neste quadro
-    if (model.keepRange && dist < model.keepRange) {
-        mx -= Math.cos(a) * e.speed * dt * 2;
-        my -= Math.sin(a) * e.speed * dt * 2;
-    }
+
+    // Para frente (+) ou para trás (-): sem keepRange vai sempre ao herói; com keepRange avança se está longe,
+    // para na distância certa e recua se o herói chega perto, tudo gradual
+    const target = model.keepRange
+        ? Math.max(-1, Math.min(1, (dist - model.keepRange) / RIVAL_KEEP_BAND)) * e.speed
+        : e.speed;
+    ai.radialV ??= e.speed;
+    ai.radialV += (target - ai.radialV) * Math.min(1, dt * RIVAL_RADIAL_RESPONSE);
+
+    const strafeTarget = ai.strafeDir * model.strafeSpeed * (e.enraged ? model.enrageSpeedMultiplier : 1);
+    ai.strafeV ??= 0;
+    ai.strafeV += (strafeTarget - ai.strafeV) * Math.min(1, dt * RIVAL_STRAFE_RESPONSE);
+
+    const forward = (ai.radialV - e.speed) * dt;        // a perseguição já somou e.speed * dt
+    const mx = Math.cos(a) * forward - Math.sin(a) * ai.strafeV * dt;
+    const my = Math.sin(a) * forward + Math.cos(a) * ai.strafeV * dt;
     e.x = Math.max(40, Math.min(state.width - 40, e.x + mx));
     e.y = Math.max(70, Math.min(state.height - 40, e.y + my));
 }

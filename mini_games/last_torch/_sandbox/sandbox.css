@@ -1,0 +1,33 @@
+/* Arena de testes: só existe nesta página, nunca no jogo */
+#startScreen { display: none !important; }
+#sbToggle {
+    position: fixed; left: 8px; bottom: 8px; z-index: 9999; padding: 6px 10px; border-radius: 8px;
+    background: #7f1d1d; color: #fff; border: 1px solid #ef4444; font: 600 12px/1 Inter, sans-serif; cursor: pointer;
+}
+#sbPanel {
+    position: fixed; inset: 0; z-index: 9998; display: flex; align-items: center; justify-content: center;
+    background: rgba(2, 6, 23, 0.82); padding: 16px; overflow: auto;
+}
+#sbPanel.hidden { display: none; }
+#sbPanel .card {
+    width: min(560px, 100%); background: #0b1220; border: 1px solid #334155; border-radius: 12px; padding: 16px 18px;
+    color: #e2e8f0; font: 14px/1.4 Inter, sans-serif;
+}
+#sbPanel h2 { margin: 0 0 4px; font: 700 18px Cinzel, serif; color: #fca5a5; }
+#sbPanel p.note { margin: 0 0 12px; color: #94a3b8; font-size: 12px; }
+#sbPanel h3 { margin: 12px 0 6px; font-size: 11px; letter-spacing: .08em; color: #94a3b8; text-transform: uppercase; }
+.sb-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.sb-opt {
+    flex: 1 1 120px; padding: 8px 10px; border-radius: 8px; background: #111a2e; border: 1px solid #334155;
+    color: #e2e8f0; cursor: pointer; text-align: left; font: inherit;
+}
+.sb-opt small { display: block; color: #94a3b8; font-size: 11px; }
+.sb-opt.on { border-color: #ef4444; background: #2a0f14; }
+.sb-field { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 0; }
+.sb-field input[type=number] { width: 80px; background: #111a2e; color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; padding: 4px 6px; }
+#sbGo {
+    width: 100%; margin-top: 14px; padding: 12px; border-radius: 10px; border: 1px solid #ef4444; background: #991b1b;
+    color: #fff; font: 700 15px Inter, sans-serif; cursor: pointer;
+}
+#sbTools { display: flex; gap: 6px; margin-top: 8px; }
+#sbTools button { flex: 1; padding: 6px; border-radius: 8px; border: 1px solid #334155; background: #111a2e; color: #cbd5e1; cursor: pointer; font-size: 12px; }
