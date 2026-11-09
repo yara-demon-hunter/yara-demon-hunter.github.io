@@ -1,5 +1,5 @@
 import { getCloneArea } from '../systems/shadow_clone.js';
-import { SHADOW_CLONE_VISUALS as V } from '../../data_model/visuals/characters/shadow_clone_visual.js';
+import { SHADOW_CLONE_VISUALS as V, shadowColorsOf } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { ctx, passives, shadowClones, state } from '../core/state.js';
 import { drawGlow } from './fx/glow.js';
@@ -70,9 +70,9 @@ export function renderShadowClone() {
         ctx.save();
         drawGlow(ctx, V.auraColor, c.x, c.y, V.auraRadius, appear);
         ctx.globalAlpha = V.alpha * appear;
-        // Mesmo boneco do herói escolhido (Demon Hunter ou Azael), pintado de sombra
+        // Mesmo boneco do herói escolhido, pintado de sombra
         const model = getHero().model;
-        renderPlayer25D(c, c.anim, model === 'azael' ? V.azaelColors : V.colors, null, model);
+        renderPlayer25D(c, c.anim, shadowColorsOf(model), null, model);
         ctx.globalAlpha = appear;
         renderHpBar(c);
         ctx.restore();

@@ -6,7 +6,7 @@
 // Lados sempre do ponto de vista dele: direita = +b (mão da adaga, bainha), esquerda = -b (bolsa).
 // A cabeça usa a mesma geometria do Azael (NS.azael.kit), com as medidas do Zeph. Referência: art_reference/zeph.
 // rig: { project, projectVec, limb, ball, disk, anim, C, sinF, cosF }. Medidas e cores: js/data/visuals/hero25d.js (zeph).
-// Script clássico: expõe window.YaraStage25D.zeph; hero25d.js liga o contexto (bind) antes de desenhar.
+// Script clássico: registra window.YaraStage25D.bodies.zeph; hero25d.js liga o contexto (bind) antes de desenhar.
 (() => {
 const NS = window.YaraStage25D = window.YaraStage25D || {};
 const Z = window.YaraRpgData.visuals.hero25d.zeph;
@@ -428,8 +428,24 @@ function drawZephDagger(rig, hand, dir, alpha) {
     ctx.globalAlpha = baseAlpha;
 }
 
-NS.zeph = {
+// --- REGISTRO DO BONECO (lido por hero25d.js) --- interface completa em js/stage/README.md
+NS.bodies = NS.bodies || {};
+NS.bodies.zeph = {
+    vis: 'zeph',
     bind(context) { ctx = context; },
-    zephHeadParts, drawZephArm, drawZephLeg, drawZephTorso, drawZephDagger
+    idleArms: true,
+    drawLeg: (rig, { hip, knee, ankle, toe }) => drawZephLeg(rig, hip, knee, ankle, toe),
+    drawTorso: (rig, pose, bottom, top, wb, wt) => drawZephTorso(rig, pose, bottom, top, wb, wt),
+    // Sem capa (a bolsa e a alça ficam no tronco)
+    drawBack() {},
+    // Em repouso: adaga baixa à frente do quadril, ponta para a frente (guarda de faca)
+    swordRest(rig, pose, { hand, dir, blend }) {
+        const m = rig.mix(dir, [0.95, 0.12 + Math.sin(pose.t * 1.3) * 0.06, 0.12], 1 - blend);
+        const size = Math.hypot(...m) || 1;
+        return { hand, dir: m.map(v => v / size) };
+    },
+    drawArm: (rig, shoulder, elbow, hand, armWidth, handRadius) => drawZephArm(rig, shoulder, elbow, hand, armWidth, handRadius),
+    drawBlade: (rig, hand, dir, alpha) => drawZephDagger(rig, hand, dir, alpha),
+    headParts: (pose, rig) => zephHeadParts(pose, rig)
 };
 })();

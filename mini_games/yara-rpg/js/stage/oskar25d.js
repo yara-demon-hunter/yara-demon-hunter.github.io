@@ -6,7 +6,7 @@
 // Lados sempre do ponto de vista dele: direita = +b, esquerda = -b.
 // A cabeça usa a mesma geometria do Azael (NS.azael.kit), no esquema do Zeph. Referência: art_reference/oskar.
 // rig: { project, projectVec, limb, ball, disk, anim, C, sinF, cosF }. Medidas e cores: js/data/visuals/hero25d.js (oskar).
-// Script clássico: expõe window.YaraStage25D.oskar; hero25d.js liga o contexto (bind) antes de desenhar.
+// Script clássico: registra window.YaraStage25D.bodies.oskar; hero25d.js liga o contexto (bind) antes de desenhar.
 (() => {
 const NS = window.YaraStage25D = window.YaraStage25D || {};
 const O = window.YaraRpgData.visuals.hero25d.oskar;
@@ -448,8 +448,47 @@ function drawOskarAxe(rig, hand, dir, alpha) {
     ctx.globalAlpha = baseAlpha;
 }
 
-NS.oskar = {
+// --- REGISTRO DO BONECO (lido por hero25d.js) --- interface completa em js/stage/README.md
+NS.bodies = NS.bodies || {};
+NS.bodies.oskar = {
+    vis: 'oskar',
     bind(context) { ctx = context; },
-    oskarHeadParts, drawOskarArm, drawOskarLeg, drawOskarTorso, drawOskarAxe
+    drawLeg: (rig, { hip, knee, ankle, toe }) => drawOskarLeg(rig, hip, knee, ankle, toe),
+    drawTorso: (rig, pose, bottom, top, wb, wt) => drawOskarTorso(rig, pose, bottom, top, wb, wt),
+    // Sem capa
+    drawBack() {},
+    // Em repouso segura o machado com as duas mãos, cabo deitado na frente da cintura e a cabeça para a frente e a
+    // esquerda; sobe e desce devagar com a respiração. Correndo balança com a passada. No golpe vai para a varredura normal.
+    swordRest(rig, pose, { hand, dir, blend }) {
+        const k = 1 - blend;
+        const st = rig.anim.stride;
+        const restO = [
+            pose.lean * 0.5 + 2.8 + Math.sin(st) * 0.35 * pose.run,
+            2.6,
+            rig.V.handHeight + 1.2 - pose.crouch + Math.sin(pose.t * 1.4) * 0.25 * (1 - pose.run) + Math.abs(Math.sin(st)) * 0.6 * pose.run
+        ];
+        const dirO = [0.75 + Math.sin(pose.t * 1.1) * 0.04 + Math.cos(st) * 0.12 * pose.run, -0.65, 0.12 + Math.sin(st) * 0.18 * pose.run];
+        const h2 = rig.add3(rig.mix(hand, restO, k), O.rightHandOffset.map(v => v * k));
+        const m = rig.mix(dir, rig.norm3(dirO), k);
+        const size = Math.hypot(...m) || 1;
+        return { hand: h2, dir: m.map(v => v / size) };
+    },
+    // Ombros e cotovelos têm ajustes próprios (some o do cotovelo no golpe); a mão livre fica no cabo do machado,
+    // acima da outra (duas mãos), menos quando bebe a poção
+    armTweak(rig, side, pose) {
+        if (side > 0) return { shoulderOffset: O.rightShoulderOffset, elbowOffset: O.rightElbowOffset.map(v => v * (1 - pose.blend)) };
+        return {
+            shoulderOffset: O.leftShoulderOffset,
+            elbowOffset: O.leftElbowOffset.map(v => v * (1 - pose.blend)),
+            hand(hand) {
+                if (pose.flask > 0) return hand;
+                const grip = rig.swordArmPose(pose);
+                return rig.add3(rig.add3(grip.hand, grip.dir.map(v => v * O.gripSpread)), O.leftHandOffset.map(v => v * (1 - pose.blend)));
+            }
+        };
+    },
+    drawArm: (rig, shoulder, elbow, hand, armWidth, handRadius) => drawOskarArm(rig, shoulder, elbow, hand, armWidth, handRadius),
+    drawBlade: (rig, hand, dir, alpha) => drawOskarAxe(rig, hand, dir, alpha),
+    headParts: (pose, rig) => oskarHeadParts(pose, rig)
 };
 })();

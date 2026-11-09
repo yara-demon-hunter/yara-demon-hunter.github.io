@@ -1,6 +1,6 @@
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { HEROES } from '../../data_model/heroes.js';
-import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
+import { SHADOW_CLONE_VISUALS, shadowColorsOf } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { ctx } from '../core/state.js';
 import { lerpAngle } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
@@ -61,7 +61,7 @@ export function renderRival(e) {
     // Sombra do rival: paleta de sombra (a mesma do Shadow Clone), semitransparente, na aura do rival
     const shadow = model.isShadow;
     const colors = shadow
-        ? (model.heroModel === 'azael' ? SHADOW_CLONE_VISUALS.azaelColors : SHADOW_CLONE_VISUALS.colors)
+        ? shadowColorsOf(model.heroModel)
         : HEROES[model.heroKey].colors ?? undefined;
     drawGlow(ctx, model.color, e.x, e.y, e.radius * 2.4, shadow ? 0.22 : e.enraged ? 0.55 : 0.32);
     ctx.save();

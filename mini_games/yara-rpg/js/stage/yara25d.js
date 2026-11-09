@@ -7,7 +7,7 @@
 // esquerda = -b (cabelo branco, olho azul, ombreira, ponta do cachecol).
 // A cabeça usa a mesma geometria do Azael (NS.azael.kit), com as medidas da Yara. Referência: art_reference/yara.
 // rig: { project, projectVec, limb, ball, disk, anim, C, sinF, cosF }. Medidas e cores: js/data/visuals/hero25d.js (yara).
-// Script clássico: expõe window.YaraStage25D.yara; hero25d.js liga o contexto (bind) antes de desenhar.
+// Script clássico: registra window.YaraStage25D.bodies.yara; hero25d.js liga o contexto (bind) antes de desenhar.
 (() => {
 const NS = window.YaraStage25D = window.YaraStage25D || {};
 const Y = window.YaraRpgData.visuals.hero25d.yara;
@@ -572,8 +572,24 @@ function drawYaraSword(rig, hand, dir, alpha) {
     ctx.globalAlpha = baseAlpha;
 }
 
-NS.yara = {
+// --- REGISTRO DO BONECO (lido por hero25d.js) --- interface completa em js/stage/README.md
+NS.bodies = NS.bodies || {};
+NS.bodies.yara = {
+    vis: 'yara',
     bind(context) { ctx = context; },
-    yaraHeadParts, drawYaraScarfTail, drawYaraArm, drawYaraLeg, drawYaraTorso, drawYaraSword
+    idleArms: true,
+    drawLeg: (rig, { hip, knee, ankle, toe }) => drawYaraLeg(rig, hip, knee, ankle, toe),
+    drawTorso: (rig, pose, bottom, top, wb, wt) => drawYaraTorso(rig, pose, bottom, top, wb, wt),
+    // Sem capa: no lugar dela, a ponta do cachecol voando
+    drawBack: (rig, pose) => drawYaraScarfTail(rig, pose),
+    // Em repouso segura a espada curta em pé, ponta para cima e um pouco para a frente (guarda), balançando de leve
+    swordRest(rig, pose, { hand, dir, blend }) {
+        const m = rig.mix(dir, [0.35 + Math.sin(pose.t * 1.3) * 0.08, 0.15, 0.92], 1 - blend);
+        const size = Math.hypot(...m) || 1;
+        return { hand, dir: m.map(v => v / size) };
+    },
+    drawArm: (rig, shoulder, elbow, hand, armWidth, handRadius) => drawYaraArm(rig, shoulder, elbow, hand, armWidth, handRadius),
+    drawBlade: (rig, hand, dir, alpha) => drawYaraSword(rig, hand, dir, alpha),
+    headParts: (pose, rig) => yaraHeadParts(pose, rig)
 };
 })();

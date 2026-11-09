@@ -1,5 +1,7 @@
 import { AZAEL_VISUALS as A } from '../../data_model/visuals/characters/azael_visual.js';
+import { HERO_25D_VISUALS as V } from '../../data_model/visuals/characters/hero25d_visual.js';
 import { ctx } from '../core/state.js';
+import { registerBody } from './body_registry.js';
 import { drawGlow } from './fx/glow.js';
 
 // --- AZAEL (herói 2.5D) ---
@@ -743,3 +745,81 @@ export function drawAzaelTorso(rig, pose, bottom, top, wb, wt) {
     disk([scarf[0], 0, scarf[2] + 0.2], [top.A * 0.85, 0, 0], [0, top.B * 0.64, 0]);
     ctx.stroke();
 }
+
+// --- REGISTRO DO BONECO (lido por js/render/player25d.js; interface em js/render/body_registry.js) ---
+// Azael ataca com a mão ESQUERDA e guarda a katana na bainha: o braço livre (o direito) fica sempre na bainha, e a
+// lâmina só aparece quando sai dela (drawn).
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+// Quanto a katana está fora da bainha (0 = guardada, 1 = na mão). Sobe e desce junto com a mão indo do cabo para o
+// golpe, então a lâmina desliza para fora e para dentro da bainha em vez de piscar.
+const drawnOf = (pose) => clamp01((Math.max(pose.blend, pose.sword?.w ?? 0) - 0.02) / A.drawBlend);
+
+// Em repouso a mão fica no cabo da katana guardada; no golpe ela sai da bainha e varre.
+// armHand: a mão esquerda (a da espada): no cabo (boca da bainha + sheathHand ao longo dela + leftHandOffset) ou na varredura.
+function swordRest(rig, pose, { swingAngle, blend }) {
+    const sheath = scabbardFrame(pose);
+    const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
+    const d = mix(sheath.dir, [Math.cos(swingAngle), Math.sin(swingAngle), 0], blend);
+    const size = Math.hypot(...d) || 1;
+    const restHand = sheath.mouth.map((v, i) => v + sheath.dir[i] * A.sheathHand + A.leftHandOffset[i]);
+    let armHand = mix(restHand, swingHand, blend);
+    if (pose.sword) armHand = mix(armHand, pose.sword.hand, pose.sword.w);
+    return { hand: mix(sheath.grip, swingHand, blend), dir: d.map(v => v / size), armHand };
+}
+
+// Braço livre (o direito): lançar adaga, feitiço, bola de fogo e poção usam posições do lado esquerdo; aqui elas são
+// espelhadas para o lado direito, e sem ação a mão fica na bainha.
+function freeArm(rig, pose, { hand, throwK, charge, fireHold, cast }) {
+    const shoulder = [pose.lean, V.chest.B, pose.shoulderZ - 0.5];
+    const sheath = scabbardFrame(pose);
+    const rest = sheath.grip.map((v, i) => v + A.rightHandOffset[i]);
+    const act = Math.max(
+        throwK >= 0 ? Math.min(1, Math.sin(Math.PI * throwK) * 4) : 0,
+        charge > 0 || fireHold > 0 ? Math.min(1, Math.max(charge, fireHold) * 4) : 0,
+        cast,
+        pose.free ? pose.free.w : 0
+    );
+    const mirrored = mix(rest, [hand[0], -hand[1], hand[2]], act);
+    const eo = A.rightElbowOffset.map(v => v * (1 - act));
+    const elbow = [(shoulder[0] + mirrored[0]) / 2 + 0.6 + eo[0], (shoulder[1] + mirrored[1]) / 2 + 1 + eo[1], (shoulder[2] + mirrored[2]) / 2 + (throwK >= 0 ? 0.8 : 0) + eo[2]];
+    return { shoulder, hand: mirrored, elbow };
+}
+
+// Braço ESQUERDO (o da espada): em repouso a mão fica no cabo; no golpe sai da bainha e o cotovelo volta ao movimento normal.
+function swordArmPart(rig, pose) {
+    const { armHand: hand } = rig.swordArmPose(pose);
+    const shoulder = [pose.lean, -V.chest.B, pose.shoulderZ - 0.5];
+    const hold = 1 - drawnOf(pose);
+    const leo = A.leftElbowOffset.map(v => v * hold);
+    // Segurando o cabo, o braço cruza na frente da barriga (cotovelo à frente) e é desenhado na frente do corpo
+    const elbow = [(shoulder[0] + hand[0]) / 2 - 0.4 + hold * 2.2 + leo[0], -V.chest.B - 1 + hold * 2.6 + leo[1], (shoulder[2] + hand[2]) / 2 + leo[2]];
+    const armDepth = rig.project(...elbow).depth + 0.1;
+    return {
+        // (na frente do corpo, mas sempre atrás da cabeça: senão o pano do ombro cobre o rosto)
+        depth: hold > 0.5 ? Math.min(Math.max(armDepth, rig.project(...hand).depth + 0.2), rig.project(pose.headA, 0, pose.headZ).depth - 0.05) : armDepth,
+        draw() {
+            drawAzaelArm(rig, shoulder, elbow, hand, V.armWidth, V.handRadius);
+        }
+    };
+}
+
+registerBody('azael', {
+    vis: A,
+    sheathed: true,
+    // O corpo sobe e desce duas vezes por passada (um pé de cada vez) e anda mais agachado
+    runBob: (anim, run) => (0.5 - 0.5 * Math.cos(anim.stride * 2)) * A.runBob * run - A.runCrouch * run,
+    drawLeg: (rig, { hip, knee, ankle, side, reach, lift }) => drawAzaelLeg(rig, hip, knee, ankle, [reach + 0.4, side * V.footSpread, 0.9 + lift]),
+    drawTorso: (rig, pose, bottom, top, wb, wt) => drawAzaelTorso(rig, pose, bottom, top, wb, wt),
+    drawBack(rig, pose, anchors, hem) {
+        rig.sashEnds(pose);
+        drawAzaelCape(rig, pose, anchors, hem);
+    },
+    freeArm,
+    drawArm: (rig, shoulder, elbow, hand, armWidth, handRadius) => drawAzaelArm(rig, shoulder, elbow, hand, armWidth, handRadius),
+    swordArmPart,
+    swordRest,
+    drawBlade: (rig, hand, dir, alpha) => drawKatana(rig, hand, dir, alpha),
+    drawn: drawnOf,
+    headParts: (pose, rig) => [azaelHeadPart(pose, rig), azaelHairPart(pose, rig), azaelScabbardPart(pose, rig, 1 - drawnOf(pose))]
+});

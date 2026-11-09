@@ -59,3 +59,7 @@ export const SHADOW_CLONE_VISUALS = {
 };
 // Clone do Azael: o boneco dele (js/render/azael25d.js) com a mesma paleta de sombra
 SHADOW_CLONE_VISUALS.azaelColors = { ...AZAEL_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors, ...AZAEL_SHADOW };
+// Paleta de sombra de cada herói com boneco próprio (chave = model de data_model/heroes.js); quem não está aqui usa `colors`.
+// Herói novo: uma linha aqui.
+SHADOW_CLONE_VISUALS.colorsByModel = { azael: SHADOW_CLONE_VISUALS.azaelColors };
+export const shadowColorsOf = (model) => SHADOW_CLONE_VISUALS.colorsByModel[model] ?? SHADOW_CLONE_VISUALS.colors;

@@ -131,8 +131,10 @@ js/
   render/monster_sprites.js       gera os sprites dos monstros e dos tiros a partir da arte procedural
   render/moth.js, bloater.js, wraith.js, zombie_wolf.js, headless_knight.js ...   arte de cada monstro (usada para gerar os sprites)
   render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
-  render/player25d.js             herói 2.5D (padrão) e posturas dos golpes especiais
-  render/azael25d.js              peças do Azael no mesmo boneco 2.5D (rosto, cabelo, katana, bainha, pés)
+  render/player25d.js             motor do herói 2.5D: pose, posturas dos golpes especiais e ordem de desenho; desenha o Demon Hunter e chama o boneco registrado dos outros heróis, sem citar nenhum pelo nome
+  render/body_registry.js         registro dos bonecos de herói (registerBody) e a lista dos ganchos que cada um pode ter
+  render/bodies.js                um import por boneco registrado
+  render/azael25d.js              peças do Azael no mesmo boneco 2.5D (rosto, cabelo, katana, bainha, pés) e o registro dele
   render/hero_gear.js             equipamento e paleta dos Juramentos, peças do mesmo boneco 2.5D
   render/shadow_clone.js          Shadow Clone: herói 2.5D com paleta de sombra
   render/fx/                      glow, carimbos (stamp), sprites pequenos, atlas de números, anéis, relógio do desenho, easing, barra de vida
@@ -161,6 +163,18 @@ draft/                            versões anteriores mantidas como referência
 - Todo estado que muda durante a partida fica em `js/core/state.js` (objeto `state`); os sistemas leem e escrevem nele.
 - Novo CSS: crie o arquivo na pasta da funcionalidade e adicione um `@import` em `css/game.css`.
 - Novo motor JS: crie o módulo em `js/systems/` (ou `render/`, `ui/`) e chame-o a partir de `js/game.js`.
+
+## Como criar um herói novo
+
+O desenho do herói é um boneco 2.5D; cada herói com boneco próprio vive no seu arquivo e `player25d.js` não muda.
+Referência de arte em `art_reference/<id>/character.md`. Passo a passo (use o Azael como exemplo):
+
+1. **Visual:** `data_model/visuals/characters/<id>_visual.js`, copiando `azael_visual.js`: `colors` (mesmas chaves de `HERO_VISUALS.colors`), `bladeLength`, `bladeWidth`, `glowScale`, `strideSpeed` e as medidas só dele.
+2. **Boneco:** `js/render/<id>25d.js`, copiando `azael25d.js`, com as peças (cabeça, tronco, pernas, braços, arma) e, no fim, `registerBody('<id>', { vis, ... })`. Os ganchos (todos opcionais, o que faltar usa o desenho do Demon Hunter) estão listados em `js/render/body_registry.js`.
+3. **Lista:** um `import './<id>25d.js';` em `js/render/bodies.js`.
+4. **Herói:** entrada em `data_model/heroes.js` com `model: '<id>'`, `colors`, `mods`, retrato e a conquista que o libera; stats base em `data_model/character_bases.js`.
+5. **Sombra:** uma linha em `colorsByModel` (`shadow_clone_visual.js`) com a paleta de sombra dele, usada pelo Shadow Clone e pelo rival sombra. Sem a linha, usa a paleta padrão.
+6. **Rival:** se o herói tiver um rival próprio, `RIVAL_OF` e o boss em `data_model/bosses.js` (o rival é só dado: usa o mesmo boneco).
 
 ## Controles
 

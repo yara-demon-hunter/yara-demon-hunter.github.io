@@ -5,7 +5,8 @@ import { CHARACTER_BASES } from './character_bases.js';
 // --- HERÓIS ---
 // Liberados por conquistas do Santuário (data_model/sanctuary.js). mods: mesmas chaves de js/systems/modifiers.js.
 // colors: troca só o que muda na paleta do herói 2.5D; portrait: filtro CSS aplicado no retrato.
-// model: boneco 2.5D ('hunter' se ausente; 'azael' usa js/render/azael25d.js); portraitImage: arte própria do retrato.
+// model: boneco 2.5D ('hunter' se ausente; os outros se registram em js/render/bodies.js, ex.: 'azael' em js/render/azael25d.js);
+// portraitImage: arte própria do retrato.
 // free: já vem liberado, sem conquista.
 // shelved: guardado por enquanto. Some da tela inicial e das conquistas, mas os dados ficam para voltar depois.
 export const HEROES = {
