@@ -9,8 +9,8 @@ export const CHARACTER_BASES = {
             dash: { distance: 150, seconds: 0.17 }
         },
         boss: {
-            moveSpeed: 50,
-            lungeLength: 380,
+            moveSpeed: 85,
+            lungeLength: 300,
             lungeSeconds: 0.12
         }
     },
@@ -18,11 +18,11 @@ export const CHARACTER_BASES = {
         player: {
             mods: { damage: 0.25, lifeSteal: 0.05, maxHp: -0.25, knifeRange: -0.35 },
             moveSpeed: 180,
-            dash: { distance: 200, seconds: 0.17 }
+            dash: { distance: 220, seconds: 0.17 }
         },
         boss: {
-            moveSpeed: 90,
-            lungeLength: 380,
+            moveSpeed: 140,
+            lungeLength: 400,
             lungeSeconds: 0.09
         }
     }

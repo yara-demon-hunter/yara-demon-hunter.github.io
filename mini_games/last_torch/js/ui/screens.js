@@ -18,6 +18,7 @@ import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
 import { startHints } from './hints.js';
 import { renderHeroPicker } from './heroes.js';
+import { renderHeroStats } from './hero_stats.js';
 import { resetQuickPick } from './quick_pick.js';
 import { updateHUD } from './hud.js';
 
@@ -308,6 +309,7 @@ export function renderStartScreen() {
     const hero = getHero();
     document.getElementById('startSanctuaryCount').innerText = `${ACHIEVEMENTS.filter(a => save.achievements[a.id]).length}/${ACHIEVEMENTS.length} earned`;
     renderHeroPicker();
+    renderHeroStats();
     const dark = document.getElementById('darknessPicker');
     dark.classList.toggle('hidden', save.maxDarkness <= 1);
     document.getElementById('darknessValue').innerText = save.darkness;

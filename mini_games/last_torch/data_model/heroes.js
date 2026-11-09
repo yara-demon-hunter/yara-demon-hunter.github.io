@@ -14,6 +14,8 @@ export const HEROES = {
         tagline: 'Patient and strategic. He waits, aims, and lets the torch work.',
         trait: '+15% health, +20% dagger damage, +25% dagger range, +15% attack speed while standing still, +20% torch warmth, but -5% blade damage.',
         mods: CHARACTER_BASES.hunter.player.mods,
+        // perk: a marca do herói, mostrada com as barras de atributo na tela inicial (js/ui/hero_stats.js)
+        perk: { name: 'STEADY HAND', text: 'Attacks faster standing still. The torch warms and heals him more.' },
         startPower: null,
         colors: null,
         portrait: ''
@@ -70,6 +72,7 @@ export const HEROES = {
         mods: CHARACTER_BASES.azael.player.mods,
         startPower: null,
         model: 'azael',
+        perk: { name: 'BLOOD DRINKER', text: 'Heals a part of the damage he deals. Hits hard, but breaks easily.' },
         colors: AZAEL_VISUALS.colors,
         portrait: '',
         portraitImage: 'images/characters/azael-small.webp',

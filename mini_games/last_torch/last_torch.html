@@ -119,7 +119,11 @@ permalink: /mini_games/last_torch/last_torch.html
         </div>
 
         <!-- Escolha do herói: só os ativos (ACTIVE_HEROES). Os cartões são montados em js/ui/heroes.js -->
-        <div id="heroPicker" class="hero-picker" role="radiogroup" aria-label="Choose your hunter"></div>
+        <div class="hero-select">
+            <div id="heroPicker" class="hero-picker" role="radiogroup" aria-label="Choose your hunter"></div>
+            <!-- Barras de atributo do herói escolhido (js/ui/hero_stats.js) -->
+            <div id="heroAttrs" class="hero-attrs"></div>
+        </div>
 
         <!-- Escuridão: só depois de vencer a noite -->
         <div id="darknessPicker" class="darkness-picker hidden">

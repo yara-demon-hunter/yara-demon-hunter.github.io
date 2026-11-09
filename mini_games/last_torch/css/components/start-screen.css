@@ -179,7 +179,17 @@
 
 /* Escolha do herói: cartões quadrados lado a lado, retrato grande em cima e nome embaixo */
 .start-body { display: flex; flex-direction: column; }
-.hero-picker { display: flex; justify-content: center; gap: 0.8rem; margin: 0 0 1rem; }
+.hero-select { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; margin: 0 0 1rem; }
+.hero-picker { display: flex; justify-content: center; gap: 0.8rem; margin: 0; }
+/* Barras de atributo do herói escolhido: duas colunas, para ocupar pouca altura */
+.hero-attrs { width: 100%; max-width: 21rem; padding: 0.5rem 0.7rem; border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 0.7rem; background: rgba(8, 12, 16, 0.6); }
+.hs-bars { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 0.9rem; }
+.hs-row { display: flex; align-items: center; gap: 0.4rem; font-family: 'Inter', sans-serif; font-size: 0.56rem; font-weight: 800; letter-spacing: 0.08em; color: #94a3b8; }
+.hs-row span { width: 3.4rem; flex-shrink: 0; }
+.hs-bar { flex: 1; height: 0.4rem; border-radius: 0.2rem; background: rgba(148, 163, 184, 0.16); overflow: hidden; }
+.hs-bar i { display: block; height: 100%; background: #ea580c; box-shadow: 0 0 6px rgba(234, 88, 12, 0.7); transition: width 0.25s; }
+.hs-perk { display: flex; flex-direction: column; gap: 0.1rem; margin-top: 0.4rem; font-family: 'Inter', sans-serif; font-size: 0.6rem; line-height: 1.25; color: #aab3bf; }
+.hs-perk strong { color: #fdba74; font-size: 0.62rem; letter-spacing: 0.08em; }
 .hero-pick {
     display: flex;
     flex-direction: column;
@@ -232,7 +242,7 @@
     color: #fdba74;
     white-space: nowrap;
 }
-.hero-picker:has(~ #btnStart:disabled) { opacity: 0.45; pointer-events: none; }
+.hero-select:has(~ #btnStart:disabled) { opacity: 0.45; pointer-events: none; }
 
 /* Santuário embaixo do PLAY */
 .start-links { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
@@ -275,7 +285,14 @@
         align-items: center;
     }
     .start-body > * { grid-column: 2; }
-    .start-body > .hero-picker { grid-column: 1; grid-row: 1 / span 6; margin: 0; gap: 0.6rem; }
+    .start-body > .hero-select { grid-column: 1; grid-row: 1 / span 6; margin: 0; gap: 0.4rem; }
+    .hero-picker { gap: 0.6rem; }
+    .hero-attrs { padding: 0.3rem 0.5rem; max-width: 16.5rem; }
+    .hs-bars { gap: 0.15rem 0.6rem; }
+    .hs-row { font-size: 0.5rem; }
+    .hs-row span { width: 2.9rem; }
+    .hs-perk { margin-top: 0.25rem; font-size: 0.52rem; }
+    .hs-perk strong { font-size: 0.54rem; }
     .hero-pick { width: clamp(6rem, 31vh, 7.8rem); padding: 0.45rem; gap: 0.3rem; }
     .hero-pick-name { font-size: 0.58rem; letter-spacing: 0.04em; }
     .start-links .start-btn-small { padding: 0.3rem 0.6rem; }
