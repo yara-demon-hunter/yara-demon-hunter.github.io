@@ -11,9 +11,12 @@
 // requires: o nó anterior na árvore, como req(id, nível mínimo). O pré-requisito vem SEMPRE do nó anterior
 // (a linha que chega nele): quem já cumpriu a cadeia até ali não esbarra em exigências de nós mais atrás.
 // Se um nó mais atrás precisa ter mais nível, suba o nível pedido no nó do meio. O painel de detalhe mostra
-// tudo o que falta de uma vez, e `kills` entra como pedido extra.
-// kills: { type, count, label } exige matar `count` monstros daquele tipo NA NOITE ATUAL (type 'ANY' = qualquer).
+// tudo o que falta de uma vez. Só a ligação com o nó anterior abre um nó: não há exigência de matar monstros.
 // O custo vem de TREE_COSTS (por ramo e tipo de nó). `cost` no nó só para uma exceção. maxLvl padrão 5.
+// needs: 'knives' marca a skill que só funciona com adaga. Quem não lança adaga (mod noKnives: o Captain Brutos, ou o
+// Oath of Slaughter jurado) tem esses nós SELADOS (não é o cadeado: o cadeado é "ainda não", o selo é "não é para
+// este personagem"): não se compram e valem como cumpridos para os nós que vêm depois (passe livre), então a cadeia
+// segue aberta (js/systems/tree.js, isRestricted).
 const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
 
 export const TREE_POINTS = {
@@ -57,37 +60,34 @@ export const TREE_NODES = [
     { id: 'atkSpeed', branch: 'blade', kind: 'stat', key: 'atkSpeed', x: 1, y: 1, requires: [req('damage')] },
     { id: 'keenEye', branch: 'blade', kind: 'power', key: 'keenEye', x: 2, y: 1, requires: [req('atkSpeed', 2)] },
     { id: 'slashArc', branch: 'blade', kind: 'stat', key: 'slashArc', x: 3, y: 1, requires: [req('keenEye', 2)] },
-    { id: 'shadowWhirl', branch: 'blade', kind: 'passive', key: 'shadowWhirl', x: 4, y: 1, requires: [req('slashArc', 2)],
-      kills: { type: 'BAT', count: 15, label: 'Bats' } },
+    { id: 'shadowWhirl', branch: 'blade', kind: 'passive', key: 'shadowWhirl', x: 4, y: 1, requires: [req('slashArc', 2)] },
     { id: 'executioner', branch: 'blade', kind: 'passive', key: 'executioner', x: 4, y: 0, requires: [req('bloodlustEvolve')] },
     // Linha da força: quebrar o chão
     { id: 'radius', branch: 'blade', kind: 'stat', key: 'radius', x: 1, y: 2, requires: [req('damage')] },
     { id: 'knockback', branch: 'blade', kind: 'stat', key: 'knockback', x: 2, y: 2, requires: [req('radius')] },
-    { id: 'earthbreaker', branch: 'blade', kind: 'power', key: 'earthbreaker', x: 3, y: 2, requires: [req('knockback', 2)],
-      kills: { type: 'SKELETON', count: 20, label: 'Skeletons' } },
+    { id: 'earthbreaker', branch: 'blade', kind: 'power', key: 'earthbreaker', x: 3, y: 2, requires: [req('knockback', 2)] },
     { id: 'earthbreakerEvolve', branch: 'blade', kind: 'evolve', key: 'earthbreaker', x: 4, y: 2, requires: [req('earthbreaker', 5)] },
     // Linha do corpo: aguentar o cerco
     { id: 'playerHp', branch: 'blade', kind: 'stat', key: 'playerHp', x: 1, y: 3, requires: [req('damage')], cost: 2,
       levelText: (mods) => `${formatPercent(-mods.damageTaken)} less damage taken, monsters come +${formatPercent(mods.provoke)} farther`,
       mods: { damageTaken: -0.04, provoke: 0.25 } },
-    { id: 'bloodEdge', branch: 'blade', kind: 'power', key: 'bloodEdge', x: 2, y: 3, requires: [req('playerHp', 2)],
-      kills: { type: 'ANY', count: 40, label: 'monsters' } },
+    { id: 'bloodEdge', branch: 'blade', kind: 'power', key: 'bloodEdge', x: 2, y: 3, requires: [req('playerHp', 2)] },
     { id: 'warCry', branch: 'blade', kind: 'passive', key: 'warCry', x: 3, y: 3, requires: [req('bloodEdge')] },
     { id: 'oathSlaughter', branch: 'blade', kind: 'passive', key: 'oathSlaughter', oath: true, x: 6, y: 1.5, requires: [req('executioner'), req('earthbreakerEvolve')] },
 
     // --- SOMBRA: o ladrão. Técnica, combos, esquiva e ouro. Barato: o preço é saber jogar. Cinco linhas (y de 0 a 4) ---
     { id: 'moveSpeed', branch: 'shadow', kind: 'stat', key: 'moveSpeed', x: 0, y: 1.5, requires: [] },
     // Linha das adagas
-    { id: 'ricochet', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 0, requires: [req('moveSpeed')] },
+    { id: 'ricochet', needs: 'knives', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 0, requires: [req('moveSpeed')] },
     { id: 'mirrorWard', branch: 'shadow', kind: 'passive', key: 'mirrorWard', x: 2, y: 0, requires: [req('ricochet', 2)] },
-    { id: 'daggerMastery', branch: 'shadow', kind: 'mod', x: 3, y: 0, requires: [req('mirrorWard')],
+    { id: 'daggerMastery', needs: 'knives', branch: 'shadow', kind: 'mod', x: 3, y: 0, requires: [req('mirrorWard')],
       name: 'Dagger Mastery', icon: '🔪', desc: 'Your daggers cut deeper, fly farther and faster, and recharge sooner.',
       levelText: (mods) => `+${formatPercent(mods.knifeDamage)} dagger damage, +${formatPercent(mods.knifeRange)} range, +${formatPercent(mods.knifeSpeed)} speed, ${formatPercent(mods.knifeCooldown)} shorter recharge`,
       mods: { knifeDamage: 0.15, knifeRange: 0.12, knifeSpeed: 0.05, knifeCooldown: 0.06 } },
-    { id: 'fanOfKnives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 4, y: 0, requires: [req('daggerMastery', 2)] },
+    { id: 'fanOfKnives', needs: 'knives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 4, y: 0, requires: [req('daggerMastery', 2)] },
     // Linha da técnica: marcar e carregar
-    { id: 'deathMark', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
-    { id: 'chargedThrow', branch: 'shadow', kind: 'power', key: 'chargedThrow', x: 3, y: 1, requires: [req('deathMark', 2)] },
+    { id: 'deathMark', needs: 'knives', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
+    { id: 'chargedThrow', needs: 'knives', branch: 'shadow', kind: 'power', key: 'chargedThrow', x: 3, y: 1, requires: [req('deathMark', 2)] },
     { id: 'shadowRaven', branch: 'shadow', kind: 'passive', key: 'shadowRaven', x: 2, y: 1, requires: [req('deathMark', 2)] },
     // Caminho das sombras: Move Speed -> Shadow Clone -> Umbral Bond (5/5) -> Shadow Legion -> Juramento
     { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 1, y: 2, requires: [req('moveSpeed', 2)] },
@@ -130,7 +130,7 @@ export const TREE_NODES = [
     { id: 'emberEvolve', branch: 'flame', kind: 'evolve', key: 'emberTrail', x: 2, y: 3, cost: 3, requires: [req('emberTrail', 5)] },
     // As armas pegam fogo: saem do Hellwalker
     { id: 'flameBlade', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
-    { id: 'fireballs', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 0, requires: [req('phoenixPact')] },
+    { id: 'fireballs', needs: 'knives', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 0, requires: [req('phoenixPact')] },
     { id: 'oathHearth', branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('fireballs'), req('fireRingEvolve')] },
 
     // --- MALDIÇÃO: o feiticeiro. Magia, área e distância ---
@@ -139,33 +139,27 @@ export const TREE_NODES = [
       levelText: (mods) => `+${formatPercent(mods.xp)} XP`, mods: { xp: 0.05 } },
     // Linha do gelo e da força
     { id: 'chillAura', branch: 'curse', kind: 'power', key: 'chillAura', x: 1, y: 0, requires: [req('arcaneStudy')] },
-    { id: 'soulNova', branch: 'curse', kind: 'power', key: 'soulNova', x: 2, y: 0, requires: [req('chillAura', 2)],
-      kills: { type: 'WITCH', count: 10, label: 'Witches' } },
+    { id: 'soulNova', branch: 'curse', kind: 'power', key: 'soulNova', x: 2, y: 0, requires: [req('chillAura', 2)] },
     { id: 'novaEvolve', branch: 'curse', kind: 'evolve', key: 'soulNova', x: 3, y: 0, requires: [req('soulNova', 5)] },
-    { id: 'starfall', branch: 'curse', kind: 'power', key: 'starfall', x: 4, y: 0, requires: [req('chainLightning', 2)],
-      kills: { type: 'VAMPIRE', count: 15, label: 'Vampires' } },
+    { id: 'starfall', branch: 'curse', kind: 'power', key: 'starfall', x: 4, y: 0, requires: [req('chainLightning', 2)] },
     // Linha da tempestade: à distância
     { id: 'graveWisp', branch: 'curse', kind: 'power', key: 'graveWisp', x: 1, y: 1, requires: [req('arcaneStudy')] },
     { id: 'occultFocus', branch: 'curse', kind: 'mod', x: 2, y: 1, requires: [req('graveWisp')],
       name: 'Occult Focus', icon: '🔮', desc: 'Your spells return to your hand faster.',
       levelText: (mods) => `${formatPercent(mods.spellHaste)} shorter spell recharge`, mods: { spellHaste: 0.06 } },
-    { id: 'chainLightning', branch: 'curse', kind: 'power', key: 'chainLightning', x: 3, y: 1, requires: [req('occultFocus', 2)],
-      kills: { type: 'BAT', count: 20, label: 'Bats' } },
+    { id: 'chainLightning', branch: 'curse', kind: 'power', key: 'chainLightning', x: 3, y: 1, requires: [req('occultFocus', 2)] },
     { id: 'wrathEvolve', branch: 'curse', kind: 'evolve', key: 'chainLightning', x: 4, y: 1, requires: [req('chainLightning', 5)] },
     // Linha do vazio: em área
     { id: 'creepingHex', branch: 'curse', kind: 'power', key: 'creepingHex', x: 1, y: 2, requires: [req('arcaneStudy')] },
     { id: 'darkKnowledge', branch: 'curse', kind: 'mod', x: 2, y: 2, requires: [req('creepingHex')],
       name: 'Dark Knowledge', icon: '📚', desc: 'Forbidden words hit harder.',
       levelText: (mods) => `+${formatPercent(mods.spellDamage)} spell damage`, mods: { spellDamage: 0.1 } },
-    { id: 'voidRift', branch: 'curse', kind: 'power', key: 'voidRift', x: 3, y: 2, requires: [req('darkKnowledge', 2)],
-      kills: { type: 'ANY', count: 60, label: 'monsters' } },
+    { id: 'voidRift', branch: 'curse', kind: 'power', key: 'voidRift', x: 3, y: 2, requires: [req('darkKnowledge', 2)] },
     { id: 'voidRiftEvolve', branch: 'curse', kind: 'evolve', key: 'voidRift', x: 4, y: 2, requires: [req('voidRift', 5)] },
     // Linha da morte
-    { id: 'corpseBurst', branch: 'curse', kind: 'power', key: 'corpseBurst', x: 1, y: 3, requires: [req('arcaneStudy')],
-      kills: { type: 'SKELETON', count: 30, label: 'Skeletons' } },
+    { id: 'corpseBurst', branch: 'curse', kind: 'power', key: 'corpseBurst', x: 1, y: 3, requires: [req('arcaneStudy')] },
     { id: 'corpseEvolve', branch: 'curse', kind: 'evolve', key: 'corpseBurst', x: 2, y: 3, requires: [req('corpseBurst', 5)] },
-    { id: 'orbitBlades', branch: 'curse', kind: 'power', key: 'orbitBlades', x: 3, y: 3, requires: [req('darkKnowledge', 2)],
-      kills: { type: 'SKELETON', count: 20, label: 'Skeletons' } },
+    { id: 'orbitBlades', branch: 'curse', kind: 'power', key: 'orbitBlades', x: 3, y: 3, requires: [req('darkKnowledge', 2)] },
     { id: 'orbitEvolve', branch: 'curse', kind: 'evolve', key: 'orbitBlades', x: 4, y: 3, requires: [req('orbitBlades', 5)] },
     { id: 'oathRuin', branch: 'curse', kind: 'passive', key: 'oathRuin', oath: true, x: 6, y: 1.5, requires: [req('wrathEvolve'), req('voidRiftEvolve')] }
 ];

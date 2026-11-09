@@ -4,7 +4,7 @@
 export const CHARACTER_BASES = {
     hunter: {
         player: {
-            mods: { maxHp: 0.15, knifeDamage: 0.2, knifeRange: 0.25, stillAttack: 0.15, warmth: 0.2, damage: -0.05 },
+            mods: { maxHp: 0.15, knifeDamage: 0.2, knifeRange: 0.25, stillAttack: 0.15, warmth: 0.2, damage: -0.05, bladeRadius: 0.1 },
             moveSpeed: 150,
             dash: { distance: 150, seconds: 0.17 }
         },
@@ -30,9 +30,9 @@ export const CHARACTER_BASES = {
     // forte e bem mais devagar; como semi-boss (BOSS_MODELS.BRUTOS) usa o mesmo ritmo lento e o mesmo dash curto.
     brutos: {
         player: {
-            mods: { maxHp: 0.4, bladeDamage: 0.4, attackSpeed: -0.3, damageTaken: -0.1, noKnives: 1 },
-            moveSpeed: 105,
-            dash: { distance: 85, seconds: 0.2 }
+            mods: { maxHp: 0.35, bladeDamage: 0.35, attackSpeed: -0.3, damageTaken: -0.1, bladeRadius: 0.25, noKnives: 1 },
+            moveSpeed: 110,
+            dash: { distance: 95, seconds: 0.2 }
         },
         boss: {
             moveSpeed: 38,

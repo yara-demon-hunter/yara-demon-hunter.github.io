@@ -51,8 +51,8 @@ export function getCritMultiplier() {
 export function getAtkRadius() {
     return Math.min(
         state.width * BLADE_SKILL.maxRadiusScreenRatio,
-        BLADE_SKILL.baseRadius
-            + (attributes.radius.lvl - 1) * BLADE_SKILL.radiusPerUpgrade
+        (BLADE_SKILL.baseRadius
+            + (attributes.radius.lvl - 1) * BLADE_SKILL.radiusPerUpgrade) * (1 + mod('bladeRadius'))
     );
 }
 

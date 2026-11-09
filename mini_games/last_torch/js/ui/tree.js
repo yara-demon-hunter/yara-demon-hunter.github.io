@@ -2,7 +2,7 @@ import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES } from '../../data_model/tree.js
 import { BRANCH_IMAGES, TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { state } from '../core/state.js';
-import { buyNode, getNextText, getNodeInfo, getNodeState } from '../systems/tree.js';
+import { buyNode, getNextText, getNodeInfo, getNodeState, getRestrictionText } from '../systems/tree.js';
 
 // --- ÁRVORES (tela) ---
 // Uma fábrica monta cada árvore: skills (tela de status) e relíquias (acampamento). O mapa é montado uma
@@ -126,6 +126,8 @@ function createTreeView(cfg) {
     const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic';
 
     function levelText(node, st) {
+        // Selado (sem adaga): não é cadeado, é "não é para este personagem"
+        if (st.restricted) return st.level > 0 ? `NO DAGGERS · Lv. ${st.level}/${st.max}` : 'NO DAGGERS';
         if (node.kind === 'evolve') return st.maxed ? 'EVOLVED' : 'EVOLUTION';
         if (node.kind === 'relic') return st.maxed ? 'OWNED' : 'RELIC';
         if (node.oath) return st.maxed ? 'SWORN' : 'OATH';
@@ -143,7 +145,15 @@ function createTreeView(cfg) {
             line.textContent = `${met ? '✔' : '✖'} ${text}`;
             note.appendChild(line);
         };
-        if (st.maxed) add(true, 'Complete');
+        if (st.restricted) {
+            const line = document.createElement('span');
+            line.className = 'is-sealed';
+            line.textContent = `⊘ ${getRestrictionText()}`;
+            const pass = document.createElement('span');
+            pass.className = 'is-met';
+            pass.textContent = '✔ Free pass: the skills after it stay open.';
+            note.append(line, pass);
+        } else if (st.maxed) add(true, 'Complete');
         else if (!st.reached) st.checks.forEach(c => add(c.met, `${c.label}${c.showCount && !c.met ? ` (${c.have}/${c.need})` : ''}`));
     }
 
@@ -163,7 +173,7 @@ function createTreeView(cfg) {
         }
         const st = getNodeState(node);
         const info = getNodeInfo(node);
-        const next = st.maxed ? '' : getNextText(node);
+        const next = st.maxed || st.restricted ? '' : getNextText(node);
         setIcon(detail('Icon'), node, info);
         detail('Name').textContent = info.name;
         detail('Level').textContent = levelText(node, st);
@@ -171,7 +181,7 @@ function createTreeView(cfg) {
         if (detail('Branch')) detail('Branch').textContent = branches[node.branch].style;
         detail('Next').textContent = next ? `Next: ${next}` : '';
         renderNote(st);
-        buy.classList.toggle('hidden', st.maxed);
+        buy.classList.toggle('hidden', st.maxed || st.restricted);
         buy.disabled = !st.canBuy;
         const symbol = st.currency === 'gold' ? '🪙' : '⚡';
         const verb = st.currency === 'gold' ? 'BUY' : 'LEARN';
@@ -203,14 +213,18 @@ function createTreeView(cfg) {
             button.classList.toggle('is-ready', st.canBuy);
             button.classList.toggle('is-open', st.open && !st.canBuy);
             button.classList.toggle('is-selected', node.id === selected);
-            // Corrente: só quando falta um pré-requisito ou kills (não quando falta só ponto)
+            // Corrente: só quando falta o nó anterior (não quando falta só ponto)
             button.classList.toggle('is-chained', !st.reached && !st.maxed);
-            button.querySelector('.tnode-level').textContent = node.kind !== 'evolve' && !isSingle(node) ? `${st.level}/${st.max}` : '';
+            // Selado para este personagem (sem adaga): visual próprio, diferente do cadeado
+            button.classList.toggle('is-sealed', st.restricted);
+            button.querySelector('.tnode-level').textContent = node.kind !== 'evolve' && !isSingle(node) && !(st.restricted && st.level === 0) ? `${st.level}/${st.max}` : '';
         });
         lines.forEach(({ line, from, to, need }) => {
-            const fromLevel = getNodeState(from).level;
-            line.classList.toggle('is-lit', fromLevel >= need);
-            line.classList.toggle('is-owned', fromLevel >= need && getNodeState(to).level > 0);
+            const fromState = getNodeState(from);
+            const fromLevel = fromState.level;
+            // Passe livre: a linha que sai de um nó selado fica acesa, a cadeia segue aberta
+            line.classList.toggle('is-lit', fromLevel >= need || fromState.restricted);
+            line.classList.toggle('is-owned', (fromLevel >= need || fromState.restricted) && getNodeState(to).level > 0);
         });
         renderDetail();
     };

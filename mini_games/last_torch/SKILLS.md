@@ -144,6 +144,15 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Event Horizon | Evolução | Fenda maior, que abre de novo onde caiu | Espiral azul |
 | Occult Focus, Dark Knowledge | Efeitos | Menos recarga e mais dano nos feitiços | - |
 
+## Skills seladas (sem adaga)
+
+Algumas skills só funcionam com adaga: Ricochet, Death Mark, Charged Dagger Throw, Dagger Mastery, Fan of Knives e Fireballs (as adagas viram bolas de fogo). Elas levam `needs: 'knives'` em `data_model/tree.js`. Quando o jogador não lança adaga (mod `noKnives`: o **Captain Brutos**, ou quem jurou o **Oath of Slaughter**), esses nós ficam **selados**:
+
+- **Não é o cadeado.** O cadeado diz "ainda não" (falta o nó anterior). O selo diz "não é para este personagem": borda sólida cor de ferrugem, ícone apagado e um risco diagonal laranja, sem corrente. O painel de detalhe mostra a etiqueta `NO DAGGERS`, o motivo e o passe livre.
+- **Passe livre.** Um nó selado conta como cumprido para os nós que o pedem, e a ligação que sai dele fica acesa. Assim a cadeia não trava: com o Brutos, Return Fire (que pede Ricochet) e Shadow Raven (que pede Death Mark) abrem normalmente, e o Oath of the Hearth não fica preso por Fireballs.
+- **Não se compra** (nem pela escolha rápida, nem pelo medalhão que pulsa). Níveis comprados antes do Oath ficam, só não sobem mais.
+- Regra única em `isRestricted(node)` (`js/systems/tree.js`): `needs === 'knives'` e `mod('noKnives') > 0`. Skill nova que depende de adaga: basta pôr `needs: 'knives'` no nó.
+
 ## Como adicionar uma skill
 
 1. Escolha o ramo pela pergunta acima e a linha pelo tema.

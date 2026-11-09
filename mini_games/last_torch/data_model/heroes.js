@@ -14,7 +14,7 @@ export const HEROES = {
     hunter: {
         name: 'Demon Hunter',
         tagline: 'Patient and strategic. He waits, aims, and lets the torch work.',
-        trait: '+15% health, +20% dagger damage, +25% dagger range, +15% attack speed while standing still, +20% torch warmth, but -5% blade damage.',
+        trait: '+15% health, +20% dagger damage, +25% dagger range, +10% blade reach, +15% attack speed while standing still, +20% torch warmth, but -5% blade damage.',
         mods: CHARACTER_BASES.hunter.player.mods,
         // perk: a marca do herói, mostrada com as barras de atributo na tela inicial (js/ui/hero_stats.js)
         perk: { name: 'STEADY HAND', text: 'Attacks faster standing still. The torch warms and heals him more.' },
@@ -84,7 +84,7 @@ export const HEROES = {
     brutos: {
         name: 'Captain Brutos',
         tagline: 'Slow and iron-clad. Every blow of the axe lands like a siege engine.',
-        trait: '+40% health, +40% blade damage and -10% damage taken, but -30% attack speed, a short dash, slow movement, and no daggers.',
+        trait: '+35% health, +35% blade damage, +25% blade reach and -10% damage taken, but -30% attack speed, a short dash, slow movement, and no daggers.',
         mods: CHARACTER_BASES.brutos.player.mods,
         startPower: null,
         model: 'brutos',

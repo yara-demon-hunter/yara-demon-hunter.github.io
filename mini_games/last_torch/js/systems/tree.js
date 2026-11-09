@@ -10,7 +10,7 @@ import { prepareShackle } from '../render/shackle.js';
 import { showToast } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { getStatText } from '../ui/status.js';
-import { refreshModifiers } from './modifiers.js';
+import { getHero, mod, refreshModifiers } from './modifiers.js';
 import { celebrateEvolution } from './powers.js';
 import { syncMaxHp, syncTorchMax } from './torch.js';
 
@@ -103,9 +103,19 @@ export function getNextText(node) {
 
 const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || node.kind === 'evolve';
 
-// Quantos monstros do tipo o jogador já matou nesta partida (todas as horas; zera só ao começar outra)
-function getKillCount(type) {
-    return type === 'ANY' ? state.run.kills : state.run.killsByType[type] ?? 0;
+// Skill que só funciona com adaga (needs: 'knives') e o jogador não lança adaga (mod noKnives): o nó fica selado.
+// Não se compra, e conta como cumprido para quem o pede (passe livre). Vale para o herói que não tem adaga (Captain
+// Brutos) e para quem jurou o Oath of Slaughter; níveis já comprados ficam, só não sobem mais.
+export function isRestricted(node) {
+    return node.needs === 'knives' && mod('noKnives') > 0;
+}
+
+// Por que está selado, para a tela: de quem é a escolha (o herói ou o Juramento)
+export function getRestrictionText() {
+    const hero = getHero();
+    return (hero.mods?.noKnives ?? 0) > 0
+        ? `${hero.name} fights without daggers: this skill is not for him.`
+        : 'The Oath of Slaughter sealed your daggers: this skill can no longer be used.';
 }
 
 // Lista completa do que um nó pede, com o que o jogador já tem: { label, have, need, met }.
@@ -115,15 +125,13 @@ export function getRequirementChecks(node) {
         const parent = NODE_BY_ID[id];
         const name = getNodeInfo(parent).name;
         const have = getNodeLevel(parent);
+        // Passe livre: pedir um nó selado (sem adaga) não segura ninguém
+        if (isRestricted(parent)) return { label: `${name} (sealed: free pass)`, have: lvl, need: lvl, met: true, showCount: false, skipped: true };
         return { label: isSingle(parent) ? name : `${name} Lv. ${lvl}`, have: Math.min(have, lvl), need: lvl, met: have >= lvl, showCount: lvl > 1 && !isSingle(parent) };
     });
     if (node.oath) {
         const free = !state.oath || state.oath === node.key;
         checks.push({ label: 'One oath per night', have: free ? 1 : 0, need: 1, met: free, showCount: false });
-    }
-    if (node.kills) {
-        const have = getKillCount(node.kills.type);
-        checks.push({ label: `Slay ${node.kills.count} ${node.kills.label}`, have: Math.min(have, node.kills.count), need: node.kills.count, met: have >= node.kills.count, showCount: true });
     }
     return checks;
 }
@@ -136,13 +144,14 @@ export function getNodeState(node) {
     const checks = getRequirementChecks(node);
     // O herói que já começa com o poder abre o nó sem passar pelos requisitos
     const reached = level > 0 || checks.every(c => c.met);
+    const restricted = isRestricted(node);
     const maxed = level >= max;
-    const open = reached && !maxed;
+    const open = reached && !maxed && !restricted;
     const currency = getNodeCurrency(node);
     const balance = currency === 'gold' ? state.coins : state.skillPoints;
     // Relíquias só se compram no acampamento
     const atCamp = node.kind !== 'relic' || state.gameState === 'CAMP';
-    return { level, max, cost, currency, checks, reached, maxed, open, canBuy: open && atCamp && balance >= cost };
+    return { level, max, cost, currency, checks, reached: reached || restricted, maxed, open, restricted, canBuy: open && atCamp && balance >= cost };
 }
 
 // Um Juramento acabou de abrir: é a decisão da noite, não pode passar despercebida

@@ -207,6 +207,21 @@
 }
 /* O losango está girado 45°: a ponta da direita é o canto de cima à direita do quadrado */
 .tnode-evolve.is-chained::after { top: 0; transform: translate(-85%, -50%) rotate(-45deg); }
+/* Selado pelo personagem (sem adaga: Captain Brutos ou o Oath of Slaughter): não é o cadeado de "ainda não", é "não é para
+   ele". Borda fina e sólida cor de ferrugem, ícone apagado e um risco diagonal; as ligações que saem dele seguem acesas
+   (passe livre: a cadeia continua aberta). Sem corrente nem cadeado. */
+.tnode.is-sealed:not(.is-selected) { border-style: solid; border-color: rgba(180, 83, 9, 0.6); background: #0c0a09; box-shadow: none; animation: none; }
+.tnode.is-sealed .tnode-icon { opacity: 0.4; filter: grayscale(1) brightness(0.9); }
+.tnode.is-sealed .tnode-level { color: #b45309; }
+.tnode.is-sealed .tnode-level:empty { display: none; }
+.tnode.is-sealed::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(to top right, transparent calc(50% - 1.5px), rgba(251, 146, 60, 0.85) calc(50% - 1px), rgba(251, 146, 60, 0.85) calc(50% + 1px), transparent calc(50% + 1.5px));
+    pointer-events: none;
+}
 .tnode.is-selected { border-color: #fff; }
 /* Juramento: hexágono maior no fim do ramo. A borda é a peça de trás e o miolo é o ícone, os dois recortados */
 .tnode.tnode-oath {
@@ -273,6 +288,7 @@
 .tdetail-text .tdetail-next:empty, .tdetail-text .tdetail-note:empty { display: none; }
 .tdetail-note span { display: block; color: #fca5a5; }
 .tdetail-note span.is-met { color: #6ee7b7; }
+.tdetail-note span.is-sealed { color: #fb923c; }
 .tdetail-buy {
     flex-shrink: 0;
     min-height: 2.6rem;
@@ -329,6 +345,7 @@
 .tnode:has(.tnode-icon.has-image) { width: calc(var(--cell) * 0.94); height: calc(var(--cell) * 0.94); border-width: 1.5px; }
 .tnode-evolve:has(.tnode-icon.has-image) { width: calc(var(--cell) * 0.74); height: calc(var(--cell) * 0.74); }
 .tnode.is-open:not(.is-owned) .tnode-icon.has-image, .tnode.is-chained .tnode-icon.has-image { opacity: 0.62; filter: grayscale(0.45); }
+.tnode.is-sealed .tnode-icon.has-image { opacity: 0.45; filter: grayscale(1) brightness(0.9); }
 .tnode-oath .tnode-icon.has-image { width: auto; height: auto; background: var(--icon-image) center / 100% no-repeat, var(--fill); }
 .tdetail-icon.has-image { width: 2.6rem; height: 2.6rem; }
 @media (max-height: 520px) { .tdetail-icon.has-image { width: 1.9rem; height: 1.9rem; } }

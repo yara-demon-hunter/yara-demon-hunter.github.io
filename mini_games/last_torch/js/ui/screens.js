@@ -60,7 +60,7 @@ export function startGame() {
     state.frenzyActiveTimer = 0;
     state.frenzyDuration = 0;
 
-    state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, killsByType: {} };
+    state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0 };
     state.streak = 0;
     state.streakTimer = 0;
     state.multiKill = 0;
