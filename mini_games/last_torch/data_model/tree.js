@@ -108,11 +108,11 @@ export const TREE_NODES = [
     { id: 'warmHearth', branch: 'flame', kind: 'mod', x: 1, y: 0, requires: [req('torchKeeper')],
       name: 'Warm Hearth', icon: '♨️', desc: 'The fire warms you and mends itself.',
       levelText: (mods) => `+${formatPercent(mods.warmth)} warmth, torch heals ${mods.torchRegen} health/s`,
-      mods: { warmth: 0.2, torchRegen: 0.2 } },
+      mods: { warmth: 0.2, torchRegen: 0.1 } },
     { id: 'undyingFlame', branch: 'flame', kind: 'mod', x: 2, y: 0, requires: [req('warmHearth', 2)],
       name: 'Undying Flame', icon: '🕯️', desc: 'The torch refuses to go out.',
       levelText: (mods) => `+${mods.torchHp} torch health, heals ${mods.torchRegen} health/s`,
-      mods: { torchHp: 20, torchRegen: 0.3 } },
+      mods: { torchHp: 20, torchRegen: 0.15 } },
     { id: 'phoenixPact', branch: 'flame', kind: 'passive', key: 'phoenixPact', x: 3, y: 0, requires: [req('undyingFlame', 2)] },
     // Linha da guarda: quem fica parado é recompensado
     { id: 'steadyStance', branch: 'flame', kind: 'mod', x: 1, y: 1, requires: [req('torchKeeper')],

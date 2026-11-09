@@ -1,23 +1,23 @@
 # Captain Brutos
 
-- **id no jogo:** _(a definir; ainda não está em `js/data/characters.js` nem em `js/data/visuals/stage.js`)_
-- **Papel:** _(a definir)_ Capitão guerreiro de armadura negra e machado de duas faces. Presença intimidadora, focado em combate.
-- **Desenho:** ainda não existe boneco 2.5D. Quando for feito, seguir o esquema do Oskar (`js/stage/oskar25d.js`, registrado em `NS.bodies`; ver "Como criar um boneco novo" em `js/stage/README.md`).
-- **Imagens:** ainda não adicionadas. Entram em `images/` (ver **Imagens**). As cores abaixo são **estimadas da descrição** e devem ser conferidas quando as imagens chegarem.
+- **id no jogo:** `brutos` em `HEROES` (`data_model/heroes.js`) e `BRUTOS` em `BOSS_MODELS` (`data_model/bosses.js`); boneco `brutos` (`js/render/brutos25d.js`, dados em `data_model/visuals/characters/brutos_visual.js`).
+- **Papel:** **semi-boss e herói jogável** do Last Torch. Como herói (id `brutos` em `HEROES`, `data_model/heroes.js`): liberado ao vencê-lo como semi-boss (conquista Iron Captain); lento e pesado, dash curto, golpes fortes e demorados, sem adaga; rival: o Azael. Como semi-boss: Aparece na hora 6, no meio da noite: o rival do herói (o Azael, ou o Demon Hunter se o jogador for o Azael) o chama e ele entra falando uma frase curta ("I will break him." / "He will not."). **Estático e lento**: anda devagar direto para o herói, dá golpes fortes de machado (preparação lenta), pancadas no chão e um **dash curto**. **Não lança adaga** nem atira, e não anda de lado. Falas em `BOSS_INTROS` (`data_model/dialogues.js`).
+- **Desenho:** boneco **2.5D** no mesmo esquema do Oskar do RPG (cabeça com rosto na geometria do Azael, machado de duas lâminas sempre nas duas mãos), com armadura, capa e cicatriz.
+- **Imagens:** `images/brutos-full-body.webp` (parado, corpo inteiro), `images/burtos-running.webp` (correndo), `images/burtos-attack.webp` (golpe por cima) e `images/brutos.webp` (busto de perfil, o retrato). Retrato do diálogo, da escolha de herói e do bestiário: `images/characters/brutos-small.webp`, gerado de `brutos.webp` por `make_portrait.py` (nesta pasta; rode `python3 mini_games/last_torch/art_reference/captain-brutos/make_portrait.py`, precisa só de ffmpeg e Python 3). O script faz um recorte fechado de dentro da armadura (embaixo e na esquerda), para a imagem encher o quadro como a do Azael em vez de parecer um busto cortado; espelha para ele olhar para a direita (o diálogo espelha o lado do rival, então ele sempre olha para o centro); e **limpa o contorno claro** que a remoção do fundo deixou nas bordas da capa e do corpo (cinza-claro de 1 a 2 px, que aparecia como branco contra o fundo escuro do quadro). O recorte (`CROP` no script) vale para esta arte; outra imagem pode pedir outros números, e o arquivo original `brutos.webp` não é alterado. As cores abaixo foram conferidas com as imagens.
 
 ## Aparência
 
 - **Silhueta / forma geral:** guerreiro **alto**, de compleição imponente, **extremamente musculoso e robusto**. Lê-se como um comandante blindado de preto, com ombreiras largas, capa pesada nas costas e um machado grande nas mãos. Transmite força bruta e intimidação.
 - **Cabeça e rosto:** traços **severos e marcantes**, expressão **séria, fechada e focada em combate**. Uma **cicatriz profunda corta a região superior do rosto** (testa/sobrancelha/olho): é o detalhe que mais marca o rosto.
 - **Cabelo e barba:** cabelo **curto e preto**. **Barba densa, volumosa e bem alinhada**, contornando maxilar e queixo (preta, combinando com o cabelo).
-- **Pele:** _(a definir pelas imagens; estimada clara/bronzeada, com músculos marcados)_.
+- **Pele:** bronzeada, com músculos marcados nos braços.
 - **Vestuário e equipamento:**
   - **Armadura pesada negra**: **ombreiras robustas**, **peitoral articulado de placas escuras**, proteções **texturizadas nos braços**.
   - **Cota de malha (chainmail)** visível por baixo das placas (nas juntas, cavas e barra do peitoral).
   - **Calça de couro resistente** e **botas de combate reforçadas**.
   - **Grevas e joelheiras de ferro escurecidas** (pernas e joelhos blindados).
   - **Capa preta longa e pesada**, presa aos ombros por **fechos robustos**, descendo pelas costas e **esvoaçando levemente** com o movimento.
-- **Mãos e pés:** _(a definir; estimado: manoplas/luvas de couro ou ferro escuro e botas reforçadas)_.
+- **Mãos e pés:** mãos de pele, sem luva, grandes e fechadas no cabo; botas de combate reforçadas, escuras.
 - **Arma:** **machado de duas faces grande e robusto**: **cabo longo de madeira reforçada** e **lâminas de aço afiadas em ambas as laterais superiores**, feito para golpes devastadores. Empunhado (mãos a confirmar pelas imagens; um machado desse tamanho sugere as duas mãos).
 - **Partes que se movem separadamente:** braços, machado, capa, peito (respiração), pernas.
 - **Tamanho relativo:** alto e largo, do porte do Oskar ou maior (a confirmar).
@@ -26,7 +26,7 @@
 
 ## Cores
 
-_(estimadas da descrição; sem imagens ainda)_
+_(conferidas com as imagens)_
 
 - **Pele:** #c98a5e, sombra #9a5f3c, luz #e0a679, contorno #1a1410
 - **Cabelo e barba:** #15110f, sombra #0a0807, brilho #2b2522
@@ -45,7 +45,7 @@ Pixel art de RPG, contorno escuro. Capitão duro e implacável: postura firme e 
 
 ## Desenho em 2.5D
 
-Quando for implementar, partir do `oskar25d.js` (cabeça de pele com rosto, mesmo porte grande) e do Azael para a capa (`drawAzaelCape`):
+Implementado em `js/render/brutos25d.js`, a partir do Oskar do RPG (cabeça de pele com rosto, mesmo porte grande); a capa é a padrão do herói, preta:
 
 - **Cabeça:** cabelo preto curto colado à cabeça; barba preta densa em massa única; sobrancelhas grossas; **cicatriz desenhada por cima do rosto** (traço claro na testa/sobrancelha/olho).
 - **Tronco:** largo, peitoral de placas escuras, ombreiras grandes e redondas, cota de malha como trama nas juntas.
@@ -58,31 +58,31 @@ Quando for implementar, partir do `oskar25d.js` (cabeça de pele com rosto, mesm
 
 ## Animações
 
-Mesmos estados do palco do RPG (ver `previews/characters_preview.html`). Descrição proposta, a ajustar:
+Como boss, o Brutos usa as animações do corpo de herói do Last Torch (andar, golpe, dash). Descrição do que acontece, a ajustar:
 
 | Animação | Quando acontece | O que se move | Duração / ritmo | Imagens |
 |---|---|---|---|---|
-| idle (parado) | sem ação | de pé, firme, machado em guarda; respiração lenta e pesada, capa balança de leve | loop ~1,4s | |
-| andar (explorar) | ao explorar | passos pesados; capa esvoaça para trás | acompanha a velocidade | |
-| ataque (combo / pesado) | ao atacar | ergue o machado, corpo todo no golpe, desce com força | ~0,5s | |
-| crítico (Fúria) | ataque com a Fúria cheia | golpe maior com impacto no chão | ~0,6s | |
-| aparo | ao aparar | cabo do machado atravessado na frente do corpo | ~1,1s | |
-| esquiva | ao esquivar | passo pesado para trás | ~0,3s | |
-| poção | ao beber | solta uma mão do machado para levar o frasco à boca | ~1,1s | |
-| descanso | na fogueira | _(a definir)_ | lento | |
+| idle (parado) | sem ação | de pé, firme, machado em guarda; respiração lenta e pesada, capa balança de leve | loop ~1,4s | `images/brutos-full-body.webp` |
+| andar | indo até o herói | passos pesados e lentos; capa esvoaça para trás | acompanha a velocidade | `images/burtos-running.webp` |
+| golpe de machado | herói perto (`meleeRange`) | ergue o machado e desce com o corpo todo; a preparação é lenta (~0,4s) e o corte é largo | ~0,4s + recuperação ~1,9s | `images/burtos-attack.webp` |
+| dash curto | no ataque `lunge` | para e mira (~0,8s), depois avança 150 px em ~0,2s com o machado | ~1s | |
+| pancada no chão | no ataque `slam` | o machado desce e dois círculos grandes estouram no chão depois de ~1,1s | ~1,2s | |
 | levar dano | ao ser atingido | pisca branco e recua pouco (é pesado) | ~0,1s | |
-| derrota | ao perder | ajoelha apoiado no machado e tomba | ~1,4s | |
-| retrato | seleção de personagem | — | — | _(a definir)_ |
+| retrato | diálogo de chegada e bestiário | — | — | `../../images/characters/brutos-small.webp` |
 
 ## Imagens
 
-Ainda não há imagens. Quando chegarem, salvar em `images/` (`.webp`, pixel art) e listar aqui, por exemplo:
+Imagens paradas (`.webp`, pixel art, fundo transparente):
 
-- `images/captain-brutos-idle.webp` — parado em guarda
-- `images/captain-brutos-attack.webp` — machado erguido (o alto do golpe)
+- `images/brutos.webp` — busto de perfil virado para a esquerda: cabelo curto preto, barba densa, cara fechada, **cicatriz diagonal na testa cruzando a sobrancelha**, colar de cota de malha, peitoral de placas, ombreira com frisos e capa preta (é o retrato)
+- `images/brutos-full-body.webp` — parado em guarda, 3/4: machado inclinado na frente do corpo, seguro nas duas mãos (a de baixo perto do pomo, a de cima no meio do cabo), capa aberta para os dois lados, pernas afastadas
+- `images/burtos-running.webp` — correndo de frente, machado atravessado, capa para trás
+- `images/burtos-attack.webp` — machado erguido acima da cabeça com as duas mãos (o alto do golpe), de lado
+
+O que as imagens mostram e a descrição não dizia: **braços de pele à mostra (bíceps)** com **braçadeiras pretas** no antebraço, **colar e saia de cota de malha** (a saia pendurada do cinto), **cinto e tiras de couro marrons**, **ombreiras redondas e com frisos**, ponteira de aço no pomo do machado. A cicatriz só aparece bem no busto (`brutos.webp`): uma linha diagonal na testa que cruza a sobrancelha. No boneco ela é um traço claro do alto da testa até a bochecha, cruzando a sobrancelha e o olho direito.
 
 ## Observações
 
 - Lados sempre do ponto de vista dele (no boneco 2.5D, direita = lado +b).
-- Texto escrito a partir da descrição fornecida; **nada foi inventado além disso**. Campos marcados _(a definir)_ ou _(estimado)_ esperam as imagens.
-- Falta decidir: id no jogo, papel (jogável, inimigo, chefe ou NPC), mãos do machado e passiva/equipamento inicial.
+- Machado **sempre nas duas mãos** (decidido pelas imagens).
+- Valores de luta (vida, dano, alcance do dash, intervalos) em `BOSS_MODELS.BRUTOS`: são um primeiro palpite e pedem teste de jogo.

@@ -746,6 +746,9 @@ export function drawAzaelTorso(rig, pose, bottom, top, wb, wt) {
     ctx.stroke();
 }
 
+// Ferramentas de geometria e de cabeça com rosto, para outros bonecos (js/render/brutos25d.js): mesma geometria, medidas próprias
+export const kit = { mix, add, norm, dot, cross, sub, flowChain, smoothThrough, strokeSmooth, drawRibbon, viewDir, headFrame, strokeVisible, silhouettePath, drawEar, olimb, oball, wrap };
+
 // --- REGISTRO DO BONECO (lido por js/render/player25d.js; interface em js/render/body_registry.js) ---
 // Azael ataca com a mão ESQUERDA e guarda a katana na bainha: o braço livre (o direito) fica sempre na bainha, e a
 // lâmina só aparece quando sai dela (drawn).

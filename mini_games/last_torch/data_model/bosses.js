@@ -192,6 +192,57 @@ export const BOSS_MODELS = {
         projectileSpeed: 270,
         enrageSpeedMultiplier: 1.3,
     },
+    // Semi-boss do meio da noite (hora 6): o rival do herói o chama (BOSS_INTROS em dialogues.js) e ele entra falando uma
+    // frase curta. Corpo de herói (renderAs 'RIVAL'), mas sem duelo: noDuel. Estático e lento: anda devagar sempre
+    // para o herói, não atira, não lança adaga e não anda de lado; só golpes pesados de machado (lentos de preparar),
+    // círculos no chão (slam) e um dash curto (lunge). Boneco: js/render/brutos25d.js.
+    BRUTOS: {
+        ...RIVAL_BASE,
+        name: 'Captain Brutos',
+        title: 'Captain of the Black Guard',
+        heroModel: 'brutos',
+        noDuel: true,
+        portraitImage: 'images/characters/brutos-small.webp',
+        renderScale: 1.1,
+        radius: 26,
+        // Meio do caminho entre o rival da abertura e o Demon Lord (a vida sobe com a hora: 0.65 + 0.17 por hora)
+        hpBase: 1500,
+        speedMin: CHARACTER_BASES.brutos.boss.moveSpeed,
+        speedMax: CHARACTER_BASES.brutos.boss.moveSpeed,
+        color: '#94a3b8',
+        damage: 38,
+        // Golpe automático de perto: raro, largo e pesado, com a preparação visível (meleeHitDelaySeconds)
+        meleeRange: 74,
+        meleeArc: 2.8,
+        meleeCooldownSeconds: 1.9,
+        meleeHitDelaySeconds: 0.4,
+        meleeDamageMultiplier: 1.5,
+        // Estático: vai reto ao herói, sem andar de lado nem recuar
+        keepRange: 0,
+        strafeSpeed: 0,
+        // Dash curto: aviso longo (o boneco para e mira), avanço curto e mais lento que o do Azael
+        lungeLength: CHARACTER_BASES.brutos.boss.lungeLength,
+        lungeSeconds: CHARACTER_BASES.brutos.boss.lungeSeconds,
+        lungeWindupSeconds: 0.8,
+        lungeHitRadius: 34,
+        lungeDamageMultiplier: 1.3,
+        // Pancada no chão: poucos círculos, grandes, com o machado batendo junto (slamSwing)
+        slamCount: 2,
+        slamRadius: 86,
+        slamDelaySeconds: 1.15,
+        slamDamageMultiplier: 1.2,
+        slamTorchDamage: 8,
+        slamSwing: true,
+        patternGapSeconds: 2.6,
+        patterns: ['slam', 'lunge', 'slam', 'slam', 'lunge'],
+        enrageRatio: 0.4,
+        enrageGapMultiplier: 0.75,
+        enrageSpeedMultiplier: 1.25,
+        knockbackResist: 0.95,
+        scoreReward: 400,
+        goldBase: 70,
+        xpRewardBase: 220,
+    },
     LONG_NIGHT: {
         name: 'The Long Night',
         title: 'The Dark Itself',
@@ -283,8 +334,9 @@ shadowOf('AZAEL');
 shadowOf('DEMON_HUNTER');
 
 export const BOSS_SPAWNING = {
-    // Hora → boss da noite. RIVAL: o rival do herói (RIVAL_OF); RIVAL_FINAL: a revanche dele, que fecha a noite
-    schedule: { 1: 'RIVAL', 4: 'DEMON_LORD', 8: 'BLOOD_COUNTESS', 11: 'LONG_NIGHT', 12: 'RIVAL_FINAL' },
+    // Hora → boss da noite. RIVAL: o rival do herói (RIVAL_OF); RIVAL_FINAL: a revanche dele, que fecha a noite.
+    // BRUTOS (hora 6): semi-boss do meio da noite
+    schedule: { 1: 'RIVAL', 4: 'DEMON_LORD', 6: 'BRUTOS', 8: 'BLOOD_COUNTESS', 11: 'LONG_NIGHT', 12: 'RIVAL_FINAL' },
     lastScheduledHour: 12,
     // Modo sem fim (depois da hora 12): um boss a cada everyTurns horas, nesta ordem
     everyTurns: 4,
@@ -292,13 +344,20 @@ export const BOSS_SPAWNING = {
     rotation: ['DEMON_LORD', 'BLOOD_COUNTESS', 'LONG_NIGHT']
 };
 
-export function isBossTurn(turn) {
-    const { schedule, lastScheduledHour, everyTurns } = BOSS_SPAWNING;
-    return turn <= lastScheduledHour ? !!schedule[turn] : turn % everyTurns === 0;
+// Boss com a conversa de duelo (rival da hora 1 e a revanche). Os que têm corpo de herói mas noDuel (Brutos) entram
+// pela provocação dos outros bosses.
+export function hasDuel(model) {
+    return model.renderAs === 'RIVAL' && !model.noDuel;
 }
 
-// Rival de cada boneco de herói: o Demon Hunter (e as variações dele) enfrenta o Azael, e o Azael o Demon Hunter
-export const RIVAL_OF = { hunter: 'AZAEL', azael: 'DEMON_HUNTER' };
+// heroModel: o boneco do herói escolhido; há horas que ficam sem boss para certos heróis (o Brutos não luta contra si mesmo)
+export function isBossTurn(turn, heroModel = 'hunter') {
+    const { lastScheduledHour, everyTurns } = BOSS_SPAWNING;
+    return turn <= lastScheduledHour ? !!chooseBossType(turn, heroModel) : turn % everyTurns === 0;
+}
+
+// Rival de cada boneco de herói: o Demon Hunter (e as variações dele) e o Brutos enfrentam o Azael, e o Azael o Demon Hunter
+export const RIVAL_OF = { hunter: 'AZAEL', azael: 'DEMON_HUNTER', brutos: 'AZAEL' };
 
 // Boss da hora (heroModel: o boneco do herói escolhido, getHero().model, que decide o rival)
 export function chooseBossType(turn, heroModel = 'hunter') {
@@ -306,6 +365,8 @@ export function chooseBossType(turn, heroModel = 'hunter') {
     const rival = RIVAL_OF[heroModel] ?? RIVAL_OF.hunter;
     if (turn <= lastScheduledHour) {
         const slot = schedule[turn];
+        // O semi-boss Brutos é o Captain Brutos: quem joga com ele não o enfrenta (a hora fica normal)
+        if (slot === 'BRUTOS' && heroModel === 'brutos') return null;
         if (slot === 'RIVAL') return rival;
         if (slot === 'RIVAL_FINAL') return `${rival}_FINAL`;
         return slot ?? null;

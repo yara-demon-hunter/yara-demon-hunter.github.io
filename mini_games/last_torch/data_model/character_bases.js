@@ -25,6 +25,20 @@ export const CHARACTER_BASES = {
             lungeLength: 400,
             lungeSeconds: 0.09
         }
+    },
+    // Captain Brutos: lento e pesado, com dash curto. Como herói não lança adaga (noKnives) e a lâmina bate bem mais
+    // forte e bem mais devagar; como semi-boss (BOSS_MODELS.BRUTOS) usa o mesmo ritmo lento e o mesmo dash curto.
+    brutos: {
+        player: {
+            mods: { maxHp: 0.4, bladeDamage: 0.4, attackSpeed: -0.3, damageTaken: -0.1, noKnives: 1 },
+            moveSpeed: 105,
+            dash: { distance: 85, seconds: 0.2 }
+        },
+        boss: {
+            moveSpeed: 38,
+            lungeLength: 150,
+            lungeSeconds: 0.22
+        }
     }
 };
 

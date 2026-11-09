@@ -101,8 +101,8 @@ export function getWarmthRadius() {
 }
 // Pontos por segundo; zero sob o Oath of Slaughter. A cura cresce com metade do bônus de alcance
 // (warmthHealShare) e tem teto, para relíquias, ramo da chama e Juramento não a empilharem sem fim
-const WARMTH_HEAL_SHARE = 0.5;
-const WARMTH_HEAL_MAX_MULTIPLIER = 2;
+const WARMTH_HEAL_SHARE = 0.3;
+const WARMTH_HEAL_MAX_MULTIPLIER = 1.5;
 export function getWarmthHeal() {
     if (mod('noWarmthHeal') > 0) return 0;
     const multiplier = Math.min(WARMTH_HEAL_MAX_MULTIPLIER, 1 + mod('warmth') * WARMTH_HEAL_SHARE);

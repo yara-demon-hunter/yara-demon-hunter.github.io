@@ -2,7 +2,9 @@
 // Mostrados quando o rival surge e quando ele cai (js/ui/dialogue.js): o retrato de quem fala acende e o texto vem embaixo.
 // Chave: o rival (BOSS_MODELS). first: o duelo da hora 1; final: a revanche da hora 12.
 // Cada duelo tem before (quando o rival surge, antes da luta) e after (quando ele cai).
-// who: 'rival' (o boss) ou 'hero' (quem o jogador controla).
+// byHero: falas próprias de um herói (chave = model de data_model/heroes.js) contra esse rival; sem ele, valem as de cima.
+// who: 'rival' (o boss do duelo, ou quem provoca), 'hero' (quem o jogador controla) ou 'boss' (o boss que chega nas
+// provocações, ex.: Captain Brutos; o retrato dele toma o lugar do rival enquanto fala).
 export const DUEL_DIALOGUES = {
     // Jogando com o Demon Hunter, contra o Azael
     AZAEL: {
@@ -29,6 +31,35 @@ export const DUEL_DIALOGUES = {
                 { who: 'hero', text: 'I am not fighting for myself. I am fighting for the light.' },
                 { who: 'rival', text: 'Then keep your little flame, hunter. This night is yours.' }
             ]
+        },
+        // Falas próprias de outros heróis contra o Azael (byHero[model], com a mesma forma de first e final)
+        byHero: {
+            brutos: {
+                first: {
+                    before: [
+                        { who: 'rival', text: 'A captain with an axe, guarding a little flame. Brave... or foolish.' },
+                        { who: 'hero', text: 'Azael. Come closer.' },
+                        { who: 'rival', text: 'Gladly. Let us see how hard that axe really hits.' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'You hit like a falling wall... I will be back, Captain.' },
+                        { who: 'hero', text: 'Bring a bigger blade.' },
+                        { who: 'rival', text: 'Before dawn. Count on it.' }
+                    ]
+                },
+                final: {
+                    before: [
+                        { who: 'rival', text: 'I told you I would return, Captain. The night is almost over.' },
+                        { who: 'hero', text: 'Then I end it here.' },
+                        { who: 'rival', text: 'One of us will not see the dawn.' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'Again... A wall that walks. How do I break you?' },
+                        { who: 'hero', text: 'You do not. Keep to the dark.' },
+                        { who: 'rival', text: '...This night is yours, Captain.' }
+                    ]
+                }
+            }
         }
     },
     // Jogando com o Azael, contra o Demon Hunter
@@ -80,6 +111,12 @@ export const BOSS_INTROS = {
             { who: 'hero', text: 'Then send whatever you have left.' },
             { who: 'rival', text: 'Gladly. My Countess is thirsty... try not to bleed too fast.' }
         ],
+        // Semi-boss do meio da noite: o Azael o chama e o capitão responde com uma frase curta
+        BRUTOS: [
+            { who: 'rival', text: 'Enough games. Captain Brutos! This hunter is yours.' },
+            { who: 'boss', text: 'I will break him.' },
+            { who: 'hero', text: 'Then come and try, Captain.' }
+        ],
         LONG_NIGHT: [
             { who: 'rival', text: 'Impressive. But not even you can fight the night itself.' },
             { who: 'hero', text: 'Dawn is close. I can feel it.' },
@@ -102,6 +139,12 @@ export const BOSS_INTROS = {
             { who: 'rival', text: 'Something old is coming, Azael. It can smell your blood.' },
             { who: 'hero', text: 'Then it will choke on it.' },
             { who: 'rival', text: 'Prove it. I will be right here, blade ready.' }
+        ],
+        // Semi-boss do meio da noite: o Demon Hunter o chama e o capitão responde com uma frase curta
+        BRUTOS: [
+            { who: 'rival', text: 'Captain Brutos! The demon is yours. Do not let him pass.' },
+            { who: 'boss', text: 'He will not.' },
+            { who: 'hero', text: 'Move, then, or be moved.' }
         ],
         LONG_NIGHT: [
             { who: 'rival', text: 'The darkness itself is waking. Not even I can stop it.' },

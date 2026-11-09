@@ -1,4 +1,4 @@
-import { mod } from '../systems/modifiers.js';
+import { getHero, mod } from '../systems/modifiers.js';
 import { NIGHT, getHourName } from '../../data_model/night.js';
 import { STREAK } from '../../data_model/streak.js';
 import { isBossTurn } from '../../data_model/bosses.js';
@@ -147,7 +147,7 @@ function updateNightPips() {
         ui.pips.textContent = '';
         for (let h = 1; h <= total; h++) {
             const pip = document.createElement('i');
-            if (isBossTurn(h)) pip.className = 'is-boss';
+            if (isBossTurn(h, getHero().model)) pip.className = 'is-boss';
             ui.pips.appendChild(pip);
         }
     }

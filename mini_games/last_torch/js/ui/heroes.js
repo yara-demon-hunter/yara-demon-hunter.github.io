@@ -1,5 +1,5 @@
 import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
-import { ACTIVE_HEROES, HEROES } from '../../data_model/heroes.js';
+import { ACTIVE_HEROES, HEROES, ORDERED_HEROES } from '../../data_model/heroes.js';
 import { save, persist } from '../core/save.js';
 import { audio } from '../core/state.js';
 import { paintHeroPortrait, renderStartScreen } from './screens.js';
@@ -56,7 +56,7 @@ function el(tag, className, text) {
 function renderHeroes() {
     const roster = document.getElementById('heroRoster');
     roster.replaceChildren();
-    Object.entries(HEROES).forEach(([key, hero]) => {
+    ORDERED_HEROES.map(key => [key, HEROES[key]]).forEach(([key, hero]) => {
         const owned = isOwned(key);
         const picked = save.hero === key;
         const trial = ACHIEVEMENTS.find(a => a.hero === key);

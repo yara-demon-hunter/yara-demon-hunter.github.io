@@ -1,7 +1,7 @@
 import { TURN_DIFFICULTY, getTurnDifficulty } from '../../data_model/difficulty.js';
 import { ELITE_TYPES, rollElite } from '../../data_model/elites.js';
 import { HOUR_EVENTS, NIGHT, rollHourHordes } from '../../data_model/night.js';
-import { BOSS_MODELS, BOSS_SPAWNING, chooseBossType, createBoss, isBossTurn } from '../../data_model/bosses.js';
+import { BOSS_MODELS, BOSS_SPAWNING, chooseBossType, createBoss, hasDuel, isBossTurn } from '../../data_model/bosses.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, chooseMonsterType, createMonster } from '../../data_model/monsters.js';
 import { isMonsterUnlocked } from '../../data_model/difficulty.js';
 import { audio, player, state } from '../core/state.js';
@@ -163,7 +163,7 @@ export function spawnBoss() {
     audio.playBossRoar();
     audio.setMood('boss');
     // Rival: os dois conversam antes da luta (depois da entrada dele aparecer)
-    if (model.renderAs === 'RIVAL') {
+    if (hasDuel(model)) {
         const boss = state.currentBoss;
         setTimeout(() => whenHunting(() => {
             if (state.currentBoss === boss) playDuelDialogue(boss.type, 'before', () => {});
@@ -207,7 +207,7 @@ export function updateSpawner(dt) {
 
 // Plano da hora: quantas hordas e elites e, nas horas de boss, quem chega no fim da onda (bossCalled: já chamado)
 export function buildHourPlan(hour) {
-    const boss = isBossTurn(hour) ? chooseBossType(hour, getHero().model) : null;
+    const boss = isBossTurn(hour, getHero().model) ? chooseBossType(hour, getHero().model) : null;
     const elites = [];
     if (hour >= HOUR_EVENTS.firstEliteHour) elites.push({ at: HOUR_EVENTS.eliteMoment, fired: false });
     if (hour >= HOUR_EVENTS.secondEliteHour) elites.push({ at: HOUR_EVENTS.secondEliteMoment, fired: false });

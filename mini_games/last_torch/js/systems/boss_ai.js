@@ -86,6 +86,11 @@ const ACTIONS = {
                 model.slamTorchDamage ?? 0
             );
         }
+        // Corpo de herói que bate no chão (Brutos): o machado desce junto com o aviso
+        if (model.slamSwing) {
+            e.angle = aimAngle(e);
+            e.comboStep = ((e.comboStep ?? 1) % 3) + 1;
+        }
         audio.playBossAttack();
     },
     summon(e, model) {

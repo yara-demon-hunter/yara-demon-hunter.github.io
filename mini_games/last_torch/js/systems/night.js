@@ -1,5 +1,5 @@
 import { getTurnDifficulty } from '../../data_model/difficulty.js';
-import { BOSS_MODELS } from '../../data_model/bosses.js';
+import { BOSS_MODELS, hasDuel } from '../../data_model/bosses.js';
 import { NIGHT, getHourName, rollOmen } from '../../data_model/night.js';
 import { save, persist } from '../core/save.js';
 import { audio, player, state } from '../core/state.js';
@@ -69,7 +69,7 @@ function callBoss(plan) {
     plan.bossCalled = true;
     audio.setMood('silent');
     updateHUD();
-    if (BOSS_MODELS[plan.boss].renderAs === 'RIVAL' || !hasBossIntro(plan.boss)) {
+    if (hasDuel(BOSS_MODELS[plan.boss]) || !hasBossIntro(plan.boss)) {
         announceBoss(plan);
         return;
     }
@@ -164,7 +164,7 @@ export function onBossKilled(e, model) {
     bumpStat('bosses');
 
     // Rival: os ataques dele somem já, e a conversa entre os dois vem antes de a noite seguir
-    if (model.renderAs === 'RIVAL') {
+    if (hasDuel(model)) {
         state.enemyProjectiles.length = 0;
         state.telegraphs.length = 0;
         setTimeout(() => whenHunting(() => playDuelDialogue(e.type, 'after', afterBoss)), DUEL_DIALOGUE_DELAY_MS);

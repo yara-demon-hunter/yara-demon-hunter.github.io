@@ -1,5 +1,6 @@
 import { HERO_VISUALS } from './visuals/characters/hero_visual.js';
 import { AZAEL_VISUALS } from './visuals/characters/azael_visual.js';
+import { BRUTOS_VISUALS } from './visuals/characters/brutos_visual.js';
 import { CHARACTER_BASES } from './character_bases.js';
 
 // --- HERÓIS ---
@@ -79,11 +80,31 @@ export const HEROES = {
         portraitImage: 'images/characters/azael-small.webp',
         // Liberado pela conquista Dawn (vencer a noite). unlockHint: aviso no cartão bloqueado
         unlockHint: 'Beat the game'
+    },
+    brutos: {
+        name: 'Captain Brutos',
+        tagline: 'Slow and iron-clad. Every blow of the axe lands like a siege engine.',
+        trait: '+40% health, +40% blade damage and -10% damage taken, but -30% attack speed, a short dash, slow movement, and no daggers.',
+        mods: CHARACTER_BASES.brutos.player.mods,
+        startPower: null,
+        model: 'brutos',
+        perk: { name: 'HEAVY HANDS', text: 'Slow, crushing axe blows and thick armor. No daggers: the blade does all the work.' },
+        colors: BRUTOS_VISUALS.colors,
+        portrait: '',
+        portraitImage: 'images/characters/brutos-small.webp',
+        // Liberado pela conquista Iron Captain (vencer o Captain Brutos na hora 6). unlockHint: aviso no cartão bloqueado
+        unlockHint: 'Defeat Captain Brutos'
     }
 };
 
-// Heróis que aparecem na escolha da tela inicial, na ordem
-export const ACTIVE_HEROES = Object.keys(HEROES).filter(key => !HEROES[key].shelved);
+// Ordem dos heróis nas telas de escolha. Quem não está na lista vem depois, na ordem em que foi declarado em HEROES
+// (herói novo entra no fim sem mexer aqui; para mudar a posição, é só pôr a chave na lista).
+export const HERO_ORDER = ['hunter', 'brutos', 'azael'];
+const rank = (key) => (HERO_ORDER.includes(key) ? HERO_ORDER.indexOf(key) : HERO_ORDER.length);
+export const ORDERED_HEROES = Object.keys(HEROES).sort((a, b) => rank(a) - rank(b));
+
+// Heróis que aparecem na escolha da tela inicial, na ordem de HERO_ORDER
+export const ACTIVE_HEROES = ORDERED_HEROES.filter(key => !HEROES[key].shelved);
 
 // colors em cada herói traz só o que muda; aqui vira a paleta completa
 Object.values(HEROES).forEach(hero => {

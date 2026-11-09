@@ -40,11 +40,11 @@ export const POWER_MODELS = {
         },
         // warmthDamage = bônus de dano do herói dentro do calor da tocha (antigo Sacred Ground)
         levels: [
-            { dps: 0.35, life: 2.2, radius: 20, warmthDamage: 0.08 },
-            { dps: 0.5, life: 2.2, radius: 20, warmthDamage: 0.16 },
-            { dps: 0.5, life: 3.2, radius: 22, warmthDamage: 0.24 },
-            { dps: 0.7, life: 3.2, radius: 22, warmthDamage: 0.32 },
-            { dps: 0.7, life: 3.6, radius: 30, warmthDamage: 0.4 }
+            { dps: 0.2, life: 2.2, radius: 20, warmthDamage: 0.08 },
+            { dps: 0.3, life: 2.2, radius: 20, warmthDamage: 0.16 },
+            { dps: 0.3, life: 3.2, radius: 22, warmthDamage: 0.24 },
+            { dps: 0.4, life: 3.2, radius: 22, warmthDamage: 0.32 },
+            { dps: 0.4, life: 3.6, radius: 30, warmthDamage: 0.4 }
         ],
         dropEvery: 34, tickSeconds: 0.3, maxFires: 22
     },
@@ -56,7 +56,7 @@ export const POWER_MODELS = {
         get upgrades() {
             return this.levels.map(level => `Restore ${formatNumber(level.heal)} health per kill`);
         },
-        levels: [{ heal: 1 }, { heal: 1.5 }, { heal: 2 }, { heal: 2.5 }, { heal: 3 }]
+        levels: [{ heal: 0.4 }, { heal: 0.6 }, { heal: 0.8 }, { heal: 1 }, { heal: 1.2 }]
     },
     keenEye: {
         name: 'Keen Eye', icon: '👁️', maxLvl: 5,
@@ -445,7 +445,7 @@ export const EVOLUTIONS = {
             const { dps, life, radius } = this.levels;
             return `Pillars of fire rise from your steps, burning enemies for ${formatMultiplier(dps)} blade damage per second for ${formatNumber(life)}s within ${radius} range.`;
         },
-        levels: { dps: 1.3, life: 4.5, radius: 42 }
+        levels: { dps: 0.7, life: 4, radius: 42 }
     },
     bloodlust: {
         name: 'Crimson Tide', icon: '🌊',

@@ -3,6 +3,7 @@
 // Lido por js/render/shadow_clone.js e pelo golpe em js/render/entities.js. Só afeta o desenho.
 import { HERO_VISUALS } from './hero_visual.js';
 import { AZAEL_VISUALS } from './azael_visual.js';
+import { BRUTOS_VISUALS } from './brutos_visual.js';
 
 // Tons de sombra que o clone do Azael usa nas peças só dele (pele, cabelo, faixas, bainha)
 const AZAEL_SHADOW = {
@@ -61,5 +62,18 @@ export const SHADOW_CLONE_VISUALS = {
 SHADOW_CLONE_VISUALS.azaelColors = { ...AZAEL_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors, ...AZAEL_SHADOW };
 // Paleta de sombra de cada herói com boneco próprio (chave = model de data_model/heroes.js); quem não está aqui usa `colors`.
 // Herói novo: uma linha aqui.
-SHADOW_CLONE_VISUALS.colorsByModel = { azael: SHADOW_CLONE_VISUALS.azaelColors };
+// Clone do Brutos: o boneco dele (js/render/brutos25d.js) com tons de sombra nas peças só dele (pele, cabelo, armadura, couro, aço)
+const BRUTOS_SHADOW = {
+    skin: '#2a1846', skinShade: '#170c2a', skinLight: '#3b2363', outline: '#000000',
+    hair: '#0d0719', hairShade: '#05030b', beard: '#0d0719', beardShade: '#05030b', mouth: '#0d0719',
+    eye: '#c084fc', eyeWhite: '#3b2363', scar: '#4c1d95', scarLight: '#6d28d9',
+    armor: '#160d29', armorShade: '#0a0615', armorLight: '#2a1846', armorEdge: '#4c2f80',
+    mail: '#2a1846', mailShade: '#140a24', leather: '#1e1035', leatherShade: '#110a20', pantsShade: '#0a0612',
+    iron: '#1b1030', ironLight: '#34205e',
+    axeHead: '#6d4cc0', axeEdge: '#c4b5fd', axeDark: '#2a1846', haft: '#1e1035', haftShade: '#110a20', binding: '#0a0612'
+};
+SHADOW_CLONE_VISUALS.colorsByModel = {
+    azael: SHADOW_CLONE_VISUALS.azaelColors,
+    brutos: { ...BRUTOS_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors, ...BRUTOS_SHADOW }
+};
 export const shadowColorsOf = (model) => SHADOW_CLONE_VISUALS.colorsByModel[model] ?? SHADOW_CLONE_VISUALS.colors;

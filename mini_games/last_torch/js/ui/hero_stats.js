@@ -9,11 +9,12 @@ import { save } from '../core/save.js';
 // quem lidera naquele atributo; a diferença entre as barras é a diferença real). Os valores vêm dos mesmos dados do jogo (character_bases.js e mods).
 const STATS = [
     { label: 'HEALTH', value: (h, b) => CHARACTER_MODEL.baseHp * (1 + (h.mods.maxHp ?? 0)) },
-    { label: 'DAMAGE', value: (h, b) => 1 + (h.mods.damage ?? 0) },
+    { label: 'DAMAGE', value: (h, b) => (1 + (h.mods.damage ?? 0)) * (1 + (h.mods.bladeDamage ?? 0)) },
     { label: 'SPEED', value: (h, b) => b.player.moveSpeed },
     { label: 'DASH', value: (h, b) => b.player.dash.distance },
-    { label: 'DAGGER', value: (h, b) => (1 + (h.mods.knifeDamage ?? 0)) * KNIFE_SKILL.damageMultiplier },
-    { label: 'RANGE', value: (h, b) => KNIFE_SKILL.maxRange * (1 + (h.mods.knifeRange ?? 0)) }
+    // noKnives (Brutos): sem adaga, as barras de adaga e alcance ficam no mínimo
+    { label: 'DAGGER', value: (h, b) => (h.mods.noKnives ? 0 : (1 + (h.mods.knifeDamage ?? 0)) * KNIFE_SKILL.damageMultiplier) },
+    { label: 'RANGE', value: (h, b) => (h.mods.noKnives ? 0 : KNIFE_SKILL.maxRange * (1 + (h.mods.knifeRange ?? 0))) }
 ];
 const MIN_BAR = 12;                 // % mínimo, para a barra nunca sumir
 

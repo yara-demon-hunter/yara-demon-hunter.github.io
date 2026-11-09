@@ -2,6 +2,7 @@ import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { SHADOW_CLONE_VISUALS, shadowColorsOf } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { ctx } from '../core/state.js';
+import { BODIES } from './body_registry.js';
 import { lerpAngle } from './fx/easing.js';
 import { drawGlow } from './fx/glow.js';
 import { createHeroAnim, updateHeroAnim } from './player.js';
@@ -62,7 +63,7 @@ export function renderRival(e) {
     const shadow = model.isShadow;
     const colors = shadow
         ? shadowColorsOf(model.heroModel)
-        : HEROES[model.heroKey].colors ?? undefined;
+        : (HEROES[model.heroKey]?.colors ?? BODIES[model.heroModel]?.vis.colors);
     drawGlow(ctx, model.color, e.x, e.y, e.radius * 2.4, shadow ? 0.22 : e.enraged ? 0.55 : 0.32);
     ctx.save();
     if (shadow) ctx.globalAlpha = SHADOW_CLONE_VISUALS.alpha;

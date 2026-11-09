@@ -71,7 +71,7 @@ function renderNext() {
     const hour = state.turn;
     document.getElementById('campNextHour').innerText = `WAVE ${hour} · ${getHourName(hour)}`;
     const threat = document.getElementById('campNextThreat');
-    if (isBossTurn(hour)) {
+    if (isBossTurn(hour, getHero().model)) {
         threat.innerText = `☠️ ${BOSS_MODELS[chooseBossType(hour, getHero().model)].name} awaits`;
     } else if (state.nextOmen) {
         threat.innerText = `${state.nextOmen.icon} ${state.nextOmen.name}: ${state.nextOmen.desc}`;

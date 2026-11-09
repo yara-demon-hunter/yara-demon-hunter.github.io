@@ -316,6 +316,39 @@ function sashEnds(pose) {
     }
 }
 
+// Capa padrão: presa nos ombros, barra rasgada e dobras (cores C.cape*). Bonecos com drawBack podem chamá-la por rig.drawCapeShape
+function drawCapeShape(anchors, hem) {
+    const n = H.capeStrips;
+    ctx.beginPath();
+    anchors.forEach((p, i) => {
+        const s = project(...p);
+        if (i === 0) ctx.moveTo(s.x, s.y);
+        else ctx.lineTo(s.x, s.y);
+    });
+    // Barra rasgada (de volta), com entalhes entre as pontas
+    for (let i = n; i >= 0; i--) {
+        const p = project(...hem[i]);
+        ctx.lineTo(p.x, p.y);
+        if (i > 0) {
+            const q = hem[i - 1];
+            const mid = [(hem[i][0] + q[0]) / 2 * 0.85, (hem[i][1] + q[1]) / 2, (hem[i][2] + q[2]) / 2 + 1.2];
+            const m = project(...mid);
+            ctx.lineTo(m.x, m.y);
+        }
+    }
+    ctx.closePath();
+    ctx.fillStyle = C.cape;
+    ctx.fill();
+    ctx.strokeStyle = C.capeEdge;
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+
+    // Dobras do ombro até as pontas compridas
+    for (let i = 1; i < n; i += 2) {
+        limb([anchors[i], [(anchors[i][0] + hem[i][0]) / 2, (anchors[i][1] + hem[i][1]) / 2, (anchors[i][2] + hem[i][2]) / 2], hem[i]], 0.8, C.capeFold);
+    }
+}
+
 function capePart(pose) {
     const t = pose.t;
     const run = pose.run;
@@ -350,34 +383,7 @@ function capePart(pose) {
                 return;
             }
             sashEnds(pose);
-            ctx.beginPath();
-            anchors.forEach((p, i) => {
-                const s = project(...p);
-                if (i === 0) ctx.moveTo(s.x, s.y);
-                else ctx.lineTo(s.x, s.y);
-            });
-            // Barra rasgada (de volta), com entalhes entre as pontas
-            for (let i = n; i >= 0; i--) {
-                const p = project(...hem[i]);
-                ctx.lineTo(p.x, p.y);
-                if (i > 0) {
-                    const q = hem[i - 1];
-                    const mid = [(hem[i][0] + q[0]) / 2 * 0.85, (hem[i][1] + q[1]) / 2, (hem[i][2] + q[2]) / 2 + 1.2];
-                    const m = project(...mid);
-                    ctx.lineTo(m.x, m.y);
-                }
-            }
-            ctx.closePath();
-            ctx.fillStyle = C.cape;
-            ctx.fill();
-            ctx.strokeStyle = C.capeEdge;
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
-
-            // Dobras do ombro até as pontas compridas
-            for (let i = 1; i < n; i += 2) {
-                limb([anchors[i], [(anchors[i][0] + hem[i][0]) / 2, (anchors[i][1] + hem[i][1]) / 2, (anchors[i][2] + hem[i][2]) / 2], hem[i]], 0.8, C.capeFold);
-            }
+            drawCapeShape(anchors, hem);
         }
     };
 }
@@ -499,12 +505,6 @@ function swordArmPose(pose) {
     let swingAngle = restAngle;
     if (anim.swingActive || pose.blend > 0) swingAngle = swingAngleAt(Math.min(anim.swingElapsed, anim.swingSeconds), anim);
     const blend = pose.blend;
-    if (B?.swordRest) {
-        const rest = B.swordRest(rig, pose, { swingAngle, blend });
-        const held = holdSword(pose, rest);
-        if (rest.armHand) held.armHand = rest.armHand;
-        return held;
-    }
     const restHand = [pose.lean * 0.5 + 1.6 + Math.sin(anim.stride + Math.PI) * V.armSwing * 0.4 * pose.run, V.chest.B + 0.8, V.handHeight - pose.crouch];
     const swingHand = [Math.cos(swingAngle) * V.swingRadius, Math.sin(swingAngle) * V.swingRadius, V.swingHeight];
     const hand = restHand.map((v, i) => v + (swingHand[i] - v) * blend);
@@ -512,6 +512,14 @@ function swordArmPose(pose) {
     const drop = V.restBladeDrop * (1 - blend);
     const len = Math.hypot(1, drop);
     const dir = [Math.cos(angle) / len, Math.sin(angle) / len, -drop / len];
+    // Bonecos com a arma própria em repouso (swordRest: Azael, Brutos) mudam mão e direção a partir da pose normal;
+    // no golpe (blend = 1) voltam à varredura. armHand: a mão que segura a arma, se não for a padrão
+    if (B?.swordRest) {
+        const rest = B.swordRest(rig, pose, { hand, dir, swingAngle, blend });
+        const held = holdSword(pose, rest);
+        if (rest.armHand) held.armHand = rest.armHand;
+        return held;
+    }
     return holdSword(pose, { hand, dir });
 }
 
@@ -744,7 +752,7 @@ function headPart(pose) {
 const rig = {
     project, projectVec, limb, ball, disk,
     // Pose e vetores, para bonecos com braços ou espada próprios
-    mix, holdSword, swordArmPose, sashEnds,
+    mix, holdSword, swordArmPose, sashEnds, drawCapeShape,
     get anim() { return anim; },
     get C() { return C; },
     get sinF() { return sinF; },
@@ -794,7 +802,8 @@ export function renderPlayer25D(body = player, bodyAnim = heroAnim, colors = V.c
     ctx.save();
     ctx.globalAlpha *= pulse;
     ctx.translate(body.x + body.hitDirX * K.distance * push, body.y + body.hitDirY * K.distance * push);
-    ctx.scale(V.scale, V.scale);
+    const bodyScale = V.scale * (B?.vis.bodyScale ?? 1);
+    ctx.scale(bodyScale, bodyScale);
 
     const pose = buildPose(t, body);
     drawGearGround(gear, pose, rig);

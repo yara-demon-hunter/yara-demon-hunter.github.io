@@ -18,6 +18,9 @@ let index = 0;
 let typed = 0;
 let typeTimer = null;
 let finish = null;
+// Quem aparece no lugar do rival quando fala um 'boss' (Captain Brutos): { name, portraitImage }. null = não há
+let bossHero = null;
+let rivalHero = null;
 
 // Espera a caçada estar rodando (o jogador pode ter pausado nesse meio tempo); se a partida acabou, desiste
 export function whenHunting(run) {
@@ -61,10 +64,21 @@ function build(rivalHero, playerHero, intro) {
     requestAnimationFrame(() => root.classList.add('is-open'));
 }
 
+// Troca o retrato do lado do rival: o do rival, ou o do boss que chegou quando ele fala
+function showRivalSide(hero) {
+    const box = root.querySelector('.dlg-rival');
+    box.querySelector('img').src = hero.portraitImage ?? HUNTER_IMAGE;
+    box.querySelector('img').alt = hero.name;
+    box.querySelector('.dlg-name').textContent = hero.name;
+}
+
 function showLine() {
     const line = lines[index];
-    root.dataset.who = line.who;
-    root.querySelector('.dlg-speaker').textContent = root.querySelector(`.dlg-${line.who} .dlg-name`).textContent;
+    // 'boss' fala do lado do rival, com o retrato dele
+    const side = line.who === 'boss' ? 'rival' : line.who;
+    if (bossHero && side === 'rival') showRivalSide(line.who === 'boss' ? bossHero : rivalHero);
+    root.dataset.who = side;
+    root.querySelector('.dlg-speaker').textContent = root.querySelector(`.dlg-${side} .dlg-name`).textContent;
     const text = root.querySelector('.dlg-text');
     typed = 0;
     text.textContent = '';
@@ -119,7 +133,8 @@ function onKey(e) {
 export function playDuelDialogue(bossType, moment, onDone) {
     const final = bossType.endsWith('_FINAL');
     const key = final ? bossType.slice(0, -'_FINAL'.length) : bossType;
-    const script = DUEL_DIALOGUES[key]?.[final ? 'final' : 'first']?.[moment];
+    const set = DUEL_DIALOGUES[key];
+    const script = (set?.byHero?.[getHero().model] ?? set)?.[final ? 'final' : 'first']?.[moment];
     play(script, key, false, onDone);
 }
 
@@ -131,11 +146,13 @@ export function hasBossIntro(bossType) {
 
 export function playBossIntro(bossType, onDone) {
     const rival = RIVAL_OF[getHero().model] ?? RIVAL_OF.hunter;
-    play(BOSS_INTROS[rival]?.[bossType] ?? BOSS_INTROS[rival]?.default, rival, true, onDone);
+    const boss = BOSS_MODELS[bossType];
+    play(BOSS_INTROS[rival]?.[bossType] ?? BOSS_INTROS[rival]?.default, rival, true, onDone, { name: boss.name, portraitImage: boss.portraitImage });
 }
 
 // rivalType: o boss do rival (AZAEL ou DEMON_HUNTER), de onde vem o retrato dele
-function play(script, rivalType, intro, onDone) {
+// arriving: o boss que chega e fala nas falas 'boss' ({ name, portraitImage }), se houver
+function play(script, rivalType, intro, onDone, arriving = null) {
     if (!script || root) {
         onDone();
         return;
@@ -145,7 +162,9 @@ function play(script, rivalType, intro, onDone) {
     finish = onDone;
     state.gameState = 'DIALOGUE';
     releaseTouchControls();
-    build(HEROES[BOSS_MODELS[rivalType].heroKey], getHero(), intro);
+    rivalHero = HEROES[BOSS_MODELS[rivalType].heroKey];
+    bossHero = script.some(l => l.who === 'boss') ? arriving : null;
+    build(rivalHero, getHero(), intro);
     document.addEventListener('keydown', onKey, true);
     showLine();
 }
