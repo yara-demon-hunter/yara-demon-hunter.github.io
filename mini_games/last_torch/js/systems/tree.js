@@ -91,13 +91,14 @@ export function getNextText(node) {
     if (node.kind === 'passive' || node.kind === 'relic') return '';
     if (node.kind === 'power') return POWER_MODELS[node.key].upgrades[powers[node.key].lvl] ?? '';
     if (node.kind === 'evolve') return `${evolvable(node).name} evolves`;
-    if (node.kind === 'mod') return node.levelText;
+    if (node.kind === 'mod') return typeof node.levelText === 'function' ? node.levelText(node.mods) : node.levelText;
     const attr = attributes[node.key];
     const before = getStatText(node.key);
     attr.lvl++;
     const after = getStatText(node.key);
     attr.lvl--;
-    return node.levelText ? `${before} → ${after}; ${node.levelText}` : `${before} → ${after}`;
+    const levelText = typeof node.levelText === 'function' ? node.levelText(node.mods) : node.levelText;
+    return levelText ? `${before} → ${after}; ${levelText}` : `${before} → ${after}`;
 }
 
 const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || node.kind === 'evolve';

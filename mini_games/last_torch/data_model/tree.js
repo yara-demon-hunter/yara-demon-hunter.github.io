@@ -7,12 +7,15 @@
 // Conceito de cada ramo, formatos e regras de custo: SKILLS.md.
 // x = coluna (0 a 6, da esquerda para a direita), y = linha dentro do ramo (0 a 3; 1.5 = entre duas linhas).
 // stat com `mods` e `levelText`: além de subir o atributo, cada nível soma esses efeitos (Fury e Hero Health).
+// `levelText` também pode ser uma função de `mods`, para os números exibidos seguirem os valores do efeito.
 // requires: o nó anterior na árvore, como req(id, nível mínimo). O pré-requisito vem SEMPRE do nó anterior
 // (a linha que chega nele): quem já cumpriu a cadeia até ali não esbarra em exigências de nós mais atrás.
 // Se um nó mais atrás precisa ter mais nível, suba o nível pedido no nó do meio. O painel de detalhe mostra
 // tudo o que falta de uma vez, e `kills` entra como pedido extra.
 // kills: { type, count, label } exige matar `count` monstros daquele tipo NA NOITE ATUAL (type 'ANY' = qualquer).
 // O custo vem de TREE_COSTS (por ramo e tipo de nó). `cost` no nó só para uma exceção. maxLvl padrão 5.
+const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
+
 export const TREE_POINTS = {
     perLevel: 2                 // pontos por nível do herói
 };
@@ -47,7 +50,7 @@ export const TREE_NODES = [
     { id: 'damage', branch: 'blade', kind: 'stat', key: 'damage', x: 0, y: 1.5, requires: [] },
     // Linha da Fúria: matar alimenta matar
     { id: 'frenzyNova', branch: 'blade', kind: 'stat', key: 'frenzyNova', x: 1, y: 0, requires: [req('damage')],
-      levelText: '+12% Fury charge', mods: { furyCharge: 0.12 } },
+      levelText: (mods) => `+${Math.round(mods.furyCharge * 100)}% Fury charge`, mods: { furyCharge: 0.12 } },
     { id: 'bloodlust', branch: 'blade', kind: 'power', key: 'bloodlust', x: 2, y: 0, requires: [req('frenzyNova', 2)] },
     { id: 'bloodlustEvolve', branch: 'blade', kind: 'evolve', key: 'bloodlust', x: 3, y: 0, requires: [req('bloodlust', 5)] },
     // Linha do aço: o golpe cada vez mais largo e mortal
@@ -65,7 +68,8 @@ export const TREE_NODES = [
     { id: 'earthbreakerEvolve', branch: 'blade', kind: 'evolve', key: 'earthbreaker', x: 4, y: 2, requires: [req('earthbreaker', 5)] },
     // Linha do corpo: aguentar o cerco
     { id: 'playerHp', branch: 'blade', kind: 'stat', key: 'playerHp', x: 1, y: 3, requires: [req('damage')], cost: 2,
-      levelText: '-4% damage taken, monsters come from +25% farther', mods: { damageTaken: -0.04, provoke: 0.25 } },
+      levelText: (mods) => `${formatPercent(-mods.damageTaken)} less damage taken, monsters come +${formatPercent(mods.provoke)} farther`,
+      mods: { damageTaken: -0.04, provoke: 0.25 } },
     { id: 'bloodEdge', branch: 'blade', kind: 'power', key: 'bloodEdge', x: 2, y: 3, requires: [req('playerHp', 2)],
       kills: { type: 'ANY', count: 40, label: 'monsters' } },
     { id: 'warCry', branch: 'blade', kind: 'passive', key: 'warCry', x: 3, y: 3, requires: [req('bloodEdge')] },
@@ -77,7 +81,9 @@ export const TREE_NODES = [
     { id: 'ricochet', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 0, requires: [req('moveSpeed')] },
     { id: 'mirrorWard', branch: 'shadow', kind: 'passive', key: 'mirrorWard', x: 2, y: 0, requires: [req('ricochet', 2)] },
     { id: 'daggerMastery', branch: 'shadow', kind: 'mod', x: 3, y: 0, requires: [req('mirrorWard')],
-      name: 'Dagger Mastery', icon: '🔪', desc: 'Your daggers cut deeper, fly farther and faster, and recharge sooner.', levelText: '+15% dagger damage, +12% range, +5% speed, -6% recharge', mods: { knifeDamage: 0.15, knifeRange: 0.12, knifeSpeed: 0.05, knifeCooldown: 0.06 } },
+      name: 'Dagger Mastery', icon: '🔪', desc: 'Your daggers cut deeper, fly farther and faster, and recharge sooner.',
+      levelText: (mods) => `+${formatPercent(mods.knifeDamage)} dagger damage, +${formatPercent(mods.knifeRange)} range, +${formatPercent(mods.knifeSpeed)} speed, ${formatPercent(mods.knifeCooldown)} shorter recharge`,
+      mods: { knifeDamage: 0.15, knifeRange: 0.12, knifeSpeed: 0.05, knifeCooldown: 0.06 } },
     { id: 'fanOfKnives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 4, y: 0, requires: [req('daggerMastery', 2)] },
     // Linha da técnica: marcar e carregar
     { id: 'deathMark', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
@@ -96,16 +102,22 @@ export const TREE_NODES = [
 
     // --- CHAMA: o guardião. Paciência, a tocha, muralhas de fogo ---
     { id: 'torchKeeper', branch: 'flame', kind: 'mod', x: 0, y: 1.5, requires: [],
-      name: 'Torch Keeper', icon: '🏮', desc: 'The torch holds more flame.', levelText: '+15 torch health', mods: { torchHp: 15 } },
+      name: 'Torch Keeper', icon: '🏮', desc: 'The torch holds more flame.',
+      levelText: (mods) => `+${mods.torchHp} torch health`, mods: { torchHp: 15 } },
     // Linha do calor: a tocha não morre
     { id: 'warmHearth', branch: 'flame', kind: 'mod', x: 1, y: 0, requires: [req('torchKeeper')],
-      name: 'Warm Hearth', icon: '♨️', desc: 'The fire warms you and mends itself.', levelText: '+20% warmth, torch heals 0.2/s', mods: { warmth: 0.2, torchRegen: 0.2 } },
+      name: 'Warm Hearth', icon: '♨️', desc: 'The fire warms you and mends itself.',
+      levelText: (mods) => `+${formatPercent(mods.warmth)} warmth, torch heals ${mods.torchRegen} health/s`,
+      mods: { warmth: 0.2, torchRegen: 0.2 } },
     { id: 'undyingFlame', branch: 'flame', kind: 'mod', x: 2, y: 0, requires: [req('warmHearth', 2)],
-      name: 'Undying Flame', icon: '🕯️', desc: 'The torch refuses to go out.', levelText: '+20 torch health, heals 0.3/s', mods: { torchHp: 20, torchRegen: 0.3 } },
+      name: 'Undying Flame', icon: '🕯️', desc: 'The torch refuses to go out.',
+      levelText: (mods) => `+${mods.torchHp} torch health, heals ${mods.torchRegen} health/s`,
+      mods: { torchHp: 20, torchRegen: 0.3 } },
     { id: 'phoenixPact', branch: 'flame', kind: 'passive', key: 'phoenixPact', x: 3, y: 0, requires: [req('undyingFlame', 2)] },
     // Linha da guarda: quem fica parado é recompensado
     { id: 'steadyStance', branch: 'flame', kind: 'mod', x: 1, y: 1, requires: [req('torchKeeper')],
-      name: 'Steady Stance', icon: '⛰️', desc: 'Your blade is faster while you stand your ground.', levelText: '+8% attack speed standing still', mods: { stillAttack: 0.08 } },
+      name: 'Steady Stance', icon: '⛰️', desc: 'Your blade is faster while you stand your ground.',
+      levelText: (mods) => `+${formatPercent(mods.stillAttack)} attack speed standing still`, mods: { stillAttack: 0.08 } },
     { id: 'vigil', branch: 'flame', kind: 'passive', key: 'vigil', x: 2, y: 1, requires: [req('steadyStance', 2)] },
     { id: 'backdraft', branch: 'flame', kind: 'passive', key: 'backdraft', x: 3, y: 1, requires: [req('vigil')] },
     // Linha da muralha
@@ -123,7 +135,8 @@ export const TREE_NODES = [
 
     // --- MALDIÇÃO: o feiticeiro. Magia, área e distância ---
     { id: 'arcaneStudy', branch: 'curse', kind: 'mod', x: 0, y: 1.5, requires: [],
-      name: 'Arcane Study', icon: '🧿', desc: 'You learn from every kill.', levelText: '+5% XP', mods: { xp: 0.05 } },
+      name: 'Arcane Study', icon: '🧿', desc: 'You learn from every kill.',
+      levelText: (mods) => `+${formatPercent(mods.xp)} XP`, mods: { xp: 0.05 } },
     // Linha do gelo e da força
     { id: 'chillAura', branch: 'curse', kind: 'power', key: 'chillAura', x: 1, y: 0, requires: [req('arcaneStudy')] },
     { id: 'soulNova', branch: 'curse', kind: 'power', key: 'soulNova', x: 2, y: 0, requires: [req('chillAura', 2)],
@@ -134,14 +147,16 @@ export const TREE_NODES = [
     // Linha da tempestade: à distância
     { id: 'graveWisp', branch: 'curse', kind: 'power', key: 'graveWisp', x: 1, y: 1, requires: [req('arcaneStudy')] },
     { id: 'occultFocus', branch: 'curse', kind: 'mod', x: 2, y: 1, requires: [req('graveWisp')],
-      name: 'Occult Focus', icon: '🔮', desc: 'Your spells return to your hand faster.', levelText: '-6% spell recharge', mods: { spellHaste: 0.06 } },
+      name: 'Occult Focus', icon: '🔮', desc: 'Your spells return to your hand faster.',
+      levelText: (mods) => `${formatPercent(mods.spellHaste)} shorter spell recharge`, mods: { spellHaste: 0.06 } },
     { id: 'chainLightning', branch: 'curse', kind: 'power', key: 'chainLightning', x: 3, y: 1, requires: [req('occultFocus', 2)],
       kills: { type: 'BAT', count: 20, label: 'Bats' } },
     { id: 'wrathEvolve', branch: 'curse', kind: 'evolve', key: 'chainLightning', x: 4, y: 1, requires: [req('chainLightning', 5)] },
     // Linha do vazio: em área
     { id: 'creepingHex', branch: 'curse', kind: 'power', key: 'creepingHex', x: 1, y: 2, requires: [req('arcaneStudy')] },
     { id: 'darkKnowledge', branch: 'curse', kind: 'mod', x: 2, y: 2, requires: [req('creepingHex')],
-      name: 'Dark Knowledge', icon: '📚', desc: 'Forbidden words hit harder.', levelText: '+10% spell damage', mods: { spellDamage: 0.1 } },
+      name: 'Dark Knowledge', icon: '📚', desc: 'Forbidden words hit harder.',
+      levelText: (mods) => `+${formatPercent(mods.spellDamage)} spell damage`, mods: { spellDamage: 0.1 } },
     { id: 'voidRift', branch: 'curse', kind: 'power', key: 'voidRift', x: 3, y: 2, requires: [req('darkKnowledge', 2)],
       kills: { type: 'ANY', count: 60, label: 'monsters' } },
     { id: 'voidRiftEvolve', branch: 'curse', kind: 'evolve', key: 'voidRift', x: 4, y: 2, requires: [req('voidRift', 5)] },

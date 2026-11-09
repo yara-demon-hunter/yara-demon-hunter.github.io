@@ -1,9 +1,16 @@
 // --- STATS DO HERÓI ---
 // Melhorados na árvore de skills (data_model/tree.js): cada ponto gasto sobe um nível.
+const SLASH_ARC_MAX_LEVEL = 6;
+
 export const UPGRADE_MODELS = {
     damage: { name: 'Blade Damage', icon: '⚔️', lvl: 1, maxLvl: 99, desc: 'Increases the base damage of each hit.' },
     radius: { name: 'Attack Range', icon: '🎯', lvl: 1, maxLvl: 99, desc: 'Increases the radius that detects targets.' },
-    slashArc: { name: 'Slash Width', icon: '🌙', lvl: 1, maxLvl: 6, desc: 'Widens the slash (Lv. 1: 40° up to Max Lv.: 180°).' },
+    slashArc: {
+        name: 'Slash Width', icon: '🌙', lvl: 1, maxLvl: SLASH_ARC_MAX_LEVEL,
+        get desc() {
+            return `Widens the slash (${BLADE_SKILL.minimumSlashArcDegrees}° at level 1 up to ${BLADE_SKILL.maximumSlashArcDegrees}° at max level).`;
+        }
+    },
     atkSpeed: { name: 'Attack Speed', icon: '⏱️', lvl: 1, maxLvl: 99, desc: 'Reduces the cooldown between hits.' },
     moveSpeed: { name: 'Move Speed', icon: '🥾', lvl: 1, maxLvl: 99, desc: 'Makes the character move faster.' },
     frenzyNova: { name: 'Fury (Skill)', icon: '😡', lvl: 1, maxLvl: 99, desc: 'Increases the duration and damage of Fury, which fires on its own when the bar fills, and makes the bar fill faster.' },
@@ -39,12 +46,12 @@ export const FRENZY_NOVA_SKILL = {
     maximumEnergy: 100,
     baseDurationSeconds: 3,
     durationPerUpgradeLevelSeconds: 0.5,
-    damageBonusPerUpgradeLevel: 0.15,   // golpes da lâmina durante a Fúria: +15% por nível (js/systems/stats.js, getBladeDamage)
+    damageBonusPerUpgradeLevel: 0.12,   // golpes da lâmina durante a Fúria: +12% por nível (js/systems/stats.js, getBladeDamage)
     slashCount: 8,
     slashRadiusMultiplier: 1.3,
     // Explosão ao ativar: empurra e fere tudo em volta (o resto da Fúria é o golpe acelerado)
     burstRadiusMultiplier: 2.4,
-    burstDamageMultiplier: 2,
+    burstDamageMultiplier: 1.7,
     burstKnockback: 460
 };
 

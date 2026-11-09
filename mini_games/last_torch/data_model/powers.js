@@ -2,11 +2,22 @@
 // Aprendidos na árvore de skills (data_model/tree.js). Cada um tem 5 níveis.
 // damage = fração do dano da lâmina. Os dados de cada nível ficam em `levels`.
 // O ramo de cada poder está em data_model/tree.js; o conceito, em SKILLS.md.
+const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
+const formatNumber = (value) => String(Number(value.toFixed(2)));
+const formatMultiplier = (value) => `${formatNumber(value)}×`;
+
 export const POWER_MODELS = {
     orbitBlades: {
         name: 'Spectral Blades', icon: '🗡️', maxLvl: 5,
-        desc: 'Ghost daggers circle you and cut whatever they touch.',
-        upgrades: ['2 orbiting blades', '+1 blade', '+35% damage', '+1 blade', '+1 blade, wider orbit'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `${level.count} ghost daggers circle you, dealing ${formatMultiplier(level.damage)} blade damage within ${level.radius} range.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.count} blades · ${formatMultiplier(level.damage)} blade damage · ${level.radius} orbit range`
+            );
+        },
         levels: [
             { count: 2, damage: 0.55, radius: 66 },
             { count: 3, damage: 0.55, radius: 66 },
@@ -18,8 +29,15 @@ export const POWER_MODELS = {
     },
     emberTrail: {
         name: 'Ember Steps', icon: '👣', maxLvl: 5,
-        desc: 'Your footsteps catch fire. Monsters that cross them burn. The fire also lends you strength: every level makes you hit 8% harder inside the warmth of the torch.',
-        upgrades: ['Burning footprints, +8% damage in the warmth', '+40% burn, +16% in the warmth', 'Fires last longer, +24% in the warmth', '+40% burn, +32% in the warmth', 'Wider flames, +40% in the warmth'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Your footsteps leave fire that burns monsters for ${formatMultiplier(level.dps)} blade damage per second for ${formatNumber(level.life)}s. Inside the torch's warmth, your blade deals ${formatPercent(level.warmthDamage)} more damage.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${formatMultiplier(level.dps)} burn damage for ${formatNumber(level.life)}s · +${formatPercent(level.warmthDamage)} blade damage in the warmth · ${level.radius} fire radius`
+            );
+        },
         // warmthDamage = bônus de dano do herói dentro do calor da tocha (antigo Sacred Ground)
         levels: [
             { dps: 0.35, life: 2.2, radius: 20, warmthDamage: 0.08 },
@@ -32,21 +50,38 @@ export const POWER_MODELS = {
     },
     bloodEdge: {
         name: 'Blood Edge', icon: '🩸', maxLvl: 5,
-        desc: 'Every kill feeds you.',
-        upgrades: ['Heal 1 per kill', 'Heal 1.5 per kill', 'Heal 2 per kill', 'Heal 2.5 per kill', 'Heal 3 per kill'],
+        get desc() {
+            return `Each kill restores ${formatNumber(this.levels[this.levels.length - 1].heal)} health at max level.`;
+        },
+        get upgrades() {
+            return this.levels.map(level => `Restore ${formatNumber(level.heal)} health per kill`);
+        },
         levels: [{ heal: 1 }, { heal: 1.5 }, { heal: 2 }, { heal: 2.5 }, { heal: 3 }]
     },
     keenEye: {
         name: 'Keen Eye', icon: '👁️', maxLvl: 5,
-        desc: 'You see the weak point. +7% crit chance, +25% crit damage per level.',
-        upgrades: ['+7% crit, +25% crit damage', 'Sharper', 'Sharper', 'Sharper', 'Lethal'],
+        get desc() {
+            return `Each level adds ${formatPercent(this.mods.critChance)} critical chance and ${formatPercent(this.mods.critDamage)} critical damage.`;
+        },
+        get upgrades() {
+            return this.levels.map(() =>
+                `+${formatPercent(this.mods.critChance)} critical chance · +${formatPercent(this.mods.critDamage)} critical damage`
+            );
+        },
         levels: [{}, {}, {}, {}, {}],
         mods: { critChance: 0.07, critDamage: 0.25 }
     },
     ricochet: {
         name: 'Ricochet', icon: '🎯', maxLvl: 5,
-        desc: 'Daggers bounce to the next monster after a hit.',
-        upgrades: ['1 bounce', '2 bounces', '+25% dagger damage', '3 bounces', '4 bounces'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Your daggers bounce between up to ${level.bounces} monsters. At max level, they also deal ${formatPercent(level.damage)} more damage.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `Up to ${level.bounces} bounces · +${formatPercent(level.damage)} dagger damage`
+            );
+        },
         levels: [
             { bounces: 1, damage: 0 },
             { bounces: 2, damage: 0 },
@@ -58,8 +93,15 @@ export const POWER_MODELS = {
     },
     deathMark: {
         name: 'Death Mark', icon: '❌', maxLvl: 5,
-        desc: 'Daggers mark monsters. Your blade detonates the mark. Dashing through it hits harder and gives the dash back.',
-        upgrades: ['Marks detonate for 160% damage', '220% damage', 'Blast hits nearby monsters', '300% damage', '360% damage, wider blast'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Daggers mark monsters for ${formatNumber(level.seconds)}s. Your blade detonates the mark for ${formatMultiplier(level.damage)} blade damage; dashing through deals ${formatMultiplier(this.dashMultiplier)} damage and restores the dash. At max level, the blast reaches ${level.splash}.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${formatMultiplier(level.damage)} blade damage · ${formatNumber(level.seconds)}s mark · ${level.splash ? `${level.splash} blast radius` : 'no splash'}`
+            );
+        },
         levels: [
             { seconds: 4, damage: 1.6, splash: 0 },
             { seconds: 4, damage: 2.2, splash: 0 },
@@ -71,8 +113,15 @@ export const POWER_MODELS = {
     },
     shadowBond: {
         name: 'Umbral Bond', icon: '🖤', maxLvl: 5,
-        desc: 'Your bond with the shadows grows. They are tougher, hit harder and guard a wider area around the torch.',
-        upgrades: ['+25% shadow health, +30% damage, +25 area', '+50% health, +60% damage, +50 area', '+75% health, +90% damage, +75 area', '+100% health, +120% damage, +100 area', '+125% health, +150% damage, +125 area'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `At max level, shadows gain ${formatPercent(level.hp)} health, ${formatPercent(level.damage)} damage, and ${level.area} more guard area around the torch.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `+${formatPercent(level.hp)} shadow health · +${formatPercent(level.damage)} damage · +${level.area} guard area`
+            );
+        },
         // Valores acumulados: hp e damage são bônus (fração), area soma ao raio de guarda (unidades do mundo)
         levels: [
             { hp: 0.25, damage: 0.3, area: 25 },
@@ -84,8 +133,17 @@ export const POWER_MODELS = {
     },
     chargedThrow: {
         name: 'Charged Dagger Throw', icon: '🌟', maxLvl: 5,
-        desc: 'Hold the dagger button to charge. The longer you hold, the harder it hits and the more monsters it pierces. At the top it charges in a blink and pierces everything in its path.',
-        upgrades: ['Up to +100% damage, pierces 2', '+50% charged damage', 'Pierces 3', 'Charges faster', 'Charges in a blink, +160% damage, pierces everything'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            const pierceText = level.pierces >= 99 ? 'all targets' : `${level.pierces} targets`;
+            return `Hold the dagger button to charge it for up to ${formatNumber(level.seconds)}s. A fully charged dagger deals ${formatPercent(level.damage)} bonus damage and pierces ${pierceText}.`;
+        },
+        get upgrades() {
+            return this.levels.map(level => {
+                const pierceText = level.pierces >= 99 ? 'all targets' : `${level.pierces} targets`;
+                return `${formatNumber(level.seconds)}s full charge · +${formatPercent(level.damage)} charged damage · pierces ${pierceText}`;
+            });
+        },
         // seconds = tempo até a carga cheia; damage = bônus de dano na carga cheia; pierces = monstros atravessados
         levels: [
             { seconds: 1.2, damage: 1, pierces: 2 },
@@ -99,8 +157,15 @@ export const POWER_MODELS = {
     },
     torchBolts: {
         name: 'Flame Sentinel', icon: '🔥', maxLvl: 5,
-        desc: 'The torch itself fires at whatever comes close.',
-        upgrades: ['One bolt', 'Fires faster', '2 bolts at once', '+40% damage', '3 bolts at once'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `The torch fires ${level.count} bolts every ${formatNumber(level.cooldown)}s, each dealing ${formatMultiplier(level.damage)} spell damage.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.count} bolts · every ${formatNumber(level.cooldown)}s · ${formatMultiplier(level.damage)} spell damage`
+            );
+        },
         levels: [
             { cooldown: 2.1, count: 1, damage: 1 },
             { cooldown: 1.5, count: 1, damage: 1 },
@@ -112,8 +177,15 @@ export const POWER_MODELS = {
     },
     soulNova: {
         name: 'Soul Nova', icon: '💫', maxLvl: 5,
-        desc: 'A pulse of force bursts from you, hurling monsters away.',
-        upgrades: ['Pulse every 7s', '+30% radius', 'Every 5.5s', '+50% damage', 'Every 4.5s'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `A pulse bursts from you every ${formatNumber(level.cooldown)}s, dealing ${formatMultiplier(level.damage)} spell damage and hurling monsters within ${level.radius} range away.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `Pulse every ${formatNumber(level.cooldown)}s · ${level.radius} radius · ${formatMultiplier(level.damage)} spell damage`
+            );
+        },
         levels: [
             { cooldown: 7, radius: 130, damage: 1.2 },
             { cooldown: 7, radius: 170, damage: 1.2 },
@@ -125,8 +197,15 @@ export const POWER_MODELS = {
     },
     corpseBurst: {
         name: 'Corpse Burst', icon: '💥', maxLvl: 5,
-        desc: 'Slain monsters may explode, and explosions can chain.',
-        upgrades: ['20% chance', '30% chance', 'Bigger blasts', '40% chance', '50% chance, bigger blasts'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Slain monsters have a ${formatPercent(level.chance)} chance to explode, dealing ${formatMultiplier(level.damage)} spell damage within ${level.radius} range. Explosions can chain.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${formatPercent(level.chance)} chance · ${level.radius} blast radius · ${formatMultiplier(level.damage)} spell damage`
+            );
+        },
         levels: [
             { chance: 0.2, radius: 62, damage: 1 },
             { chance: 0.3, radius: 62, damage: 1 },
@@ -138,8 +217,15 @@ export const POWER_MODELS = {
     },
     chainLightning: {
         name: 'Storm Sigil', icon: '⚡', maxLvl: 5,
-        desc: 'Lightning leaps from monster to monster.',
-        upgrades: ['Strikes 3 targets', 'Strikes 5 targets', 'Strikes faster', '+40% damage', 'Strikes 8 targets'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Lightning strikes every ${formatNumber(level.cooldown)}s, leaping to ${level.jumps} targets and dealing ${formatMultiplier(level.damage)} spell damage.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.jumps} targets · every ${formatNumber(level.cooldown)}s · ${formatMultiplier(level.damage)} spell damage`
+            );
+        },
         levels: [
             { cooldown: 3, jumps: 3, damage: 0.9 },
             { cooldown: 3, jumps: 5, damage: 0.9 },
@@ -151,8 +237,15 @@ export const POWER_MODELS = {
     },
     chillAura: {
         name: 'Cold Moon', icon: '❄️', maxLvl: 5,
-        desc: 'Monsters near you slow down and freeze over.',
-        upgrades: ['25% slow nearby', '+30% radius', '35% slow', '+30% radius', '45% slow'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Monsters within ${level.radius} range are slowed by ${formatPercent(level.slow)} and take ${formatMultiplier(level.dps)} spell damage per second.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${formatPercent(level.slow)} slow · ${level.radius} radius · ${formatMultiplier(level.dps)} spell damage per second`
+            );
+        },
         levels: [
             { slow: 0.25, radius: 120, dps: 0.12 },
             { slow: 0.25, radius: 155, dps: 0.12 },
@@ -163,8 +256,15 @@ export const POWER_MODELS = {
     },
     starfall: {
         name: 'Starfall', icon: '🌠', maxLvl: 5,
-        desc: 'Stars fall on the monsters, crushing everything around the impact.',
-        upgrades: ['1 star every 5s', '2 stars', 'Bigger impact', '3 stars', '4 stars, heavier'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `${level.count} stars fall every ${formatNumber(level.cooldown)}s, each crushing enemies within ${level.radius} range for ${formatMultiplier(level.damage)} spell damage.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.count} stars · every ${formatNumber(level.cooldown)}s · ${level.radius} impact radius · ${formatMultiplier(level.damage)} spell damage`
+            );
+        },
         levels: [
             { cooldown: 5, count: 1, radius: 74, damage: 2.4 },
             { cooldown: 5, count: 2, radius: 74, damage: 2.4 },
@@ -176,34 +276,55 @@ export const POWER_MODELS = {
     },
     bloodlust: {
         name: 'Bloodlust', icon: '🐺', maxLvl: 5,
-        desc: 'Every kill feeds the hunger: your blade hits harder and faster until the killing stops.',
-        upgrades: ['6 stacks: +3% damage, +2% speed each', '8 stacks', '+4% damage per stack', '11 stacks, they last longer', '+5% damage, +3% speed per stack'],
+        get desc() {
+            const strongest = this.levels[this.levels.length - 1];
+            return `Every kill adds a stack, up to ${strongest.stacks}. At max level, each stack grants ${formatPercent(strongest.damage)} blade damage and ${formatPercent(strongest.speed)} attack speed. Stacks decay every ${formatNumber(this.decaySeconds)}s after the last kill.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.stacks} stacks max · +${formatPercent(level.damage)} blade damage and +${formatPercent(level.speed)} attack speed per stack`
+            );
+        },
         levels: [
-            { stacks: 6, damage: 0.03, speed: 0.02, seconds: 3 },
-            { stacks: 8, damage: 0.03, speed: 0.02, seconds: 3 },
-            { stacks: 8, damage: 0.04, speed: 0.02, seconds: 3 },
-            { stacks: 11, damage: 0.04, speed: 0.02, seconds: 4 },
-            { stacks: 11, damage: 0.05, speed: 0.03, seconds: 4 }
+            { stacks: 6, damage: 0.025, speed: 0.015, seconds: 3 },
+            { stacks: 8, damage: 0.025, speed: 0.015, seconds: 3 },
+            { stacks: 8, damage: 0.03, speed: 0.015, seconds: 3 },
+            { stacks: 11, damage: 0.03, speed: 0.015, seconds: 4 },
+            { stacks: 11, damage: 0.04, speed: 0.02, seconds: 4 }
         ],
         decaySeconds: 0.4       // tempo acabou: perde uma carga a cada decaySeconds
     },
     earthbreaker: {
         name: 'Earthbreaker', icon: '🔨', maxLvl: 5,
-        desc: 'When monsters get close you leap and smash the ground, crushing and stunning everything around you.',
-        upgrades: ['Slam every 9s', '+25% radius', 'Every 7.5s', '+50% damage', 'Every 6s, wider'],
+        get desc() {
+            const strongest = this.levels[this.levels.length - 1];
+            return `When monsters get close, you leap and smash the ground, dealing up to ${formatMultiplier(strongest.damage)} your blade damage within ${strongest.radius} range and stunning enemies for ${formatNumber(this.stunSeconds)}s.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `Slam every ${formatNumber(level.cooldown)}s · ${formatMultiplier(level.damage)} blade damage · ${level.radius} range`
+            );
+        },
         levels: [
             { cooldown: 9, radius: 105, damage: 2.4 },
             { cooldown: 9, radius: 130, damage: 2.4 },
             { cooldown: 7.5, radius: 130, damage: 2.4 },
-            { cooldown: 7.5, radius: 130, damage: 3.6 },
-            { cooldown: 6, radius: 155, damage: 3.6 }
+            { cooldown: 7.5, radius: 130, damage: 3.2 },
+            { cooldown: 6, radius: 155, damage: 3.2 }
         ],
         stunSeconds: 0.7, knockback: 420
     },
     fireRing: {
         name: 'Hearth Ring', icon: '🔆', maxLvl: 5,
-        desc: 'A ring of fire found deep in the darkness creates a circle of fire around the torch to protect its user',
-        upgrades: ['Burns and slows 30%', '+50% burn', 'Wider, slows 40%', '+45% burn', 'Widest, slows 50%'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `A ring of fire protects the torch, burning enemies within ${level.radius} range for ${formatMultiplier(level.dps)} spell damage per second and slowing them by ${formatPercent(level.slow)}.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.radius} radius · ${formatMultiplier(level.dps)} spell damage per second · ${formatPercent(level.slow)} slow`
+            );
+        },
         levels: [
             { radius: 150, dps: 0.35, slow: 0.3 },
             { radius: 150, dps: 0.5, slow: 0.3 },
@@ -215,8 +336,15 @@ export const POWER_MODELS = {
     },
     graveWisp: {
         name: 'Grave Wisp', icon: '💀', maxLvl: 5,
-        desc: 'A burning skull floats at your shoulder and shoots monsters from far away.',
-        upgrades: ['One bolt every 1.8s', 'Every 1.4s', '2 bolts at once', '+35% damage', '3 bolts, every 1.2s'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `A burning skull fires ${level.count} bolts every ${formatNumber(level.cooldown)}s from up to ${this.range} range, each dealing ${formatMultiplier(level.damage)} spell damage.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.count} bolts · every ${formatNumber(level.cooldown)}s · ${formatMultiplier(level.damage)} spell damage`
+            );
+        },
         levels: [
             { cooldown: 1.8, count: 1, damage: 1.2 },
             { cooldown: 1.4, count: 1, damage: 1.2 },
@@ -228,8 +356,15 @@ export const POWER_MODELS = {
     },
     creepingHex: {
         name: 'Creeping Hex', icon: '🕸️', maxLvl: 5,
-        desc: 'A curse eats a monster alive. When it dies, the curse jumps to the ones around it.',
-        upgrades: ['Jumps to 2 monsters', '+40% curse damage', 'Jumps to 3, lasts longer', 'Casts faster, +40% damage', 'Jumps to 4, casts faster'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `A curse deals ${formatMultiplier(level.dps)} spell damage per second for ${formatNumber(level.seconds)}s. When its target dies, it spreads to ${level.spread} nearby monsters. Casts every ${formatNumber(level.cooldown)}s.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.spread} spreads · ${formatMultiplier(level.dps)} spell damage per second · ${formatNumber(level.seconds)}s duration · every ${formatNumber(level.cooldown)}s`
+            );
+        },
         levels: [
             { cooldown: 5, dps: 0.9, seconds: 5, spread: 2 },
             { cooldown: 5, dps: 1.25, seconds: 5, spread: 2 },
@@ -241,8 +376,15 @@ export const POWER_MODELS = {
     },
     voidRift: {
         name: 'Void Rift', icon: '🕳️', maxLvl: 5,
-        desc: 'A rift opens in the thickest part of the horde, drags everything in and collapses.',
-        upgrades: ['Rift every 10s', '+30% pull', 'Every 8s', '+50% damage', 'Every 6.5s, wider'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `A rift opens every ${formatNumber(level.cooldown)}s, pulling enemies within ${level.radius} range with force ${level.pull} before collapsing for ${formatMultiplier(level.damage)} spell damage.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `Every ${formatNumber(level.cooldown)}s · ${level.radius} radius · ${level.pull} pull · ${formatMultiplier(level.damage)} spell damage · ${formatNumber(level.seconds)}s duration`
+            );
+        },
         levels: [
             { cooldown: 10, radius: 125, pull: 150, damage: 3, seconds: 1.3 },
             { cooldown: 10, radius: 125, pull: 195, damage: 3, seconds: 1.3 },
@@ -255,8 +397,19 @@ export const POWER_MODELS = {
     },
     phantomDash: {
         name: 'Phantom Rush', icon: '👻', maxLvl: 5,
-        desc: 'Your dash cuts through everything in its path.',
-        upgrades: ['Dash deals damage', '-15% dash cooldown', '+1 dash charge', '+60% damage', '-15% dash cooldown'],
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Your dash deals ${formatMultiplier(level.damage)} blade damage to enemies in its path.`;
+        },
+        get upgrades() {
+            return this.levels.map(level => {
+                const mods = level.mods ?? {};
+                const details = [`${formatMultiplier(level.damage)} blade damage`];
+                if (mods.dashCooldown) details.push(`${formatPercent(mods.dashCooldown)} shorter dash cooldown`);
+                if (mods.dashCharges) details.push(`+${mods.dashCharges} dash charge`);
+                return details.join(' · ');
+            });
+        },
         levels: [
             { damage: 1.5 },
             { damage: 1.5, mods: { dashCooldown: 0.15 } },
@@ -273,69 +426,104 @@ export const EVOLUTIONS = {
     // Passiva que evolui (passives.shadowClone.evolved): count = sombras em guarda
     shadowClone: {
         name: 'Shadow Legion', icon: '🥷',
-        desc: 'Three shadows guard the torch instead of one, each one watching a different monster.',
+        get desc() {
+            return `${this.levels.count} shadows guard the torch, each watching a different monster.`;
+        },
         levels: { count: 3 }
     },
     orbitBlades: {
         name: 'Blade Tempest', icon: '🌪️',
-        desc: 'Eight blades in a wide storm, and they hit far harder.',
+        get desc() {
+            const { count, damage, radius } = this.levels;
+            return `${count} blades circle you, each dealing ${formatMultiplier(damage)} blade damage within ${radius} range.`;
+        },
         levels: { count: 8, damage: 1.1, radius: 104 }
     },
     emberTrail: {
         name: 'Hellwalker', icon: '☄️',
-        desc: 'Great pillars of fire rise from every step you take.',
+        get desc() {
+            const { dps, life, radius } = this.levels;
+            return `Pillars of fire rise from your steps, burning enemies for ${formatMultiplier(dps)} blade damage per second for ${formatNumber(life)}s within ${radius} range.`;
+        },
         levels: { dps: 1.3, life: 4.5, radius: 42 }
     },
     bloodlust: {
         name: 'Crimson Tide', icon: '🌊',
-        desc: 'With the hunger high, every swing throws a crescent of blood through the horde.',
-        levels: { stacks: 14, damage: 0.05, speed: 0.03, seconds: 5 },
+        get desc() {
+            const { minStacks, damage, speed, range } = this.crescent;
+            const { stacks, damage: stackDamage, speed: stackSpeed } = this.levels;
+            return `At ${minStacks} or more stacks, every swing throws a blood crescent through the horde. At max level, each crescent deals ${formatMultiplier(damage)} blade damage; each stack grants ${formatPercent(stackDamage)} damage and ${formatPercent(stackSpeed)} attack speed, up to ${stacks} stacks. Range: ${range}.`;
+        },
+        levels: { stacks: 14, damage: 0.04, speed: 0.02, seconds: 5 },
         crescent: { minStacks: 5, damage: 0.7, speed: 560, range: 340, radius: 26 }
     },
     earthbreaker: {
         name: 'Cataclysm', icon: '🌋',
-        desc: 'Each slam splits the earth: aftershocks roll out and lava bursts through the cracks.',
-        levels: { cooldown: 5, radius: 180, damage: 4.5 },
-        aftershocks: 2, aftershockSeconds: 0.24, aftershockStep: 70, aftershockDamage: 0.5,
+        get desc() {
+            const { cooldown, radius, damage } = this.levels;
+            return `Each slam every ${formatNumber(cooldown)}s deals ${formatMultiplier(damage)} blade damage within ${radius} range, followed by ${this.aftershocks} aftershocks at ${formatMultiplier(damage * this.aftershockDamage)} blade damage each. It also opens ${this.lava.count} lava cracks that burn for ${formatNumber(this.lava.life)}s.`;
+        },
+        levels: { cooldown: 5, radius: 180, damage: 3.8 },
+        aftershocks: 2, aftershockSeconds: 0.24, aftershockStep: 70, aftershockDamage: 0.4,
         lava: { count: 7, life: 3, radius: 24, dps: 1 }
     },
     fireRing: {
         name: 'Solar Wall', icon: '🌅',
-        desc: 'The ring becomes a wall of white fire that flares every few seconds, hurling monsters back.',
+        get desc() {
+            const { radius, dps, slow } = this.levels;
+            return `The ring becomes a wall of white fire, burning for ${formatMultiplier(dps)} spell damage per second and slowing by ${formatPercent(slow)}. Every ${formatNumber(this.flare.seconds)}s it flares for ${formatMultiplier(this.flare.damage)} spell damage and knocks monsters back. Range: ${radius}.`;
+        },
         levels: { radius: 200, dps: 1.3, slow: 0.55 },
         flare: { seconds: 4.5, damage: 1.5, knockback: 520, reach: 46 }
     },
     voidRift: {
         name: 'Event Horizon', icon: '🌌',
-        desc: 'The rift swallows far more, and tears open a second time where it fell.',
+        get desc() {
+            const { cooldown, radius, pull, damage, seconds } = this.levels;
+            return `Every ${formatNumber(cooldown)}s, the rift pulls enemies within ${radius} range with force ${pull}, then collapses for ${formatMultiplier(damage)} spell damage. A second rift opens after ${formatNumber(this.secondRift.seconds)}s for ${formatMultiplier(this.secondRift.damage)} spell damage. The rift lasts ${formatNumber(seconds)}s.`;
+        },
         levels: { cooldown: 7, radius: 190, pull: 280, damage: 4.5, seconds: 1.5 },
         secondRift: { seconds: 0.7, damage: 0.6 }
     },
     phantomDash: {
         name: 'Night Reaper', icon: '🌘',
-        desc: 'Your shadow runs after every dash and cuts the same path again.',
+        get desc() {
+            return `After each dash, your shadow repeats the path after ${formatNumber(this.echo.delaySeconds)}s, dealing ${formatMultiplier(this.echo.damage)} blade damage to enemies within ${this.echo.hitRadius} range.`;
+        },
         levels: { damage: 3 },
         echo: { delaySeconds: 0.28, seconds: 0.16, damage: 0.8, hitRadius: 26 }
     },
     corpseBurst: {
         name: 'Red Harvest', icon: '🥀',
-        desc: 'Every kill explodes. Every blast heals you.',
+        get desc() {
+            const { chance, radius, damage } = this.levels;
+            return `Every kill has a ${formatPercent(chance)} chance to trigger an explosion, dealing ${formatMultiplier(damage)} spell damage within ${radius} range.`;
+        },
         levels: { chance: 1, radius: 110, damage: 1.7 }
     },
     chainLightning: {
         name: 'Wrath of Heaven', icon: '🌩️',
-        desc: 'Lightning strikes on every critical hit.',
+        get desc() {
+            const { cooldown, jumps, damage } = this.levels;
+            return `Lightning strikes every ${formatNumber(cooldown)}s, leaping to ${jumps} targets for ${formatMultiplier(damage)} spell damage.`;
+        },
         levels: { cooldown: 1.9, jumps: 8, damage: 1.3 }
     },
     soulNova: {
         name: 'Absolute Zero', icon: '🧊',
-        desc: 'Your pulse freezes everything it touches solid.',
+        get desc() {
+            const { cooldown, radius, damage } = this.levels;
+            return `Your pulse bursts every ${formatNumber(cooldown)}s, dealing ${formatMultiplier(damage)} spell damage within ${radius} range and freezing enemies for ${formatNumber(this.freezeSeconds)}s.`;
+        },
         levels: { cooldown: 4, radius: 250, damage: 2.2 },
         freezeSeconds: 1.6
     },
     torchBolts: {
         name: 'Sun Spire', icon: '☀️',
-        desc: 'The torch becomes a sun, raining fire across the clearing.',
+        get desc() {
+            const { cooldown, count, damage } = this.levels;
+            return `The torch rains ${count} bolts every ${formatNumber(cooldown)}s, each dealing ${formatMultiplier(damage)} spell damage.`;
+        },
         levels: { cooldown: 0.8, count: 5, damage: 1.7 }
     }
 };

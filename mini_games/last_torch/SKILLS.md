@@ -25,10 +25,10 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 
 | Juramento | Ramo | Bônus | Preço | Forma do herói |
 |---|---|---|---|---|
-| Oath of Slaughter | Blade | +35% dano da lâmina, +10% ataque, +40% Fúria, matar cura 1, provoca de mais longe | O calor da tocha não cura mais, e não lança mais adagas | Chifres, ombreiras com espinhos, espada enorme |
-| Oath of Whispers | Shadow | +1 dash, -20% recarga do dash, +15% velocidade, +10% crítico, +50% adaga, uma sombra nova a cada 5 mortes (até 8) | -25% vida | Cachecol ao vento, adagas nas costas |
-| Oath of the Hearth | Flame | Tocha leva -35% de dano, +30% vida, calor dobrado que queima | -25% velocidade | Ombreiras douradas, peitoral, lanterna |
-| Oath of Ruin | Curse | +20% dano e -12% recarga dos feitiços | -40% dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
+| Oath of Slaughter | Blade | Reforça a lâmina, a Fúria e a cura ao matar; atrai monstros | O calor da tocha não cura mais, e não lança mais adagas | Chifres, ombreiras com espinhos, espada enorme |
+| Oath of Whispers | Shadow | Reforça o dash, a velocidade, os críticos e as adagas; mais mortes trazem sombras | Reduz a vida máxima | Cachecol ao vento, adagas nas costas |
+| Oath of the Hearth | Flame | Protege a tocha, fortalece o herói e amplia o calor, que queima monstros | Reduz a velocidade | Ombreiras douradas, peitoral, lanterna |
+| Oath of Ruin | Curse | Reforça e acelera os feitiços | Reduz o dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
 
 Regras: abre ao aprender **as duas skills que chegam nele** (as ligações do mapa) e fica na coluna 6, sempre na mesma posição.
 Slaughter pede Cataclysm e Executioner; Whispers, Shadow Legion e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Fireballs e Solar Wall;
@@ -111,31 +111,31 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 
 | Skill | Tipo | Efeito | Golpe ou arte |
 |---|---|---|---|
-| Bloodlust | Poder | Cada morte empilha dano e velocidade da lâmina; parou de matar, some | Arco e aura vermelhos, lâmina em brasa |
+| Bloodlust | Poder | Cada morte empilha dano e velocidade da lâmina; quando as mortes param, as cargas desaparecem | Arco e aura vermelhos, lâmina em brasa |
 | Crimson Tide | Evolução | Com a fome alta, cada golpe joga uma meia-lua de sangue que atravessa a horda | Meia-lua |
 | Earthbreaker | Poder | Com monstros perto, salta e crava a espada: fere e atordoa em volta; no ar, nada encosta | Salto com espada erguida, rachaduras |
 | Cataclysm | Evolução | Abalos saem do impacto e lava brota das rachaduras | Rachaduras em lava |
-| Provoke (dentro do Hero Health) | Efeito | A cada nível de Hero Health, +25% na distância em que os monstros largam a tocha e vêm atrás do herói: é assim que o guerreiro a protege | - |
-| War Cry | Passiva | Cercado por 5, ruge: joga longe, atordoa e dá +30% na lâmina por 4s | Braços abertos, cabeça para trás |
-| Executioner | Passiva | A lâmina termina monstros abaixo de 20% da vida (elites 10%, bosses não) | X vermelho |
+| Provoke (dentro do Hero Health) | Efeito | A cada nível de Hero Health, aumenta a distância em que os monstros largam a tocha e vêm atrás do herói: é assim que o guerreiro a protege | - |
+| War Cry | Passiva | Cercado, ruge: joga os monstros para longe, atordoa e fortalece temporariamente a lâmina | Braços abertos, cabeça para trás |
+| Executioner | Passiva | A lâmina termina monstros enfraquecidos em um golpe (bosses são imunes) | X vermelho |
 | Death Mark | Poder | A adaga marca. A lâmina detona; o dash detona mais forte e devolve a carga. Toda detonação recarrega a adaga | Mira girando, X violeta |
-| Charged Dagger Throw | Poder | Segure o botão da adaga para carregar: quanto mais tempo, mais dano e mais monstros atravessados. No nível 5 carrega num piscar e atravessa tudo (o antigo Soul Spear) | Anel que se fecha, adaga brilhando |
-| Shadow Clone | Passiva | Uma sombra guarda uma área em volta da tocha (raio 200) e não sai dela. Espera no posto; quando um monstro chega perto, anda em linha reta até ele, golpeia com o combo do herói e volta. Os monstros não correm atrás dela, mas quem esbarra ou acerta um tiro a machuca; ela tem vida e volta depois de 10s | Sombra violeta, barra de vida e área tracejada no chão |
-| Shadow Legion | Evolução | Abre com Umbral Bond 5/5 e custa 3 pontos. Três sombras em vez de uma, cada uma cuidando de um monstro | Três sombras no anel |
-| Shadow Raven | Passiva | Abre com Death Mark 2/2. Um corvo pequeno voa no ombro do herói e, a cada 2,4s, mergulha no monstro mais perto (até 300), bica com 110% do dano da lâmina e volta. O monstro bicado fica 2s numa mira vermelha e leva 25% a mais de dano em todo golpe (lâmina, adaga, feitiço, sombras) enquanto ela durar | Corvo violeta-escuro; mira vermelha tracejada com cruz |
-| Explosão da sombra | Efeito do Shadow Clone | A sombra que cai explode em 8 adagas para todos os lados (12 com Fan of Knives). Valem o dano, alcance e velocidade do Dagger Mastery e o Ricochet | Adagas violeta em círculo |
-| Umbral Bond | Poder | 5 níveis que fortalecem as sombras: a cada nível +25% de vida, +30% de dano e +25 de raio na área de guarda (no 5º, +125%, +150% e +125). Vale para o Shadow Clone, a Legion e as sombras do Oath of Whispers | Área de guarda maior |
-| Shadow Shackle | Passiva | Automática, recarga de 15s: uma corrente voa até o monstro mais forte ao alcance da adaga e o prende naquele ponto por 10s, boss inclusive. Só tira o andar: ele continua atacando, e o boss que se teleporta fica preso no ponto novo | Corrente voando; estacas no chão com correntes até o monstro |
-| Smoke Bomb | Passiva | O dash deixa um rasto longo de fumaça por 7s: freia monstros e todo golpe que eles levam ali, de lâmina ou adaga, tem 25% de chance extra de ser crítico (sorteada à parte da chance normal do herói) | Rasto de nuvens |
+| Charged Dagger Throw | Poder | Segure o botão da adaga para carregar: quanto mais tempo, mais dano e mais monstros atravessados. No nível máximo carrega num piscar e atravessa tudo (o antigo Soul Spear) | Anel que se fecha, adaga brilhando |
+| Shadow Clone | Passiva | Uma sombra guarda uma área em volta da tocha e não sai dela. Espera no posto; quando um monstro chega perto, anda em linha reta até ele, golpeia com o combo do herói e volta. Os monstros não correm atrás dela, mas quem esbarra ou acerta um tiro a machuca; ela tem vida e volta depois de um tempo | Sombra violeta, barra de vida e área tracejada no chão |
+| Shadow Legion | Evolução | Abre com Umbral Bond no nível máximo. Mais sombras guardam a tocha, cada uma cuidando de um monstro | Sombras no anel |
+| Shadow Raven | Passiva | Abre com Death Mark. Um corvo pequeno voa no ombro do herói, mergulha no monstro mais perto, bica com dano da lâmina e volta. O monstro bicado fica marcado e leva mais dano em todo golpe (lâmina, adaga, feitiço, sombras) enquanto a marca durar | Corvo violeta-escuro; mira vermelha tracejada com cruz |
+| Explosão da sombra | Efeito do Shadow Clone | A sombra que cai explode em adagas para todos os lados. Valem o dano, alcance e velocidade do Dagger Mastery e o Ricochet | Adagas violeta em círculo |
+| Umbral Bond | Poder | Fortalece as sombras, ampliando a vida, o dano e a área de guarda a cada nível. Vale para o Shadow Clone, a Legion e as sombras do Oath of Whispers | Área de guarda maior |
+| Shadow Shackle | Passiva | Automática: uma corrente voa até o monstro mais forte ao alcance da adaga e o prende naquele ponto, boss inclusive. Só tira o andar: ele continua atacando, e o boss que se teleporta fica preso no ponto novo | Corrente voando; estacas no chão com correntes até o monstro |
+| Smoke Bomb | Passiva | O dash deixa um rasto longo de fumaça: freia monstros e aumenta a chance de crítico de todo golpe que eles levam ali, de lâmina ou adaga | Rasto de nuvens |
 | Night Reaper | Evolução | Uma sombra refaz o caminho do dash, cortando de novo | Silhueta violeta |
-| Coin Rush | Relíquia | Cada moeda adianta o dash e a adaga em 0,05s | 🧤 Fortune |
+| Coin Rush | Relíquia | Cada moeda adianta o dash e a adaga | 🧤 Fortune |
 | Master Thief | Relíquia | Atravessar monstros com o dash rouba ouro; Perfect Dodge rouba um punhado | Moedas saltando |
 | Steady Stance | Efeito | Parado, ataca mais rápido | - |
 | Vigil | Passiva | Parado, ergue um escudo que para um golpe e estoura em fogo | Ajoelhado, espada fincada, redoma |
 | Backdraft | Passiva | Monstro que alcança a tocha causa uma explosão em volta dela | Explosão |
-| Flaming Sword | Passiva | A espada pega fogo: todo corte, inclusive das sombras, deixa o monstro queimando por 3s (40% do golpe por segundo; o dobro sob o Oath of the Hearth, com chama dourada maior). Monstro em chamas que morre passa o fogo a quem está num raio de 90 | Línguas de fogo na lâmina, corte laranja |
-| Fireballs | Passiva | As adagas viram bolas de fogo: o herói para por 0,55s (tempo fixo) com a bola crescendo na mão, como o Lorde Demônio, sem andar, golpear nem dar dash; ao acertar, ela explode, fere os vizinhos com 60% do dano, deixa todos em chamas e o chão queimando por 2s. Por baixo continuam adagas, então Dagger Mastery, Fan of Knives, Ricochet, Death Mark, Charged Dagger Throw e a explosão das sombras valem igual. O Oath of Slaughter também as bloqueia | Bola de fogo com cauda |
-| Phoenix Pact | Passiva | Uma fênix voa no ombro do herói e atira bolas de fogo que queimam o alvo e os vizinhos. Quando ele cai, ela morre para levantá-lo (uma vez por hora) e renasce na hora seguinte | Fênix; ao morrer, mergulha no herói e vira asas de fogo |
+| Flaming Sword | Passiva | A espada pega fogo: todo corte, inclusive das sombras, deixa o monstro queimando. Monstro em chamas que morre passa o fogo a quem está por perto; o Oath of the Hearth fortalece a chama | Línguas de fogo na lâmina, corte laranja |
+| Fireballs | Passiva | As adagas viram bolas de fogo: o herói para com a bola crescendo na mão, como o Lorde Demônio, sem andar, golpear nem dar dash; ao acertar, ela explode, fere os vizinhos, deixa todos em chamas e o chão queimando. Por baixo continuam adagas, então Dagger Mastery, Fan of Knives, Ricochet, Death Mark, Charged Dagger Throw e a explosão das sombras valem igual. O Oath of Slaughter também as bloqueia | Bola de fogo com cauda |
+| Phoenix Pact | Passiva | Uma fênix voa no ombro do herói e atira bolas de fogo que queimam o alvo e os vizinhos. Quando ele cai, ela morre para levantá-lo e renasce depois | Fênix; ao morrer, mergulha no herói e vira asas de fogo |
 | Hearth Ring | Poder | Um anel de fogo achado no fundo da escuridão cria um círculo de fogo em volta da tocha para proteger quem o usa; quem cruza queima e anda mais devagar | Anel de chamas |
 | Solar Wall | Evolução | O anel vira muralha branca que sobe de tempos em tempos, jogando monstros longe | Labareda |
 | Grave Wisp | Poder | Caveira em chamas no ombro que atira de longe | Caveira, tiros violeta |

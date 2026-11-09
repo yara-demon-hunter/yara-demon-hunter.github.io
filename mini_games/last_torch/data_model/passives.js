@@ -4,6 +4,9 @@
 // onde cost é o preço base em moedas.
 // mods: efeitos simples, somados por js/systems/modifiers.js. As skills têm mecânica própria.
 
+const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
+const formatMultiplier = (value) => `${Number(value.toFixed(2))}×`;
+
 export const PASSIVE_SKILL_MODELS = {
     shadowWhirl: {
         name: 'Whirlwind',
@@ -11,7 +14,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 80,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'The 3rd combo hit becomes a 360° spin that strikes every enemy in range.'
+        desc: 'Your final combo hit becomes a full spin that strikes every enemy in range.'
     },
     mirrorWard: {
         name: 'Return Fire',
@@ -19,7 +22,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 60,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Bats an incoming enemy shot back at the nearest monster. Recharges in 8s.'
+        get desc() {
+            return `Bats an incoming enemy shot back at the nearest monster. Recharges in ${MIRROR_WARD.cooldownSeconds}s.`;
+        }
     },
     shadowShackle: {
         name: 'Shadow Shackle',
@@ -27,7 +32,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 120,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Every 15 seconds you hurl a chain at the strongest monster within dagger range. It stays nailed to that spot for 10 seconds, bosses included. A chained monster can still attack, and a boss can still teleport, but neither can walk.'
+        get desc() {
+            return `Every ${SHADOW_SHACKLE.cooldownSeconds}s you hurl a chain at the strongest monster within dagger range. It stays nailed to that spot for ${SHADOW_SHACKLE.holdSeconds}s, bosses included. A chained monster can still attack, and a boss can still teleport, but neither can walk.`;
+        }
     },
     fanOfKnives: {
         name: 'Fan of Knives',
@@ -35,7 +42,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 110,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Throws 3 daggers at once in a fan.'
+        get desc() {
+            return `Throws ${FAN_OF_KNIVES.count} daggers at once in a fan.`;
+        }
     },
     shadowClone: {
         name: 'Shadow Clone',
@@ -43,7 +52,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 150,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'A shadow keeps watch near the torch and walks out to cut down whatever comes close. Monsters ignore it, but a stray hit can still bring it down. It returns after a while.'
+        get desc() {
+            return `A shadow keeps watch near the torch and walks out to cut down whatever comes close. Monsters ignore it, but a stray hit can still bring it down. It returns after ${SHADOW_CLONE.respawnSeconds}s.`;
+        }
     },
     warCry: {
         name: 'War Cry',
@@ -51,7 +62,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Surrounded by 5 monsters, you roar: they are thrown back and stunned, and your blade hits 30% harder for 4s.'
+        get desc() {
+            return `When surrounded by ${WAR_CRY.monsters} monsters, you roar: they are thrown back and stunned, and your blade hits ${formatPercent(WAR_CRY.bladeBonus)} harder for ${WAR_CRY.bonusSeconds}s.`;
+        }
     },
     executioner: {
         name: 'Executioner',
@@ -59,7 +72,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Your blade finishes off monsters under 20% health in one brutal cut. Elites under 10%. Bosses are immune.'
+        get desc() {
+            return `Your blade finishes off monsters under ${formatPercent(EXECUTIONER.threshold)} health in one brutal cut. Elites under ${formatPercent(EXECUTIONER.eliteThreshold)}. Bosses are immune.`;
+        }
     },
     smokeBomb: {
         name: 'Smoke Bomb',
@@ -67,7 +82,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 70,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Every dash leaves a long trail of smoke that lingers for 7 seconds. Monsters inside it slow down, and every hit they take, from blade or dagger, has a 25% chance to be a critical hit.'
+        get desc() {
+            return `Every dash leaves a trail of smoke that lingers for ${SMOKE_BOMB.seconds}s. Monsters inside it slow down, and every hit they take, from blade or dagger, has a ${formatPercent(SMOKE_BOMB.critChance)} chance to be a critical hit.`;
+        }
     },
     vigil: {
         name: 'Vigil',
@@ -75,7 +92,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Stand still for a moment to raise a flame shield. It stops one hit and bursts, burning what is near. Returns after 6s.'
+        get desc() {
+            return `Stand still for ${VIGIL.stillSeconds}s to raise a flame shield. It stops one hit, then bursts within ${VIGIL.burstRadius} range for ${formatMultiplier(VIGIL.burstDamage)} spell damage. Returns after ${VIGIL.rechargeSeconds}s.`;
+        }
     },
     flameBlade: {
         name: 'Flaming Sword',
@@ -83,7 +102,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Your sword catches fire. Every cut sets monsters ablaze, and they keep burning for 3s. A burning monster that dies passes the fire to the ones around it. Under the Oath of the Hearth the fire burns twice as hot.'
+        get desc() {
+            return `Your sword catches fire. Every cut burns monsters for ${formatPercent(FLAME_BLADE.burnRatio)} of the hit's damage per second for ${FLAME_BLADE.burnSeconds}s. A burning monster that dies passes the fire to others within ${FLAME_BLADE.spreadRadius} range. Under the Oath of the Hearth, burn damage is multiplied by ${FLAME_BLADE.oathMultiplier}.`;
+        }
     },
     fireballs: {
         name: 'Fireballs',
@@ -99,7 +120,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 70,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Every monster that reaches the torch sets off a blast of fire around it.'
+        get desc() {
+            return `Every monster that reaches the torch sets off a blast of fire within ${BACKDRAFT.radius} range for ${formatMultiplier(BACKDRAFT.damage)} spell damage.`;
+        }
     },
     phoenixPact: {
         name: 'Phoenix Pact',
@@ -116,7 +139,9 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'A small raven circles at your shoulder. Every 2.4 seconds it dives at the nearest monster, pecks it and flies back. The pecked monster is locked in a red crosshair for 2 seconds: every hit it takes, from your blade, daggers, spells or shadows, deals 25% more damage.'
+        get desc() {
+            return `A small raven circles at your shoulder. Every ${SHADOW_RAVEN.cooldownSeconds}s it dives at the nearest monster within ${SHADOW_RAVEN.range} range, pecks it for ${formatMultiplier(SHADOW_RAVEN.damage)} blade damage and flies back. The pecked monster is marked for ${SHADOW_RAVEN.markSeconds}s: every hit it takes deals ${formatPercent(SHADOW_RAVEN.markDamage)} more damage.`;
+        }
     },
 
     // --- JURAMENTOS ---
@@ -129,7 +154,10 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         oath: true, gear: 'slaughter', tagline: 'Blood answers blood',
-        desc: '+35% blade damage, +10% attack speed, +40% Fury charge, every kill heals 1 and monsters come for you from farther away. The price: the warmth of the torch no longer heals you, and you can no longer throw daggers.',
+        get desc() {
+            const { bladeDamage, attackSpeed, furyCharge, killHeal } = this.mods;
+            return `+${formatPercent(bladeDamage)} blade damage, +${formatPercent(attackSpeed)} attack speed, +${formatPercent(furyCharge)} Fury charge, and each kill heals ${killHeal}. Monsters are drawn to you from farther away. The price: the warmth of the torch no longer heals you, and you can no longer throw daggers.`;
+        },
         mods: { bladeDamage: 0.35, attackSpeed: 0.1, furyCharge: 0.4, killHeal: 1, provoke: 0.5, noWarmthHeal: 1, noKnives: 1 }
     },
     oathWhispers: {
@@ -139,7 +167,10 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         oath: true, gear: 'whispers', tagline: 'Never where they strike',
-        desc: '+1 dash charge, 20% shorter dash cooldown, +15% move speed, +10% crit and +50% dagger damage. Every 5 kills a new shadow joins the torch (up to 8). The price: -25% max health.',
+        get desc() {
+            const mods = this.mods;
+            return `+${mods.dashCharges} dash charge, ${formatPercent(mods.dashCooldown)} shorter dash cooldown, +${formatPercent(mods.moveSpeed)} move speed, +${formatPercent(mods.critChance)} critical chance and +${formatPercent(mods.knifeDamage)} dagger damage. Every ${SHADOW_CLONE.whispers.killsPerShadow} kills a shadow joins the torch (up to ${SHADOW_CLONE.whispers.maxShadows}). The price: ${formatPercent(Math.abs(mods.maxHp))} less max health.`;
+        },
         mods: { dashCharges: 1, dashCooldown: 0.2, moveSpeed: 0.15, critChance: 0.1, knifeDamage: 0.5, maxHp: -0.25 }
     },
     oathHearth: {
@@ -149,7 +180,10 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         oath: true, gear: 'hearth', tagline: 'The flame will not die',
-        desc: 'The torch takes 35% less damage, +30% max health, its warmth reaches twice as far and burns monsters inside it. The price: -25% move speed.',
+        get desc() {
+            const mods = this.mods;
+            return `The torch takes ${formatPercent(mods.torchGuard)} less damage, you gain ${formatPercent(mods.maxHp)} max health, and its warmth reaches ${formatMultiplier(1 + mods.warmth)} as far and burns monsters inside it. The price: ${formatPercent(Math.abs(mods.moveSpeed))} less move speed.`;
+        },
         mods: { torchGuard: 0.35, maxHp: 0.3, warmth: 1, warmthBurn: 0.4, moveSpeed: -0.25 }
     },
     oathRuin: {
@@ -159,7 +193,10 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         oath: true, gear: 'ruin', tagline: 'The dark pays in kind',
-        desc: 'Spells deal 20% more damage and recharge 12% faster. The price: your blade deals 40% less damage.',
+        get desc() {
+            const mods = this.mods;
+            return `Spells deal ${formatPercent(mods.spellDamage)} more damage and recharge ${formatPercent(mods.spellHaste)} faster. The price: your blade deals ${formatPercent(Math.abs(mods.bladeDamage))} less damage.`;
+        },
         mods: { spellDamage: 0.2, spellHaste: 0.12, bladeDamage: -0.4 }
     },
 
@@ -330,14 +367,14 @@ export const WAR_CRY = {
     knockback: 620,
     stunSeconds: 1,
     damage: 1.2,
-    bladeBonus: 0.3,            // dano extra da lâmina depois do rugido
-    bonusSeconds: 4
+    bladeBonus: 0.2,            // dano extra da lâmina depois do rugido
+    bonusSeconds: 3.5
 };
 
 // Executioner: fração da vida abaixo da qual a lâmina termina o serviço
 export const EXECUTIONER = {
-    threshold: 0.2,
-    eliteThreshold: 0.1,
+    threshold: 0.15,
+    eliteThreshold: 0.08,
     furyCharge: 4
 };
 
