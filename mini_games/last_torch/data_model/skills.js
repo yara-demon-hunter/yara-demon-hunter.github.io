@@ -31,7 +31,7 @@ export const BLADE_SKILL = {
     // A Fúria não acelera mais o golpe (antes 0.25 = 4x mais rápido): com Bloodlust e Knockback ela virava uma
     // metralhadora de empurrões que jogava até boss para longe. Agora ela dá dano (FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel)
     frenzyCooldownMultiplier: 1,
-    minimumCooldownSeconds: 0.15,   // teto de ~6,7 golpes por segundo, somando tudo (antes 0.07 = ~14)
+    minimumCooldownSeconds: 0.2,    // teto de 5 golpes por segundo, somando tudo (antes 0.15 = ~6,7; antes ainda 0.07 = ~14)
     baseKnockback: 50,              // empurrão do golpe, igual para todos os heróis (antes 80)
     knockbackPerUpgrade: 45,        // por nível de Knockback: nível 5 = 230 (antes 70 = 360)
     baseCritChance: 0.06,

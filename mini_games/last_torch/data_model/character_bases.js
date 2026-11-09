@@ -17,11 +17,11 @@ export const CHARACTER_BASES = {
     azael: {
         player: {
             mods: { damage: 0.25, lifeSteal: 0.05, maxHp: -0.25 },
-            moveSpeed: 150,
+            moveSpeed: 180,
             dash: { distance: 180, seconds: 0.17 }
         },
         boss: {
-            moveSpeed: 62,
+            moveSpeed: 80,
             lungeLength: 330,
             lungeSeconds: 0.12
         }

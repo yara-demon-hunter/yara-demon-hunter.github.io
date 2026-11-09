@@ -158,7 +158,7 @@ export const PASSIVE_SKILL_MODELS = {
             const { bladeDamage, attackSpeed, furyCharge, killHeal } = this.mods;
             return `+${formatPercent(bladeDamage)} blade damage, +${formatPercent(attackSpeed)} attack speed, +${formatPercent(furyCharge)} Fury charge, and each kill heals ${killHeal}. Monsters are drawn to you from farther away. The price: the warmth of the torch no longer heals you, and you can no longer throw daggers.`;
         },
-        mods: { bladeDamage: 0.35, attackSpeed: 0.1, furyCharge: 0.4, killHeal: 1, provoke: 0.5, noWarmthHeal: 1, noKnives: 1 }
+        mods: { bladeDamage: 0.25, attackSpeed: 0.05, furyCharge: 0.4, killHeal: 1, provoke: 0.5, noWarmthHeal: 1, noKnives: 1 }
     },
     oathWhispers: {
         name: 'Oath of Whispers',
@@ -373,8 +373,8 @@ export const WAR_CRY = {
 
 // Executioner: fração da vida abaixo da qual a lâmina termina o serviço
 export const EXECUTIONER = {
-    threshold: 0.15,
-    eliteThreshold: 0.08,
+    threshold: 0.12,
+    eliteThreshold: 0.06,
     furyCharge: 4
 };
 
