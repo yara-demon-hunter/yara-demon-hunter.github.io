@@ -16,15 +16,15 @@ import { CHARACTER_BASES } from './character_bases.js';
 // Na primeira hora da noite (BOSS_SPAWNING.schedule) o herói enfrenta o outro herói jogável: quem joga
 // com o Demon Hunter luta com o Azael, e quem joga com o Azael luta com o Demon Hunter (ver chooseBossType).
 // renderAs 'RIVAL' desenha o mesmo boneco 2.5D do herói (js/render/rival.js); heroModel escolhe qual e heroKey a
-// paleta (data_model/heroes.js). renderScale: o tamanho do boneco em relação ao herói.
+// paleta (data_model/heroes.js). renderScale: o tamanho do boneco em relação ao herói (1 = igual ao jogável).
 // lunge: mira uma linha no chão por lungeWindupSeconds, depois atravessa ela com a espada em lungeSeconds.
 const RIVAL_BASE = {
     renderAs: 'RIVAL',
-    renderScale: 1.3,
+    renderScale: 1,               // mesmo tamanho do boneco jogável
     // Luta de abertura: o herói ainda está no nível 1, então a vida é bem menor que a do Demon Lord
     hpBase: 700,
     hpPerTurn: 0,
-    radius: 26,
+    radius: 20,                   // área de contato do boneco em tamanho normal (era 26 com o boneco 30% maior)
     initialShootCooldownSeconds: 1.5,
     burstIntervalSeconds: 0.3,
     // Golpe automático de espada, como o do herói: quando o herói entra em meleeRange, golpeia a cada
@@ -38,9 +38,9 @@ const RIVAL_BASE = {
     strafeSpeed: 55,
     strafeSwitchSeconds: 1.6,
     castSeconds: 0.34,
-    lungeWindupSeconds: 0.75,
+    lungeWindupSeconds: 0.55,
     // A investida é rápida e a área de contato é mais grossa que a linha de aviso (que não mostra a folga extra)
-    lungeHitRadius: 30,
+    lungeHitRadius: 40,
     lungeDamageMultiplier: 1.1,
     // Os rivais atiram adagas (mais rápidas que as bolas de fogo dos outros bosses)
     projectileStyle: 'dagger',
@@ -266,6 +266,10 @@ function shadowOf(key) {
         isShadow: true,
         renderScale: 1,
         radius: 18,
+        // Sombra de quem mantém distância (Demon Hunter) também fica longe e joga adagas em você a cada
+        // shadowThrowSeconds; a do Azael vai em cima do herói e só golpeia. Adaga de sombra não fere a tocha
+        shadowThrowSeconds: base.keepRange ? 2.6 : 0,
+        projectileTorchDamage: 0,
         shadowDamageRatio: 0.5,
         meleeCooldownSeconds: base.meleeCooldownSeconds * 1.4,
         knockbackResist: 0,

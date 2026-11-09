@@ -66,7 +66,7 @@ export const HEROES = {
     azael: {
         name: 'Azael',
         tagline: 'Aggressive. A demon who hunts his own kind, up close.',
-        trait: '+25% damage and heals 5% of the damage he deals, but -25% health.',
+        trait: '+25% damage and heals 5% of the damage he deals, but -25% health and -35% dagger range.',
         mods: CHARACTER_BASES.azael.player.mods,
         startPower: null,
         model: 'azael',

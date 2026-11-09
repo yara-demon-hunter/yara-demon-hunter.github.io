@@ -10,20 +10,20 @@ export const CHARACTER_BASES = {
         },
         boss: {
             moveSpeed: 50,
-            lungeLength: 330,
-            lungeSeconds: 0.16
+            lungeLength: 380,
+            lungeSeconds: 0.12
         }
     },
     azael: {
         player: {
-            mods: { damage: 0.25, lifeSteal: 0.05, maxHp: -0.25 },
+            mods: { damage: 0.25, lifeSteal: 0.05, maxHp: -0.25, knifeRange: -0.35 },
             moveSpeed: 180,
-            dash: { distance: 180, seconds: 0.17 }
+            dash: { distance: 200, seconds: 0.17 }
         },
         boss: {
-            moveSpeed: 80,
-            lungeLength: 330,
-            lungeSeconds: 0.12
+            moveSpeed: 90,
+            lungeLength: 380,
+            lungeSeconds: 0.09
         }
     }
 };

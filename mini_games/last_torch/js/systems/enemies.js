@@ -531,6 +531,14 @@ export function updateEnemyProjectiles(dt) {
 
         p.x += p.vx * dt;
         p.y += p.vy * dt;
+        // Tiro com alcance máximo (adagas do Azael): some ao percorrer a distância
+        if (p.range) {
+            p.travelled += Math.hypot(p.vx, p.vy) * dt;
+            if (p.travelled >= p.range) {
+                enemyProjectiles.splice(i, 1);
+                continue;
+            }
+        }
 
         if (passives.mirrorWard.lvl > 0 && player.reflectTimer <= 0
             && Math.hypot(player.x - p.x, player.y - p.y) < p.radius + MIRROR_WARD.catchRadius

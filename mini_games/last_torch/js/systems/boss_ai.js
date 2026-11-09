@@ -21,6 +21,8 @@ function fireShot(e, model, angle, speedScale = 1) {
     }
     state.enemyProjectiles.push({
         owner: e.type,
+        range: model.projectileRange ?? 0,      // 0 = vai até sair da tela
+        travelled: 0,
         color: model.color,
         x: e.x, y: e.y,
         vx: Math.cos(angle) * model.projectileSpeed * speedScale,
@@ -145,6 +147,14 @@ const ACTIONS = {
     }
 };
 
+function distanceToSegment(px, py, ax, ay, bx, by) {
+    const dx = bx - ax;
+    const dy = by - ay;
+    const len2 = dx * dx + dy * dy;
+    const t = len2 > 0 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2)) : 0;
+    return Math.hypot(px - (ax + dx * t), py - (ay + dy * t));
+}
+
 // Investida em andamento: parado mirando, depois corre a linha em lungeSeconds. Fere o herói uma vez ao passar
 // por ele. Preso pelo Shadow Shackle, desiste da investida.
 function updateLunge(e, model, ai, dt) {
@@ -153,6 +163,7 @@ function updateLunge(e, model, ai, dt) {
         const i = state.telegraphs.indexOf(L.line);
         if (i >= 0) state.telegraphs.splice(i, 1);
         e.dashTimer = 0;
+        e.invulnerable = false;
         ai.lunge = null;
         return;
     }
@@ -169,6 +180,9 @@ function updateLunge(e, model, ai, dt) {
         }
         return;
     }
+    e.invulnerable = true;      // imune durante o avanço (js/systems/damage.js): não morre atravessando os golpes do herói
+    const prevX = e.x;
+    const prevY = e.y;
     L.t = Math.min(1, L.t + dt / model.lungeSeconds);
     e.x = L.fromX + (L.toX - L.fromX) * L.t;
     e.y = L.fromY + (L.toY - L.fromY) * L.t;
@@ -176,11 +190,13 @@ function updateLunge(e, model, ai, dt) {
     e.chainX = e.x;
     e.chainY = e.y;
     e.dashTimer = model.lungeSeconds * (1 - L.t);
-    if (!L.hit && Math.hypot(player.x - e.x, player.y - e.y) < e.radius + model.lungeHitRadius) {
+    // O avanço é tão rápido que num quadro ele passa por cima do herói: confere o trecho percorrido, não só o ponto final
+    if (!L.hit && distanceToSegment(player.x, player.y, prevX, prevY, e.x, e.y) < e.radius + model.lungeHitRadius) {
         L.hit = hurtPlayer(e.damage * model.lungeDamageMultiplier, e.x, e.y, 0.6);
     }
     if (L.t >= 1) {
         e.dashTimer = 0;
+        e.invulnerable = false;
         ai.lunge = null;
         createExplosion(e.x, e.y, model.color, 14);
         e.shootTimer = model.patternGapSeconds * (e.enraged ? model.enrageGapMultiplier : 1);
@@ -257,9 +273,17 @@ function updateRival(e, model, ai, dt) {
     updateRivalMovement(e, model, ai, dt);
 }
 
-// Sombra do rival: só o golpe de perto e o andar de lado do rival, sem a lista de ataques
+// Sombra do rival: o golpe de perto e o andar do rival, sem a lista de ataques. As que mantêm distância
+// (shadowThrowSeconds) jogam uma adaga no herói de tempos em tempos
 export function updateShadowAI(e, model, dt) {
-    updateRival(e, model, e.ai ??= {}, dt);
+    const ai = e.ai ??= {};
+    updateRival(e, model, ai, dt);
+    if (!model.shadowThrowSeconds || e.chained || state.phase !== 'HUNT') return;
+    ai.throwTimer ??= model.shadowThrowSeconds * (0.4 + Math.random() * 0.8);    // não jogam todas juntas
+    ai.throwTimer -= dt;
+    if (ai.throwTimer > 0) return;
+    ai.throwTimer = model.shadowThrowSeconds * (0.85 + Math.random() * 0.3);
+    fireShot(e, model, aimAngle(e));
 }
 
 function enrage(e, model) {

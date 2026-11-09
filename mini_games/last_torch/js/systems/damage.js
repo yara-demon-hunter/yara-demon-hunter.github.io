@@ -22,7 +22,7 @@ function inSmoke(e) {
 }
 
 export function dealDamage(e, amount, o = {}) {
-    if (e.hp <= 0) return 0;
+    if (e.hp <= 0 || e.invulnerable) return 0;
     const crit = o.crit || (!o.noCrit && (Math.random() < getCritChance() || (inSmoke(e) && Math.random() < SMOKE_BOMB.critChance)));
     const dmg = amount * (crit ? getCritMultiplier() : 1) * (e.ravenMark > 0 ? 1 + SHADOW_RAVEN.markDamage : 1);
 
