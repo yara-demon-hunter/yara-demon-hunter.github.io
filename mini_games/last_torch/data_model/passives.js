@@ -184,7 +184,7 @@ export const PASSIVE_SKILL_MODELS = {
             const mods = this.mods;
             return `The torch takes ${formatPercent(mods.torchGuard)} less damage, you gain ${formatPercent(mods.maxHp)} max health, and its warmth reaches ${formatMultiplier(1 + mods.warmth)} as far and burns monsters inside it. The price: ${formatPercent(Math.abs(mods.moveSpeed))} less move speed.`;
         },
-        mods: { torchGuard: 0.35, maxHp: 0.3, warmth: 1, warmthBurn: 0.4, moveSpeed: -0.25 }
+        mods: { torchGuard: 0.25, maxHp: 0.3, warmth: 1, warmthBurn: 0.4, moveSpeed: -0.25 }
     },
     oathRuin: {
         name: 'Oath of Ruin',
@@ -225,8 +225,8 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🏺',
         cost: 90,
         maxLvl: 1,
-        desc: 'The torch slowly recovers: +1 health every 5 seconds.',
-        mods: { torchRegen: 0.2 }
+        desc: 'The torch slowly recovers: +1 health every 8 seconds.',
+        mods: { torchRegen: 0.12 }
     },
     secondPrayer: {
         name: 'Second Prayer',
@@ -297,8 +297,8 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🧥',
         cost: 55,
         maxLvl: 1,
-        desc: 'The warmth of the torch reaches 20% farther and heals you 6% faster.',
-        mods: { warmth: 0.2 }
+        desc: 'The warmth of the torch reaches 15% farther and heals you 4.5% faster.',
+        mods: { warmth: 0.15 }
     },
     furyStone: {
         name: 'Fury Stone',
@@ -312,7 +312,7 @@ export const PASSIVE_SKILL_MODELS = {
     sharpenedEdge: { name: 'Sharpened Edge', icon: '🪚', cost: 110, maxLvl: 1, desc: 'For blade fighters: +15% blade damage, +8% attack speed.', mods: { bladeDamage: 0.15, attackSpeed: 0.08 } },
     shadeQuiver: { name: 'Shade Quiver', icon: '🪶', cost: 120, maxLvl: 1, desc: 'For shadow stalkers: +20% dagger damage, -8% dagger recharge, +4% critical chance.', mods: { knifeDamage: 0.2, knifeCooldown: 0.08, critChance: 0.04 } },
     occultTome: { name: 'Occult Tome', icon: '🪬', cost: 120, maxLvl: 1, desc: 'For curse casters: +15% spell damage, -8% spell recharge.', mods: { spellDamage: 0.15, spellHaste: 0.08 } },
-    emberLantern: { name: 'Ember Lantern', icon: '🪔', cost: 100, maxLvl: 1, desc: 'For flame keepers: the torch heals 0.2/s and its warmth reaches 15% farther.', mods: { torchRegen: 0.2, warmth: 0.15 } },
+    emberLantern: { name: 'Ember Lantern', icon: '🪔', cost: 100, maxLvl: 1, desc: 'For flame keepers: the torch heals 0.12/s and its warmth reaches 10% farther.', mods: { torchRegen: 0.12, warmth: 0.1 } },
     phantomVeil: { name: 'Phantom Veil', icon: '🧣', cost: 110, maxLvl: 1, desc: 'For shadow dodgers: -12% dash recharge, +5% move speed.', mods: { dashCooldown: 0.12, moveSpeed: 0.05 } },
     wizardsWand: { name: "Wizard's Wand", icon: '🪄', cost: 130, maxLvl: 1, desc: 'For curse casters: +20% spell damage, -6% spell recharge.', mods: { spellDamage: 0.2, spellHaste: 0.06 } },
     owlsWisdom: { name: "Owl's Wisdom", icon: '🦉', cost: 140, maxLvl: 1, desc: 'For curse casters: -12% spell recharge, +10% XP.', mods: { spellHaste: 0.12, xp: 0.1 } },
@@ -338,8 +338,8 @@ export const CAMP = {
     costMultiplier: 1.8,
     costGrowthPerHour: 0.15,        // relíquias ficam mais caras a cada hora
     freeTorchHeal: 0,               // a tocha recupera isto de graça ao chegar no acampamento (zero: quem cura é o Feed)
-    fuel: { heal: 30, cost: 40, costPerHour: 12, costPerUse: 25 },
-    rest: { healRatio: 0.5, cost: 30, costPerHour: 9, costPerUse: 20 }
+    fuel: { heal: 22, cost: 40, costPerHour: 12, costPerUse: 25 },
+    rest: { healRatio: 0.4, cost: 30, costPerHour: 9, costPerUse: 20 }
 };
 
 // Fan of Knives: várias adagas de uma vez, abertas em leque em volta da mira
@@ -433,7 +433,7 @@ export const BACKDRAFT = {
 // Phoenix Pact: a fênix voa no ombro do herói e atira bolas de fogo. Quando ele cai, ela morre para levantá-lo
 // (uma vez por hora) e renasce na hora seguinte.
 export const PHOENIX_PACT = {
-    healRatio: 0.6,
+    healRatio: 0.45,
     invulnerableSeconds: 2.5,
     radius: 300,
     damage: 3,
