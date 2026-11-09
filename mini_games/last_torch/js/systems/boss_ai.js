@@ -71,6 +71,14 @@ const ACTIONS = {
             fireShot(e, model, ai.spin + Math.PI, 0.8);
         };
     },
+    // Onda de curto alcance em volta do próprio boss (Captain Brutos): o machado ergue e desce no chão; quem estiver perto
+    // quando o aviso termina leva o golpe. Sem mira no herói: ele precisa chegar perto para ser atingido.
+    quake(e, model) {
+        e.angle = aimAngle(e);
+        e.comboStep = ((e.comboStep ?? 1) % 3) + 1;
+        addSlam(e.x, e.y, model.quakeRadius, model.quakeDelaySeconds, e.damage * model.quakeDamageMultiplier, null, model.quakeTorchDamage ?? 0);
+        audio.playBossAttack();
+    },
     // Círculos no chão: o primeiro no herói, os outros em volta dele
     slam(e, model) {
         for (let i = 0; i < model.slamCount; i++) {
@@ -85,11 +93,6 @@ const ACTIONS = {
                 null,
                 model.slamTorchDamage ?? 0
             );
-        }
-        // Corpo de herói que bate no chão (Brutos): o machado desce junto com o aviso
-        if (model.slamSwing) {
-            e.angle = aimAngle(e);
-            e.comboStep = ((e.comboStep ?? 1) % 3) + 1;
         }
         audio.playBossAttack();
     },

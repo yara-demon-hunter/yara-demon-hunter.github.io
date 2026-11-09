@@ -1,5 +1,5 @@
 import { createEnemy } from './monsters.js';
-import { CHARACTER_BASES } from './character_bases.js';
+import { RIVAL_OF, bossModelOf } from './characters/index.js';
 
 // --- BOSSES ---
 // Separados dos monstros comuns: não entram no sorteio normal, aparecem a cada `everyTurns`
@@ -142,107 +142,15 @@ export const BOSS_MODELS = {
         xpRewardBase: 320,
         xpRewardPerTurn: 30,
     },
-    // Rival de quem joga com o Demon Hunter: rápido, ataca de perto e some na sombra
-    AZAEL: {
-        ...RIVAL_BASE,
-        name: 'Azael',
-        title: 'The Demon Who Hunts His Kind',
-        heroModel: 'azael',
-        heroKey: 'azael',
-        speedMin: CHARACTER_BASES.azael.boss.moveSpeed,
-        speedMax: CHARACTER_BASES.azael.boss.moveSpeed,
-        lungeLength: CHARACTER_BASES.azael.boss.lungeLength,
-        lungeSeconds: CHARACTER_BASES.azael.boss.lungeSeconds,
-        color: '#ef4444',
-        damage: 31,
-        meleeCooldownSeconds: 0.85,
-        keepRange: 0,
-        burstCount: 3,
-        patternGapSeconds: 1.9,
-        patterns: ['lunge', 'volley', 'shadows', 'lunge', 'blink', 'lunge', 'ring'],
-        ringCount: 12,
-        projectileSpeed: 300,
-        enrageSpeedMultiplier: 1.35,
-    },
-    // Rival de quem joga com o Azael: mais lento, lança adagas e crava círculos no chão
-    DEMON_HUNTER: {
-        ...RIVAL_BASE,
-        name: 'Demon Hunter',
-        title: 'He Hunts Your Kind',
-        heroModel: 'hunter',
-        heroKey: 'hunter',
-        speedMin: CHARACTER_BASES.hunter.boss.moveSpeed,
-        speedMax: CHARACTER_BASES.hunter.boss.moveSpeed,
-        lungeLength: CHARACTER_BASES.hunter.boss.lungeLength,
-        lungeSeconds: CHARACTER_BASES.hunter.boss.lungeSeconds,
-        color: '#38bdf8',
-        damage: 26,
-        meleeCooldownSeconds: 1.1,
-        keepRange: 170,
-        strafeSpeed: 70,
-        burstCount: 4,
-        patternGapSeconds: 2.1,
-        patterns: ['volley', 'lunge', 'shadows', 'slam', 'lunge', 'volley', 'ring'],
-        ringCount: 14,
-        slamCount: 3,
-        slamRadius: 70,
-        slamDelaySeconds: 1,
-        slamDamageMultiplier: 0.9,
-        slamTorchDamage: 6,
-        projectileSpeed: 270,
-        enrageSpeedMultiplier: 1.3,
-    },
+    // Rival de quem joga com o Demon Hunter (e com o Brutos): rápido, ataca de perto e some na sombra. Os números e o jeito de
+    // lutar dele estão em data_model/characters/azael.js (boss proporcional ao personagem).
+    AZAEL: { ...RIVAL_BASE, ...bossModelOf('azael') },
+    // Rival de quem joga com o Azael: mais lento, lança adagas e crava círculos no chão (data_model/characters/hunter.js)
+    DEMON_HUNTER: { ...RIVAL_BASE, ...bossModelOf('hunter') },
     // Semi-boss do meio da noite (hora 6): o rival do herói o chama (BOSS_INTROS em dialogues.js) e ele entra falando uma
-    // frase curta. Corpo de herói (renderAs 'RIVAL'), mas sem duelo: noDuel. Estático e lento: anda devagar sempre
-    // para o herói, não atira, não lança adaga e não anda de lado; só golpes pesados de machado (lentos de preparar),
-    // círculos no chão (slam) e um dash curto (lunge). Boneco: js/render/brutos25d.js.
-    BRUTOS: {
-        ...RIVAL_BASE,
-        name: 'Captain Brutos',
-        title: 'Captain of the Black Guard',
-        heroModel: 'brutos',
-        noDuel: true,
-        portraitImage: 'images/characters/brutos-small.webp',
-        renderScale: 1.1,
-        radius: 26,
-        // Meio do caminho entre o rival da abertura e o Demon Lord (a vida sobe com a hora: 0.65 + 0.17 por hora)
-        hpBase: 1500,
-        speedMin: CHARACTER_BASES.brutos.boss.moveSpeed,
-        speedMax: CHARACTER_BASES.brutos.boss.moveSpeed,
-        color: '#94a3b8',
-        damage: 38,
-        // Golpe automático de perto: raro, largo e pesado, com a preparação visível (meleeHitDelaySeconds)
-        meleeRange: 74,
-        meleeArc: 2.8,
-        meleeCooldownSeconds: 1.9,
-        meleeHitDelaySeconds: 0.4,
-        meleeDamageMultiplier: 1.5,
-        // Estático: vai reto ao herói, sem andar de lado nem recuar
-        keepRange: 0,
-        strafeSpeed: 0,
-        // Dash curto: aviso longo (o boneco para e mira), avanço curto e mais lento que o do Azael
-        lungeLength: CHARACTER_BASES.brutos.boss.lungeLength,
-        lungeSeconds: CHARACTER_BASES.brutos.boss.lungeSeconds,
-        lungeWindupSeconds: 0.8,
-        lungeHitRadius: 34,
-        lungeDamageMultiplier: 1.3,
-        // Pancada no chão: poucos círculos, grandes, com o machado batendo junto (slamSwing)
-        slamCount: 2,
-        slamRadius: 86,
-        slamDelaySeconds: 1.15,
-        slamDamageMultiplier: 1.2,
-        slamTorchDamage: 8,
-        slamSwing: true,
-        patternGapSeconds: 2.6,
-        patterns: ['slam', 'lunge', 'slam', 'slam', 'lunge'],
-        enrageRatio: 0.4,
-        enrageGapMultiplier: 0.75,
-        enrageSpeedMultiplier: 1.25,
-        knockbackResist: 0.95,
-        scoreReward: 400,
-        goldBase: 70,
-        xpRewardBase: 220,
-    },
+    // frase curta. Corpo de herói (renderAs 'RIVAL'), mas sem duelo (noDuel). Tanque imparável: números e jeito de lutar em
+    // data_model/characters/brutos.js (boss proporcional ao personagem). Boneco: js/render/brutos25d.js.
+    BRUTOS: { ...RIVAL_BASE, ...bossModelOf('brutos') },
     LONG_NIGHT: {
         name: 'The Long Night',
         title: 'The Dark Itself',
@@ -357,7 +265,8 @@ export function isBossTurn(turn, heroModel = 'hunter') {
 }
 
 // Rival de cada boneco de herói: o Demon Hunter (e as variações dele) e o Brutos enfrentam o Azael, e o Azael o Demon Hunter
-export const RIVAL_OF = { hunter: 'AZAEL', azael: 'DEMON_HUNTER', brutos: 'AZAEL' };
+// (vem do campo `rival` de cada personagem, em data_model/characters/)
+export { RIVAL_OF };
 
 // Boss da hora (heroModel: o boneco do herói escolhido, getHero().model, que decide o rival)
 export function chooseBossType(turn, heroModel = 'hunter') {
@@ -383,6 +292,7 @@ export function createBoss(type, turn, x, y, random = Math.random) {
     return {
         ...createEnemy(model, type, turn, x, y, random),
         knockbackResist: model.knockbackResist ?? BOSS_KNOCKBACK_RESIST,
+        unstoppable: !!model.unstoppable,     // não é atrasado, preso nem empurrado (Captain Brutos)
         isBoss: true,
         name: model.name
     };

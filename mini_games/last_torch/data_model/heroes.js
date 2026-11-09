@@ -1,9 +1,10 @@
 import { HERO_VISUALS } from './visuals/characters/hero_visual.js';
-import { AZAEL_VISUALS } from './visuals/characters/azael_visual.js';
-import { BRUTOS_VISUALS } from './visuals/characters/brutos_visual.js';
-import { CHARACTER_BASES } from './character_bases.js';
+import { HERO_ENTRIES, HERO_ORDER } from './characters/index.js';
 
 // --- HERÓIS ---
+// Os personagens com identidade própria (Demon Hunter, Brutos, Azael) NÃO são escritos aqui: cada um tem o seu arquivo em
+// data_model/characters/ (nome, textos, vida, velocidade, bônus...), e este arquivo só os junta. Aqui ficam os heróis
+// guardados (shelved), que ainda usam o formato antigo.
 // Liberados por conquistas do Santuário (data_model/sanctuary.js). mods: mesmas chaves de js/systems/modifiers.js.
 // colors: troca só o que muda na paleta do herói 2.5D; portrait: filtro CSS aplicado no retrato.
 // model: boneco 2.5D ('hunter' se ausente; os outros se registram em js/render/bodies.js, ex.: 'azael' em js/render/azael25d.js);
@@ -11,17 +12,7 @@ import { CHARACTER_BASES } from './character_bases.js';
 // free: já vem liberado, sem conquista.
 // shelved: guardado por enquanto. Some da tela inicial e das conquistas, mas os dados ficam para voltar depois.
 export const HEROES = {
-    hunter: {
-        name: 'Demon Hunter',
-        tagline: 'Patient and strategic. He waits, aims, and lets the torch work.',
-        trait: '+15% health, +20% dagger damage, +25% dagger range, +10% blade reach, +15% attack speed while standing still, +20% torch warmth, but -5% blade damage.',
-        mods: CHARACTER_BASES.hunter.player.mods,
-        // perk: a marca do herói, mostrada com as barras de atributo na tela inicial (js/ui/hero_stats.js)
-        perk: { name: 'STEADY HAND', text: 'Attacks faster standing still. The torch warms and heals him more.' },
-        startPower: null,
-        colors: null,
-        portrait: ''
-    },
+    hunter: HERO_ENTRIES.hunter,
     reaver: {
         name: 'Ash Reaver',
         shelved: true,
@@ -67,39 +58,13 @@ export const HEROES = {
         },
         portrait: 'hue-rotate(70deg) saturate(1.3)'
     },
-    azael: {
-        name: 'Azael',
-        tagline: 'Aggressive. A demon who hunts his own kind, up close.',
-        trait: '+25% damage and heals 5% of the damage he deals, but -25% health and -35% dagger range.',
-        mods: CHARACTER_BASES.azael.player.mods,
-        startPower: null,
-        model: 'azael',
-        perk: { name: 'BLOOD DRINKER', text: 'Heals a part of the damage he deals. Hits hard, but breaks easily.' },
-        colors: AZAEL_VISUALS.colors,
-        portrait: '',
-        portraitImage: 'images/characters/azael-small.webp',
-        // Liberado pela conquista Dawn (vencer a noite). unlockHint: aviso no cartão bloqueado
-        unlockHint: 'Beat the game'
-    },
-    brutos: {
-        name: 'Captain Brutos',
-        tagline: 'Slow and iron-clad. Every blow of the axe lands like a siege engine.',
-        trait: '+35% health, +35% blade damage, +25% blade reach and -10% damage taken, but -30% attack speed, a short dash, slow movement, and no daggers.',
-        mods: CHARACTER_BASES.brutos.player.mods,
-        startPower: null,
-        model: 'brutos',
-        perk: { name: 'HEAVY HANDS', text: 'Slow, crushing axe blows and thick armor. No daggers: the blade does all the work.' },
-        colors: BRUTOS_VISUALS.colors,
-        portrait: '',
-        portraitImage: 'images/characters/brutos-small.webp',
-        // Liberado pela conquista Iron Captain (vencer o Captain Brutos na hora 6). unlockHint: aviso no cartão bloqueado
-        unlockHint: 'Defeat Captain Brutos'
-    }
+    azael: HERO_ENTRIES.azael,
+    brutos: HERO_ENTRIES.brutos
 };
 
-// Ordem dos heróis nas telas de escolha. Quem não está na lista vem depois, na ordem em que foi declarado em HEROES
-// (herói novo entra no fim sem mexer aqui; para mudar a posição, é só pôr a chave na lista).
-export const HERO_ORDER = ['hunter', 'brutos', 'azael'];
+// Ordem dos heróis nas telas de escolha: o campo `order` de cada personagem (data_model/characters/). Quem não tem
+// vem depois, na ordem em que foi declarado em HEROES.
+export { HERO_ORDER };
 const rank = (key) => (HERO_ORDER.includes(key) ? HERO_ORDER.indexOf(key) : HERO_ORDER.length);
 export const ORDERED_HEROES = Object.keys(HEROES).sort((a, b) => rank(a) - rank(b));
 

@@ -259,7 +259,7 @@ function shackleTarget() {
     const range = getKnifeRange();
     let best = null;
     for (const e of state.enemies) {
-        if (e.hp <= 0 || e.chained || Math.hypot(e.x - player.x, e.y - player.y) > range) continue;
+        if (e.hp <= 0 || e.chained || e.unstoppable || Math.hypot(e.x - player.x, e.y - player.y) > range) continue;
         if (!best || e.maxHp > best.maxHp) best = e;
     }
     return best;

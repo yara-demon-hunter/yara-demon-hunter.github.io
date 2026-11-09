@@ -4,7 +4,7 @@ import { STREAK } from '../../data_model/streak.js';
 import { isBossTurn } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { player, state } from '../core/state.js';
-import { getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
+import { getAxeQuake, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
 import { hasBuyableNode } from '../systems/tree.js';
 
 // --- HUD ---
@@ -59,17 +59,24 @@ export function updateFuryCard() {
 // --- BOTÕES DE TOQUE ---
 // Anel de recarga (--cd: 1 logo após o uso, 0 = pronto) em poucos degraus: cada mudança repinta o botão.
 const CD_STEPS = 12;
-const knifeShown = { cd: -1, ready: null, sealed: null };
+const knifeShown = { cd: -1, ready: null, sealed: null, quake: null };
 
 export function updateKnifeButton() {
     if (!hasTouchButtons) return;
-    const ratio = Math.min(1, state.knifeTimer / getKnifeCooldown());
+    // Captain Brutos: o botão da adaga vira o Axe Quake (o anel é a recarga do golpe)
+    const quakeHero = mod('axeQuake') > 0;
+    if (knifeShown.quake !== quakeHero) {
+        knifeShown.quake = quakeHero;
+        ui.knifeButton.setAttribute('aria-label', quakeHero ? 'Axe Quake' : 'Throw dagger');
+        document.getElementById('knifeButtonKnob').textContent = quakeHero ? '🪓' : '🗡️';
+    }
+    const ratio = quakeHero ? Math.min(1, state.quake.timer / (getAxeQuake()?.cooldownSeconds ?? 1)) : Math.min(1, state.knifeTimer / getKnifeCooldown());
     const cd = Math.ceil(ratio * CD_STEPS) / CD_STEPS;
     if (knifeShown.cd !== cd) {
         knifeShown.cd = cd;
         ui.knifeButton.style.setProperty('--cd', cd);
     }
-    const sealed = mod('noKnives') > 0;
+    const sealed = mod('noKnives') > 0 && !quakeHero;
     if (knifeShown.sealed !== sealed) {
         knifeShown.sealed = sealed;
         ui.knifeButton.classList.toggle('is-sealed', sealed);

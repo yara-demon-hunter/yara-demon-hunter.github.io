@@ -1,5 +1,5 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { getCharacterBase } from '../../data_model/character_bases.js';
+import { getCharacterBase } from '../../data_model/characters/index.js';
 import { BLADE_SKILL, DASH_SKILL, FRENZY_NOVA_SKILL, KNIFE_SKILL, SPELL_SKILL } from '../../data_model/skills.js';
 import { WAR_CRY } from '../../data_model/passives.js';
 import { getPowerLevel } from '../../data_model/powers.js';
@@ -14,7 +14,7 @@ function getCurrentCharacterBase() {
 // Só as cartas escolhidas contam; o nível do herói não muda os stats sozinho.
 // mod(): bônus de herói, relíquias e presságios (js/systems/modifiers.js).
 export function getAtkDamage() {
-    let base = (BLADE_SKILL.baseDamage
+    let base = (getCurrentCharacterBase().player.attackDamage
         + (attributes.damage.lvl - 1) * BLADE_SKILL.damagePerUpgrade) * (1 + mod('damage'));
     if (state.frenzyActiveTimer > 0) base *= 1 + getFrenzyDamageBonus();
     if (mod('lowHpDamage') > 0 && player.hp < player.maxHp * 0.35) base *= 1 + mod('lowHpDamage');
@@ -51,8 +51,8 @@ export function getCritMultiplier() {
 export function getAtkRadius() {
     return Math.min(
         state.width * BLADE_SKILL.maxRadiusScreenRatio,
-        (BLADE_SKILL.baseRadius
-            + (attributes.radius.lvl - 1) * BLADE_SKILL.radiusPerUpgrade) * (1 + mod('bladeRadius'))
+        getCurrentCharacterBase().player.bladeRange
+            + (attributes.radius.lvl - 1) * BLADE_SKILL.radiusPerUpgrade
     );
 }
 
@@ -68,7 +68,7 @@ export function getSlashArcDegree() {
 }
 
 export function getAtkCooldown() {
-    let cd = (BLADE_SKILL.baseCooldownSeconds
+    let cd = (getCurrentCharacterBase().player.attackCooldown
         - (attributes.atkSpeed.lvl - 1) * BLADE_SKILL.cooldownReductionPerUpgrade) * (1 - mod('attackSpeed'));
     if (state.frenzyActiveTimer > 0) cd *= BLADE_SKILL.frenzyCooldownMultiplier;
     const hunger = getPowerLevel(powers.bloodlust);
@@ -77,17 +77,27 @@ export function getAtkCooldown() {
     return Math.max(BLADE_SKILL.minimumCooldownSeconds, cd);
 }
 export function getPlayerMaxSpeed() {
-    return (getCurrentCharacterBase().player.moveSpeed
+    const speed = (getCurrentCharacterBase().player.moveSpeed
         + (attributes.moveSpeed.lvl - 1) * CHARACTER_MODEL.moveSpeedPerUpgrade) * (1 + mod('moveSpeed'));
+    // Axe Quake em andamento (Captain Brutos): quase parado enquanto o machado sobe e desce
+    return player.move?.kind === 'quake' ? speed * getAxeQuake().moveSpeed : speed;
 }
 export function getKnockback() {
     return BLADE_SKILL.baseKnockback
         + (attributes.knockback.lvl - 1) * BLADE_SKILL.knockbackPerUpgrade;
 }
 export function getMaxPlayerHp() {
-    return Math.round((CHARACTER_MODEL.baseHp
+    return Math.round((getCurrentCharacterBase().player.maxHp
         + (attributes.playerHp.lvl - 1) * CHARACTER_MODEL.hpPerUpgrade
         + mod('maxHpFlat')) * (1 + mod('maxHp')));
+}
+// Axe Quake do personagem escolhido (força, cooldown, alcance...: data_model/characters/); null se ele não tem
+export function getAxeQuake() {
+    return getCurrentCharacterBase().player.axeQuake;
+}
+// Alcance base da adaga: do personagem escolhido (cada um tem o seu)
+export function getKnifeBaseRange() {
+    return getCurrentCharacterBase().player.knifeRange;
 }
 // Fração do golpe que chega no herói
 export function getDamageTakenRatio() {

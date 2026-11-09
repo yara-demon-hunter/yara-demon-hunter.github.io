@@ -4,7 +4,6 @@ export const CHARACTER_MODEL = {
     initialHp: 100,
     initialPositionOffsetY: -60,
     moveSpeedPerUpgrade: 8,
-    baseHp: 100,
     hpPerUpgrade: 10,
     invulnerabilitySeconds: 0.5,
     projectileInvulnerabilitySeconds: 0.4,

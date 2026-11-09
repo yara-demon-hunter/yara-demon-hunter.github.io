@@ -333,7 +333,8 @@ export function updateEnemies(dt) {
         const distCore = Math.hypot(state.coreX - e.x, state.coreY - e.y);
 
         const toTargetAngle = Math.atan2(targetY - e.y, targetX - e.x);
-        const slow = e.slow ?? 0;
+        // Imparável (Captain Brutos): nada o atrasa
+        const slow = e.unstoppable ? 0 : (e.slow ?? 0);
         e.slow = 0;
 
         if (e.frozen > 0) {

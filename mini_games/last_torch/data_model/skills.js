@@ -18,15 +18,14 @@ export const UPGRADE_MODELS = {
     knockback: { name: 'Knockback', icon: '👊', lvl: 1, maxLvl: 99, desc: 'Increases the push when hitting targets.' }
 };
 
+// Dano de cada golpe, tempo entre golpes e alcance da lâmina e da adaga NÃO ficam aqui: são de cada personagem
+// (data_model/characters/). Aqui só o que sobe por nível de skill e as regras gerais.
 export const BLADE_SKILL = {
-    baseDamage: 30,
     damagePerUpgrade: 5,
-    baseRadius: 56,
     radiusPerUpgrade: 7,
     maxRadiusScreenRatio: 0.38,
     minimumSlashArcDegrees: 40,
     maximumSlashArcDegrees: 180,
-    baseCooldownSeconds: 0.7,
     cooldownReductionPerUpgrade: 0.03,
     // A Fúria não acelera mais o golpe (antes 0.25 = 4x mais rápido): com Bloodlust e Knockback ela virava uma
     // metralhadora de empurrões que jogava até boss para longe. Agora ela dá dano (FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel)
@@ -66,7 +65,6 @@ export const KNIFE_SKILL = {
     cooldownSeconds: 0.9,
     speed: 520,
     radius: 7,
-    maxRange: 420,
     damageMultiplier: 0.8,
     knockbackMultiplier: 0.8
 };

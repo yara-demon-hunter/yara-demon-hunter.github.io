@@ -134,6 +134,29 @@ function slamStance(stance, k) {
     }
 }
 
+// Axe Quake (Captain Brutos): ergue o machado acima da cabeça com as duas mãos, o corpo se inclina para trás, e desce no
+// chão. Sem salto: ele é pesado e fica plantado.
+function quakeStance(stance, k) {
+    const M = V.moves.quake;
+    if (k < M.raiseEnd) {
+        const p = easeOutQuad(k / M.raiseEnd);
+        stance.lean -= 1.6 * p;
+        stance.crouch += M.crouch * 0.3 * p;
+        twoHanded(stance, -0.25 * p, p, 19 + 3 * p);
+    } else if (k < M.impactAt) {
+        const p = (k - M.raiseEnd) / (M.impactAt - M.raiseEnd);
+        const fall = p * p;
+        stance.lean += -1.6 + 4.6 * fall;
+        stance.crouch += M.crouch * (0.3 + 0.7 * fall);
+        twoHanded(stance, -0.25 + 2.65 * fall, 1, 22 - 8 * fall);
+    } else {
+        const p = (k - M.impactAt) / (1 - M.impactAt);
+        stance.lean += 3 * (1 - p);
+        stance.crouch += M.crouch * (1 - easeOutQuad(p));
+        twoHanded(stance, 2.4, k < M.recoverAt ? 1 : 1 - (k - M.recoverAt) / (1 - M.recoverAt), 14);
+    }
+}
+
 function roarStance(stance, k) {
     const M = V.moves.roar;
     const w = k < 0.18 ? easeOutQuad(k / 0.18) : k > 0.74 ? 1 - easeOutQuad((k - 0.74) / 0.26) : 1;
@@ -161,7 +184,7 @@ function oathStance(stance, k) {
     }
 }
 
-const STANCES = { slam: slamStance, roar: roarStance, oath: oathStance };
+const STANCES = { slam: slamStance, quake: quakeStance, roar: roarStance, oath: oathStance };
 
 function applyStance(stance, body, blend) {
     if (anim.dash > 0.01) {

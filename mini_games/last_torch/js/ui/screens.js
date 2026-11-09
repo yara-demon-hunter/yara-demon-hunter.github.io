@@ -8,6 +8,7 @@ import { attributes, audio, passives, player, powers, state } from '../core/stat
 import { checkAchievements, pushStats, rewardText } from '../systems/sanctuary.js';
 import { getOwnedPowers, hasBuyableNode } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
+import { resetQuake } from '../systems/quake.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
 import { continueEndless, startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
@@ -85,6 +86,7 @@ export function startGame() {
     state.enemyProjectiles = [];
     state.knives = [];
     state.knifeTimer = 0;
+    resetQuake();
     state.knifePending = null;
     state.knifeCharge = 0;
     state.knifeInput.stick.fire = false;

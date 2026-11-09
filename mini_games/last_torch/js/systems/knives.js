@@ -8,7 +8,7 @@ import { createExplosion } from './effects.js';
 import { mod } from './modifiers.js';
 import { burstFireball } from './skills_flame.js';
 import { markEnemy } from './skills_shadow.js';
-import { getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
+import { getKnifeBaseRange, getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
 
 const KNIFE_RELEASE_SECONDS = K.throwSeconds * K.letGoFraction;
 // Toque no botão da adaga quase no fim da recarga: guarda o arremesso e solta assim que ficar pronta,
@@ -125,7 +125,7 @@ export function burstKnives(x, y) {
 
 // Alcance atual da adaga (com Dagger Mastery)
 export function getKnifeRange() {
-    return KNIFE_SKILL.maxRange * (1 + mod('knifeRange'));
+    return getKnifeBaseRange() * (1 + mod('knifeRange'));
 }
 
 // Charged Dagger Throw: fração da carga atual (0 a 1)

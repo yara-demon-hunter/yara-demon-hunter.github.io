@@ -179,6 +179,8 @@ export const state = {
     // fire = dedo acabou de soltar, arremessar no próximo quadro)
     knifeInput: { held: false, x: 0, y: 0, stick: { active: false, x: 0, y: 0, aimAngle: 0, fire: false } },
     knifeTimer: 0,
+    // Axe Quake (Captain Brutos): recarga em segundos e o botão de toque segurado
+    quake: { timer: 0, touch: false },
     knifeThrowTime: -100000,
     knifeThrowAngle: 0,
     knifePending: null,

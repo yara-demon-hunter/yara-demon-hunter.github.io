@@ -59,7 +59,8 @@ css/
   components/orientation.css      aviso de virar o aparelho de lado (celular em pé)
 data_model/                       DADOS do jogo (balanceamento), separados do motor
   character.js                    atributos, progressão, calor da tocha e raio de atração do ouro
-  heroes.js                       heróis jogáveis: bônus, paleta e retrato
+  characters/                     UM ARQUIVO POR PERSONAGEM (hunter.js, azael.js, brutos.js): nome, textos, vida, velocidade, dash, bônus, números como boss e rival; index.js monta o que o jogo lê e explica como criar um
+  heroes.js                       junta os personagens de characters/ aos heróis guardados (shelved)
   core.js                         vida, colisão e aparência do núcleo
   monsters.js                     monstros, aparição e recompensas
   bosses.js                       bosses: vida, ataques (patterns) e rotação
@@ -99,6 +100,7 @@ js/
   systems/damage.js               todo dano nos monstros passa por aqui: crítico, clarão, número, recuo
   systems/combat.js               ataque automático, golpes da lâmina e Fúria
   systems/knives.js               adaga de arremesso e Ricochet
+  systems/quake.js                Axe Quake do Captain Brutos (golpe em área de curto alcance no lugar da adaga)
   systems/dash.js                 dash e esquiva perfeita
   systems/powers.js               poderes do level up
   systems/skills.js               skills dos ramos: ponto único (atualiza, limpa entre horas, cerimônia do Juramento)
@@ -173,15 +175,15 @@ Referência de arte em `art_reference/<id>/character.md`. Passo a passo (use o A
 1. **Visual:** `data_model/visuals/characters/<id>_visual.js`, copiando `azael_visual.js`: `colors` (mesmas chaves de `HERO_VISUALS.colors`), `bladeLength`, `bladeWidth`, `glowScale`, `strideSpeed` e as medidas só dele.
 2. **Boneco:** `js/render/<id>25d.js`, copiando `azael25d.js`, com as peças (cabeça, tronco, pernas, braços, arma) e, no fim, `registerBody('<id>', { vis, ... })`. Os ganchos (todos opcionais, o que faltar usa o desenho do Demon Hunter) estão listados em `js/render/body_registry.js`.
 3. **Lista:** um `import './<id>25d.js';` em `js/render/bodies.js`.
-4. **Herói:** entrada em `data_model/heroes.js` com `model: '<id>'`, `colors`, `mods`, retrato e a conquista que o libera; stats base em `data_model/character_bases.js`. A posição dele nas telas de escolha vem de `HERO_ORDER` em `heroes.js` (quem não está na lista entra no fim).
+4. **Personagem:** um arquivo `data_model/characters/<id>.js` (copie o `brutos.js`) com TUDO dele: nome, textos, `colors`, retrato, vida, velocidade, dash, bônus em %, números como boss, rival e a posição na tela de escolha (`order`); depois, ponha-o na lista de `data_model/characters/index.js` e a conquista que o libera (`hero: '<id>'`) em `data_model/sanctuary.js`. Os números são conferidos ao abrir o jogo (um stat com nome errado dá erro).
 5. **Sombra:** uma linha em `colorsByModel` (`shadow_clone_visual.js`) com a paleta de sombra dele, usada pelo Shadow Clone e pelo rival sombra. Sem a linha, usa a paleta padrão.
 6. **Rival:** se o herói tiver um rival próprio, `RIVAL_OF` e o boss em `data_model/bosses.js` (o rival é só dado: usa o mesmo boneco).
 
 ## Captain Brutos (semi-boss e herói)
 
-**Como herói** (`HEROES.brutos`, liberado pela conquista Iron Captain: vencer o Brutos): lento (velocidade 105) e pesado, com dash curto (85 px), +40% de vida, +40% de dano de lâmina e -10% de dano recebido, mas -30% de velocidade de ataque e **sem adaga** (`noKnives`, o botão fica selado como no Oath of Slaughter). Valores em `CHARACTER_BASES.brutos` (`data_model/character_bases.js`). O rival dele é o Azael (`RIVAL_OF`), com falas próprias de duelo (`DUEL_DIALOGUES.AZAEL.byHero.brutos`), e quem joga com ele **não enfrenta o semi-boss**: a hora 6 fica normal (`chooseBossType` devolve `null`; `isBossTurn(hora, model)`). O Shadow Clone dele usa uma paleta de sombra própria (`colorsByModel`).
+**Como herói** (`HEROES.brutos`, liberado pela conquista Iron Captain: vencer o Brutos): lento e pesado, com dash curto, mais vida, mais dano de lâmina e menos dano recebido, mas menos velocidade de ataque e **sem adaga** (`noKnives`). No lugar da adaga ele tem o **Axe Quake**: clique esquerdo (ou o botão do canto, no celular) ergue o machado e desce no chão, e uma onda de curto alcance estoura em volta dele (dano alto, empurrão forte e atordoamento), com recarga de 3,5 s. Força, cooldown, alcance, empurrão e atordoamento ficam em `abilities.axeQuake` no `data_model/characters/brutos.js` (`js/systems/quake.js`). Valores do personagem em `data_model/characters/brutos.js`. O rival dele é o Azael (`RIVAL_OF`), com falas próprias de duelo (`DUEL_DIALOGUES.AZAEL.byHero.brutos`), e quem joga com ele **não enfrenta o semi-boss**: a hora 6 fica normal (`chooseBossType` devolve `null`; `isBossTurn(hora, model)`). O Shadow Clone dele usa uma paleta de sombra própria (`colorsByModel`).
 
-**Como semi-boss**: na hora 6 o rival do herói (Azael ou Demon Hunter) chama o capitão (`BOSS_INTROS.*.BRUTOS` em `data_model/dialogues.js`: uma fala do rival, a frase curta do Brutos, uma resposta do herói) e ele entra na luta. É um boss com corpo de herói (`renderAs: 'RIVAL'`) mas sem a conversa de duelo (`noDuel`, `hasDuel` em `data_model/bosses.js`). Estático e lento: anda devagar para o herói, não atira nem lança adaga e não anda de lado; só golpes pesados de machado, pancadas no chão (`slam`, o machado desce junto: `slamSwing`) e um dash curto (`lunge`, 150 px). Tudo é ajustável em `BOSS_MODELS.BRUTOS`. Boneco: `js/render/brutos25d.js`; visual: `data_model/visuals/characters/brutos_visual.js`; referência de arte: `art_reference/captain-brutos`.
+**Como semi-boss**: na hora 6 o rival do herói (Azael ou Demon Hunter) chama o capitão (`BOSS_INTROS.*.BRUTOS` em `data_model/dialogues.js`: uma fala do rival, a frase curta do Brutos, uma resposta do herói) e ele entra na luta. É um boss com corpo de herói (`renderAs: 'RIVAL'`) mas sem a conversa de duelo (`noDuel`, `hasDuel` em `data_model/bosses.js`). Um tanque **imparável** (`unstoppable`): avança sem parar para o herói e nada o atrasa, prende (Shadow Shackle) ou empurra. Sem magia, sem tiros e sem adaga: só golpes pesados de machado de perto, o **Axe Quake** em volta dele (`quake`: o machado desce e uma onda de curto alcance estoura ao redor, então o herói precisa estar perto para levar) e um dash curto (`lunge`, 150 px). Tudo é ajustável em `BOSS_MODELS.BRUTOS`. Boneco: `js/render/brutos25d.js`; visual: `data_model/visuals/characters/brutos_visual.js`; referência de arte: `art_reference/captain-brutos`.
 
 Um boss novo com corpo de herói segue o mesmo caminho: boneco registrado (ver "Como criar um herói novo", passos 1 a 3), entrada em `BOSS_MODELS` com `renderAs: 'RIVAL'` e `heroModel`, hora em `BOSS_SPAWNING.schedule` e, se for chamado pelo rival, falas em `BOSS_INTROS` (a fala do boss usa `who: 'boss'`; precisa de `portraitImage` no modelo).
 

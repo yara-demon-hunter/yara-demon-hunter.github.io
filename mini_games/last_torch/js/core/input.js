@@ -76,6 +76,20 @@ function setupKnifeButton() {
         stick.x = v.x;
         stick.y = v.y;
     };
+    // Axe Quake (Captain Brutos): no lugar da mira, segurar o botão repete o golpe quando a recarga acaba
+    const quake = state.quake;
+    base.addEventListener('pointerdown', (e) => {
+        if (state.gameState !== 'PLAYING' || mod('axeQuake') <= 0) return;
+        quake.touch = true;
+        base.setPointerCapture(e.pointerId);
+        audio.init();
+        e.preventDefault();
+    });
+    const releaseQuake = () => { quake.touch = false; };
+    base.addEventListener('pointerup', releaseQuake);
+    base.addEventListener('pointercancel', releaseQuake);
+    base.addEventListener('lostpointercapture', releaseQuake);
+    touchReleases.push(releaseQuake);
     base.addEventListener('pointerdown', (e) => {
         if (state.gameState !== 'PLAYING' || mod('noKnives') > 0) return;
         // Um dedo novo sempre assume o botão: se o anterior se perdeu sem "soltar", o botão não trava

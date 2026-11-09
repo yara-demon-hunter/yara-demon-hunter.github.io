@@ -12,6 +12,7 @@ import { advanceTime, updateEffects, updateRealTimeEffects } from './systems/eff
 import { updateEnemies, updateEnemyProjectiles } from './systems/enemies.js';
 import { updateGold } from './systems/gold.js';
 import { updateKnives } from './systems/knives.js';
+import { updateQuake } from './systems/quake.js';
 import { updateNight } from './systems/night.js';
 import { updatePickups } from './systems/pickups.js';
 import { updatePlayer } from './systems/player.js';
@@ -84,6 +85,7 @@ export function update(dt) {
     updateAutoAttack(dt);
     updateShadowClone(dt);
     updateKnives(dt);
+    updateQuake(dt);
     updatePowers(dt);
     updateSkills(dt);
     updateSpawner(dt);
