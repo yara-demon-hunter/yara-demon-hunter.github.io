@@ -37,10 +37,12 @@ FileUtils.rm_rf(build_output)
 FileUtils.mkdir_p(build_output)
 build_output.join("index.html").write(html)
 
-%w[js css data_model images].each do |directory|
+# library: a cópia da biblioteca de personagens e monstros (mini_games/_library, copiada pelo sync)
+%w[js css data_model library images].each do |directory|
   FileUtils.cp_r(source_game.join(directory), build_output.join(directory))
 end
 Dir.glob(build_output.join("**/*.md")).each { |path| FileUtils.rm_f(path) }
+FileUtils.rm_f(build_output.join("library/.synced-from-library"))
 # As versões grandes são para páginas e prévias: o jogo só carrega as -small (data_model/tree_images.js)
 Dir.glob(build_output.join("images/**/*.webp")).each do |path|
   FileUtils.rm_f(path) if File.exist?(path.sub(/\.webp\z/, "-small.webp"))

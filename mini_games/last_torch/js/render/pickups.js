@@ -1,7 +1,7 @@
 import { PICKUP_DROP, PICKUP_MODELS } from '../../data_model/pickups.js';
 import { POWERS_VISUALS } from '../../data_model/visuals/effects/powers_visual.js';
 import { ctx, state } from '../core/state.js';
-import { drawGlow } from './fx/glow.js';
+import { drawGlow } from '../../library/core/glow.js';
 
 // --- ITENS NO CHÃO (desenho procedural) ---
 const P = POWERS_VISUALS.pickup;

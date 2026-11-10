@@ -3,7 +3,7 @@ import { POWERS_VISUALS as V } from '../../data_model/visuals/effects/powers_vis
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
 import { ctx, player, powers, state } from '../core/state.js';
 import { drawFireOrb } from './fire.js';
-import { drawGlow } from './fx/glow.js';
+import { drawGlow } from '../../library/core/glow.js';
 import { getDashedRing } from './fx/rings.js';
 import { DAGGER_LENGTH, DAGGER_WIDTH, getDaggerSprite } from './fx/sprites.js';
 import { resetWorldView, stamp } from './fx/stamp.js';

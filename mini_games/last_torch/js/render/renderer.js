@@ -14,7 +14,7 @@ import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestG
 import { renderLevelUpBack, renderLevelUpFront } from './level_up.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 import { renderPlayer25D } from './player25d.js';
-import { HERO_25D_VISUALS } from '../../data_model/visuals/characters/hero25d_visual.js';
+import { HERO_25D_VISUALS } from '../../library/characters/hunter/hero25d_visual.js';
 import { player } from '../core/state.js';
 import { getHero } from '../systems/modifiers.js';
 import {
@@ -39,8 +39,8 @@ import {
     renderShield, renderSkillAuras, renderSkillHits, renderSmokes, renderWisp
 } from './skills.js';
 
-// O herói padrão é o 2.5D (js/render/player25d.js). O top-down antigo (js/render/player.js) continua
-// no projeto: abra a página com ?hero=topdown para usá-lo.
+// O herói padrão é o 2.5D (js/render/player25d.js). O top-down antigo (js/render/player.js, desenho em
+// library/characters/hunter/hero_topdown.js) continua no projeto: abra a página com ?hero=topdown para usá-lo.
 const HERO_25D = new URLSearchParams(window.location.search).get('hero') !== 'topdown';
 
 // Herói com a forma do Juramento da noite, se houver

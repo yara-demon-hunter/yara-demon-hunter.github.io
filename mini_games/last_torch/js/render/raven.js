@@ -2,8 +2,8 @@ import { RAVEN_VISUALS as V } from '../../data_model/visuals/effects/raven_visua
 import { WORLD } from '../../data_model/world.js';
 import { ctx, passives, state } from '../core/state.js';
 import { makeCanvas } from './fx/sprites.js';
-import { drawGlow } from './fx/glow.js';
-import { renderNow } from './fx/clock.js';
+import { drawGlow } from '../../library/core/glow.js';
+import { renderNow } from '../../library/core/clock.js';
 import { feather, ramp } from './phoenix.js';
 
 // --- CORVO ---

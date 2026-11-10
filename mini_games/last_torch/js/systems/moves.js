@@ -1,10 +1,10 @@
-import { HERO_25D_VISUALS as V } from '../../data_model/visuals/characters/hero25d_visual.js';
+import { HERO_25D_VISUALS as V } from '../../library/characters/hunter/hero25d_visual.js';
 import { player } from '../core/state.js';
 
 // --- GOLPES ESPECIAIS DO HERÓI ---
 // Salto, rugido e juramento: animações longas que têm um instante de impacto. O tempo anda com a lógica
-// (hit stop e câmera lenta valem), e o desenho (js/render/player25d.js) só lê player.move.
-// onImpact roda uma vez, no instante impactAt da animação (data_model/visuals/characters/hero25d_visual.js).
+// (hit stop e câmera lenta valem), e o desenho (library/characters/hunter/hero25d.js) só lê player.move.
+// onImpact roda uma vez, no instante impactAt da animação (library/characters/hunter/hero25d_visual.js, moves).
 export function startMove(kind, onImpact = null) {
     const { seconds, impactAt } = V.moves[kind];
     player.move = { kind, age: 0, seconds, impactAt, onImpact };

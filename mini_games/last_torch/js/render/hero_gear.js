@@ -1,8 +1,8 @@
-import { HERO_25D_VISUALS as V } from '../../data_model/visuals/characters/hero25d_visual.js';
+import { HERO_25D_VISUALS as V } from '../../library/characters/hunter/hero25d_visual.js';
 import { OATH_VISUALS as O } from '../../data_model/visuals/characters/oath_visual.js';
 import { PASSIVE_SKILL_MODELS } from '../../data_model/passives.js';
 import { ctx, state } from '../core/state.js';
-import { drawGlow } from './fx/glow.js';
+import { drawGlow } from '../../library/core/glow.js';
 
 // --- EQUIPAMENTO DOS JURAMENTOS ---
 // Peças extras do boneco 2.5D (js/render/player25d.js), na mesma câmera e na mesma ordem de profundidade.

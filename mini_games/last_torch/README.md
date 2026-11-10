@@ -26,7 +26,7 @@ Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
 
 O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça com CPU limitada):
 
-- **Monstros são sprites.** `js/render/monster_sprites.js` roda a arte procedural uma vez por quadro de animação e guarda num atlas; em campo cada monstro custa 2 `drawImage`. Só bosses e herói são desenhados a cada quadro. Monstro novo: entra em `ART` e em `data_model/visuals/monsters/sprites_visual.js`.
+- **Monstros são sprites.** `js/render/monster_sprites.js` roda a arte procedural uma vez por quadro de animação e guarda num atlas; em campo cada monstro custa 2 `drawImage`. Só bosses e herói são desenhados a cada quadro. Monstro novo: a arte vai na biblioteca (`mini_games/_library/monsters/<id>/`, ver o README dela) e entra em `ART` e em `data_model/visuals/monsters/sprites_visual.js`.
 - **Nada repetido é desenhado do zero:** moedas, adagas, tiros, brilhos e algarismos vêm de sprites (`js/render/fx/`). Evite `fillText`, `setLineDash`, `shadowBlur`, gradientes novos por quadro e `ctx.save/restore` por objeto.
 - **Chão e névoa:** o chão é copiado 1:1 (grama e brilho da tocha já pintados nele); a névoa é desenhada numa tela pequena poucas vezes por segundo.
 - **DOM:** os sistemas só chamam `updateHUD()`; a escrita sai no máximo 10 vezes por segundo, só do que mudou, e as barras usam `transform`. Sem `backdrop-filter` nem animação de sombra.
@@ -39,8 +39,18 @@ O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça co
 
 ## Estrutura
 
+A arte dos personagens e dos monstros (desenho e cores) vem da **biblioteca compartilhada** `mini_games/_library/`, que
+outros jogos também podem usar. O jogo carrega a cópia dela em `library/`, feita pelo sync: **não edite `library/`**.
+Mude em `mini_games/_library/` e rode `ruby mini_games/_library/sync.rb` (como funciona: `mini_games/_library/README.md`).
+O que é regra do Last Torch (vida, dano, velocidade, ataques, Juramentos, adaga, Fúria) continua aqui.
+
 ```
 last_torch.html   tela e elementos da interface
+library/                          CÓPIA da biblioteca de personagens e monstros (gerada pelo sync, não editar)
+  core/                           ctx compartilhado, ganchos do jogo (host.js), glow, easing, relógio do desenho, aleatório com semente
+  characters/hunter/              Demon Hunter, o boneco 2.5D base (hero25d.js), a animação (hero_anim.js), os ganchos do jogo (hero_hooks.js), o top-down antigo e o registro dos outros bonecos
+  characters/azael/, brutos/      os bonecos do Azael e do Captain Brutos e as cores deles
+  monsters/<id>/                  um por monstro ou boss (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, shadow_wolf, headless_knight, bone_colossus, demon_lord): desenho e cores
 css/
   game.css                        ponto de entrada: só importa os arquivos abaixo
   base/base.css                   fonte, body e canvas
@@ -78,9 +88,9 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   sanctuary.js                    conquistas (troféus e façanhas), janela de mortes simultâneas e bestiário
   world.js                        tamanho padronizado do mundo e zoom (areaScale) por perfil desktop/mobile
   visuals/                        cores, tamanhos e ritmos das animações (arte procedural)
-    characters/                   herói, formas dos Juramentos (oath_visual.js) e Shadow Clone
-    monsters/                     um arquivo por monstro (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, headless_knight, bone_colossus) e sprites_visual.js (quadros dos sprites)
-    bosses/                       Demon Lord e paletas de quem reaproveita arte (palettes_visual.js)
+    characters/                   barras em cima da cabeça do herói (hero_hud_visual.js), formas dos Juramentos (oath_visual.js) e Shadow Clone
+    monsters/sprites_visual.js    quadros dos sprites dos monstros (as cores de cada monstro estão na biblioteca)
+    bosses/palettes_visual.js     paletas dos bosses que reaproveitam arte
     scenery/                      cenário (forest_visual.js, torch_visual.js)
     items/gold_visual.js          ouro
     effects/                      golpes, level up, adaga, rebate, juice_visual.js (impacto), powers_visual.js (poderes e itens), skills_visual.js (skills dos ramos) e phoenix_visual.js (fênix)
@@ -131,16 +141,13 @@ js/
   render/raven.js                  corvo do Shadow Raven: arte procedural em atlas e voo em campo
   render/pickups.js               itens e baús
   render/monster_sprites.js       gera os sprites dos monstros e dos tiros a partir da arte procedural
-  render/moth.js, bloater.js, wraith.js, zombie_wolf.js, headless_knight.js ...   arte de cada monstro (usada para gerar os sprites)
-  render/player.js                herói procedural (capa, capuz, máscara, espada) e rastro de sombra
-  render/player25d.js             motor do herói 2.5D: pose, posturas dos golpes especiais e ordem de desenho; desenha o Demon Hunter e chama o boneco registrado dos outros heróis, sem citar nenhum pelo nome
-  render/body_registry.js         registro dos bonecos de herói (registerBody) e a lista dos ganchos que cada um pode ter
-  render/bodies.js                um import por boneco registrado
-  render/azael25d.js              peças do Azael no mesmo boneco 2.5D (rosto, cabelo, katana, bainha, pés) e o registro dele
-  render/brutos25d.js             peças do Captain Brutos (semi-boss): rosto com cicatriz, armadura negra, capa e machado, e o registro dele
+  render/player.js                estado de animação do herói do jogador, rastro de sombra e o herói top-down antigo (?hero=topdown)
+  render/player25d.js             liga as regras do jogo ao boneco 2.5D da biblioteca (adaga, bola de fogo, cortes do combo, Fúria, Bloodlust, Flaming Sword, Juramentos)
+  render/bodies.js                os bonecos que o jogo usa: um import por boneco da biblioteca
   render/hero_gear.js             equipamento e paleta dos Juramentos, peças do mesmo boneco 2.5D
+  render/rival.js                 bosses com corpo de herói (Azael, Demon Hunter, Brutos)
   render/shadow_clone.js          Shadow Clone: herói 2.5D com paleta de sombra
-  render/fx/                      glow, carimbos (stamp), sprites pequenos, atlas de números, anéis, relógio do desenho, easing, barra de vida
+  render/fx/                      carimbos (stamp), sprites pequenos, atlas de números, anéis, barra de vida (glow, easing e relógio estão em library/core)
   ui/hud.js                       atualização do HUD
   ui/banner.js                    faixas, gritos e notificações
   ui/tree.js                      desenho das árvores (ramos, nós, ligações e abas de ramo) e painel de detalhe; uma fábrica monta a de skills e a de relíquias
@@ -156,12 +163,12 @@ js/
   ui/buttons.js                   eventos dos botões e atalhos de teclado
   audio/sound-engine.js           efeitos sintetizados (Web Audio API), mixagem e volumes
   audio/music.js                  música procedural: clima por momento da noite
-art_reference/                    imagens e fichas de referência dos personagens (não carregadas pelo jogo)
 previews/                         páginas para analisar os monstros e o herói (como abrir: previews/README.md)
 draft/                            versões anteriores mantidas como referência
 ```
 
 - Para mudar **balanceamento**, edite apenas `data_model/`.
+- Para mudar a **arte** de um personagem ou monstro, edite em `mini_games/_library/` e rode o sync. A referência de arte (imagens e fichas) fica lá também, na pasta de cada um (`art_reference/`).
 - Relíquia, herói ou melhoria com efeito simples não precisa de código: basta declarar `mods` (chaves em `js/systems/modifiers.js`).
 - Todo estado que muda durante a partida fica em `js/core/state.js` (objeto `state`); os sistemas leem e escrevem nele.
 - Novo CSS: crie o arquivo na pasta da funcionalidade e adicione um `@import` em `css/game.css`.
@@ -169,12 +176,13 @@ draft/                            versões anteriores mantidas como referência
 
 ## Como criar um herói novo
 
-O desenho do herói é um boneco 2.5D; cada herói com boneco próprio vive no seu arquivo e `player25d.js` não muda.
-Referência de arte em `art_reference/<id>/character.md`. Passo a passo (use o Azael como exemplo):
+O desenho do herói é um boneco 2.5D da biblioteca; cada herói com boneco próprio vive na sua pasta e o motor
+(`hero25d.js`) não muda. Passo a passo (use o Azael como exemplo); os passos 1 e 2 são na biblioteca
+(`mini_games/_library/characters/<id>/`, com a referência de arte em `art_reference/` ali dentro):
 
-1. **Visual:** `data_model/visuals/characters/<id>_visual.js`, copiando `azael_visual.js`: `colors` (mesmas chaves de `HERO_VISUALS.colors`), `bladeLength`, `bladeWidth`, `glowScale`, `strideSpeed` e as medidas só dele.
-2. **Boneco:** `js/render/<id>25d.js`, copiando `azael25d.js`, com as peças (cabeça, tronco, pernas, braços, arma) e, no fim, `registerBody('<id>', { vis, ... })`. Os ganchos (todos opcionais, o que faltar usa o desenho do Demon Hunter) estão listados em `js/render/body_registry.js`.
-3. **Lista:** um `import './<id>25d.js';` em `js/render/bodies.js`.
+1. **Visual:** `<id>_visual.js`, copiando `azael/azael_visual.js`: `colors` (mesmas chaves de `HERO_VISUALS.colors`), `bladeLength`, `bladeWidth`, `glowScale`, `strideSpeed` e as medidas só dele.
+2. **Boneco:** `<id>25d.js`, copiando `azael/azael25d.js`, com as peças (cabeça, tronco, pernas, braços, arma) e, no fim, `registerBody('<id>', { vis, ... })`. Os ganchos (todos opcionais, o que faltar usa o desenho do Demon Hunter) estão listados em `characters/hunter/body_registry.js`; a geometria da cabeça e dos membros está em `characters/hunter/kit25d.js`. Depois rode `ruby mini_games/_library/sync.rb`.
+3. **Lista:** um `import '../../library/characters/<id>/<id>25d.js';` em `js/render/bodies.js`.
 4. **Personagem:** um arquivo `data_model/characters/<id>.js` (copie o `brutos.js`) com TUDO dele: nome, textos, `colors`, retrato, vida, velocidade, dash, bônus em %, números como boss, rival e a posição na tela de escolha (`order`); depois, ponha-o na lista de `data_model/characters/index.js` e a conquista que o libera (`hero: '<id>'`) em `data_model/sanctuary.js`. Os números são conferidos ao abrir o jogo (um stat com nome errado dá erro).
 5. **Sombra:** uma linha em `colorsByModel` (`shadow_clone_visual.js`) com a paleta de sombra dele, usada pelo Shadow Clone e pelo rival sombra. Sem a linha, usa a paleta padrão.
 6. **Rival:** se o herói tiver um rival próprio, `RIVAL_OF` e o boss em `data_model/bosses.js` (o rival é só dado: usa o mesmo boneco).
@@ -183,7 +191,7 @@ Referência de arte em `art_reference/<id>/character.md`. Passo a passo (use o A
 
 **Como herói** (`HEROES.brutos`, liberado pela conquista Iron Captain: vencer o Brutos): lento e pesado, com dash curto, mais vida, mais dano de lâmina e menos dano recebido, mas menos velocidade de ataque e **sem adaga** (`noKnives`). No lugar da adaga ele tem o **Axe Quake**: clique esquerdo (ou o botão do canto, no celular) ergue o machado e desce no chão, e uma onda de curto alcance estoura em volta dele (dano alto, empurrão forte e atordoamento), com recarga de 3,5 s. Força, cooldown, alcance, empurrão e atordoamento ficam em `abilities.axeQuake` no `data_model/characters/brutos.js` (`js/systems/quake.js`). Valores do personagem em `data_model/characters/brutos.js`. O rival dele é o Azael (`RIVAL_OF`), com falas próprias de duelo (`DUEL_DIALOGUES.AZAEL.byHero.brutos`), e quem joga com ele **não enfrenta o semi-boss**: a hora 6 fica normal (`chooseBossType` devolve `null`; `isBossTurn(hora, model)`). O Shadow Clone dele usa uma paleta de sombra própria (`colorsByModel`).
 
-**Como semi-boss**: na hora 6 o rival do herói (Azael ou Demon Hunter) chama o capitão (`BOSS_INTROS.*.BRUTOS` em `data_model/dialogues.js`: uma fala do rival, a frase curta do Brutos, uma resposta do herói) e ele entra na luta. É um boss com corpo de herói (`renderAs: 'RIVAL'`) mas sem a conversa de duelo (`noDuel`, `hasDuel` em `data_model/bosses.js`). Um tanque **imparável** (`unstoppable`): avança sem parar para o herói e nada o atrasa, prende (Shadow Shackle) ou empurra. Sem magia, sem tiros e sem adaga: só golpes pesados de machado de perto, o **Axe Quake** em volta dele (`quake`: o machado desce e uma onda de curto alcance estoura ao redor, então o herói precisa estar perto para levar) e um dash curto (`lunge`, 150 px). Tudo é ajustável em `BOSS_MODELS.BRUTOS`. Boneco: `js/render/brutos25d.js`; visual: `data_model/visuals/characters/brutos_visual.js`; referência de arte: `art_reference/captain-brutos`.
+**Como semi-boss**: na hora 6 o rival do herói (Azael ou Demon Hunter) chama o capitão (`BOSS_INTROS.*.BRUTOS` em `data_model/dialogues.js`: uma fala do rival, a frase curta do Brutos, uma resposta do herói) e ele entra na luta. É um boss com corpo de herói (`renderAs: 'RIVAL'`) mas sem a conversa de duelo (`noDuel`, `hasDuel` em `data_model/bosses.js`). Um tanque **imparável** (`unstoppable`): avança sem parar para o herói e nada o atrasa, prende (Shadow Shackle) ou empurra. Sem magia, sem tiros e sem adaga: só golpes pesados de machado de perto, o **Axe Quake** em volta dele (`quake`: o machado desce e uma onda de curto alcance estoura ao redor, então o herói precisa estar perto para levar) e um dash curto (`lunge`, 150 px). Tudo é ajustável em `BOSS_MODELS.BRUTOS`. Boneco, visual e referência de arte: `mini_games/_library/characters/brutos/` (`brutos25d.js`, `brutos_visual.js`, `art_reference/`).
 
 Um boss novo com corpo de herói segue o mesmo caminho: boneco registrado (ver "Como criar um herói novo", passos 1 a 3), entrada em `BOSS_MODELS` com `renderAs: 'RIVAL'` e `heroModel`, hora em `BOSS_SPAWNING.schedule` e, se for chamado pelo rival, falas em `BOSS_INTROS` (a fala do boss usa `who: 'boss'`; precisa de `portraitImage` no modelo).
 

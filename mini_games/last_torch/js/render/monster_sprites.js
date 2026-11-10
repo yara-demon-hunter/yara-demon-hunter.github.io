@@ -1,39 +1,39 @@
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { MONSTER_MODELS } from '../../data_model/monsters.js';
-import { DEMON_LORD_VISUALS } from '../../data_model/visuals/bosses/demon_lord_visual.js';
-import { BAT_VISUALS } from '../../data_model/visuals/monsters/bat_visual.js';
-import { BLOATER_VISUALS } from '../../data_model/visuals/monsters/bloater_visual.js';
-import { MOTH_VISUALS } from '../../data_model/visuals/monsters/moth_visual.js';
-import { SKELETON_VISUALS } from '../../data_model/visuals/monsters/skeleton_visual.js';
+import { DEMON_LORD_VISUALS } from '../../library/monsters/demon_lord/demon_lord_visual.js';
+import { BAT_VISUALS } from '../../library/monsters/bat/bat_visual.js';
+import { BLOATER_VISUALS } from '../../library/monsters/bloater/bloater_visual.js';
+import { MOTH_VISUALS } from '../../library/monsters/moth/moth_visual.js';
+import { SKELETON_VISUALS } from '../../library/monsters/skeleton/skeleton_visual.js';
 import {
     MONSTER_SPRITES, SPRITE_FRAMES, SPRITE_MAX_SCALE, SPRITE_MIN_SCALE, SPRITE_UNDERLAY_PIXELS
 } from '../../data_model/visuals/monsters/sprites_visual.js';
-import { VAMPIRE_VISUALS } from '../../data_model/visuals/monsters/vampire_visual.js';
-import { WITCH_VISUALS } from '../../data_model/visuals/monsters/witch_visual.js';
-import { SHADOW_WOLF_VISUALS } from '../../data_model/visuals/monsters/shadow_wolf_visual.js';
-import { ZOMBIE_WOLF_VISUALS } from '../../data_model/visuals/monsters/zombie_wolf_visual.js';
-import { BONE_COLOSSUS_VISUALS } from '../../data_model/visuals/monsters/bone_colossus_visual.js';
-import { HEADLESS_KNIGHT_VISUALS } from '../../data_model/visuals/monsters/headless_knight_visual.js';
-import { WRAITH_VISUALS } from '../../data_model/visuals/monsters/wraith_visual.js';
+import { VAMPIRE_VISUALS } from '../../library/monsters/vampire/vampire_visual.js';
+import { WITCH_VISUALS } from '../../library/monsters/witch/witch_visual.js';
+import { SHADOW_WOLF_VISUALS } from '../../library/monsters/shadow_wolf/shadow_wolf_visual.js';
+import { ZOMBIE_WOLF_VISUALS } from '../../library/monsters/zombie_wolf/zombie_wolf_visual.js';
+import { BONE_COLOSSUS_VISUALS } from '../../library/monsters/bone_colossus/bone_colossus_visual.js';
+import { HEADLESS_KNIGHT_VISUALS } from '../../library/monsters/headless_knight/headless_knight_visual.js';
+import { WRAITH_VISUALS } from '../../library/monsters/wraith/wraith_visual.js';
 import { BOSS_PALETTES, NECROMANCER_COLORS } from '../../data_model/visuals/bosses/palettes_visual.js';
 import { ctx, setDrawTarget, state } from '../core/state.js';
-import { renderBat } from './bat.js';
-import { renderBloater } from './bloater.js';
-import { renderDemonFireball, renderDemonLord } from './demon_lord.js';
-import { setRenderClock } from './fx/clock.js';
-import { drawGlow, getGlowSprite } from './fx/glow.js';
+import { renderBat } from '../../library/monsters/bat/bat.js';
+import { renderBloater } from '../../library/monsters/bloater/bloater.js';
+import { renderDemonFireball, renderDemonLord } from '../../library/monsters/demon_lord/demon_lord.js';
+import { setRenderClock } from '../../library/core/clock.js';
+import { drawGlow, getGlowSprite } from '../../library/core/glow.js';
 import { makeCanvas } from './fx/sprites.js';
 import { drawDagger } from './knife.js';
-import { renderMoth } from './moth.js';
+import { renderMoth } from '../../library/monsters/moth/moth.js';
 import { renderRival } from './rival.js';
-import { renderSkeleton } from './skeleton.js';
-import { renderVampire } from './vampire.js';
-import { renderWitch, renderWitchBolt } from './witch.js';
-import { renderShadowWolf } from './shadow_wolf.js';
-import { renderZombieWolf } from './zombie_wolf.js';
-import { renderBoneColossus } from './bone_colossus.js';
-import { renderHeadlessKnight } from './headless_knight.js';
-import { renderWraith } from './wraith.js';
+import { renderSkeleton } from '../../library/monsters/skeleton/skeleton.js';
+import { renderVampire } from '../../library/monsters/vampire/vampire.js';
+import { renderWitch, renderWitchBolt } from '../../library/monsters/witch/witch.js';
+import { renderShadowWolf } from '../../library/monsters/shadow_wolf/shadow_wolf.js';
+import { renderZombieWolf } from '../../library/monsters/zombie_wolf/zombie_wolf.js';
+import { renderBoneColossus } from '../../library/monsters/bone_colossus/bone_colossus.js';
+import { renderHeadlessKnight } from '../../library/monsters/headless_knight/headless_knight.js';
+import { renderWraith } from '../../library/monsters/wraith/wraith.js';
 
 // --- SPRITES DOS MONSTROS ---
 // A arte continua procedural: os mesmos renderizadores desenham o monstro andando, com o relógio e o

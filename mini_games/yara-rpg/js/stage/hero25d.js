@@ -1,5 +1,5 @@
 // --- HERÓI 2.5D DO PALCO ---
-// Cópia adaptada do boneco do Last Torch (last_torch/js/render/player25d.js e o estado de animação de player.js).
+// Cópia adaptada do boneco do Last Torch (hoje na biblioteca: mini_games/_library/characters/hunter/hero25d.js e hero_anim.js).
 // O herói é um boneco 3D simples: pernas, tronco, braços, capuz (ou a cabeça do Azael), capa e espada. Cada peça é
 // projetada pela câmera (inclinada, olhando um pouco de cima) e desenhada na ordem da profundidade.
 // Fora do Last Torch ficaram a adaga, os Juramentos e as skills; entraram as posturas do RPG (aparo, poção, derrota).

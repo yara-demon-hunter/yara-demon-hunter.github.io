@@ -2,7 +2,8 @@ window.YaraRpgData = window.YaraRpgData || {};
 window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
 
 // --- DADOS VISUAIS: heróis 2.5D do palco (js/stage/hero25d.js e js/stage/azael25d.js) ---
-// Copiados do Last Torch (data_model/visuals/characters/hero_visual.js, hero25d_visual.js e azael_visual.js).
+// Copiados do Last Torch (hoje na biblioteca mini_games/_library/characters/: hunter/hero_visual.js, hunter/hero25d_visual.js
+// e azael/azael_visual.js).
 // O RPG tem a sua cópia: mudar aqui não muda o Last Torch, e vice-versa.
 // hero: paleta e ritmos da animação. body: medidas do boneco em 3D. azael: paleta e peças do Azael.
 (() => {

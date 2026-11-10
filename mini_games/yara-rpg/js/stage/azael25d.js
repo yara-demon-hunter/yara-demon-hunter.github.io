@@ -1,5 +1,5 @@
 // --- AZAEL (herói 2.5D do palco) ---
-// Cópia de last_torch/js/render/azael25d.js. Peças do Azael montadas na mesma câmera e com a mesma animação do
+// Cópia de mini_games/_library/characters/azael/azael25d.js (o Azael do Last Torch). Peças do Azael montadas na mesma câmera e com a mesma animação do
 // boneco de js/stage/hero25d.js: cabeça sem capuz (rosto, orelhas pontudas, olhos vermelhos, pintura de guerra),
 // cabelo branco esvoaçante, bandana, katana curva, bainha na cintura, braços nus enfaixados e pés descalços de 3 dedos.
 // rig: { project, projectVec, limb, ball, disk, anim, C, sinF, cosF, heightScale, sphereY }.

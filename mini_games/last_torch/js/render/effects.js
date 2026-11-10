@@ -4,8 +4,8 @@ import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visua
 import { ctx, player, state } from '../core/state.js';
 import { mod } from '../systems/modifiers.js';
 import { getWarmthDamage } from '../systems/stats.js';
-import { easeOutBack, easeOutCubic } from './fx/easing.js';
-import { drawGlow } from './fx/glow.js';
+import { easeOutBack, easeOutCubic } from '../../library/core/easing.js';
+import { drawGlow } from '../../library/core/glow.js';
 import { drawNumber } from './fx/numbers.js';
 import { getDashedRing } from './fx/rings.js';
 

@@ -10,7 +10,8 @@ Páginas de desenvolvimento para analisar a arte do palco 2.5D com o código rea
 | `stage_preview.html` | O palco do jogo (`js/stage/stage.js`) com um estado de mentira: personagem, região, monstro, pet, nível, Fúria, baú, presença e derrota, mais o resultado do turno (acerta, crítico, atordoa, erra, mata; o monstro revida, é aparado ou erra). Cada botão chama `stage.play(ação, relatório)`, como `js/stage/hooks.js` faz no jogo |
 
 O boneco do Azael (Mysterious Creature) é a mesma arte do Last Torch: ao mudar o desenho em
-`js/stage/azael25d.js`, copie para `mini_games/last_torch/js/render/azael25d.js` (e vice-versa).
+`js/stage/azael25d.js`, copie para a biblioteca de personagens, `mini_games/_library/characters/azael/azael25d.js`
+(e vice-versa); o Last Torch recebe de lá pelo sync.
 
 ## Como abrir
 

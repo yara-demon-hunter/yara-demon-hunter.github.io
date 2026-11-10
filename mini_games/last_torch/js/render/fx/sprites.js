@@ -1,6 +1,6 @@
 import { GOLD_VISUALS as G } from '../../../data_model/visuals/items/gold_visual.js';
 import { KNIFE_VISUALS as K } from '../../../data_model/visuals/effects/knife_visual.js';
-import { getGlowSprite } from './glow.js';
+import { getGlowSprite } from '../../../library/core/glow.js';
 import { drawDagger } from '../knife.js';
 
 // --- SPRITES PEQUENOS ---

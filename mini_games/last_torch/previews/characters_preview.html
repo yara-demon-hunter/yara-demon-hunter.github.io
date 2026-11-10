@@ -53,7 +53,7 @@
         import { HEROES } from '../data_model/heroes.js';
         import { KNIFE_SKILL } from '../data_model/skills.js';
         import { EVOLUTIONS } from '../data_model/powers.js';
-        import { HERO_25D_VISUALS } from '../data_model/visuals/characters/hero25d_visual.js';
+        import { HERO_25D_VISUALS } from '../library/characters/hunter/hero25d_visual.js';
         import { OATH_VISUALS } from '../data_model/visuals/characters/oath_visual.js';
         import { SHADOW_CLONE_VISUALS } from '../data_model/visuals/characters/shadow_clone_visual.js';
         import { KNIFE_VISUALS as K } from '../data_model/visuals/effects/knife_visual.js';
@@ -73,11 +73,12 @@
         import { renderShockwaves } from '../js/render/effects.js';
         import { renderBladeSlashes, renderKnives } from '../js/render/entities.js';
         import { renderGroundFires } from '../js/render/powers.js';
-        import { drawGlow } from '../js/render/fx/glow.js';
+        import { drawGlow } from '../library/core/glow.js';
         import { setWorldView } from '../js/render/fx/stamp.js';
         import { getOathPalette } from '../js/render/hero_gear.js';
         import { renderLevelUpBack, renderLevelUpFront } from '../js/render/level_up.js';
-        import { createHeroAnim, heroAnim, updateHeroAnim } from '../js/render/player.js';
+        import { heroAnim } from '../js/render/player.js';
+        import { createHeroAnim, updateHeroAnim } from '../library/characters/hunter/hero_anim.js';
         import { drawPhoenixArt, renderPhoenixBird } from '../js/render/phoenix.js';
         import { drawRavenArt, renderRavenBird } from '../js/render/raven.js';
         import { renderShackle } from '../js/render/shackle.js';

@@ -38,24 +38,24 @@
         import { MONSTER_MODELS } from '../data_model/monsters.js';
         import { TURN_DIFFICULTY } from '../data_model/difficulty.js';
         import { BOSS_PALETTES, NECROMANCER_COLORS } from '../data_model/visuals/bosses/palettes_visual.js';
-        import { DEMON_LORD_VISUALS } from '../data_model/visuals/bosses/demon_lord_visual.js';
-        import { VAMPIRE_VISUALS } from '../data_model/visuals/monsters/vampire_visual.js';
-        import { WITCH_VISUALS } from '../data_model/visuals/monsters/witch_visual.js';
+        import { DEMON_LORD_VISUALS } from '../library/monsters/demon_lord/demon_lord_visual.js';
+        import { VAMPIRE_VISUALS } from '../library/monsters/vampire/vampire_visual.js';
+        import { WITCH_VISUALS } from '../library/monsters/witch/witch_visual.js';
         import { canvas, ctx, player, state } from '../js/core/state.js';
-        import { renderBat } from '../js/render/bat.js';
-        import { COLOSSUS_ATTACK_SECONDS, colossusCharge, renderBoneColossus, setColossusAttackClock } from '../js/render/bone_colossus.js';
-        import { renderBloater } from '../js/render/bloater.js';
-        import { renderDemonFireball, renderDemonLord } from '../js/render/demon_lord.js';
-        import { drawGlow } from '../js/render/fx/glow.js';
-        import { renderHeadlessKnight } from '../js/render/headless_knight.js';
+        import { renderBat } from '../library/monsters/bat/bat.js';
+        import { COLOSSUS_ATTACK_SECONDS, colossusCharge, renderBoneColossus, setColossusAttackClock } from '../library/monsters/bone_colossus/bone_colossus.js';
+        import { renderBloater } from '../library/monsters/bloater/bloater.js';
+        import { renderDemonFireball, renderDemonLord } from '../library/monsters/demon_lord/demon_lord.js';
+        import { drawGlow } from '../library/core/glow.js';
+        import { renderHeadlessKnight } from '../library/monsters/headless_knight/headless_knight.js';
         import { ensureMonsterSprites, getMonsterSprite, withColors } from '../js/render/monster_sprites.js';
-        import { renderMoth } from '../js/render/moth.js';
-        import { renderSkeleton } from '../js/render/skeleton.js';
-        import { renderVampire } from '../js/render/vampire.js';
-        import { renderWitch, renderWitchBolt } from '../js/render/witch.js';
-        import { renderWraith } from '../js/render/wraith.js';
-        import { renderZombieWolf } from '../js/render/zombie_wolf.js';
-        import { renderShadowWolf } from '../js/render/shadow_wolf.js';
+        import { renderMoth } from '../library/monsters/moth/moth.js';
+        import { renderSkeleton } from '../library/monsters/skeleton/skeleton.js';
+        import { renderVampire } from '../library/monsters/vampire/vampire.js';
+        import { renderWitch, renderWitchBolt } from '../library/monsters/witch/witch.js';
+        import { renderWraith } from '../library/monsters/wraith/wraith.js';
+        import { renderZombieWolf } from '../library/monsters/zombie_wolf/zombie_wolf.js';
+        import { renderShadowWolf } from '../library/monsters/shadow_wolf/shadow_wolf.js';
 
         state.gameState = 'PLAYING';     // a arte só anima durante a partida
         player.x = -1e6;                 // herói longe: o vampiro não estica os braços

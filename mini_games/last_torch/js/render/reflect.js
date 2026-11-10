@@ -1,8 +1,8 @@
 import { MIRROR_WARD } from '../../data_model/passives.js';
 import { REFLECT_VISUALS as V } from '../../data_model/visuals/effects/reflect_visual.js';
 import { ctx, passives, player, state } from '../core/state.js';
-import { easeOutCubic } from './fx/easing.js';
-import { drawGlow } from './fx/glow.js';
+import { easeOutCubic } from '../../library/core/easing.js';
+import { drawGlow } from '../../library/core/glow.js';
 
 // --- REBATE (Mirror Ward) ---
 // Tiro rebatido azul com rastro de partículas e a animação de parry no herói: um escudo em arco

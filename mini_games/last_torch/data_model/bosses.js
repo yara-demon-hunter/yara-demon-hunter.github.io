@@ -149,7 +149,7 @@ export const BOSS_MODELS = {
     DEMON_HUNTER: { ...RIVAL_BASE, ...bossModelOf('hunter') },
     // Semi-boss do meio da noite (hora 6): o rival do herói o chama (BOSS_INTROS em dialogues.js) e ele entra falando uma
     // frase curta. Corpo de herói (renderAs 'RIVAL'), mas sem duelo (noDuel). Tanque imparável: números e jeito de lutar em
-    // data_model/characters/brutos.js (boss proporcional ao personagem). Boneco: js/render/brutos25d.js.
+    // data_model/characters/brutos.js (boss proporcional ao personagem). Boneco: library/characters/brutos/brutos25d.js.
     BRUTOS: { ...RIVAL_BASE, ...bossModelOf('brutos') },
     LONG_NIGHT: {
         name: 'The Long Night',

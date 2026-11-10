@@ -1,3 +1,4 @@
+import { BONE_COLOSSUS_VISUALS } from '../library/monsters/bone_colossus/bone_colossus_visual.js';
 import { getTurnDifficulty, isMonsterUnlocked } from './difficulty.js';
 
 export const MONSTER_MODELS = {
@@ -234,7 +235,9 @@ export const MONSTER_MODELS = {
         // os seguintes uma fração menor. Segue em campo até morrer: dá tempo de matá-lo.
         // A espada vem da direita para a frente: quem estiver nesse leque (sweep) leva o dano de contato dele.
         // Ângulos em radianos a partir da direção da tocha; positivo é a direita dele.
-        torchSlam: { range: 125, windupSeconds: 1.1, strikeSeconds: 0.16, recoverSeconds: 0.7, cooldownSeconds: 3.5, firstRatio: 0.5, repeatRatio: 0.2, sweep: { radius: 200, fromAngle: -0.4, toAngle: 1.35 } },
+        // A duração de cada fase (windupSeconds, strikeSeconds, recoverSeconds) é a da animação, na biblioteca
+        // (library/monsters/bone_colossus/bone_colossus_visual.js, `slam`): assim o dano cai quando a espada encosta.
+        torchSlam: { range: 125, ...BONE_COLOSSUS_VISUALS.slam, cooldownSeconds: 3.5, firstRatio: 0.5, repeatRatio: 0.2, sweep: { radius: 200, fromAngle: -0.4, toAngle: 1.35 } },
         stepShake: { intensity: 5, intervalSeconds: 0.9 },   // um tremor por passo (2 passos por ciclo da animação)
         arrival: { title: 'THE BONE COLOSSUS', sub: 'It marches for the torch' },
         initialShootCooldownSeconds: 2,

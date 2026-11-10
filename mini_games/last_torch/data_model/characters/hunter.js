@@ -1,6 +1,6 @@
 // --- DEMON HUNTER ---
 // Tudo do personagem num lugar só: quem ele é, os números dele, o boss em que ele vira e o rival. Cores e medidas do
-// desenho ficam em data_model/visuals/characters/ (o Demon Hunter usa a paleta padrão do jogo).
+// desenho ficam em library/characters/hunter/ (o Demon Hunter usa a paleta padrão do jogo).
 // Como os números funcionam e como criar um personagem: data_model/characters/index.js.
 export const HUNTER = {
     id: 'hunter',

@@ -1,7 +1,7 @@
 // --- AZAEL ---
 // Tudo do personagem num lugar só (ver data_model/characters/index.js). Cores e medidas do desenho:
-// data_model/visuals/characters/azael_visual.js; o boneco: js/render/azael25d.js.
-import { AZAEL_VISUALS } from '../visuals/characters/azael_visual.js';
+// library/characters/azael/ (azael_visual.js e o boneco azael25d.js; a fonte é mini_games/_library).
+import { AZAEL_VISUALS } from '../../library/characters/azael/azael_visual.js';
 
 export const AZAEL = {
     id: 'azael',

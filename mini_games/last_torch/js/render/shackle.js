@@ -1,8 +1,8 @@
 import { SHACKLE_VISUALS as V } from '../../data_model/visuals/effects/shackle_visual.js';
 import { SHADOW_SHACKLE } from '../../data_model/passives.js';
 import { ctx, player, state } from '../core/state.js';
-import { renderNow } from './fx/clock.js';
-import { drawGlow } from './fx/glow.js';
+import { renderNow } from '../../library/core/clock.js';
+import { drawGlow } from '../../library/core/glow.js';
 import { makeCanvas } from './fx/sprites.js';
 
 // --- CORRENTE ---

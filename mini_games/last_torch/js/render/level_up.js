@@ -1,7 +1,7 @@
 import { LEVEL_UP_VISUALS as V } from '../../data_model/visuals/effects/level_up_visual.js';
 import { ctx, player, state } from '../core/state.js';
-import { easeOutCubic, easeOutQuad } from './fx/easing.js';
-import { drawGlow } from './fx/glow.js';
+import { easeOutCubic, easeOutQuad } from '../../library/core/easing.js';
+import { drawGlow } from '../../library/core/glow.js';
 
 // --- LEVEL UP ---
 // Depois de escolher a carta: fios de energia roxa sobem girando em volta do herói e um texto

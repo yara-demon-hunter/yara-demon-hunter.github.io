@@ -75,9 +75,10 @@ Usar `fx/shapes.js` e definir as formas em `data_model/visuals/`:
 
 ## Referências de arte do usuário
 
-Antes de desenhar um personagem, verifique se existe `art_reference/<id>/`. Se existir:
+Personagens e monstros moram na biblioteca compartilhada `mini_games/_library/` (ver o README dela). Antes de desenhar
+um, verifique se existe `art_reference/` na pasta dele (`mini_games/_library/characters/<id>/` ou `monsters/<id>/`). Se existir:
 - Leia o `character.md` e veja as imagens em `images/` (silhueta, cores, poses-chave).
-- Recrie em código: formas simples (`fx/shapes.js`), cores em `data_model/visuals/`, animações por interpolação/easing entre as poses descritas.
+- Recrie em código, na mesma pasta: formas simples, cores no `<id>_visual.js`, animações por interpolação/easing entre as poses descritas. Depois rode o sync.
 - **Nunca** carregue essas imagens no jogo; elas são só referência.
 - Se algo estiver ambíguo (ex.: como uma parte se move), pergunte ao usuário antes de inventar.
 

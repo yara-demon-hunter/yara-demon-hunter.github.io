@@ -1,8 +1,8 @@
 import { FOREST_VISUALS as F } from '../../data_model/visuals/scenery/forest_visual.js';
 import { ctx, player, state } from '../core/state.js';
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
-import { drawGlow } from './fx/glow.js';
-import { createRandom, pick, randomRange } from './fx/random.js';
+import { drawGlow } from '../../library/core/glow.js';
+import { createRandom, pick, randomRange } from '../../library/core/random.js';
 import { getWorldView, resetWorldView } from './fx/stamp.js';
 
 // --- CENÁRIO: NOITE NA FLORESTA (desenho procedural, sem imagens) ---

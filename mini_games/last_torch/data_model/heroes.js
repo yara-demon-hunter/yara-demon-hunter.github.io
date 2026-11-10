@@ -1,4 +1,4 @@
-import { HERO_VISUALS } from './visuals/characters/hero_visual.js';
+import { HERO_VISUALS } from '../library/characters/hunter/hero_visual.js';
 import { HERO_ENTRIES, HERO_ORDER } from './characters/index.js';
 
 // --- HERÓIS ---
@@ -7,7 +7,7 @@ import { HERO_ENTRIES, HERO_ORDER } from './characters/index.js';
 // guardados (shelved), que ainda usam o formato antigo.
 // Liberados por conquistas do Santuário (data_model/sanctuary.js). mods: mesmas chaves de js/systems/modifiers.js.
 // colors: troca só o que muda na paleta do herói 2.5D; portrait: filtro CSS aplicado no retrato.
-// model: boneco 2.5D ('hunter' se ausente; os outros se registram em js/render/bodies.js, ex.: 'azael' em js/render/azael25d.js);
+// model: boneco 2.5D ('hunter' se ausente; os outros se registram em js/render/bodies.js, ex.: 'azael' em library/characters/azael/azael25d.js);
 // portraitImage: arte própria do retrato.
 // free: já vem liberado, sem conquista.
 // shelved: guardado por enquanto. Some da tela inicial e das conquistas, mas os dados ficam para voltar depois.

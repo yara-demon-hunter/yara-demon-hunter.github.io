@@ -5,8 +5,8 @@
 //
 // COMO CRIAR UM PERSONAGEM NOVO
 // 1. Copie brutos.js para <id>.js, troque o id e preencha. Coloque na lista CHARACTER_LIST abaixo.
-// 2. Visual: data_model/visuals/characters/<id>_visual.js (cores e medidas) e o boneco js/render/<id>25d.js
-//    (passos em "Como criar um herói novo" no README do Last Torch).
+// 2. Visual: na biblioteca de personagens, mini_games/_library/characters/<id>/ (<id>_visual.js com cores e medidas e o
+//    boneco <id>25d.js), depois o sync (passos em "Como criar um herói novo" no README do Last Torch).
 // 3. Conquista que o libera: uma linha com `hero: '<id>'` em data_model/sanctuary.js.
 // 4. Se ele for rival de alguém: campo `rival` do outro personagem e, se ele virar boss, BOSS_MODELS em bosses.js.
 //

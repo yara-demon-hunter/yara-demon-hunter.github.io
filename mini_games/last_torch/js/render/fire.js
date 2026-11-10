@@ -1,6 +1,6 @@
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
 import { ctx } from '../core/state.js';
-import { drawGlow } from './fx/glow.js';
+import { drawGlow } from '../../library/core/glow.js';
 
 const F = SKILLS_VISUALS.fire;
 

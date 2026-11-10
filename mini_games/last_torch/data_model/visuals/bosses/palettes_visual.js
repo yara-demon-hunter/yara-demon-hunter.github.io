@@ -1,8 +1,8 @@
 // --- DADOS VISUAIS: paletas de quem reaproveita a arte de outro monstro. ---
 // Lidas por js/render/entities.js. renderAs e palette ficam em data_model/bosses.js.
-import { DEMON_LORD_VISUALS } from './demon_lord_visual.js';
-import { VAMPIRE_VISUALS } from '../monsters/vampire_visual.js';
-import { WITCH_VISUALS } from '../monsters/witch_visual.js';
+import { DEMON_LORD_VISUALS } from '../../../library/monsters/demon_lord/demon_lord_visual.js';
+import { VAMPIRE_VISUALS } from '../../../library/monsters/vampire/vampire_visual.js';
+import { WITCH_VISUALS } from '../../../library/monsters/witch/witch_visual.js';
 
 export const BOSS_PALETTES = {
     countess: {

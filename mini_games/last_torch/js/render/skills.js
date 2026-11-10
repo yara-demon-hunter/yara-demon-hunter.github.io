@@ -2,9 +2,9 @@ import { getPowerLevel, POWER_MODELS } from '../../data_model/powers.js';
 import { WAR_CRY } from '../../data_model/passives.js';
 import { SKILLS_VISUALS as V } from '../../data_model/visuals/effects/skills_visual.js';
 import { ctx, player, powers, state } from '../core/state.js';
-import { easeOutBack, easeOutCubic } from './fx/easing.js';
+import { easeOutBack, easeOutCubic } from '../../library/core/easing.js';
 import { drawFlameTongue } from './fire.js';
-import { drawGlow } from './fx/glow.js';
+import { drawGlow } from '../../library/core/glow.js';
 import { drawPhoenixSprite } from './phoenix.js';
 import { getDashedRing } from './fx/rings.js';
 

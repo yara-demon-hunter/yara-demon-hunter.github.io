@@ -2,10 +2,10 @@ import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { SHADOW_CLONE_VISUALS, shadowColorsOf } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { ctx } from '../core/state.js';
-import { BODIES } from './body_registry.js';
-import { lerpAngle } from './fx/easing.js';
-import { drawGlow } from './fx/glow.js';
-import { createHeroAnim, updateHeroAnim } from './player.js';
+import { BODIES } from '../../library/characters/hunter/body_registry.js';
+import { lerpAngle } from '../../library/core/easing.js';
+import { drawGlow } from '../../library/core/glow.js';
+import { createHeroAnim, updateHeroAnim } from '../../library/characters/hunter/hero_anim.js';
 import { renderPlayer25D } from './player25d.js';
 
 // --- RIVAL (boss com o boneco de um herói) ---

@@ -1,9 +1,9 @@
 // --- DADOS VISUAIS: Shadow Clone (passiva) ---
 // O clone é o mesmo boneco 2.5D do herói (js/render/player25d.js) pintado com esta paleta de sombra.
 // Lido por js/render/shadow_clone.js e pelo golpe em js/render/entities.js. Só afeta o desenho.
-import { HERO_VISUALS } from './hero_visual.js';
-import { AZAEL_VISUALS } from './azael_visual.js';
-import { BRUTOS_VISUALS } from './brutos_visual.js';
+import { HERO_VISUALS } from '../../../library/characters/hunter/hero_visual.js';
+import { AZAEL_VISUALS } from '../../../library/characters/azael/azael_visual.js';
+import { BRUTOS_VISUALS } from '../../../library/characters/brutos/brutos_visual.js';
 
 // Tons de sombra que o clone do Azael usa nas peças só dele (pele, cabelo, faixas, bainha)
 const AZAEL_SHADOW = {
@@ -58,11 +58,11 @@ export const SHADOW_CLONE_VISUALS = {
         bladeGlowSoftFrenzy: 'rgba(192, 38, 211, 0.85)'
     }
 };
-// Clone do Azael: o boneco dele (js/render/azael25d.js) com a mesma paleta de sombra
+// Clone do Azael: o boneco dele (library/characters/azael/azael25d.js) com a mesma paleta de sombra
 SHADOW_CLONE_VISUALS.azaelColors = { ...AZAEL_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors, ...AZAEL_SHADOW };
 // Paleta de sombra de cada herói com boneco próprio (chave = model de data_model/heroes.js); quem não está aqui usa `colors`.
 // Herói novo: uma linha aqui.
-// Clone do Brutos: o boneco dele (js/render/brutos25d.js) com tons de sombra nas peças só dele (pele, cabelo, armadura, couro, aço)
+// Clone do Brutos: o boneco dele (library/characters/brutos/brutos25d.js) com tons de sombra nas peças só dele (pele, cabelo, armadura, couro, aço)
 const BRUTOS_SHADOW = {
     skin: '#2a1846', skinShade: '#170c2a', skinLight: '#3b2363', outline: '#000000',
     hair: '#0d0719', hairShade: '#05030b', beard: '#0d0719', beardShade: '#05030b', mouth: '#0d0719',

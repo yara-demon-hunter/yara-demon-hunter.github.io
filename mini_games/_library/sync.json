@@ -1,0 +1,21 @@
+{
+  "games": {
+    "last_torch": {
+      "enabled": true,
+      "target": "last_torch/library"
+    },
+    "yara-rpg": {
+      "enabled": false,
+      "target": "yara-rpg/library",
+      "note": "O RPG carrega scripts clássicos (sem import/export). Antes de ligar, ele precisa carregar a biblioteca como módulos ES."
+    },
+    "wild-push-smash": {
+      "enabled": false,
+      "target": "wild-push-smash/library"
+    },
+    "yara-arena": {
+      "enabled": false,
+      "target": "yara-arena/library"
+    }
+  }
+}

@@ -2,7 +2,7 @@ import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { EVOLUTIONS, getPowerLevel } from '../../data_model/powers.js';
 import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
-import { createHeroAnim } from '../render/player.js';
+import { createHeroAnim } from '../../library/characters/hunter/hero_anim.js';
 import { audio, passives, powers, shadowClones as clones, state } from '../core/state.js';
 import { executeBladeSlash, findNearestEnemy, hitEnemiesInArc } from './combat.js';
 import { createExplosion } from './effects.js';

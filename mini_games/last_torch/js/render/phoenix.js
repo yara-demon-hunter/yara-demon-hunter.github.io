@@ -2,8 +2,8 @@ import { PHOENIX_VISUALS as V } from '../../data_model/visuals/effects/phoenix_v
 import { WORLD } from '../../data_model/world.js';
 import { ctx, passives, state } from '../core/state.js';
 import { makeCanvas } from './fx/sprites.js';
-import { drawGlow } from './fx/glow.js';
-import { renderNow } from './fx/clock.js';
+import { drawGlow } from '../../library/core/glow.js';
+import { renderNow } from '../../library/core/clock.js';
 
 // --- FÊNIX ---
 // Ave de fogo do Phoenix Pact. A arte tem muitas penas e degradês: é desenhada uma vez por quadro da batida de

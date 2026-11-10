@@ -4,17 +4,19 @@ import { createPassives } from '../../data_model/passives.js';
 import { createPowers } from '../../data_model/powers.js';
 import { FRENZY_NOVA_SKILL, createAttributes } from '../../data_model/skills.js';
 import { SoundEngine } from '../audio/sound-engine.js';
+import { setCtx } from '../../library/core/canvas.js';
+import { setHost } from '../../library/core/host.js';
 
 // --- OBJETOS COMPARTILHADOS ---
 export const canvas = document.getElementById('gameCanvas');
-// alpha: false — o fundo é sempre pintado por inteiro, então o navegador não precisa misturar o canvas com a página
-export let ctx = canvas.getContext('2d', { alpha: false });
+// O ctx é o da biblioteca de personagens (library/core/canvas.js): o jogo e os monstros e heróis de lá desenham no
+// mesmo destino. alpha: false — o fundo é sempre pintado por inteiro, então o navegador não precisa misturar o canvas com a página
+setCtx(canvas.getContext('2d', { alpha: false }));
+export { ctx } from '../../library/core/canvas.js';
 
 // Desenha em outro canvas (geração de sprites). Quem importa ctx passa a ver o novo destino. Devolve o anterior.
 export function setDrawTarget(target) {
-    const previous = ctx;
-    ctx = target;
-    return previous;
+    return setCtx(target);
 }
 
 export const audio = new SoundEngine();
@@ -189,3 +191,10 @@ export const state = {
 
     spawnTimer: 0
 };
+
+// O que a arte da biblioteca pergunta ao jogo (library/core/host.js): as animações só andam durante a caçada, e os
+// monstros reagem ao herói
+setHost({
+    animating: () => state.gameState === 'PLAYING',
+    target: () => player
+});

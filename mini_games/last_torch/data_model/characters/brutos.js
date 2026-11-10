@@ -1,8 +1,8 @@
 // --- CAPTAIN BRUTOS ---
 // Herói jogável e semi-boss da hora 6 (BOSS_MODELS.BRUTOS). Tudo do personagem num lugar só (ver
-// data_model/characters/index.js). Cores e medidas do desenho: data_model/visuals/characters/brutos_visual.js; o
-// boneco: js/render/brutos25d.js; referência de arte: art_reference/captain-brutos.
-import { BRUTOS_VISUALS } from '../visuals/characters/brutos_visual.js';
+// data_model/characters/index.js). Cores e medidas do desenho, o boneco e a
+// referência de arte: library/characters/brutos/ (a fonte é mini_games/_library/characters/brutos).
+import { BRUTOS_VISUALS } from '../../library/characters/brutos/brutos_visual.js';
 
 export const BRUTOS = {
     id: 'brutos',

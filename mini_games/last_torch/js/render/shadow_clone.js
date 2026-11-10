@@ -2,9 +2,9 @@ import { getCloneArea } from '../systems/shadow_clone.js';
 import { SHADOW_CLONE_VISUALS as V, shadowColorsOf } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { ctx, passives, shadowClones, state } from '../core/state.js';
-import { drawGlow } from './fx/glow.js';
+import { drawGlow } from '../../library/core/glow.js';
 import { getDashedRing } from './fx/rings.js';
-import { updateHeroAnim } from './player.js';
+import { updateHeroAnim } from '../../library/characters/hunter/hero_anim.js';
 import { renderPlayer25D } from './player25d.js';
 import { getHero } from '../systems/modifiers.js';
 
