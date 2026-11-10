@@ -1,9 +1,10 @@
 ---
 layout: default
 title: Livros
+description: "Conheça os livros da série de fantasia sombria Yara, Caçadora de Demônios e comece a ler os capítulos publicados de O Despertar da Vingança."
 lang: pt
 translation_id: books-index
-last_updated: 2026-09-23
+last_updated: 2026-11-10
 ---
 
 <section class="page-content">

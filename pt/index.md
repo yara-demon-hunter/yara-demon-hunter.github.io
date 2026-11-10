@@ -1,12 +1,12 @@
 ---
 layout: default
-title: "Yara, Caçadora de Demônios"
+title: "Yara, Caçadora de Demônios: Fantasia Sombria e Jogos"
 lang: pt
-description: "Uma jovem caçadora, um mundo marcado por demônios e segredos que deveriam permanecer enterrados. Leia a série Yara, Caçadora de Demônios."
+description: "Leia fantasia sombria original sobre uma aldeia coberta pela névoa e uma antiga vingança. Explore a história, os personagens e jogos grátis de Yara."
 book_id: book-0
 translation_id: home
 translation: /en/
-last_updated: 2026-09-26
+last_updated: 2026-11-10
 ---
 
 <section class="story-intro">
@@ -44,77 +44,70 @@ last_updated: 2026-09-26
 
 </section>
 
-<!-- SEÇÃO 1: Origem / Conexão emocional -->
 <section class="home-section">
 
     <p class="section-label">
-        Mais do que uma história
+        Comece por aqui
     </p>
 
     <h2>
-        Uma história que começou pequena
+        Leia o primeiro livro
     </h2>
 
     <p>
-        Algumas histórias começam com grandes planos. Outras simplesmente começam.
+        Em <em>O Despertar da Vingança</em>, um homem desaparece de uma aldeia isolada, cercada por uma floresta impenetrável. Uma névoa viva cobre as ruas todas as noites, e uma regra antiga proíbe entrar na mata depois que o sino toca.
     </p>
 
     <p>
-        Yara nasceu durante um período inesperado: em meio à pandemia, entre 2020 e 2021, uma ideia começou a ganhar forma e, pouco a pouco, deixou de ser apenas uma história para se transformar em um universo.
+        O desaparecimento é apenas o primeiro movimento de uma busca muito mais antiga. Leia o prólogo e os capítulos publicados do primeiro livro e acompanhe a história enquanto ela se desenvolve.
     </p>
 
     <p>
-        Desde então, Miguel Amaral vem desenvolvendo esse mundo aos poucos, criando personagens, lugares, acontecimentos e histórias que ainda estão longe de ter sido completamente contadas.
+        <a href="{{ '/pt/books/book-1/chapters/' | relative_url }}">Leia o prólogo e os capítulos</a>
     </p>
 
 </section>
 
 
-<!-- SEÇÃO 2: Visão de longo prazo e expansão do universo -->
 <section class="home-section">
 
     <p class="section-label">
-        O que vem pela frente
+        Explore o universo
     </p>
 
     <h2>
-        Um universo em construção
+        Histórias além das páginas
     </h2>
 
     <p>
-        O livro que você está prestes a ler é apenas uma parte desse universo.
-        Conforme a história avança, novos personagens serão apresentados, novos mistérios serão descobertos e diferentes partes desse mundo começarão a se conectar.
+        A aldeia, a floresta e as pessoas entre esses lugares formam um mundo que pode ser explorado por diferentes ângulos. Conheça o arquivo de personagens e o atlas, ou entre nesse cenário pelos mini games.
     </p>
 
-    <p>
-        Algumas histórias poderão acontecer muito antes dos acontecimentos de Yara. Outras poderão surgir depois. Algumas talvez acompanhem personagens que você ainda nem conhece. O objetivo é construir esse universo aos poucos, permitindo que ele cresça junto com seus leitores.
-    </p>
-
-    <p>
-        Novos livros, personagens e histórias fazem parte do futuro deste projeto. E, com o tempo, esse universo poderá ultrapassar as páginas. Novas formas de explorar a história estão nos planos, incluindo experiências interativas e, futuramente, jogos ambientados nesse mesmo mundo. Nada disso precisa acontecer de uma vez. Este é um universo que será construído capítulo após capítulo, história após história.
-    </p>
+    <ul>
+        <li><a href="{{ '/pt/characters/' | relative_url }}">Conheça os personagens</a></li>
+        <li><a href="{{ '/pt/world/' | relative_url }}">Explore o atlas do mundo</a></li>
+        <li><a href="{{ '/pt/mini-games/' | relative_url }}">Jogue os mini games</a></li>
+        <li><a href="{{ '/pt/updates/' | relative_url }}">Veja as atualizações</a></li>
+    </ul>
 
 </section>
 
-<!-- SEÇÃO 3: Imersão no Mundo e Chamada Final -->
 <section class="home-section">
 
     <p class="section-label">
-        A História
+        Um universo criado por um autor independente
     </p>
 
     <h2>
-        O Mundo de Yara
+        Sobre o projeto
     </h2>
 
     <p>
-        Em um mundo onde criaturas sobrenaturais caminham entre os vivos,
-        Yara dedica sua vida à caça dos demônios que ameaçam aqueles que
-        não podem enfrentá-los.
+        Miguel Amaral começou a desenvolver <em>Yara, Caçadora de Demônios</em> entre 2020 e 2021. O que começou como uma história cresceu até se tornar um projeto original de fantasia, com livros, perfis de personagens, locais e jogos para navegador.
     </p>
 
     <p>
-        Mas algumas coisas deveriam permanecer esquecidas.
+        Os livros e jogos fazem parte do mesmo universo, mas cada um oferece uma maneira própria de conhecer seus personagens e lugares. Saiba mais <a href="{{ '/pt/about/' | relative_url }}">sobre o projeto e seu criador</a>.
     </p>
 
 </section>
@@ -122,19 +115,15 @@ last_updated: 2026-09-26
 <section class="home-section">
 
     <p class="section-label">
-        Você chegou no começo
+        Continue explorando
     </p>
 
     <h2>
-        Acompanhe o nascimento desse universo
+        Acompanhe a história
     </h2>
 
     <p>
-        Talvez, daqui a alguns anos, este seja apenas o primeiro livro de uma história muito maior. E você poderá dizer que estava aqui desde o começo.
-    </p>
-
-    <p>
-        Leia, acompanhe as próximas histórias e descubra, aos poucos, tudo o que existe por trás do mundo de Yara.
+        Comece pelos <a href="{{ '/pt/books/book-1/chapters/' | relative_url }}">capítulos</a>, depois explore a <a href="{{ '/pt/world/gudran_village/' | relative_url }}">Aldeia do Gudran</a> e a <a href="{{ '/pt/world/misty_forest/' | relative_url }}">Floresta da Névoa</a> onde a história começa.
     </p>
 
 </section>

@@ -3,12 +3,11 @@
     {% assign site_name = "Yara, Caçadora de Demônios" %}
 {% endif %}
 
-{% assign seo_title = page.title | default: site_name %}
+{% assign seo_title = page.seo_title | default: page.title | default: site_name %}
 {% unless seo_title == site_name or seo_title contains site_name %}
     {% assign seo_title = seo_title | append: " | " | append: site_name %}
 {% endunless %}
-
-{% assign seo_description = page.description | default: page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 %}
+{% assign seo_description = page.description | default: page.character.summary | default: page.location.summary | default: page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 157 %}
 {% assign seo_image = page.image | default: page.og_image | default: "/assets/images/common/books/book-1/cover.jpeg" %}
 
 <title>{{ seo_title | xml_escape }}</title>

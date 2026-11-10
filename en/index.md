@@ -1,12 +1,12 @@
 ---
 layout: default
-title: "Yara, Demon Hunter"
+title: "Yara, Demon Hunter: Dark Fantasy Story and Games"
 lang: en
-description: "A young hunter, a world marked by demons, and secrets that should have stayed buried. Read the Yara, Demon Hunter web serial."
+description: "Read an original dark fantasy story of a hunter, a mist-covered village, and an old vengeance. Explore Yara's world, characters, and free browser games."
 book_id: book-0
 translation_id: home
 translation: /pt/
-last_updated: 2026-09-26
+last_updated: 2026-11-10
 ---
 
 <section class="story-intro">
@@ -44,76 +44,26 @@ last_updated: 2026-09-26
 
 </section>
 
-<!-- SECTION 1: Origin / Emotional connection -->
 <section class="home-section">
 
     <p class="section-label">
-        More than a story
+        Start here
     </p>
 
     <h2>
-        A story that started small
+        Read the first book
     </h2>
 
     <p>
-        Some stories start with grand plans. Others simply begin.
+        In <em>The Awakening of Vengeance</em>, a man disappears from an isolated village surrounded by an impenetrable forest. A living mist closes over the streets each night, while an old rule says no one may enter the woods after the bell.
     </p>
 
     <p>
-        Yara was born during an unexpected time: amid the pandemic, between 2020 and 2021, an idea began to take shape and, little by little, evolved from just a story into a universe.
+        The disappearance is only the first move in a much older pursuit. Read the prologue and published chapters of the first book, then follow the story as it grows.
     </p>
 
     <p>
-        Since then, Miguel Amaral has been slowly developing this world, creating characters, places, events, and stories that are still far from being completely told.
-    </p>
-
-</section>
-
-<!-- SECTION 2: Long-term vision and universe expansion -->
-<section class="home-section">
-
-    <p class="section-label">
-        What lies ahead
-    </p>
-
-    <h2>
-        A universe in the making
-    </h2>
-
-    <p>
-        The book you are about to read is just one part of this universe.
-        As the story progresses, new characters will be introduced, new mysteries will be uncovered, and different parts of this world will begin to connect.
-    </p>
-
-    <p>
-        Some stories might take place long before the events of Yara. Others may emerge after. Some might follow characters you don't even know yet. The goal is to build this universe gradually, allowing it to grow alongside its readers.
-    </p>
-
-    <p>
-        New books, characters, and stories are part of this project's future. And over time, this universe may step beyond the pages. New ways to explore the story are planned, including interactive experiences and, eventually, games set in this same world. None of this needs to happen all at once. This is a universe that will be built chapter by chapter, story by story.
-    </p>
-
-</section>
-
-<!-- SECTION 3: World Immersion and Final Call -->
-<section class="home-section">
-
-    <p class="section-label">
-        The Story
-    </p>
-
-    <h2>
-        The World of Yara
-    </h2>
-
-    <p>
-        In a world where supernatural creatures walk among the living,
-        Yara dedicates her life to hunting the demons that threaten those who
-        cannot defend themselves.
-    </p>
-
-    <p>
-        But some things should remain forgotten.
+        <a href="{{ '/en/books/book-1/chapters/' | relative_url }}">Read the prologue and chapters</a>
     </p>
 
 </section>
@@ -121,19 +71,58 @@ last_updated: 2026-09-26
 <section class="home-section">
 
     <p class="section-label">
-        You are here from the beginning
+        Explore the universe
     </p>
 
     <h2>
-        Witness the birth of this universe
+        Stories beyond the page
     </h2>
 
     <p>
-        Perhaps, in a few years, this will be just the first book of a much larger story. And you will be able to say you were here from the very beginning.
+        The village, the forest, and the people caught between them form a world that can be explored from different angles. Browse the character archive and atlas, or step into the setting through the mini games.
+    </p>
+
+    <ul>
+        <li><a href="{{ '/en/characters/' | relative_url }}">Meet the characters</a></li>
+        <li><a href="{{ '/en/world/' | relative_url }}">Explore the world atlas</a></li>
+        <li><a href="{{ '/en/mini-games/' | relative_url }}">Play the mini games</a></li>
+        <li><a href="{{ '/en/updates/' | relative_url }}">See project updates</a></li>
+    </ul>
+
+</section>
+
+<section class="home-section">
+
+    <p class="section-label">
+        A creator-built universe
+    </p>
+
+    <h2>
+        About the project
+    </h2>
+
+    <p>
+        Miguel Amaral began developing <em>Yara, Demon Hunter</em> in 2020–2021. What started as a story has grown into an original fantasy project with books, character profiles, locations, and browser games.
     </p>
 
     <p>
-        Read, follow the upcoming stories, and discover, little by little, everything that lies behind the world of Yara.
+        The books and games are created as parts of the same universe, but each offers its own way to encounter the characters and places. Learn more about <a href="{{ '/en/about/' | relative_url }}">the project and its creator</a>.
+    </p>
+
+</section>
+
+<section class="home-section">
+
+    <p class="section-label">
+        Keep exploring
+    </p>
+
+    <h2>
+        Follow the story as it unfolds
+    </h2>
+
+    <p>
+        Start with the <a href="{{ '/en/books/book-1/chapters/' | relative_url }}">chapters</a>, then explore the <a href="{{ '/en/world/gudran_village/' | relative_url }}">village of Gudran</a> and the <a href="{{ '/en/world/misty_forest/' | relative_url }}">Misty Forest</a> where the story begins.
     </p>
 
 </section>

@@ -29,6 +29,7 @@ location:
 Uma muralha de madeira cerca a aldeia. Pouco mais de duzentas pessoas vivem entre casas de pedra e madeira, reunidas ao redor de uma praça. O povoado cresceu em torno do pequeno castelo do Lorde Gudran e também abriga uma igreja e uma torre de sino.
 
 Os sinos marcam a passagem do dia e alertam os moradores quando o perigo se aproxima.
+Leia mais sobre o significado dessa regra em <a href="{{ '/pt/world/o-sino/' | relative_url }}">O sino do Gudran</a>.
 
 ## A vida junto à floresta
 

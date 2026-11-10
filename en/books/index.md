@@ -1,9 +1,10 @@
 ---
 layout: default
 title: Books
+description: "Discover the books in the Yara, Demon Hunter dark fantasy series and start reading the published chapters of The Awakening of Vengeance."
 lang: en
 translation_id: books-index
-last_updated: 2026-09-23
+last_updated: 2026-11-10
 ---
 
 <section class="page-content">

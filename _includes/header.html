@@ -68,6 +68,13 @@
                     Sobre
                 </a>
 
+                <a
+                    class="{% if page.url contains '/pt/contact' %}is-active{% endif %}"
+                    href="{{ '/pt/contact/' | relative_url }}"
+                >
+                    Contato
+                </a>
+
                 {% include language-selector.html %}
 
             </nav>
@@ -137,6 +144,13 @@
                     href="{{ '/en/about/' | relative_url }}"
                 >
                     About
+                </a>
+
+                <a
+                    class="{% if page.url contains '/en/contact' %}is-active{% endif %}"
+                    href="{{ '/en/contact/' | relative_url }}"
+                >
+                    Contact
                 </a>
 
                 {% include language-selector.html %}

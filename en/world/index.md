@@ -1,10 +1,11 @@
 ---
 layout: default
 title: World Atlas
+description: "Explore the villages, forests, rivers, castles, and other places of Yara, Demon Hunter through the illustrated world atlas."
 lang: en
 book_id: book-1
 translation_id: world
-last_updated: 2026-10-31
+last_updated: 2026-11-10
 ---
 
 <section class="location-directory">

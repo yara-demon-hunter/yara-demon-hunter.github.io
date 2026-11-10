@@ -1,10 +1,11 @@
 ---
 layout: default
 title: Atlas do Mundo
+description: "Explore aldeias, florestas, rios, castelos e outros lugares de Yara, Caçadora de Demônios neste atlas ilustrado."
 lang: pt
 book_id: book-1
 translation_id: world
-last_updated: 2026-10-31
+last_updated: 2026-11-10
 ---
 
 <section class="location-directory">

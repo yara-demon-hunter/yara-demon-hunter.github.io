@@ -29,6 +29,7 @@ location:
 A wooden wall surrounds the village. A little over two hundred people live among stone-and-timber houses gathered around a square. The settlement is built around Lord Gudran's small castle, and it also has a church and a bell tower.
 
 The bells mark the passing of the day and warn the villagers when danger approaches.
+Read more about the meaning of this rule in <a href="{{ '/en/world/the-bell/' | relative_url }}">The Bell of Gudran</a>.
 
 ## Life by the forest
 

@@ -31,136 +31,90 @@
     </div>
 
     <div class="site-footer__inner">
-
         {% if page.lang == "pt" %}
-
-            <p>Yara, Caçadora de Demônios</p>
-            <p>Uma história de fantasia sombria.</p>
-
-            <p>
-                <a href="{{ '/pt/about/' | relative_url }}">
-                    Sobre
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/pt/privacy/' | relative_url }}">
-                    Política de Privacidade
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/pt/terms/' | relative_url }}">
-                    Termos de Uso
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/pt/cookies/' | relative_url }}">
-                    Cookies
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/pt/faq/' | relative_url }}">
-                    FAQ
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/pt/support/' | relative_url }}">
-                    Apoio
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/pt/copyright/' | relative_url }}">
-                    Direitos autorais e uso
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/pt/contact/' | relative_url }}">
-                    Contato
-                </a>
-            </p>
-
-            <p>
-                <a href="mailto:yarademonhunter@gmail.com">
-                    yarademonhunter@gmail.com
-                </a>
-            </p>
-
+            {% assign footer_lang = "pt" %}
+            {% assign footer_brand = "Yara, Caçadora de Demônios" %}
+            {% assign footer_tagline = "Uma história de fantasia sombria." %}
+            {% assign footer_explore = "Explore" %}
+            {% assign footer_project = "Projeto" %}
+            {% assign footer_legal = "Informações" %}
+            {% assign footer_about = "Sobre" %}
+            {% assign footer_books = "Livros" %}
+            {% assign footer_characters = "Personagens" %}
+            {% assign footer_world = "Atlas do Mundo" %}
+            {% assign footer_games = "Mini games" %}
+            {% assign footer_updates = "Atualizações" %}
+            {% assign footer_faq = "FAQ" %}
+            {% assign footer_support = "Apoio" %}
+            {% assign footer_contact = "Contato" %}
+            {% assign footer_privacy = "Privacidade" %}
+            {% assign footer_cookies = "Cookies" %}
+            {% assign footer_terms = "Termos de Uso" %}
+            {% assign footer_copyright = "Direitos autorais e uso" %}
+            {% assign footer_rights = "Todos os direitos reservados." %}
         {% else %}
-
-            <p>Yara, Demon Hunter</p>
-            <p>A dark fantasy story.</p>
-
-            <p>
-                <a href="{{ '/en/about/' | relative_url }}">
-                    About
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/en/privacy/' | relative_url }}">
-                    Privacy Policy
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/en/terms/' | relative_url }}">
-                    Terms of Use
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/en/cookies/' | relative_url }}">
-                    Cookies
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/en/faq/' | relative_url }}">
-                    FAQ
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/en/support/' | relative_url }}">
-                    Support
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/en/copyright/' | relative_url }}">
-                    Copyright and Usage
-                </a>
-            </p>
-
-            <p>
-                <a href="{{ '/en/contact/' | relative_url }}">
-                    Contact
-                </a>
-            </p>
-
-            <p>
-                <a href="mailto:yarademonhunter@gmail.com">
-                    yarademonhunter@gmail.com
-                </a>
-            </p>
-
+            {% assign footer_lang = "en" %}
+            {% assign footer_brand = "Yara, Demon Hunter" %}
+            {% assign footer_tagline = "A dark fantasy story." %}
+            {% assign footer_explore = "Explore" %}
+            {% assign footer_project = "Project" %}
+            {% assign footer_legal = "Information" %}
+            {% assign footer_about = "About" %}
+            {% assign footer_books = "Books" %}
+            {% assign footer_characters = "Characters" %}
+            {% assign footer_world = "World Atlas" %}
+            {% assign footer_games = "Mini games" %}
+            {% assign footer_updates = "Updates" %}
+            {% assign footer_faq = "FAQ" %}
+            {% assign footer_support = "Support" %}
+            {% assign footer_contact = "Contact" %}
+            {% assign footer_privacy = "Privacy" %}
+            {% assign footer_cookies = "Cookies" %}
+            {% assign footer_terms = "Terms of Use" %}
+            {% assign footer_copyright = "Copyright and Usage" %}
+            {% assign footer_rights = "All rights reserved." %}
         {% endif %}
 
-        <p class="site-footer__copyright">
-            © {{ site.time | date: "%Y" }} Miguel Angelo do Amaral Junior.
-            {% if page.lang == "pt" %}
-                Todos os direitos reservados.
-            {% else %}
-                All rights reserved.
-            {% endif %}
-        </p>
+        <div class="site-footer__brand">
+            <strong>{{ footer_brand }}</strong>
+            <span>{{ footer_tagline }}</span>
+            <a href="mailto:yarademonhunter@gmail.com">yarademonhunter@gmail.com</a>
+        </div>
 
+        <nav class="site-footer__nav" aria-label="{% if page.lang == 'pt' %}Links do rodapé{% else %}Footer links{% endif %}">
+            <section class="site-footer__group">
+                <h2>{{ footer_explore }}</h2>
+                <ul>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/books/' | relative_url }}">{{ footer_books }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/characters/' | relative_url }}">{{ footer_characters }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/world/' | relative_url }}">{{ footer_world }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/mini-games/' | relative_url }}">{{ footer_games }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/updates/' | relative_url }}">{{ footer_updates }}</a></li>
+                </ul>
+            </section>
+            <section class="site-footer__group">
+                <h2>{{ footer_project }}</h2>
+                <ul>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/about/' | relative_url }}">{{ footer_about }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/faq/' | relative_url }}">{{ footer_faq }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/support/' | relative_url }}">{{ footer_support }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/contact/' | relative_url }}">{{ footer_contact }}</a></li>
+                </ul>
+            </section>
+            <section class="site-footer__group">
+                <h2>{{ footer_legal }}</h2>
+                <ul>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/privacy/' | relative_url }}">{{ footer_privacy }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/cookies/' | relative_url }}">{{ footer_cookies }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/terms/' | relative_url }}">{{ footer_terms }}</a></li>
+                    <li><a href="{{ '/' | append: footer_lang | append: '/copyright/' | relative_url }}">{{ footer_copyright }}</a></li>
+                </ul>
+            </section>
+        </nav>
+
+        <p class="site-footer__copyright">
+            © {{ site.time | date: "%Y" }} Miguel Angelo do Amaral Junior. {{ footer_rights }}
+        </p>
     </div>
 
 </footer>

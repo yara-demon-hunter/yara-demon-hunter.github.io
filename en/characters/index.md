@@ -1,10 +1,11 @@
 ---
 layout: default
 title: Character Archive
+description: "Explore character profiles from Yara, Demon Hunter, including their roles, story connections, visual archives, and appearances in the books and mini games."
 lang: en
 book_id: book-1
 translation_id: characters-index
-last_updated: 2026-11-02
+last_updated: 2026-11-10
 ---
 
 <section class="character-directory">

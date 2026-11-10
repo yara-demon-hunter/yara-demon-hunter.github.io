@@ -1,10 +1,11 @@
 ---
 layout: default
 title: Arquivo de Personagens
+description: "Explore os perfis de Yara, Caçadora de Demônios, com papéis na história, relações, arquivos visuais e aparições nos livros e mini games."
 lang: pt
 book_id: book-1
 translation_id: characters-index
-last_updated: 2026-11-02
+last_updated: 2026-11-10
 ---
 
 <section class="character-directory">
