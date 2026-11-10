@@ -7,7 +7,7 @@ lang: pt
 translation_id: last-torch-guide
 mini_games_hub: true
 hide_recent_updates: true
-last_updated: 2026-11-01
+last_updated: 2026-11-10
 image: /assets/images/common/mini-game/last_torch_cover.jpeg
 permalink: /pt/mini-games/last-torch/
 ---
@@ -39,7 +39,7 @@ permalink: /pt/mini-games/last-torch/
     </header>
 
     <nav class="game-guide__toc" aria-label="Conteúdo da página">
-        <a href="#partida">Partida</a>
+        <a href="#trailers">Vídeos</a>
         <a href="#noite">A noite</a>
         <a href="#cacador">O caçador</a>
         <a href="#monstros">Monstros</a>
@@ -50,13 +50,19 @@ permalink: /pt/mini-games/last-torch/
         <a href="#controles">Controles</a>
     </nav>
 
-    <section id="partida" class="game-guide__section">
-        <h2>Veja o jogo em ação</h2>
-        <figure class="game-clip game-clip--wide">
-            <video autoplay muted loop playsinline preload="metadata" poster="{{ art }}gameplay.webp" aria-label="O caçador circula a tocha enquanto os monstros se aproximam">
-                <source src="{{ art }}gameplay.mp4" type="video/mp4">
+    <section id="trailers" class="game-guide__section">
+        <h2>Assista aos vídeos</h2>
+        <figure class="game-trailer game-trailer--desktop">
+            <video controls muted loop playsinline preload="none" data-trailer-device="desktop" width="1920" height="1080" poster="{{ art }}cover.webp" aria-label="Vídeo de Last Torch para desktop em formato widescreen">
+                <source src="{{ '/mini_games/last_torch/previews/last_torch_landscape_1920x1080.mp4' | relative_url }}" type="video/mp4">
             </video>
-            <figcaption>Hora 7: o caçador defende a chama enquanto a floresta se fecha.</figcaption>
+            <figcaption><strong>Vídeo para desktop</strong>Formato widescreen 16:9.</figcaption>
+        </figure>
+        <figure class="game-trailer game-trailer--mobile">
+            <video controls muted loop playsinline preload="none" data-trailer-device="mobile" width="1080" height="1620" poster="{{ art }}cover.webp" aria-label="Vídeo de Last Torch para celular em formato vertical">
+                <source src="{{ '/mini_games/last_torch/previews/last_torch_portrait_1080x1620.mp4' | relative_url }}" type="video/mp4">
+            </video>
+            <figcaption><strong>Vídeo para celular</strong>Formato vertical para smartphones.</figcaption>
         </figure>
     </section>
 
@@ -185,3 +191,5 @@ permalink: /pt/mini-games/last-torch/
         <a class="mini-game-card__button" href="{{ play }}">Jogar agora</a>
     </section>
 </article>
+
+<script src="{{ '/assets/js/last-torch-trailers.js' | relative_url }}" defer></script>

@@ -361,6 +361,25 @@
     background: #0b1424;
 }
 
+.game-trailer--mobile {
+    display: none;
+}
+
+.game-trailer video {
+    display: block;
+    width: min(100%, 860px);
+    height: auto;
+    margin: 0 auto;
+    border-radius: 12px;
+    background: #0b1424;
+}
+
+.game-trailer--mobile video {
+    width: min(100%, 420px);
+    aspect-ratio: 2 / 3;
+    object-fit: contain;
+}
+
 .game-guide figcaption {
     margin-top: 6px;
     font-size: 0.88rem;
@@ -566,6 +585,13 @@
 }
 
 @media (max-width: 720px) {
+    .game-trailer--desktop {
+        display: none;
+    }
+
+    .game-trailer--mobile {
+        display: block;
+    }
     .game-guide__facts,
     .game-guide__bestiary {
         grid-template-columns: repeat(2, minmax(0, 1fr));
