@@ -68,6 +68,8 @@
          http://localhost:8010/_library/tools/tuner.html (ver ../README.md, "Ajuste ao vivo"). -->
     <header>
         <h1>Ajuste ao vivo</h1>
+        <select id="kind" aria-label="Heróis ou monstros"><option value="hero">Heróis</option><option value="monster">Monstros</option></select>
+        <label class="check" id="topdownBox" hidden><input id="topdown" type="checkbox"> Topdown (desenho de cima)</label>
         <select id="model" aria-label="Personagem"></select>
         <label class="check"><input id="pause" type="checkbox"> Pausar</label>
         <button id="copy" class="primary">Copiar alterados</button>
@@ -117,6 +119,36 @@
         import '../characters/yara/yara25d.js';
         import '../characters/zeph/zeph25d.js';
         import '../characters/oskar/oskar25d.js';
+        import { SKELETON_25D_VISUALS } from '../monsters/25d/skeleton/skeleton25d_visual.js';
+        import '../monsters/25d/skeleton/skeleton25d.js';
+        import { SKELETON_CRAWLER_25D_VISUALS } from '../monsters/25d/skeleton_crawler/skeleton_crawler25d_visual.js';
+        import '../monsters/25d/skeleton_crawler/skeleton_crawler25d.js';
+        import { BLOATER_25D_VISUALS } from '../monsters/25d/bloater/bloater25d_visual.js';
+        import '../monsters/25d/bloater/bloater25d.js';
+        import { BAT_VISUALS as TD_BAT } from '../monsters/topdown/bat/bat_visual.js';
+        import { renderBat } from '../monsters/topdown/bat/bat.js';
+        import { BLOATER_VISUALS as TD_BLOATER } from '../monsters/topdown/bloater/bloater_visual.js';
+        import { renderBloater } from '../monsters/topdown/bloater/bloater.js';
+        import { MOTH_VISUALS as TD_MOTH } from '../monsters/topdown/moth/moth_visual.js';
+        import { renderMoth } from '../monsters/topdown/moth/moth.js';
+        import { WRAITH_VISUALS as TD_WRAITH } from '../monsters/topdown/wraith/wraith_visual.js';
+        import { renderWraith } from '../monsters/topdown/wraith/wraith.js';
+        import { ZOMBIE_WOLF_VISUALS as TD_ZOMBIE_WOLF } from '../monsters/topdown/zombie_wolf/zombie_wolf_visual.js';
+        import { renderZombieWolf } from '../monsters/topdown/zombie_wolf/zombie_wolf.js';
+        import { SHADOW_WOLF_VISUALS as TD_SHADOW_WOLF } from '../monsters/topdown/shadow_wolf/shadow_wolf_visual.js';
+        import { renderShadowWolf } from '../monsters/topdown/shadow_wolf/shadow_wolf.js';
+        import { HEADLESS_KNIGHT_VISUALS as TD_HEADLESS_KNIGHT } from '../monsters/topdown/headless_knight/headless_knight_visual.js';
+        import { renderHeadlessKnight } from '../monsters/topdown/headless_knight/headless_knight.js';
+        import { SKELETON_VISUALS as TD_SKELETON } from '../monsters/topdown/skeleton/skeleton_visual.js';
+        import { renderSkeleton } from '../monsters/topdown/skeleton/skeleton.js';
+        import { BONE_COLOSSUS_VISUALS as TD_BONE_COLOSSUS } from '../monsters/topdown/bone_colossus/bone_colossus_visual.js';
+        import { renderBoneColossus } from '../monsters/topdown/bone_colossus/bone_colossus.js';
+        import { WITCH_VISUALS as TD_WITCH } from '../monsters/topdown/witch/witch_visual.js';
+        import { renderWitch } from '../monsters/topdown/witch/witch.js';
+        import { VAMPIRE_VISUALS as TD_VAMPIRE } from '../monsters/topdown/vampire/vampire_visual.js';
+        import { renderVampire } from '../monsters/topdown/vampire/vampire.js';
+        import { DEMON_LORD_VISUALS as TD_DEMON_LORD } from '../monsters/topdown/demon_lord/demon_lord_visual.js';
+        import { renderDemonLord } from '../monsters/topdown/demon_lord/demon_lord.js';
 
         const $ = (id) => document.getElementById(id);
         setHost({ animating: () => true, target: () => null });
@@ -131,22 +163,75 @@
             yara: 'characters/yara/yara_visual.js',
             zeph: 'characters/zeph/zeph_visual.js',
             oskar: 'characters/oskar/oskar_visual.js',
+            skeleton: 'monsters/25d/skeleton/skeleton25d_visual.js',
+            skeleton_crawler: 'monsters/25d/skeleton_crawler/skeleton_crawler25d_visual.js',
+            bloater: 'monsters/25d/bloater/bloater25d_visual.js',
             body: 'characters/hunter/hero25d_visual.js',
             hunterColors: 'characters/hunter/hero_visual.js'
         };
+        // Monstros: as cores moram no desenho de cima (o mesmo objeto de cores vale para os dois desenhos)
+        const COLOR_FILES = { skeleton: 'monsters/topdown/skeleton/skeleton_visual.js', skeleton_crawler: 'monsters/topdown/skeleton/skeleton_visual.js', bloater: 'monsters/topdown/bloater/bloater_visual.js' };
+        // Monstros topdown (o desenho 2D de cima, que o Last Torch usa): id td_<pasta>. radius: o do monstro no jogo
+        // (no Last Torch, MONSTER_MODELS / BOSS_MODELS); o tamanho do 2.5D no jogo também parte dele
+        const TOPDOWN = {
+            td_bat: { draw: renderBat, radius: 10, folder: 'bat' },
+            td_bloater: { draw: renderBloater, radius: 19, folder: 'bloater' },
+            td_moth: { draw: renderMoth, radius: 10, folder: 'moth' },
+            td_wraith: { draw: renderWraith, radius: 12, folder: 'wraith' },
+            td_zombie_wolf: { draw: renderZombieWolf, radius: 13, folder: 'zombie_wolf' },
+            td_shadow_wolf: { draw: renderShadowWolf, radius: 12, folder: 'shadow_wolf' },
+            td_headless_knight: { draw: renderHeadlessKnight, radius: 20, folder: 'headless_knight' },
+            td_skeleton: { draw: renderSkeleton, radius: 14, folder: 'skeleton' },
+            td_bone_colossus: { draw: renderBoneColossus, radius: 54, folder: 'bone_colossus' },
+            td_witch: { draw: renderWitch, radius: 13, folder: 'witch' },
+            td_vampire: { draw: renderVampire, radius: 18, folder: 'vampire' },
+            td_demon_lord: { draw: renderDemonLord, radius: 32, folder: 'demon_lord' },
+        };
+        const RADIUS = { skeleton: 14, skeleton_crawler: 14, bloater: 19 };
+        // [id, nome, bloco de dados, tipo]
         const MODELS = [
-            ['hunter', 'Demon Hunter', V],
-            ['azael', 'Azael', AZAEL_VISUALS],
-            ['brutos', 'Brutos', BRUTOS_VISUALS],
-            ['yara', 'Yara', YARA_VISUALS],
-            ['zeph', 'Zeph', ZEPH_VISUALS],
-            ['oskar', 'Oskar', OSKAR_VISUALS]
+            ['hunter', 'Demon Hunter', V, 'hero'],
+            ['azael', 'Azael', AZAEL_VISUALS, 'hero'],
+            ['brutos', 'Brutos', BRUTOS_VISUALS, 'hero'],
+            ['yara', 'Yara', YARA_VISUALS, 'hero'],
+            ['zeph', 'Zeph', ZEPH_VISUALS, 'hero'],
+            ['oskar', 'Oskar', OSKAR_VISUALS, 'hero'],
+            ['skeleton', 'Esqueleto', SKELETON_25D_VISUALS, 'rig'],
+            ['skeleton_crawler', 'Esqueleto Rastejante', SKELETON_CRAWLER_25D_VISUALS, 'rig'],
+            ['bloater', 'Inchado (Bloater)', BLOATER_25D_VISUALS, 'rig'],
+            ['td_bat', 'Morcego', TD_BAT, 'topdown'],
+            ['td_bloater', 'Bloater', TD_BLOATER, 'topdown'],
+            ['td_moth', 'Mariposa', TD_MOTH, 'topdown'],
+            ['td_wraith', 'Espectro', TD_WRAITH, 'topdown'],
+            ['td_zombie_wolf', 'Lobo Zumbi', TD_ZOMBIE_WOLF, 'topdown'],
+            ['td_shadow_wolf', 'Lobo Sombrio', TD_SHADOW_WOLF, 'topdown'],
+            ['td_headless_knight', 'Cavaleiro Sem Cabeça', TD_HEADLESS_KNIGHT, 'topdown'],
+            ['td_skeleton', 'Esqueleto', TD_SKELETON, 'topdown'],
+            ['td_bone_colossus', 'Colosso de Ossos', TD_BONE_COLOSSUS, 'topdown'],
+            ['td_witch', 'Bruxa', TD_WITCH, 'topdown'],
+            ['td_vampire', 'Vampiro', TD_VAMPIRE, 'topdown'],
+            ['td_demon_lord', 'Demon Lord (boss)', TD_DEMON_LORD, 'topdown'],
         ];
+        Object.entries(TOPDOWN).forEach(([key, td]) => { FILES[key] = `monsters/topdown/${td.folder}/${td.folder}_visual.js`; });
+        // tipo: 'hero', 'rig' (monstro 2.5D) ou 'topdown' (monstro 2D de cima)
+        const typeOf = (key) => MODELS.find(([k]) => k === key)?.[3] ?? 'hero';
+        const kindOf = (key) => (typeOf(key) === 'hero' ? 'hero' : 'monster');
         // Câmera: mudam por vista, não são do personagem (ficam fora dos controles)
         const CAMERA_KEYS = new Set(['scale', 'heightScale', 'groundSquash', 'depthHeightWeight']);
         const params = new URLSearchParams(location.search);
-        MODELS.forEach(([key, name]) => $('model').add(new Option(name, key)));
-        $('model').value = MODELS.some(([k]) => k === params.get('model')) ? params.get('model') : MODELS[0][0];
+        // A lista mostra só o tipo escolhido: heróis, ou monstros 2.5D / topdown (caixa "Topdown")
+        const wantedType = () => ($('kind').value === 'hero' ? 'hero' : $('topdown').checked ? 'topdown' : 'rig');
+        function fillModels(pick) {
+            const type = wantedType();
+            $('topdownBox').hidden = $('kind').value === 'hero';
+            $('model').innerHTML = '';
+            MODELS.filter(m => m[3] === type).forEach(([key, name]) => $('model').add(new Option(name, key)));
+            $('model').value = MODELS.some(([k, , , t]) => k === pick && t === type) ? pick : MODELS.find(m => m[3] === type)[0];
+        }
+        const startModel = MODELS.some(([k]) => k === params.get('model')) ? params.get('model') : MODELS[0][0];
+        $('kind').value = kindOf(startModel);
+        $('topdown').checked = typeOf(startModel) === 'topdown';
+        fillModels(startModel);
 
         const clone = (v) => JSON.parse(JSON.stringify(v));
         const blockOf = (key) => (key === 'body' ? V : MODELS.find(([k]) => k === key)[2]);
@@ -298,11 +383,12 @@
         const GROUPS = [
             ['Rosto: posições', /^(eye|iris|brow|nose|mouth|ear|face|jaw|beard|mustache|mask)/],
             ['Cabeça e cabelo', /^(head|hair|bang|side|tail|band|scarf|hood|recede)/],
+            ['Postura (rastejante)', /^crawl/],
             ['Corpo', /^(shoulder|waist|hip|arm|leg|boot|toe|heel|claw|run|cape|bodyScale|stride|foot|knee|ankle|breath|sash|hand|dash|vigil|shadow)/],
             ['Braços (offsets)', /^(right|left)(Hand|Elbow|Shoulder)/],
             ['Arma', /^(blade|glow|scabbard|sheath|hilt|guard|draw|axe|grip|swing|restBlade|charge)/]
         ];
-        const ORDER = ['Rosto: posições', 'Cabeça e cabelo', 'Corpo', 'Braços (offsets)', 'Arma', 'Outros', 'Cores'];
+        const ORDER = ['Postura (rastejante)', 'Rosto: posições', 'Cabeça e cabelo', 'Corpo', 'Braços (offsets)', 'Arma', 'Outros', 'Cores'];
         function sectionFor(path) {
             if (path.startsWith('colors.')) return 'Cores';
             const g = GROUPS.find(([, re]) => re.test(path.split('.')[0]));
@@ -336,7 +422,10 @@
                 }
                 sections.get(title).appendChild(el);
             };
-            if (key === 'hunter') {
+            if (typeOf(key) === 'topdown') {
+                // Monstro topdown: só o bloco dele (cores, medidas e ritmos do desenho de cima)
+                entriesOf(blockOf(key)).forEach(([path, v]) => add(sectionFor(path), controlRow(key, path, v), sectionFor(path) !== 'Cores'));
+            } else if (key === 'hunter') {
                 // Demon Hunter: o bloco dele é o corpo de todos
                 entriesOf(V, { skipCamera: true }).forEach(([path, v]) => add(sectionFor(path), controlRow('hunter', path, v), sectionFor(path) !== 'Cores'));
             } else {
@@ -361,7 +450,8 @@
             const edits = {};
             [...new Set([$('model').value, 'body', 'hunter'])].forEach(key => {
                 Object.entries(saved[key] || {}).forEach(([path, value]) => {
-                    const file = path.startsWith('colors.') && (key === 'hunter' || key === 'body') ? FILES.hunterColors : FILES[key];
+                    const file = path.startsWith('colors.') && (key === 'hunter' || key === 'body') ? FILES.hunterColors
+                        : path.startsWith('colors.') && COLOR_FILES[key] ? COLOR_FILES[key] : FILES[key];
                     const owner = key === 'body' ? 'hunter' : key;
                     (edits[file] = edits[file] || { owner, byPath: new Map() }).byPath.set(path, value);
                 });
@@ -430,26 +520,32 @@
 
         // o: { cam, facing (número ou função do tempo), zoom (px por unidade numa vista de 260 px), footY, walk, swing }
         const VIEWS = [
+            ['Topdown', 'o desenho 2D de cima, como no Last Torch', 'topdown'],
+            ['Andando', { topdown: true, facing: (t) => t * 0.6, fit: 0.42, walk: true }],
+            ['Parado', { topdown: true, facing: -Math.PI / 4, fit: 0.42 }],
+            ['Girando', { topdown: true, facing: (t) => t * 0.8, fit: 0.42 }],
+            ['Tamanho do jogo', { topdown: true, facing: (t) => t * 0.8, zoom: 1, walk: true }],
             ['Last Torch', 'a câmera do jogo, quase de cima'],
             ['Andando', { cam: LT, facing: (t) => t * 0.6, zoom: 6, walk: true, footY: 0.62 }],
             ['Parado', { cam: LT, facing: -Math.PI / 4, zoom: 6, footY: 0.62 }],
             ['Golpes', { cam: LT, facing: 0.5, zoom: 6, swing: true, footY: 0.62 }],
             ['Tamanho do jogo', { cam: LT, facing: (t) => t * 0.8, zoom: GAME_SCALE, walk: true, footY: 0.55 }],
             ['Palco do yara-rpg', 'de lado, inclinada 34°'],
-            ['Rosto · para a direita', { cam: RPG, facing: STAGE_RIGHT, zoom: 15, footY: 1.4 }],
-            ['Rosto · para a esquerda', { cam: RPG, facing: STAGE_LEFT, zoom: 15, footY: 1.4 }],
-            ['Rosto · de frente', { cam: RPG, facing: Math.PI / 2, zoom: 15, footY: 1.4 }],
-            ['Rosto · de perfil', { cam: RPG, facing: 0, zoom: 15, footY: 1.4 }],
+            ['Rosto · para a direita', { cam: RPG, facing: STAGE_RIGHT, zoom: 15, footY: 1.4, face: true }],
+            ['Rosto · para a esquerda', { cam: RPG, facing: STAGE_LEFT, zoom: 15, footY: 1.4, face: true }],
+            ['Rosto · de frente', { cam: RPG, facing: Math.PI / 2, zoom: 15, footY: 1.4, face: true }],
+            ['Rosto · de perfil', { cam: RPG, facing: 0, zoom: 15, footY: 1.4, face: true }],
             ['Palco · parado', { cam: RPG, facing: STAGE_RIGHT, zoom: 7 }],
             ['Palco · andando', { cam: RPG, facing: STAGE_RIGHT, zoom: 7, walk: true }],
             ['Palco · golpes', { cam: RPG, facing: STAGE_RIGHT, zoom: 7, swing: true }],
             ['Palco · girando', { cam: RPG, facing: (t) => t * 0.8, zoom: 7 }]
         ];
         const views = [];
-        VIEWS.forEach(([label, o]) => {
+        VIEWS.forEach(([label, o, ...rest]) => {
             if (typeof o === 'string') {
                 const h = document.createElement('h2');
                 h.innerHTML = `${label} <small>(${o})</small>`;
+                h.dataset.mode = rest[0] ?? 'rig';
                 $('views').appendChild(h);
                 return;
             }
@@ -459,9 +555,10 @@
             cap.textContent = label;
             fig.append(canvas, cap);
             $('views').appendChild(fig);
+            fig.dataset.mode = o.topdown ? 'topdown' : 'rig';
             const anim = createHeroAnim(false);
             const body = { x: 0, y: 0, angle: 0, comboStep: 1, dashTimer: 0, hitTime: -1e9, hitDirX: 0, hitDirY: 0, iFrames: 0, move: null };
-            views.push({ o, canvas, g: canvas.getContext('2d'), anim, body, t: 0, lap: -1 });
+            views.push({ o, fig, canvas, g: canvas.getContext('2d'), anim, body, t: 0, lap: -1, monster: { x: 0, y: 0, vx: 0, vy: 0, angle: 0, hp: 100, maxHp: 100, radius: 14, phase: 0, shootTimer: 99 } });
         });
 
         const faceOf = (v) => (typeof v.o.facing === 'function' ? v.o.facing(v.t) : v.o.facing);
@@ -493,11 +590,36 @@
             const key = $('model').value;
             g.fillStyle = '#17140d';
             g.fillRect(0, 0, w, h);
-            const scale = o.zoom * (o.zoom === GAME_SCALE ? 1 : w / 260);
+            if (o.topdown) {
+                // O desenho 2D de cima, andando como o monstro do jogo. fit: o monstro ocupa essa fração da vista
+                const td = TOPDOWN[key];
+                if (!td) return;
+                const e = Object.assign(v.monster, { x: v.body.x, y: v.body.y, angle: faceOf(v), radius: td.radius, isBoss: key === 'td_demon_lord' });
+                const k = o.fit ? (w * o.fit) / (td.radius * 2.6) : 1;
+                setCtx(g);
+                g.save();
+                g.translate(w / 2, h / 2);
+                g.scale(k, k);
+                g.translate(-e.x, -e.y);
+                td.draw(e);
+                g.restore();
+                return;
+            }
+            const gameScale = typeOf(key) === 'rig' ? (RADIUS[key] ?? 14) * blockOf(key).scalePerRadius : GAME_SCALE;
+            const scale = o.zoom === GAME_SCALE ? gameScale : o.zoom * (w / 260);
             setCtx(g);
             if (o.cam === RPG) {
                 // Palco do RPG: a câmera e os ajustes dele, como em yara-rpg/js/stage/heroes.js
-                const body = { ...v.body, x: w / 2, y: h * (o.footY ?? 0.8) };
+                // Vistas de rosto miram a cabeça do boneco (o Esqueleto Rastejante tem a cabeça baixa)
+                const block = blockOf(key);
+                const headZ = block.crawl ? block.crawlHeadZ : block.bodyHeight ?? V.headHeight;
+                const k = scale * (block.bodyScale ?? 1);
+                // Cabeça à frente do corpo (rastejante): a vista de rosto também a centraliza na horizontal
+                const headA = block.crawl ? block.crawlLean + block.crawlHeadForward : 0;
+                const face = faceOf(v);
+                const footX = o.face ? w / 2 - headA * Math.cos(face) * k : w / 2;
+                const footY = o.face ? h * 0.5 + headZ * RPG().heightScale * k - headA * Math.sin(face) * RPG().groundSquash * k : h * (o.footY ?? 0.8);
+                const body = { ...v.body, x: footX, y: footY };
                 renderHero25D(body, v.anim, blockOf(key).colors, null, key,
                     { camera: RPG(), scale, time: window.__clock, moves: RPG_MOVES(), body: RPG_BODY, frenzyGlow: 1.4 });
                 return;
@@ -540,11 +662,26 @@
             requestAnimationFrame(frame);
         }
 
+        // Monstro topdown mostra só as vistas de cima; heróis e monstros 2.5D, só as do boneco
+        const showViews = () => {
+            const mode = typeOf($('model').value) === 'topdown' ? 'topdown' : 'rig';
+            document.querySelectorAll('#views [data-mode]').forEach(el => { el.style.display = el.dataset.mode === mode ? '' : 'none'; });
+        };
         $('model').addEventListener('change', () => {
             history.replaceState(null, '', `?model=${$('model').value}`);
             buildControls();
+            showViews();
             $('out').value = '';
         });
+        $('kind').addEventListener('change', () => {
+            fillModels();
+            $('model').dispatchEvent(new Event('change'));
+        });
+        $('topdown').addEventListener('change', () => {
+            fillModels();
+            $('model').dispatchEvent(new Event('change'));
+        });
+        showViews();
         buildControls();
         // Altura do cabeçalho (muda no celular): as vistas e o painel grudam logo abaixo dele
         const header = document.querySelector('header');

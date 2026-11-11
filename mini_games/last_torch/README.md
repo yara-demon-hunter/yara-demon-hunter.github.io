@@ -26,7 +26,7 @@ Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
 
 O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça com CPU limitada):
 
-- **Monstros são sprites.** `js/render/monster_sprites.js` roda a arte procedural uma vez por quadro de animação e guarda num atlas; em campo cada monstro custa 2 `drawImage`. Só bosses e herói são desenhados a cada quadro. Monstro novo: a arte vai na biblioteca (`mini_games/_library/monsters/<id>/`, ver o README dela) e entra em `ART` e em `data_model/visuals/monsters/sprites_visual.js`.
+- **Monstros são sprites.** `js/render/monster_sprites.js` roda a arte procedural uma vez por quadro de animação e guarda num atlas; em campo cada monstro custa 2 `drawImage`. Só bosses e herói são desenhados a cada quadro. Monstro novo: a arte vai na biblioteca (`mini_games/_library/monsters/topdown/<id>/`, ver o README dela) e entra em `ART` e em `data_model/visuals/monsters/sprites_visual.js`.
 - **Nada repetido é desenhado do zero:** moedas, adagas, tiros, brilhos e algarismos vêm de sprites (`js/render/fx/`). Evite `fillText`, `setLineDash`, `shadowBlur`, gradientes novos por quadro e `ctx.save/restore` por objeto.
 - **Chão e névoa:** o chão é copiado 1:1 (grama e brilho da tocha já pintados nele); a névoa é desenhada numa tela pequena poucas vezes por segundo.
 - **DOM:** os sistemas só chamam `updateHUD()`; a escrita sai no máximo 10 vezes por segundo, só do que mudou, e as barras usam `transform`. Sem `backdrop-filter` nem animação de sombra.
@@ -50,7 +50,7 @@ library/                          CÓPIA da biblioteca de personagens e monstros
   core/                           ctx compartilhado, ganchos do jogo (host.js), glow, easing, relógio do desenho, aleatório com semente
   characters/hunter/              Demon Hunter, o boneco 2.5D base (hero25d.js), a animação (hero_anim.js), os ganchos do jogo (hero_hooks.js), o top-down antigo e o registro dos outros bonecos
   characters/azael/, brutos/      os bonecos do Azael e do Captain Brutos e as cores deles
-  monsters/<id>/                  um por monstro ou boss (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, shadow_wolf, headless_knight, bone_colossus, demon_lord): desenho e cores
+  monsters/topdown/<id>/          um por monstro ou boss (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, shadow_wolf, headless_knight, bone_colossus, demon_lord): desenho e cores
 css/
   game.css                        ponto de entrada: só importa os arquivos abaixo
   base/base.css                   fonte, body e canvas

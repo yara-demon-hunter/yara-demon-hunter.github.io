@@ -271,7 +271,7 @@ function buildPose(t, body) {
     const breath = Math.sin((t / H.breathPeriodSeconds) * Math.PI * 2) * V.breathAmount * (1 - run);
     // Alguns bonecos sobem e descem no ritmo da corrida (runBob)
     const bob = B?.runBob ? B.runBob(anim, run) : 0;
-    return {
+    const pose = {
         ...stance,
         t,
         run,
@@ -283,6 +283,9 @@ function buildPose(t, body) {
         headZ: V.headHeight + breath - run * 1.4 - stance.crouch + stance.rise * 1.3 + bob,
         blend
     };
+    // Bonecos com outra postura (ex.: o esqueleto que rasteja) ajustam a pose pronta
+    if (B?.poseTweak) B.poseTweak(pose, anim);
+    return pose;
 }
 
 // --- PARTES (cada uma desenhada na ordem da profundidade) ---

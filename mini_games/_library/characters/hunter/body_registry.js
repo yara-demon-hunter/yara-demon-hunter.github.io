@@ -12,6 +12,7 @@
 //   sheathed                         arma na bainha: não é empunhada no dash nem na derrota
 //   idleArms                         parado, os braços respiram e balançam devagar (Yara, Zeph)
 //   vigilFreeHand                    [a, b, z]: onde fica a mão livre ajoelhado (sem fincar a espada)
+//   poseTweak(pose, anim)            muda a pose pronta (lean, hipZ, shoulderZ, headA, headZ...): outra postura
 //   runBob(anim, run)                sobe e desce do corpo na corrida (devolve a altura)
 //   drawLeg(rig, { hip, knee, ankle, toe, reach, side, lift })
 //   drawTorso(rig, pose, bottom, top, wb, wt)

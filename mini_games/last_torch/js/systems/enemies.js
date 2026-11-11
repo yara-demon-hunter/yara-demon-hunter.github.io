@@ -21,7 +21,7 @@ import { gainXp } from './progression.js';
 import { recordBeast } from './sanctuary.js';
 import { addStreakKill, getScoreMultiplier, getStreakGoldBonus } from './streak.js';
 import { lerpAngle } from '../../library/core/easing.js';
-import { knightHeadPosition } from '../../library/monsters/headless_knight/headless_knight.js';
+import { knightHeadPosition } from '../../library/monsters/topdown/headless_knight/headless_knight.js';
 import { getAtkDamage } from './stats.js';
 import { hurtTorch } from './torch.js';
 

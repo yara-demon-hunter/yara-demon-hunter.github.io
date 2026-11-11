@@ -39,8 +39,8 @@ AGENT_NOTE = <<~TEXT
 
   Para qualquer mudança de arte de personagem ou monstro (desenho, cores, medidas, animação):
 
-  1. Edite o arquivo de mesmo caminho em `mini_games/_library/` (ex.: `library/monsters/bat/bat.js` →
-     `mini_games/_library/monsters/bat/bat.js`). A primeira linha de cada `.js` daqui diz qual é o original.
+  1. Edite o arquivo de mesmo caminho em `mini_games/_library/` (ex.: `library/monsters/topdown/bat/bat.js` →
+     `mini_games/_library/monsters/topdown/bat/bat.js`). A primeira linha de cada `.js` daqui diz qual é o original.
   2. Rode na raiz do repositório: `ruby mini_games/_library/sync.rb`
   3. Confira: `ruby mini_games/_library/sync.rb --check`
 
