@@ -48,11 +48,14 @@ monsters/
                            render...), <id>_visual.js (cores e medidas) e art_reference/
                            bat, bloater, moth, wraith, zombie_wolf, shadow_wolf, headless_knight, skeleton,
                            bone_colossus, witch, vampire, demon_lord (boss)
-  25d/<id>/                o mesmo monstro no boneco 2.5D dos heróis, para qualquer câmera: <id>25d.js e
-                           <id>25d_visual.js (cores lidas do topdown). Por enquanto: skeleton, skeleton_crawler (o
-                           Esqueleto Rastejante, com as peças do skeleton), bloater e witch (blend da Bruxa dos dois
-                           jogos). Cada um tem art_reference/ com a ficha de como foi criado. monster25d.js desenha qualquer
-                           um deles a partir do monstro do jogo. O Last Torch fica no desenho de cima
+  25d/<id>/                o mesmo monstro no boneco 2.5D dos heróis, para qualquer câmera: <id>25d.js,
+                           <id>25d_visual.js (cores lidas do topdown) e art_reference/ (a ficha de como foi criado).
+                           Todos os do topdown têm versão 2.5D, mais o skeleton_crawler (Esqueleto Rastejante).
+                           O Last Torch fica no desenho de cima; o 2.5D é para o yara-rpg e jogos futuros
+  25d/monster25d.js        desenha qualquer monstro 2.5D a partir do monstro do jogo (animação, giro, tamanho, aura)
+  25d/creature25d.js       monstros sem corpo de gente (registerCreature) e peças comuns: polígonos, chama, tronco,
+                           montante, corrente que afina
+  25d/wolf25d.js           corpo de lobo em galope, comum ao shadow_wolf e ao zombie_wolf
 ```
 
 Cada pasta de personagem ou monstro pode ter `art_reference/` com as imagens e a ficha (`character.md`). Elas nunca
@@ -60,7 +63,8 @@ são carregadas por jogo nenhum.
 
 **Dependências entre pastas** (ao levar um para outro lugar, leve o que ele usa):
 `yara`, `zeph` e `oskar` → `azael` (orelha e bandagem); `azael` e `brutos` → `hunter` → `core`;
-`topdown/bone_colossus` → `topdown/skeleton`; `25d/skeleton_crawler` → `25d/skeleton` → `topdown/skeleton` (cores) e `characters/hunter`;
+`topdown/bone_colossus` → `topdown/skeleton`; cada `25d/<id>` → `topdown/<id>` (cores), `25d/monster25d.js` e `characters/hunter`; `25d/skeleton_crawler` e
+`25d/bone_colossus` → `25d/skeleton`; os lobos → `25d/wolf25d.js`;
 todos os monstros → `core`.
 
 **O que não está aqui, e fica em cada jogo:** balanceamento (vida, dano, velocidade, ataques, quando aparece), regras
@@ -131,7 +135,7 @@ junto com os scripts `defer`, então ele entra entre eles, antes de quem o usa.
 ## Ajuste ao vivo
 
 `tools/tuner.html`: no topo, **Heróis** ou **Monstros**. Nos monstros, a caixa **Topdown** troca entre os bonecos 2.5D
-(Esqueleto, Esqueleto Rastejante) e os 12 desenhos 2D de cima do Last Torch (`?model=td_<pasta>`, ex.: `td_witch`),
+(os 13 monstros) e os 12 desenhos 2D de cima do Last Torch (`?model=td_<pasta>`, ex.: `td_witch`),
 cada um com as suas cores e medidas. Os heróis e os monstros 2.5D aparecem nas **duas câmeras**: a do Last Torch (quase de
 cima) e a do palco do yara-rpg (de lado, rosto em 3/4). Os controles deslizantes mexem nas medidas, posições e cores e
 o boneco muda na hora. O Demon Hunter é o boneco base: o bloco dele (`hero25d_visual.js`) é o corpo de todos.
