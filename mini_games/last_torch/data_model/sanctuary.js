@@ -60,6 +60,7 @@ export const MULTI_KILL = {
 // (js/render/monster_sprites.js); sem sprite pronto (bosses têm retrato próprio, getBossPortrait), vale o ícone.
 const MONSTER_ENTRIES = [
     { key: 'SKELETON', name: 'Skeleton', icon: '💀' },
+    { key: 'SKELETON_CRAWLER', name: 'Crawling Skeleton', icon: '🦴' },
     { key: 'BAT', name: 'Bat', icon: '🦇' },
     { key: 'SHADOW_WOLF', name: 'Shadow Wolf', icon: '🐺' },
     { key: 'VAMPIRE', name: 'Vampire', icon: '🧛' },

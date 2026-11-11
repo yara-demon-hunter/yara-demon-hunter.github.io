@@ -37,6 +37,7 @@ export const TURN_DIFFICULTY = {
     // Primeiro turno em que cada monstro pode nascer
     monsterUnlockTurn: {
         SKELETON: 1,
+        SKELETON_CRAWLER: 1,
         BAT: 1,
         SHADOW_WOLF: 1,
         VAMPIRE: 2,

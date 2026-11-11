@@ -21,7 +21,7 @@ import { gainXp } from './progression.js';
 import { recordBeast } from './sanctuary.js';
 import { addStreakKill, getScoreMultiplier, getStreakGoldBonus } from './streak.js';
 import { lerpAngle } from '../../library/core/easing.js';
-import { knightHeadPosition } from '../../library/monsters/topdown/headless_knight/headless_knight.js';
+import { knightHeadOf } from '../core/monster_art.js';
 import { getAtkDamage } from './stats.js';
 import { hurtTorch } from './torch.js';
 
@@ -145,7 +145,7 @@ function updateTorchSlam(e, S, distCore, dt) {
 // Bruxa: tiro no alvo; acerta a tocha também
 function shoot(e, model, angle) {
     // O Cavaleiro Sem Cabeça atira com a cabeça, que flutua de lado
-    const from = e.type === 'HEADLESS_KNIGHT' ? knightHeadPosition(e) : e;
+    const from = e.type === 'HEADLESS_KNIGHT' ? knightHeadOf(e) : e;
     state.enemyProjectiles.push({
         owner: e.type,          // quem atirou (só muda o desenho do projétil)
         color: model.projectileColor ?? model.color,

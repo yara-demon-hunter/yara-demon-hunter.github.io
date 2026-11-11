@@ -76,11 +76,16 @@ export const WITCH_25D_VISUALS = {
     particleOrbit: 6,
     previewCharge: 0.35,       // no tuner e nas prévias: 0 = sem feitiço, 1 = bola cheia
 
+    // Onde fica a mão que conjura, em unidades do boneco (a = frente, b = lado, z = altura): o jogo acende o brilho do feitiço ali
+    castHand: { a: 9, b: 4.6, z: 13.5 },
+
     // Brilho roxo em volta (aura) e quanto o feitiço demora a carregar no jogo
-    auraRadius: 26,
+    auraRadius: 18,
     auraAlpha: WITCH_VISUALS.auraAlpha,
     chargeSeconds: WITCH_VISUALS.chargeSeconds,
 
     // Tamanho no Last Torch: px por unidade = raio do monstro × isto (o desenho de cima usa raio × 1,7)
-    scalePerRadius: 0.16
+    scalePerRadius: 0.16,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 9
 };

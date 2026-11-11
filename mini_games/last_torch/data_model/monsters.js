@@ -19,6 +19,24 @@ export const MONSTER_MODELS = {
         xpRewardBase: 20,
         xpRewardPerTurn: 3,
     },
+    // Esqueleto Rastejante: o clássico "deitado". Mais lento e bem mais resistente que o Esqueleto, vem desde a primeira hora
+    SKELETON_CRAWLER: {
+        spawnWeight: 0.2,
+        hpBase: 115,
+        hpPerTurn: 20,
+        speedMin: 24,
+        speedMax: 40,
+        radius: 15,
+        color: '#c9c0a4',
+        damage: 18,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 32,
+        goldBase: 8,
+        goldVariance: 0.5,
+        xpRewardBase: 30,
+        xpRewardPerTurn: 4,
+    },
     BAT: {
         spawnWeight: 0.22,
         hpBase: 24,
@@ -280,7 +298,7 @@ export const MONSTER_SPAWNING = {
     separationStrength: 60
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];

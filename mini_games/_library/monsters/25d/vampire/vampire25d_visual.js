@@ -43,10 +43,12 @@ export const VAMPIRE_25D_VISUALS = {
 
     medallionRadius: 0.5,
 
-    auraRadius: 22,
+    auraRadius: 19.3,
     auraAlpha: VAMPIRE_VISUALS.auraAlpha,
     grabDistance: VAMPIRE_VISUALS.grabDistance,
     focusZ: 20.5,
     focusA: 1,
-    scalePerRadius: 0.135
+    scalePerRadius: 0.135,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 12
 };

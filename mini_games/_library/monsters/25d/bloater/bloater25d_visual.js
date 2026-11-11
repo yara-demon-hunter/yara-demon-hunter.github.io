@@ -61,9 +61,11 @@ export const BLOATER_25D_VISUALS = {
     stitches: 5,
 
     // Brilho verde em volta (aura)
-    auraRadius: 30,
+    auraRadius: 16,
     auraAlpha: BLOATER_VISUALS.auraAlpha,
 
     // Tamanho no Last Torch: px por unidade = raio do monstro × isto (o desenho de cima usa raio × 1,28)
-    scalePerRadius: 0.16
+    scalePerRadius: 0.16,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 10
 };

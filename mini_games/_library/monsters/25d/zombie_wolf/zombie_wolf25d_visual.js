@@ -41,9 +41,11 @@ export const ZOMBIE_WOLF_25D_VISUALS = {
     tailLength: 6,
     tailFlame: 3.4,
 
-    auraRadius: 22,
+    auraRadius: 17.5,
     auraAlpha: ZOMBIE_WOLF_VISUALS.auraAlpha,
     focusZ: 11,
     focusA: 11,
-    scalePerRadius: 0.18
+    scalePerRadius: 0.18,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 6.5
 };

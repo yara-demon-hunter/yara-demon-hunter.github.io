@@ -48,6 +48,7 @@ export const JUICE_VISUALS = {
     // Quantidade e cores dos pedaços por monstro
     deathBits: {
         SKELETON: { count: 6, colors: ['#e7e0cf', '#b9b09a', '#8f8772'], shape: 'bone', stain: 'rgba(14, 12, 9, 0.5)' },
+        SKELETON_CRAWLER: { count: 7, colors: ['#e0d8c2', '#b2a98f', '#857d69'], shape: 'bone', stain: 'rgba(14, 12, 9, 0.5)' },
         BAT: { count: 4, colors: ['#3b1d5c', '#7c3aed', '#2a1740'], shape: 'shard', stain: 'rgba(24, 8, 44, 0.5)' },
         VAMPIRE: { count: 6, colors: ['#7f1d1d', '#1c1917', '#b91c1c'], shape: 'shard', stain: 'rgba(48, 6, 10, 0.62)' },
         WITCH: { count: 6, colors: ['#581c87', '#f50bca', '#2e1065'], shape: 'shard', stain: 'rgba(30, 8, 48, 0.55)' },

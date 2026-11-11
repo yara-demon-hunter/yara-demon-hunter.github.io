@@ -40,9 +40,11 @@ export const SHADOW_WOLF_25D_VISUALS = {
     smokeLength: 8,
     smokePuffs: 5,
 
-    auraRadius: 22,
+    auraRadius: 16.9,
     auraAlpha: SHADOW_WOLF_VISUALS.auraAlpha,
     focusZ: 11.2,
     focusA: 10.5,
-    scalePerRadius: 0.18
+    scalePerRadius: 0.18,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 6.5
 };

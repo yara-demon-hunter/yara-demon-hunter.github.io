@@ -16,11 +16,14 @@ function wingShape(root, back, span, chord, side, elev, sweep) {
     return [root, out(0.55, chord * 0.35), out(1, sweep), out(0.95, sweep - chord * 0.55), out(0.5, -chord * 0.75), back];
 }
 
+// Gravando num atlas (e.baking), o balanço e as brasas ficam de fora: o jogo aplica o balanço no carimbo
+let baking = false;
+
 function parts(pose, rig) {
     const { C, project, ball, limb } = rig;
     const t = pose.t;
     const flap = Math.sin(t * S.flapHz * Math.PI * 2);
-    const sway = Math.sin(t * S.wobbleHz * Math.PI * 2) * S.wobble;
+    const sway = baking ? 0 : Math.sin(t * S.wobbleHz * Math.PI * 2) * S.wobble;
     const z0 = S.flyHeight - flap * S.bob;
     const elev = flap * S.flapAngle + 0.15;
     const wingPart = (side) => ({
@@ -56,6 +59,7 @@ function parts(pose, rig) {
         // Rastro de cinzas em brasa
         depth: project(-S.emberTrail * 0.5, sway, z0).depth - 1,
         draw() {
+            if (baking) return;
             for (let i = 0; i < S.embers; i++) {
                 const p = (t * 1.4 + i / S.embers) % 1;
                 const pos = [-3 - p * S.emberTrail, sway * (1 - p) + Math.sin(t * 9 + i) * 0.8, z0 - p * 3 + Math.cos(t * 7 + i) * 0.6];
@@ -71,5 +75,6 @@ function parts(pose, rig) {
 registerCreature('moth', S, parts);
 
 export function renderMoth25D(e) {
+    baking = !!e.baking;
     renderMonster25D(e, 'moth', S);
 }

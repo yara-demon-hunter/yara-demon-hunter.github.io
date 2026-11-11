@@ -74,10 +74,12 @@ export const SKELETON_25D_VISUALS = {
     ragWidth: 0.85,
 
     // Brilho verde em volta (aura) e quanto tempo os ossos piscam em branco ao levar dano
-    auraRadius: 22,
+    auraRadius: 14.4,
     auraAlpha: 0.1,
     hurtFlashSeconds: 0.12,
 
     // Tamanho no Last Torch: px por unidade = raio do monstro × isto (o desenho de cima usa raio × 1,35)
-    scalePerRadius: 0.15
+    scalePerRadius: 0.15,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 12
 };

@@ -28,8 +28,11 @@ export const BONE_COLOSSUS_25D_VISUALS = {
     // Golpe na tocha (o jogo informa a fase; no tuner: 0 = repouso, 0,5 = recuado, 1 = batendo)
     previewSlam: 0,
 
+    auraRadius: 17,
     auraAlpha: BONE_COLOSSUS_VISUALS.auraAlpha,
     focusZ: 20,
     focusA: 1,
-    scalePerRadius: 0.15
+    scalePerRadius: 0.15,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 12
 };

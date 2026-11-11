@@ -35,9 +35,11 @@ export const MOTH_25D_VISUALS = {
     embers: MOTH_VISUALS.embers + 2,
     emberTrail: 10,
 
-    auraRadius: 20,
+    auraRadius: 17,
     auraAlpha: MOTH_VISUALS.auraAlpha,
     focusZ: 11.5,
     focusA: 1,
-    scalePerRadius: 0.2
+    scalePerRadius: 0.2,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 10
 };

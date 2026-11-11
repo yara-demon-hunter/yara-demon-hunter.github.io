@@ -145,3 +145,17 @@ registerBody('headless_knight', {
 export function renderHeadlessKnight25D(e) {
     renderMonster25D(e, 'headless_knight', S);
 }
+
+// De onde sai o tiro: o elmo flutuante, no mundo do jogo (como knightHeadPosition do desenho de cima). Segue o desenho:
+// ponto (frente, lado, altura) do boneco projetado pela câmera do jogo e tirado do centro do corpo.
+export function knightHeadPosition25D(e) {
+    const f = e.facing ?? e.angle;
+    const k = e.radius * S.scalePerRadius * S.bodyScale;
+    const a = S.helmForward + 0.8;
+    const b = -(V.chest.B + S.helmSide);
+    const z = S.helmHeight - S.center;
+    return {
+        x: e.x + (a * Math.cos(f) - b * Math.sin(f)) * k,
+        y: e.y + ((a * Math.sin(f) + b * Math.cos(f)) * V.groundSquash - z * V.heightScale) * k
+    };
+}

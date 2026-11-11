@@ -19,5 +19,7 @@ export const SKELETON_CRAWLER_25D_VISUALS = {
     crawlHandReach: 4.5,       // mãos no chão, à frente dos ombros
     crawlHandSpread: 4.2,
     crawlHandLift: 2.2,        // quanto a mão sobe ao dar o passo
-    crawlBob: 0.5              // sobe e desce a cada puxada
+    crawlBob: 0.5,             // sobe e desce a cada puxada
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 5
 };

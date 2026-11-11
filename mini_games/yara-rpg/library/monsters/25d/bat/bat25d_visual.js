@@ -35,10 +35,12 @@ export const BAT_25D_VISUALS = {
     wingScallops: BAT_VISUALS.wingScallops,
     wingBones: BAT_VISUALS.wingBoneCount,
 
-    auraRadius: 20,
+    auraRadius: 21.9,
     auraAlpha: BAT_VISUALS.auraAlpha,
     // Tuner: para onde as vistas de rosto olham
     focusZ: 12.5,
     focusA: 2,
-    scalePerRadius: 0.2
+    scalePerRadius: 0.2,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 10
 };

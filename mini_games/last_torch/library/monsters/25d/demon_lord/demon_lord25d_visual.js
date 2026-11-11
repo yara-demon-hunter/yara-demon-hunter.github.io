@@ -51,10 +51,12 @@ export const DEMON_LORD_25D_VISUALS = {
     fireballRadius: 2.6,
     previewCharge: 0.4,        // no tuner: 0 = sem fogo, 1 = bola cheia
 
-    auraRadius: 30,
+    auraRadius: 28.5,
     auraAlpha: D.auraAlpha,
     chargeSeconds: D.chargeSeconds,
     focusZ: 20,
     focusA: 2.5,
-    scalePerRadius: 0.115
+    scalePerRadius: 0.115,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 14
 };

@@ -10,7 +10,6 @@ import { BAT_VISUALS } from '../../library/monsters/topdown/bat/bat_visual.js';
 import { BLOATER_VISUALS } from '../../library/monsters/topdown/bloater/bloater_visual.js';
 import { MOTH_VISUALS } from '../../library/monsters/topdown/moth/moth_visual.js';
 import { SKELETON_VISUALS } from '../../library/monsters/topdown/skeleton/skeleton_visual.js';
-import { SPRITE_FRAMES } from '../../data_model/visuals/monsters/sprites_visual.js';
 import { VAMPIRE_VISUALS } from '../../library/monsters/topdown/vampire/vampire_visual.js';
 import { WITCH_VISUALS } from '../../library/monsters/topdown/witch/witch_visual.js';
 import { SHADOW_WOLF_VISUALS } from '../../library/monsters/topdown/shadow_wolf/shadow_wolf_visual.js';
@@ -18,7 +17,9 @@ import { ZOMBIE_WOLF_VISUALS } from '../../library/monsters/topdown/zombie_wolf/
 import { BONE_COLOSSUS_VISUALS } from '../../library/monsters/topdown/bone_colossus/bone_colossus_visual.js';
 import { HEADLESS_KNIGHT_VISUALS } from '../../library/monsters/topdown/headless_knight/headless_knight_visual.js';
 import { WRAITH_VISUALS } from '../../library/monsters/topdown/wraith/wraith_visual.js';
-import { knightHeadPosition } from '../../library/monsters/topdown/headless_knight/headless_knight.js';
+import { USE_25D, knightHeadOf } from '../core/monster_art.js';
+import { MONSTERS_25D } from '../../library/monsters/25d/index.js';
+import { HERO_25D_VISUALS as BODY_25D } from '../../library/characters/hunter/hero25d_visual.js';
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { FAN_OF_KNIVES } from '../../data_model/passives.js';
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
@@ -34,7 +35,7 @@ import { getDashedRing } from './fx/rings.js';
 import { COIN_SIZE, DAGGER_LENGTH, DAGGER_WIDTH, getCoinAtlas, getDaggerSprite } from './fx/sprites.js';
 import { resetWorldView, stamp } from './fx/stamp.js';
 import { colossusCharge, renderBoneColossus } from '../../library/monsters/topdown/bone_colossus/bone_colossus.js';
-import { getBoltSprite, getMonsterSprite, withColors } from './monster_sprites.js';
+import { getBoltSprite, getMonsterSprite, spriteFrame, withBossPalette25D, withColors } from './monster_sprites.js';
 import { renderReflectedBolt } from './reflect.js';
 import { renderRival } from './rival.js';
 import { renderVampire } from '../../library/monsters/topdown/vampire/vampire.js';
@@ -211,6 +212,7 @@ export function renderEnemyProjectiles() {
 function drawBoss(e) {
     const model = BOSS_MODELS[e.type];
     if (model.renderAs === 'RIVAL') renderRival(e);
+    else if (USE_25D) withBossPalette25D(model.renderAs, model.palette, e);
     else if (model.renderAs === 'VAMPIRE') withColors(VAMPIRE_VISUALS, BOSS_PALETTES[model.palette], () => renderVampire(e));
     else withColors(DEMON_LORD_VISUALS, BOSS_PALETTES[model.palette], () => renderDemonLord(e));
 }
@@ -245,15 +247,23 @@ function stampMonster(e, t) {
     }
     if (spec.wobbleAmount) rotation += Math.sin(t * spec.wobbleHz * TAU + e.phase) * spec.wobbleAmount;
     if (spec.floatAmount) y -= Math.sin(t * spec.floatHz * TAU + e.phase) * e.radius * spec.floatAmount * 1.5;
+    if (spec.swayAmount) {
+        // 2.5D: o sprite não gira, então o zigue-zague dos voadores vira um desvio de lado
+        const side = Math.sin(t * spec.swayHz * TAU + e.phase) * e.radius * spec.swayAmount;
+        x -= Math.sin(rotation) * side;
+        y += Math.cos(rotation) * side;
+    }
     if (e.lungeState === 2) {
         rotation = Math.atan2(e.lungeY, e.lungeX);
-        width *= 1.4;
-        height *= 0.85;
+        if (!sprite.directions) {
+            width *= 1.4;
+            height *= 0.85;
+        }
     }
 
     const cycle = (t / spec.playSeconds + e.phase / TAU) % 1;
-    const frame = Math.floor(cycle * SPRITE_FRAMES);
-    stamp(atlas, frame * cell, 0, cell, cell, x, y, rotation, width, height);
+    const frame = spriteFrame(sprite, rotation, cycle);
+    stamp(atlas, frame.sx, frame.sy, cell, cell, x, y, frame.rotation, width, height);
 }
 
 // Anel girando em volta do elite, para ser reconhecido de longe
@@ -271,10 +281,21 @@ function renderEliteMark(e) {
 // Bruxa e necromante carregando: a mão brilha antes do tiro
 function renderCastGlow(e, charge) {
     const f = e.facing ?? e.angle;
-    const reach = e.radius * WITCH_VISUALS.scale * 0.95;
-    const hand = e.radius * WITCH_VISUALS.scale * 0.26;
-    const x = e.x + Math.cos(f) * reach - Math.sin(f) * hand;
-    const y = e.y + Math.sin(f) * reach + Math.cos(f) * hand;
+    let x;
+    let y;
+    if (USE_25D) {
+        // 2.5D: a mão que conjura (ponto do boneco, em unidades) projetada pela câmera do jogo
+        const P = MONSTERS_25D.witch.visuals;
+        const k = e.radius * P.scalePerRadius;
+        const { a, b, z } = P.castHand;
+        x = e.x + (a * Math.cos(f) - b * Math.sin(f)) * k;
+        y = e.y + ((a * Math.sin(f) + b * Math.cos(f)) * BODY_25D.groundSquash - (z - P.center) * BODY_25D.heightScale) * k;
+    } else {
+        const reach = e.radius * WITCH_VISUALS.scale * 0.95;
+        const hand = e.radius * WITCH_VISUALS.scale * 0.26;
+        x = e.x + Math.cos(f) * reach - Math.sin(f) * hand;
+        y = e.y + Math.sin(f) * reach + Math.cos(f) * hand;
+    }
     drawGlow(ctx, e.type === 'WITCH' ? WITCH_VISUALS.colors.orbGlow : 'rgba(34, 197, 94, 0.85)', x, y, e.radius * (0.4 + charge), 0.9);
 }
 
@@ -284,6 +305,7 @@ const HEALTH_BAR_OFFSETS = {
     WITCH: WITCH_VISUALS.healthBarOffset,
     NECROMANCER: WITCH_VISUALS.healthBarOffset,
     SKELETON: SKELETON_VISUALS.healthBarOffset,
+    SKELETON_CRAWLER: SKELETON_VISUALS.healthBarOffset,
     VAMPIRE: VAMPIRE_VISUALS.healthBarOffset,
     MOTH: MOTH_VISUALS.healthBarOffset,
     BLOATER: BLOATER_VISUALS.healthBarOffset,
@@ -318,7 +340,7 @@ function renderEnemyOverlays(t) {
                 drawGlow(ctx, ZOMBIE_WOLF_VISUALS.colors.aimAura, e.x, e.y, e.radius * 2.6, 0.55);
             } else if (e.type === 'HEADLESS_KNIGHT' && e.shootTimer > 0 && e.shootTimer < HEADLESS_KNIGHT_VISUALS.chargeSeconds) {
                 // A cabeça acende os olhos antes do tiro
-                const head = knightHeadPosition(e);
+                const head = knightHeadOf(e);
                 const charge = 1 - e.shootTimer / HEADLESS_KNIGHT_VISUALS.chargeSeconds;
                 drawGlow(ctx, HEADLESS_KNIGHT_VISUALS.colors.eyeGlow, head.x, head.y, e.radius * (0.7 + charge * 0.8), 0.9);
             } else if (e.type === 'BONE_COLOSSUS' && e.slamState) {
@@ -360,7 +382,7 @@ export function renderEnemies() {
     for (const e of state.enemies) {
         // Sombras do rival: o mesmo boneco dele (js/render/rival.js)
         if (e.isBoss || e.shadowOwner) drawBoss(e);
-        else if (getMonsterSprite(e.type).spec.live) renderBoneColossus(e);
+        else if (getMonsterSprite(e.type).spec.live) (USE_25D ? MONSTERS_25D.bone_colossus.render : renderBoneColossus)(e);
     }
     renderEnemyOverlays(t);
 }

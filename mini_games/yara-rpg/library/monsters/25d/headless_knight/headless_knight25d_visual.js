@@ -51,9 +51,11 @@ export const HEADLESS_KNIGHT_25D_VISUALS = {
     helmFloat: 0.5,
     plumeLength: 4.5,
 
-    auraRadius: 24,
+    auraRadius: 19.5,
     auraAlpha: HEADLESS_KNIGHT_VISUALS.auraAlpha,
     focusZ: 17,
     focusA: 1,
-    scalePerRadius: 0.13
+    scalePerRadius: 0.13,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 11
 };

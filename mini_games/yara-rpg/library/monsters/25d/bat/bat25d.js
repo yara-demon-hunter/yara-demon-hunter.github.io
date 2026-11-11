@@ -28,11 +28,14 @@ function wing(rig, side, z0, elev, sway) {
     return mix(rootFront, tip, 0.5);
 }
 
+// Gravando num atlas (e.baking), o balanço de lado fica de fora: o jogo aplica no carimbo (sprites_visual.js, sway)
+let baking = false;
+
 function parts(pose, rig) {
     const { C, project, ball, limb } = rig;
     const t = pose.t;
     const flap = Math.sin(t * S.flapHz * Math.PI * 2);
-    const sway = Math.sin(t * S.wobbleHz * Math.PI * 2) * S.wobble;
+    const sway = baking ? 0 : Math.sin(t * S.wobbleHz * Math.PI * 2) * S.wobble;
     const z0 = S.flyHeight - flap * S.bob;
     const elev = flap * S.flapAngle;
     const body = [-0.6, sway, z0];
@@ -74,5 +77,6 @@ function parts(pose, rig) {
 registerCreature('bat', S, parts);
 
 export function renderBat25D(e) {
+    baking = !!e.baking;
     renderMonster25D(e, 'bat', S);
 }

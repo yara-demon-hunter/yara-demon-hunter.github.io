@@ -41,9 +41,11 @@ export const WRAITH_25D_VISUALS = {
     previewAim: 0,
     previewLunge: 0,
 
-    auraRadius: 22,
+    auraRadius: 19.8,
     auraAlpha: WRAITH_VISUALS.auraAlpha,
     focusZ: 17,
     focusA: 2,
-    scalePerRadius: 0.17
+    scalePerRadius: 0.17,
+    // Altura (em unidades do boneco) do centro do corpo: o jogo põe esse ponto em cima do centro de colisão do monstro
+    center: 11
 };
