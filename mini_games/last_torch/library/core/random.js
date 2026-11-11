@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/core/random.js e rode o sync.
 // --- ALEATÓRIO COM SEMENTE ---
 // Mesmo seed => mesmo cenário (as árvores não "pulam" ao redimensionar).
 export function createRandom(seed) {

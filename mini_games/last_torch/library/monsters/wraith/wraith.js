@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/wraith/wraith.js e rode o sync.
 import { WRAITH_VISUALS as V } from './wraith_visual.js';
 import { ctx } from '../../core/canvas.js';
 import { renderNow } from '../../core/clock.js';

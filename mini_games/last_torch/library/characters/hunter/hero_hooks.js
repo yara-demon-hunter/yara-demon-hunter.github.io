@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/characters/hunter/hero_hooks.js e rode o sync.
 // --- O QUE O JOGO ACRESCENTA AO BONECO 2.5D ---
 // O boneco (hero25d.js) e a animação dele (hero_anim.js) não conhecem as regras do jogo que os usa. O jogo liga aqui,
 // com setHeroHooks, o que muda o desenho: o gesto de arremesso, o que a mão livre segura, efeitos na lâmina,

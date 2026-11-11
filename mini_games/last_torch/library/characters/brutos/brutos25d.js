@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/characters/brutos/brutos25d.js e rode o sync.
 import { BRUTOS_VISUALS as O } from './brutos_visual.js';
 import { HERO_25D_VISUALS as V } from '../hunter/hero25d_visual.js';
 import { registerBody } from '../hunter/body_registry.js';

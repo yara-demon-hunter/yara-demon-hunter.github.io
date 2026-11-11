@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/characters/hunter/kit25d.js e rode o sync.
 import { ctx } from '../../core/canvas.js';
 
 // --- FERRAMENTAS DOS BONECOS 2.5D ---

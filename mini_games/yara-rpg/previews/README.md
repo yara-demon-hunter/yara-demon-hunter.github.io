@@ -6,12 +6,12 @@ Páginas de desenvolvimento para analisar a arte do palco 2.5D com o código rea
 |---|---|
 | `index.html` | Página inicial: um botão para cada prévia abaixo |
 | `characters_preview.html` | Escolha o personagem pela foto no topo (`?char=<id de js/data/characters.js>`, ex.: `?char=mysterious-creature`) e a página mostra só ele, com a câmera do palco: rosto de perto, parado, andando, Fúria pronta, no tamanho do jogo, os golpes do combo, giro, golpe pesado, grito da Fúria, dash, aparo, poção, descanso, dano, derrota, fuga, as oito direções (vista de cima, câmera do Last Torch) e girando |
-| `tuner.html` | Ajuste ao vivo: escolha o personagem (`?model=zeph`, `yara`, `azael`, `hunter`) e mexa nos valores do bloco dele em `js/data/visuals/hero25d.js` (medidas, posições do rosto, cabelo, corpo, arma, cores e o corpo de todos em `body`) com controles deslizantes, vendo o boneco mudar na hora em várias vistas (rosto de perto, palco, golpe, tamanho do jogo, de cima). Os alterados ficam em amarelo; **Copiar alterados** gera as linhas para colar no arquivo de dados. Os ajustes ficam guardados no navegador até **Desfazer tudo**. A página não grava nada no arquivo |
 | `stage_preview.html` | O palco do jogo (`js/stage/stage.js`) com um estado de mentira: personagem, região, monstro, pet, nível, Fúria, baú, presença e derrota, mais o resultado do turno (acerta, crítico, atordoa, erra, mata; o monstro revida, é aparado ou erra). Cada botão chama `stage.play(ação, relatório)`, como `js/stage/hooks.js` faz no jogo |
 
-O boneco do Azael (Mysterious Creature) é a mesma arte do Last Torch: ao mudar o desenho em
-`js/stage/azael25d.js`, copie para a biblioteca de personagens, `mini_games/_library/characters/azael/azael25d.js`
-(e vice-versa); o Last Torch recebe de lá pelo sync.
+Os bonecos dos heróis (Demon Hunter, Azael, Yara, Zeph, Oskar) vêm da biblioteca de personagens
+(`mini_games/_library/characters/`), a mesma do Last Torch; o jogo usa a cópia em `library/`, gerada pelo sync.
+Para mudar um boneco, edite na biblioteca e rode `ruby mini_games/_library/sync.rb`. O ajuste ao vivo (medidas,
+rosto, cores, vendo nas câmeras dos dois jogos) é `mini_games/_library/tools/tuner.html`.
 
 ## Como abrir
 
@@ -32,8 +32,8 @@ O boneco do Azael (Mysterious Creature) é a mesma arte do Last Torch: ao mudar 
 
 Se a porta 8000 estiver ocupada, troque o número nos dois lugares (por exemplo, `python3 -m http.server 8001` e `localhost:8001`).
 
-As prévias usam scripts clássicos (sem módulos), então também abrem direto do disco com dois cliques. O servidor
-continua sendo o caminho mais seguro: alguns navegadores bloqueiam imagens em `file://`.
+As prévias carregam os heróis como módulo (`js/stage/heroes.js`), então precisam do servidor: abertas direto do disco
+(`file://`), o navegador bloqueia os módulos.
 
 ## Pelo Jekyll
 

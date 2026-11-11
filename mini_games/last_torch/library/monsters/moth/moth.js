@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/moth/moth.js e rode o sync.
 import { MOTH_VISUALS as V } from './moth_visual.js';
 import { ctx } from '../../core/canvas.js';
 import { renderNow } from '../../core/clock.js';

@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/bone_colossus/bone_colossus_visual.js e rode o sync.
 // --- DADOS VISUAIS: Colosso de Ossos. ---
 // O corpo é o do esqueleto (../skeleton/skeleton.js) em tamanho gigante, com ossos mais escuros e a alma em brasa,
 // e o montante pesado na mão direita.

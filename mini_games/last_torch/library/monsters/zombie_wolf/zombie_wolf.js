@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/zombie_wolf/zombie_wolf.js e rode o sync.
 import { ZOMBIE_WOLF_VISUALS as V } from './zombie_wolf_visual.js';
 import { ctx } from '../../core/canvas.js';
 import { renderNow } from '../../core/clock.js';

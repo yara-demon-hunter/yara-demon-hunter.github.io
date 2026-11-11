@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/core/easing.js e rode o sync.
 // --- EASING ---
 // t de 0 a 1.
 export const easeOutQuad = (t) => 1 - (1 - t) * (1 - t);

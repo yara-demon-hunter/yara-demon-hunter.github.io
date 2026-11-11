@@ -12,7 +12,7 @@ import { drawGlow } from '../../core/glow.js';
 // rig: { project, projectVec, limb, ball, disk, anim, C, sinF, cosF }. Coordenadas locais: a = frente, b = direita, z = altura.
 
 // Orelha pontuda (side = -1 esquerda, 1 direita): folha que sai do lado da cabeça para trás e para cima
-function drawEar(rig, H, side, C, P = A) {
+export function drawEar(rig, H, side, C, P = A) {
     const R = H.R;
     const up = rig.project(...H.at(0.4, side * R * 0.93, 0.3));
     const low = rig.project(...H.at(-0.5, side * R * 0.93, -1.1));
@@ -441,7 +441,7 @@ export function azaelScabbardPart(pose, rig, sheathed) {
 
 // --- BRAÇOS E PERNAS ---
 // Faixa de pano enrolada num trecho do membro (de q0 a q1), com as voltas marcadas
-function wrap(rig, from, to, q0, q1, width, turns) {
+export function wrap(rig, from, to, q0, q1, width, turns) {
     const { limb, C } = rig;
     limb([mix(from, to, q0), mix(from, to, q1)], width + 0.6, C.outline);
     limb([mix(from, to, q0), mix(from, to, q1)], width, C.bandage);

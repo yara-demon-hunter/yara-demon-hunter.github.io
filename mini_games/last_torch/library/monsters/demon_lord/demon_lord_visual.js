@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/demon_lord/demon_lord_visual.js e rode o sync.
 // --- DADOS VISUAIS: Demon Lord (boss). ---
 // Cores, tamanhos e ritmos de animação lidos pelo desenho desta pasta.
 

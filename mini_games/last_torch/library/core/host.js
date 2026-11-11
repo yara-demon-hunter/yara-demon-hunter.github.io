@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/core/host.js e rode o sync.
 // --- O QUE OS DESENHOS PERGUNTAM AO JOGO ---
 // A biblioteca não conhece o jogo que a usa. As poucas coisas que a arte precisa saber dele passam por aqui; o jogo
 // preenche com setHost ao abrir. Sem isso, os valores padrão abaixo valem (anima sempre, sem alvo).

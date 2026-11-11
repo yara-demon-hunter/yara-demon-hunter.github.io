@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/headless_knight/headless_knight_visual.js e rode o sync.
 // --- DADOS VISUAIS: Cavaleiro Sem Cabeça. ---
 // Referência de arte: art_reference/ (nesta pasta). Vista de cima: ombreiras enormes, o gorjal oco com a chama
 // azul no lugar da cabeça, a capa cobrindo as costas (os pés só aparecem na frente), a espada arrastando de um

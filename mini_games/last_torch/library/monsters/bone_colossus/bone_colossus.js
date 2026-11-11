@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/bone_colossus/bone_colossus.js e rode o sync.
 import { BONE_COLOSSUS_VISUALS as V } from './bone_colossus_visual.js';
 import { SKELETON_VISUALS } from '../skeleton/skeleton_visual.js';
 import { ctx } from '../../core/canvas.js';

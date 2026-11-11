@@ -42,7 +42,7 @@
     </style>
 </head>
 <body>
-    <!-- Página de desenvolvimento: o boneco 2.5D de cada personagem do RPG (js/stage/hero25d.js e js/stage/azael25d.js),
+    <!-- Página de desenvolvimento: o boneco 2.5D de cada personagem do RPG (biblioteca de personagens: ../library/characters/),
          com a câmera do palco. ?char=<id de js/data/characters.js> escolhe o personagem. Como abrir: previews/README.md -->
     <nav id="picker" aria-label="Escolha o personagem"></nav>
     <main>
@@ -52,14 +52,23 @@
         <div id="sections"></div>
     </main>
 
-    <!-- Os scripts do jogo entram sempre com a versão mais nova (o navegador não reaproveita cópia antiga em cache) -->
+    <!-- Os scripts do jogo entram um depois do outro, sempre com a versão mais nova (o navegador não reaproveita cópia
+         antiga em cache). heroes.js é um módulo (liga a biblioteca de personagens, ../library): por isso a página só
+         começa (previewMain) quando tudo carregou. -->
     <script>
-        ["../js/data/characters.js", "../js/data/visuals/hero25d.js", "../js/data/visuals/stage.js", "../js/stage/fx.js", "../js/stage/azael25d.js", "../js/stage/yara25d.js", "../js/stage/zeph25d.js", "../js/stage/oskar25d.js", "../js/stage/hero25d.js"].forEach(function (src) {
-            document.write('<script src="' + src + '?v=' + Date.now() + '"><\/script>');
-        });
+        (function load(list) {
+            if (!list.length) return window.previewMain();
+            const s = document.createElement('script');
+            const src = list[0];
+            if (src.endsWith('heroes.js')) s.type = 'module';
+            s.src = src + '?v=' + Date.now();
+            s.onload = () => load(list.slice(1));
+            s.onerror = () => load(list.slice(1));
+            document.head.appendChild(s);
+        })(["../js/data/characters.js", "../js/data/visuals/stage.js", "../js/stage/fx.js", "../js/stage/heroes.js"]);
     </script>
     <script>
-        (() => {
+        window.previewMain = () => {
             const DATA = window.YaraRpgData;
             const STAGE = DATA.visuals.stage;
             const HERO = window.YaraStage25D?.hero;
@@ -86,7 +95,7 @@
                 picker.appendChild(link);
             });
             document.getElementById('title').textContent = CHAR.name;
-            document.getElementById('model').textContent = `Boneco: ${{ azael: 'Azael (js/stage/azael25d.js)', yara: 'Yara (js/stage/yara25d.js)', zeph: 'Zeph (js/stage/zeph25d.js)', oskar: 'Oskar (js/stage/oskar25d.js)' }[LOOK.model] ?? 'Demon Hunter (js/stage/hero25d.js)'}`
+            document.getElementById('model').textContent = `Boneco: ${{ azael: 'Azael', yara: 'Yara', zeph: 'Zeph', oskar: 'Oskar' }[LOOK.model] ?? 'Demon Hunter'} (mini_games/_library/characters/${LOOK.model === 'hunter' || !LOOK.model ? 'hunter' : LOOK.model}/)`
                 + (LOOK.colors ? ' · cores próprias (js/data/visuals/stage.js)' : '');
 
             // --- CÂMERAS ---
@@ -272,7 +281,7 @@
             window.previewStep = (seconds, step = 1 / 60) => {
                 for (let t = 0; t < seconds; t += step) all.forEach(({ s }) => tick(s, step));
             };
-        })();
+        };
     </script>
 </body>
 </html>

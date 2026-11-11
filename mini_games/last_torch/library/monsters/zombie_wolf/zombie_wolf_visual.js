@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/zombie_wolf/zombie_wolf_visual.js e rode o sync.
 // --- DADOS VISUAIS: Lobo Zumbi. ---
 // Referência de arte: art_reference/ (nesta pasta). Vista de cima: lobo magro em galope, costelas à mostra,
 // chama roxa na espinha e na ponta da cauda, olhos violeta e coleira de ferro partida.

@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/moth/moth_visual.js e rode o sync.
 // --- DADOS VISUAIS: Mariposa de cinzas. ---
 // Vista de cima: quatro asas empoeiradas com olhos desenhados, antenas e rastro de cinza.
 export const MOTH_VISUALS = {

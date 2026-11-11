@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/headless_knight/headless_knight.js e rode o sync.
 import { HEADLESS_KNIGHT_VISUALS as V } from './headless_knight_visual.js';
 import { ctx } from '../../core/canvas.js';
 import { renderNow } from '../../core/clock.js';

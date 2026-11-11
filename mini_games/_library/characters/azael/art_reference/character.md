@@ -96,8 +96,8 @@ Código em `characters/azael/azael25d.js`; cores e medidas em `characters/azael/
 - Corpo: contorno escuro em braços, pernas e pés; ombro da espada nu com faixa no bíceps, o outro coberto pelo pano;
   peitoral e abdômen marcados, faixa cruzando o peito e cachecol volumoso com dobras. Sem cinto (obi) e sem bolsinha:
   no boneco pequeno ficavam ruins.
-- O yara-rpg tem uma cópia idêntica (`yara-rpg/js/stage/azael25d.js` + `azael` em `yara-rpg/js/data/visuals/hero25d.js`):
-  ao mudar o desenho aqui, copie para lá.
+- O mesmo boneco é usado no Last Torch e no palco do yara-rpg (os dois recebem a biblioteca pelo sync): confira nas
+  duas câmeras em `mini_games/_library/tools/tuner.html?model=azael`.
 - Capa de pano: cada tira ondula e o meio cede com o peso na corrida; o cachecol cobre os ombros.
 - Corrida: corpo sobe e desce a cada passo, postura um pouco agachada; pés de 3 dedos com garras.
 - Guarda (tsuba): disco perpendicular à espada (não é mais uma bolinha), com posição ao longo da espada em

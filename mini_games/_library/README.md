@@ -1,7 +1,7 @@
 # Biblioteca de personagens e monstros
 
 Um lugar só para a arte de cada personagem e monstro: o desenho em código, as cores e medidas e a referência de arte
-(imagens e ficha). Qualquer mini game pode usar; hoje só o Last Torch está ligado.
+(imagens e ficha). Qualquer mini game pode usar; hoje estão ligados o Last Torch e o yara-rpg.
 
 ## A regra
 
@@ -12,7 +12,7 @@ ruby mini_games/_library/sync.rb
 ```
 
 Cada jogo continua independente: ele carrega a **própria cópia** da biblioteca (no Last Torch, `last_torch/library/`),
-nunca esta pasta. O sync apaga e refaz essa cópia, então nada editado lá sobrevive. Para conferir se alguma cópia está
+nunca esta pasta (no yara-rpg, `yara-rpg/library/`). O sync apaga e refaz essa cópia, então nada editado lá sobrevive. Para conferir se alguma cópia está
 desatualizada ou foi editada à mão (sai com erro se estiver):
 
 ```bash
@@ -20,7 +20,8 @@ ruby mini_games/_library/sync.rb --check
 ```
 
 Quais jogos recebem a cópia, e onde, está em `sync.json` (`"enabled": true` liga). O sync copia tudo menos
-`art_reference/`, os `.md` e os arquivos do próprio sync. Esta pasta começa com `_`, então o Jekyll não a publica.
+`art_reference/`, os `.md` e os arquivos do próprio sync; na cópia ele gera `README.md`, `CLAUDE.md` e `AGENTS.md`
+(instruções para pessoas e IAs) e põe na primeira linha de cada `.js` um aviso com o caminho do original. Esta pasta começa com `_`, então o Jekyll não a publica.
 
 ## O que tem aqui
 
@@ -39,8 +40,9 @@ characters/
     body_registry.js       registro dos outros bonecos (registerBody) e a lista dos ganchos de cada um
     kit25d.js              geometria compartilhada pelos bonecos com rosto (cabeça, membros com contorno, fitas)
     hero_topdown.js        o Demon Hunter antigo, visto de cima
-  azael/                   azael25d.js (o boneco) e azael_visual.js
+  azael/                   azael25d.js (o boneco) e azael_visual.js; exporta a orelha e a bandagem que a Yara usa
   brutos/                  brutos25d.js (o boneco) e brutos_visual.js
+  yara/, zeph/, oskar/     os heróis do yara-rpg, no mesmo esquema (<id>25d.js e <id>_visual.js)
 monsters/<id>/             <id>.js (o desenho, função render...) e <id>_visual.js (cores e medidas)
                            bat, bloater, moth, wraith, zombie_wolf, shadow_wolf, headless_knight, skeleton,
                            bone_colossus, witch, vampire, demon_lord (boss)
@@ -50,7 +52,8 @@ Cada pasta de personagem ou monstro pode ter `art_reference/` com as imagens e a
 são carregadas por jogo nenhum.
 
 **Dependências entre pastas** (ao levar um para outro lugar, leve o que ele usa):
-`azael` e `brutos` → `hunter` → `core`; `bone_colossus` → `skeleton`; todos os monstros → `core`.
+`yara`, `zeph` e `oskar` → `azael` (orelha e bandagem); `azael` e `brutos` → `hunter` → `core`;
+`bone_colossus` → `skeleton`; todos os monstros → `core`.
 
 **O que não está aqui, e fica em cada jogo:** balanceamento (vida, dano, velocidade, ataques, quando aparece), regras
 e efeitos do jogo (no Last Torch: adaga, Fúria, Juramentos, Shadow Clone, bosses que reaproveitam arte com outra
@@ -59,7 +62,8 @@ paleta, sprites em atlas, barras de vida) e as imagens de retrato que o jogo mos
 ## Como um jogo usa a biblioteca
 
 Os arquivos são módulos ES (`import`/`export`). O jogo precisa ligar três coisas ao abrir; no Last Torch, as duas
-primeiras estão em `js/core/state.js` e a terceira em `js/render/player25d.js`:
+primeiras estão em `js/core/state.js` e a terceira em `js/render/player25d.js`. O yara-rpg, que é feito de scripts
+clássicos, carrega um módulo só (`js/stage/heroes.js`) que importa a biblioteca e a expõe em `window`:
 
 1. **Onde desenhar:** `setCtx(canvas.getContext('2d'))` (`core/canvas.js`). `setCtx(outro)` troca o destino por um
    instante (para gerar sprites) e devolve o anterior.
@@ -84,6 +88,12 @@ updateHeroAnim(anim, corpo);
 renderHero25D(corpo, anim, BRUTOS_VISUALS.colors, null, 'brutos');
 ```
 
+**Outra câmera.** Sem mais nada, o boneco usa a câmera do Last Torch (quase de cima, em `hero25d_visual.js`). Um jogo
+com outra câmera passa um sexto argumento, `view`: `{ camera: { heightScale, groundSquash, depthHeightWeight }, scale,
+time, moves, knockback, frenzyGlow, body }` (ver o comentário de `renderHero25D`). O palco do yara-rpg é assim: vê
+de lado, com os pés em `corpo.x, corpo.y`, e anima com `steerHeroAnim` (o jogo diz velocidade e direção) e
+`startHeroSwing` em vez de `updateHeroAnim`.
+
 ### Ligar em outro jogo
 
 1. Em `sync.json`, ponha `"enabled": true` no jogo (e ajuste `target`, a pasta da cópia dentro dele).
@@ -91,8 +101,9 @@ renderHero25D(corpo, anim, BRUTOS_VISUALS.colors, null, 'brutos');
 3. Faça os três passos acima no código do jogo e importe só o que ele usa da cópia (`<jogo>/library/...`).
 4. Se o jogo tem build próprio (como `build-standalone.rb`), inclua a pasta `library` nele.
 
-O yara-rpg ainda está desligado: ele carrega scripts clássicos (sem `import`), então precisa passar a carregar a
-biblioteca como módulos antes. Até lá, o Azael dele (`yara-rpg/js/stage/azael25d.js`) continua uma cópia adaptada à mão.
+Jogo feito de scripts clássicos (sem `import`), como o yara-rpg: um `<script type="module">` que importa a
+biblioteca e põe em `window` o que os outros scripts usam (`yara-rpg/js/stage/heroes.js`). Módulos rodam na ordem
+junto com os scripts `defer`, então ele entra entre eles, antes de quem o usa.
 
 ## Criar um personagem ou monstro
 
@@ -105,6 +116,20 @@ biblioteca como módulos antes. Até lá, o Azael dele (`yara-rpg/js/stage/azael
   com as peças e um `registerBody('<id>', { vis, ... })` no fim. Os ganchos possíveis estão em
   `characters/hunter/body_registry.js`; o que faltar usa o desenho do Demon Hunter.
 - Depois: sync, e no jogo os passos dele (no Last Torch, "Como criar um herói novo" no README do jogo).
+
+## Ajuste ao vivo
+
+`tools/tuner.html` mostra um herói (Demon Hunter, Azael, Brutos, Yara, Zeph ou Oskar) nas **duas câmeras**: a do Last Torch (quase de
+cima) e a do palco do yara-rpg (de lado, rosto em 3/4). Os controles deslizantes mexem nas medidas, posições e cores e
+o boneco muda na hora. O Demon Hunter é o boneco base: o bloco dele (`hero25d_visual.js`) é o corpo de todos.
+
+```bash
+cd mini_games && python3 -m http.server 8010
+# abra http://localhost:8010/_library/tools/tuner.html  (?model=azael, brutos, yara, zeph, oskar)
+```
+
+Para gravar: **Copiar alterados** gera as linhas já com o arquivo de cada uma; cole no `*_visual.js` indicado e rode o
+sync. A página não grava nada sozinha. `tools/` não vai para os jogos.
 
 ## Referência de arte
 

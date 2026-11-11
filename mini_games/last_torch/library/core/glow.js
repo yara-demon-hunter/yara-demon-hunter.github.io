@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/core/glow.js e rode o sync.
 // --- BRILHO EM CACHE ---
 // Um gradiente radial pré-desenhado por cor, em tamanho fixo, esticado com drawImage para qualquer raio.
 // Muito mais barato que ctx.shadowBlur. O raio não entra na chave: o cache tem uma entrada por cor e

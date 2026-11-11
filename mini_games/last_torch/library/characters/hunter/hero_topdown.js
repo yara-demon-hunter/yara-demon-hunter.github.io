@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/characters/hunter/hero_topdown.js e rode o sync.
 import { HERO_VISUALS as V } from './hero_visual.js';
 import { swingAngleAt, capeJag } from './hero_anim.js';
 import { ctx } from '../../core/canvas.js';

@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/bat/bat_visual.js e rode o sync.
 // --- DADOS VISUAIS: Morcego. ---
 // Cores, tamanhos e ritmos de animação lidos pelo desenho desta pasta.
 

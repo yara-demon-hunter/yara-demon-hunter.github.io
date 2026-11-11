@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/wraith/wraith_visual.js e rode o sync.
 // --- DADOS VISUAIS: Espectro. ---
 // Vista de cima: capuz vazio com dois olhos frios, flutuando sobre um rastro de fiapos.
 export const WRAITH_VISUALS = {

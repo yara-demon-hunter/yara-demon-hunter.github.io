@@ -85,7 +85,13 @@ export const HERO_25D_VISUALS = {
         // Juramento: ajoelha e ergue a espada
         oath: { seconds: 1.15, impactAt: 0.4, kneelEnd: 0.32, raiseEnd: 0.62, crouch: 5 },
         // Feitiço: a mão livre sobe com um brilho
-        cast: { seconds: 0.34 }
+        cast: { seconds: 0.34 },
+        // Aparo: espada atravessada na frente do corpo, nas duas mãos (yara-rpg)
+        guard: { seconds: 1.1, crouch: 2.2 },
+        // Poção: a mão livre leva o frasco à boca e a cabeça vai para trás (yara-rpg)
+        drink: { seconds: 1.1 },
+        // Derrota: ajoelha e tomba (yara-rpg)
+        fall: { seconds: 1.4, crouch: 6 }
     },
     // Dash: corpo abaixado e jogado para a frente, braços para trás
     dashLean: 7,

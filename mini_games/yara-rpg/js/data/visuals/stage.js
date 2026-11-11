@@ -16,6 +16,28 @@ window.YaraRpgData.visuals = window.YaraRpgData.visuals || {};
             heroTop: 25            // altura do topo da cabeça do herói (unidades)
         },
 
+        // Bonecos dos heróis na câmera do palco. A arte (corpo, cores, golpes) vem da biblioteca de personagens
+        // (library/characters/, cópia de mini_games/_library); aqui fica só o que muda por causa desta câmera.
+        hero: {
+            depthHeightWeight: 0.25,   // peso da altura na ordem de desenho (o que fica na frente)
+            swingHalfArc: 0.8,         // meia abertura do arco do golpe (radianos)
+            frenzyGlow: 1.4,           // a lâmina brilha mais com a Fúria
+            // Empurrão e anel no chão ao levar dano (unidades do boneco)
+            knockback: { seconds: 0.32, distance: 6, peakAt: 0.3, ringSeconds: 0.35, ringStartRadius: 4, ringEndRadius: 16 },
+            // Medidas do corpo trocadas nesta câmera: sombra menor e capa que sobe menos na corrida (de lado ela cobriria o boneco)
+            body: {
+                shadowRadiusFront: 3.3,
+                shadowColor: 'rgba(0, 0, 0, 0.42)',
+                capeRunLift: 6.5,
+                capeRunLength: 13
+            },
+            // Golpes especiais com ajustes do palco (o resto vem da biblioteca): salto mais baixo e grito mais curto
+            moves: {
+                slam: { height: 16 },
+                roar: { seconds: 0.6, impactAt: 0.25 }
+            }
+        },
+
         // Posições na trilha (unidades a partir do centro da tela, na profundidade dos personagens)
         layout: {
             heroExplore: -14,      // herói explorando (sem monstro)

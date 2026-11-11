@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/shadow_wolf/shadow_wolf.js e rode o sync.
 import { SHADOW_WOLF_VISUALS as V } from './shadow_wolf_visual.js';
 import { ctx } from '../../core/canvas.js';
 import { renderNow } from '../../core/clock.js';

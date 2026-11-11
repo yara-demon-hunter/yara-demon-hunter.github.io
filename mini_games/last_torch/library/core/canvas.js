@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/core/canvas.js e rode o sync.
 // --- ONDE A BIBLIOTECA DESENHA ---
 // Todo desenho da biblioteca usa este ctx. O jogo liga o canvas dele com setCtx ao abrir e pode trocar o destino
 // por um instante (gerar sprites num canvas fora da tela): quem importa ctx passa a ver o novo destino.

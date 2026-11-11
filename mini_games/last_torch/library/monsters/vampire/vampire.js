@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/vampire/vampire.js e rode o sync.
 import { VAMPIRE_VISUALS as V } from './vampire_visual.js';
 import { ctx } from '../../core/canvas.js';
 import { host } from '../../core/host.js';

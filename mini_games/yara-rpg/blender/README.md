@@ -20,14 +20,14 @@ Saída em `renders/zeph/`:
 O jogo desenha os personagens em código (`js/systems/rig.js`). O Blender usa **o mesmo esqueleto e os mesmos ângulos**,
 então uma pose de `js/data/rig/zeph.js` funciona aqui sem conversão, e vice-versa. Usos possíveis:
 
-1. **Referência** (já funciona): renders de perfil vão para `art_reference/<id>/images/` e alimentam o fluxo atual.
+1. **Referência** (já funciona): renders de perfil vão para `mini_games/_library/characters/<id>/art_reference/images/` e alimentam o fluxo atual.
    Também dá para testar uma pose no Blender antes de passá-la para o jogo.
 2. **Sprites pré-renderizados** (próximo passo, se você quiser): renderizar cada animação quadro a quadro em PNG
    transparente e o palco do jogo passar a desenhar imagens em vez do rig. O visual fica bem mais rico, mas exige
    mudar `stage.js` e aumenta o peso do jogo.
 
 ## Pedidos que funcionam bem
-- "Crie o personagem `<id>` no Blender a partir de `art_reference/<id>/`"
+- "Crie o personagem `<id>` no Blender a partir de `mini_games/_library/characters/<id>/art_reference/`"
 - "Melhore o rosto/cabelo do Zeph e renderize de novo até ficar bom"
 - "Passe a animação de ataque do jogo para o Blender e gere os quadros"
 - "Use o HDRI `<arquivo>` e materiais PBR na jaqueta"

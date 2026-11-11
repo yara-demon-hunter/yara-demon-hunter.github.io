@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/witch/witch_visual.js e rode o sync.
 // --- DADOS VISUAIS: Bruxa. ---
 // Cores, tamanhos e ritmos de animação lidos pelo desenho desta pasta.
 

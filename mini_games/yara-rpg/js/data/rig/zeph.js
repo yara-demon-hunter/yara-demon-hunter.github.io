@@ -2,7 +2,7 @@ window.YaraRpgData = window.YaraRpgData || {};
 window.YaraRpgData.rig = window.YaraRpgData.rig || {};
 
 // ZEPH — lenhador jovem, jaqueta oliva, machado de duas mãos.
-// Referência: art_reference/zeph (ficha + GIFs só para estudo; o jogo não usa aquelas imagens).
+// Referência: mini_games/_library/characters/zeph/art_reference (ficha + GIFs só para estudo; o jogo não usa aquelas imagens).
 // Convenções de ângulo e campos da pose: topo de js/systems/rig.js. Estilo: art_reference/STYLE.md.
 (() => {
     // Guarda de combate: base de várias animações (o golpe começa e termina nela)

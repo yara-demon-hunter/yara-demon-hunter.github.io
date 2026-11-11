@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/characters/hunter/hero_visual.js e rode o sync.
 // --- DADOS VISUAIS: Demon Hunter (Caçador das Sombras). Referência: art_reference/ (nesta pasta). ---
 // Paleta, tamanhos e ritmos de animação do herói. O boneco 2.5D (hero25d.js) e o top-down (hero_topdown.js) leem daqui;
 // Azael e Brutos partem desta paleta e destes ritmos. As barras do HUD em cima da cabeça são do jogo, não daqui.

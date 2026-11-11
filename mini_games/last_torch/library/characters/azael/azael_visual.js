@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/characters/azael/azael_visual.js e rode o sync.
 // --- DADOS VISUAIS: Azael (herói 2.5D). Referência: art_reference/ (nesta pasta). ---
 // Demônio ronin: pele branco-prateada, cabelo branco esvoaçante, olhos vermelhos, bandana e capa marrons,
 // katana na bainha da cintura e pés descalços de 3 dedos (2 na frente, 1 atrás).

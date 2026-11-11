@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/characters/brutos/brutos_visual.js e rode o sync.
 // --- DADOS VISUAIS: Captain Brutos (herói 2.5D). Referência: art_reference/ (nesta pasta). ---
 // Capitão alto e massudo de armadura negra: ombreiras, peitoral de placas, cota de malha aparecendo, grevas e
 // joelheiras, capa preta longa e um machado de duas lâminas sempre nas duas mãos. Cabelo curto preto, barba densa e

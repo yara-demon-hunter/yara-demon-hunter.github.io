@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/shadow_wolf/shadow_wolf_visual.js e rode o sync.
 // --- DADOS VISUAIS: Lobo Sombriço. ---
 // Mesmo lobo do Yara RPG (yara-rpg/images/monsters/shadow-wolf.webp), visto de cima: pelo cinza-azulado escuro
 // com mechas claras, juba desgrenhada, olhos e boca vermelhos, e a traseira se desfazendo em fumaça preta.

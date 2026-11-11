@@ -145,3 +145,63 @@ export function updateHeroAnim(a, body) {
     a.dash += ((body.dashTimer > 0 ? 1 : 0) - a.dash) * Math.min(1, dt * V.dashBlendRate);
     a.vigil += ((body.vigilStance ? 1 : 0) - a.vigil) * Math.min(1, dt * V.vigilBlendRate);
 }
+
+// --- ANIMAÇÃO GUIADA PELO JOGO (palco do yara-rpg) ---
+// Para quem não move o corpo pelo mundo: o jogo diz a velocidade (vx, vy em px/s, na escala do Last Torch), para onde
+// olhar (face) e quanto tempo passou (dt). input: { vx, vy, face, dashing, kneeling }. Mesmos ritmos de hero_visual.js.
+export function steerHeroAnim(a, input, dt) {
+    if (dt <= 0) return;
+    const clampSpeed = (v) => Math.max(-600, Math.min(600, v || 0));
+    const k = Math.min(1, dt * V.speedSmoothing);
+    a.velX += (clampSpeed(input.vx) - a.velX) * k;
+    a.velY += (clampSpeed(input.vy) - a.velY) * k;
+    a.speed = Math.hypot(a.velX, a.velY);
+
+    const runTarget = Math.min(1, a.speed / V.runSpeedForFullEffect);
+    a.run += (runTarget - a.run) * Math.min(1, dt * V.runSmoothing);
+    a.stride += dt * (BODIES[a.model]?.vis.strideSpeed ?? V.strideSpeed) * (0.25 + a.run);
+
+    // Giro suave para onde o jogo manda olhar
+    const before = a.facing;
+    a.facing = lerpAngle(a.facing, input.face ?? a.facing, Math.min(1, dt * V.turnSmoothing));
+    let dAng = a.facing - before;
+    while (dAng > Math.PI) dAng -= Math.PI * 2;
+    while (dAng < -Math.PI) dAng += Math.PI * 2;
+    a.turnRate += (dAng / dt - a.turnRate) * Math.min(1, dt * 10);
+
+    // Capa: atraso suave oposto à velocidade (no referencial do herói)
+    const cos = Math.cos(-a.facing);
+    const sin = Math.sin(-a.facing);
+    const lx = a.velX * cos - a.velY * sin;
+    const ly = a.velX * sin + a.velY * cos;
+    const lag = (v) => Math.max(-V.capeMaxLag, Math.min(V.capeMaxLag, v));
+    const f = Math.min(1, dt * V.capeFollow);
+    a.capeX += (lag(-lx * V.capeDragPerSpeed) - a.capeX) * f;
+    a.capeY += (lag(-ly * V.capeDragPerSpeed - a.turnRate * V.capeTurnLag) - a.capeY) * f;
+
+    if (a.swingActive) {
+        a.swingElapsed += dt;
+        if (a.swingElapsed > a.swingSeconds + V.recoverSeconds) a.swingActive = false;
+    }
+    const blendTarget = a.swingActive && a.swingElapsed < a.swingSeconds + V.recoverSeconds * 0.4 ? 1 : 0;
+    a.swingBlend += (blendTarget - a.swingBlend) * Math.min(1, dt * V.swingBlendRate);
+    if (a.swingBlend < 0.001) a.swingBlend = 0;
+    a.dash += ((input.dashing ? 1 : 0) - a.dash) * Math.min(1, dt * V.dashBlendRate);
+    a.vigil += ((input.kneeling ? 1 : 0) - a.vigil) * Math.min(1, dt * V.vigilBlendRate);
+}
+
+// Golpe do combo pedido pelo jogo: step 1, 2, 3 ou 'whirl' (giro); halfArc: meia abertura do corte. Devolve a duração.
+export function startHeroSwing(a, step, halfArc = 0.7) {
+    const combo = V.combo[step] || V.combo[1];
+    a.swingSeconds = combo.seconds;
+    a.swingElapsed = 0;
+    a.swingActive = true;
+    if (combo.spin) {
+        a.swingFrom = -Math.PI;
+        a.swingTo = Math.PI;
+    } else {
+        a.swingFrom = combo.from * (halfArc + combo.extraArc);
+        a.swingTo = combo.to * (halfArc + combo.extraArc);
+    }
+    return combo.seconds;
+}

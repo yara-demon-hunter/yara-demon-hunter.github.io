@@ -1,5 +1,5 @@
 // --- PALCO 2.5D ---
-// Mostra o que acontece no jogo: o herói (boneco 2.5D de js/stage/hero25d.js) anda pela trilha ao explorar,
+// Mostra o que acontece no jogo: o herói (boneco 2.5D da biblioteca de personagens, via js/stage/heroes.js) anda pela trilha ao explorar,
 // avança e golpeia o monstro, apara, esquiva, bebe poção, acende a fogueira... num cenário 2.5D por região
 // (js/stage/scenery.js). Só descreve: não muda nenhuma regra do jogo.
 //

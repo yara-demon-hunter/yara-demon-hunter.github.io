@@ -1,3 +1,4 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/bloater/bloater_visual.js e rode o sync.
 // --- DADOS VISUAIS: Inchado. ---
 // Vista de cima: corpo enorme e esverdeado, bolsas de gás que brilham e pulsam mais rápido perto de estourar.
 export const BLOATER_VISUALS = {

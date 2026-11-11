@@ -1,10 +1,10 @@
 # Blender — personagens do Yara RPG
 
 Pasta de trabalho 3D do yara-rpg. Nada aqui é carregado pelo jogo nem publicado no site (excluída em `_config.yml`).
-Serve para modelar, posar e renderizar personagens; o que for útil sai como imagem para `../art_reference/<id>/images/`.
+Serve para modelar, posar e renderizar personagens; o que for útil sai como imagem para `mini_games/_library/characters/<id>/art_reference/images/`.
 
 ## Fluxo (sempre em loop)
-1. **Modele a partir das imagens de `../art_reference/<id>/images/`**, não das proporções do rig 2D.
+1. **Modele a partir das imagens de `mini_games/_library/characters/<id>/art_reference/images/`**, não das proporções do rig 2D.
    Extraia os quadros (o script faz isso em `renders/<id>/_ref/`), meça proporções e anote no topo de `characters/<id>.py`.
 2. Escreva/edite o script `bpy`: personagem em `characters/<id>.py`, cena em `scenes/<id>_render.py`.
 3. Renderize sem janela: `./run.sh scenes/<id>_render.py` (`--only a,b` para alguns quadros).
