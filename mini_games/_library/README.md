@@ -50,7 +50,8 @@ monsters/
                            bone_colossus, witch, vampire, demon_lord (boss)
   25d/<id>/                o mesmo monstro no boneco 2.5D dos heróis, para qualquer câmera: <id>25d.js e
                            <id>25d_visual.js (cores lidas do topdown). Por enquanto: skeleton, skeleton_crawler (o
-                           Esqueleto Rastejante, com as peças do skeleton) e bloater. monster25d.js desenha qualquer
+                           Esqueleto Rastejante, com as peças do skeleton), bloater e witch (blend da Bruxa dos dois
+                           jogos). Cada um tem art_reference/ com a ficha de como foi criado. monster25d.js desenha qualquer
                            um deles a partir do monstro do jogo. O Last Torch fica no desenho de cima
 ```
 
@@ -114,6 +115,9 @@ junto com os scripts `defer`, então ele entra entre eles, antes de quem o usa.
 
 ## Criar um personagem ou monstro
 
+- **Monstro 2.5D:** pasta `monsters/25d/<id>/` com `<id>25d_visual.js` (cores lidas do topdown), `<id>25d.js` (as
+  peças num `registerBody`, como o Esqueleto) e **sempre** `art_reference/character.md`: de onde veio (topdown, outro
+  jogo, imagens), a tabela de peças, as decisões e o que foi rejeitado, mais uma imagem do resultado no tuner.
 - **Monstro:** pasta `monsters/topdown/<id>/` com `<id>_visual.js` (cores e medidas) e `<id>.js` com uma função
   `render<Nome>(e)` que desenha no `ctx` de `core/canvas.js`, centrado em `e.x, e.y` e virado para `e.angle`. Use
   `renderNow()` (`core/clock.js`) para o tempo da animação e `host.animating()` antes de avançar o estado dela. Copie
