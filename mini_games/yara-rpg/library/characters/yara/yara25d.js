@@ -373,9 +373,8 @@ function drawYaraArm(rig, shoulder, elbow, hand, armWidth, handRadius) {
     limb([mix(el, hand, 0.4), hand], w + 0.85, C.outline);
     limb([mix(el, hand, 0.4), hand], w + 0.25, C.leather);
     limb([mix(el, hand, 0.68), mix(el, hand, 0.72)], w + 0.3, C.leatherShade);
-    K.oball(rig, hand, handRadius * 0.7, C.leather);
-    const d = norm(sub(hand, el));
-    ball(add(hand, d, 0.75), 0.5, C.skin);
+    // Mão de luva de couro: redonda, com o risco dos dedos e do polegar (kit25d.js, drawHand)
+    K.drawHand(rig, el, hand, right ? 1 : -1, { color: C.leather, shade: C.leatherShade, size: handRadius * Y.handScale, grip: right ? 1 : 0 });
     if (!right) {
         // Ombreira de metal com gola de pelo branco por cima e uma tira de couro no braço
         const top = [sh[0] - 0.1, sh[1] * 1.05, sh[2] + 0.5];

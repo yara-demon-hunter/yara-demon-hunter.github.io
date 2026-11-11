@@ -257,11 +257,8 @@ function drawOskarArm(rig, shoulder, elbow, hand, armWidth, handRadius) {
     limb([mix(elbow, hand, 0.2), mix(elbow, hand, 0.7)].map(p => [p[0], p[1], p[2] - 0.3]), w * 0.2, C.skinShade);
     // Munhequeira
     K.olimb(rig, [mix(elbow, hand, 0.74), mix(elbow, hand, 0.9)], w * 0.84, C.wristband);
-    // Mão: palma e dedos fechados no cabo
-    const d = norm(sub(hand, elbow));
-    K.oball(rig, hand, handRadius * 0.62, C.skin);
-    K.olimb(rig, [add(hand, d, 0.3), add(hand, d, 0.75)], handRadius * 0.82, C.skin);
-    limb([add(hand, d, 0.52), add(hand, d, 0.54)], handRadius * 0.86, C.skinShade);
+    // Mão redonda com o risco dos dedos e do polegar (kit25d.js, drawHand)
+    K.drawHand(rig, elbow, hand, Math.sign(shoulder[1]) || 1, { color: C.skin, shade: C.skinShade, size: handRadius * O.handScale, grip: 1 });
 }
 
 // Perna: calça marrom-escura larga até a canela e bota de couro com faixas enroladas; pé chato no chão

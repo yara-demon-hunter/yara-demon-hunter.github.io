@@ -142,6 +142,20 @@ export const BRUTOS_VISUALS = {
     leftHandOffset: [0, 0, 0],
     // Ombreiras: raio em relação ao braço
     pauldronScale: 0.95,
+    // Capa: presa por cima das ombreiras (largura dos ombros × capeShoulderSpread, capeRise acima) e caindo reta pelas
+    // costas (barra × capeHemSpread). Sem isso ela sai de dentro do corpo e só aparece abaixo da cintura.
+    capeShoulderSpread: 1.45,
+    capeRise: 0.9,
+    // Nas pontas (sobre as ombreiras) a capa desce, seguindo a curva dos ombros
+    capeShoulderDrop: 2.2,
+    capeHemSpread: 1.05,
+    // Quanto a capa inteira vai para trás das costas (unidades; + = mais longe do corpo) e quanto só a barra vai a mais
+    capeBackOffset: 0,
+    capeHemBackOffset: 0,
+    // Espessura do pano (borda escura em volta da capa; 0 = fina como a do Demon Hunter)
+    capeThickness: 0,
     // Brilho em volta do machado (aço, fraco)
-    glowScale: 0.6
+    glowScale: 0.6,
+    // Tamanho da mão (em relação ao handRadius do corpo)
+    handScale: 0.85
 };

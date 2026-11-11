@@ -46,6 +46,8 @@ export const HERO_25D_VISUALS = {
     shoulderRadius: 2,
     armWidth: 2.2,
     handRadius: 1.2,
+    // Tamanho da mão (bola) em relação ao handRadius
+    handScale: 1.05,
     handHeight: 10,
     armSwing: 2.6,
 

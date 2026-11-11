@@ -183,3 +183,27 @@ export function oball(rig, p, r, color) {
     rig.ball(p, r, color);
 }
 
+
+// --- MÃO ---
+// Mão redonda (uma bola) com dois riscos que dizem "mão": a dobra dos dedos atravessando a frente e um risquinho do
+// polegar do lado de dentro. elbow → hand dá a direção do antebraço; side: +1 mão direita, -1 esquerda.
+// o: { color (pele ou luva), shade (cor dos riscos; padrão o contorno), outline (cor do contorno; null = sem
+//      contorno), size (raio da bola; padrão 1), grip (0 = relaxada, 1 = fechada: a dobra dos dedos fica mais marcada) }
+export function drawHand(rig, elbow, hand, side, o) {
+    const { limb, ball } = rig;
+    const r = o.size ?? 1;
+    const grip = o.grip ?? 0;
+    const line = o.outline === undefined ? rig.C.outline : o.outline;
+    const crease = o.shade ?? line ?? 'rgba(0, 0, 0, 0.45)';
+    const d = norm(sub(hand, elbow));
+    let inward = norm([-d[1], d[0], 0]).map(v => v * (side > 0 ? -1 : 1));
+    if (!Number.isFinite(inward[0])) inward = [0, -side, 0];
+    if (line) ball(hand, r + 0.3, line);
+    ball(hand, r, o.color);
+    // Dobra dos dedos: arco na frente da bola, de um lado ao outro
+    const front = add(hand, d, r * 0.35);
+    limb([add(add(front, inward, -r * 0.7), d, -r * 0.15), add(front, d, r * 0.12), add(add(front, inward, r * 0.7), d, -r * 0.15)],
+        r * (0.16 + 0.06 * grip), crease);
+    // Polegar: risquinho do lado de dentro, da base para a frente
+    limb([add(add(hand, inward, r * 0.55), d, -r * 0.2), add(add(hand, inward, r * 0.45), d, r * 0.3)], r * 0.14, crease);
+}

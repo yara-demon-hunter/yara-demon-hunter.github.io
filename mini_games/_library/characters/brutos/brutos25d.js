@@ -261,11 +261,8 @@ function drawBrutosArm(rig, shoulder, elbow, hand, armWidth, handRadius) {
         limb([[a[0] - pr * 0.6, a[1], a[2]], [a[0] + pr * 0.6, a[1], a[2]]], 0.3, C.armorShade);
     }
     ball([sh[0] + 0.2, sh[1], sh[2] + pr * 0.55], pr * 0.32, C.armorLight);
-    // Mão: palma e dedos fechados no cabo
-    const d = norm(sub(hand, elbow));
-    K.oball(rig, hand, handRadius * 0.62, C.skin);
-    K.olimb(rig, [add(hand, d, 0.3), add(hand, d, 0.75)], handRadius * 0.82, C.skin);
-    limb([add(hand, d, 0.52), add(hand, d, 0.54)], handRadius * 0.86, C.skinShade);
+    // Mão redonda com o risco dos dedos e do polegar (kit25d.js, drawHand)
+    K.drawHand(rig, elbow, hand, Math.sign(shoulder[1]) || 1, { color: C.skin, shade: C.skinShade, size: handRadius * O.handScale, grip: 1 });
 }
 
 // Perna: calça de couro na coxa, joelheira de ferro, greva escura até o tornozelo e bota reforçada
@@ -534,8 +531,18 @@ registerBody('brutos', {
     vis: O,
     drawLeg: (rig, { hip, knee, ankle, toe }) => drawBrutosLeg(rig, hip, knee, ankle, toe),
     drawTorso: (rig, pose, bottom, top, wb, wt) => drawBrutosTorso(rig, pose, bottom, top, wb, wt),
-    // A capa padrão (preta, com as cores dele), sem as pontas da faixa da cintura
-    drawBack: (rig, pose, anchors, hem) => rig.drawCapeShape(anchors, hem),
+    // A capa padrão (preta, com as cores dele), sem as pontas da faixa da cintura. Presa na largura das ombreiras e
+    // caindo reta, para cobrir as costas inteiras (a do Demon Hunter, mais estreita, sumiria dentro dos ombros dele)
+    drawBack: (rig, pose, anchors, hem) => rig.drawCapeShape(
+        anchors.map((p, i) => {
+            const side = Math.abs(2 * i / (anchors.length - 1) - 1);
+            return [p[0] - O.capeBackOffset, p[1] * O.capeShoulderSpread, p[2] + O.capeRise - O.capeShoulderDrop * side * side];
+        }),
+        hem.map(p => [p[0] - O.capeBackOffset - O.capeHemBackOffset, p[1] * O.capeHemSpread, p[2]]),
+        { thickness: O.capeThickness }
+    ),
+    // De costas, a capa vem por cima do tronco (cobre o cinto e as alças); de frente fica atrás, como sempre
+    backDepth: (rig, pose, depth) => (rig.sinF < 0 ? Math.max(depth, rig.project(pose.lean * 0.6, 0, 13.5).depth + 0.05) : depth),
     freeArm,
     drawArm: (rig, shoulder, elbow, hand, armWidth, handRadius) => drawBrutosArm(rig, shoulder, elbow, hand, armWidth, handRadius),
     swordArmPart,

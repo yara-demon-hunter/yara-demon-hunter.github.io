@@ -105,5 +105,7 @@ export const ZEPH_VISUALS = {
     // Adaga: lâmina curta e reta
     bladeLength: 7.7,
     bladeWidth: 2.06,
-    glowScale: 0.48
+    glowScale: 0.48,
+    // Tamanho da mão (em relação ao handRadius do corpo)
+    handScale: 0.75
 };

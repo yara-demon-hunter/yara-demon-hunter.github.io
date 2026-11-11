@@ -6,6 +6,7 @@ import { heroHooks as hooks } from './hero_hooks.js';
 import { ctx } from '../../core/canvas.js';
 import { easeOutCubic, easeOutQuad, lerpAngle } from '../../core/easing.js';
 import { drawGlow } from '../../core/glow.js';
+import { drawHand } from './kit25d.js';
 
 export { setHeroHooks } from './hero_hooks.js';
 
@@ -388,8 +389,9 @@ function sashEnds(pose) {
     }
 }
 
-// Capa padrão: presa nos ombros, barra rasgada e dobras (cores C.cape*). Bonecos com drawBack podem chamá-la por rig.drawCapeShape
-function drawCapeShape(anchors, hem) {
+// Capa padrão: presa nos ombros, barra rasgada e dobras (cores C.cape*). Bonecos com drawBack podem chamá-la por rig.drawCapeShape.
+// thickness (opcional): espessura do pano, uma borda escura (C.capeInner) em volta da capa inteira; 0 = pano fino
+function drawCapeShape(anchors, hem, { thickness = 0 } = {}) {
     const n = H.capeStrips;
     ctx.beginPath();
     anchors.forEach((p, i) => {
@@ -409,6 +411,12 @@ function drawCapeShape(anchors, hem) {
         }
     }
     ctx.closePath();
+    if (thickness > 0) {
+        ctx.strokeStyle = C.capeInner ?? C.capeEdge;
+        ctx.lineWidth = 0.6 + thickness * 2;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+    }
     ctx.fillStyle = C.cape;
     ctx.fill();
     ctx.strokeStyle = C.capeEdge;
@@ -446,8 +454,10 @@ function capePart(pose) {
         ]);
     }
 
+    const depth = project(pose.lean - 3.5, 0, 9).depth;
     return {
-        depth: project(pose.lean - 3.5, 0, 9).depth,
+        // backDepth: o boneco pode mudar a ordem de desenho das costas (ex.: capa por cima do tronco, vista de costas)
+        depth: B?.backDepth ? B.backDepth(rig, pose, depth) : depth,
         draw() {
             // Quem tem as costas próprias (drawBack) desenha no lugar da capa
             if (B?.drawBack) {
@@ -595,7 +605,8 @@ function freeArmPart(pose, body) {
             if (hooks.drawHeldItem && ((throwK >= 0 && throwK < hooks.throwVisual.letGoFraction) || charge > 0 || fireHold > 0)) {
                 hooks.drawHeldItem(rig, { shoulder, hand, pose, charge, fireHold });
             }
-            if (!B?.drawArm) ball(hand, V.handRadius, C.glove);
+            // Mão livre: bola com o risco dos dedos (mais marcado ao segurar a adaga, carregar ou lançar)
+            if (!B?.drawArm) drawHand(rig, elbow, hand, -1, { color: C.glove, shade: C.sleeve, outline: null, size: V.handRadius * V.handScale, grip: throwK >= 0 || charge > 0 || fireHold > 0 ? 1 : 0 });
             if (charge > 0 || cast > 0) {
                 const glow = project(...hand);
                 ctx.save();
@@ -661,7 +672,8 @@ function swordArmPart(pose) {
             }
             ball(shoulder, V.shoulderRadius, C.sleeve);
             limb([shoulder, elbow, hand], V.armWidth, C.sleeve);
-            ball(hand, V.handRadius, C.glove);
+            // Mão da espada: bola com o risco dos dedos
+            drawHand(rig, elbow, hand, 1, { color: C.glove, shade: C.sleeve, outline: null, size: V.handRadius * V.handScale, grip: 1 });
         }
     };
 }

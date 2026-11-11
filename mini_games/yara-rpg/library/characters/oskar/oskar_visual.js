@@ -131,5 +131,7 @@ export const OSKAR_VISUALS = {
     leftShoulderOffset: [-0.59, 0.4, 0.26],
     leftElbowOffset: [0, 0, 0],
     leftHandOffset: [0, 0, 0],
-    glowScale: 0.59
+    glowScale: 0.59,
+    // Tamanho da mão (em relação ao handRadius do corpo)
+    handScale: 0.85
 };

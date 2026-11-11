@@ -100,5 +100,7 @@ export const YARA_VISUALS = {
     // Espada curta, reta e larga
     bladeLength: 13,
     bladeWidth: 2.85,
-    glowScale: 0.37
+    glowScale: 0.37,
+    // Tamanho da mão (em relação ao handRadius do corpo)
+    handScale: 0.75
 };

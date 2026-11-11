@@ -41,12 +41,16 @@
         }
         details { border-bottom: 1px solid #2a2418; padding: 4px 0 8px; }
         summary { cursor: pointer; color: #fbbf24; font-weight: 700; font-size: 14px; padding: 6px 0; }
-        .row { display: grid; grid-template-columns: 215px 1fr 64px; gap: 6px; align-items: center; margin: 3px 0; font-size: 12px; }
+        .row { display: grid; grid-template-columns: 150px 46px 1fr 46px 64px; gap: 5px; align-items: center; margin: 3px 0; font-size: 12px; }
+        /* Mínimo e máximo da barra (editáveis): discretos até passar o mouse ou focar */
+        .row input.lim { width: 46px; padding: 2px 3px; font-size: 10.5px; color: #8a8270; background: #120f09; border-color: #2a2418; }
+        .row input.lim:hover, .row input.lim:focus { color: #e7dfcc; border-color: #5c5137; }
+        .row input.lim.custom { color: #93c5fd; border-color: #1e3a5f; }
         .row.changed .name { color: #fde68a; }
         .row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, monospace; font-size: 11.5px; }
         .row input[type=range] { width: 100%; accent-color: #fbbf24; }
         .row input[type=number] { width: 68px; padding: 3px 4px; font-size: 12px; }
-        .row.wide { grid-template-columns: 215px 1fr; }
+        .row.wide { grid-template-columns: 150px 1fr; }
         .row input[type=text] { width: 100%; font: 12px ui-monospace, monospace; padding: 3px 5px; }
         .row input[type=text].bad { border-color: #ef4444; }
         .row input[type=color] { width: 100%; height: 24px; padding: 0; border: 1px solid #3a3322; border-radius: 4px; background: none; }
@@ -74,6 +78,7 @@
         <aside>
             <input id="filter" class="filter" type="text" placeholder="Filtrar (ex.: eye, ear, hair, leg)">
             <p class="hint">Mude os valores e veja o boneco na hora, nas duas câmeras. Os alterados ficam em amarelo.
+                Os campinhos dos lados da barra são o mínimo e o máximo dela: mude à vontade (ficam azuis e guardados).
                 Para gravar: <b>Copiar alterados</b>, cole as linhas no arquivo indicado em <code>mini_games/_library/</code>
                 e rode <code>ruby mini_games/_library/sync.rb</code>. Os ajustes ficam guardados neste navegador até você desfazer.</p>
             <div id="controls"></div>
@@ -155,6 +160,13 @@
         const persist = () => {
             try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch { /* sem armazenamento: só nesta aba */ }
         };
+        // Faixas das barras escolhidas à mão: { 'modelo:caminho': { min, max } }
+        const RANGES = 'library-tuner-ranges';
+        let ranges = {};
+        try { ranges = JSON.parse(localStorage.getItem(RANGES) || '{}') || {}; } catch { ranges = {}; }
+        const persistRanges = () => {
+            try { localStorage.setItem(RANGES, JSON.stringify(ranges)); } catch { /* só nesta aba */ }
+        };
         const getAt = (obj, path) => path.split('.').reduce((o, k) => o?.[k], obj);
         const setAt = (obj, path, value) => {
             const keys = path.split('.');
@@ -203,18 +215,61 @@
             row.appendChild(name);
             if (typeof value === 'number') {
                 const r = rangeFor(getAt(ORIGINAL[key], path) ?? value);
-                const range = Object.assign(document.createElement('input'), { type: 'range', min: r.min, max: r.max, step: r.step, value });
+                const rk = `${key}:${path}`;
+                const custom = ranges[rk] || {};
+                const min0 = Math.min(custom.min ?? r.min, value);
+                const max0 = Math.max(custom.max ?? r.max, value);
+                const range = Object.assign(document.createElement('input'), { type: 'range', min: min0, max: max0, step: r.step, value });
                 const num = Object.assign(document.createElement('input'), { type: 'number', step: r.step, value: fmt(value) });
+                const lo = Object.assign(document.createElement('input'), { type: 'number', className: 'lim', value: fmt(min0), title: 'Mínimo da barra' });
+                const hi = Object.assign(document.createElement('input'), { type: 'number', className: 'lim', value: fmt(max0), title: 'Máximo da barra' });
+                lo.classList.toggle('custom', custom.min !== undefined);
+                hi.classList.toggle('custom', custom.max !== undefined);
+                // Passo fino o bastante para a faixa escolhida (umas 400 posições na barra)
+                const fitStep = () => { range.step = Math.min(r.step, Math.max(0.0001, (+range.max - +range.min) / 400)); };
+                fitStep();
+                const setLimit = (input, which) => {
+                    if (input.value === '' || isNaN(+input.value)) return;
+                    const v = +input.value;
+                    if (which === 'min' && v >= +range.max) return;
+                    if (which === 'max' && v <= +range.min) return;
+                    range[which] = v;
+                    fitStep();
+                    ranges[rk] = { ...(ranges[rk] || {}), [which]: v };
+                    persistRanges();
+                    input.classList.add('custom');
+                    // O valor atual fica dentro da faixa nova
+                    const cur = +num.value;
+                    const clamped = Math.min(+range.max, Math.max(+range.min, cur));
+                    range.value = clamped;
+                    if (clamped !== cur) { num.value = fmt(clamped); commit(key, path, clamped, row); }
+                };
+                lo.addEventListener('change', () => setLimit(lo, 'min'));
+                hi.addEventListener('change', () => setLimit(hi, 'max'));
+                // Duplo clique no campo volta à faixa automática
+                const resetLimit = (input, which) => {
+                    if (ranges[rk]) delete ranges[rk][which];
+                    persistRanges();
+                    const v = which === 'min' ? Math.min(r.min, +num.value) : Math.max(r.max, +num.value);
+                    range[which] = v;
+                    input.value = fmt(v);
+                    input.classList.remove('custom');
+                    fitStep();
+                };
+                lo.addEventListener('dblclick', () => resetLimit(lo, 'min'));
+                hi.addEventListener('dblclick', () => resetLimit(hi, 'max'));
                 range.addEventListener('input', () => { num.value = fmt(+range.value); commit(key, path, +range.value, row); });
                 num.addEventListener('input', () => {
                     if (num.value === '' || isNaN(+num.value)) return;
                     const v = +num.value;
-                    if (v < +range.min) range.min = v;
-                    if (v > +range.max) range.max = v;
+                    // Valor digitado fora da faixa: a faixa cresce até ele
+                    if (v < +range.min) { range.min = v; lo.value = fmt(v); }
+                    if (v > +range.max) { range.max = v; hi.value = fmt(v); }
+                    fitStep();
                     range.value = v;
                     commit(key, path, v, row);
                 });
-                row.append(range, num);
+                row.append(lo, range, hi, num);
             } else if (isColor(value)) {
                 row.classList.add('wide');
                 const color = Object.assign(document.createElement('input'), { type: 'color', value });

@@ -18,6 +18,7 @@
 //   drawTorso(rig, pose, bottom, top, wb, wt)
 //   drawBack(rig, pose, anchors, hem)  no lugar da capa (o boneco chama rig.sashEnds(pose) se quiser as pontas da faixa e
 //                                    rig.drawCapeShape(anchors, hem) para a capa padrão com as cores dele)
+//   backDepth(rig, pose, depth)      profundidade da peça das costas (capa); depth é a padrão. Maior = desenhada por cima
 //   freeArm(rig, pose, s)            braço livre: recebe s = { hand, throwK, charge, fireHold, cast } (mão que o jogo
 //                                    quer: arremesso, feitiço, poção...) e devolve { shoulder, hand, elbow }
 //   drawArm(rig, shoulder, elbow, hand, armWidth, handRadius)  desenha o braço livre (inclusive a mão) e, se não houver

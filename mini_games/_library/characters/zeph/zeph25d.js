@@ -252,14 +252,8 @@ function drawZephArm(rig, shoulder, elbow, hand, armWidth, handRadius) {
     limb([mix(elbow, hand, 0.8), mix(elbow, hand, 0.88)], w * 0.95, C.jacketShade);
     ball([sh[0] + 0.2, sh[1] * 1.02, sh[2] + 0.3], 0.5, C.patch);
     if (!right) ball(mix(elbow, hand, 0.4), 0.38, C.patch);
-    // Mão: pulso, palma oval, dedos à frente e polegar para dentro
-    const d = norm(sub(hand, elbow));
-    const inward = norm([-d[1], d[0], 0]).map(v => v * (right ? -1 : 1));
-    K.olimb(rig, [mix(elbow, hand, 0.9), hand], w * 0.55, C.skin);
-    K.oball(rig, hand, handRadius * 0.62, C.skin);
-    K.olimb(rig, [add(hand, d, 0.35), add(hand, d, 0.85)], handRadius * 0.85, C.skin);
-    K.olimb(rig, [add(hand, inward, 0.3), add(add(hand, inward, 0.6), d, 0.45)], 0.32, C.skin);
-    limb([add(add(hand, d, 0.85), inward, -0.25), add(add(hand, d, 0.85), inward, 0.25)], 0.12, C.skinShade);
+    // Mão redonda com o risco dos dedos e do polegar (kit25d.js, drawHand)
+    K.drawHand(rig, elbow, hand, right ? 1 : -1, { color: C.skin, shade: C.skinShade, size: handRadius * Z.handScale, grip: right ? 1 : 0 });
 }
 
 // Perna: calça verde larga enfiada na bota marrom curta (dobrada no alto); pé chato no chão
