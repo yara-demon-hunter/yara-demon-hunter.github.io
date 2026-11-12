@@ -179,3 +179,12 @@
     .dlg-text { font-size: 0.9rem; min-height: 2.6em; }
     .dlg-bar { height: 6vh; }
 }
+
+/* Celular em pé: os retratos sobem, um em cada lado, e a caixa de fala ocupa a largura toda embaixo */
+@media (orientation: portrait) and (max-width: 599px) {
+    .dlg-portrait { width: 38vw; bottom: auto; top: calc(50% - 38vw); }
+    .dlg-hero { left: 6vw; }
+    .dlg-rival { right: 6vw; }
+    .dlg-box { width: 100%; }
+    .dlg-text { font-size: 1rem; min-height: 3.9em; }
+}

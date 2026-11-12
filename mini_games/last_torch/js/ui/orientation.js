@@ -1,18 +1,7 @@
-import { WORLD } from '../../data_model/world.js';
-
-// --- ORIENTAÇÃO NO CELULAR ---
-// No celular o jogo é jogado DE LADO (paisagem), com os dois polegares: joystick à esquerda
-// e botão da adaga à direita. Ao começar a partida tenta travar a tela em paisagem (tela cheia;
-// funciona no Android). Onde não dá para travar (iOS), o aviso #rotateNotice pede para virar o
-// aparelho de lado e o jogo fica parado enquanto ele estiver em pé.
-// A mesma condição está em css/components/orientation.css.
-const phonePortrait = window.matchMedia(
-    `(pointer: coarse) and (orientation: portrait) and (max-width: ${WORLD.mobileMaxShortSide - 1}px)`
-);
-
-export function isPhonePortrait() {
-    return phonePortrait.matches;
-}
+// --- CELULAR: EM PÉ OU DE LADO ---
+// O jogo roda nas duas orientações. O mundo tem o lado menor fixo (data_model/world.js), então herói e
+// monstros ficam do mesmo tamanho na tela em pé e deitado; em pé a arena fica mais alta que larga.
+// Em portais (CrazyGames) quem cuida da tela cheia é o próprio portal.
 
 // iPhone (Safari) não tem a API de tela cheia: o jeito é abrir pela Tela de Início
 const isIphone = /iPhone|iPod/.test(navigator.userAgent);
@@ -25,14 +14,14 @@ export function showIosHint() {
     document.getElementById('iosHint')?.classList.toggle('hidden', !isIphone || isStandalone() || inPortal);
 }
 
-export async function lockLandscape() {
-    if (!window.matchMedia('(pointer: coarse)').matches) return;
+// No site, no celular: tela cheia ao começar (precisa de um toque do jogador). Não trava a orientação.
+export async function enterFullscreen() {
+    if (inPortal || !window.matchMedia('(pointer: coarse)').matches) return;
     try {
         if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
         }
-        await screen.orientation.lock('landscape');
     } catch {
-        // Sem suporte (iOS, alguns navegadores): fica o aviso para virar o aparelho de lado
+        // Sem suporte (iPhone): segue na página normal
     }
 }

@@ -3,6 +3,7 @@ import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
 import { EVOLUTIONS } from '../../data_model/powers.js';
 import { preloadTreeImages, treeImageFor, paintIcon } from '../../data_model/tree_images.js';
 import { DARKNESS, getHourName } from '../../data_model/night.js';
+import { START } from '../../data_model/start.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
 import { checkAchievements, pushStats, rewardText } from '../systems/sanctuary.js';
@@ -346,4 +347,16 @@ export function setupScreens() {
     const play = document.getElementById('btnStart');
     play.textContent = 'PLAY';
     play.disabled = false;
+    if (START.skipMenuOnFirstVisit && save.stats.runs === 0) startFirstVisit();
+}
+
+// Primeira visita: a caçada começa sozinha. O navegador só libera o som depois de um toque, clique ou tecla,
+// então o som liga no primeiro gesto do jogador.
+function startFirstVisit() {
+    startGame();
+    const unlockAudio = () => {
+        audio.init();
+        ['pointerdown', 'keydown'].forEach(type => window.removeEventListener(type, unlockAudio, true));
+    };
+    ['pointerdown', 'keydown'].forEach(type => window.addEventListener(type, unlockAudio, true));
 }

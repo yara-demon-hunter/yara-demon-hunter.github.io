@@ -355,3 +355,10 @@
 .tree-tab .tree-band-icon.has-image { width: 2.6rem; height: 2.6rem; }
 .tree-band-name { text-align: center; line-height: 1.15; }
 @media (max-height: 520px) { .tree-tab .tree-band-icon.has-image { width: 1.9rem; height: 1.9rem; } }
+
+/* Celular em pé: a legenda sai e o detalhe fica enxuto; a altura que sobra vai para o mapa */
+@media (orientation: portrait) and (max-width: 599px) {
+    .tdetail-legend, .tdetail-branch { display: none; }
+    .tree-detail { gap: 0.3rem; padding: 0.5rem 0.6rem; }
+    .tdetail-text > span { font-size: 0.78rem; line-height: 1.3; }
+}

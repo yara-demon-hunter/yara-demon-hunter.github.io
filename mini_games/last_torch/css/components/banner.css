@@ -138,3 +138,11 @@ body:has(#campScreen:not(.hidden)) #toasts { left: 26%; }
     .toast b { font-size: 0.64rem; }
     .toast div span { font-size: 0.56rem; }
 }
+
+/* Celular em pé: embaixo ficam os controles de toque, então os avisos descem do topo, abaixo do HUD */
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) {
+    #toasts { top: calc(env(safe-area-inset-top) + 6.4rem); bottom: auto; }
+    .toast { max-width: 82vw; }
+    /* Com um menu aberto, o topo é do menu: os avisos voltam para baixo */
+    body:has(.game-screen:not(.hidden)) #toasts { top: auto; bottom: max(0.6rem, env(safe-area-inset-bottom)); }
+}

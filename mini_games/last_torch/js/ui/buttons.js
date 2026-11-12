@@ -1,7 +1,7 @@
 import { audio, state } from '../core/state.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
 import { chooseHero, closeHeroes, pickHeroOnStart } from './heroes.js';
-import { inPortal, lockLandscape, showIosHint } from './orientation.js';
+import { inPortal, enterFullscreen, showIosHint } from './orientation.js';
 import { choosePick, isPicking, setupQuickPick } from './quick_pick.js';
 import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
 import { changeDarkness, keepHunting, quitToMenu, returnToMenu, shareResult, startGame } from './screens.js';
@@ -23,14 +23,14 @@ export function setupButtons() {
     showIosHint();
     document.getElementById('btnShare').classList.toggle('hidden', inPortal);
 
-    // No celular: tela cheia travada de lado, em paisagem (precisa de um toque do jogador para ser permitido).
-    // Também ao voltar da pausa, caso o jogador tenha saído da tela cheia (a trava se perde junto).
+    // No celular (fora de portal): tela cheia, que precisa de um toque do jogador para ser permitida.
+    // Também ao voltar da pausa, caso o jogador tenha saído da tela cheia.
     const start = () => {
-        lockLandscape();
+        enterFullscreen();
         startGame();
     };
     const resume = () => {
-        lockLandscape();
+        enterFullscreen();
         resumeGame();
     };
     on('btnStart', start);
@@ -44,7 +44,7 @@ export function setupButtons() {
     on('btnResumeSettings', resume);
     on('btnResume', resume);
     on('btnEndless', () => {
-        lockLandscape();
+        enterFullscreen();
         keepHunting();
     });
     // Sair para o menu pede confirmação: um toque sem querer não pode jogar a noite fora
@@ -61,7 +61,7 @@ export function setupButtons() {
     on('btnFuel', buyFuel);
     on('btnRest', buyRest);
     on('btnCampLeave', () => {
-        lockLandscape();
+        enterFullscreen();
         leaveCamp();
     });
 

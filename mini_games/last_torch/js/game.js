@@ -24,7 +24,6 @@ import { updateStreak } from './systems/streak.js';
 import { updateTorch } from './systems/torch.js';
 import { setupButtons } from './ui/buttons.js';
 import { flushHud, updateDashButton, updateKnifeButton } from './ui/hud.js';
-import { isPhonePortrait } from './ui/orientation.js';
 import { updateQuickPick } from './ui/quick_pick.js';
 import { setupScreens } from './ui/screens.js';
 
@@ -56,14 +55,12 @@ function watchFrameRate(frameMs) {
 
 // Fora da partida (menu, cartas, acampamento, pausa) nada se mexe no canvas: não desenha nada
 function isIdle() {
-    return state.gameState !== 'PLAYING' || isPhonePortrait();
+    return state.gameState !== 'PLAYING';
 }
 
 // --- UPDATE LOOP ---
 export function update(dt) {
     if (state.gameState !== 'PLAYING') return;
-    // Celular em pé: o aviso de virar o aparelho de lado cobre a tela e a partida fica parada
-    if (isPhonePortrait()) return;
     dt = Math.min(dt, 0.05);
 
     // Hit stop e câmera lenta: a lógica anda com o dt do efeito; tremor e clarão seguem no tempo real

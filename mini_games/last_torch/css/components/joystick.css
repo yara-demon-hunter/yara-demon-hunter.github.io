@@ -180,6 +180,24 @@
     }
 }
 
+/* Celular em pé: a tela é estreita, então os controles ficam menores e o dash sobe para cima da adaga
+   (ao lado dela não cabe sem encostar no joystick). */
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) {
+    :root {
+        --touch-base: 5.4rem;
+        --touch-base-knob: 2.5rem;
+        --touch-base-icon: 1.3rem;
+        --touch-ring: 6px;
+        --touch-bottom: max(2.2rem, calc(env(safe-area-inset-bottom) + 1.4rem));
+        --touch-left: max(1.6rem, calc(env(safe-area-inset-left) + 1rem));
+        --touch-right: max(1.6rem, calc(env(safe-area-inset-right) + 1rem));
+    }
+    #dashButton {
+        right: calc(var(--touch-right) + var(--touch-size) * 0.11);
+        bottom: calc(var(--touch-bottom) + var(--touch-size) * 1.22);
+    }
+}
+
 /* Oath of Slaughter: a adaga está selada */
 #knifeButton.is-sealed { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
 

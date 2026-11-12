@@ -22,6 +22,8 @@ Uma partida é **uma noite de 12 horas**. Sobreviva até o amanhecer com o heró
 
 Tudo persiste no `localStorage` do jogador (`js/core/save.js`).
 
+**Primeira visita:** quem nunca jogou (`save.stats.runs === 0`) cai direto na caçada, sem a tela inicial; o som liga no primeiro toque, clique ou tecla. Para voltar a abrir sempre pela tela inicial: `skipMenuOnFirstVisit: false` em `data_model/start.js`.
+
 ## Desempenho
 
 O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça com CPU limitada):
@@ -66,7 +68,6 @@ css/
   components/tree.css             árvores: cada ramo é um bloco; abas em tela pequena, 2 x 2 em tela grande, célula calculada para caber sem rolar
   components/joystick.css         controles de toque: joystick, adaga e dash
   components/start-screen.css     tela inicial
-  components/orientation.css      aviso de virar o aparelho de lado (celular em pé)
 data_model/                       DADOS do jogo (balanceamento), separados do motor
   character.js                    atributos, progressão, calor da tocha e raio de atração do ouro
   characters/                     UM ARQUIVO POR PERSONAGEM (hunter.js, azael.js, brutos.js): nome, textos, vida, velocidade, dash, bônus, números como boss e rival; index.js monta o que o jogo lê e explica como criar um
@@ -77,6 +78,7 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
   elites.js                       modificadores de elite
   difficulty.js                   crescimento por hora: vida, dano, spawn, cota de pontos
   night.js                        a noite: horas, hordas, presságios, Escuridão
+  start.js                        abertura do jogo: primeira visita direto na caçada (skipMenuOnFirstVisit)
   skills.js                       stats, lâmina, Fúria, feitiços, adaga e dash
   powers.js                       poderes (aprendidos na árvore) e evoluções
   passives.js                     skills passivas e Juramentos (type 'skill', na árvore de pontos), relíquias (preço base em ouro) e preços do acampamento
@@ -159,7 +161,7 @@ js/
   ui/screens.js                   início de partida, fim da noite e tela inicial
   ui/hints.js                     dicas da primeira partida
   ui/quick_pick.js                escolha rápida: três nós da árvore ao ganhar pontos
-  ui/orientation.js               celular de lado (paisagem): trava de orientação e pausa com o aparelho em pé
+  ui/orientation.js               celular: tela cheia no site (fora de portal) e dica do iPhone; joga-se em pé ou deitado
   ui/buttons.js                   eventos dos botões e atalhos de teclado
   audio/sound-engine.js           efeitos sintetizados (Web Audio API), mixagem e volumes
   audio/music.js                  música procedural: clima por momento da noite
@@ -198,7 +200,7 @@ Um boss novo com corpo de herói segue o mesmo caminho: boneco registrado (ver "
 ## Controles
 
 - **Desktop:** mova o mouse para direcionar o herói. `WASD`/setas ficam desligadas por padrão; quem quiser liga em Settings (ao apertar uma delas, o mouse passa a servir só para mirar até a próxima partida). Clique com o botão esquerdo no canvas para arremessar uma faca na direção do cursor; segure para repetir (recarga própria) ou, com Charged Dagger Throw, para carregar e soltar. `Espaço`, `Shift` ou o botão direito dão o dash. `Esc` ou `P` pausam. `Enter` recomeça.
-- **Celular:** jogado **de lado (paisagem)**, com os dois polegares. Ao começar, o jogo entra em tela cheia e trava em paisagem (Android); onde não dá para travar (iOS), um aviso pede para virar o aparelho de lado e a partida fica pausada enquanto ele estiver em pé. O joystick (canto inferior esquerdo) move o herói. O botão menor, acima da adaga, dá o dash. O botão da adaga (canto inferior direito) mira enquanto está pressionado, com uma linha tracejada saindo do herói: sem arrastar mira no monstro mais perto; arrastando mira na direção do arraste. A adaga só é arremessada ao **soltar** o botão, uma vez, se a recarga (anel em volta do botão) já terminou; com Charged Dagger Throw, quanto mais tempo segurar, mais forte ela sai. Tocar na tela não arremessa. Os ataques corpo a corpo são automáticos. Em Settings, **Move and resize buttons** deixa arrastar os três controles e mudar o tamanho deles, com um Reset que volta ao padrão (js/ui/touch_layout.js).
+- **Celular:** joga-se **em pé ou deitado**, com os dois polegares. O lado menor do mundo é fixo (`data_model/world.js`), então herói e monstros ficam do mesmo tamanho na tela nas duas orientações; em pé a arena fica mais alta que larga. No site (fora de portal) o jogo entra em tela cheia ao começar, sem travar a orientação. Em pé, os controles ficam menores, o dash sobe para cima da adaga e os avisos descem do topo (regras `orientation: portrait` nos CSS de cada tela). O joystick (canto inferior esquerdo) move o herói. O botão menor, acima da adaga, dá o dash. O botão da adaga (canto inferior direito) mira enquanto está pressionado, com uma linha tracejada saindo do herói: sem arrastar mira no monstro mais perto; arrastando mira na direção do arraste. A adaga só é arremessada ao **soltar** o botão, uma vez, se a recarga (anel em volta do botão) já terminou; com Charged Dagger Throw, quanto mais tempo segurar, mais forte ela sai. Tocar na tela não arremessa. Os ataques corpo a corpo são automáticos. Em Settings, **Move and resize buttons** deixa arrastar os três controles e mudar o tamanho deles, com um Reset que volta ao padrão (js/ui/touch_layout.js).
 
 O jogo usa a mesma lógica e progressão em todas as telas; apenas a disposição da interface e o controle de movimento se adaptam ao dispositivo.
 
