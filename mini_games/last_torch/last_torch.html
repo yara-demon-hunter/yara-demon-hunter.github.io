@@ -22,6 +22,43 @@ permalink: /mini_games/last_torch/last_torch.html
 </head>
 <body>
 
+<!-- TELA DE CARREGAMENTO: cobre tudo até os módulos chegarem. A barra anda com o que de fato já foi baixado
+     (modulepreload no pacote do portal; contagem dos .js recebidos no site). js/ui/screens.js a fecha. Styles in css/components/loading.css -->
+<style>#loadingScreen{position:fixed;inset:0;z-index:100;background:#04070a;color:#e7e0cf}</style>
+<div id="loadingScreen" role="status" aria-label="Loading">
+    <h1 class="loading-title"><span>DEMON HUNTER:</span>LAST TORCH</h1>
+    <div class="loading-track"><i id="loadingBar"></i></div>
+    <p class="loading-text">Lighting the torch…</p>
+</div>
+<script>
+(function () {
+    var bar = document.getElementById('loadingBar');
+    var links = document.querySelectorAll('link[rel="modulepreload"]');
+    var expected = links.length || 140;
+    var done = 0;
+    var shown = 0;
+    function show(p) { shown = Math.max(shown, Math.min(p, 0.95)); bar.style.transform = 'scaleX(' + shown + ')'; }
+    function tick() { done++; show(done / expected); }
+    if (links.length) {
+        links.forEach(function (l) { l.addEventListener('load', tick); l.addEventListener('error', tick); });
+    } else if (window.PerformanceObserver) {
+        try {
+            new PerformanceObserver(function (list) {
+                list.getEntries().forEach(function (e) { if (/\.js(\?|$)/.test(e.name)) tick(); });
+            }).observe({ type: 'resource', buffered: true });
+        } catch (err) { /* sem suporte: a barra só completa no fim */ }
+    }
+    window.finishLoading = function () {
+        bar.style.transform = 'scaleX(1)';
+        var box = document.getElementById('loadingScreen');
+        setTimeout(function () {
+            box.classList.add('is-done');
+            setTimeout(function () { box.remove(); }, 400);
+        }, 180);
+    };
+})();
+</script>
+
 <!-- CANVAS -->
 <canvas id="gameCanvas"></canvas>
 

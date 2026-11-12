@@ -347,6 +347,7 @@ export function setupScreens() {
     const play = document.getElementById('btnStart');
     play.textContent = 'PLAY';
     play.disabled = false;
+    window.finishLoading?.();
     if (START.skipMenuOnFirstVisit && save.stats.runs === 0) startFirstVisit();
 }
 

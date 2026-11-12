@@ -1,0 +1,46 @@
+/* --- TELA DE CARREGAMENTO (HTML em last_torch.html, fechada por finishLoading em js/ui/screens.js) --- */
+#loadingScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    padding: 1rem;
+    background:
+        radial-gradient(ellipse 80% 55% at 50% 105%, rgba(124, 45, 18, 0.45), transparent 70%),
+        radial-gradient(ellipse at 50% 40%, #0a1116 0%, #04070a 70%, #010203 100%);
+    transition: opacity 0.35s ease-out;
+}
+#loadingScreen.is-done { opacity: 0; pointer-events: none; }
+.loading-title {
+    text-align: center;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: clamp(2rem, 9vw, 3.6rem);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #e7e0cf;
+    text-shadow: 0 0 24px rgba(251, 146, 60, 0.45);
+}
+.loading-title span { display: block; font-size: 0.4em; letter-spacing: 0.4em; color: #fdba74; }
+.loading-track {
+    width: min(70vw, 20rem);
+    height: 0.5rem;
+    border: 1px solid rgba(251, 146, 60, 0.35);
+    border-radius: 0.3rem;
+    background: rgba(8, 12, 16, 0.8);
+    overflow: hidden;
+}
+.loading-track i {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #c2410c, #fb923c, #fde68a);
+    box-shadow: 0 0 12px rgba(251, 146, 60, 0.7);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease-out;
+}
+.loading-text { color: #94a3b8; font-size: 0.8rem; letter-spacing: 0.12em; }
