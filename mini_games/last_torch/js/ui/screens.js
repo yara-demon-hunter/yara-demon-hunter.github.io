@@ -14,7 +14,7 @@ import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
 import { continueEndless, startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { resetTorch } from '../systems/torch.js';
-import { prepareForest } from '../render/forest.js';
+import { prepareScenery } from '../render/scenery.js';
 import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_sprites.js';
 import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
@@ -36,7 +36,7 @@ export function paintHeroPortrait(node, hero) {
 // --- INÍCIO DE PARTIDA ---
 export function startGame() {
     audio.init();
-    prepareForest();
+    prepareScenery();
     ensureMonsterSprites();
     state.turn = 1;
     state.scoreTurn = 0;

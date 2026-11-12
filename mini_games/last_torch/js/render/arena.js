@@ -10,7 +10,7 @@ import { drawHpBar } from './fx/hp_bar.js';
 import { getDashedRing } from './fx/rings.js';
 
 // --- ARENA: Núcleo e Raio de Alcance ---
-// (o chão/fundo fica em forest.js)
+// (o chão/fundo fica em scenery.js e na biblioteca de cenários)
 // Tocha (Center Tower) vista de cima: base de pedra, chama que tremula e brasas.
 // A chama encolhe conforme o núcleo perde vida.
 let shownHpRatio = 1;

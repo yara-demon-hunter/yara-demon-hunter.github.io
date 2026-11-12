@@ -1,6 +1,6 @@
-# Biblioteca de personagens e monstros
+# Biblioteca de personagens, monstros e cenários
 
-Um lugar só para a arte de cada personagem e monstro: o desenho em código, as cores e medidas e a referência de arte
+Um lugar só para a arte de cada personagem, monstro e cenário: o desenho em código, as cores e medidas e a referência de arte
 (imagens e ficha). Qualquer mini game pode usar; hoje estão ligados o Last Torch e o yara-rpg.
 
 ## A regra
@@ -43,6 +43,10 @@ characters/
   azael/                   azael25d.js (o boneco) e azael_visual.js; exporta a orelha e a bandagem que a Yara usa
   brutos/                  brutos25d.js (o boneco) e brutos_visual.js
   yara/, zeph/, oskar/     os heróis do yara-rpg, no mesmo esquema (<id>25d.js e <id>_visual.js)
+scenery/                   o chão do jogo: terreno, névoa, luz, clima (manual: scenery/README.md)
+  scenery.js, scenery_kit.js   o motor (cache, camadas, luzes) e as peças prontas (vento, névoa, vinheta, vaga-lumes)
+  <id>/                    um por cenário: <id>.js (o chão e o que balança), <id>_visual.js (números) e art_reference/
+                           dark_forest (Floresta Sombria, o atual do Last Torch) e dark_forest_2 (Floresta da Névoa, do yara-rpg)
 monsters/
   topdown/<id>/            o desenho plano, visto de cima (o que o Last Torch usa): <id>.js (o desenho, função
                            render...), <id>_visual.js (cores e medidas) e art_reference/
@@ -67,7 +71,7 @@ são carregadas por jogo nenhum.
 `25d/bone_colossus` → `25d/skeleton`; os lobos → `25d/wolf25d.js`;
 todos os monstros → `core`.
 
-**O que não está aqui, e fica em cada jogo:** balanceamento (vida, dano, velocidade, ataques, quando aparece), regras
+**O que não está aqui, e fica em cada jogo:** a fonte de luz do cenário e a regra dela (no Last Torch, a tocha), balanceamento (vida, dano, velocidade, ataques, quando aparece), regras
 e efeitos do jogo (no Last Torch: adaga, Fúria, Juramentos, Shadow Clone, bosses que reaproveitam arte com outra
 paleta, sprites em atlas, barras de vida) e as imagens de retrato que o jogo mostra.
 
@@ -117,6 +121,12 @@ Jogo feito de scripts clássicos (sem `import`), como o yara-rpg: um `<script ty
 biblioteca e põe em `window` o que os outros scripts usam (`yara-rpg/js/stage/heroes.js`). Módulos rodam na ordem
 junto com os scripts `defer`, então ele entra entre eles, antes de quem o usa.
 
+## Criar um cenário
+
+Pasta `scenery/<id>/` com `<id>.js`, `<id>_visual.js` e **sempre** `art_reference/scenery.md` (a ficha, com a referência
+e o que foi rejeitado). Contrato, camadas, orçamento de desempenho, passo a passo a partir de uma foto e modelo da ficha:
+**`scenery/README.md`**. Depois: uma linha em `scenery/index.js`, sync e, no jogo, o id em `WORLD.scenery`.
+
 ## Criar um personagem ou monstro
 
 - **Monstro 2.5D:** pasta `monsters/25d/<id>/` com `<id>25d_visual.js` (cores lidas do topdown), `<id>25d.js` (as
@@ -147,6 +157,9 @@ cd mini_games && python3 -m http.server 8010
 
 Para gravar: **Copiar alterados** gera as linhas já com o arquivo de cada uma; cole no `*_visual.js` indicado e rode o
 sync. A página não grava nada sozinha. `tools/` não vai para os jogos.
+
+**Cenários:** `tools/scenery_tuner.html` (`?scenery=dark_forest&preset=mobP&quality=1`), uma página própria: o cenário
+renderizado pelo motor, com um controle para cada número do `<id>_visual.js` (detalhes em `scenery/README.md`).
 
 ## Referência de arte
 

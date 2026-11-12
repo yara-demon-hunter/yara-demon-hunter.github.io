@@ -1,0 +1,76 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/scenery/dark_forest/dark_forest_visual.js e rode o sync.
+// --- DADOS VISUAIS: cenário Floresta Sombria (dark_forest) ---
+// Cores, densidades e ritmos lidos por dark_forest.js (o chão e a grama) e por scenery_kit.js (vento, névoa,
+// vinheta e vaga-lumes). A ficha de como foi criado: art_reference/scenery.md.
+
+// --- CENÁRIO: FLORESTA SOMBRIA (vista de cima) ---
+// Noite fria: uma fonte de luz ilumina um círculo sem névoa; conforme ela é ameaçada (danger), a luz encolhe e a
+// névoa avança. Vento mexe a grama e a névoa rola por cima de tudo. (A fonte de luz em si, a tocha, é do jogo.)
+export const DARK_FOREST_VISUALS = {
+    seed: 1337,
+
+    // Noite fria: camada azulada escura por cima de tudo (antes da vinheta)
+    nightTint: 'rgba(3, 9, 26, 0.42)',
+
+    // Chão
+    groundColor: '#02070a',
+    clearingColor: 'rgba(22, 42, 56, 0.5)',
+    moonlightColor: 'rgba(130, 170, 220, 0.10)',
+    mossColors: ['rgba(10, 34, 38, 0.38)', 'rgba(6, 20, 26, 0.5)', 'rgba(24, 32, 40, 0.3)'],
+    mossPatchesPer100kPx: 14,
+    grassColor: 'rgba(40, 90, 85, 0.22)',
+    grassTuftsPer100kPx: 110,
+    stoneColor: 'rgba(100, 120, 140, 0.18)',
+    stonesPer100kPx: 10,
+    leafColors: ['rgba(60, 50, 40, 0.22)', 'rgba(40, 70, 60, 0.2)'],
+    leavesPer100kPx: 60,
+
+    // Clareira: elipse proporcional à tela (0 = centro, 1 = borda)
+    clearingRadiusRatio: 0.62,
+
+    // Vento: rajadas que atravessam a tela (afetam a grama)
+    windSpeed: 0.55,              // velocidade das rajadas
+    windWaveLength: 0.0035,       // quanto a rajada varia ao longo da tela (menor = onda mais larga)
+    windBase: 0.35,               // vento constante mínimo (0 a 1)
+
+    // Grama animada: tufos que se curvam com o vento
+    grassClumpsPer100kPx: 42,
+    grassBladesPerClump: 3,
+    grassMinHeight: 6,
+    grassMaxHeight: 13,
+    grassBend: 6,                 // curvatura máxima na rajada (px)
+    swayingClumps: [80, 0, 0],    // tufos que balançam a cada quadro, por nível de detalhe; o resto fica pintado no chão
+    grassColors: ['rgba(46, 110, 100, 0.55)', 'rgba(30, 80, 78, 0.5)', 'rgba(70, 140, 120, 0.4)'],
+
+    // Névoa: camadas de textura rolando em direções diferentes + manchas soltas
+    fogColor: '170, 195, 215',
+    fogDensityBoostAtZeroHp: 1.3, // quanto a névoa fica mais densa com a torre quase apagada (+130%)
+    fogFrameMs: [55, 80, 125],    // intervalo entre redesenhos da névoa, por nível de detalhe
+    fogResolution: 0.25,          // pixels da névoa por unidade do mundo (ela é borrada: pouca resolução basta)
+    fogTileSize: 512,             // tamanho do tile no mundo
+    fogTilePixels: 128,           // tamanho real do tile
+    fogTilePuffs: 80,
+    fogLayers: [
+        { speedX: 26, speedY: 7, scale: 1.6, alpha: 0.24 },
+        { speedX: -16, speedY: -11, scale: 1.1, alpha: 0.17 },
+        { speedX: 9, speedY: -5, scale: 2.4, alpha: 0.12 }
+    ],
+    fogBlobs: 12,
+    fogMinRadius: 140,
+    fogMaxRadius: 300,
+    fogAlphaCenter: 0.1,
+    fogAlphaEdge: 0.3,
+    fogDriftSpeed: 34,
+    fogWobble: 50,
+
+    // Vaga-lumes (verde-azulados e discretos)
+    fireflies: [10, 5, 0],        // quantidade, por nível de detalhe
+    fireflyGlow: 'rgba(140, 230, 200, 0.75)',
+    fireflySpeed: 16,
+    fireflyGlowRadius: 6,
+
+    // Vinheta escura
+    vignetteColor: 'rgba(0, 2, 8, 0.88)',
+    vignetteInnerRatio: 0.4,
+    vignetteResolution: 0.06      // pixels por unidade do mundo: é só um degradê
+};

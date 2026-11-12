@@ -30,7 +30,7 @@ O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça co
 
 - **Monstros são sprites.** `js/render/monster_sprites.js` roda a arte procedural uma vez por quadro de animação e guarda num atlas; em campo cada monstro custa 2 `drawImage`. Só bosses e herói são desenhados a cada quadro. Monstro novo: a arte vai na biblioteca (`mini_games/_library/monsters/topdown/<id>/`, ver o README dela) e entra em `ART` e em `data_model/visuals/monsters/sprites_visual.js`.
 - **Nada repetido é desenhado do zero:** moedas, adagas, tiros, brilhos e algarismos vêm de sprites (`js/render/fx/`). Evite `fillText`, `setLineDash`, `shadowBlur`, gradientes novos por quadro e `ctx.save/restore` por objeto.
-- **Chão e névoa:** o chão é copiado 1:1 (grama e brilho da tocha já pintados nele); a névoa é desenhada numa tela pequena poucas vezes por segundo.
+- **Chão e névoa:** vêm da biblioteca de cenários (`mini_games/_library/scenery/`, manual lá). O chão é copiado 1:1 (grama e brilho da tocha já pintados nele); a névoa é desenhada numa tela pequena poucas vezes por segundo. Esse orçamento vale para todo cenário novo.
 - **DOM:** os sistemas só chamam `updateHUD()`; a escrita sai no máximo 10 vezes por segundo, só do que mudou, e as barras usam `transform`. Sem `backdrop-filter` nem animação de sombra.
 - **Resolução interna** limitada em `data_model/world.js` (`maxPixelRatio`, `maxCanvasPixels`). O HUD é DOM e continua nítido.
 - **Detalhe adaptativo:** `state.quality` vai de 0 a 2. O celular começa em 1 e `js/game.js` desce sozinho se o aparelho não sustentar ~42 FPS; o nível 2 trava em ~30 FPS.
@@ -41,7 +41,7 @@ O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça co
 
 ## Estrutura
 
-A arte dos personagens e dos monstros (desenho e cores) vem da **biblioteca compartilhada** `mini_games/_library/`, que
+A arte dos personagens, dos monstros e do **cenário** (desenho e cores) vem da **biblioteca compartilhada** `mini_games/_library/`, que
 outros jogos também podem usar. O jogo carrega a cópia dela em `library/`, feita pelo sync: **não edite `library/`**.
 Mude em `mini_games/_library/` e rode `ruby mini_games/_library/sync.rb` (como funciona: `mini_games/_library/README.md`).
 O que é regra do Last Torch (vida, dano, velocidade, ataques, Juramentos, adaga, Fúria) continua aqui.
@@ -52,6 +52,7 @@ library/                          CÓPIA da biblioteca de personagens e monstros
   core/                           ctx compartilhado, ganchos do jogo (host.js), glow, easing, relógio do desenho, aleatório com semente
   characters/hunter/              Demon Hunter, o boneco 2.5D base (hero25d.js), a animação (hero_anim.js), os ganchos do jogo (hero_hooks.js), o top-down antigo e o registro dos outros bonecos
   characters/azael/, brutos/      os bonecos do Azael e do Captain Brutos e as cores deles
+  scenery/<id>/                   um por cenário (dark_forest, dark_forest_2): o chão, a grama, os números; o motor e o kit de névoa, luz e vinheta ficam em scenery/
   monsters/topdown/<id>/          um por monstro ou boss (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, shadow_wolf, headless_knight, bone_colossus, demon_lord): desenho e cores
 css/
   game.css                        ponto de entrada: só importa os arquivos abaixo
@@ -93,7 +94,7 @@ data_model/                       DADOS do jogo (balanceamento), separados do mo
     characters/                   barras em cima da cabeça do herói (hero_hud_visual.js), formas dos Juramentos (oath_visual.js) e Shadow Clone
     monsters/sprites_visual.js    quadros dos sprites dos monstros (as cores de cada monstro estão na biblioteca)
     bosses/palettes_visual.js     paletas dos bosses que reaproveitam arte
-    scenery/                      cenário (forest_visual.js, torch_visual.js)
+    scenery/torch_visual.js       a tocha (fonte de luz): raio da luz, chama e barra de vida. O cenário em si (floresta) está na biblioteca
     items/gold_visual.js          ouro
     effects/                      golpes, level up, adaga, rebate, juice_visual.js (impacto), powers_visual.js (poderes e itens), skills_visual.js (skills dos ramos) e phoenix_visual.js (fênix)
     index.js                      reexporta tudo
@@ -133,7 +134,7 @@ js/
   systems/effects.js              tempo (hit stop, câmera lenta), partículas, pedaços, manchas, números, ondas
   render/renderer.js              ordem das camadas de desenho
   render/arena.js                 tocha (núcleo) e raio de alcance do herói
-  render/forest.js                cenário: chão pré-pintado, névoa em baixa resolução, luz da tocha e do herói
+  render/scenery.js               ponte com o cenário da biblioteca (WORLD.scenery): passa o estado da partida e cuida da luz da tocha e do herói
   render/entities.js              inimigos, projéteis, golpes e moedas
   render/effects.js               manchas, pedaços, ondas de choque, avisos no chão, números, amanhecer
   render/powers.js                desenho dos poderes
@@ -170,6 +171,7 @@ draft/                            versões anteriores mantidas como referência
 ```
 
 - Para mudar **balanceamento**, edite apenas `data_model/`.
+- Para mudar ou criar um **cenário**, edite em `mini_games/_library/scenery/` (ficha e workflow em `scenery/README.md`), rode o sync e escolha o id em `WORLD.scenery` (`data_model/world.js`: `'dark_forest'` ou `'dark_forest_2'`). A tocha e a luz dela continuam aqui (`js/render/scenery.js`, `torch_visual.js`).
 - Para mudar a **arte** de um personagem ou monstro, edite em `mini_games/_library/` e rode o sync. A referência de arte (imagens e fichas) fica lá também, na pasta de cada um (`art_reference/`).
 - Relíquia, herói ou melhoria com efeito simples não precisa de código: basta declarar `mods` (chaves em `js/systems/modifiers.js`).
 - Todo estado que muda durante a partida fica em `js/core/state.js` (objeto `state`); os sistemas leem e escrevem nele.

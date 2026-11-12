@@ -37,7 +37,7 @@ export const HUNTER = {
         stillAttack: 15,            // velocidade de ataque parado
 
         // ADAGA
-        knifeRange: 525,            // alcance da adaga, px (valor absoluto)
+        knifeRange: 400,            // alcance da adaga, px (valor absoluto)
         knifeDamage: 20,            // dano da adaga, bônus em % (soma ao attackDamage)
 
         // HABILIDADES (true = liga)

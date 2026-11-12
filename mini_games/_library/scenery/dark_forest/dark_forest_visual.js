@@ -1,10 +1,11 @@
-// --- DADOS VISUAIS: Cenário: floresta sombria. ---
-// Cores, tamanhos e ritmos de animação lidos pelos renderizadores em js/render/.
+// --- DADOS VISUAIS: cenário Floresta Sombria (dark_forest) ---
+// Cores, densidades e ritmos lidos por dark_forest.js (o chão e a grama) e por scenery_kit.js (vento, névoa,
+// vinheta e vaga-lumes). A ficha de como foi criado: art_reference/scenery.md.
 
 // --- CENÁRIO: FLORESTA SOMBRIA (vista de cima) ---
-// Noite fria: o núcleo é uma tocha que ilumina um círculo sem névoa; conforme ela perde
-// vida, a luz encolhe e a névoa avança. Vento mexe a grama e a névoa rola por cima de tudo.
-export const FOREST_VISUALS = {
+// Noite fria: uma fonte de luz ilumina um círculo sem névoa; conforme ela é ameaçada (danger), a luz encolhe e a
+// névoa avança. Vento mexe a grama e a névoa rola por cima de tudo. (A fonte de luz em si, a tocha, é do jogo.)
+export const DARK_FOREST_VISUALS = {
     seed: 1337,
 
     // Noite fria: camada azulada escura por cima de tudo (antes da vinheta)

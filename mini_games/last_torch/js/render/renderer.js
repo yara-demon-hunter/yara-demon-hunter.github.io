@@ -10,7 +10,7 @@ import {
     renderParticles,
     renderGoldDrops
 } from './entities.js';
-import { renderFireflies, renderFogAndVignette, renderForestGrass, renderForestGround } from './forest.js';
+import { renderSceneryAmbient, renderSceneryGround, renderSceneryOverlay, renderScenerySway } from './scenery.js';
 import { renderLevelUpBack, renderLevelUpFront } from './level_up.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 import { renderPlayer25D } from './player25d.js';
@@ -126,8 +126,8 @@ export function render() {
     }
     setWorldView(unit, originX, originY);
 
-    renderForestGround();
-    renderForestGrass();
+    renderSceneryGround();
+    renderScenerySway();
     if (state.quality < 2) renderStains();
     renderCracks();
     renderWarmth();
@@ -173,8 +173,8 @@ export function render() {
     renderLightning();
     renderStars();
     renderShockwaves();
-    renderFireflies();
-    renderFogAndVignette();
+    renderSceneryAmbient();
+    renderSceneryOverlay();
     renderDawn();
     renderClearWave();
     renderHpBars();

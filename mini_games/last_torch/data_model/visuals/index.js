@@ -2,7 +2,6 @@ export * from '../../library/characters/hunter/hero_visual.js';
 export * from './characters/oath_visual.js';
 export * from './characters/shadow_clone_visual.js';
 export * from '../../library/monsters/topdown/bat/bat_visual.js';
-export * from './scenery/forest_visual.js';
 export * from './scenery/torch_visual.js';
 export * from './items/gold_visual.js';
 export * from './effects/slash_visual.js';

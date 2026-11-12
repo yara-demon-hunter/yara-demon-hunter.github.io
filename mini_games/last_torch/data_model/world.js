@@ -3,6 +3,9 @@
 // tela. Assim todos têm a mesma área de combate, o mesmo alcance e a mesma distância dos
 // monstros, em qualquer monitor ou celular. Só a proporção (largura x altura) varia um pouco.
 export const WORLD = {
+    // Cenário do chão e da névoa: o id de um cenário da biblioteca (mini_games/_library/scenery/<id>/)
+    scenery: 'dark_forest_2',
+
     // Telas com o menor lado menor que isso (em px do navegador) usam o perfil "mobile"
     mobileMaxShortSide: 600,
 
