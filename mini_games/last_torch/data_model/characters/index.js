@@ -20,9 +20,10 @@
 import { AZAEL } from './azael.js';
 import { BRUTOS } from './brutos.js';
 import { HUNTER } from './hunter.js';
+import { ROWAN } from './rowan.js';
 
 // Todos os personagens. A posição na tela de escolha vem do `order` de cada um, não desta lista.
-export const CHARACTER_LIST = [HUNTER, AZAEL, BRUTOS];
+export const CHARACTER_LIST = [HUNTER, ROWAN, AZAEL, BRUTOS];
 
 // Os stats que todo personagem tem de declarar. kind: 'absolute' (valor do personagem, o jogo lê direto dele),
 // 'percent' (bônus em %: 20 vira 0.2 no modificador `mod`) ou 'flag' (true/false vira modificador 1/0).
@@ -70,11 +71,20 @@ function buildPlayer(character) {
         }
         mods.axeQuake = 1;
     }
+    // Habilidade do druida (Rowan): Root Snare no botão da adaga (js/systems/druid.js)
+    const rootSnare = character.abilities?.rootSnare ?? null;
+    if (rootSnare) {
+        for (const key of ['damage', 'cooldownSeconds', 'radius', 'rootSeconds', 'range']) {
+            if (typeof rootSnare[key] !== 'number') throw new Error(`Personagem ${character.id}: falta "${key}" em abilities.rootSnare`);
+        }
+        mods.rootSnare = 1;
+    }
     // Fúria do personagem (character.fury): o tipo e os números dela (js/systems/fury.js)
     const FURY_KEYS = {
         blades: ['name'],
         bloodWaltz: ['name', 'cuts', 'cutSeconds', 'cutRange', 'cutDamage', 'healRatio', 'trailSeconds'],
-        stomp: ['name', 'extraSeconds', 'stepSeconds', 'radius', 'damage', 'knockback', 'stunSeconds', 'shake', 'damageTakenCut']
+        stomp: ['name', 'extraSeconds', 'stepSeconds', 'radius', 'damage', 'knockback', 'stunSeconds', 'shake', 'damageTakenCut'],
+        forestGuardian: ['name', 'durationSeconds', 'damageReduction', 'radius', 'damage', 'tickSeconds', 'slow']
     };
     const fury = character.fury;
     if (!fury || !FURY_KEYS[fury.kind]) throw new Error(`Personagem ${character.id}: falta a Fúria (fury.kind: ${Object.keys(FURY_KEYS).join(', ')})`);
@@ -90,6 +100,7 @@ function buildPlayer(character) {
         bladeRange: stats.bladeRange,
         knifeRange: stats.knifeRange,
         axeQuake,
+        rootSnare,
         fury,
         moveSpeed: stats.speed,
         dash: { distance: stats.dashDistance, seconds: stats.dashSeconds }

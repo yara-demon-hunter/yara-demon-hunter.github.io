@@ -1,4 +1,6 @@
 import { TREE_POINTS } from '../../data_model/tree.js';
+import { CORE_MODEL } from '../../data_model/core.js';
+import { save } from '../core/save.js';
 import { state } from '../core/state.js';
 import { getKnifeRange } from '../systems/knives.js';
 import { mod } from '../systems/modifiers.js';
@@ -55,7 +57,7 @@ export const STAT_GROUPS = [
             { attr: 'playerHp' },
             { icon: '🛡️', name: 'Damage Taken', note: 'Every hit on you lands this much softer.', amount: () => 1 - getDamageTakenRatio(), format: reduction },
             { icon: '🍖', name: 'Heal per Kill', note: 'Health you recover with every kill.', amount: getKillHeal, format: (n) => `+${n.toFixed(1)}` },
-            { icon: '📿', name: 'Revives Left', note: 'Times you can still rise when you fall.', amount: () => state.revives, format: whole },
+            { icon: '📿', name: 'Revives Left', note: 'Times you can still rise when you fall.', amount: () => state.revives + (state.secondWind && save.darkness <= CORE_MODEL.secondWind.maxDarkness ? 1 : 0), format: whole },
             { attr: 'moveSpeed' },
             { icon: '💨', name: 'Dash Charges', note: 'Dashes you can hold at once.', amount: getDashCharges, format: whole },
             { icon: '⏱️', name: 'Dash Recharge', note: 'Time to get a dash back.', amount: getDashCooldown, format: seconds },

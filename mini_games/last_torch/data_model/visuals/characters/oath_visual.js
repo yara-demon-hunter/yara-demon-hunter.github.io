@@ -61,6 +61,17 @@ export const OATH_VISUALS = {
             bladeGlowSoft: 'rgba(245, 158, 11, 0.85)', bladeGlowSoftFrenzy: 'rgba(253, 224, 71, 0.95)'
         }
     },
+    // Druida: o herói mantém as cores dele; folhas giram em volta do corpo e o brilho dos pés é verde
+    wild: {
+        aura: '#4ade80',
+        slash: ['#16a34a', '#4ade80', '#bef264'],
+        bladeLength: 1,
+        bladeWidth: 1,
+        hoodTip: 1,
+        hoodRise: 0,
+        gear: { leaf: '#5fa33a', leafLight: '#a3d65c', leafShade: '#33661f', leaves: 6 },
+        colors: {}
+    },
     // Feiticeiro: roxo e magenta, capuz alto, grimório flutuando e runas girando nos pés
     ruin: {
         aura: '#d946ef',

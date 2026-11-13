@@ -3,5 +3,6 @@
 // Herói novo: um import aqui (ver "Como criar um herói novo" no README do Last Torch).
 import '../../library/characters/azael/azael25d.js';
 import '../../library/characters/brutos/brutos25d.js';
+import '../../library/characters/rowan/rowan25d.js';
 
 export { BODIES } from '../../library/characters/hunter/body_registry.js';

@@ -1,0 +1,555 @@
+import { ROWAN_VISUALS as Z } from './rowan_visual.js';
+import { registerBody } from '../hunter/body_registry.js';
+import * as KIT from '../hunter/kit25d.js';
+import { drawEar as azaelEar, wrap as azaelWrap } from '../azael/azael25d.js';
+import { ctx } from '../../core/canvas.js';
+
+// Geometria compartilhada (hunter/kit25d.js) e a orelha e a bandagem do Azael
+const K = { ...KIT, drawEar: azaelEar, wrap: azaelWrap };
+
+// --- ROWAN, O DRUIDA (herói 2.5D) ---
+// Peças do Rowan montadas na mesma câmera e com a mesma animação do boneco de ../hunter/hero25d.js. O molde é o do Zeph
+// (cabeça de pele com o cabelo em massa única por cima, tronco, braços e pernas), com o que é só dele: cabelo comprido
+// em mechas com folhas presas, barba longa com duas tranças, ombreiras de couro, túnica oliva com alças cruzadas e
+// barra dourada, manto verde-escuro (a capa padrão, com as cores dele) e o CAJADO no lugar da espada: madeira
+// retorcida que termina numa espiral segurando uma esfera laranja. Lados sempre do ponto de vista dele: direita = +b (mão do cajado).
+// Ficha de como foi criado: art_reference/character.md. Medidas e cores: rowan_visual.js.
+// rig: { project, projectVec, limb, ball, disk, anim, C, sinF, cosF }.
+const { mix, add, norm, dot, cross, sub } = K;
+
+// Orelha humana: pequena e arredondada, rente à cabeça
+// Orelha humana: oval, um pouco saliente, no lado da cabeça, da altura da sobrancelha até a base do nariz,
+// com a dobra de dentro mais escura
+function drawRoundEar(rig, H, side, C) {
+    const k = H.R / 3;
+    const p = H.at(Z.earX * k, side * H.R * 1.02, Z.earY * k);
+    const top = H.at((Z.earX - 0.1) * k, side * H.R * 1.04, (Z.earY + Z.earSize) * k);
+    const low = H.at((Z.earX + 0.1) * k, side * H.R * 1.0, (Z.earY - Z.earSize) * k);
+    K.olimb(rig, [top, p, low], Z.earWidth, C.skin);
+    rig.limb([mix(top, p, 0.4), mix(p, low, 0.5)].map(q => add(q, H.s, side * 0.08)), 0.3, C.skinShade);
+}
+
+// --- CABEÇA ---
+// Cabeça de pele com o cabelo como uma massa só por cima (sem peças soltas): a linha do cabelo desce em pontas na
+// testa (a franja), forma costeletas na frente das orelhas e vai até a nuca; o topo tem volume irregular (bagunçado).
+// Desenhada em pedaços da superfície, só os virados para a câmera.
+
+// Linha do cabelo (latitude, em radianos) para cada longitude: lon 0 = testa, ±PI/2 = orelhas, PI = nuca
+function hairLatAt(lon, latLine) {
+    const back = Math.pow((1 - Math.cos(lon)) / 2, 1.6);
+    let lat = latLine + (-1.0 - Z.napeDrop - latLine) * back;
+    // Franja: pontas que descem até perto das sobrancelhas (onda triangular), só na frente
+    const front = Math.max(0, Math.cos(lon));
+    const tri = Math.abs(((lon * Z.bangSpikes / Math.PI) % 2 + 2) % 2 - 1);
+    lat -= Z.bangDepth * Math.pow(front, 1.5) * (1 - tri);
+    // Costeletas: a linha desce na frente de cada orelha
+    lat -= Z.sideburn * Math.exp(-Math.pow((Math.abs(lon) - 1.25) / 0.18, 2));
+    return lat;
+}
+
+// Volume irregular do cabelo: o raio varia um pouco com a direção (tufos arredondados, não espetos)
+function hairRadius(R, lon, lat) {
+    return R * Z.hairPuff * (1 + Z.hairBumps * Math.sin(lon * 5 + 1.3) * Math.cos(lat * 2) * Math.max(0, Math.sin(lat + 0.4)));
+}
+
+function rowanHeadParts(pose, rig) {
+    const { project, C } = rig;
+    const H = K.headFrame(pose, rig, Z);
+    const R = H.R;
+    const latLine = Math.asin(Z.hairline / 3);
+    const head = {
+        depth: project(...H.c).depth,
+        draw() {
+            const t = pose.t;
+            const baseAlpha = ctx.globalAlpha;
+            const vis = Math.max(0, Math.min(1, (H.frontVis + 0.05) / 0.3));
+            const ears = [-1, 1].map(side => ({ side, near: dot([0, side, 0], H.d) > 0 }));
+            ears.filter(e => !e.near).forEach(e => drawRoundEar(rig, H, e.side, C));
+
+            // Cabeça de pele com contorno
+            K.silhouettePath(rig, H, R);
+            ctx.fillStyle = C.skin;
+            ctx.fill();
+            ctx.strokeStyle = C.outline;
+            ctx.lineWidth = 0.4;
+            ctx.stroke();
+            if (vis > 0) {
+                ctx.globalAlpha = baseAlpha * vis;
+                drawFace(rig, H, C, t);
+                ctx.globalAlpha = baseAlpha;
+            }
+
+            // Malha do cabelo: da linha do cabelo até o alto
+            const NL = 72;
+            const NV = 8;
+            const cap = [];
+            for (let i = 0; i <= NL; i++) {
+                const lon = -Math.PI + (i / NL) * Math.PI * 2;
+                const lh = hairLatAt(lon, latLine);
+                const row = [];
+                for (let j = 0; j <= NV; j++) {
+                    const lat = lh + (Math.PI / 2 - lh) * (j / NV);
+                    row.push(H.sphere(lon, lat, hairRadius(R, lon, lat) * (j === 0 ? 0.985 : 1)));
+                }
+                cap.push(row);
+            }
+            const quads = [];
+            for (let i = 0; i < NL; i++) {
+                for (let j = 0; j < NV; j++) {
+                    const q = [cap[i][j], cap[i + 1][j], cap[i + 1][j + 1], cap[i][j + 1]];
+                    const mid = mix(mix(q[0], q[1], 0.5), mix(q[2], q[3], 0.5), 0.5);
+                    const f = H.facing(mid);
+                    if (f < -0.05) continue;
+                    // Luz de cima: os pedaços do alto e virados para a câmera ficam mais claros
+                    const up = dot(norm(sub(mid, H.c)), H.u);
+                    quads.push({ q, depth: project(...mid).depth, light: up > 0.75 ? 2 : up > 0.35 ? 1 : 0 });
+                }
+            }
+            quads.sort((a, b) => a.depth - b.depth);
+            const tones = [C.hairShade, C.hair, C.hairLight];
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = 0.16;
+            for (const { q, light } of quads) {
+                const pq = q.map(p => project(...p));
+                ctx.fillStyle = tones[light === 2 ? 1 : light === 1 ? 1 : 0];
+                ctx.strokeStyle = ctx.fillStyle;
+                ctx.beginPath();
+                pq.forEach((p, k) => (k === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+            // Mechas: fios mais escuros do alto até as pontas da franja e um brilho no topo
+            for (let i = 0; i < NL; i += 6) {
+                K.strokeVisible(rig, H, cap[i].slice(0, -2).reverse(), 0.16, C.hairShade);
+            }
+            const shine = [];
+            for (let k = 0; k <= 8; k++) shine.push(H.sphere(-0.9 + k * 0.22, 1.0 + 0.12 * Math.sin(k), hairRadius(R, -0.9 + k * 0.22, 1.0) * 1.01));
+            K.strokeVisible(rig, H, shine, 0.35, C.hairLight);
+
+            // Orelha do lado de cá, por cima do cabelo dos lados (a do lado de lá fica atrás da cabeça)
+            ears.filter(e => e.near).forEach(e => drawRoundEar(rig, H, e.side, C));
+
+            // Contorno: a linha do cabelo (franja em pontas) e a borda de fora do cabelo
+            K.strokeVisible(rig, H, cap.map(row => row[0]), 0.3, C.outline);
+            const g1 = norm(cross([0, 0, 1], H.d));
+            const g2 = cross(H.d, g1);
+            let arc = [];
+            const flush = () => {
+                if (arc.length > 1) K.strokeSmooth(rig, arc, 0.45, C.outline);
+                arc = [];
+            };
+            for (let i = 0; i <= 60; i++) {
+                const a = (i / 60) * Math.PI * 2;
+                const dir = add(g1.map(v => v * Math.cos(a)), g2, Math.sin(a));
+                const lat = Math.asin(Math.max(-1, Math.min(1, dot(dir, H.u))));
+                const lon = Math.atan2(dot(dir, H.s), dot(dir, H.f));
+                if (lat < hairLatAt(lon, latLine) + 0.02) {
+                    flush();
+                    continue;
+                }
+                arc.push(add(H.c, dir, hairRadius(R, lon, lat)));
+            }
+            flush();
+        }
+    };
+    return [head, ...crownParts(rig, H)];
+}
+
+// Mechas soltas caindo dos lados e da nuca até os ombros e folhas presas no cabelo (coroa). Peças separadas da cabeça,
+// cada uma na sua profundidade: as mechas do lado de lá ficam atrás.
+function crownParts(rig, H) {
+    const { project, limb, ball, C } = rig;
+    const R = H.R;
+    const parts = [];
+    const nL = Z.hairLocks;
+    for (let i = 0; i < nL; i++) {
+        // De uma orelha à outra, passando pela nuca
+        const lon = Math.PI * (0.56 + (i / (nL - 1)) * 0.9) * (i % 2 ? 1 : -1);
+        const root = H.sphere(lon, -0.15, R * Z.hairPuff * 0.98);
+        const out = norm(sub(root, H.c));
+        const len = Z.maneLength * (0.8 + 0.2 * Math.cos(i * 2.1));
+        const mid = add(add(root, out, 0.7), [0, 0, -len * 0.5], 1);
+        const tip = add(add(root, out, 0.5), [0, 0, -len], 1);
+        parts.push({
+            depth: project(...mid).depth,
+            draw() {
+                K.olimb(rig, [root, mid, tip], 0.9, i % 3 ? C.hair : C.hairShade);
+                limb([mix(root, mid, 0.3), mix(mid, tip, 0.6)].map(p => add(p, out, 0.15)), 0.22, C.hairLight);
+            }
+        });
+    }
+    // Folhas da coroa: uma por vez em volta da cabeça, na altura da testa; só as viradas para a câmera aparecem
+    const n = Z.crownLeaves;
+    for (let i = 0; i < n; i++) {
+        const lon = -Math.PI + ((i + 0.5) / n) * Math.PI * 2;
+        const base = H.sphere(lon, 0.55 + 0.25 * (i % 2), R * Z.hairPuff * 1.03);
+        const top = H.sphere(lon + 0.3, 0.75 + 0.25 * (i % 2), R * Z.hairPuff * 1.14);
+        if (H.facing(base) < 0.05) continue;
+        parts.push({
+            depth: project(...base).depth + 0.35,
+            draw() {
+                K.olimb(rig, [base, top], 0.62, i % 2 ? C.leaf : C.leafShade);
+                limb([mix(base, top, 0.2), mix(base, top, 0.85)], 0.16, C.leafLight);
+            }
+        });
+    }
+    return parts;
+}
+
+// Rosto: adulto e sério, sobrancelhas grossas franzidas, olhos verdes, nariz largo; barba longa cobre a mandíbula e
+// desce em duas tranças até o peito. Pisca de tempos em tempos (como na animação de referência).
+function drawFace(rig, H, C, t) {
+    const { project } = rig;
+    // As medidas do rosto são para uma cabeça de raio 3: escalam junto com a cabeça
+    const fk = H.R / 3;
+    const F = (sv, uv) => H.face(sv * fk, uv * fk);
+    const P = (sv, uv) => project(...F(sv, uv));
+    const shown = (sv, uv) => H.facing(F(sv, uv)) > 0.05;
+
+    const outline = [...Z.face.map(([sv, uv]) => [-sv, uv]), ...[...Z.face].reverse().slice(1)];
+    const pts = outline.map(([sv, uv]) => project(...H.clampVisible(F(sv, uv))));
+    ctx.fillStyle = C.skin;
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length - 1; i++) {
+        ctx.quadraticCurveTo(pts[i].x, pts[i].y, (pts[i].x + pts[i + 1].x) / 2, (pts[i].y + pts[i + 1].y) / 2);
+    }
+    ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+    ctx.closePath();
+    ctx.fill();
+    // Contorno só do queixo e da mandíbula
+    // (só os pontos bem virados para a câmera: o lado de lá do queixo fica sem linha, senão vira um risco na bochecha)
+    const jaw = outline.slice(3, outline.length - 3).map(([sv, uv]) => F(sv, uv)).filter(p => H.facing(p) > 0.3);
+    if (jaw.length > 1) K.strokeSmooth(rig, jaw, 0.24, C.outline);
+
+    // Posições do rosto (dados em rowan_visual.js; ajuste ao vivo em mini_games/_library/tools/tuner.html)
+    const ex = Z.eyeX;
+    const ey = Z.eyeY;
+    const ew = Z.eyeWidth;
+    const eo = Z.eyeOpen;
+    const ny = Z.noseY;
+    // Nariz reto e discreto (só a sombra de um lado e a ponta)
+    if (shown(0, ny)) {
+        K.strokeSmooth(rig, [F(-0.12, ny + Z.noseLength / 2), F(-0.2, ny - 0.25)], 0.14, C.skinShade);
+        K.strokeSmooth(rig, [F(-0.28, ny - 0.35), F(0.05, ny - 0.43), F(0.25, ny - 0.35)], 0.14, C.skinShade);
+    }
+    drawBeard(rig, H, C, F, shown);
+    // Boca fechada, séria, no meio da barba
+    if (shown(0, Z.mouthY)) K.strokeSmooth(rig, [F(-Z.mouthWidth, Z.mouthY + 0.02), F(0, Z.mouthY - 0.03), F(Z.mouthWidth, Z.mouthY + 0.02)], 0.16, C.mouth);
+
+    const blink = (t % 3.6) > 3.45;
+    for (const side of [-1, 1]) {
+        if (!shown(side * ex, ey)) continue;
+        if (blink) {
+            K.strokeSmooth(rig, [F(side * (ex - ew + 0.05), ey - 0.04), F(side * ex, ey - 0.11), F(side * (ex + ew - 0.05), ey - 0.02)], 0.2, C.outline);
+        } else {
+            const inner = P(side * (ex - ew), ey - 0.04);
+            const outer = P(side * (ex + ew), ey + 0.02);
+            const top = P(side * ex, ey + eo);
+            const bottom = P(side * ex, ey - eo);
+            ctx.fillStyle = C.eyeWhite;
+            ctx.beginPath();
+            ctx.moveTo(inner.x, inner.y);
+            ctx.quadraticCurveTo(top.x, top.y, outer.x, outer.y);
+            ctx.quadraticCurveTo(bottom.x, bottom.y, inner.x, inner.y);
+            ctx.fill();
+            const e = P(side * ex, ey);
+            const er = P(side * (ex + 0.22), ey);
+            const rx = Math.max(0.08, Math.min(Z.irisSize, Math.hypot(er.x - e.x, er.y - e.y)));
+            ctx.fillStyle = C.eye;
+            ctx.beginPath();
+            ctx.ellipse(e.x, e.y, rx, Z.irisSize, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#16100c';
+            ctx.beginPath();
+            ctx.ellipse(e.x, e.y, rx * 0.45, Z.irisSize * 0.45, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(e.x - rx * 0.5, e.y - Z.irisSize * 0.6, 0.09, 0.09);
+            // Pálpebra de cima
+            K.strokeSmooth(rig, [F(side * (ex - ew), ey - 0.02), F(side * ex, ey + eo * 0.95), F(side * (ex + ew + 0.02), ey + 0.03)], 0.17, C.outline);
+        }
+        // Sobrancelha grossa, quase reta, levemente franzida (desce um pouco para o meio: browTilt)
+        const by = ey + Z.browY;
+        K.strokeSmooth(rig, [F(side * (ex - Z.browWidth), by - Z.browTilt), F(side * (ex - 0.03), by + 0.02), F(side * (ex + Z.browWidth), by - 0.01)], Z.browThickness, C.hairShade);
+    }
+}
+
+// Barba cheia (como a do Oskar): das costeletas pela mandíbula até abaixo do queixo, com bigode; duas tranças com
+// anéis verdes e uma folha descem do queixo até o peito.
+function drawBeard(rig, H, C, F, shown) {
+    const { project, limb, ball } = rig;
+    const visPt = (sv, uv) => project(...H.clampVisible(F(sv, uv)));
+    const bw = Z.beardWidth;
+    const bt = Z.beardTop;
+    const my = Z.mustacheY;
+    const beard = [
+        [-bw, bt], [-bw * 0.97, -1.4], [-bw * 0.85, -2.5], [-bw * 0.5, -3.5], [0, Z.beardChin],
+        [bw * 0.5, -3.5], [bw * 0.85, -2.5], [bw * 0.97, -1.4], [bw, bt],
+        [bw * 0.8, -0.95], [bw * 0.45, -1.45], [0.75, my - 0.05], [0.3, my + 0.18], [0, my + 0.22], [-0.3, my + 0.18], [-0.75, my - 0.05], [-bw * 0.45, -1.45], [-bw * 0.8, -0.95]
+    ].map(([sv, uv]) => visPt(sv, uv));
+    ctx.fillStyle = C.beard;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(beard[0].x, beard[0].y);
+    for (let i = 1; i < beard.length; i++) {
+        const prev = beard[i - 1];
+        const p = beard[i];
+        ctx.quadraticCurveTo(prev.x, prev.y, (prev.x + p.x) / 2, (prev.y + p.y) / 2);
+    }
+    ctx.closePath();
+    ctx.fill();
+    const low = [[-bw * 0.85, -2.5], [-bw * 0.5, -3.5], [0, Z.beardChin], [bw * 0.5, -3.5], [bw * 0.85, -2.5]]
+        .map(([sv, uv]) => F(sv, uv)).filter(p => H.facing(p) > 0.25);
+    if (low.length > 1) K.strokeSmooth(rig, low, 0.24, C.outline);
+    // Fios da barba (mais escuros) e o lado de lá na sombra
+    for (const sv of [-1.4, -0.6, 0.3, 1.1]) {
+        if (shown(sv, -2.4)) K.strokeSmooth(rig, [F(sv * 1.1, -1.7), F(sv, -2.6), F(sv * 0.7, -3.5)], 0.14, C.beardShade);
+    }
+    // Tranças: descem do queixo em linha reta (gravidade), com anéis verdes e uma folha presa
+    for (const side of [-1, 1]) {
+        if (!shown(side * 0.7, -3.6)) continue;
+        const top = F(side * 0.7, -3.6);
+        const bot = add(top, [0, 0, -Z.braidLength], 1);
+        K.olimb(rig, [top, bot], 0.75, C.beard);
+        for (let k = 1; k <= 3; k++) limb([mix(top, bot, k * 0.24 - 0.05), mix(top, bot, k * 0.24 + 0.03)], 0.82, k === 2 ? C.braidRing : C.beardShade);
+        ball(add(bot, [0, 0, -0.2], 1), 0.45, C.beardShade);
+    }
+    const leaf = F(0.2, -3.2);
+    if (H.facing(leaf) > 0.2) {
+        K.olimb(rig, [leaf, add(leaf, [0.2, 0.4, -1.1], 1)], 0.5, C.leaf);
+        limb([leaf, add(leaf, [0.15, 0.3, -0.8], 1)], 0.12, C.leafLight);
+    }
+}
+
+// --- BRAÇOS E PERNAS ---
+// Braço com a manga verde até o pulso (remendo redondo no ombro), mão nua
+function drawRowanArm(rig, shoulder, elbow, hand, armWidth, handRadius) {
+    const { limb, ball, C } = rig;
+    const right = shoulder[1] > 0;
+    const sh = [shoulder[0], shoulder[1] * Z.shoulderScale, shoulder[2]];
+    const w = armWidth * Z.armScale;
+    // Braço afina do ombro ao pulso: braço mais grosso, antebraço mais fino, cotovelo marcado
+    K.oball(rig, sh, w * 0.62, C.jacket);
+    K.olimb(rig, [sh, elbow], w * 1.08, C.jacket);
+    K.olimb(rig, [elbow, mix(elbow, hand, 0.86)], w * 0.88, C.jacket);
+    ball(elbow, w * 0.5, C.jacket);
+    limb([mix(sh, elbow, 0.1), mix(sh, elbow, 0.6)].map(p => [p[0], p[1], p[2] + 0.35]), w * 0.28, C.jacketLight);
+    limb([mix(elbow, hand, 0.15), mix(elbow, hand, 0.7)].map(p => [p[0], p[1], p[2] - 0.3]), w * 0.25, C.jacketShade);
+    // Braçadeira de couro trançado no antebraço
+    K.olimb(rig, [mix(elbow, hand, 0.4), mix(elbow, hand, 0.86)], w * 0.98, C.leather);
+    limb([mix(elbow, hand, 0.5), mix(elbow, hand, 0.78)], w * 0.3, C.leatherLight);
+    // Ombreira de couro em duas camadas
+    const pad = [sh[0], sh[1] * 1.08, sh[2] + 0.45];
+    K.oball(rig, pad, w * 0.62, C.leather);
+    K.oball(rig, [pad[0], pad[1] * 1.04, pad[2] - 0.6], w * 0.52, C.leatherShade);
+    ball([pad[0] + 0.2, pad[1], pad[2] + 0.4], w * 0.24, C.leatherLight);
+    // Mão redonda com o risco dos dedos e do polegar (kit25d.js, drawHand)
+    K.drawHand(rig, elbow, hand, right ? 1 : -1, { color: C.skin, shade: C.skinShade, size: handRadius * Z.handScale, grip: right ? 1 : 0 });
+}
+
+// Perna: calça marrom enfiada na bota alta de couro (dobrada no alto); pé chato no chão
+function drawRowanLeg(rig, hip, knee, ankle, toe) {
+    const { limb, C } = rig;
+    const shin = mix(knee, ankle, 0.22);
+    // Calça: coxa larga afinando para o joelho e a canela, com dobras
+    K.olimb(rig, [hip, knee], Z.legWidth, C.pants);
+    K.olimb(rig, [knee, shin], Z.legWidth * 0.82, C.pants);
+    limb([mix(hip, knee, 0.2), mix(hip, knee, 0.85)].map(p => [p[0] + 0.35, p[1], p[2]]), 0.24, C.pantsShade);
+    limb([mix(knee, shin, 0.1), mix(knee, shin, 0.5)].map(p => [p[0] + 0.25, p[1], p[2] + 0.2]), 0.2, C.pantsShade);
+    // Bota curta: cano dobrado no alto (faixa mais clara) e pé chato
+    K.olimb(rig, [shin, ankle], Z.legWidth * 0.75, C.leather);
+    limb([mix(shin, ankle, 0), mix(shin, ankle, 0.15)], Z.legWidth * 0.82, C.leatherLight);
+    const heel = [ankle[0] - 0.5, ankle[1], toe[2] + 0.35];
+    const tip = [toe[0] - 0.3, toe[1], toe[2] + 0.35];
+    K.olimb(rig, [ankle, heel], Z.legWidth * 0.66, C.leather);
+    K.olimb(rig, [heel, tip], 1.55, C.leather);
+    limb([[heel[0] - 0.2, heel[1], heel[2] - 0.5], [tip[0] + 0.2, tip[1], tip[2] - 0.5]], 0.45, C.leatherShade);
+}
+
+// --- TRONCO ---
+// Túnica verde-oliva com barra dourada e alças de couro cruzadas no peito, cinto largo com fivela redonda de folha,
+// bolsa de couro no quadril esquerdo e um amuleto de folha laranja do lado direito
+function drawRowanTorso(rig, pose, bottom, top, wb, wt) {
+    const { project, limb, disk, C, sinF } = rig;
+    const front = Math.max(0, Math.min(1, sinF * 1.5 + 0.4));
+    const baseAlpha = ctx.globalAlpha;
+    const at = (z) => bottom.a + (top.a - bottom.a) * ((z - bottom.z) / (top.z - bottom.z));
+    const fa = (z) => at(z) + 2.5;
+
+    // Quadril (calça)
+    ctx.fillStyle = C.pants;
+    ctx.strokeStyle = C.outline;
+    ctx.lineWidth = 0.4;
+    disk([bottom.a, 0, bottom.z], [bottom.A * 1.1, 0, 0], [0, bottom.B * 1.05, 0]);
+    ctx.fill();
+    ctx.stroke();
+
+    // Jaqueta: do quadril (barra um pouco abaixo do cinto) aos ombros
+    const zb = bottom.z - 1.6;
+    const pb = project(at(zb), 0, zb);
+    const pt = project(top.a, 0, top.z);
+    const hb = wb * Z.waistScale * 1.05;
+    const ht = wt * Z.shoulderScale;
+    ctx.fillStyle = C.jacket;
+    ctx.beginPath();
+    ctx.moveTo(pb.x - hb, pb.y);
+    ctx.lineTo(pt.x - ht, pt.y);
+    ctx.lineTo(pt.x + ht, pt.y);
+    ctx.lineTo(pb.x + hb, pb.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Volume: o lado de lá da jaqueta mais escuro
+    ctx.save();
+    ctx.globalAlpha *= 0.45;
+    ctx.fillStyle = C.jacketShade;
+    ctx.beginPath();
+    ctx.moveTo(pb.x + hb * 0.35, pb.y);
+    ctx.lineTo(pt.x + ht * 0.4, pt.y);
+    ctx.lineTo(pt.x + ht, pt.y);
+    ctx.lineTo(pb.x + hb, pb.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    if (front > 0) {
+        ctx.globalAlpha = baseAlpha * front;
+        // Abertura da túnica com barra dourada, luz no peito e as duas alças de couro cruzadas
+        limb([[fa(top.z - 3), 0.15, top.z - 3], [fa(zb + 0.3), 0.15, zb + 0.3]], 0.3, C.trim);
+        limb([[fa(top.z - 1.5), -2, top.z - 1.5], [fa(top.z - 1.5), -0.6, top.z - 1.5]], 0.6, C.jacketLight);
+        const wTop = wt * Z.shoulderScale * 0.8;
+        const wLow = wb * Z.waistScale * 0.8;
+        for (const side of [-1, 1]) {
+            const a = [fa(top.z - 0.4), side * wTop, top.z - 0.4];
+            const b = [fa(bottom.z + 1), -side * wLow, bottom.z + 1];
+            K.olimb(rig, [a, b], 0.62, C.leather);
+            limb([a, b].map(p => [p[0] + 0.05, p[1], p[2] + 0.18]), 0.16, C.leatherLight);
+        }
+        // Barra dourada embaixo da túnica
+        limb([[fa(zb + 0.2), -hb * 0.9, zb + 0.2], [fa(zb + 0.2), hb * 0.9, zb + 0.2]], 0.32, C.trim);
+        ctx.globalAlpha = baseAlpha;
+    }
+
+    // Cinto: só a metade da frente do anel aparece
+    const ringFront = (z, A, B, width, color) => {
+        const c = project(at(z), 0, z);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(c.x - 20, c.y, 40, 20);
+        ctx.clip();
+        disk([at(z), 0, z], [A, 0, 0], [0, B, 0]);
+        ctx.strokeStyle = C.outline;
+        ctx.lineWidth = width + 0.45;
+        ctx.stroke();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.stroke();
+        ctx.restore();
+    };
+    ringFront(bottom.z + 0.6, bottom.A * 1.1, bottom.B * 1.02, 1.0, C.leather);
+
+    if (front > 0) {
+        ctx.globalAlpha = baseAlpha * front;
+        // Fivela redonda de metal com uma folha no meio
+        const buckle = [bottom.a + bottom.A * 1.12, 0.2, bottom.z + 0.6];
+        K.oball(rig, buckle, 0.85, C.buckle);
+        rig.ball(buckle, 0.55, C.leatherShade);
+        rig.limb([add(buckle, [0.1, -0.3, -0.25], 1), add(buckle, [0.1, 0.3, 0.25], 1)], 0.3, C.leaf);
+        ctx.globalAlpha = baseAlpha;
+    }
+    // Bolsa de couro no quadril esquerdo (só quando esse lado está virado para a câmera)
+    const bag = [bottom.a + 0.4, -bottom.B * 1.12, bottom.z - 0.6];
+    const hipDepth = project(bottom.a, 0, bottom.z).depth;
+    if (project(...bag).depth > hipDepth - 0.5) {
+        K.oball(rig, bag, 1.25, C.leather);
+        rig.ball([bag[0] + 0.15, bag[1], bag[2] + 0.6], 0.8, C.leatherLight);
+        rig.ball([bag[0] + 0.6, bag[1] - 0.1, bag[2] + 0.1], 0.22, C.buckle);
+    }
+    // Amuleto de folha laranja pendurado no cinto, do lado direito
+    const charm = [bottom.a + bottom.A * 0.9, bottom.B * 0.55, bottom.z + 0.3];
+    if (project(...charm).depth > hipDepth - 0.5) {
+        limb([charm, add(charm, [0, 0, -0.8], 1)], 0.12, C.leatherShade);
+        K.olimb(rig, [add(charm, [0, 0, -0.8], 1), add(charm, [0.1, 0.1, -2.2], 1)], 0.62, C.seed);
+        limb([add(charm, [0.05, 0, -1], 1), add(charm, [0.1, 0.1, -2], 1)], 0.12, C.leatherShade);
+    }
+
+    // Pescoço (a gola cobre a base; a cabeça, desenhada depois, cobre o alto)
+    K.olimb(rig, [[top.a + 0.2, 0, top.z], [top.a + 0.6, 0, top.z + 2.4]], 1.7, C.skin);
+    limb([[top.a + 0.25, 0.5, top.z + 0.4], [top.a + 0.55, 0.5, top.z + 2]], 0.4, C.skinShade);
+    // Gola alta da jaqueta
+    const collar = [top.a + 0.1, 0, top.z + 0.5];
+    ctx.fillStyle = C.jacket;
+    ctx.strokeStyle = C.outline;
+    ctx.lineWidth = 0.35;
+    disk(collar, [top.A * 0.7, 0, 0], [0, top.B * 0.42, 0]);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = C.jacketShade;
+    disk([collar[0] + 0.1, 0, collar[2] + 0.6], [top.A * 0.5, 0, 0], [0, top.B * 0.3, 0]);
+    ctx.fill();
+}
+
+// --- CAJADO ---
+// Madeira retorcida: o cabo desce até perto do chão, sobe além da mão e termina numa espiral que segura a esfera laranja.
+// hand = mão no cabo, dir = direção do cajado (a "ponta da lâmina" é a semente, a Z.bladeLength da mão).
+function drawRowanStaff(rig, hand, dir, alpha) {
+    const { project, limb, ball, C } = rig;
+    const at = (d) => add(hand, dir, d);
+    const flat = Math.hypot(dir[0], dir[1]) || 1;
+    const w = [-dir[1] / flat, dir[0] / flat, 0];
+    const L = Z.bladeLength;
+    const baseAlpha = ctx.globalAlpha;
+    ctx.globalAlpha = baseAlpha * alpha;
+
+    // Cabo com um leve desvio no meio (madeira torta), mais grosso embaixo
+    const bend = (d, k) => add(at(d), w, k);
+    K.olimb(rig, [at(-Z.staffBelow), bend(-Z.staffBelow * 0.45, 0.35), at(0)], 0.78, C.wood);
+    K.olimb(rig, [at(0), bend(L * 0.45, -0.4), at(L - 2.2)], 0.66, C.wood);
+    limb([at(-Z.staffBelow * 0.9), bend(-Z.staffBelow * 0.4, 0.3), at(L - 3)].map(p => add(p, w, 0.2)), 0.18, C.woodLight);
+    // Nó de corda onde a mão segura e uma folha brotando do cabo
+    limb([at(-0.9), at(0.9)], 0.95, C.leatherShade);
+    K.olimb(rig, [bend(L * 0.5, -0.5), bend(L * 0.5 + 1.4, -1.9)], 0.5, C.leaf);
+    // Espiral: a madeira sobe por um lado, faz a volta por cima da esfera e termina enrolada para dentro
+    const seed = at(L);
+    const r = Z.seedRadius + 0.75;
+    const curl = [at(L - 2.2)];
+    for (let k = 0; k <= 9; k++) {
+        const a = -Math.PI * 0.85 + k * (Math.PI * 1.75 / 9);
+        const rr = r * (1 - k * 0.035);
+        curl.push(add(bend(L + Math.sin(a) * rr, -Math.cos(a) * rr), [0, 0, 0], 1));
+    }
+    K.olimb(rig, curl, 0.55, C.wood);
+    limb(curl.slice(1, 7).map(p => add(p, [0, 0, 0.15], 1)), 0.14, C.woodLight);
+    // Esfera: brilho, corpo e miolo claro (pulsa devagar)
+    const p = project(...seed);
+    const pulse = 1 + 0.08 * Math.sin((rig.anim?.t ?? 0) * 3);
+    ctx.fillStyle = C.seedGlow;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, Z.seedRadius * 1.7 * pulse, 0, Math.PI * 2);
+    ctx.fill();
+    ball(seed, Z.seedRadius * pulse, C.seed);
+    ball(add(seed, [0.2, 0, 0.4], 1), Z.seedRadius * 0.4, C.seedCore);
+    ctx.globalAlpha = baseAlpha;
+}
+
+// --- REGISTRO DO BONECO (lido por ../hunter/hero25d.js; interface em ../hunter/body_registry.js) ---
+registerBody('rowan', {
+    vis: Z,
+    idleArms: true,
+    drawLeg: (rig, { hip, knee, ankle, toe }) => drawRowanLeg(rig, hip, knee, ankle, toe),
+    drawTorso: (rig, pose, bottom, top, wb, wt) => drawRowanTorso(rig, pose, bottom, top, wb, wt),
+    // Manto: a capa padrão do boneco, com as cores dele (cape, capeFold, capeEdge em rowan_visual.js)
+    // Em repouso: cajado em pé ao lado do corpo, levemente inclinado para a frente, balançando devagar
+    swordRest(rig, pose, { hand, dir, blend }) {
+        const m = rig.mix(dir, [0.2 + Math.sin(pose.t * 1.1) * 0.03, 0.06, 0.97], 1 - blend);
+        const size = Math.hypot(...m) || 1;
+        return { hand, dir: m.map(v => v / size) };
+    },
+    // De costas, o manto vem por cima do tronco (cobre o cinto, as alças e a bolsa); de frente fica atrás, como sempre
+    backDepth: (rig, pose, depth) => (rig.sinF < 0 ? Math.max(depth, rig.project(pose.lean * 0.6, 0, 13.5).depth + 0.05) : depth),
+    drawArm: (rig, shoulder, elbow, hand, armWidth, handRadius) => drawRowanArm(rig, shoulder, elbow, hand, armWidth, handRadius),
+    drawBlade: (rig, hand, dir, alpha) => drawRowanStaff(rig, hand, dir, alpha),
+    headParts: (pose, rig) => rowanHeadParts(pose, rig)
+});

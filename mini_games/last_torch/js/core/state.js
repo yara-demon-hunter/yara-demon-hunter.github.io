@@ -90,6 +90,7 @@ export const state = {
     streakTimer: 0,
     streakTierShown: 0,
     revives: 0,
+    secondWind: false,          // a segunda chance da tocha ainda está disponível nesta noite (js/systems/player.js)
     skillPoints: 0,             // pontos para gastar na árvore (medalhão de status)
     levelPointsCarry: 0,        // fração de ponto acumulada (relíquias que dão pontos extras)
     tree: {},                   // níveis dos nós de efeito simples (data_model/tree.js, kind 'mod')
@@ -171,6 +172,11 @@ export const state = {
     echoes: [],
     rifts: [],
     wisp: { x: 0, y: 0, placed: false, flash: 0 },
+    // Natureza (js/systems/skills_nature.js): carvalhos, cogumelos, nuvens de esporos, monstros na videira e o carvalho
+    // que esconde o herói agora (null = ninguém escondido)
+    // lure: o carvalho acordado que os monstros próximos vão atacar; hideIn: o arbusto que esconde o herói agora; ambush: o golpe
+    // da emboscada está pronto; claws: marcas de garra das mordidas
+    nature: { oaks: [], seed: null, bushes: [], pods: [], clouds: [], vines: [], wolves: [], claws: [], lure: null, hideIn: null, ambush: false, stealthCd: 0, hideTime: 0 },
 
     // Animação de level up em andamento: { age, label } ou null
     levelUpFx: null,
@@ -183,6 +189,8 @@ export const state = {
     knifeTimer: 0,
     // Axe Quake (Captain Brutos): recarga em segundos e o botão de toque segurado
     quake: { timer: 0, touch: false },
+    // Druida (js/systems/druid.js): círculos de raízes do Root Snare e da Fúria em campo
+    druid: { snares: [] },
     knifeThrowTime: -100000,
     knifeThrowAngle: 0,
     knifePending: null,

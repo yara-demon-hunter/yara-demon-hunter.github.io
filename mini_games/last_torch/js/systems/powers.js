@@ -6,6 +6,7 @@ import { startCast } from './moves.js';
 import { hurtPlayer } from './player.js';
 import { feedBloodlust } from './skills_blade.js';
 import { spreadHex } from './skills_curse.js';
+import { onNatureKill } from './skills_nature.js';
 import { getKillHeal, getSpellCooldown, getSpellDamage } from './stats.js';
 
 // --- PODERES ---
@@ -294,6 +295,7 @@ export function onEnemyKilled(e) {
     if (heal > 0) player.hp = Math.min(player.maxHp, player.hp + heal);
     feedBloodlust();
     spreadHex(e);
+    onNatureKill(e);
 
     const burst = getPowerLevel(powers.corpseBurst);
     if (burst && Math.random() < burst.chance) {

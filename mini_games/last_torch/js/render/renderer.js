@@ -33,6 +33,8 @@ import {
     renderOrbitBlades, renderStars
 } from './powers.js';
 import { renderReflectWard } from './reflect.js';
+import { renderGuardianWard, renderSnares } from './druid.js';
+import { renderNatureFront, renderNatureGround, renderRoots, renderSpiritWolves } from './nature.js';
 import { renderShadowClone } from './shadow_clone.js';
 import { getHeroGear, getOathPalette } from './hero_gear.js';
 import {
@@ -49,8 +51,12 @@ const HERO_25D = new URLSearchParams(window.location.search).get('hero') !== 'to
 function renderHeroBlock() {
     if (player.hidden) return;
     renderSkillAuras();
+    // Escondido no arbusto: o herói aparece fraco, para o jogador saber onde ele está
+    const hiding = state.nature.hideIn !== null;
+    if (hiding) ctx.globalAlpha = 0.5;
     if (HERO_25D) renderHero();
     else renderPlayer();
+    if (hiding) ctx.globalAlpha = 1;
     renderOrbitBlades();
     renderShield();
     renderWisp();
@@ -151,6 +157,8 @@ export function render() {
     renderAttackRange();
     renderChillAura();
     renderRifts();
+    renderNatureGround();
+    renderSnares();
     renderTelegraphs();
     renderGoldDrops();
     renderPickups();
@@ -163,6 +171,8 @@ export function render() {
     if (heroBehind) renderHeroBlock();
     renderCore();
     renderEnemies('front', state.coreY);
+    renderRoots();
+    renderSpiritWolves();
     renderMonsterCurses();
     renderShackle();
     renderSmokes();
@@ -176,6 +186,8 @@ export function render() {
     renderLevelUpBack();
     if (!heroBehind) renderHeroBlock();
     renderFuryTrails();
+    renderGuardianWard();
+    renderNatureFront();
     renderReflectWard();
     renderCrescents();
     renderSkillHits();

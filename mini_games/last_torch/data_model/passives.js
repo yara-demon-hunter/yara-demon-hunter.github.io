@@ -144,6 +144,41 @@ export const PASSIVE_SKILL_MODELS = {
         }
     },
 
+    // --- NATUREZA ---
+    thornBurst: {
+        name: 'Thorn Burst',
+        icon: '🌵',
+        cost: 120,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        get desc() {
+            return `A monster that dies while pinned by roots bursts into thorns: ${formatMultiplier(THORN_BURST.damage)} spell damage to everything within ${THORN_BURST.radius} range.`;
+        }
+    },
+    thornBark: {
+        name: 'Thorn Bark',
+        icon: '🪵',
+        cost: 110,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        get desc() {
+            return `Your oak fights back: a monster that strikes it takes ${formatMultiplier(THORN_BARK.damage)} spell damage and is pinned by roots for ${THORN_BARK.rootSeconds}s.`;
+        }
+    },
+    oathWild: {
+        name: 'Oath of the Wild',
+        icon: '🦌',
+        cost: 200,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        oath: true, gear: 'wild', tagline: 'The forest remembers',
+        get desc() {
+            const mods = this.mods;
+            return `You heal ${mods.hpRegen} health per second, gain ${formatPercent(mods.maxHp)} max health, roots hold ${formatPercent(mods.rootSeconds)} longer and spells deal ${formatPercent(mods.spellDamage)} more damage. The price: your Fury no longer charges. The wild gives life, not rage.`;
+        },
+        mods: { hpRegen: 1.2, maxHp: 0.15, rootSeconds: 0.5, spellDamage: 0.15, noFury: 1 }
+    },
+
     // --- JURAMENTOS ---
     // oath: true = só um por noite (js/systems/tree.js). Um modo de jogar inteiro, com bônus e um preço.
     // gear: forma do herói (data_model/visuals/characters/oath_visual.js)
@@ -331,6 +366,10 @@ export const PASSIVE_SKILL_MODELS = {
     treasureSense: { name: 'Treasure Sense', icon: '🗝️', cost: 95, maxLvl: 1, desc: 'Chests give +1 skill point.', mods: { chestPoints: 1 } },
     lastPrayer: { name: 'Last Prayer', icon: '🙏', cost: 200, maxLvl: 1, desc: 'Rise once more when you fall.', mods: { revives: 1 } }
 };
+
+// Natureza: o estouro de espinhos e a casca do carvalho (js/systems/skills_nature.js)
+export const THORN_BURST = { radius: 80, damage: 1.2, knockback: 90 };
+export const THORN_BARK = { damage: 0.8, rootSeconds: 1 };
 
 // --- ACAMPAMENTO ---
 // Fim de cada hora: o ouro compra relíquias na árvore do acampamento e também alimenta a tocha.

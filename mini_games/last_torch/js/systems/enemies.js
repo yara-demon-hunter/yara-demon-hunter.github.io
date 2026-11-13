@@ -310,6 +310,8 @@ export function updateEnemies(dt) {
     const hunting = state.phase === 'HUNT';
     // Provoke e Oath of Slaughter: o herói chama a horda de mais longe
     const provoked = MONSTER_SPAWNING.targetPlayerDistance * (1 + mod('provoke'));
+    const lure = state.nature.lure;
+    const hidden = state.nature.hideIn;
 
     for (let i = enemies.length - 1; i >= 0; i--) {
         const e = enemies[i];
@@ -319,6 +321,7 @@ export function updateEnemies(dt) {
         if (e.orbitCd > 0) e.orbitCd -= dt;
         if (e.marked > 0) e.marked -= dt;
         if (e.ravenMark > 0) e.ravenMark -= dt;
+        if (e.rooted > 0) e.rooted -= dt;
 
         e.x += e.vx * dt;
         e.y += e.vy * dt;
@@ -326,9 +329,13 @@ export function updateEnemies(dt) {
         e.vy *= damping;
 
         const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
-        const huntsPlayer = !model.ignoresPlayer && distToPlayer < provoked;
-        const targetX = huntsPlayer ? player.x : state.coreX;
-        const targetY = huntsPlayer ? player.y : state.coreY;
+        // Arbusto da emboscada: com o herói escondido, o monstro comum não o vê e segue para a tocha. Carvalho acordado: o
+        // monstro por perto vai bater nele. Boss não se deixa enganar
+        const blind = hidden && !e.isBoss && !model.isShadow;
+        const lured = lure && !e.isBoss && !model.ignoresPlayer && Math.hypot(lure.x - e.x, lure.y - e.y) < lure.lures;
+        const huntsPlayer = !blind && !model.ignoresPlayer && distToPlayer < provoked;
+        const targetX = lured ? lure.x : huntsPlayer ? player.x : state.coreX;
+        const targetY = lured ? lure.y : huntsPlayer ? player.y : state.coreY;
         const distToTarget = Math.hypot(targetX - e.x, targetY - e.y);
         const distCore = Math.hypot(state.coreX - e.x, state.coreY - e.y);
 
@@ -344,7 +351,7 @@ export function updateEnemies(dt) {
         } else {
             e.angle = toTargetAngle;
             e.facing = lerpAngle(e.facing ?? e.angle, e.angle, Math.min(1, dt * FACING_SMOOTHING));
-            const lunging = model.lunge && hunting && !e.chained && updateLunge(e, model.lunge, distToTarget, toTargetAngle, dt);
+            const lunging = model.lunge && hunting && !e.chained && !(e.rooted > 0) && updateLunge(e, model.lunge, distToTarget, toTargetAngle, dt);
             // Só mantém distância dentro do campo e antes da reta final: parado fora do mapa, ninguém o alcançaria e a hora não fecharia
             const inField = e.x > e.radius && e.x < state.width - e.radius && e.y > e.radius && e.y < state.height - e.radius;
             const holdsDistance = model.keepDistance && inField && !state.lastStand && distToTarget < model.keepDistance;
@@ -352,7 +359,8 @@ export function updateEnemies(dt) {
             if (state.phase !== 'HUNT' && hunting) return;
             const blockedByTorch = e.isBoss && distCore < CORE_MODEL.bossStopDistance + e.radius;
 
-            if (!lunging && !holdsDistance && !blockedByTorch && !slamming) {
+            // Preso por raízes (Natureza): não anda, mas continua atacando o que estiver ao alcance
+            if (!lunging && !holdsDistance && !blockedByTorch && !slamming && !(e.rooted > 0)) {
                 const speed = e.speed * (1 - slow);
                 e.x += Math.cos(toTargetAngle) * speed * dt;
                 e.y += Math.sin(toTargetAngle) * speed * dt;

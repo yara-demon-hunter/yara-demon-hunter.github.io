@@ -95,15 +95,15 @@
 }
 .tree-tab i:empty { display: none; }
 
-/* Tela grande: a árvore inteira à vista, com os quatro ramos em 2 x 2. Abaixo dessa largura os nós ficariam
+/* Tela grande: a árvore inteira à vista, com os ramos em grade (2 colunas até quatro ramos, 3 com cinco). Abaixo dessa largura os nós ficariam
    pequenos demais para o dedo, e as abas dão nós maiores */
 @media (min-width: 1100px) and (min-height: 560px) {
     .tree-tabs { grid-template-columns: minmax(0, 1fr) 17rem; }
     .tree-rail { display: none; }
     .tree-tabs .tree-map {
-        --cell: min(100cqw / (2 * var(--w) + var(--gap)), 100cqh / (var(--rows-sum) + var(--gap)), 4.6rem);
+        --cell: min(100cqw / (var(--cols, 2) * var(--w) + (var(--cols, 2) - 1) * var(--gap)), 100cqh / (var(--rows-sum) + var(--row-gaps, 1) * var(--gap)), 4.6rem);
         display: grid;
-        grid-template-columns: repeat(2, auto);
+        grid-template-columns: repeat(var(--cols, 2), auto);
     }
     .tree-tabs .tree-branch { background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 12%, transparent), transparent 55%); }
     .tree-tabs .tree-branch:not(.is-active) { display: flex; }

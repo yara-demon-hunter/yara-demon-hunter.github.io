@@ -24,7 +24,8 @@ function inSmoke(e) {
 export function dealDamage(e, amount, o = {}) {
     if (e.hp <= 0 || e.invulnerable) return 0;
     const crit = o.crit || (!o.noCrit && (Math.random() < getCritChance() || (inSmoke(e) && Math.random() < SMOKE_BOMB.critChance)));
-    const dmg = amount * (crit ? getCritMultiplier() : 1) * (e.ravenMark > 0 ? 1 + SHADOW_RAVEN.markDamage : 1);
+    const dmg = amount * (crit ? getCritMultiplier() : 1) * (e.ravenMark > 0 ? 1 + SHADOW_RAVEN.markDamage : 1)
+        * (e.rooted > 0 ? 1 + mod('rootedDamage') : 1);     // Barbed Roots: preso por raízes leva mais de tudo
 
     e.hp -= dmg;
     e.hitFlash = J.hitFlashSeconds;

@@ -5,12 +5,22 @@ import { preloadTreeImages, treeImageFor, paintIcon } from '../../data_model/tre
 import { DARKNESS, getHourName } from '../../data_model/night.js';
 import { START } from '../../data_model/start.js';
 import { save, persist } from '../core/save.js';
+import { clearRun, loadRun, saveRun } from '../core/run_save.js';
+import { HEROES } from '../../data_model/heroes.js';
+import { OMENS } from '../../data_model/night.js';
+import { openCamp } from './camp.js';
+import { resetFieldForNewTurn } from '../systems/spawner.js';
+import { preparePhoenix } from '../render/phoenix.js';
+import { prepareRaven } from '../render/raven.js';
+import { prepareShackle } from '../render/shackle.js';
+import { getTorchMaxHp } from '../systems/torch.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
 import { checkAchievements, pushStats, rewardText } from '../systems/sanctuary.js';
 import { getOwnedPowers, hasBuyableNode } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
 import { resetQuake } from '../systems/quake.js';
 import { resetFury } from '../systems/fury.js';
+import { resetDruid } from '../systems/druid.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
 import { continueEndless, startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
@@ -37,6 +47,7 @@ export function paintHeroPortrait(node, hero) {
 
 // --- INÍCIO DE PARTIDA ---
 export function startGame() {
+    clearRun();                    // outra partida: o registro de CONTINUAR da anterior não vale mais
     audio.init();
     prepareScenery();
     prepareCore();
@@ -67,6 +78,7 @@ export function startGame() {
 
     state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0 };
     state.streak = 0;
+    state.rushPaid = {};
     state.streakTimer = 0;
     state.multiKill = 0;
     state.multiTimer = 0;
@@ -93,6 +105,7 @@ export function startGame() {
     state.knifeTimer = 0;
     resetQuake();
     resetFury();
+    resetDruid();
     state.knifePending = null;
     state.knifeCharge = 0;
     state.knifeInput.stick.fire = false;
@@ -120,6 +133,7 @@ export function startGame() {
 
     refreshModifiers();
     state.revives = mod('revives');
+    state.secondWind = true;       // a tocha traz o herói de volta uma vez por noite (CORE_MODEL.secondWind)
     resetTorch();
 
     player.maxHp = getMaxPlayerHp();
@@ -148,6 +162,59 @@ export function startGame() {
     startHour();
     updateHUD();
     startHints();
+}
+
+// --- CONTINUAR ---
+// Recomeça do registro mais recente (js/core/run_save.js): começa uma partida normal, joga por cima tudo o que estava
+// guardado e abre o acampamento (se parou nele) ou o começo da hora.
+export function continueRun() {
+    const snap = loadRun();
+    if (!snap) return false;
+    if (!HEROES[snap.hero] || HEROES[snap.hero].shelved) {
+        clearRun();
+        return false;
+    }
+    save.hero = snap.hero;
+    save.darkness = Math.min(save.maxDarkness, snap.darkness);
+    startGame();                   // zera tudo e já começa a hora 1: o que vem a seguir sobrescreve
+    resetFieldForNewTurn();
+    state.turn = snap.turn;
+    state.endless = snap.endless;
+    state.totalScore = snap.totalScore;
+    state.coins = snap.coins;
+    state.skillPoints = snap.skillPoints;
+    state.levelPointsCarry = snap.levelPointsCarry;
+    state.playerLevel = snap.playerLevel;
+    state.playerXp = snap.playerXp;
+    state.playerMaxXp = snap.playerMaxXp;
+    state.tree = { ...snap.tree };
+    for (const [key, lvl] of Object.entries(snap.attributes)) if (attributes[key]) attributes[key].lvl = lvl;
+    for (const [key, p] of Object.entries(snap.passives)) if (passives[key]) Object.assign(passives[key], p);
+    for (const [key, p] of Object.entries(snap.powers)) if (powers[key]) Object.assign(powers[key], p);
+    state.oath = snap.oath;
+    state.oathAnnounced = snap.oathAnnounced;
+    state.oathCeremony = null;
+    state.secondWind = snap.secondWind;
+    state.run = { ...state.run, ...snap.run };
+    state.nextOmen = snap.omen ? Object.values(OMENS).find(o => o.name === snap.omen) ?? null : null;
+    refreshModifiers();
+    state.revives = snap.revives;
+    state.coreHpMax = getTorchMaxHp();
+    state.coreHp = Math.min(state.coreHpMax, snap.coreHp);
+    player.maxHp = getMaxPlayerHp();
+    player.hp = Math.min(player.maxHp, snap.hp);
+    resetDash();
+    // Sprites que levam um instante para montar, melhor agora do que no meio da luta
+    if (passives.phoenixPact.lvl > 0) preparePhoenix();
+    if (passives.shadowRaven.lvl > 0) prepareRaven();
+    if (passives.shadowShackle.lvl > 0) prepareShackle();
+    if (snap.kind === 'camp') openCamp(true);
+    else {
+        startHour();
+        saveRun('hunt');
+    }
+    updateHUD();
+    return true;
 }
 
 // --- PROGRESSO ---
@@ -231,6 +298,7 @@ export function triggerGameOver(reason) {
     const newRecord = state.totalScore > save.stats.bestScore && save.stats.bestScore > 0;
 
     bankRun();
+    clearRun();                    // a noite acabou: nada para continuar (a noite sem fim guarda de novo no próximo acampamento)
     if (reason === 'DAWN') {
         save.stats.victories++;
         save.stats.bestDarknessWon = Math.max(save.stats.bestDarknessWon, save.darkness);
@@ -320,6 +388,12 @@ export function renderStartScreen() {
     renderHeroStats();
     const dark = document.getElementById('darknessPicker');
     dark.classList.toggle('hidden', save.maxDarkness <= 1);
+    // CONTINUE: aparece se há uma noite guardada, dizendo em que onda ela parou
+    const run = loadRun();
+    const resumable = run && HEROES[run.hero] && !HEROES[run.hero].shelved;
+    const btnContinue = document.getElementById('btnContinue');
+    btnContinue.classList.toggle('hidden', !resumable);
+    if (resumable) btnContinue.innerHTML = `CONTINUE<em>${HEROES[run.hero].name} · Wave ${run.turn}${run.kind === 'camp' ? ' · camp' : ''}</em>`;
     document.getElementById('darknessValue').innerText = save.darkness;
     dark.title = `Start with ${save.darkness} skill point${save.darkness === 1 ? '' : 's'}`;
     paintHeroPortrait(document.getElementById('heroPortrait'), hero);
@@ -354,7 +428,8 @@ export function setupScreens() {
     play.textContent = 'PLAY';
     play.disabled = false;
     window.finishLoading?.();
-    if (START.skipMenuOnFirstVisit && save.stats.runs === 0) startFirstVisit();
+    // Quem fechou a aba no meio da primeira noite ainda tem runs === 0, mas tem uma noite guardada: vê o menu com o CONTINUE
+    if (START.skipMenuOnFirstVisit && save.stats.runs === 0 && !loadRun()) startFirstVisit();
 }
 
 // Primeira visita: a caçada começa sozinha. O navegador só libera o som depois de um toque, clique ou tecla,

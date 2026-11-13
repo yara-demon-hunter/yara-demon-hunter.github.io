@@ -63,6 +63,7 @@ export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
 // Com um Last Prayer sobrando o herói levanta; senão, a noite acaba
 function heroDown() {
     if (tryPhoenix()) return;
+    if (trySecondWind()) return;
     if (state.revives <= 0) {
         player.hp = 0;
         beginDeath('PLAYER');
@@ -85,6 +86,39 @@ function heroDown() {
     addShockwave(player.x, player.y, { radius: 420, color: '#fde68a', width: 10, seconds: 0.7 });
     showBanner('', 'NOT YET', 'The prayer is answered', 'gold');
     audio.playRevive();
+}
+
+// Segunda chance da tocha (CORE_MODEL.secondWind): uma vez por noite ela gasta parte da chama e puxa o herói de volta
+// para junto dela, com os monstros jogados para longe. Ensina o que a tocha é: a outra vida do jogador.
+function trySecondWind() {
+    const W = CORE_MODEL.secondWind;
+    if (!state.secondWind || save.darkness > W.maxDarkness || state.coreHp <= 1) return false;
+    state.secondWind = false;
+    state.run.revivesUsed++;
+    const fromX = player.x;
+    const fromY = player.y;
+    state.coreHp = Math.max(1, state.coreHp - state.coreHpMax * W.torchCostRatio);
+    player.x = state.coreX;
+    player.y = state.coreY + W.offsetY;
+    player.targetX = player.x;
+    player.targetY = player.y;
+    player.hp = player.maxHp * W.heroHpRatio;
+    player.iFrames = W.invulnerableSeconds;
+    state.enemyProjectiles.length = 0;
+    for (const e of state.enemies) {
+        if (e.isBoss) continue;
+        const a = Math.atan2(e.y - player.y, e.x - player.x);
+        e.vx += Math.cos(a) * W.knockback;
+        e.vy += Math.sin(a) * W.knockback;
+    }
+    slowMotion(0.3, 0.9);
+    screenFlash('#fed7aa', 0.75);
+    createExplosion(fromX, fromY, '#fb923c', 18);
+    addShockwave(state.coreX, state.coreY, { radius: 460, color: '#fdba74', width: 12, seconds: 0.8 });
+    addShockwave(player.x, player.y, { radius: 160, color: '#fef3c7', width: 6, seconds: 0.5 });
+    showBanner('', 'THE TORCH CALLS YOU BACK', 'It gave part of its flame. It cannot do it twice.', 'gold');
+    audio.playRevive();
+    return true;
 }
 
 // --- MOVIMENTAÇÃO DO HERÓI ---

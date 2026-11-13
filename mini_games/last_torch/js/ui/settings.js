@@ -22,6 +22,7 @@ export function openSettings() {
 
 export function toggleSetting(key) {
     save.settings[key] = !save.settings[key];
+    if (key === 'quickPick') save.settings.quickPickChosen = true;   // a escolha do jogador passa a valer sempre
     if (key === 'moveKeys') {
         // Voltou ao mouse: o herói volta a seguir o cursor e nenhuma tecla fica presa
         Object.keys(keys).forEach((code) => { keys[code] = false; });

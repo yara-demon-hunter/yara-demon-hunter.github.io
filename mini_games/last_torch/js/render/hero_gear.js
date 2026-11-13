@@ -219,7 +219,28 @@ function ruinParts(pose, rig) {
     return parts;
 }
 
-const PARTS = { slaughter: slaughterParts, whispers: whispersParts, hearth: hearthParts, ruin: ruinParts };
+// Folhas que giram em volta do corpo (Oath of the Wild)
+function wildParts(pose, rig) {
+    const { project, limb } = rig;
+    const G = O.wild.gear;
+    const parts = [];
+    for (let i = 0; i < G.leaves; i++) {
+        const a = pose.t * 1.6 + (i / G.leaves) * TAU;
+        const z = pose.shoulderZ - 4 + Math.sin(pose.t * 2 + i * 1.7) * 2.2;
+        const base = [pose.lean + Math.cos(a) * 7, Math.sin(a) * 7, z];
+        const tip = [base[0] + Math.cos(a + 1.5) * 1.5, base[1] + Math.sin(a + 1.5) * 1.5, z + 1.3];
+        parts.push({
+            depth: project(...base).depth,
+            draw() {
+                limb([base, tip], 1.1, i % 2 ? G.leaf : G.leafShade);
+                limb([base, tip], 0.3, G.leafLight);
+            }
+        });
+    }
+    return parts;
+}
+
+const PARTS = { slaughter: slaughterParts, whispers: whispersParts, hearth: hearthParts, ruin: ruinParts, wild: wildParts };
 
 export function gearParts(gear, pose, rig) {
     return gear ? PARTS[gear](pose, rig) : [];

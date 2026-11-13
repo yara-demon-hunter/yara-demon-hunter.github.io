@@ -16,6 +16,10 @@ export const TURN_DIFFICULTY = {
     damageMultiplierFirstTurn: 0.55,
     damageMultiplierPerTurn: 0.103,
     maxDamageMultiplier: 2.6,
+    // Alívio nas primeiras ondas (multiplica o dano acima): a onda 1 é onde o jogador novo aprende, e era onde ele morria
+    // (medido com bots: quem "vai para cima" caía em ~26 s, quem anda sem rumo em ~70 s, todos na onda 1). Da onda 4 em
+    // diante nada muda. Um valor por onda, a partir da 1; onda sem valor = 1.
+    earlyDamageRelief: [0.5, 0.7, 0.86],
 
     // Tempo entre um monstro e o próximo
     spawnIntervalFirstTurnSeconds: 1.75,
@@ -59,7 +63,8 @@ export function getTurnDifficulty(turn) {
     return {
         hpMultiplier: D.hpMultiplierFirstTurn + steps * D.hpMultiplierPerTurn,
         speedMultiplier: Math.min(D.maxSpeedMultiplier, D.speedMultiplierFirstTurn + steps * D.speedMultiplierPerTurn),
-        damageMultiplier: Math.min(D.maxDamageMultiplier, D.damageMultiplierFirstTurn + steps * D.damageMultiplierPerTurn),
+        damageMultiplier: Math.min(D.maxDamageMultiplier, D.damageMultiplierFirstTurn + steps * D.damageMultiplierPerTurn)
+            * (D.earlyDamageRelief[steps] ?? 1),
         spawnIntervalSeconds: Math.max(
             D.minimumSpawnIntervalSeconds,
             D.spawnIntervalFirstTurnSeconds - steps * D.spawnIntervalReductionPerTurnSeconds

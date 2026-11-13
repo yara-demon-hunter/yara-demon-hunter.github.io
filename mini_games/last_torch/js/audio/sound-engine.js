@@ -468,6 +468,12 @@ export class SoundEngine {
         this.tone({ type: 'sine', freq: 450, to: 135, attack: 0.05, decay: 0.5, gain: 0.1 });
     }
 
+    playSeedLaunch() {
+        if (!this.ctx) return;
+        this.burst({ filter: 'bandpass', freq: 1800, to: 700, q: 1.2, decay: 0.12, gain: 0.12 });
+        this.tone({ type: 'triangle', freq: 520, to: 260, decay: 0.11, gain: 0.07 });
+    }
+
     playBossDeath() {
         if (!this.ctx) return;
         this.tone({ type: 'sawtooth', freq: 200, to: 28, attack: 0.02, decay: 1.6, gain: 0.2 });

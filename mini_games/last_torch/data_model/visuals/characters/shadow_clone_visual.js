@@ -4,6 +4,7 @@
 import { HERO_VISUALS } from '../../../library/characters/hunter/hero_visual.js';
 import { AZAEL_VISUALS } from '../../../library/characters/azael/azael_visual.js';
 import { BRUTOS_VISUALS } from '../../../library/characters/brutos/brutos_visual.js';
+import { ROWAN_VISUALS } from '../../../library/characters/rowan/rowan_visual.js';
 
 // Tons de sombra que o clone do Azael usa nas peças só dele (pele, cabelo, faixas, bainha)
 const AZAEL_SHADOW = {
@@ -74,6 +75,16 @@ const BRUTOS_SHADOW = {
 };
 SHADOW_CLONE_VISUALS.colorsByModel = {
     azael: SHADOW_CLONE_VISUALS.azaelColors,
-    brutos: { ...BRUTOS_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors, ...BRUTOS_SHADOW }
+    brutos: { ...BRUTOS_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors, ...BRUTOS_SHADOW },
+    // Clone do Rowan: o boneco dele com pele, cabelo, túnica, folhas e madeira em tons de sombra; a semente fica violeta
+    rowan: {
+        ...ROWAN_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors,
+        skin: '#2a1846', skinShade: '#170c2a', skinLight: '#3b2363', outline: '#000000', mouth: '#0d0719',
+        hair: '#1e1035', hairShade: '#110a20', hairLight: '#34205e', eye: '#c084fc', eyeWhite: '#3b2363',
+        jacket: '#160d29', jacketShade: '#0a0615', jacketLight: '#2a1846', patch: '#110a20', pants: '#140a24', pantsShade: '#0a0612',
+        leather: '#1e1035', leatherShade: '#110a20', leatherLight: '#34205e', wood: '#1e1035', woodShade: '#0a0612', woodLight: '#4c2f80',
+        leaf: '#4c1d95', leafShade: '#2e1065', leafLight: '#7c3aed', seed: '#a855f7', seedCore: '#e9d5ff', seedGlow: 'rgba(168, 85, 247, 0.5)',
+        antler: '#34205e', antlerShade: '#1b1030'
+    }
 };
 export const shadowColorsOf = (model) => SHADOW_CLONE_VISUALS.colorsByModel[model] ?? SHADOW_CLONE_VISUALS.colors;

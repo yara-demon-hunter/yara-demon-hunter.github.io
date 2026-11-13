@@ -1,0 +1,27 @@
+/* --- ANÚNCIO DA FÚRIA (js/ui/fury_cutin.js) ---
+   A mesma faixa escura das ondas (#banner, banner.css), com a foto do herói e o nome do especial. Só opacity e transform. */
+#furyCutIn {
+    position: absolute; top: 22%; left: 0; right: 0; z-index: 13; pointer-events: none; opacity: 0; --tone: #f0abfc;
+    display: flex; align-items: center; justify-content: center; gap: 0.9rem; padding: 0.55rem 1rem;
+    background: linear-gradient(90deg, transparent, rgba(2, 4, 8, 0.78) 22%, rgba(2, 4, 8, 0.78) 78%, transparent);
+}
+#furyCutIn.is-showing { animation: cutinShow 0.85s ease-out both; }
+#furyCutIn img {
+    width: clamp(3.6rem, 13vh, 5.6rem); aspect-ratio: 1; object-fit: cover; object-position: top; border-radius: 50%;
+    border: 2px solid var(--tone); background: #020617; box-shadow: 0 0 22px color-mix(in srgb, var(--tone) 55%, transparent);
+}
+.cutin-text { display: flex; flex-direction: column; text-align: left; }
+.cutin-text span { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.42em; color: #94a3b8; text-transform: uppercase; }
+.cutin-text b {
+    font-family: 'Cinzel', Georgia, serif; font-size: clamp(1.4rem, 4.6vw, 2.5rem); font-weight: 800; letter-spacing: 0.12em; line-height: 1.15;
+    color: #f8fafc; text-transform: uppercase; text-shadow: 0 0 24px var(--tone), 0 2px 0 #000;
+}
+@keyframes cutinShow {
+    0% { opacity: 0; transform: scaleY(0.5); }
+    12% { opacity: 1; transform: scaleY(1.06); }
+    20% { transform: scaleY(1); }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+@media (max-height: 520px) and (orientation: landscape) { #furyCutIn { top: 16%; padding: 0.3rem 1rem; } .cutin-text span { font-size: 0.55rem; } }
+@media (max-width: 600px) { .cutin-text b { font-size: clamp(1.1rem, 6vw, 1.6rem); } .cutin-text span { letter-spacing: 0.3em; } }

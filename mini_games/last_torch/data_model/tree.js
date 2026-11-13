@@ -29,7 +29,8 @@ export const TREE_COSTS = {
     shadow: { basic: 1, power: 1, special: 1 },
     blade: { basic: 1, power: 2, special: 3 },
     flame: { basic: 1, power: 3, special: 4 },
-    curse: { basic: 1, power: 3, special: 4 }
+    curse: { basic: 1, power: 3, special: 4 },
+    nature: { basic: 1, power: 2, special: 3 }
 };
 
 export const TREE_LAYOUT = {
@@ -42,7 +43,8 @@ export const TREE_BRANCHES = {
     blade: { name: 'BLADE', path: 'BLADE PATH', icon: '🤺', color: '#f87171', style: 'Warrior: raw strength, kill everything.' },
     shadow: { name: 'SHADOW', path: 'SHADOW PATH', icon: '🌑', color: '#a5b4fc', style: 'Thief: technical and cheap, takes skill.' },
     flame: { name: 'FLAME', path: 'FLAME PATH', icon: '🕯️', color: '#fb923c', style: 'Keeper: defensive, calm and cautious.' },
-    curse: { name: 'CURSE', path: 'CURSE PATH', icon: '🌙', color: '#e879f9', style: 'Sorcerer: spells, area and distance.' }
+    curse: { name: 'CURSE', path: 'CURSE PATH', icon: '🌙', color: '#e879f9', style: 'Sorcerer: spells, area and distance.' },
+    nature: { name: 'NATURE', path: 'NATURE PATH', icon: '🌿', color: '#4ade80', style: 'Druid: roots, life drain and living cover.' }
 };
 
 // req(id) = nível 1 do nó; req(id, 3) = nível 3
@@ -161,7 +163,44 @@ export const TREE_NODES = [
     { id: 'corpseEvolve', branch: 'curse', kind: 'evolve', key: 'corpseBurst', x: 2, y: 3, requires: [req('corpseBurst', 5)] },
     { id: 'orbitBlades', branch: 'curse', kind: 'power', key: 'orbitBlades', x: 3, y: 3, requires: [req('darkKnowledge', 2)] },
     { id: 'orbitEvolve', branch: 'curse', kind: 'evolve', key: 'orbitBlades', x: 4, y: 3, requires: [req('orbitBlades', 5)] },
-    { id: 'oathRuin', branch: 'curse', kind: 'passive', key: 'oathRuin', oath: true, x: 6, y: 1.5, requires: [req('wrathEvolve'), req('voidRiftEvolve')] }
+    { id: 'oathRuin', branch: 'curse', kind: 'passive', key: 'oathRuin', oath: true, x: 6, y: 1.5, requires: [req('wrathEvolve'), req('voidRiftEvolve')] },
+
+    // --- NATUREZA: o druida. Controle e paciência: prender no chão, drenar a vida, esconder-se atrás do que cresce ---
+    { id: 'wildHeart', branch: 'nature', kind: 'mod', x: 0, y: 1.5, requires: [],
+      name: 'Wild Heart', icon: '🌱', desc: 'The forest mends your wounds, slowly and always.',
+      levelText: (mods) => `Heal ${mods.hpRegen} health per second`, mods: { hpRegen: 0.3 } },
+    // Linha das raízes: prender no chão
+    { id: 'graspingRoots', branch: 'nature', kind: 'power', key: 'graspingRoots', x: 1, y: 0, requires: [req('wildHeart')] },
+    { id: 'barbedRoots', branch: 'nature', kind: 'mod', x: 2, y: 0, requires: [req('graspingRoots', 2)],
+      name: 'Barbed Roots', icon: '🥀', desc: 'A pinned monster is an easy target for everything you have.',
+      levelText: (mods) => `Pinned monsters take +${formatPercent(mods.rootedDamage)} damage from every hit`, mods: { rootedDamage: 0.08 } },
+    { id: 'rootsEvolve', branch: 'nature', kind: 'evolve', key: 'graspingRoots', x: 3, y: 0, requires: [req('graspingRoots', 5)] },
+    { id: 'thornBurst', branch: 'nature', kind: 'passive', key: 'thornBurst', x: 4, y: 0, requires: [req('rootsEvolve')] },
+    // Linha da seiva: drenar a vida
+    { id: 'leechVine', branch: 'nature', kind: 'power', key: 'leechVine', x: 1, y: 1, requires: [req('wildHeart')] },
+    { id: 'lifebloom', branch: 'nature', kind: 'mod', x: 2, y: 1, requires: [req('leechVine', 2)],
+      name: 'Lifebloom', icon: '🌸', desc: 'What you cut feeds you.',
+      levelText: (mods) => `+${mods.maxHpFlat} health, ${formatPercent(mods.lifeSteal)} of your hit damage returns as health`, mods: { maxHpFlat: 6, lifeSteal: 0.01 } },
+    { id: 'leechEvolve', branch: 'nature', kind: 'evolve', key: 'leechVine', x: 3, y: 1, requires: [req('leechVine', 5)] },
+    // Linha do bosque: a árvore que esconde
+    { id: 'shelterOak', branch: 'nature', kind: 'power', key: 'shelterOak', x: 1, y: 2, requires: [req('wildHeart', 2)] },
+    { id: 'thornBark', branch: 'nature', kind: 'passive', key: 'thornBark', x: 2, y: 2, requires: [req('shelterOak', 2)] },
+    { id: 'oakEvolve', branch: 'nature', kind: 'evolve', key: 'shelterOak', x: 3, y: 2, requires: [req('shelterOak', 5)] },
+    // Linha dos esporos: o chão que envenena
+    { id: 'sporePods', branch: 'nature', kind: 'power', key: 'sporePods', x: 1, y: 3, requires: [req('wildHeart')] },
+    { id: 'toxicBloom', branch: 'nature', kind: 'mod', x: 2, y: 3, requires: [req('sporePods', 2)],
+      name: 'Toxic Bloom', icon: '🧪', desc: 'Thicker spores, slower lungs.',
+      levelText: (mods) => `+${formatPercent(mods.poison)} poison damage and cloud duration`, mods: { poison: 0.12 } },
+    { id: 'sporeEvolve', branch: 'nature', kind: 'evolve', key: 'sporePods', x: 3, y: 3, requires: [req('sporePods', 5)] },
+    // Linha dos animais: a matilha que guarda a tocha
+    { id: 'spiritWolves', branch: 'nature', kind: 'power', key: 'spiritWolves', x: 1, y: 4, requires: [req('wildHeart', 2)] },
+    { id: 'packInstinct', branch: 'nature', kind: 'mod', x: 2, y: 4, requires: [req('spiritWolves', 2)],
+      name: 'Pack Instinct', icon: '🐾', desc: 'The pack runs faster and bites deeper.',
+      levelText: (mods) => `+${formatPercent(mods.wolfDamage)} wolf damage, +${formatPercent(mods.wolfSpeed)} wolf speed, +${formatPercent(mods.wolfHealth)} wolf health`, mods: { wolfDamage: 0.12, wolfSpeed: 0.06, wolfHealth: 0.15 } },
+    { id: 'wolvesEvolve', branch: 'nature', kind: 'evolve', key: 'spiritWolves', x: 3, y: 4, requires: [req('spiritWolves', 5)] },
+    // Linha da emboscada: o arbusto que esconde
+    { id: 'hidingBush', branch: 'nature', kind: 'power', key: 'hidingBush', x: 1, y: 5, requires: [req('wildHeart', 2)] },
+    { id: 'oathWild', branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 6, y: 1.5, requires: [req('thornBurst'), req('oakEvolve')] }
 ];
 
 export const TREE_BY_ID = Object.fromEntries(TREE_NODES.map(node => [node.id, node]));

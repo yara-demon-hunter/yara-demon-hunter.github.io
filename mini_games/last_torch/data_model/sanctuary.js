@@ -9,7 +9,7 @@ import { NIGHT } from './night.js';
 export const ACHIEVEMENTS = [
     // --- TROFÉUS ---
     { id: 'firstNight', group: 'trophy', icon: '🩸', name: 'First Blood', desc: 'Finish your first hunt.', stat: 'runs', target: 1 },
-    { id: 'hour3', group: 'trophy', icon: '🌒', name: 'Into the Hush', desc: 'Reach Wave 3.', stat: 'bestHour', target: 3 },
+    { id: 'hour3', group: 'trophy', icon: '🌒', name: 'Into the Hush', desc: 'Reach Wave 3.', stat: 'bestHour', target: 3, hero: 'rowan' },
     { id: 'hour4', group: 'trophy', icon: '🌕', name: 'Blood Moon', desc: 'Reach Wave 4.', stat: 'bestHour', target: 4 },
     { id: 'kills300', group: 'trophy', icon: '⚰️', name: 'Reaper', desc: 'Slay 200 monsters.', stat: 'kills', target: 200 },
     { id: 'demon', group: 'trophy', icon: '😈', name: 'Demon Slayer', desc: 'Slay the Demon Lord.', stat: 'boss_DEMON_LORD', target: 1, hero: 'reaver' },
@@ -27,6 +27,7 @@ export const ACHIEVEMENTS = [
     { id: 'sworn2', group: 'trophy', icon: '🤫', name: 'Never Where They Strike', desc: 'Reach Wave 8 under the Oath of Whispers.', stat: 'oath_oathWhispers', target: 8 },
     { id: 'sworn3', group: 'trophy', icon: '🛡️', name: 'The Flame Will Not Die', desc: 'Reach Wave 8 under the Oath of the Hearth.', stat: 'oath_oathHearth', target: 8 },
     { id: 'sworn4', group: 'trophy', icon: '📕', name: 'The Dark Pays in Kind', desc: 'Reach Wave 8 under the Oath of Ruin.', stat: 'oath_oathRuin', target: 8 },
+    { id: 'sworn5', group: 'trophy', icon: '🦌', name: 'The Forest Remembers', desc: 'Reach Wave 8 under the Oath of the Wild.', stat: 'oath_oathWild', target: 8 },
     { id: 'hour20', group: 'trophy', icon: '♾️', name: 'Endless Dark', desc: 'Reach Wave 20 in the endless night.', stat: 'bestHour', target: 20 },
     { id: 'darkness8', group: 'trophy', icon: '👑', name: 'Lightbringer', desc: 'Win a night on Darkness 8.', stat: 'bestDarknessWon', target: 8 },
 

@@ -5,11 +5,13 @@ import { audio, maxUltEnergy, passives, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { blast, dealDamage, ignite } from './damage.js';
 import { addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
-import { mod } from './modifiers.js';
 import { isFireCasting } from './knives.js';
 import { launchCrescent, tryExecute } from './skills_blade.js';
 import { detonateMark } from './skills_shadow.js';
 import { startFury } from './fury.js';
+import { consumeAmbush } from './skills_nature.js';
+import { getHero, mod } from './modifiers.js';
+import { showFuryCutIn } from '../ui/fury_cutin.js';
 import {
     getAtkCooldown,
     getAtkDamage,
@@ -93,6 +95,8 @@ export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, a
 export function chargeUlt(amount) {
     // Com a Fúria ativa a barra mostra o tempo restante e não carrega: a próxima se ganha depois que esta acabar
     if (state.frenzyActiveTimer > 0) return;
+    // Oath of the Wild: a floresta dá vida, não fúria
+    if (mod('noFury') > 0) return;
 
     state.ultEnergy = Math.min(maxUltEnergy, state.ultEnergy + amount);
     updateHUD();
@@ -103,6 +107,7 @@ export function chargeUlt(amount) {
 
 // Ativação automática da Fúria. A barra e a duração são iguais para todos; o especial é de cada personagem (js/systems/fury.js).
 // O do Demon Hunter (a explosão de lâminas) continua aqui.
+const FURY_COLORS = { blades: '#f0abfc', bloodWaltz: '#f87171', stomp: '#cbd5e1', forestGuardian: '#4ade80' };
 export function triggerFrenzyUlt() {
     state.ultEnergy = 0;
     const fury = getFury();
@@ -110,6 +115,12 @@ export function triggerFrenzyUlt() {
     state.frenzyDuration = getFrenzyDuration() + (fury.extraSeconds ?? 0);
     state.frenzyActiveTimer = state.frenzyDuration;
     audio.playUltSound();
+    const startedAt = state.runTime;      // se uma partida nova começar durante o anúncio, o golpe não sai nela
+    // Anúncio: a faixa com a foto do herói aparece e some com a caçada parada; só então o golpe sai (a tela livre)
+    showFuryCutIn(getHero(), fury.name, fury.color ?? FURY_COLORS[fury.kind] ?? '#f0abfc', () => { if (state.runTime >= startedAt) releaseFury(fury); });
+}
+
+function releaseFury(fury) {
     if (startFury(fury)) {
         updateHUD();
         return;
@@ -170,6 +181,7 @@ export function updateAutoAttack(dt) {
             if (e.marked > 0 && player.dashTimer <= 0) detonateMark(e, false);
             tryExecute(e);
         });
+    consumeAmbush();
     launchCrescent(atkAngle);
     if (hits > 0) {
         audio.playHit(hits);

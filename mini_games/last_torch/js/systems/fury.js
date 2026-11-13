@@ -34,7 +34,7 @@ export function startFury(fury) {
     resetFury();
     run.kind = fury.kind;
     run.fury = fury;
-    showCallout(fury.name.toUpperCase(), fury.kind === 'bloodWaltz' ? '#f87171' : '#cbd5e1');
+    showCallout(fury.name.toUpperCase(), fury.kind === 'bloodWaltz' ? '#f87171' : fury.color ?? '#cbd5e1');
     if (fury.kind === 'bloodWaltz') {
         run.left = fury.cuts;
         run.timer = 0;
@@ -42,6 +42,10 @@ export function startFury(fury) {
         zoomPunch(0.03);
         hitStop(0.06);
         createExplosion(player.x, player.y, '#450a0a', 16);
+    } else if (fury.kind === 'forestGuardian') {
+        run.timer = 0;
+        addShockwave(player.x, player.y, { radius: 52, color: '#166534', width: 10, seconds: 0.65 });
+        createExplosion(player.x, player.y, '#14532d', 20);
     } else if (fury.kind === 'stomp') {
         run.timer = 0;
         shakeScreen(fury.shake * 1.6);
@@ -50,9 +54,16 @@ export function startFury(fury) {
     return true;
 }
 
-// Parte do dano que o herói recebe durante a Fúria (o Brutos aguenta mais pancada nas pisadas)
+// Brutos recebe menos dano; o escudo de folhas de Rowan reduz o dano recebido.
 export function furyDamageRatio() {
-    return run.kind === 'stomp' && state.frenzyActiveTimer > 0 ? 1 - run.fury.damageTakenCut : 1;
+    if (state.frenzyActiveTimer <= 0) return 1;
+    if (run.kind === 'stomp') return 1 - run.fury.damageTakenCut;
+    if (run.kind === 'forestGuardian') return 1 - run.fury.damageReduction;
+    return 1;
+}
+
+export function forestGuardianActive() {
+    return run.kind === 'forestGuardian' && state.frenzyActiveTimer > 0;
 }
 
 // --- VALSA DE SANGUE (Azael) ---
@@ -165,5 +176,23 @@ export function updateFury(dt) {
             run.timer = run.fury.stepSeconds;
             stomp();
         }
+        return;
+    }
+    if (run.kind === 'forestGuardian') {
+        if (state.frenzyActiveTimer <= 0 || player.hp <= 0) {
+            resetFury();
+            return;
+        }
+        const F = run.fury;
+        run.timer -= dt;
+        for (const e of state.enemies) {
+            if (e.hp <= 0 || Math.hypot(e.x - player.x, e.y - player.y) > F.radius + e.radius) continue;
+            e.slow = Math.max(e.slow ?? 0, F.slow);
+            if (run.timer <= 0) {
+                dealDamage(e, getBladeDamage() * F.damage, { noCrit: true, quiet: true });
+                createExplosion(e.x, e.y - e.radius, '#4ade80', 2);
+            }
+        }
+        if (run.timer <= 0) run.timer = F.tickSeconds;
     }
 }

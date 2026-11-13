@@ -115,7 +115,7 @@ permalink: /mini_games/last_torch/last_torch.html
     <!-- Sequência de mortes -->
     <div id="hudStreak" aria-hidden="true">
         <b id="streakCount">0</b>
-        <span>STREAK</span>
+        <span id="streakLabel">STREAK</span>
         <i><u id="streakBar"></u></i>
     </div>
     <!-- Lembrete do mouse: aparece no começo da hora 1 e some aos poucos (só no computador, js/ui/hints.js) -->
@@ -173,6 +173,8 @@ permalink: /mini_games/last_torch/last_torch.html
         </div>
 
         <!-- O PLAY nasce desligado: js/ui/screens.js o acende quando o jogo termina de chegar pela rede -->
+        <!-- CONTINUE: só aparece com uma noite guardada (js/core/run_save.js, js/ui/screens.js) -->
+        <button id="btnContinue" class="start-btn start-btn-continue hidden">CONTINUE</button>
         <button id="btnStart" class="start-btn" disabled>LOADING</button>
         <p id="iosHint" class="hidden">Full screen on iPhone: tap Share, then <b>Add to Home Screen</b>, and open it from there.</p>
         <div class="start-links">

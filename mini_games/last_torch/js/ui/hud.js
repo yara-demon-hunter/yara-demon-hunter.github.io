@@ -1,10 +1,10 @@
 import { getHero, mod } from '../systems/modifiers.js';
 import { NIGHT, getHourName } from '../../data_model/night.js';
-import { STREAK } from '../../data_model/streak.js';
+import { STREAK, rushTier } from '../../data_model/streak.js';
 import { isBossTurn } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { player, state } from '../core/state.js';
-import { getAxeQuake, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
+import { getAxeQuake, getRootSnare, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
 import { hasBuyableNode } from '../systems/tree.js';
 
 // --- HUD ---
@@ -19,7 +19,7 @@ const ui = {
     turn: el('turnLabel'), hourName: el('hourName'), scoreBar: el('scoreBar'), pips: el('nightPips'),
     bossBox: el('bossHpContainer'), bossName: el('bossNameText'), bossHp: el('bossHpText'), bossBar: el('bossHpBar'),
     heroCard: el('heroCard'), screenFx: el('screenFx'), statusButton: el('btnPause'), statusBadge: el('statusBadge'),
-    streakBox: el('hudStreak'), streakCount: el('streakCount'), streakBar: el('streakBar'),
+    streakBox: el('hudStreak'), streakCount: el('streakCount'), streakBar: el('streakBar'), streakLabel: el('streakLabel'),
     knifeButton: el('knifeButton'), dashButton: el('dashButton'), dashCharges: el('dashCharges')
 };
 const hasTouchButtons = window.matchMedia('(pointer: coarse)').matches;
@@ -64,13 +64,17 @@ const knifeShown = { cd: -1, ready: null, sealed: null, quake: null };
 export function updateKnifeButton() {
     if (!hasTouchButtons) return;
     // Captain Brutos: o botão da adaga vira o Axe Quake (o anel é a recarga do golpe)
-    const quakeHero = mod('axeQuake') > 0;
-    if (knifeShown.quake !== quakeHero) {
-        knifeShown.quake = quakeHero;
-        ui.knifeButton.setAttribute('aria-label', quakeHero ? 'Axe Quake' : 'Throw dagger');
-        document.getElementById('knifeButtonKnob').textContent = quakeHero ? '🪓' : '🗡️';
+    // Rowan: o botão vira o Root Snare. Os dois usam o mesmo relógio (state.quake.timer)
+    const snareHero = mod('rootSnare') > 0;
+    const quakeHero = mod('axeQuake') > 0 || snareHero;
+    const kind = snareHero ? 'snare' : quakeHero ? 'quake' : 'knife';
+    if (knifeShown.quake !== kind) {
+        knifeShown.quake = kind;
+        ui.knifeButton.setAttribute('aria-label', snareHero ? 'Root Snare' : quakeHero ? 'Axe Quake' : 'Throw dagger');
+        document.getElementById('knifeButtonKnob').textContent = snareHero ? '🌿' : quakeHero ? '🪓' : '🗡️';
     }
-    const ratio = quakeHero ? Math.min(1, state.quake.timer / (getAxeQuake()?.cooldownSeconds ?? 1)) : Math.min(1, state.knifeTimer / getKnifeCooldown());
+    const abilitySeconds = snareHero ? getRootSnare().cooldownSeconds : getAxeQuake()?.cooldownSeconds ?? 1;
+    const ratio = quakeHero ? Math.min(1, state.quake.timer / abilitySeconds) : Math.min(1, state.knifeTimer / getKnifeCooldown());
     const cd = Math.ceil(ratio * CD_STEPS) / CD_STEPS;
     if (knifeShown.cd !== cd) {
         knifeShown.cd = cd;
@@ -134,6 +138,9 @@ function updateStreakHud() {
         pulse(ui.streakCount, 1.3, 160);
         const tier = [...STREAK.tiers].reverse().find(t => state.streak >= t.at);
         ui.streakBox.style.setProperty('--tone', tier ? tier.color : '#e2e8f0');
+        // Rush: o nível do combo (bônus de ataque e de passo enquanto a sequência durar)
+        const rush = rushTier(state.streak);
+        setText(ui.streakLabel, rush > 0 ? `RUSH ${['I', 'II', 'III', 'IV', 'V', 'VI'][rush - 1]}` : 'STREAK');
     }
     setBar(ui.streakBar, state.streakTimer / STREAK.windowSeconds);
 }

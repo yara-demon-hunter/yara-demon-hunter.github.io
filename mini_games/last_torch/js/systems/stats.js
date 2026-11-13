@@ -5,6 +5,8 @@ import { WAR_CRY } from '../../data_model/passives.js';
 import { getPowerLevel } from '../../data_model/powers.js';
 import { attributes, passives, player, powers, state } from '../core/state.js';
 import { getHero, mod } from './modifiers.js';
+import { STREAK, rushTier } from '../../data_model/streak.js';
+import { getAmbushBonus } from './skills_nature.js';
 
 function getCurrentCharacterBase() {
     return getCharacterBase(getHero().model ?? 'hunter');
@@ -33,6 +35,7 @@ export function getBladeDamage() {
     return getAtkDamage() * (1 + mod('bladeDamage'))
         * (1 + (hunger ? state.bloodlust.stacks * hunger.damage : 0))
         * (1 + (state.warCryTimer > 0 ? WAR_CRY.bladeBonus : 0))
+        * (1 + getAmbushBonus())     // Ambush Bush: o corte que sai do arbusto
         * (state.frenzyActiveTimer > 0 ? 1 + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel : 1);
 }
 // Feitiços e tudo que a chama faz sozinha
@@ -74,11 +77,13 @@ export function getAtkCooldown() {
     const hunger = getPowerLevel(powers.bloodlust);
     if (hunger) cd *= 1 - state.bloodlust.stacks * hunger.speed;
     if (mod('stillAttack') > 0 && player.stillTime > 0.3) cd *= 1 - mod('stillAttack');
+    cd *= 1 - rushTier(state.streak) * STREAK.rush.attackSpeedPerTier;     // Rush: o combo da sequência de mortes
     return Math.max(BLADE_SKILL.minimumCooldownSeconds, cd);
 }
 export function getPlayerMaxSpeed() {
     const speed = (getCurrentCharacterBase().player.moveSpeed
-        + (attributes.moveSpeed.lvl - 1) * CHARACTER_MODEL.moveSpeedPerUpgrade) * (1 + mod('moveSpeed'));
+        + (attributes.moveSpeed.lvl - 1) * CHARACTER_MODEL.moveSpeedPerUpgrade) * (1 + mod('moveSpeed'))
+        * (1 + rushTier(state.streak) * STREAK.rush.moveSpeedPerTier);
     // Axe Quake em andamento (Captain Brutos): quase parado enquanto o machado sobe e desce
     return player.move?.kind === 'quake' ? speed * getAxeQuake().moveSpeed : speed;
 }
@@ -95,6 +100,11 @@ export function getMaxPlayerHp() {
 // A Fúria do personagem escolhido: { kind, name, ...números } (data_model/characters/<id>.js)
 export function getFury() {
     return getCurrentCharacterBase().player.fury;
+}
+
+// Habilidade do druida (data_model/characters/rowan.js); null para quem não a tem
+export function getRootSnare() {
+    return getCurrentCharacterBase().player.rootSnare;
 }
 
 export function getAxeQuake() {
@@ -127,9 +137,15 @@ export function getFrenzyDamageBonus() {
     return attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;
 }
 export function getFrenzyDuration() {
-    return FRENZY_NOVA_SKILL.baseDurationSeconds
-        + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.durationPerUpgradeLevelSeconds
-        + mod('furyDuration');
+    const level = attributes.frenzyNova.lvl;
+    const characterDuration = getCurrentCharacterBase().player.fury.durationSeconds;
+    const baseDuration = characterDuration ?? (
+        FRENZY_NOVA_SKILL.baseDurationSeconds + level * FRENZY_NOVA_SKILL.durationPerUpgradeLevelSeconds
+    );
+    const characterUpgrade = characterDuration === undefined
+        ? 0
+        : Math.max(0, level - 1) * FRENZY_NOVA_SKILL.durationPerUpgradeLevelSeconds;
+    return baseDuration + characterUpgrade + mod('furyDuration');
 }
 // Dano de uma adaga, antes da carga do Charged Dagger Throw
 // Com Fireballs a adaga vira magia: tudo da adaga continua valendo e o dano mágico entra por cima

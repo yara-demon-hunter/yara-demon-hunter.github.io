@@ -1,6 +1,9 @@
 import { MULTI_KILL } from '../../data_model/sanctuary.js';
-import { STREAK } from '../../data_model/streak.js';
-import { audio, state } from '../core/state.js';
+import { STREAK, rushTier } from '../../data_model/streak.js';
+import { audio, player, state } from '../core/state.js';
+import { addNumber, addShockwave } from './effects.js';
+import { dropGold } from './gold.js';
+import { announcePoints } from './progression.js';
 import { showCallout } from '../ui/banner.js';
 import { chargeUlt } from './combat.js';
 import { mod } from './modifiers.js';
@@ -17,9 +20,34 @@ export function addStreakKill() {
 
     const tier = STREAK.tiers.find(t => t.at === state.streak);
     if (tier) {
-        showCallout(tier.label, tier.color);
-        audio.playStreakTier(STREAK.tiers.indexOf(tier));
+        const index = STREAK.tiers.indexOf(tier);
+        showCallout(`${tier.label} · RUSH ${ROMAN[index] ?? index + 1}`, tier.color);
+        audio.playStreakTier(index);
+        payTier(tier, index);
     }
+}
+
+// Prêmio do marco: cura, moedas e, nos marcos altos, pontos de skill (uma vez por onda cada marco)
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+function payTier(tier, index) {
+    if (tier.heal && player.hp > 0) {
+        const heal = Math.round(player.maxHp * tier.heal);
+        player.hp = Math.min(player.maxHp, player.hp + heal);
+        addNumber(player.x, player.y - 40, heal, 1, 'heal');
+    }
+    if (tier.gold) dropGold(player.x, player.y, tier.gold);
+    addShockwave(player.x, player.y, { radius: 110 + index * 20, color: tier.color, width: 5, seconds: 0.4 });
+    const paid = state.rushPaid ??= {};
+    if (tier.points && paid[index] !== state.turn) {
+        paid[index] = state.turn;
+        state.skillPoints += tier.points;
+        announcePoints(tier.points);
+    }
+}
+
+// Bônus do Rush enquanto a sequência durar (js/systems/stats.js)
+export function getRushTier() {
+    return rushTier(state.streak);
 }
 
 // Várias mortes quase juntas (um golpe, uma explosão): o contador sobe enquanto a janela estiver aberta

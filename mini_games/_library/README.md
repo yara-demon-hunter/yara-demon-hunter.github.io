@@ -44,6 +44,7 @@ characters/
   azael/                   azael25d.js (o boneco) e azael_visual.js; exporta a orelha e a bandagem que a Yara usa
   brutos/                  brutos25d.js (o boneco) e brutos_visual.js
   yara/, zeph/, oskar/     os heróis do yara-rpg, no mesmo esquema (<id>25d.js e <id>_visual.js)
+  rowan/                   o druida do Last Torch (molde do Zeph com galhada, folhas e cajado); ficha em art_reference/character.md
 objects/                   objetos do jogo que não são personagem nem cenário (a tocha 2,5D); um por pasta: <id>.js, <id>_visual.js e art_reference/object.md
   torch/                   a tocha 2,5D: poste e gaiola em dois sprites (atrás e na frente do fogo), fogo num atlas de poucos quadros (createTorch25D); a regra da vida fica no jogo
 scenery/                   o chão do jogo: terreno, névoa, luz, clima (manual: scenery/README.md)

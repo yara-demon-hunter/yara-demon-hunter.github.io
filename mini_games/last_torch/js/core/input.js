@@ -79,7 +79,7 @@ function setupKnifeButton() {
     // Axe Quake (Captain Brutos): no lugar da mira, segurar o botão repete o golpe quando a recarga acaba
     const quake = state.quake;
     base.addEventListener('pointerdown', (e) => {
-        if (state.gameState !== 'PLAYING' || mod('axeQuake') <= 0) return;
+        if (state.gameState !== 'PLAYING' || (mod('axeQuake') <= 0 && mod('rootSnare') <= 0)) return;
         quake.touch = true;
         base.setPointerCapture(e.pointerId);
         audio.init();

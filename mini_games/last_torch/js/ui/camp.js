@@ -2,6 +2,7 @@ import { CAMP } from '../../data_model/passives.js';
 import { BOSS_MODELS, chooseBossType, isBossTurn } from '../../data_model/bosses.js';
 import { getHourName } from '../../data_model/night.js';
 import { persist } from '../core/save.js';
+import { saveRun } from '../core/run_save.js';
 import { audio, player, state } from '../core/state.js';
 import { collectAllGold } from '../systems/gold.js';
 import { startHour } from '../systems/night.js';
@@ -80,10 +81,13 @@ function renderNext() {
     }
 }
 
-export function openCamp() {
+// resumed: voltando de um CONTINUE, o acampamento já aconteceu (ouro recolhido, tocha alimentada): não repete
+export function openCamp(resumed = false) {
     state.gameState = 'CAMP';
-    collectAllGold();
-    feedTorch(CAMP.freeTorchHeal);
+    if (!resumed) {
+        collectAllGold();
+        feedTorch(CAMP.freeTorchHeal);
+    }
     fuelUses = 0;
     restUses = 0;
     document.getElementById('campEyebrow').innerText = `WAVE ${state.turn - 1} SURVIVED`;
@@ -94,6 +98,7 @@ export function openCamp() {
     relicTree.open();
     audio.setMood('camp');
     reportProgress();
+    saveRun('camp');
 }
 
 export function buyFuel() {
@@ -124,5 +129,6 @@ export function leaveCamp() {
     state.knifeInput.stick.fire = false;
     state.gameState = 'PLAYING';
     persist();
+    saveRun('hunt');
     startHour();
 }

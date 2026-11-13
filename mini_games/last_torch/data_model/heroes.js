@@ -13,6 +13,7 @@ import { HERO_ENTRIES, HERO_ORDER } from './characters/index.js';
 // shelved: guardado por enquanto. Some da tela inicial e das conquistas, mas os dados ficam para voltar depois.
 export const HEROES = {
     hunter: HERO_ENTRIES.hunter,
+    rowan: HERO_ENTRIES.rowan,
     reaver: {
         name: 'Ash Reaver',
         shelved: true,

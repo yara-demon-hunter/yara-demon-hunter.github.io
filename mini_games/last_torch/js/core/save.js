@@ -1,6 +1,8 @@
 // --- SAVE (localStorage) ---
 // Tudo que sobrevive entre partidas. Se o navegador bloquear o localStorage o jogo roda normalmente,
 // só não guarda o progresso.
+import { START } from '../../data_model/start.js';
+
 const SAVE_KEY = 'last_torch_save_v1';
 
 function createSave() {
@@ -16,7 +18,8 @@ function createSave() {
             elites: 0, evolutions: 0, bestDarknessWon: 0, bosses: 0, chests: 0,
             bestMultiKill: 0, perfectDodges: 0, flawlessHours: 0
         },
-        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, moveKeys: false, quickPick: false, touch: { scale: 1, positions: {} } },
+        // quickPickChosen: o jogador já ligou ou desligou a escolha ao subir de nível em Settings; sem isso vale o padrão (data_model/start.js)
+        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, moveKeys: false, quickPick: START.quickPickDefault, quickPickChosen: false, touch: { scale: 1, positions: {} } },
         seenTutorial: false,
         learnedWarmth: false,       // já se curou na tocha alguma vez: a dica "a tocha cura" para de aparecer (js/ui/hints.js)
         seenTreeHint: false
@@ -38,8 +41,11 @@ function load() {
             stats: { ...fresh.stats, ...saved.stats },
             bestiary: { ...saved.bestiary },
             // moveKeys substituiu keyboard, que vinha ligado: quem já jogou também começa só com o mouse
-            // Escolha ao subir de nível: sempre começa desligada, quem quiser liga em Settings
-            settings: { ...fresh.settings, ...saved.settings, quickPick: false }
+            // Escolha ao subir de nível: vale o que o jogador escolheu em Settings; quem nunca mexeu fica com o padrão
+            settings: {
+                ...fresh.settings, ...saved.settings,
+                quickPick: saved.settings?.quickPickChosen ? Boolean(saved.settings.quickPick) : START.quickPickDefault
+            }
         };
     } catch {
         return fresh;

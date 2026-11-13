@@ -114,9 +114,12 @@ function createTreeView(cfg) {
         map.style.setProperty('--gap', branchGap);
         map.style.setProperty('--w', labelWidth + tiers);
         map.style.setProperty('--rows', Math.max(...rows));
-        // Grade 2 x 2: a altura de cada fileira é a do maior ramo dela
+        // Tela grande: grade de 2 colunas (até 4 ramos) ou 3 (5 ou mais). A altura de cada fileira é a do maior ramo dela
+        const cols = branchKeys.length > 4 ? 3 : 2;
         const pairs = [];
-        for (let i = 0; i < rows.length; i += 2) pairs.push(Math.max(...rows.slice(i, i + 2)));
+        for (let i = 0; i < rows.length; i += cols) pairs.push(Math.max(...rows.slice(i, i + cols)));
+        map.style.setProperty('--cols', cols);
+        map.style.setProperty('--row-gaps', pairs.length - 1);
         map.style.setProperty('--rows-sum', pairs.reduce((sum, n) => sum + n, 0));
         map.style.setProperty('--h', rows.reduce((sum, n) => sum + n, 0) + (branchKeys.length - 1) * branchGap);
         branchKeys.forEach(buildBranch);

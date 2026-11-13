@@ -3,7 +3,7 @@
 Guia para decidir onde cada skill mora, quanto custa e como aparece. Toda skill nova deve seguir estas regras.
 Os dados ficam em `data_model/tree.js`, `data_model/powers.js` e `data_model/passives.js`.
 
-## Os 4 ramos
+## Os 5 ramos (o quinto, Natureza, está descrito no README do jogo)
 
 Cada ramo é um **jeito de jogar**, não só uma lista de bônus. A pergunta de cada um é: o que o jogador faz de diferente?
 
@@ -12,6 +12,7 @@ Cada ramo é um **jeito de jogar**, não só uma lista de bônus. A pergunta de 
 | **Blade** | Guerreiro | Agressivo. Entra no meio e mata todo mundo. Ser cercado é bom. | Matar acelera (Bloodlust), acelerar mata mais, a Fúria explode, quem sobra é executado. | Médio |
 | **Shadow** | Ladrão | Técnico. Marca de longe, detona de perto, atravessa a horda e rouba. | Adaga marca, dash detona e devolve o dash, moedas adiantam a recarga: um combo que nunca para. | O mais barato |
 | **Flame** | Guardião | Defensivo e calmo. Fica firme perto da tocha e deixa o fogo trabalhar. | Parado, ergue o escudo. A horda queima ao cruzar o anel. Nada passa. | O mais caro |
+| **Nature** | Druida | Estratégico e paciente. Prende no chão, bebe a vida dos monstros, some atrás de uma árvore e deixa a matilha caçar. | Raízes prendem, tudo o que bate em quem está preso bate mais, a videira cura; a semente do carvalho drena um monstro e, quando ele morre, a muda cura quem ficar perto até crescer e lutar. | Médio (poder 2, especial 3) |
 | **Curse** | Feiticeiro | Estratégico. Fica longe, em área e à distância, e assiste à horda morrer em cadeia. | A maldição pula de monstro em monstro, a fenda junta todos, a explosão acaba com eles. | O mais caro |
 
 **Pergunta para encaixar uma skill:** o que ela pede do jogador? Agressividade vai em Blade; precisão ou

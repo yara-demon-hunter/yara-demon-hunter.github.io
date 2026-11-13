@@ -9,8 +9,9 @@ import { clearBladeSkills, updateBladeSkills, updateCracks } from './skills_blad
 import { clearCurseSkills, updateCurseSkills } from './skills_curse.js';
 import { updateFlameSkills } from './skills_flame.js';
 import { clearShadowSkills, updateShadowSkills } from './skills_shadow.js';
+import { clearNatureSkills, updateNatureSkills } from './skills_nature.js';
 
-// --- SKILLS DOS QUATRO RAMOS ---
+// --- SKILLS DOS CINCO RAMOS ---
 // Ponto único: o que anda a cada quadro (cada ramo no seu arquivo), o que limpa entre as horas e o Juramento.
 export function updateSkills(dt) {
     updateCompanions(dt);
@@ -20,6 +21,7 @@ export function updateSkills(dt) {
     updateShadowSkills(dt);
     updateFlameSkills(dt);
     updateCurseSkills(dt);
+    updateNatureSkills(dt);
     updateCracks(dt);
     if (state.oathCeremony) playOathCeremony();
 }
@@ -29,6 +31,7 @@ export function clearSkillEffects() {
     clearBladeSkills();
     clearShadowSkills();
     clearCurseSkills();
+    clearNatureSkills();
     state.phoenixFx = null;
 }
 
