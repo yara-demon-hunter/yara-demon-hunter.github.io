@@ -29,9 +29,10 @@ export function renderStains() {
 }
 
 // Calor da tocha: anel fraco no chão, visível quando o herói precisa de cura ou quando dá bônus (Ember Steps, Juramento)
+// Área de calor da tocha: onde ela cura o herói. O círculo tracejado fica SEMPRE visível, com a vida cheia ou não, para o
+// jogador aprender onde fica (só some se um Juramento tirou a cura e a área não faz mais nada).
 export function renderWarmth() {
-    const heals = player.hp < player.maxHp && mod('noWarmthHeal') <= 0;
-    if (!heals && getWarmthDamage() <= 0 && mod('warmthBurn') <= 0) return;
+    if (mod('noWarmthHeal') > 0 && getWarmthDamage() <= 0 && mod('warmthBurn') <= 0) return;
     const reach = CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
     ctx.strokeStyle = J.warmth.ringColor;
     ctx.lineWidth = 1.5;

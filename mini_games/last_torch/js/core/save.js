@@ -18,6 +18,7 @@ function createSave() {
         },
         settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, moveKeys: false, quickPick: false, touch: { scale: 1, positions: {} } },
         seenTutorial: false,
+        learnedWarmth: false,       // já se curou na tocha alguma vez: a dica "a tocha cura" para de aparecer (js/ui/hints.js)
         seenTreeHint: false
     };
 }

@@ -1,4 +1,5 @@
 import { CORE_MODEL } from '../../data_model/core.js';
+import { learnedWarmth } from '../ui/hints.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
@@ -69,6 +70,7 @@ export function updateTorch(dt) {
         if (warmthFloat >= 4) {
             addNumber(player.x, player.y - 40, warmthFloat, 1, 'heal');
             warmthFloat = 0;
+            learnedWarmth();          // viu o número verde subir: aprendeu que a tocha cura
         }
     }
 }

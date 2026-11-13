@@ -101,5 +101,6 @@ export const JUICE_VISUALS = {
 
     // Tocha pedindo socorro e calor em volta dela
     torchAlarm: { color: 'rgba(248, 113, 113, 0.75)', pulseHz: 1.6 },
+    // Área de calor da tocha (onde ela cura o herói): o círculo tracejado fica sempre visível (js/render/effects.js)
     warmth: { color: 'rgba(251, 146, 60, 0.12)', ringColor: 'rgba(253, 186, 116, 0.28)' }
 };
