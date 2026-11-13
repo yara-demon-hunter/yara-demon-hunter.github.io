@@ -13,6 +13,7 @@
 // Se um nó mais atrás precisa ter mais nível, suba o nível pedido no nó do meio. O painel de detalhe mostra
 // tudo o que falta de uma vez. Só a ligação com o nó anterior abre um nó: não há exigência de matar monstros.
 // O custo vem de TREE_COSTS (por ramo e tipo de nó). `cost` no nó só para uma exceção. maxLvl padrão 5.
+// notFor: ['rowan'] sela a skill para esses heróis, como o hero (a Fireballs, que mexeria nas rosas dele): selada, não se compra.
 // needs: 'knives' marca a skill que só funciona com adaga. Quem não lança adaga (mod noKnives: o Captain Brutos, ou o
 // Oath of Slaughter jurado) tem esses nós SELADOS (não é o cadeado: o cadeado é "ainda não", o selo é "não é para
 // este personagem"): não se compram e valem como cumpridos para os nós que vêm depois (passe livre), então a cadeia
@@ -133,7 +134,7 @@ export const TREE_NODES = [
     // As armas pegam fogo: saem do Hellwalker
     { id: 'flameBlade', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
     // As bolas de fogo vêm depois da espada em chamas: nada mais depende delas (heróis sem adaga as têm seladas e a cadeia segue)
-    { id: 'fireballs', needs: 'knives', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
+    { id: 'fireballs', needs: 'knives', notFor: ['rowan'], branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
     { id: 'oathHearth', branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('phoenixPact'), req('fireRingEvolve')] },
 
     // --- MALDIÇÃO: o feiticeiro. Magia, área e distância ---
@@ -170,23 +171,23 @@ export const TREE_NODES = [
     { id: 'wildHeart', branch: 'nature', kind: 'mod', x: 0, y: 1.5, requires: [],
       name: 'Wild Heart', icon: '🌱', desc: 'The forest mends your wounds, slowly and always.',
       levelText: (mods) => `Heal ${mods.hpRegen} health per second`, mods: { hpRegen: 0.3 } },
-    // Quatro linhas. Cada uma é uma corrente; duas delas (raízes e carvalho/esporos) terminam no Oath of the Wild.
+    // Quatro linhas. Duas delas terminam no Oath of the Wild (raízes e carvalho); a rosa negra fica sozinha na última.
     // Linha 1, as raízes: Grasping Roots -> Strangling Grove -> Thorn Burst -> Oath
     { id: 'graspingRoots', branch: 'nature', kind: 'power', key: 'graspingRoots', x: 1, y: 0, requires: [req('wildHeart')] },
     { id: 'rootsEvolve', branch: 'nature', kind: 'evolve', key: 'graspingRoots', x: 2, y: 0, requires: [req('graspingRoots', 5)] },
     { id: 'thornBurst', branch: 'nature', kind: 'passive', key: 'thornBurst', x: 3, y: 0, requires: [req('rootsEvolve')] },
-    // Linha 2, o bosque: Wicked Oak -> Ancient Grove -> Spore Pods -> Plague Garden -> Oath
-    { id: 'shelterOak', branch: 'nature', kind: 'power', key: 'shelterOak', x: 1, y: 1, requires: [req('wildHeart', 2)] },
+    // Linha 2, o carvalho: Wicked Oak -> Ancient Grove -> Leech Vine (as videiras saem do carvalho) -> Oath
+    { id: 'shelterOak', branch: 'nature', kind: 'power', key: 'shelterOak', x: 1, y: 1, cost: 1, requires: [req('wildHeart', 2)] },
     { id: 'oakEvolve', branch: 'nature', kind: 'evolve', key: 'shelterOak', x: 2, y: 1, requires: [req('shelterOak', 5)] },
-    { id: 'sporePods', branch: 'nature', kind: 'power', key: 'sporePods', x: 3, y: 1, requires: [req('oakEvolve')] },
-    { id: 'sporeEvolve', branch: 'nature', kind: 'evolve', key: 'sporePods', x: 4, y: 1, requires: [req('sporePods', 5)] },
-    // Linha 3, a seiva e o lobo: Leech Vine -> Shadow Wolf -> The White Wolf
-    { id: 'leechVine', branch: 'nature', kind: 'power', key: 'leechVine', x: 1, y: 2, requires: [req('wildHeart')] },
-    { id: 'spiritWolves', branch: 'nature', kind: 'power', key: 'spiritWolves', x: 2, y: 2, requires: [req('leechVine', 5)] },
-    { id: 'wolvesEvolve', branch: 'nature', kind: 'evolve', key: 'spiritWolves', x: 3, y: 2, requires: [req('spiritWolves', 5)] },
+    { id: 'leechVine', branch: 'nature', kind: 'power', key: 'leechVine', x: 3, y: 1, requires: [req('oakEvolve')] },
+    // Linha 3, os esporos e o lobo: Spore Pods -> Plague Garden -> Shadow Wolf -> The White Wolf
+    { id: 'sporePods', branch: 'nature', kind: 'power', key: 'sporePods', x: 1, y: 2, requires: [req('wildHeart')] },
+    { id: 'sporeEvolve', branch: 'nature', kind: 'evolve', key: 'sporePods', x: 2, y: 2, requires: [req('sporePods', 5)] },
+    { id: 'spiritWolves', branch: 'nature', kind: 'power', key: 'spiritWolves', x: 3, y: 2, requires: [req('sporeEvolve')] },
+    { id: 'wolvesEvolve', branch: 'nature', kind: 'evolve', key: 'spiritWolves', x: 4, y: 2, requires: [req('spiritWolves', 5)] },
     // Linha 4, sozinha: a rosa negra, só do Rowan (o nó fica selado para os outros e conta como cumprido para quem o pede)
     { id: 'darkRoses', hero: 'rowan', branch: 'nature', kind: 'passive', key: 'darkRoses', x: 1, y: 3, requires: [req('wildHeart', 2)] },
-    { id: 'oathWild', branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 6, y: 1.5, requires: [req('thornBurst'), req('sporeEvolve')] }
+    { id: 'oathWild', branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 6, y: 1.5, requires: [req('thornBurst'), req('leechVine')] }
 ];
 
 export const TREE_BY_ID = Object.fromEntries(TREE_NODES.map(node => [node.id, node]));

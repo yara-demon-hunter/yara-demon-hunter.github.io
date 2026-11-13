@@ -50,7 +50,7 @@ export const AZAEL = {
     },
 
     // --- FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) ---
-    // kind: 'blades' (explosão de lâminas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael) ou 'stomp' (pisadas,
+    // kind: 'swordRain' (chuva de espadas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael) ou 'stomp' (pisadas,
     // a do Brutos). Os números de cada uma estão explicados ao lado. js/systems/fury.js; a duração vem da árvore (skill Fury).
     // VALSA DE SANGUE: até 6 cortes seguidos. A cada corte ele salta para o monstro mais perto que NÃO seja o do corte anterior,
     // atravessa o monstro e deixa um risco vermelho no caminho; com 2 monstros, vai e volta 3 vezes entre eles. Cada corte cura.

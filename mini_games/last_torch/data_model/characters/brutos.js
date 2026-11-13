@@ -65,7 +65,7 @@ export const BRUTOS = {
     },
 
     // --- FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) ---
-    // kind: 'blades' (explosão de lâminas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael) ou 'stomp' (pisadas,
+    // kind: 'swordRain' (chuva de espadas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael) ou 'stomp' (pisadas,
     // a do Brutos). Os números de cada uma estão explicados ao lado. js/systems/fury.js; a duração vem da árvore (skill Fury).
     // PISADAS DO CAPITÃO: enquanto a Fúria dura, cada passo pesado bate no chão em volta dele: dano, empurrão, um atordoamento
     // curto e a tela tremendo. Sem crescer e sem golpe final (pedido do usuário). Ele também aguenta mais pancada.

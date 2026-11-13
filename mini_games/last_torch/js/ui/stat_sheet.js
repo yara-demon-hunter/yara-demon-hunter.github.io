@@ -1,5 +1,4 @@
 import { CHARACTER_BASES } from '../../data_model/characters/index.js';
-import { FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
 import { TREE_POINTS } from '../../data_model/tree.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { save } from '../core/save.js';
@@ -101,27 +100,31 @@ const row = (icon, name, note, value) => ({ icon, name, note, amount: () => 1, f
 
 export function getFuryGroup() {
     const hero = getHero();
+    // Oath of the Wild: a Fúria não machuca (js/systems/fury.js, furyDamage): os multiplicadores de dano viram x0
+    const dmg = (n) => (mod('furyNoDamage') > 0 ? 0 : n);
     const fury = CHARACTER_BASES[hero.id]?.player.fury;
     if (!fury) return null;
     const duration = row('⏳', 'Duration', 'How long the Fury lasts. The Fury skill makes it longer.', secondsShort(getFrenzyDuration() + (fury.extraSeconds ?? 0)));
     const rows = {
-        blades: () => [
-            row('💥', 'Opening Burst', 'When the Fury starts, everything around you is hit and pushed back. Damage = your blade damage times this.', times(FRENZY_NOVA_SKILL.burstDamageMultiplier)),
+        swordRain: () => [
             duration,
-            row('🗡️', 'Blade Damage', 'Extra damage on every blade hit while the Fury lasts (grows with the Fury skill).', `+${Math.round(getFrenzyDamageBonus() * 100)}%`),
-            row('🌀', 'Slashes', 'Blades that fly out around you.', `${FRENZY_NOVA_SKILL.slashCount}`)
+            row('🗡️', 'Swords', 'A sword falls on a monster near you every few moments while the Fury lasts.', secondsShort(fury.stepSeconds)),
+            row('💥', 'Sword Damage', 'Damage of each sword = your blade damage times this.', times(dmg(fury.damage))),
+            row('📏', 'Sword Reach', 'How wide each impact is.', `${fury.radius}px`),
+            row('⚔️', 'Giant Sword', 'At the very end, a giant sword falls where the most monsters are. Damage = your blade damage times this; it also pushes them back.', times(dmg(fury.giantDamage))),
+            row('🌀', 'Giant Reach', 'How wide the giant sword hits.', `${fury.giantRadius}px`)
         ],
         bloodWaltz: () => [
             row('🩸', 'Cuts', 'Fast cuts in a row, each leaping to the nearest monster that is not the last one.', `${fury.cuts}`),
-            row('💥', 'Cut Damage', 'Damage of each cut = your blade damage times this.', times(fury.cutDamage)),
-            row('❤️', 'Heal', 'Share of each cut that returns as health.', `${Math.round(fury.healRatio * 100)}%`),
+            row('💥', 'Cut Damage', 'Damage of each cut = your blade damage times this.', times(dmg(fury.cutDamage))),
+            row('❤️', 'Heal', 'Share of each cut that returns as health.', `${dmg(1) ? Math.round(fury.healRatio * 100) : 0}%`),
             row('📏', 'Reach', 'How far he looks for the next monster.', `${fury.cutRange}px`),
             row('⚡', 'Speed', 'Time between one cut and the next.', secondsShort(fury.cutSeconds))
         ],
         stomp: () => [
             duration,
             row('🦶', 'Stomp', 'Time between one stomp and the next.', secondsShort(fury.stepSeconds)),
-            row('💥', 'Stomp Damage', 'Damage of each stomp around him = your blade damage times this.', times(fury.damage)),
+            row('💥', 'Stomp Damage', 'Damage of each stomp around him = your blade damage times this.', times(dmg(fury.damage))),
             row('📏', 'Stomp Reach', 'How far each stomp reaches.', `${fury.radius}px`),
             row('💫', 'Stun', 'Common monsters are stunned (bosses are not).', secondsShort(fury.stunSeconds)),
             row('🛡️', 'Damage Taken', 'He takes less damage while the Fury lasts.', `-${Math.round(fury.damageTakenCut * 100)}%`)
@@ -129,7 +132,7 @@ export function getFuryGroup() {
         forestGuardian: () => [
             duration,
             row('🛡️', 'Damage Taken', 'The leaf shield makes every hit on him softer.', `-${Math.round(fury.damageReduction * 100)}%`),
-            row('🍃', 'Leaf Damage', 'Damage dealt to every monster in reach, again and again = your blade damage times this.', times(fury.damage)),
+            row('🍃', 'Leaf Damage', 'Damage dealt to every monster in reach, again and again = your blade damage times this.', times(dmg(fury.damage))),
             row('⏱️', 'Pulse', 'Time between leaf hits.', secondsShort(fury.tickSeconds)),
             row('📏', 'Reach', 'How far the leaves reach around him.', `${fury.radius}px`),
             row('🐌', 'Slow', 'Monsters in the leaves move slower.', `-${Math.round(fury.slow * 100)}%`)
@@ -137,7 +140,7 @@ export function getFuryGroup() {
     }[fury.kind];
     if (!rows) return null;
     const summary = {
-        blades: 'a burst of blades flies out around him',
+        swordRain: 'swords fall from the sky on the monsters around him, and a giant one ends it',
         bloodWaltz: 'a chain of fast cuts, leaping from monster to monster',
         stomp: 'stomps the ground around him, stunning monsters',
         forestGuardian: 'a leaf shield that hurts and slows the monsters around him'

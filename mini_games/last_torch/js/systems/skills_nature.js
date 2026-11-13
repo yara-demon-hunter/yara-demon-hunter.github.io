@@ -7,7 +7,6 @@ import { mod } from './modifiers.js';
 import { startCast } from './moves.js';
 import { nearestEnemy, ready } from './powers.js';
 import { getKnifeDamage, getSpellCooldown, getSpellDamage } from './stats.js';
-import { feedTorch } from './torch.js';
 
 // --- SKILLS DA NATUREZA ---
 // O druida controla o campo em vez de bater mais forte: prende os monstros no chão (raízes), bebe a vida deles (videira),
@@ -62,46 +61,52 @@ function updateGraspingRoots(dt) {
     } else state.powerTimers.graspingRoots = 0.4;      // ninguém ao alcance: tenta de novo logo
 }
 
-// --- VIDEIRA QUE DRENA ---
-let healFloat = 0;
+// --- VIDEIRA QUE DRENA (sai do carvalho) ---
+// As videiras nascem de cada carvalho (muda não: só a árvore pequena ou a grande), agarram os monstros mais perto DELE e drenam
+// a vida deles; o que drenam volta como vida para o próprio carvalho (não para o herói). Sem carvalho, a skill não faz nada.
+// Cada carvalho guarda os monstros que está drenando em oak.vines (o desenho: js/render/nature.js).
 function updateLeechVine(dt) {
     const level = getPowerLevel(powers.leechVine);
-    const vines = N.vines;
-    if (!level) {
-        vines.length = 0;
-        return;
-    }
     const M = POWER_MODELS.leechVine;
-    // Solta quem morreu ou saiu do alcance
-    for (let i = vines.length - 1; i >= 0; i--) {
-        const e = vines[i];
-        if (e.hp <= 0 || !state.enemies.includes(e) || Math.hypot(e.x - player.x, e.y - player.y) > M.breakRange) vines.splice(i, 1);
-    }
-    if (!ready('leechVine', dt, M.tickSeconds)) return;
-    while (vines.length > level.targets) vines.pop();
-    if (vines.length < level.targets) {
-        const skip = new Set(vines);
-        while (vines.length < level.targets) {
-            const target = nearestEnemy(player.x, player.y, M.range, skip);
-            if (!target) break;
-            skip.add(target);
-            vines.push(target);
+    for (const oak of N.oaks) {
+        oak.vines ??= [];
+        if (!level || oak.stage === 'sapling') {
+            oak.vines.length = 0;
+            continue;
+        }
+        // Solta quem morreu ou saiu do alcance do carvalho
+        for (let i = oak.vines.length - 1; i >= 0; i--) {
+            const e = oak.vines[i];
+            if (e.hp <= 0 || !state.enemies.includes(e) || Math.hypot(e.x - oak.x, e.y - oak.y) > M.breakRange) oak.vines.splice(i, 1);
         }
     }
-    if (vines.length === 0 || player.hp <= 0) return;
+    if (!level || !ready('leechVine', dt, M.tickSeconds)) return;
     const amount = getSpellDamage() * level.dps * M.tickSeconds;
-    let drained = 0;
-    for (const e of vines) drained += dealDamage(e, amount, { noCrit: true, quiet: true });
-    const heal = drained * level.heal;
-    if (player.hp < player.maxHp) {
-        player.hp = Math.min(player.maxHp, player.hp + heal);
-        healFloat += heal;
-        if (healFloat >= 4) {
-            addNumber(player.x, player.y - 40, healFloat, 1, 'heal');
-            healFloat = 0;
+    for (const oak of N.oaks) {
+        if (oak.stage === 'sapling') continue;
+        while (oak.vines.length > level.targets) oak.vines.pop();
+        if (oak.vines.length < level.targets) {
+            const skip = new Set(oak.vines);
+            while (oak.vines.length < level.targets) {
+                const target = nearestEnemy(oak.x, oak.y, M.range, skip);
+                if (!target) break;
+                skip.add(target);
+                oak.vines.push(target);
+            }
+        }
+        if (oak.vines.length === 0) continue;
+        let drained = 0;
+        for (const e of oak.vines) drained += dealDamage(e, amount, { noCrit: true, quiet: true });
+        const heal = drained * level.heal;
+        if (oak.hp < oak.maxHp) {
+            oak.hp = Math.min(oak.maxHp, oak.hp + heal);
+            oak.healFloat = (oak.healFloat ?? 0) + heal;
+            if (oak.healFloat >= 4) {
+                addNumber(oak.x, oak.y - 44, oak.healFloat, 1, 'heal');
+                oak.healFloat = 0;
+            }
         }
     }
-    feedTorch(heal * M.torchShare);
 }
 
 // --- CARVALHO MALIGNO ---
@@ -252,12 +257,10 @@ function updateShelterOak(dt) {
                     const damage = getSpellDamage() * oak.damage;
                     hit.sort((a, b) => Math.hypot(a.x - oak.x, a.y - oak.y) - Math.hypot(b.x - oak.x, b.y - oak.y));
                     hit.forEach((e, k) => {
-                        const a = Math.atan2(e.y - oak.y, e.x - oak.x);
-                        dealDamage(e, damage, { noCrit: true, style: 'spell', kbX: Math.cos(a) * 220, kbY: Math.sin(a) * 220 });
+                        dealDamage(e, damage, { noCrit: true, style: 'spell' });
                         if (k < 4) oak.swipes.push({ x: e.x, y: e.y, age: 0, side: k % 2 ? 1 : -1 });
                     });
-                    oak.shake = 0.22;
-                    shakeScreen(3);
+                    oak.shake = 0.22;          // só a árvore balança: o chicote não empurra os monstros nem treme a tela
                     audio.playSlice();
                 } else oak.lash = 0.15;
             }
@@ -623,7 +626,6 @@ export function clearNatureSkills() {
     N.seeds.length = 0;
     N.pods.length = 0;
     N.clouds.length = 0;
-    N.vines.length = 0;
     N.claws.length = 0;
     N.thorns.length = 0;
     N.lure = null;
@@ -634,5 +636,4 @@ export function clearNatureSkills() {
         w.dead = false;
         w.hp = w.maxHp;
     }
-    healFloat = 0;
 }

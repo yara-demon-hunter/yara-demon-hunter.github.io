@@ -18,3 +18,10 @@ Desenhada a cada quadro só enquanto o herói a empunha (peças simples de `limb
 ## Ajuste
 
 Pelo tuner do personagem: `tools/tuner.html?model=<id do personagem>` (medidas e cores). Depois, `ruby mini_games/_library/sync.rb`.
+
+## A espada que cai (Sword Rain)
+
+`sword_rain.js` (`drawFallingSword(g)`, ponta para baixo na origem) e `sword_rain_visual.js` (cores e formato): a espada da Fúria do
+Demon Hunter, a Sword Rain. Reta, lâmina larga rosa-clara com fio brilhante e nervura, guarda lilás e pomo rosa. O jogo a monta
+uma vez como sprite (js/render/fury.js) e a carimba: no ar, com aviso no chão e rastro de luz; fincada, sumindo aos poucos; a
+gigante é a mesma em escala 2,6x. Criada em 2026-11-13.

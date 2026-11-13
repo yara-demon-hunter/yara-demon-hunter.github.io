@@ -174,7 +174,7 @@ export const state = {
     wisp: { x: 0, y: 0, placed: false, flash: 0 },
     // Natureza (js/systems/skills_nature.js): carvalhos, cogumelos, nuvens de esporos, monstros na videira e o lobo
     // lure: o carvalho acordado que os monstros próximos vão atacar; claws: marcas de garra das mordidas
-    nature: { oaks: [], seeds: [], pods: [], clouds: [], thorns: [], vines: [], wolves: [], claws: [], lure: null },
+    nature: { oaks: [], seeds: [], pods: [], clouds: [], thorns: [], wolves: [], claws: [], lure: null },
 
     // Animação de level up em andamento: { age, label } ou null
     levelUpFx: null,

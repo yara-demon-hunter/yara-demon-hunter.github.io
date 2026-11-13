@@ -45,11 +45,22 @@ export const HUNTER = {
     },
 
     // --- FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) ---
-    // kind: 'blades' (explosão de lâminas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael) ou 'stomp' (pisadas,
-    // a do Brutos). Os números de cada uma estão explicados ao lado. js/systems/fury.js; a duração vem da árvore (skill Fury).
+    // kind: 'swordRain' (chuva de espadas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael), 'stomp' (pisadas, a do
+    // Brutos) ou 'forestGuardian' (escudo de folhas, a do Rowan). js/systems/fury.js; a duração vem da árvore (skill Fury).
+    // SWORD RAIN: durante a Fúria, uma espada cai do céu em cima de um monstro por perto a cada `stepSeconds`; no fim, uma espada
+    // gigante cai onde há mais monstros juntos. O dano de cada uma é o dano da lâmina x o multiplicador.
     fury: {
-        kind: 'blades',
-        name: 'Blade Storm'         // a explosão de lâminas em volta (FRENZY_NOVA_SKILL em data_model/skills.js)
+        kind: 'swordRain',
+        name: 'Sword Rain',
+        stepSeconds: 0.13,          // tempo entre uma espada e a próxima
+        fallSeconds: 0.22,          // a queda de cada espada (o aviso no chão dura isso)
+        radius: 38,                 // alcance do impacto de cada espada, px
+        damage: 0.55,               // dano de cada espada = dano da lâmina x este número
+        range: 340,                 // até onde ele escolhe os alvos, a partir do herói, px
+        giantFallSeconds: 0.5,      // a espada gigante cai nos últimos instantes da Fúria
+        giantRadius: 125,           // alcance do impacto dela, px
+        giantDamage: 2.4,           // dano da gigante = dano da lâmina x este número
+        giantKnockback: 380         // empurrão da gigante
     },
 
     // --- COMO BOSS (quando outro herói o enfrenta como rival; BOSS_MODELS.DEMON_HUNTER) ---

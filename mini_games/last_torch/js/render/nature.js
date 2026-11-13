@@ -472,22 +472,29 @@ export function renderSpiritWolves() {
     }
 }
 
-// Leech Vine: uma trepadeira com espinhos do herói até cada monstro. O caule balança, os espinhos (curvos para trás, como
-// farpas) se alternam dos dois lados, um pulso de seiva sobe do monstro para o herói e na ponta ficam garras de espinho.
+// Leech Vine: uma trepadeira com espinhos do CARVALHO até cada monstro que ele drena. O caule balança, os espinhos (curvos
+// para trás, como farpas) se alternam dos dois lados, um pulso de seiva sobe do monstro para a árvore e na ponta ficam
+// garras de espinho.
 const THORN_FILL = '#d9f99d';
 const THORN_EDGE = '#14532d';
 function renderLeechVines(t) {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    const curves = N.vines.map((e, i) => ({
-        e,
-        x0: player.x,
-        y0: player.y - 16,
-        mx: (player.x + e.x) / 2 + Math.sin(t * 3 + i * 2.1) * 12,
-        my: (player.y - 16 + e.y) / 2 - 14 + Math.cos(t * 2.3 + i) * 6,
-        x1: e.x,
-        y1: e.y
-    }));
+    const curves = [];
+    for (const oak of N.oaks) {
+        if (!oak.vines?.length) continue;
+        const sy = oak.y - 20;         // da base da copa
+        oak.vines.forEach((e, i) => curves.push({
+            e,
+            x0: oak.x,
+            y0: sy,
+            mx: (oak.x + e.x) / 2 + Math.sin(t * 3 + i * 2.1 + oak.x) * 12,
+            my: (sy + e.y) / 2 - 14 + Math.cos(t * 2.3 + i) * 6,
+            x1: e.x,
+            y1: e.y
+        }));
+    }
+    if (curves.length === 0) return;
     // O caule: três traços (sombra, folha, brilho) para todas as videiras de uma vez
     for (const [color, width] of VINE_STROKES) {
         ctx.strokeStyle = color;
@@ -528,7 +535,7 @@ function renderLeechVines(t) {
             ctx.fill();
             ctx.stroke();
         }
-        // Pulso de seiva do monstro para o herói
+        // Pulso de seiva do monstro para a árvore
         for (let k = 0; k < 2; k++) {
             const u = 1 - ((t * 1.3 + i * 0.37 + k * 0.5) % 1);
             const v = 1 - u;
@@ -558,9 +565,7 @@ function renderLeechVines(t) {
 // --- VIDEIRAS E CARVALHO (depois do herói) ---
 export function renderNatureFront() {
     renderRoseMarks();
-    if (N.vines.length > 0 && !player.hidden) {
-        renderLeechVines(performance.now() / 1000);
-    }
+    renderLeechVines(performance.now() / 1000);
     for (const seed of N.seeds) {
         const target = seed.target;
         if (!(target.hp > 0)) continue;

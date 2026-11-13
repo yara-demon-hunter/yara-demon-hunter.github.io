@@ -3,6 +3,7 @@ import { registerBody } from '../../../characters/hunter/body_registry.js';
 import { mix, add, norm, sub, olimb, oball, flowChain } from '../../../characters/hunter/kit25d.js';
 import { trunk, poly, glowAt, facesCamera, taper } from '../creature25d.js';
 import { renderMonster25D } from '../monster25d.js';
+import { renderNow } from '../../../core/clock.js';
 
 // --- DEMON LORD 2.5D (boss) ---
 // O Demon Lord de topdown/demon_lord/demon_lord.js no boneco 2.5D: demônio vermelho musculoso de peito largo, cabeça
@@ -201,9 +202,23 @@ registerBody('demon_lord', {
 });
 
 // --- NO JOGO (câmera do Last Torch) ---
-// O fogo carrega quando falta menos que chargeSeconds para o tiro (e.shootTimer, em segundos)
+// O fogo carrega quando falta menos que chargeSeconds para o tiro (e.shootTimer, em segundos).
+// Nas rajadas o jogo reinicia esse relógio a cada disparo, e a mão subia e descia a cada tiro (parecia tremer). Por isso a
+// carga que se desenha é suavizada por boss (e.chargeVis): sobe depressa, desce devagar, e durante a rajada (e.ai.shots > 0)
+// o braço fica esticado com o fogo aceso, até o último tiro.
+const CHARGE_RISE = 6;      // por segundo
+const CHARGE_FALL = 2.2;
 export function renderDemonLord25D(e) {
-    charge = Math.max(0, Math.min(1, 1 - (e.shootTimer ?? 99) / S.chargeSeconds));
+    const wanted = e.ai?.shots > 0 ? 1 : Math.max(0, Math.min(1, 1 - (e.shootTimer ?? 99) / S.chargeSeconds));
+    const now = renderNow() / 1000;
+    if (e.baking || e.chargeVis === undefined) e.chargeVis = wanted;
+    else {
+        const dt = Math.min(0.1, Math.max(0, now - (e.chargeAt ?? now)));
+        const rate = wanted > e.chargeVis ? CHARGE_RISE : CHARGE_FALL;
+        e.chargeVis = wanted > e.chargeVis ? Math.min(wanted, e.chargeVis + rate * dt) : Math.max(wanted, e.chargeVis - rate * dt);
+    }
+    e.chargeAt = now;
+    charge = e.chargeVis;
     renderMonster25D(e, 'demon_lord', S);
     charge = null;
 }

@@ -177,9 +177,9 @@ export const PASSIVE_SKILL_MODELS = {
         oath: true, gear: 'wild', tagline: 'The forest remembers',
         get desc() {
             const mods = this.mods;
-            return `You heal ${mods.hpRegen} health per second, gain ${formatPercent(mods.maxHp)} max health, roots hold ${formatPercent(mods.rootSeconds)} longer and spells deal ${formatPercent(mods.spellDamage)} more damage. The price: your Fury no longer charges. The wild gives life, not rage.`;
+            return `You heal ${mods.hpRegen} health per second, gain ${formatPercent(mods.maxHp)} max health, roots hold ${formatPercent(mods.rootSeconds)} longer and spells deal ${formatPercent(mods.spellDamage)} more damage. The price: your Fury deals no damage. It still shields you and slows monsters, but the wild gives life, not rage.`;
         },
-        mods: { hpRegen: 1.2, maxHp: 0.15, rootSeconds: 0.5, spellDamage: 0.15, noFury: 1 }
+        mods: { hpRegen: 1.2, maxHp: 0.15, rootSeconds: 0.5, spellDamage: 0.15, furyNoDamage: 1 }
     },
 
     // --- JURAMENTOS ---

@@ -109,12 +109,15 @@ const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || n
 export function isRestricted(node) {
     // hero: skill de um herói só (Dark Roses): fica selada para os outros
     if (node.hero && getHero().id !== node.hero) return true;
+    // notFor: skill que um herói não pode usar (o druida não usa Fireballs: as rosas dele não queimam)
+    if (node.notFor?.includes(getHero().id)) return true;
     return node.needs === 'knives' && mod('noKnives') > 0;
 }
 
 // Por que está selado, para a tela: de quem é a escolha (o herói ou o Juramento)
 export function getRestrictionText(node) {
     if (node?.hero && getHero().id !== node.hero) return `Only ${node.hero[0].toUpperCase()}${node.hero.slice(1)} can learn this skill.`;
+    if (node?.notFor?.includes(getHero().id)) return `${getHero().name} cannot use this skill: his roses do not burn.`;
     const hero = getHero();
     return (hero.mods?.noKnives ?? 0) > 0
         ? `${hero.name} fights without daggers: this skill is not for him.`

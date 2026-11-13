@@ -422,22 +422,21 @@ export const POWER_MODELS = {
         name: 'Leech Vine', icon: '🩸', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `Living vines latch onto the ${level.targets} nearest monsters, draining ${formatMultiplier(level.dps)} spell damage per second from each and returning ${formatPercent(level.heal)} of it to you as health. The torch drinks too: it heals ${formatPercent(this.torchShare)} of what you heal.`;
+            return `Thorned vines grow from your oaks (the small tree and the full oak) and latch onto the ${level.targets} monsters nearest to each one, draining ${formatMultiplier(level.dps)} spell damage per second from each. What they drain returns to the oak as health: ${formatPercent(level.heal)} of it. It needs an oak to do anything.`;
         },
         get upgrades() {
             return this.levels.map(level =>
-                `${level.targets} vine${level.targets > 1 ? 's' : ''} · ${formatMultiplier(level.dps)} spell damage per second · ${formatPercent(level.heal)} returns as health`
+                `${level.targets} vine${level.targets > 1 ? 's' : ''} per oak · ${formatMultiplier(level.dps)} spell damage per second · ${formatPercent(level.heal)} heals the oak`
             );
         },
         levels: [
-            { targets: 1, dps: 0.5, heal: 0.12 },
-            { targets: 2, dps: 0.55, heal: 0.14 },
-            { targets: 2, dps: 0.7, heal: 0.16 },
-            { targets: 3, dps: 0.85, heal: 0.18 },
-            { targets: 3, dps: 1, heal: 0.2 }
+            { targets: 1, dps: 0.5, heal: 0.3 },
+            { targets: 2, dps: 0.55, heal: 0.35 },
+            { targets: 2, dps: 0.7, heal: 0.4 },
+            { targets: 3, dps: 0.85, heal: 0.45 },
+            { targets: 3, dps: 1, heal: 0.5 }
         ],
-        torchShare: 0.25,       // a tocha também bebe: recebe esta parte da vida que você recupera (era da Heartwood)
-        range: 150,             // a videira agarra até aqui
+        range: 150,             // a videira agarra até aqui do carvalho
         breakRange: 200,        // e solta além daqui
         tickSeconds: 0.25
     },

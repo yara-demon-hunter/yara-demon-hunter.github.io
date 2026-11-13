@@ -3,8 +3,8 @@ import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { audio, maxUltEnergy, passives, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
-import { blast, dealDamage, ignite } from './damage.js';
-import { addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
+import { dealDamage, ignite } from './damage.js';
+import { createExplosion, hitStop, shakeScreen } from './effects.js';
 import { isFireCasting } from './knives.js';
 import { launchCrescent, tryExecute } from './skills_blade.js';
 import { detonateMark } from './skills_shadow.js';
@@ -13,7 +13,6 @@ import { getHero, mod } from './modifiers.js';
 import { showFuryCutIn } from '../ui/fury_cutin.js';
 import {
     getAtkCooldown,
-    getAtkDamage,
     getAtkRadius,
     getBladeDamage,
     getFrenzyDuration,
@@ -95,7 +94,6 @@ export function chargeUlt(amount) {
     // Com a Fúria ativa a barra mostra o tempo restante e não carrega: a próxima se ganha depois que esta acabar
     if (state.frenzyActiveTimer > 0) return;
     // Oath of the Wild: a floresta dá vida, não fúria
-    if (mod('noFury') > 0) return;
 
     state.ultEnergy = Math.min(maxUltEnergy, state.ultEnergy + amount);
     updateHUD();
@@ -105,8 +103,8 @@ export function chargeUlt(amount) {
 }
 
 // Ativação automática da Fúria. A barra e a duração são iguais para todos; o especial é de cada personagem (js/systems/fury.js).
-// O do Demon Hunter (a explosão de lâminas) continua aqui.
-const FURY_COLORS = { blades: '#f0abfc', bloodWaltz: '#f87171', stomp: '#cbd5e1', forestGuardian: '#4ade80' };
+// O especial de cada herói (inclusive a Chuva de Espadas do Demon Hunter) roda em fury.js; aqui só o disparo e o anúncio.
+const FURY_COLORS = { swordRain: '#f0abfc', bloodWaltz: '#f87171', stomp: '#cbd5e1', forestGuardian: '#4ade80' };
 export function triggerFrenzyUlt() {
     state.ultEnergy = 0;
     const fury = getFury();
@@ -120,31 +118,7 @@ export function triggerFrenzyUlt() {
 }
 
 function releaseFury(fury) {
-    if (startFury(fury)) {
-        updateHUD();
-        return;
-    }
-    shakeScreen(15);
-    hitStop(0.07);
-    zoomPunch(0.035);
-    screenFlash('#f0abfc', 0.3);
-    addShockwave(player.x, player.y, { radius: getAtkRadius() * FRENZY_NOVA_SKILL.burstRadiusMultiplier, color: '#f0abfc', width: 8, seconds: 0.45 });
-    state.blastBudget++;
-    blast(player.x, player.y, getAtkRadius() * FRENZY_NOVA_SKILL.burstRadiusMultiplier,
-        getAtkDamage() * FRENZY_NOVA_SKILL.burstDamageMultiplier, FRENZY_NOVA_SKILL.burstKnockback, '#f0abfc');
-
-    // Disparo de ondas de lâminas em várias direções no momento de ativação
-    for (let i = 0; i < FRENZY_NOVA_SKILL.slashCount; i++) {
-        const angle = (Math.PI * 2 / FRENZY_NOVA_SKILL.slashCount) * i;
-        executeBladeSlash(
-            player.x,
-            player.y,
-            angle,
-            getAtkRadius() * FRENZY_NOVA_SKILL.slashRadiusMultiplier,
-            3
-        );
-    }
-
+    startFury(fury);
     updateHUD();
 }
 

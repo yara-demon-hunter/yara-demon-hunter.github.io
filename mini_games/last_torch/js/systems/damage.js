@@ -29,12 +29,23 @@ function inSmoke(e) {
 
 export function dealDamage(e, amount, o = {}) {
     if (e.hp <= 0 || e.invulnerable) return 0;
+    // Golpe sem dano (a Fúria sob o Oath of the Wild): só empurra, sem piscar nem número
+    if (amount <= 0) {
+        if (o.kbX || o.kbY) {
+            const resist = 1 - (e.knockbackResist ?? 0);
+            e.vx += (o.kbX ?? 0) * resist;
+            e.vy += (o.kbY ?? 0) * resist;
+        }
+        return 0;
+    }
     const crit = o.crit || (!o.noCrit && (Math.random() < getCritChance() || (inSmoke(e) && Math.random() < SMOKE_BOMB.critChance)));
     const dmg = amount * (crit ? getCritMultiplier() : 1) * (e.ravenMark > 0 ? 1 + SHADOW_RAVEN.markDamage : 1)
         * (e.rooted > 0 ? 1 + rootedBonus() : 1);     // Strangling Grove: preso por raízes leva mais de tudo
 
     e.hp -= dmg;
-    e.hitFlash = J.hitFlashSeconds;
+    // Dano contínuo (quiet: veneno, videira, espinhos, queimadura...) não pisca nem faz o monstro "levar um golpe": a cada tique
+    // isso reiniciaria o tranco sem parar (o rival, com corpo de herói, ficava se contorcendo)
+    if (!o.quiet) e.hitFlash = J.hitFlashSeconds;
     state.run.damage += dmg;
     // Vampirismo do herói (Azael): parte do dano causado volta como vida. Dano contínuo (quiet) não conta
     if (!o.quiet && player.hp > 0 && mod('lifeSteal') > 0) player.hp = Math.min(player.maxHp, player.hp + dmg * mod('lifeSteal'));

@@ -39,7 +39,8 @@ function prepareBody(e) {
     e.lastHitFlash ??= 0;
     // Levou um golpe: o mesmo tranco e o mesmo anel de dano do herói
     const flash = e.hitFlash ?? 0;
-    if (flash > e.lastHitFlash + 0.001) {
+    // No máximo um tranco a cada 0,3 s: golpes muito rápidos não prendem o rival na animação de dor
+    if (flash > e.lastHitFlash + 0.001 && performance.now() - e.hitTime > 300) {
         e.hitTime = performance.now();
         e.hitDirX = e.recoilX ?? 0;
         e.hitDirY = e.recoilY ?? 0;

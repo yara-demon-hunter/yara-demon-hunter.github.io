@@ -10,7 +10,7 @@ import {
     renderParticles,
     renderGoldDrops
 } from './entities.js';
-import { renderFuryTrails } from './fury.js';
+import { renderFuryTrails, renderFurySwords } from './fury.js';
 import { renderSceneryAmbient, renderSceneryGround, renderSceneryOverlay, renderScenerySway } from './scenery.js';
 import { renderLevelUpBack, renderLevelUpFront } from './level_up.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
@@ -182,6 +182,7 @@ export function render() {
     renderLevelUpBack();
     if (!heroBehind) renderHeroBlock();
     renderFuryTrails();
+    renderFurySwords();
     renderGuardianWard();
     renderNatureFront();
     renderReflectWard();

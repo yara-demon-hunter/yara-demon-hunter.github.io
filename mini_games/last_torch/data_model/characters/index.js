@@ -81,7 +81,7 @@ function buildPlayer(character) {
     }
     // Fúria do personagem (character.fury): o tipo e os números dela (js/systems/fury.js)
     const FURY_KEYS = {
-        blades: ['name'],
+        swordRain: ['name', 'stepSeconds', 'fallSeconds', 'radius', 'damage', 'range', 'giantFallSeconds', 'giantRadius', 'giantDamage', 'giantKnockback'],
         bloodWaltz: ['name', 'cuts', 'cutSeconds', 'cutRange', 'cutDamage', 'healRatio', 'trailSeconds'],
         stomp: ['name', 'extraSeconds', 'stepSeconds', 'radius', 'damage', 'knockback', 'stunSeconds', 'shake', 'damageTakenCut'],
         forestGuardian: ['name', 'durationSeconds', 'damageReduction', 'radius', 'damage', 'tickSeconds', 'slow']
