@@ -576,7 +576,7 @@ export const EVOLUTIONS = {
         thornBark: { damage: 0.8, rootSeconds: 1 }      // o que era o nó Thorn Bark: quem bate na árvore leva dano e fica preso
     },
     spiritWolves: {
-        name: 'The White Wolf', icon: '🐺',
+        name: 'The White Wolf', icon: '🌕',
         get desc() {
             const { damage, hp } = this.levels;
             return `The wolf turns white: ${formatMultiplier(damage)} spell damage per bite (+${formatPercent(this.damageBonus)} more), ${Math.round(hp * (1 + this.healthBonus))} health, ${formatPercent(this.speedBonus)} faster, and it returns after ${this.respawnSeconds}s. Every bite hamstrings: the monster is pinned for ${formatNumber(this.hamstringSeconds)}s.`;

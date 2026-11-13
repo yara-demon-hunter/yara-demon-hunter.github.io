@@ -55,6 +55,12 @@ function parts(pose, rig) {
             }
             for (let i = 0; i < 3; i++) flameWisp(rig, f, S, [f.sh[0] + 1, (i - 1) * 1.5, f.sh[2] + S.bodyWidth * 0.5], i + 3, 1.4);
         },
+        paw(r, paw) {
+            // Garras claras, três por pata, abertas para a frente (as mesmas do Lobo Sombrio aliado)
+            for (let k = -1; k <= 1; k++) {
+                limb([[paw[0] + S.legWidth * 0.5, paw[1] + k * 0.38, paw[2] + 0.05], [paw[0] + S.legWidth * 1.3, paw[1] + k * 0.55, paw[2] - 0.15]], 0.32, C.claw);
+            }
+        },
         head(r, f) {
             const R = S.headRadius;
             // Faixa clara no focinho e sobrancelhas franzidas

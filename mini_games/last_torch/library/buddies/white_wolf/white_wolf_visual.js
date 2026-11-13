@@ -15,6 +15,7 @@ export const WHITE_WOLF_VISUALS = {
         smoke: '#e8f1fb',
         mouth: '#b4506b',
         fang: '#ffffff',
+        claw: '#f4fffd',
         nose: '#2a2f3d',
         eye: '#7dd3fc',
         eyeGlow: 'rgba(125, 211, 252, 0.9)',
