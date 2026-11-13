@@ -10,6 +10,7 @@ import { checkAchievements, pushStats, rewardText } from '../systems/sanctuary.j
 import { getOwnedPowers, hasBuyableNode } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
 import { resetQuake } from '../systems/quake.js';
+import { resetFury } from '../systems/fury.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
 import { continueEndless, startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
@@ -90,6 +91,7 @@ export function startGame() {
     state.knives = [];
     state.knifeTimer = 0;
     resetQuake();
+    resetFury();
     state.knifePending = null;
     state.knifeCharge = 0;
     state.knifeInput.stick.fire = false;

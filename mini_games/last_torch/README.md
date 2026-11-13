@@ -112,7 +112,8 @@ js/
   systems/enemies.js              IA, colisões, mortes/recompensas e projéteis inimigos
   systems/boss_ai.js              ataques dos bosses e avisos no chão
   systems/damage.js               todo dano nos monstros passa por aqui: crítico, clarão, número, recuo
-  systems/combat.js               ataque automático, golpes da lâmina e Fúria
+  systems/combat.js               ataque automático, golpes da lâmina e o disparo da Fúria (a do Demon Hunter: explosão de lâminas)
+  systems/fury.js                 as Fúrias de cada personagem: Valsa de Sangue (Azael: até 6 cortes alternando entre os monstros mais perto, com riscos vermelhos e cura) e Pisadas do Capitão (Brutos: tremores a cada passo, Fúria 2,5 s mais longa); os riscos são desenhados em render/fury.js
   systems/knives.js               adaga de arremesso e Ricochet
   systems/quake.js                Axe Quake do Captain Brutos (golpe em área de curto alcance no lugar da adaga)
   systems/dash.js                 dash e esquiva perfeita
@@ -189,7 +190,7 @@ O desenho do herói é um boneco 2.5D da biblioteca; cada herói com boneco pró
 1. **Visual:** `<id>_visual.js`, copiando `azael/azael_visual.js`: `colors` (mesmas chaves de `HERO_VISUALS.colors`), `bladeLength`, `bladeWidth`, `glowScale`, `strideSpeed` e as medidas só dele.
 2. **Boneco:** `<id>25d.js`, copiando `azael/azael25d.js`, com as peças (cabeça, tronco, pernas, braços, arma) e, no fim, `registerBody('<id>', { vis, ... })`. Os ganchos (todos opcionais, o que faltar usa o desenho do Demon Hunter) estão listados em `characters/hunter/body_registry.js`; a geometria da cabeça e dos membros está em `characters/hunter/kit25d.js`. Depois rode `ruby mini_games/_library/sync.rb`.
 3. **Lista:** um `import '../../library/characters/<id>/<id>25d.js';` em `js/render/bodies.js`.
-4. **Personagem:** um arquivo `data_model/characters/<id>.js` (copie o `brutos.js`) com TUDO dele: nome, textos, `colors`, retrato, vida, velocidade, dash, bônus em %, números como boss, rival e a posição na tela de escolha (`order`); depois, ponha-o na lista de `data_model/characters/index.js` e a conquista que o libera (`hero: '<id>'`) em `data_model/sanctuary.js`. Os números são conferidos ao abrir o jogo (um stat com nome errado dá erro).
+4. **Personagem:** um arquivo `data_model/characters/<id>.js` (copie o `brutos.js`) com TUDO dele: nome, textos, `colors`, retrato, vida, velocidade, dash, bônus em %, a **Fúria** (`fury`: `blades`, `bloodWaltz` ou `stomp`, com os números dela), números como boss, rival e a posição na tela de escolha (`order`); depois, ponha-o na lista de `data_model/characters/index.js` e a conquista que o libera (`hero: '<id>'`) em `data_model/sanctuary.js`. Os números são conferidos ao abrir o jogo (um stat com nome errado dá erro).
 5. **Sombra:** uma linha em `colorsByModel` (`shadow_clone_visual.js`) com a paleta de sombra dele, usada pelo Shadow Clone e pelo rival sombra. Sem a linha, usa a paleta padrão.
 6. **Rival:** se o herói tiver um rival próprio, `RIVAL_OF` e o boss em `data_model/bosses.js` (o rival é só dado: usa o mesmo boneco).
 

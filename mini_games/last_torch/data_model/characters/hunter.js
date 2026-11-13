@@ -44,6 +44,14 @@ export const HUNTER = {
         noKnives: false             // não lança adaga; as skills de adaga ficam seladas na árvore
     },
 
+    // --- FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) ---
+    // kind: 'blades' (explosão de lâminas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael) ou 'stomp' (pisadas,
+    // a do Brutos). Os números de cada uma estão explicados ao lado. js/systems/fury.js; a duração vem da árvore (skill Fury).
+    fury: {
+        kind: 'blades',
+        name: 'Blade Storm'         // a explosão de lâminas em volta (FRENZY_NOVA_SKILL em data_model/skills.js)
+    },
+
     // --- COMO BOSS (quando outro herói o enfrenta como rival; BOSS_MODELS.DEMON_HUNTER) ---
     // O boss é PROPORCIONAL ao personagem: cada valor = o stat do personagem x a razão abaixo. Equilibrou o personagem?
     // O boss acompanha. As razões ficam aqui, só deste personagem. O resto é o jeito de lutar dele.

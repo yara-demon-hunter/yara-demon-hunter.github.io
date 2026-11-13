@@ -9,12 +9,14 @@ import { mod } from './modifiers.js';
 import { isFireCasting } from './knives.js';
 import { launchCrescent, tryExecute } from './skills_blade.js';
 import { detonateMark } from './skills_shadow.js';
+import { startFury } from './fury.js';
 import {
     getAtkCooldown,
     getAtkDamage,
     getAtkRadius,
     getBladeDamage,
     getFrenzyDuration,
+    getFury,
     getKnockback,
     getSlashArcRadian
 } from './stats.js';
@@ -99,12 +101,19 @@ export function chargeUlt(amount) {
     if (state.ultEnergy >= maxUltEnergy) triggerFrenzyUlt();
 }
 
-// Ativação Automática da Skill Frenzy Nova
+// Ativação automática da Fúria. A barra e a duração são iguais para todos; o especial é de cada personagem (js/systems/fury.js).
+// O do Demon Hunter (a explosão de lâminas) continua aqui.
 export function triggerFrenzyUlt() {
     state.ultEnergy = 0;
-    state.frenzyDuration = getFrenzyDuration();
+    const fury = getFury();
+    // Cada personagem pode durar um pouco mais (o Brutos: as pisadas são o show dele)
+    state.frenzyDuration = getFrenzyDuration() + (fury.extraSeconds ?? 0);
     state.frenzyActiveTimer = state.frenzyDuration;
     audio.playUltSound();
+    if (startFury(fury)) {
+        updateHUD();
+        return;
+    }
     shakeScreen(15);
     hitStop(0.07);
     zoomPunch(0.035);

@@ -70,6 +70,17 @@ function buildPlayer(character) {
         }
         mods.axeQuake = 1;
     }
+    // Fúria do personagem (character.fury): o tipo e os números dela (js/systems/fury.js)
+    const FURY_KEYS = {
+        blades: ['name'],
+        bloodWaltz: ['name', 'cuts', 'cutSeconds', 'cutRange', 'cutDamage', 'healRatio', 'trailSeconds'],
+        stomp: ['name', 'extraSeconds', 'stepSeconds', 'radius', 'damage', 'knockback', 'stunSeconds', 'shake', 'damageTakenCut']
+    };
+    const fury = character.fury;
+    if (!fury || !FURY_KEYS[fury.kind]) throw new Error(`Personagem ${character.id}: falta a Fúria (fury.kind: ${Object.keys(FURY_KEYS).join(', ')})`);
+    for (const key of FURY_KEYS[fury.kind]) {
+        if (fury[key] === undefined) throw new Error(`Personagem ${character.id}: falta "${key}" em fury`);
+    }
     // Os valores absolutos vão direto para o jogo (js/systems/stats.js lê do personagem escolhido)
     return {
         mods,
@@ -79,6 +90,7 @@ function buildPlayer(character) {
         bladeRange: stats.bladeRange,
         knifeRange: stats.knifeRange,
         axeQuake,
+        fury,
         moveSpeed: stats.speed,
         dash: { distance: stats.dashDistance, seconds: stats.dashSeconds }
     };

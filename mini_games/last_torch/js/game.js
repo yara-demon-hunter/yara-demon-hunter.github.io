@@ -7,6 +7,7 @@ import { state } from './core/state.js';
 import { render } from './render/renderer.js';
 import { updateTelegraphs } from './systems/boss_ai.js';
 import { updateAutoAttack } from './systems/combat.js';
+import { updateFury } from './systems/fury.js';
 import { updateDash } from './systems/dash.js';
 import { advanceTime, updateEffects, updateRealTimeEffects } from './systems/effects.js';
 import { updateEnemies, updateEnemyProjectiles } from './systems/enemies.js';
@@ -80,6 +81,7 @@ export function update(dt) {
     updateDash(dt);
     updateTorch(dt);
     updateAutoAttack(dt);
+    updateFury(dt);
     updateShadowClone(dt);
     updateKnives(dt);
     updateQuake(dt);

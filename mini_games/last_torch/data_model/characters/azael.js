@@ -49,6 +49,22 @@ export const AZAEL = {
         noKnives: false             // não lança adaga; as skills de adaga ficam seladas na árvore
     },
 
+    // --- FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) ---
+    // kind: 'blades' (explosão de lâminas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael) ou 'stomp' (pisadas,
+    // a do Brutos). Os números de cada uma estão explicados ao lado. js/systems/fury.js; a duração vem da árvore (skill Fury).
+    // VALSA DE SANGUE: até 6 cortes seguidos. A cada corte ele salta para o monstro mais perto que NÃO seja o do corte anterior,
+    // atravessa o monstro e deixa um risco vermelho no caminho; com 2 monstros, vai e volta 3 vezes entre eles. Cada corte cura.
+    fury: {
+        kind: 'bloodWaltz',
+        name: 'Blood Waltz',
+        cuts: 6,                    // quantos cortes (no máximo)
+        cutSeconds: 0.12,           // tempo entre um corte e o próximo
+        cutRange: 380,              // até onde ele procura o próximo monstro, px
+        cutDamage: 2.2,             // dano de cada corte = dano da lâmina x este número
+        healRatio: 0.3,             // parte do dano de cada corte que volta como vida (soma ao roubo de vida dele)
+        trailSeconds: 0.4           // quanto tempo o risco vermelho leva para sumir
+    },
+
     // --- COMO BOSS (quando outro herói o enfrenta como rival; BOSS_MODELS.AZAEL) ---
     // O boss é PROPORCIONAL ao personagem: cada valor = o stat do personagem x a razão abaixo. Equilibrou o personagem?
     // O boss acompanha. As razões ficam aqui, só deste personagem. O resto é o jeito de lutar dele.

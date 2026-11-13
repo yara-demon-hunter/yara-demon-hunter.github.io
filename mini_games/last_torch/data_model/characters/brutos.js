@@ -64,6 +64,24 @@ export const BRUTOS = {
         }
     },
 
+    // --- FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) ---
+    // kind: 'blades' (explosão de lâminas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael) ou 'stomp' (pisadas,
+    // a do Brutos). Os números de cada uma estão explicados ao lado. js/systems/fury.js; a duração vem da árvore (skill Fury).
+    // PISADAS DO CAPITÃO: enquanto a Fúria dura, cada passo pesado bate no chão em volta dele: dano, empurrão, um atordoamento
+    // curto e a tela tremendo. Sem crescer e sem golpe final (pedido do usuário). Ele também aguenta mais pancada.
+    fury: {
+        kind: 'stomp',
+        name: "Captain's Tremor",
+        extraSeconds: 2.5,          // a Fúria dele dura este tanto a mais que a dos outros (a pedido: as pisadas são o show)
+        stepSeconds: 0.36,          // tempo entre uma pisada e a próxima
+        radius: 90,                 // alcance de cada pisada, px
+        damage: 0.9,                // dano de cada pisada = dano da lâmina x este número
+        knockback: 150,             // empurrão
+        stunSeconds: 0.3,           // atordoamento nos monstros comuns (chefes não)
+        shake: 5,                   // quanto a tela treme a cada pisada
+        damageTakenCut: 0.3         // recebe 30% menos dano enquanto a Fúria dura
+    },
+
     // --- COMO BOSS (semi-boss da hora 6; BOSS_MODELS.BRUTOS) ---
     // O boss é PROPORCIONAL ao personagem: cada valor = o stat do personagem x a razão abaixo. Equilibrou o personagem?
     // O boss acompanha. As razões ficam aqui, só deste personagem. O resto é o jeito de lutar dele.

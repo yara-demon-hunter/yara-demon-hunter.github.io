@@ -92,6 +92,11 @@ export function getMaxPlayerHp() {
         + mod('maxHpFlat')) * (1 + mod('maxHp')));
 }
 // Axe Quake do personagem escolhido (força, cooldown, alcance...: data_model/characters/); null se ele não tem
+// A Fúria do personagem escolhido: { kind, name, ...números } (data_model/characters/<id>.js)
+export function getFury() {
+    return getCurrentCharacterBase().player.fury;
+}
+
 export function getAxeQuake() {
     return getCurrentCharacterBase().player.axeQuake;
 }

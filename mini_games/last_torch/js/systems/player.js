@@ -1,4 +1,5 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
+import { furyDamageRatio } from './fury.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { save } from '../core/save.js';
 import { audio, joystick, keys, player, state } from '../core/state.js';
@@ -43,7 +44,7 @@ export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
         player.iFrames = invulnerableSeconds;
         return false;
     }
-    const damage = amount * getDamageTakenRatio();
+    const damage = amount * getDamageTakenRatio() * furyDamageRatio();
     player.hp -= damage;
     player.iFrames = invulnerableSeconds;
     state.hourHit = true;

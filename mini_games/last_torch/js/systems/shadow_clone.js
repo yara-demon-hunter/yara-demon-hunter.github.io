@@ -1,6 +1,6 @@
 import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { EVOLUTIONS, getPowerLevel } from '../../data_model/powers.js';
-import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
+import { BLADE_SKILL } from '../../data_model/skills.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { createHeroAnim } from '../../library/characters/hunter/hero_anim.js';
 import { audio, passives, powers, shadowClones as clones, state } from '../core/state.js';
@@ -58,7 +58,6 @@ function reviveClone(c) {
     c.spawnTime = performance.now();
     c.comboStep = 1;
     c.attackTimer = 0;
-    c.frenzy = state.frenzyActiveTimer > 0;
     c.x = c.postX;
     c.y = c.postY;
     createExplosion(c.x, c.y, SHADOW_CLONE_VISUALS.spawnBurstColor, 18);
@@ -74,7 +73,6 @@ function spawnClone(index, count) {
         angle: 0,
         attackTimer: 0,
         comboStep: 1,
-        frenzy: false,
         iFrames: 0,
         hitDirX: 0, hitDirY: 0, hitTime: -100000,
         anim: createHeroAnim(false)
@@ -138,15 +136,6 @@ function updateCloneAttack(c, dt) {
     c.comboStep = step >= 3 ? 1 : step + 1;
 }
 
-// Lâminas em todas as direções quando a Fúria do herói começa (só visual, como as do herói)
-function mirrorFrenzyNova(c) {
-    const radius = getAtkRadius() * SHADOW_CLONE.radiusMultiplier * FRENZY_NOVA_SKILL.slashRadiusMultiplier;
-    for (let i = 0; i < FRENZY_NOVA_SKILL.slashCount; i++) {
-        const angle = (TAU / FRENZY_NOVA_SKILL.slashCount) * i;
-        executeBladeSlash(c.x, c.y, angle, radius, 3, false, c);
-    }
-}
-
 // Anda em linha reta até (x, y) sem passar de speed; para a stop de distância. Nunca sai da área da tocha.
 function walkTo(c, x, y, speed, stop, dt) {
     const dx = x - c.x;
@@ -179,7 +168,6 @@ export function updateShadowClone(dt) {
     clones.length = count;
     const reach = getAtkRadius() * SHADOW_CLONE.radiusMultiplier;
     const claimed = new Set();
-    const frenzy = state.frenzyActiveTimer > 0;
 
     clones.forEach((c, i) => {
         setPost(c, i, count);
@@ -214,7 +202,6 @@ export function updateShadowClone(dt) {
         }
 
         updateCloneAttack(c, dt);
-        if (frenzy && !c.frenzy) mirrorFrenzyNova(c);
-        c.frenzy = frenzy;
+        // A Fúria é só do herói: as sombras não a repetem (cada personagem tem a sua, e repeti-la multiplicaria o dano)
     });
 }

@@ -223,6 +223,14 @@ export class SoundEngine {
 
     // --- SKILLS DOS RAMOS ---
     // Earthbreaker: pancada grave com pedras. scale < 1 nos abalos seguintes
+    // Corte rápido de lâmina no ar ("shiink"): chiado agudo que sobe + um fio metálico
+    playSlice() {
+        if (!this.ctx) return;
+        this.burst({ filter: 'highpass', freq: 2600, to: 7500, attack: 0.004, decay: 0.09, gain: 0.32 });
+        this.burst({ filter: 'bandpass', freq: 5200, to: 9000, q: 4, attack: 0.002, decay: 0.12, gain: 0.18 });
+        this.tone({ type: 'sawtooth', freq: 1900, to: 3400, decay: 0.07, gain: 0.06 });
+    }
+
     playSlam(scale = 1) {
         if (!this.ctx) return;
         this.tone({ type: 'sine', freq: 130, to: 34, decay: 0.42, gain: 0.5 * scale });
