@@ -4,7 +4,7 @@ title: Project Updates
 lang: en
 translation_id: updates
 description: Follow news, changes, and new pages from the Yara, Demon Hunter project.
-last_updated: 2026-11-01
+last_updated: 2026-11-13
 hide_recent_updates: true
 ---
 
@@ -30,7 +30,7 @@ hide_recent_updates: true
                     </h2>
                     <p>{{ update.summary.en }}</p>
                     <a class="updates-archive__link" href="{{ update.url.en | relative_url }}">
-                        Read the updated page <span aria-hidden="true">→</span>
+                        {% if update.url.en contains "/updates/" %}Read the update{% else %}Read the updated page{% endif %} <span aria-hidden="true">→</span>
                     </a>
                 </article>
             </li>

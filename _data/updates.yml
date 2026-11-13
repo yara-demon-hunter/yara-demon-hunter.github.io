@@ -1,3 +1,69 @@
+- date: "2026-11-13"
+  title:
+    en: "Last Torch: new trailers"
+    pt: "Last Torch: novos trailers"
+  summary:
+    en: "Two new 20-second trailers, widescreen and vertical, show real gameplay with different heroes, powers, bosses and dialogues."
+    pt: "Dois novos trailers de 20 segundos, widescreen e vertical, mostram jogabilidade real com heróis, poderes, chefes e diálogos diferentes."
+  url:
+    en: "/en/updates/last-torch-new-trailers/"
+    pt: "/pt/updates/last-torch-novos-trailers/"
+
+- date: "2026-11-13"
+  title:
+    en: "Last Torch: a different Fury for each hero"
+    pt: "Last Torch: uma Fúria diferente para cada herói"
+  summary:
+    en: "Demon Hunter keeps the blade burst, Azael gets Blood Waltz and Captain Brutos gets the Captain's Tremor. Shadow clones no longer copy Fury."
+    pt: "O Demon Hunter mantém a explosão de lâminas, o Azael ganha a Blood Waltz e o Captain Brutos ganha o Captain's Tremor. As sombras não copiam mais a Fúria."
+  url:
+    en: "/en/updates/last-torch-fury-for-each-hero/"
+    pt: "/pt/updates/last-torch-furia-de-cada-heroi/"
+
+- date: "2026-11-13"
+  title:
+    en: "Last Torch: the torch gets a new look"
+    pt: "Last Torch: a tocha ganhou um visual novo"
+  summary:
+    en: "A hero-sized wooden pole with a cage of fire. The flame shrinks as the torch weakens, the health bar sits above it and it covers whoever walks behind."
+    pt: "Um poste de madeira do tamanho do herói com uma gaiola de fogo. A chama encolhe quando a tocha enfraquece, a barra de vida fica em cima e ela cobre quem passa atrás."
+  url:
+    en: "/en/updates/last-torch-new-2-5d-torch/"
+    pt: "/pt/updates/last-torch-nova-tocha-2-5d/"
+
+- date: "2026-11-12"
+  title:
+    en: "Last Torch: the Misty Forest"
+    pt: "Last Torch: a Floresta da Névoa"
+  summary:
+    en: "A new scenery from the first phase of Yara RPG: teal fog, glowing mushrooms and ferns that sway in the wind, light enough for phones."
+    pt: "Um cenário novo da primeira fase do Yara RPG: névoa azul-esverdeada, cogumelos que brilham e samambaias que balançam ao vento, leve até para celulares."
+  url:
+    en: "/en/updates/last-torch-misty-forest/"
+    pt: "/pt/updates/last-torch-floresta-da-nevoa/"
+
+- date: "2026-11-12"
+  title:
+    en: "Last Torch: a clearer start"
+    pt: "Last Torch: um início mais claro"
+  summary:
+    en: "A loading bar that really fills, a dashed circle that always shows where the torch heals you, and a hint that appears right when you need it."
+    pt: "Uma barra de carregamento que enche de verdade, um círculo tracejado que sempre mostra onde a tocha cura você e uma dica que aparece na hora certa."
+  url:
+    en: "/en/updates/last-torch-clearer-start/"
+    pt: "/pt/updates/last-torch-inicio-mais-claro/"
+
+- date: "2026-11-12"
+  title:
+    en: "Last Torch: play it upright on your phone"
+    pt: "Last Torch: jogue em pé no celular"
+  summary:
+    en: "No more \"turn your phone sideways\" warning. Controls, skill tree, menus and dialogues now fit a phone held upright or sideways."
+    pt: "Acabou o aviso de \"vire o celular\". Controles, árvore de skills, menus e diálogos agora cabem num celular em pé ou deitado."
+  url:
+    en: "/en/updates/last-torch-play-upright-on-phone/"
+    pt: "/pt/updates/last-torch-jogue-em-pe-no-celular/"
+
 - date: "2026-11-09"
   title:
     en: "Last Torch: new preview videos and balance pass"

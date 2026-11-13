@@ -1,0 +1,68 @@
+---
+layout: default
+---
+{% comment %}
+  Página própria de um update do projeto. Os updates novos têm uma página cada (texto, imagens e o que mudou); a lista
+  (_data/updates.yml) aponta para elas. Campos do front matter: title, description, date, last_updated, update_label,
+  hero (imagem), hero_alt, hero_width, hero_height, translation_id, lang, permalink, hide_recent_updates: true.
+{% endcomment %}
+{% assign is_pt = false %}
+{% if page.lang == "pt" %}{% assign is_pt = true %}{% endif %}
+{% assign game_guide = '/en/mini-games/last-torch/' %}
+{% assign updates_index = '/en/updates/' %}
+{% if is_pt %}{% assign game_guide = '/pt/mini-games/last-torch/' %}{% assign updates_index = '/pt/updates/' %}{% endif %}
+
+<article class="update-post">
+    <nav class="update-post__crumbs" aria-label="{% if is_pt %}Você está aqui{% else %}You are here{% endif %}">
+        <a href="{{ updates_index | relative_url }}">{% if is_pt %}Atualizações{% else %}Updates{% endif %}</a>
+        <span aria-hidden="true">›</span>
+        <span>{{ page.title }}</span>
+    </nav>
+
+    <header class="update-post__header">
+        <p class="section-label">{{ page.update_label | default: "Last Torch" }}</p>
+        <h1>{{ page.title }}</h1>
+        <p class="update-post__meta">
+            <time datetime="{{ page.date | date: '%Y-%m-%d' }}">
+                {% if is_pt %}{{ page.date | date: "%d/%m/%Y" }}{% else %}{{ page.date | date: "%B %-d, %Y" }}{% endif %}
+            </time>
+        </p>
+        <p class="update-post__lead">{{ page.description }}</p>
+        {% if page.hero %}
+            <figure class="update-post__hero">
+                <img src="{{ page.hero | relative_url }}" alt="{{ page.hero_alt }}" width="{{ page.hero_width | default: 1280 }}" height="{{ page.hero_height | default: 720 }}">
+            </figure>
+        {% endif %}
+    </header>
+
+    <div class="update-post__body">
+        {{ content }}
+    </div>
+
+    <aside class="update-post__cta">
+        <h2>{% if is_pt %}Veja no jogo{% else %}See it in the game{% endif %}</h2>
+        <p>{% if is_pt %}Last Torch é grátis, roda no navegador e o progresso fica salvo nele.{% else %}Last Torch is free, runs in your browser and saves your progress there.{% endif %}</p>
+        <div class="update-post__buttons">
+            <a class="update-post__button" href="{{ '/mini_games/last_torch/last_torch.html' | relative_url }}">{% if is_pt %}Jogar agora{% else %}Play now{% endif %}</a>
+            <a class="update-post__ghost" href="{{ game_guide | relative_url }}">{% if is_pt %}Guia do jogo{% else %}Game guide{% endif %}</a>
+        </div>
+    </aside>
+
+    <section class="update-post__more" aria-labelledby="more-updates-title">
+        <h2 id="more-updates-title">{% if is_pt %}Outras atualizações{% else %}More updates{% endif %}</h2>
+        <ul>
+            {% assign all_updates = site.data.updates | sort: "date" | reverse %}
+            {% assign shown = 0 %}
+            {% for update in all_updates %}
+                {% if update.url[page.lang] != page.url and shown < 3 %}
+                    {% assign shown = shown | plus: 1 %}
+                    <li>
+                        <time datetime="{{ update.date | date: '%Y-%m-%d' }}">{% if is_pt %}{{ update.date | date: "%d/%m/%Y" }}{% else %}{{ update.date | date: "%B %-d, %Y" }}{% endif %}</time>
+                        <a href="{{ update.url[page.lang] | relative_url }}">{{ update.title[page.lang] }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <a class="update-post__all" href="{{ updates_index | relative_url }}">{% if is_pt %}Ver todas as atualizações{% else %}View all updates{% endif %} <span aria-hidden="true">→</span></a>
+    </section>
+</article>

@@ -228,6 +228,26 @@
 }
 
 .game-guide__facts div,
+.game-guide__updates {
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.game-guide__updates li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(243, 232, 208, 0.12);
+}
+
+.game-guide__updates time {
+    color: #b9a47a;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+}
+
 .game-guide__panel {
     padding: 12px 14px;
     border: 1px solid rgba(195, 164, 102, 0.25);

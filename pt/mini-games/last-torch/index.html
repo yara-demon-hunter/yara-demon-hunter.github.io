@@ -7,7 +7,7 @@ lang: pt
 translation_id: last-torch-guide
 mini_games_hub: true
 hide_recent_updates: true
-last_updated: 2026-11-10
+last_updated: 2026-11-13
 image: /assets/images/common/mini-game/last_torch_cover.jpeg
 permalink: /pt/mini-games/last-torch/
 ---
@@ -48,19 +48,20 @@ permalink: /pt/mini-games/last-torch/
         <a href="#juramentos">Juramentos</a>
         <a href="#herois">Heróis</a>
         <a href="#controles">Controles</a>
+        <a href="#atualizacoes">Atualizações</a>
     </nav>
 
     <section id="trailers" class="game-guide__section">
         <h2>Assista aos vídeos</h2>
         <figure class="game-trailer game-trailer--desktop">
             <video controls muted loop playsinline preload="none" data-trailer-device="desktop" width="1920" height="1080" poster="{{ art }}cover.webp" aria-label="Vídeo de Last Torch para desktop em formato widescreen">
-                <source src="{{ '/mini_games/last_torch/previews/last_torch_landscape_1920x1080.mp4' | relative_url }}" type="video/mp4">
+                <source src="{{ art }}trailer-desktop.mp4" type="video/mp4">
             </video>
             <figcaption><strong>Vídeo para desktop</strong>Formato widescreen 16:9.</figcaption>
         </figure>
         <figure class="game-trailer game-trailer--mobile">
             <video controls muted loop playsinline preload="none" data-trailer-device="mobile" width="1080" height="1620" poster="{{ art }}cover.webp" aria-label="Vídeo de Last Torch para celular em formato vertical">
-                <source src="{{ '/mini_games/last_torch/previews/last_torch_portrait_1080x1620.mp4' | relative_url }}" type="video/mp4">
+                <source src="{{ art }}trailer-mobile.mp4" type="video/mp4">
             </video>
             <figcaption><strong>Vídeo para celular</strong>Formato vertical para smartphones.</figcaption>
         </figure>
@@ -83,7 +84,7 @@ permalink: /pt/mini-games/last-torch/
             <figure><img src="{{ art }}hero-slash.webp" alt="Animação do combo de lâmina" width="200" height="200" loading="lazy"><figcaption><strong>Lâmina</strong> Ataca sozinha</figcaption></figure>
             <figure><img src="{{ art }}hero-whirl.webp" alt="Animação do Whirlwind" width="200" height="200" loading="lazy"><figcaption><strong>Whirlwind</strong> Giro de 360°</figcaption></figure>
             <figure><img src="{{ art }}hero-dash.webp" alt="Animação do dash" width="200" height="200" loading="lazy"><figcaption><strong>Dash</strong> Intocável por um instante</figcaption></figure>
-            <figure><img src="{{ art }}hero-fury.webp" alt="Animação da Fúria" width="200" height="200" loading="lazy"><figcaption><strong>Fúria</strong> Dispara com a barra cheia</figcaption></figure>
+            <figure><img src="{{ art }}hero-fury.webp" alt="Animação da Fúria" width="200" height="200" loading="lazy"><figcaption><strong>Fúria</strong> Dispara com a barra cheia. Cada herói tem a sua</figcaption></figure>
             <figure><img src="{{ art }}hero-levelup.webp" alt="Animação de subida de nível" width="200" height="200" loading="lazy"><figcaption><strong>Subir de nível</strong> Um ponto de habilidade</figcaption></figure>
             <figure><img src="{{ art }}hero-clone.webp" alt="Três sombras guardando a tocha enquanto os monstros se aproximam" width="200" height="200" loading="lazy"><figcaption><strong>Shadow Clone</strong> Guarda a área em volta da tocha</figcaption></figure>
         </div>
@@ -183,12 +184,27 @@ permalink: /pt/mini-games/last-torch/
             </div>
             <div class="game-guide__panel">
                 <h3>Celular</h3>
-                <p>Deite o aparelho. Joystick para mover. Toque no botão da adaga para arremessar no monstro mais perto, ou arraste para mirar e solte para arremessar.</p>
+                <p>Segure em pé ou deitado. Joystick para mover. Toque no botão da adaga para arremessar no monstro mais perto, ou arraste para mirar e solte para arremessar.</p>
             </div>
         </div>
         <p>Grátis, sem instalar nada, e o progresso fica salvo no seu navegador.</p>
         <p>É sua primeira partida? Leia o <a href="{{ '/pt/guias/guia-sobreviver-last-torch/' | relative_url }}">guia para sobreviver à primeira noite</a>.</p>
         <a class="mini-game-card__button" href="{{ play }}">Jogar agora</a>
+    </section>
+
+    <section id="atualizacoes" class="game-guide__section">
+        <h2>Últimas atualizações</h2>
+        <ul class="game-guide__updates">
+            {% assign latest = site.data.updates | sort: "date" | reverse %}
+            {% assign shown = 0 %}
+            {% for update in latest %}
+                {% if update.url.pt contains "/updates/" and shown < 6 %}
+                    {% assign shown = shown | plus: 1 %}
+                    <li><time datetime="{{ update.date | date: '%Y-%m-%d' }}">{{ update.date | date: "%d/%m/%Y" }}</time> <a href="{{ update.url.pt | relative_url }}">{{ update.title.pt }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <p><a href="{{ '/pt/updates/' | relative_url }}">Ver todas as atualizações do projeto</a></p>
     </section>
 </article>
 

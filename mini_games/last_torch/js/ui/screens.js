@@ -70,7 +70,8 @@ export function startGame() {
     state.streakTimer = 0;
     state.multiKill = 0;
     state.multiTimer = 0;
-    state.skillPoints = 0;
+    // Cada nível de Escuridão rende 1 ponto de skill inicial (Escuridão 1 = 1 ponto, 2 = 2, ...)
+    state.skillPoints = save.darkness;
     state.levelPointsCarry = 0;
     state.tree = {};
     state.pickupPity = 0;
@@ -320,6 +321,7 @@ export function renderStartScreen() {
     const dark = document.getElementById('darknessPicker');
     dark.classList.toggle('hidden', save.maxDarkness <= 1);
     document.getElementById('darknessValue').innerText = save.darkness;
+    dark.title = `Start with ${save.darkness} skill point${save.darkness === 1 ? '' : 's'}`;
     paintHeroPortrait(document.getElementById('heroPortrait'), hero);
 }
 

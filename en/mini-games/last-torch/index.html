@@ -7,7 +7,7 @@ lang: en
 translation_id: last-torch-guide
 mini_games_hub: true
 hide_recent_updates: true
-last_updated: 2026-11-10
+last_updated: 2026-11-13
 image: /assets/images/common/mini-game/last_torch_cover.jpeg
 permalink: /en/mini-games/last-torch/
 ---
@@ -48,19 +48,20 @@ permalink: /en/mini-games/last-torch/
         <a href="#oaths">Oaths</a>
         <a href="#heroes">Heroes</a>
         <a href="#controls">Controls</a>
+        <a href="#updates">Updates</a>
     </nav>
 
     <section id="trailers" class="game-guide__section">
         <h2>Watch the trailers</h2>
         <figure class="game-trailer game-trailer--desktop">
             <video controls muted loop playsinline preload="none" data-trailer-device="desktop" width="1920" height="1080" poster="{{ art }}cover.webp" aria-label="Last Torch desktop trailer in widescreen format">
-                <source src="{{ '/mini_games/last_torch/previews/last_torch_landscape_1920x1080.mp4' | relative_url }}" type="video/mp4">
+                <source src="{{ art }}trailer-desktop.mp4" type="video/mp4">
             </video>
             <figcaption><strong>Desktop trailer</strong>Widescreen 16:9 format.</figcaption>
         </figure>
         <figure class="game-trailer game-trailer--mobile">
             <video controls muted loop playsinline preload="none" data-trailer-device="mobile" width="1080" height="1620" poster="{{ art }}cover.webp" aria-label="Last Torch mobile trailer in vertical format">
-                <source src="{{ '/mini_games/last_torch/previews/last_torch_portrait_1080x1620.mp4' | relative_url }}" type="video/mp4">
+                <source src="{{ art }}trailer-mobile.mp4" type="video/mp4">
             </video>
             <figcaption><strong>Mobile trailer</strong>Vertical format for phones.</figcaption>
         </figure>
@@ -83,7 +84,7 @@ permalink: /en/mini-games/last-torch/
             <figure><img src="{{ art }}hero-slash.webp" alt="Blade combo animation" width="200" height="200" loading="lazy"><figcaption><strong>Blade</strong> Attacks on its own</figcaption></figure>
             <figure><img src="{{ art }}hero-whirl.webp" alt="Whirlwind animation" width="200" height="200" loading="lazy"><figcaption><strong>Whirlwind</strong> A 360° spin</figcaption></figure>
             <figure><img src="{{ art }}hero-dash.webp" alt="Dash animation" width="200" height="200" loading="lazy"><figcaption><strong>Dash</strong> Briefly untouchable</figcaption></figure>
-            <figure><img src="{{ art }}hero-fury.webp" alt="Fury animation" width="200" height="200" loading="lazy"><figcaption><strong>Fury</strong> Fires when the bar fills</figcaption></figure>
+            <figure><img src="{{ art }}hero-fury.webp" alt="Fury animation" width="200" height="200" loading="lazy"><figcaption><strong>Fury</strong> Fires when the bar fills. Each hero has their own</figcaption></figure>
             <figure><img src="{{ art }}hero-levelup.webp" alt="Level up animation" width="200" height="200" loading="lazy"><figcaption><strong>Level up</strong> One skill point</figcaption></figure>
             <figure><img src="{{ art }}hero-clone.webp" alt="Three shadows guarding the torch while monsters approach" width="200" height="200" loading="lazy"><figcaption><strong>Shadow Clone</strong> Guards the area around the torch</figcaption></figure>
         </div>
@@ -183,12 +184,27 @@ permalink: /en/mini-games/last-torch/
             </div>
             <div class="game-guide__panel">
                 <h3>Phone</h3>
-                <p>Hold it sideways. Joystick to move. Tap the dagger button to throw at the nearest monster, or drag it to aim and release to throw.</p>
+                <p>Hold it upright or sideways. Joystick to move. Tap the dagger button to throw at the nearest monster, or drag it to aim and release to throw.</p>
             </div>
         </div>
         <p>Free, nothing to install, and your progress is saved in your browser.</p>
         <p>New to the game? Read the <a href="{{ '/en/guides/last-torch-survival-guide/' | relative_url }}">beginner's survival guide</a> before your first night.</p>
         <a class="mini-game-card__button" href="{{ play }}">Play now</a>
+    </section>
+
+    <section id="updates" class="game-guide__section">
+        <h2>Latest updates</h2>
+        <ul class="game-guide__updates">
+            {% assign latest = site.data.updates | sort: "date" | reverse %}
+            {% assign shown = 0 %}
+            {% for update in latest %}
+                {% if update.url.en contains "/updates/" and shown < 6 %}
+                    {% assign shown = shown | plus: 1 %}
+                    <li><time datetime="{{ update.date | date: '%Y-%m-%d' }}">{{ update.date | date: "%B %-d, %Y" }}</time> <a href="{{ update.url.en | relative_url }}">{{ update.title.en }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <p><a href="{{ '/en/updates/' | relative_url }}">View all project updates</a></p>
     </section>
 </article>
 
