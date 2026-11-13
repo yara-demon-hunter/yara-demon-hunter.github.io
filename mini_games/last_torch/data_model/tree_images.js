@@ -52,7 +52,10 @@ export const TREE_IMAGES = {
     flameBlade: img('flaming-sword'),
     fireballs: img('fireballs'),
     graveWisp: img('grave-wisp'),
-    wrathEvolve: img('wrath-of-heaven')
+    wrathEvolve: img('wrath-of-heaven'),
+    leechVine: img('leech-vine'),
+    spiritWolves: img('shadow-wolf'),
+    darkRoses: img('dark-rose')
 };
 
 // Arte de cada ramo. Ramo sem imagem usa o emoji de TREE_BRANCHES.
@@ -60,7 +63,8 @@ export const BRANCH_IMAGES = {
     blade: img('blade-path'),
     shadow: img('shadow-path'),
     flame: img('flame-path'),
-    curse: img('curse-path')
+    curse: img('curse-path'),
+    nature: img('nature-path')
 };
 
 // Imagem da skill pela chave do poder, passiva ou atributo (evolved: a evolução tem a própria arte)

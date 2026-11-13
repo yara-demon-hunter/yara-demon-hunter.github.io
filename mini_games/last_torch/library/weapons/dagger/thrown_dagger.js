@@ -1,12 +1,13 @@
-import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/weapons/dagger/thrown_dagger.js e rode o sync.
+import { DAGGER_VISUALS } from './dagger_visual.js';
 
-const C = K.colors;
-const S = K.shape;
+const C = DAGGER_VISUALS.colors;
+const S = DAGGER_VISUALS.shape;
 
-// --- ADAGA (desenho procedural) ---
+// --- ADAGA DE ARREMESSO (desenho procedural) ---
 // Desenhada ao longo de +x com a origem no meio do cabo (onde a mão segura).
 // Usada em voo (js/render/entities.js) e na mão do herói (js/render/player25d.js); quem chama ajusta com ctx.scale.
-export function drawDagger(ctx, t) {
+export function drawThrownDagger(ctx, t) {
     const base = ctx.globalAlpha;
     ctx.lineCap = 'round';
 

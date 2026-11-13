@@ -50,6 +50,5 @@ export const SKILLS_VISUALS = {
         motes: 12
     },
     hex: { glow: 'rgba(168, 85, 247, 0.7)', spark: '#e9d5ff', beam: { color: '#d8b4fe', core: '#ffffff', glow: 'rgba(168, 85, 247, 0.4)' } },
-    wisp: { bone: '#e7e0cf', boneShade: '#a8a08c', eye: '#d946ef', flame: 'rgba(192, 38, 211, 0.75)', flameCore: 'rgba(240, 171, 252, 0.85)', scale: 1 },
     soulBolt: { glow: 'rgba(168, 85, 247, 0.9)', mid: '#c084fc', core: '#faf5ff' }
 };

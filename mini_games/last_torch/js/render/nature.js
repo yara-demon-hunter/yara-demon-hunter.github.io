@@ -1,8 +1,10 @@
+import { THORN_ROSES } from '../../data_model/passives.js';
 import { POWER_MODELS } from '../../data_model/powers.js';
-import { ctx, player, state } from '../core/state.js';
+import { ctx, player, powers, state } from '../core/state.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { makeCanvas } from './fx/sprites.js';
 import { resetWorldView, stamp } from './fx/stamp.js';
+import { drawRoseMark, drawThornPatch } from '../../library/weapons/thrown.js';
 import { getMonsterSprite, spriteFrame } from './monster_sprites.js';
 
 // --- DESENHO DAS SKILLS DA NATUREZA (js/systems/skills_nature.js) ---
@@ -239,45 +241,6 @@ function getEvilCrown() {
     return evilCrownSprite;
 }
 
-// Arbusto: massa de folhas baixa e redonda, com frutinhas
-const BUSH_W = 64;
-const BUSH_H = 44;
-let bushSprite = null;
-function getBush() {
-    if (bushSprite) return bushSprite;
-    bushSprite = makeCanvas(BUSH_W * PX, BUSH_H * PX, (g) => {
-        g.scale(PX, PX);
-        g.translate(BUSH_W / 2, BUSH_H * 0.62);
-        g.fillStyle = 'rgba(8, 20, 10, 0.4)';
-        g.beginPath();
-        g.ellipse(0, 7, 27, 6, 0, 0, TAU);
-        g.fill();
-        const blobs = [
-            [-17, 0, 11, '#14532d'], [17, 1, 11, '#14532d'], [0, 3, 13, '#14532d'], [-9, -7, 12, '#166534'], [10, -7, 12, '#166534'],
-            [0, -12, 12, '#15803d'], [-18, -6, 8, '#16a34a'], [19, -5, 8, '#16a34a'], [-5, -16, 7, '#22c55e'], [7, -15, 6, '#4ade80']
-        ];
-        for (const [x, y, r, color] of blobs) {
-            g.fillStyle = color;
-            g.beginPath();
-            g.ellipse(x, y, r, r * 0.8, 0, 0, TAU);
-            g.fill();
-        }
-        g.fillStyle = 'rgba(187, 247, 208, 0.45)';
-        for (const [x, y] of [[-14, -12], [4, -20], [-4, -6], [14, -10], [-20, -2]]) {
-            g.beginPath();
-            g.ellipse(x, y, 2.6, 1.4, -0.5, 0, TAU);
-            g.fill();
-        }
-        g.fillStyle = '#ef4444';
-        for (const [x, y] of [[-10, -4], [8, -3], [-1, -11], [15, 0]]) {
-            g.beginPath();
-            g.arc(x, y, 1.15, 0, TAU);
-            g.fill();
-        }
-    });
-    return bushSprite;
-}
-
 // Cogumelo de esporos: chapéu verde-limão com pintas
 const POD = 22;
 let podSprite = null;
@@ -320,7 +283,55 @@ function getPod() {
 }
 
 // --- CHÃO: sombra do carvalho, cogumelos e nuvens (antes dos monstros) ---
+// Dark Roses: a marca (um sprite) e as rosas de espinho no chão (3 sprites), montados uma vez
+const MARK_SIZE = 24;
+let markSprite = null;
+function getRoseMark() {
+    return markSprite ??= makeCanvas(MARK_SIZE * PX, MARK_SIZE * PX, (g) => {
+        g.scale(PX, PX);
+        g.translate(MARK_SIZE / 2, MARK_SIZE / 2);
+        drawRoseMark(g, 0);
+    });
+}
+const PATCH_W = 72;
+const PATCH_H = 58;
+const patchSprites = [];
+function getThornPatch(variant) {
+    return patchSprites[variant] ??= makeCanvas(PATCH_W * PX, PATCH_H * PX, (g) => {
+        g.scale(PX, PX);
+        g.translate(PATCH_W / 2, PATCH_H / 2);
+        drawThornPatch(g, variant);
+    });
+}
+
+function renderThornPatches() {
+    for (const p of N.thorns) {
+        const grow = Math.min(1, p.age / THORN_ROSES.growSeconds);
+        const fade = Math.min(1, (THORN_ROSES.patchSeconds - p.age) / 0.8);
+        const k = (0.5 + 0.5 * grow) * (2 - grow) * (THORN_ROSES.radius / 34);
+        ctx.globalAlpha = fade * grow;
+        ctx.drawImage(getThornPatch(p.variant), p.x - PATCH_W * k / 2, p.y - PATCH_H * k / 2, PATCH_W * k, PATCH_H * k);
+    }
+    ctx.globalAlpha = 1;
+}
+
+// A marca da Dark Roses fica flutuando sobre o monstro, piscando nos últimos segundos
+function renderRoseMarks() {
+    const t = performance.now() / 1000;
+    const sprite = getRoseMark();
+    for (const e of state.enemies) {
+        if (!(e.roseMark > 0) || e.hp <= 0) continue;
+        const dying = e.roseMark < 2 ? 0.45 + 0.55 * Math.abs(Math.sin(t * 8)) : 1;
+        const size = MARK_SIZE * (e.isBoss ? 1.4 : 1);
+        ctx.globalAlpha = dying;
+        // Acima da barra de vida, flutuando um pouco
+        ctx.drawImage(sprite, e.x - size / 2, e.y - e.radius - size * 1.25 + Math.sin(t * 3 + e.x) * 1.5, size, size);
+    }
+    ctx.globalAlpha = 1;
+}
+
 export function renderNatureGround() {
+    renderThornPatches();
     if (N.oaks.length === 0 && N.pods.length === 0 && N.clouds.length === 0) return;
     const t = performance.now() / 1000;
     for (const oak of N.oaks) {
@@ -383,9 +394,12 @@ export function renderRoots() {
 const WOLF_RADIUS = 12;
 export function renderSpiritWolves() {
     if (N.wolves.length === 0) return;
-    const sprite = getMonsterSprite('SHADOW_WOLF');
+    // The White Wolf (evolução): arte própria, o lobo branco (_library/buddies/white_wolf), montada só quando evolui
+    const white = powers.spiritWolves.evolved;
+    const sprite = getMonsterSprite(white ? 'BUDDY_WHITE_WOLF' : 'BUDDY_SHADOW_WOLF');
     if (!sprite?.atlas) return;
     const t = performance.now() / 1000;
+    const atlas = sprite.atlas;
     const base = sprite.worldSize * (WOLF_RADIUS / sprite.radius);
     const live = N.wolves.filter(w => !w.dead);
     // Sombras no chão e brilhos
@@ -394,7 +408,7 @@ export function renderSpiritWolves() {
         ctx.beginPath();
         ctx.ellipse(w.x, w.y + 6, 9 - w.lift * 0.3, 3.4, 0, 0, TAU);
         ctx.fill();
-        drawGlow(ctx, 'rgba(74, 222, 128, 0.85)', w.x, w.y - w.lift, w.mode === 'hunt' ? 28 : 22, (w.mode === 'hunt' ? 0.6 : 0.4) * Math.min(1, w.age * 2));
+        drawGlow(ctx, white ? 'rgba(220, 238, 255, 0.9)' : 'rgba(74, 222, 128, 0.85)', w.x, w.y - w.lift, w.mode === 'hunt' ? 28 : 22, (w.mode === 'hunt' ? 0.6 : 0.4) * Math.min(1, w.age * 2));
     }
     // Rastro da corrida: imagens que vão sumindo
     for (const w of live) {
@@ -403,7 +417,7 @@ export function renderSpiritWolves() {
         for (let k = w.trail.length - 1; k >= 1; k--) {
             const p = w.trail[k];
             ctx.globalAlpha = 0.3 * (1 - k / w.trail.length);
-            stamp(sprite.atlas, f.sx, f.sy, sprite.cell, sprite.cell, p.x, p.y - w.lift * 0.6, f.rotation, base * 1.1, base * 1.1);
+            stamp(atlas, f.sx, f.sy, sprite.cell, sprite.cell, p.x, p.y - w.lift * 0.6, f.rotation, base, base);
         }
     }
     for (const w of live) {
@@ -411,9 +425,10 @@ export function renderSpiritWolves() {
         const cycle = w.moving ? (t / (sprite.spec.playSeconds ?? 0.4) / (w.mode === 'hunt' ? 0.7 : 1) + w.seed) % 1 : 0;
         const f = spriteFrame(sprite, w.angle, cycle);
         const bump = w.bit > 0 ? 6 * (w.bit / 0.2) : 0;
-        const size = base * ((running ? 1.18 : 1) + 0.04 * Math.sin(t * 5 + w.seed));
+        // O tamanho nunca muda: sem esticar na corrida nem pulsar (o lobo é sempre do mesmo tamanho)
+        const size = base;
         ctx.globalAlpha = 0.92;
-        stamp(sprite.atlas, f.sx, f.sy, sprite.cell, sprite.cell, w.x + Math.cos(w.angle) * bump, w.y - w.lift + Math.sin(w.angle) * bump, f.rotation, size * (running ? 1.15 : 1), size);
+        stamp(atlas, f.sx, f.sy, sprite.cell, sprite.cell, w.x + Math.cos(w.angle) * bump, w.y - w.lift + Math.sin(w.angle) * bump, f.rotation, size, size);
         // Ferido: um clarão vermelho por cima
         if (w.hurt > 0) {
             ctx.globalAlpha = Math.min(0.6, w.hurt * 3);
@@ -457,28 +472,98 @@ export function renderSpiritWolves() {
     }
 }
 
-// --- VIDEIRAS E CARVALHO (depois do herói) ---
-export function renderNatureFront() {
-    if (N.vines.length > 0 && !player.hidden) {
-        const t = performance.now() / 1000;
-        ctx.lineCap = 'round';
-        for (const [color, width] of VINE_STROKES) {
-            ctx.strokeStyle = color;
-            ctx.lineWidth = width;
+// Leech Vine: uma trepadeira com espinhos do herói até cada monstro. O caule balança, os espinhos (curvos para trás, como
+// farpas) se alternam dos dois lados, um pulso de seiva sobe do monstro para o herói e na ponta ficam garras de espinho.
+const THORN_FILL = '#d9f99d';
+const THORN_EDGE = '#14532d';
+function renderLeechVines(t) {
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    const curves = N.vines.map((e, i) => ({
+        e,
+        x0: player.x,
+        y0: player.y - 16,
+        mx: (player.x + e.x) / 2 + Math.sin(t * 3 + i * 2.1) * 12,
+        my: (player.y - 16 + e.y) / 2 - 14 + Math.cos(t * 2.3 + i) * 6,
+        x1: e.x,
+        y1: e.y
+    }));
+    // O caule: três traços (sombra, folha, brilho) para todas as videiras de uma vez
+    for (const [color, width] of VINE_STROKES) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        for (const c of curves) {
+            ctx.moveTo(c.x0, c.y0);
+            ctx.quadraticCurveTo(c.mx, c.my, c.x1, c.y1);
+        }
+        ctx.stroke();
+    }
+    ctx.lineWidth = 0.7;
+    ctx.strokeStyle = THORN_EDGE;
+    ctx.fillStyle = THORN_FILL;
+    curves.forEach((c, i) => {
+        const length = Math.hypot(c.x1 - c.x0, c.y1 - c.y0);
+        const count = Math.max(4, Math.min(18, Math.round(length / 10)));
+        for (let k = 1; k < count; k++) {
+            const u = k / count;
+            const v = 1 - u;
+            const px = v * v * c.x0 + 2 * v * u * c.mx + u * u * c.x1;
+            const py = v * v * c.y0 + 2 * v * u * c.my + u * u * c.y1;
+            let tx = 2 * v * (c.mx - c.x0) + 2 * u * (c.x1 - c.mx);
+            let ty = 2 * v * (c.my - c.y0) + 2 * u * (c.y1 - c.my);
+            const n = Math.hypot(tx, ty) || 1;
+            tx /= n;
+            ty /= n;
+            const side = k % 2 ? 1 : -1;
+            const nx = -ty * side;
+            const ny = tx * side;
+            const size = 6 + 2 * Math.sin(k * 2.7 + i);
+            // Farpa: a base no caule e a ponta para fora, inclinada para o herói
             ctx.beginPath();
-            N.vines.forEach((e, i) => {
-                const mx = (player.x + e.x) / 2 + Math.sin(t * 3 + i * 2.1) * 12;
-                const my = (player.y - 16 + e.y) / 2 - 14 + Math.cos(t * 2.3 + i) * 6;
-                ctx.moveTo(player.x, player.y - 16);
-                ctx.quadraticCurveTo(mx, my, e.x, e.y);
-            });
+            ctx.moveTo(px - tx * 2.2, py - ty * 2.2);
+            ctx.lineTo(px + nx * size - tx * 3, py + ny * size - ty * 3);
+            ctx.lineTo(px + tx * 2.2, py + ty * 2.2);
+            ctx.closePath();
+            ctx.fill();
             ctx.stroke();
         }
-        for (const e of N.vines) drawGlow(ctx, 'rgba(74, 222, 128, 0.7)', e.x, e.y, 10, 0.6);
+        // Pulso de seiva do monstro para o herói
+        for (let k = 0; k < 2; k++) {
+            const u = 1 - ((t * 1.3 + i * 0.37 + k * 0.5) % 1);
+            const v = 1 - u;
+            const px = v * v * c.x0 + 2 * v * u * c.mx + u * u * c.x1;
+            const py = v * v * c.y0 + 2 * v * u * c.my + u * u * c.y1;
+            drawGlow(ctx, 'rgba(190, 242, 100, 0.9)', px, py, 5, 0.7);
+        }
+        // Garras de espinho onde a videira agarra o monstro
+        const spin = t * 1.5 + i;
+        for (let k = 0; k < 5; k++) {
+            const a = spin + (k / 5) * TAU;
+            const cx = c.x1;
+            const cy = c.y1 - 2;
+            ctx.beginPath();
+            ctx.moveTo(cx + Math.cos(a - 0.3) * 4.5, cy + Math.sin(a - 0.3) * 4.5);
+            ctx.lineTo(cx + Math.cos(a) * 13, cy + Math.sin(a) * 13);
+            ctx.lineTo(cx + Math.cos(a + 0.3) * 4.5, cy + Math.sin(a + 0.3) * 4.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+        drawGlow(ctx, 'rgba(74, 222, 128, 0.7)', c.x1, c.y1, 10, 0.55);
+    });
+}
+
+
+// --- VIDEIRAS E CARVALHO (depois do herói) ---
+export function renderNatureFront() {
+    renderRoseMarks();
+    if (N.vines.length > 0 && !player.hidden) {
+        renderLeechVines(performance.now() / 1000);
     }
-    if (N.seed?.target?.hp > 0) {
-        const seed = N.seed;
+    for (const seed of N.seeds) {
         const target = seed.target;
+        if (!(target.hp > 0)) continue;
         let x;
         let y;
         if (seed.attached) {
@@ -577,17 +662,5 @@ export function renderNatureFront() {
         ctx.fillStyle = oak.awake > 0.5 ? '#f87171' : '#4ade80';
         ctx.fillRect(oak.x - 16, oak.y + 9, 32 * ratio, 3.5);
     }
-    // Arbusto: o herói escondido fica visível por dentro (a folhagem fica translúcida)
-    for (const b of N.bushes) {
-        const grow = Math.min(1, b.age / POWER_MODELS.hidingBush.growSeconds);
-        const fade = Math.min(1, (b.seconds - b.age) / 0.6);
-        const k = grow * (2 - grow);
-        const rustle = b.rustle > 0 ? Math.sin(b.rustle * 60) * 2.2 : 0;
-        const w = BUSH_W * (b.radius / 36) * 0.9 * k;
-        const h = BUSH_H * (b.radius / 36) * 0.9 * k;
-        ctx.globalAlpha = fade * (N.hideIn === b ? 0.5 : 0.95);
-        ctx.drawImage(getBush(), b.x - w / 2 + rustle, b.y - h * 0.8, w, h);
-        ctx.globalAlpha = 1;
-    }
 }
-const VINE_STROKES = [['rgba(5, 46, 22, 0.85)', 4.5], ['#16a34a', 2.4], ['#86efac', 0.9]];
+const VINE_STROKES = [['rgba(5, 46, 22, 0.85)', 5], ['#16a34a', 2.8], ['#86efac', 1]];

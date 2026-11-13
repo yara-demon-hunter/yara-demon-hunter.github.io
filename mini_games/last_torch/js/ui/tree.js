@@ -139,7 +139,7 @@ function createTreeView(cfg) {
     }
 
     // Lista do que falta (e do que já foi cumprido), uma linha por pedido. Vazia se tudo está cumprido.
-    function renderNote(st) {
+    function renderNote(st, node) {
         const note = detail('Note');
         note.replaceChildren();
         const add = (met, text) => {
@@ -151,7 +151,7 @@ function createTreeView(cfg) {
         if (st.restricted) {
             const line = document.createElement('span');
             line.className = 'is-sealed';
-            line.textContent = `⊘ ${getRestrictionText()}`;
+            line.textContent = `⊘ ${getRestrictionText(node)}`;
             const pass = document.createElement('span');
             pass.className = 'is-met';
             pass.textContent = '✔ Free pass: the skills after it stay open.';
@@ -183,7 +183,7 @@ function createTreeView(cfg) {
         detail('Desc').textContent = info.desc;
         if (detail('Branch')) detail('Branch').textContent = branches[node.branch].style;
         detail('Next').textContent = next ? `Next: ${next}` : '';
-        renderNote(st);
+        renderNote(st, node);
         buy.classList.toggle('hidden', st.maxed || st.restricted);
         buy.disabled = !st.canBuy;
         const symbol = st.currency === 'gold' ? '🪙' : '⚡';

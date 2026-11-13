@@ -6,6 +6,7 @@ import './pebbles/pebbles.js';
 import './root/root.js';
 import './stump/stump.js';
 import './rock/rock.js';
+import './bush/bush.js';
 import './fern/fern.js';
 import './grass/grass.js';
 import './mushroom/mushroom.js';

@@ -155,15 +155,18 @@ export const PASSIVE_SKILL_MODELS = {
             return `A monster that dies while pinned by roots bursts into thorns: ${formatMultiplier(THORN_BURST.damage)} spell damage to everything within ${THORN_BURST.radius} range.`;
         }
     },
-    thornBark: {
-        name: 'Thorn Bark',
-        icon: '🪵',
-        cost: 110,
+    // Só o Rowan (hero: 'rowan' no nó da árvore): as rosas escurecem e ferem mais. Vale como mod de dano da adaga (knifeDamage),
+    // então soma com o Dagger Mastery e tudo o mais que melhora a adaga
+    darkRoses: {
+        name: 'Dark Roses',
+        icon: '🥀',
+        cost: 140,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         get desc() {
-            return `Your oak fights back: a monster that strikes it takes ${formatMultiplier(THORN_BARK.damage)} spell damage and is pinned by roots for ${THORN_BARK.rootSeconds}s.`;
-        }
+            return `Your roses wither and turn black: +${formatPercent(this.mods.knifeDamage)} dagger damage, and a monster they hit is marked with a black rose for ${THORN_ROSES.markSeconds}s. If it dies marked, thorn roses burst from the ground where it fell and hurt everything that crosses them for ${THORN_ROSES.patchSeconds}s. Only Rowan can learn this. Every skill that improves daggers works on roses.`;
+        },
+        mods: { knifeDamage: 0.6 }
     },
     oathWild: {
         name: 'Oath of the Wild',
@@ -369,7 +372,9 @@ export const PASSIVE_SKILL_MODELS = {
 
 // Natureza: o estouro de espinhos e a casca do carvalho (js/systems/skills_nature.js)
 export const THORN_BURST = { radius: 80, damage: 1.2, knockback: 90 };
-export const THORN_BARK = { damage: 0.8, rootSeconds: 1 };
+// Dark Roses (só o Rowan): o monstro atingido por uma rosa negra fica marcado por markSeconds; se morrer marcado, brotam rosas de
+// espinho no lugar (patchSeconds) que ferem quem passa (damage = dano da adaga x isto, a cada tickSeconds) e desaceleram
+export const THORN_ROSES = { markSeconds: 10, patchSeconds: 5, radius: 34, damage: 0.35, tickSeconds: 0.5, slow: 0.35, growSeconds: 0.25 };
 
 // --- ACAMPAMENTO ---
 // Fim de cada hora: o ouro compra relíquias na árvore do acampamento e também alimenta a tocha.

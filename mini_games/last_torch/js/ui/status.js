@@ -9,7 +9,7 @@ import {
 } from '../systems/stats.js';
 import { getHero } from '../systems/modifiers.js';
 import { getHourName } from '../../data_model/night.js';
-import { STAT_GROUPS } from './stat_sheet.js';
+import { STAT_GROUPS, getFuryGroup } from './stat_sheet.js';
 
 // --- STATUS ---
 // O medalhão pausa a partida e mostra a build: stats, poderes e relíquias. Som, efeitos e controles ficam em settings.js.
@@ -44,10 +44,16 @@ function createStatRow({ name, note, level, value, empty, tone }) {
 function renderStats() {
     const list = document.getElementById('shopList');
     list.innerHTML = '';
-    STAT_GROUPS.forEach(({ title, rows }) => {
+    [getFuryGroup(), ...STAT_GROUPS].filter(Boolean).forEach(({ title, summary, rows }) => {
         const heading = document.createElement('h3');
         heading.className = 'stat-group';
         heading.textContent = title;
+        if (summary) {
+            const note = document.createElement('span');
+            note.className = 'stat-group-note';
+            note.textContent = ` - ${summary}`;
+            heading.appendChild(note);
+        }
         list.appendChild(heading);
         rows.forEach(row => {
             const attr = attributes[row.attr];

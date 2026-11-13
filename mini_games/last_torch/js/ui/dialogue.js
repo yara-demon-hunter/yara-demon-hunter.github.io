@@ -139,15 +139,22 @@ export function playDuelDialogue(bossType, moment, onDone) {
 }
 
 // Provocação antes de um boss que não é o rival: quem fala é o rival do herói (RIVAL_OF). Sem falas, segue direto.
+// As falas de cada herói (byHero) valem primeiro; sem elas, as do rival para todos
+function introScript(rival, bossType) {
+    const set = BOSS_INTROS[rival];
+    const own = set?.byHero?.[getHero().model];
+    return own?.[bossType] ?? own?.default ?? set?.[bossType] ?? set?.default;
+}
+
 export function hasBossIntro(bossType) {
     const rival = RIVAL_OF[getHero().model] ?? RIVAL_OF.hunter;
-    return !!(BOSS_INTROS[rival]?.[bossType] ?? BOSS_INTROS[rival]?.default);
+    return !!introScript(rival, bossType);
 }
 
 export function playBossIntro(bossType, onDone) {
     const rival = RIVAL_OF[getHero().model] ?? RIVAL_OF.hunter;
     const boss = BOSS_MODELS[bossType];
-    play(BOSS_INTROS[rival]?.[bossType] ?? BOSS_INTROS[rival]?.default, rival, true, onDone, { name: boss.name, portraitImage: boss.portraitImage });
+    play(introScript(rival, bossType), rival, true, onDone, { name: boss.name, portraitImage: boss.portraitImage });
 }
 
 // rivalType: o boss do rival (AZAEL ou DEMON_HUNTER), de onde vem o retrato dele

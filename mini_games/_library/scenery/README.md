@@ -50,7 +50,7 @@ entram pela borda). Quem quiser a moldura da câmera lateral (como no yara-rpg) 
 ## Peças: o que compõe um cenário (`props/`)
 
 Um cenário não precisa desenhar cada pedra e cada cogumelo: ele escolhe **peças** da biblioteca (`scenery/props/<id>/`), no mesmo
-molde dos monstros: desenho, valores padrão e ficha. Hoje: musgo, folha caída, pedrinha, raiz, toco, pedra (**estáticas**, carimbadas
+molde dos monstros: desenho, valores padrão e ficha. Hoje: musgo, folha caída, pedrinha, raiz, toco, pedra, arbusto (**estáticas**, carimbadas
 no chão uma vez) e samambaia, capim, cogumelo que brilha (**animadas**, atlas de poucos quadros). O catálogo está no Ateliê
 (`tools/prop_tuner.html`), com cada peça de perto, ao vivo e com todos os quadros.
 

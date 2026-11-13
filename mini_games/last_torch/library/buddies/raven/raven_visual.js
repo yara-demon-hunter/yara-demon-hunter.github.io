@@ -1,5 +1,6 @@
-// --- DADOS VISUAIS: corvo do Shadow Raven. ---
-// Lidos por js/render/raven.js. Só afeta o desenho.
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/buddies/raven/raven_visual.js e rode o sync.
+// --- DADOS VISUAIS: o Corvo (buddy) ---
+// Lidos por raven.js. Só afeta o desenho: tamanho, quadros, cores das penas, brilho e penas soltas.
 export const RAVEN_VISUALS = {
     scale: 0.62,                // tamanho no mundo em relação à arte (pequeno: do tamanho de uma sombra no ombro)
     frames: 12,                 // quadros de uma batida de asa

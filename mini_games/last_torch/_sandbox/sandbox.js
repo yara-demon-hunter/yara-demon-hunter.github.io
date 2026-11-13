@@ -9,6 +9,8 @@ import { player, state } from '/js/core/state.js';
 import { addMonster, spawnBoss } from '/js/systems/spawner.js';
 import { startHour } from '/js/systems/night.js';
 import { startGame } from '/js/ui/screens.js';
+import { flushHeroUnlocks, queueHeroUnlock } from '/js/ui/hero_unlock.js';
+import { ACHIEVEMENTS } from '/data_model/sanctuary.js';
 
 const choice = { hero: ACTIVE_HEROES[0], boss: 'AZAEL' };
 const picked = new Set();               // monstros escolhidos para a luta (vários, clicando)
@@ -41,6 +43,9 @@ panel.innerHTML = `
     <label class="sb-field">God mode: torch (never goes out) <input id="sbGodTorch" type="checkbox" checked></label>
     <label class="sb-field">God mode: monsters (never die) <input id="sbGodMonsters" type="checkbox" checked></label>
     <button id="sbGo">⚔️ Start fight</button>
+    <h3>Preview: hero unlocked <small>(the real reward screen)</small></h3>
+    <div class="sb-row" id="sbUnlocks"></div>
+    <label class="sb-field">As seen mid-run, at camp (no PLAY AS button) <input id="sbUnlockCamp" type="checkbox"></label>
   </div>`;
 document.body.appendChild(panel);
 
@@ -76,6 +81,30 @@ function fillMonsters() {
     });
 }
 fillMonsters();
+
+// Prévia do prêmio de personagem liberado: o mesmo evento do jogo (js/ui/hero_unlock.js), para qualquer herói
+function previewUnlock(key) {
+    const before = state.gameState;
+    state.gameState = value('#sbUnlockCamp').checked ? 'CAMP' : 'START';     // CAMP = visto no meio da noite
+    panel.classList.add('hidden');
+    queueHeroUnlock(key, ACHIEVEMENTS.find(a => a.hero === key));
+    flushHeroUnlocks();
+    const watch = new MutationObserver(() => {
+        if (document.querySelector('.hero-unlock')) return;
+        watch.disconnect();
+        state.gameState = before;
+        panel.classList.remove('hidden');
+    });
+    watch.observe(document.body, { childList: true });
+}
+const unlockHost = panel.querySelector('#sbUnlocks');
+Object.entries(HEROES).filter(([, h]) => !h.shelved).forEach(([key, hero]) => {
+    const b = document.createElement('button');
+    b.className = 'sb-opt';
+    b.textContent = hero.name;
+    b.onclick = () => previewUnlock(key);
+    unlockHost.appendChild(b);
+});
 
 function value(id) { return panel.querySelector(id); }
 

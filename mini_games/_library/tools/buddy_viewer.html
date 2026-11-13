@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca · Buddies</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0c0a06; color: #d6cfbf; font-family: system-ui, sans-serif; }
+        .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 16px 60px; }
+        a.back { color: #a39b86; font-size: 13px; text-decoration: none; }
+        h1 { margin: 6px 0 4px; font-size: 26px; color: #fde68a; }
+        .lead { margin: 0 0 20px; color: #a39b86; font-size: 14px; line-height: 1.5; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+        .card { background: #17140d; border: 1px solid #2a2418; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+        .card h2 { margin: 0; font-size: 17px; color: #fde68a; }
+        .card p { margin: 0; font-size: 12.5px; line-height: 1.45; color: #a39b86; }
+        canvas { width: 100%; aspect-ratio: 4 / 3; border-radius: 8px; background: radial-gradient(circle at 50% 60%, #2b3a2c, #0b100c 85%); image-rendering: auto; }
+        .row { display: flex; flex-wrap: wrap; gap: 6px; }
+        button, a.btn {
+            padding: 6px 11px; font-size: 12.5px; color: #e7dfcc; background: #231e12; border: 1px solid #3a3322; border-radius: 999px;
+            cursor: pointer; text-decoration: none;
+        }
+        button:hover, a.btn:hover { border-color: #fbbf24; }
+        button.on { border-color: #fbbf24; background: #3a2c0c; }
+        code { color: #c9c0aa; }
+        .note { margin-top: 24px; font-size: 12.5px; line-height: 1.6; color: #a39b86; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <a class="back" href="index.html">← Ateliê</a>
+    <h1>Buddies</h1>
+    <p class="lead">Quem anda e luta ao lado do herói. Aves e caveira são desenhos 2D animados (aqui, a 3x); os lobos são bonecos 2.5D e abrem no tuner,
+        onde dá para ajustar medidas e cores ao vivo. O que cada um FAZ (vida, mordida, mira) fica no jogo.</p>
+    <div class="grid" id="grid"></div>
+    <p class="note">Arte: <code>mini_games/_library/buddies/&lt;id&gt;/</code> (desenho, cores e <code>art_reference/</code> com a ficha <code>buddy.md</code> e <code>images/</code>).
+        Depois de mudar um <code>_visual.js</code>, rode <code>ruby mini_games/_library/sync.rb</code>.</p>
+</div>
+<script type="module">
+    import { preparePhoenix, renderPhoenixBuddy, prepareRaven, renderRavenBuddy, drawGraveWisp } from '../buddies/index.js';
+
+    const grid = document.getElementById('grid');
+    const W = 360;
+    const H = 270;
+    const state = { phoenix: { action: false, rise: false }, raven: { action: false, rise: false }, wisp: { action: false } };
+
+    function card(id, title, text, extra) {
+        const box = document.createElement('div');
+        box.className = 'card';
+        const canvas = document.createElement('canvas');
+        canvas.width = W * 2;
+        canvas.height = H * 2;
+        const row = document.createElement('div');
+        row.className = 'row';
+        const h = document.createElement('h2');
+        h.textContent = title;
+        const p = document.createElement('p');
+        p.textContent = text;
+        box.append(h, canvas, row, p);
+        grid.appendChild(box);
+        return { canvas, row };
+    }
+    function toggle(row, label, key, prop) {
+        const b = document.createElement('button');
+        b.textContent = label;
+        b.onclick = () => { state[key][prop] = !state[key][prop]; b.classList.toggle('on', state[key][prop]); };
+        row.appendChild(b);
+    }
+    function link(row, label, href) {
+        const a = document.createElement('a');
+        a.className = 'btn';
+        a.textContent = label;
+        a.href = href;
+        row.appendChild(a);
+    }
+
+    // Fênix
+    const ph = card('phoenix', 'Fênix', 'Ave de fogo do Phoenix Pact: 16 quadros de batida de asa num atlas, brilho laranja e fagulhas.');
+    toggle(ph.row, 'Atirando (bico brilha)', 'phoenix', 'action');
+    toggle(ph.row, 'Nascendo (cresce da brasa)', 'phoenix', 'rise');
+    // Corvo
+    const rv = card('raven', 'Corvo', 'Ave do Shadow Raven: 12 quadros de batida, brilho violeta; mergulhando, bate mais rápido e solta penas.');
+    toggle(rv.row, 'Mergulhando', 'raven', 'action');
+    toggle(rv.row, 'Nascendo (cresce da sombra)', 'raven', 'rise');
+    // Caveira
+    const ws = card('wisp', 'Caveira voadora (Grave Wisp)', 'Caveira em chamas roxas que acompanha o herói; a chama cresce quando ela atira.');
+    toggle(ws.row, 'Atirando (chama cresce)', 'wisp', 'action');
+    // Lobos (2.5D): abrem no tuner
+    for (const [id, title, text] of [
+        ['buddy_shadow_wolf', 'Shadow Wolf', 'O lobo do Rowan: negro, peludo, agachado, olhos vermelhos e chama roxa escura. Boneco 2.5D.'],
+        ['white_wolf', 'The White Wolf', 'A evolução do Shadow Wolf: lobo branco-prateado com névoa clara. Boneco 2.5D.']
+    ]) {
+        const c = card(id, title, text);
+        c.canvas.remove();
+        link(c.row, 'Abrir no tuner (ajustar ao vivo)', `tuner.html?model=${id}`);
+    }
+
+    const sizes = { phoenix: ph.canvas, raven: rv.canvas, wisp: ws.canvas };
+    const t0 = performance.now();
+    preparePhoenix(false);
+    prepareRaven(false);
+    function frame() {
+        const t = (performance.now() - t0) / 1000;
+        for (const [key, canvas] of Object.entries(sizes)) {
+            const g = canvas.getContext('2d');
+            g.setTransform(1, 0, 0, 1, 0, 0);
+            g.clearRect(0, 0, canvas.width, canvas.height);
+            g.setTransform(6, 0, 0, 6, 0, 0);       // 3x do tamanho de campo (e 2x de pixels na tela)
+            const cx = W / 6 + 10;
+            const cy = H / 6 + (key === 'phoenix' ? -2 : 14);       // a cauda da fênix é comprida: sobe um pouco
+            const rise = state[key].rise ? Math.min(1, (t % 3) / 1.6) : 1;
+            if (key === 'phoenix') renderPhoenixBuddy(g, { x: cx, y: cy, facing: 1, tilt: Math.sin(t * 1.4) * 0.12, flash: state.phoenix.action ? 1 : 0, rise }, 0);
+            if (key === 'raven') renderRavenBuddy(g, { x: cx, y: cy, facing: 1, tilt: Math.sin(t * 1.6) * 0.1 - (state.raven.action ? 0.3 : 0), dive: state.raven.action ? 1 : 0, rise });
+            if (key === 'wisp') drawGraveWisp(g, cx, cy, t, state.wisp.action ? 1 : 0);
+        }
+        requestAnimationFrame(frame);
+    }
+    frame();
+</script>
+</body>
+</html>

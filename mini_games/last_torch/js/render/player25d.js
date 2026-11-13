@@ -6,11 +6,11 @@ import { OATH_VISUALS } from '../../data_model/visuals/characters/oath_visual.js
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
 import { getPowerLevel } from '../../data_model/powers.js';
 import { ctx, passives, player, powers, state } from '../core/state.js';
-import { getFireCastRatio, getKnifeChargeRatio } from '../systems/knives.js';
+import { getFireCastRatio, getKnifeChargeRatio, getThrownStyle } from '../systems/knives.js';
 import { drawFireOrb, drawFlameTongue } from './fire.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { drawGearGround, gearParts } from './hero_gear.js';
-import { drawDagger } from './knife.js';
+import { getThrownWeapon } from '../../library/weapons/thrown.js';
 import { heroAnim } from './player.js';
 import './bodies.js';
 
@@ -31,7 +31,7 @@ function drawHeldDagger(rig, shoulder, hand, t) {
     ctx.translate(p0.x, p0.y);
     ctx.rotate(Math.atan2(p1.y - p0.y, p1.x - p0.x));
     ctx.scale(KNIFE_VISUALS.handScale * Math.max(0.35, fore), KNIFE_VISUALS.handScale);
-    drawDagger(ctx, t);
+    getThrownWeapon(getThrownStyle()).draw(ctx, t);
     ctx.restore();
 }
 

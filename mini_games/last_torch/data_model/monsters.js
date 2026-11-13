@@ -298,6 +298,14 @@ export const MONSTER_SPAWNING = {
     separationStrength: 60
 };
 
+// Buddies que usam o sistema de sprites dos monstros (os lobos do Rowan; a arte mora em library/buddies). NÃO são monstros: não
+// nascem, não entram no bestiário nem em MONSTER_MODELS. js/render/monster_sprites.js monta o sprite deles sob demanda.
+//   BUDDY_SHADOW_WOLF: o Shadow Wolf (poder do Nature)   BUDDY_WHITE_WOLF: The White Wolf (a evolução dele)
+export const BUDDY_MODELS = {
+    BUDDY_SHADOW_WOLF: { radius: 12, color: '#3d3a55' },
+    BUDDY_WHITE_WOLF: { radius: 12, color: '#e2e8f0' }
+};
+
 const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {

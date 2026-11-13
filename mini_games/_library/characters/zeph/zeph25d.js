@@ -3,6 +3,7 @@ import { registerBody } from '../hunter/body_registry.js';
 import * as KIT from '../hunter/kit25d.js';
 import { drawEar as azaelEar, wrap as azaelWrap } from '../azael/azael25d.js';
 import { ctx } from '../../core/canvas.js';
+import { drawDagger } from '../../weapons/dagger/dagger.js';
 
 // Geometria compartilhada (hunter/kit25d.js) e a orelha e a bandagem do Azael
 const K = { ...KIT, drawEar: azaelEar, wrap: azaelWrap };
@@ -394,37 +395,6 @@ function drawZephTorso(rig, pose, bottom, top, wb, wt) {
     ctx.fill();
 }
 
-// --- ADAGA ---
-// Lâmina curta, reta e pontuda, guarda pequena de ferro e cabo de couro. hand = mão no cabo, dir = direção da lâmina.
-function drawZephDagger(rig, hand, dir, alpha) {
-    const { project, limb, ball, C } = rig;
-    const at = (d) => add(hand, dir, d);
-    const flat = Math.hypot(dir[0], dir[1]) || 1;
-    const w = [-dir[1] / flat, dir[0] / flat, 0];
-    const L = Z.bladeLength;
-    const half = Z.bladeWidth / 2;
-    const baseAlpha = ctx.globalAlpha;
-    ctx.globalAlpha = baseAlpha * alpha;
-
-    limb([at(-1.6), at(0.1)], 0.85, C.grip);
-    ball(at(-1.75), 0.42, C.guard);
-    limb([add(at(0.35), w, -0.85), add(at(0.35), w, 0.85)], 0.55, C.guard);
-
-    const side = (d, k) => project(...add(at(d), w, k));
-    const tip = project(...at(L));
-    const shape = [side(0.6, -half), side(L - 1.4, -half * 0.85), tip, side(L - 1.4, half * 0.85), side(0.6, half)];
-    ctx.fillStyle = C.blade;
-    ctx.strokeStyle = C.outline;
-    ctx.lineWidth = 0.22;
-    ctx.beginPath();
-    shape.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    limb([at(1), at(L - 1.6)], 0.25, C.bladeCore);
-    ctx.globalAlpha = baseAlpha;
-}
-
 // --- REGISTRO DO BONECO (lido por ../hunter/hero25d.js; interface em ../hunter/body_registry.js) ---
 registerBody('zeph', {
     vis: Z,
@@ -440,6 +410,6 @@ registerBody('zeph', {
         return { hand, dir: m.map(v => v / size) };
     },
     drawArm: (rig, shoulder, elbow, hand, armWidth, handRadius) => drawZephArm(rig, shoulder, elbow, hand, armWidth, handRadius),
-    drawBlade: (rig, hand, dir, alpha) => drawZephDagger(rig, hand, dir, alpha),
+    drawBlade: (rig, hand, dir, alpha) => drawDagger(rig, hand, dir, alpha, Z),
     headParts: (pose, rig) => zephHeadParts(pose, rig)
 });

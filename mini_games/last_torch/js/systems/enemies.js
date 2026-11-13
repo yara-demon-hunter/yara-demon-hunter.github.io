@@ -311,7 +311,6 @@ export function updateEnemies(dt) {
     // Provoke e Oath of Slaughter: o herói chama a horda de mais longe
     const provoked = MONSTER_SPAWNING.targetPlayerDistance * (1 + mod('provoke'));
     const lure = state.nature.lure;
-    const hidden = state.nature.hideIn;
 
     for (let i = enemies.length - 1; i >= 0; i--) {
         const e = enemies[i];
@@ -331,9 +330,8 @@ export function updateEnemies(dt) {
         const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
         // Arbusto da emboscada: com o herói escondido, o monstro comum não o vê e segue para a tocha. Carvalho acordado: o
         // monstro por perto vai bater nele. Boss não se deixa enganar
-        const blind = hidden && !e.isBoss && !model.isShadow;
         const lured = lure && !e.isBoss && !model.ignoresPlayer && Math.hypot(lure.x - e.x, lure.y - e.y) < lure.lures;
-        const huntsPlayer = !blind && !model.ignoresPlayer && distToPlayer < provoked;
+        const huntsPlayer = !model.ignoresPlayer && distToPlayer < provoked;
         const targetX = lured ? lure.x : huntsPlayer ? player.x : state.coreX;
         const targetY = lured ? lure.y : huntsPlayer ? player.y : state.coreY;
         const distToTarget = Math.hypot(targetX - e.x, targetY - e.y);

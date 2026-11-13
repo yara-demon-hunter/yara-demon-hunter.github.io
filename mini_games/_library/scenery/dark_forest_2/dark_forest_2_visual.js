@@ -27,7 +27,9 @@ export const DARK_FOREST_2_VISUALS = {
         { prop: 'rock', per100kPx: 0.4, avoidCenter: 90, maxTries: 60 },
         { prop: 'fern', per100kPx: [0.8, 0.45, 0.2], frames: [10, 6, 4], variants: 3, size: 1.8, cycleSeconds: 3.4, avoidCenter: 70 },
         { prop: 'grass', per100kPx: [1.4, 0.7, 0], frames: [8, 6, 4], variants: 3, size: 1.7, cycleSeconds: 3.4, avoidCenter: 70 },
-        { prop: 'mushroom', per100kPx: [0.5, 0.3, 0.15], frames: [8, 6, 4], variants: 2, size: 1.9, cycleSeconds: 2.6, avoidCenter: 70 }
+        { prop: 'mushroom', per100kPx: [0.5, 0.3, 0.15], frames: [8, 6, 4], variants: 2, size: 1.9, cycleSeconds: 2.6, avoidCenter: 70 },
+        // Arbustos: só enfeite (antigo poder Ambush Bush); no fim da receita para não mexer no sorteio das outras peças
+        { prop: 'bush', per100kPx: 0.2, avoidCenter: 90, maxTries: 60 }
     ],
 
     // Vento (a mesma lógica da floresta: rajadas que viajam pela tela)

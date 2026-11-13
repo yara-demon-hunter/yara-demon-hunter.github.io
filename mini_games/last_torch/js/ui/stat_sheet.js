@@ -1,12 +1,14 @@
+import { CHARACTER_BASES } from '../../data_model/characters/index.js';
+import { FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
 import { TREE_POINTS } from '../../data_model/tree.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { save } from '../core/save.js';
 import { state } from '../core/state.js';
 import { getKnifeRange } from '../systems/knives.js';
-import { mod } from '../systems/modifiers.js';
+import { getHero, mod } from '../systems/modifiers.js';
 import {
     getCritChance, getCritMultiplier, getDamageTakenRatio, getDashCharges, getDashCooldown, getKillHeal, getKnifeCooldown,
-    getKnifeDamage, getMagnetRadius, getSpellCooldown, getSpellDamage, getWarmthDamage, getWarmthHeal, getWarmthRadius
+    getFrenzyDamageBonus, getFrenzyDuration, getKnifeDamage, getMagnetRadius, getSpellCooldown, getSpellDamage, getWarmthDamage, getWarmthHeal, getWarmthRadius
 } from '../systems/stats.js';
 
 // --- FICHA DE STATS ---
@@ -89,3 +91,56 @@ export const STAT_GROUPS = [
         ]
     }
 ];
+
+// --- O ESPECIAL (A FÚRIA) DO PERSONAGEM ---
+// No topo da aba Build: o nome do especial do herói e o que ele faz, com os números dele (tempo, dano, alcance...), lidos do
+// `fury` do personagem (data_model/characters/<id>.js) e da skill Fury. Uma linha por número; passar o dedo/mouse mostra o que é.
+const times = (n) => `x${Number(n.toFixed(2))}`;
+const secondsShort = (n) => `${Number(n.toFixed(2))}s`;
+const row = (icon, name, note, value) => ({ icon, name, note, amount: () => 1, format: () => value });
+
+export function getFuryGroup() {
+    const hero = getHero();
+    const fury = CHARACTER_BASES[hero.id]?.player.fury;
+    if (!fury) return null;
+    const duration = row('⏳', 'Duration', 'How long the Fury lasts. The Fury skill makes it longer.', secondsShort(getFrenzyDuration() + (fury.extraSeconds ?? 0)));
+    const rows = {
+        blades: () => [
+            row('💥', 'Opening Burst', 'When the Fury starts, everything around you is hit and pushed back. Damage = your blade damage times this.', times(FRENZY_NOVA_SKILL.burstDamageMultiplier)),
+            duration,
+            row('🗡️', 'Blade Damage', 'Extra damage on every blade hit while the Fury lasts (grows with the Fury skill).', `+${Math.round(getFrenzyDamageBonus() * 100)}%`),
+            row('🌀', 'Slashes', 'Blades that fly out around you.', `${FRENZY_NOVA_SKILL.slashCount}`)
+        ],
+        bloodWaltz: () => [
+            row('🩸', 'Cuts', 'Fast cuts in a row, each leaping to the nearest monster that is not the last one.', `${fury.cuts}`),
+            row('💥', 'Cut Damage', 'Damage of each cut = your blade damage times this.', times(fury.cutDamage)),
+            row('❤️', 'Heal', 'Share of each cut that returns as health.', `${Math.round(fury.healRatio * 100)}%`),
+            row('📏', 'Reach', 'How far he looks for the next monster.', `${fury.cutRange}px`),
+            row('⚡', 'Speed', 'Time between one cut and the next.', secondsShort(fury.cutSeconds))
+        ],
+        stomp: () => [
+            duration,
+            row('🦶', 'Stomp', 'Time between one stomp and the next.', secondsShort(fury.stepSeconds)),
+            row('💥', 'Stomp Damage', 'Damage of each stomp around him = your blade damage times this.', times(fury.damage)),
+            row('📏', 'Stomp Reach', 'How far each stomp reaches.', `${fury.radius}px`),
+            row('💫', 'Stun', 'Common monsters are stunned (bosses are not).', secondsShort(fury.stunSeconds)),
+            row('🛡️', 'Damage Taken', 'He takes less damage while the Fury lasts.', `-${Math.round(fury.damageTakenCut * 100)}%`)
+        ],
+        forestGuardian: () => [
+            duration,
+            row('🛡️', 'Damage Taken', 'The leaf shield makes every hit on him softer.', `-${Math.round(fury.damageReduction * 100)}%`),
+            row('🍃', 'Leaf Damage', 'Damage dealt to every monster in reach, again and again = your blade damage times this.', times(fury.damage)),
+            row('⏱️', 'Pulse', 'Time between leaf hits.', secondsShort(fury.tickSeconds)),
+            row('📏', 'Reach', 'How far the leaves reach around him.', `${fury.radius}px`),
+            row('🐌', 'Slow', 'Monsters in the leaves move slower.', `-${Math.round(fury.slow * 100)}%`)
+        ]
+    }[fury.kind];
+    if (!rows) return null;
+    const summary = {
+        blades: 'a burst of blades flies out around him',
+        bloodWaltz: 'a chain of fast cuts, leaping from monster to monster',
+        stomp: 'stomps the ground around him, stunning monsters',
+        forestGuardian: 'a leaf shield that hurts and slows the monsters around him'
+    }[fury.kind];
+    return { title: `Special Attack (Fury): ${fury.name.toUpperCase()}`, summary, rows: rows() };
+}

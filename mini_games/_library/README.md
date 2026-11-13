@@ -45,6 +45,8 @@ characters/
   brutos/                  brutos25d.js (o boneco) e brutos_visual.js
   yara/, zeph/, oskar/     os heróis do yara-rpg, no mesmo esquema (<id>25d.js e <id>_visual.js)
   rowan/                   o druida do Last Torch (molde do Zeph com galhada, folhas e cajado); ficha em art_reference/character.md
+buddies/                   quem anda e luta ao lado do herói (fênix, corvo, caveira voadora, lobo sombrio, lobo branco): um por pasta (desenho, cores e art_reference/ com buddy.md e images/). O que o buddy FAZ fica no jogo
+weapons/                   as armas dos personagens, separadas deles: espada, katana, machados, adaga, espada curta, cajado e a rosa de arremesso; um por pasta (<id>.js e art_reference/weapon.md). thrown.js: as armas de arremesso (adaga, rosa, rosa negra)
 objects/                   objetos do jogo que não são personagem nem cenário (a tocha 2,5D); um por pasta: <id>.js, <id>_visual.js e art_reference/object.md
   torch/                   a tocha 2,5D: poste e gaiola em dois sprites (atrás e na frente do fogo), fogo num atlas de poucos quadros (createTorch25D); a regra da vida fica no jogo
 scenery/                   o chão do jogo: terreno, névoa, luz, clima (manual: scenery/README.md)
@@ -164,6 +166,8 @@ cd mini_games && python3 -m http.server 8010
 
 Para gravar: **Copiar alterados** gera as linhas já com o arquivo de cada uma; cole no `*_visual.js` indicado e rode o
 sync. A página não grava nada sozinha. `tools/` não vai para os jogos.
+
+**Buddies:** `tools/buddy_viewer.html` mostra a fênix, o corvo e a caveira animados (com botões para atirar/mergulhar/nascer) e abre os dois lobos no tuner (`tuner.html?model=buddy_shadow_wolf` e `?model=white_wolf`).
 
 **Cenários:** `tools/scenery_tuner.html` (`?scenery=dark_forest_2&preset=mobP&quality=1`), uma página própria: o cenário
 renderizado pelo motor, com um controle para cada número do `<id>_visual.js`; num cenário feito de peças, um grupo por peça da receita

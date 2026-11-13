@@ -168,22 +168,28 @@
 /* Requisito cumprido, mas faltam pontos: só apagado (sem cadeado) */
 .tnode.is-open:not(.is-owned) .tnode-icon { opacity: 0.42; filter: grayscale(0.7); }
 /* Dá para aprender agora */
-/* Brilho vermelho pulsante (o mesmo aviso do medalhão), igual em todos os ramos */
+/* Verde piscando: a skill que o jogador já pode comprar acende e pulsa (borda, brilho e o ícone), para ficar óbvio onde
+   gastar os pontos. O medalhão continua com o aviso vermelho dele. */
 .tnode.is-ready {
-    border-color: #ef4444;
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.55);
-    background: color-mix(in srgb, #ef4444 16%, #0b1220);
-    animation: tnode-ready-pulse 2.4s ease-in-out infinite;
+    border-color: #4ade80;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.7);
+    background: color-mix(in srgb, #22c55e 22%, #0b1220);
+    animation: tnode-ready-pulse 1.2s ease-in-out infinite;
 }
+.tnode.is-ready .tnode-icon { animation: tnode-ready-icon 1.2s ease-in-out infinite; }
 @keyframes tnode-ready-pulse {
-    0%, 100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.35); }
-    50% { box-shadow: 0 0 11px rgba(239, 68, 68, 0.7); }
+    0%, 100% { border-color: #22c55e; box-shadow: 0 0 5px rgba(34, 197, 94, 0.45); }
+    50% { border-color: #bbf7d0; box-shadow: 0 0 16px rgba(74, 222, 128, 0.95), 0 0 4px rgba(187, 247, 208, 0.8); }
+}
+@keyframes tnode-ready-icon {
+    0%, 100% { filter: brightness(1) saturate(1); }
+    50% { filter: brightness(1.35) saturate(1.25) drop-shadow(0 0 3px rgba(134, 239, 172, 0.9)); }
 }
 @keyframes tnode-ready-pulse-oath {
-    0%, 100% { filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6)); }
-    50% { filter: drop-shadow(0 0 7px rgba(239, 68, 68, 0.95)); }
+    0%, 100% { filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.65)); }
+    50% { filter: drop-shadow(0 0 9px rgba(134, 239, 172, 1)); }
 }
-@media (prefers-reduced-motion: reduce) { .tnode.is-ready, .tnode.tnode-oath.is-ready { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .tnode.is-ready, .tnode.is-ready .tnode-icon, .tnode.tnode-oath.is-ready { animation: none; } }
 .tnode.is-owned { border-color: var(--tone); background: color-mix(in srgb, var(--tone) 18%, #0b1220); }
 .tnode.is-owned .tnode-level { color: var(--tone); }
 .tnode.is-maxed { border-color: #fde047; background: rgba(66, 46, 8, 0.8); box-shadow: 0 0 10px rgba(253, 224, 71, 0.4); }
@@ -245,11 +251,11 @@
 }
 .tnode.tnode-oath.is-open, .tnode.tnode-oath.is-chained { background: none; }
 .tnode.tnode-oath.is-ready {
-    --edge: #ef4444;
-    --fill: color-mix(in srgb, #ef4444 18%, #0b1220);
+    --edge: #4ade80;
+    --fill: color-mix(in srgb, #22c55e 22%, #0b1220);
     background: none;
     box-shadow: none;
-    animation: tnode-ready-pulse-oath 2.4s ease-in-out infinite;
+    animation: tnode-ready-pulse-oath 1.2s ease-in-out infinite;
 }
 .tnode.tnode-oath.is-maxed {
     --edge: #fde047;

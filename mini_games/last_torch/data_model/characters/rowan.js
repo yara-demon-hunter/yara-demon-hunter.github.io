@@ -1,20 +1,21 @@
 // --- ROWAN, O DRUIDA ---
 // Tudo do personagem num lugar só (ver data_model/characters/index.js). Cores e medidas do desenho, o boneco e a ficha
 // de como foi criado: library/characters/rowan/ (a fonte é mini_games/_library/characters/rowan).
-// O jeito de jogar dele é outro: bate pouco com o cajado e usa raízes para controlar o campo. No lugar da adaga, faz
-// raízes brotarem onde o jogador aponta; sua Fúria o envolve num escudo de folhas que reduz dano.
+// O jeito de jogar dele é outro: bate pouco com o cajado e deixa a floresta lutar. No lugar da adaga, lança ROSAS (a arma
+// dele, em _library/weapons/rose); todas as skills de adaga valem para elas. Sua Fúria o envolve num escudo de folhas.
 import { ROWAN_VISUALS } from '../../library/characters/rowan/rowan_visual.js';
 
 export const ROWAN = {
     id: 'rowan',
     model: 'rowan',                 // boneco 2.5D (js/render/bodies.js)
+    thrown: 'rose',                 // o que lança com a mão livre: 'rose' no lugar da adaga (_library/weapons/thrown.js)
     order: 1.5,                     // posição na tela de escolha: logo depois do Demon Hunter (é o primeiro a ser liberado)
 
     // --- QUEM É ---
     name: 'Rowan',
     tagline: 'Druid. He never fights alone: the forest walks with him.',
-    trait: 'No daggers: Root Snare pins monsters where you point. His Fury surrounds him with a leaf shield, reducing damage taken by 25% while nearby enemies take damage and slow down.',
-    perk: { name: 'FOREST GUARDIAN', text: 'Instead of daggers, roots burst where you aim and pin monsters down. His Fury surrounds him with a leaf shield, reducing damage taken by 25% while nearby enemies take damage and slow down.' },
+    trait: 'Throws roses instead of daggers. The forest fights beside him.',
+    perk: { name: 'FOREST GUARDIAN', text: 'Throws roses instead of daggers. The forest fights beside him.' },
     colors: ROWAN_VISUALS.colors,
     portrait: '',
     portraitImage: 'images/characters/rowan-small.webp',
@@ -43,25 +44,12 @@ export const ROWAN = {
         bladeDamage: -15,           // dano só do cajado (soma ao attackDamage): ele bate fraco de perto
         stillAttack: 0,             // velocidade de ataque parado
 
-        // ADAGA
-        knifeRange: 300,            // alcance da adaga, px (sem efeito: ele não lança adaga)
-        knifeDamage: 0,             // dano da adaga, bônus em %
+        // ROSA (a arma de arremesso dele; usa os mesmos números e skills da adaga)
+        knifeRange: 300,            // alcance da rosa, px
+        knifeDamage: 0,             // dano da rosa, bônus em %
 
         // HABILIDADES (true = liga)
-        noKnives: true              // não lança adaga; as skills de adaga ficam seladas na árvore
-    },
-
-    // --- HABILIDADES ---
-    abilities: {
-        // ROOT SNARE (no lugar da adaga): clique esquerdo (ou o botão do canto, no celular) e raízes brotam num círculo onde
-        // o jogador aponta (no celular, no monstro mais perto), prendendo e ferindo quem está ali. js/systems/druid.js
-        rootSnare: {
-            damage: 1.1,                // dano = dano de feitiço x este número
-            cooldownSeconds: 4.5,       // tempo de espera entre um uso e o próximo
-            radius: 80,                 // raio do círculo de raízes, px
-            rootSeconds: 2.4,           // quanto tempo os monstros ficam presos (boss: uma fração, como toda raiz)
-            range: 320                  // até onde ele alcança, a partir do herói, px
-        },
+        noKnives: false             // lança rosas: as skills de adaga valem para elas
     },
 
     // --- FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) ---

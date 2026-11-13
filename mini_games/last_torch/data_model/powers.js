@@ -422,7 +422,7 @@ export const POWER_MODELS = {
         name: 'Leech Vine', icon: '🩸', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `Living vines latch onto the ${level.targets} nearest monsters, draining ${formatMultiplier(level.dps)} spell damage per second from each and returning ${formatPercent(level.heal)} of it to you as health.`;
+            return `Living vines latch onto the ${level.targets} nearest monsters, draining ${formatMultiplier(level.dps)} spell damage per second from each and returning ${formatPercent(level.heal)} of it to you as health. The torch drinks too: it heals ${formatPercent(this.torchShare)} of what you heal.`;
         },
         get upgrades() {
             return this.levels.map(level =>
@@ -430,12 +430,13 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { targets: 1, dps: 0.45, heal: 0.1 },
-            { targets: 2, dps: 0.5, heal: 0.11 },
-            { targets: 2, dps: 0.65, heal: 0.12 },
-            { targets: 3, dps: 0.75, heal: 0.13 },
-            { targets: 3, dps: 0.9, heal: 0.14 }
+            { targets: 1, dps: 0.5, heal: 0.12 },
+            { targets: 2, dps: 0.55, heal: 0.14 },
+            { targets: 2, dps: 0.7, heal: 0.16 },
+            { targets: 3, dps: 0.85, heal: 0.18 },
+            { targets: 3, dps: 1, heal: 0.2 }
         ],
+        torchShare: 0.25,       // a tocha também bebe: recebe esta parte da vida que você recupera (era da Heartwood)
         range: 150,             // a videira agarra até aqui
         breakRange: 200,        // e solta além daqui
         tickSeconds: 0.25
@@ -444,19 +445,19 @@ export const POWER_MODELS = {
         name: 'Wicked Oak', icon: '🌳', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree after ${formatNumber(this.saplingSeconds)}s and an oak after ${formatNumber(this.adultSeconds)}s. The oak wakes near monsters and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; only one seed or tree can exist at a time.`;
+            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree after ${formatNumber(this.saplingSeconds)}s and an oak after ${formatNumber(this.adultSeconds)}s. The oak wakes near monsters and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; up to ${level.count} seeds or trees can exist at a time (more as you level it).`;
         },
         get upgrades() {
             return this.levels.map(level =>
-                `${level.hp} oak health · ${level.reach} reach · ${formatMultiplier(level.damage)} lash every ${formatNumber(level.lashSeconds)}s · stands ${formatNumber(level.seconds)}s · seed every ${formatNumber(level.cooldown)}s`
+                `${level.count} at once · ${level.hp} oak health · ${level.reach} reach · ${formatMultiplier(level.damage)} lash every ${formatNumber(level.lashSeconds)}s · stands ${formatNumber(level.seconds)}s · seed every ${formatNumber(level.cooldown)}s`
             );
         },
         levels: [
-            { cooldown: 16, seconds: 10, hp: 140, reach: 80, damage: 1.1, lashSeconds: 0.9 },
-            { cooldown: 15, seconds: 11, hp: 180, reach: 86, damage: 1.3, lashSeconds: 0.85 },
-            { cooldown: 14, seconds: 12, hp: 230, reach: 92, damage: 1.5, lashSeconds: 0.8 },
-            { cooldown: 13, seconds: 13, hp: 280, reach: 100, damage: 1.8, lashSeconds: 0.75 },
-            { cooldown: 12, seconds: 14, hp: 340, reach: 108, damage: 2.1, lashSeconds: 0.7 }
+            { count: 1, cooldown: 16, seconds: 10, hp: 140, reach: 80, damage: 1.1, lashSeconds: 0.9 },
+            { count: 1, cooldown: 15, seconds: 11, hp: 180, reach: 86, damage: 1.3, lashSeconds: 0.85 },
+            { count: 2, cooldown: 14, seconds: 12, hp: 230, reach: 92, damage: 1.5, lashSeconds: 0.8 },
+            { count: 2, cooldown: 13, seconds: 13, hp: 280, reach: 100, damage: 1.8, lashSeconds: 0.75 },
+            { count: 3, cooldown: 12, seconds: 14, hp: 340, reach: 108, damage: 2.1, lashSeconds: 0.7 }
         ],
         plantRange: 300,        // só planta com monstro a esta distância do herói (não gasta a árvore à toa)
         seedDamage: 0.12,       // drena pouco a pouco a vida do monstro marcado, em dano de feitiço por segundo
@@ -470,29 +471,6 @@ export const POWER_MODELS = {
         trunkRadius: 16,        // onde os monstros batem
         hitSeconds: 0.7,        // intervalo entre golpes de um mesmo monstro na árvore
         growSeconds: 0.45
-    },
-    hidingBush: {
-        name: 'Ambush Bush', icon: '🍃', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `A bush grows where you stand for ${formatNumber(level.seconds)}s. Inside it you vanish: monsters lose sight of you (bosses are not fooled). Your next strike from the bush hits ${formatPercent(level.ambush)} harder, but it breaks your cover for ${formatNumber(this.revealSeconds)}s. Grows every ${formatNumber(level.cooldown)}s.`;
-        },
-        get upgrades() {
-            return this.levels.map(level =>
-                `+${formatPercent(level.ambush)} ambush damage · ${level.radius} bush · stands ${formatNumber(level.seconds)}s · every ${formatNumber(level.cooldown)}s`
-            );
-        },
-        levels: [
-            { cooldown: 14, seconds: 6, radius: 36, ambush: 0.6 },
-            { cooldown: 13, seconds: 7, radius: 40, ambush: 0.8 },
-            { cooldown: 12, seconds: 7.5, radius: 44, ambush: 1 },
-            { cooldown: 11, seconds: 8, radius: 48, ambush: 1.2 },
-            { cooldown: 10, seconds: 9, radius: 52, ambush: 1.5 }
-        ],
-        plantRange: 260,        // só cresce com monstro a esta distância
-        stealthSeconds: 0.35,   // tempo dentro dela até sumir de vista
-        revealSeconds: 2.5,     // depois do golpe, o herói fica à vista este tempo
-        growSeconds: 0.4
     },
     sporePods: {
         name: 'Spore Pods', icon: '🍄', maxLvl: 5,
@@ -518,29 +496,31 @@ export const POWER_MODELS = {
         minGap: 46              // distância mínima entre dois cogumelos
     },
     spiritWolves: {
-        name: 'Spirit Wolves', icon: '🐺', maxLvl: 5,
+        name: 'Shadow Wolf', icon: '🐺', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `${level.count} spirit wolves roam free and hunt on their own: each runs at the nearest monster, stays on it and bites for ${formatMultiplier(level.damage)} spell damage (${formatMultiplier(this.rootedBonus)} on a monster pinned by roots). They have ${level.hp} health: monsters that reach them hit back, and a fallen wolf returns after ${this.respawnSeconds}s.`;
+            return `A shadow wolf roams free and hunts on its own: it runs at the nearest monster, stays on it and bites for ${formatMultiplier(level.damage)} spell damage (${formatMultiplier(this.rootedBonus)} on a monster pinned by roots). It has ${level.hp} health: monsters that reach it hit back, and if it falls it returns after ${this.respawnSeconds}s.`;
         },
         get upgrades() {
             return this.levels.map(level =>
-                `${level.count} wol${level.count > 1 ? 'ves' : 'f'} · ${formatMultiplier(level.damage)} spell damage per bite · a bite every ${formatNumber(level.biteSeconds)}s · ${level.hp} health each`
+                `${formatMultiplier(level.damage)} spell damage per bite · a bite every ${formatNumber(level.biteSeconds)}s · ${level.hp} health`
             );
         },
         levels: [
-            { count: 1, damage: 0.9, biteSeconds: 1.1, hp: 70 },
-            { count: 1, damage: 1.2, biteSeconds: 1, hp: 85 },
-            { count: 2, damage: 1.2, biteSeconds: 1, hp: 85 },
-            { count: 2, damage: 1.45, biteSeconds: 0.9, hp: 100 },
-            { count: 3, damage: 1.6, biteSeconds: 0.9, hp: 115 }
+            { damage: 0.9, biteSeconds: 1.1, hp: 70 },
+            { damage: 1.2, biteSeconds: 1, hp: 85 },
+            { damage: 1.45, biteSeconds: 0.95, hp: 100 },
+            { damage: 1.7, biteSeconds: 0.9, hp: 120 },
+            { damage: 2, biteSeconds: 0.85, hp: 145 }
         ],
         runSpeed: 300,          // a corrida atrás da presa e a volta ao herói
         huntRange: 280,         // procura presa até aqui do lobo
         leash: 340,             // não se afasta mais que isto do herói
         biteRange: 16,
         bodyRadius: 11,         // alcance em que os monstros batem no lobo
-        homeRadius: 52,         // onde rodeia o herói sem presa
+        homeRadius: 52,         // onde fica ao lado do herói sem presa (um ponto fixo)
+        followFar: 40,          // passando disto do ponto, o lobo começa a seguir o herói
+        followNear: 10,         // ao chegar a isto, para
         hitSeconds: 0.8,        // cada monstro bate no lobo neste ritmo
         damageTaken: 0.55,      // fração do dano do monstro que o lobo leva
         regen: 0.03,            // cura por segundo (fração da vida) quando está solto perto do herói
@@ -579,36 +559,32 @@ export const EVOLUTIONS = {
         name: 'Strangling Grove', icon: '🪴',
         get desc() {
             const { count, seconds, dps } = this.levels;
-            return `Roots pin ${count} monsters for ${formatNumber(seconds)}s and crush for ${formatMultiplier(dps)} spell damage per second. When a pinned monster dies, its roots leap to the nearest monster.`;
+            return `Roots pin ${count} monsters for ${formatNumber(seconds)}s and crush for ${formatMultiplier(dps)} spell damage per second. Barbed: a pinned monster takes +${formatPercent(this.rootedDamage)} damage from every hit. When a pinned monster dies, its roots leap to the nearest monster.`;
         },
         levels: { cooldown: 4, count: 7, seconds: 3.2, dps: 1.2 },
+        rootedDamage: 0.3,      // o que era a Barbed Roots: preso por raízes leva mais de tudo
         spreadRange: 160
-    },
-    leechVine: {
-        name: 'Heartwood', icon: '💚',
-        get desc() {
-            const { targets, dps, heal } = this.levels;
-            return `${targets} vines drain ${formatMultiplier(dps)} spell damage per second each and return ${formatPercent(heal)} as health. The torch drinks too: it heals ${formatPercent(this.torchShare)} of what you heal.`;
-        },
-        levels: { targets: 4, dps: 1.1, heal: 0.16 },
-        torchShare: 0.25
     },
     shelterOak: {
         name: 'Ancient Grove', icon: '🌲',
         get desc() {
             const { hp, seconds, reach } = this.levels;
-            return `A huge oak with ${hp} health and ${reach} reach that stands for ${formatNumber(seconds)}s. When it falls, its roots tear out of the ground: every monster around it is pinned for ${formatNumber(this.burst.seconds)}s and takes ${formatMultiplier(this.burst.damage)} spell damage.`;
+            return `A huge oak with ${hp} health and ${reach} reach that stands for ${formatNumber(seconds)}s. When it falls, its roots tear out of the ground: every monster around it is pinned for ${formatNumber(this.burst.seconds)}s and takes ${formatMultiplier(this.burst.damage)} spell damage. Thorn bark: a monster that strikes the oak takes ${formatMultiplier(this.thornBark.damage)} spell damage and is pinned by roots for ${this.thornBark.rootSeconds}s.`;
         },
-        levels: { cooldown: 11, seconds: 18, hp: 460, reach: 125, damage: 2.6, lashSeconds: 0.6 },
-        burst: { radiusRatio: 1.6, seconds: 3, damage: 2.5 }
+        levels: { count: 3, cooldown: 11, seconds: 18, hp: 460, reach: 125, damage: 2.6, lashSeconds: 0.6 },
+        burst: { radiusRatio: 1.6, seconds: 3, damage: 2.5 },
+        thornBark: { damage: 0.8, rootSeconds: 1 }      // o que era o nó Thorn Bark: quem bate na árvore leva dano e fica preso
     },
     spiritWolves: {
-        name: 'Alpha Pack', icon: '🌕',
+        name: 'The White Wolf', icon: '🐺',
         get desc() {
-            const { count, damage, hp } = this.levels;
-            return `${count} wolves with ${hp} health, ${formatMultiplier(damage)} spell damage per bite, and a fallen wolf returns after ${this.respawnSeconds}s. Every bite hamstrings: the monster is pinned for ${formatNumber(this.hamstringSeconds)}s.`;
+            const { damage, hp } = this.levels;
+            return `The wolf turns white: ${formatMultiplier(damage)} spell damage per bite (+${formatPercent(this.damageBonus)} more), ${Math.round(hp * (1 + this.healthBonus))} health, ${formatPercent(this.speedBonus)} faster, and it returns after ${this.respawnSeconds}s. Every bite hamstrings: the monster is pinned for ${formatNumber(this.hamstringSeconds)}s.`;
         },
-        levels: { count: 4, damage: 1.9, biteSeconds: 0.8, hp: 150 },
+        levels: { damage: 2.4, biteSeconds: 0.75, hp: 200 },
+        damageBonus: 0.12,      // o que era o Pack Instinct, agora do lobo branco
+        speedBonus: 0.06,
+        healthBonus: 0.15,
         respawnSeconds: 7,
         hamstringSeconds: 0.7
     },
@@ -616,9 +592,9 @@ export const EVOLUTIONS = {
         name: 'Plague Garden', icon: '☣️',
         get desc() {
             const { max, dps } = this.levels;
-            return `Up to ${max} mushrooms, ${formatMultiplier(dps)} poison per second. A monster that dies inside a cloud leaves a new mushroom where it fell.`;
+            return `Up to ${max} mushrooms, thicker spores: ${formatMultiplier(dps)} poison per second. A monster that dies inside a cloud leaves a new mushroom where it fell.`;
         },
-        levels: { max: 7, dps: 1.4 }
+        levels: { max: 7, dps: 1.8 }       // dps com o que era o Toxic Bloom (+30% de veneno)
     },
     // Passiva que evolui (passives.shadowClone.evolved): count = sombras em guarda
     shadowClone: {

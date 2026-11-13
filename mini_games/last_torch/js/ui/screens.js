@@ -16,6 +16,7 @@ import { prepareShackle } from '../render/shackle.js';
 import { getTorchMaxHp } from '../systems/torch.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
 import { checkAchievements, pushStats, rewardText } from '../systems/sanctuary.js';
+import { flushHeroUnlocks } from './hero_unlock.js';
 import { getOwnedPowers, hasBuyableNode } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
 import { resetQuake } from '../systems/quake.js';
@@ -223,6 +224,7 @@ export function reportProgress() {
     pushStats();
     checkAchievements();
     persist();
+    flushHeroUnlocks();             // um herói liberado durante a caçada espera até aqui
 }
 
 // Número subindo aos poucos, com um tique de som
@@ -284,11 +286,12 @@ function bankRun() {
 export function quitToMenu() {
     bankRun();
     pushStats();
-    checkAchievements({ toast: false });
+    checkAchievements({ toast: false, announce: true, flush: false });      // o prêmio do herói aparece no menu, logo abaixo
     persist();
     ['settingsScreen', 'shopScreen', 'pickScreen', 'confirmScreen'].forEach(id => document.getElementById(id).classList.add('hidden'));
     state.knifeInput.stick.fire = false;
     returnToMenu();
+    setTimeout(flushHeroUnlocks, 500);
 }
 
 // --- FIM DA NOITE ---
@@ -306,7 +309,7 @@ export function triggerGameOver(reason) {
     }
     pushStats();
 
-    const unlocked = checkAchievements({ toast: false });
+    const unlocked = checkAchievements({ toast: false, announce: true, flush: false });
     persist();
 
     // Tela final
@@ -349,6 +352,7 @@ export function triggerGameOver(reason) {
     screen.classList.remove('hidden');
     audio.setMood(reason === 'DAWN' ? 'dawn' : 'menu');
     if (reason !== 'DAWN') audio.playGameOver();
+    flushHeroUnlocks();             // o prêmio de um herói novo vem depois do resumo da noite
 }
 
 // Resultado para compartilhar: traz gente nova para o jogo

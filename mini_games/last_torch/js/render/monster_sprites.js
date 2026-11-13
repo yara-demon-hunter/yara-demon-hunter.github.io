@@ -1,5 +1,5 @@
 import { BOSS_MODELS } from '../../data_model/bosses.js';
-import { MONSTER_MODELS } from '../../data_model/monsters.js';
+import { BUDDY_MODELS, MONSTER_MODELS } from '../../data_model/monsters.js';
 import { DEMON_LORD_VISUALS } from '../../library/monsters/topdown/demon_lord/demon_lord_visual.js';
 import { BAT_VISUALS } from '../../library/monsters/topdown/bat/bat_visual.js';
 import { BLOATER_VISUALS } from '../../library/monsters/topdown/bloater/bloater_visual.js';
@@ -9,6 +9,7 @@ import {
     MONSTER_ART, MONSTER_SPRITES, MONSTER_SPRITES_25D, SPRITE_DIRECTIONS, SPRITE_FRAMES, SPRITE_MAX_SCALE, SPRITE_MIN_SCALE,
     SPRITE_UNDERLAY_PIXELS
 } from '../../data_model/visuals/monsters/sprites_visual.js';
+import { BUDDIES_25D } from '../../library/buddies/index.js';
 import { MONSTERS_25D } from '../../library/monsters/25d/index.js';
 import { VAMPIRE_VISUALS } from '../../library/monsters/topdown/vampire/vampire_visual.js';
 import { WITCH_VISUALS } from '../../library/monsters/topdown/witch/witch_visual.js';
@@ -25,7 +26,7 @@ import { renderDemonFireball, renderDemonLord } from '../../library/monsters/top
 import { setRenderClock } from '../../library/core/clock.js';
 import { drawGlow, getGlowSprite } from '../../library/core/glow.js';
 import { makeCanvas } from './fx/sprites.js';
-import { drawDagger } from './knife.js';
+import { drawThrownDagger as drawDagger } from '../../library/weapons/dagger/thrown_dagger.js';
 import { renderMoth } from '../../library/monsters/topdown/moth/moth.js';
 import { renderRival } from './rival.js';
 import { renderSkeleton } from '../../library/monsters/topdown/skeleton/skeleton.js';
@@ -85,17 +86,23 @@ const FOLDER_25D = {
     NECROMANCER: 'witch', MOTH: 'moth', BLOATER: 'bloater', WRAITH: 'wraith', SHADOW_WOLF: 'shadow_wolf',
     ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight', BONE_COLOSSUS: 'bone_colossus'
 };
+// Buddies (library/buddies): os lobos do Rowan. Mesmo caminho dos monstros, mas a pasta é a de buddies
+const BUDDY_FOLDER_25D = { BUDDY_SHADOW_WOLF: 'shadow_wolf', BUDDY_WHITE_WOLF: 'white_wolf' };
 const artOf25D = (type) => {
-    const { visuals: P, render } = MONSTERS_25D[FOLDER_25D[type]];
+    const { visuals: P, render } = BUDDY_FOLDER_25D[type] ? BUDDIES_25D[BUDDY_FOLDER_25D[type]] : MONSTERS_25D[FOLDER_25D[type]];
     const visual = { scale: 1, auraRadius: P.auraRadius * P.scalePerRadius, auraAlpha: P.auraAlpha, shadowAlpha: 0, colors: P.colors };
     const draw = type === 'NECROMANCER' ? (e) => withColors(P, { ...P.colors, ...NECROMANCER_COLORS }, () => render(e)) : render;
     return { visual, draw, P };
 };
-const ART_25D = Object.fromEntries(Object.keys(FOLDER_25D).map(type => [type, artOf25D(type)]));
+const ART_25D = Object.fromEntries([...Object.keys(FOLDER_25D), ...Object.keys(BUDDY_FOLDER_25D)].map(type => [type, artOf25D(type)]));
 
 const ART = USE_25D ? ART_25D : ART_TOPDOWN;
 // Os atlas a gravar (um por tipo) e as especificações de cada um
 const SPECS = USE_25D ? MONSTER_SPRITES_25D : MONSTER_SPRITES;
+
+// Buddies (BUDDY_MODELS) não entram na fila da abertura: o sprite sai na primeira vez que alguém pede (getMonsterSprite)
+const ON_DEMAND = new Set(Object.keys(BUDDY_MODELS).filter(type => ART[type]));
+const modelOf = (type) => MONSTER_MODELS[type] ?? BUDDY_MODELS[type];
 
 const sprites = {};
 let bakedScale = 0;
@@ -126,7 +133,7 @@ function bakeUnderlay(type) {
 
 function bakeMonster(type, pixels) {
     const spec = SPECS[type];
-    const model = MONSTER_MODELS[type];
+    const model = modelOf(type);
     const { visual, draw } = ART[type];
     const drawnRadius = model.radius * visual.scale;
     const worldSize = drawnRadius * spec.extent * 2;
@@ -195,7 +202,7 @@ function bakeMonster(type, pixels) {
 const WARMUP_STEPS_25D = 8;         // basta para a capa e a postura se assentarem em cada direção
 function bakeMonster25D(type, pixels) {
     const spec = SPECS[type];
-    const model = MONSTER_MODELS[type];
+    const model = modelOf(type);
     const { visual, draw, P } = ART[type];
     const unit = model.radius * P.scalePerRadius * (P.bodyScale ?? 1);       // pixels do mundo por unidade do boneco
     const worldSize = spec.extent * 2 * unit;
@@ -282,7 +289,7 @@ function bakeNext() {
 // Gera aos poucos, um tipo por vez, sem travar a página ao abrir
 export function scheduleMonsterSprites() {
     bakedScale = getTargetScale();
-    queue = Object.keys(SPECS);
+    queue = Object.keys(SPECS).filter(type => !ON_DEMAND.has(type));
     clearTimeout(bakeTimer);
     bakeTimer = setTimeout(bakeNext, 0);
 }
@@ -292,13 +299,15 @@ export function ensureMonsterSprites() {
     const target = getTargetScale();
     if (!bakedScale || Math.abs(target / bakedScale - 1) > RESCALE_THRESHOLD) {
         bakedScale = target;
-        queue = Object.keys(SPECS);
+        queue = Object.keys(SPECS).filter(type => !ON_DEMAND.has(type));
+        for (const type of ON_DEMAND) delete sprites[type];        // refeitos na escala nova, quando alguém pedir
     }
     clearTimeout(bakeTimer);
     while (queue.length > 0) bakeNext();
 }
 
 export function getMonsterSprite(type) {
+    if (!sprites[type] && ON_DEMAND.has(type) && bakedScale) sprites[type] = (USE_25D ? bakeMonster25D : bakeMonster)(type, bakedScale);
     return sprites[type];
 }
 

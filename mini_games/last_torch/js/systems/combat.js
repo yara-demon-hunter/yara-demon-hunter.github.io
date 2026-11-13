@@ -9,7 +9,6 @@ import { isFireCasting } from './knives.js';
 import { launchCrescent, tryExecute } from './skills_blade.js';
 import { detonateMark } from './skills_shadow.js';
 import { startFury } from './fury.js';
-import { consumeAmbush } from './skills_nature.js';
 import { getHero, mod } from './modifiers.js';
 import { showFuryCutIn } from '../ui/fury_cutin.js';
 import {
@@ -181,7 +180,6 @@ export function updateAutoAttack(dt) {
             if (e.marked > 0 && player.dashTimer <= 0) detonateMark(e, false);
             tryExecute(e);
         });
-    consumeAmbush();
     launchCrescent(atkAngle);
     if (hits > 0) {
         audio.playHit(hits);

@@ -6,7 +6,6 @@ import { getPowerLevel } from '../../data_model/powers.js';
 import { attributes, passives, player, powers, state } from '../core/state.js';
 import { getHero, mod } from './modifiers.js';
 import { STREAK, rushTier } from '../../data_model/streak.js';
-import { getAmbushBonus } from './skills_nature.js';
 
 function getCurrentCharacterBase() {
     return getCharacterBase(getHero().model ?? 'hunter');
@@ -35,7 +34,6 @@ export function getBladeDamage() {
     return getAtkDamage() * (1 + mod('bladeDamage'))
         * (1 + (hunger ? state.bloodlust.stacks * hunger.damage : 0))
         * (1 + (state.warCryTimer > 0 ? WAR_CRY.bladeBonus : 0))
-        * (1 + getAmbushBonus())     // Ambush Bush: o corte que sai do arbusto
         * (state.frenzyActiveTimer > 0 ? 1 + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel : 1);
 }
 // Feitiços e tudo que a chama faz sozinha

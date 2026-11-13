@@ -32,6 +32,7 @@ import { renderDemonLord } from '../../library/monsters/topdown/demon_lord/demon
 import { easeOutCubic } from '../../library/core/easing.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { getDashedRing } from './fx/rings.js';
+import { getThrownWeapon } from '../../library/weapons/thrown.js';
 import { COIN_SIZE, DAGGER_LENGTH, DAGGER_WIDTH, getCoinAtlas, getDaggerSprite } from './fx/sprites.js';
 import { resetWorldView, stamp } from './fx/stamp.js';
 import { colossusCharge, renderBoneColossus } from '../../library/monsters/topdown/bone_colossus/bone_colossus.js';
@@ -442,31 +443,34 @@ export function renderKnifeAim() {
 }
 
 // Adaga de arremesso: voa na altura da mão (sombra no chão marca a posição real), com brilho frio,
-// um risco de velocidade e cópias apagadas atrás. É um carimbo: o desenho fica em js/render/knife.js
+// um risco de velocidade e cópias apagadas atrás. É um carimbo: o desenho é da biblioteca: library/weapons/thrown.js
 export function renderKnives() {
     if (state.knives.length === 0) return;
-    const dagger = getDaggerSprite();
     const now = performance.now() / 1000;
     for (const k of state.knives) {
+        const weapon = getThrownWeapon(k.style);
+        const dagger = getDaggerSprite(k.style);
         if (k.fire) {
             drawFireOrb(k.x, k.y - K.flightHeight, SKILLS_VISUALS.fire.orbRadius * k.scale, now + k.x * 0.01, k.angle, Math.min(1, k.travelled / 40));
             continue;
         }
-        const width = DAGGER_LENGTH * K.flightScale * k.scale;
-        const height = DAGGER_WIDTH * K.flightScale * k.scale;
+        const width = DAGGER_LENGTH * K.flightScale * k.scale * weapon.scale;
+        const height = DAGGER_WIDTH * K.flightScale * k.scale * weapon.scale;
+        // A rosa gira em voo (a adaga voa reta): o giro vem da distância andada
+        const turn = k.angle + k.travelled * weapon.spin;
         const y = k.y - K.flightHeight;
         const trail = Math.min(1, k.travelled / 40);
         const dx = Math.cos(k.angle);
         const dy = Math.sin(k.angle);
 
-        ctx.fillStyle = K.colors.shadow;
+        ctx.fillStyle = weapon.colors.shadow;
         ctx.beginPath();
         ctx.ellipse(k.x, k.y, K.shadowLength, K.shadowWidth, k.angle, 0, TAU);
         ctx.fill();
-        drawGlow(ctx, K.colors.glow, k.x, y, K.glowRadius, 0.55);
+        drawGlow(ctx, weapon.colors.glow, k.x, y, K.glowRadius, 0.55);
 
         // Risco de velocidade
-        ctx.strokeStyle = K.colors.trail;
+        ctx.strokeStyle = weapon.colors.trail;
         ctx.lineWidth = 0.8;
         ctx.globalAlpha = 0.35 * trail;
         ctx.beginPath();
@@ -478,10 +482,10 @@ export function renderKnives() {
         for (let g = K.ghostCount; g >= 1; g--) {
             ctx.globalAlpha = 0.28 * (1 - g / (K.ghostCount + 1)) * trail;
             const back = g * K.ghostGap * trail;
-            stamp(dagger, 0, 0, dagger.width, dagger.height, k.x - dx * back, y - dy * back, k.angle, width, height);
+            stamp(dagger, 0, 0, dagger.width, dagger.height, k.x - dx * back, y - dy * back, turn - (g * K.ghostGap * trail) * weapon.spin, width, height);
         }
         ctx.globalAlpha = 1;
-        stamp(dagger, 0, 0, dagger.width, dagger.height, k.x, y, k.angle, width, height);
+        stamp(dagger, 0, 0, dagger.width, dagger.height, k.x, y, turn, width, height);
         resetWorldView();
     }
 }

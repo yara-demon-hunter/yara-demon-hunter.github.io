@@ -59,6 +59,33 @@ export const DUEL_DIALOGUES = {
                         { who: 'rival', text: '...This night is yours, Captain.' }
                     ]
                 }
+            },
+            // Rowan, o druida: calmo e sensato, só quer a paz da floresta
+            rowan: {
+                first: {
+                    before: [
+                        { who: 'rival', text: 'A druid guarding a little flame in the dark. How quaint.' },
+                        { who: 'hero', text: 'Azael. I do not want a fight. Leave the forest in peace.' },
+                        { who: 'rival', text: 'Peace is for the dead, druid. Let us see what your roots can do.' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'Roots and roses... You beat me this time, druid. I will be back.' },
+                        { who: 'hero', text: 'Then I hope you come back wiser. The forest will still be here.' },
+                        { who: 'rival', text: 'Before dawn. Count on it.' }
+                    ]
+                },
+                final: {
+                    before: [
+                        { who: 'rival', text: 'I told you I would return, druid. The night is almost over.' },
+                        { who: 'hero', text: 'It does not have to end in blood, Azael. Go in peace.' },
+                        { who: 'rival', text: 'No. One of us will not see the dawn.' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'Again... How does something so gentle keep beating me?' },
+                        { who: 'hero', text: 'Patience. The forest outlasts every storm. Rest now.' },
+                        { who: 'rival', text: '...Keep your flame, druid. This night is yours.' }
+                    ]
+                }
             }
         }
     },
@@ -126,7 +153,38 @@ export const BOSS_INTROS = {
             { who: 'rival', text: 'Dawn came and went, and still you fight.' },
             { who: 'hero', text: 'As long as the torch burns.' },
             { who: 'rival', text: 'Then let us see how long it burns against this one.' }
-        ]
+        ],
+        // Falas próprias de outros heróis (byHero[model], com a mesma forma de cima)
+        byHero: {
+            // Rowan, o druida: calmo e sensato, só quer a paz da floresta
+            rowan: {
+                DEMON_LORD: [
+                    { who: 'rival', text: 'Still standing, druid? Then meet something far older than your trees.' },
+                    { who: 'hero', text: 'Please, Azael. Call it back. No one needs to burn.' },
+                    { who: 'rival', text: 'Not yet. First, let us see if your calm survives my beast.' }
+                ],
+                BLOOD_COUNTESS: [
+                    { who: 'rival', text: 'The night grows tired of you, druid. Let us end this.' },
+                    { who: 'hero', text: 'Then send her, if you must. I only wish to keep the forest quiet.' },
+                    { who: 'rival', text: 'Gladly. My Countess is thirsty... try not to bleed too fast.' }
+                ],
+                BRUTOS: [
+                    { who: 'rival', text: 'Enough games. Captain Brutos! This druid is yours.' },
+                    { who: 'boss', text: 'I will break him.' },
+                    { who: 'hero', text: 'There is no need for this, Captain. Walk away and no one is hurt.' }
+                ],
+                LONG_NIGHT: [
+                    { who: 'rival', text: 'Impressive. But not even you can fight the night itself.' },
+                    { who: 'hero', text: 'I do not fight the night. I wait for the dawn.' },
+                    { who: 'rival', text: 'Then meet the Long Night... and pray the dawn still comes.' }
+                ],
+                default: [
+                    { who: 'rival', text: 'Dawn came and went, and still you fight.' },
+                    { who: 'hero', text: 'Only to keep the forest quiet.' },
+                    { who: 'rival', text: 'Then let us see how quiet it stays against this one.' }
+                ]
+            }
+        }
     },
     // Jogando com o Azael: o Demon Hunter assiste e desafia
     DEMON_HUNTER: {

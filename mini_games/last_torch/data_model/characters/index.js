@@ -145,6 +145,7 @@ export function getCharacterBase(model = 'hunter') {
 // Entrada de cada personagem em HEROES (data_model/heroes.js): identidade e textos + os mods montados acima
 export const HERO_ENTRIES = Object.fromEntries(CHARACTER_LIST.map(character => {
     const entry = {
+        id: character.id,
         name: character.name,
         tagline: character.tagline,
         trait: character.trait,
@@ -153,7 +154,7 @@ export const HERO_ENTRIES = Object.fromEntries(CHARACTER_LIST.map(character => {
         colors: character.colors,
         portrait: character.portrait
     };
-    for (const key of ['model', 'perk', 'portraitImage', 'unlockHint']) if (character[key] !== undefined) entry[key] = character[key];
+    for (const key of ['model', 'perk', 'portraitImage', 'unlockHint', 'thrown']) if (character[key] !== undefined) entry[key] = character[key];
     return [character.id, entry];
 }));
 

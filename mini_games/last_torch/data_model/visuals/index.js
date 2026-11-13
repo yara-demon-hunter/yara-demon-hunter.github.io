@@ -17,8 +17,8 @@ export * from '../../library/monsters/topdown/wraith/wraith_visual.js';
 export * from './effects/juice_visual.js';
 export * from './effects/powers_visual.js';
 export * from './effects/skills_visual.js';
-export * from './effects/phoenix_visual.js';
-export * from './effects/raven_visual.js';
+export * from '../../library/buddies/phoenix/phoenix_visual.js';       // buddy da biblioteca
+export * from '../../library/buddies/raven/raven_visual.js';           // buddy da biblioteca
 export * from './effects/shackle_visual.js';
 export * from './monsters/sprites_visual.js';
 export * from '../../library/monsters/topdown/zombie_wolf/zombie_wolf_visual.js';

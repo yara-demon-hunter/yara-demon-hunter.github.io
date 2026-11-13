@@ -9,6 +9,7 @@ import { mix } from '../../characters/hunter/kit25d.js';
 //    snoutWidth, mouthOpen, earLength, legWidth, legSpread, stride, footLift, bounce, eyeGlow) e colors
 //    (fur, furDark, ink, fang, eye, eyeGlow; mouth ou gum).
 // hooks (todos opcionais): body(rig, f), neck(rig, f), head(rig, f), tail(rig, f) → desenham por cima daquela peça;
+//    paw(rig, paw, front, side) → por cima de cada pata (garras, pelos); paw é o ponto do pé;
 //    ears: false esconde as orelhas padrão. f é o esqueleto do quadro: { hip, sh, head, snout, g, run, t }.
 export function wolfFrame(pose, rig, S) {
     const g = rig.anim.stride;
@@ -21,7 +22,7 @@ export function wolfFrame(pose, rig, S) {
     return { hip, sh, head, snout, g, run, t: pose.t };
 }
 
-function leg(rig, S, f, side, front) {
+function leg(rig, S, f, side, front, hooks) {
     const { C, limb, ball } = rig;
     const phase = f.g + (front ? 0 : Math.PI) + (side > 0 ? 0 : 0.6);
     const top = front ? [f.sh[0] - 0.4, side * S.legSpread, f.sh[2] - 0.8] : [f.hip[0] + 0.5, side * S.legSpread, f.hip[2] - 0.6];
@@ -39,6 +40,7 @@ function leg(rig, S, f, side, front) {
             limb(pts, S.legWidth, C.furDark);
             ball(paw, S.legWidth * 0.62, C.furDark);
             limb([paw, [paw[0] + S.legWidth * 0.7, paw[1], paw[2] - 0.1]], S.legWidth * 0.9, C.furDark);
+            hooks.paw?.(rig, paw, front, side);
         }
     };
 }
@@ -48,7 +50,7 @@ export function wolfParts(pose, rig, S, hooks = {}) {
     const f = wolfFrame(pose, rig, S);
     const mouth = C.mouth ?? C.gum;
     const parts = [];
-    for (const front of [true, false]) for (const side of [-1, 1]) parts.push(leg(rig, S, f, side, front));
+    for (const front of [true, false]) for (const side of [-1, 1]) parts.push(leg(rig, S, f, side, front, hooks));
 
     // Cauda (atrás de tudo quando ele vem de frente)
     parts.push({

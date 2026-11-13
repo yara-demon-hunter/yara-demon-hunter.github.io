@@ -172,11 +172,9 @@ export const state = {
     echoes: [],
     rifts: [],
     wisp: { x: 0, y: 0, placed: false, flash: 0 },
-    // Natureza (js/systems/skills_nature.js): carvalhos, cogumelos, nuvens de esporos, monstros na videira e o carvalho
-    // que esconde o herói agora (null = ninguém escondido)
-    // lure: o carvalho acordado que os monstros próximos vão atacar; hideIn: o arbusto que esconde o herói agora; ambush: o golpe
-    // da emboscada está pronto; claws: marcas de garra das mordidas
-    nature: { oaks: [], seed: null, bushes: [], pods: [], clouds: [], vines: [], wolves: [], claws: [], lure: null, hideIn: null, ambush: false, stealthCd: 0, hideTime: 0 },
+    // Natureza (js/systems/skills_nature.js): carvalhos, cogumelos, nuvens de esporos, monstros na videira e o lobo
+    // lure: o carvalho acordado que os monstros próximos vão atacar; claws: marcas de garra das mordidas
+    nature: { oaks: [], seeds: [], pods: [], clouds: [], thorns: [], vines: [], wolves: [], claws: [], lure: null },
 
     // Animação de level up em andamento: { age, label } ou null
     levelUpFx: null,

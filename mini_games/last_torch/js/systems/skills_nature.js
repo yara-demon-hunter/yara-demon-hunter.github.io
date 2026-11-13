@@ -1,4 +1,4 @@
-import { THORN_BARK, THORN_BURST } from '../../data_model/passives.js';
+import { THORN_BURST, THORN_ROSES } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
@@ -6,7 +6,7 @@ import { addNumber, addShockwave, createExplosion, screenFlash, shakeScreen } fr
 import { mod } from './modifiers.js';
 import { startCast } from './moves.js';
 import { nearestEnemy, ready } from './powers.js';
-import { getSpellCooldown, getSpellDamage } from './stats.js';
+import { getKnifeDamage, getSpellCooldown, getSpellDamage } from './stats.js';
 import { feedTorch } from './torch.js';
 
 // --- SKILLS DA NATUREZA ---
@@ -14,11 +14,9 @@ import { feedTorch } from './torch.js';
 // some atrás de uma árvore que cresce na hora (carvalho) e deixa o chão envenenado (cogumelos). O dano é de feitiço.
 // Tudo o que fica no campo mora em state.nature; o desenho está em js/render/nature.js (sprites montados uma vez).
 // Regras que outros sistemas leem:
-//   e.rooted (segundos)   monstro preso por raízes: não anda (js/systems/enemies.js), leva mais dano com Barbed Roots
+//   e.rooted (segundos)   monstro preso por raízes: não anda (js/systems/enemies.js), leva mais dano com a Strangling Grove
 //                         (js/systems/damage.js) e sofre o esmagamento (e.rootDps) aqui
 //   state.nature.lure     o carvalho ACORDADO: os monstros comuns por perto vão bater nele em vez de no herói (enemies.js)
-//   state.nature.hideIn   o arbusto em que o herói está escondido agora, ou null: monstros comuns não o veem (enemies.js)
-//   state.nature.ambush   o golpe da emboscada está pronto: o próximo corte do herói bate mais forte (consumeAmbush)
 const N = state.nature;
 const COLOR = '#4ade80';
 
@@ -103,7 +101,7 @@ function updateLeechVine(dt) {
             healFloat = 0;
         }
     }
-    if (powers.leechVine.evolved) feedTorch(heal * EVOLUTIONS.leechVine.torchShare);
+    feedTorch(heal * M.torchShare);
 }
 
 // --- CARVALHO MALIGNO ---
@@ -144,13 +142,14 @@ function updateShelterOak(dt) {
     const M = POWER_MODELS.shelterOak;
     const level = getPowerLevel(powers.shelterOak);
     const timers = state.powerTimers;
-    if (level && state.phase === 'HUNT' && N.oaks.length === 0 && !N.seed) {
+    // Até level.count (1 a 3, sobe com o nível) sementes e árvores ao mesmo tempo
+    if (level && state.phase === 'HUNT' && N.oaks.length + N.seeds.length < level.count) {
         timers.shelterOak = (timers.shelterOak ?? 2) - dt;
         if (timers.shelterOak <= 0) {
             let target = null;
             let nearest = M.plantRange;
             for (const e of state.enemies) {
-                if (e.hp <= 0) continue;
+                if (e.hp <= 0 || N.seeds.some(s => s.target === e)) continue;
                 const distance = Math.hypot(e.x - player.x, e.y - player.y);
                 if (distance > M.plantRange) continue;
                 if (!target || e.hp > target.hp || (e.hp === target.hp && distance < nearest)) {
@@ -160,7 +159,7 @@ function updateShelterOak(dt) {
             }
             if (target) {
                 const distance = Math.hypot(target.x - player.x, target.y - player.y);
-                N.seed = {
+                N.seeds.push({
                     target,
                     timer: M.seedTickSeconds,
                     flightAge: 0,
@@ -168,7 +167,7 @@ function updateShelterOak(dt) {
                     startX: player.x,
                     startY: player.y - 20,
                     attached: false
-                };
+                });
                 timers.shelterOak = getSpellCooldown(level.cooldown);
                 audio.playSeedLaunch();
             } else {
@@ -176,10 +175,10 @@ function updateShelterOak(dt) {
             }
         }
     }
-    if (N.seed) {
-        const seed = N.seed;
+    for (let i = N.seeds.length - 1; i >= 0; i--) {
+        const seed = N.seeds[i];
         if (!state.enemies.includes(seed.target)) {
-            N.seed = null;
+            N.seeds.splice(i, 1);
         } else if (seed.target.hp > 0) {
             if (!seed.attached) {
                 seed.flightAge = Math.min(seed.flightSeconds, seed.flightAge + dt);
@@ -198,7 +197,6 @@ function updateShelterOak(dt) {
         }
     }
     N.lure = null;
-    const bark = passives.thornBark.lvl > 0;
     for (let i = N.oaks.length - 1; i >= 0; i--) {
         const oak = N.oaks[i];
         if (oak.stage !== 'adult') {
@@ -276,9 +274,9 @@ function updateShelterOak(dt) {
             e.vx += Math.cos(a) * 160;
             e.vy += Math.sin(a) * 160;
             createExplosion(oak.x, oak.y - 14, '#a16207', 4);
-            if (bark) {
-                dealDamage(e, getSpellDamage() * THORN_BARK.damage, { noCrit: true, style: 'spell' });
-                rootEnemy(e, THORN_BARK.rootSeconds);
+            if (oak.evolved) {
+                dealDamage(e, getSpellDamage() * EVOLUTIONS.shelterOak.thornBark.damage, { noCrit: true, style: 'spell' });
+                rootEnemy(e, EVOLUTIONS.shelterOak.thornBark.rootSeconds);
             }
         }
         if (oak.hp <= 0 || (oak.stage === 'adult' && oak.age >= oak.seconds)) {
@@ -287,64 +285,6 @@ function updateShelterOak(dt) {
             fellOak(oak);
         }
     }
-}
-
-// --- ARBUSTO DA EMBOSCADA ---
-// Cresce onde o herói está. Dentro dele o herói some de vista (monstros comuns o ignoram) e o próximo corte sai bem mais
-// forte; o golpe quebra o disfarce por alguns segundos. O arbusto também some com o tempo.
-function updateHidingBush(dt) {
-    const M = POWER_MODELS.hidingBush;
-    const level = getPowerLevel(powers.hidingBush);
-    const timers = state.powerTimers;
-    if (level && state.phase === 'HUNT') {
-        timers.hidingBush = (timers.hidingBush ?? 3) - dt;
-        if (timers.hidingBush <= 0 && N.bushes.length === 0 && nearestEnemy(player.x, player.y, M.plantRange)) {
-            timers.hidingBush = getSpellCooldown(level.cooldown);
-            N.bushes.push({ x: player.x, y: player.y + 2, age: 0, seconds: level.seconds, radius: level.radius, ambush: level.ambush, rustle: 0 });
-            createExplosion(player.x, player.y, '#166534', 14);
-            addShockwave(player.x, player.y, { radius: level.radius * 1.4, color: COLOR, width: 4, seconds: 0.4 });
-            audio.playSmoke();
-        }
-    }
-    N.hideIn = null;
-    N.ambush = false;
-    if (N.stealthCd > 0) N.stealthCd -= dt;
-    let inside = null;
-    for (let i = N.bushes.length - 1; i >= 0; i--) {
-        const b = N.bushes[i];
-        b.age += dt;
-        if (b.rustle > 0) b.rustle -= dt;
-        if (b.age >= b.seconds) {
-            N.bushes.splice(i, 1);
-            createExplosion(b.x, b.y, '#166534', 8);
-            continue;
-        }
-        if (b.age > M.growSeconds && player.hp > 0 && Math.hypot(player.x - b.x, player.y - b.y) < b.radius) inside = b;
-    }
-    if (inside && N.stealthCd <= 0) {
-        N.hideTime += dt;
-        N.hideIn = inside;
-        N.ambush = N.hideTime >= M.stealthSeconds;
-        N.ambushBonus = inside.ambush;
-    } else N.hideTime = 0;
-}
-
-// Multiplicador de dano do corte da emboscada (js/systems/stats.js, getBladeDamage); 0 sem emboscada pronta
-export function getAmbushBonus() {
-    return N.ambush ? N.ambushBonus : 0;
-}
-
-// O corte saiu: a emboscada acaba, o herói fica à vista por um tempo e o arbusto balança
-export function consumeAmbush() {
-    if (!N.ambush) return;
-    N.ambush = false;
-    N.hideIn = null;
-    N.hideTime = 0;
-    N.stealthCd = POWER_MODELS.hidingBush.revealSeconds;
-    if (N.bushes[0]) N.bushes[0].rustle = 0.35;
-    createExplosion(player.x, player.y, '#4ade80', 12);
-    addShockwave(player.x, player.y, { radius: 60, color: '#bbf7d0', width: 4, seconds: 0.3 });
-    shakeScreen(2);
 }
 
 // --- COGUMELOS DE ESPOROS ---
@@ -426,18 +366,20 @@ function wolfPrey(w, taken) {
 function wolfHome(w, i, t) {
     const M = POWER_MODELS.spiritWolves;
     const count = N.wolves.length;
-    const a = (i / count) * 6.283 + t * 0.7 + w.seed;
+    // Um ponto fixo ao lado do herói (atrás e à esquerda): o lobo não persegue um alvo que gira, senão treme parado
+    const a = 2.5 + (i / count) * 6.283 + w.seed * 0.3;
     return { x: player.x + Math.cos(a) * M.homeRadius, y: player.y + Math.sin(a) * M.homeRadius * 0.7 + 6 };
 }
 
 function wolfMaxHp(level, evolved) {
-    return (evolved ? EVOLUTIONS.spiritWolves.levels.hp : level.hp) * (1 + mod('wolfHealth'));
+    const E = EVOLUTIONS.spiritWolves;
+    return evolved ? E.levels.hp * (1 + E.healthBonus) : level.hp;
 }
 
 function newWolf(level, evolved, index) {
     const a = Math.random() * 6.283;
     const hp = wolfMaxHp(level, evolved);
-    return { x: player.x + Math.cos(a) * 30, y: player.y + Math.sin(a) * 30, angle: a, mode: 'roam', prey: null, cool: 0.4 + index * 0.4, seed: index * 2.1, age: 0, lift: 0, trail: [], bit: 0, moving: false, hp, maxHp: hp, dead: false, respawn: 0, hurt: 0 };
+    return { x: player.x + Math.cos(a) * 30, y: player.y + Math.sin(a) * 30, angle: a, mode: 'roam', prey: null, following: false, cool: 0.4 + index * 0.4, seed: index * 2.1, age: 0, lift: 0, trail: [], bit: 0, moving: false, hp, maxHp: hp, dead: false, respawn: 0, hurt: 0 };
 }
 
 function updateSpiritWolves(dt) {
@@ -449,13 +391,16 @@ function updateSpiritWolves(dt) {
     }
     const M = POWER_MODELS.spiritWolves;
     const evolved = powers.spiritWolves.evolved;
-    while (wolves.length < level.count) {
+    while (wolves.length < 1) {
         wolves.push(newWolf(level, evolved, wolves.length));
         createExplosion(player.x, player.y, COLOR, 8);
     }
-    wolves.length = level.count;
+    wolves.length = 1;
     const t = state.runTime;
-    const run = M.runSpeed * (1 + mod('wolfSpeed'));
+    const E = EVOLUTIONS.spiritWolves;
+    const run = M.runSpeed * (evolved ? 1 + E.speedBonus : 1);
+    const bodyRadius = M.bodyRadius;
+    const biteDamage = evolved ? E.levels.damage * (1 + E.damageBonus) : level.damage;
     const maxHp = wolfMaxHp(level, evolved);
     const respawnSeconds = evolved ? EVOLUTIONS.spiritWolves.respawnSeconds : M.respawnSeconds;
     const biteSeconds = evolved ? EVOLUTIONS.spiritWolves.levels.biteSeconds : level.biteSeconds;
@@ -488,7 +433,7 @@ function updateSpiritWolves(dt) {
         // Os monstros que encostam no lobo batem nele e ele recua um pouco
         for (const e of state.enemies) {
             if (e.wolfCd > 0 || e.stunned > 0 || e.hp <= 0) continue;
-            if (Math.hypot(e.x - w.x, e.y - w.y) > M.bodyRadius + e.radius * 0.9) continue;
+            if (Math.hypot(e.x - w.x, e.y - w.y) > bodyRadius + e.radius * 0.9) continue;
             e.wolfCd = M.hitSeconds;
             w.hp -= e.damage * M.damageTaken;
             w.hurt = 0.22;
@@ -544,7 +489,7 @@ function updateSpiritWolves(dt) {
             w.moving = w.cool > 0.2;
             if (w.cool <= 0) {
                 const rooted = prey.rooted > 0 ? M.rootedBonus : 1;
-                dealDamage(prey, getSpellDamage() * level.damage * rooted * (1 + mod('wolfDamage')), { noCrit: true, style: 'spell', kbX: Math.cos(w.angle) * 70, kbY: Math.sin(w.angle) * 70 });
+                dealDamage(prey, getSpellDamage() * biteDamage * rooted, { noCrit: true, style: 'spell', kbX: Math.cos(w.angle) * 70, kbY: Math.sin(w.angle) * 70 });
                 N.claws.push({ x: prey.x, y: prey.y, angle: w.angle, age: 0 });
                 if (N.claws.length > 8) N.claws.shift();
                 createExplosion(prey.x, prey.y, '#bbf7d0', 5);
@@ -557,22 +502,33 @@ function updateSpiritWolves(dt) {
             return;
         }
 
-        // Sem presa (ou longe demais do herói): volta a rodeá-lo e se cura devagar
+        // Sem presa (ou longe demais do herói): fica perto do herói e se cura devagar. Histerese: só se mexe quando o herói se
+        // afasta (começa a seguir passando de followFar, para ao chegar a followNear); parado, fica quieto e olha o monstro
+        // mais perto (ou o herói), virando devagar. Antes ele corria atrás de um ponto que girava e tremia parado.
         const dx = home.x - w.x;
         const dy = home.y - w.y;
         const d = Math.hypot(dx, dy);
-        w.mode = d > 14 ? 'return' : 'roam';
-        w.moving = d > 6;
+        if (d > M.followFar || tooFar) w.following = true;
+        else if (d < M.followNear) w.following = false;
         if (!tooFar) w.hp = Math.min(w.maxHp, w.hp + w.maxHp * M.regen * dt);
-        if (d > 3) {
-            const step = Math.min(d, (d > 14 ? run : run * 0.35) * dt);
+        let want;
+        if (w.following) {
+            w.mode = 'return';
+            w.moving = true;
+            const speed = Math.min(run, 70 + d * 3.2);
+            const step = Math.min(d, speed * dt);
             w.x += (dx / d) * step;
             w.y += (dy / d) * step;
-            w.angle = Math.atan2(dy, dx);
+            want = Math.atan2(dy, dx);
         } else {
+            w.mode = 'roam';
+            w.moving = false;
             const away = nearestEnemy(player.x, player.y, M.huntRange);
-            w.angle = away ? Math.atan2(away.y - w.y, away.x - w.x) : Math.atan2(player.y - w.y, player.x - w.x) + 3.14;
+            want = away ? Math.atan2(away.y - w.y, away.x - w.x) : Math.atan2(player.y - w.y, player.x - w.x);
         }
+        // Vira devagar, pelo caminho mais curto (nunca de um quadro para o outro)
+        const turn = Math.atan2(Math.sin(want - w.angle), Math.cos(want - w.angle));
+        w.angle += turn * Math.min(1, dt * (w.following ? 14 : 5));
     });
     for (let i = N.claws.length - 1; i >= 0; i--) {
         N.claws[i].age += dt;
@@ -580,11 +536,48 @@ function updateSpiritWolves(dt) {
     }
 }
 
+// --- DARK ROSES (só o Rowan) ---
+// A rosa negra que acerta MARCA o monstro (e.roseMark, em segundos). Se ele morrer marcado, rosas de espinho brotam onde caiu
+// (state.nature.thorns) e ferem e desaceleram o que passar por cima por alguns segundos. O desenho: js/render/nature.js.
+export function markWithRose(e) {
+    if (e.hp <= 0) return;
+    if (!(e.roseMark > 0)) createExplosion(e.x, e.y - 10, '#a78bfa', 5);
+    e.roseMark = THORN_ROSES.markSeconds;
+}
+
+function updateRoseThorns(dt) {
+    for (const e of state.enemies) if (e.roseMark > 0) e.roseMark -= dt;
+    for (let i = N.thorns.length - 1; i >= 0; i--) {
+        const p = N.thorns[i];
+        p.age += dt;
+        if (p.age >= THORN_ROSES.patchSeconds) {
+            N.thorns.splice(i, 1);
+            continue;
+        }
+        p.tick -= dt;
+        const tick = p.tick <= 0;
+        if (tick) p.tick += THORN_ROSES.tickSeconds;
+        const damage = getKnifeDamage() * THORN_ROSES.damage;
+        for (const e of state.enemies) {
+            if (e.hp <= 0 || Math.hypot(e.x - p.x, e.y - p.y) > THORN_ROSES.radius + e.radius * 0.6) continue;
+            e.slow = Math.max(e.slow ?? 0, THORN_ROSES.slow);
+            if (tick) dealDamage(e, damage, { noCrit: true, quiet: true, style: 'spell' });
+        }
+    }
+}
+
 // --- MORTE DE UM MONSTRO (chamado por js/systems/powers.js, onEnemyKilled) ---
 export function onNatureKill(e) {
-    if (N.seed?.target === e) {
+    // Dark Roses: morreu marcado, rosas de espinho brotam onde caiu
+    if (e.roseMark > 0 && N.thorns.length < 14) {
+        N.thorns.push({ x: e.x, y: e.y, age: 0, tick: 0.2, variant: Math.floor(Math.random() * 3) });
+        createExplosion(e.x, e.y, '#a78bfa', 10);
+        audio.playSummon?.();
+    }
+    const seeded = N.seeds.findIndex(seed => seed.target === e);
+    if (seeded >= 0) {
         const level = getPowerLevel(powers.shelterOak);
-        N.seed = null;
+        N.seeds.splice(seeded, 1);
         if (level) growOak(e.x, e.y, level);
     }
     if (e.rooted > 0) {
@@ -619,25 +612,21 @@ export function updateNatureSkills(dt) {
     updateGraspingRoots(dt);
     updateLeechVine(dt);
     updateShelterOak(dt);
-    updateHidingBush(dt);
     updateSporePods(dt);
     updateSpiritWolves(dt);
+    updateRoseThorns(dt);
 }
 
 // Virada da hora: o campo fica limpo
 export function clearNatureSkills() {
     N.oaks.length = 0;
-    N.seed = null;
-    N.bushes.length = 0;
+    N.seeds.length = 0;
     N.pods.length = 0;
     N.clouds.length = 0;
     N.vines.length = 0;
     N.claws.length = 0;
+    N.thorns.length = 0;
     N.lure = null;
-    N.hideIn = null;
-    N.ambush = false;
-    N.hideTime = 0;
-    N.stealthCd = 0;
     // Na virada da hora a matilha se refaz: quem caiu volta com a vida cheia
     for (const w of N.wolves) {
         w.prey = null;

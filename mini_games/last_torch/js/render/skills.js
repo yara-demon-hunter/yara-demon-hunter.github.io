@@ -6,6 +6,7 @@ import { easeOutBack, easeOutCubic } from '../../library/core/easing.js';
 import { drawFlameTongue } from './fire.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { drawPhoenixSprite } from './phoenix.js';
+import { drawGraveWisp } from '../../library/buddies/grave_wisp/grave_wisp.js';
 import { getDashedRing } from './fx/rings.js';
 
 // --- SKILLS DOS RAMOS (desenho) ---
@@ -324,34 +325,11 @@ export function renderSkillHits() {
     ctx.restore();
 }
 
-// Caveira em chamas que acompanha o herói (Grave Wisp)
+// Caveira em chamas que acompanha o herói (Grave Wisp): o desenho é um buddy da biblioteca (library/buddies/grave_wisp)
 export function renderWisp() {
     if (powers.graveWisp.lvl <= 0 || !state.wisp.placed) return;
-    const W = V.wisp;
     const { x, y, flash } = state.wisp;
-    const t = performance.now() / 1000;
-    const fire = flash > 0 ? 1.5 : 1;
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    drawGlow(ctx, W.flame, x, y - 4, 15 * fire, 0.75);
-    for (let i = 0; i < 3; i++) {
-        const up = (t * 1.9 + i / 3) % 1;
-        drawGlow(ctx, W.flameCore, x + Math.sin(t * 7 + i * 2) * 3, y - 6 - up * 12, 6 * (1 - up) + 1, 0.9 * (1 - up));
-    }
-    ctx.restore();
-    ctx.fillStyle = W.bone;
-    ctx.beginPath();
-    ctx.arc(x, y - 1, 5.6, 0, TAU);
-    ctx.fill();
-    ctx.fillRect(x - 3, y + 2.5, 6, 3.2);
-    ctx.fillStyle = W.boneShade;
-    ctx.fillRect(x - 1.6, y + 4, 0.8, 1.7);
-    ctx.fillRect(x + 0.8, y + 4, 0.8, 1.7);
-    ctx.fillStyle = W.eye;
-    ctx.beginPath();
-    ctx.arc(x - 2.1, y - 1, 1.4, 0, TAU);
-    ctx.arc(x + 2.1, y - 1, 1.4, 0, TAU);
-    ctx.fill();
+    drawGraveWisp(ctx, x, y, performance.now() / 1000, flash);
 }
 
 // Escudo do Vigil: uma redoma com a base em chamas

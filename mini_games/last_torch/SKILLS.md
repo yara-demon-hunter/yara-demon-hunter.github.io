@@ -12,7 +12,7 @@ Cada ramo é um **jeito de jogar**, não só uma lista de bônus. A pergunta de 
 | **Blade** | Guerreiro | Agressivo. Entra no meio e mata todo mundo. Ser cercado é bom. | Matar acelera (Bloodlust), acelerar mata mais, a Fúria explode, quem sobra é executado. | Médio |
 | **Shadow** | Ladrão | Técnico. Marca de longe, detona de perto, atravessa a horda e rouba. | Adaga marca, dash detona e devolve o dash, moedas adiantam a recarga: um combo que nunca para. | O mais barato |
 | **Flame** | Guardião | Defensivo e calmo. Fica firme perto da tocha e deixa o fogo trabalhar. | Parado, ergue o escudo. A horda queima ao cruzar o anel. Nada passa. | O mais caro |
-| **Nature** | Druida | Estratégico e paciente. Prende no chão, bebe a vida dos monstros, some atrás de uma árvore e deixa a matilha caçar. | Raízes prendem, tudo o que bate em quem está preso bate mais, a videira cura; a semente do carvalho drena um monstro e, quando ele morre, a muda cura quem ficar perto até crescer e lutar. | Médio (poder 2, especial 3) |
+| **Nature** | Druida | Estratégico e paciente. Prende no chão, bebe a vida dos monstros, planta um carvalho que luta por você e solta um lobo para caçar. | Raízes prendem, tudo o que bate em quem está preso bate mais, a videira cura; a semente do carvalho drena um monstro e, quando ele morre, a muda cura quem ficar perto até crescer e lutar. | Médio (poder 2, especial 3) |
 | **Curse** | Feiticeiro | Estratégico. Fica longe, em área e à distância, e assiste à horda morrer em cadeia. | A maldição pula de monstro em monstro, a fenda junta todos, a explosão acaba com eles. | O mais caro |
 
 **Pergunta para encaixar uma skill:** o que ela pede do jogador? Agressividade vai em Blade; precisão ou
@@ -32,7 +32,7 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 | Oath of Ruin | Curse | Reforça e acelera os feitiços | Reduz o dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
 
 Regras: abre ao aprender **as duas skills que chegam nele** (as ligações do mapa) e fica na coluna 6, sempre na mesma posição.
-Slaughter pede Cataclysm e Executioner; Whispers, Shadow Legion e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Fireballs e Solar Wall;
+Slaughter pede Cataclysm e Executioner; Whispers, Shadow Legion e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Phoenix Pact e Solar Wall;
 Ruin, Wrath of Heaven e Event Horizon. Os dados ficam em `data_model/passives.js`, e a arte
 em `data_model/visuals/characters/oath_visual.js` e `js/render/hero_gear.js`.
 
@@ -95,11 +95,11 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Esquiva: Phantom Rush, Night Reaper*, Shadow Shackle*, Smoke Bomb*. Move Speed, Phantom Rush, Night Reaper, Shadow Shackle, Smoke Bomb, Juramento
   - Oath of Whispers*
 - **Flame** (raiz: Torch Keeper)
-  - Calor: Warm Hearth, Undying Flame, Phoenix Pact*, Fireballs*
+  - Calor: Warm Hearth, Undying Flame, Phoenix Pact*
   - Guarda: Steady Stance*, Vigil*, Backdraft*
   - Muralha: Flame Sentinel, Sun Spire, Hearth Ring*, Solar Wall*
   - Brasa: Ember Steps (fogo nos passos e dano dentro do calor da tocha), Hellwalker
-  - Armas: Flaming Sword* (sai do Hellwalker)
+  - Armas: Flaming Sword* (sai do Hellwalker), Fireballs* (vem depois da Flaming Sword; nada mais depende dela)
   - Oath of the Hearth*
 - **Curse** (raiz: Arcane Study)
   - Gelo e força: Cold Moon, Soul Nova, Absolute Zero, Starfall

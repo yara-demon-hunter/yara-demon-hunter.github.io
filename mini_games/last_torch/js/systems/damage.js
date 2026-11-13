@@ -1,6 +1,7 @@
 import { SHADOW_RAVEN, SMOKE_BOMB } from '../../data_model/passives.js';
+import { EVOLUTIONS } from '../../data_model/powers.js';
 import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
-import { audio, player, state } from '../core/state.js';
+import { audio, player, powers, state } from '../core/state.js';
 import { syncBossBar } from '../ui/hud.js';
 import { addDamageNumber, addShockwave, createExplosion, shakeScreen } from './effects.js';
 import { onCritical } from './powers.js';
@@ -14,6 +15,11 @@ import { getCritChance, getCritMultiplier } from './stats.js';
 // style = cor do número pelo tipo de dano (spell, torch, shadow; sem style = lâmina e adaga, branco)
 // Smoke Bomb: quem está dentro de uma nuvem leva cada golpe com uma chance extra de ser crítico
 // (sorteada à parte da chance normal do herói)
+// Strangling Grove: o monstro preso por raízes leva mais de tudo
+function rootedBonus() {
+    return (powers.graspingRoots.evolved ? EVOLUTIONS.graspingRoots.rootedDamage : 0) + mod('rootedDamage');
+}
+
 function inSmoke(e) {
     for (const s of state.smokes) {
         if (Math.hypot(e.x - s.x, e.y - s.y) < s.radius + e.radius) return true;
@@ -25,7 +31,7 @@ export function dealDamage(e, amount, o = {}) {
     if (e.hp <= 0 || e.invulnerable) return 0;
     const crit = o.crit || (!o.noCrit && (Math.random() < getCritChance() || (inSmoke(e) && Math.random() < SMOKE_BOMB.critChance)));
     const dmg = amount * (crit ? getCritMultiplier() : 1) * (e.ravenMark > 0 ? 1 + SHADOW_RAVEN.markDamage : 1)
-        * (e.rooted > 0 ? 1 + mod('rootedDamage') : 1);     // Barbed Roots: preso por raízes leva mais de tudo
+        * (e.rooted > 0 ? 1 + rootedBonus() : 1);     // Strangling Grove: preso por raízes leva mais de tudo
 
     e.hp -= dmg;
     e.hitFlash = J.hitFlashSeconds;

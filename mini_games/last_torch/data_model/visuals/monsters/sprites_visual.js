@@ -59,6 +59,9 @@ export const MONSTER_SPRITES_25D = {
     BLOATER: { extent: 15, bakeSeconds: 1 / 1.6, playSeconds: 0.7, speed: 33 },
     WRAITH: { extent: 15, bakeSeconds: 1 / 1.1, playSeconds: 0.9, speed: 60 },
     SHADOW_WOLF: { extent: 20, bakeSeconds: 1 / 2.8, playSeconds: 0.38, speed: 100 },
+    // Buddies (BUDDY_MODELS): os lobos do Rowan, montados sob demanda
+    BUDDY_SHADOW_WOLF: { extent: 20, bakeSeconds: 1 / 2.8, playSeconds: 0.38, speed: 100 },
+    BUDDY_WHITE_WOLF: { extent: 20, bakeSeconds: 1 / 2.8, playSeconds: 0.38, speed: 100 },
     ZOMBIE_WOLF: { extent: 19, bakeSeconds: 1 / 2.6, playSeconds: 0.4, speed: 85 },
     HEADLESS_KNIGHT: { extent: 23, bakeSeconds: 1, playSeconds: 1, speed: 26 },
     // live: em campo é desenhado ao vivo (o golpe mexe braço, tronco e espada); o sprite serve ao bestiário

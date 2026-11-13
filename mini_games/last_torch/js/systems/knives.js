@@ -1,6 +1,7 @@
 import { FAN_OF_KNIVES, FIREBALLS, SHADOW_CLONE } from '../../data_model/passives.js';
 import { KNIFE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
+import { getThrownWeapon } from '../../library/weapons/thrown.js';
 import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, joystick, passives, player, powers, state } from '../core/state.js';
 import { dealDamage } from './damage.js';
@@ -8,7 +9,16 @@ import { createExplosion } from './effects.js';
 import { mod } from './modifiers.js';
 import { burstFireball } from './skills_flame.js';
 import { markEnemy } from './skills_shadow.js';
+import { markWithRose } from './skills_nature.js';
 import { getKnifeBaseRange, getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
+import { getHero } from './modifiers.js';
+
+// O que o herói lança: adaga, ou a rosa do Rowan (a Rosa Negra, com a skill Dark Roses). Só muda o desenho: dano, alcance e
+// todas as skills de adaga valem igual para a rosa
+export function getThrownStyle() {
+    if (getHero().thrown !== 'rose') return 'dagger';
+    return passives.darkRoses.lvl > 0 ? 'darkRose' : 'rose';
+}
 
 const KNIFE_RELEASE_SECONDS = K.throwSeconds * K.letGoFraction;
 // Toque no botão da adaga quase no fim da recarga: guarda o arremesso e solta assim que ficar pronta,
@@ -63,7 +73,7 @@ function releaseKnife(thrower = player) {
     const x = thrower.x + cos * K.spawnForward - sin * K.spawnSide;
     const y = thrower.y + sin * K.spawnForward + cos * K.spawnSide;
 
-    const speed = KNIFE_SKILL.speed * (1 + mod('knifeSpeed'));
+    const speed = KNIFE_SKILL.speed * (1 + mod('knifeSpeed')) * getThrownWeapon(getThrownStyle()).speed;
     const maxRange = getKnifeRange();
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
     const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
@@ -86,11 +96,12 @@ function releaseKnife(thrower = player) {
             pierces: Math.round(power * (lance?.pierces ?? 0)),
             scale: 1 + power * (POWER_MODELS.chargedThrow.maxScale - 1),
             fire: passives.fireballs.lvl > 0,
+            style: getThrownStyle(),
             struck: null                // monstros já atingidos por esta adaga (Ricochet)
         });
     }
 
-    createExplosion(x, y - K.flightHeight, passives.fireballs.lvl > 0 ? '#fb923c' : K.colors.edge, 5 + count * 2);
+    createExplosion(x, y - K.flightHeight, passives.fireballs.lvl > 0 ? '#fb923c' : getThrownWeapon(getThrownStyle()).colors.edge, 5 + count * 2);
     if (thrower === player) audio.playSwordSlash(1);
 }
 
@@ -99,7 +110,7 @@ export function burstKnives(x, y) {
     if (mod('noKnives') > 0) return;
     const B = SHADOW_CLONE.burst;
     const count = B.knives + (passives.fanOfKnives.lvl > 0 ? B.fanBonus : 0);
-    const speed = KNIFE_SKILL.speed * (1 + mod('knifeSpeed'));
+    const speed = KNIFE_SKILL.speed * (1 + mod('knifeSpeed')) * getThrownWeapon(getThrownStyle()).speed;
     const maxRange = getKnifeRange();
     const ricochet = getPowerLevel(powers.ricochet);
     const damage = getKnifeDamage() * B.damageMultiplier;
@@ -117,10 +128,11 @@ export function burstKnives(x, y) {
             pierces: 0,
             scale: 1,
             fire: passives.fireballs.lvl > 0,
+            style: getThrownStyle(),
             struck: null
         });
     }
-    createExplosion(x, y - K.flightHeight, passives.fireballs.lvl > 0 ? '#fb923c' : K.colors.edge, 10 + count);
+    createExplosion(x, y - K.flightHeight, passives.fireballs.lvl > 0 ? '#fb923c' : getThrownWeapon(getThrownStyle()).colors.edge, 10 + count);
 }
 
 // Alcance atual da adaga (com Dagger Mastery)
@@ -237,6 +249,7 @@ export function updateKnives(dt) {
         if (hit) {
             dealDamage(hit, k.damage, { style: k.fire ? 'spell' : null, kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
             markEnemy(hit);
+            if (k.style === 'darkRose') markWithRose(hit);
             if (k.fire) burstFireball(k, hit);
             createExplosion(k.x, k.y, hit.color, 6);
             audio.playHit(1);

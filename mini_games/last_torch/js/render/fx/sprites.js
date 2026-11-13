@@ -1,7 +1,7 @@
 import { GOLD_VISUALS as G } from '../../../data_model/visuals/items/gold_visual.js';
 import { KNIFE_VISUALS as K } from '../../../data_model/visuals/effects/knife_visual.js';
 import { getGlowSprite } from '../../../library/core/glow.js';
-import { drawDagger } from '../knife.js';
+import { getThrownWeapon } from '../../../library/weapons/thrown.js';
 
 // --- SPRITES PEQUENOS ---
 // Tudo que aparece muitas vezes é desenhado uma vez e depois carimbado: moeda e adaga.
@@ -46,18 +46,19 @@ export function getCoinAtlas() {
     return coins;
 }
 
-// Adaga parada, apontando para +x, com a origem no centro do sprite
+// Arma de arremesso parada (adaga ou rosa), apontando para +x, com a origem no centro do sprite; um sprite por estilo
 const DAGGER_PIXELS = 2;
-export const DAGGER_LENGTH = 30;    // unidades da adaga
+export const DAGGER_LENGTH = 30;    // unidades da arma
 export const DAGGER_WIDTH = 12;
-let dagger = null;
+const thrown = {};
 
-export function getDaggerSprite() {
-    if (dagger) return dagger;
-    dagger = makeCanvas(DAGGER_LENGTH * DAGGER_PIXELS, DAGGER_WIDTH * DAGGER_PIXELS, (g) => {
+export function getDaggerSprite(style = 'dagger') {
+    if (thrown[style]) return thrown[style];
+    const weapon = getThrownWeapon(style);
+    thrown[style] = makeCanvas(DAGGER_LENGTH * DAGGER_PIXELS, DAGGER_WIDTH * DAGGER_PIXELS, (g) => {
         g.scale(DAGGER_PIXELS, DAGGER_PIXELS);
-        g.translate(DAGGER_LENGTH / 2 - K.shape.centerX, DAGGER_WIDTH / 2);
-        drawDagger(g, 0);
+        g.translate(DAGGER_LENGTH / 2 - weapon.centerX, DAGGER_WIDTH / 2);
+        weapon.draw(g, 0);
     });
-    return dagger;
+    return thrown[style];
 }

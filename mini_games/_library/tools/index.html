@@ -55,6 +55,11 @@
                 <span>Os 13 monstros 2.5D e os 12 desenhos de cima do Last Torch, cada um com as suas cores e medidas.</span>
                 <em>tuner.html · monstros</em>
             </a>
+            <a class="card" href="buddy_viewer.html">
+                <span class="icon">🐺</span><b>Buddies</b>
+                <span>Quem anda e luta ao lado do herói: fênix, corvo, caveira voadora (animados aqui) e os lobos (no tuner).</span>
+                <em>buddy_viewer.html</em>
+            </a>
             <a class="card" href="scenery_tuner.html?scenery=dark_forest_2">
                 <span class="icon">🌲</span><b>Cenários</b>
                 <span>O cenário inteiro renderizado pelo motor: base, receita de peças, névoa, vento e luz, em computador e celular.</span>
@@ -105,7 +110,7 @@
 
         const HEROES = [['hunter', 'Demon Hunter'], ['azael', 'Azael'], ['brutos', 'Captain Brutos'], ['yara', 'Yara'], ['zeph', 'Zeph'], ['oskar', 'Oskar'], ['rowan', 'Rowan (druida)']];
         const MONSTERS = [['skeleton', 'Esqueleto'], ['skeleton_crawler', 'Esqueleto rastejante'], ['bloater', 'Inchado'], ['witch', 'Bruxa'], ['bat', 'Morcego'],
-            ['moth', 'Mariposa'], ['wraith', 'Espectro'], ['shadow_wolf', 'Lobo sombrio'], ['zombie_wolf', 'Lobo zumbi'], ['headless_knight', 'Cavaleiro sem cabeça'],
+            ['moth', 'Mariposa'], ['wraith', 'Espectro'], ['shadow_wolf', 'Lobo sombrio'], ['white_wolf', 'Buddy: Lobo branco'], ['buddy_shadow_wolf', 'Buddy: Lobo sombrio'], ['zombie_wolf', 'Lobo zumbi'], ['headless_knight', 'Cavaleiro sem cabeça'],
             ['bone_colossus', 'Colosso de ossos'], ['vampire', 'Vampiro'], ['demon_lord', 'Senhor demônio']];
 
         const box = document.getElementById('shortcuts');
@@ -128,6 +133,7 @@
         try {
             group('Heróis', HEROES.map(([id, name]) => [`tuner.html?model=${id}`, name]));
             group('Monstros', MONSTERS.map(([id, name]) => [`tuner.html?model=${id}`, name]));
+            group('Buddies', [['buddy_viewer.html', 'Fênix, corvo e caveira', 'animados'], ['tuner.html?model=buddy_shadow_wolf', 'Shadow Wolf', '2.5D'], ['tuner.html?model=white_wolf', 'White Wolf', '2.5D']]);
             group('Cenários', sceneryIds().map(id => {
                 const pieces = createScenery(id).visual.props;
                 return [`scenery_tuner.html?scenery=${id}`, id, pieces ? `${pieces.length} peças` : 'desenho próprio'];

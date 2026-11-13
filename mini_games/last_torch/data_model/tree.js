@@ -132,8 +132,9 @@ export const TREE_NODES = [
     { id: 'emberEvolve', branch: 'flame', kind: 'evolve', key: 'emberTrail', x: 2, y: 3, cost: 3, requires: [req('emberTrail', 5)] },
     // As armas pegam fogo: saem do Hellwalker
     { id: 'flameBlade', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
-    { id: 'fireballs', needs: 'knives', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 0, requires: [req('phoenixPact')] },
-    { id: 'oathHearth', branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('fireballs'), req('fireRingEvolve')] },
+    // As bolas de fogo vêm depois da espada em chamas: nada mais depende delas (heróis sem adaga as têm seladas e a cadeia segue)
+    { id: 'fireballs', needs: 'knives', branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
+    { id: 'oathHearth', branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('phoenixPact'), req('fireRingEvolve')] },
 
     // --- MALDIÇÃO: o feiticeiro. Magia, área e distância ---
     { id: 'arcaneStudy', branch: 'curse', kind: 'mod', x: 0, y: 1.5, requires: [],
@@ -169,38 +170,23 @@ export const TREE_NODES = [
     { id: 'wildHeart', branch: 'nature', kind: 'mod', x: 0, y: 1.5, requires: [],
       name: 'Wild Heart', icon: '🌱', desc: 'The forest mends your wounds, slowly and always.',
       levelText: (mods) => `Heal ${mods.hpRegen} health per second`, mods: { hpRegen: 0.3 } },
-    // Linha das raízes: prender no chão
+    // Quatro linhas. Cada uma é uma corrente; duas delas (raízes e carvalho/esporos) terminam no Oath of the Wild.
+    // Linha 1, as raízes: Grasping Roots -> Strangling Grove -> Thorn Burst -> Oath
     { id: 'graspingRoots', branch: 'nature', kind: 'power', key: 'graspingRoots', x: 1, y: 0, requires: [req('wildHeart')] },
-    { id: 'barbedRoots', branch: 'nature', kind: 'mod', x: 2, y: 0, requires: [req('graspingRoots', 2)],
-      name: 'Barbed Roots', icon: '🥀', desc: 'A pinned monster is an easy target for everything you have.',
-      levelText: (mods) => `Pinned monsters take +${formatPercent(mods.rootedDamage)} damage from every hit`, mods: { rootedDamage: 0.08 } },
-    { id: 'rootsEvolve', branch: 'nature', kind: 'evolve', key: 'graspingRoots', x: 3, y: 0, requires: [req('graspingRoots', 5)] },
-    { id: 'thornBurst', branch: 'nature', kind: 'passive', key: 'thornBurst', x: 4, y: 0, requires: [req('rootsEvolve')] },
-    // Linha da seiva: drenar a vida
-    { id: 'leechVine', branch: 'nature', kind: 'power', key: 'leechVine', x: 1, y: 1, requires: [req('wildHeart')] },
-    { id: 'lifebloom', branch: 'nature', kind: 'mod', x: 2, y: 1, requires: [req('leechVine', 2)],
-      name: 'Lifebloom', icon: '🌸', desc: 'What you cut feeds you.',
-      levelText: (mods) => `+${mods.maxHpFlat} health, ${formatPercent(mods.lifeSteal)} of your hit damage returns as health`, mods: { maxHpFlat: 6, lifeSteal: 0.01 } },
-    { id: 'leechEvolve', branch: 'nature', kind: 'evolve', key: 'leechVine', x: 3, y: 1, requires: [req('leechVine', 5)] },
-    // Linha do bosque: a árvore que esconde
-    { id: 'shelterOak', branch: 'nature', kind: 'power', key: 'shelterOak', x: 1, y: 2, requires: [req('wildHeart', 2)] },
-    { id: 'thornBark', branch: 'nature', kind: 'passive', key: 'thornBark', x: 2, y: 2, requires: [req('shelterOak', 2)] },
-    { id: 'oakEvolve', branch: 'nature', kind: 'evolve', key: 'shelterOak', x: 3, y: 2, requires: [req('shelterOak', 5)] },
-    // Linha dos esporos: o chão que envenena
-    { id: 'sporePods', branch: 'nature', kind: 'power', key: 'sporePods', x: 1, y: 3, requires: [req('wildHeart')] },
-    { id: 'toxicBloom', branch: 'nature', kind: 'mod', x: 2, y: 3, requires: [req('sporePods', 2)],
-      name: 'Toxic Bloom', icon: '🧪', desc: 'Thicker spores, slower lungs.',
-      levelText: (mods) => `+${formatPercent(mods.poison)} poison damage and cloud duration`, mods: { poison: 0.12 } },
-    { id: 'sporeEvolve', branch: 'nature', kind: 'evolve', key: 'sporePods', x: 3, y: 3, requires: [req('sporePods', 5)] },
-    // Linha dos animais: a matilha que guarda a tocha
-    { id: 'spiritWolves', branch: 'nature', kind: 'power', key: 'spiritWolves', x: 1, y: 4, requires: [req('wildHeart', 2)] },
-    { id: 'packInstinct', branch: 'nature', kind: 'mod', x: 2, y: 4, requires: [req('spiritWolves', 2)],
-      name: 'Pack Instinct', icon: '🐾', desc: 'The pack runs faster and bites deeper.',
-      levelText: (mods) => `+${formatPercent(mods.wolfDamage)} wolf damage, +${formatPercent(mods.wolfSpeed)} wolf speed, +${formatPercent(mods.wolfHealth)} wolf health`, mods: { wolfDamage: 0.12, wolfSpeed: 0.06, wolfHealth: 0.15 } },
-    { id: 'wolvesEvolve', branch: 'nature', kind: 'evolve', key: 'spiritWolves', x: 3, y: 4, requires: [req('spiritWolves', 5)] },
-    // Linha da emboscada: o arbusto que esconde
-    { id: 'hidingBush', branch: 'nature', kind: 'power', key: 'hidingBush', x: 1, y: 5, requires: [req('wildHeart', 2)] },
-    { id: 'oathWild', branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 6, y: 1.5, requires: [req('thornBurst'), req('oakEvolve')] }
+    { id: 'rootsEvolve', branch: 'nature', kind: 'evolve', key: 'graspingRoots', x: 2, y: 0, requires: [req('graspingRoots', 5)] },
+    { id: 'thornBurst', branch: 'nature', kind: 'passive', key: 'thornBurst', x: 3, y: 0, requires: [req('rootsEvolve')] },
+    // Linha 2, o bosque: Wicked Oak -> Ancient Grove -> Spore Pods -> Plague Garden -> Oath
+    { id: 'shelterOak', branch: 'nature', kind: 'power', key: 'shelterOak', x: 1, y: 1, requires: [req('wildHeart', 2)] },
+    { id: 'oakEvolve', branch: 'nature', kind: 'evolve', key: 'shelterOak', x: 2, y: 1, requires: [req('shelterOak', 5)] },
+    { id: 'sporePods', branch: 'nature', kind: 'power', key: 'sporePods', x: 3, y: 1, requires: [req('oakEvolve')] },
+    { id: 'sporeEvolve', branch: 'nature', kind: 'evolve', key: 'sporePods', x: 4, y: 1, requires: [req('sporePods', 5)] },
+    // Linha 3, a seiva e o lobo: Leech Vine -> Shadow Wolf -> The White Wolf
+    { id: 'leechVine', branch: 'nature', kind: 'power', key: 'leechVine', x: 1, y: 2, requires: [req('wildHeart')] },
+    { id: 'spiritWolves', branch: 'nature', kind: 'power', key: 'spiritWolves', x: 2, y: 2, requires: [req('leechVine', 5)] },
+    { id: 'wolvesEvolve', branch: 'nature', kind: 'evolve', key: 'spiritWolves', x: 3, y: 2, requires: [req('spiritWolves', 5)] },
+    // Linha 4, sozinha: a rosa negra, só do Rowan (o nó fica selado para os outros e conta como cumprido para quem o pede)
+    { id: 'darkRoses', hero: 'rowan', branch: 'nature', kind: 'passive', key: 'darkRoses', x: 1, y: 3, requires: [req('wildHeart', 2)] },
+    { id: 'oathWild', branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 6, y: 1.5, requires: [req('thornBurst'), req('sporeEvolve')] }
 ];
 
 export const TREE_BY_ID = Object.fromEntries(TREE_NODES.map(node => [node.id, node]));

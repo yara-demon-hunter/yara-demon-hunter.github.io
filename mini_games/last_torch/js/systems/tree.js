@@ -107,11 +107,14 @@ const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || n
 // Não se compra, e conta como cumprido para quem o pede (passe livre). Vale para o herói que não tem adaga (Captain
 // Brutos) e para quem jurou o Oath of Slaughter; níveis já comprados ficam, só não sobem mais.
 export function isRestricted(node) {
+    // hero: skill de um herói só (Dark Roses): fica selada para os outros
+    if (node.hero && getHero().id !== node.hero) return true;
     return node.needs === 'knives' && mod('noKnives') > 0;
 }
 
 // Por que está selado, para a tela: de quem é a escolha (o herói ou o Juramento)
-export function getRestrictionText() {
+export function getRestrictionText(node) {
+    if (node?.hero && getHero().id !== node.hero) return `Only ${node.hero[0].toUpperCase()}${node.hero.slice(1)} can learn this skill.`;
     const hero = getHero();
     return (hero.mods?.noKnives ?? 0) > 0
         ? `${hero.name} fights without daggers: this skill is not for him.`

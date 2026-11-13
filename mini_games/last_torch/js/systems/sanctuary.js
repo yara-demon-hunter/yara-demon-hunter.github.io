@@ -3,6 +3,7 @@ import { HEROES } from '../../data_model/heroes.js';
 import { save, persist } from '../core/save.js';
 import { state } from '../core/state.js';
 import { showToast } from '../ui/banner.js';
+import { flushHeroUnlocks, queueHeroUnlock } from '../ui/hero_unlock.js';
 
 // --- SANTUÁRIO (registro) ---
 // Tudo que vale para além da noite: recordes, façanhas e o bestiário. O desenho fica em js/ui/sanctuary.js.
@@ -12,7 +13,9 @@ export function rewardText(a) {
 }
 
 // Conquistas completadas agora. toast: avisa na tela (na tela final elas já aparecem na lista).
-export function checkAchievements({ toast = true } = {}) {
+// toast: avisa na tela. announce: um herói liberado ganha o prêmio com foto (js/ui/hero_unlock.js); por padrão, quando há
+// aviso. A reconciliação de saves antigos, ao abrir o jogo, não anuncia nada.
+export function checkAchievements({ toast = true, announce = toast, flush = true } = {}) {
     const done = [];
     ACHIEVEMENTS.forEach(a => {
         const earned = save.achievements[a.id] || (save.stats[a.stat] ?? 0) >= a.target;
@@ -32,7 +35,11 @@ export function checkAchievements({ toast = true } = {}) {
     });
     if (done.length === 0) return done;
     persist();
-    if (toast) done.forEach(a => showToast(a.icon, a.name, rewardText(a)));
+    // Herói liberado: o prêmio com a foto no lugar do aviso simples (espera a caçada acabar, se for o caso)
+    const heroes = announce ? done.filter(a => a.hero && !HEROES[a.hero].shelved) : [];
+    heroes.forEach(a => queueHeroUnlock(a.hero, a));
+    if (toast) done.filter(a => !heroes.includes(a)).forEach(a => showToast(a.icon, a.name, rewardText(a)));
+    if (flush) flushHeroUnlocks();
     return done;
 }
 

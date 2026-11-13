@@ -51,12 +51,8 @@ const HERO_25D = new URLSearchParams(window.location.search).get('hero') !== 'to
 function renderHeroBlock() {
     if (player.hidden) return;
     renderSkillAuras();
-    // Escondido no arbusto: o herói aparece fraco, para o jogador saber onde ele está
-    const hiding = state.nature.hideIn !== null;
-    if (hiding) ctx.globalAlpha = 0.5;
     if (HERO_25D) renderHero();
     else renderPlayer();
-    if (hiding) ctx.globalAlpha = 1;
     renderOrbitBlades();
     renderShield();
     renderWisp();

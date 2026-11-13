@@ -103,6 +103,8 @@
     letter-spacing: 0.14em;
 }
 .stat-group:first-child { padding-top: 0; }
+/* O resumo do especial, na mesma linha do título: sem negrito nem espaço entre as letras */
+.stat-group-note { color: #cbd5e1; font-weight: 500; letter-spacing: 0.02em; }
 .shop-panel-title {
     min-height: 36px;
     display: flex;

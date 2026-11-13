@@ -1,5 +1,5 @@
-// --- DADOS VISUAIS: fênix do Phoenix Pact. ---
-// Lidos por js/render/phoenix.js. Só afeta o desenho.
+// --- DADOS VISUAIS: a Fênix (buddy) ---
+// Lidos por phoenix.js. Só afeta o desenho: tamanho, quadros, cores das penas, brilho e fagulhas.
 export const PHOENIX_VISUALS = {
     scale: 0.48,                // tamanho no mundo em relação à arte
     frames: 16,                 // quadros de uma batida de asa

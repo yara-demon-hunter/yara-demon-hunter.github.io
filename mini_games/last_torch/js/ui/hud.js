@@ -67,11 +67,12 @@ export function updateKnifeButton() {
     // Rowan: o botão vira o Root Snare. Os dois usam o mesmo relógio (state.quake.timer)
     const snareHero = mod('rootSnare') > 0;
     const quakeHero = mod('axeQuake') > 0 || snareHero;
-    const kind = snareHero ? 'snare' : quakeHero ? 'quake' : 'knife';
+    const roseHero = !quakeHero && getHero().thrown === 'rose';       // Rowan: lança rosas no lugar da adaga
+    const kind = snareHero ? 'snare' : quakeHero ? 'quake' : roseHero ? 'rose' : 'knife';
     if (knifeShown.quake !== kind) {
         knifeShown.quake = kind;
-        ui.knifeButton.setAttribute('aria-label', snareHero ? 'Root Snare' : quakeHero ? 'Axe Quake' : 'Throw dagger');
-        document.getElementById('knifeButtonKnob').textContent = snareHero ? '🌿' : quakeHero ? '🪓' : '🗡️';
+        ui.knifeButton.setAttribute('aria-label', snareHero ? 'Root Snare' : quakeHero ? 'Axe Quake' : roseHero ? 'Throw rose' : 'Throw dagger');
+        document.getElementById('knifeButtonKnob').textContent = snareHero ? '🌿' : quakeHero ? '🪓' : roseHero ? '🌹' : '🗡️';
     }
     const abilitySeconds = snareHero ? getRootSnare().cooldownSeconds : getAxeQuake()?.cooldownSeconds ?? 1;
     const ratio = quakeHero ? Math.min(1, state.quake.timer / abilitySeconds) : Math.min(1, state.knifeTimer / getKnifeCooldown());
