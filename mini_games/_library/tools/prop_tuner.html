@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca · Ajuste de peças</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0c0a06; color: #d6cfbf; font-family: system-ui, sans-serif; }
+        header {
+            position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+            padding: 10px 16px; background: #0c0a06; border-bottom: 1px solid #3a3322;
+        }
+        header h1 { margin: 0 8px 0 0; font-size: 18px; color: #fde68a; }
+        header a.home { color: #c9c0aa; text-decoration: none; font-size: 14px; border: 1px solid #3a3322; border-radius: 6px; padding: 5px 9px; }
+        header a.home:hover { border-color: #fbbf24; }
+        select, button, input[type=text], input[type=number] {
+            background: #17140d; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 14px;
+        }
+        button { cursor: pointer; font-weight: 600; }
+        button:hover, button:focus-visible { border-color: #fbbf24; outline: none; }
+        button.primary { background: #3a2f17; border-color: #5c5137; }
+        label.check { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; }
+        .layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 12px; padding: 12px 16px 40px; }
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+        main { min-width: 0; display: grid; gap: 14px; align-content: start; }
+        main h2 { margin: 0 0 6px; font-size: 14px; color: #fbbf24; }
+        main h2 small { color: #7a725f; font-weight: 400; }
+        canvas { display: block; max-width: 100%; border: 1px solid #2a2418; border-radius: 8px; }
+        .frames { display: grid; gap: 6px; }
+        .frames-row { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+        .frames-row canvas { border-radius: 4px; }
+        .frames-row .tag { width: 22px; color: #7a725f; font-size: 11px; }
+        .info { font-size: 12px; color: #a39b86; line-height: 1.55; background: #120f09; border: 1px solid #2a2418; border-radius: 8px; padding: 8px 10px; }
+        .info b { color: #fde68a; }
+        aside { position: sticky; top: calc(var(--header-h, 52px) + 12px); max-height: calc(100vh - var(--header-h, 52px) - 24px); overflow: auto; background: #120f09; border: 1px solid #2a2418; border-radius: 10px; padding: 10px 12px; }
+        @media (max-width: 900px) { aside { position: static; max-height: none; } }
+        .row { display: grid; grid-template-columns: 140px 1fr 70px; gap: 6px; align-items: center; margin: 3px 0; font-size: 12px; }
+        .row.changed .name { color: #fde68a; }
+        .row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, monospace; font-size: 11.5px; }
+        .row input[type=range] { width: 100%; accent-color: #fbbf24; }
+        .row input[type=number] { width: 70px; padding: 3px 4px; font-size: 12px; }
+        .row input[type=text] { grid-column: 2 / 4; width: 100%; font: 12px ui-monospace, monospace; padding: 3px 5px; }
+        .row input[type=color] { width: 100%; height: 24px; padding: 0; border: 1px solid #3a3322; border-radius: 4px; background: none; }
+        .hint { font-size: 12px; color: #7a725f; margin: 4px 0 8px; line-height: 1.4; }
+        code { color: #c9c0aa; }
+        #out { width: 100%; min-height: 110px; margin-top: 6px; background: #0c0a06; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 6px; font: 12px ui-monospace, monospace; padding: 6px; }
+    </style>
+</head>
+<body>
+    <!-- Ferramenta de desenvolvimento da biblioteca (não é copiada para os jogos pelo sync).
+         Galeria e ajuste das PEÇAS que compõem os cenários (scenery/props/): cada uma vista de perto, ao vivo, com todos os
+         quadros do atlas (as animadas) ou várias amostras (as estáticas), e um controle para cada número do <id>_visual.js.
+         Mexe só nos objetos na memória desta página: para gravar, use "Copiar alterados", cole no arquivo indicado e rode o sync.
+         Como abrir: na pasta mini_games, `python3 -m http.server 8010` e abra
+         http://localhost:8010/_library/tools/prop_tuner.html (ou pela página inicial, index.html, desta pasta). -->
+    <header>
+        <a class="home" href="index.html">← Ateliê</a>
+        <h1>Ajuste de peças</h1>
+        <select id="prop" aria-label="Peça"></select>
+        <select id="zoom" aria-label="Zoom">
+            <option value="3">Zoom 3×</option>
+            <option value="5" selected>Zoom 5×</option>
+            <option value="8">Zoom 8×</option>
+        </select>
+        <select id="bg" aria-label="Fundo">
+            <option value="#12292f">Fundo: Floresta da Névoa</option>
+            <option value="#02070a">Fundo: Floresta Sombria</option>
+            <option value="#2a2218">Fundo: terra</option>
+            <option value="#6f7f80">Fundo: claro</option>
+            <option value="#000000">Fundo: preto</option>
+        </select>
+        <label class="check"><input id="pause" type="checkbox"> Pausar</label>
+        <button id="copy" class="primary">Copiar alterados</button>
+        <button id="reset">Desfazer tudo</button>
+    </header>
+    <div class="layout">
+        <main id="stage">
+            <section><h2 id="liveTitle">Ao vivo</h2><canvas id="live"></canvas></section>
+            <section id="framesBox"><h2 id="framesTitle">Quadros</h2><div class="frames" id="frames"></div></section>
+            <div class="info" id="info"></div>
+        </main>
+        <aside>
+            <p class="hint">Cada linha é um valor padrão da peça (<code>&lt;id&gt;_visual.js</code>); os alterados ficam em amarelo. Mudar aqui muda a
+                peça em <b>todos</b> os cenários que a usam (para mudar só em um, use <code>palette</code> na receita do cenário, pelo ajuste de cenário).
+                Para gravar: <b>Copiar alterados</b>, cole no arquivo indicado e rode <code>ruby mini_games/_library/sync.rb</code>.
+                Os ajustes ficam guardados neste navegador até você desfazer.</p>
+            <div id="controls"></div>
+            <textarea id="out" readonly placeholder="Os valores copiados aparecem aqui também"></textarea>
+        </aside>
+    </div>
+
+    <!-- Relógio próprio: a animação lê performance.now(); aqui ele só anda quando a página manda (Pausar congela) -->
+    <script>
+        window.__clock = 0;
+        performance.now = () => window.__clock;
+        setTimeout(() => {
+            if (window.__ready) return;
+            const local = location.protocol === 'file:';
+            document.getElementById('stage').innerHTML = `<p style="padding:24px;color:#fbbf24;line-height:1.6">
+                As peças não carregaram${local ? ': a página foi aberta direto do disco, e o navegador bloqueia os módulos assim' : ' (veja o console do navegador, F12)'}.<br>
+                No terminal, na pasta <code>mini_games</code>: <code>python3 -m http.server 8010</code><br>
+                e abra <code>http://localhost:8010/_library/tools/prop_tuner.html</code></p>`;
+        }, 2500);
+    </script>
+    <script type="module">
+        import { createRandom } from '../core/random.js';
+        import { buildSpriteSheet, frameAt } from '../scenery/scenery_kit.js';
+        import { getProp, propIds } from '../scenery/props/index.js';
+        import { createScenery, sceneryIds } from '../scenery/index.js';
+
+        const $ = (id) => document.getElementById(id);
+        const live = $('live');
+        const liveCtx = live.getContext('2d');
+        const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+        // --- ESTADO ---
+        let prop = null;
+        let visual = null;
+        let original = null;
+        let saved = {};
+        let storeKey = '';
+        let dirty = true;
+        let sheet = null;
+
+        const getAt = (obj, path) => path.split('.').reduce((o, k) => o?.[k], obj);
+        const setAt = (obj, path, value) => {
+            const keys = path.split('.');
+            const last = keys.pop();
+            keys.reduce((o, k) => o[k], obj)[last] = value;
+        };
+        const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+        const fmt = (v) => (typeof v === 'number' ? +v.toFixed(4) : v);
+        const persist = () => { try { localStorage.setItem(storeKey, JSON.stringify(saved)); } catch { /* sem armazenamento */ } };
+
+        // --- CORES ---
+        const toHex = (r, g, b) => '#' + [r, g, b].map(n => (+n).toString(16).padStart(2, '0')).join('');
+        function parseColor(s) {
+            let m = s.match(/^#([0-9a-f]{6})$/i);
+            if (m) return { kind: 'hex', hex: s.toLowerCase(), a: 1 };
+            m = s.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/);
+            if (m) return { kind: 'rgba', hex: toHex(m[1], m[2], m[3]), a: m[4] === undefined ? 1 : +m[4] };
+            m = s.match(/^(\d+),\s*(\d+),\s*(\d+)$/);
+            if (m) return { kind: 'triplet', hex: toHex(m[1], m[2], m[3]), a: 1 };
+            return null;
+        }
+        function formatColor(kind, hex, a) {
+            const n = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+            if (kind === 'hex') return hex;
+            if (kind === 'triplet') return n.join(', ');
+            return `rgba(${n.join(', ')}, ${+a.toFixed(3)})`;
+        }
+
+        // --- CONTROLES ---
+        function rangeFor(v) {
+            const a = Math.abs(v);
+            const integer = Number.isInteger(v);
+            const max = a === 0 ? (integer ? 20 : 2) : a <= 1 ? Math.max(1, a * 2) : Math.max(4, a * 2.5);
+            const step = integer ? 1 : a >= 20 ? 0.5 : a >= 5 ? 0.1 : 0.01;
+            return { min: v < 0 ? -max : 0, max, step };
+        }
+        function commit(path, value, row) {
+            setAt(visual, path, value);
+            if (same(value, getAt(original, path))) delete saved[path]; else saved[path] = value;
+            persist();
+            row.classList.toggle('changed', !same(getAt(visual, path), getAt(original, path)));
+            dirty = true;
+        }
+        function controlRow(path, value) {
+            const row = document.createElement('div');
+            row.className = 'row';
+            const name = Object.assign(document.createElement('span'), { className: 'name', textContent: path, title: path });
+            row.appendChild(name);
+            if (typeof value === 'number') {
+                const r = rangeFor(getAt(original, path));
+                const range = Object.assign(document.createElement('input'), { type: 'range', min: r.min, max: r.max, step: r.step, value });
+                const num = Object.assign(document.createElement('input'), { type: 'number', step: r.step, value: fmt(value) });
+                range.addEventListener('input', () => { num.value = fmt(+range.value); commit(path, +range.value, row); });
+                num.addEventListener('change', () => {
+                    const v = parseFloat(num.value);
+                    if (Number.isNaN(v)) return;
+                    if (v > +range.max) range.max = v;
+                    if (v < +range.min) range.min = v;
+                    range.value = v;
+                    commit(path, v, row);
+                });
+                row.append(range, num);
+            } else {
+                const color = typeof value === 'string' ? parseColor(value) : null;
+                if (color) {
+                    const picker = Object.assign(document.createElement('input'), { type: 'color', value: color.hex });
+                    row.appendChild(picker);
+                    let alphaRange = null;
+                    const write = (alpha) => commit(path, formatColor(color.kind, picker.value, alpha), row);
+                    if (color.kind === 'rgba') {
+                        alphaRange = Object.assign(document.createElement('input'), { type: 'range', min: 0, max: 1, step: 0.01, value: color.a, title: 'transparência' });
+                        alphaRange.addEventListener('input', () => write(+alphaRange.value));
+                        row.appendChild(alphaRange);
+                    }
+                    picker.addEventListener('input', () => write(alphaRange ? +alphaRange.value : 1));
+                } else {
+                    const text = Object.assign(document.createElement('input'), { type: 'text', value: String(value) });
+                    text.addEventListener('change', () => commit(path, text.value, row));
+                    row.appendChild(text);
+                }
+            }
+            row.classList.toggle('changed', !same(getAt(visual, path), getAt(original, path)));
+            return row;
+        }
+        function entriesOf(obj, base = '') {
+            const out = [];
+            Object.entries(obj).forEach(([k, v]) => {
+                const path = base ? `${base}.${k}` : k;
+                if (typeof v === 'number' || typeof v === 'string') out.push([path, v]);
+                else if (v && typeof v === 'object') out.push(...entriesOf(v, path));
+            });
+            return out;
+        }
+        function buildControls() {
+            const box = $('controls');
+            box.textContent = '';
+            entriesOf(visual).forEach(([path, value]) => box.appendChild(controlRow(path, value)));
+        }
+
+        // --- COPIAR ---
+        const literal = (v) => JSON.stringify(v, (k, x) => (typeof x === 'number' ? fmt(x) : x))
+            .replace(/"([A-Za-z_$][\w$]*)":/g, '$1: ').replace(/,(?=\S)/g, ', ').replace(/"/g, "'");
+        function changedLines() {
+            const tops = [...new Set(Object.keys(saved).map(p => p.split('.')[0]))];
+            if (!tops.length) return '// Nada alterado';
+            return [`// mini_games/_library/scenery/props/${prop.id}/${prop.id}_visual.js (troque as linhas destas chaves)`,
+                ...tops.map(k => `    ${k}: ${literal(visual[k])},`)].join('\n');
+        }
+        $('copy').addEventListener('click', async () => {
+            const text = changedLines();
+            $('out').value = text;
+            try {
+                await navigator.clipboard.writeText(text);
+                $('copy').textContent = 'Copiado!';
+            } catch {
+                $('out').select();
+                $('copy').textContent = 'Selecione e copie abaixo';
+            }
+            setTimeout(() => { $('copy').textContent = 'Copiar alterados'; }, 1600);
+        });
+        $('reset').addEventListener('click', () => {
+            Object.keys(saved).forEach(path => { try { setAt(visual, path, structuredClone(getAt(original, path))); } catch { /* chave que não existe mais */ } });
+            saved = {};
+            persist();
+            buildControls();
+            $('out').value = '';
+            dirty = true;
+        });
+
+        // --- QUEM USA ESTA PEÇA ---
+        function usersOf(id) {
+            const lines = [];
+            sceneryIds().forEach(sid => {
+                const recipe = createScenery(sid).visual.props;
+                (recipe || []).filter(e => e.prop === id).forEach(e => {
+                    const per = Array.isArray(e.per100kPx) ? e.per100kPx.join(' / ') : e.per100kPx;
+                    const extra = e.palette && Object.keys(e.palette).length ? `, troca: ${Object.keys(e.palette).join(', ')}` : '';
+                    lines.push(`<b>${sid}</b>: ${per} por 100 mil${e.size && e.size !== 1 ? `, tamanho ${e.size}×` : ''}${extra}`);
+                });
+            });
+            return lines.length ? lines.join('<br>') : 'nenhum cenário usa esta peça ainda';
+        }
+
+        // --- DESENHO ---
+        // As animadas ficam numa fileira só (mais compacta); as estáticas, em duas
+        const dims = () => (prop.kind === 'animated' ? { cols: 6, rows: 1 } : { cols: 4, rows: 2 });
+        function layoutFor() {
+            const zoom = +$('zoom').value;
+            const cellW = prop.kind === 'animated' ? prop.cell[0] * 1.15 : prop.previewSize;
+            const cellH = prop.kind === 'animated' ? prop.cell[1] * 1.15 : prop.previewSize;
+            return { zoom, cellW, cellH };
+        }
+        function rebuild() {
+            const { zoom, cellW, cellH } = layoutFor();
+            const { cols, rows } = dims();
+            live.width = Math.round(cols * cellW * zoom * DPR / Math.max(1, zoom / 5));
+            live.height = Math.round(rows * cellH * zoom * DPR / Math.max(1, zoom / 5));
+            live.style.width = live.width / DPR + 'px';
+            live.style.height = live.height / DPR + 'px';
+            const scale = live.width / (cols * cellW);                      // pixels do canvas por unidade do mundo
+            const framesBox = $('frames');
+            framesBox.textContent = '';
+            if (prop.kind === 'animated') {
+                const frames = Math.max(2, Math.round(visual.__frames ?? 8));
+                sheet = buildSpriteSheet({
+                    cell: prop.cell, anchor: prop.anchor, frames, variants: prop.variants, res: scale, seed: 777,
+                    paint: (g, r, phase) => prop.paint(g, r, phase, visual)
+                });
+                for (let v = 0; v < prop.variants; v++) {
+                    const row = document.createElement('div');
+                    row.className = 'frames-row';
+                    row.appendChild(Object.assign(document.createElement('span'), { className: 'tag', textContent: 'v' + (v + 1) }));
+                    for (let f = 0; f < frames; f++) {
+                        const c = document.createElement('canvas');
+                        c.width = sheet.cw;
+                        c.height = sheet.ch;
+                        c.style.background = $('bg').value;
+                        c.getContext('2d').drawImage(sheet.canvas, f * sheet.cw, v * sheet.ch, sheet.cw, sheet.ch, 0, 0, sheet.cw, sheet.ch);
+                        c.style.width = Math.round(sheet.cw / scale * zoom * 0.55) + 'px';
+                        c.style.height = Math.round(sheet.ch / scale * zoom * 0.55) + 'px';
+                        row.appendChild(c);
+                    }
+                    framesBox.appendChild(row);
+                }
+                $('framesTitle').innerHTML = `Quadros do atlas <small>(${frames} quadros × ${prop.variants} variações, o ciclo emenda do último para o primeiro)</small>`;
+                $('liveTitle').innerHTML = 'Ao vivo <small>(animada: cada uma começa numa fase diferente, como no cenário)</small>';
+                $('info').innerHTML = `<b>${prop.name}</b> · animada (atlas) · célula ${prop.cell[0]}×${prop.cell[1]} unidades · ${frames} quadros × ${prop.variants} variações ≈ `
+                    + `<b>${Math.round(sheet.bytes / 1024)} KB</b> na resolução desta tela (no jogo é menor: o cenário usa menos quadros nos detalhes baixos e a escala da tela).<br>`
+                    + `Em cena cada peça custa <b>1 drawImage</b> por quadro.<br><br>Usada em:<br>${usersOf(prop.id)}`;
+            } else {
+                sheet = null;
+                // As estáticas: 12 amostras com sorteios diferentes
+                const g = document.createElement('canvas');
+                const cols = 6;
+                g.width = Math.round(cols * cellW * scale * 0.7);
+                g.height = Math.round(2 * cellH * scale * 0.7);
+                g.style.background = $('bg').value;
+                g.style.width = g.width / DPR + 'px';
+                const gg = g.getContext('2d');
+                gg.scale(scale * 0.7, scale * 0.7);
+                for (let i = 0; i < cols * 2; i++) {
+                    const rand = createRandom(100 + i * 31);
+                    prop.draw(gg, ((i % cols) + 0.5) * cellW, (Math.floor(i / cols) + 0.5) * cellH, prop.roll(rand, visual), visual);
+                }
+                framesBox.appendChild(g);
+                $('framesTitle').innerHTML = 'Amostras <small>(doze sorteios diferentes da mesma peça)</small>';
+                $('liveTitle').innerHTML = 'No chão <small>(estática: é pintada uma vez no chão do cenário e não custa nada por quadro)</small>';
+                $('info').innerHTML = `<b>${prop.name}</b> · estática (carimbada no chão uma vez) · custo por quadro: <b>zero</b>.<br><br>Usada em:<br>${usersOf(prop.id)}`;
+            }
+            live.dataset.scale = scale;
+            dirty = false;
+        }
+
+        function drawLive() {
+            const scale = +live.dataset.scale;
+            const { cellW, cellH } = layoutFor();
+            liveCtx.setTransform(1, 0, 0, 1, 0, 0);
+            liveCtx.fillStyle = $('bg').value;
+            liveCtx.fillRect(0, 0, live.width, live.height);
+            liveCtx.setTransform(scale, 0, 0, scale, 0, 0);
+            const t = window.__clock / 1000;
+            const { cols, rows } = dims();
+            for (let i = 0; i < cols * rows; i++) {
+                const cx = ((i % cols) + 0.5) * cellW;
+                const cy = (Math.floor(i / cols) + 0.5) * cellH;
+                if (prop.kind === 'animated') {
+                    const frame = frameAt(sheet, t, +visual.__cycle || 3, (i * 0.137) % 1);
+                    const w = prop.cell[0];
+                    const h = prop.cell[1];
+                    liveCtx.drawImage(sheet.canvas, frame * sheet.cw, (i % prop.variants) * sheet.ch, sheet.cw, sheet.ch,
+                        cx - prop.anchor[0] * w, cy - prop.anchor[1] * h + h * 0.15, w, h);
+                } else {
+                    const rand = createRandom(5000 + i * 17);
+                    prop.draw(liveCtx, cx, cy, prop.roll(rand, visual), visual);
+                }
+            }
+        }
+
+        let last = 0;
+        function frame(real) {
+            requestAnimationFrame(frame);
+            if (!$('pause').checked) window.__clock += Math.min(100, real - (last || real));
+            last = real;
+            if (dirty) rebuild();
+            drawLive();
+        }
+
+        // --- CARREGAR UMA PEÇA ---
+        function loadProp(id) {
+            prop = getProp(id);
+            visual = prop.visual;
+            if (!Object.getOwnPropertyDescriptor(visual, '__original')) Object.defineProperty(visual, '__original', { value: structuredClone(visual), enumerable: false });
+            original = visual.__original;
+            // Controles só da página (não são da peça): quadros do atlas e duração do ciclo
+            Object.defineProperty(visual, '__frames', { value: 8, enumerable: false, writable: true, configurable: true });
+            Object.defineProperty(visual, '__cycle', { value: 3, enumerable: false, writable: true, configurable: true });
+            storeKey = `prop_tuner:${id}`;
+            saved = {};
+            try { saved = JSON.parse(localStorage.getItem(storeKey) || '{}'); } catch { saved = {}; }
+            // Ajustes guardados de uma versão antiga do arquivo (chave que não existe mais) são descartados: senão quebrariam o desfazer
+            Object.keys(saved).forEach(path => { if (getAt(original, path) === undefined) delete saved[path]; });
+            persist();
+            Object.entries(saved).forEach(([path, value]) => { try { setAt(visual, path, value); } catch { delete saved[path]; } });
+            buildControls();
+            if (prop.kind === 'animated') {
+                const extra = document.createElement('div');
+                extra.innerHTML = '<p class="hint">Só para ver nesta página (não vão para o arquivo):</p>';
+                [['__frames', 'quadros do ciclo', 3, 16, 1], ['__cycle', 'duração do ciclo (s)', 0.5, 8, 0.1]].forEach(([key, label, min, max, step]) => {
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    const range = Object.assign(document.createElement('input'), { type: 'range', min, max, step, value: visual[key] });
+                    const num = Object.assign(document.createElement('input'), { type: 'number', step, value: visual[key] });
+                    range.addEventListener('input', () => { visual[key] = +range.value; num.value = +range.value; dirty = true; });
+                    num.addEventListener('change', () => { visual[key] = parseFloat(num.value) || min; range.value = visual[key]; dirty = true; });
+                    row.append(Object.assign(document.createElement('span'), { className: 'name', textContent: label }), range, num);
+                    extra.appendChild(row);
+                });
+                $('controls').prepend(extra);
+            }
+            const url = new URL(location.href);
+            url.searchParams.set('prop', id);
+            history.replaceState(null, '', url);
+            dirty = true;
+        }
+
+        // --- INÍCIO ---
+        propIds().forEach(id => {
+            const p = getProp(id);
+            $('prop').appendChild(Object.assign(document.createElement('option'), { value: id, textContent: `${p.name} (${p.kind === 'animated' ? 'animada' : 'estática'})` }));
+        });
+        const params = new URLSearchParams(location.search);
+        if (propIds().includes(params.get('prop'))) $('prop').value = params.get('prop');
+        if (['3', '5', '8'].includes(params.get('zoom'))) $('zoom').value = params.get('zoom');
+        $('prop').addEventListener('change', () => loadProp($('prop').value));
+        $('zoom').addEventListener('change', () => { dirty = true; });
+        $('bg').addEventListener('change', () => { dirty = true; });
+        window.addEventListener('resize', () => { document.documentElement.style.setProperty('--header-h', document.querySelector('header').offsetHeight + 'px'); });
+        document.documentElement.style.setProperty('--header-h', document.querySelector('header').offsetHeight + 'px');
+        loadProp($('prop').value);
+        window.__ready = true;
+        requestAnimationFrame(frame);
+    </script>
+</body>
+</html>

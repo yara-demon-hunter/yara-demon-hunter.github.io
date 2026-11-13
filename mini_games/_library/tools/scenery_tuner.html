@@ -13,6 +13,8 @@
             padding: 10px 16px; background: #0c0a06; border-bottom: 1px solid #3a3322;
         }
         header h1 { margin: 0 8px 0 0; font-size: 18px; color: #fde68a; }
+        header a.home { color: #c9c0aa; text-decoration: none; font-size: 14px; border: 1px solid #3a3322; border-radius: 6px; padding: 5px 9px; }
+        header a.home:hover { border-color: #fbbf24; }
         select, button, input[type=text], input[type=number] {
             background: #17140d; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 14px;
         }
@@ -49,6 +51,7 @@
          e rode o sync. Como abrir: na pasta mini_games, `python3 -m http.server 8010` e abra
          http://localhost:8010/_library/tools/scenery_tuner.html (ver ../README.md, "Ajuste ao vivo"). -->
     <header>
+        <a class="home" href="index.html">← Ateliê</a>
         <h1>Ajuste de cenário</h1>
         <select id="scenery" aria-label="Cenário"></select>
         <select id="preset" aria-label="Tela">
@@ -100,6 +103,7 @@
     <script type="module">
         import { setCtx } from '../core/canvas.js';
         import { createScenery, sceneryIds } from '../scenery/index.js';
+import { getProp } from '../scenery/props/index.js';
 
         const $ = (id) => document.getElementById(id);
         const canvas = $('view');
@@ -127,6 +131,24 @@
             keys.reduce((o, k) => o[k], obj)[last] = value;
         }
         const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+        // Troca de paleta de uma peça (props.N.palette.chave...): o valor "de fábrica" é o padrão da peça, não o do arquivo do cenário
+        const PALETTE = /^props\.(\d+)\.palette\.(.+)$/;
+        function baseline(path) {
+            const own = getAt(original, path);
+            if (own !== undefined) return own;
+            const m = path.match(PALETTE);
+            return m ? getAt(getProp(visual.props[+m[1]].prop).visual, m[2]) : undefined;
+        }
+        // Cria a troca de paleta clonando o valor padrão da peça (assim as listas de cores continuam inteiras)
+        function ensurePalette(path) {
+            const m = path.match(PALETTE);
+            if (!m) return;
+            const entry = visual.props[+m[1]];
+            entry.palette = entry.palette || {};
+            const top = m[2].split('.')[0];
+            if (!(top in entry.palette)) entry.palette[top] = structuredClone(getProp(entry.prop).visual[top]);
+        }
         const fmt = (v) => (typeof v === 'number' ? +v.toFixed(4) : v);
 
         function persist() {
@@ -161,11 +183,12 @@
         }
 
         function markRow(row, path) {
-            row.classList.toggle('changed', !same(getAt(visual, path), getAt(original, path)));
+            row.classList.toggle('changed', !same(getAt(visual, path) ?? baseline(path), baseline(path)));
         }
         function commit(path, value, row) {
+            ensurePalette(path);
             setAt(visual, path, value);
-            if (same(value, getAt(original, path))) delete saved[path]; else saved[path] = value;
+            if (same(value, baseline(path))) delete saved[path]; else saved[path] = value;
             persist();
             markRow(row, path);
             scheduleRebuild();
@@ -181,7 +204,7 @@
             name.title = path;
             row.appendChild(name);
             if (typeof value === 'number') {
-                const r = rangeFor(getAt(original, path));
+                const r = rangeFor(baseline(path));
                 const range = Object.assign(document.createElement('input'), { type: 'range', min: r.min, max: r.max, step: r.step, value });
                 const num = Object.assign(document.createElement('input'), { type: 'number', step: r.step, value: fmt(value) });
                 range.addEventListener('input', () => { num.value = fmt(+range.value); commit(path, +range.value, row); });
@@ -222,6 +245,7 @@
             const out = [];
             Object.entries(obj).forEach(([k, v]) => {
                 const path = base ? `${base}.${k}` : k;
+                if (k === 'prop' && /^props\.\d+\.prop$/.test(path)) return;       // o id da peça, não um valor
                 if (typeof v === 'number' || typeof v === 'string') out.push([path, v]);
                 else if (v && typeof v === 'object') out.push(...entriesOf(v, path));
             });
@@ -230,6 +254,8 @@
 
         function groupOf(path) {
             const top = path.split('.')[0];
+            const piece = path.match(/^props\.(\d+)\./);
+            if (piece) return `Peça: ${getProp(visual.props[+piece[1]].prop).name} (#${+piece[1] + 1})`;
             if (top === 'seed') return 'Sorteio (seed)';
             if (/^fog/.test(top)) return 'Névoa';
             if (/^firefl/.test(top)) return 'Pontos de luz (vaga-lumes)';
@@ -242,13 +268,22 @@
             const box = $('controls');
             box.textContent = '';
             const groups = new Map();
-            entriesOf(visual).forEach(([path, value]) => {
+            const add = (path, value) => {
                 const g = groupOf(path);
                 if (!groups.has(g)) groups.set(g, []);
-                groups.get(g).push([path, value]);
+                if (!groups.get(g).some(([p]) => p === path)) groups.get(g).push([path, value]);
+            };
+            entriesOf(visual).forEach(([path, value]) => add(path, value));
+            // Cenário feito de peças: cada peça mostra também a paleta dela, para trocar as cores só neste cenário
+            (visual.props || []).forEach((entry, n) => {
+                entriesOf(getProp(entry.prop).visual).forEach(([sub, value]) => {
+                    const path = `props.${n}.palette.${sub}`;
+                    add(path, getAt(visual, path) ?? value);
+                });
             });
-            // O chão primeiro: é o que torna cada cenário único
-            [...groups.entries()].sort(([a], [b]) => (b.startsWith('Chão') ? 1 : 0) - (a.startsWith('Chão') ? 1 : 0)).forEach(([title, list], i) => {
+            // Ordem: a base primeiro (é o que torna cada cenário único), depois as peças na ordem da receita, depois o resto
+            const rank = (title) => (title.startsWith('Chão') ? 0 : title.startsWith('Peça:') ? 1 : 2);
+            [...groups.entries()].sort(([a], [b]) => rank(a) - rank(b)).forEach(([title, list], i) => {
                 const d = document.createElement('details');
                 d.open = i === 0;
                 d.innerHTML = '<summary></summary>';
@@ -306,7 +341,14 @@
             setTimeout(() => { $('copy').textContent = 'Copiar alterados'; }, 1600);
         });
         $('reset').addEventListener('click', () => {
-            Object.keys(saved).forEach(path => setAt(visual, path, structuredClone(getAt(original, path))));
+            Object.keys(saved).forEach(path => { try {
+                const m = path.match(PALETTE);
+                if (m && getAt(original, `props.${m[1]}.palette.${m[2].split('.')[0]}`) === undefined) {
+                    delete visual.props[+m[1]].palette[m[2].split('.')[0]];        // a troca nem existia no arquivo: some
+                } else {
+                    setAt(visual, path, structuredClone(getAt(original, path)));
+                }
+            } catch { /* chave que não existe mais */ } });
             saved = {};
             persist();
             buildControls();
@@ -329,7 +371,10 @@
             storeKey = `scenery_tuner:${id}`;
             saved = {};
             try { saved = JSON.parse(localStorage.getItem(storeKey) || '{}'); } catch { saved = {}; }
-            Object.entries(saved).forEach(([path, value]) => setAt(visual, path, value));
+            // Ajustes guardados de uma versão antiga do arquivo (chave que não existe mais) são descartados: senão quebrariam o desfazer
+            Object.keys(saved).forEach(path => { try { if (baseline(path) === undefined) delete saved[path]; } catch { delete saved[path]; } });
+            persist();
+            Object.entries(saved).forEach(([path, value]) => { try { ensurePalette(path); setAt(visual, path, value); } catch { delete saved[path]; } });
             buildControls();
             const url = new URL(location.href);
             url.searchParams.set('scenery', id);

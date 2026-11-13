@@ -10,6 +10,14 @@
   - Paleta e fileiras de origem: `mini_games/yara-rpg/js/data/visuals/stage.js` → `scenes['dark-forest']`.
 - **Resultado:** `images/dark_forest_2_resultado.png` (o Last Torch em execução com este cenário)
 
+## Feito de peças
+
+Desde 2026-11-12 este cenário é uma **base + receita de peças**: [dark_forest_2.js](../dark_forest_2.js) só desenha o chão (terra mais clara
+no centro e o lago de luz do portal) e a lista `props` do [arquivo de dados](../dark_forest_2_visual.js) escolhe as peças da biblioteca
+(`scenery/props/`: musgo, folha caída, pedrinha, raiz, toco, pedra, samambaia, capim e cogumelo que brilha), com quantidade, tamanho,
+quadros do atlas e, se quiser, uma paleta própria. Cada peça tem a sua ficha (`props/<id>/art_reference/prop.md`) e pode ser usada por
+outros cenários. A migração foi provada com **108 imagens idênticas antes e depois**.
+
 ## Como foi criado
 
 Pedido do usuário: recriar o cenário da primeira fase do yara-rpg em 2D, com o mesmo estilo e movimento nas coisas **sem gastar
@@ -28,7 +36,7 @@ copa por cima da ação esconderia o que o jogador enfrenta.
 | `renderSway` | **Samambaias**: folhas que saem do centro e arqueiam, cada uma balançando em fase própria | atlas de 10/6/4 quadros × 3 variações | 1 `drawImage` cada |
 | `renderSway` | **Capim**: lâminas que se curvam com a rajada | atlas de 8/6/4 quadros × 3 variações (some no detalhe 2) | 1 `drawImage` cada |
 | `renderSway` | **Cogumelos** com o brilho azulado pulsando | atlas de 8/6/4 quadros × 2 variações, ciclo próprio de 2,6 s | 1 `drawImage` cada |
-| `renderAmbient` | Esporos de luz azul-gelo que vagam e piscam (12 / 6 / 0) | kit (`fireflies`) | por quadro, barato |
+| `renderAmbient` | Esporos de luz azul-gelo que vagam e piscam (8 / 4 / 0) | kit (`fireflies`) | por quadro, barato |
 | `renderOverlay` | Névoa azul-esverdeada em 3 camadas + manchas, tom frio e vinheta | kit | tela pequena, a cada 55 a 125 ms |
 
 (Os números `a/b/c` são os níveis de detalhe 0, 1 e 2.)
@@ -76,8 +84,13 @@ aparecerem de cima), cogumelo `#8ef0ff`, névoa `127, 178, 186`. A luz quente do
   mais discreto e pulsa.
 - **Tamanho dentro do desenho:** o atlas nasce já no tamanho final (a célula e o desenho crescem juntos), em vez de esticar um atlas
   pequeno, que ficaria borrado.
-- **Desempenho:** o capim, o mais numeroso e discreto, foi reduzido de 4,5 para 3 por 100 mil unidades; as células dos atlas
-  foram apertadas ao tamanho real das peças; esporos 12/6/0.
+- **"Mato" demais (cortado a pedido):** o chão estava cheio e brigava com os monstros. Quantidades por 100 mil unidades: samambaias
+  1,6 → 0,8; capim 4,5 → 1,4; cogumelos 0,8 → 0,5; folhas 46 → 22; pedrinhas 22 → 6; pedras 1,5 → 0,4; esporos 12 → 8 (detalhe 0).
+  As células dos atlas foram apertadas ao tamanho real das peças.
+- **Chão mais escuro:** a pedido, ficou mais perto da Floresta Sombria (`ground` `#12292f → #0b1c22 → #050e12`, tom da noite 36%).
+- **Chaves duplicadas (achado na migração para peças):** o arquivo de dados antigo tinha `fern` e `grass` duas vezes (uma como cor, outra
+  como configuração), então as cores `#183f37` e `#33645a` nunca foram aplicadas: samambaia e capim saíam sempre em `#2f5f50`, com o miolo
+  da samambaia preto. As peças guardam essas cores efetivas, para o visual aprovado não mudar.
 
 ## Como usar no Last Torch
 

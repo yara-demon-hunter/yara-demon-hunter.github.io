@@ -41,7 +41,7 @@ O jogo roda em celular fraco. Regras que mantêm isso de pé (ao mexer, meça co
 
 ## Estrutura
 
-A arte dos personagens, dos monstros e do **cenário** (desenho e cores) vem da **biblioteca compartilhada** `mini_games/_library/`, que
+A arte dos personagens, dos monstros, da **tocha** (`library/objects/torch`) e do **cenário** (desenho e cores) vem da **biblioteca compartilhada** `mini_games/_library/`, que
 outros jogos também podem usar. O jogo carrega a cópia dela em `library/`, feita pelo sync: **não edite `library/`**.
 Mude em `mini_games/_library/` e rode `ruby mini_games/_library/sync.rb` (como funciona: `mini_games/_library/README.md`).
 O que é regra do Last Torch (vida, dano, velocidade, ataques, Juramentos, adaga, Fúria) continua aqui.
@@ -52,6 +52,7 @@ library/                          CÓPIA da biblioteca de personagens e monstros
   core/                           ctx compartilhado, ganchos do jogo (host.js), glow, easing, relógio do desenho, aleatório com semente
   characters/hunter/              Demon Hunter, o boneco 2.5D base (hero25d.js), a animação (hero_anim.js), os ganchos do jogo (hero_hooks.js), o top-down antigo e o registro dos outros bonecos
   characters/azael/, brutos/      os bonecos do Azael e do Captain Brutos e as cores deles
+  objects/torch/                  a tocha 2,5D: torch25d.js (poste e gaiola em sprites, fogo em atlas) e torch25d_visual.js (cores e medidas); a regra da vida fica em js/render/arena.js
   scenery/<id>/                   um por cenário (dark_forest, dark_forest_2): o chão, a grama, os números; o motor e o kit de névoa, luz e vinheta ficam em scenery/
   monsters/topdown/<id>/          um por monstro ou boss (bat, skeleton, witch, vampire, moth, bloater, wraith, zombie_wolf, shadow_wolf, headless_knight, bone_colossus, demon_lord): desenho e cores
 css/
@@ -133,7 +134,8 @@ js/
   systems/progression.js          XP e level up
   systems/effects.js              tempo (hit stop, câmera lenta), partículas, pedaços, manchas, números, ondas
   render/renderer.js              ordem das camadas de desenho
-  render/arena.js                 tocha (núcleo) e raio de alcance do herói
+  render/arena.js                 liga a tocha da biblioteca ao jogo (o fogo encolhe com a vida do núcleo: flameBySize), barras de vida e raio de alcance do herói
+                                  (a ordem de profundidade fica em renderer.js: quem está atrás da base da tocha é desenhado antes dela)
   render/scenery.js               ponte com o cenário da biblioteca (WORLD.scenery): passa o estado da partida e cuida da luz da tocha e do herói
   render/entities.js              inimigos, projéteis, golpes e moedas
   render/effects.js               manchas, pedaços, ondas de choque, avisos no chão, números, amanhecer

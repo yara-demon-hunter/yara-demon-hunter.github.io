@@ -13,6 +13,8 @@
             padding: 10px 16px; background: #0c0a06; border-bottom: 1px solid #3a3322;
         }
         header h1 { margin: 0 8px 0 0; font-size: 18px; color: #fde68a; }
+        header a.home { color: #c9c0aa; text-decoration: none; font-size: 14px; border: 1px solid #3a3322; border-radius: 6px; padding: 5px 9px; }
+        header a.home:hover { border-color: #fbbf24; }
         select, button, input[type=text], input[type=number] {
             background: #17140d; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 14px;
         }
@@ -67,6 +69,7 @@
          Como abrir: na pasta mini_games, `python3 -m http.server 8010` e abra
          http://localhost:8010/_library/tools/tuner.html (ver ../README.md, "Ajuste ao vivo"). -->
     <header>
+        <a class="home" href="index.html">← Ateliê</a>
         <h1>Ajuste ao vivo</h1>
         <select id="kind" aria-label="Heróis ou monstros"><option value="hero">Heróis</option><option value="monster">Monstros</option></select>
         <label class="check" id="topdownBox" hidden><input id="topdown" type="checkbox"> Topdown (desenho de cima)</label>
@@ -552,7 +555,8 @@
         $('reset').addEventListener('click', () => {
             const key = $('model').value;
             [...new Set([key, 'body', 'hunter'])].forEach(k => {
-                Object.keys(saved[k] || {}).forEach(path => setAt(blockOf(k), path, clone(getAt(ORIGINAL[k], path))));
+                // Ajuste de uma versão antiga (chave que não existe mais) não pode travar o desfazer dos outros
+                Object.keys(saved[k] || {}).forEach(path => { try { setAt(blockOf(k), path, clone(getAt(ORIGINAL[k], path))); } catch { /* chave que não existe mais */ } });
                 delete saved[k];
             });
             persist();

@@ -1,6 +1,6 @@
-# Biblioteca de personagens, monstros e cenários
+# Biblioteca de personagens, monstros, objetos e cenários
 
-Um lugar só para a arte de cada personagem, monstro e cenário: o desenho em código, as cores e medidas e a referência de arte
+Um lugar só para a arte de cada personagem, monstro, objeto e cenário: o desenho em código, as cores e medidas e a referência de arte
 (imagens e ficha). Qualquer mini game pode usar; hoje estão ligados o Last Torch e o yara-rpg.
 
 ## A regra
@@ -30,6 +30,7 @@ core/                      usado por todos
   canvas.js                o ctx onde tudo é desenhado (o jogo liga com setCtx)
   host.js                  o que a arte pergunta ao jogo: se está animando e onde está o alvo dos monstros (setHost)
   glow.js, easing.js, clock.js, random.js   brilho em cache, curvas de easing, relógio do desenho, aleatório com semente
+  sprite_sheet.js          atlas de animação (buildSpriteSheet, drawSheetFrame, frameAt), makeCanvas e taper: o movimento sem gastar memória, usado por cenários e objetos
 characters/
   hunter/                  Demon Hunter: o boneco 2.5D BASE, de quem os outros heróis partem
     hero25d.js             o motor do boneco (câmera, pose, golpes especiais, capa, espada) e o desenho do Demon Hunter
@@ -43,7 +44,10 @@ characters/
   azael/                   azael25d.js (o boneco) e azael_visual.js; exporta a orelha e a bandagem que a Yara usa
   brutos/                  brutos25d.js (o boneco) e brutos_visual.js
   yara/, zeph/, oskar/     os heróis do yara-rpg, no mesmo esquema (<id>25d.js e <id>_visual.js)
+objects/                   objetos do jogo que não são personagem nem cenário (a tocha 2,5D); um por pasta: <id>.js, <id>_visual.js e art_reference/object.md
+  torch/                   a tocha 2,5D: poste e gaiola em dois sprites (atrás e na frente do fogo), fogo num atlas de poucos quadros (createTorch25D); a regra da vida fica no jogo
 scenery/                   o chão do jogo: terreno, névoa, luz, clima (manual: scenery/README.md)
+  compose.js, props/       a receita de peças e o catálogo de PEÇAS que compõem os cenários (musgo, pedra, toco, samambaia, cogumelo...)
   scenery.js, scenery_kit.js   o motor (cache, camadas, luzes) e as peças prontas (vento, névoa, vinheta, vaga-lumes)
   <id>/                    um por cenário: <id>.js (o chão e o que balança), <id>_visual.js (números) e art_reference/
                            dark_forest (Floresta Sombria, o atual do Last Torch) e dark_forest_2 (Floresta da Névoa, do yara-rpg)
@@ -144,6 +148,8 @@ e o que foi rejeitado). Contrato, camadas, orçamento de desempenho, passo a pas
 
 ## Ajuste ao vivo
 
+**Comece pelo Ateliê:** `tools/index.html` é a página-mãe, com um cartão para cada ferramenta abaixo e atalhos diretos para cada herói, monstro, cenário e peça.
+
 `tools/tuner.html`: no topo, **Heróis** ou **Monstros**. Nos monstros, a caixa **Topdown** troca entre os bonecos 2.5D
 (os 13 monstros) e os 12 desenhos 2D de cima do Last Torch (`?model=td_<pasta>`, ex.: `td_witch`),
 cada um com as suas cores e medidas. Os heróis e os monstros 2.5D aparecem nas **duas câmeras**: a do Last Torch (quase de
@@ -158,8 +164,17 @@ cd mini_games && python3 -m http.server 8010
 Para gravar: **Copiar alterados** gera as linhas já com o arquivo de cada uma; cole no `*_visual.js` indicado e rode o
 sync. A página não grava nada sozinha. `tools/` não vai para os jogos.
 
-**Cenários:** `tools/scenery_tuner.html` (`?scenery=dark_forest&preset=mobP&quality=1`), uma página própria: o cenário
-renderizado pelo motor, com um controle para cada número do `<id>_visual.js` (detalhes em `scenery/README.md`).
+**Cenários:** `tools/scenery_tuner.html` (`?scenery=dark_forest_2&preset=mobP&quality=1`), uma página própria: o cenário
+renderizado pelo motor, com um controle para cada número do `<id>_visual.js`; num cenário feito de peças, um grupo por peça da receita
+(quantidade, tamanho, quadros) e a paleta dela, para trocar cores só naquele cenário (detalhes em `scenery/README.md`).
+
+**Objetos:** `tools/object_tuner.html?object=torch`: a tocha com a chama cheia, pela metade e quase apagada, ao lado da imagem de referência, e um controle para cada número.
+
+**Peças:** `tools/prop_tuner.html?prop=mushroom`: cada peça dos cenários de perto, ao vivo (as animadas com todos os quadros do atlas),
+em vários fundos, e um controle para cada valor padrão dela.
+
+**Ateliê (página-mãe):** `tools/index.html` (`http://localhost:8010/_library/tools/`): um cartão para cada ferramenta acima e atalhos
+diretos para cada herói, monstro, cenário, objeto e peça (as listas de cenários e peças saem do registro: item novo aparece sozinho).
 
 ## Referência de arte
 

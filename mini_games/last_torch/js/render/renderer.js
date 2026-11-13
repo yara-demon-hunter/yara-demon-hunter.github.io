@@ -44,6 +44,19 @@ import {
 const HERO_25D = new URLSearchParams(window.location.search).get('hero') !== 'topdown';
 
 // Herói com a forma do Juramento da noite, se houver
+// O herói e o que anda com ele (auras, lâminas em órbita, escudo, fênix, corvo)
+function renderHeroBlock() {
+    if (player.hidden) return;
+    renderSkillAuras();
+    if (HERO_25D) renderHero();
+    else renderPlayer();
+    renderOrbitBlades();
+    renderShield();
+    renderWisp();
+    renderPhoenixBird();
+    renderRavenBird();
+}
+
 function renderHero() {
     const gear = getHeroGear();
     const hero = getHero();
@@ -133,7 +146,6 @@ export function render() {
     renderWarmth();
     renderGroundFires();
     renderFireRing();
-    renderCore();
     renderTorchAlarm();
     renderAttackRange();
     renderChillAura();
@@ -143,7 +155,13 @@ export function render() {
     renderPickups();
     renderBladeSlashes();
     renderEnemyProjectiles();
-    renderEnemies();
+    // Profundidade 2.5D: quem está atrás da base da tocha (mais acima na tela) é desenhado antes dela, e ela o cobre;
+    // quem está na frente vem depois e passa por cima dela
+    const heroBehind = !player.hidden && player.y < state.coreY;
+    renderEnemies('behind', state.coreY);
+    if (heroBehind) renderHeroBlock();
+    renderCore();
+    renderEnemies('front', state.coreY);
     renderMonsterCurses();
     renderShackle();
     renderSmokes();
@@ -155,16 +173,7 @@ export function render() {
     renderDashGhosts();
     renderShadowClone();
     renderLevelUpBack();
-    if (!player.hidden) {
-        renderSkillAuras();
-        if (HERO_25D) renderHero();
-        else renderPlayer();
-        renderOrbitBlades();
-        renderShield();
-        renderWisp();
-        renderPhoenixBird();
-        renderRavenBird();
-    }
+    if (!heroBehind) renderHeroBlock();
     renderReflectWard();
     renderCrescents();
     renderSkillHits();

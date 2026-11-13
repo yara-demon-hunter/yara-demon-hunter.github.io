@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca · Ateliê</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0c0a06; color: #d6cfbf; font-family: system-ui, sans-serif; }
+        .wrap { max-width: 1040px; margin: 0 auto; padding: 28px 16px 60px; }
+        h1 { margin: 0 0 4px; font-size: 28px; color: #fde68a; }
+        .lead { margin: 0 0 22px; color: #a39b86; font-size: 15px; line-height: 1.5; }
+        h2 { margin: 28px 0 10px; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: #fbbf24; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+        a.card {
+            display: flex; flex-direction: column; gap: 6px; padding: 16px 16px 14px; text-decoration: none; color: inherit;
+            background: #17140d; border: 1px solid #2a2418; border-radius: 12px; transition: border-color 0.12s, transform 0.12s;
+        }
+        a.card:hover, a.card:focus-visible { border-color: #fbbf24; transform: translateY(-2px); outline: none; }
+        .card .icon { font-size: 30px; line-height: 1; }
+        .card b { font-size: 18px; color: #fde68a; }
+        .card span { font-size: 13px; color: #a39b86; line-height: 1.45; }
+        .card em { margin-top: auto; padding-top: 6px; font-style: normal; font-size: 12px; color: #7a725f; }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .chips a {
+            padding: 5px 10px; font-size: 13px; color: #e7dfcc; text-decoration: none;
+            background: #17140d; border: 1px solid #3a3322; border-radius: 999px;
+        }
+        .chips a:hover, .chips a:focus-visible { border-color: #fbbf24; outline: none; }
+        .chips a small { color: #7a725f; }
+        .note { margin-top: 30px; padding: 12px 14px; font-size: 13px; line-height: 1.6; color: #a39b86; background: #120f09; border: 1px solid #2a2418; border-radius: 10px; }
+        code { color: #c9c0aa; }
+        #error { display: none; padding: 20px; color: #fbbf24; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <!-- Página-mãe das ferramentas de desenvolvimento da biblioteca (não é copiada para os jogos pelo sync).
+         Um cartão para cada tuner e atalhos diretos para cada herói, monstro, cenário e peça. As listas de cenários e de
+         peças saem do próprio registro da biblioteca: item novo aparece aqui sozinho.
+         Como abrir: na pasta mini_games, `python3 -m http.server 8010` e abra http://localhost:8010/_library/tools/ -->
+    <div class="wrap">
+        <h1>Ateliê</h1>
+        <p class="lead">Onde se vê e se ajusta a arte da biblioteca: heróis, monstros, cenários e as peças que compõem os cenários.
+            Escolha um cartão; cada ferramenta mostra o resultado na hora e gera as linhas para gravar no arquivo certo.</p>
+
+        <div class="cards">
+            <a class="card" href="tuner.html?model=hunter">
+                <span class="icon">🗡️</span><b>Personagens</b>
+                <span>Medidas, rosto, posições e cores dos heróis 2.5D, vistos com a câmera do Last Torch e a do palco do yara-rpg.</span>
+                <em>tuner.html · heróis</em>
+            </a>
+            <a class="card" href="tuner.html?model=skeleton">
+                <span class="icon">💀</span><b>Monstros</b>
+                <span>Os 13 monstros 2.5D e os 12 desenhos de cima do Last Torch, cada um com as suas cores e medidas.</span>
+                <em>tuner.html · monstros</em>
+            </a>
+            <a class="card" href="scenery_tuner.html?scenery=dark_forest_2">
+                <span class="icon">🌲</span><b>Cenários</b>
+                <span>O cenário inteiro renderizado pelo motor: base, receita de peças, névoa, vento e luz, em computador e celular.</span>
+                <em>scenery_tuner.html</em>
+            </a>
+            <a class="card" href="object_tuner.html?object=torch">
+                <span class="icon">🔥</span><b>Objetos</b>
+                <span>Os objetos do jogo que não são personagem nem cenário: a tocha 2,5D (gaiola de fogo), com o fogo cheio, pela metade e quase apagado.</span>
+                <em>object_tuner.html</em>
+            </a>
+            <a class="card" href="prop_tuner.html?prop=mushroom">
+                <span class="icon">🍄</span><b>Peças</b>
+                <span>Cada coisa que compõe um cenário (cogumelo, pedra, samambaia, toco...), de perto, ao vivo e com todos os quadros.</span>
+                <em>prop_tuner.html</em>
+            </a>
+        </div>
+
+        <h2>Atalhos</h2>
+        <div id="shortcuts"></div>
+
+        <h2>Prévias dos jogos (com o código real de cada um)</h2>
+        <div class="cards">
+            <a class="card" href="../../last_torch/previews/index.html">
+                <span class="icon">🔥</span><b>Last Torch</b>
+                <span>Monstros, armas, poderes e heróis no tamanho e com os efeitos do jogo.</span>
+                <em>last_torch/previews</em>
+            </a>
+            <a class="card" href="../../yara-rpg/previews/index.html">
+                <span class="icon">📜</span><b>yara-rpg</b>
+                <span>O palco do jogo com um estado de mentira, e os personagens em todas as poses.</span>
+                <em>yara-rpg/previews</em>
+            </a>
+        </div>
+
+        <div class="note">
+            <b>Para gravar um ajuste:</b> use <b>Copiar alterados</b> na ferramenta, cole as linhas no arquivo indicado em
+            <code>mini_games/_library/</code> e rode <code>ruby mini_games/_library/sync.rb</code> (os jogos carregam uma cópia, nunca esta pasta).<br>
+            <b>Para provar que nada quebrou:</b> <code>scenery_regression.py</code> compara os pixels antes e depois (o jogo inteiro, tocha incluída), e <code>scenery_perf.py</code>
+            mede o custo por quadro e a memória (modo de uso no topo de cada arquivo, nesta pasta).<br>
+            <b>Manuais:</b> <code>_library/README.md</code> (visão geral), <code>_library/scenery/README.md</code> (cenários e peças).
+        </div>
+        <div id="error"></div>
+    </div>
+
+    <script type="module">
+        import { sceneryIds, createScenery } from '../scenery/index.js';
+        import { getProp, propIds } from '../scenery/props/index.js';
+
+        const HEROES = [['hunter', 'Demon Hunter'], ['azael', 'Azael'], ['brutos', 'Captain Brutos'], ['yara', 'Yara'], ['zeph', 'Zeph'], ['oskar', 'Oskar']];
+        const MONSTERS = [['skeleton', 'Esqueleto'], ['skeleton_crawler', 'Esqueleto rastejante'], ['bloater', 'Inchado'], ['witch', 'Bruxa'], ['bat', 'Morcego'],
+            ['moth', 'Mariposa'], ['wraith', 'Espectro'], ['shadow_wolf', 'Lobo sombrio'], ['zombie_wolf', 'Lobo zumbi'], ['headless_knight', 'Cavaleiro sem cabeça'],
+            ['bone_colossus', 'Colosso de ossos'], ['vampire', 'Vampiro'], ['demon_lord', 'Senhor demônio']];
+
+        const box = document.getElementById('shortcuts');
+        function group(title, links) {
+            const h = document.createElement('h2');
+            h.style.fontSize = '12px';
+            h.style.margin = '14px 0 6px';
+            h.style.color = '#a39b86';
+            h.textContent = title;
+            const chips = document.createElement('div');
+            chips.className = 'chips';
+            links.forEach(([href, label, hint]) => {
+                const a = Object.assign(document.createElement('a'), { href });
+                a.innerHTML = hint ? `${label} <small>${hint}</small>` : label;
+                chips.appendChild(a);
+            });
+            box.append(h, chips);
+        }
+
+        try {
+            group('Heróis', HEROES.map(([id, name]) => [`tuner.html?model=${id}`, name]));
+            group('Monstros', MONSTERS.map(([id, name]) => [`tuner.html?model=${id}`, name]));
+            group('Cenários', sceneryIds().map(id => {
+                const pieces = createScenery(id).visual.props;
+                return [`scenery_tuner.html?scenery=${id}`, id, pieces ? `${pieces.length} peças` : 'desenho próprio'];
+            }));
+            group('Objetos', [['object_tuner.html?object=torch', 'Tocha 2,5D', 'chama em atlas']]);
+            group('Peças', propIds().map(id => {
+                const p = getProp(id);
+                return [`prop_tuner.html?prop=${id}`, p.name, p.kind === 'animated' ? 'animada' : 'estática'];
+            }));
+        } catch (e) {
+            const err = document.getElementById('error');
+            err.style.display = 'block';
+            err.innerHTML = `Os atalhos de cenários e peças não carregaram${location.protocol === 'file:' ? ': a página foi aberta direto do disco, e o navegador bloqueia os módulos assim' : ` (${e.message})`}.<br>
+                No terminal, na pasta <code>mini_games</code>: <code>python3 -m http.server 8010</code> e abra <code>http://localhost:8010/_library/tools/</code>`;
+        }
+    </script>
+</body>
+</html>

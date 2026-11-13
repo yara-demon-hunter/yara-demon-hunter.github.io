@@ -47,12 +47,59 @@ O jogador precisa sempre ver o que enfrenta. Nenhuma camada de cenário desenha 
 da vinheta e dos pontos de luz. Galhos, copas e troncos em primeiro plano foram testados e **rejeitados** (cobriam monstros que
 entram pela borda). Quem quiser a moldura da câmera lateral (como no yara-rpg) precisa de outro jeito que não cubra a luta.
 
+## Peças: o que compõe um cenário (`props/`)
+
+Um cenário não precisa desenhar cada pedra e cada cogumelo: ele escolhe **peças** da biblioteca (`scenery/props/<id>/`), no mesmo
+molde dos monstros: desenho, valores padrão e ficha. Hoje: musgo, folha caída, pedrinha, raiz, toco, pedra (**estáticas**, carimbadas
+no chão uma vez) e samambaia, capim, cogumelo que brilha (**animadas**, atlas de poucos quadros). O catálogo está no Ateliê
+(`tools/prop_tuner.html`), com cada peça de perto, ao vivo e com todos os quadros.
+
+```
+props/
+  props.js          o registro (registerProp, getProp, propIds) e o contrato de uma peça
+  index.js          uma linha por peça
+  <id>/  <id>.js  <id>_visual.js  art_reference/prop.md
+```
+
+**A peça não tem cor no código:** recebe a *paleta* (os valores padrão do `<id>_visual.js`) e a receita do cenário pode trocar o que quiser só
+para ele. O mesmo cogumelo brilha azul na floresta e vermelho numa caverna com `palette: { glow: '255, 80, 60' }`.
+
+**A receita** é a lista `props` no `<id>_visual.js` do cenário; `composeScenery` (`scenery/compose.js`) lê a lista, pinta as estáticas no chão
+(depois da base), monta um atlas por peça animada e posiciona tudo:
+
+```js
+// dark_forest_2_visual.js
+props: [
+    { prop: 'moss', per100kPx: 12 },                                              // estática: quantidade por 100 mil unidades quadradas
+    { prop: 'rock', per100kPx: 0.4, avoidCenter: 90, maxTries: 60 },              // sem nascer perto da tocha
+    { prop: 'mushroom', per100kPx: [0.5, 0.3, 0.15], frames: [8, 6, 4], variants: 2, size: 1.9,
+      cycleSeconds: 2.6, avoidCenter: 70, palette: { glow: '255, 80, 60' } }      // animada: listas por nível de detalhe
+]
+```
+
+O arquivo do cenário (`<id>.js`) fica só com a **base** (chão, luz, clima): `registerScenery(composeScenery({ id, name, visual, paintBase }))`.
+Cada campo da receita está explicado no topo de `compose.js`. Regras: a ordem da receita é a ordem em que as estáticas são pintadas e o
+sorteio é consumido (mudar a ordem muda o cenário); peça animada só gera atlas se aparecer no nível de detalhe; nenhuma peça cobre a ação.
+
+### Criar uma peça nova
+
+1. Pasta `props/<id>/` com `<id>_visual.js` (todos os valores padrão), `<id>.js` com `registerProp({...})` (copie uma parecida: `rock` para
+   estática, `fern` para animada) e `art_reference/prop.md` (ficha curta: papel, como é desenhada, o que a paleta controla, custo, decisões).
+2. Uma linha em `props/index.js` e `ruby mini_games/_library/sync.rb`.
+3. Veja e ajuste em `tools/prop_tuner.html`; use na receita de um cenário.
+
+Peças estáticas: `roll(r, p)` sorteia os atributos (a ordem das chamadas a `r()` não pode mudar depois de aprovada) e `draw(g, x, y, atributos, p)` desenha.
+Peças animadas: `cell`, `anchor`, `variants` e `paint(g, r, phase, p)` (veja "Movimento sem gastar memória").
+
 ## Quem é dono de quê
 
 ```
 scenery/
   scenery.js         o MOTOR: registro (registerScenery), cache, ordem das camadas, névoa, luzes. Igual para todos.
+  compose.js         composeScenery: monta um cenário a partir da base + a receita de peças (props)
+  props/             o catálogo de PEÇAS que compõem os cenários (veja a seção acima)
   scenery_kit.js     o KIT: peças prontas (vento, névoa, vinheta, vaga-lumes, brilho da fonte, cutLight). Escolha o que usar.
+                     (o atlas de animação e o taper moram em core/sprite_sheet.js; o kit os reexporta)
   index.js           importa todos os cenários (uma linha por cenário) e exporta createScenery
   <id>/
     <id>.js          a definição: paintGround (+ buildSway/drawSway) e o registerScenery no fim
@@ -125,9 +172,11 @@ O jogo roda em celular fraco. Um cenário só entra se obedecer:
    o conteúdo publicado precisa ser original.
 2. **Leitura da referência.** Anote na ficha: clima, paleta (cores reais), elementos do chão, de onde vem a luz, o que
    se mexeria (vento, neve, brasas, névoa).
-3. **Decida o que é cada camada.** Para cada elemento: pintado no chão (barato, parado) ou em `renderSway` (animado,
+3. **Procure no catálogo** (`tools/prop_tuner.html`) quais elementos da foto já existem como peça. Crie só as que faltam (veja "Criar uma
+   peça nova"). Se o cenário for feito de peças, o passo 4 é montar a receita; se for um desenho próprio, siga abaixo.
+   Para um elemento sem peça: pintado no chão (barato, parado) ou em `renderSway` (animado,
    poucos)? Névoa/clima/vaga-lumes: ligue pelos dados do kit.
-4. **Crie a pasta** copiando `dark_forest/`: renomeie os dois arquivos, o `id` no `registerScenery` e o export do visual.
+4. **Crie a pasta** copiando `dark_forest_2/` (base + receita; ou `dark_forest/` para um desenho próprio): renomeie os dois arquivos, o `id` no `registerScenery` e o export do visual.
    Troque o conteúdo de `paintGround` pelo seu chão e ajuste o visual.
 5. **Registre:** uma linha em `scenery/index.js`.
 6. **Sync:** `ruby mini_games/_library/sync.rb` (e `--check` para conferir).

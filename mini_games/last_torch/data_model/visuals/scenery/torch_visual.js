@@ -2,7 +2,7 @@
 // Cores, tamanhos e ritmos de animação lidos pelos renderizadores em js/render/.
 
 // --- TOCHA (CENTER TOWER) ---
-// A luz da tocha abre um círculo sem névoa. O raio acompanha a vida do núcleo.
+// A luz da tocha abre um círculo sem névoa. O raio acompanha a vida do núcleo. A chama encolhe junto.
 export const TORCH_VISUALS = {
     // Raio da luz (fração do menor lado da tela): cheio com 100% de vida, mínimo com 0%
     lightRadiusMaxRatio: 0.62,
@@ -18,23 +18,17 @@ export const TORCH_VISUALS = {
     groundGlowColor: '255, 150, 60',
     groundGlowAlpha: 0.3,
 
-    // Corpo da tocha (visto de cima)
-    baseColor: '#1b1410',
-    baseRimColor: '#4a3322',
-    flameColors: ['rgba(234, 88, 12, 0.85)', 'rgba(251, 146, 60, 0.85)', 'rgba(253, 224, 71, 0.9)'],
-    flameCoreColor: '#fff7ed',
-    flameGlowColor: 'rgba(251, 146, 60, 0.9)',
-    flameMinScale: 0.1,            // tamanho da chama com a vida zerada: quase apagada
+    // Tamanho do fogo pela vida da tocha: pares [vida, tamanho], ligados em linha reta (1 = o fogo cheio do desenho).
+    // Pedido do usuário: a cheia maior; pela metade = a cheia antiga; quase apagada = a "pela metade" antiga.
+    // (o desenho da tocha em si está em library/objects/torch: poste, gaiola, fogo, brasas e brilho)
+    flameBySize: [[0, 0.3], [0.12, 0.38], [0.5, 0.77], [1, 1]],
     flameSmoothing: 5,             // suavidade ao encolher após um golpe (maior = mais rápido)
-    tongues: 6,
-    embers: 8,
-    emberColor: '#fdba74',
 
-    // Barrinha de vida em cima da fogueira
+    // Barrinha de vida da tocha: em cima dela, logo acima do fogo cheio (offsetY = distância da base do poste para cima)
     hpBar: {
         width: 58,
         height: 6,
-        offsetY: 58,               // distância do centro da fogueira até a barra
+        offsetY: 80,               // distância da base do poste até a barra (positivo = acima)
         back: 'rgba(15, 23, 42, 0.85)',
         fillLeft: '#e11d48',
         fillRight: '#fb923c',

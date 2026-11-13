@@ -1,0 +1,6 @@
+// GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/scenery/props/grass/grass_visual.js e rode o sync.
+// --- DADOS VISUAIS: peça Capim (grass) ---
+export const GRASS_VISUALS = {
+    blade: '#2f5f50',
+    bend: 2.2                // quanto as lâminas se curvam na rajada
+};

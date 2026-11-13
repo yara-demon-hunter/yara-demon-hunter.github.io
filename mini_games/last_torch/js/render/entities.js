@@ -221,6 +221,7 @@ function drawBoss(e) {
 function renderUnderlays() {
     if (state.quality >= 2) return;
     for (const e of state.enemies) {
+        if (!inPass(e)) continue;
         if (e.isBoss || e.shadowOwner) continue;
         const sprite = getMonsterSprite(e.type);
         if (sprite.spec.live) continue;     // ele desenha a própria sombra
@@ -319,6 +320,7 @@ const HEALTH_BAR_OFFSETS = {
 // Tudo que vem por cima do corpo: clarão do golpe, gelo, mira, aviso de estouro e vida
 function renderEnemyOverlays(t) {
     for (const e of state.enemies) {
+        if (!inPass(e)) continue;
         if (e.hitFlash > 0) {
             ctx.globalCompositeOperation = 'lighter';
             drawGlow(ctx, '#ffffff', e.x, e.y, e.radius * 1.5, (e.hitFlash / J.hitFlashSeconds) * 0.75);
@@ -367,19 +369,30 @@ function renderEnemyOverlays(t) {
     }
 }
 
-export function renderEnemies() {
+// Profundidade em relação à tocha: 'behind' desenha só quem está atrás da base dela (mais acima na tela), 'front' só quem está na
+// frente; sem argumento, todos. O renderer chama as duas passadas com a tocha no meio, para ela cobrir quem passa por trás.
+let depthPass = null;
+let depthSplit = 0;
+const inPass = (e) => depthPass === null || (depthPass === 'behind' ? e.y < depthSplit : e.y >= depthSplit);
+
+export function renderEnemies(pass = null, splitY = 0) {
+    depthPass = pass;
+    depthSplit = splitY;
     const t = performance.now() / 1000;
     renderUnderlays();
 
     for (const e of state.enemies) {
+        if (!inPass(e)) continue;
         if (e.elite) renderEliteMark(e);
     }
     for (const e of state.enemies) {
+        if (!inPass(e)) continue;
         if (!e.isBoss && !e.shadowOwner && !getMonsterSprite(e.type).spec.live) stampMonster(e, t);
     }
     resetWorldView();
 
     for (const e of state.enemies) {
+        if (!inPass(e)) continue;
         // Sombras do rival: o mesmo boneco dele (js/render/rival.js)
         if (e.isBoss || e.shadowOwner) drawBoss(e);
         else if (getMonsterSprite(e.type).spec.live) (USE_25D ? MONSTERS_25D.bone_colossus.render : renderBoneColossus)(e);

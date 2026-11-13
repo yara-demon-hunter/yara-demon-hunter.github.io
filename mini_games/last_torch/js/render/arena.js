@@ -1,20 +1,22 @@
-import { CORE_MODEL } from '../../data_model/core.js';
 import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { HERO_HUD_VISUALS } from '../../data_model/visuals/characters/hero_hud_visual.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
 import { ctx, maxUltEnergy, player, shadowClones, state } from '../core/state.js';
 import { getAtkRadius } from '../systems/stats.js';
-import { drawGlow } from '../../library/core/glow.js';
+import { createTorch25D } from '../../library/objects/torch/torch25d.js';
+import { TORCH25D_VISUALS } from '../../library/objects/torch/torch25d_visual.js';
 import { drawHpBar } from './fx/hp_bar.js';
 import { getDashedRing } from './fx/rings.js';
 
 // --- ARENA: Núcleo e Raio de Alcance ---
 // (o chão/fundo fica em scenery.js e na biblioteca de cenários)
-// Tocha (Center Tower) vista de cima: base de pedra, chama que tremula e brasas.
-// A chama encolhe conforme o núcleo perde vida.
+// A tocha (Center Tower) é o objeto 2.5D da biblioteca (library/objects/torch): poste de madeira, copa com a cruz e a chama
+// em atlas. Aqui fica só a regra do jogo: a chama encolhe conforme o núcleo perde vida, sem saltar de tamanho.
 let shownHpRatio = 1;
 let lastFlameTime = 0;
+let torch = null;
+let torchKey = '';
 
 function getCoreHpRatio() {
     return Math.max(0, Math.min(1, state.coreHp / state.coreHpMax));
@@ -28,55 +30,31 @@ function updateShownHpRatio(now) {
     return shownHpRatio;
 }
 
+// Tamanho do fogo para a vida (0 a 1): interpola a tabela T.flameBySize
+function flameSizeFor(hp) {
+    const table = T.flameBySize;
+    for (let i = 1; i < table.length; i++) {
+        const [h0, s0] = table[i - 1];
+        const [h1, s1] = table[i];
+        if (hp <= h1) return s0 + (s1 - s0) * Math.max(0, (hp - h0) / (h1 - h0));
+    }
+    return table[table.length - 1][1];
+}
+
+// A tocha nasce na resolução da tela e no nível de detalhe atuais; recria só quando algum dos dois muda
+export function prepareCore() {
+    const res = state.view.scale * state.view.pixelRatio;
+    const key = `${res.toFixed(3)}|${state.quality}`;
+    if (key === torchKey) return;
+    torchKey = key;
+    torch = createTorch25D({ res, frames: TORCH25D_VISUALS.frames[state.quality] });
+}
+
 export function renderCore() {
-    const { coreX: x, coreY: y } = state;
+    prepareCore();
     const t = performance.now() / 1000;
-    const hpRatio = updateShownHpRatio(t);
-    const scale = T.flameMinScale + (1 - T.flameMinScale) * hpRatio;
-    const flicker = 1 + Math.sin(t * 17) * 0.08 + Math.sin(t * 31) * 0.06;
-
-    // Base de pedra
-    ctx.fillStyle = T.baseColor;
-    ctx.beginPath();
-    ctx.arc(x, y, CORE_MODEL.visualRadius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = T.baseRimColor;
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-
-    // Halo quente
-    drawGlow(ctx, T.flameGlowColor, x, y, 46 * scale * flicker, 0.7);
-
-    // Línguas de fogo giratórias
-    for (let i = 0; i < T.tongues; i++) {
-        const a = (i / T.tongues) * Math.PI * 2 + t * (0.9 + i * 0.12);
-        const wobble = 0.7 + 0.3 * Math.sin(t * 9 + i * 1.7);
-        const r = CORE_MODEL.visualRadius * 0.5 * scale * wobble;
-        ctx.fillStyle = T.flameColors[i % T.flameColors.length];
-        ctx.beginPath();
-        ctx.ellipse(x + Math.cos(a) * r * 0.55, y + Math.sin(a) * r * 0.55, r * 0.9, r * 0.55, a, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    // Miolo claro da chama
-    drawGlow(ctx, '#fde68a', x, y, 13 * scale * flicker, 1);
-    drawGlow(ctx, T.flameCoreColor, x, y, 6 * scale, 0.9);
-
-    // Brasas subindo (saem do centro para fora)
-    ctx.fillStyle = T.emberColor;
-    for (let k = 0; k < T.embers; k++) {
-        const phase = (t * 0.55 + k / T.embers) % 1;
-        const a = k * 2.399 + Math.floor(t * 0.55 + k / T.embers) * 1.3;
-        const r = (CORE_MODEL.visualRadius * 0.4 + phase * 30) * scale;
-        ctx.globalAlpha = (1 - phase) * 0.9;
-        ctx.beginPath();
-        ctx.arc(x + Math.cos(a) * r, y + Math.sin(a) * r, 1.6 * (1 - phase * 0.6), 0, Math.PI * 2);
-        ctx.fill();
-    }
-    ctx.restore();
+    const flame = flameSizeFor(updateShownHpRatio(t));
+    torch.render(ctx, state.coreX, state.coreY, { flame, time: t });
 }
 
 function renderFuryBar() {
