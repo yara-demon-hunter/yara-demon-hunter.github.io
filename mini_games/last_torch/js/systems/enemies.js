@@ -13,7 +13,7 @@ import { dropGold } from './gold.js';
 import { mod } from './modifiers.js';
 import { checkHourEnd, onBossKilled } from './night.js';
 import { dropChest, maybeDropPickup } from './pickups.js';
-import { hurtPlayer } from './player.js';
+import { hurtPlayer, knockbackPlayer } from './player.js';
 import { damageShadowClone } from './shadow_clone.js';
 import { addHostileFire, onEnemyKilled } from './powers.js';
 import { onTorchTouched, spreadBurn } from './skills_flame.js';
@@ -474,12 +474,14 @@ export function updateEnemies(dt) {
 
         // Colisão com Herói
         if (hunting && distToPlayer < e.radius + CHARACTER_MODEL.collisionRadius && player.iFrames <= 0) {
-            hurtPlayer(e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            const hit = hurtPlayer(e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
             if (state.phase !== 'HUNT') return;
 
             const pushAngle = Math.atan2(e.y - player.y, e.x - player.x);
-            e.vx += Math.cos(pushAngle) * MONSTER_SPAWNING.contactKnockback;
-            e.vy += Math.sin(pushAngle) * MONSTER_SPAWNING.contactKnockback;
+            const contactImpulse = MONSTER_SPAWNING.contactKnockback * (1 - (e.knockbackResist ?? 0));
+            e.vx += Math.cos(pushAngle) * contactImpulse;
+            e.vy += Math.sin(pushAngle) * contactImpulse;
+            if (hit && model.contactKnockback) knockbackPlayer(e.x, e.y, model.contactKnockback);
             if (mod('thorns') > 0) dealDamage(e, getAtkDamage() * mod('thorns'), { noCrit: true });
         }
 
@@ -489,8 +491,9 @@ export function updateEnemies(dt) {
                 if (!c.active || c.iFrames > 0 || Math.hypot(c.x - e.x, c.y - e.y) >= e.radius + CHARACTER_MODEL.collisionRadius) continue;
                 damageShadowClone(c, e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
                 const pushAngle = Math.atan2(e.y - c.y, e.x - c.x);
-                e.vx += Math.cos(pushAngle) * MONSTER_SPAWNING.contactKnockback;
-                e.vy += Math.sin(pushAngle) * MONSTER_SPAWNING.contactKnockback;
+                const contactImpulse = MONSTER_SPAWNING.contactKnockback * (1 - (e.knockbackResist ?? 0));
+                e.vx += Math.cos(pushAngle) * contactImpulse;
+                e.vy += Math.sin(pushAngle) * contactImpulse;
             }
         }
 

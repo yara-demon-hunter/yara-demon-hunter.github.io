@@ -5,7 +5,7 @@ import { registerBody } from '../../../characters/hunter/body_registry.js';
 import { HERO_25D_VISUALS as V } from '../../../characters/hunter/hero25d_visual.js';
 import { mix, norm } from '../../../characters/hunter/kit25d.js';
 import { skeletonBody, renderSkeletonModel } from '../skeleton/skeleton25d.js';
-import { greatsword } from '../creature25d.js';
+import { poly } from '../creature25d.js';
 
 // --- COLOSSO DE OSSOS 2.5D ---
 // Como no desenho de cima (topdown/bone_colossus): é o Esqueleto 2.5D (../skeleton/skeleton25d.js) em tamanho gigante,
@@ -65,7 +65,23 @@ registerBody('bone_colossus', {
     },
     drawBlade(rig, hand, dir) {
         const { C } = rig;
-        greatsword(rig, hand, dir, S.bladeLength, S.bladeWidth, { blade: C.swordSteel, edge: C.swordEdge, guard: C.swordGold, grip: C.swordGrip, dark: C.swordDark });
+        const at = (d) => [hand[0] + dir[0] * d, hand[1] + dir[1] * d, hand[2] + dir[2] * d];
+        const flat = Math.hypot(dir[0], dir[1]);
+        const side = flat > 0.05 ? [-dir[1] / flat, dir[0] / flat, 0] : [0, 1, 0];
+        const offset = (point, amount) => [point[0] + side[0] * amount, point[1] + side[1] * amount, point[2]];
+        rig.limb([at(-2.6), at(0.6)], 1.3, C.swordGrip);
+        rig.ball(at(-2.8), 0.9, C.swordGold);
+        const guard = at(1);
+        rig.limb([offset(guard, -S.bladeWidth * 1.5), offset(guard, S.bladeWidth * 1.5)], 1.2, C.swordGold);
+
+        // Montante facetado: gumes paralelos no corpo e um bico comprido, reto e anguloso.
+        const base = at(1.3);
+        const shoulder = at(S.bladeLength - S.bladeWidth * 1.7);
+        const tip = at(S.bladeLength);
+        const half = S.bladeWidth * 0.9;
+        poly(rig, [offset(base, -half), offset(shoulder, -half), tip, offset(shoulder, half), offset(base, half)], C.swordDark, C.ink, 0.55);
+        poly(rig, [offset(base, -half * 0.62), offset(shoulder, -half * 0.62), tip, offset(shoulder, half * 0.55), offset(base, half * 0.55)], C.swordSteel);
+        poly(rig, [offset(base, -half * 0.62), offset(shoulder, -half * 0.62), tip], C.swordEdge);
     }
 });
 

@@ -34,6 +34,7 @@ export function createPlayerState() {
         attackTimer: 0,
         hp: CHARACTER_MODEL.initialHp,
         maxHp: CHARACTER_MODEL.initialHp,
+        knockbackX: 0, knockbackY: 0,
         iFrames: 0,
         // Só visual: direção e instante do último golpe recebido (animação de empurrão)
         hitDirX: 0, hitDirY: 0, hitTime: -100000,

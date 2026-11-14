@@ -277,7 +277,8 @@ export const MONSTER_MODELS = {
         radius: 27,
         color: '#5b3b22',
         damage: 24,
-        knockbackResist: 0.88,
+        knockbackResist: 1,
+        immovable: true,                 // massa da criatura: não é empurrada por golpes nem pela separação da horda
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 65,

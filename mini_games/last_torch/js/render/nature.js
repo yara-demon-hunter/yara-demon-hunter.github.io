@@ -266,7 +266,9 @@ export function renderSpiritWolves() {
         const running = w.mode === 'hunt' && w.moving && w.lift > 0;
         const cycle = w.moving ? (t / (sprite.spec.playSeconds ?? 0.4) / (w.mode === 'hunt' ? 0.7 : 1) + w.seed) % 1 : 0;
         const f = spriteFrame(sprite, w.angle, cycle);
-        const bump = w.bit > 0 ? 6 * (w.bit / 0.2) : 0;
+        // Pequeno bote de corpo no impacto, com avanço e recolhimento suaves; sem pernas correndo no lugar.
+        const bitePhase = w.bit > 0 ? 1 - w.bit / 0.2 : 0;
+        const bump = w.bit > 0 ? Math.sin(bitePhase * Math.PI) * 9 : 0;
         // O tamanho nunca muda: sem esticar na corrida nem pulsar (o lobo é sempre do mesmo tamanho)
         const size = base;
         ctx.globalAlpha = 0.92;

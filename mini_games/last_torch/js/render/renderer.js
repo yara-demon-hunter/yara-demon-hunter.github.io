@@ -51,6 +51,7 @@ const HERO_25D = new URLSearchParams(window.location.search).get('hero') !== 'to
 // O herói e o que anda com ele (auras, lâminas em órbita, escudo, fênix, corvo)
 function renderHeroBlock() {
     if (player.hidden) return;
+    ctx.save();
     renderSkillAuras();
     if (HERO_25D) renderHero();
     else renderPlayer();
@@ -59,6 +60,7 @@ function renderHeroBlock() {
     renderWisp();
     renderPhoenixBird();
     renderRavenBird();
+    ctx.restore();
 }
 
 // Blessed Blade: a lâmina amarela, com brilho forte e faíscas de raio (js/render/player25d.js). Montada uma vez por paleta, sem criar objeto por quadro
@@ -172,13 +174,11 @@ export function render() {
     renderPickups();
     renderBladeSlashes();
     renderEnemyProjectiles();
-    // Profundidade 2.5D: quem está atrás da base da tocha (mais acima na tela) é desenhado antes dela, e ela o cobre;
-    // quem está na frente vem depois e passa por cima dela
+    // A tocha continua sendo o corte de profundidade; em cada lado, herói e inimigos são ordenados juntos pelo Y do chão.
     const heroBehind = !player.hidden && player.y < state.coreY;
-    renderEnemies('behind', state.coreY);
-    if (heroBehind) renderHeroBlock();
+    renderEnemies('behind', state.coreY, heroBehind ? renderHeroBlock : null, player.y);
     renderCore();
-    renderEnemies('front', state.coreY);
+    renderEnemies('front', state.coreY, heroBehind ? null : renderHeroBlock, player.y);
     renderRoots();
     renderSpiritWolves();
     renderMonsterCurses();
@@ -192,7 +192,6 @@ export function render() {
     renderDashGhosts();
     renderShadowClone();
     renderLevelUpBack();
-    if (!heroBehind) renderHeroBlock();
     renderFuryTrails();
     renderFurySwords();
     renderGuardianWard();

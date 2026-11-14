@@ -265,21 +265,7 @@ function stampMonster(e, t) {
 
     const cycle = (t / spec.playSeconds + e.phase / TAU) % 1;
     const frame = spriteFrame(sprite, rotation, cycle);
-    const previousAlpha = ctx.globalAlpha;
-    if (e.type === 'TREANT') {
-        const actors = [player, ...state.enemies];
-        for (const actor of actors) {
-            if (!actor || actor === e || actor.hp <= 0 || actor.hidden || actor.y >= y) continue;
-            const dx = Math.abs(actor.x - x);
-            const dy = y - actor.y;
-            if (dx < width * 0.43 + (actor.radius ?? 0) && dy < height * 0.43 + (actor.radius ?? 0)) {
-                ctx.globalAlpha = previousAlpha * 0.72;
-                break;
-            }
-        }
-    }
     stamp(atlas, frame.sx, frame.sy, cell, cell, x, y, frame.rotation, width, height);
-    ctx.globalAlpha = previousAlpha;
 }
 
 // Anel girando em volta do elite, para ser reconhecido de longe
@@ -390,7 +376,7 @@ let depthPass = null;
 let depthSplit = 0;
 const inPass = (e) => depthPass === null || (depthPass === 'behind' ? e.y < depthSplit : e.y >= depthSplit);
 
-export function renderEnemies(pass = null, splitY = 0) {
+export function renderEnemies(pass = null, splitY = 0, renderActor = null, actorY = 0) {
     depthPass = pass;
     depthSplit = splitY;
     const t = performance.now() / 1000;
@@ -406,7 +392,13 @@ export function renderEnemies(pass = null, splitY = 0) {
     }
     resetWorldView();
 
+    // Insere o herói na mesma ordem de profundidade dos inimigos, usando a posição no chão.
+    let actorRendered = false;
     for (const e of ordered) {
+        if (renderActor && !actorRendered && actorY < e.y) {
+            renderActor();
+            actorRendered = true;
+        }
         // Sombras do rival: o mesmo boneco dele (js/render/rival.js)
         if (e.isBoss || e.shadowOwner) drawBoss(e);
         else if (getMonsterSprite(e.type).spec.live) {
@@ -414,6 +406,7 @@ export function renderEnemies(pass = null, splitY = 0) {
             else (USE_25D ? MONSTERS_25D.bone_colossus.render : renderBoneColossus)(e);
         }
     }
+    if (renderActor && !actorRendered) renderActor();
     renderEnemyOverlays(t);
 }
 

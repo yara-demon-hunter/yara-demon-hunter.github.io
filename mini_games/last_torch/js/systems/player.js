@@ -60,6 +60,15 @@ export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
     return true;
 }
 
+// Recuo físico de criaturas pesadas; separado do dano para outros contatos manterem o comportamento atual.
+export function knockbackPlayer(fromX, fromY, force) {
+    const dx = player.x - fromX;
+    const dy = player.y - fromY;
+    const distance = Math.hypot(dx, dy) || 1;
+    player.knockbackX += (dx / distance) * force;
+    player.knockbackY += (dy / distance) * force;
+}
+
 // Com um Last Prayer sobrando o herói levanta; senão, a noite acaba
 function heroDown() {
     if (tryPhoenix()) return;
@@ -171,6 +180,15 @@ export function updatePlayer(dt) {
             player.x += dir.x * moveDist;
             player.y += dir.y * moveDist;
         }
+    }
+
+    if (player.knockbackX || player.knockbackY) {
+        player.x += player.knockbackX * dt;
+        player.y += player.knockbackY * dt;
+        const damping = Math.pow(0.035, dt);
+        player.knockbackX *= damping;
+        player.knockbackY *= damping;
+        if (Math.hypot(player.knockbackX, player.knockbackY) < 4) player.knockbackX = player.knockbackY = 0;
     }
 
     player.x = Math.max(15, Math.min(state.width - 15, player.x));

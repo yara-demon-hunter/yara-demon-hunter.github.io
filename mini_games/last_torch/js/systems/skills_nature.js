@@ -556,7 +556,8 @@ function updateSpiritWolves(dt) {
                 if (d > reach + 40) w.lift = Math.sin(Math.min(1, (d - reach - 40) / 90) * Math.PI) * 5;
                 return;
             }
-            w.moving = w.cool > 0.2;
+            // Ao alcance, firma as patas enquanto espera a próxima mordida; o bote visual acontece no impacto.
+            w.moving = false;
             if (w.cool <= 0) {
                 const rooted = prey.rooted > 0 ? M.rootedBonus : 1;
                 dealDamage(prey, getSpellDamage() * biteDamage * rooted, { noCrit: true, style: 'spell', kbX: Math.cos(w.angle) * 70, kbY: Math.sin(w.angle) * 70 });
