@@ -355,44 +355,65 @@ export function drawAncientRoots(g, x, y, scale = 1, t = 0, motion = 0) {
     g.scale(scale, scale);
     g.lineCap = 'round';
     g.lineJoin = 'round';
+    const gait = 0.28 + motion * 0.72;
     for (const side of [-1, 1]) {
-        const phase = t * 2.2 + side * Math.PI;
-        const step = Math.sin(phase) * motion;
-        const sway = Math.sin(t * 1.45 + side) * 1.8 + step * 2.4;
-        const lift = Math.max(0, Math.cos(phase)) * motion * 2.2;
+        const phase = t * 1.05 + (side > 0 ? Math.PI : 0);
+        const stride = Math.sin(phase);
+        const lift = Math.max(0, Math.cos(phase)) * gait * 5;
+        const reach = stride * gait * 9;
+        const sway = Math.sin(t * 0.8 + side) * 1.2 + reach * 0.35;
+        const tipX = side * (28 + reach);
+        const tipY = 8 - lift + sway;
+        const root = (color, width) => {
+            g.strokeStyle = color;
+            g.lineWidth = width;
+            g.beginPath();
+            g.moveTo(side * 4, -3 - lift * 0.18);
+            g.bezierCurveTo(side * (10 + reach * 0.25), 2 - lift, side * (18 + reach * 0.55), 5 - lift, side * (24 + reach), 1 + sway);
+            g.bezierCurveTo(side * (35 + reach), -2 - lift, side * (38 + reach), 9 - lift, side * (30 + reach), tipY);
+            g.stroke();
+        };
         g.strokeStyle = '#24160b';
-        g.lineWidth = 6;
-        g.beginPath();
-        g.moveTo(side * 4, -3 - lift * 0.25);
-        g.bezierCurveTo(side * (11 + step), 3 - lift, side * (16 + step), 4 - lift, side * (22 + step), 1 + sway);
-        g.bezierCurveTo(side * (31 + step), -2 - lift, side * (34 + step), 8 - lift, side * (27 + step), 10 + sway);
-        g.bezierCurveTo(side * (22 + step), 12 + lift * 0.3, side * (22 + step), 6, side * (27 + step), 5 + sway);
-        g.stroke();
-        g.strokeStyle = '#5b3a1a';
-        g.lineWidth = 3.2;
-        g.beginPath();
-        g.moveTo(side * 4, -3 - lift * 0.25);
-        g.bezierCurveTo(side * (11 + step), 3 - lift, side * (16 + step), 4 - lift, side * (22 + step), 1 + sway);
-        g.bezierCurveTo(side * (31 + step), -2 - lift, side * (34 + step), 8 - lift, side * (27 + step), 10 + sway);
-        g.stroke();
+        root('#24160b', 7);
+        root('#5b3a1a', 3.2);
+        // Dedos grossos abrem e fecham devagar enquanto a raiz se apoia e avança.
+        for (const toe of [-1, 0, 1]) {
+            const spread = (4 + Math.max(0, stride) * 2) * gait;
+            const endX = tipX + side * (toe === 0 ? 6 : 3.5);
+            const endY = tipY + toe * spread;
+            g.strokeStyle = '#24160b';
+            g.lineWidth = toe === 0 ? 3.1 : 2.4;
+            g.beginPath();
+            g.moveTo(tipX, tipY);
+            g.quadraticCurveTo(tipX + side * 3, tipY + toe * spread * 0.35 - lift * 0.12, endX, endY);
+            g.stroke();
+            g.strokeStyle = '#75491f';
+            g.lineWidth = 1;
+            g.beginPath();
+            g.moveTo(tipX, tipY);
+            g.quadraticCurveTo(tipX + side * 3, tipY + toe * spread * 0.35 - lift * 0.12, endX, endY);
+            g.stroke();
+        }
         g.fillStyle = '#86efac';
         g.beginPath();
-        g.arc(side * (27 + step), 5 + sway - lift, 1.8, 0, TAU);
+        g.arc(tipX, tipY - 0.4, 1.8, 0, TAU);
         g.fill();
     }
     // Folhagem luminosa baixa, como as brotações verdes da referência.
     for (const side of [-1, 1]) {
-        const x = side * 31;
+        const phase = t * 1.05 + (side > 0 ? Math.PI : 0);
+        const x = side * (31 + Math.sin(phase) * (1.5 + motion * 3));
+        const y = 5 - Math.max(0, Math.cos(phase)) * (motion * 1.5);
         g.fillStyle = '#14532d';
         g.beginPath();
-        g.ellipse(x, 5, 10, 5, side * 0.12, 0, TAU);
+        g.ellipse(x, y, 10, 5, side * 0.12, 0, TAU);
         g.fill();
         for (let i = 0; i < 4; i++) {
             const lx = x + side * (i - 1.5) * 3.5;
-            const ly = 3 - (i % 2) * 3;
+            const ly = y - (i % 2) * 3 + Math.sin(t * 0.9 + i + side) * 0.5;
             g.fillStyle = i % 2 ? '#65d936' : '#9bfa38';
             g.beginPath();
-            g.ellipse(lx, ly, 3.2, 1.8, side * -0.55, 0, TAU);
+            g.ellipse(lx, ly, 3.2, 1.8, side * -0.55 + Math.sin(t * 0.8 + i) * 0.06, 0, TAU);
             g.fill();
         }
     }
@@ -419,7 +440,7 @@ export function drawAncientMist(g, x, y, scale = 1, t = 0) {
     g.ellipse(0, 1, 38, 14, 0, 0, TAU);
     g.fill();
     for (const side of [-1, 1]) {
-        const phase = t * 1.3 + side * 1.7;
+        const phase = t * 0.65 + side * 1.7;
         const drift = Math.sin(phase) * 4;
         const rise = (Math.sin(phase * 0.7) + 1) * 4;
         g.shadowColor = '#4ade80';
@@ -442,9 +463,9 @@ export function drawAncientMist(g, x, y, scale = 1, t = 0) {
     g.shadowBlur = 0;
     g.fillStyle = 'rgba(74, 222, 128, 0.24)';
     for (let i = 0; i < 5; i++) {
-        const phase = t * 1.8 + i * 1.7;
+        const phase = t * 0.9 + i * 1.7;
         const xOffset = Math.sin(phase) * (18 + i * 2);
-        const yOffset = -5 - ((t * 8 + i * 9) % 18);
+        const yOffset = -5 - ((t * 3 + i * 9) % 18);
         g.beginPath();
         g.arc(xOffset, yOffset, 1.1 + (i % 2) * 0.6, 0, TAU);
         g.fill();
@@ -563,7 +584,7 @@ export function drawOakBuddy(g, x, y, { t = 0, awake = 0, ancient = false, walki
     g.globalAlpha = 1;
     if (ancient) {
         drawAncientMist(g, x, y, 1, t);
-        drawAncientRoots(g, x, y + 2, 1, t);
+        drawAncientRoots(g, x, y + 2, 1, t, walking ? 1 : 0.18);
     }
     g.drawImage(ancient ? getAncientTrunk() : getTrunk(), x - tw / 2, y - th + 5, tw, th);
     if (awake > 0.02 && !ancient) { g.globalAlpha = awake; g.drawImage(getEvilTrunk(), x - tw / 2, y - th + 5, tw, th); }

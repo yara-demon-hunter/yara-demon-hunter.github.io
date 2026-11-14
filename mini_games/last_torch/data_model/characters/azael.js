@@ -46,7 +46,7 @@ export const AZAEL = {
 
         // ===== SPEED: velocidade de movimento junto com o dash =====
         speed: 180,                 // velocidade de movimento, px/s
-        dashDistance: 220,          // distância do dash, px
+        dashDistance: 250,          // distância do dash, px
         dashSeconds: 0.17,          // duração do dash, s
         dashCharges: 1,             // dashes guardados ao mesmo tempo
         dashCooldown: 2.6,          // segundos para recuperar um dash

@@ -47,7 +47,7 @@ export const BRUTOS = {
 
         // ===== SPEED: velocidade de movimento junto com o dash =====
         speed: 100,                 // velocidade de movimento, px/s: lento
-        dashDistance: 95,           // distância do dash, px: curto
+        dashDistance: 90,           // distância do dash, px: curto
         dashSeconds: 0.2,           // duração do dash, s
         dashCharges: 1,             // dashes guardados ao mesmo tempo
         dashCooldown: 2.6,          // segundos para recuperar um dash

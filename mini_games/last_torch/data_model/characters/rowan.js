@@ -52,7 +52,7 @@ export const ROWAN = {
 
         // ===== SPEED: velocidade de movimento junto com o dash =====
         speed: 135,                 // velocidade de movimento, px/s
-        dashDistance: 150,          // distância do dash, px
+        dashDistance: 110,          // distância do dash, px
         dashSeconds: 0.17,          // duração do dash, s
         dashCharges: 1,             // dashes guardados ao mesmo tempo
         dashCooldown: 2.6,          // segundos para recuperar um dash

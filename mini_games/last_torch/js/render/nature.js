@@ -446,16 +446,17 @@ export function renderNatureFront() {
         const grow = oakScale(oak);
         const fade = 1;              // a árvore não some mais com o tempo
         const t = performance.now() / 1000;
-        // Levando pancada, treme; andando, balança de leve a cada passo
-        const sway = (oak.shake > 0 ? Math.sin(oak.shake * 70) * 1.6 : 0) + (oak.walking ? Math.sin(t * 3) * 0.8 : 0);
-        const k = grow * (2 - grow);
         const ancient = oak.stage === 'elder';
+        // Levando pancada, treme; andando, balança de leve a cada passo
+        const sway = (oak.shake > 0 ? Math.sin(oak.shake * 70) * 1.6 : 0)
+            + (ancient ? Math.sin(t * 0.55) * (0.55 + (oak.walkK ?? 0) * 0.9) : oak.walking ? Math.sin(t * 3) * 0.8 : 0);
+        const k = grow * (2 - grow);
         const tw = (ancient ? ANCIENT_TRUNK_W : TRUNK_W) * k;
         const th = (ancient ? ANCIENT_TRUNK_H : TRUNK_H) * k;
         const cw = (ancient ? ANCIENT_CROWN_W : CROWN_W) * k;
         const ch = (ancient ? ANCIENT_CROWN_H : CROWN_H) * k;
         ctx.globalAlpha = fade;
-        if (oak.walkK > 0.02) renderWalkingRoots(oak, k, t);
+        if (oak.walkK > 0.02 && !ancient) renderWalkingRoots(oak, k, t);
         if (ancient) {
             drawAncientMist(ctx, oak.x + sway, oak.y, k, t);
             drawAncientRoots(ctx, oak.x + sway, oak.y + 2 * k, k, t, oak.walkK ?? 0);
