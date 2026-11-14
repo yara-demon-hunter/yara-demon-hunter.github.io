@@ -4,6 +4,7 @@
 import { HERO_VISUALS } from '../../../library/characters/hunter/hero_visual.js';
 import { AZAEL_VISUALS } from '../../../library/characters/azael/azael_visual.js';
 import { BRUTOS_VISUALS } from '../../../library/characters/brutos/brutos_visual.js';
+import { AVGUSTINO_VISUALS } from '../../../library/characters/avgustino/avgustino_visual.js';
 import { ROWAN_VISUALS } from '../../../library/characters/rowan/rowan_visual.js';
 
 // Tons de sombra que o clone do Azael usa nas peças só dele (pele, cabelo, faixas, bainha)
@@ -74,6 +75,16 @@ const BRUTOS_SHADOW = {
     axeHead: '#6d4cc0', axeEdge: '#c4b5fd', axeDark: '#2a1846', haft: '#1e1035', haftShade: '#110a20', binding: '#0a0612'
 };
 SHADOW_CLONE_VISUALS.colorsByModel = {
+    // Clone do Avgustino: pele, cabelo, sobretudo, chapéu e prata em tons de sombra
+    avgustino: {
+        ...AVGUSTINO_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors,
+        skin: '#2a1846', skinShade: '#170c2a', skinLight: '#3b2363', outline: '#000000', mouth: '#0d0719',
+        hair: '#34205e', hairShade: '#1e1035', beard: '#34205e', beardShade: '#1e1035',
+        coat: '#160d29', coatShade: '#0a0615', coatLight: '#2a1846', hat: '#160d29', hatShade: '#0a0615', hatLight: '#2a1846', hatBand: '#05030b',
+        shirt: '#0d0719', shirtShade: '#05030b', shirtLight: '#1e1035', pants: '#140a24', pantsShade: '#0a0612',
+        boot: '#0d0719', bootShade: '#05030b', bootLight: '#1e1035', cross: '#c4b5fd', crossShade: '#7c3aed', chain: '#8b5cf6',
+        lens: '#05030b', lensGlint: '#7c3aed', frame: '#1e1035', metal: '#4c2f80'
+    },
     azael: SHADOW_CLONE_VISUALS.azaelColors,
     brutos: { ...BRUTOS_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors, ...BRUTOS_SHADOW },
     // Clone do Rowan: o boneco dele com pele, cabelo, túnica, folhas e madeira em tons de sombra; a semente fica violeta

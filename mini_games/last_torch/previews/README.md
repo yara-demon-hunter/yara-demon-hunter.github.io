@@ -17,6 +17,13 @@ As páginas usam módulos ES, e o navegador os bloqueia em arquivos abertos dire
 
    ```bash
    cd mini_games/last_torch
+   python3 previews/serve.py
+   ```
+
+   (é o `http.server` do Python, mas sem cache: com o comum, depois de mudar o código o navegador mistura arquivos velhos e novos e a página fica preta. Se usar `python3 -m http.server 8000`, recarregue com Ctrl+Shift+R.)
+
+   ```bash
+   # alternativa, com cache:
    python3 -m http.server 8000
    ```
 

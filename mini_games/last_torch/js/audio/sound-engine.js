@@ -468,6 +468,17 @@ export class SoundEngine {
         this.tone({ type: 'sine', freq: 450, to: 135, attack: 0.05, decay: 0.5, gain: 0.1 });
     }
 
+    // Sino de igreja: parciais desafinadas como um sino de bronze (hum, prima, terça, quinta, nominal), com cauda longa
+    playBell(echo = false) {
+        if (!this.ctx) return;
+        const f = echo ? 247 : 196;
+        const gain = echo ? 0.07 : 0.1;
+        [[0.5, 1, 2.6], [1, 0.9, 2.2], [1.19, 0.45, 1.6], [1.5, 0.35, 1.4], [2, 0.5, 1.8], [2.74, 0.22, 1.0]].forEach(([ratio, g, decay]) => {
+            this.tone({ type: 'sine', freq: f * ratio, attack: 0.005, decay, gain: gain * g });
+        });
+        this.burst({ filter: 'bandpass', freq: 2400, to: 1200, q: 2, decay: 0.08, gain: 0.05 });
+    }
+
     playSeedLaunch() {
         if (!this.ctx) return;
         this.burst({ filter: 'bandpass', freq: 1800, to: 700, q: 1.2, decay: 0.12, gain: 0.12 });

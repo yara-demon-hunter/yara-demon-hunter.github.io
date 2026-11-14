@@ -15,36 +15,56 @@ export const HUNTER = {
     portrait: '',                   // filtro CSS do retrato antigo; com portraitImage, a arte própria
 
     // --- NÚMEROS: todos os parâmetros do personagem, nenhum escondido (0 / false = não tem) ---
+    // Agrupados como as barras da tela de seleção: HP, DAMAGE, DEFENSE, FURY (bloco `fury`, mais abaixo), REGEN, SPEED, RANGE, DAGGER, MAGIC.
     stats: {
-        // VIDA E MOVIMENTO (valores absolutos)
+        // ===== HP: a vida =====
         maxHp: 100,                 // vida máxima
+
+        // ===== DAMAGE: o dano da lâmina por segundo (golpe, ritmo, combo e crítico) =====
+        attackDamage: 25,           // dano de cada golpe da lâmina (a adaga parte dele; a magia tem o próprio: magicDamage)
+        attackCooldown: 0.7,        // segundos entre golpes: MENOR = ataca mais rápido
+        bladeDamage: 0,             // dano só da lâmina (soma ao attackDamage)
+        stillAttack: 15,            // velocidade de ataque parado
+        baseKnockback: 50,          // empurrão do golpe, px/s
+        comboDamage: 1.5,           // o 3º golpe do combo bate x vezes mais forte
+        comboKnockback: 1.25,       // e empurra x vezes mais
+        baseCritChance: 0.06,       // chance de crítico (0.06 = 6 por cento)
+        critMultiplier: 2,          // quanto um crítico multiplica o golpe
+
+        // ===== DEFENSE: quanto menos dano ele recebe (bônus em %: -10 = recebe 10% menos) =====
+        damageTaken: -10,           // dano recebido (-10 = recebe 10% menos)
+
+        // ===== REGEN: a cura base (calor da tocha: quanto cura e até onde alcança; roubo de vida) =====
+        warmthHeal: 1.0,            // CURA: vida por segundo que o calor da tocha cura quem está dentro dele
+        warmthRadius: 120,          // ALCANCE: raio do calor da tocha em volta dela, px
+        lifeSteal: 0,               // parte do dano causado que volta como vida
+
+        // ===== SPEED: velocidade de movimento junto com o dash =====
         speed: 130,                 // velocidade de movimento, px/s
         dashDistance: 150,          // distância do dash, px
         dashSeconds: 0.17,          // duração do dash, s
+        dashCharges: 1,             // dashes guardados ao mesmo tempo
+        dashCooldown: 2.6,          // segundos para recuperar um dash
+        dashInvulnerable: 0.3,      // segundos invulnerável durante o dash
 
-        // DEFESA (bônus em %: +10 = 10% mais, -10 = 10% menos)
-        damageTaken: 0,             // dano recebido (-10 = recebe 10% menos)
-        warmth: 20,                 // calor da tocha: cura perto dela
-        lifeSteal: 0,               // parte do dano causado que volta como vida
+        // ===== RANGE: o alcance da lâmina =====
+        bladeRange: 55,             // alcance da lâmina, px
 
-        // LÂMINA (valores absolutos, só deste personagem)
-        attackDamage: 25,         // dano de cada golpe, vale para lâmina, adaga e feitiços
-        attackCooldown: 0.7,        // segundos entre golpes: MENOR = ataca mais rápido
-        bladeRange: 55,           // alcance da lâmina, px
-
-        // LÂMINA (bônus em %)
-        bladeDamage: 0,             // dano só da lâmina (soma ao attackDamage)
-        stillAttack: 15,            // velocidade de ataque parado
-
-        // ADAGA
+        // ===== DAGGER: a adaga (dano x alcance) =====
         knifeRange: 400,            // alcance da adaga, px (valor absoluto)
         knifeDamage: 20,            // dano da adaga, bônus em % (soma ao attackDamage)
+        knifeCooldown: 0.9,         // segundos entre adagas
+        knifeSpeed: 520,            // velocidade da adaga em voo, px/s
+        knifeDamageRatio: 0.8,      // dano da adaga = dano de cada golpe x este número
+        knifeKnockbackRatio: 0.8,   // empurrão da adaga = empurrão do golpe x este número
+        noKnives: false,            // não lança adaga; as skills de adaga ficam seladas na árvore
+        magicKnife: false,          // o arremesso usa o dano de MAGIA (número azul) em vez do dano de lâmina: a rosa e a adaga benta são magia
 
-        // HABILIDADES (true = liga)
-        noKnives: false             // não lança adaga; as skills de adaga ficam seladas na árvore
+        // ===== MAGIC: o dano da magia (feitiços, tocha, fênix, bolas de fogo, luz...); 0 = não usa magia =====
+        magicDamage: 20             // dano base da MAGIA (feitiços, tocha, fênix, bolas de fogo, luz...): independente do dano da lâmina. 0 = não usa magia
     },
 
-    // --- FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) ---
+    // ===== FURY: a FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) =====
     // kind: 'swordRain' (chuva de espadas, a do Demon Hunter), 'bloodWaltz' (saltos de sombra, a do Azael), 'stomp' (pisadas, a do
     // Brutos) ou 'forestGuardian' (escudo de folhas, a do Rowan). js/systems/fury.js; a duração vem da árvore (skill Fury).
     // SWORD RAIN: durante a Fúria, uma espada cai do céu em cima de um monstro por perto a cada `stepSeconds`; no fim, uma espada
@@ -52,6 +72,12 @@ export const HUNTER = {
     fury: {
         kind: 'swordRain',
         name: 'Sword Rain',
+        // --- CARGA E DURAÇÃO (toda Fúria tem; é o que cada personagem ajusta no seu jeito de carregar) ---
+        chargePerHit: 3,            // carga da barra por monstro atingido pela lâmina (a barra tem 100)
+        chargePerKill: 1.5,         // carga por morte na sequência
+        durationSeconds: 3.5,        // quanto dura com a skill Fury no nível 1
+        durationPerLevel: 0.5,      // segundos a mais por nível da skill Fury
+        damageBonusPerLevel: 0.12,  // dano da lâmina durante a Fúria: +12% por nível da skill Fury
         stepSeconds: 0.20,          // tempo entre uma espada e a próxima
         fallSeconds: 0.22,          // a queda de cada espada (o aviso no chão dura isso)
         radius: 38,                 // alcance do impacto de cada espada, px

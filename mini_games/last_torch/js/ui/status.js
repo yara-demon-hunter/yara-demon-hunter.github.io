@@ -98,45 +98,8 @@ export function showBuildNote(row) {
     document.getElementById('buildNote').textContent = row?.dataset.note ?? BUILD_NOTE_HINT;
 }
 
-const TABS = ['tree', 'build'];
-let currentTab = 'tree';
-
-function showTab(name) {
-    currentTab = name;
-    TABS.forEach(tab => {
-        const id = `tab${tab[0].toUpperCase()}${tab.slice(1)}`;
-        document.getElementById(id).classList.toggle('hidden', tab !== name);
-    });
-    document.querySelectorAll('[data-status-tab]').forEach(b => b.classList.toggle('is-on', b.dataset.statusTab === name));
-    if (name === 'tree') skillTree.open();
-}
-
-export function setStatusTab(name) {
-    showTab(name);
-}
-
-// Pontos e ouro no cabeçalho
-function renderHeader() {
-    document.getElementById('statusPoints').innerText = state.skillPoints;
-    document.getElementById('shopCoinsText').innerText = state.coins;
-}
-
-skillTree.onChange = renderHeader;
-
-// De onde a tela foi aberta: a caçada ou o acampamento (from = 'CAMP', com onBack para redesenhar o acampamento)
-let returnState = 'PLAYING';
-let afterReturn = null;
-
-export function openStatus(from = 'PLAYING', onBack = null) {
-    if (state.gameState !== from) return;
-    returnState = from;
-    afterReturn = onBack;
-    state.gameState = 'PAUSED';
-    document.getElementById('statusLevel').innerText = `LEVEL ${state.playerLevel}`;
-    document.getElementById('statusHour').innerText = `Wave ${state.turn} · ${getHourName(state.turn)}`;
-    document.getElementById('statusHero').innerText = ` · ${getHero().name}`;
-    document.getElementById('btnResume').innerText = from === 'CAMP' ? 'BACK TO THE CAMP ▶' : 'BACK TO THE HUNT ▶';
-    renderHeader();
+// Aba Build: stats, poderes e relíquias. Redesenhada ao abrir a tela e sempre que a árvore muda (pontos gastos)
+function renderBuild() {
     renderStats();
     const skills = Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0)
         .map(p => (p.evolved
@@ -152,6 +115,53 @@ export function openStatus(from = 'PLAYING', onBack = null) {
     renderBuildList('passiveList', Object.values(passives).filter(p => p.type !== 'skill' && p.lvl > 0).map(p => ({
         icon: p.icon, name: p.name, desc: p.desc, level: 0
     })), 'No relics yet. Buy them at the camp, between waves.');
+    showBuildNote(null);
+}
+
+const TABS = ['tree', 'build'];
+let currentTab = 'tree';
+
+function showTab(name) {
+    currentTab = name;
+    TABS.forEach(tab => {
+        const id = `tab${tab[0].toUpperCase()}${tab.slice(1)}`;
+        document.getElementById(id).classList.toggle('hidden', tab !== name);
+    });
+    document.querySelectorAll('[data-status-tab]').forEach(b => b.classList.toggle('is-on', b.dataset.statusTab === name));
+    if (name === 'tree') skillTree.open();
+    if (name === 'build') renderBuild();
+}
+
+export function setStatusTab(name) {
+    showTab(name);
+}
+
+// Pontos e ouro no cabeçalho
+function renderHeader() {
+    document.getElementById('statusPoints').innerText = state.skillPoints;
+    document.getElementById('shopCoinsText').innerText = state.coins;
+}
+
+skillTree.onChange = () => {
+    renderHeader();
+    renderBuild();
+};
+
+// De onde a tela foi aberta: a caçada ou o acampamento (from = 'CAMP', com onBack para redesenhar o acampamento)
+let returnState = 'PLAYING';
+let afterReturn = null;
+
+export function openStatus(from = 'PLAYING', onBack = null) {
+    if (state.gameState !== from) return;
+    returnState = from;
+    afterReturn = onBack;
+    state.gameState = 'PAUSED';
+    document.getElementById('statusLevel').innerText = `LEVEL ${state.playerLevel}`;
+    document.getElementById('statusHour').innerText = `Wave ${state.turn} · ${getHourName(state.turn)}`;
+    document.getElementById('statusHero').innerText = ` · ${getHero().name}`;
+    document.getElementById('btnResume').innerText = from === 'CAMP' ? 'BACK TO THE CAMP ▶' : 'BACK TO THE HUNT ▶';
+    renderHeader();
+    renderBuild();
     showBuildNote(null);
     document.getElementById('shopScreen').classList.remove('hidden');
     showTab(currentTab);

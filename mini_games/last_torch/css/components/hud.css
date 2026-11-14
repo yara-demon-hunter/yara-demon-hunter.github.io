@@ -1,6 +1,7 @@
 /* --- HUD ---
-   Tudo no topo; a base da tela fica livre.
-   [ Demon Hunter card: retrato, nome, level/XP, gold/skills ] [ medalhão de status ]  [ Turno + chefão ]  [ som ]
+   Cartão do herói e botões no topo; o turno e o relógio da onda embaixo, no centro (entre o joystick e os botões do celular).
+   Em cima: [ Demon Hunter card ] [ medalhão de status ] [ controles ] ............ [ vida do boss ]
+   Embaixo, no centro: [ turno: WAVE x/12, barra e marcas da noite ]
    Só os botões e o medalhão pegam toques; o cartão do herói deixa passar. */
 #hud {
     position: absolute;
@@ -208,6 +209,23 @@
 /* Fúria ativa: cartão quente; a barra esvazia com o tempo */
 #heroCard.fury-active { border-color: rgba(251, 146, 60, 0.9); }
 
+/* --- Embaixo, no centro: turno + chefão e o relógio da onda --- */
+#hudBottom {
+    position: absolute;
+    left: 50%;
+    bottom: max(0.5rem, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    gap: 0.4rem;
+    width: min(26rem, calc(100% - 10rem));
+    pointer-events: none;
+}
+/* Vida do boss: canto direito do topo */
+#bossHpContainer { margin-left: auto; flex: 0 0 auto; width: min(13rem, 34%); align-self: center; padding: 0.3rem 0.5rem; }
+#bossHpContainer .hud-label { font-size: 0.62rem; }
+#bossHpContainer .hud-bar { height: 0.38rem; }
+
 /* --- Turno + chefão --- */
 #hudWorld {
     display: flex;
@@ -215,12 +233,11 @@
     gap: 0.3rem;
     flex: 1;
     min-width: 0;
-    max-width: 22rem;
-    margin: 0 auto;
+    margin: 0;
 }
 
 /* --- Botões --- */
-#hudButtons { display: flex; flex-direction: column; gap: 0.35rem; margin-left: auto; pointer-events: auto; }
+#hudButtons { display: flex; flex-direction: column; gap: 0.35rem; align-self: center; pointer-events: auto; }
 .hud-btn {
     display: flex;
     align-items: center;
@@ -325,7 +342,7 @@
 /* --- Tela larga: a hora da noite fica no eixo da tocha, herói e botões nas pontas, na linha da pontuação --- */
 @media (min-width: 1024px) {
     #hudTop { max-width: none; }
-    #hudWorld { position: absolute; left: 50%; width: 22rem; margin: 0; transform: translateX(-50%); }
+    #hudBottom { width: 26rem; }
 }
 
 /* --- Celular em pé (< 640px): cartão do herói à esquerda, turno ao centro, botões só com ícone --- */
@@ -361,7 +378,8 @@
     #xpTrack { height: 0.16rem; }
     #xpRow { font-size: 0.56rem; }
     #heroChips { font-size: 0.7rem; gap: 0.45rem; }
-    #hudWorld { padding: 0.22rem 0.4rem; gap: 0.15rem; max-width: 13.5rem; }
+    #hudWorld { padding: 0.22rem 0.4rem; gap: 0.15rem; }
+    #hudBottom { bottom: max(0.25rem, env(safe-area-inset-bottom)); width: min(20rem, calc(100% - 14rem)); }
     .hud-label { font-size: 0.62rem; margin-bottom: 0.1rem; }
     .hud-bar { height: 0.28rem; }
     .hud-bar-thin { height: 0.22rem; }

@@ -6,7 +6,7 @@ import { dropGold } from './gold.js';
 import { announcePoints } from './progression.js';
 import { showCallout } from '../ui/banner.js';
 import { chargeUlt } from './combat.js';
-import { mod } from './modifiers.js';
+import { getFuryChargePerKill } from './stats.js';
 import { noteBest } from './sanctuary.js';
 
 // --- SEQUÊNCIA DE MORTES ---
@@ -16,7 +16,7 @@ export function addStreakKill() {
     if (state.streak > state.run.bestStreak) state.run.bestStreak = state.streak;
     noteBest('bestStreak', state.streak);
     addMultiKill();
-    chargeUlt(STREAK.furyChargePerKill * (1 + mod('furyCharge')));
+    chargeUlt(getFuryChargePerKill());
 
     const tier = STREAK.tiers.find(t => t.at === state.streak);
     if (tier) {

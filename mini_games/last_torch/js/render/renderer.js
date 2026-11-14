@@ -16,7 +16,7 @@ import { renderLevelUpBack, renderLevelUpFront } from './level_up.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 import { renderPlayer25D } from './player25d.js';
 import { HERO_25D_VISUALS } from '../../library/characters/hunter/hero25d_visual.js';
-import { player } from '../core/state.js';
+import { passives, player } from '../core/state.js';
 import { getHero } from '../systems/modifiers.js';
 import {
     renderClearWave, renderDawn, renderFloaters, renderGibs, renderScreenFlash,
@@ -34,6 +34,7 @@ import {
 } from './powers.js';
 import { renderReflectWard } from './reflect.js';
 import { renderGuardianWard, renderSnares } from './druid.js';
+import { renderLightFront, renderLightGround } from './light.js';
 import { renderNatureFront, renderNatureGround, renderRoots, renderSpiritWolves } from './nature.js';
 import { renderShadowClone } from './shadow_clone.js';
 import { getHeroGear, getOathPalette } from './hero_gear.js';
@@ -60,10 +61,20 @@ function renderHeroBlock() {
     renderRavenBird();
 }
 
+// Blessed Blade: a lâmina molhada de água benta (azul-prata, brilho azul). Montada uma vez por paleta, sem criar objeto por quadro
+const BLESSED_BLADE_COLORS = { blade: '#93c5fd', bladeCore: '#e0f2fe', runes: '#e0f2fe', bladeGlow: '#38bdf8', bladeGlowSoft: 'rgba(56, 189, 248, 0.55)' };
+const blessedPalettes = new WeakMap();
+function blessedPalette(colors) {
+    let p = blessedPalettes.get(colors);
+    if (!p) blessedPalettes.set(colors, p = { ...colors, ...BLESSED_BLADE_COLORS });
+    return p;
+}
+
 function renderHero() {
     const gear = getHeroGear();
     const hero = getHero();
-    renderPlayer25D(player, heroAnim, getOathPalette(gear, hero.colors ?? HERO_25D_VISUALS.colors), gear, hero.model);
+    const colors = getOathPalette(gear, hero.colors ?? HERO_25D_VISUALS.colors);
+    renderPlayer25D(player, heroAnim, passives.blessedBlade.lvl > 0 ? blessedPalette(colors) : colors, gear, hero.model);
 }
 
 // Funde a borda do mundo com as faixas laterais/superiores (se existirem) para não haver corte seco.
@@ -154,6 +165,7 @@ export function render() {
     renderChillAura();
     renderRifts();
     renderNatureGround();
+    renderLightGround();
     renderSnares();
     renderTelegraphs();
     renderGoldDrops();
@@ -185,6 +197,7 @@ export function render() {
     renderFurySwords();
     renderGuardianWard();
     renderNatureFront();
+    renderLightFront();
     renderReflectWard();
     renderCrescents();
     renderSkillHits();

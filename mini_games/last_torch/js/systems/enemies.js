@@ -322,6 +322,7 @@ export function updateEnemies(dt) {
         if (e.marked > 0) e.marked -= dt;
         if (e.ravenMark > 0) e.ravenMark -= dt;
         if (e.rooted > 0) e.rooted -= dt;
+        if (e.blessed > 0) e.blessed -= dt;
 
         e.x += e.vx * dt;
         e.y += e.vy * dt;

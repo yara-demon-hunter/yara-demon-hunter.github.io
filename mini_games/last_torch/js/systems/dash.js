@@ -6,7 +6,7 @@ import { isFireCasting } from './knives.js';
 import { addFloater, hitStop, slowMotion } from './effects.js';
 import { bumpStat } from './sanctuary.js';
 import { leaveSmokeTrail, onDashEnd, onDashStart, stealOnPerfectDodge, strikeDashPath } from './skills_shadow.js';
-import { getDashCharges, getDashCooldown, getDashDistance, getDashSeconds } from './stats.js';
+import { characterStat, getDashCharges, getDashCooldown, getDashDistance, getDashSeconds } from './stats.js';
 
 // --- DASH ---
 // Esquiva curta e invulnerável, com cargas. Vai para onde o jogador está indo; parado, para onde
@@ -69,7 +69,7 @@ export function tryDash() {
     player.dashStruck = null;
     player.dashFromX = player.x;
     player.dashFromY = player.y;
-    player.iFrames = Math.max(player.iFrames, DASH_SKILL.invulnerableSeconds);
+    player.iFrames = Math.max(player.iFrames, characterStat('dashInvulnerable'));
     audio.playDash();
     onDashStart(player.x, player.y);
 
@@ -110,6 +110,7 @@ export function moveDash(dt) {
 // Recarga das cargas
 export function updateDash(dt) {
     const max = getDashCharges();
+    if (player.dashCharges > max) player.dashCharges = max;     // perdeu cargas (Oath of Faith tira o dash)
     if (player.dashCharges >= max) {
         player.dashRecharge = 0;
         return;

@@ -7,7 +7,7 @@ import { getKnifeRange } from '../systems/knives.js';
 import { getHero, mod } from '../systems/modifiers.js';
 import {
     getCritChance, getCritMultiplier, getDamageTakenRatio, getDashCharges, getDashCooldown, getKillHeal, getKnifeCooldown,
-    getFrenzyDamageBonus, getFrenzyDuration, getKnifeDamage, getMagnetRadius, getSpellCooldown, getSpellDamage, getWarmthDamage, getWarmthHeal, getWarmthRadius
+    getFrenzyDamageBonus, getFrenzyDuration, getFuryChargePerHit, getFuryChargePerKill, getKnifeDamage, getMagnetRadius, getSpellCooldown, getSpellDamage, getWarmthDamage, getWarmthHeal, getWarmthRadius
 } from '../systems/stats.js';
 
 // --- FICHA DE STATS ---
@@ -29,27 +29,38 @@ const modRow = (key, icon, name, note, format = bonus) => ({ icon, name, note, a
 
 export const STAT_GROUPS = [
     {
-        title: 'ATTACK',
+        title: 'BLADE',
         rows: [
             { attr: 'damage' },
-            { icon: '🔮', name: 'Magic Damage', note: 'What each spell starts from, before the power that casts it. Its numbers show in blue.', amount: getSpellDamage, format: whole, tone: 'spell' },
-            { icon: '🔪', name: 'Dagger Damage', note: 'One dagger, before any charge.', amount: getKnifeDamage, format: whole },
             { attr: 'atkSpeed' },
-            { icon: '⏳', name: 'Spell Recharge', note: 'How much faster spells return.', amount: () => 1 - getSpellCooldown(1), format: reduction },
-            { icon: '🗡️', name: 'Dagger Recharge', note: 'Time between daggers.', amount: getKnifeCooldown, format: seconds },
-            { icon: '🎲', name: 'Crit Chance', note: 'How often a hit lands as a critical.', amount: getCritChance, format: plain },
-            { icon: '💥', name: 'Crit Damage', note: 'How much a critical multiplies the hit.', amount: getCritMultiplier, format: (n) => `x${n.toFixed(2)}` },
             { attr: 'radius' },
             { attr: 'slashArc' },
             { attr: 'knockback' },
-            { icon: '📏', name: 'Dagger Range', note: 'How far a dagger flies.', amount: getKnifeRange, format: pixels },
-            modRow('knifeSpeed', '💨', 'Dagger Speed', 'Daggers fly faster.'),
-            { attr: 'frenzyNova' },
-            modRow('furyCharge', '🔋', 'Fury Charge', 'The Fury bar fills faster.'),
-            modRow('lowHpDamage', '🩸', 'Low HP Damage', 'Extra damage while under 35% health.'),
-            { icon: '♨️', name: 'Warmth Damage', note: 'Extra damage inside the warmth of the torch.', amount: getWarmthDamage, format: bonus },
             modRow('stillAttack', '⛰️', 'Still Attack', 'Faster blade while you stand still.'),
-            modRow('thorns', '🌵', 'Thorns', 'Monsters that touch you take this share of your damage.', plain)
+            modRow('lowHpDamage', '🩸', 'Low HP Damage', 'Extra damage while under 35% health.')
+        ]
+    },
+    {
+        title: 'CRITICAL',
+        rows: [
+            { icon: '🎲', name: 'Crit Chance', note: 'How often a hit lands as a critical.', amount: getCritChance, format: plain },
+            { icon: '💥', name: 'Crit Damage', note: 'How much a critical multiplies the hit.', amount: getCritMultiplier, format: (n) => `x${n.toFixed(2)}` }
+        ]
+    },
+    {
+        title: 'DAGGER',
+        rows: [
+            { icon: '🔪', name: 'Dagger Damage', note: 'One dagger, before any charge.', amount: getKnifeDamage, format: whole },
+            { icon: '🗡️', name: 'Dagger Recharge', note: 'Time between daggers.', amount: getKnifeCooldown, format: seconds },
+            { icon: '📏', name: 'Dagger Range', note: 'How far a dagger flies.', amount: getKnifeRange, format: pixels },
+            modRow('knifeSpeed', '💨', 'Dagger Speed', 'Daggers fly faster.')
+        ]
+    },
+    {
+        title: 'MAGIC',
+        rows: [
+            { icon: '🔮', name: 'Magic Damage', note: 'What each spell starts from, before the power that casts it. Its numbers show in blue.', amount: getSpellDamage, format: whole, tone: 'spell' },
+            { icon: '⏳', name: 'Spell Recharge', note: 'How much faster spells return.', amount: () => 1 - getSpellCooldown(1), format: reduction }
         ]
     },
     {
@@ -59,10 +70,16 @@ export const STAT_GROUPS = [
             { icon: '🛡️', name: 'Damage Taken', note: 'Every hit on you lands this much softer.', amount: () => 1 - getDamageTakenRatio(), format: reduction },
             { icon: '🍖', name: 'Heal per Kill', note: 'Health you recover with every kill.', amount: getKillHeal, format: (n) => `+${n.toFixed(1)}` },
             { icon: '📿', name: 'Revives Left', note: 'Times you can still rise when you fall.', amount: () => state.revives + (state.secondWind && save.darkness <= CORE_MODEL.secondWind.maxDarkness ? 1 : 0), format: whole },
+            modRow('thorns', '🌵', 'Thorns', 'Monsters that touch you take this share of your damage.', plain),
+            modRow('provoke', '📣', 'Monster Lure', 'Monsters leave the torch to chase you from farther away.')
+        ]
+    },
+    {
+        title: 'MOVEMENT',
+        rows: [
             { attr: 'moveSpeed' },
             { icon: '💨', name: 'Dash Charges', note: 'Dashes you can hold at once.', amount: getDashCharges, format: whole },
-            { icon: '⏱️', name: 'Dash Recharge', note: 'Time to get a dash back.', amount: getDashCooldown, format: seconds },
-            modRow('provoke', '📣', 'Monster Lure', 'Monsters leave the torch to chase you from farther away.')
+            { icon: '⏱️', name: 'Dash Recharge', note: 'Time to get a dash back.', amount: getDashCooldown, format: seconds }
         ]
     },
     {
@@ -73,6 +90,7 @@ export const STAT_GROUPS = [
             modRow('torchGuard', '🧱', 'Torch Guard', 'Every hit on the torch lands this much softer.', reduction),
             { icon: '🌡️', name: 'Warmth Reach', note: 'How far the warmth of the torch reaches.', amount: getWarmthRadius, format: pixels },
             { icon: '❤️‍🔥', name: 'Warmth Heal', note: 'Health you recover inside the warmth.', amount: getWarmthHeal, format: perSecond },
+            { icon: '♨️', name: 'Warmth Damage', note: 'Extra damage inside the warmth of the torch.', amount: getWarmthDamage, format: bonus },
             modRow('warmthBurn', '🌋', 'Warmth Burn', 'Monsters inside the warmth burn for this share of your magic damage.', (n) => `${Math.round(n * 100)}%/s`)
         ]
     },
@@ -129,10 +147,21 @@ export function getFuryGroup() {
             row('💫', 'Stun', 'Common monsters are stunned (bosses are not).', secondsShort(fury.stunSeconds)),
             row('🛡️', 'Damage Taken', 'He takes less damage while the Fury lasts.', `-${Math.round(fury.damageTakenCut * 100)}%`)
         ],
+        consecration: () => [
+            duration,
+            row('✝️', 'Holy Damage', 'Damage dealt to every monster inside the circle, again and again = your magic damage times this.', times(dmg(fury.damage))),
+            row('😈', 'Demons', 'Elites and bosses take this much more from the light.', `+${Math.round(fury.demonBonus * 100)}%`),
+            row('⏱️', 'Pulse', 'Time between light hits.', secondsShort(fury.tickSeconds)),
+            row('📏', 'Circle', 'How wide the holy circle is.', `${fury.radius}px`),
+            row('🐌', 'Slow', 'Monsters in the circle move slower.', `-${Math.round(fury.slow * 100)}%`),
+            row('🛡️', 'Damage Taken', 'Inside the circle every hit on him is softer.', `-${Math.round(fury.damageReduction * 100)}%`),
+            row('💛', 'Healing', 'Health per second for him inside the circle (the torch heals too).', `${fury.healPerSecond}/s`),
+            row('✨', 'Finale', 'When the circle fades a cross of light bursts: magic damage times this.', times(dmg(fury.finaleDamage)))
+        ],
         forestGuardian: () => [
             duration,
             row('🛡️', 'Damage Taken', 'The leaf shield makes every hit on him softer.', `-${Math.round(fury.damageReduction * 100)}%`),
-            row('🍃', 'Leaf Damage', 'Damage dealt to every monster in reach, again and again = your blade damage times this.', times(dmg(fury.damage))),
+            row('🍃', 'Leaf Damage', 'Damage dealt to every monster in reach, again and again = your magic damage times this.', times(dmg(fury.damage))),
             row('⏱️', 'Pulse', 'Time between leaf hits.', secondsShort(fury.tickSeconds)),
             row('📏', 'Reach', 'How far the leaves reach around him.', `${fury.radius}px`),
             row('🐌', 'Slow', 'Monsters in the leaves move slower.', `-${Math.round(fury.slow * 100)}%`)
@@ -143,7 +172,14 @@ export function getFuryGroup() {
         swordRain: 'swords fall from the sky on the monsters around him, and a giant one ends it',
         bloodWaltz: 'a chain of fast cuts, leaping from monster to monster',
         stomp: 'stomps the ground around him, stunning monsters',
+        consecration: 'a circle of holy light that burns and slows monsters, heals him and the torch, and ends in a cross of light',
         forestGuardian: 'a leaf shield that hurts and slows the monsters around him'
     }[fury.kind];
-    return { title: `Special Attack (Fury): ${fury.name.toUpperCase()}`, summary, rows: rows() };
+    return { title: `Special Attack (Fury): ${fury.name.toUpperCase()}`, summary, rows: [
+        { attr: 'frenzyNova' },
+        ...rows(),
+        row('🔋', 'Charge per Hit', 'How much of the Fury bar (out of 100) each monster hit by your blade fills.', getFuryChargePerHit().toFixed(1)),
+        row('☠️', 'Charge per Kill', 'How much of the Fury bar each kill in a streak fills.', getFuryChargePerKill().toFixed(1)),
+        modRow('furyCharge', '⚡', 'Fury Charge', 'The Fury bar fills faster (relics, skills, oaths).')
+    ] };
 }

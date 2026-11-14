@@ -7,6 +7,7 @@ import { hurtPlayer } from './player.js';
 import { feedBloodlust } from './skills_blade.js';
 import { spreadHex } from './skills_curse.js';
 import { onNatureKill } from './skills_nature.js';
+import { onLightKill } from './skills_light.js';
 import { getKillHeal, getSpellCooldown, getSpellDamage } from './stats.js';
 
 // --- PODERES ---
@@ -252,7 +253,7 @@ function updateTorchBolts(dt) {
                 vx: Math.cos(a) * M.speed, vy: Math.sin(a) * M.speed,
                 target,
                 damage: getSpellDamage() * level.damage,
-                style: 'torch',
+                style: 'spell',
                 life: 1.6
             });
         }
@@ -296,6 +297,7 @@ export function onEnemyKilled(e) {
     feedBloodlust();
     spreadHex(e);
     onNatureKill(e);
+    onLightKill(e);
 
     const burst = getPowerLevel(powers.corpseBurst);
     if (burst && Math.random() < burst.chance) {

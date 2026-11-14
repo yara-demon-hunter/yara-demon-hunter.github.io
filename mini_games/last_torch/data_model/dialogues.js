@@ -86,6 +86,34 @@ export const DUEL_DIALOGUES = {
                         { who: 'rival', text: '...Keep your flame, druid. This night is yours.' }
                     ]
                 }
+            },
+            // Father Avgustino: calmo e contido, decidido a deter o demônio a qualquer custo. O Azael não o leva a sério (um padre!),
+            // mas vai se surpreendendo. Ele fala pouco e nunca diz tudo
+            avgustino: {
+                first: {
+                    before: [
+                        { who: 'rival', text: 'A priest? They send a priest to guard the flame? Do you plan to bore me to death with a sermon?' },
+                        { who: 'hero', text: 'Azael. I know what you are. And I know what you are for.' },
+                        { who: 'rival', text: 'Pray all you like, father. I will enjoy this.' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'Impossible... A man of the cloth, and that hits like... Who are you, priest?' },
+                        { who: 'hero', text: 'Someone who will stop you. Whatever it costs me.' },
+                        { who: 'rival', text: 'Before dawn. And this time I will not laugh.' }
+                    ]
+                },
+                final: {
+                    before: [
+                        { who: 'rival', text: 'Back to preach again, father? I almost forgot how stubborn you were.' },
+                        { who: 'hero', text: 'It will not end while you still walk. I will see to it.' },
+                        { who: 'rival', text: 'At any cost? Even your soul, priest?' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'Again... I mocked you. I was wrong. What are you willing to burn to stop me?' },
+                        { who: 'hero', text: 'Everything I am. I have already paid the price.' },
+                        { who: 'rival', text: '...Keep your flame, priest. But I wonder what it cost you.' }
+                    ]
+                }
             }
         }
     },
@@ -182,6 +210,35 @@ export const BOSS_INTROS = {
                     { who: 'rival', text: 'Dawn came and went, and still you fight.' },
                     { who: 'hero', text: 'Only to keep the forest quiet.' },
                     { who: 'rival', text: 'Then let us see how quiet it stays against this one.' }
+                ]
+            },
+            // Father Avgustino: decidido a deter o demônio a qualquer custo. Quem o enfrenta o subestima (é um padre) e vai se
+            // surpreendendo; ele fala pouco e deixa mais perguntas do que respostas
+            avgustino: {
+                DEMON_LORD: [
+                    { who: 'rival', text: 'Still standing, father? I expected you to be on your knees by now. Then meet something older than your church.' },
+                    { who: 'hero', text: 'I have read what it is. I will not let it cross this threshold.' },
+                    { who: 'rival', text: 'Bold, for a priest. Let us see what your faith is worth against my beast.' }
+                ],
+                BLOOD_COUNTESS: [
+                    { who: 'rival', text: 'You survived this long, priest? I am almost impressed. The night grows tired of you.' },
+                    { who: 'hero', text: 'Then send her. Whatever it takes, I will stop all of you.' },
+                    { who: 'rival', text: 'Gladly. My Countess is thirsty... try not to bleed too fast.' }
+                ],
+                BRUTOS: [
+                    { who: 'rival', text: 'Captain Brutos! Silence this priest. He has been preaching long enough.' },
+                    { who: 'boss', text: 'A priest? I will break him.' },
+                    { who: 'hero', text: 'You may try, Captain. I do not break. I have already paid for that.' }
+                ],
+                LONG_NIGHT: [
+                    { who: 'rival', text: 'I did not think a priest would last this long. But not even you can fight the night itself.' },
+                    { who: 'hero', text: 'I do not need to win it. I only need to stop you before it ends.' },
+                    { who: 'rival', text: 'Then meet the Long Night... and pray the dawn still comes.' }
+                ],
+                default: [
+                    { who: 'rival', text: 'Dawn came and went, and the priest is still fighting. Who taught you to fight like that?' },
+                    { who: 'hero', text: 'Until the last of you is gone. At any cost.' },
+                    { who: 'rival', text: 'Then let us see how much that cost is against this one.' }
                 ]
             }
         }

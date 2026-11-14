@@ -173,6 +173,11 @@ export function spawnBoss() {
 const RIVAL_INTRO_DELAY_MS = 700;
 
 export function updateSpawner(dt) {
+    // Relógio da onda: conta toda a caçada, até o último monstro (não o acampamento)
+    if (state.phase === 'HUNT') {
+        state.waveTime += dt;
+        updateWaveEta(dt);
+    }
     if (state.phase !== 'HUNT' || state.lastStand) return;
 
     if (state.bossPending > 0) {
@@ -242,4 +247,52 @@ export function resetFieldForNewTurn() {
     clearSkillEffects();
     state.currentBoss = null;
     state.spawnTimer = TURN_DIFFICULTY.turnStartGraceSeconds;
+    state.waveTime = 0;             // o relógio da onda recomeça
+    state.waveEta = -1;             // e a estimativa também (-1 = ainda sem ritmo para estimar)
+    eta.rate = 0;
+    eta.samples = 0;
+    eta.timer = 0;
+    eta.lastScore = 0;
+}
+
+// --- TEMPO ESTIMADO DA ONDA ---
+// (O contador do HUD foi tirado por enquanto: confundia. A estimativa continua calculada em state.waveEta, pronta para voltar.)
+// A onda fecha pela pontuação (scoreTurn chega a targetScore), não pelo tempo. A contagem regressiva do HUD é uma ESTIMATIVA:
+// o que falta da cota dividido pelo ritmo em que o jogador pontua. O ritmo mistura a média da onda inteira (estável) com a do
+// último trecho (reage quando a horda aperta ou afrouxa); o número mostrado desce um segundo por segundo e só corrige aos poucos,
+// para não saltar na tela.
+const ETA = {
+    sampleSeconds: 1,           // de quanto em quanto tempo mede o ritmo
+    recentWeight: 0.25,         // peso de cada medida nova na média recente
+    minSamples: 5,              // medidas antes de mostrar um número (antes disso: --:--)
+    correction: 0.35            // quão rápido o número mostrado corrige para a estimativa nova (por segundo)
+};
+const eta = { rate: 0, samples: 0, timer: 0, lastScore: 0 };
+
+function updateWaveEta(dt) {
+    const plan = state.hourPlan;
+    if (state.lastStand || plan?.bossCalled) {
+        state.waveEta = 0;
+        return;
+    }
+    eta.timer += dt;
+    if (eta.timer >= ETA.sampleSeconds) {
+        eta.timer -= ETA.sampleSeconds;
+        const gained = (state.scoreTurn - eta.lastScore) / ETA.sampleSeconds;
+        eta.lastScore = state.scoreTurn;
+        eta.rate = eta.samples === 0 ? gained : eta.rate + (gained - eta.rate) * ETA.recentWeight;
+        eta.samples++;
+    }
+    const average = state.scoreTurn / Math.max(1, state.waveTime);
+    const rate = (average + eta.rate) / 2;
+    if (eta.samples < ETA.minSamples || rate <= 0.01) {
+        state.waveEta = -1;
+        return;
+    }
+    const target = Math.max(0, (state.targetScore - state.scoreTurn) / rate);
+    if (state.waveEta < 0) state.waveEta = target;
+    else {
+        state.waveEta = Math.max(0, state.waveEta - dt);
+        state.waveEta += (target - state.waveEta) * Math.min(1, dt * ETA.correction);
+    }
 }

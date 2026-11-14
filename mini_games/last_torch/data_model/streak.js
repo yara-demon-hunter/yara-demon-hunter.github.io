@@ -8,7 +8,6 @@ export const STREAK = {
     maxScoreMultiplier: 5,
     goldPerKill: 0.007,         // bônus de ouro por morte na sequência
     maxGoldBonus: 0.5,
-    furyChargePerKill: 2.5,     // cada morte também carrega a Fúria
     // RUSH: o combo. Cada marco alcançado sobe um nível de Rush, que vale ENQUANTO a sequência durar: o herói ataca e
     // anda mais rápido a cada nível. Parou de matar, a sequência zera e o Rush some: é o que faz o jogador não parar.
     rush: { attackSpeedPerTier: 0.05, moveSpeedPerTier: 0.03 },

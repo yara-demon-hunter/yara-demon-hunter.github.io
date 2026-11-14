@@ -1,7 +1,8 @@
 import { audio, player, state } from '../core/state.js';
 import { dealDamage } from './damage.js';
 import { addNumber, addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
-import { getBladeDamage, getMaxPlayerHp } from './stats.js';
+import { getBladeDamage, getMaxPlayerHp, getSpellDamage } from './stats.js';
+import { feedTorch } from './torch.js';
 import { mod } from './modifiers.js';
 import { showCallout } from '../ui/banner.js';
 
@@ -11,13 +12,21 @@ import { showCallout } from '../ui/banner.js';
 //               últimos instantes uma espada gigante cai onde há mais monstros juntos (o desenho: js/render/fury.js)
 //   bloodWaltz  Azael: até 6 cortes seguidos, saltando para o monstro mais perto que não seja o do corte anterior e
 //               deixando um risco vermelho no caminho (com 2 monstros, vai e volta 3 vezes); cada corte cura
+//   consecration Avgustino: abre um círculo de luz no chão onde ele está; dentro dele os monstros queimam e andam mais
+//               devagar (demônios sofrem mais), e ele e a tocha se curam. No fim, uma cruz de luz estoura (js/render/fury.js)
 //   stomp       Brutos: enquanto a Fúria dura, cada pisada bate no chão em volta dele e a tela treme
 // Os números ficam no arquivo de cada personagem (`fury` em data_model/characters/<id>.js). Só o herói tem Fúria: as sombras
 // do Shadow Clone não a repetem. Um objeto só, reaproveitado: nada é criado por quadro.
 // Oath of the Wild: a Fúria não machuca (defende e deixa lento como sempre). Todo dano de Fúria passa por aqui
+const isDemon = (e) => e.elite || e.isBoss;
+
 export function furyDamage(amount) {
     return mod('furyNoDamage') > 0 ? 0 : amount;
 }
+
+// Terra Consagrada (Avgustino): o círculo em campo e a cruz do fim (js/render/fury.js desenha)
+export const consecration = { on: false, x: 0, y: 0, radius: 0, age: 0, pulse: 0, finale: 0, finaleRadius: 0 };
+export const CONSECRATION_FINALE_SECONDS = 0.9;     // a cruz de luz do fim: desce, crava no chão e some
 
 const run = { kind: null, fury: null, left: 0, timer: 0, side: 1, last: null };
 
@@ -32,6 +41,7 @@ let nextTrail = 0;
 export function resetFury() {
     for (const t of furyTrails) t.life = 0;
     for (const s of furySwords) s.on = false;
+    consecration.on = false;
     run.kind = null;
     run.fury = null;
     run.left = 0;
@@ -66,6 +76,14 @@ export function startFury(fury) {
         run.timer = 0;
         addShockwave(player.x, player.y, { radius: 52, color: '#166534', width: 10, seconds: 0.65 });
         createExplosion(player.x, player.y, '#14532d', 20);
+    } else if (fury.kind === 'consecration') {
+        run.timer = 0;
+        run.heal = 0;
+        Object.assign(consecration, { on: true, x: player.x, y: player.y, radius: fury.radius, age: 0 });
+        screenFlash('#fde68a', 0.3);
+        addShockwave(player.x, player.y, { radius: fury.radius, color: '#fde68a', width: 10, seconds: 0.6 });
+        createExplosion(player.x, player.y, '#fef3c7', 18);
+        audio.playBlast();
     } else if (fury.kind === 'stomp') {
         run.timer = 0;
         shakeScreen(fury.shake * 1.6);
@@ -79,7 +97,12 @@ export function furyDamageRatio() {
     if (state.frenzyActiveTimer <= 0) return 1;
     if (run.kind === 'stomp') return 1 - run.fury.damageTakenCut;
     if (run.kind === 'forestGuardian') return 1 - run.fury.damageReduction;
+    if (run.kind === 'consecration' && insideConsecration(player.x, player.y)) return 1 - run.fury.damageReduction;
     return 1;
+}
+
+export function insideConsecration(x, y) {
+    return consecration.on && Math.hypot(x - consecration.x, y - consecration.y) < consecration.radius;
 }
 
 export function forestGuardianActive() {
@@ -268,6 +291,8 @@ function updateSwordRain(dt) {
 
 // Chamado a cada quadro (js/game.js), depois do ataque do herói
 export function updateFury(dt) {
+    if (consecration.finale > 0) consecration.finale -= dt;
+    if (consecration.pulse > 0) consecration.pulse = Math.max(0, consecration.pulse - dt * 3);
     for (const t of furyTrails) if (t.life > 0) t.life -= dt;
     // As espadas no ar e fincadas seguem o relógio delas mesmo depois que a Fúria acaba
     for (const s of furySwords) {
@@ -304,6 +329,53 @@ export function updateFury(dt) {
         }
         return;
     }
+    if (run.kind === 'consecration') {
+        const F = run.fury;
+        if (state.frenzyActiveTimer <= 0 || player.hp <= 0) {
+            // Fim: uma cruz de luz estoura em cima do círculo
+            if (player.hp > 0) {
+                for (const e of state.enemies) {
+                    if (e.hp <= 0 || Math.hypot(e.x - consecration.x, e.y - consecration.y) > F.radius * F.finaleRadius + e.radius) continue;
+                    const a = Math.atan2(e.y - consecration.y, e.x - consecration.x);
+                    dealDamage(e, furyDamage(getSpellDamage() * F.finaleDamage * (isDemon(e) ? 1 + F.demonBonus : 1)),
+                        { noCrit: true, style: 'spell', kbX: Math.cos(a) * 260, kbY: Math.sin(a) * 260 });
+                }
+                consecration.finale = CONSECRATION_FINALE_SECONDS;
+                consecration.finaleRadius = F.radius * F.finaleRadius;
+                addShockwave(consecration.x, consecration.y, { radius: consecration.finaleRadius, color: '#fef3c7', width: 12, seconds: 0.5 });
+                screenFlash('#fef3c7', 0.35);
+                shakeScreen(10);
+                audio.playBlast();
+            }
+            resetFury();
+            return;
+        }
+        consecration.age += dt;
+        run.timer -= dt;
+        const pulse = run.timer <= 0;
+        if (pulse) {
+            run.timer = F.tickSeconds;
+            consecration.pulse = 1;         // o desenho acende o círculo e solta uma onda do centro
+        }
+        for (const e of state.enemies) {
+            if (e.hp <= 0 || Math.hypot(e.x - consecration.x, e.y - consecration.y) > F.radius + e.radius) continue;
+            e.slow = Math.max(e.slow ?? 0, F.slow);
+            if (pulse) {
+                dealDamage(e, furyDamage(getSpellDamage() * F.damage * (isDemon(e) ? 1 + F.demonBonus : 1)), { noCrit: true, quiet: true, number: true, style: 'spell' });
+                createExplosion(e.x, e.y - e.radius, '#fef3c7', 2);
+            }
+        }
+        // Quem está dentro do círculo se cura: ele e a tocha
+        if (insideConsecration(player.x, player.y)) player.hp = Math.min(getMaxPlayerHp(), player.hp + F.healPerSecond * dt);
+        if (state.phase === 'HUNT' && Math.hypot(state.coreX - consecration.x, state.coreY - consecration.y) < F.radius) {
+            run.heal += F.torchHealPerSecond * dt;
+            if (run.heal >= 1) {
+                feedTorch(Math.floor(run.heal));
+                run.heal -= Math.floor(run.heal);
+            }
+        }
+        return;
+    }
     if (run.kind === 'forestGuardian') {
         if (state.frenzyActiveTimer <= 0 || player.hp <= 0) {
             resetFury();
@@ -315,7 +387,7 @@ export function updateFury(dt) {
             if (e.hp <= 0 || Math.hypot(e.x - player.x, e.y - player.y) > F.radius + e.radius) continue;
             e.slow = Math.max(e.slow ?? 0, F.slow);
             if (run.timer <= 0) {
-                dealDamage(e, furyDamage(getBladeDamage() * F.damage), { noCrit: true, quiet: true });
+                dealDamage(e, furyDamage(getSpellDamage() * F.damage), { noCrit: true, quiet: true, number: true, style: 'spell' });
                 createExplosion(e.x, e.y - e.radius, '#4ade80', 2);
             }
         }

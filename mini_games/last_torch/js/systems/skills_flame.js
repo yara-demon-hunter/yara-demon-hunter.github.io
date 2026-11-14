@@ -10,7 +10,7 @@ import { wander, followRate } from './companions.js';
 import { mod } from './modifiers.js';
 import { phoenixBeak } from '../render/phoenix.js';
 import { addGroundFire, nearestEnemy, ready } from './powers.js';
-import { getSpellCooldown, getSpellDamage } from './stats.js';
+import { getSpellCooldown, getSpellDamage, getWarmthRadius } from './stats.js';
 
 // --- SKILLS DA CHAMA ---
 // O guardião ganha com paciência: fica perto da tocha, firme, e deixa o fogo trabalhar.
@@ -43,7 +43,7 @@ function updateSolarFlare(dt, level) {
         const d = Math.hypot(dx, dy) || 1;
         if (Math.abs(d - level.radius) > F.reach + e.radius) continue;
         const push = e.isBoss ? 0 : F.knockback;
-        dealDamage(e, damage, { kbX: (dx / d) * push, kbY: (dy / d) * push, noCrit: true, style: 'torch' });
+        dealDamage(e, damage, { kbX: (dx / d) * push, kbY: (dy / d) * push, noCrit: true, style: 'spell' });
     }
     addShockwave(state.coreX, state.coreY, { radius: level.radius + F.reach, color: '#fef08a', width: 10, seconds: 0.4 });
     audio.playNova();
@@ -81,7 +81,7 @@ export function absorbHit() {
 export function onTorchTouched() {
     if (passives.backdraft.lvl <= 0) return;
     state.blastBudget++;
-    blast(state.coreX, state.coreY, BACKDRAFT.radius, getSpellDamage() * BACKDRAFT.damage, BACKDRAFT.knockback, '#fb923c', 'torch');
+    blast(state.coreX, state.coreY, BACKDRAFT.radius, getSpellDamage() * BACKDRAFT.damage, BACKDRAFT.knockback, '#fb923c', 'spell');
 }
 
 // --- PHOENIX PACT ---
@@ -188,7 +188,7 @@ export function tryPhoenix() {
 function updateWarmthBurn(dt) {
     const burn = mod('warmthBurn');
     if (burn <= 0 || !ready('warmthBurn', dt, 0.5)) return;
-    const reach = CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
+    const reach = getWarmthRadius();
     const damage = getSpellDamage() * burn * 0.5;
     for (const e of state.enemies) {
         if (Math.hypot(e.x - state.coreX, e.y - state.coreY) > reach + e.radius) continue;

@@ -24,6 +24,9 @@
             background-color: #0b1120; background-repeat: no-repeat;
         }
         #picker.hidden { display: none; }
+        #sections { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 12px 12px; }
+        #sections a { padding: 6px 12px; border-radius: 999px; border: 1px solid #334155; color: #cbd5e1; text-decoration: none; font: 600 13px system-ui, sans-serif; background: #0b1424; }
+        #sections a.is-picked { border-color: #fbbf24; color: #fde68a; }
     </style>
 </head>
 <body>
@@ -32,6 +35,17 @@
          usando o código real do jogo. Como abrir: previews/README.md -->
     <nav id="picker" aria-label="Escolha o personagem"></nav>
     <canvas id="gameCanvas" width="1200" height="7970"></canvas>
+    <!-- Erro ao carregar ou rodar: mostra a mensagem na página (sem isso o canvas só fica preto) -->
+    <pre id="previewError" style="display:none; margin:12px auto; max-width:1180px; padding:12px 14px; border:1px solid #ef4444; border-radius:8px; background:#2a0f14; color:#fecaca; font:13px/1.4 monospace; white-space:pre-wrap;"></pre>
+    <script>
+        const showPreviewError = (msg) => {
+            const box = document.getElementById('previewError');
+            box.style.display = 'block';
+            box.textContent += (box.textContent ? '\n' : '') + msg + '\n(Se acabou de atualizar o código: recarregue com Ctrl+Shift+R, o navegador pode estar usando arquivos antigos do cache.)';
+        };
+        addEventListener('error', (e) => showPreviewError(`Erro: ${e.message}  (${e.filename}:${e.lineno})`));
+        addEventListener('unhandledrejection', (e) => showPreviewError(`Erro: ${e.reason?.stack ?? e.reason}`));
+    </script>
     <!-- Aberta direto do disco (file://) o navegador bloqueia os módulos e o canvas ficaria preto: avisa na tela -->
     <script>
         if (location.protocol === 'file:') {
@@ -58,8 +72,8 @@
         import { SHADOW_CLONE_VISUALS } from '../data_model/visuals/characters/shadow_clone_visual.js';
         import { KNIFE_VISUALS as K } from '../data_model/visuals/effects/knife_visual.js';
         import { FIREBALLS, PHOENIX_PACT, SHADOW_SHACKLE } from '../data_model/passives.js';
-        import { PHOENIX_VISUALS } from '../data_model/visuals/effects/phoenix_visual.js';
-        import { RAVEN_VISUALS } from '../data_model/visuals/effects/raven_visual.js';
+        import { PHOENIX_VISUALS } from '../library/buddies/phoenix/phoenix_visual.js';
+        import { RAVEN_VISUALS } from '../library/buddies/raven/raven_visual.js';
         import { SLASH_VISUALS } from '../data_model/visuals/effects/slash_visual.js';
         import { LEVEL_UP_VISUALS } from '../data_model/visuals/effects/level_up_visual.js';
         import { ctx, passives, player, powers, shadowClones, state } from '../js/core/state.js';
@@ -79,8 +93,10 @@
         import { renderLevelUpBack, renderLevelUpFront } from '../js/render/level_up.js';
         import { heroAnim } from '../js/render/player.js';
         import { createHeroAnim, updateHeroAnim } from '../library/characters/hunter/hero_anim.js';
-        import { drawPhoenixArt, renderPhoenixBird } from '../js/render/phoenix.js';
-        import { drawRavenArt, renderRavenBird } from '../js/render/raven.js';
+        import { renderPhoenixBird } from '../js/render/phoenix.js';
+        import { renderRavenBird } from '../js/render/raven.js';
+        import { drawPhoenixArt } from '../library/buddies/phoenix/phoenix.js';
+        import { drawRavenArt } from '../library/buddies/raven/raven.js';
         import { renderShackle } from '../js/render/shackle.js';
         import { renderPlayer25D } from '../js/render/player25d.js';
         import { renderBolts, renderDashGhosts, renderLightning } from '../js/render/powers.js';
@@ -109,7 +125,7 @@
         const picker = document.getElementById('picker');
         CHARACTERS.forEach(([key, hero]) => {
             const link = document.createElement('a');
-            link.href = `?hero=${key}`;
+            link.href = `?hero=${key}&section=${new URLSearchParams(location.search).get('section') ?? 'basics'}`;
             link.className = key === HERO_KEY || modelOf(hero) === MODEL ? 'is-picked' : '';
             const face = document.createElement('span');
             face.className = 'face';
@@ -422,9 +438,9 @@
         // --- JURAMENTOS ---
         const OATHS = [
             ['slaughter', 'Oath of Slaughter'], ['whispers', 'Oath of Whispers'],
-            ['hearth', 'Oath of the Hearth'], ['ruin', 'Oath of Ruin']
-        ];
-        const OATH_KEYS = { slaughter: 'oathSlaughter', whispers: 'oathWhispers', hearth: 'oathHearth', ruin: 'oathRuin' };
+            ['hearth', 'Oath of the Hearth'], ['ruin', 'Oath of Ruin'], ['wild', 'Oath of the Wild'], ['faith', 'Oath of Faith']
+        ].filter(([gear]) => OATH_VISUALS[gear]);       // só as formas que existem nos dados (um arquivo velho no cache não quebra a página)
+        const OATH_KEYS = { slaughter: 'oathSlaughter', whispers: 'oathWhispers', hearth: 'oathHearth', ruin: 'oathRuin', wild: 'oathWild', faith: 'oathFaith' };
         const oathScene = (gear, opts) => front({ gear, oath: OATH_KEYS[gear], colors: getOathPalette(gear, HERO_COLORS), ...opts });
         const oathIdle = OATHS.map(([gear, name]) => [name, oathScene(gear, {})]);
         const oathRun = OATHS.map(([gear, name], i) => [`${name}: correndo`, oathScene(gear, { speed: 150, heading: 0.5 + i * 1.6 })]);
@@ -919,7 +935,7 @@
         if (captureLabel) {
             picker.classList.add('hidden');
             ctx.canvas.width = captureSize;
-            ctx.canvas.height = captureSize;
+            ctx.ctx.canvas.height = captureSize;
         }
         const everyScene = new Map([
             ...running.map((s, i) => [`correndo: ${OCTANT_NAMES[i]}`, s]), ...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
@@ -959,7 +975,7 @@
             const flight = elapsed - letGo;
             const cos = Math.cos(facing);
             const sin = Math.sin(facing);
-            const travelled = flight * KNIFE_SKILL.speed;
+            const travelled = flight * (KNIFE_SKILL.speed ?? 520);     // a velocidade agora é de cada personagem (knifeSpeed); 520 = a de todos hoje
             state.knives = flight > 0 && travelled < 330 ? [{
                 x: x + cos * (K.spawnForward + travelled) - sin * K.spawnSide,
                 y: y + sin * (K.spawnForward + travelled) + cos * K.spawnSide,
@@ -1042,6 +1058,63 @@
             }
         }
 
+        // --- SEÇÕES DA PÁGINA ---
+        // A página tinha tudo de uma vez (ficava lenta). Agora um grupo por vez: ?section=<chave> (padrão: basics).
+        // Cada seção: grupos em que aparece, altura e o desenho (y = onde começa).
+        const sectionGallery = (title, list, zoom) => (y, dt) => {
+            list.forEach(([, sc]) => { sc.dt = dt; });
+            gallery(title, y, list, zoom);
+        };
+        const SECTIONS = [
+            { groups: ['basics', 'all'], height: 234, draw(y, dt) {
+                text('Correndo nas oito direções', 24, y, 17, '#67e8f9', 700);
+                running.forEach((sc, i) => {
+                    view(sc, 24 + i * 145, y + 12, 137, 170, 1.7, dt);
+                    text(OCTANT_NAMES[i], 30 + i * 145, y + 200, 12);
+                });
+            } },
+            { groups: ['basics', 'all'], height: 270, draw: sectionGallery('Poses', poses) },
+            { groups: ['basics', 'all'], height: 270, draw: sectionGallery('Golpes (com a marca do corte)', swings, 1.7) },
+            { groups: ['basics', 'all'], height: 270, draw: sectionGallery('Dash, dano, nível e Return Fire', effects, 1.9) },
+            { groups: ['basics', 'all'], height: 270, draw: sectionGallery('Heróis e Shadow Clone', [...heroes, ['Shadow Clone', clone]], 2) },
+            { groups: ['oaths', 'all'], height: 270, draw: sectionGallery('Juramentos: as formas', oathIdle, 2.5) },
+            { groups: ['oaths', 'all'], height: 270, draw: sectionGallery('Juramentos em movimento', oathRun, 2) },
+            { groups: ['oaths', 'all'], height: 270, draw: sectionGallery('Juramentos em combate', oathSwing, 2) },
+            { groups: ['oaths', 'all'], height: 270, draw: sectionGallery('Juramentos com as skills do ramo', oathShow, 1.2) },
+            { groups: ['oaths', 'all'], height: 270, draw: sectionGallery('Juramento quadro a quadro', oathFrames, 1.8) },
+            { groups: ['moves', 'all'], height: 270, draw: sectionGallery('Golpes especiais', heroMoves, 1.45) },
+            { groups: ['moves', 'all'], height: 270, draw: sectionGallery('Earthbreaker quadro a quadro', slamFrames, 1.7) },
+            { groups: ['moves', 'all'], height: 270, draw: sectionGallery('Mais poses', heroMoves2, 1.45) },
+            { groups: ['skills', 'all'], height: 270, draw: sectionGallery('Skills de Blade', bladeFx, 1.05) },
+            { groups: ['skills', 'all'], height: 270, draw: sectionGallery('Skills de Shadow', shadowFx, 1.05) },
+            { groups: ['skills', 'all'], height: 270, draw: sectionGallery('Shadow Clone e Shadow Legion (guarda da tocha)', guardFx, 1.1) },
+            { groups: ['skills', 'all'], height: 270, draw: sectionGallery('Skills de Flame', flameFx, 0.52) },
+            { groups: ['skills', 'all'], height: 270, draw: sectionGallery('Skills de Curse', curseFx, 0.82) },
+            { groups: ['skills', 'all'], height: 270, draw: sectionGallery('Flame: espada e adagas em chamas', flameArms, 1.05) },
+            { groups: ['companions', 'all'], height: 270, draw: sectionGallery('Phoenix Pact: a fênix em ação', phoenixFx, 1.02) },
+            { groups: ['companions', 'all'], height: 560, draw: (y, dt, now) => drawPhoenixSection(now, y) },
+            { groups: ['companions', 'all'], height: 270, draw: sectionGallery('Shadow Raven: o corvo em ação', ravenFx, 1.02) },
+            { groups: ['companions', 'all'], height: 270, draw: sectionGallery('Shadow Raven: com a fênix e o Grave Wisp', ravenTeam, 1.02) },
+            { groups: ['companions', 'all'], height: 330, draw: (y, dt, now) => drawRavenSection(now, y) },
+            { groups: ['companions', 'all'], height: 270, draw: sectionGallery('Shadow Shackle: a corrente em ação', shackleFx, 0.8) },
+            { groups: ['dagger', 'all'], height: 840, draw: (y, dt, now) => drawKnifeSection(now, y) }
+        ];
+        const SECTION_GROUPS = [['basics', 'Básico'], ['oaths', 'Juramentos'], ['moves', 'Golpes especiais'], ['skills', 'Skills'], ['companions', 'Fênix, corvo e corrente'], ['dagger', 'Adaga'], ['all', 'Tudo (lento)']];
+        const askedSection = new URLSearchParams(location.search).get('section');
+        const SECTION = SECTION_GROUPS.some(([k]) => k === askedSection) ? askedSection : 'basics';
+        // A tela do canvas tem só a altura das seções escolhidas
+        ctx.canvas.height = 80 + SECTIONS.filter(sec => sec.groups.includes(SECTION)).reduce((sum, sec) => sum + sec.height, 0);
+        const sectionNav = document.createElement('nav');
+        sectionNav.id = 'sections';
+        SECTION_GROUPS.forEach(([key, label]) => {
+            const link = document.createElement('a');
+            link.href = `?hero=${HERO_KEY}&section=${key}`;
+            link.textContent = label;
+            if (key === SECTION) link.className = 'is-picked';
+            sectionNav.appendChild(link);
+        });
+        picker.after(sectionNav);
+
         function frame() {
             const now = performance.now();
             const dt = Math.min(0.05, (now - last) / 1000);
@@ -1054,44 +1127,17 @@
                 return;
             }
             ctx.fillStyle = '#050b16';
-            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+            ctx.fillRect(0, 0, WIDTH, ctx.canvas.height);
 
             text(`${HERO.name.toUpperCase()}: tudo do personagem`, 24, 34, 20, '#fde68a', 700);
 
-            text('Correndo nas oito direções', 24, 66, 17, '#67e8f9', 700);
-            running.forEach((s, i) => {
-                view(s, 24 + i * 145, 78, 137, 170, 1.7, dt);
-                text(OCTANT_NAMES[i], 30 + i * 145, 266, 12);
-            });
-
-            [...poses, ...swings, ...effects, ...heroes, ['Shadow Clone', clone], ...oathIdle, ...oathRun, ...oathSwing, ...oathShow,
-                ...heroMoves, ...slamFrames, ...oathFrames, ...heroMoves2, ...bladeFx, ...shadowFx, ...guardFx, ...flameFx, ...phoenixFx, ...ravenFx, ...ravenTeam, ...shackleFx, ...flameArms, ...curseFx].forEach(([, s]) => { s.dt = dt; });
-            gallery('Poses', 300, poses);
-            gallery('Golpes (com a marca do corte)', 570, swings, 1.7);
-            gallery('Dash, dano, nível e Return Fire', 840, effects, 1.9);
-            gallery('Heróis e Shadow Clone', 1110, [...heroes, ['Shadow Clone', clone]], 2);
-
-            gallery('Juramentos: as quatro formas', 1380, oathIdle, 2.5);
-            gallery('Juramentos em movimento', 1650, oathRun, 2);
-            gallery('Juramentos em combate', 1920, oathSwing, 2);
-            gallery('Juramentos com as skills do ramo', 2190, oathShow, 1.2);
-            gallery('Golpes especiais', 2460, heroMoves, 1.45);
-            gallery('Earthbreaker quadro a quadro', 2730, slamFrames, 1.7);
-            gallery('Juramento quadro a quadro', 3000, oathFrames, 1.8);
-            gallery('Mais poses', 3270, heroMoves2, 1.45);
-            gallery('Skills de Blade', 3540, bladeFx, 1.05);
-            gallery('Skills de Shadow', 3810, shadowFx, 1.05);
-            gallery('Shadow Clone e Shadow Legion (guarda da tocha)', 4080, guardFx, 1.1);
-            gallery('Skills de Flame', 4350, flameFx, 0.52);
-            gallery('Skills de Curse', 4620, curseFx, 0.82);
-            gallery('Flame: espada e adagas em chamas', 4890, flameArms, 1.05);
-            gallery('Phoenix Pact: a fênix em ação', 5160, phoenixFx, 1.02);
-            drawPhoenixSection(now, 5430);
-            gallery('Shadow Raven: o corvo em ação', 5990, ravenFx, 1.02);
-            gallery('Shadow Raven: com a fênix e o Grave Wisp', 6260, ravenTeam, 1.02);
-            drawRavenSection(now, 6530);
-            gallery('Shadow Shackle: a corrente em ação', 6860, shackleFx, 0.8);
-            drawKnifeSection(now, 7130);
+            // Só as seções do grupo escolhido (?section=), empilhadas a partir do topo: as outras nem rodam (a página fica leve)
+            let y = 66;
+            for (const sec of SECTIONS) {
+                if (!sec.groups.includes(SECTION)) continue;
+                sec.draw(y, dt, now);
+                y += sec.height;
+            }
             requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);

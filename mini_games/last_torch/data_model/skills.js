@@ -28,37 +28,19 @@ export const BLADE_SKILL = {
     maximumSlashArcDegrees: 180,
     cooldownReductionPerUpgrade: 0.03,
     // A Fúria não acelera mais o golpe (antes 0.25 = 4x mais rápido): com Bloodlust e Knockback ela virava uma
-    // metralhadora de empurrões que jogava até boss para longe. Agora ela dá dano (FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel)
+    // metralhadora de empurrões que jogava até boss para longe. Agora ela dá dano (fury.damageBonusPerLevel)
     frenzyCooldownMultiplier: 1,
     minimumCooldownSeconds: 0.2,    // teto de 5 golpes por segundo, somando tudo (antes 0.15 = ~6,7; antes ainda 0.07 = ~14)
-    baseKnockback: 50,              // empurrão do golpe, igual para todos os heróis (antes 80)
     knockbackPerUpgrade: 45,        // por nível de Knockback: nível 5 = 230 (antes 70 = 360)
-    baseCritChance: 0.06,
-    baseCritMultiplier: 2,
-    comboDamageMultiplier: 1.5,
-    comboKnockbackMultiplier: 1.25, // 3º golpe do combo (antes 1.4)
     comboDashDistance: 35
 };
 
-export const FRENZY_NOVA_SKILL = {
-    chargePerHit: 6,
-    maximumEnergy: 100,
-    baseDurationSeconds: 3,
-    durationPerUpgradeLevelSeconds: 0.5,
-    damageBonusPerUpgradeLevel: 0.12,   // golpes da lâmina durante a Fúria: +12% por nível (js/systems/stats.js, getBladeDamage)
-    slashCount: 8,
-    slashRadiusMultiplier: 1.3,
-    // Explosão ao ativar: empurra e fere tudo em volta (o resto da Fúria é o golpe acelerado)
-    burstRadiusMultiplier: 2.4,
-    burstDamageMultiplier: 1.7,
-    burstKnockback: 460
+// A barra de Fúria é igual para todos (100). Carga, duração e bônus de cada personagem estão no `fury` dele (data_model/characters/).
+export const FURY_BAR = {
+    maximumEnergy: 100
 };
 
-// Feitiços: tudo que age sozinho (Flame e Curse). Custam mais pontos que os golpes da lâmina (data_model/tree.js),
-// e por isso batem mais forte que o dano da lâmina em que se baseiam.
-export const SPELL_SKILL = {
-    damageMultiplier: 1.1
-};
+// Feitiços (Flame e Curse): o dano base é o `magicDamage` de cada personagem (data_model/characters/); quem tem 0 não usa magia.
 
 // Faca de arremesso: golpe separado da lâmina, com recarga própria. Anda enquanto arremessa.
 // A rosa do druida (Rowan) deixa o monstro atingido mais lento (as outras armas de arremesso não)
@@ -67,19 +49,14 @@ export const ROSE_SKILL = {
     slow: 0.35              // 35% mais lento
 };
 
+// Adaga: velocidade, recarga, dano e empurrão são de cada personagem (`stats` em data_model/characters/). Só o tamanho é geral.
 export const KNIFE_SKILL = {
-    cooldownSeconds: 0.9,
-    speed: 520,
-    radius: 7,
-    damageMultiplier: 0.8,
-    knockbackMultiplier: 0.8
+    radius: 7
 };
 
 // Dash: esquiva rápida com invulnerabilidade. Espaço, Shift ou botão direito; botão próprio no celular.
+// Dash: cargas, recarga e invulnerabilidade são de cada personagem. Só o rastro é geral.
 export const DASH_SKILL = {
-    charges: 1,
-    cooldownSeconds: 2.6,       // tempo para recuperar uma carga
-    invulnerableSeconds: 0.3,
     ghosts: 6                   // imagens deixadas pelo caminho
 };
 

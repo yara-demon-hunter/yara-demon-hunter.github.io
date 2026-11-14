@@ -182,6 +182,35 @@ export const PASSIVE_SKILL_MODELS = {
         mods: { hpRegen: 1.2, maxHp: 0.15, rootSeconds: 0.5, spellDamage: 0.15, furyNoDamage: 1 }
     },
 
+    // Lâmina benta (só o Avgustino): a água benta na arma; cada golpe da lâmina também queima com magia (uma parte pequena dela)
+    blessedBlade: {
+        name: 'Blessed Blade',
+        icon: '🗡️',
+        cost: 0,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        get desc() {
+            return `You anoint your blade with holy water. Every blade hit also burns for ${Math.round(this.magicRatio * 100)}% of your magic damage (a blue number next to the white one): physical and holy at once.`;
+        },
+        magicRatio: 0.2     // parte do dano de magia que cada golpe da lâmina soma (baixa: é um tempero, não o total da magia)
+    },
+    oathFaith: {
+        name: 'Oath of Faith',
+        icon: '🕯️',
+        cost: 200,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        oath: true, gear: 'faith', tagline: 'Light answers the dark',
+        get desc() {
+            const mods = this.mods;
+            const S = this.shields;
+            return `${S.count} shields of light circle you, striking every monster that comes close for ${Math.round(S.damage * 100)}% of your magic damage and pushing it back. Spells deal ${formatPercent(mods.spellDamage)} more damage, you heal ${mods.hpRegen} health per second, the torch gains ${mods.torchHp} health and holds ${formatPercent(mods.torchGuard)} more against hits. The price: the faithful do not flee. You can no longer dash.`;
+        },
+        // Os escudos de luz que giram em volta do herói (js/systems/skills_light.js; desenho em js/render/light.js)
+        shields: { count: 3, orbit: 46, spin: 2.2, size: 11, damage: 0.55, hitSeconds: 0.6, knockback: 160 },
+        mods: { spellDamage: 0.2, hpRegen: 1, torchHp: 40, torchGuard: 0.15, noDash: 1 }
+    },
+
     // --- JURAMENTOS ---
     // oath: true = só um por noite (js/systems/tree.js). Um modo de jogar inteiro, com bônus e um preço.
     // gear: forma do herói (data_model/visuals/characters/oath_visual.js)
@@ -450,6 +479,9 @@ export const MASTER_THIEF = {
 
 // Vigil: parado por stillSeconds, ergue um escudo que para um golpe e estoura
 // Flaming Sword: o corte deixa o monstro queimando (fração do dano do golpe, por segundo)
+// Blessed Blade (Avgustino): a parte da magia que cada golpe da lâmina soma (js/systems/combat.js)
+export const BLESSED_BLADE = PASSIVE_SKILL_MODELS.blessedBlade;
+
 export const FLAME_BLADE = {
     burnRatio: 0.4,
     burnSeconds: 3,

@@ -1,5 +1,5 @@
-import { FLAME_BLADE } from '../../data_model/passives.js';
-import { BLADE_SKILL, FRENZY_NOVA_SKILL } from '../../data_model/skills.js';
+import { BLESSED_BLADE, FLAME_BLADE } from '../../data_model/passives.js';
+import { BLADE_SKILL } from '../../data_model/skills.js';
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { audio, maxUltEnergy, passives, player, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
@@ -15,10 +15,13 @@ import {
     getAtkCooldown,
     getAtkRadius,
     getBladeDamage,
+    characterStat,
     getFrenzyDuration,
+    getFuryChargePerHit,
     getFury,
     getKnockback,
-    getSlashArcRadian
+    getSlashArcRadian,
+    getSpellDamage
 } from './stats.js';
 
 // --- SISTEMA DE CORTE COM A LÂMINA ---
@@ -64,7 +67,8 @@ export function findNearestEnemy(x, y, maxDist) {
 
 // Dano e empurrão em todo monstro dentro do alcance e da abertura do corte (ou em volta toda:
 // giro e Fúria ativa). onHit é chamado a cada monstro atingido.
-export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, allAround, onHit) {
+// magic: dano de magia somado a cada golpe (Blessed Blade). O golpe sai num número só, em azul, com a soma dos dois
+export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, allAround, onHit, magic = 0) {
     let hits = 0;
     state.enemies.forEach(e => {
         const d = Math.hypot(e.x - x, e.y - y);
@@ -76,7 +80,7 @@ export function hitEnemiesInArc(x, y, atkAngle, radius, arcHalf, dmg, kbForce, a
 
             // Aplica dano se o inimigo está dentro da abertura angular atual do corte
             if (diffAngle <= arcHalf + 0.1 || state.frenzyActiveTimer > 0 || allAround) {
-                dealDamage(e, dmg, { kbX: Math.cos(enemyAngle) * kbForce, kbY: Math.sin(enemyAngle) * kbForce });
+                dealDamage(e, dmg + magic, { kbX: Math.cos(enemyAngle) * kbForce, kbY: Math.sin(enemyAngle) * kbForce, style: magic > 0 ? 'spell' : null });
                 if (passives.flameBlade.lvl > 0) {
                     const oath = state.oath === 'oathHearth' ? FLAME_BLADE.oathMultiplier : 1;
                     ignite(e, dmg * FLAME_BLADE.burnRatio * oath, FLAME_BLADE.burnSeconds);
@@ -104,7 +108,7 @@ export function chargeUlt(amount) {
 
 // Ativação automática da Fúria. A barra e a duração são iguais para todos; o especial é de cada personagem (js/systems/fury.js).
 // O especial de cada herói (inclusive a Chuva de Espadas do Demon Hunter) roda em fury.js; aqui só o disparo e o anúncio.
-const FURY_COLORS = { swordRain: '#f0abfc', bloodWaltz: '#f87171', stomp: '#cbd5e1', forestGuardian: '#4ade80' };
+const FURY_COLORS = { swordRain: '#f0abfc', bloodWaltz: '#f87171', stomp: '#cbd5e1', forestGuardian: '#4ade80', consecration: '#fde68a' };
 export function triggerFrenzyUlt() {
     state.ultEnergy = 0;
     const fury = getFury();
@@ -143,17 +147,19 @@ export function updateAutoAttack(dt) {
     const whirl = player.comboStep === 3 && passives.shadowWhirl.lvl > 0;
     executeBladeSlash(player.x, player.y, atkAngle, attackRad, player.comboStep, whirl);
 
-    const dmg = getBladeDamage() * (player.comboStep === 3 ? BLADE_SKILL.comboDamageMultiplier : 1.0);
-    const kbForce = getKnockback() * (player.comboStep === 3 ? BLADE_SKILL.comboKnockbackMultiplier : 1.0);
+    const dmg = getBladeDamage() * (player.comboStep === 3 ? characterStat('comboDamage') : 1.0);
+    const kbForce = getKnockback() * (player.comboStep === 3 ? characterStat('comboKnockback') : 1.0);
 
     // Colisão de dano no arco do golpe
     const hits = hitEnemiesInArc(player.x, player.y, atkAngle, attackRad, currentArcHalf, dmg, kbForce, whirl,
         (e) => {
-            chargeUlt(FRENZY_NOVA_SKILL.chargePerHit * (1 + mod('furyCharge')));
+            chargeUlt(getFuryChargePerHit());
             // Em pleno dash a marca espera: é o dash que vai detoná-la, com o bônus
             if (e.marked > 0 && player.dashTimer <= 0) detonateMark(e, false);
             tryExecute(e);
-        });
+        },
+        // Blessed Blade (Avgustino): a lâmina benta soma uma parte pequena da magia a cada golpe (um número só, azul)
+        passives.blessedBlade.lvl > 0 ? getSpellDamage() * BLESSED_BLADE.magicRatio : 0);
     launchCrescent(atkAngle);
     if (hits > 0) {
         audio.playHit(hits);

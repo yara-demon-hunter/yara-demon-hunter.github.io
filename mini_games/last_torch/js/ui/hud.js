@@ -4,7 +4,7 @@ import { STREAK, rushTier } from '../../data_model/streak.js';
 import { isBossTurn } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { player, state } from '../core/state.js';
-import { getAxeQuake, getRootSnare, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
+import { getAxeQuake, getRootSnare, getDashCharges, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
 import { hasBuyableNode } from '../systems/tree.js';
 
 // --- HUD ---
@@ -93,10 +93,17 @@ export function updateKnifeButton() {
     }
 }
 
-const dashShown = { cd: -1, charges: -1 };
+const dashShown = { cd: -1, charges: -1, off: false };
 
 export function updateDashButton() {
     if (!hasTouchButtons) return;
+    // Sem dash (Oath of Faith): o botão some
+    const noDash = getDashCharges() <= 0;
+    if (dashShown.off !== noDash) {
+        dashShown.off = noDash;
+        ui.dashButton.style.display = noDash ? 'none' : '';
+    }
+    if (noDash) return;
     const ratio = player.dashCharges > 0 ? 0 : Math.min(1, Math.max(0, player.dashRecharge) / getDashCooldown());
     const cd = Math.ceil(ratio * CD_STEPS) / CD_STEPS;
     if (dashShown.cd !== cd) {

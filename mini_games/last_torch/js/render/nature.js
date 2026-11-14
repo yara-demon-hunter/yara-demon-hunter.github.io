@@ -19,15 +19,17 @@ const TAU = Math.PI * 2;
 const OAK_TRANSITION_SECONDS = 0.45;
 
 function oakScale(oak) {
-    const base = oak.stage === 'adult'
-        ? Math.min(1, oak.age / POWER_MODELS.shelterOak.growSeconds)
+    const grown = oak.stage === 'adult' || oak.stage === 'elder';
+    // Quarto estágio (furioso): um pouco maior, crescendo junto com a cara furiosa (oak.awake, 0 a 1)
+    const base = grown
+        ? Math.min(1, oak.age / POWER_MODELS.shelterOak.growSeconds) * (1 + (POWER_MODELS.shelterOak.elder.scale - 1) * oak.awake)
         : oak.stage === 'young' ? 0.48 : 0.2;
     const pop = oak.transition > 0 ? 0.8 + 0.35 * (1 - oak.transition / OAK_TRANSITION_SECONDS) : 1;
     return base * pop;
 }
 
 function renderHealingRing(oak, t) {
-    if (oak.stage === 'adult') return;
+    if (oak.stage === 'adult' || oak.stage === 'elder') return;
     ctx.globalAlpha = 0.8;
     ctx.strokeStyle = '#4ade80';
     ctx.lineWidth = 1.8;
@@ -174,9 +176,9 @@ export function renderNatureGround() {
     const t = performance.now() / 1000;
     for (const oak of N.oaks) {
         const grow = oakScale(oak);
-        const fade = oak.stage === 'adult' && !oak.evolved ? Math.min(1, (oak.seconds - oak.age) / 0.8) : 1;
+        const fade = 1;              // a árvore não some mais com o tempo
         renderHealingRing(oak, t);
-        // Acordada: o alcance dos galhos, em vermelho, tracejado (o mesmo padrão do anel de cura); dormindo, nada
+        // Furiosa (quarto estágio): o alcance dos galhos, em vermelho, tracejado (o mesmo padrão do anel de cura)
         if (oak.awake > 0.3) {
             ctx.globalAlpha = 0.8 * oak.awake * fade;
             ctx.strokeStyle = '#ef4444';
@@ -436,16 +438,17 @@ export function renderNatureFront() {
     }
     for (const oak of N.oaks) {
         const grow = oakScale(oak);
-        const fade = oak.stage === 'adult' && !oak.evolved ? Math.min(1, (oak.seconds - oak.age) / 0.8) : 1;
+        const fade = 1;              // a árvore não some mais com o tempo
         const t = performance.now() / 1000;
-        // Acordada, balança sem parar; levando pancada, treme
-        const sway = (oak.shake > 0 ? Math.sin(oak.shake * 70) * 1.6 : 0) + oak.awake * Math.sin(t * 4) * 0.9;
+        // Levando pancada, treme; andando, balança de leve a cada passo
+        const sway = (oak.shake > 0 ? Math.sin(oak.shake * 70) * 1.6 : 0) + (oak.walking ? Math.sin(t * 3) * 0.8 : 0);
         const k = grow * (2 - grow);
         const tw = TRUNK_W * k;
         const th = TRUNK_H * k;
         const cw = CROWN_W * k;
         const ch = CROWN_H * k;
         ctx.globalAlpha = fade;
+        if (oak.walkK > 0.02) renderWalkingRoots(oak, k, t);
         if (oak.stage === 'sapling') {
             ctx.fillStyle = '#78350f';
             ctx.fillRect(oak.x - 1.2, oak.y - 8 * k, 2.4, 9 * k);
@@ -504,4 +507,33 @@ export function renderNatureFront() {
         ctx.fillRect(oak.x - 16, oak.y + 9, 32 * ratio, 3.5);
     }
 }
+// Raízes andando: quando o carvalho caminha, raízes saem da base, se esticam e recolhem em onda, uma de cada vez, como pés
+// arrastando a árvore. Poucos traços (5 raízes x 3 cores), só enquanto anda (oak.walkK some aos poucos quando para).
+const ROOT_STROKES = [['#1c1208', 3.2], ['#5b3a1a', 2], ['#8a5a2b', 0.8]];
+function renderWalkingRoots(oak, k, t) {
+    const base = ctx.globalAlpha;
+    ctx.globalAlpha = base * oak.walkK;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 5; i++) {
+        const side = i / 4 * 2 - 1;                                   // -1 (esquerda) a 1 (direita)
+        const step = 0.5 + 0.5 * Math.sin(t * 5 + i * 1.7);           // cada raiz no seu tempo: estica e recolhe
+        const len = (9 + 9 * step) * k;
+        const sx = oak.x + side * 7 * k;
+        const sy = oak.y + 2;
+        const ex = sx + side * len;
+        const ey = sy + (3 + 4 * step) * k;
+        const cx = sx + side * len * 0.5;
+        const cy = sy - 4 * k * (1 - step);                          // o meio arqueia quando a raiz recolhe
+        for (const [color, width] of ROOT_STROKES) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width * Math.max(0.6, k);
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+            ctx.quadraticCurveTo(cx, cy, ex, ey);
+            ctx.stroke();
+        }
+    }
+    ctx.globalAlpha = base;
+}
+
 const VINE_STROKES = [['rgba(5, 46, 22, 0.85)', 5], ['#16a34a', 2.8], ['#86efac', 1]];

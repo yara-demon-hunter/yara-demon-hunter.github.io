@@ -239,7 +239,7 @@ export const MONSTER_MODELS = {
     BONE_COLOSSUS: {
         spawnWeight: 0.03,
         maxAlive: 1,                     // no máximo um em campo
-        hpBase: 1300,
+        hpBase: 650,
         hpPerTurn: 180,
         speedMin: 22,
         speedMax: 22,

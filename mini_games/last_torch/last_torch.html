@@ -86,26 +86,27 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
         </div>
 
-        <!-- Medalhão de status: pausa e mostra a build -->
+        <!-- Medalhão de status (pausa e mostra a build) e, ao lado, o botão de controles -->
         <button id="btnPause" class="status-btn" title="Skill tree and status (P)" aria-label="Skill tree and hero status"><span id="statusBadge" class="hud-badge"></span></button>
+        <div id="hudButtons">
+            <button id="btnSettings" class="hud-btn" title="Settings" aria-label="Settings">🎮</button>
+        </div>
 
-        <!-- Hora da noite e boss (a vida da tocha fica em cima da fogueira, no canvas) -->
+        <!-- Vida do boss: no canto direito do topo, só quando há um boss em campo -->
+        <div id="bossHpContainer" class="hidden hud-panel hud-stat hud-boss">
+            <div class="hud-label" style="--tone: #f87171;"><span id="bossNameText">☠️ BOSS</span><span id="bossHpText">1000</span></div>
+            <div class="hud-bar hud-bar-red"><div id="bossHpBar" class="hud-fill" style="background: linear-gradient(90deg, #dc2626, #f43f5e, #f59e0b)"></div></div>
+        </div>
+    </div>
+
+    <!-- Embaixo, no centro: a hora da noite (a vida da tocha fica em cima da fogueira, no canvas) -->
+    <div id="hudBottom">
         <div id="hudWorld" class="hud-panel" style="--tone: #fdba74;">
             <div class="hud-stat hud-turn">
                 <div class="hud-label" style="--tone: #fcd34d;"><span id="turnLabel">WAVE 1</span><span id="hourName">Dusk</span></div>
                 <div class="hud-bar hud-bar-amber hud-bar-thin"><div id="scoreBar" class="hud-fill" style="background: linear-gradient(90deg, #f59e0b, #fde68a); transform: scaleX(0)"></div></div>
                 <div id="nightPips" aria-hidden="true"></div>
             </div>
-            <!-- Boss Health Bar -->
-            <div id="bossHpContainer" class="hidden hud-stat hud-boss">
-                <div class="hud-label" style="--tone: #f87171;"><span id="bossNameText">☠️ BOSS</span><span id="bossHpText">1000</span></div>
-                <div class="hud-bar hud-bar-red"><div id="bossHpBar" class="hud-fill" style="background: linear-gradient(90deg, #dc2626, #f43f5e, #f59e0b)"></div></div>
-            </div>
-        </div>
-
-        <!-- Buttons -->
-        <div id="hudButtons">
-            <button id="btnSettings" class="hud-btn" title="Settings" aria-label="Settings">🎮</button>
         </div>
     </div>
 

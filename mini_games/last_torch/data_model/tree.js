@@ -31,7 +31,8 @@ export const TREE_COSTS = {
     blade: { basic: 1, power: 2, special: 3 },
     flame: { basic: 1, power: 3, special: 4 },
     curse: { basic: 1, power: 3, special: 4 },
-    nature: { basic: 1, power: 2, special: 3 }
+    nature: { basic: 1, power: 2, special: 3 },
+    light: { basic: 1, power: 2, special: 3 }
 };
 
 export const TREE_LAYOUT = {
@@ -45,7 +46,8 @@ export const TREE_BRANCHES = {
     shadow: { name: 'SHADOW', path: 'SHADOW PATH', icon: '🌑', color: '#a5b4fc', style: 'Thief: technical and cheap, takes skill.' },
     flame: { name: 'FLAME', path: 'FLAME PATH', icon: '🕯️', color: '#fb923c', style: 'Keeper: defensive, calm and cautious.' },
     curse: { name: 'CURSE', path: 'CURSE PATH', icon: '🌙', color: '#e879f9', style: 'Sorcerer: spells, area and distance.' },
-    nature: { name: 'NATURE', path: 'NATURE PATH', icon: '🌿', color: '#4ade80', style: 'Druid: roots, life drain and living cover.' }
+    nature: { name: 'NATURE', path: 'NATURE PATH', icon: '🌿', color: '#4ade80', style: 'Druid: roots, life drain and living cover.' },
+    light: { name: 'LIGHT', path: 'LIGHT PATH', icon: '✝️', color: '#fde68a', style: 'Priest: holy ground, blessed water and divine wrath.' }
 };
 
 // req(id) = nível 1 do nó; req(id, 3) = nível 3
@@ -56,7 +58,7 @@ export const TREE_NODES = [
     { id: 'damage', branch: 'blade', kind: 'stat', key: 'damage', x: 0, y: 1.5, requires: [] },
     // Linha da Fúria: matar alimenta matar
     { id: 'frenzyNova', branch: 'blade', kind: 'stat', key: 'frenzyNova', x: 1, y: 0, requires: [req('damage')],
-      levelText: (mods) => `+${Math.round(mods.furyCharge * 100)}% Fury charge`, mods: { furyCharge: 0.12 } },
+      levelText: (mods) => `+${Math.round(mods.furyCharge * 100)}% Fury charge`, mods: { furyCharge: 0.06 } },
     { id: 'bloodlust', branch: 'blade', kind: 'power', key: 'bloodlust', x: 2, y: 0, requires: [req('frenzyNova', 2)] },
     { id: 'bloodlustEvolve', branch: 'blade', kind: 'evolve', key: 'bloodlust', x: 3, y: 0, requires: [req('bloodlust', 5)] },
     // Linha do aço: o golpe cada vez mais largo e mortal
@@ -187,7 +189,35 @@ export const TREE_NODES = [
     { id: 'wolvesEvolve', branch: 'nature', kind: 'evolve', key: 'spiritWolves', x: 4, y: 2, requires: [req('spiritWolves', 5)] },
     // Linha 4, sozinha: a rosa negra, só do Rowan (o nó fica selado para os outros e conta como cumprido para quem o pede)
     { id: 'darkRoses', hero: 'rowan', branch: 'nature', kind: 'passive', key: 'darkRoses', x: 1, y: 3, requires: [req('wildHeart', 2)] },
+
+    // --- LUZ: o padre. Fé e luz sagrada: chão consagrado, água benta que marca e a ira divina que julga ---
+    { id: 'silentVigil', branch: 'light', kind: 'mod', x: 0, y: 1.5, requires: [],
+      name: 'Silent Vigil', icon: '🕯️', desc: 'Faith keeps you standing, slowly and always.',
+      levelText: (mods) => `Heal ${mods.hpRegen} health per second`, mods: { hpRegen: 0.3 } },
+    // Quatro linhas ao lado do Silent Vigil; a da água benta termina na Blessed Blade (só do Avgustino) e a última é o sino da tocha. Duas delas (chão e ira) terminam no Oath of Faith.
+    // Linha 1, o chão: Sacred Ground -> Consecrated Earth
+    { id: 'holyGround', branch: 'light', kind: 'power', key: 'holyGround', x: 1, y: 0, requires: [req('silentVigil')] },
+    { id: 'groundEvolve', branch: 'light', kind: 'evolve', key: 'holyGround', x: 2, y: 0, requires: [req('holyGround', 5)] },
+    // Linha 2, a água benta: Holy Water -> Blessed Rain -> Blessed Blade
+    { id: 'holyWater', branch: 'light', kind: 'power', key: 'holyWater', x: 1, y: 1, requires: [req('silentVigil')] },
+    { id: 'waterEvolve', branch: 'light', kind: 'evolve', key: 'holyWater', x: 2, y: 1, requires: [req('holyWater', 5)] },
+    // ...e, depois da chuva, a lâmina benta: só do Avgustino (selada para os outros)
+    { id: 'blessedBlade', hero: 'avgustino', branch: 'light', kind: 'passive', key: 'blessedBlade', x: 3, y: 1, requires: [req('waterEvolve')] },
+    // Linha 3, a ira: Smite -> Divine Wrath
+    { id: 'smite', branch: 'light', kind: 'power', key: 'smite', x: 1, y: 2, requires: [req('silentVigil')] },
+    { id: 'smiteEvolve', branch: 'light', kind: 'evolve', key: 'smite', x: 2, y: 2, requires: [req('smite', 5)] },
+    // Linha 4, o sino: Church Bell -> Cathedral Toll (defende a tocha)
+    { id: 'churchBell', branch: 'light', kind: 'power', key: 'churchBell', x: 1, y: 3, requires: [req('silentVigil')] },
+    { id: 'bellEvolve', branch: 'light', kind: 'evolve', key: 'churchBell', x: 2, y: 3, requires: [req('churchBell', 5)] },
+    { id: 'oathFaith', branch: 'light', kind: 'passive', key: 'oathFaith', oath: true, x: 6, y: 1.5, requires: [req('groundEvolve'), req('smiteEvolve')] },
+
     { id: 'oathWild', branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 6, y: 1.5, requires: [req('thornBurst'), req('leechVine')] }
 ];
 
 export const TREE_BY_ID = Object.fromEntries(TREE_NODES.map(node => [node.id, node]));
+// Dois nós com o mesmo id quebram a árvore em silêncio (um apaga o outro e as ligações passam a apontar para o errado): falha já ao abrir
+if (Object.keys(TREE_BY_ID).length !== TREE_NODES.length) {
+    const seen = new Set();
+    const repeated = TREE_NODES.map(n => n.id).filter(id => seen.has(id) || !seen.add(id));
+    throw new Error(`data_model/tree.js: id de nó repetido: ${[...new Set(repeated)].join(', ')}`);
+}

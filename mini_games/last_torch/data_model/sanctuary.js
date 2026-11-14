@@ -12,7 +12,7 @@ export const ACHIEVEMENTS = [
     // Rowan: libera ao terminar a onda 1 (bestHour passa a 2 quando o primeiro acampamento abre)
     { id: 'hour2', group: 'trophy', icon: '🌘', name: 'First Light', desc: 'Survive Wave 1.', stat: 'bestHour', target: 2, hero: 'rowan' },
     { id: 'hour3', group: 'trophy', icon: '🌒', name: 'Into the Hush', desc: 'Reach Wave 3.', stat: 'bestHour', target: 3 },
-    { id: 'hour4', group: 'trophy', icon: '🌕', name: 'Blood Moon', desc: 'Reach Wave 4.', stat: 'bestHour', target: 4 },
+    { id: 'hour4', group: 'trophy', icon: '🌕', name: 'Blood Moon', desc: 'Reach Wave 4.', stat: 'bestHour', target: 4, hero: 'avgustino' },
     { id: 'kills300', group: 'trophy', icon: '⚰️', name: 'Reaper', desc: 'Slay 200 monsters.', stat: 'kills', target: 200 },
     { id: 'demon', group: 'trophy', icon: '😈', name: 'Demon Slayer', desc: 'Slay the Demon Lord.', stat: 'boss_DEMON_LORD', target: 1, hero: 'reaver' },
     { id: 'evolve', group: 'trophy', icon: '✨', name: 'Transcendence', desc: 'Evolve a power.', stat: 'evolutions', target: 1 },

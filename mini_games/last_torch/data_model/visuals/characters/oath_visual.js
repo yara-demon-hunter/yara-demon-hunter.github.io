@@ -42,26 +42,63 @@ export const OATH_VISUALS = {
             bladeGlowSoft: 'rgba(139, 92, 246, 0.85)', bladeGlowSoftFrenzy: 'rgba(216, 180, 254, 0.9)'
         }
     },
-    // Guardião: ouro e brasa, ombreiras largas, peitoral e uma lanterna na cintura
+    // Fé (Oath of Faith): roupa escura com acabamento dourado, estola branca com cruzes, auréola sobre a cabeça e uma cruz de
+    // luz flutuando atrás das costas. Serve para qualquer herói: as chaves de cor cobrem o boneco padrão e o do Avgustino
+    faith: {
+        aura: '#fde68a',
+        slash: ['#fbbf24', '#fde68a', '#fef9e7'],
+        bladeLength: 1.05,
+        bladeWidth: 1.1,
+        hoodTip: 0.8,
+        hoodRise: 0,
+        gear: {
+            halo: '#fde68a', haloGlow: 'rgba(253, 230, 138, 0.8)',
+            stole: '#f5f0e1', stoleShade: '#cfc6ad', stoleTrim: '#d4a72c', stoleCross: '#b8860b',
+            cross: '#fef9e7', crossEdge: '#d4a72c', crossGlow: 'rgba(254, 243, 199, 0.75)', mote: '#fef3c7'
+        },
+        colors: {
+            // Boneco padrão (capuz e máscara)
+            cape: '#1c1830', capeFold: '#2a2445', capeEdge: '#d4a72c', capeInner: '#120f20',
+            body: '#16131f', sleeve: '#221d33', sash: '#d4a72c', boots: '#0d0b14',
+            hood: '#1a1628', hoodFold: '#2c2642', hoodInner: '#05040a',
+            mask: '#f5f0e1', maskShade: '#bfb595', maskEyes: '#f59e0b', eyeGlint: '#fffbeb',
+            glove: '#f5f0e1', strap: '#8a6d12', buckle: '#fde68a',
+            // Avgustino (sobretudo, chapéu, crucifixo)
+            // (o chapéu fica com as cores dele: só a auréola brilha na cabeça)
+            coat: '#1d1a2b', coatShade: '#131120', coatLight: '#d4a72c', cross: '#fde68a', crossShade: '#b8860b', chain: '#fbbf24',
+            // A lâmina: ouro e luz
+            blade: '#fde68a', bladeCore: '#fffbeb', runes: '#fffbeb', bladeGlow: '#fbbf24',
+            bladeGlowSoft: 'rgba(251, 191, 36, 0.8)', bladeGlowSoftFrenzy: 'rgba(254, 249, 231, 0.95)'
+        }
+    },
+    // Guardião (Oath of the Hearth): ARMADURA DE FOGO. Placas de ferro escuro com rachaduras de lava brilhando, ombreiras e
+    // elmo soltando chamas, um núcleo de fogo no peito e brasas subindo. Serve para qualquer herói (boneco padrão e Avgustino)
     hearth: {
-        aura: '#fbbf24',
-        slash: ['#f59e0b', '#fbbf24', '#fb923c'],
+        aura: '#f97316',
+        slash: ['#ea580c', '#f97316', '#fbbf24'],
         bladeLength: 1.1,
         bladeWidth: 1.25,
         hoodTip: 0.7,
         hoodRise: 0,
-        gear: { gold: '#d4a72c', goldLight: '#fde68a', goldShade: '#8a6d12', lantern: '#fbbf24', flame: 'rgba(251, 146, 60, 0.9)', chain: '#78716c' },
+        gear: {
+            iron: '#2b211b', ironLight: '#4a3a2e', outline: '#0c0806',
+            lava: '#f97316', lavaHot: '#fde68a', lavaGlow: 'rgba(249, 115, 22, 0.85)',
+            flameOuter: '#ea580c', flameMid: '#f97316', flameCore: '#fde68a',
+            ember: '#fb923c', emberHot: '#fde68a'
+        },
         colors: {
-            cape: '#3a2408', capeFold: '#4f3310', capeEdge: '#b45309', capeInner: '#2b1a05',
-            body: '#1f1608', sleeve: '#33240d', sash: '#d97706', boots: '#120c04',
-            hood: '#2b1c07', hoodFold: '#47300e', hoodInner: '#0a0602',
-            mask: '#fde68a', maskShade: '#b8922f', maskEyes: '#7c2d12', eyeGlint: '#fff7ed',
-            glove: '#1f1405', strap: '#6b4a12', buckle: '#fde68a',
-            blade: '#fcd34d', bladeCore: '#fffbeb', runes: '#fef3c7', bladeGlow: '#f59e0b',
-            bladeGlowSoft: 'rgba(245, 158, 11, 0.85)', bladeGlowSoftFrenzy: 'rgba(253, 224, 71, 0.95)'
+            cape: '#1c1410', capeFold: '#2a1c14', capeEdge: '#f97316', capeInner: '#120d0a',
+            body: '#16110e', sleeve: '#2a201a', sash: '#ea580c', boots: '#0f0b08',
+            hood: '#1a1310', hoodFold: '#2e2018', hoodInner: '#060403',
+            mask: '#3a2c22', maskShade: '#20160f', maskEyes: '#fb923c', eyeGlint: '#fde68a',
+            glove: '#2b211b', strap: '#4a3a2e', buckle: '#f97316',
+            coat: '#1c1410', coatShade: '#120d0a', coatLight: '#f97316', hat: '#1c1410', hatShade: '#120d0a', hatLight: '#3a2c22',
+            hatBand: '#ea580c', cross: '#fbbf24', crossShade: '#b45309', chain: '#f97316',
+            blade: '#fb923c', bladeCore: '#fff7ed', runes: '#fde68a', bladeGlow: '#f97316',
+            bladeGlowSoft: 'rgba(249, 115, 22, 0.85)', bladeGlowSoftFrenzy: 'rgba(253, 224, 71, 0.95)'
         }
     },
-    // Druida: o herói mantém as cores dele; folhas giram em volta do corpo e o brilho dos pés é verde
+    // Druida: capa verde-musgo; folhas giram em volta do corpo (orbit: raio do anel) e o brilho dos pés é verde
     wild: {
         aura: '#4ade80',
         slash: ['#16a34a', '#4ade80', '#bef264'],
@@ -69,8 +106,12 @@ export const OATH_VISUALS = {
         bladeWidth: 1,
         hoodTip: 1,
         hoodRise: 0,
-        gear: { leaf: '#5fa33a', leafLight: '#a3d65c', leafShade: '#33661f', leaves: 6 },
-        colors: {}
+        gear: { leaf: '#5fa33a', leafLight: '#a3d65c', leafShade: '#33661f', leaves: 6, orbit: 9.5 },
+        // A capa (e o sobretudo do Avgustino) fica verde-musgo; o resto mantém as cores do herói
+        colors: {
+            cape: '#1f3a1c', capeFold: '#2c4f27', capeEdge: '#5fa33a', capeInner: '#142812',
+            coat: '#1f3320', coatShade: '#142214', coatLight: '#5fa33a'
+        }
     },
     // Feiticeiro: roxo e magenta, capuz alto, grimório flutuando e runas girando nos pés
     ruin: {

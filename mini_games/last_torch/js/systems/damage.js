@@ -1,5 +1,5 @@
 import { SHADOW_RAVEN, SMOKE_BOMB } from '../../data_model/passives.js';
-import { EVOLUTIONS } from '../../data_model/powers.js';
+import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
 import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
 import { audio, player, powers, state } from '../core/state.js';
 import { syncBossBar } from '../ui/hud.js';
@@ -40,7 +40,8 @@ export function dealDamage(e, amount, o = {}) {
     }
     const crit = o.crit || (!o.noCrit && (Math.random() < getCritChance() || (inSmoke(e) && Math.random() < SMOKE_BOMB.critChance)));
     const dmg = amount * (crit ? getCritMultiplier() : 1) * (e.ravenMark > 0 ? 1 + SHADOW_RAVEN.markDamage : 1)
-        * (e.rooted > 0 ? 1 + rootedBonus() : 1);     // Strangling Grove: preso por raízes leva mais de tudo
+        * (e.rooted > 0 ? 1 + rootedBonus() : 1)
+        * (e.blessed > 0 ? 1 + POWER_MODELS.holyWater.blessBonus : 1);       // Holy Water: abençoado leva mais de tudo     // Strangling Grove: preso por raízes leva mais de tudo
 
     e.hp -= dmg;
     // Dano contínuo (quiet: veneno, videira, espinhos, queimadura...) não pisca nem faz o monstro "levar um golpe": a cada tique
@@ -57,7 +58,8 @@ export function dealDamage(e, amount, o = {}) {
         e.recoilX = Math.sign(o.kbX ?? 0);
         e.recoilY = Math.sign(o.kbY ?? 0);
     }
-    if (!o.quiet) addDamageNumber(e.x, e.y - e.radius - 4, dmg, crit, crit ? null : o.style);
+    // number: dano contínuo que mesmo assim mostra o número (os pulsos das Fúrias de magia), sem piscar o monstro
+    if (!o.quiet || o.number) addDamageNumber(e.x, e.y - e.radius - 4, dmg, crit, crit ? null : o.style);
     if (crit) {
         audio.playCrit();
         createExplosion(e.x, e.y, '#fde047', 4);

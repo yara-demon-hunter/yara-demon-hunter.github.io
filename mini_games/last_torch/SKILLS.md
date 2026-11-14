@@ -3,7 +3,7 @@
 Guia para decidir onde cada skill mora, quanto custa e como aparece. Toda skill nova deve seguir estas regras.
 Os dados ficam em `data_model/tree.js`, `data_model/powers.js` e `data_model/passives.js`.
 
-## Os 5 ramos (o quinto, Natureza, está descrito no README do jogo)
+## Os 6 ramos (o quinto, Natureza, e o sexto, Luz, estão descritos no README do jogo)
 
 Cada ramo é um **jeito de jogar**, não só uma lista de bônus. A pergunta de cada um é: o que o jogador faz de diferente?
 
@@ -13,6 +13,7 @@ Cada ramo é um **jeito de jogar**, não só uma lista de bônus. A pergunta de 
 | **Shadow** | Ladrão | Técnico. Marca de longe, detona de perto, atravessa a horda e rouba. | Adaga marca, dash detona e devolve o dash, moedas adiantam a recarga: um combo que nunca para. | O mais barato |
 | **Flame** | Guardião | Defensivo e calmo. Fica firme perto da tocha e deixa o fogo trabalhar. | Parado, ergue o escudo. A horda queima ao cruzar o anel. Nada passa. | O mais caro |
 | **Nature** | Druida | Estratégico e paciente. Prende no chão, bebe a vida dos monstros, planta um carvalho que luta por você e solta um lobo para caçar. | Raízes prendem, tudo o que bate em quem está preso bate mais; a semente do carvalho drena um monstro e, quando ele morre, a muda cura quem ficar perto até crescer e lutar; do carvalho saem videiras que drenam os monstros e curam a própria árvore. | Médio (poder 2, especial 3) |
+| **Light** | Padre | Firme e paciente. Consagra o chão, abençoa com água benta e deixa a ira divina cair sobre os mais fortes. | O círculo sagrado queima e atrasa; o monstro abençoado leva mais de tudo; o raio atordoa o mais forte e, na evolução, bane quem está quase morto. Oath of Faith: mais dano de feitiço e cura, sem adagas. | Médio (poder 2, especial 3) |
 | **Curse** | Feiticeiro | Estratégico. Fica longe, em área e à distância, e assiste à horda morrer em cadeia. | A maldição pula de monstro em monstro, a fenda junta todos, a explosão acaba com eles. | O mais caro |
 
 **Pergunta para encaixar uma skill:** o que ela pede do jogador? Agressividade vai em Blade; precisão ou
@@ -167,3 +168,11 @@ Algumas skills só funcionam com adaga: Ricochet, Death Mark, Charged Dagger Thr
    poder; o que continua a linha depois dela sai do poder em diagonal, para a ligação não passar por cima do losango.
 5. Não defina `cost`: deixe a tabela decidir.
 6. Mostre a skill em `previews/characters_preview.html` e atualize o mapa acima.
+
+
+## Dano de lâmina x dano de magia
+
+Cada personagem tem dois danos base independentes (`stats` em `data_model/characters/<id>.js`):
+
+- **`attackDamage` (lâmina, físico):** golpes da lâmina, adaga, o 3º golpe do combo, as skills do ramo Blade e Shadow, bombas e espinhos, e as Fúrias de lâmina (Sword Rain, Blood Waltz, Stomp). Número **branco** na tela.
+- **`magicDamage` (magia):** tudo que age sozinho ou vem do poder: skills dos ramos Flame (tocha, fênix, anel de fogo...), Curse, Nature e Light, bolas de fogo (Fireballs) e as Fúrias de magia (Forest Guardian, Sacred Ground). Número **azul** na tela. Quem tem `magicDamage: 0` (Captain Brutos) não usa magia: as skills de magia ficam seladas para ele.

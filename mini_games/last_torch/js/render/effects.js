@@ -3,7 +3,7 @@ import { CORE_MODEL } from '../../data_model/core.js';
 import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
 import { ctx, player, state } from '../core/state.js';
 import { mod } from '../systems/modifiers.js';
-import { getWarmthDamage } from '../systems/stats.js';
+import { getWarmthDamage, getWarmthRadius } from '../systems/stats.js';
 import { easeOutBack, easeOutCubic } from '../../library/core/easing.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { drawNumber } from './fx/numbers.js';
@@ -33,12 +33,24 @@ export function renderStains() {
 // jogador aprender onde fica (só some se um Juramento tirou a cura e a área não faz mais nada).
 export function renderWarmth() {
     if (mod('noWarmthHeal') > 0 && getWarmthDamage() <= 0 && mod('warmthBurn') <= 0) return;
-    const reach = CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
-    ctx.strokeStyle = J.warmth.ringColor;
-    ctx.lineWidth = 1.5;
+    const reach = getWarmthRadius();
+    const heals = mod('noWarmthHeal') <= 0;
+    // Verde quando o calor cura a vida (o normal): o mesmo desenho do anel de cura do carvalho, para o jogador ler "aqui cura".
+    // Laranja e mais fraco só quando um Juramento tirou a cura e o calor apenas queima.
+    const H = J.warmth.healRing;
+    ctx.save();
     ctx.translate(state.coreX, state.coreY);
-    ctx.stroke(getDashedRing(reach, 6));
-    ctx.translate(-state.coreX, -state.coreY);
+    if (heals) {
+        ctx.globalAlpha = H.alpha;
+        ctx.strokeStyle = H.color;
+        ctx.lineWidth = H.width;
+        ctx.stroke(getDashedRing(reach, H.dash));
+    } else {
+        ctx.strokeStyle = J.warmth.ringColor;
+        ctx.lineWidth = 1.5;
+        ctx.stroke(getDashedRing(reach, 6));
+    }
+    ctx.restore();
 }
 
 // Tocha ferida: anel pulsando em volta, para o jogador achar o perigo sem olhar a barra

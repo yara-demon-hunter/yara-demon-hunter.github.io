@@ -395,6 +395,101 @@ export const POWER_MODELS = {
         reach: 1.7,             // atrai até reach x radius do centro
         knockback: 110
     },
+    // --- LUZ (js/systems/skills_light.js). O dano é de feitiço: o que fortalece feitiços fortalece a luz ---
+    holyGround: {
+        name: 'Sacred Ground', icon: '✝️', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Every ${formatNumber(level.cooldown)}s a circle of holy light opens where the most monsters stand. For ${formatNumber(level.seconds)}s it burns everything inside for ${formatMultiplier(level.dps)} spell damage per second and slows it by ${formatPercent(level.slow)}.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.radius} radius · ${formatMultiplier(level.dps)} spell damage per second · ${formatPercent(level.slow)} slow · lasts ${formatNumber(level.seconds)}s · every ${formatNumber(level.cooldown)}s`
+            );
+        },
+        levels: [
+            { cooldown: 9, radius: 70, dps: 0.6, slow: 0.25, seconds: 4 },
+            { cooldown: 8.5, radius: 76, dps: 0.7, slow: 0.28, seconds: 4.5 },
+            { cooldown: 8, radius: 82, dps: 0.85, slow: 0.3, seconds: 5 },
+            { cooldown: 7.5, radius: 88, dps: 1, slow: 0.33, seconds: 5.5 },
+            { cooldown: 7, radius: 96, dps: 1.15, slow: 0.36, seconds: 6 }
+        ],
+        range: 320,             // só abre o círculo com monstro a esta distância do herói
+        tickSeconds: 0.5,
+        maxGrounds: 3
+    },
+    holyWater: {
+        name: 'Holy Water', icon: '💧', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Every ${formatNumber(level.cooldown)}s you hurl a vial of holy water at the nearest monster. It bursts for ${formatMultiplier(level.damage)} spell damage and leaves the ground soaked for ${formatNumber(level.puddleSeconds)}s: monsters walking through it burn for ${formatMultiplier(level.puddleDps)} spell damage per second. It blesses everything it touches: for ${formatNumber(level.seconds)}s a blessed monster takes ${formatPercent(this.blessBonus)} more damage from everything.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.count} vial${level.count > 1 ? 's' : ''} · ${formatMultiplier(level.damage)} spell damage · ${level.radius} burst · blessed ${formatNumber(level.seconds)}s · every ${formatNumber(level.cooldown)}s`
+            );
+        },
+        levels: [
+            { cooldown: 6.5, count: 1, radius: 54, damage: 1.1, seconds: 4, puddleSeconds: 3, puddleDps: 0.35 },
+            { cooldown: 6, count: 1, radius: 58, damage: 1.3, seconds: 4.5, puddleSeconds: 3.5, puddleDps: 0.4 },
+            { cooldown: 5.5, count: 1, radius: 62, damage: 1.5, seconds: 5, puddleSeconds: 4, puddleDps: 0.45 },
+            { cooldown: 5.5, count: 2, radius: 64, damage: 1.5, seconds: 5.5, puddleSeconds: 4.5, puddleDps: 0.5 },
+            { cooldown: 5, count: 2, radius: 68, damage: 1.7, seconds: 6, puddleSeconds: 5, puddleDps: 0.55 }
+        ],
+        range: 340,
+        puddleRatio: 0.9,       // tamanho da poça = raio do estouro x este número
+        puddleTickSeconds: 0.5,
+        maxPuddles: 8,
+        blessBonus: 0.2,        // o monstro abençoado leva mais de tudo
+        knockback: 90,
+        flightSeconds: 0.95        // o frasco no ar: devagar, para dar para ver que é um frasco (antes 0.45)
+    },
+    smite: {
+        name: 'Smite', icon: '⚡', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Every ${formatNumber(level.cooldown)}s a bolt of divine light strikes the strongest monster in reach for ${formatMultiplier(level.damage)} spell damage and stuns it for ${formatNumber(level.stun)}s. Bosses are only staggered.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.count} bolt${level.count > 1 ? 's' : ''} · ${formatMultiplier(level.damage)} spell damage · stun ${formatNumber(level.stun)}s · every ${formatNumber(level.cooldown)}s`
+            );
+        },
+        levels: [
+            { cooldown: 7, count: 1, damage: 2.4, stun: 0.8 },
+            { cooldown: 6.5, count: 1, damage: 2.8, stun: 0.9 },
+            { cooldown: 6, count: 2, damage: 2.8, stun: 1 },
+            { cooldown: 5.5, count: 2, damage: 3.2, stun: 1.1 },
+            { cooldown: 5, count: 3, damage: 3.6, stun: 1.2 }
+        ],
+        range: 360,
+        radius: 34,
+        bossStunRatio: 0.3
+    },
+    churchBell: {
+        name: 'Church Bell', icon: '🔔', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `A holy bell hangs over the torch. Every ${formatNumber(level.cooldown)}s it tolls: a ring of sound bursts from the torch, pushing monsters away from it, dealing ${formatMultiplier(level.damage)} spell damage within ${level.radius} range and stunning them for ${formatNumber(level.stun)}s. Bosses are only staggered.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.radius} range · ${formatMultiplier(level.damage)} spell damage · stun ${formatNumber(level.stun)}s · every ${formatNumber(level.cooldown)}s`
+            );
+        },
+        levels: [
+            { cooldown: 9, radius: 120, damage: 0.9, stun: 0.5, knockback: 260 },
+            { cooldown: 8.5, radius: 130, damage: 1.05, stun: 0.55, knockback: 280 },
+            { cooldown: 8, radius: 140, damage: 1.2, stun: 0.6, knockback: 300 },
+            { cooldown: 7.5, radius: 150, damage: 1.35, stun: 0.7, knockback: 320 },
+            { cooldown: 7, radius: 160, damage: 1.5, stun: 0.8, knockback: 340 }
+        ],
+        tolls: 1,               // badaladas por toque (a evolução faz 3)
+        gapSeconds: 0.45,       // tempo entre uma badalada e a próxima
+        growth: 0.25,           // cada badalada seguinte alcança mais longe (x 1 + growth por badalada)
+        wakeRatio: 1.4,         // só toca com monstro a até radius x wakeRatio da tocha (não gasta o toque à toa)
+        bossStunRatio: 0.3
+    },
     // --- NATUREZA (js/systems/skills_nature.js). O dano é de feitiço: o que fortalece feitiços fortalece a floresta ---
     graspingRoots: {
         name: 'Grasping Roots', icon: '🌿', maxLvl: 5,
@@ -422,7 +517,7 @@ export const POWER_MODELS = {
         name: 'Leech Vine', icon: '🩸', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `Thorned vines grow from your oaks (the small tree and the full oak) and latch onto the ${level.targets} monsters nearest to each one, draining ${formatMultiplier(level.dps)} spell damage per second from each. What they drain returns to the oak as health: ${formatPercent(level.heal)} of it. It needs an oak to do anything.`;
+            return `Thorned vines grow from your oaks (the small tree and the full oak) and latch onto the ${level.targets} monster${level.targets > 1 ? 's' : ''} nearest to each one, draining ${formatMultiplier(level.dps)} spell damage per second from each. What they drain returns to the oak as health: ${formatPercent(level.heal)} of it. It needs an oak to do anything.`;
         },
         get upgrades() {
             return this.levels.map(level =>
@@ -431,10 +526,10 @@ export const POWER_MODELS = {
         },
         levels: [
             { targets: 1, dps: 0.5, heal: 0.3 },
-            { targets: 2, dps: 0.55, heal: 0.35 },
-            { targets: 2, dps: 0.7, heal: 0.4 },
-            { targets: 3, dps: 0.85, heal: 0.45 },
-            { targets: 3, dps: 1, heal: 0.5 }
+            { targets: 1, dps: 0.55, heal: 0.35 },
+            { targets: 1, dps: 0.7, heal: 0.4 },
+            { targets: 1, dps: 0.85, heal: 0.45 },
+            { targets: 1, dps: 1, heal: 0.5 }
         ],
         range: 150,             // a videira agarra até aqui do carvalho
         breakRange: 200,        // e solta além daqui
@@ -444,33 +539,40 @@ export const POWER_MODELS = {
         name: 'Wicked Oak', icon: '🌳', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree after ${formatNumber(this.saplingSeconds)}s and an oak after ${formatNumber(this.adultSeconds)}s, and every monster you kill speeds it up by ${formatNumber(this.killGrowthSeconds)}s. The oak wakes near monsters and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; up to ${level.count} seeds or trees can exist at a time (more as you level it).`;
+            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree after ${formatNumber(this.saplingSeconds)}s, a full oak after ${formatNumber(this.adultSeconds)}s and, after ${formatNumber(this.elder.seconds)}s, a furious elder oak that is bigger and hits harder, and every monster you kill speeds it up by ${formatNumber(this.killGrowthSeconds)}s. There is only ever one tree, and it stays with you through every wave of the night, regaining some health between waves. The grown oak walks, very slowly, toward the fight and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; if it falls, a new seed can be planted.`;
         },
         get upgrades() {
             return this.levels.map(level =>
-                `${level.count} at once · ${level.hp} oak health · ${level.reach} reach · ${formatMultiplier(level.damage)} lash every ${formatNumber(level.lashSeconds)}s · stands ${formatNumber(level.seconds)}s · seed every ${formatNumber(level.cooldown)}s`
+                `${level.hp} oak health · ${level.reach} reach · ${formatMultiplier(level.damage)} lash every ${formatNumber(level.lashSeconds)}s · new seed ${formatNumber(level.cooldown)}s after it falls`
             );
         },
         levels: [
-            { count: 1, cooldown: 16, seconds: 10, hp: 140, reach: 80, damage: 1.1, lashSeconds: 0.9 },
-            { count: 1, cooldown: 15, seconds: 11, hp: 180, reach: 86, damage: 1.3, lashSeconds: 0.85 },
-            { count: 2, cooldown: 14, seconds: 12, hp: 230, reach: 92, damage: 1.5, lashSeconds: 0.8 },
-            { count: 2, cooldown: 13, seconds: 13, hp: 280, reach: 100, damage: 1.8, lashSeconds: 0.75 },
-            { count: 3, cooldown: 12, seconds: 14, hp: 340, reach: 108, damage: 2.1, lashSeconds: 0.7 }
+            { count: 1, cooldown: 16, seconds: 10, hp: 140, reach: 80, damage: 0.85, lashSeconds: 0.95 },
+            { count: 1, cooldown: 15, seconds: 11, hp: 180, reach: 86, damage: 1, lashSeconds: 0.9 },
+            { count: 1, cooldown: 14, seconds: 12, hp: 230, reach: 92, damage: 1.15, lashSeconds: 0.9 },
+            { count: 1, cooldown: 13, seconds: 13, hp: 280, reach: 100, damage: 1.35, lashSeconds: 0.85 },
+            { count: 1, cooldown: 12, seconds: 14, hp: 340, reach: 108, damage: 1.55, lashSeconds: 0.8 }
         ],
         plantRange: 300,        // só planta com monstro a esta distância do herói (não gasta a árvore à toa)
         seedDamage: 0.12,       // drena pouco a pouco a vida do monstro marcado, em dano de feitiço por segundo
         seedTickSeconds: 0.5,
-        saplingSeconds: 10,     // muda vira árvore pequena
-        adultSeconds: 45,       // árvore pequena amadurece em uma árvore completa
-        killGrowthSeconds: 1.2, // cada monstro morto adianta o crescimento de toda muda ou árvore pequena neste tanto
+        saplingSeconds: 20,     // muda vira árvore pequena (antes 10)
+        adultSeconds: 100,      // árvore pequena amadurece em uma árvore completa (antes 45); a árvore agora dura a noite toda
+        killGrowthSeconds: 1.5, // cada monstro morto adianta o crescimento de toda muda ou árvore pequena neste tanto
         healingRadius: 58,
         healingPerSecond: 1,
         wakeRatio: 1.5,         // acorda com monstro a até wakeRatio x reach da árvore e volta a dormir sem ninguém por perto
         lureRadius: 130,        // monstros a esta distância dela, com ela acordada, vão bater nela em vez de no herói
         trunkRadius: 16,        // onde os monstros batem
         hitSeconds: 0.7,        // intervalo entre golpes de um mesmo monstro na árvore
-        growSeconds: 0.45
+        growSeconds: 0.45,
+        waveHealRatio: 0.5,     // na virada da onda a árvore recupera esta parte da vida máxima
+        // Quarto estágio, o carvalho FURIOSO: depois de adulto ele segue crescendo (tempo + mortes) até `seconds` de crescimento;
+        // fica um pouco maior (scale), com a cara de quando ataca, e alcança e bate mais
+        elder: { seconds: 220, scale: 1.25, reach: 1.15, damage: 1.25, walk: 1.2 },
+        // A árvore adulta anda, bem devagar: até o monstro mais perto (dentro de reach x seekRatio) que ainda não está ao alcance
+        // dos galhos; sem monstros, volta para perto do herói (se estiver a mais de heroDistance)
+        walk: { speed: 9, seekRatio: 3, heroDistance: 160 }
     },
     sporePods: {
         name: 'Spore Pods', icon: '🍄', maxLvl: 5,
@@ -555,6 +657,49 @@ export const POWER_MODELS = {
 // --- EVOLUÇÕES ---
 // Poder no nível máximo + requisitos do nó de evolução (data_model/tree.js) = transforma o poder.
 export const EVOLUTIONS = {
+    holyGround: {
+        name: 'Consecrated Earth', icon: '⛪',
+        get desc() {
+            const { radius, dps, seconds } = this.levels;
+            return `A wide circle (${radius} radius) burns for ${formatMultiplier(dps)} spell damage per second for ${formatNumber(seconds)}s. Demons (elites and bosses) take ${formatPercent(this.demonBonus)} more. You heal ${this.healPerSecond} health per second standing in it, and when it fades a cross of light bursts for ${formatMultiplier(this.finale.damage)} spell damage.`;
+        },
+        levels: { cooldown: 6, radius: 120, dps: 1.5, slow: 0.4, seconds: 7 },
+        demonBonus: 0.35,
+        healPerSecond: 2,
+        finale: { radiusRatio: 1.15, damage: 2.2 }
+    },
+    holyWater: {
+        name: 'Blessed Rain', icon: '🌧️',
+        get desc() {
+            const R = this.rain;
+            return `No more vials: every ${formatNumber(R.every)}s a holy rain falls over the whole field for ${formatNumber(R.seconds)}s. Every monster on screen burns for ${formatMultiplier(R.dps)} spell damage per second and stays blessed (takes more damage from everything), and big drops splash where monsters stand for ${formatMultiplier(R.damage)} spell damage, soaking the ground. Baptism: a blessed monster that dies explodes in a burst of light for ${formatMultiplier(this.baptism.damage)} spell damage.`;
+        },
+        // Os frascos param na evolução: só a chuva. levels: o que a chuva usa das poças e da bênção
+        levels: { cooldown: 16, count: 0, radius: 70, damage: 1.7, seconds: 3, puddleSeconds: 4, puddleDps: 0.5 },
+        // A chuva: a cada `every` segundos, por `seconds`. Todo monstro na tela leva `dps` (dano de magia por segundo, de
+        // tickSeconds em tickSeconds) e fica abençoado; uma gota grande estoura em cima de um monstro a cada `dropSeconds`
+        rain: { every: 16, seconds: 9, tickSeconds: 0.5, dps: 0.6, dropSeconds: 0.22, radius: 44, damage: 0.6 },
+        baptism: { radius: 70, damage: 1.2 }
+    },
+    smite: {
+        name: 'Divine Wrath', icon: '☀️',
+        get desc() {
+            const { count, damage } = this.levels;
+            return `${count} bolts strike for ${formatMultiplier(damage)} spell damage. Judgment: a monster struck below ${formatPercent(this.judgment)} health is banished on the spot (bosses are not).`;
+        },
+        levels: { cooldown: 4.5, count: 4, damage: 4, stun: 1.4 },
+        judgment: 0.25
+    },
+    churchBell: {
+        name: 'Cathedral Toll', icon: '⛪',
+        get desc() {
+            return `The bell tolls ${this.tolls} times in a row, each ring wider than the last. Blessed monsters take double damage from it, and every toll mends the torch for ${this.torchHeal} health.`;
+        },
+        levels: { cooldown: 8, radius: 160, damage: 1.5, stun: 0.8, knockback: 340 },
+        tolls: 3,
+        blessedMultiplier: 2,
+        torchHeal: 4
+    },
     graspingRoots: {
         name: 'Strangling Grove', icon: '🪴',
         get desc() {
@@ -571,7 +716,7 @@ export const EVOLUTIONS = {
             const { hp, reach } = this.levels;
             return `A huge oak with ${hp} health and ${reach} reach that never withers with time: it only falls if monsters destroy it. When it falls, its roots tear out of the ground: every monster around it is pinned for ${formatNumber(this.burst.seconds)}s and takes ${formatMultiplier(this.burst.damage)} spell damage. Thorn bark: a monster that strikes the oak takes ${formatMultiplier(this.thornBark.damage)} spell damage and is pinned by roots for ${this.thornBark.rootSeconds}s.`;
         },
-        levels: { count: 3, cooldown: 11, seconds: 18, hp: 400, reach: 110, damage: 1.9, lashSeconds: 0.8 },
+        levels: { count: 1, cooldown: 11, seconds: 18, hp: 400, reach: 110, damage: 1.5, lashSeconds: 0.85 },
         burst: { radiusRatio: 1.6, seconds: 3, damage: 2 },
         thornBark: { damage: 0.6, rootSeconds: 1 }      // o que era o nó Thorn Bark: quem bate na árvore leva dano e fica preso
     },

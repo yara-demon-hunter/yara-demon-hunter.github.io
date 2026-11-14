@@ -10,14 +10,15 @@ import { mod } from './modifiers.js';
 import { burstFireball } from './skills_flame.js';
 import { markEnemy } from './skills_shadow.js';
 import { markWithRose } from './skills_nature.js';
-import { getKnifeBaseRange, getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
+import { characterStat, getKnifeBaseRange, isMagicKnife, getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
 import { getHero } from './modifiers.js';
 
 // O que o herói lança: adaga, ou a rosa do Rowan (a Rosa Negra, com a skill Dark Roses). Só muda o desenho: dano, alcance e
 // todas as skills de adaga valem igual para a rosa
 export function getThrownStyle() {
-    if (getHero().thrown !== 'rose') return 'dagger';
-    return passives.darkRoses.lvl > 0 ? 'darkRose' : 'rose';
+    const thrown = getHero().thrown;
+    if (thrown === 'rose') return passives.darkRoses.lvl > 0 ? 'darkRose' : 'rose';
+    return thrown === 'cross' ? 'cross' : 'dagger';
 }
 
 const KNIFE_RELEASE_SECONDS = K.throwSeconds * K.letGoFraction;
@@ -73,7 +74,7 @@ function releaseKnife(thrower = player) {
     const x = thrower.x + cos * K.spawnForward - sin * K.spawnSide;
     const y = thrower.y + sin * K.spawnForward + cos * K.spawnSide;
 
-    const speed = KNIFE_SKILL.speed * (1 + mod('knifeSpeed')) * getThrownWeapon(getThrownStyle()).speed;
+    const speed = characterStat('knifeSpeed') * (1 + mod('knifeSpeed')) * getThrownWeapon(getThrownStyle()).speed;
     const maxRange = getKnifeRange();
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
     const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
@@ -82,7 +83,7 @@ function releaseKnife(thrower = player) {
     const power = state.knifeThrowPower >= POWER_MODELS.chargedThrow.minCharge ? state.knifeThrowPower : 0;
     // A carga da Charged Dagger Throw se divide entre as adagas do leque
     const damage = getKnifeDamage() * (1 + power * (lance?.damage ?? 0) / count);
-    const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
+    const knockback = getKnockback() * characterStat('knifeKnockbackRatio');
 
     for (let i = 0; i < count; i++) {
         const angle = aim + (i - (count - 1) / 2) * spread;
@@ -96,6 +97,7 @@ function releaseKnife(thrower = player) {
             pierces: Math.round(power * (lance?.pierces ?? 0)),
             scale: 1 + power * (POWER_MODELS.chargedThrow.maxScale - 1),
             fire: passives.fireballs.lvl > 0,
+            magic: isMagicKnife(),
             style: getThrownStyle(),
             struck: null                // monstros já atingidos por esta adaga (Ricochet)
         });
@@ -110,11 +112,11 @@ export function burstKnives(x, y) {
     if (mod('noKnives') > 0) return;
     const B = SHADOW_CLONE.burst;
     const count = B.knives + (passives.fanOfKnives.lvl > 0 ? B.fanBonus : 0);
-    const speed = KNIFE_SKILL.speed * (1 + mod('knifeSpeed')) * getThrownWeapon(getThrownStyle()).speed;
+    const speed = characterStat('knifeSpeed') * (1 + mod('knifeSpeed')) * getThrownWeapon(getThrownStyle()).speed;
     const maxRange = getKnifeRange();
     const ricochet = getPowerLevel(powers.ricochet);
     const damage = getKnifeDamage() * B.damageMultiplier;
-    const knockback = getKnockback() * KNIFE_SKILL.knockbackMultiplier;
+    const knockback = getKnockback() * characterStat('knifeKnockbackRatio');
     const offset = Math.random() * Math.PI * 2;
     for (let i = 0; i < count; i++) {
         const angle = offset + (i / count) * Math.PI * 2;
@@ -128,6 +130,7 @@ export function burstKnives(x, y) {
             pierces: 0,
             scale: 1,
             fire: passives.fireballs.lvl > 0,
+            magic: isMagicKnife(),
             style: getThrownStyle(),
             struck: null
         });
@@ -247,7 +250,7 @@ export function updateKnives(dt) {
         const hit = enemies.find(e => e.hp > 0 && !k.struck?.has(e)
             && Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius * k.scale);
         if (hit) {
-            dealDamage(hit, k.damage, { style: k.fire ? 'spell' : null, kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
+            dealDamage(hit, k.damage, { style: k.fire || k.magic ? 'spell' : null, kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
             markEnemy(hit);
             if (k.style === 'rose' || k.style === 'darkRose') hit.roseSlowTimer = ROSE_SKILL.slowSeconds;       // a rosa do druida deixa o monstro lento
             if (k.style === 'darkRose') markWithRose(hit);

@@ -2,7 +2,7 @@ import { createPlayerState } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { createPassives } from '../../data_model/passives.js';
 import { createPowers } from '../../data_model/powers.js';
-import { FRENZY_NOVA_SKILL, createAttributes } from '../../data_model/skills.js';
+import { FURY_BAR, createAttributes } from '../../data_model/skills.js';
 import { SoundEngine } from '../audio/sound-engine.js';
 import { setCtx } from '../../library/core/canvas.js';
 import { setHost } from '../../library/core/host.js';
@@ -37,7 +37,7 @@ export const keys = {};
 // Direção do joystick virtual (-1..1 em cada eixo; 0,0 = solto); lastX, lastY = última direção usada
 export const joystick = { x: 0, y: 0, lastX: 0, lastY: 0 };
 
-export const maxUltEnergy = FRENZY_NOVA_SKILL.maximumEnergy;
+export const maxUltEnergy = FURY_BAR.maximumEnergy;
 
 // --- VARIÁVEIS DE ESTADO ---
 // Tudo que muda durante a partida fica neste objeto para ser compartilhado entre os módulos.
@@ -72,6 +72,8 @@ export const state = {
 
     // Dados de Progresso (turn = hora da noite; targetScore fecha a hora)
     turn: 1,
+    waveTime: 0,                // segundos da caçada desde que a onda começou
+    waveEta: -1,                // segundos estimados até a cota da onda fechar (boss ou fim); -1 = ainda sem estimativa
     scoreTurn: 0,
     targetScore: 0,
     totalScore: 0,
@@ -174,6 +176,8 @@ export const state = {
     wisp: { x: 0, y: 0, placed: false, flash: 0 },
     // Natureza (js/systems/skills_nature.js): carvalhos, cogumelos, nuvens de esporos, monstros na videira e o lobo
     // lure: o carvalho acordado que os monstros próximos vão atacar; claws: marcas de garra das mordidas
+    // Luz (js/systems/skills_light.js): círculos sagrados, frascos de água benta, raios e explosões de luz
+    light: { grounds: [], flasks: [], bolts: [], bursts: [], puddles: [], drops: [], bell: { swing: 0, flash: 0, queue: 0, gap: 0, index: 0, level: null }, bellRings: [], rain: 0, rainDrop: 0, rainTick: 0, rainTimer: 12 },
     nature: { oaks: [], seeds: [], pods: [], clouds: [], thorns: [], wolves: [], claws: [], lure: null },
 
     // Animação de level up em andamento: { age, label } ou null

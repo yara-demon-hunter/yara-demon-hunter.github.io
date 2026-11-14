@@ -1,6 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { getCharacterBase } from '../../data_model/characters/index.js';
-import { BLADE_SKILL, DASH_SKILL, FRENZY_NOVA_SKILL, KNIFE_SKILL, SPELL_SKILL } from '../../data_model/skills.js';
+import { BLADE_SKILL } from '../../data_model/skills.js';
 import { WAR_CRY } from '../../data_model/passives.js';
 import { getPowerLevel } from '../../data_model/powers.js';
 import { attributes, passives, player, powers, state } from '../core/state.js';
@@ -9,6 +9,11 @@ import { STREAK, rushTier } from '../../data_model/streak.js';
 
 function getCurrentCharacterBase() {
     return getCharacterBase(getHero().model ?? 'hunter');
+}
+
+// Um número do personagem escolhido (`stats` em data_model/characters/<id>.js)
+export function characterStat(key) {
+    return getCurrentCharacterBase().player.stats[key];
 }
 
 // --- FÓRMULAS DE ATRIBUTOS ---
@@ -34,20 +39,22 @@ export function getBladeDamage() {
     return getAtkDamage() * (1 + mod('bladeDamage'))
         * (1 + (hunger ? state.bloodlust.stacks * hunger.damage : 0))
         * (1 + (state.warCryTimer > 0 ? WAR_CRY.bladeBonus : 0))
-        * (state.frenzyActiveTimer > 0 ? 1 + attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel : 1);
+        * (state.frenzyActiveTimer > 0 ? 1 + getFrenzyDamageBonus() : 1);
 }
+// DANO DE MAGIA: feitiços, tocha, fênix, bolas de fogo, luz, natureza... Vem do `magicDamage` do personagem (0 = ele não usa magia).
+// Sai AZUL na tela (style 'spell'). O dano de LÂMINA (getBladeDamage) é o físico: golpes, adaga, sombras, Fúrias de lâmina.
 // Feitiços e tudo que a chama faz sozinha
 export function getSpellDamage() {
-    return getAtkDamage() * SPELL_SKILL.damageMultiplier * (1 + mod('spellDamage'));
+    return characterStat('magicDamage') * (1 + mod('spellDamage'));
 }
 export function getSpellCooldown(seconds) {
     return seconds * Math.max(0.3, 1 - mod('spellHaste'));
 }
 export function getCritChance() {
-    return BLADE_SKILL.baseCritChance + mod('critChance');
+    return characterStat('baseCritChance') + mod('critChance');
 }
 export function getCritMultiplier() {
-    return BLADE_SKILL.baseCritMultiplier + mod('critDamage');
+    return characterStat('critMultiplier') + mod('critDamage');
 }
 export function getAtkRadius() {
     return Math.min(
@@ -86,7 +93,7 @@ export function getPlayerMaxSpeed() {
     return player.move?.kind === 'quake' ? speed * getAxeQuake().moveSpeed : speed;
 }
 export function getKnockback() {
-    return BLADE_SKILL.baseKnockback
+    return characterStat('baseKnockback')
         + (attributes.knockback.lvl - 1) * BLADE_SKILL.knockbackPerUpgrade;
 }
 export function getMaxPlayerHp() {
@@ -120,43 +127,52 @@ export function getKillHeal() {
     return (getPowerLevel(powers.bloodEdge)?.heal ?? 0) + mod('killHeal');
 }
 export function getWarmthRadius() {
-    return CHARACTER_MODEL.warmthRadius * (1 + mod('warmth'));
+    return characterStat('warmthRadius') * (1 + mod('warmth'));
 }
-// Pontos por segundo; zero sob o Oath of Slaughter. A cura cresce com metade do bônus de alcance
-// (warmthHealShare) e tem teto, para relíquias, ramo da chama e Juramento não a empilharem sem fim
+// Calor da tocha: o alcance (`warmthRadius`) e a cura por segundo (`warmthHeal`) são do personagem; relíquias e skills (mod 'warmth')
+// somam por cima. A cura cresce com parte do bônus de alcance (WARMTH_HEAL_SHARE) e tem teto; zero sob o Oath of Slaughter.
 const WARMTH_HEAL_SHARE = 0.3;
 const WARMTH_HEAL_MAX_MULTIPLIER = 1.5;
 export function getWarmthHeal() {
     if (mod('noWarmthHeal') > 0) return 0;
     const multiplier = Math.min(WARMTH_HEAL_MAX_MULTIPLIER, 1 + mod('warmth') * WARMTH_HEAL_SHARE);
-    return CHARACTER_MODEL.warmthHealPerSecond * multiplier;
+    return characterStat('warmthHeal') * multiplier;
 }
+// Tudo da Fúria vem do `fury` do personagem escolhido (data_model/characters/<id>.js); o nível da skill Fury (frenzyNova) sobe por cima
 export function getFrenzyDamageBonus() {
-    return attributes.frenzyNova.lvl * FRENZY_NOVA_SKILL.damageBonusPerUpgradeLevel;
+    return attributes.frenzyNova.lvl * getFury().damageBonusPerLevel;
 }
 export function getFrenzyDuration() {
-    const level = attributes.frenzyNova.lvl;
-    const characterDuration = getCurrentCharacterBase().player.fury.durationSeconds;
-    const baseDuration = characterDuration ?? (
-        FRENZY_NOVA_SKILL.baseDurationSeconds + level * FRENZY_NOVA_SKILL.durationPerUpgradeLevelSeconds
-    );
-    const characterUpgrade = characterDuration === undefined
-        ? 0
-        : Math.max(0, level - 1) * FRENZY_NOVA_SKILL.durationPerUpgradeLevelSeconds;
-    return baseDuration + characterUpgrade + mod('furyDuration');
+    const fury = getFury();
+    return fury.durationSeconds + Math.max(0, attributes.frenzyNova.lvl - 1) * fury.durationPerLevel + mod('furyDuration');
+}
+// Carga da barra por monstro atingido e por morte na sequência, já com o bônus de Fury Charge
+export function getFuryChargePerHit() {
+    return getFury().chargePerHit * (1 + mod('furyCharge'));
+}
+export function getFuryChargePerKill() {
+    return getFury().chargePerKill * (1 + mod('furyCharge'));
 }
 // Dano de uma adaga, antes da carga do Charged Dagger Throw
 // Com Fireballs a adaga vira magia: tudo da adaga continua valendo e o dano mágico entra por cima
 export function getKnifeDamage() {
     const ricochet = getPowerLevel(powers.ricochet);
-    const magic = passives.fireballs.lvl > 0 ? 1 + mod('spellDamage') : 1;
-    return getAtkDamage() * KNIFE_SKILL.damageMultiplier * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0)) * magic;
+    // Com Fireballs, ou num personagem de arremesso mágico (magicKnife: a rosa do Rowan, a adaga benta do Avgustino), o dano base
+    // passa a ser o da MAGIA (e não o da lâmina)
+    const base = passives.fireballs.lvl > 0 || isMagicKnife() ? getSpellDamage() : getAtkDamage();
+    return base * characterStat('knifeDamageRatio') * (1 + mod('knifeDamage') + (ricochet?.damage ?? 0));
+}
+// O arremesso deste personagem é magia (dano azul)?
+export function isMagicKnife() {
+    return mod('magicKnife') > 0;
 }
 export function getKnifeCooldown() {
-    return KNIFE_SKILL.cooldownSeconds * (1 - mod('knifeCooldown'));
+    return characterStat('knifeCooldown') * (1 - mod('knifeCooldown'));
 }
 export function getDashCharges() {
-    return DASH_SKILL.charges + mod('dashCharges');
+    // Oath of Faith: o juramento tira o dash (noDash)
+    if (mod('noDash') > 0) return 0;
+    return characterStat('dashCharges') + mod('dashCharges');
 }
 export function getDashDistance() {
     return getCurrentCharacterBase().player.dash.distance;
@@ -165,7 +181,7 @@ export function getDashSeconds() {
     return getCurrentCharacterBase().player.dash.seconds;
 }
 export function getDashCooldown() {
-    return DASH_SKILL.cooldownSeconds * Math.max(0.3, 1 - mod('dashCooldown'));
+    return characterStat('dashCooldown') * Math.max(0.3, 1 - mod('dashCooldown'));
 }
 export function getMagnetRadius() {
     return CHARACTER_MODEL.magnetRadius * (1 + mod('magnet'));

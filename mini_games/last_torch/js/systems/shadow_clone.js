@@ -1,13 +1,12 @@
 import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { EVOLUTIONS, getPowerLevel } from '../../data_model/powers.js';
-import { BLADE_SKILL } from '../../data_model/skills.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { createHeroAnim } from '../../library/characters/hunter/hero_anim.js';
 import { audio, passives, powers, shadowClones as clones, state } from '../core/state.js';
 import { executeBladeSlash, findNearestEnemy, hitEnemiesInArc } from './combat.js';
 import { createExplosion } from './effects.js';
 import { burstKnives } from './knives.js';
-import { getAtkCooldown, getAtkDamage, getAtkRadius, getKnockback, getMaxPlayerHp, getSlashArcRadian } from './stats.js';
+import { characterStat, getAtkCooldown, getAtkDamage, getAtkRadius, getKnockback, getMaxPlayerHp, getSlashArcRadian } from './stats.js';
 
 // --- SHADOW CLONE (passiva) ---
 // Sombras que guardam a tocha. Elas se movem dentro de uma área em volta da chama (SHADOW_CLONE.areaRadius) e não
@@ -128,8 +127,8 @@ function updateCloneAttack(c, dt) {
     c.y = y;
 
     const combo = step === 3;
-    const dmg = getAtkDamage() * SHADOW_CLONE.damageMultiplier * (1 + bond().damage) * (combo ? BLADE_SKILL.comboDamageMultiplier : 1);
-    const kbForce = getKnockback() * SHADOW_CLONE.knockbackMultiplier * (combo ? BLADE_SKILL.comboKnockbackMultiplier : 1);
+    const dmg = getAtkDamage() * SHADOW_CLONE.damageMultiplier * (1 + bond().damage) * (combo ? characterStat('comboDamage') : 1);
+    const kbForce = getKnockback() * SHADOW_CLONE.knockbackMultiplier * (combo ? characterStat('comboKnockback') : 1);
     // Não carrega a Fúria (sem onHit)
     hitEnemiesInArc(x, y, angle, radius, getSlashArcRadian() / 2, dmg, kbForce, whirl);
 

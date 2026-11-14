@@ -14,6 +14,7 @@ import { HERO_ENTRIES, HERO_ORDER } from './characters/index.js';
 export const HEROES = {
     hunter: HERO_ENTRIES.hunter,
     rowan: HERO_ENTRIES.rowan,
+    avgustino: HERO_ENTRIES.avgustino,
     reaver: {
         name: 'Ash Reaver',
         shelved: true,

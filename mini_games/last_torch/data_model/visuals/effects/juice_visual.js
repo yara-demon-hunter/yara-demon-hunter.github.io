@@ -102,5 +102,6 @@ export const JUICE_VISUALS = {
     // Tocha pedindo socorro e calor em volta dela
     torchAlarm: { color: 'rgba(248, 113, 113, 0.75)', pulseHz: 1.6 },
     // Área de calor da tocha (onde ela cura o herói): o círculo tracejado fica sempre visível (js/render/effects.js)
-    warmth: { color: 'rgba(251, 146, 60, 0.12)', ringColor: 'rgba(253, 186, 116, 0.28)' }
+    // ringColor: o círculo laranja (calor que só queima, sem cura: Juramento); healRing: o círculo verde do calor que CURA, igual ao anel de cura do carvalho (js/render/nature.js: mesma cor, espessura e traço; parado, sem girar)
+    warmth: { color: 'rgba(251, 146, 60, 0.12)', ringColor: 'rgba(253, 186, 116, 0.28)', healRing: { color: '#4ade80', alpha: 0.8, width: 1.8, dash: 5.7 } }
 };

@@ -11,6 +11,7 @@ import { showToast } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { getStatText } from '../ui/status.js';
 import { getHero, mod, refreshModifiers } from './modifiers.js';
+import { characterStat } from './stats.js';
 import { celebrateEvolution } from './powers.js';
 import { syncMaxHp, syncTorchMax } from './torch.js';
 
@@ -111,7 +112,29 @@ export function isRestricted(node) {
     if (node.hero && getHero().id !== node.hero) return true;
     // notFor: skill que um herói não pode usar (o druida não usa Fireballs: as rosas dele não queimam)
     if (node.notFor?.includes(getHero().id)) return true;
+    if (isSealedForHero(node)) return true;
+    if (isMagicNode(node) && characterMagic() <= 0) return true;
     return node.needs === 'knives' && mod('noKnives') > 0;
+}
+
+// Ramos e skills que o personagem não pode seguir (sealedBranches / sealedSkills no arquivo dele: o Rowan não tem lâmina).
+// A skill Fury (frenzyNova) fica fora do selo: é a Fúria, de todos, mesmo morando no ramo Blade.
+function isSealedForHero(node) {
+    const hero = getHero();
+    if (hero.sealedSkills?.includes(node.id)) return true;
+    return !!hero.sealedBranches?.includes(node.branch) && node.id !== 'frenzyNova';
+}
+
+// Skills que causam dano de MAGIA (dependem do `magicDamage` do personagem): os poderes, passivas e evoluções dos ramos de
+// feitiço (Maldição, Natureza, Luz) e as da Chama que usam magia. Quem tem magicDamage 0 (Captain Brutos) as tem seladas.
+const MAGIC_FLAME_KEYS = new Set(['torchBolts', 'fireRing', 'emberTrail', 'phoenixPact', 'backdraft', 'vigil', 'fireballs']);
+function isMagicNode(node) {
+    if (node.kind === 'mod' || node.kind === 'stat' || node.oath) return false;
+    if (node.branch === 'curse' || node.branch === 'nature' || node.branch === 'light') return true;
+    return node.branch === 'flame' && MAGIC_FLAME_KEYS.has(node.key);
+}
+function characterMagic() {
+    return characterStat('magicDamage');
 }
 
 // Por que está selado, para a tela: de quem é a escolha (o herói ou o Juramento)
@@ -119,6 +142,8 @@ export function getRestrictionText(node) {
     if (node?.hero && getHero().id !== node.hero) return `Only ${node.hero[0].toUpperCase()}${node.hero.slice(1)} can learn this skill.`;
     if (node?.notFor?.includes(getHero().id)) return `${getHero().name} cannot use this skill: his roses do not burn.`;
     const hero = getHero();
+    if (isSealedForHero(node)) return node.branch === 'blade' ? `${hero.name} carries no blade: the Blade Path is not for him.` : `${hero.name} cannot use this skill: his weapon does not cut.`;
+    if (isMagicNode(node) && characterMagic() <= 0) return `${hero.name} has no magic: this skill is not for him.`;
     return (hero.mods?.noKnives ?? 0) > 0
         ? `${hero.name} fights without daggers: this skill is not for him.`
         : 'The Oath of Slaughter sealed your daggers: this skill can no longer be used.';

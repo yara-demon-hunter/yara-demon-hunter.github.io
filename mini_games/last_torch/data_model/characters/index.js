@@ -17,13 +17,14 @@
 // alcances em px); só os bônus que somam a outras fontes (dano da lâmina, da adaga, calor...) são % (+20 = 20% mais,
 // -5 = 5% menos). NÃO existe valor base compartilhado: cada personagem traz o seu, e o jogo lê dele. O que a árvore de
 // skills e as relíquias dão (mais vida por nível, mais alcance por nível...) soma por cima, igual para todos.
+import { AVGUSTINO } from './avgustino.js';
 import { AZAEL } from './azael.js';
 import { BRUTOS } from './brutos.js';
 import { HUNTER } from './hunter.js';
 import { ROWAN } from './rowan.js';
 
 // Todos os personagens. A posição na tela de escolha vem do `order` de cada um, não desta lista.
-export const CHARACTER_LIST = [HUNTER, ROWAN, AZAEL, BRUTOS];
+export const CHARACTER_LIST = [HUNTER, ROWAN, AVGUSTINO, AZAEL, BRUTOS];
 
 // Os stats que todo personagem tem de declarar. kind: 'absolute' (valor do personagem, o jogo lê direto dele),
 // 'percent' (bônus em %: 20 vira 0.2 no modificador `mod`) ou 'flag' (true/false vira modificador 1/0).
@@ -38,12 +39,28 @@ const STAT_SCHEMA = {
     bladeRange: { kind: 'absolute' },
     knifeRange: { kind: 'absolute' },
     damageTaken: { kind: 'percent', mod: 'damageTaken' },
-    warmth: { kind: 'percent', mod: 'warmth' },
     lifeSteal: { kind: 'percent', mod: 'lifeSteal' },
     bladeDamage: { kind: 'percent', mod: 'bladeDamage' },
     stillAttack: { kind: 'percent', mod: 'stillAttack' },
     knifeDamage: { kind: 'percent', mod: 'knifeDamage' },
-    noKnives: { kind: 'flag', mod: 'noKnives' }
+    noKnives: { kind: 'flag', mod: 'noKnives' },
+    magicKnife: { kind: 'flag', mod: 'magicKnife' },
+    // Regras próprias de cada personagem (valores absolutos, lidos em js/systems/stats.js)
+    baseCritChance: { kind: 'absolute' },
+    critMultiplier: { kind: 'absolute' },
+    baseKnockback: { kind: 'absolute' },
+    comboDamage: { kind: 'absolute' },
+    comboKnockback: { kind: 'absolute' },
+    knifeCooldown: { kind: 'absolute' },
+    knifeSpeed: { kind: 'absolute' },
+    knifeDamageRatio: { kind: 'absolute' },
+    knifeKnockbackRatio: { kind: 'absolute' },
+    dashCharges: { kind: 'absolute' },
+    dashCooldown: { kind: 'absolute' },
+    dashInvulnerable: { kind: 'absolute' },
+    magicDamage: { kind: 'absolute' },
+    warmthHeal: { kind: 'absolute' },
+    warmthRadius: { kind: 'absolute' }
 };
 
 const round = (n) => Math.round(n * 1e6) / 1e6;
@@ -84,16 +101,18 @@ function buildPlayer(character) {
         swordRain: ['name', 'stepSeconds', 'fallSeconds', 'radius', 'damage', 'range', 'giantFallSeconds', 'giantRadius', 'giantDamage', 'giantKnockback'],
         bloodWaltz: ['name', 'cuts', 'cutSeconds', 'cutRange', 'cutDamage', 'healRatio', 'trailSeconds'],
         stomp: ['name', 'extraSeconds', 'stepSeconds', 'radius', 'damage', 'knockback', 'stunSeconds', 'shake', 'damageTakenCut'],
-        forestGuardian: ['name', 'durationSeconds', 'damageReduction', 'radius', 'damage', 'tickSeconds', 'slow']
+        forestGuardian: ['name', 'damageReduction', 'radius', 'damage', 'tickSeconds', 'slow'],
+        consecration: ['name', 'damageReduction', 'radius', 'damage', 'tickSeconds', 'slow', 'healPerSecond', 'torchHealPerSecond', 'demonBonus', 'finaleDamage', 'finaleRadius']
     };
     const fury = character.fury;
     if (!fury || !FURY_KEYS[fury.kind]) throw new Error(`Personagem ${character.id}: falta a Fúria (fury.kind: ${Object.keys(FURY_KEYS).join(', ')})`);
-    for (const key of FURY_KEYS[fury.kind]) {
+    for (const key of ['chargePerHit', 'chargePerKill', 'durationSeconds', 'durationPerLevel', 'damageBonusPerLevel', ...FURY_KEYS[fury.kind]]) {
         if (fury[key] === undefined) throw new Error(`Personagem ${character.id}: falta "${key}" em fury`);
     }
     // Os valores absolutos vão direto para o jogo (js/systems/stats.js lê do personagem escolhido)
     return {
         mods,
+        stats,                      // todos os números do personagem, como escritos no arquivo dele
         maxHp: stats.maxHp,
         attackDamage: stats.attackDamage,
         attackCooldown: stats.attackCooldown,
@@ -154,7 +173,7 @@ export const HERO_ENTRIES = Object.fromEntries(CHARACTER_LIST.map(character => {
         colors: character.colors,
         portrait: character.portrait
     };
-    for (const key of ['model', 'perk', 'portraitImage', 'unlockHint', 'thrown']) if (character[key] !== undefined) entry[key] = character[key];
+    for (const key of ['model', 'perk', 'portraitImage', 'unlockHint', 'thrown', 'sealedBranches', 'sealedSkills']) if (character[key] !== undefined) entry[key] = character[key];
     return [character.id, entry];
 }));
 

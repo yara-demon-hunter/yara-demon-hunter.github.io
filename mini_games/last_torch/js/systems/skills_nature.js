@@ -7,6 +7,7 @@ import { mod } from './modifiers.js';
 import { startCast } from './moves.js';
 import { nearestEnemy, ready } from './powers.js';
 import { getKnifeDamage, getSpellCooldown, getSpellDamage } from './stats.js';
+import { noteAmbientHeal } from './torch.js';
 
 // --- SKILLS DA NATUREZA ---
 // O druida controla o campo em vez de bater mais forte: prende os monstros no chão (raízes), bebe a vida deles (videira),
@@ -128,7 +129,7 @@ function growOak(x, y, level) {
 function fellOak(oak) {
     createExplosion(oak.x, oak.y - 20, '#166534', 18);
     createExplosion(oak.x, oak.y, '#78350f', 10);
-    if (!oak.evolved || oak.stage !== 'adult') return;
+    if (!oak.evolved || (oak.stage !== 'adult' && oak.stage !== 'elder')) return;
     // Ancient Grove: as raízes rasgam o chão em volta
     const B = EVOLUTIONS.shelterOak.burst;
     const reach = oak.reach * B.radiusRatio;
@@ -147,8 +148,8 @@ function updateShelterOak(dt) {
     const M = POWER_MODELS.shelterOak;
     const level = getPowerLevel(powers.shelterOak);
     const timers = state.powerTimers;
-    // Até level.count (1 a 3, sobe com o nível) sementes e árvores ao mesmo tempo
-    if (level && state.phase === 'HUNT' && N.oaks.length + N.seeds.length < level.count) {
+    // Uma árvore só: ou semente, ou árvore (ela fica a noite toda, de onda em onda)
+    if (level && state.phase === 'HUNT' && N.oaks.length + N.seeds.length < 1) {
         timers.shelterOak = (timers.shelterOak ?? 2) - dt;
         if (timers.shelterOak <= 0) {
             let target = null;
@@ -204,7 +205,20 @@ function updateShelterOak(dt) {
     N.lure = null;
     for (let i = N.oaks.length - 1; i >= 0; i--) {
         const oak = N.oaks[i];
-        if (oak.stage !== 'adult') {
+        // A árvore dura a noite toda: se o jogador subiu ou evoluiu a skill depois de plantá-la, ela acompanha
+        if (level) {
+            // Quarto estágio (furioso): um pouco maior, alcança e bate mais
+            const fury = oak.stage === 'elder' ? M.elder : null;
+            oak.reach = level.reach * (fury ? fury.reach : 1);
+            oak.damage = level.damage * (fury ? fury.damage : 1);
+            oak.lashSeconds = level.lashSeconds;
+            oak.evolved = powers.shelterOak.evolved;
+            if (level.hp > oak.maxHp) {
+                oak.hp += level.hp - oak.maxHp;
+                oak.maxHp = level.hp;
+            }
+        }
+        if (oak.stage === 'sapling' || oak.stage === 'young') {
             oak.growthAge += dt * (1 + mod('oakGrowth'));
             if (oak.stage === 'sapling' && oak.growthAge >= M.saplingSeconds) {
                 oak.stage = 'young';
@@ -220,14 +234,58 @@ function updateShelterOak(dt) {
                 addShockwave(oak.x, oak.y, { radius: oak.reach, color: COLOR, width: 5, seconds: 0.45 });
                 audio.playSummon();
             }
-            if (oak.stage !== 'adult' && player.hp > 0 && Math.hypot(player.x - oak.x, player.y - oak.y) <= oak.healRadius) {
-                player.hp = Math.min(player.maxHp, player.hp + M.healingPerSecond * dt);
+            if (oak.stage !== 'adult' && oak.stage !== 'elder' && player.hp > 0 && Math.hypot(player.x - oak.x, player.y - oak.y) <= oak.healRadius) {
+                const healed = Math.min(player.maxHp - player.hp, M.healingPerSecond * dt);
+                player.hp += healed;
+                noteAmbientHeal(healed);       // entra no número verde junto com a cura da tocha
             }
         }
-        if (oak.stage === 'adult') oak.age += dt;
+        const grown = oak.stage === 'adult' || oak.stage === 'elder';
+        if (grown) {
+            oak.age += dt;
+            // Quarto estágio: o carvalho adulto continua crescendo (tempo + mortes) até ficar furioso de vez
+            oak.growthAge += dt * (1 + mod('oakGrowth'));
+            if (oak.stage === 'adult' && oak.growthAge >= M.elder.seconds) {
+                oak.stage = 'elder';
+                oak.transition = 0.45;
+                createExplosion(oak.x, oak.y - 34, '#4ade80', 18);
+                createExplosion(oak.x, oak.y - 30, '#7f1d1d', 8);
+                addShockwave(oak.x, oak.y, { radius: oak.reach * M.elder.reach, color: COLOR, width: 6, seconds: 0.5 });
+                audio.playSummon();
+            }
+        }
+        // A cara furiosa (os sprites "evil" da biblioteca) é a do quarto estágio, e entra aos poucos
+        oak.awake += ((oak.stage === 'elder' ? 1 : 0) - oak.awake) * Math.min(1, dt * 2);
         if (oak.transition > 0) oak.transition = Math.max(0, oak.transition - dt);
         if (oak.shake > 0) oak.shake -= dt;
-        // Acorda com monstro por perto e volta a dormir quando o perigo passa
+        // Anda, bem devagar: vai até o monstro mais perto que ainda não está ao alcance dos galhos; sem monstros, volta para
+        // perto do herói. Muda e árvore pequena ficam enraizadas.
+        oak.walking = false;
+        if (grown && oak.age > M.growSeconds) {
+            let goal = null;
+            let best = oak.reach * M.walk.seekRatio;
+            let inReach = false;
+            for (const e of state.enemies) {
+                if (e.hp <= 0) continue;
+                const d = Math.hypot(e.x - oak.x, e.y - oak.y);
+                if (d < oak.reach * 0.8 + e.radius) inReach = true;
+                if (d < best) {
+                    best = d;
+                    goal = e;
+                }
+            }
+            if (!goal && Math.hypot(player.x - oak.x, player.y - oak.y) > M.walk.heroDistance) goal = player;
+            if (goal && !inReach) {
+                const a = Math.atan2(goal.y - oak.y, goal.x - oak.x);
+                const speed = M.walk.speed * (oak.stage === 'elder' ? M.elder.walk : 1);
+                oak.x = Math.max(30, Math.min(state.width - 30, oak.x + Math.cos(a) * speed * dt));
+                oak.y = Math.max(40, Math.min(state.height - 20, oak.y + Math.sin(a) * speed * dt));
+                oak.walking = true;
+            }
+        }
+        // Raízes andando no desenho: entram e saem aos poucos (0 a 1)
+        oak.walkK = (oak.walkK ?? 0) + ((oak.walking ? 1 : 0) - (oak.walkK ?? 0)) * Math.min(1, dt * 4);
+        // Adulta: atrai os monstros por perto e chicoteia o que está ao alcance (sem "acordar": nada de rugido nem clarão)
         let near = false;
         for (const e of state.enemies) {
             if (e.hp > 0 && Math.hypot(e.x - oak.x, e.y - oak.y) < oak.reach * M.wakeRatio + e.radius) {
@@ -235,17 +293,7 @@ function updateShelterOak(dt) {
                 break;
             }
         }
-        const goal = oak.stage === 'adult' && near && oak.age > M.growSeconds ? 1 : 0;
-        if (goal > oak.awakeGoal) {
-            createExplosion(oak.x, oak.y - 30, '#7f1d1d', 10);
-            addShockwave(oak.x, oak.y, { radius: oak.reach, color: '#b91c1c', width: 4, seconds: 0.4 });
-            audio.playBossRoar?.();
-            oak.lash = 0.25;
-        }
-        oak.awakeGoal = goal;
-        oak.awake += (goal - oak.awake) * Math.min(1, dt * 7);
-        // Acordada: chicoteia o que está ao alcance
-        if (oak.awake > 0.7) {
+        if (grown && near && oak.age > M.growSeconds) {
             N.lure = oak;
             oak.lash -= dt;
             if (oak.lash <= 0) {
@@ -282,8 +330,8 @@ function updateShelterOak(dt) {
                 rootEnemy(e, EVOLUTIONS.shelterOak.thornBark.rootSeconds);
             }
         }
-        // O treant (Ancient Grove) não morre pelo tempo: só cai se os monstros acabarem com a vida dele
-        if (oak.hp <= 0 || (oak.stage === 'adult' && !oak.evolved && oak.age >= oak.seconds)) {
+        // A árvore não murcha com o tempo (nem entre ondas): só cai se os monstros acabarem com a vida dela
+        if (oak.hp <= 0) {
             N.oaks.splice(i, 1);
             timers.shelterOak = getSpellCooldown(level.cooldown);
             fellOak(oak);
@@ -573,7 +621,7 @@ function updateRoseThorns(dt) {
 // --- MORTE DE UM MONSTRO (chamado por js/systems/powers.js, onEnemyKilled) ---
 export function onNatureKill(e) {
     // Cada monstro morto (de qualquer jeito) adianta o crescimento das mudas e das árvores pequenas (a anterior à semente nova)
-    for (const oak of N.oaks) if (oak.stage !== 'adult') oak.growthAge += POWER_MODELS.shelterOak.killGrowthSeconds * (1 + mod('oakGrowth'));
+    for (const oak of N.oaks) if (oak.stage !== 'elder') oak.growthAge += POWER_MODELS.shelterOak.killGrowthSeconds * (1 + mod('oakGrowth'));
     // Dark Roses: morreu marcado, rosas de espinho brotam onde caiu
     if (e.roseMark > 0 && N.thorns.length < 14) {
         N.thorns.push({ x: e.x, y: e.y, age: 0, tick: 0.2, variant: Math.floor(Math.random() * 3) });
@@ -624,8 +672,10 @@ export function updateNatureSkills(dt) {
 }
 
 // Virada da hora: o campo fica limpo
-export function clearNatureSkills() {
-    N.oaks.length = 0;
+// all: começo de noite ou fim de jogo (a árvore NÃO sobrevive à noite); sem all (virada de onda) a árvore fica e recupera parte da vida
+export function clearNatureSkills(all = false) {
+    if (all) N.oaks.length = 0;
+    else for (const oak of N.oaks) oak.hp = Math.min(oak.maxHp, oak.hp + oak.maxHp * POWER_MODELS.shelterOak.waveHealRatio);
     N.seeds.length = 0;
     N.pods.length = 0;
     N.clouds.length = 0;
