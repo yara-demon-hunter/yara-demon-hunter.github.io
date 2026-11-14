@@ -95,6 +95,62 @@ function updateLunge(e, L, dist, angle, dt) {
     return false;
 }
 
+// O Treant para e ergue os braços antes do soco; sem marca no chão, como os golpes dos bosses.
+function updateTreantPunch(e, P, dist, angle, dt) {
+    e.punchCooldown ??= 1.6;
+    if (e.punchState === 1) {
+        e.punchTimer -= dt;
+        e.swing = 1 - Math.max(0, e.punchTimer) / P.windupSeconds;
+        if (e.punchTimer <= 0) {
+            e.punchState = 2;
+            e.punchTimer = P.strikeSeconds;
+            const hits = (x, y, radius = 0) => {
+                const dx = x - e.x, dy = y - e.y;
+                const d = Math.hypot(dx, dy);
+                const diff = Math.atan2(Math.sin(Math.atan2(dy, dx) - e.punchAngle), Math.cos(Math.atan2(dy, dx) - e.punchAngle));
+                return d <= P.range + radius && Math.abs(diff) <= P.halfAngle;
+            };
+            if (hits(player.x, player.y, CHARACTER_MODEL.collisionRadius)) {
+                hurtPlayer(e.damage * P.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            }
+            for (const clone of shadowClones) {
+                if (clone.active && hits(clone.x, clone.y, CHARACTER_MODEL.collisionRadius)) {
+                    damageShadowClone(clone, e.damage * P.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+                }
+            }
+            createExplosion(e.x + Math.cos(e.punchAngle) * 28, e.y + Math.sin(e.punchAngle) * 28, e.color, 10);
+            addShockwave(e.x + Math.cos(e.punchAngle) * 26, e.y + Math.sin(e.punchAngle) * 26, { radius: 28, color: '#a3e635', width: 5, seconds: 0.3 });
+            shakeScreen(4);
+            audio.playSlam(0.65);
+        }
+        return true;
+    }
+    if (e.punchState === 2) {
+        e.punchTimer -= dt;
+        e.swing = 1;
+        if (e.punchTimer <= 0) {
+            e.punchState = 3;
+            e.punchTimer = P.recoverySeconds;
+        }
+        return true;
+    }
+    if (e.punchState === 3) {
+        e.punchTimer -= dt;
+        e.swing = Math.max(0, e.punchTimer / P.recoverySeconds);
+        if (e.punchTimer <= 0) e.punchState = 0;
+        return true;
+    }
+    e.swing = 0;
+    e.punchCooldown -= dt;
+    if (dist > P.range || e.punchCooldown > 0) return false;
+    e.punchAngle = angle;
+    e.punchState = 1;
+    e.punchTimer = P.windupSeconds;
+    e.punchCooldown = P.cooldownSeconds;
+    e.swing = 0;
+    return true;
+}
+
 // O golpe do Colosso varre um leque: da direita dele até a frente, na direção da tocha
 function inSlamSweep(e, sweep, x, y) {
     if (Math.hypot(x - e.x, y - e.y) > sweep.radius + CHARACTER_MODEL.collisionRadius) return false;
@@ -361,11 +417,12 @@ export function updateEnemies(dt) {
             const inField = e.x > e.radius && e.x < state.width - e.radius && e.y > e.radius && e.y < state.height - e.radius;
             const holdsDistance = model.keepDistance && inField && !state.lastStand && distToTarget < model.keepDistance;
             const slamming = model.torchSlam && hunting && updateTorchSlam(e, model.torchSlam, distCore, dt);
+            const punching = model.punch && hunting && updateTreantPunch(e, model.punch, distToTarget, toTargetAngle, dt);
             if (state.phase !== 'HUNT' && hunting) return;
             const blockedByTorch = e.isBoss && distCore < CORE_MODEL.bossStopDistance + e.radius;
 
             // Preso por raízes (Natureza): não anda, mas continua atacando o que estiver ao alcance
-            if (!lunging && !holdsDistance && !blockedByTorch && !slamming && !(e.rooted > 0)) {
+            if (!lunging && !holdsDistance && !blockedByTorch && !slamming && !punching && !(e.rooted > 0)) {
                 const speed = e.speed * (1 - slow);
                 e.x += Math.cos(toTargetAngle) * speed * dt;
                 e.y += Math.sin(toTargetAngle) * speed * dt;

@@ -17,8 +17,14 @@ export const TRUNK_W = 34;
 export const TRUNK_H = 58;
 export const CROWN_W = 104;
 export const CROWN_H = 80;
+export const ANCIENT_TRUNK_W = 48;
+export const ANCIENT_TRUNK_H = 64;
+export const ANCIENT_CROWN_W = 130;
+export const ANCIENT_CROWN_H = 92;
 let trunkSprite = null;
 let crownSprite = null;
+let ancientTrunkSprite = null;
+let ancientCrownSprite = null;
 export function getTrunk() {
     if (trunkSprite) return trunkSprite;
     trunkSprite = makeCanvas(TRUNK_W * PX, TRUNK_H * PX, (g) => {
@@ -140,6 +146,312 @@ export function getCrown() {
     return crownSprite;
 }
 
+// Ancient Grove: uma copa ampla e um tronco antigo marcado pela runa verde da evolução
+export function getAncientTrunk() {
+    if (ancientTrunkSprite) return ancientTrunkSprite;
+    ancientTrunkSprite = makeCanvas(ANCIENT_TRUNK_W * PX, ANCIENT_TRUNK_H * PX, (g) => {
+        g.scale(PX, PX);
+        g.translate(ANCIENT_TRUNK_W / 2, ANCIENT_TRUNK_H - 5);
+        g.fillStyle = '#24160b';
+        g.beginPath();
+        g.moveTo(-22, 2);
+        g.quadraticCurveTo(-11, -7, -8, -14);
+        g.lineTo(8, -14);
+        g.quadraticCurveTo(11, -7, 22, 2);
+        g.quadraticCurveTo(0, 7, -22, 2);
+        g.fill();
+        g.fillStyle = '#3b2817';
+        g.beginPath();
+        g.moveTo(-11, 0);
+        g.quadraticCurveTo(-7, -27, -9, -55);
+        g.quadraticCurveTo(0, -62, 9, -55);
+        g.quadraticCurveTo(7, -27, 11, 0);
+        g.closePath();
+        g.fill();
+        g.fillStyle = '#624425';
+        g.beginPath();
+        g.moveTo(-8, -3);
+        g.quadraticCurveTo(-5, -30, -7, -54);
+        g.lineTo(-2, -57);
+        g.quadraticCurveTo(-1, -28, -3, -2);
+        g.closePath();
+        g.fill();
+        g.strokeStyle = '#21160d';
+        g.lineWidth = 1.4;
+        g.lineCap = 'round';
+        for (const [x, lean] of [[-5, -1], [1, 0.5], [6, 1]]) {
+            g.beginPath();
+            g.moveTo(x, -6);
+            g.quadraticCurveTo(x + lean * 3, -28, x + lean * 2, -50);
+            g.stroke();
+        }
+        // Raízes que sobem pelas laterais do tronco, em vez de um pé liso.
+        g.lineCap = 'round';
+        for (const side of [-1, 1]) {
+            g.strokeStyle = '#24160b';
+            g.lineWidth = 7;
+            g.beginPath();
+            g.moveTo(side * 18, 1);
+            g.bezierCurveTo(side * 12, -5, side * 15, -12, side * 8, -17);
+            g.bezierCurveTo(side * 2, -22, side * 9, -28, side * 6, -36);
+            g.stroke();
+            g.strokeStyle = '#75491f';
+            g.lineWidth = 2.8;
+            g.beginPath();
+            g.moveTo(side * 18, 1);
+            g.bezierCurveTo(side * 12, -5, side * 15, -12, side * 8, -17);
+            g.bezierCurveTo(side * 2, -22, side * 9, -28, side * 6, -36);
+            g.stroke();
+            g.strokeStyle = '#24160b';
+            g.lineWidth = 4;
+            g.beginPath();
+            g.moveTo(side * 17, -2);
+            g.bezierCurveTo(side * 21, -8, side * 15, -12, side * 11, -14);
+            g.stroke();
+        }
+        // Rosto-runa esculpido na casca, seguindo a marca verde da Ancient Grove
+        g.save();
+        g.shadowColor = '#86efac';
+        g.shadowBlur = 10;
+        g.strokeStyle = '#65ff45';
+        g.lineWidth = 3.4;
+        g.lineJoin = 'round';
+        g.beginPath();
+        g.moveTo(0, -53);
+        g.lineTo(-4, -46);
+        g.lineTo(-10, -42);
+        g.lineTo(-9, -34);
+        g.quadraticCurveTo(-11, -27, -7, -21);
+        g.lineTo(0, -13);
+        g.lineTo(7, -21);
+        g.quadraticCurveTo(11, -27, 9, -34);
+        g.lineTo(10, -42);
+        g.lineTo(4, -46);
+        g.closePath();
+        g.stroke();
+        g.beginPath();
+        g.moveTo(0, -48);
+        g.lineTo(0, -54);
+        g.lineTo(3, -49);
+        g.moveTo(-8, -41);
+        g.lineTo(-13, -46);
+        g.lineTo(-9, -38);
+        g.moveTo(8, -41);
+        g.lineTo(13, -46);
+        g.lineTo(9, -38);
+        g.moveTo(-7, -34);
+        g.lineTo(-3, -30);
+        g.lineTo(0, -34);
+        g.lineTo(3, -30);
+        g.lineTo(7, -34);
+        g.moveTo(0, -30);
+        g.lineTo(0, -19);
+        g.lineTo(-4, -24);
+        g.moveTo(0, -19);
+        g.lineTo(4, -24);
+        g.stroke();
+        g.fillStyle = '#bbf7d0';
+        g.beginPath();
+        g.ellipse(-4.5, -32, 2, 1.1, -0.35, 0, TAU);
+        g.ellipse(4.5, -32, 2, 1.1, 0.35, 0, TAU);
+        g.fill();
+        g.fillStyle = '#bbf7d0';
+        g.beginPath();
+        g.arc(0, -53, 1.8, 0, TAU);
+        g.fill();
+        g.restore();
+        g.strokeStyle = 'rgba(134, 239, 172, 0.5)';
+        g.lineWidth = 1;
+        g.beginPath();
+        g.moveTo(-13, -4);
+        g.quadraticCurveTo(-17, -9, -18, -13);
+        g.moveTo(13, -4);
+        g.quadraticCurveTo(17, -9, 18, -13);
+        g.stroke();
+    });
+    return ancientTrunkSprite;
+}
+
+export function getAncientCrown() {
+    if (ancientCrownSprite) return ancientCrownSprite;
+    ancientCrownSprite = makeCanvas(ANCIENT_CROWN_W * PX, ANCIENT_CROWN_H * PX, (g) => {
+        g.scale(PX, PX);
+        g.translate(ANCIENT_CROWN_W / 2, ANCIENT_CROWN_H / 2);
+        // Galhos principais ficam visíveis entre as poucas massas de folhas.
+        g.lineCap = 'round';
+        g.lineJoin = 'round';
+        g.strokeStyle = '#24160b';
+        g.lineWidth = 6;
+        g.beginPath();
+        // O eixo central começa acima do rosto-runa para não atravessar a marca luminosa.
+        g.moveTo(0, -5);
+        g.lineTo(-5, -7);
+        g.lineTo(-24, -23);
+        g.moveTo(-5, -7);
+        g.lineTo(-8, -31);
+        g.lineTo(-20, -43);
+        g.moveTo(-23, -22);
+        g.lineTo(-44, -18);
+        g.lineTo(-57, -29);
+        g.moveTo(0, -5);
+        g.lineTo(8, -8);
+        g.lineTo(24, -24);
+        g.lineTo(25, -42);
+        g.moveTo(8, -8);
+        g.lineTo(38, -11);
+        g.lineTo(52, -26);
+        g.moveTo(24, -24);
+        g.lineTo(43, -37);
+        g.stroke();
+        g.strokeStyle = '#75491f';
+        g.lineWidth = 2.4;
+        g.stroke();
+        const blobs = [
+            [-52, 0, 13, '#14532d'], [-46, -17, 14, '#15803d'], [-37, -31, 14, '#16a34a'],
+            [-24, -38, 14, '#22c55e'], [-9, -43, 14, '#16a34a'], [7, -43, 15, '#22c55e'],
+            [23, -39, 15, '#16a34a'], [38, -30, 15, '#15803d'], [49, -16, 15, '#16a34a'],
+            [54, 1, 13, '#14532d'], [-50, 16, 12, '#166534'], [-37, 13, 14, '#16a34a'],
+            [-23, 9, 13, '#15803d'], [-9, 5, 13, '#166534'], [8, 5, 13, '#14532d'],
+            [23, 9, 14, '#166534'], [39, 14, 13, '#15803d'], [50, 17, 11, '#14532d']
+        ];
+        for (const [x, y, r, color] of blobs) {
+            g.fillStyle = '#0b2f1b';
+            g.beginPath();
+            g.ellipse(x, y + 2, r + 1.5, r * 0.82 + 1.5, 0, 0, TAU);
+            g.fill();
+            g.fillStyle = color;
+            const points = [];
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * TAU;
+                const radius = r * ([0.9, 0.78, 1, 0.82][i % 4]);
+                points.push([x + Math.cos(angle) * radius, y + Math.sin(angle) * radius * 0.82]);
+            }
+            const last = points[points.length - 1];
+            const first = points[0];
+            g.beginPath();
+            g.moveTo((last[0] + first[0]) / 2, (last[1] + first[1]) / 2);
+            for (let i = 0; i < points.length; i++) {
+                const point = points[i];
+                const next = points[(i + 1) % points.length];
+                g.quadraticCurveTo(point[0], point[1], (point[0] + next[0]) / 2, (point[1] + next[1]) / 2);
+            }
+            g.closePath();
+            g.fill();
+        }
+        g.fillStyle = 'rgba(190, 255, 110, 0.82)';
+        for (const [x, y] of [[-43, -22], [-27, -35], [-8, -45], [9, -46], [28, -37], [45, -23], [-49, -3], [49, 4], [-25, 5], [27, 5], [-39, 20], [38, 20]]) {
+            g.beginPath();
+            g.ellipse(x, y, 2.4, 1.4, -0.5, 0, TAU);
+            g.fill();
+        }
+    });
+    return ancientCrownSprite;
+}
+
+// Raízes vivas em espiral, desenhadas antes do tronco para parecerem brotar do chão.
+export function drawAncientRoots(g, x, y, scale = 1, t = 0, motion = 0) {
+    g.save();
+    g.translate(x, y);
+    g.scale(scale, scale);
+    g.lineCap = 'round';
+    g.lineJoin = 'round';
+    for (const side of [-1, 1]) {
+        const phase = t * 2.2 + side * Math.PI;
+        const step = Math.sin(phase) * motion;
+        const sway = Math.sin(t * 1.45 + side) * 1.8 + step * 2.4;
+        const lift = Math.max(0, Math.cos(phase)) * motion * 2.2;
+        g.strokeStyle = '#24160b';
+        g.lineWidth = 6;
+        g.beginPath();
+        g.moveTo(side * 4, -3 - lift * 0.25);
+        g.bezierCurveTo(side * (11 + step), 3 - lift, side * (16 + step), 4 - lift, side * (22 + step), 1 + sway);
+        g.bezierCurveTo(side * (31 + step), -2 - lift, side * (34 + step), 8 - lift, side * (27 + step), 10 + sway);
+        g.bezierCurveTo(side * (22 + step), 12 + lift * 0.3, side * (22 + step), 6, side * (27 + step), 5 + sway);
+        g.stroke();
+        g.strokeStyle = '#5b3a1a';
+        g.lineWidth = 3.2;
+        g.beginPath();
+        g.moveTo(side * 4, -3 - lift * 0.25);
+        g.bezierCurveTo(side * (11 + step), 3 - lift, side * (16 + step), 4 - lift, side * (22 + step), 1 + sway);
+        g.bezierCurveTo(side * (31 + step), -2 - lift, side * (34 + step), 8 - lift, side * (27 + step), 10 + sway);
+        g.stroke();
+        g.fillStyle = '#86efac';
+        g.beginPath();
+        g.arc(side * (27 + step), 5 + sway - lift, 1.8, 0, TAU);
+        g.fill();
+    }
+    // Folhagem luminosa baixa, como as brotações verdes da referência.
+    for (const side of [-1, 1]) {
+        const x = side * 31;
+        g.fillStyle = '#14532d';
+        g.beginPath();
+        g.ellipse(x, 5, 10, 5, side * 0.12, 0, TAU);
+        g.fill();
+        for (let i = 0; i < 4; i++) {
+            const lx = x + side * (i - 1.5) * 3.5;
+            const ly = 3 - (i % 2) * 3;
+            g.fillStyle = i % 2 ? '#65d936' : '#9bfa38';
+            g.beginPath();
+            g.ellipse(lx, ly, 3.2, 1.8, side * -0.55, 0, TAU);
+            g.fill();
+        }
+    }
+    g.strokeStyle = '#3b2817';
+    g.lineWidth = 4;
+    g.beginPath();
+    g.moveTo(-8, 1);
+    g.quadraticCurveTo(0, 8, 8, 1);
+    g.stroke();
+    g.restore();
+}
+
+export function drawAncientMist(g, x, y, scale = 1, t = 0) {
+    g.save();
+    g.translate(x, y);
+    g.scale(scale, scale);
+    g.lineCap = 'round';
+    const groundFog = g.createRadialGradient(0, 1, 2, 0, 1, 38);
+    groundFog.addColorStop(0, 'rgba(74, 222, 128, 0.35)');
+    groundFog.addColorStop(0.55, 'rgba(74, 222, 128, 0.16)');
+    groundFog.addColorStop(1, 'rgba(74, 222, 128, 0)');
+    g.fillStyle = groundFog;
+    g.beginPath();
+    g.ellipse(0, 1, 38, 14, 0, 0, TAU);
+    g.fill();
+    for (const side of [-1, 1]) {
+        const phase = t * 1.3 + side * 1.7;
+        const drift = Math.sin(phase) * 4;
+        const rise = (Math.sin(phase * 0.7) + 1) * 4;
+        g.shadowColor = '#4ade80';
+        g.shadowBlur = 12;
+        g.strokeStyle = 'rgba(74, 222, 128, 0.12)';
+        g.lineWidth = 10;
+        g.beginPath();
+        g.moveTo(side * 22, 4);
+        g.bezierCurveTo(side * (31 + drift), 0, side * (15 - drift), -8 - rise, side * (25 + drift), -15 - rise);
+        g.bezierCurveTo(side * (34 - drift), -21 - rise, side * (19 + drift), -27 - rise, side * (28 - drift), -34 - rise);
+        g.stroke();
+        g.strokeStyle = 'rgba(134, 239, 172, 0.3)';
+        g.lineWidth = 2;
+        g.beginPath();
+        g.moveTo(side * 22, 4);
+        g.bezierCurveTo(side * (31 + drift), 0, side * (15 - drift), -8 - rise, side * (25 + drift), -15 - rise);
+        g.bezierCurveTo(side * (34 - drift), -21 - rise, side * (19 + drift), -27 - rise, side * (28 - drift), -34 - rise);
+        g.stroke();
+    }
+    g.shadowBlur = 0;
+    g.fillStyle = 'rgba(74, 222, 128, 0.24)';
+    for (let i = 0; i < 5; i++) {
+        const phase = t * 1.8 + i * 1.7;
+        const xOffset = Math.sin(phase) * (18 + i * 2);
+        const yOffset = -5 - ((t * 8 + i * 9) % 18);
+        g.beginPath();
+        g.arc(xOffset, yOffset, 1.1 + (i % 2) * 0.6, 0, TAU);
+        g.fill();
+    }
+    g.restore();
+}
+
 // Carvalho acordado: a mesma silhueta, escura e roxa, com rosto no tronco e garras nos galhos
 let evilTrunkSprite = null;
 let evilCrownSprite = null;
@@ -242,16 +554,23 @@ export function drawRootFeet(ctx, ox, oy, k, oak) {
 }
 
 // A árvore inteira num lugar só (para a prévia): tronco, pés, copa; awake 0..1 mistura a versão acordada
-export function drawOakBuddy(g, x, y, { t = 0, awake = 0, walking = false, feet = true, facing = 1 } = {}) {
+export function drawOakBuddy(g, x, y, { t = 0, awake = 0, ancient = false, walking = false, feet = true, facing = 1 } = {}) {
     const oak = { stepT: t, moving: walking, facing };
-    const tw = TRUNK_W, th = TRUNK_H, cw = CROWN_W, ch = CROWN_H;
+    const tw = ancient ? ANCIENT_TRUNK_W : TRUNK_W;
+    const th = ancient ? ANCIENT_TRUNK_H : TRUNK_H;
+    const cw = ancient ? ANCIENT_CROWN_W : CROWN_W;
+    const ch = ancient ? ANCIENT_CROWN_H : CROWN_H;
     g.globalAlpha = 1;
-    g.drawImage(getTrunk(), x - tw / 2, y - th + 5, tw, th);
-    if (awake > 0.02) { g.globalAlpha = awake; g.drawImage(getEvilTrunk(), x - tw / 2, y - th + 5, tw, th); }
+    if (ancient) {
+        drawAncientMist(g, x, y, 1, t);
+        drawAncientRoots(g, x, y + 2, 1, t);
+    }
+    g.drawImage(ancient ? getAncientTrunk() : getTrunk(), x - tw / 2, y - th + 5, tw, th);
+    if (awake > 0.02 && !ancient) { g.globalAlpha = awake; g.drawImage(getEvilTrunk(), x - tw / 2, y - th + 5, tw, th); }
     g.globalAlpha = 1;
     if (feet) drawRootFeet(g, x, y, 1, oak);
     g.globalAlpha = 0.9;
-    g.drawImage(getCrown(), x - cw / 2, y - 66 - ch / 2, cw, ch);
-    if (awake > 0.02) { g.globalAlpha = 0.9 * awake; g.drawImage(getEvilCrown(), x - cw / 2, y - 66 - ch / 2, cw, ch); }
+    g.drawImage(ancient ? getAncientCrown() : getCrown(), x - cw / 2, y - (ancient ? 72 : 66) - ch / 2, cw, ch);
+    if (awake > 0.02 && !ancient) { g.globalAlpha = 0.9 * awake; g.drawImage(getEvilCrown(), x - cw / 2, y - 66 - ch / 2, cw, ch); }
     g.globalAlpha = 1;
 }

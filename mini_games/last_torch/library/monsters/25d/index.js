@@ -25,6 +25,8 @@ import { VAMPIRE_25D_VISUALS } from './vampire/vampire25d_visual.js';
 import { renderVampire25D } from './vampire/vampire25d.js';
 import { DEMON_LORD_25D_VISUALS } from './demon_lord/demon_lord25d_visual.js';
 import { renderDemonLord25D } from './demon_lord/demon_lord25d.js';
+import { TREANT_MONSTER_25D_VISUALS } from './treant/treant25d_visual.js';
+import { renderTreantMonster25D } from './treant/treant25d.js';
 
 // --- OS MONSTROS 2.5D, EM UM LUGAR SÓ ---
 // id da pasta (monsters/25d/<id>) → { visuals: medidas e cores, render: desenha a partir do monstro do jogo }.
@@ -42,7 +44,8 @@ export const MONSTERS_25D = {
     headless_knight: { visuals: HEADLESS_KNIGHT_25D_VISUALS, render: renderHeadlessKnight25D },
     bone_colossus: { visuals: BONE_COLOSSUS_25D_VISUALS, render: renderBoneColossus25D },
     vampire: { visuals: VAMPIRE_25D_VISUALS, render: renderVampire25D },
-    demon_lord: { visuals: DEMON_LORD_25D_VISUALS, render: renderDemonLord25D }
+    demon_lord: { visuals: DEMON_LORD_25D_VISUALS, render: renderDemonLord25D },
+    treant: { visuals: TREANT_MONSTER_25D_VISUALS, render: renderTreantMonster25D }
 };
 
 export { knightHeadPosition25D };

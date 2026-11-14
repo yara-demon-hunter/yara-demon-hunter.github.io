@@ -265,7 +265,21 @@ function stampMonster(e, t) {
 
     const cycle = (t / spec.playSeconds + e.phase / TAU) % 1;
     const frame = spriteFrame(sprite, rotation, cycle);
+    const previousAlpha = ctx.globalAlpha;
+    if (e.type === 'TREANT') {
+        const actors = [player, ...state.enemies];
+        for (const actor of actors) {
+            if (!actor || actor === e || actor.hp <= 0 || actor.hidden || actor.y >= y) continue;
+            const dx = Math.abs(actor.x - x);
+            const dy = y - actor.y;
+            if (dx < width * 0.43 + (actor.radius ?? 0) && dy < height * 0.43 + (actor.radius ?? 0)) {
+                ctx.globalAlpha = previousAlpha * 0.72;
+                break;
+            }
+        }
+    }
     stamp(atlas, frame.sx, frame.sy, cell, cell, x, y, frame.rotation, width, height);
+    ctx.globalAlpha = previousAlpha;
 }
 
 // Anel girando em volta do elite, para ser reconhecido de longe
@@ -380,23 +394,25 @@ export function renderEnemies(pass = null, splitY = 0) {
     depthPass = pass;
     depthSplit = splitY;
     const t = performance.now() / 1000;
+    // Desenha de trás para frente: o ator mais abaixo na tela deve cobrir o que está mais acima.
+    const ordered = state.enemies.filter(inPass).sort((a, b) => a.y - b.y);
     renderUnderlays();
 
-    for (const e of state.enemies) {
-        if (!inPass(e)) continue;
+    for (const e of ordered) {
         if (e.elite) renderEliteMark(e);
     }
-    for (const e of state.enemies) {
-        if (!inPass(e)) continue;
+    for (const e of ordered) {
         if (!e.isBoss && !e.shadowOwner && !getMonsterSprite(e.type).spec.live) stampMonster(e, t);
     }
     resetWorldView();
 
-    for (const e of state.enemies) {
-        if (!inPass(e)) continue;
+    for (const e of ordered) {
         // Sombras do rival: o mesmo boneco dele (js/render/rival.js)
         if (e.isBoss || e.shadowOwner) drawBoss(e);
-        else if (getMonsterSprite(e.type).spec.live) (USE_25D ? MONSTERS_25D.bone_colossus.render : renderBoneColossus)(e);
+        else if (getMonsterSprite(e.type).spec.live) {
+            if (USE_25D && e.type === 'TREANT') MONSTERS_25D.treant.render(e);
+            else (USE_25D ? MONSTERS_25D.bone_colossus.render : renderBoneColossus)(e);
+        }
     }
     renderEnemyOverlays(t);
 }

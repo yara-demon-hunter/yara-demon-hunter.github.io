@@ -4,7 +4,7 @@
 // monstros, em qualquer monitor ou celular. Só a proporção (largura x altura) varia um pouco.
 export const WORLD = {
     // Cenário do chão e da névoa: o id de um cenário da biblioteca (mini_games/_library/scenery/<id>/)
-    scenery: 'dark_forest_2',
+    scenery: 'dark_forest_2', // altere para 'dark_forest_3' para comparar a variante de névoa mais leve
 
     // Telas com o menor lado menor que isso (em px do navegador) usam o perfil "mobile"
     mobileMaxShortSide: 600,

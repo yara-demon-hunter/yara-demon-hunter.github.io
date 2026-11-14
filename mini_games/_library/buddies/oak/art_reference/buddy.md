@@ -11,5 +11,6 @@
 | Pezinhos | dois pés de raiz com três dedinhos; alternam o passo ao andar (só no treant) |
 | Copa | massas de folha escuras embaixo e claras em cima, mais alta que o rosto para não cobri-lo |
 | Acordada | tudo mais escuro e roxo; olhos vermelhos, dentes e garras |
+| Ancient Grove | forma final maior, com menos folhas e galhos expostos; raízes sobem pelas laterais do tronco e se espalham pela base, entre névoa verde e um rosto-runa verde luminoso entalhado no tronco |
 
-Arquivo: `oak.js` (`getOakTrunk/Crown/EvilTrunk/EvilCrown`, `drawRootFeet`, `drawOakBuddy`). Existe também um boneco 2.5D do treant (`treant/`), que não é o que o jogo usa; fica para o Ateliê (`tuner.html?model=buddy_treant`) e para o RPG.
+Arquivo: `oak.js` (`getTrunk/Crown/EvilTrunk/EvilCrown`, `getAncientTrunk/Crown`, `drawAncientRoots`, `drawRootFeet`, `drawOakBuddy`). A imagem `images/ancient-grove-skill.webp` é a referência visual. Existe também um boneco 2.5D do treant (`treant/`), que não é o que o jogo usa; fica para o Ateliê (`tuner.html?model=buddy_treant`) e para o RPG.

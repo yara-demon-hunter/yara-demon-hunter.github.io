@@ -3,7 +3,7 @@ import { POWER_MODELS } from '../../data_model/powers.js';
 import { ctx, player, powers, state } from '../core/state.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { makeCanvas } from './fx/sprites.js';
-import { CROWN_H, CROWN_W, TRUNK_H, TRUNK_W, getCrown, getEvilCrown, getEvilTrunk, getTrunk } from '../../library/buddies/oak/oak.js';
+import { ANCIENT_CROWN_H, ANCIENT_CROWN_W, ANCIENT_TRUNK_H, ANCIENT_TRUNK_W, CROWN_H, CROWN_W, TRUNK_H, TRUNK_W, drawAncientMist, drawAncientRoots, getAncientCrown, getAncientTrunk, getCrown, getEvilCrown, getEvilTrunk, getTrunk } from '../../library/buddies/oak/oak.js';
 import { resetWorldView, stamp } from './fx/stamp.js';
 import { drawRoseMark, drawThornPatch } from '../../library/weapons/thrown.js';
 import { getMonsterSprite, spriteFrame } from './monster_sprites.js';
@@ -28,8 +28,24 @@ function oakScale(oak) {
     return base * pop;
 }
 
+// A copa passa à frente de quem está atrás dela; quando há sobreposição, fica translúcida para manter a leitura.
+function oakCanopyAlpha(oak, width, height, k) {
+    const cx = oak.x;
+    const cy = oak.y - 72 * k;
+    const rx = width * 0.43;
+    const ry = height * 0.4;
+    const overlapsBehind = (actor) => {
+        if (!actor || actor.hidden || actor.hp <= 0 || actor.y >= oak.y + actor.radius * 0.25) return false;
+        const dx = (actor.x - cx) / (rx + (actor.radius ?? 0));
+        const dy = (actor.y - cy) / (ry + (actor.radius ?? 0));
+        return dx * dx + dy * dy < 1;
+    };
+    if (overlapsBehind(player)) return 0.72;
+    for (const enemy of state.enemies) if (overlapsBehind(enemy)) return 0.72;
+    return 0.9;
+}
+
 function renderHealingRing(oak, t) {
-    if (oak.stage === 'adult' || oak.stage === 'elder') return;
     ctx.globalAlpha = 0.8;
     ctx.strokeStyle = '#4ade80';
     ctx.lineWidth = 1.8;
@@ -431,12 +447,17 @@ export function renderNatureFront() {
         // Levando pancada, treme; andando, balança de leve a cada passo
         const sway = (oak.shake > 0 ? Math.sin(oak.shake * 70) * 1.6 : 0) + (oak.walking ? Math.sin(t * 3) * 0.8 : 0);
         const k = grow * (2 - grow);
-        const tw = TRUNK_W * k;
-        const th = TRUNK_H * k;
-        const cw = CROWN_W * k;
-        const ch = CROWN_H * k;
+        const ancient = oak.stage === 'elder';
+        const tw = (ancient ? ANCIENT_TRUNK_W : TRUNK_W) * k;
+        const th = (ancient ? ANCIENT_TRUNK_H : TRUNK_H) * k;
+        const cw = (ancient ? ANCIENT_CROWN_W : CROWN_W) * k;
+        const ch = (ancient ? ANCIENT_CROWN_H : CROWN_H) * k;
         ctx.globalAlpha = fade;
         if (oak.walkK > 0.02) renderWalkingRoots(oak, k, t);
+        if (ancient) {
+            drawAncientMist(ctx, oak.x + sway, oak.y, k, t);
+            drawAncientRoots(ctx, oak.x + sway, oak.y + 2 * k, k, t, oak.walkK ?? 0);
+        }
         if (oak.stage === 'sapling') {
             ctx.fillStyle = '#78350f';
             ctx.fillRect(oak.x - 1.2, oak.y - 8 * k, 2.4, 9 * k);
@@ -446,20 +467,24 @@ export function renderNatureFront() {
             ctx.ellipse(oak.x + 3 * k, oak.y - 10 * k, 4 * k, 2 * k, 0.5, 0, TAU);
             ctx.fill();
         } else {
-            ctx.drawImage(getTrunk(), oak.x - tw / 2 + sway, oak.y - th + 5 * k, tw, th);
+            ctx.drawImage(ancient ? getAncientTrunk() : getTrunk(), oak.x - tw / 2 + sway, oak.y - th + 5 * k, tw, th);
         }
-        if (oak.awake > 0.02) {
+        if (oak.awake > 0.02 && !ancient) {
             ctx.globalAlpha = fade * oak.awake;
             ctx.drawImage(getEvilTrunk(), oak.x - tw / 2 + sway, oak.y - th + 5 * k, tw, th);
         }
         if (oak.stage !== 'sapling') {
-            ctx.globalAlpha = fade * 0.9;
-            ctx.drawImage(getCrown(), oak.x - cw / 2 + sway * 1.6, oak.y - 66 * k - ch / 2, cw, ch);
+            ctx.globalAlpha = fade * oakCanopyAlpha(oak, cw, ch, k);
+            ctx.drawImage(ancient ? getAncientCrown() : getCrown(), oak.x - cw / 2 + sway * 1.6, oak.y - (ancient ? 72 : 66) * k - ch / 2, cw, ch);
         }
-        if (oak.awake > 0.02) {
+        if (oak.awake > 0.02 && !ancient) {
             ctx.globalAlpha = fade * 0.9 * oak.awake;
             ctx.drawImage(getEvilCrown(), oak.x - cw / 2 + sway * 1.6, oak.y - 66 * k - ch / 2, cw, ch);
             drawGlow(ctx, 'rgba(239, 68, 68, 0.8)', oak.x, oak.y - 36 * k, 12, 0.35 * oak.awake);
+        }
+        if (ancient) {
+            ctx.globalAlpha = fade;
+            drawGlow(ctx, 'rgba(74, 222, 128, 0.75)', oak.x, oak.y - 35 * k, 22 * k, 0.18 + 0.18 * oak.awake);
         }
         ctx.globalAlpha = 1;
         // Chicotadas: um galho grosso que sai da copa e vai até cada monstro atingido
@@ -495,30 +520,57 @@ export function renderNatureFront() {
         ctx.fillRect(oak.x - 16, oak.y + 9, 32 * ratio, 3.5);
     }
 }
-// Raízes andando: quando o carvalho caminha, raízes saem da base, se esticam e recolhem em onda, uma de cada vez, como pés
-// arrastando a árvore. Poucos traços (5 raízes x 3 cores), só enquanto anda (oak.walkK some aos poucos quando para).
-const ROOT_STROKES = [['#1c1208', 3.2], ['#5b3a1a', 2], ['#8a5a2b', 0.8]];
+// Raízes andando: dois pés principais alternam apoio e elevação; raízes menores acompanham o arrasto.
+const ROOT_STROKES = [['#160e08', 4.2], ['#382314', 3], ['#76502b', 1.8], ['#a07842', 0.7]];
 function renderWalkingRoots(oak, k, t) {
     const base = ctx.globalAlpha;
-    ctx.globalAlpha = base * oak.walkK;
+    const move = oak.walkK;
+    ctx.globalAlpha = base * move;
     ctx.lineCap = 'round';
-    for (let i = 0; i < 5; i++) {
-        const side = i / 4 * 2 - 1;                                   // -1 (esquerda) a 1 (direita)
-        const step = 0.5 + 0.5 * Math.sin(t * 5 + i * 1.7);           // cada raiz no seu tempo: estica e recolhe
-        const len = (9 + 9 * step) * k;
-        const sx = oak.x + side * 7 * k;
-        const sy = oak.y + 2;
-        const ex = sx + side * len;
-        const ey = sy + (3 + 4 * step) * k;
-        const cx = sx + side * len * 0.5;
-        const cy = sy - 4 * k * (1 - step);                          // o meio arqueia quando a raiz recolhe
-        for (const [color, width] of ROOT_STROKES) {
+    // Sombra de contato dá peso e mantém a base legível no chão.
+    ctx.fillStyle = 'rgba(4, 12, 7, 0.3)';
+    ctx.beginPath();
+    ctx.ellipse(oak.x, oak.y + 5 * k, 19 * k, 5 * k, 0, 0, TAU);
+    ctx.fill();
+    const drawRoot = (sx, sy, ex, ey, cx, cy, width, leaf = false) => {
+        for (const [color, strokeWidth] of ROOT_STROKES) {
             ctx.strokeStyle = color;
-            ctx.lineWidth = width * Math.max(0.6, k);
+            ctx.lineWidth = strokeWidth * width * Math.max(0.65, k);
             ctx.beginPath();
             ctx.moveTo(sx, sy);
             ctx.quadraticCurveTo(cx, cy, ex, ey);
             ctx.stroke();
+        }
+        if (leaf) {
+            ctx.fillStyle = '#8bea42';
+            ctx.beginPath();
+            ctx.ellipse(ex, ey - 0.6 * k, 1.9 * k, 1 * k, Math.atan2(ey - cy, ex - cx), 0, TAU);
+            ctx.fill();
+        }
+    };
+    // Dois pés robustos: enquanto um empurra o chão, o outro avança e levanta.
+    for (const side of [-1, 1]) {
+        const phase = t * 5.4 + (side > 0 ? Math.PI : 0);
+        const stride = Math.sin(phase);
+        const lift = Math.max(0, Math.cos(phase));
+        const reach = stride * 8 * k;
+        const rise = lift * 4.5 * k;
+        const sx = oak.x + side * 4 * k;
+        const sy = oak.y + 1;
+        const ex = sx + side * 12 * k + reach;
+        const ey = sy + 6 * k - rise;
+        drawRoot(sx, sy, ex, ey, sx + side * 7 * k + reach * 0.45, sy + 2 * k - rise * 1.4, 1.25);
+        // Dedos da raiz se abrem na ponta do pé e acompanham a fase do passo.
+        for (const toe of [-1, 0, 1]) {
+            const tx = ex + side * (3.5 + Math.max(0, stride) * 2) * k;
+            const ty = ey + toe * 2.1 * k;
+            drawRoot(ex, ey, tx, ty, ex + side * 2.5 * k, ey + toe * 1.1 * k - rise * 0.12, 0.52, toe === 0);
+        }
+        // Raízes menores arrastam-se atrás do pé, com atraso para não se moverem em bloco.
+        for (const trail of [-1, 1]) {
+            const tx = sx - side * (8 + trail * 2) * k + stride * 2.5 * k;
+            const ty = sy + (4 + trail * 2) * k;
+            drawRoot(sx, sy, tx, ty, sx - side * 5 * k, sy + 2 * k - rise * 0.25, 0.48, trail > 0 && lift > 0.35);
         }
     }
     ctx.globalAlpha = base;

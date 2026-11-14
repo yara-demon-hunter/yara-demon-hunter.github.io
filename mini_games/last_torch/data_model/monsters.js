@@ -266,6 +266,28 @@ export const MONSTER_MODELS = {
         xpRewardBase: 60,
         xpRewardPerTurn: 5
     },
+    // Treant: criatura enorme, lenta e resistente que estreia na primeira fase.
+    TREANT: {
+        spawnWeight: 0.07,
+        maxAlive: 2,
+        hpBase: 420,
+        hpPerTurn: 90,
+        speedMin: 9,
+        speedMax: 12,
+        radius: 27,
+        color: '#5b3b22',
+        damage: 24,
+        knockbackResist: 0.88,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 65,
+        goldBase: 16,
+        goldVariance: 0.35,
+        xpRewardBase: 32,
+        xpRewardPerTurn: 5,
+        // Soco lento de curto alcance: o braço se ergue sem aviso no chão e o dano chega no fim da preparação.
+        punch: { cooldownSeconds: 4.8, windupSeconds: 1.35, strikeSeconds: 0.18, recoverySeconds: 0.55, range: 112, halfAngle: 0.52, damageMultiplier: 2.8 }
+    },
     // Necromante: fica longe e levanta esqueletos até alguém ir buscá-lo.
     NECROMANCER: {
         spawnWeight: 0.06,
@@ -307,7 +329,7 @@ export const BUDDY_MODELS = {
     BUDDY_TREANT: { radius: 18, color: '#5b3b22' }
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS', 'TREANT'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];

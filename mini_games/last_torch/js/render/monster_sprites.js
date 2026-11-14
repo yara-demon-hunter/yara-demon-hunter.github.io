@@ -11,6 +11,8 @@ import {
 } from '../../data_model/visuals/monsters/sprites_visual.js';
 import { BUDDIES_25D } from '../../library/buddies/index.js';
 import { MONSTERS_25D } from '../../library/monsters/25d/index.js';
+import { TREANT_MONSTER_25D_VISUALS } from '../../library/monsters/25d/treant/treant25d_visual.js';
+import { drawOakBuddy } from '../../library/buddies/oak/oak.js';
 import { VAMPIRE_VISUALS } from '../../library/monsters/topdown/vampire/vampire_visual.js';
 import { WITCH_VISUALS } from '../../library/monsters/topdown/witch/witch_visual.js';
 import { SHADOW_WOLF_VISUALS } from '../../library/monsters/topdown/shadow_wolf/shadow_wolf_visual.js';
@@ -23,7 +25,7 @@ import { ctx, setDrawTarget, state } from '../core/state.js';
 import { renderBat } from '../../library/monsters/topdown/bat/bat.js';
 import { renderBloater } from '../../library/monsters/topdown/bloater/bloater.js';
 import { renderDemonFireball, renderDemonLord } from '../../library/monsters/topdown/demon_lord/demon_lord.js';
-import { setRenderClock } from '../../library/core/clock.js';
+import { renderNow, setRenderClock } from '../../library/core/clock.js';
 import { drawGlow, getGlowSprite } from '../../library/core/glow.js';
 import { makeCanvas } from './fx/sprites.js';
 import { drawThrownDagger as drawDagger } from '../../library/weapons/dagger/thrown_dagger.js';
@@ -74,7 +76,8 @@ const ART_TOPDOWN = {
     SHADOW_WOLF: { visual: SHADOW_WOLF_VISUALS, draw: renderShadowWolf },
     ZOMBIE_WOLF: { visual: ZOMBIE_WOLF_VISUALS, draw: renderZombieWolf },
     HEADLESS_KNIGHT: { visual: HEADLESS_KNIGHT_VISUALS, draw: renderHeadlessKnight },
-    BONE_COLOSSUS: { visual: BONE_COLOSSUS_VISUALS, draw: renderBoneColossus }
+    BONE_COLOSSUS: { visual: BONE_COLOSSUS_VISUALS, draw: renderBoneColossus },
+    TREANT: { visual: TREANT_MONSTER_25D_VISUALS, draw: (e) => drawOakBuddy(ctx, e.x, e.y, { t: renderNow() / 1000, ancient: true, walking: true, facing: 1 }) }
 };
 
 // --- OS MONSTROS 2.5D ---
@@ -82,7 +85,7 @@ const ART_TOPDOWN = {
 // do chão vêm do "underlay" (bakeUnderlay), que lê visual: o 2.5D mede a aura em unidades do boneco, então vira
 // "raios do monstro" aqui; a sombra o próprio boneco já desenha.
 const FOLDER_25D = {
-    SKELETON: 'skeleton', SKELETON_CRAWLER: 'skeleton_crawler', BAT: 'bat', VAMPIRE: 'vampire', WITCH: 'witch',
+    SKELETON: 'skeleton', SKELETON_CRAWLER: 'skeleton_crawler', BAT: 'bat', VAMPIRE: 'vampire', WITCH: 'witch', TREANT: 'treant',
     NECROMANCER: 'witch', MOTH: 'moth', BLOATER: 'bloater', WRAITH: 'wraith', SHADOW_WOLF: 'shadow_wolf',
     ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight', BONE_COLOSSUS: 'bone_colossus'
 };

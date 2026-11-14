@@ -561,7 +561,7 @@ export const POWER_MODELS = {
         healingRadius: 58,
         healingPerSecond: 1,
         wakeRatio: 1.5,         // acorda com monstro a até wakeRatio x reach da árvore e volta a dormir sem ninguém por perto
-        lureRadius: 130,        // monstros a esta distância dela, com ela acordada, vão bater nela em vez de no herói
+        lureRadius: 220,        // provoca monstros comuns a longa distância para atacarem a árvore crescida
         trunkRadius: 16,        // onde os monstros batem
         hitSeconds: 0.7,        // intervalo entre golpes de um mesmo monstro na árvore
         growSeconds: 0.45,
@@ -577,7 +577,7 @@ export const POWER_MODELS = {
         name: 'Spore Pods', icon: '🍄', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `Mushrooms sprout behind you (up to ${level.max}). Only the druid can eat them: Rowan walking over one bursts it into a healing puff that restores ${formatNumber(level.heal)} health. The first monster to step on one bursts it into a cloud that poisons for ${formatMultiplier(level.dps)} spell damage per second and slows by ${formatPercent(level.slow)} for ${formatNumber(level.seconds)}s.`;
+            return `Mushrooms sprout behind you (up to ${level.max}). Only the druid can eat them, and only when injured: Rowan walking over one bursts it into a healing puff that restores ${formatNumber(level.heal)} health (up to 10 at max level). The first monster to step on one bursts it into a cloud that poisons for ${formatMultiplier(level.dps)} spell damage per second and slows by ${formatPercent(level.slow)} for ${formatNumber(level.seconds)}s.`;
         },
         get upgrades() {
             return this.levels.map(level =>
@@ -585,11 +585,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { cooldown: 5, max: 2, radius: 70, dps: 0.6, seconds: 3, slow: 0.25, heal: 1 },
-            { cooldown: 4.5, max: 3, radius: 74, dps: 0.7, seconds: 3, slow: 0.3, heal: 1.2 },
-            { cooldown: 4.5, max: 3, radius: 80, dps: 0.85, seconds: 3.5, slow: 0.3, heal: 1.5 },
-            { cooldown: 4, max: 4, radius: 84, dps: 1, seconds: 3.5, slow: 0.35, heal: 1.8 },
-            { cooldown: 3.5, max: 5, radius: 90, dps: 1.1, seconds: 4, slow: 0.4, heal: 2 }
+            { cooldown: 5, max: 2, radius: 70, dps: 0.6, seconds: 3, slow: 0.25, heal: 5 },
+            { cooldown: 4.5, max: 3, radius: 74, dps: 0.7, seconds: 3, slow: 0.3, heal: 6 },
+            { cooldown: 4.5, max: 3, radius: 80, dps: 0.85, seconds: 3.5, slow: 0.3, heal: 7.5 },
+            { cooldown: 4, max: 4, radius: 84, dps: 1, seconds: 3.5, slow: 0.35, heal: 9 },
+            { cooldown: 3.5, max: 5, radius: 90, dps: 1.1, seconds: 4, slow: 0.4, heal: 10 }
         ],
         armSeconds: 0.6,        // o cogumelo leva este tempo para ficar pronto
         triggerRadius: 24,      // monstro a esta distância o estoura; o Rowan (só ele; depois de se afastar do cogumelo que plantou) o come com a mesma distância

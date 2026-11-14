@@ -234,11 +234,12 @@ function updateShelterOak(dt) {
                 addShockwave(oak.x, oak.y, { radius: oak.reach, color: COLOR, width: 5, seconds: 0.45 });
                 audio.playSummon();
             }
-            if (oak.stage !== 'adult' && oak.stage !== 'elder' && player.hp > 0 && Math.hypot(player.x - oak.x, player.y - oak.y) <= oak.healRadius) {
-                const healed = Math.min(player.maxHp - player.hp, M.healingPerSecond * dt);
-                player.hp += healed;
-                noteAmbientHeal(healed);       // entra no número verde junto com a cura da tocha
-            }
+        }
+        // O círculo de cura continua ativo depois que o carvalho amadurece e evolui.
+        if (player.hp > 0 && Math.hypot(player.x - oak.x, player.y - oak.y) <= oak.healRadius) {
+            const healed = Math.min(player.maxHp - player.hp, M.healingPerSecond * dt);
+            player.hp += healed;
+            noteAmbientHeal(healed);       // entra no número verde junto com a cura da tocha
         }
         const grown = oak.stage === 'adult' || oak.stage === 'elder';
         if (grown) {
@@ -348,6 +349,12 @@ function podLimit(level) {
     return level.max;
 }
 
+function burstSporePod(p, level, power) {
+    N.clouds.push({ x: p.x, y: p.y, age: 0, seconds: level.seconds * power, radius: level.radius, dps: level.dps * power, slow: level.slow, seed: p.seed });
+    createExplosion(p.x, p.y, '#a3e635', 12);
+    audio.playSmoke();
+}
+
 function updateSporePods(dt) {
     const M = POWER_MODELS.sporePods;
     const level = getPowerLevel(powers.sporePods);
@@ -363,19 +370,17 @@ function updateSporePods(dt) {
         const p = N.pods[i];
         p.age += dt;
         if (p.age < M.armSeconds || !level) continue;
-        // Só o Rowan (o druida) come o cogumelo: ao pisar, ele estoura numa nuvem que CURA um pouco. Só vale depois de o herói se afastar do cogumelo que ele mesmo
-        // plantou (senão comeria cada um no instante em que nasce)
+        // Só o Rowan, e apenas quando está ferido, come o cogumelo. Precisa se afastar dele depois de plantar para não comê-lo ao nascer.
         const heroDist = Math.hypot(player.x - p.x, player.y - p.y);
         if (heroDist > M.triggerRadius + 14) p.left = true;
-        if (p.left && heroDist < M.triggerRadius && player.hp > 0 && getHero().id === 'rowan') {
+        if (p.left && heroDist < M.triggerRadius && player.hp > 0 && player.hp < player.maxHp && getHero().id === 'rowan') {
             N.pods.splice(i, 1);
+            burstSporePod(p, level, power);
             const healed = Math.min(player.maxHp - player.hp, level.heal);
             if (healed > 0) {
                 player.hp += healed;
                 addNumber(player.x, player.y - 40, healed, 1, 'heal');
             }
-            createExplosion(p.x, p.y, '#bef264', 10);
-            audio.playSmoke();
             continue;
         }
         let stepped = false;
@@ -387,9 +392,7 @@ function updateSporePods(dt) {
         }
         if (!stepped) continue;
         N.pods.splice(i, 1);
-        N.clouds.push({ x: p.x, y: p.y, age: 0, seconds: level.seconds * power, radius: level.radius, dps: level.dps * power, slow: level.slow, seed: p.seed });
-        createExplosion(p.x, p.y, '#a3e635', 12);
-        audio.playSmoke();
+        burstSporePod(p, level, power);
     }
     // Nuvens: freiam a cada quadro e envenenam a cada tique
     const tick = N.clouds.length > 0 && ready('sporeTick', dt, M.tickSeconds);

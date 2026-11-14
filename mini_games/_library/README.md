@@ -61,7 +61,7 @@ monsters/
                            bone_colossus, witch, vampire, demon_lord (boss)
   25d/<id>/                o mesmo monstro no boneco 2.5D dos heróis, para qualquer câmera: <id>25d.js,
                            <id>25d_visual.js (cores lidas do topdown) e art_reference/ (a ficha de como foi criado).
-                           Todos os do topdown têm versão 2.5D, mais o skeleton_crawler (Esqueleto Rastejante).
+                           Todos os do topdown têm versão 2.5D, mais o skeleton_crawler (Esqueleto Rastejante) e o treant (reusa a arte do buddy).
                            O Last Torch fica no desenho de cima; o 2.5D é para o yara-rpg e jogos futuros
   25d/monster25d.js        desenha qualquer monstro 2.5D a partir do monstro do jogo (animação, giro, tamanho, aura)
   25d/creature25d.js       monstros sem corpo de gente (registerCreature) e peças comuns: polígonos, chama, tronco,
