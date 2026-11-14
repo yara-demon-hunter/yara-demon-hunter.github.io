@@ -55,7 +55,18 @@ export const TREE_IMAGES = {
     wrathEvolve: img('wrath-of-heaven'),
     leechVine: img('leech-vine'),
     spiritWolves: img('shadow-wolf'),
-    darkRoses: img('dark-rose')
+    wolvesEvolve: img('the-white-wolf'),
+    oakEvolve: img('ancient-grove'),
+    oathWild: img('oath-of-the-wild'),
+    darkRoses: img('dark-rose'),
+    // Light Path
+    silentVigil: img('silent-vigil'),
+    holyGround: img('sacred-ground'),
+    groundEvolve: img('consecrated-earth'),
+    holyWater: img('holy-water'),
+    blessedBlade: img('blessed-sword'),
+    smite: img('smite'),
+    oathFaith: img('oath-of-faith')
 };
 
 // Arte de cada ramo. Ramo sem imagem usa o emoji de TREE_BRANCHES.
@@ -64,7 +75,8 @@ export const BRANCH_IMAGES = {
     shadow: img('shadow-path'),
     flame: img('flame-path'),
     curse: img('curse-path'),
-    nature: img('nature-path')
+    nature: img('nature-path'),
+    light: img('light-path')
 };
 
 // Imagem da skill pela chave do poder, passiva ou atributo (evolved: a evolução tem a própria arte)

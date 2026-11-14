@@ -27,36 +27,6 @@ function groundCross(x, y, s, alpha) {
     ctx.stroke();
 }
 
-// Círculo sagrado: brilho, anel duplo, marcas girando devagar e a cruz no centro
-function holyCircle(x, y, radius, t, alpha, withCross) {
-    ctx.globalAlpha = 0.5 * alpha;
-    drawGlow(ctx, 'rgba(253, 230, 138, 0.55)', x, y, radius * 1.05, 1);
-    ctx.strokeStyle = GOLD;
-    ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.85 * alpha;
-    ctx.beginPath();
-    ctx.ellipse(x, y, radius, radius * SQUASH, 0, 0, TAU);
-    ctx.stroke();
-    ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.5 * alpha;
-    ctx.beginPath();
-    ctx.ellipse(x, y, radius * 0.86, radius * 0.86 * SQUASH, 0, 0, TAU);
-    ctx.stroke();
-    // Marcas entre os dois anéis, girando
-    ctx.globalAlpha = 0.7 * alpha;
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 12; i++) {
-        const a = t * 0.25 + (i / 12) * TAU;
-        const c = Math.cos(a);
-        const s = Math.sin(a) * SQUASH;
-        ctx.beginPath();
-        ctx.moveTo(x + c * radius * 0.88, y + s * radius * 0.88);
-        ctx.lineTo(x + c * radius * 0.97, y + s * radius * 0.97);
-        ctx.stroke();
-    }
-    if (withCross) groundCross(x, y, radius * 0.3, 0.8 * alpha);
-}
-
 // Luz que sobe do chão (a cruz do fim e os raios): um pilar fino com brilho
 function pillar(x, y, width, height, alpha) {
     ctx.globalAlpha = alpha;
@@ -240,10 +210,7 @@ function renderRain(t) {
 export function renderLightGround() {
     const t = state.runTime;
     renderPuddles(t);
-    for (const g of L.grounds) {
-        const fade = Math.min(1, g.age / 0.3, (g.seconds - g.age) / 0.5);
-        holyCircle(g.x, g.y, g.radius * (0.7 + 0.3 * Math.min(1, g.age / 0.3)), t, Math.max(0, fade) * (g.evolved ? 1 : 0.85), g.evolved);
-    }
+    L.grounds.forEach((g, i) => renderGroundSkill(g, i, t));
     if (consecration.on) renderSacredGround(t);
     ctx.globalAlpha = 1;
 }
@@ -251,9 +218,10 @@ export function renderLightGround() {
 // Por cima: frascos no ar, raios caindo, estouros de luz e a cruz do fim da Fúria
 export function renderLightFront() {
     renderRain(state.runTime);
+    renderGroundSkillsFront(state.runTime);
     renderChurchBell();
     renderFaithShields();
-    if (!L.flasks.length && !L.drops.length && !L.bolts.length && !L.bursts.length && !consecration.on && consecration.finale <= 0) {
+    if (!L.flasks.length && !L.grounds.length && !L.drops.length && !L.bolts.length && !L.bursts.length && !consecration.on && consecration.finale <= 0) {
         ctx.globalAlpha = 1;
         return;
     }
@@ -288,159 +256,204 @@ export function renderLightFront() {
 }
 
 // --- TERRA CONSAGRADA (a Fúria do Avgustino, js/systems/fury.js) ---
-// Um selo de luz no chão: brilho dourado, anel duplo com uma faixa de runas e quatro cruzes girando devagar, uma estrela de
-// oito pontas girando ao contrário e a cruz grande no centro. A cada pulso de dano o selo acende e uma onda sai do centro.
-// Por cima: um feixe de luz desce do céu ao abrir, e pontos de luz sobem do chão enquanto dura. No fim, uma cruz de luz
-// gigante desce, crava no centro e some. Só traços e brilhos prontos: nada de sprite novo.
+// Luz, não símbolos: um clarão dourado que enche o círculo (mais forte no centro), um anel fino com contas de luz, raios suaves
+// girando devagar e, de pé na borda, uma cortina de colunas de luz que sobe e treme. A cada pulso de dano uma onda clara
+// atravessa o círculo. Ao abrir, uma cúpula de luz estoura do chão; no fim, uma cruz de luz (feita de dois feixes em forma de
+// lente, sem blocos duros) desce e crava no centro. Só gradientes e brilhos: nenhum sprite.
 const GOLD_SOFT = 'rgba(253, 230, 138, 0.55)';
 const easeOut = (k) => 1 - (1 - k) * (1 - k) * (1 - k);
+const BEADS = 28;
+const COLUMNS = 26;
 
 function renderSacredGround(t) {
     const C = consecration;
-    const open = easeOut(Math.min(1, C.age / 0.45));
-    const R = C.radius * (0.35 + 0.65 * open);
-    const glow = 0.35 + 0.35 * C.pulse;
+    const open = easeOut(Math.min(1, C.age / 0.5));
+    const R = C.radius * (0.4 + 0.6 * open);
+    const lift = 0.8 + 0.4 * C.pulse;
     ctx.save();
-    ctx.globalAlpha = glow * open;
-    drawGlow(ctx, GOLD_SOFT, C.x, C.y, R * 1.15, 1);
     ctx.translate(C.x, C.y);
     ctx.scale(1, SQUASH);
-    // Chão iluminado
-    ctx.globalAlpha = (0.1 + 0.08 * C.pulse) * open;
-    ctx.fillStyle = '#fde68a';
+    // Chão aceso: do branco-quente no centro ao dourado e sumindo na borda
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, R);
+    g.addColorStop(0, 'rgba(255, 251, 235, 0.55)');
+    g.addColorStop(0.45, 'rgba(253, 230, 138, 0.28)');
+    g.addColorStop(1, 'rgba(253, 224, 71, 0.04)');
+    ctx.globalAlpha = Math.min(1, lift) * open;
+    ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(0, 0, R, 0, TAU);
     ctx.fill();
-    // Anel duplo
+    // Raios suaves saindo do centro (setores fracos), girando devagar
+    ctx.save();
+    ctx.rotate(t * 0.12);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = 0.16 * open;
+    ctx.fillStyle = '#fde68a';
+    for (let i = 0; i < 10; i++) {
+        const a0 = (i / 10) * TAU;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, R * 0.96, a0, a0 + TAU / 20);
+        ctx.closePath();
+        ctx.fill();
+    }
+    ctx.restore();
+    // Anel fino e um segundo anel mais fraco por dentro
     ctx.globalAlpha = 0.9 * open;
-    ctx.strokeStyle = GOLD;
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#fde68a';
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
     ctx.arc(0, 0, R, 0, TAU);
     ctx.stroke();
-    ctx.lineWidth = 1.2;
+    ctx.globalAlpha = 0.35 * open;
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(0, 0, R * 0.84, 0, TAU);
+    ctx.arc(0, 0, R * 0.9, 0, TAU);
     ctx.stroke();
-    // Faixa de runas entre os anéis (traços curtos) e quatro cruzes pequenas, girando devagar
-    ctx.save();
-    ctx.rotate(t * 0.18);
-    ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.75 * open;
-    ctx.beginPath();
-    for (let i = 0; i < 28; i++) {
-        if (i % 7 === 0) continue;
-        const a = (i / 28) * TAU;
-        ctx.moveTo(Math.cos(a) * R * 0.88, Math.sin(a) * R * 0.88);
-        ctx.lineTo(Math.cos(a + 0.05) * R * 0.96, Math.sin(a + 0.05) * R * 0.96);
-    }
-    ctx.stroke();
-    ctx.lineWidth = 2.4;
-    ctx.strokeStyle = WHITE;
-    ctx.beginPath();
-    for (let i = 0; i < 4; i++) {
-        const a = (i / 4) * TAU;
-        const cx = Math.cos(a) * R * 0.92;
-        const cy = Math.sin(a) * R * 0.92;
-        ctx.moveTo(cx, cy - 7);
-        ctx.lineTo(cx, cy + 7);
-        ctx.moveTo(cx - 4.5, cy - 2);
-        ctx.lineTo(cx + 4.5, cy - 2);
-    }
-    ctx.stroke();
-    ctx.restore();
-    // Estrela de oito pontas (dois quadrados), girando ao contrário
-    ctx.save();
-    ctx.rotate(-t * 0.12);
-    ctx.globalAlpha = 0.55 * open;
-    ctx.strokeStyle = GOLD;
-    ctx.lineWidth = 1.4;
-    const s = R * 0.6;
-    for (const rot of [0, Math.PI / 4]) {
-        ctx.save();
-        ctx.rotate(rot);
-        ctx.strokeRect(-s / Math.SQRT2, -s / Math.SQRT2, s * Math.SQRT2, s * Math.SQRT2);
-        ctx.restore();
-    }
-    ctx.restore();
-    // Onda do pulso: um anel claro saindo do centro até a borda
-    if (C.pulse > 0) {
-        ctx.globalAlpha = 0.8 * C.pulse * open;
-        ctx.strokeStyle = WHITE;
-        ctx.lineWidth = 2.5;
+    // Contas de luz no anel, girando devagar
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = '#fffbeb';
+    for (let i = 0; i < BEADS; i++) {
+        const a = t * 0.2 + (i / BEADS) * TAU;
+        ctx.globalAlpha = (0.55 + 0.4 * Math.sin(t * 3 + i * 0.9)) * open;
         ctx.beginPath();
-        ctx.arc(0, 0, R * (1 - C.pulse) + 4, 0, TAU);
+        ctx.arc(Math.cos(a) * R, Math.sin(a) * R, 1.7, 0, TAU);
+        ctx.fill();
+    }
+    // Onda do pulso: um anel claro que atravessa o círculo do centro até a borda
+    if (C.pulse > 0) {
+        const w = 1 - C.pulse;
+        ctx.globalAlpha = 0.75 * C.pulse * open;
+        ctx.strokeStyle = '#fffbeb';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.arc(0, 0, R * (0.1 + 0.9 * w), 0, TAU);
         ctx.stroke();
     }
     ctx.restore();
-    // A cruz grande no centro, deitada no chão
-    ctx.lineWidth = 5;
-    groundCross(C.x, C.y, R * 0.34, (0.75 + 0.25 * C.pulse) * open);
+    // Brilho do centro (onde o padre está)
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = (0.4 + 0.25 * C.pulse) * open;
+    drawGlow(ctx, GOLD_SOFT, C.x, C.y, R * 0.55, 1);
+    ctx.restore();
     ctx.globalAlpha = 1;
 }
 
-// Por cima: o feixe que desce do céu ao abrir e os pontos de luz subindo do chão
+// Por cima: a cortina de colunas de luz na borda, a cúpula que estoura ao abrir e os pontos de luz subindo
 function renderSacredMotes(t) {
     const C = consecration;
-    if (C.age < 0.6) {
-        const k = C.age / 0.6;
-        pillar(C.x, C.y, 46 * (1 - k) + 6, 520, 1 - k * k);
+    const open = easeOut(Math.min(1, C.age / 0.5));
+    const R = C.radius * (0.4 + 0.6 * open);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    // Ao abrir: um clarão em cúpula que estoura do centro e some
+    if (C.age < 0.7) {
+        const k = C.age / 0.7;
+        ctx.globalAlpha = 0.45 * (1 - k);
+        drawGlow(ctx, 'rgba(255, 244, 200, 0.9)', C.x, C.y - 14 * k, C.radius * (0.35 + 0.9 * k), 1);
     }
-    const open = Math.min(1, C.age / 0.45);
-    ctx.fillStyle = '#fef3c7';
-    for (let i = 0; i < 22; i++) {
-        const phase = (t * 0.45 + i * 0.37) % 1;
+    // Cortina: colunas finas de luz de pé na borda, com altura e brilho tremendo de leve (um gradiente só, copiado)
+    const h = 64;
+    const grad = ctx.createLinearGradient(0, 0, 0, -h);
+    grad.addColorStop(0, 'rgba(255, 245, 200, 0.55)');
+    grad.addColorStop(0.5, 'rgba(253, 230, 138, 0.2)');
+    grad.addColorStop(1, 'rgba(253, 230, 138, 0)');
+    ctx.fillStyle = grad;
+    for (let i = 0; i < COLUMNS; i++) {
+        const a = (i / COLUMNS) * TAU + t * 0.1;
+        const x = C.x + Math.cos(a) * R;
+        const y = C.y + Math.sin(a) * R * SQUASH;
+        const shimmer = 0.65 + 0.35 * Math.sin(t * 2.4 + i * 1.7);
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(1, shimmer * open);
+        ctx.globalAlpha = Math.sin(a) < -0.3 ? 0.45 : 1;      // as de trás ficam mais fracas
+        ctx.fillRect(-1.6, -h, 3.2, h);
+        ctx.restore();
+    }
+    // Pontos de luz subindo dentro do círculo
+    ctx.fillStyle = '#fffbeb';
+    for (let i = 0; i < 18; i++) {
+        const phase = (t * 0.4 + i * 0.37) % 1;
         const a = i * 2.39996;
-        const r = C.radius * 0.92 * Math.sqrt((i * 0.618) % 1);
-        const x = C.x + Math.cos(a) * r;
-        const y = C.y + Math.sin(a) * r * SQUASH - phase * 80;
-        ctx.globalAlpha = Math.sin(phase * Math.PI) * 0.9 * open;
-        ctx.fillRect(x - 1.2, y - 1.2, 2.4, 2.4);
+        const r = C.radius * 0.9 * Math.sqrt((i * 0.618) % 1);
+        ctx.globalAlpha = Math.sin(phase * Math.PI) * 0.85 * open;
+        ctx.beginPath();
+        ctx.arc(C.x + Math.cos(a) * r, C.y + Math.sin(a) * r * SQUASH - phase * 70, 1.4, 0, TAU);
+        ctx.fill();
     }
+    ctx.restore();
     ctx.globalAlpha = 1;
 }
 
-// A cruz de luz gigante do fim: desce do céu (primeiro terço), crava no centro com um clarão e some aos poucos
+// Feixe em forma de lente (afunila nas duas pontas): o braço de uma cruz de luz, branco no miolo e dourado nas bordas
+function lensBeam(x, y, length, thick, vertical, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (!vertical) ctx.rotate(-Math.PI / 2);
+    ctx.globalAlpha = alpha;
+    const half = length / 2;
+    ctx.beginPath();
+    ctx.moveTo(0, -half);
+    ctx.quadraticCurveTo(thick, 0, 0, half);
+    ctx.quadraticCurveTo(-thick, 0, 0, -half);
+    ctx.closePath();
+    const g = ctx.createLinearGradient(-thick, 0, thick, 0);
+    g.addColorStop(0, 'rgba(253, 224, 71, 0.15)');
+    g.addColorStop(0.5, 'rgba(255, 251, 235, 1)');
+    g.addColorStop(1, 'rgba(253, 224, 71, 0.15)');
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.restore();
+}
+
+// A cruz de luz do fim: desce do céu bem rápido, crava no centro e vira um clarão que se abre e some
 function renderFinaleCross() {
     const C = consecration;
     const k = 1 - C.finale / CONSECRATION_FINALE_SECONDS;
-    const fall = Math.min(1, k / 0.18);      // desce rápido: o golpe (dano e onda) acontece na hora em que ela crava
-    const fade = k < 0.18 ? 1 : 1 - (k - 0.18) / 0.82;
-    const h = 190;
-    const w = 24;
-    const drop = (1 - easeOut(fall)) * 320;
-    const baseY = C.y - drop;
+    const fall = Math.min(1, k / 0.18);
+    const fade = k < 0.18 ? 1 : Math.max(0, 1 - (k - 0.18) / 0.82);
+    const drop = (1 - easeOut(fall)) * 300;
+    const cy = C.y - 90 - drop;
     ctx.save();
-    ctx.globalAlpha = 0.7 * fade;
-    drawGlow(ctx, 'rgba(254, 243, 199, 0.85)', C.x, baseY - h * 0.55, 120, 1);
-    ctx.globalAlpha = fade;
-    ctx.fillStyle = WHITE;
-    ctx.strokeStyle = GOLD;
-    ctx.lineWidth = 3;
-    // Haste em pé e a travessa no alto
-    ctx.fillRect(C.x - w / 2, baseY - h, w, h);
-    ctx.strokeRect(C.x - w / 2, baseY - h, w, h);
-    ctx.fillRect(C.x - w * 2.6, baseY - h * 0.74, w * 5.2, w);
-    ctx.strokeRect(C.x - w * 2.6, baseY - h * 0.74, w * 5.2, w);
-    ctx.restore();
+    ctx.globalCompositeOperation = 'lighter';
+    // Brilho em volta da cruz
+    ctx.globalAlpha = 0.65 * fade;
+    drawGlow(ctx, 'rgba(255, 244, 200, 0.9)', C.x, cy, 90 + 30 * (1 - fade), 1);
+    // Os dois braços (um raio vertical comprido e a travessa mais curta), mais finos conforme some
+    const sharp = 0.6 + 0.4 * fade;
+    lensBeam(C.x, cy - 10, 210, 11 * sharp, true, fade);
+    lensBeam(C.x, cy - 40, 120, 9 * sharp, false, fade);
     // O impacto: clarão no chão que abre e some
     if (fall >= 1) {
         const hit = Math.min(1, (k - 0.18) / 0.82);
-        ctx.globalAlpha = 0.8 * (1 - hit);
-        drawGlow(ctx, 'rgba(254, 249, 231, 0.95)', C.x, C.y, C.finaleRadius * (0.5 + 0.6 * hit), 1);
+        ctx.globalAlpha = 0.85 * (1 - hit);
+        drawGlow(ctx, 'rgba(255, 251, 235, 0.95)', C.x, C.y, C.finaleRadius * (0.45 + 0.7 * hit), 1);
+        ctx.globalAlpha = 0.6 * (1 - hit);
+        ctx.strokeStyle = '#fffbeb';
+        ctx.lineWidth = 2.5 * (1 - hit) + 1;
+        ctx.beginPath();
+        ctx.ellipse(C.x, C.y, C.finaleRadius * (0.3 + 0.8 * hit), C.finaleRadius * (0.3 + 0.8 * hit) * SQUASH, 0, 0, TAU);
+        ctx.stroke();
     }
+    ctx.restore();
     ctx.globalAlpha = 1;
 }
 
 // --- CHURCH BELL: o sino sobre a tocha e as ondas de som ---
-// Sino dourado translúcido pendurado numa viga curta acima da chama; balança quando toca (amortecendo) e acende. Cada
+// Sino dourado translúcido flutuando em volta da tocha, em cima da chama; balança forte quando toca (amortecendo) e acende. Cada
 // badalada solta um anel dourado no chão que abre da tocha até o alcance, e dois arcos de "som" sobem do sino.
-const BELL_Y = 104;                 // altura do sino acima da base da tocha, px
+const BELL_Y = 104;                 // altura média do sino acima da base da tocha, px
+const BELL_ORBIT = { x: 38, y: 9, speed: 0.7, bob: 3 };   // o sino flutua em volta da tocha, em cima: raio (largura e altura), rad/s e subida e descida
 function renderChurchBell() {
     if (powers.churchBell.lvl <= 0) return;
     const B = L.bell;
-    const x = state.coreX;
-    const y = state.coreY - BELL_Y;
+    // O sino flutua devagar em volta da tocha (uma elipse acima dela) e balança um pouquinho; ao tocar, faz a animação de sempre
+    const tt = performance.now() / 1000;
+    const orbit = tt * BELL_ORBIT.speed;
+    const x = state.coreX + Math.cos(orbit) * BELL_ORBIT.x;
+    const y = state.coreY - BELL_Y + Math.sin(orbit) * BELL_ORBIT.y + Math.sin(tt * 1.7) * BELL_ORBIT.bob;
     // Anéis no chão
     for (const ring of L.bellRings) {
         const k = ring.age / ring.seconds;
@@ -465,15 +478,8 @@ function renderChurchBell() {
             ctx.stroke();
         }
     }
-    // A viga e o sino
-    const swing = Math.sin(performance.now() / 1000 * 9) * 0.45 * B.swing;
-    ctx.globalAlpha = 0.9;
-    ctx.strokeStyle = '#3f2a14';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(x - 13, y - 17);
-    ctx.lineTo(x + 13, y - 17);
-    ctx.stroke();
+    // O sino flutuando (sem viga): inclina de leve com o movimento e balança forte ao tocar
+    const swing = Math.sin(tt * 9) * 0.45 * B.swing + Math.sin(tt * 1.3) * 0.06 + Math.cos(orbit) * 0.05;
     ctx.save();
     ctx.translate(x, y - 16);
     ctx.rotate(swing);
@@ -551,6 +557,137 @@ function renderFaithShields() {
         ctx.moveTo(x - s * 0.42, y - s * 0.12);
         ctx.lineTo(x + s * 0.42, y - s * 0.12);
         ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+}
+
+// --- SACRED GROUND / CONSECRATED EARTH (a skill do círculo de luz; js/systems/skills_light.js) ---
+// Sacred Ground: um chão aceso de luz dourada, anel fino com contas, seis velas com a chama tremendo (a arte do ícone: as duas
+// velas com auréola) e pontos de luz subindo. Consecrated Earth (evoluída): o mesmo, mais raios suaves girando e CRUZES DE LUZ que
+// sobem do centro uma atrás da outra, com uma auréola no alto, como almas subindo. Só gradientes e brilhos.
+function groundLife(g) {
+    return Math.max(0, Math.min(1, g.age / 0.35, (g.seconds - g.age) / 0.6));
+}
+
+function renderGroundSkill(g, index, t) {
+    const life = groundLife(g);
+    if (life <= 0) return;
+    const R = g.radius * (0.55 + 0.45 * easeOut(Math.min(1, g.age / 0.4)));
+    ctx.save();
+    ctx.translate(g.x, g.y);
+    ctx.scale(1, SQUASH);
+    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, R);
+    grad.addColorStop(0, `rgba(255, 251, 235, ${g.evolved ? 0.42 : 0.3})`);
+    grad.addColorStop(0.55, 'rgba(253, 230, 138, 0.2)');
+    grad.addColorStop(1, 'rgba(253, 224, 71, 0.03)');
+    ctx.globalAlpha = life;
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, 0, R, 0, TAU);
+    ctx.fill();
+    if (g.evolved) {
+        // Raios suaves girando devagar
+        ctx.save();
+        ctx.rotate(t * 0.14 + index);
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.085 * life;
+        ctx.fillStyle = '#fde68a';
+        for (let i = 0; i < 12; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, R * 0.96, (i / 12) * TAU, (i / 12) * TAU + TAU / 30);
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+    ctx.globalAlpha = 0.85 * life;
+    ctx.strokeStyle = '#fde68a';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.arc(0, 0, R, 0, TAU);
+    ctx.stroke();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = '#fffbeb';
+    const beads = g.evolved ? 22 : 16;
+    for (let i = 0; i < beads; i++) {
+        const a = t * 0.2 + (i / beads) * TAU;
+        ctx.globalAlpha = (0.5 + 0.4 * Math.sin(t * 3 + i)) * life;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a) * R, Math.sin(a) * R, 1.5, 0, TAU);
+        ctx.fill();
+    }
+    ctx.restore();
+    // Velas no anel: cera branca e chama tremendo (seis; a Consecrated Earth tem oito)
+    const candles = g.evolved ? 8 : 6;
+    for (let i = 0; i < candles; i++) {
+        const a = (i / candles) * TAU + Math.PI / candles;
+        const x = g.x + Math.cos(a) * R * 0.96;
+        const y = g.y + Math.sin(a) * R * 0.96 * SQUASH;
+        const flick = 0.8 + 0.2 * Math.sin(t * 11 + i * 2.3) + 0.08 * Math.sin(t * 27 + i);
+        ctx.globalAlpha = life;
+        ctx.fillStyle = '#f5f0e1';
+        ctx.fillRect(x - 1.6, y - 5, 3.2, 5);
+        ctx.fillStyle = '#cfc6ad';
+        ctx.fillRect(x - 1.6, y - 5, 1, 5);
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.6 * life * flick;
+        drawGlow(ctx, 'rgba(253, 224, 71, 0.9)', x, y - 8, 7, 1);
+        ctx.restore();
+        ctx.globalAlpha = life;
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath();
+        ctx.ellipse(x, y - 8, 1.7, 3.2 * flick, 0, 0, TAU);
+        ctx.fill();
+        ctx.fillStyle = '#fde68a';
+        ctx.beginPath();
+        ctx.ellipse(x, y - 7.4, 0.9, 1.8 * flick, 0, 0, TAU);
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+}
+
+// Por cima: pontos de luz subindo e, na Consecrated Earth, as cruzes de luz subindo do centro com a auréola no alto
+function renderGroundSkillsFront(t) {
+    for (const [index, g] of L.grounds.entries()) {
+        const life = groundLife(g);
+        if (life <= 0) continue;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = '#fffbeb';
+        for (let i = 0; i < 9; i++) {
+            const phase = (t * 0.4 + i * 0.31 + index * 0.17) % 1;
+            const a = i * 2.39996;
+            const r = g.radius * 0.85 * Math.sqrt((i * 0.618) % 1);
+            ctx.globalAlpha = Math.sin(phase * Math.PI) * 0.8 * life;
+            ctx.beginPath();
+            ctx.arc(g.x + Math.cos(a) * r, g.y + Math.sin(a) * r * SQUASH - phase * 46, 1.3, 0, TAU);
+            ctx.fill();
+        }
+        if (g.evolved) {
+            // Duas cruzes de luz defasadas: cada uma nasce no centro, sobe devagar crescendo, ganha uma auréola e some no alto
+            for (let c = 0; c < 2; c++) {
+                const p = (t * 0.32 + c * 0.5 + index * 0.23) % 1;
+                const fadeIn = Math.min(1, p / 0.2);
+                const fadeOut = Math.min(1, (1 - p) / 0.35);
+                const a = fadeIn * fadeOut * life;
+                const scale = 0.55 + 0.45 * Math.min(1, p / 0.5);
+                const cy = g.y - 8 - p * g.radius * 1.15;
+                ctx.globalAlpha = 0.3 * a;
+                drawGlow(ctx, 'rgba(255, 244, 200, 0.9)', g.x, cy, 20 * scale, 1);
+                lensBeam(g.x, cy, 76 * scale, 5.6 * scale, true, a);
+                lensBeam(g.x, cy - 12 * scale, 46 * scale, 4.4 * scale, false, a);
+                // Auréola flutuando sobre o alto da cruz
+                ctx.globalAlpha = 0.8 * a;
+                ctx.strokeStyle = '#fde68a';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.ellipse(g.x, cy - 46 * scale, 10 * scale, 3.4 * scale, 0, 0, TAU);
+                ctx.stroke();
+            }
+        }
+        ctx.restore();
     }
     ctx.globalAlpha = 1;
 }
