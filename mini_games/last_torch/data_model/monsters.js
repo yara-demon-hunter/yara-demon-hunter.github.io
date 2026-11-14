@@ -266,7 +266,7 @@ export const MONSTER_MODELS = {
         xpRewardBase: 60,
         xpRewardPerTurn: 5
     },
-    // Treant: criatura enorme, lenta e resistente que estreia na primeira fase.
+    // Treant: criatura enorme, lenta e resistente; só aparece a partir da wave 3.
     TREANT: {
         spawnWeight: 0.07,
         maxAlive: 2,

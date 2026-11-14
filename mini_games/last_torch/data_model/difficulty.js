@@ -52,8 +52,8 @@ export const TURN_DIFFICULTY = {
         WRAITH: 5,
         NECROMANCER: 6,
         HEADLESS_KNIGHT: 6,
-        BONE_COLOSSUS: 7,
-        TREANT: 1
+        TREANT: 3,
+        BONE_COLOSSUS: 8
     }
 };
 
