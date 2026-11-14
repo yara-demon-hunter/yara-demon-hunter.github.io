@@ -1,3 +1,4 @@
+import { ROSE_SKILL } from '../../data_model/skills.js';
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
@@ -339,6 +340,11 @@ export function updateEnemies(dt) {
 
         const toTargetAngle = Math.atan2(targetY - e.y, targetX - e.x);
         // Imparável (Captain Brutos): nada o atrasa
+        // Lentidão com tempo (a rosa do druida): enquanto durar, vale como a lentidão de qualquer outro efeito
+        if (e.roseSlowTimer > 0) {
+            e.roseSlowTimer -= dt;
+            e.slow = Math.max(e.slow ?? 0, ROSE_SKILL.slow);
+        }
         const slow = e.unstoppable ? 0 : (e.slow ?? 0);
         e.slow = 0;
 

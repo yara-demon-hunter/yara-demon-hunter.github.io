@@ -2,7 +2,7 @@ import { CHARACTER_MODEL, getXpToNextLevel } from '../../data_model/character.js
 import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
 import { EVOLUTIONS } from '../../data_model/powers.js';
 import { preloadTreeImages, treeImageFor, paintIcon } from '../../data_model/tree_images.js';
-import { DARKNESS, getHourName } from '../../data_model/night.js';
+import { DARKNESS, getHourName, startingSkillPoints } from '../../data_model/night.js';
 import { START } from '../../data_model/start.js';
 import { save, persist } from '../core/save.js';
 import { clearRun, loadRun, saveRun } from '../core/run_save.js';
@@ -83,8 +83,8 @@ export function startGame() {
     state.streakTimer = 0;
     state.multiKill = 0;
     state.multiTimer = 0;
-    // Cada nível de Escuridão rende 1 ponto de skill inicial (Escuridão 1 = 1 ponto, 2 = 2, ...)
-    state.skillPoints = save.darkness;
+    // Cada nível de Escuridão rende 2 pontos de skill inicial (Escuridão 1 = 2, 2 = 4, 3 = 6, ...): só no começo (DARKNESS.startPointsPerLevel)
+    state.skillPoints = startingSkillPoints(save.darkness);
     state.levelPointsCarry = 0;
     state.tree = {};
     state.pickupPity = 0;
@@ -399,7 +399,8 @@ export function renderStartScreen() {
     btnContinue.classList.toggle('hidden', !resumable);
     if (resumable) btnContinue.innerHTML = `CONTINUE<em>${HEROES[run.hero].name} · Wave ${run.turn}${run.kind === 'camp' ? ' · camp' : ''}</em>`;
     document.getElementById('darknessValue').innerText = save.darkness;
-    dark.title = `Start with ${save.darkness} skill point${save.darkness === 1 ? '' : 's'}`;
+    const startPoints = startingSkillPoints(save.darkness);
+    dark.title = `Start with ${startPoints} skill point${startPoints === 1 ? '' : 's'}`;
     paintHeroPortrait(document.getElementById('heroPortrait'), hero);
 }
 

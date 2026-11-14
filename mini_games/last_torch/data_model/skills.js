@@ -61,6 +61,12 @@ export const SPELL_SKILL = {
 };
 
 // Faca de arremesso: golpe separado da lâmina, com recarga própria. Anda enquanto arremessa.
+// A rosa do druida (Rowan) deixa o monstro atingido mais lento (as outras armas de arremesso não)
+export const ROSE_SKILL = {
+    slowSeconds: 4,
+    slow: 0.35              // 35% mais lento
+};
+
 export const KNIFE_SKILL = {
     cooldownSeconds: 0.9,
     speed: 520,

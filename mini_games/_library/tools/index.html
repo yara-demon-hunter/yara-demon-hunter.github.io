@@ -133,7 +133,7 @@
         try {
             group('Heróis', HEROES.map(([id, name]) => [`tuner.html?model=${id}`, name]));
             group('Monstros', MONSTERS.map(([id, name]) => [`tuner.html?model=${id}`, name]));
-            group('Buddies', [['buddy_viewer.html', 'Fênix, corvo e caveira', 'animados'], ['tuner.html?model=buddy_shadow_wolf', 'Shadow Wolf', '2.5D'], ['tuner.html?model=white_wolf', 'White Wolf', '2.5D']]);
+            group('Buddies', [['buddy_viewer.html', 'Fênix, corvo, caveira e carvalho', 'animados'], ['tuner.html?model=buddy_shadow_wolf', 'Shadow Wolf', '2.5D'], ['tuner.html?model=white_wolf', 'White Wolf', '2.5D'], ['tuner.html?model=buddy_treant', 'Treant (árvore andante)', '2.5D']]);
             group('Cenários', sceneryIds().map(id => {
                 const pieces = createScenery(id).visual.props;
                 return [`scenery_tuner.html?scenery=${id}`, id, pieces ? `${pieces.length} peças` : 'desenho próprio'];

@@ -12,6 +12,7 @@ import { purgeEnemy } from './enemies.js';
 import { refreshModifiers } from './modifiers.js';
 import { collectAllPickups } from './pickups.js';
 import { bumpStat } from './sanctuary.js';
+import { resetStreak } from './streak.js';
 import { hasBossIntro, playBossIntro, playDuelDialogue, whenHunting } from '../ui/dialogue.js';
 import { buildHourPlan, prepareBossSummon, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
@@ -24,6 +25,7 @@ const DEATH_SLOW = 0.28;
 
 export function startHour() {
     const hour = state.turn;
+    resetStreak();
     state.phase = 'HUNT';
     state.scoreTurn = 0;
     state.targetScore = getTurnDifficulty(hour).targetScore;

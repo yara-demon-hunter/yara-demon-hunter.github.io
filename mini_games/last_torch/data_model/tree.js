@@ -177,7 +177,7 @@ export const TREE_NODES = [
     { id: 'rootsEvolve', branch: 'nature', kind: 'evolve', key: 'graspingRoots', x: 2, y: 0, requires: [req('graspingRoots', 5)] },
     { id: 'thornBurst', branch: 'nature', kind: 'passive', key: 'thornBurst', x: 3, y: 0, requires: [req('rootsEvolve')] },
     // Linha 2, o carvalho: Wicked Oak -> Ancient Grove -> Leech Vine (as videiras saem do carvalho) -> Oath
-    { id: 'shelterOak', branch: 'nature', kind: 'power', key: 'shelterOak', x: 1, y: 1, cost: 1, requires: [req('wildHeart', 2)] },
+    { id: 'shelterOak', branch: 'nature', kind: 'power', key: 'shelterOak', x: 1, y: 1, cost: 1, requires: [req('wildHeart')] },
     { id: 'oakEvolve', branch: 'nature', kind: 'evolve', key: 'shelterOak', x: 2, y: 1, requires: [req('shelterOak', 5)] },
     { id: 'leechVine', branch: 'nature', kind: 'power', key: 'leechVine', x: 3, y: 1, requires: [req('oakEvolve')] },
     // Linha 3, os esporos e o lobo: Spore Pods -> Plague Garden -> Shadow Wolf -> The White Wolf

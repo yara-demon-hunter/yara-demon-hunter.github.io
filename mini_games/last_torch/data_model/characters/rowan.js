@@ -19,8 +19,8 @@ export const ROWAN = {
     colors: ROWAN_VISUALS.colors,
     portrait: '',
     portraitImage: 'images/characters/rowan-small.webp',
-    // Liberado pela conquista Into the Hush (chegar à onda 3; data_model/sanctuary.js). unlockHint: aviso no cartão bloqueado
-    unlockHint: 'Reach Wave 3',
+    // Liberado pela conquista First Light (terminar a onda 1; data_model/sanctuary.js). unlockHint: aviso no cartão bloqueado
+    unlockHint: 'Survive Wave 1',
 
     // --- NÚMEROS: todos os parâmetros do personagem, nenhum escondido (0 / false = não tem) ---
     stats: {

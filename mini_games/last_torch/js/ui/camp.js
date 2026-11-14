@@ -12,6 +12,7 @@ import { feedTorch } from '../systems/torch.js';
 import { hasBuyableNode } from '../systems/tree.js';
 import { updateHUD } from './hud.js';
 import { reportProgress } from './screens.js';
+import { resetStreak } from '../systems/streak.js';
 import { openStatus } from './status.js';
 import { relicTree } from './tree.js';
 
@@ -84,6 +85,7 @@ function renderNext() {
 // resumed: voltando de um CONTINUE, o acampamento já aconteceu (ouro recolhido, tocha alimentada): não repete
 export function openCamp(resumed = false) {
     state.gameState = 'CAMP';
+    resetStreak();
     if (!resumed) {
         collectAllGold();
         feedTorch(CAMP.freeTorchHeal);

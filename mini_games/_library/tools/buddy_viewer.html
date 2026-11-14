@@ -32,19 +32,19 @@
 <div class="wrap">
     <a class="back" href="index.html">← Ateliê</a>
     <h1>Buddies</h1>
-    <p class="lead">Quem anda e luta ao lado do herói. Aves e caveira são desenhos 2D animados (aqui, a 3x); os lobos são bonecos 2.5D e abrem no tuner,
+    <p class="lead">Quem anda e luta ao lado do herói. Aves, caveira e carvalho são desenhos 2D animados (aqui, a 3x); os lobos são bonecos 2.5D e abrem no tuner,
         onde dá para ajustar medidas e cores ao vivo. O que cada um FAZ (vida, mordida, mira) fica no jogo.</p>
     <div class="grid" id="grid"></div>
     <p class="note">Arte: <code>mini_games/_library/buddies/&lt;id&gt;/</code> (desenho, cores e <code>art_reference/</code> com a ficha <code>buddy.md</code> e <code>images/</code>).
         Depois de mudar um <code>_visual.js</code>, rode <code>ruby mini_games/_library/sync.rb</code>.</p>
 </div>
 <script type="module">
-    import { preparePhoenix, renderPhoenixBuddy, prepareRaven, renderRavenBuddy, drawGraveWisp } from '../buddies/index.js';
+    import { preparePhoenix, renderPhoenixBuddy, prepareRaven, renderRavenBuddy, drawGraveWisp, drawOakBuddy } from '../buddies/index.js';
 
     const grid = document.getElementById('grid');
     const W = 360;
     const H = 270;
-    const state = { phoenix: { action: false, rise: false }, raven: { action: false, rise: false }, wisp: { action: false } };
+    const state = { phoenix: { action: false, rise: false }, raven: { action: false, rise: false }, wisp: { action: false }, oak: { action: false, walk: true } };
 
     function card(id, title, text, extra) {
         const box = document.createElement('div');
@@ -87,6 +87,11 @@
     // Caveira
     const ws = card('wisp', 'Caveira voadora (Grave Wisp)', 'Caveira em chamas roxas que acompanha o herói; a chama cresce quando ela atira.');
     toggle(ws.row, 'Atirando (chama cresce)', 'wisp', 'action');
+    // Carvalho
+    const ok = card('oak', 'Carvalho / Treant (árvore andante)', 'A árvore do Wicked Oak: rosto assombrado e bracinhos de galho (parada no jogo). Acordada, fica escura e roxa, com garras. Os pezinhos de raiz andando ficam na biblioteca, mas o jogo não os usa.');
+    toggle(ok.row, 'Acordada (assombrada)', 'oak', 'action');
+    toggle(ok.row, 'Andando (pezinhos)', 'oak', 'walk');
+    ok.row.lastChild.classList.add('on');
     // Lobos (2.5D): abrem no tuner
     for (const [id, title, text] of [
         ['buddy_shadow_wolf', 'Shadow Wolf', 'O lobo do Rowan: negro, peludo, agachado, olhos vermelhos e chama roxa escura. Boneco 2.5D.'],
@@ -97,7 +102,7 @@
         link(c.row, 'Abrir no tuner (ajustar ao vivo)', `tuner.html?model=${id}`);
     }
 
-    const sizes = { phoenix: ph.canvas, raven: rv.canvas, wisp: ws.canvas };
+    const sizes = { phoenix: ph.canvas, raven: rv.canvas, wisp: ws.canvas, oak: ok.canvas };
     const t0 = performance.now();
     preparePhoenix(false);
     prepareRaven(false);
@@ -113,6 +118,7 @@
             const rise = state[key].rise ? Math.min(1, (t % 3) / 1.6) : 1;
             if (key === 'phoenix') renderPhoenixBuddy(g, { x: cx, y: cy, facing: 1, tilt: Math.sin(t * 1.4) * 0.12, flash: state.phoenix.action ? 1 : 0, rise }, 0);
             if (key === 'raven') renderRavenBuddy(g, { x: cx, y: cy, facing: 1, tilt: Math.sin(t * 1.6) * 0.1 - (state.raven.action ? 0.3 : 0), dive: state.raven.action ? 1 : 0, rise });
+            if (key === 'oak') { g.setTransform(3, 0, 0, 3, 0, 0); drawOakBuddy(g, W / 3, 160, { t, awake: state.oak.action ? 1 : 0, walking: state.oak.walk, facing: 1 }); }
             if (key === 'wisp') drawGraveWisp(g, cx, cy, t, state.wisp.action ? 1 : 0);
         }
         requestAnimationFrame(frame);

@@ -27,6 +27,15 @@ export function addStreakKill() {
     }
 }
 
+// O combo acaba com a onda: ao abrir o acampamento e ao começar a próxima, ele recomeça do zero (a onda fechando estende o
+// tempo dele só para a comemoração; sem isto o combo e o Rush voltavam junto com a onda seguinte). O recorde fica guardado.
+export function resetStreak() {
+    state.streak = 0;
+    state.streakTimer = 0;
+    state.multiKill = 0;
+    state.multiTimer = 0;
+}
+
 // Prêmio do marco: cura, moedas e, nos marcos altos, pontos de skill (uma vez por onda cada marco)
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 function payTier(tier, index) {

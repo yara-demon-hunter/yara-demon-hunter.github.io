@@ -1,5 +1,5 @@
 import { FAN_OF_KNIVES, FIREBALLS, SHADOW_CLONE } from '../../data_model/passives.js';
-import { KNIFE_SKILL } from '../../data_model/skills.js';
+import { KNIFE_SKILL, ROSE_SKILL } from '../../data_model/skills.js';
 import { KNIFE_VISUALS as K } from '../../data_model/visuals/effects/knife_visual.js';
 import { getThrownWeapon } from '../../library/weapons/thrown.js';
 import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
@@ -249,6 +249,7 @@ export function updateKnives(dt) {
         if (hit) {
             dealDamage(hit, k.damage, { style: k.fire ? 'spell' : null, kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
             markEnemy(hit);
+            if (k.style === 'rose' || k.style === 'darkRose') hit.roseSlowTimer = ROSE_SKILL.slowSeconds;       // a rosa do druida deixa o monstro lento
             if (k.style === 'darkRose') markWithRose(hit);
             if (k.fire) burstFireball(k, hit);
             createExplosion(k.x, k.y, hit.color, 6);

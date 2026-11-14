@@ -14,7 +14,8 @@ export const RELIC_LAYOUT = {
 export const RELIC_BRANCHES = {
     fortune: { name: 'FORTUNE', icon: '💰', color: '#fcd34d' },
     ward: { name: 'WARD', icon: '🛡️', color: '#6ee7b7' },
-    wrath: { name: 'WRATH', icon: '😈', color: '#fb7185' }
+    wrath: { name: 'WRATH', icon: '😈', color: '#fb7185' },
+    thicket: { name: 'THICKET', icon: '🪵', color: '#86efac' }
 };
 
 export const RELIC_NODES = [
@@ -64,7 +65,17 @@ export const RELIC_NODES = [
     // Terceira fileira, para magos: começa do zero, sem depender do Shadow
     { id: 'occultTome', branch: 'wrath', kind: 'relic', key: 'occultTome', x: 0, y: 2, requires: [] },
     { id: 'wizardsWand', branch: 'wrath', kind: 'relic', key: 'wizardsWand', x: 1, y: 2, requires: [req('occultTome')] },
-    { id: 'owlsWisdom', branch: 'wrath', kind: 'relic', key: 'owlsWisdom', x: 2, y: 2, requires: [req('wizardsWand')] }
+    { id: 'owlsWisdom', branch: 'wrath', kind: 'relic', key: 'owlsWisdom', x: 2, y: 2, requires: [req('wizardsWand')] },
+
+    // --- THICKET (mata fechada): ajudam o ramo Nature da árvore de skills (carvalho, raízes, esporos, lobos, regeneração) ---
+    { id: 'acornPouch', branch: 'thicket', kind: 'relic', key: 'acornPouch', x: 0, y: 0, requires: [] },
+    { id: 'mossyStone', branch: 'thicket', kind: 'relic', key: 'mossyStone', x: 1, y: 0, requires: [req('acornPouch')] },
+    { id: 'sporeJar', branch: 'thicket', kind: 'relic', key: 'sporeJar', x: 2, y: 0, requires: [req('mossyStone')] },
+    { id: 'wolfTotem', branch: 'thicket', kind: 'relic', key: 'wolfTotem', x: 3, y: 0, requires: [req('sporeJar')] },
+    { id: 'dewVial', branch: 'thicket', kind: 'relic', key: 'dewVial', x: 0, y: 1, requires: [] },
+    { id: 'sunpetal', branch: 'thicket', kind: 'relic', key: 'sunpetal', x: 1, y: 1, requires: [req('dewVial')] },
+    { id: 'lotusBloom', branch: 'thicket', kind: 'relic', key: 'lotusBloom', x: 2, y: 1, requires: [req('sunpetal')] },
+    { id: 'autumnCharm', branch: 'thicket', kind: 'relic', key: 'autumnCharm', x: 3, y: 1, requires: [req('lotusBloom')] }
 ];
 
 export const RELIC_BY_ID = Object.fromEntries(RELIC_NODES.map(node => [node.id, node]));

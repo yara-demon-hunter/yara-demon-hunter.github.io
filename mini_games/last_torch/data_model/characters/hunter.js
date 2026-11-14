@@ -52,14 +52,14 @@ export const HUNTER = {
     fury: {
         kind: 'swordRain',
         name: 'Sword Rain',
-        stepSeconds: 0.13,          // tempo entre uma espada e a próxima
+        stepSeconds: 0.20,          // tempo entre uma espada e a próxima
         fallSeconds: 0.22,          // a queda de cada espada (o aviso no chão dura isso)
         radius: 38,                 // alcance do impacto de cada espada, px
-        damage: 0.55,               // dano de cada espada = dano da lâmina x este número
+        damage: 0.20,               // dano de cada espada = dano da lâmina x este número
         range: 340,                 // até onde ele escolhe os alvos, a partir do herói, px
         giantFallSeconds: 0.5,      // a espada gigante cai nos últimos instantes da Fúria
         giantRadius: 125,           // alcance do impacto dela, px
-        giantDamage: 2.4,           // dano da gigante = dano da lâmina x este número
+        giantDamage: 1.6,           // dano da gigante = dano da lâmina x este número
         giantKnockback: 380         // empurrão da gigante
     },
 

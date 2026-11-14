@@ -87,7 +87,7 @@ const FOLDER_25D = {
     ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight', BONE_COLOSSUS: 'bone_colossus'
 };
 // Buddies (library/buddies): os lobos do Rowan. Mesmo caminho dos monstros, mas a pasta é a de buddies
-const BUDDY_FOLDER_25D = { BUDDY_SHADOW_WOLF: 'shadow_wolf', BUDDY_WHITE_WOLF: 'white_wolf' };
+const BUDDY_FOLDER_25D = { BUDDY_SHADOW_WOLF: 'shadow_wolf', BUDDY_WHITE_WOLF: 'white_wolf', BUDDY_TREANT: 'treant' };
 const artOf25D = (type) => {
     const { visuals: P, render } = BUDDY_FOLDER_25D[type] ? BUDDIES_25D[BUDDY_FOLDER_25D[type]] : MONSTERS_25D[FOLDER_25D[type]];
     const visual = { scale: 1, auraRadius: P.auraRadius * P.scalePerRadius, auraAlpha: P.auraAlpha, shadowAlpha: 0, colors: P.colors };

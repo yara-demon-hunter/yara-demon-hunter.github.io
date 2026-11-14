@@ -444,7 +444,7 @@ export const POWER_MODELS = {
         name: 'Wicked Oak', icon: '🌳', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree after ${formatNumber(this.saplingSeconds)}s and an oak after ${formatNumber(this.adultSeconds)}s. The oak wakes near monsters and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; up to ${level.count} seeds or trees can exist at a time (more as you level it).`;
+            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree after ${formatNumber(this.saplingSeconds)}s and an oak after ${formatNumber(this.adultSeconds)}s, and every monster you kill speeds it up by ${formatNumber(this.killGrowthSeconds)}s. The oak wakes near monsters and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; up to ${level.count} seeds or trees can exist at a time (more as you level it).`;
         },
         get upgrades() {
             return this.levels.map(level =>
@@ -463,6 +463,7 @@ export const POWER_MODELS = {
         seedTickSeconds: 0.5,
         saplingSeconds: 10,     // muda vira árvore pequena
         adultSeconds: 45,       // árvore pequena amadurece em uma árvore completa
+        killGrowthSeconds: 1.2, // cada monstro morto adianta o crescimento de toda muda ou árvore pequena neste tanto
         healingRadius: 58,
         healingPerSecond: 1,
         wakeRatio: 1.5,         // acorda com monstro a até wakeRatio x reach da árvore e volta a dormir sem ninguém por perto
@@ -567,12 +568,12 @@ export const EVOLUTIONS = {
     shelterOak: {
         name: 'Ancient Grove', icon: '🌲',
         get desc() {
-            const { hp, seconds, reach } = this.levels;
-            return `A huge oak with ${hp} health and ${reach} reach that stands for ${formatNumber(seconds)}s. When it falls, its roots tear out of the ground: every monster around it is pinned for ${formatNumber(this.burst.seconds)}s and takes ${formatMultiplier(this.burst.damage)} spell damage. Thorn bark: a monster that strikes the oak takes ${formatMultiplier(this.thornBark.damage)} spell damage and is pinned by roots for ${this.thornBark.rootSeconds}s.`;
+            const { hp, reach } = this.levels;
+            return `A huge oak with ${hp} health and ${reach} reach that never withers with time: it only falls if monsters destroy it. When it falls, its roots tear out of the ground: every monster around it is pinned for ${formatNumber(this.burst.seconds)}s and takes ${formatMultiplier(this.burst.damage)} spell damage. Thorn bark: a monster that strikes the oak takes ${formatMultiplier(this.thornBark.damage)} spell damage and is pinned by roots for ${this.thornBark.rootSeconds}s.`;
         },
-        levels: { count: 3, cooldown: 11, seconds: 18, hp: 460, reach: 125, damage: 2.6, lashSeconds: 0.6 },
-        burst: { radiusRatio: 1.6, seconds: 3, damage: 2.5 },
-        thornBark: { damage: 0.8, rootSeconds: 1 }      // o que era o nó Thorn Bark: quem bate na árvore leva dano e fica preso
+        levels: { count: 3, cooldown: 11, seconds: 18, hp: 400, reach: 110, damage: 1.9, lashSeconds: 0.8 },
+        burst: { radiusRatio: 1.6, seconds: 3, damage: 2 },
+        thornBark: { damage: 0.6, rootSeconds: 1 }      // o que era o nó Thorn Bark: quem bate na árvore leva dano e fica preso
     },
     spiritWolves: {
         name: 'The White Wolf', icon: '🌕',

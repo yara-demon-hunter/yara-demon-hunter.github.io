@@ -3,9 +3,11 @@ import { POWER_MODELS } from '../../data_model/powers.js';
 import { ctx, player, powers, state } from '../core/state.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { makeCanvas } from './fx/sprites.js';
+import { CROWN_H, CROWN_W, TRUNK_H, TRUNK_W, getCrown, getEvilCrown, getEvilTrunk, getTrunk } from '../../library/buddies/oak/oak.js';
 import { resetWorldView, stamp } from './fx/stamp.js';
 import { drawRoseMark, drawThornPatch } from '../../library/weapons/thrown.js';
 import { getMonsterSprite, spriteFrame } from './monster_sprites.js';
+
 
 // --- DESENHO DAS SKILLS DA NATUREZA (js/systems/skills_nature.js) ---
 // Raízes, carvalho e cogumelo são sprites montados uma vez (na primeira vez que aparecem) e depois só copiados:
@@ -75,170 +77,6 @@ function getRoots() {
         g.fill();
     });
     return rootSprite;
-}
-
-// Carvalho: tronco e copa em sprites separados (a copa muda de transparência)
-const TRUNK_W = 34;
-const TRUNK_H = 58;
-const CROWN_W = 104;
-const CROWN_H = 80;
-let trunkSprite = null;
-let crownSprite = null;
-function getTrunk() {
-    if (trunkSprite) return trunkSprite;
-    trunkSprite = makeCanvas(TRUNK_W * PX, TRUNK_H * PX, (g) => {
-        g.scale(PX, PX);
-        g.translate(TRUNK_W / 2, TRUNK_H - 5);
-        // Raízes na base
-        g.fillStyle = '#2f1d0e';
-        g.beginPath();
-        g.moveTo(-15, 3);
-        g.quadraticCurveTo(-8, -3, -6, -9);
-        g.lineTo(6, -9);
-        g.quadraticCurveTo(8, -3, 15, 3);
-        g.quadraticCurveTo(0, 6, -15, 3);
-        g.fill();
-        // Tronco afinando para cima
-        g.fillStyle = '#4a2f17';
-        g.beginPath();
-        g.moveTo(-7, 0);
-        g.quadraticCurveTo(-5, -26, -6, -50);
-        g.lineTo(6, -50);
-        g.quadraticCurveTo(5, -26, 7, 0);
-        g.closePath();
-        g.fill();
-        // Luz de um lado, sombra do outro, veios da casca
-        g.fillStyle = '#6b4423';
-        g.beginPath();
-        g.moveTo(-6, -2);
-        g.quadraticCurveTo(-4.4, -26, -5.2, -50);
-        g.lineTo(-1.5, -50);
-        g.quadraticCurveTo(-1, -26, -2, -2);
-        g.closePath();
-        g.fill();
-        g.strokeStyle = '#2f1d0e';
-        g.lineWidth = 0.9;
-        for (const x of [-2.5, 1.2, 3.8]) {
-            g.beginPath();
-            g.moveTo(x, -4);
-            g.quadraticCurveTo(x + 1.2, -24, x - 0.4, -46);
-            g.stroke();
-        }
-        // Galhos abrindo para a copa
-        g.strokeStyle = '#4a2f17';
-        g.lineWidth = 3.2;
-        g.lineCap = 'round';
-        for (const [dx, dy] of [[-13, -9], [12, -8]]) {
-            g.beginPath();
-            g.moveTo(dx * 0.2, -40);
-            g.lineTo(dx, -42 + dy);
-            g.stroke();
-        }
-    });
-    return trunkSprite;
-}
-function getCrown() {
-    if (crownSprite) return crownSprite;
-    crownSprite = makeCanvas(CROWN_W * PX, CROWN_H * PX, (g) => {
-        g.scale(PX, PX);
-        g.translate(CROWN_W / 2, CROWN_H / 2);
-        // Massas de folha: escuras embaixo, claras em cima (posições fixas: a árvore é sempre a mesma)
-        const blobs = [
-            [-28, 10, 20, '#14532d'], [26, 12, 19, '#14532d'], [0, 16, 22, '#14532d'], [-14, -2, 23, '#166534'], [16, -1, 22, '#166534'],
-            [-30, -6, 15, '#166534'], [32, -4, 14, '#15803d'], [0, -12, 24, '#15803d'], [-16, -18, 16, '#16a34a'], [14, -19, 15, '#16a34a'],
-            [0, -24, 13, '#22c55e']
-        ];
-        for (const [x, y, r, color] of blobs) {
-            g.fillStyle = color;
-            g.beginPath();
-            g.ellipse(x, y, r, r * 0.82, 0, 0, TAU);
-            g.fill();
-        }
-        // Pontos de luz nas folhas
-        g.fillStyle = 'rgba(187, 247, 208, 0.5)';
-        for (const [x, y] of [[-20, -22], [-6, -30], [10, -26], [22, -14], [-32, -10], [2, -14], [-12, -8]]) {
-            g.beginPath();
-            g.ellipse(x, y, 2.6, 1.5, -0.5, 0, TAU);
-            g.fill();
-        }
-    });
-    return crownSprite;
-}
-
-// Carvalho acordado: a mesma silhueta, escura e roxa, com rosto no tronco e garras nos galhos
-let evilTrunkSprite = null;
-let evilCrownSprite = null;
-function getEvilTrunk() {
-    if (evilTrunkSprite) return evilTrunkSprite;
-    evilTrunkSprite = makeCanvas(TRUNK_W * PX, TRUNK_H * PX, (g) => {
-        g.scale(PX, PX);
-        g.drawImage(getTrunk(), 0, 0, TRUNK_W, TRUNK_H);
-        g.globalCompositeOperation = 'source-atop';
-        g.fillStyle = 'rgba(30, 6, 40, 0.55)';
-        g.fillRect(0, 0, TRUNK_W, TRUNK_H);
-        g.globalCompositeOperation = 'source-over';
-        g.translate(TRUNK_W / 2, TRUNK_H - 5);
-        // Rosto: olhos vermelhos tortos e uma boca de dentes
-        g.fillStyle = '#0a0410';
-        g.beginPath();
-        g.ellipse(-2.4, -32, 2.1, 1.3, -0.45, 0, TAU);
-        g.ellipse(2.4, -32, 2.1, 1.3, 0.45, 0, TAU);
-        g.fill();
-        g.fillStyle = '#ef4444';
-        g.beginPath();
-        g.ellipse(-2.4, -32, 1.2, 0.7, -0.45, 0, TAU);
-        g.ellipse(2.4, -32, 1.2, 0.7, 0.45, 0, TAU);
-        g.fill();
-        g.fillStyle = '#0a0410';
-        g.beginPath();
-        g.moveTo(-3.4, -27.6);
-        g.quadraticCurveTo(0, -23.4, 3.4, -27.6);
-        g.quadraticCurveTo(0, -26.2, -3.4, -27.6);
-        g.fill();
-        g.fillStyle = '#fef3c7';
-        for (const x of [-2, -0.6, 0.8, 2.2]) {
-            g.beginPath();
-            g.moveTo(x - 0.45, -27);
-            g.lineTo(x, -25.4);
-            g.lineTo(x + 0.45, -27);
-            g.fill();
-        }
-        // Galhos em garra
-        g.strokeStyle = '#1b0f26';
-        g.lineWidth = 1.4;
-        g.lineCap = 'round';
-        for (const side of [-1, 1]) {
-            g.beginPath();
-            g.moveTo(side * 5, -34);
-            g.quadraticCurveTo(side * 12, -30, side * 14, -22);
-            g.stroke();
-            for (const d of [-0.5, 0.1, 0.7]) {
-                g.beginPath();
-                g.moveTo(side * 14, -22);
-                g.lineTo(side * (14 + Math.cos(d + (side < 0 ? 2.4 : 0.1)) * 3.2), -22 + Math.sin(d + 0.9) * 3.2);
-                g.stroke();
-            }
-        }
-    });
-    return evilTrunkSprite;
-}
-function getEvilCrown() {
-    if (evilCrownSprite) return evilCrownSprite;
-    evilCrownSprite = makeCanvas(CROWN_W * PX, CROWN_H * PX, (g) => {
-        g.scale(PX, PX);
-        g.drawImage(getCrown(), 0, 0, CROWN_W, CROWN_H);
-        g.globalCompositeOperation = 'source-atop';
-        g.fillStyle = 'rgba(46, 16, 70, 0.62)';
-        g.fillRect(0, 0, CROWN_W, CROWN_H);
-        g.globalCompositeOperation = 'source-over';
-        g.fillStyle = 'rgba(239, 68, 68, 0.55)';
-        for (const [x, y] of [[-22, -6], [18, -10], [-4, -22], [30, 4], [-32, 8]]) {
-            g.beginPath();
-            g.arc(CROWN_W / 2 + x, CROWN_H / 2 + y, 1.2, 0, TAU);
-            g.fill();
-        }
-    });
-    return evilCrownSprite;
 }
 
 // Cogumelo de esporos: chapéu verde-limão com pintas
@@ -336,21 +174,19 @@ export function renderNatureGround() {
     const t = performance.now() / 1000;
     for (const oak of N.oaks) {
         const grow = oakScale(oak);
-        const fade = oak.stage === 'adult' ? Math.min(1, (oak.seconds - oak.age) / 0.8) : 1;
+        const fade = oak.stage === 'adult' && !oak.evolved ? Math.min(1, (oak.seconds - oak.age) / 0.8) : 1;
         renderHealingRing(oak, t);
-        // Dormindo: só uma sombra. Acordada: o alcance dos galhos, em vermelho
-        ctx.globalAlpha = (0.14 + 0.1 * oak.awake) * grow * fade;
-        ctx.fillStyle = oak.awake > 0.5 ? '#3b0764' : '#052e16';
-        ctx.beginPath();
-        ctx.ellipse(oak.x, oak.y, oak.reach * (0.3 + 0.7 * oak.awake) * grow, oak.reach * (0.3 + 0.7 * oak.awake) * 0.75 * grow, 0, 0, TAU);
-        ctx.fill();
+        // Acordada: o alcance dos galhos, em vermelho, tracejado (o mesmo padrão do anel de cura); dormindo, nada
         if (oak.awake > 0.3) {
-            ctx.globalAlpha = 0.55 * oak.awake * fade;
+            ctx.globalAlpha = 0.8 * oak.awake * fade;
             ctx.strokeStyle = '#ef4444';
-            ctx.lineWidth = 1.4;
+            ctx.lineWidth = 1.8;
+            ctx.setLineDash([9, 8]);
+            ctx.lineDashOffset = -t * 2;
             ctx.beginPath();
             ctx.ellipse(oak.x, oak.y, oak.reach, oak.reach * 0.75, 0, 0, TAU);
             ctx.stroke();
+            ctx.setLineDash([]);
         }
     }
     ctx.globalAlpha = 1;
@@ -600,7 +436,7 @@ export function renderNatureFront() {
     }
     for (const oak of N.oaks) {
         const grow = oakScale(oak);
-        const fade = oak.stage === 'adult' ? Math.min(1, (oak.seconds - oak.age) / 0.8) : 1;
+        const fade = oak.stage === 'adult' && !oak.evolved ? Math.min(1, (oak.seconds - oak.age) / 0.8) : 1;
         const t = performance.now() / 1000;
         // Acordada, balança sem parar; levando pancada, treme
         const sway = (oak.shake > 0 ? Math.sin(oak.shake * 70) * 1.6 : 0) + oak.awake * Math.sin(t * 4) * 0.9;
@@ -627,11 +463,11 @@ export function renderNatureFront() {
         }
         if (oak.stage !== 'sapling') {
             ctx.globalAlpha = fade * 0.9;
-            ctx.drawImage(getCrown(), oak.x - cw / 2 + sway * 1.6, oak.y - 56 * k - ch / 2, cw, ch);
+            ctx.drawImage(getCrown(), oak.x - cw / 2 + sway * 1.6, oak.y - 66 * k - ch / 2, cw, ch);
         }
         if (oak.awake > 0.02) {
             ctx.globalAlpha = fade * 0.9 * oak.awake;
-            ctx.drawImage(getEvilCrown(), oak.x - cw / 2 + sway * 1.6, oak.y - 56 * k - ch / 2, cw, ch);
+            ctx.drawImage(getEvilCrown(), oak.x - cw / 2 + sway * 1.6, oak.y - 66 * k - ch / 2, cw, ch);
             drawGlow(ctx, 'rgba(239, 68, 68, 0.8)', oak.x, oak.y - 36 * k, 12, 0.35 * oak.awake);
         }
         ctx.globalAlpha = 1;

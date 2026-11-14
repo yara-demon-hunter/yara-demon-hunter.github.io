@@ -205,7 +205,7 @@ function updateShelterOak(dt) {
     for (let i = N.oaks.length - 1; i >= 0; i--) {
         const oak = N.oaks[i];
         if (oak.stage !== 'adult') {
-            oak.growthAge += dt;
+            oak.growthAge += dt * (1 + mod('oakGrowth'));
             if (oak.stage === 'sapling' && oak.growthAge >= M.saplingSeconds) {
                 oak.stage = 'young';
                 oak.transition = 0.45;
@@ -282,7 +282,8 @@ function updateShelterOak(dt) {
                 rootEnemy(e, EVOLUTIONS.shelterOak.thornBark.rootSeconds);
             }
         }
-        if (oak.hp <= 0 || (oak.stage === 'adult' && oak.age >= oak.seconds)) {
+        // O treant (Ancient Grove) não morre pelo tempo: só cai se os monstros acabarem com a vida dele
+        if (oak.hp <= 0 || (oak.stage === 'adult' && !oak.evolved && oak.age >= oak.seconds)) {
             N.oaks.splice(i, 1);
             timers.shelterOak = getSpellCooldown(level.cooldown);
             fellOak(oak);
@@ -376,7 +377,7 @@ function wolfHome(w, i, t) {
 
 function wolfMaxHp(level, evolved) {
     const E = EVOLUTIONS.spiritWolves;
-    return evolved ? E.levels.hp * (1 + E.healthBonus) : level.hp;
+    return (evolved ? E.levels.hp * (1 + E.healthBonus) : level.hp) * (1 + mod('wolfPower'));
 }
 
 function newWolf(level, evolved, index) {
@@ -403,7 +404,7 @@ function updateSpiritWolves(dt) {
     const E = EVOLUTIONS.spiritWolves;
     const run = M.runSpeed * (evolved ? 1 + E.speedBonus : 1);
     const bodyRadius = M.bodyRadius;
-    const biteDamage = evolved ? E.levels.damage * (1 + E.damageBonus) : level.damage;
+    const biteDamage = (evolved ? E.levels.damage * (1 + E.damageBonus) : level.damage) * (1 + mod('wolfPower'));
     const maxHp = wolfMaxHp(level, evolved);
     const respawnSeconds = evolved ? EVOLUTIONS.spiritWolves.respawnSeconds : M.respawnSeconds;
     const biteSeconds = evolved ? EVOLUTIONS.spiritWolves.levels.biteSeconds : level.biteSeconds;
@@ -571,6 +572,8 @@ function updateRoseThorns(dt) {
 
 // --- MORTE DE UM MONSTRO (chamado por js/systems/powers.js, onEnemyKilled) ---
 export function onNatureKill(e) {
+    // Cada monstro morto (de qualquer jeito) adianta o crescimento das mudas e das árvores pequenas (a anterior à semente nova)
+    for (const oak of N.oaks) if (oak.stage !== 'adult') oak.growthAge += POWER_MODELS.shelterOak.killGrowthSeconds * (1 + mod('oakGrowth'));
     // Dark Roses: morreu marcado, rosas de espinho brotam onde caiu
     if (e.roseMark > 0 && N.thorns.length < 14) {
         N.thorns.push({ x: e.x, y: e.y, age: 0, tick: 0.2, variant: Math.floor(Math.random() * 3) });

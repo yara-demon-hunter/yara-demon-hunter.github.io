@@ -9,7 +9,9 @@ import { NIGHT } from './night.js';
 export const ACHIEVEMENTS = [
     // --- TROFÉUS ---
     { id: 'firstNight', group: 'trophy', icon: '🩸', name: 'First Blood', desc: 'Finish your first hunt.', stat: 'runs', target: 1 },
-    { id: 'hour3', group: 'trophy', icon: '🌒', name: 'Into the Hush', desc: 'Reach Wave 3.', stat: 'bestHour', target: 3, hero: 'rowan' },
+    // Rowan: libera ao terminar a onda 1 (bestHour passa a 2 quando o primeiro acampamento abre)
+    { id: 'hour2', group: 'trophy', icon: '🌘', name: 'First Light', desc: 'Survive Wave 1.', stat: 'bestHour', target: 2, hero: 'rowan' },
+    { id: 'hour3', group: 'trophy', icon: '🌒', name: 'Into the Hush', desc: 'Reach Wave 3.', stat: 'bestHour', target: 3 },
     { id: 'hour4', group: 'trophy', icon: '🌕', name: 'Blood Moon', desc: 'Reach Wave 4.', stat: 'bestHour', target: 4 },
     { id: 'kills300', group: 'trophy', icon: '⚰️', name: 'Reaper', desc: 'Slay 200 monsters.', stat: 'kills', target: 200 },
     { id: 'demon', group: 'trophy', icon: '😈', name: 'Demon Slayer', desc: 'Slay the Demon Lord.', stat: 'boss_DEMON_LORD', target: 1, hero: 'reaver' },

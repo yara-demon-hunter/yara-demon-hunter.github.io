@@ -63,10 +63,17 @@ export const OMEN_SPAWNING = { firstHour: 3, chance: 0.6 };
 // Liberados ao vencer a noite: tudo fica mais duro.
 export const DARKNESS = {
     maxLevel: 8,
+    startPointsPerLevel: 2,       // pontos de skill para começar a noite, por nível de Escuridão (só no início)
     enemyHpPerLevel: 0.28,
     enemyDamagePerLevel: 0.12,
     enemySpeedPerLevel: 0.03
 };
+
+// Pontos de skill com que a noite começa: startPointsPerLevel por nível de Escuridão, arredondado para baixo se o valor
+// for fracionado. Com 2 por nível: Escuridão 1 = 2, 2 = 4, 3 = 6, 4 = 8...
+export function startingSkillPoints(darkness) {
+    return Math.floor(darkness * DARKNESS.startPointsPerLevel);
+}
 
 // Sorteia as hordas da hora (uma de cada tipo, entre as já liberadas)
 export function rollHourHordes(hour, random = Math.random) {

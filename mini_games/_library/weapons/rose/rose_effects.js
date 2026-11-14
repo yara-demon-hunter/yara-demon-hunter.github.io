@@ -63,19 +63,11 @@ export function drawRoseMark(ctx, t) {
     ctx.stroke();
 }
 
-// Rosas de espinho no chão, vistas de cima: um tapete de terra escura, trepadeiras com espinhos saindo do centro e três rosas
-// negras abertas. Origem no centro; ~64 x 50 unidades. seed muda o desenho (3 variações).
+// Rosas de espinho no chão, vistas de cima: trepadeiras com espinhos saindo do centro e três rosas negras abertas (sem tapete
+// de terra em volta: só as rosas e os espinhos). Origem no centro; ~64 x 50 unidades. seed muda o desenho (3 variações).
 export function drawThornPatch(ctx, seed = 0) {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    // Terra escura com borda violeta
-    ctx.fillStyle = E.soil;
-    ctx.strokeStyle = E.soilEdge;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 30, 23, 0, 0, TAU);
-    ctx.fill();
-    ctx.stroke();
     // Trepadeiras: curvas saindo do centro, cada uma com espinhos
     const vines = 7;
     for (let i = 0; i < vines; i++) {

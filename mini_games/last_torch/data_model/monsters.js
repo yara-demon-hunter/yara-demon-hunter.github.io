@@ -303,7 +303,8 @@ export const MONSTER_SPAWNING = {
 //   BUDDY_SHADOW_WOLF: o Shadow Wolf (poder do Nature)   BUDDY_WHITE_WOLF: The White Wolf (a evolução dele)
 export const BUDDY_MODELS = {
     BUDDY_SHADOW_WOLF: { radius: 12, color: '#3d3a55' },
-    BUDDY_WHITE_WOLF: { radius: 12, color: '#e2e8f0' }
+    BUDDY_WHITE_WOLF: { radius: 12, color: '#e2e8f0' },
+    BUDDY_TREANT: { radius: 18, color: '#5b3b22' }
 };
 
 const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS'];

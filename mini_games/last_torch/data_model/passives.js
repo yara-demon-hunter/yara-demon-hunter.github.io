@@ -346,6 +346,15 @@ export const PASSIVE_SKILL_MODELS = {
         desc: 'Fury lasts 2 seconds longer and charges 25% faster.',
         mods: { furyDuration: 2, furyCharge: 0.25 }
     },
+    // --- RELÍQUIAS DA NATUREZA: reforçam o ramo Nature (carvalho, raízes, esporos, lobos, regeneração) ---
+    acornPouch: { name: 'Acorn Pouch', icon: '🌰', cost: 70, maxLvl: 1, desc: 'Seeds, saplings and oaks grow 30% faster.', mods: { oakGrowth: 0.3 } },
+    mossyStone: { name: 'Mossy Stone', icon: '🪨', cost: 80, maxLvl: 1, desc: 'Roots hold monsters 30% longer.', mods: { rootSeconds: 0.3 } },
+    sporeJar: { name: 'Spore Jar', icon: '🫙', cost: 100, maxLvl: 1, desc: 'Spore clouds and poison hit 25% harder.', mods: { poison: 0.25 } },
+    wolfTotem: { name: 'Wolf Totem', icon: '🐾', cost: 120, maxLvl: 1, desc: 'Your wolf bites 20% harder and has 20% more health.', mods: { wolfPower: 0.2 } },
+    dewVial: { name: 'Dew Vial', icon: '💧', cost: 60, maxLvl: 1, desc: 'Recover 0.5 health per second.', mods: { hpRegen: 0.5 } },
+    sunpetal: { name: 'Sunpetal', icon: '🌼', cost: 90, maxLvl: 1, desc: '+12% spell damage, -6% spell recharge.', mods: { spellDamage: 0.12, spellHaste: 0.06 } },
+    lotusBloom: { name: 'Lotus Bloom', icon: '🪷', cost: 110, maxLvl: 1, desc: '+10% max health and recover 0.4 health per second.', mods: { maxHp: 0.1, hpRegen: 0.4 } },
+    autumnCharm: { name: 'Autumn Charm', icon: '🍂', cost: 130, maxLvl: 1, desc: '+10% spell damage, -10% spell recharge, +10% XP.', mods: { spellDamage: 0.1, spellHaste: 0.1, xp: 0.1 } },
     // --- RELÍQUIAS POR CLASSE: cada uma reforça um ramo da árvore de skills (Blade, Shadow, Flame, Curse) ---
     sharpenedEdge: { name: 'Sharpened Edge', icon: '🪚', cost: 110, maxLvl: 1, desc: 'For blade fighters: +15% blade damage, +8% attack speed.', mods: { bladeDamage: 0.15, attackSpeed: 0.08 } },
     shadeQuiver: { name: 'Shade Quiver', icon: '🪶', cost: 120, maxLvl: 1, desc: 'For shadow stalkers: +20% dagger damage, -8% dagger recharge, +4% critical chance.', mods: { knifeDamage: 0.2, knifeCooldown: 0.08, critChance: 0.04 } },
@@ -374,7 +383,7 @@ export const PASSIVE_SKILL_MODELS = {
 export const THORN_BURST = { radius: 80, damage: 1.2, knockback: 90 };
 // Dark Roses (só o Rowan): o monstro atingido por uma rosa negra fica marcado por markSeconds; se morrer marcado, brotam rosas de
 // espinho no lugar (patchSeconds) que ferem quem passa (damage = dano da adaga x isto, a cada tickSeconds) e desaceleram
-export const THORN_ROSES = { markSeconds: 10, patchSeconds: 5, radius: 34, damage: 0.35, tickSeconds: 0.5, slow: 0.35, growSeconds: 0.25 };
+export const THORN_ROSES = { markSeconds: 10, patchSeconds: 6, radius: 34, damage: 0.35, tickSeconds: 0.5, slow: 0.35, growSeconds: 0.25 };
 
 // --- ACAMPAMENTO ---
 // Fim de cada hora: o ouro compra relíquias na árvore do acampamento e também alimenta a tocha.
