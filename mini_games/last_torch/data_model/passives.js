@@ -372,8 +372,8 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '💢',
         cost: 100,
         maxLvl: 1,
-        desc: 'Fury lasts 2 seconds longer and charges 25% faster.',
-        mods: { furyDuration: 2, furyCharge: 0.25 }
+        desc: 'Fury lasts 2 seconds longer and charges 5% faster.',
+        mods: { furyDuration: 2, furyCharge: 0.05 }
     },
     // --- RELÍQUIAS DA NATUREZA: reforçam o ramo Nature (carvalho, raízes, esporos, lobos, regeneração) ---
     acornPouch: { name: 'Acorn Pouch', icon: '🌰', cost: 70, maxLvl: 1, desc: 'Seeds, saplings and oaks grow 30% faster.', mods: { oakGrowth: 0.3 } },

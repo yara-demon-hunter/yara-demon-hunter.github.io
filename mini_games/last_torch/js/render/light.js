@@ -4,7 +4,7 @@ import { CONSECRATION_FINALE_SECONDS, consecration } from '../systems/fury.js';
 import { PASSIVE_SKILL_MODELS } from '../../data_model/passives.js';
 import { drawGlow } from '../../library/core/glow.js';
 
-// --- DESENHO DAS SKILLS DA LUZ (js/systems/skills_light.js) e da Terra Consagrada (js/systems/fury.js) ---
+// --- DESENHO DAS SKILLS DA LUZ (js/systems/skills_light.js) e de Divine Sanctuary (js/systems/fury.js) ---
 // Só linhas e brilhos prontos: um círculo é um brilho, dois anéis, alguns traços e uma cruz. Nada cobre a ação: o
 // círculo fica no chão (antes dos monstros) e os raios e frascos são finos e curtos.
 const L = state.light;
@@ -331,7 +331,7 @@ export function renderLightFront() {
     ctx.globalAlpha = 1;
 }
 
-// --- TERRA CONSAGRADA (a Fúria do Avgustino, js/systems/fury.js) ---
+// --- DIVINE SANCTUARY (a Fúria do Avgustino, js/systems/fury.js) ---
 // Luz, não símbolos: um clarão dourado que enche o círculo (mais forte no centro), um anel fino com contas de luz, raios suaves
 // girando devagar e, de pé na borda, uma cortina de colunas de luz que sobe e treme. A cada pulso de dano uma onda clara
 // atravessa o círculo. Ao abrir, uma cúpula de luz estoura do chão; no fim, uma cruz de luz (feita de dois feixes em forma de

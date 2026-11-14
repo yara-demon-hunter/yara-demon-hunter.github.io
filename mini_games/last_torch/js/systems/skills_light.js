@@ -37,9 +37,9 @@ function densestSpot(radius, range) {
 function updateHolyGround(dt) {
     const M = POWER_MODELS.holyGround;
     const level = getPowerLevel(powers.holyGround);
-    // Um círculo por vez: a recarga só corre depois que o atual acaba, e enquanto ele existe nenhum outro é criado
-    if (L.grounds.length > 0) return;
-    if (level && ready('holyGround', dt, getSpellCooldown(level.cooldown))) {
+    // Um círculo por vez: a recarga só corre depois que o atual acaba, e enquanto ele existe nenhum outro é criado.
+    // Mesmo com um círculo ativo, ele ainda precisa envelhecer e receber dano abaixo.
+    if (L.grounds.length === 0 && level && ready('holyGround', dt, getSpellCooldown(level.cooldown))) {
         const spot = densestSpot(level.radius, M.range);
         if (spot) {
             L.grounds.push({

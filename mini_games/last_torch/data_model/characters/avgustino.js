@@ -2,7 +2,7 @@
 // Tudo do personagem num lugar só (ver data_model/characters/index.js). Cores e medidas do desenho, o boneco e a ficha
 // de como foi criado: library/characters/avgustino/ (a fonte é mini_games/_library/characters/avgustino).
 // Padre misterioso de óculos escuros: cauteloso, de poucas palavras. Luta com uma lâmina de prata benta e a adaga, e a
-// tocha o aquece mais (a fé como abrigo), mas ele é frágil. Sua Fúria é a Terra Consagrada: um círculo de luz que cura e queima.
+// tocha o aquece mais (a fé como abrigo), mas ele é frágil. Sua Fúria é Divine Sanctuary: um círculo de luz que cura e queima.
 import { AVGUSTINO_VISUALS } from '../../library/characters/avgustino/avgustino_visual.js';
 
 export const AVGUSTINO = {
@@ -73,12 +73,12 @@ export const AVGUSTINO = {
     },
 
     // ===== FURY: a FÚRIA (o especial que dispara sozinho quando a barra enche; cada personagem tem a sua) =====
-    // TERRA CONSAGRADA: ele crava o crucifixo no chão e abre um círculo de luz onde está. Dentro dele os monstros queimam em
+    // DIVINE SANCTUARY: ele crava o crucifixo no chão e abre um círculo de luz onde está. Dentro dele os monstros queimam em
     // pulsos e andam mais devagar (demônios, mais ainda), ele e a tocha se curam e levam menos dano. No fim do tempo, uma cruz
     // de luz estoura em cima do círculo.
     fury: {
         kind: 'consecration',
-        name: 'Sacred Ground',
+        name: 'Divine Sanctuary',
         // --- CARGA E DURAÇÃO (toda Fúria tem; é o que cada personagem ajusta no seu jeito de carregar) ---
         chargePerHit: 3,            // carga da barra por monstro atingido pela lâmina (a barra tem 100)
         chargePerKill: 1.5,         // carga por morte na sequência

@@ -677,7 +677,7 @@ export const EVOLUTIONS = {
         levels: { cooldown: 16, count: 0, radius: 70, damage: 1.7, seconds: 3, puddleSeconds: 4, puddleDps: 0.5 },
         // A chuva: a cada `every` segundos, por `seconds`. Todo monstro na tela leva `dps` (dano de magia por segundo, de
         // tickSeconds em tickSeconds) e fica abençoado; uma gota grande estoura em cima de um monstro a cada `dropSeconds`
-        rain: { every: 16, seconds: 9, tickSeconds: 0.5, dps: 0.6, dropSeconds: 0.22, radius: 44, damage: 0.6 },
+        rain: { every: 25, seconds: 9, tickSeconds: 0.5, dps: 0.6, dropSeconds: 0.22, radius: 44, damage: 0.6 },
         baptism: { radius: 70, damage: 1.2 }
     },
     smite: {

@@ -175,4 +175,4 @@ Algumas skills só funcionam com adaga: Ricochet, Death Mark, Charged Dagger Thr
 Cada personagem tem dois danos base independentes (`stats` em `data_model/characters/<id>.js`):
 
 - **`attackDamage` (lâmina, físico):** golpes da lâmina, adaga, o 3º golpe do combo, as skills do ramo Blade e Shadow, bombas e espinhos, e as Fúrias de lâmina (Sword Rain, Blood Waltz, Stomp). Número **branco** na tela.
-- **`magicDamage` (magia):** tudo que age sozinho ou vem do poder: skills dos ramos Flame (tocha, fênix, anel de fogo...), Curse, Nature e Light, bolas de fogo (Fireballs) e as Fúrias de magia (Forest Guardian, Sacred Ground). Número **azul** na tela. Quem tem `magicDamage: 0` (Captain Brutos) não usa magia: as skills de magia ficam seladas para ele.
+- **`magicDamage` (magia):** tudo que age sozinho ou vem do poder: skills dos ramos Flame (tocha, fênix, anel de fogo...), Curse, Nature e Light, bolas de fogo (Fireballs) e as Fúrias de magia (Forest Guardian, Divine Sanctuary). Número **azul** na tela. Quem tem `magicDamage: 0` (Captain Brutos) não usa magia: as skills de magia ficam seladas para ele.
