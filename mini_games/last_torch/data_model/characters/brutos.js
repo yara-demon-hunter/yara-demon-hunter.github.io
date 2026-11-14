@@ -54,7 +54,7 @@ export const BRUTOS = {
         dashInvulnerable: 0.3,      // segundos invulnerável durante o dash
 
         // ===== RANGE: o alcance da lâmina =====
-        bladeRange: 70,             // alcance da lâmina, px: o machado alcança mais
+        bladeRange: 40,             // alcance da lâmina, px: o machado alcança mais
 
         // ===== DAGGER: a adaga (dano x alcance) =====
         knifeRange: 420,            // alcance da adaga, px (sem efeito: ele não lança adaga)
@@ -101,7 +101,7 @@ export const BRUTOS = {
         extraSeconds: 2.5,          // a Fúria dele dura este tanto a mais que a dos outros (a pedido: as pisadas são o show)
         stepSeconds: 0.36,          // tempo entre uma pisada e a próxima
         radius: 90,                 // alcance de cada pisada, px
-        damage: 0.9,                // dano de cada pisada = dano da lâmina x este número
+        damage: 0.30,                // dano de cada pisada = dano da lâmina x este número
         knockback: 150,             // empurrão
         stunSeconds: 0.3,           // atordoamento nos monstros comuns (chefes não)
         shake: 5,                   // quanto a tela treme a cada pisada

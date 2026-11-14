@@ -18,8 +18,8 @@ const STATS = [
     // DEFENSE: quanto menos dano ele recebe (`damageTaken` do personagem: -10 = recebe 10% menos). Sem redução, a barra fica no mínimo.
     // A vida é a barra HP e a cura do calor da tocha não é defesa.
     { label: 'DEFENSE', value: (h, b) => Math.max(0, -(h.mods.damageTaken ?? 0)) },
-    // FURY (o especial): carga por golpe x duração (data_model/characters/<id>.js, `fury`)
-    { label: 'FURY', value: (h, b) => b.player.fury.chargePerHit * (1 + (h.mods.furyCharge ?? 0)) * (b.player.fury.durationSeconds + (b.player.fury.extraSeconds ?? 0)) },
+    // FURY combina carga por golpe com o dano estimado de uma Fúria completa
+    { label: 'FURY', value: (h, b) => furyEstimate(h, b).score },
     // REGEN junta as três curas base: a do calor da tocha (`warmthHeal`, vida por segundo) multiplicada pelo alcance dele (`warmthRadius` em
     // relação ao raio de referência de 92px: quanto maior, mais tempo ele passa curando) e o roubo de vida (`lifeSteal`) sobre o dano da
     // lâmina por segundo. É o que ele se cura sem comprar nada.
@@ -36,6 +36,41 @@ const STATS = [
     // MAGIC é o dano dos feitiços: o `magicDamage` do personagem (0 = sem magia), com o bônus de feitiço
     { label: 'MAGIC', value: (h, b) => b.player.stats.magicDamage * (1 + (h.mods.spellDamage ?? 0)) }
 ];
+// Estimativa contra um alvo: considera a duração base e o bônus de dano da skill Fury, sem área, críticos ou bônus temporários.
+function furyEstimate(h, b) {
+    const F = b.player.fury;
+    const blade = b.player.attackDamage
+        * (1 + (h.mods.damage ?? 0))
+        * (1 + (h.mods.bladeDamage ?? 0))
+        * (1 + F.damageBonusPerLevel);
+    const magic = b.player.stats.magicDamage * (1 + (h.mods.spellDamage ?? 0));
+    const seconds = F.durationSeconds + (F.extraSeconds ?? 0);
+    const chargePerHit = F.chargePerHit * (1 + (h.mods.furyCharge ?? 0));
+    let damage;
+    switch (F.kind) {
+        case 'swordRain': {
+            const normalSwords = Math.ceil(Math.max(0, seconds - F.giantFallSeconds - 0.12) / F.stepSeconds);
+            damage = blade * (F.damage * normalSwords + F.giantDamage);
+            break;
+        }
+        case 'bloodWaltz':
+            damage = blade * F.cuts * F.cutDamage;
+            break;
+        case 'stomp':
+            damage = blade * F.damage * Math.ceil(seconds / F.stepSeconds);
+            break;
+        case 'forestGuardian':
+            damage = magic * F.damage * Math.ceil(seconds / F.tickSeconds);
+            break;
+        case 'consecration':
+            damage = magic * (F.damage * Math.ceil(seconds / F.tickSeconds) + F.finaleDamage);
+            break;
+        default:
+            throw new Error(`Unknown Fury kind: ${F.kind}`);
+    }
+    return { chargePerHit, damage, score: chargePerHit * damage };
+}
+
 const MIN_BAR = 12;                 // % mínimo, para a barra nunca sumir
 
 const values = (key) => {
@@ -54,7 +89,11 @@ export function renderHeroStats() {
         const best = Math.max(...all.map(v => v[i]));
         const t = best > 0 ? mine[i] / best : 1;
         const percent = Math.max(MIN_BAR, Math.round(t * 100));
-        return `<div class="hs-row"><span>${stat.label}</span><div class="hs-bar"><i style="width:${percent}%"></i></div></div>`;
+        const fury = stat.label === 'FURY' ? furyEstimate({ ...hero, mods: hero.mods ?? {} }, getCharacterBase(hero.model ?? 'hunter')) : null;
+        const title = fury
+            ? `Fury charge: ${fury.chargePerHit.toFixed(1)} per hit | estimated damage: ${Math.round(fury.damage)} per use`
+            : '';
+        return `<div class="hs-row"${title ? ` title="${title}" aria-label="${title}"` : ''}><span>${stat.label}</span><div class="hs-bar"><i style="width:${percent}%"></i></div></div>`;
     }).join('');
     panel.innerHTML = `<div class="hs-bars">${rows}</div>`
         + (hero.perk ? `<div class="hs-perk"><strong>${hero.perk.name}</strong><span>${hero.perk.text}</span></div>` : '');

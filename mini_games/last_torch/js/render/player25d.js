@@ -36,6 +36,25 @@ function drawHeldDagger(rig, shoulder, hand, t) {
 }
 
 // Flaming Sword: línguas de fogo ao longo da lâmina; sob o Oath of the Hearth, maiores e douradas
+// Blessed Blade: faíscas de raio amarelas saindo da lâmina, em zigue-zague curto que pisca (poucos traços, nada de sprite)
+function drawBladeSparks(rig, hand, dir, t) {
+    const { C, limb } = rig;
+    const dx = dir[0], dy = dir[1];
+    const flat = Math.hypot(dx, dy) || 1;
+    const wx = -dy / flat, wy = dx / flat;
+    for (let i = 0; i < 3; i++) {
+        const k = (t * 5 + i * 0.37) % 1;
+        if (k > 0.55) continue;                      // pisca: some por um tempo e volta
+        const d = 3 + i * 2.8 + Math.sin(t * 13 + i) * 0.6;
+        const side = i % 2 ? 1 : -1;
+        const p0 = [hand[0] + dx * d, hand[1] + dy * d, hand[2] + 0.4];
+        const p1 = [p0[0] + wx * side * 2.4 + dx * 1.2, p0[1] + wy * side * 2.4 + dy * 1.2, p0[2] + 1.1];
+        const p2 = [p1[0] + wx * -side * 2 + dx * 1.4, p1[1] + wy * -side * 2 + dy * 1.4, p1[2] - 0.2];
+        limb([p0, p1, p2], 0.5, C.bladeGlowSoft ?? C.bladeGlow);
+        limb([p0, p1, p2], 0.22, '#fffde7');
+    }
+}
+
 function drawBladeFire(rig, hand, dir, t) {
     const F = SKILLS_VISUALS.fire;
     const hot = state.oath === 'oathHearth';
@@ -88,6 +107,7 @@ setHeroHooks({
     },
     drawBladeExtras(rig, body, hand, dir, t) {
         if (body === player && passives.flameBlade.lvl > 0) drawBladeFire(rig, hand, dir, t);
+        if (body === player && passives.blessedBlade.lvl > 0) drawBladeSparks(rig, hand, dir, t);
     },
     // Juramentos: forma (espada e capuz), o que fica no chão e as peças extras
     gearShape: (gear) => OATH_VISUALS[gear],

@@ -61,8 +61,8 @@ function renderHeroBlock() {
     renderRavenBird();
 }
 
-// Blessed Blade: a lâmina molhada de água benta (azul-prata, brilho azul). Montada uma vez por paleta, sem criar objeto por quadro
-const BLESSED_BLADE_COLORS = { blade: '#93c5fd', bladeCore: '#e0f2fe', runes: '#e0f2fe', bladeGlow: '#38bdf8', bladeGlowSoft: 'rgba(56, 189, 248, 0.55)' };
+// Blessed Blade: a lâmina amarela, com brilho forte e faíscas de raio (js/render/player25d.js). Montada uma vez por paleta, sem criar objeto por quadro
+const BLESSED_BLADE_COLORS = { blade: '#fde047', bladeCore: '#fffde7', runes: '#fef9c3', bladeGlow: '#facc15', bladeGlowSoft: 'rgba(250, 204, 21, 0.85)', bladeGlowSoftFrenzy: 'rgba(253, 224, 71, 0.95)' };
 const blessedPalettes = new WeakMap();
 function blessedPalette(colors) {
     let p = blessedPalettes.get(colors);

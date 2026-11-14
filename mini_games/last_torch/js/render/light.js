@@ -27,6 +27,87 @@ function groundCross(x, y, s, alpha) {
     ctx.stroke();
 }
 
+// --- HOLY SMITE e DIVINE WRATH: o raio que cai sobre o monstro mais forte ---
+// Holy Smite: um feixe fino em forma de lente, do céu ao alvo, com um clarão no impacto. Divine Wrath (evoluída): bem mais forte:
+// um raio em zigue-zague que pisca, uma coluna larga de luz em volta, o impacto com anel e raios no chão e uma cruz de luz que
+// estoura no alvo. Só traços, gradientes e brilhos.
+function renderBolt(b) {
+    const k = 1 - b.age / b.seconds;               // 1 -> 0
+    const sky = 440;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    if (!b.wrath) {
+        lensBeam(b.x, b.y - sky / 2, sky, b.radius * 0.42 * (0.5 + 0.5 * k), true, 0.95 * k);
+        ctx.globalAlpha = 0.6 * k;
+        drawGlow(ctx, 'rgba(254, 249, 231, 0.85)', b.x, b.y, b.radius * 1.5, 1);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+        return;
+    }
+    const t = b.age;
+    const flash = 1 - Math.min(1, t / 0.12);                      // o primeiro instante é um clarão
+    // Coluna larga de luz em volta do raio
+    lensBeam(b.x, b.y - sky / 2, sky, b.radius * (0.45 + 0.25 * k), true, 0.3 * k + 0.2 * flash);
+    // O raio: zigue-zague que muda de forma a cada pouco (parece tremer)
+    const frame = Math.floor(t * 22);
+    const pts = [[b.x + Math.sin(b.seed + frame) * 6, b.y - sky]];
+    for (let i = 1; i < 9; i++) {
+        const q = i / 9;
+        pts.push([b.x + Math.sin(b.seed * 3 + frame * 2.1 + i * 1.7) * 13 * (1 - q * 0.8), b.y - sky * (1 - q)]);
+    }
+    pts.push([b.x, b.y]);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    for (const [color, width, a] of [['rgba(250, 204, 21, 0.45)', 7, 0.4], ['#fde68a', 3, 0.85], ['#fffbeb', 1.4, 0.95]]) {
+        ctx.globalAlpha = a * (0.45 + 0.55 * k);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+        ctx.stroke();
+    }
+    // Ramais curtos saindo do raio perto do chão
+    ctx.globalAlpha = 0.8 * k;
+    ctx.strokeStyle = '#fffde7';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    for (let i = 0; i < 4; i++) {
+        const p = pts[5 + (i % 3)];
+        const side = i % 2 ? 1 : -1;
+        ctx.moveTo(p[0], p[1]);
+        ctx.lineTo(p[0] + side * (14 + (i * 5) % 9), p[1] + 14);
+        ctx.lineTo(p[0] + side * (22 + (i * 7) % 8), p[1] + 30);
+    }
+    ctx.stroke();
+    // Impacto: clarão, anel que abre e raios no chão
+    ctx.globalAlpha = 0.34 * k;
+    drawGlow(ctx, 'rgba(255, 244, 200, 0.9)', b.x, b.y, b.radius * (0.9 + 0.9 * (1 - k)), 1);
+    const spread = 1 - k;
+    ctx.globalAlpha = 0.6 * k;
+    ctx.strokeStyle = '#fde68a';
+    ctx.lineWidth = 2.2 * k + 0.8;
+    ctx.beginPath();
+    ctx.ellipse(b.x, b.y, b.radius * (0.6 + 2.2 * spread), b.radius * (0.6 + 2.2 * spread) * SQUASH, 0, 0, TAU);
+    ctx.stroke();
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+        const a = (i / 10) * TAU + b.seed;
+        const r0 = b.radius * (0.5 + 1.3 * spread);
+        const r1 = r0 + b.radius * (0.6 + 0.8 * k);
+        ctx.moveTo(b.x + Math.cos(a) * r0, b.y + Math.sin(a) * r0 * SQUASH);
+        ctx.lineTo(b.x + Math.cos(a) * r1, b.y + Math.sin(a) * r1 * SQUASH);
+    }
+    ctx.stroke();
+    // Cruz de luz que estoura no alvo (só no começo)
+    if (flash > 0) {
+        lensBeam(b.x, b.y - 8, 70 * (0.6 + 0.6 * flash), 4 * flash + 1.5, true, 0.7 * flash);
+        lensBeam(b.x, b.y - 18, 46 * (0.6 + 0.6 * flash), 3 * flash + 1.2, false, 0.7 * flash);
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+}
+
 // Luz que sobe do chão (a cruz do fim e os raios): um pilar fino com brilho
 function pillar(x, y, width, height, alpha) {
     ctx.globalAlpha = alpha;
@@ -235,12 +316,7 @@ export function renderLightFront() {
         ctx.arc(d.x, d.y - d.z, d.size, 0, TAU);
         ctx.fill();
     }
-    for (const b of L.bolts) {
-        const k = 1 - b.age / b.seconds;
-        pillar(b.x, b.y, b.radius * 0.5 * (0.4 + 0.6 * k), 340, 0.9 * k);
-        ctx.globalAlpha = 0.6 * k;
-        drawGlow(ctx, 'rgba(254, 249, 231, 0.8)', b.x, b.y, b.radius * 1.4, 1);
-    }
+    for (const b of L.bolts) renderBolt(b);
     for (const b of L.bursts) {
         const k = b.age / b.seconds;
         ctx.globalAlpha = 0.7 * (1 - k);

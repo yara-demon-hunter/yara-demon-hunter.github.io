@@ -53,7 +53,7 @@ export const AZAEL = {
         dashInvulnerable: 0.3,      // segundos invulnerável durante o dash
 
         // ===== RANGE: o alcance da lâmina =====
-        bladeRange: 40,             // alcance da lâmina, px
+        bladeRange: 35,             // alcance da lâmina, px
 
         // ===== DAGGER: a adaga (dano x alcance) =====
         knifeRange: 273,            // alcance da adaga, px (valor absoluto)

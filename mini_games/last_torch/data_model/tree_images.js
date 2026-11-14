@@ -64,8 +64,10 @@ export const TREE_IMAGES = {
     holyGround: img('sacred-ground'),
     groundEvolve: img('consecrated-earth'),
     holyWater: img('holy-water'),
+    waterEvolve: img('blessed-rain'),
     blessedBlade: img('blessed-sword'),
-    smite: img('smite'),
+    smite: img('holy-smite'),
+    smiteEvolve: img('divine-wrath'),
     oathFaith: img('oath-of-faith')
 };
 

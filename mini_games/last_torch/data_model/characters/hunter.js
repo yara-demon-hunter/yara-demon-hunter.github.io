@@ -78,14 +78,14 @@ export const HUNTER = {
         durationSeconds: 3.5,        // quanto dura com a skill Fury no nível 1
         durationPerLevel: 0.5,      // segundos a mais por nível da skill Fury
         damageBonusPerLevel: 0.12,  // dano da lâmina durante a Fúria: +12% por nível da skill Fury
-        stepSeconds: 0.20,          // tempo entre uma espada e a próxima
+        stepSeconds: 0.15,          // tempo entre uma espada e a próxima
         fallSeconds: 0.22,          // a queda de cada espada (o aviso no chão dura isso)
         radius: 38,                 // alcance do impacto de cada espada, px
-        damage: 0.20,               // dano de cada espada = dano da lâmina x este número
+        damage: 0.30,               // dano de cada espada = dano da lâmina x este número
         range: 340,                 // até onde ele escolhe os alvos, a partir do herói, px
         giantFallSeconds: 0.5,      // a espada gigante cai nos últimos instantes da Fúria
         giantRadius: 125,           // alcance do impacto dela, px
-        giantDamage: 1.6,           // dano da gigante = dano da lâmina x este número
+        giantDamage: 2.5,           // dano da gigante = dano da lâmina x este número
         giantKnockback: 380         // empurrão da gigante
     },
 

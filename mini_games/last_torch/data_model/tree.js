@@ -192,8 +192,8 @@ export const TREE_NODES = [
 
     // --- LUZ: o padre. Fé e luz sagrada: chão consagrado, água benta que marca e a ira divina que julga ---
     { id: 'silentVigil', branch: 'light', kind: 'mod', x: 0, y: 1.5, requires: [],
-      name: 'Silent Vigil', icon: '🕯️', desc: 'Faith keeps you standing, slowly and always.',
-      levelText: (mods) => `Heal ${mods.hpRegen} health per second`, mods: { hpRegen: 0.3 } },
+      name: 'Silent Vigil', icon: '🕯️', desc: 'Every blessed monster that falls restores your faith, and your spells grow stronger.',
+      levelText: (mods) => `Killing a blessed monster heals ${mods.blessedKillHeal} · +${formatPercent(mods.spellDamage)} spell damage`, mods: { blessedKillHeal: 0.8, spellDamage: 0.04 } },
     // Quatro linhas ao lado do Silent Vigil; a da água benta termina na Blessed Blade (só do Avgustino) e a última é o sino da tocha. Duas delas (chão e ira) terminam no Oath of Faith.
     // Linha 1, o chão: Sacred Ground -> Consecrated Earth
     { id: 'holyGround', branch: 'light', kind: 'power', key: 'holyGround', x: 1, y: 0, requires: [req('silentVigil')] },

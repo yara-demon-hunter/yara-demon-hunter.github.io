@@ -2,7 +2,8 @@ import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers
 import { PASSIVE_SKILL_MODELS } from '../../data_model/passives.js';
 import { audio, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
-import { addShockwave, createExplosion, screenFlash, shakeScreen } from './effects.js';
+import { addNumber, addShockwave, createExplosion, screenFlash, shakeScreen } from './effects.js';
+import { mod } from './modifiers.js';
 import { startCast } from './moves.js';
 import { nearestEnemy, ready } from './powers.js';
 import { getMaxPlayerHp, getSpellCooldown, getSpellDamage } from './stats.js';
@@ -36,10 +37,11 @@ function densestSpot(radius, range) {
 function updateHolyGround(dt) {
     const M = POWER_MODELS.holyGround;
     const level = getPowerLevel(powers.holyGround);
+    // Um círculo por vez: a recarga só corre depois que o atual acaba, e enquanto ele existe nenhum outro é criado
+    if (L.grounds.length > 0) return;
     if (level && ready('holyGround', dt, getSpellCooldown(level.cooldown))) {
         const spot = densestSpot(level.radius, M.range);
         if (spot) {
-            if (L.grounds.length >= M.maxGrounds) L.grounds.shift();
             L.grounds.push({
                 x: spot.x, y: spot.y, age: 0, seconds: level.seconds, radius: level.radius,
                 dps: level.dps, slow: level.slow, tick: 0, evolved: powers.holyGround.evolved
@@ -199,7 +201,17 @@ function updateHolyRain(dt, level) {
 
 // Blessed Rain (evoluída): o monstro abençoado que morre explode em luz
 export function onLightKill(e) {
-    if (!(e.blessed > 0) || !powers.holyWater.evolved) return;
+    if (!(e.blessed > 0)) return;
+    // Silent Vigil: cada monstro abençoado que cai cura o herói
+    const heal = mod('blessedKillHeal');
+    if (heal > 0 && player.hp > 0) {
+        const healed = Math.min(getMaxPlayerHp() - player.hp, heal);
+        if (healed > 0) {
+            player.hp += healed;
+            addNumber(player.x, player.y - 40, healed, 1, 'heal');
+        }
+    }
+    if (!powers.holyWater.evolved) return;
     const B = EVOLUTIONS.holyWater.baptism;
     state.blastBudget++;
     blast(e.x, e.y, B.radius, getSpellDamage() * B.damage, 80, '#fef3c7', 'spell');
@@ -217,15 +229,18 @@ function updateSmite(dt) {
             .slice(0, level.count);
         const judgment = powers.smite.evolved ? EVOLUTIONS.smite.judgment : 0;
         for (const e of picked) {
-            L.bolts.push({ x: e.x, y: e.y, age: 0, seconds: 0.4, radius: M.radius });
+            // Divine Wrath (evoluída): o raio dura mais, é maior e tem faíscas, impacto com onda e clarão forte
+            const wrath = powers.smite.evolved;
+            L.bolts.push({ x: e.x, y: e.y, age: 0, seconds: wrath ? 0.75 : 0.4, radius: wrath ? M.radius * 1.6 : M.radius, wrath, seed: Math.random() * 100 });
             const banish = judgment > 0 && !e.isBoss && e.hp < e.maxHp * judgment;
             dealDamage(e, banish ? e.hp + 1 : getSpellDamage() * level.damage, { noCrit: true, style: 'spell' });
             e.stunned = Math.max(e.stunned ?? 0, level.stun * (e.isBoss ? M.bossStunRatio : 1));
-            createExplosion(e.x, e.y, '#fef3c7', 8);
+            createExplosion(e.x, e.y, '#fef3c7', wrath ? 16 : 8);
+            if (wrath) addShockwave(e.x, e.y, { radius: M.radius * 3.2, color: '#fde68a', width: 8, seconds: 0.5 });
         }
         if (picked.length) {
-            screenFlash('#fef3c7', 0.1);
-            shakeScreen(4);
+            screenFlash('#fef3c7', powers.smite.evolved ? 0.14 : 0.1);
+            shakeScreen(powers.smite.evolved ? 8 : 4);
             startCast();
             audio.playBlast();
         }

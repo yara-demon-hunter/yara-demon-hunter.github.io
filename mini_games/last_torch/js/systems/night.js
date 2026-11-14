@@ -13,6 +13,7 @@ import { refreshModifiers } from './modifiers.js';
 import { collectAllPickups } from './pickups.js';
 import { bumpStat } from './sanctuary.js';
 import { resetStreak } from './streak.js';
+import { resetFury } from './fury.js';
 import { hasBossIntro, playBossIntro, playDuelDialogue, whenHunting } from '../ui/dialogue.js';
 import { buildHourPlan, prepareBossSummon, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
@@ -111,6 +112,9 @@ function updateLastStand() {
 }
 
 function beginClear() {
+    // A Fúria acaba junto com a onda: não passa para a onda seguinte (nem fica parada no acampamento)
+    state.frenzyActiveTimer = 0;
+    resetFury();
     state.phase = 'CLEAR';
     state.lastStand = false;
     state.phaseTimer = NIGHT.clearSeconds;

@@ -3,7 +3,7 @@ import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
 import { addNumber, addShockwave, createExplosion, screenFlash, shakeScreen } from './effects.js';
-import { mod } from './modifiers.js';
+import { getHero, mod } from './modifiers.js';
 import { startCast } from './moves.js';
 import { nearestEnemy, ready } from './powers.js';
 import { getKnifeDamage, getSpellCooldown, getSpellDamage } from './stats.js';
@@ -363,6 +363,21 @@ function updateSporePods(dt) {
         const p = N.pods[i];
         p.age += dt;
         if (p.age < M.armSeconds || !level) continue;
+        // Só o Rowan (o druida) come o cogumelo: ao pisar, ele estoura numa nuvem que CURA um pouco. Só vale depois de o herói se afastar do cogumelo que ele mesmo
+        // plantou (senão comeria cada um no instante em que nasce)
+        const heroDist = Math.hypot(player.x - p.x, player.y - p.y);
+        if (heroDist > M.triggerRadius + 14) p.left = true;
+        if (p.left && heroDist < M.triggerRadius && player.hp > 0 && getHero().id === 'rowan') {
+            N.pods.splice(i, 1);
+            const healed = Math.min(player.maxHp - player.hp, level.heal);
+            if (healed > 0) {
+                player.hp += healed;
+                addNumber(player.x, player.y - 40, healed, 1, 'heal');
+            }
+            createExplosion(p.x, p.y, '#bef264', 10);
+            audio.playSmoke();
+            continue;
+        }
         let stepped = false;
         for (const e of state.enemies) {
             if (Math.hypot(e.x - p.x, e.y - p.y) < M.triggerRadius + e.radius) {

@@ -178,18 +178,6 @@ export function renderNatureGround() {
         const grow = oakScale(oak);
         const fade = 1;              // a árvore não some mais com o tempo
         renderHealingRing(oak, t);
-        // Furiosa (quarto estágio): o alcance dos galhos, em vermelho, tracejado (o mesmo padrão do anel de cura)
-        if (oak.awake > 0.3) {
-            ctx.globalAlpha = 0.8 * oak.awake * fade;
-            ctx.strokeStyle = '#ef4444';
-            ctx.lineWidth = 1.8;
-            ctx.setLineDash([9, 8]);
-            ctx.lineDashOffset = -t * 2;
-            ctx.beginPath();
-            ctx.ellipse(oak.x, oak.y, oak.reach, oak.reach * 0.75, 0, 0, TAU);
-            ctx.stroke();
-            ctx.setLineDash([]);
-        }
     }
     ctx.globalAlpha = 1;
     if (N.pods.length > 0) {

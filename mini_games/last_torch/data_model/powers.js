@@ -415,8 +415,7 @@ export const POWER_MODELS = {
             { cooldown: 7, radius: 96, dps: 1.15, slow: 0.36, seconds: 6 }
         ],
         range: 320,             // só abre o círculo com monstro a esta distância do herói
-        tickSeconds: 0.5,
-        maxGrounds: 3
+        tickSeconds: 0.5
     },
     holyWater: {
         name: 'Holy Water', icon: '💧', maxLvl: 5,
@@ -445,7 +444,7 @@ export const POWER_MODELS = {
         flightSeconds: 0.95        // o frasco no ar: devagar, para dar para ver que é um frasco (antes 0.45)
     },
     smite: {
-        name: 'Smite', icon: '⚡', maxLvl: 5,
+        name: 'Holy Smite', icon: '⚡', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
             return `Every ${formatNumber(level.cooldown)}s a bolt of divine light strikes the strongest monster in reach for ${formatMultiplier(level.damage)} spell damage and stuns it for ${formatNumber(level.stun)}s. Bosses are only staggered.`;
@@ -578,22 +577,22 @@ export const POWER_MODELS = {
         name: 'Spore Pods', icon: '🍄', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `Mushrooms sprout behind you (up to ${level.max}). The first monster to step on one bursts it into a cloud that poisons for ${formatMultiplier(level.dps)} spell damage per second and slows by ${formatPercent(level.slow)} for ${formatNumber(level.seconds)}s.`;
+            return `Mushrooms sprout behind you (up to ${level.max}). Only the druid can eat them: Rowan walking over one bursts it into a healing puff that restores ${formatNumber(level.heal)} health. The first monster to step on one bursts it into a cloud that poisons for ${formatMultiplier(level.dps)} spell damage per second and slows by ${formatPercent(level.slow)} for ${formatNumber(level.seconds)}s.`;
         },
         get upgrades() {
             return this.levels.map(level =>
-                `${level.max} mushrooms · ${formatMultiplier(level.dps)} poison per second · ${formatPercent(level.slow)} slow · ${level.radius} cloud · one every ${formatNumber(level.cooldown)}s`
+                `${level.max} mushrooms · Rowan heals ${formatNumber(level.heal)} on one · ${formatMultiplier(level.dps)} poison per second · ${formatPercent(level.slow)} slow · ${level.radius} cloud · one every ${formatNumber(level.cooldown)}s`
             );
         },
         levels: [
-            { cooldown: 5, max: 2, radius: 70, dps: 0.6, seconds: 3, slow: 0.25 },
-            { cooldown: 4.5, max: 3, radius: 74, dps: 0.7, seconds: 3, slow: 0.3 },
-            { cooldown: 4.5, max: 3, radius: 80, dps: 0.85, seconds: 3.5, slow: 0.3 },
-            { cooldown: 4, max: 4, radius: 84, dps: 1, seconds: 3.5, slow: 0.35 },
-            { cooldown: 3.5, max: 5, radius: 90, dps: 1.1, seconds: 4, slow: 0.4 }
+            { cooldown: 5, max: 2, radius: 70, dps: 0.6, seconds: 3, slow: 0.25, heal: 1 },
+            { cooldown: 4.5, max: 3, radius: 74, dps: 0.7, seconds: 3, slow: 0.3, heal: 1.2 },
+            { cooldown: 4.5, max: 3, radius: 80, dps: 0.85, seconds: 3.5, slow: 0.3, heal: 1.5 },
+            { cooldown: 4, max: 4, radius: 84, dps: 1, seconds: 3.5, slow: 0.35, heal: 1.8 },
+            { cooldown: 3.5, max: 5, radius: 90, dps: 1.1, seconds: 4, slow: 0.4, heal: 2 }
         ],
         armSeconds: 0.6,        // o cogumelo leva este tempo para ficar pronto
-        triggerRadius: 24,      // monstro a esta distância o estoura
+        triggerRadius: 24,      // monstro a esta distância o estoura; o Rowan (só ele; depois de se afastar do cogumelo que plantou) o come com a mesma distância
         tickSeconds: 0.5,
         minGap: 46              // distância mínima entre dois cogumelos
     },

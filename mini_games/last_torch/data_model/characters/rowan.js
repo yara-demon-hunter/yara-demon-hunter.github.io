@@ -59,10 +59,10 @@ export const ROWAN = {
         dashInvulnerable: 0.3,      // segundos invulnerável durante o dash
 
         // ===== RANGE: o alcance da lâmina =====
-        bladeRange: 60,             // alcance do cajado, px
+        bladeRange: 65,             // alcance do cajado, px
 
         // ===== DAGGER: a adaga (dano x alcance) =====
-        knifeRange: 300,            // alcance da rosa, px
+        knifeRange: 250,            // alcance da rosa, px
         knifeDamage: 0,             // dano da rosa, bônus em %
         knifeCooldown: 0.9,         // segundos entre adagas
         knifeSpeed: 520,            // velocidade da adaga em voo, px/s
