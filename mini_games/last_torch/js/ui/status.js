@@ -19,7 +19,7 @@ const STAT_VALUES = {
     slashArc: () => `${getSlashArcDegree()}°`,
     atkSpeed: () => `${getAtkCooldown().toFixed(2)}s`,
     moveSpeed: () => Math.round(getPlayerMaxSpeed()),
-    frenzyNova: () => `${getFrenzyDuration().toFixed(1)}s +${Math.round(getFrenzyDamageBonus() * 100)}%`,
+    frenzyNova: () => `Fury duration: ${getFrenzyDuration().toFixed(1)}s\nFury damage: +${Math.round(getFrenzyDamageBonus() * 100)}%`,
     playerHp: () => getMaxPlayerHp(),
     knockback: () => Math.round(getKnockback())
 };
@@ -61,7 +61,8 @@ function renderStats() {
             const item = createStatRow(attr
                 ? { name: attr.name, note: attr.desc, level: attr.lvl, value: getStatText(row.attr) }
                 : { name: row.name, note: row.note, value: amount === 0 ? '—' : row.format(amount), empty: amount === 0, tone: row.tone });
-            paintIcon(item.querySelector('.stat-icon'), attr ? treeImageFor(row.attr) : null, attr?.icon ?? row.icon);
+            item.classList.toggle('shop-row-fury', row.attr === 'frenzyNova');
+            paintIcon(item.querySelector('.stat-icon'), treeImageFor(row.attr ?? row.iconKey), attr?.icon ?? row.icon);
             list.appendChild(item);
         });
     });

@@ -294,8 +294,9 @@
 .tdetail-name > span, .tdetail-name > em { display: block; }
 .tdetail-name > em { color: #fbbf24; font-size: 0.66rem; font-style: normal; }
 .tdetail-text { flex: 1; min-height: 0; overflow-y: auto; }
-.tdetail-text > span { display: block; margin-bottom: 0.2rem; color: #94a3b8; font-size: 0.74rem; line-height: 1.3; }
+.tdetail-text > span { display: block; min-width: 0; margin-bottom: 0.2rem; color: #94a3b8; font-size: 0.74rem; line-height: 1.25; overflow-wrap: anywhere; }
 .tdetail-text .tdetail-next { color: #67e8f9; font-weight: 700; }
+.tdetail-next > span { display: block; }
 .tdetail-preview { display: grid; gap: 0.18rem; margin: 0.15rem 0 0.35rem; }
 .tdetail-preview .shop-row { min-height: 1.55rem; }
 .tdetail-preview .shop-row-value { color: #6ee7b7; }

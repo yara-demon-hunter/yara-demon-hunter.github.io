@@ -122,10 +122,10 @@ export function getFuryGroup() {
     const dmg = (n) => (mod('furyNoDamage') > 0 ? 0 : n);
     const fury = CHARACTER_BASES[hero.id]?.player.fury;
     if (!fury) return null;
-    const duration = row('⏳', 'Duration', 'How long the Fury lasts. The Fury skill makes it longer.', secondsShort(getFrenzyDuration() + (fury.extraSeconds ?? 0)));
+    const duration = row('⏳', 'Fury Duration', 'How long the Fury lasts.', secondsShort(getFrenzyDuration() + (fury.extraSeconds ?? 0)));
+    const furyDamage = { ...row('😡', 'Fury Damage', 'Extra blade damage while Fury is active.', bonus(getFrenzyDamageBonus())), iconKey: 'frenzyNova' };
     const rows = {
         swordRain: () => [
-            duration,
             row('🗡️', 'Swords', 'A sword falls on a monster near you every few moments while the Fury lasts.', secondsShort(fury.stepSeconds)),
             row('💥', 'Sword Damage', 'Damage of each sword = your blade damage times this.', times(dmg(fury.damage))),
             row('📏', 'Sword Reach', 'How wide each impact is.', `${fury.radius}px`),
@@ -140,7 +140,6 @@ export function getFuryGroup() {
             row('⚡', 'Speed', 'Time between one cut and the next.', secondsShort(fury.cutSeconds))
         ],
         stomp: () => [
-            duration,
             row('🦶', 'Stomp', 'Time between one stomp and the next.', secondsShort(fury.stepSeconds)),
             row('💥', 'Stomp Damage', 'Damage of each stomp around him = your blade damage times this.', times(dmg(fury.damage))),
             row('📏', 'Stomp Reach', 'How far each stomp reaches.', `${fury.radius}px`),
@@ -148,7 +147,6 @@ export function getFuryGroup() {
             row('🛡️', 'Damage Taken', 'He takes less damage while the Fury lasts.', `-${Math.round(fury.damageTakenCut * 100)}%`)
         ],
         consecration: () => [
-            duration,
             row('✝️', 'Holy Damage', 'Damage dealt to every monster inside the circle, again and again = your magic damage times this.', times(dmg(fury.damage))),
             row('😈', 'Demons', 'Elites and bosses take this much more from the light.', `+${Math.round(fury.demonBonus * 100)}%`),
             row('⏱️', 'Pulse', 'Time between light hits.', secondsShort(fury.tickSeconds)),
@@ -159,7 +157,6 @@ export function getFuryGroup() {
             row('✨', 'Finale', 'When the circle fades a cross of light bursts: magic damage times this.', times(dmg(fury.finaleDamage)))
         ],
         forestGuardian: () => [
-            duration,
             row('🛡️', 'Damage Taken', 'The leaf shield makes every hit on him softer.', `-${Math.round(fury.damageReduction * 100)}%`),
             row('🍃', 'Leaf Damage', 'Damage dealt to every monster in reach, again and again = your magic damage times this.', times(dmg(fury.damage))),
             row('⏱️', 'Pulse', 'Time between leaf hits.', secondsShort(fury.tickSeconds)),
@@ -176,7 +173,8 @@ export function getFuryGroup() {
         forestGuardian: 'a leaf shield that hurts and slows the monsters around him'
     }[fury.kind];
     return { title: `Special Attack (Fury): ${fury.name.toUpperCase()}`, summary, rows: [
-        { attr: 'frenzyNova' },
+        duration,
+        furyDamage,
         ...rows(),
         row('🔋', 'Charge per Hit', 'How much of the Fury bar (out of 100) each monster hit by your blade fills.', getFuryChargePerHit().toFixed(1)),
         row('☠️', 'Charge per Kill', 'How much of the Fury bar each kill in a streak fills.', getFuryChargePerKill().toFixed(1)),

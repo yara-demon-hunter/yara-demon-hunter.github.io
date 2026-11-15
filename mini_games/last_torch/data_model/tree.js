@@ -58,7 +58,7 @@ export const TREE_NODES = [
     { id: 'damage', branch: 'blade', kind: 'stat', key: 'damage', x: 0, y: 1.5, requires: [] },
     // Linha da Fúria: matar alimenta matar
     { id: 'frenzyNova', branch: 'blade', kind: 'stat', key: 'frenzyNova', x: 1, y: 0, requires: [req('damage')],
-      levelText: (mods) => `+${Math.round(mods.furyCharge * 100)}% Fury charge`, mods: { furyCharge: 0.06 } },
+      levelText: (mods) => `Fury charge: +${Math.round(mods.furyCharge * 100)}%`, mods: { furyCharge: 0.06 } },
     { id: 'bloodlust', branch: 'blade', kind: 'power', key: 'bloodlust', x: 2, y: 0, requires: [req('frenzyNova', 2)] },
     { id: 'bloodlustEvolve', branch: 'blade', kind: 'evolve', key: 'bloodlust', x: 3, y: 0, requires: [req('bloodlust', 5)] },
     // Linha do aço: o golpe cada vez mais largo e mortal

@@ -99,7 +99,12 @@ export function getNextText(node) {
     const after = getStatText(node.key);
     attr.lvl--;
     const levelText = typeof node.levelText === 'function' ? node.levelText(node.mods) : node.levelText;
-    return levelText ? `${before} → ${after}; ${levelText}` : `${before} → ${after}`;
+    const beforeLines = typeof before === 'string' ? before.split('\n') : [];
+    const afterLines = typeof after === 'string' ? after.split('\n') : [];
+    const change = beforeLines.length > 1 && afterLines.length === beforeLines.length
+        ? beforeLines.map((line, index) => `${line} → ${afterLines[index]}`).join('\n')
+        : `${before} → ${after}`;
+    return levelText ? `${change}; ${levelText}` : change;
 }
 
 const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || node.kind === 'evolve';
