@@ -55,7 +55,11 @@
 
 /* Skills: um ramo por vez, trocado pelas abas ao lado do mapa */
 .tree-tabs { grid-template-columns: auto minmax(0, 1fr) minmax(11rem, 17rem); }
-.tree-tabs .tree-map { --cell: min(100cqw / var(--tiers), 100cqh / var(--rows-active, var(--rows)), 5.6rem); }
+.tree-tabs .tree-map {
+    /* Reserva espaço para a etiqueta de nível do Juramento na última coluna. */
+    padding-inline-end: 0.5rem;
+    --cell: min((100cqw - 0.5rem) / var(--tiers), 100cqh / var(--rows-active, var(--rows)), 5.6rem);
+}
 .tree-tabs .tree-branch { background: none; }
 .tree-tabs .tree-branch:not(.is-active), .tree-tabs .tree-band { display: none; }
 
@@ -63,6 +67,7 @@
 .tree-tab {
     position: relative;
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -101,7 +106,7 @@
     .tree-tabs { grid-template-columns: minmax(0, 1fr) 17rem; }
     .tree-rail { display: none; }
     .tree-tabs .tree-map {
-        --cell: min(100cqw / (var(--cols, 2) * var(--w) + (var(--cols, 2) - 1) * var(--gap)), 100cqh / (var(--rows-sum) + var(--row-gaps, 1) * var(--gap)), 4.6rem);
+        --cell: min((100cqw - 0.5rem) / (var(--cols, 2) * var(--w) + (var(--cols, 2) - 1) * var(--gap)), 100cqh / (var(--rows-sum) + var(--row-gaps, 1) * var(--gap)), 4.6rem);
         display: grid;
         grid-template-columns: repeat(var(--cols, 2), auto);
     }
@@ -291,6 +296,10 @@
 .tdetail-text { flex: 1; min-height: 0; overflow-y: auto; }
 .tdetail-text > span { display: block; margin-bottom: 0.2rem; color: #94a3b8; font-size: 0.74rem; line-height: 1.3; }
 .tdetail-text .tdetail-next { color: #67e8f9; font-weight: 700; }
+.tdetail-preview { display: grid; gap: 0.18rem; margin: 0.15rem 0 0.35rem; }
+.tdetail-preview .shop-row { min-height: 1.55rem; }
+.tdetail-preview .shop-row-value { color: #6ee7b7; }
+.tdetail-preview.hidden { display: none; }
 .tdetail-text .tdetail-next:empty, .tdetail-text .tdetail-note:empty { display: none; }
 .tdetail-note span { display: block; color: #fca5a5; }
 .tdetail-note span.is-met { color: #6ee7b7; }
@@ -329,7 +338,7 @@
     .tree-rail { flex-direction: column; }
     .tree-band-icon { font-size: 1rem; }
     .tree-band-name { font-size: 0.54rem; }
-    .tree-tab { min-width: 3.1rem; padding: 0.2rem; }
+    .tree-tab { min-width: 3.1rem; min-height: 0; padding: 0.1rem; }
     .tree-tab .tree-band-name { font-size: 0.54rem; letter-spacing: 0.06em; }
     .tnode-level { min-width: 1.2rem; font-size: 0.56rem; line-height: 0.8rem; }
     .tree-detail { gap: 0.25rem; padding: 0.35rem 0.45rem; }
@@ -360,7 +369,10 @@
 .tree-band-icon.has-image { width: 3.4rem; height: 3.4rem; }
 .tree-tab .tree-band-icon.has-image { width: 2.6rem; height: 2.6rem; }
 .tree-band-name { text-align: center; line-height: 1.15; }
-@media (max-height: 520px) { .tree-tab .tree-band-icon.has-image { width: 1.9rem; height: 1.9rem; } }
+@media (max-height: 520px) {
+    .tree-tab .tree-band-icon.has-image { width: 1.45rem; height: 1.45rem; }
+    .tree-tab .tree-band-name { font-size: 0.46rem; line-height: 1; }
+}
 
 /* Celular em pé: a legenda sai e o detalhe fica enxuto; a altura que sobra vai para o mapa */
 @media (orientation: portrait) and (max-width: 599px) {

@@ -17,11 +17,14 @@ export function showIosHint() {
 // No site, no celular: tela cheia ao começar (precisa de um toque do jogador). Não trava a orientação.
 export async function enterFullscreen() {
     if (inPortal || !window.matchMedia('(pointer: coarse)').matches) return;
+    const root = document.documentElement;
     try {
-        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+        if (!document.fullscreenElement && root.requestFullscreen) {
+            // Use the baseline call: some mobile browsers reject the options dictionary.
+            await root.requestFullscreen();
         }
-    } catch {
-        // Sem suporte (iPhone): segue na página normal
+    } catch (error) {
+        // Fullscreen may be denied by browser policy; keep the game playable and leave a useful diagnostic.
+        console.warn('Could not enter fullscreen:', error);
     }
 }

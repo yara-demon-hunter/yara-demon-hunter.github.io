@@ -106,6 +106,10 @@ function createTreeView(cfg) {
 
     function build() {
         built = true;
+        const preview = document.createElement('div');
+        preview.id = `${prefix}Preview`;
+        preview.className = 'tdetail-preview hidden';
+        detail('Next').after(preview);
         const { labelWidth, tiers, branchGap } = layout;
         const branchKeys = Object.keys(branches);
         const rows = branchKeys.map(branchRows);
@@ -170,6 +174,8 @@ function createTreeView(cfg) {
             detail('Desc').textContent = cfg.emptyHint;
             if (detail('Branch')) detail('Branch').textContent = '';
             detail('Next').textContent = '';
+            const preview = detail('Preview');
+            if (preview) { preview.replaceChildren(); preview.classList.add('hidden'); }
             detail('Note').replaceChildren();
             buy.classList.add('hidden');
             return;
@@ -182,7 +188,23 @@ function createTreeView(cfg) {
         detail('Level').textContent = levelText(node, st);
         detail('Desc').textContent = info.desc;
         if (detail('Branch')) detail('Branch').textContent = branches[node.branch].style;
-        detail('Next').textContent = next ? `Next: ${next}` : '';
+        const nextLine = detail('Next');
+        nextLine.textContent = '';
+        const preview = detail('Preview');
+        if (preview) {
+            preview.replaceChildren();
+            preview.classList.toggle('hidden', !next || !['stat', 'mod', 'power'].includes(node.kind));
+            if (next && ['stat', 'mod', 'power'].includes(node.kind)) {
+                const row = document.createElement('div');
+                row.className = 'shop-row tree-preview-row';
+                row.innerHTML = '<span class="shop-row-name"><span class="stat-icon"></span><span></span></span><b class="shop-row-value"></b>';
+                paintIcon(row.querySelector('.stat-icon'), node.kind === 'stat' ? TREE_IMAGES[node.key] : null, info.icon);
+                row.querySelector('.shop-row-name > span:last-child').textContent = node.kind === 'power' ? 'Next Upgrade' : info.name;
+                row.querySelector('.shop-row-value').textContent = next;
+                row.title = `${info.name}: ${info.desc}`;
+                preview.appendChild(row);
+            }
+        }
         renderNote(st, node);
         buy.classList.toggle('hidden', st.maxed || st.restricted);
         buy.disabled = !st.canBuy;
