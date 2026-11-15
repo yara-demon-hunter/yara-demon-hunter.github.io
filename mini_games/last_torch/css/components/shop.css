@@ -285,7 +285,6 @@
     .stat-list { grid-template-columns: repeat(auto-fill, minmax(8.6rem, 1fr)); gap: 0.15rem; }
     .stat-group { padding: 0.15rem 0.15rem 0; font-size: 0.54rem; }
     .shop-row { min-height: 1.3rem; padding: 0 0.3rem; }
-    .shop-row.is-empty { display: none; }
     .shop-row-name { font-size: 0.6rem; }
     .shop-row-value { font-size: 0.64rem; }
     .shop-row-name > em { display: none; }

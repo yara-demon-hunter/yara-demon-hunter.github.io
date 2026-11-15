@@ -1,6 +1,7 @@
 import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES } from '../../data_model/tree.js';
 import { BRANCH_IMAGES, TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
+import { getFuryUpgradeRows } from './stat_sheet.js';
 import { state } from '../core/state.js';
 import { buyNode, getNextText, getNodeInfo, getNodeState, getRestrictionText } from '../systems/tree.js';
 
@@ -182,7 +183,8 @@ function createTreeView(cfg) {
         }
         const st = getNodeState(node);
         const info = getNodeInfo(node);
-        const next = st.maxed || st.restricted ? '' : getNextText(node);
+        const furyUpgrade = node.key === 'frenzyNova' && !st.maxed && !st.restricted;
+        const next = st.maxed || st.restricted || furyUpgrade ? '' : getNextText(node);
         setIcon(detail('Icon'), node, info);
         detail('Name').textContent = info.name;
         detail('Level').textContent = levelText(node, st);
@@ -202,8 +204,18 @@ function createTreeView(cfg) {
         const preview = detail('Preview');
         if (preview) {
             preview.replaceChildren();
-            preview.classList.toggle('hidden', !next || !['stat', 'mod', 'power'].includes(node.kind));
-            if (next && ['stat', 'mod', 'power'].includes(node.kind)) {
+            preview.classList.toggle('hidden', !(furyUpgrade || (next && ['stat', 'mod', 'power'].includes(node.kind))));
+            if (furyUpgrade) {
+                getFuryUpgradeRows(node.mods?.furyCharge ?? 0).forEach(({ icon, name, value }) => {
+                    const row = document.createElement('div');
+                    row.className = 'shop-row tree-preview-row tree-preview-fury';
+                    row.innerHTML = '<span class="shop-row-name"><span class="stat-icon"></span><span></span></span><b class="shop-row-value"></b>';
+                    paintIcon(row.querySelector('.stat-icon'), null, icon);
+                    row.querySelector('.shop-row-name > span:last-child').textContent = name;
+                    row.querySelector('.shop-row-value').textContent = value;
+                    preview.appendChild(row);
+                });
+            } else if (next && ['stat', 'mod', 'power'].includes(node.kind)) {
                 const row = document.createElement('div');
                 row.className = `shop-row tree-preview-row${node.key === 'frenzyNova' ? ' tree-preview-fury' : ''}`;
                 row.innerHTML = '<span class="shop-row-name"><span class="stat-icon"></span><span></span></span><b class="shop-row-value"></b>';

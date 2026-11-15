@@ -24,6 +24,12 @@ const perSecond = (n) => `${n.toFixed(1)}/s`;
 const pixels = (n) => `${Math.round(n)}px`;
 const extra = (n) => `+${n}`;
 
+export const FURY_BUILD_STATS = {
+    duration: { icon: '⏳', name: 'Fury Duration' },
+    damage: { icon: '😡', name: 'Fury Damage' },
+    charge: { icon: '⚡', name: 'Fury Charge' }
+};
+
 // Atalho para as linhas que só mostram um modificador
 const modRow = (key, icon, name, note, format = bonus) => ({ icon, name, note, amount: () => mod(key), format });
 
@@ -122,8 +128,8 @@ export function getFuryGroup() {
     const dmg = (n) => (mod('furyNoDamage') > 0 ? 0 : n);
     const fury = CHARACTER_BASES[hero.id]?.player.fury;
     if (!fury) return null;
-    const duration = row('⏳', 'Fury Duration', 'How long the Fury lasts.', secondsShort(getFrenzyDuration() + (fury.extraSeconds ?? 0)));
-    const furyDamage = { ...row('😡', 'Fury Damage', 'Extra blade damage while Fury is active.', bonus(getFrenzyDamageBonus())), iconKey: 'frenzyNova' };
+    const duration = row(FURY_BUILD_STATS.duration.icon, FURY_BUILD_STATS.duration.name, 'How long the Fury lasts.', secondsShort(getFrenzyDuration() + (fury.extraSeconds ?? 0)));
+    const furyDamage = row(FURY_BUILD_STATS.damage.icon, FURY_BUILD_STATS.damage.name, 'Extra blade damage while Fury is active.', bonus(getFrenzyDamageBonus()));
     const rows = {
         swordRain: () => [
             row('🗡️', 'Swords', 'A sword falls on a monster near you every few moments while the Fury lasts.', secondsShort(fury.stepSeconds)),
@@ -178,6 +184,17 @@ export function getFuryGroup() {
         ...rows(),
         row('🔋', 'Charge per Hit', 'How much of the Fury bar (out of 100) each monster hit by your blade fills.', getFuryChargePerHit().toFixed(1)),
         row('☠️', 'Charge per Kill', 'How much of the Fury bar each kill in a streak fills.', getFuryChargePerKill().toFixed(1)),
-        modRow('furyCharge', '⚡', 'Fury Charge', 'The Fury bar fills faster (relics, skills, oaths).')
+        modRow('furyCharge', FURY_BUILD_STATS.charge.icon, FURY_BUILD_STATS.charge.name, 'The Fury bar fills faster (relics, skills, oaths).')
     ] };
+}
+
+export function getFuryUpgradeRows(chargePerLevel) {
+    const hero = getHero();
+    const fury = CHARACTER_BASES[hero.id]?.player.fury;
+    if (!fury) return [];
+    return [
+        { ...FURY_BUILD_STATS.duration, value: `+${secondsShort(fury.durationPerLevel)}` },
+        { ...FURY_BUILD_STATS.damage, value: bonus(fury.damageBonusPerLevel) },
+        { ...FURY_BUILD_STATS.charge, value: bonus(chargePerLevel) }
+    ];
 }
