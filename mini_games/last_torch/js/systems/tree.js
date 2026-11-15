@@ -107,6 +107,132 @@ export function getNextText(node) {
     return levelText ? `${change}; ${levelText}` : change;
 }
 
+// Linhas da prévia verde da árvore. Poderes guardam os números de cada nível em
+// `levels`, então a tela mostra apenas os parâmetros que mudam no próximo nível.
+const POWER_UPGRADE_FIELDS = {
+    count: ['✨', 'Projectiles', n => String(n)],
+    stacks: ['🧱', 'Stacks', n => String(n)],
+    bounces: ['🔁', 'Bounces', n => String(n)],
+    targets: ['🎯', 'Targets', n => String(n)],
+    jumps: ['⚡', 'Targets', n => String(n)],
+    spread: ['🕸️', 'Spreads', n => String(n)],
+    max: ['🍄', 'Maximum', n => String(n)],
+    pierces: ['🗡️', 'Pierces', n => n >= 99 ? 'All targets' : String(n)],
+    damage: ['💥', 'Damage', n => `${Number(n.toFixed(2))}×`],
+    dps: ['💥', 'Damage per Second', n => `${Number(n.toFixed(2))}×`],
+    cooldown: ['⏳', 'Recharge', n => `${Number(n.toFixed(2))}s`],
+    seconds: ['⌛', 'Duration', n => `${Number(n.toFixed(2))}s`],
+    life: ['⌛', 'Duration', n => `${Number(n.toFixed(2))}s`],
+    puddleSeconds: ['💧', 'Puddle Duration', n => `${Number(n.toFixed(2))}s`],
+    lashSeconds: ['⚔️', 'Attack Interval', n => `${Number(n.toFixed(2))}s`],
+    biteSeconds: ['🐺', 'Bite Interval', n => `${Number(n.toFixed(2))}s`],
+    stun: ['💫', 'Stun', n => `${Number(n.toFixed(2))}s`],
+    radius: ['📏', 'Range', n => `${Math.round(n)}px`],
+    reach: ['📏', 'Reach', n => `${Math.round(n)}px`],
+    hp: ['❤️', 'Health', n => String(Math.round(n))],
+    slow: ['🐌', 'Slow', n => `${Math.round(n * 100)}%`],
+    chance: ['🎲', 'Chance', n => `${Math.round(n * 100)}%`],
+    heal: ['❤️', 'Healing', n => n <= 1 ? `${Math.round(n * 100)}%` : String(Number(n.toFixed(1)))],
+    pull: ['🌀', 'Pull', n => String(Math.round(n))],
+    knockback: ['💨', 'Knockback', n => String(Math.round(n))]
+};
+
+const POWER_FIELD_OVERRIDES = {
+    bloodlust: {
+        damage: ['⚔️', 'Blade Damage per Stack', n => `+${Math.round(n * 100)}%`],
+        speed: ['⚡', 'Attack Speed per Stack', n => `+${Math.round(n * 100)}%`],
+        seconds: ['⌛', 'Stack Duration', n => `${Number(n.toFixed(2))}s`]
+    },
+    emberTrail: {
+        warmthDamage: ['♨️', 'Warmth Damage', n => `+${Math.round(n * 100)}%`]
+    },
+    deathMark: {
+        splash: ['💥', 'Blast Radius', n => `${Math.round(n)}px`]
+    },
+    shadowBond: {
+        area: ['🛡️', 'Guard Area', n => `${Math.round(n)}px`]
+    },
+    holyWater: {
+        puddleDps: ['💧', 'Puddle Damage per Second', n => `${Number(n.toFixed(2))}×`]
+    }
+};
+
+const POWER_MOD_FIELDS = {
+    critChance: ['🎲', 'Crit Chance', n => `+${Math.round(n * 100)}%`],
+    critDamage: ['💥', 'Crit Damage', n => `+${Math.round(n * 100)}%`],
+    dashCooldown: ['⏱️', 'Dash Recharge', n => `-${Math.round(n * 100)}%`],
+    dashCharges: ['💨', 'Dash Charges', n => `+${n}`]
+};
+
+const TREE_MOD_FIELDS = {
+    furyCharge: ['⚡', 'Fury Charge', n => `+${Math.round(n * 100)}%`],
+    damageTaken: ['🛡️', 'Damage Taken', n => `${Math.round(n * 100)}%`],
+    provoke: ['📣', 'Monster Lure', n => `+${Math.round(n * 100)}%`],
+    knifeDamage: ['🔪', 'Dagger Damage', n => `+${Math.round(n * 100)}%`],
+    knifeRange: ['📏', 'Dagger Range', n => `+${Math.round(n * 100)}%`],
+    knifeSpeed: ['💨', 'Dagger Speed', n => `+${Math.round(n * 100)}%`],
+    knifeCooldown: ['🗡️', 'Dagger Recharge', n => `-${Math.round(n * 100)}%`],
+    torchHp: ['🔥', 'Torch Health', n => `+${n}`],
+    warmth: ['🌡️', 'Warmth Reach', n => `+${Math.round(n * 100)}%`],
+    torchRegen: ['🕯️', 'Torch Regen', n => `+${Number(n.toFixed(2))}/s`],
+    stillAttack: ['⛰️', 'Still Attack', n => `+${Math.round(n * 100)}%`],
+    xp: ['📖', 'XP Bonus', n => `+${Math.round(n * 100)}%`],
+    spellHaste: ['⏳', 'Spell Recharge', n => `-${Math.round(n * 100)}%`],
+    spellDamage: ['🔮', 'Magic Damage', n => `+${Math.round(n * 100)}%`],
+    hpRegen: ['❤️', 'Heal per Second', n => `+${Number(n.toFixed(1))}/s`],
+    blessedKillHeal: ['💛', 'Heal per Blessed Kill', n => `+${Number(n.toFixed(1))}`]
+};
+
+function modifierRows(mods = {}) {
+    return Object.entries(mods).map(([field, value]) => {
+        const [icon, name, format] = TREE_MOD_FIELDS[field] ?? ['⬆️', field, String];
+        return { icon, name, value: format(value) };
+    });
+}
+
+export function getPowerUpgradeRows(key) {
+    const model = POWER_MODELS[key];
+    const level = powers[key]?.lvl ?? 0;
+    const target = model?.levels?.[level];
+    if (!model || !target) return [];
+    const previous = level > 0 ? model.levels[level - 1] : {};
+    const rows = Object.entries(target)
+        .filter(([field, value]) => field !== 'mods' && value !== previous[field] && !(typeof value === 'number' && value === 0))
+        .map(([field, value]) => {
+            const [icon, name, format] = POWER_FIELD_OVERRIDES[key]?.[field] ?? POWER_UPGRADE_FIELDS[field] ?? ['⬆️', field, String];
+            return { icon, name, value: format(value) };
+        });
+    // Keen Eye não tem valores por nível: cada compra aplica estes dois bônus fixos.
+    if (key === 'keenEye') {
+        return Object.entries(model.mods).map(([field, value]) => {
+            const [icon, name, format] = POWER_MOD_FIELDS[field];
+            return { icon, name, value: format(value) };
+        });
+    }
+    const targetMods = target.mods ?? {};
+    const previousMods = previous.mods ?? {};
+    Object.entries(targetMods).forEach(([field, value]) => {
+        if (value === previousMods[field]) return;
+        const [icon, name, format] = POWER_MOD_FIELDS[field] ?? ['⬆️', field, String];
+        rows.push({ icon, name, value: format(value) });
+    });
+    return rows;
+}
+
+export function getNodeUpgradeRows(node) {
+    if (node.kind === 'power') return getPowerUpgradeRows(node.key);
+    if (node.kind === 'mod') return modifierRows(node.mods);
+    if (node.kind !== 'stat') return [];
+    const attr = attributes[node.key];
+    attr.lvl++;
+    const value = getStatText(node.key);
+    attr.lvl--;
+    return [
+        { icon: attr.icon, name: attr.name, value, image: true },
+        ...modifierRows(node.mods)
+    ];
+}
+
 const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || node.kind === 'evolve';
 
 // Skill que só funciona com adaga (needs: 'knives') e o jogador não lança adaga (mod noKnives): o nó fica selado.

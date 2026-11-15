@@ -3,7 +3,7 @@ import { BRANCH_IMAGES, TREE_IMAGES, paintIcon } from '../../data_model/tree_ima
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { getFuryUpgradeRows } from './stat_sheet.js';
 import { state } from '../core/state.js';
-import { buyNode, getNextText, getNodeInfo, getNodeState, getRestrictionText } from '../systems/tree.js';
+import { buyNode, getNodeInfo, getNodeState, getNodeUpgradeRows, getRestrictionText } from '../systems/tree.js';
 
 // --- ÁRVORES (tela) ---
 // Uma fábrica monta cada árvore: skills (tela de status) e relíquias (acampamento). O mapa é montado uma
@@ -184,7 +184,7 @@ function createTreeView(cfg) {
         const st = getNodeState(node);
         const info = getNodeInfo(node);
         const furyUpgrade = node.key === 'frenzyNova' && !st.maxed && !st.restricted;
-        const next = st.maxed || st.restricted || furyUpgrade ? '' : getNextText(node);
+        const upgradeRows = st.maxed || st.restricted || furyUpgrade ? [] : getNodeUpgradeRows(node);
         setIcon(detail('Icon'), node, info);
         detail('Name').textContent = info.name;
         detail('Level').textContent = levelText(node, st);
@@ -196,15 +196,12 @@ function createTreeView(cfg) {
         }));
         if (detail('Branch')) detail('Branch').textContent = branches[node.branch].style;
         const nextLine = detail('Next');
-        nextLine.replaceChildren(...String(next ?? '').split(/[,;\n]\s*/).filter(Boolean).map((part) => {
-            const line = document.createElement('span');
-            line.textContent = part.trim();
-            return line;
-        }));
+        // Os aumentos ficam só na prévia verde abaixo; não repetir antes/depois em azul.
+        nextLine.replaceChildren();
         const preview = detail('Preview');
         if (preview) {
             preview.replaceChildren();
-            preview.classList.toggle('hidden', !(furyUpgrade || (next && ['stat', 'mod', 'power'].includes(node.kind))));
+            preview.classList.toggle('hidden', !(furyUpgrade || upgradeRows.length));
             if (furyUpgrade) {
                 getFuryUpgradeRows(node.mods?.furyCharge ?? 0).forEach(({ icon, name, value }) => {
                     const row = document.createElement('div');
@@ -215,15 +212,17 @@ function createTreeView(cfg) {
                     row.querySelector('.shop-row-value').textContent = value;
                     preview.appendChild(row);
                 });
-            } else if (next && ['stat', 'mod', 'power'].includes(node.kind)) {
-                const row = document.createElement('div');
-                row.className = `shop-row tree-preview-row${node.key === 'frenzyNova' ? ' tree-preview-fury' : ''}`;
-                row.innerHTML = '<span class="shop-row-name"><span class="stat-icon"></span><span></span></span><b class="shop-row-value"></b>';
-                paintIcon(row.querySelector('.stat-icon'), node.kind === 'stat' ? TREE_IMAGES[node.key] : null, info.icon);
-                row.querySelector('.shop-row-name > span:last-child').textContent = node.kind === 'power' ? 'Next Upgrade' : info.name;
-                row.querySelector('.shop-row-value').textContent = next;
-                row.title = `${info.name}: ${info.desc}`;
-                preview.appendChild(row);
+            } else {
+                upgradeRows.forEach(({ icon, name, value, image }) => {
+                    const row = document.createElement('div');
+                    row.className = 'shop-row tree-preview-row';
+                    row.innerHTML = '<span class="shop-row-name"><span class="stat-icon"></span><span></span></span><b class="shop-row-value"></b>';
+                    paintIcon(row.querySelector('.stat-icon'), image ? TREE_IMAGES[node.key] : null, icon);
+                    row.querySelector('.shop-row-name > span:last-child').textContent = name;
+                    row.querySelector('.shop-row-value').textContent = value;
+                    row.title = `${info.name}: ${info.desc}`;
+                    preview.appendChild(row);
+                });
             }
         }
         renderNote(st, node);
