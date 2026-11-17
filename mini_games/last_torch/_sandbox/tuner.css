@@ -38,3 +38,7 @@
 .tn-out { width: 100%; background: #060b16; color: #94a3b8; border: 1px solid #334155; border-radius: 6px; font: 11px/1.35 ui-monospace, monospace; resize: vertical; }
 
 @media (max-width: 900px) { .tn { grid-template-columns: 1fr; height: auto; } .tn-stage { height: 60vh; } }
+
+/* Botão de pausa sobre o palco: o jogo começa pausado e roda só quando se pede */
+.tn-pause { position: absolute; left: 10px; top: 10px; z-index: 5; padding: 8px 14px; border-radius: 9px; border: 1px solid #22c55e; background: rgba(20, 83, 45, .92); color: #fff; font: 700 13px Inter, sans-serif; cursor: pointer; }
+.tn-pause.is-paused { border-color: #f59e0b; background: rgba(120, 53, 15, .92); }

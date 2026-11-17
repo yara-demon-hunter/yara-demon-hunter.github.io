@@ -19,7 +19,7 @@ python3 mini_games/last_torch/_sandbox/serve.py        # http://localhost:8800/
 Segunda aba do painel (**📐 HUD tuner**). Mostra o jogo de verdade num iframe do tamanho de qualquer celular, tablet ou monitor.
 
 - **Resolução:** lista de celulares em pé e deitado, tablets e desktop, ou largura × altura à mão; **⟳** troca largura e altura. A caixa **touch** liga os controles de toque (joystick, adaga, dash): o servidor entrega o jogo sob `/__touch/` (o CSS ganha `(pointer: coarse)` sempre verdadeiro e o JS acredita em toque) ou `/__desk/` (como no computador).
-- **Cena:** barra do boss, sequência de mortes, selo de pontos de skill e **congelar o jogo** (para mexer com calma). O modo deus fica ligado: nada mata o herói nem a tocha.
+- **Cena:** barra do boss, sequência de mortes, selo de pontos de skill e o botão **▶ Play / ⏸ Pause** sobre o palco (o jogo começa pausado; a barra de espaço também alterna). O modo deus fica ligado: nada mata o herói nem a tocha.
 - **Peças:** cada elemento do HUD e dos controles ganha uma alça tracejada. **Arraste** na tela, use as **setas** (1 px; Shift = 10 px) ou os campos X, Y e Tamanho (%). Também dá para esconder a peça.
 - **Os ajustes** são só as propriedades `translate` e `scale` dentro do iframe: não mudam nenhum arquivo do jogo. Ficam guardados no `localStorage` do sandbox, por resolução.
 - **📋 COPY ALL CHANGES** copia **só o que foi alterado**, por resolução (movimento em px, tamanho em %, e onde o jogo tem a peça hoje), mais um JSON. Cole na conversa com a IA para ela aplicar no CSS. **Copy this screen only** copia só a resolução atual; **Reset piece** e **Reset this screen** desfazem.

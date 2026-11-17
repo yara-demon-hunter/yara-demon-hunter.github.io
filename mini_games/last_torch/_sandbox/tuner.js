@@ -66,10 +66,12 @@ export function mountTuner(root) {
     let frame = null;
     let raf = 0;
     let scale = 1;
+    let paused = true;                        // o jogo começa PAUSADO: rodando sozinho atrapalha o ajuste
 
     root.innerHTML = `
       <div class="tn">
         <div class="tn-stage" id="tnStage">
+          <button id="tnPause" class="tn-pause" title="Pause or resume the game (Space)"></button>
           <div class="tn-device" id="tnDevice"><iframe id="tnFrame" title="Game"></iframe><div id="tnHandles"></div></div>
         </div>
         <aside class="tn-side">
@@ -85,7 +87,6 @@ export function mountTuner(root) {
           <label class="tn-check"><input id="tnBoss" type="checkbox"> Boss bar</label>
           <label class="tn-check"><input id="tnStreak" type="checkbox"> Kill streak</label>
           <label class="tn-check"><input id="tnPoints" type="checkbox" checked> Skill points badge</label>
-          <label class="tn-check"><input id="tnFreeze" type="checkbox"> Freeze the game</label>
           <h3>Pieces <small>(drag on the screen, or pick here)</small></h3>
           <div id="tnList" class="tn-list"></div>
           <div id="tnFields" class="tn-fields"></div>
@@ -100,6 +101,17 @@ export function mountTuner(root) {
         </aside>
       </div>`;
     const $ = (id) => root.querySelector(`#${id}`);
+
+    function renderPause() {
+        const b = $('tnPause');
+        b.textContent = paused ? '▶ Play game' : '⏸ Pause game';
+        b.classList.toggle('is-paused', paused);
+    }
+    function togglePause() {
+        paused = !paused;
+        frame?.contentWindow?.tunerApi?.freeze(paused);
+        renderPause();
+    }
 
     // ---------- Estado de uma resolução ----------
     const key = () => keyOf(view.w, view.h, view.touch);
@@ -182,7 +194,8 @@ export function mountTuner(root) {
         api.boss($('tnBoss').checked);
         api.streak($('tnStreak').checked ? 24 : 0);
         api.points($('tnPoints').checked ? 2 : 0);
-        api.freeze($('tnFreeze').checked);
+        api.freeze(paused);
+        renderPause();
         applyAll();
     }
 
@@ -364,7 +377,9 @@ export function mountTuner(root) {
     const fromInputs = () => setView(+$('tnW').value || view.w, +$('tnH').value || view.h, $('tnTouch').checked);
     ['tnW', 'tnH', 'tnTouch'].forEach(id => { $(id).onchange = fromInputs; });
     $('tnRotate').onclick = () => setView(view.h, view.w, view.touch);
-    ['tnBoss', 'tnStreak', 'tnPoints', 'tnFreeze'].forEach(id => { $(id).onchange = applyScene; });
+    ['tnBoss', 'tnStreak', 'tnPoints'].forEach(id => { $(id).onchange = applyScene; });
+    $('tnPause').onclick = togglePause;
+    renderPause();
     $('tnResetPiece').onclick = () => { const all = changesHere(); delete all[selected]; if (!Object.keys(all).length) delete data[key()]; writeStore(data); applyOne(selected); renderFields(); renderList(); renderStatus(); };
     $('tnResetScreen').onclick = () => { delete data[key()]; writeStore(data); applyAll(); renderFields(); renderList(); renderStatus(); };
     $('tnCopy').onclick = () => copy(null);
@@ -374,6 +389,7 @@ export function mountTuner(root) {
     root.addEventListener('keydown', (e) => {
         const step = e.shiftKey ? 10 : 1;
         const move = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+        if (e.code === 'Space' && !e.target.closest('input, select, textarea, button')) { e.preventDefault(); togglePause(); return; }
         if (!move || e.target.closest('input, select, textarea')) return;
         e.preventDefault();
         const c = changesHere()[selected] ?? { dx: 0, dy: 0 };
