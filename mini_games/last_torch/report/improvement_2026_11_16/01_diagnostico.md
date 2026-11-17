@@ -24,6 +24,8 @@ Para chegar a 9, **as três** precisam subir um degrau, ou uma delas subir dois.
 
 Subindo um degrau em todas, a nota seria 2 + 3 + 2 = **7**. Ainda não passa. O painel não mostra os degraus seguintes, mas é preciso chegar perto dos números do desktop (por exemplo, conversão acima de 50% e playtime acima de 8 minutos) para somar 9.
 
+**Observação**: `D1 é a retenção do dia 1: a porcentagem de jogadores que voltam no dia seguinte ao primeiro dia em que jogaram. Se 100 pessoas jogaram hoje e 2 voltaram amanhã, o D1 é 2%. Segundo a documentação da CrazyGames, a definição é "a porcentagem de jogadores que voltam no dia seguinte à primeira sessão". O D1 do Last Torch está em 1,64% no desktop e 1,16% no celular. A meta de jogos bons, segundo a CrazyGames, é de 10 a 15%. Existe também o D7, que é a mesma conta, mas para o sétimo dia. No relatório ele aparece como 0,00%, porque os dados ainda são recentes.`
+
 **Conclusão:** o desktop dá para garantir com melhorias focadas. O celular precisa de uma mudança grande no primeiro minuto.
 
 ## 1.2 O que a CrazyGames mede (documentação oficial)

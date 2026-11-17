@@ -1,5 +1,4 @@
 import { CORE_MODEL } from '../../data_model/core.js';
-import { learnedWarmth } from '../ui/hints.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
@@ -13,7 +12,6 @@ import { getMaxPlayerHp, getWarmthHeal, getWarmthRadius } from './stats.js';
 // Por perto, o calor dela cura o herói aos poucos.
 let warmthFloat = 0;
 let warmthTimer = 0;
-let warmthFromTorch = false;
 const WARMTH_NUMBER_SECONDS = 2;      // de quantos em quantos segundos aparece o número verde da cura (junta o que curou nesse tempo)
 let warnedLow = false;
 
@@ -57,7 +55,6 @@ export function resetTorch() {
     warnedLow = false;
     warmthFloat = 0;
     warmthTimer = 0;
-    warmthFromTorch = false;
     state.coreHpMax = getTorchMaxHp();
     state.coreHp = state.coreHpMax;
 }
@@ -78,10 +75,8 @@ export function updateTorch(dt) {
         warmthTimer += dt;
         if (warmthTimer >= WARMTH_NUMBER_SECONDS) {
             addNumber(player.x, player.y - 40, warmthFloat, 1, 'heal');
-            if (warmthFromTorch) learnedWarmth();          // viu o número verde subir: aprendeu que a tocha cura
             warmthFloat = 0;
             warmthTimer = 0;
-            warmthFromTorch = false;
         }
     } else {
         warmthTimer = 0;
@@ -89,10 +84,9 @@ export function updateTorch(dt) {
 }
 
 // Cura de ambiente (o calor da tocha e o círculo verde da árvore): entra na vida na hora e alimenta o número verde acima do herói
-export function noteAmbientHeal(amount, fromTorch = false) {
+export function noteAmbientHeal(amount) {
     if (amount <= 0) return;
     warmthFloat += amount;
-    if (fromTorch) warmthFromTorch = true;
 }
 
 // Vida máxima mudou (carta, relíquia): mantém a mesma diferença até o máximo

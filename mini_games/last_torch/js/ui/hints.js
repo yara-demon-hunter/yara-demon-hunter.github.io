@@ -16,13 +16,12 @@ const HINTS = [
 
 let timers = [];
 
-// A tocha cura: a dica aparece em toda partida (uma vez por partida), na primeira vez que o herói se machuca ou aos 25 s,
-// até o jogador se curar de verdade na tocha (save.learnedWarmth, marcado em js/systems/torch.js). Aí ele aprendeu e ela
-// não volta. Nada se o Juramento tirou a cura da tocha.
+// A tocha cura: a dica aparece na onda 1 de TODA partida (uma vez por partida), na primeira vez que o herói se machuca
+// ou aos 25 s. Nada se o Juramento tirou a cura da tocha.
 let warmthShownThisRun = false;
 
 export function warmthHint() {
-    if (warmthShownThisRun || save.learnedWarmth || mod('noWarmthHeal') > 0 || state.gameState !== 'PLAYING') return;
+    if (warmthShownThisRun || state.turn !== 1 || mod('noWarmthHeal') > 0 || state.gameState !== 'PLAYING') return;
     warmthShownThisRun = true;
     showTorchHint('🔥 Stay near the torch to heal', 'Inside the dashed circle');
 }
@@ -42,11 +41,33 @@ function showTorchHint(title, sub) {
     box.classList.add('is-showing');
 }
 
-// Chamado quando a tocha cura o herói: depois de uma cura de verdade, o jogador aprendeu
-export function learnedWarmth() {
-    if (save.learnedWarmth) return;
-    save.learnedWarmth = true;
-    persist();
+// --- MÃOZINHA DO MEDALHÃO ---
+// Na onda 1, quando há pontos de skill para gastar, uma mão animada aponta para o medalhão do topo. Não bloqueia nada
+// (sem clique, só desenho) e some quando os pontos acabam, quando a onda 1 termina ou quando o jogador abre a árvore.
+// Depois de abrir a árvore uma vez ela não volta naquela partida (ganhar mais pontos não a chama de novo), mas volta na
+// onda 1 da partida seguinte. Quem usa a escolha rápida não precisa dela.
+let handShown = false;
+let treeOpenedThisRun = false;
+
+export function updateTreeHand(canSpend) {
+    const hand = document.getElementById('treeHand');
+    if (!hand) return;
+    const wanted = canSpend && state.turn === 1 && state.gameState === 'PLAYING' && !treeOpenedThisRun && !save.settings.quickPick;
+    if (wanted) {
+        // A posição vem do medalhão (muda entre celular em pé e deitado), então é lida a cada atualização do HUD
+        const rect = document.getElementById('btnPause').getBoundingClientRect();
+        if (rect.width === 0) return;
+        hand.style.left = `${rect.left + rect.width / 2}px`;
+        hand.style.top = `${rect.bottom - rect.height * 0.08}px`;
+    }
+    if (wanted === handShown) return;
+    handShown = wanted;
+    hand.classList.toggle('is-showing', wanted);
+}
+
+export function hideTreeHand() {
+    treeOpenedThisRun = true;
+    updateTreeHand(false);
 }
 
 // Toda partida, no começo da hora 1. Reiniciar a partida recomeça a animação
@@ -66,6 +87,7 @@ export function startHints() {
     timers.forEach(clearTimeout);
     timers = [];
     warmthShownThisRun = false;
+    treeOpenedThisRun = false;
     timers.push(setTimeout(warmthHint, 25000));
     if (save.seenTutorial) return;
     HINTS.filter(hint => touch() || !hint.touchOnly).forEach(hint => {

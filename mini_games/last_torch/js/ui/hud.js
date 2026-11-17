@@ -6,6 +6,7 @@ import { CORE_MODEL } from '../../data_model/core.js';
 import { player, state } from '../core/state.js';
 import { getAxeQuake, getRootSnare, getDashCharges, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
 import { hasBuyableNode } from '../systems/tree.js';
+import { updateTreeHand } from './hints.js';
 
 // --- HUD ---
 // Escrever no DOM é caro: força o navegador a recalcular estilo e layout. Por isso os sistemas só
@@ -201,6 +202,7 @@ function writeHud() {
     const canSpend = hasBuyableNode();
     setFlag(ui.statusButton, 'can-upgrade', canSpend);
     setText(ui.statusBadge, canSpend ? `+${state.skillPoints}` : '');
+    updateTreeHand(canSpend);
     setText(ui.kills, state.run.kills);
     setText(ui.coins, state.coins);
     setText(ui.score, state.totalScore.toLocaleString('en-US'));

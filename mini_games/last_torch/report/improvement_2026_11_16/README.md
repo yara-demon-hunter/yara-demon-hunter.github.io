@@ -9,7 +9,10 @@
 |---|---|
 | [01_diagnostico.md](01_diagnostico.md) | O que os números dizem, quanto falta e por que o celular está tão atrás |
 | [02_plano_de_acao.md](02_plano_de_acao.md) | O que mudar no jogo, em ordem de prioridade, com os arquivos envolvidos |
-| [03_metas_e_checklist.md](03_metas_e_checklist.md) | Metas por métrica, como medir antes de enviar e o checklist do relançamento |
+| [03_metas_e_checklist.md](03_metas_e_checklist.md) | Metas por métrica e como medir antes de enviar |
+| [04_progresso.md](04_progresso.md) | O que já foi feito, com os números medidos |
+| [05_retencao_d1_d7.md](05_retencao_d1_d7.md) | Como subir o D1 e o D7: todas as ideias |
+| [06_checklist.md](06_checklist.md) | **Checklist geral de todas as fases: o que foi feito e o que falta** |
 
 ## Resumo em 1 minuto
 

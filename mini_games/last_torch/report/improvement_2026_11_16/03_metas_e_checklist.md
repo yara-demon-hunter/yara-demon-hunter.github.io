@@ -54,43 +54,4 @@ Atualizações durante o Basic Launch são aprovadas sozinhas, e o painel atuali
 
 ## 3.4 Checklist
 
-### Fase 1 — Carregamento
-- [x] esbuild no `build-standalone.rb`, um arquivo só (JS e CSS; 371 → 9 pedidos)
-- [ ] teste de pixel a pixel antes/depois sem diferença
-- [ ] arte que não é da onda 1 carregada depois (Azael, bosses, árvore)
-- [ ] `azael-small.webp` menor ou carregado depois
-- [x] carregamento medido: desktop 0,5 s, 4G rápido 2,3 s, 4G lento 4,0 s (antes: 0,7 / 3,1 / 6,9 s) — ver 04_progresso.md
-
-### Fase 2 — Primeiro minuto
-- [ ] decidir opção A, B ou C para a escolha de skill na primeira noite
-- [ ] duelo da hora 1 curto (ou na hora 2) na primeira noite
-- [ ] tutorial visual de joystick e dash no celular
-- [ ] primeiros monstros fracos, primeiro nível em até 15s
-- [ ] bots: ninguém morre antes de 90s na primeira noite
-- [ ] testado em pé e deitado, com CPU lenta
-
-### Fase 3 — Progresso permanente
-- [ ] Brasas ao fim de toda noite, inclusive morrendo
-- [ ] Altar com melhorias permanentes; uma comprável já depois da 1ª noite
-- [ ] tela de fim de noite com Brasas, compra possível, próximo herói e HUNT AGAIN grande
-- [ ] tela de heróis com silhueta e condição de cada um
-
-### Fase 4 — Motivo diário
-- [ ] baú diário com dias seguidos
-- [ ] desafio do dia
-- [ ] recordes pessoais com aviso "NOVO RECORDE" no fim da noite e no menu
-- [ ] botão de compartilhar o resultado do desafio
-- [ ] (leaderboard do SDK só por convite: pedir ao suporte depois do Full Launch)
-- [ ] aviso "volte amanhã" no fim da noite
-- [ ] decidir sobre salvar na conta via SDK
-
-### Fase 5 — Capa
-- [ ] 2–3 capas novas testadas em miniatura
-- [ ] vídeo de 15–20s só com ação
-- [ ] trocar no portal antes do relançamento
-
-### Antes de enviar
-- [ ] build novo gerado e testado no navegador
-- [ ] 0 erros no console em uma noite inteira
-- [ ] teste com uma pessoa nova no celular
-- [ ] anotar a versão enviada e a data, para comparar com o relatório de 16/11
+No [06_checklist.md](06_checklist.md): é o único lugar onde o progresso é marcado.

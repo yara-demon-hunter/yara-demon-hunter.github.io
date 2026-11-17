@@ -21,7 +21,6 @@ function createSave() {
         // quickPickChosen: o jogador já ligou ou desligou a escolha ao subir de nível em Settings; sem isso vale o padrão (data_model/start.js)
         settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, moveKeys: false, quickPick: START.quickPickDefault, quickPickChosen: false, touch: { scale: 1, positions: {} } },
         seenTutorial: false,
-        learnedWarmth: false,       // já se curou na tocha alguma vez: a dica "a tocha cura" para de aparecer (js/ui/hints.js)
         seenTreeHint: false
     };
 }
