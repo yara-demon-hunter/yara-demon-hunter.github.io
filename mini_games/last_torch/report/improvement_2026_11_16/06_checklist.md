@@ -118,6 +118,7 @@ Achados do dono em 17/11, olhando o responsivo.
 - [ ] deitado e desktop continuam como estão (ou melhorados), sem regressão
 
 **Tuner da tela de jogo**
+- [ ] **como uma aba nova no sandbox** (`mini_games/last_torch/_sandbox`), e não uma ferramenta separada
 - [ ] ferramenta como a dos personagens, só para a tela de jogo (HUD e controles)
 - [ ] mexer no tamanho de cada elemento
 - [ ] arrastar botões e peças do HUD
