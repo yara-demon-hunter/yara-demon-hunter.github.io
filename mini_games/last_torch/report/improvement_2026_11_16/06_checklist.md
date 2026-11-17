@@ -120,9 +120,7 @@ Achados do dono em 17/11, olhando o responsivo.
 
 **Barra de vida do boss**
 - [x] em pé: ficar **abaixo** da barra de status do herói, não ao lado apertada
-- [x] retrato do boss ao lado da barra (todos os bosses já tinham retrato gerado do sprite, o do bestiário)
-- [-] placeholder para bosses sem retrato (não precisou; sem retrato aparece a caveira)
-- [ ] trocar os retratos gerados por arte própria, se o dono quiser
+- [-] retrato do boss ao lado da barra (feito e depois retirado a pedido do dono: só o nome com a caveira ☠️)
 - [x] deitado e desktop continuam como estão, sem regressão (conferido por captura)
 
 **Tuner da tela de jogo**
@@ -135,7 +133,8 @@ Achados do dono em 17/11, olhando o responsivo.
 - [x] botão "copiar" que leva **só os parâmetros alterados**, por resolução, para colar aqui e pedir à IA que aplique
 - [x] botão para zerar o que foi mexido (voltar ao padrão)
 - [x] checar o que já existe: o editor de controles de toque das Settings (o tuner é separado e só ajusta o CSS; o jogador continua tendo o dele)
-- [ ] **usar o tuner** em várias resoluções e mandar o texto copiado para a IA aplicar
+- [x] 360×640 em pé ajustado pelo dono e aplicado a todos os celulares em pé (boss 70% da largura, controles ~30% menores, coluna sequência/pontuação)
+- [ ] **usar o tuner** nas outras resoluções (deitado, tablet, desktop) e mandar o texto copiado para a IA aplicar
 
 ## Antes de relançar
 - [ ] conferir o mínimo de pontos das regras novas (4 métricas)

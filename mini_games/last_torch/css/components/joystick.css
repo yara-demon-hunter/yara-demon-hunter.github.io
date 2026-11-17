@@ -180,21 +180,24 @@
     }
 }
 
-/* Celular em pé: a tela é estreita, então os controles ficam menores e o dash sobe para cima da adaga
-   (ao lado dela não cabe sem encostar no joystick). */
+/* Celular em pé: a tela é estreita, então os controles ficam menores (~70% do que eram) e o dash fica à esquerda e um
+   pouco acima da adaga, bem menor que ela. Medidas tiradas do HUD tuner (360x640, 17/11/2026), em rem e em proporções
+   do tamanho do controle, para valerem em qualquer celular em pé. */
 @media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) {
     :root {
-        --touch-base: 5.4rem;
-        --touch-base-knob: 2.5rem;
-        --touch-base-icon: 1.3rem;
-        --touch-ring: 6px;
-        --touch-bottom: max(2.2rem, calc(env(safe-area-inset-bottom) + 1.4rem));
-        --touch-left: max(1.6rem, calc(env(safe-area-inset-left) + 1rem));
-        --touch-right: max(1.6rem, calc(env(safe-area-inset-right) + 1rem));
+        --touch-base: 3.8rem;
+        --touch-base-knob: 1.75rem;
+        --touch-base-icon: 0.9rem;
+        --touch-ring: 5px;
+        --touch-bottom: max(3.5rem, calc(env(safe-area-inset-bottom) + 2.7rem));
+        --touch-left: max(1.9rem, calc(env(safe-area-inset-left) + 1.3rem));
+        --touch-right: max(1rem, calc(env(safe-area-inset-right) + 0.5rem));
     }
     #dashButton {
-        right: calc(var(--touch-right) + var(--touch-size) * 0.11);
-        bottom: calc(var(--touch-bottom) + var(--touch-size) * 1.22);
+        right: calc(var(--touch-right) + var(--touch-size) * 0.9);
+        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.93);
+        width: calc(var(--touch-size) * 0.62);
+        height: calc(var(--touch-size) * 0.62);
     }
 }
 

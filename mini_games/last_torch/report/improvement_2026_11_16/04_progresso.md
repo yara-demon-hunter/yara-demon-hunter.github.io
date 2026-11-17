@@ -63,6 +63,15 @@ O jogo já teve Brasas e o Hearth (11 melhorias), tirados em 30/10 por informaç
 - **Tela inicial:** título ~22% menor; "DARKNESS (N skill pts)" com os pontos depois da palavra; Sanctuary e Altar sem vazar em 6 tamanhos de tela; dicas dos heróis dentro do cartão.
 - **Não verificado:** celular real; arrastar com o dedo no tuner (testado só com mouse).
 
+## 17/11/2026 — HUD e controles do celular em pé, ajustados pelo dono no tuner (360×640)
+
+O dono ajustou o 360×640 em pé no tuner e a IA reproduziu o mesmo estilo em todos os celulares em pé (largura até 599 px), com medidas em rem e proporções:
+- **Barra do boss:** 70% da largura, letras e barra menores, retrato retirado (só o nome com a caveira).
+- **Sequência de mortes e pontuação:** coluna à direita; a sequência sobe para a altura da barra do boss e a pontuação desce para baixo dela.
+- **Controles de toque:** joystick e adaga ~30% menores (61 px) e mais perto das bordas; o dash (38 px) fica à esquerda e acima da adaga.
+- **Verificado:** em 360×640, 360×740, 390×844, 412×915 e 430×932 as medidas bateram com as do dono no 360×640 (joystick, adaga, dash, pontuação e barra do boss) e não há erros. Os cantos do dash e da adaga se encostam um pouco, como no ajuste do dono.
+- **Não verificado:** celular real.
+
 ## Decisão do dono (17/11)
 
 Sem tutorial de joystick/dash: a interface é simples. Os itens "primeiros monstros mais fracos" e "primeiro nível em 15 s" ficam para depois de o dono jogar o pacote e dizer se o começo está difícil ou lento. A Fase 2 está feita no que importa.
