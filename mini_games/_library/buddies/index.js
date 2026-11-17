@@ -11,6 +11,8 @@ export {
 } from './phoenix/phoenix.js';
 export { PHOENIX_VISUALS } from './phoenix/phoenix_visual.js';
 export { drawRavenSprite, prepareRaven, renderRavenBuddy } from './raven/raven.js';
+export { drawHearthPhoenixSprite, hearthPhoenixBeak, prepareHearthPhoenix, renderHearthPhoenix } from './hearth_phoenix/hearth_phoenix.js';
+export { HEARTH_PHOENIX_VISUALS } from './hearth_phoenix/hearth_phoenix_visual.js';
 export { RAVEN_VISUALS } from './raven/raven_visual.js';
 export { drawOakBuddy, drawRootFeet, getCrown as getOakCrown, getEvilCrown as getOakEvilCrown, getEvilTrunk as getOakEvilTrunk, getTrunk as getOakTrunk } from './oak/oak.js';
 export { drawGraveWisp } from './grave_wisp/grave_wisp.js';

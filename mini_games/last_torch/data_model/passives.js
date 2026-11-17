@@ -86,16 +86,6 @@ export const PASSIVE_SKILL_MODELS = {
             return `Every dash leaves a trail of smoke that lingers for ${SMOKE_BOMB.seconds}s. Monsters inside it slow down, and every hit they take, from blade or dagger, has a ${formatPercent(SMOKE_BOMB.critChance)} chance to be a critical hit.`;
         }
     },
-    vigil: {
-        name: 'Vigil',
-        icon: '⚜️',
-        cost: 90,
-        maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        get desc() {
-            return `Stand still for ${VIGIL.stillSeconds}s to raise a flame shield. It stops one hit, then bursts within ${VIGIL.burstRadius} range for ${formatMultiplier(VIGIL.burstDamage)} spell damage. Returns after ${VIGIL.rechargeSeconds}s.`;
-        }
-    },
     flameBlade: {
         name: 'Flaming Sword',
         icon: '⚔️',
@@ -114,14 +104,24 @@ export const PASSIVE_SKILL_MODELS = {
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby, setting it ablaze and leaving the ground burning. Everything that improves your daggers still counts, and your magic damage multiplies the fireball on top (its hits show in blue). The price: you stand still for a moment, unable to do anything, while the fire grows in your hand.'
     },
-    backdraft: {
-        name: 'Backdraft',
-        icon: '🎆',
-        cost: 70,
+    hearthPhoenix: {
+        name: 'Hearth Phoenix',
+        icon: '🐦‍🔥',
+        cost: 130,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         get desc() {
-            return `Every monster that reaches the torch sets off a blast of fire within ${BACKDRAFT.radius} range for ${formatMultiplier(BACKDRAFT.damage)} spell damage.`;
+            return `A fire phoenix rises from the torch and circles it, hurling fireballs every ${HEARTH_PHOENIX.cooldownSeconds}s at monsters near the flame for ${formatMultiplier(HEARTH_PHOENIX.boltDamage)} spell damage. They count as the torch's fire.`;
+        }
+    },
+    blueTorch: {
+        name: 'Blue Torch',
+        icon: '🔵',
+        cost: 90,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        get desc() {
+            return `The torch burns blue, and so does everything it does: its bolts, rings and light. Its light and warmth reach ${formatPercent(BLUE_TORCH.light)} and ${formatPercent(BLUE_TORCH.warmth)} farther, the torch's fire hits ${formatPercent(BLUE_TORCH.fireDamage)} harder, and the cold flame slows every monster inside its warmth by ${formatPercent(BLUE_TORCH.chill)}. Monsters slowed this way take ${formatPercent(BLUE_TORCH.brittle)} more damage from the torch's fire hits only.`;
         }
     },
     phoenixPact: {
@@ -130,7 +130,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'A phoenix flies at your shoulder and hurls fireballs. When you fall, it gives its life to raise you in a storm of fire, and is reborn the next wave.'
+        desc: 'A phoenix flies at your shoulder and hurls fireballs. When you fall, it gives its life to raise you in a storm of fire. If the torch goes out, it dives into the flame and relights it at half health, shielding you both. Either way, it is reborn the next wave.'
     },
 
     shadowRaven: {
@@ -477,7 +477,6 @@ export const MASTER_THIEF = {
     perfectDodgeGold: 14
 };
 
-// Vigil: parado por stillSeconds, ergue um escudo que para um golpe e estoura
 // Flaming Sword: o corte deixa o monstro queimando (fração do dano do golpe, por segundo)
 // Blessed Blade (Avgustino): a parte da magia que cada golpe da lâmina soma (js/systems/combat.js)
 export const BLESSED_BLADE = PASSIVE_SKILL_MODELS.blessedBlade;
@@ -500,19 +499,27 @@ export const FIREBALLS = {
     patchDps: 0.5
 };
 
-export const VIGIL = {
-    stillSeconds: 0.9,
-    rechargeSeconds: 6,
-    burstRadius: 120,
-    burstDamage: 1.5,
-    burstKnockback: 420
+// Blue Torch: a tocha azul (chama, luz, golpes). Luz e calor maiores, fogo da tocha mais forte e frio que atrasa e fragiliza
+export const BLUE_TORCH = {
+    light: 0.25,                // raio da luz da tocha
+    warmth: 0.2,                // alcance do calor (onde cura o herói)
+    fireDamage: 0.3,            // dano dos golpes da tocha (Flame Sentinel, Hearth Ring, Solar Wall)
+    chill: 0.25,                // lentidão em quem está dentro do calor
+    brittle: 0.15,              // quem está lento leva mais dano dos golpes de fogo da tocha
+    color: '#60a5fa'
 };
 
-// Backdraft: explosão quando um monstro alcança a tocha
-export const BACKDRAFT = {
-    radius: 125,
-    damage: 2,
-    knockback: 420
+// Hearth Phoenix: a fênix da tocha rodeia a chama e atira nos monstros perto dela (o fogo da tocha: a Blue Torch também vale)
+export const HEARTH_PHOENIX = {
+    cooldownSeconds: 1.8,
+    range: 360,                 // a partir da tocha
+    speed: 330,
+    turnRate: 8,
+    boltDamage: 1.2,            // x dano de feitiço
+    hoverY: -170,               // acima da chama
+    orbit: 38,                  // raio do voo em volta da tocha
+    followSpeed: 5,
+    riseSeconds: 0.9
 };
 
 // Phoenix Pact: a fênix voa no ombro do herói e atira bolas de fogo. Quando ele cai, ela morre para levantá-lo
@@ -614,6 +621,6 @@ export const SHADOW_CLONE = {
     // OATH OF WHISPERS: uma sombra nova a cada tantas mortes na noite, até o total máximo (as caídas renascem)
     whispers: {
         killsPerShadow: 5,
-        maxShadows: 8
+        maxShadows: 5
     }
 };

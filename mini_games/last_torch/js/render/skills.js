@@ -1,7 +1,7 @@
 import { getPowerLevel, POWER_MODELS } from '../../data_model/powers.js';
 import { WAR_CRY } from '../../data_model/passives.js';
 import { SKILLS_VISUALS as V } from '../../data_model/visuals/effects/skills_visual.js';
-import { ctx, player, powers, state } from '../core/state.js';
+import { ctx, passives, player, powers, state } from '../core/state.js';
 import { easeOutBack, easeOutCubic } from '../../library/core/easing.js';
 import { drawFlameTongue } from './fire.js';
 import { drawGlow } from '../../library/core/glow.js';
@@ -49,7 +49,7 @@ export function renderCracks() {
 export function renderFireRing() {
     const level = getPowerLevel(powers.fireRing);
     if (!level) return;
-    const F = V.fireRing;
+    const F = passives.blueTorch.lvl > 0 ? { ...V.fireRing, ...V.blueFireRing } : V.fireRing;
     const evolved = powers.fireRing.evolved;
     const colors = evolved ? F.evolvedColors : F.colors;
     const count = F.tongues[state.quality];
@@ -332,30 +332,36 @@ export function renderWisp() {
     drawGraveWisp(ctx, x, y, performance.now() / 1000, flash);
 }
 
-// Escudo do Vigil: uma redoma com a base em chamas
-export function renderShield() {
-    if (player.shield <= 0) return;
-    const S = V.shield;
+// Escudo da tocha (Torch Ward): uma redoma de chama em volta da chama, uma casca por escudo guardado
+export function renderTorchWard() {
+    const W = state.torchWard;
+    if (W.charges <= 0 && W.flash <= 0) return;
+    const S = passives.blueTorch.lvl > 0 ? { ...V.ward, ...V.blueWard } : V.ward;
     const t = performance.now() / 1000;
-    const x = player.x;
-    const y = player.y - 12;
-    const r = S.radius + Math.sin(t * 3) * 1.2;
+    const x = state.coreX;
+    const y = state.coreY - S.lift;
     ctx.save();
-    drawGlow(ctx, S.glow, x, y, r * 1.5, 0.45);
-    ctx.fillStyle = S.fill;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, TAU);
-    ctx.fill();
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.strokeStyle = S.ring;
-    ctx.lineWidth = 1.8;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, TAU);
-    ctx.stroke();
-    for (let i = 0; i < 8; i++) {
-        const a = Math.PI * (0.1 + i * 0.114);
-        const up = (t * 1.6 + i * 0.3) % 1;
-        drawGlow(ctx, S.tongue, x + Math.cos(a) * r, y + Math.sin(a) * r - up * 9, 7 * (1 - up) + 1, 0.8 * (1 - up));
+    for (let n = 0; n < W.charges; n++) {
+        const r = S.radius + n * 7 + Math.sin(t * 3 + n) * 1.4;
+        drawGlow(ctx, S.glow, x, y, r * 1.5, 0.4);
+        ctx.fillStyle = S.fill;
+        ctx.beginPath();
+        ctx.ellipse(x, y, r, r * 1.1, 0, 0, TAU);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.strokeStyle = S.ring;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.ellipse(x, y, r, r * 1.1, 0, 0, TAU);
+        ctx.stroke();
+        if (n === 0) {
+            for (let i = 0; i < 8; i++) {
+                const a = Math.PI * (0.1 + i * 0.114);
+                const up = (t * 1.6 + i * 0.3) % 1;
+                drawGlow(ctx, S.spark, x + Math.cos(a) * r, y + Math.sin(a) * r * 1.1 - up * 9, 7 * (1 - up) + 1, 0.8 * (1 - up));
+            }
+        }
+        ctx.globalCompositeOperation = 'source-over';
     }
     ctx.restore();
 }

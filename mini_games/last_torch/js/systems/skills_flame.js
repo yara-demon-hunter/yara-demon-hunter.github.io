@@ -1,5 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
-import { BACKDRAFT, FIREBALLS, FLAME_BLADE, PHOENIX_PACT, VIGIL } from '../../data_model/passives.js';
+import { CORE_MODEL } from '../../data_model/core.js';
+import { BLUE_TORCH, FIREBALLS, HEARTH_PHOENIX, FLAME_BLADE, PHOENIX_PACT } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
@@ -8,13 +9,13 @@ import { blast, dealDamage, ignite } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { wander, followRate } from './companions.js';
 import { mod } from './modifiers.js';
-import { phoenixBeak } from '../render/phoenix.js';
+import { hearthPhoenixBeak, phoenixBeak } from '../render/phoenix.js';
 import { addGroundFire, nearestEnemy, ready } from './powers.js';
-import { getSpellCooldown, getSpellDamage, getWarmthRadius } from './stats.js';
+import { getSpellCooldown, getSpellDamage, getTorchFireDamage, getWarmthRadius } from './stats.js';
 
 // --- SKILLS DA CHAMA ---
 // O guardião ganha com paciência: fica perto da tocha, firme, e deixa o fogo trabalhar.
-// Desenho em js/render/skills.js; a pose do Vigil em js/render/player25d.js.
+// Desenho em js/render/skills.js.
 
 // --- HEARTH RING ---
 function updateFireRing(dt) {
@@ -22,12 +23,12 @@ function updateFireRing(dt) {
     if (!level) return;
     const M = POWER_MODELS.fireRing;
     const tick = ready('fireRing', dt, M.tickSeconds);
-    const damage = getSpellDamage() * level.dps * M.tickSeconds;
+    const damage = getTorchFireDamage() * level.dps * M.tickSeconds;
     for (const e of state.enemies) {
         const d = Math.hypot(e.x - state.coreX, e.y - state.coreY);
         if (Math.abs(d - level.radius) > M.width + e.radius) continue;
         e.slow = Math.max(e.slow ?? 0, level.slow);
-        if (tick) dealDamage(e, damage, { noCrit: true, quiet: true });
+        if (tick) dealDamage(e, damage, { noCrit: true, quiet: true, torchFire: true });
     }
     if (powers.fireRing.evolved) updateSolarFlare(dt, level);
 }
@@ -36,52 +37,107 @@ function updateFireRing(dt) {
 function updateSolarFlare(dt, level) {
     const F = EVOLUTIONS.fireRing.flare;
     if (!ready('solarFlare', dt, F.seconds)) return;
-    const damage = getSpellDamage() * F.damage;
+    const damage = getTorchFireDamage() * F.damage;
     for (const e of state.enemies) {
         const dx = e.x - state.coreX;
         const dy = e.y - state.coreY;
         const d = Math.hypot(dx, dy) || 1;
         if (Math.abs(d - level.radius) > F.reach + e.radius) continue;
         const push = e.isBoss ? 0 : F.knockback;
-        dealDamage(e, damage, { kbX: (dx / d) * push, kbY: (dy / d) * push, noCrit: true, style: 'spell' });
+        dealDamage(e, damage, { kbX: (dx / d) * push, kbY: (dy / d) * push, noCrit: true, style: 'spell', torchFire: true });
     }
-    addShockwave(state.coreX, state.coreY, { radius: level.radius + F.reach, color: '#fef08a', width: 10, seconds: 0.4 });
+    addShockwave(state.coreX, state.coreY, { radius: level.radius + F.reach, color: isBlueTorch() ? '#bae6fd' : '#fef08a', width: 10, seconds: 0.4 });
     audio.playNova();
 }
 
-// --- VIGIL ---
-function updateVigil(dt) {
-    if (passives.vigil.lvl <= 0) {
-        player.shield = 0;
-        player.vigilStance = false;
+// --- TORCH WARD ---
+// Um escudo de chama protege a tocha e se renova sozinho. Cada nível guarda mais escudos, renova mais rápido e repele de mais longe.
+export function isBlueTorch() {
+    return passives.blueTorch.lvl > 0;
+}
+
+function updateTorchWard(dt) {
+    const W = state.torchWard;
+    const level = getPowerLevel(powers.torchWard);
+    if (!level) {
+        W.charges = 0;
+        W.timer = 0;
         return;
     }
-    if (player.shieldCooldown > 0) player.shieldCooldown -= dt;
-    player.vigilStance = player.stillTime >= VIGIL.stillSeconds * 0.5 && !player.move;
-    if (player.shield > 0 || player.shieldCooldown > 0 || player.stillTime < VIGIL.stillSeconds) return;
-    player.shield = 1;
-    addShockwave(player.x, player.y, { radius: 46, color: '#fde68a', width: 4, seconds: 0.35 });
+    if (W.flash > 0) W.flash -= dt;
+    W.charges = Math.min(W.charges, level.charges);
+    if (W.charges >= level.charges) {
+        W.timer = 0;
+        return;
+    }
+    W.timer += dt;
+    if (W.timer < level.cooldown) return;
+    W.timer = 0;
+    W.charges++;
+    addShockwave(state.coreX, state.coreY, { radius: 52, color: wardColor(), width: 4, seconds: 0.4 });
     audio.playShield();
 }
 
-// O escudo paga o golpe (true) e estoura em volta do herói
-export function absorbHit() {
-    if (player.shield <= 0) return false;
-    player.shield = 0;
-    player.shieldCooldown = VIGIL.rechargeSeconds;
-    state.blastBudget++;
-    blast(player.x, player.y, VIGIL.burstRadius, getSpellDamage() * VIGIL.burstDamage, VIGIL.burstKnockback, '#fb923c', 'spell');
-    addShockwave(player.x, player.y, { radius: VIGIL.burstRadius, color: '#fde68a', width: 8, seconds: 0.35 });
+function wardColor() {
+    return isBlueTorch() ? '#93c5fd' : '#fde68a';
+}
+
+// Um tiro inimigo ia acertar a tocha: o escudo o devolve. Devolve true se havia escudo
+export function wardSpendForShot(x, y) {
+    const W = state.torchWard;
+    if (!getPowerLevel(powers.torchWard) || W.charges <= 0) return false;
+    W.charges--;
+    W.flash = 0.35;
+    addShockwave(x, y, { radius: 36, color: wardColor(), width: 5, seconds: 0.3 });
+    return true;
+}
+
+// Gasta um escudo: todo monstro em volta é jogado para longe e atordoado (o chefe só leva o empurrão menor). Devolve false se não havia escudo.
+// `source` é o monstro que tocou a tocha (ele nunca fica dentro do raio da chama)
+export function wardTorch(source = null) {
+    const W = state.torchWard;
+    const level = getPowerLevel(powers.torchWard);
+    if (!level || W.charges <= 0) return false;
+    W.charges--;
+    W.flash = 0.5;
+    const color = wardColor();
+    for (const e of state.enemies) {
+        if (e.hp <= 0) continue;
+        const dx = e.x - state.coreX;
+        const dy = e.y - state.coreY;
+        const d = Math.hypot(dx, dy) || 1;
+        if (e !== source && d > level.radius + e.radius) continue;
+        const push = level.knockback * (1 - (e.knockbackResist ?? 0)) * (e.isBoss ? 0.35 : 1);
+        e.vx += (dx / d) * push;
+        e.vy += (dy / d) * push;
+        if (!e.isBoss) e.stunned = Math.max(e.stunned ?? 0, level.stun);
+        const out = state.coreX + (dx / d) * (CORE_MODEL.collisionRadius + e.radius + 4);
+        const outY = state.coreY + (dy / d) * (CORE_MODEL.collisionRadius + e.radius + 4);
+        if (d < CORE_MODEL.collisionRadius + e.radius + 4) {
+            e.x = out;
+            e.y = outY;
+        }
+    }
+    addShockwave(state.coreX, state.coreY, { radius: level.radius, color, width: 9, seconds: 0.4 });
+    addShockwave(state.coreX, state.coreY, { radius: level.radius * 0.6, color: '#ffffff', width: 4, seconds: 0.28 });
+    createExplosion(state.coreX, state.coreY - 20, color, 14);
+    shakeScreen(5);
     audio.playShieldBreak();
     return true;
 }
 
-// --- BACKDRAFT ---
-// Um monstro acaba de se consumir na chama
-export function onTorchTouched() {
-    if (passives.backdraft.lvl <= 0) return;
-    state.blastBudget++;
-    blast(state.coreX, state.coreY, BACKDRAFT.radius, getSpellDamage() * BACKDRAFT.damage, BACKDRAFT.knockback, '#fb923c', 'spell');
+// --- BLUE TORCH ---
+// O frio da chama azul: quem está no calor da tocha fica lento e, enquanto durar, leva mais dano de tudo (damage.js)
+const CHILL_SECONDS = 0.35;
+function updateBlueTorch(dt) {
+    const on = isBlueTorch();
+    const reach = getWarmthRadius();
+    for (const e of state.enemies) {
+        if (e.chilled > 0) e.chilled -= dt;
+        if (!on || e.hp <= 0 || Math.hypot(e.x - state.coreX, e.y - state.coreY) > reach + e.radius) continue;
+        e.slow = Math.max(e.slow ?? 0, BLUE_TORCH.chill);
+        e.chilled = CHILL_SECONDS;
+    }
 }
 
 // --- PHOENIX PACT ---
@@ -183,6 +239,88 @@ export function tryPhoenix() {
     return true;
 }
 
+// A tocha apagou: a fênix se joga na chama e a reacende com metade da vida (uma vez por hora, a mesma vida da fênix que levanta o herói).
+// Devolve true se a tocha foi salva
+export function tryPhoenixTorch() {
+    if (passives.phoenixPact.lvl <= 0 || state.phoenixSpent) return false;
+    const bird = state.phoenix;
+    state.phoenixSpent = true;
+    state.phoenixFx = { x: state.coreX, y: state.coreY - 20, age: 0, seconds: 1.3 };
+    if (bird.placed) {
+        Object.assign(state.phoenixFx, { fromX: bird.x, fromY: bird.y, facing: bird.facing });
+        createExplosion(bird.x, bird.y, '#fde047', 16);
+    }
+    bird.placed = false;
+    state.coreHp = state.coreHpMax * 0.5;
+    // Protege o herói também: o pulso de fogo sai da tocha e os tiros voam longe
+    player.iFrames = Math.max(player.iFrames, PHOENIX_PACT.invulnerableSeconds);
+    state.enemyProjectiles.length = 0;
+    state.blastBudget++;
+    blast(state.coreX, state.coreY, PHOENIX_PACT.radius, getSpellDamage() * PHOENIX_PACT.damage, PHOENIX_PACT.knockback, '#fb923c', 'spell');
+    addShockwave(state.coreX, state.coreY, { radius: PHOENIX_PACT.radius * 1.3, color: '#fde047', width: 12, seconds: 0.7 });
+    createExplosion(state.coreX, state.coreY - 20, '#fb923c', 30);
+    slowMotion(0.3, 0.7);
+    screenFlash('#fb923c', 0.6);
+    shakeScreen(14);
+    showBanner('', 'THE TORCH LIVES', 'The phoenix gave its life', 'gold');
+    audio.playPhoenix();
+    updateHUD();
+    return true;
+}
+
+// --- HEARTH PHOENIX ---
+// Uma fênix de fogo nasce da tocha, rodeia a chama e atira nos monstros que chegam perto dela
+function updateHearthPhoenix(dt) {
+    const bird = state.hearthBird;
+    if (passives.hearthPhoenix.lvl <= 0) {
+        bird.placed = false;
+        return;
+    }
+    const H = HEARTH_PHOENIX;
+    const t = state.runTime;
+    const a = t * 0.9;
+    const homeX = state.coreX + Math.cos(a) * H.orbit;
+    const homeY = state.coreY + H.hoverY + Math.sin(a) * H.orbit * 0.35;
+    if (!bird.placed) {
+        bird.x = state.coreX;
+        bird.y = state.coreY - 40;
+        bird.placed = true;
+        bird.rise = 0;
+        createExplosion(bird.x, bird.y, '#fde047', 12);
+        addShockwave(bird.x, bird.y, { radius: 50, color: '#fb923c', width: 4, seconds: 0.4 });
+        audio.playPhoenixRise();
+    }
+    const pull = Math.min(1, dt * followRate(H.followSpeed));
+    const vx = (homeX - bird.x) * pull;
+    bird.x += vx;
+    bird.y += (homeY - bird.y) * pull;
+    bird.tilt += (Math.max(-0.3, Math.min(0.3, vx * 0.05)) - bird.tilt) * Math.min(1, dt * 8);
+    bird.rise = Math.min(1, bird.rise + dt / H.riseSeconds);
+    if (bird.flash > 0) bird.flash -= dt;
+    if (bird.look > 0) bird.look -= dt;
+    else bird.facing = vx >= 0 ? 1 : -1;
+
+    if (bird.rise < 1 || !ready('hearthPhoenix', dt, getSpellCooldown(H.cooldownSeconds))) return;
+    const target = nearestEnemy(state.coreX, state.coreY, H.range);
+    if (!target) return;
+    bird.facing = target.x >= bird.x ? 1 : -1;
+    bird.look = 0.6;
+    bird.flash = 0.16;
+    const from = hearthPhoenixBeak(bird.x, bird.y, bird.facing);
+    const ang = Math.atan2(target.y - from.y, target.x - from.x);
+    const blue = isBlueTorch();
+    state.bolts.push({
+        x: from.x, y: from.y,
+        vx: Math.cos(ang) * H.speed, vy: Math.sin(ang) * H.speed,
+        speed: H.speed, turnRate: H.turnRate,
+        target, fire: !blue, blue, style: 'spell', torchFire: true,
+        damage: getTorchFireDamage() * H.boltDamage,
+        life: 1.8,
+        onHit: burstPhoenixFire
+    });
+    audio.playBolt();
+}
+
 // --- JURAMENTO DA CHAMA ---
 // O calor da tocha também queima quem entra nele
 function updateWarmthBurn(dt) {
@@ -239,7 +377,9 @@ export function spreadBurn(dead) {
 export function updateFlameSkills(dt) {
     updateBurns(dt);
     updateFireRing(dt);
-    updateVigil(dt);
+    updateTorchWard(dt);
+    updateBlueTorch(dt);
+    updateHearthPhoenix(dt);
     updateWarmthBurn(dt);
     updatePhoenix(dt);
     const fx = state.phoenixFx;

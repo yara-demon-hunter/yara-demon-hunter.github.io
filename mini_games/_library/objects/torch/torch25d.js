@@ -72,8 +72,8 @@ function ring(g, half) {
 }
 
 // O que fica ATRÁS do fogo: sombra, poste, colar, barras de trás, metade de trás do anel e o fogo visto pelos vãos
-function paintBack(g) {
-    const C = V.colors;
+function paintBack(g, _r, _phase, blue = false) {
+    const C = blue ? { ...V.colors, ...V.blue } : V.colors;
     const G = V.cage;
     const H = V.pole.height;
 
@@ -169,8 +169,8 @@ function paintFront(g) {
 
 // Um quadro do fogo (phase de 0 a 1; o último emenda com o primeiro). r recomeça igual em todo quadro: a forma não pula.
 // Tudo o que mexe usa frequências inteiras do ciclo: o laço é sem emenda.
-function paintFire(g, r, phase) {
-    const F = V.flame;
+function paintFire(g, r, phase, blue = false) {
+    const F = blue ? { ...V.flame, ...V.blue } : V.flame;
     const rx = V.cage.tipR * 0.95;
     const ry = rx * V.cage.squash;
     const p = phase * TAU;
@@ -231,9 +231,10 @@ function paintFire(g, r, phase) {
     // 3. Miolo claro (da fogueira antiga), pulsando
     const core = g.createRadialGradient(0, -2, 0, 0, -2, 7);
     const beat = 0.85 + 0.15 * Math.sin(p * 3);
-    core.addColorStop(0, `rgba(255, 247, 237, ${0.95 * beat})`);
-    core.addColorStop(0.45, `rgba(253, 230, 138, ${0.6 * beat})`);
-    core.addColorStop(1, 'rgba(253, 230, 138, 0)');
+    const [coreIn, coreMid] = blue ? V.blue.core : ['rgba(255, 247, 237, ', 'rgba(253, 230, 138, '];
+    core.addColorStop(0, `${coreIn}${0.95 * beat})`);
+    core.addColorStop(0.45, `${coreMid}${0.6 * beat})`);
+    core.addColorStop(1, `${coreMid}0)`);
     g.fillStyle = core;
     g.fillRect(-7, -9, 14, 14);
 
@@ -252,20 +253,20 @@ function paintFire(g, r, phase) {
 }
 
 // Cria a tocha na resolução `res` (pixels por unidade do mundo). Recrie quando a resolução ou o detalhe mudarem.
-export function createTorch25D({ res, frames = V.frames[0] }) {
+export function createTorch25D({ res, frames = V.frames[0], blue = false }) {
     const G = V.cage;
     const k = V.size ?? 1;                 // tamanho geral: entra no desenho e nas células (o atlas nasce nítido, sem esticar)
     const up = G.top + G.postTip + 4;
     const cell = [(G.tipR * 2 + 12) * k, (up + 8) * k];
     const anchor = [0.5, up / (up + 8)];
-    const scaled = (paint) => (g, r, phase) => { g.scale(k, k); paint(g, r, phase); };
-    const back = buildSpriteSheet({ cell, anchor, frames: 1, variants: 1, res, seed: 11, paint: scaled(paintBack) });
+    const scaled = (paint) => (g, r, phase, flag) => { g.scale(k, k); paint(g, r, phase, flag); };
+    const back = buildSpriteSheet({ cell, anchor, frames: 1, variants: 1, res, seed: 11, paint: (g, r, phase) => scaled(paintBack)(g, r, phase, blue) });
     const front = buildSpriteSheet({ cell, anchor, frames: 1, variants: 1, res, seed: 12, paint: scaled(paintFront) });
     const fireW = Math.max(G.tipR * 3, V.flame.width * (2 + V.flame.breathe * 2 + V.flame.sway) + 14, 46);
     const fireUp = V.flame.height * (1 + V.flame.stretch) + 20;
     const fireDown = 10;
     const fire = buildSpriteSheet({
-        cell: [fireW * k, (fireUp + fireDown) * k], anchor: [0.5, fireUp / (fireUp + fireDown)], frames, variants: 1, res, seed: 23, paint: scaled(paintFire)
+        cell: [fireW * k, (fireUp + fireDown) * k], anchor: [0.5, fireUp / (fireUp + fireDown)], frames, variants: 1, res, seed: 23, paint: (g, r, phase) => scaled(paintFire)(g, r, phase, blue)
     });
     return {
         bytes: back.bytes + front.bytes + fire.bytes,
@@ -274,7 +275,7 @@ export function createTorch25D({ res, frames = V.frames[0] }) {
             const fireY = y + rimY() * k;
             const flicker = 1 + Math.sin(time * 17) * 0.08 + Math.sin(time * 31) * 0.06;
             ctx.globalCompositeOperation = 'lighter';
-            drawGlow(ctx, V.halo.color, x, fireY - 4 * k, V.halo.radius * k * size * flicker, V.halo.alpha);
+            drawGlow(ctx, blue ? V.blue.halo : V.halo.color, x, fireY - 4 * k, V.halo.radius * k * size * flicker, V.halo.alpha);
             ctx.globalCompositeOperation = 'source-over';
             // Atrás do fogo (poste, colar, barras de trás), o fogo, e na frente dele a cruz e as barras da frente
             drawSheetFrame(ctx, back, 0, 0, x, y, 1);

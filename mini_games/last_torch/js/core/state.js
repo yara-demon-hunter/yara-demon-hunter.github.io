@@ -157,6 +157,8 @@ export const state = {
     oathAnnounced: false,       // o aviso de Juramento disponível já apareceu nesta noite
     bloodlust: { stacks: 0, timer: 0 },
     warCryTimer: 0,             // bônus de dano depois do rugido
+    hearthBird: { x: 0, y: 0, placed: false, facing: 1, look: 0, tilt: 0, flash: 0, rise: 1 },
+    torchWard: { charges: 0, timer: 0, flash: 0 },   // Torch Ward: escudos guardados, tempo para o próximo e clarão da última defesa
     phoenixSpent: false,        // a fênix já morreu nesta hora
     phoenixFx: null,
     // Fênix em campo. side: de que lado do herói ela voa; look: tempo olhando para o alvo; rise: 0 a 1 ao renascer

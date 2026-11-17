@@ -199,7 +199,8 @@ export function renderEnemyProjectiles() {
         }
         const sprite = getBoltSprite(p.owner, p.color, p.radius);
         const k = p.radius / sprite.radius;
-        const rotation = Math.atan2(p.vy, p.vx);
+        // A pedra do Golem gira em voo; os outros tiros apontam para onde vão
+        const rotation = p.owner === 'GOLEM' ? state.runTime * 9 : Math.atan2(p.vy, p.vx);
         // O miolo do tiro fica à frente do centro do sprite: compensa para ele cair em (p.x, p.y)
         const shift = sprite.centerShift * k;
         stamp(sprite.canvas, 0, 0, sprite.canvas.width, sprite.canvas.height,

@@ -7,6 +7,6 @@ with sync_playwright() as p:
     pg = b.new_context(viewport={'width':800,'height':600}).new_page(); errs=[]
     pg.on('console', lambda m: errs.append(m.text[:200]) if m.type == 'error' and '404' not in m.text else None); pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.goto('http://127.0.0.1:18900/_library/tools/lab/monstro_foto.html?bake=1'); pg.wait_for_function("window.__bake", timeout=240000)
-    url = pg.evaluate(f"window.__bake({ANDAR},{SOCO},{DIRS},{TAM})", )
+    url = pg.evaluate(f"window.__bake({ANDAR},{SOCO},{DIRS},{TAM},3)", )
     open(OUT, 'wb').write(base64.b64decode(url.split(',')[1]))
     import os; print('bytes', os.path.getsize(OUT), 'erros', errs or 'nenhum'); b.close()

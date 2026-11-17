@@ -24,7 +24,7 @@ import {
 } from './effects.js';
 import { setWorldView } from './fx/stamp.js';
 import { renderRavenBird } from './raven.js';
-import { renderPhoenixBird } from './phoenix.js';
+import { renderHearthBird, renderPhoenixBird } from './phoenix.js';
 import { renderPickups } from './pickups.js';
 import { renderShackle } from './shackle.js';
 import { heroAnim } from './player.js';
@@ -40,7 +40,7 @@ import { renderShadowClone } from './shadow_clone.js';
 import { getHeroGear, getOathPalette } from './hero_gear.js';
 import {
     renderCracks, renderCrescents, renderFireRing, renderMonsterCurses, renderPhoenix, renderRifts,
-    renderShield, renderSkillAuras, renderSkillHits, renderSmokes, renderWisp
+    renderTorchWard, renderSkillAuras, renderSkillHits, renderSmokes, renderWisp
 } from './skills.js';
 
 // O herói padrão é o 2.5D (js/render/player25d.js). O top-down antigo (js/render/player.js, desenho em
@@ -56,7 +56,6 @@ function renderHeroBlock() {
     if (HERO_25D) renderHero();
     else renderPlayer();
     renderOrbitBlades();
-    renderShield();
     renderWisp();
     renderPhoenixBird();
     renderRavenBird();
@@ -179,6 +178,8 @@ export function render() {
     const heroBehind = !player.hidden && player.y < state.coreY;
     renderEnemies('behind', state.coreY, heroBehind ? renderHeroBlock : null, player.y);
     renderCore();
+    renderTorchWard();
+    renderHearthBird();
     renderEnemies('front', state.coreY, heroBehind ? null : renderHeroBlock, player.y);
     renderRoots();
     renderSpiritWolves();

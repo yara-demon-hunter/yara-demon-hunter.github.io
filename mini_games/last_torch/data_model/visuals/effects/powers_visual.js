@@ -12,6 +12,7 @@ export const POWERS_VISUALS = {
     },
     lightning: { color: '#bae6fd', core: '#ffffff', glow: 'rgba(56, 189, 248, 0.35)', width: 3, coreWidth: 1.2, glowWidth: 11 },
     bolt: { glow: 'rgba(249, 115, 22, 0.9)', core: '#fff7ed', mid: '#fb923c', radius: 5, trail: 4, trailGap: 6 },
+    blueBolt: { glow: 'rgba(59, 130, 246, 0.9)', core: '#eff6ff', mid: '#60a5fa' },
     star: { color: '#fde68a', glow: 'rgba(253, 224, 71, 0.9)', ring: 'rgba(253, 224, 71, 0.55)', height: 460, tail: 90 },
     chill: { ring: 'rgba(165, 243, 252, 0.35)', fill: 'rgba(103, 232, 249, 0.05)', flake: '#e0f2fe', flakes: 10 },
     frost: { color: 'rgba(186, 230, 253, 0.55)' },

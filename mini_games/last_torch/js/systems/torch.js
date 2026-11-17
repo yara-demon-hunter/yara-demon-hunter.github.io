@@ -5,6 +5,7 @@ import { updateHUD } from '../ui/hud.js';
 import { addNumber, createExplosion, screenFlash, shakeScreen } from './effects.js';
 import { mod } from './modifiers.js';
 import { beginDeath } from './night.js';
+import { tryPhoenixTorch, wardTorch } from './skills_flame.js';
 import { getMaxPlayerHp, getWarmthHeal, getWarmthRadius } from './stats.js';
 
 // --- TOCHA ---
@@ -21,6 +22,8 @@ export function getTorchMaxHp() {
 
 export function hurtTorch(amount, x, y) {
     if (state.phase !== 'HUNT') return;
+    // Torch Ward: o escudo paga o golpe
+    if (wardTorch()) return;
     amount *= 1 - mod('torchGuard');
     state.coreHp = Math.max(0, state.coreHp - amount);
     shakeScreen(8);
@@ -35,6 +38,7 @@ export function hurtTorch(amount, x, y) {
         audio.playAlarm();
     }
     updateHUD();
+    if (state.coreHp <= 0 && tryPhoenixTorch()) return;
     if (state.coreHp <= 0) beginDeath('CORE');
 }
 

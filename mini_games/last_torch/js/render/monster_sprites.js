@@ -428,20 +428,54 @@ function drawBossDagger(p) {
     ctx.restore();
 }
 
+// Pedra do Golem: pedaço irregular de rocha com a face de cima mais clara. Fica no centro do sprite e gira em voo (entities.js)
+function drawRock(p) {
+    const r = p.radius;
+    const pts = [[-1, -0.2], [-0.55, -0.95], [0.4, -1], [1, -0.3], [0.85, 0.6], [0.1, 1], [-0.7, 0.75]];
+    drawGlow(ctx, 'rgba(0, 0, 0, 0.5)', p.x + r * 0.15, p.y + r * 0.2, r * 1.5, 0.35);
+    const path = (scale) => {
+        ctx.beginPath();
+        pts.forEach(([x, y], i) => (i ? ctx.lineTo : ctx.moveTo).call(ctx, p.x + x * r * scale, p.y + y * r * scale));
+        ctx.closePath();
+    };
+    path(1);
+    ctx.fillStyle = '#4a433c';
+    ctx.fill();
+    path(0.82);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+    ctx.beginPath();
+    ctx.moveTo(p.x - r * 0.55, p.y - r * 0.8);
+    ctx.lineTo(p.x + r * 0.35, p.y - r * 0.82);
+    ctx.lineTo(p.x + r * 0.1, p.y - r * 0.1);
+    ctx.lineTo(p.x - r * 0.7, p.y - r * 0.1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 106, 19, 0.7)';      // uma rachadura de brasa
+    ctx.lineWidth = Math.max(0.6, r * 0.12);
+    ctx.beginPath();
+    ctx.moveTo(p.x + r * 0.1, p.y + r * 0.2);
+    ctx.lineTo(p.x + r * 0.5, p.y + r * 0.6);
+    ctx.stroke();
+}
+
 function bakeBolt(owner, color, radius) {
     const width = radius * BOLT_LENGTH;
     const height = radius * BOLT_HEIGHT;
     const canvas = makeCanvas(width * BOLT_PIXELS, height * BOLT_PIXELS);
     const target = canvas.getContext('2d');
     target.scale(BOLT_PIXELS, BOLT_PIXELS);
-    const p = { x: width * 0.72, y: height / 2, vx: 1, vy: 0, radius, color };
+    const rock = owner === 'GOLEM';
+    const p = { x: rock ? width / 2 : width * 0.72, y: height / 2, vx: 1, vy: 0, radius, color };
     const previous = setDrawTarget(target);
-    if (owner === 'WITCH') renderWitchBolt(p);
+    if (rock) drawRock(p);
+    else if (owner === 'WITCH') renderWitchBolt(p);
     else if (owner === 'DEMON_LORD') renderDemonFireball(p);
     else if (BOSS_MODELS[owner]?.projectileStyle === 'dagger') drawBossDagger(p);
     else drawOrb(p);
     setDrawTarget(previous);
-    return { canvas, radius, width, height, centerShift: width * 0.22 };
+    return { canvas, radius, width, height, centerShift: rock ? 0 : width * 0.22 };
 }
 
 export function getBoltSprite(owner, color, radius) {

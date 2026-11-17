@@ -1,7 +1,7 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { getCharacterBase } from '../../data_model/characters/index.js';
 import { BLADE_SKILL } from '../../data_model/skills.js';
-import { WAR_CRY } from '../../data_model/passives.js';
+import { BLUE_TORCH, WAR_CRY } from '../../data_model/passives.js';
 import { getPowerLevel } from '../../data_model/powers.js';
 import { attributes, passives, player, powers, state } from '../core/state.js';
 import { getHero, mod } from './modifiers.js';
@@ -127,7 +127,11 @@ export function getKillHeal() {
     return (getPowerLevel(powers.bloodEdge)?.heal ?? 0) + mod('killHeal');
 }
 export function getWarmthRadius() {
-    return characterStat('warmthRadius') * (1 + mod('warmth'));
+    return characterStat('warmthRadius') * (1 + mod('warmth') + (passives.blueTorch.lvl > 0 ? BLUE_TORCH.warmth : 0));
+}
+// Blue Torch: os golpes da própria tocha (Flame Sentinel, Hearth Ring, Solar Wall) batem mais forte
+export function getTorchFireDamage() {
+    return getSpellDamage() * (passives.blueTorch.lvl > 0 ? 1 + BLUE_TORCH.fireDamage : 1);
 }
 // Calor da tocha: o alcance (`warmthRadius`) e a cura por segundo (`warmthHeal`) são do personagem; relíquias e skills (mod 'warmth')
 // somam por cima. A cura cresce com parte do bônus de alcance (WARMTH_HEAL_SHARE) e tem teto; zero sob o Oath of Slaughter.

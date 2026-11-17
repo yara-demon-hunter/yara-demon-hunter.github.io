@@ -272,8 +272,8 @@ export const MONSTER_MODELS = {
         maxAlive: 2,
         hpBase: 250,
         hpPerTurn: 90,
-        speedMin: 6,
-        speedMax: 8,
+        speedMin: 12,
+        speedMax: 20,
         radius: 27,
         color: '#5b3b22',
         damage: 24,
@@ -295,21 +295,32 @@ export const MONSTER_MODELS = {
         maxAlive: 2,
         hpBase: 320,
         hpPerTurn: 110,
-        speedMin: 4,
-        speedMax: 5.5,
+        speedMin: 10,
+        speedMax: 15,
         radius: 28,
         color: '#6b625a',
         damage: 26,
         knockbackResist: 1,
         immovable: true,
-        initialShootCooldownSeconds: 2,
-        shootCooldownSeconds: 2,
+        // Joga uma pedra (pequena) a meia distância: nem colado nele (aí ele soca) nem longe demais
+        projectileSpeed: 130,
+        projectileRadius: 7,
+        projectileDamageMultiplier: 0.6,
+        projectileColor: '#8a7f72',
+        projectileTorchDamage: 3,
+        shootMinRange: 160,
+        shootRange: 340,
+        throwWindup: 0.5,                // ergue os braços nesse tempo antes de jogar
+        initialShootCooldownSeconds: 3,
+        shootCooldownSeconds: 4.5,
         scoreReward: 80,
         goldBase: 60,
         goldVariance: 0.35,
         xpRewardBase: 40,
         xpRewardPerTurn: 6,
-        punch: { cooldownSeconds: 5, windupSeconds: 1.4, strikeSeconds: 0.18, recoverySeconds: 0.6, range: 115, halfAngle: 0.52, damageMultiplier: 2.9 }
+        // Golpe em área: bate as duas mãos no chão. Perto dele (range) ele ergue os braços (windupSeconds) enquanto um círculo no chão (areaRadius)
+        // mostra onde vai pegar; as mãos batem quando o círculo estoura. Quem sair do círculo antes (dash) não leva dano.
+        punch: { area: true, areaRadius: 175, torchDamage: 8, cooldownSeconds: 5, windupSeconds: 1.4, strikeSeconds: 0.25, recoverySeconds: 0.7, range: 115, damageMultiplier: 2.4 }
     },
     // Necromante: fica longe e levanta esqueletos até alguém ir buscá-lo.
     NECROMANCER: {

@@ -2,7 +2,7 @@ import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { HERO_HUD_VISUALS } from '../../data_model/visuals/characters/hero_hud_visual.js';
 import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
-import { ctx, maxUltEnergy, player, shadowClones, state } from '../core/state.js';
+import { ctx, maxUltEnergy, passives, player, shadowClones, state } from '../core/state.js';
 import { getAtkRadius } from '../systems/stats.js';
 import { createTorch25D } from '../../library/objects/torch/torch25d.js';
 import { TORCH25D_VISUALS } from '../../library/objects/torch/torch25d_visual.js';
@@ -44,10 +44,11 @@ function flameSizeFor(hp) {
 // A tocha nasce na resolução da tela e no nível de detalhe atuais; recria só quando algum dos dois muda
 export function prepareCore() {
     const res = state.view.scale * state.view.pixelRatio;
-    const key = `${res.toFixed(3)}|${state.quality}`;
+    const blue = passives.blueTorch.lvl > 0;
+    const key = `${res.toFixed(3)}|${state.quality}|${blue}`;
     if (key === torchKey) return;
     torchKey = key;
-    torch = createTorch25D({ res, frames: TORCH25D_VISUALS.frames[state.quality] });
+    torch = createTorch25D({ res, frames: TORCH25D_VISUALS.frames[state.quality], blue });
 }
 
 export function renderCore() {
@@ -67,7 +68,7 @@ function renderFuryBar() {
 
 // Barrinhas da fogueira e do herói (vida e Fúria). Ficam acima da névoa para serem vistas mesmo com pouca luz
 export function renderHpBars() {
-    drawHpBar(ctx, T.hpBar, state.coreX, state.coreY, getCoreHpRatio());
+    drawHpBar(ctx, passives.blueTorch.lvl > 0 ? { ...T.hpBar, ...T.hpBarBlue } : T.hpBar, state.coreX, state.coreY, getCoreHpRatio());
     if (player.hidden) return;
     drawHpBar(ctx, HERO_HUD_VISUALS.hpBar, player.x, player.y, Math.max(0, Math.min(1, player.hp / player.maxHp)));
     renderFuryBar();

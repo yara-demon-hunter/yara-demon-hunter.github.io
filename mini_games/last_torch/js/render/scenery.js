@@ -1,7 +1,9 @@
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
 import { WORLD } from '../../data_model/world.js';
 import { createScenery } from '../../library/scenery/index.js';
-import { player, state } from '../core/state.js';
+import { BLUE_TORCH } from '../../data_model/passives.js';
+import { ctx, passives, player, state } from '../core/state.js';
+import { drawGlow } from '../../library/core/glow.js';
 
 // --- CENÁRIO NO JOGO ---
 // A arte do cenário (chão, grama, vaga-lumes, névoa, vinheta) vem da biblioteca: library/scenery/<id>/, escolhido em
@@ -20,7 +22,9 @@ const source = { glowColor: T.groundGlowColor, glowAlpha: T.groundGlowAlpha, rad
 function updateTorchLight(now) {
     const hpRatio = Math.max(0, Math.min(1, state.coreHp / state.coreHpMax));
     const minSide = Math.min(state.width, state.height);
-    const target = minSide * (T.lightRadiusMinRatio
+    // Blue Torch: a chama azul ilumina mais longe
+    const reach = passives.blueTorch.lvl > 0 ? 1 + BLUE_TORCH.light : 1;
+    const target = reach * minSide * (T.lightRadiusMinRatio
         + (T.lightRadiusMaxRatio - T.lightRadiusMinRatio) * Math.pow(hpRatio, T.lightShrinkCurve));
 
     const dt = Math.min(0.2, torch.lightTime ? now - torch.lightTime : 0);
@@ -72,6 +76,13 @@ export function prepareScenery() {
 
 export function renderSceneryGround() {
     scenery.renderGround(syncEnv());
+    // Blue Torch: o brilho no chão (pintado uma vez, laranja) ganha por cima um azul que acompanha a luz
+    if (passives.blueTorch.lvl > 0) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        drawGlow(ctx, 'rgba(59, 130, 246, 0.55)', state.coreX, state.coreY, torch.currentLight * 0.55, 0.3);
+        ctx.restore();
+    }
 }
 
 export function renderScenerySway() {

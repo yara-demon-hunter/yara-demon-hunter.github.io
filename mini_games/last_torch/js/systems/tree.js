@@ -173,6 +173,7 @@ const TREE_MOD_FIELDS = {
     knifeSpeed: ['💨', 'Dagger Speed', n => `+${Math.round(n * 100)}%`],
     knifeCooldown: ['🗡️', 'Dagger Recharge', n => `-${Math.round(n * 100)}%`],
     torchHp: ['🔥', 'Torch Health', n => `+${n}`],
+    torchGuard: ['🪨', 'Torch Guard', n => `-${Math.round(n * 100)}%`],
     warmth: ['🌡️', 'Warmth Reach', n => `+${Math.round(n * 100)}%`],
     torchRegen: ['🕯️', 'Torch Regen', n => `+${Number(n.toFixed(2))}/s`],
     stillAttack: ['⛰️', 'Still Attack', n => `+${Math.round(n * 100)}%`],
@@ -258,7 +259,7 @@ function isSealedForHero(node) {
 
 // Skills que causam dano de MAGIA (dependem do `magicDamage` do personagem): os poderes, passivas e evoluções dos ramos de
 // feitiço (Maldição, Natureza, Luz) e as da Chama que usam magia. Quem tem magicDamage 0 (Captain Brutos) as tem seladas.
-const MAGIC_FLAME_KEYS = new Set(['torchBolts', 'fireRing', 'emberTrail', 'phoenixPact', 'backdraft', 'vigil', 'fireballs']);
+const MAGIC_FLAME_KEYS = new Set(['torchBolts', 'fireRing', 'emberTrail', 'phoenixPact', 'hearthPhoenix', 'fireballs']);
 function isMagicNode(node) {
     if (node.kind === 'mod' || node.kind === 'stat' || node.oath) return false;
     if (node.branch === 'curse' || node.branch === 'nature' || node.branch === 'light') return true;

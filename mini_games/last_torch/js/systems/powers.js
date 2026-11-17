@@ -1,5 +1,5 @@
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
-import { audio, player, powers, state } from '../core/state.js';
+import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen } from './effects.js';
 import { startCast } from './moves.js';
@@ -8,7 +8,7 @@ import { feedBloodlust } from './skills_blade.js';
 import { spreadHex } from './skills_curse.js';
 import { onNatureKill } from './skills_nature.js';
 import { onLightKill } from './skills_light.js';
-import { getKillHeal, getSpellCooldown, getSpellDamage } from './stats.js';
+import { getKillHeal, getSpellCooldown, getSpellDamage, getTorchFireDamage } from './stats.js';
 
 // --- PODERES ---
 // Cada poder lê os dados do nível atual com getPowerLevel (data_model/powers.js).
@@ -252,8 +252,10 @@ function updateTorchBolts(dt) {
                 x: state.coreX, y: state.coreY,
                 vx: Math.cos(a) * M.speed, vy: Math.sin(a) * M.speed,
                 target,
-                damage: getSpellDamage() * level.damage,
+                damage: getTorchFireDamage() * level.damage,
                 style: 'spell',
+                blue: passives.blueTorch.lvl > 0,
+                torchFire: true,
                 life: 1.6
             });
         }
@@ -282,8 +284,8 @@ function updateTorchBolts(dt) {
         const hit = state.enemies.find(e => e.hp > 0 && Math.hypot(e.x - b.x, e.y - b.y) < e.radius + M.radius);
         if (hit) {
             const a = Math.atan2(b.vy, b.vx);
-            dealDamage(hit, b.damage, { kbX: Math.cos(a) * 90, kbY: Math.sin(a) * 90, style: b.style ?? (b.soul ? 'spell' : null) });
-            createExplosion(b.x, b.y, b.soul ? '#c084fc' : '#fb923c', 6);
+            dealDamage(hit, b.damage, { kbX: Math.cos(a) * 90, kbY: Math.sin(a) * 90, style: b.style ?? (b.soul ? 'spell' : null), torchFire: b.torchFire });
+            createExplosion(b.x, b.y, b.soul ? '#c084fc' : b.blue ? '#60a5fa' : '#fb923c', 6);
             b.onHit?.(b, hit);
         }
         if (hit || b.life <= 0) state.bolts.splice(i, 1);

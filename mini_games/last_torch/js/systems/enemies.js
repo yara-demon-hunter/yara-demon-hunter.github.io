@@ -6,7 +6,7 @@ import { MONSTER_MODELS, MONSTER_SPAWNING, createVampireBat, rollMonsterGold } f
 import { MIRROR_WARD } from '../../data_model/passives.js';
 import { audio, passives, player, shadowClones, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
-import { updateBossAI, updateShadowAI } from './boss_ai.js';
+import { addSlam, updateBossAI, updateShadowAI } from './boss_ai.js';
 import { dealDamage } from './damage.js';
 import { addCorpse, addGibs, addShockwave, addStain, createExplosion, hitStop, shakeScreen, zoomPunch } from './effects.js';
 import { dropGold } from './gold.js';
@@ -16,7 +16,7 @@ import { dropChest, maybeDropPickup } from './pickups.js';
 import { hurtPlayer, knockbackPlayer } from './player.js';
 import { damageShadowClone } from './shadow_clone.js';
 import { addHostileFire, onEnemyKilled } from './powers.js';
-import { onTorchTouched, spreadBurn } from './skills_flame.js';
+import { spreadBurn, wardSpendForShot, wardTorch } from './skills_flame.js';
 import { gainXp } from './progression.js';
 
 import { recordBeast } from './sanctuary.js';
@@ -101,7 +101,20 @@ function updateTreantPunch(e, P, dist, angle, dt) {
     if (e.punchState === 1) {
         e.punchTimer -= dt;
         e.swing = 1 - Math.max(0, e.punchTimer) / P.windupSeconds;
-        if (e.punchTimer <= 0) {
+        if (e.punchTimer <= 0 && P.area) {
+            // Golem: bate as duas mãos no chão. O dano em volta (e na tocha) vem do aviso no chão, que estoura agora; aqui só os clones
+            e.punchState = 2;
+            e.punchTimer = P.strikeSeconds;
+            e.slamHit = true;
+            e.slamTele = null;
+            for (const clone of shadowClones) {
+                if (clone.active && Math.hypot(clone.x - e.x, clone.y - e.y) < P.areaRadius + CHARACTER_MODEL.collisionRadius) {
+                    damageShadowClone(clone, e.damage * P.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+                }
+            }
+            shakeScreen(7);
+            audio.playSlam(0.9);
+        } else if (e.punchTimer <= 0) {
             e.punchState = 2;
             e.punchTimer = P.strikeSeconds;
             const hits = (x, y, radius = 0) => {
@@ -131,6 +144,7 @@ function updateTreantPunch(e, P, dist, angle, dt) {
         if (e.punchTimer <= 0) {
             e.punchState = 3;
             e.punchTimer = P.recoverySeconds;
+            e.slamHit = false;
         }
         return true;
     }
@@ -148,6 +162,8 @@ function updateTreantPunch(e, P, dist, angle, dt) {
     e.punchTimer = P.windupSeconds;
     e.punchCooldown = P.cooldownSeconds;
     e.swing = 0;
+    // Golpe em área: o círculo no chão avisa onde vai pegar e estoura quando as mãos batem (junto do fim da preparação)
+    if (P.area) e.slamTele = addSlam(e.x, e.y, P.areaRadius, P.windupSeconds, e.damage * P.damageMultiplier, null, P.torchDamage ?? 0, '#a8a29e');
     return true;
 }
 
@@ -237,14 +253,19 @@ function updateAttacks(e, model, angle, dt, distToTarget) {
         return;
     }
     if (!model.projectileSpeed && !model.summon) return;
-    // Fora do alcance o relógio espera: ao chegar perto ainda sobra o tempo do aviso (o brilho do elmo)
-    if (model.shootRange && distToTarget > model.shootRange) {
+    // Fora do alcance (longe demais, ou perto demais: shootMinRange) o relógio espera: ao entrar no alcance ainda sobra o tempo do aviso
+    // (o brilho do elmo, os braços do golem erguendo)
+    if ((model.shootRange && distToTarget > model.shootRange) || (model.shootMinRange && distToTarget < model.shootMinRange)) {
         e.shootTimer = Math.max(e.shootTimer, 0.6);
+        if (model.throwWindup) e.throwArm = 0;
         return;
     }
     e.shootTimer -= dt;
+    // Golem: uma mão sobe nos últimos throwWindup segundos antes da pedra (e.throwArm, 0..1)
+    if (model.throwWindup) e.throwArm = e.shootTimer < model.throwWindup ? 1 - Math.max(0, e.shootTimer) / model.throwWindup : 0;
     if (e.shootTimer > 0) return;
     e.shootTimer = model.shootCooldownSeconds;
+    e.throwArm = 0;
     if (!model.summon) shoot(e, model, angle);
     else if (!state.lastStand) raiseDead(e, model);
 }
@@ -291,6 +312,11 @@ function deathEffects(e, model) {
 
 function removeEnemy(i, e) {
     if (e === state.currentBoss) state.currentBoss = null;
+    // Golem morto no meio da pancada: o aviso no chão some junto (não estoura sozinho)
+    if (e.slamTele) {
+        const t = state.telegraphs.indexOf(e.slamTele);
+        if (t >= 0) state.telegraphs.splice(t, 1);
+    }
     state.enemies.splice(i, 1);
 }
 
@@ -515,13 +541,14 @@ export function updateEnemies(dt) {
 
         // Colisão com Núcleo: o monstro se consome na chama e leva um pedaço dela
         if (hunting && !e.isBoss && !model.torchSlam && touchesCore && !huntsPlayer) {
+            // Torch Ward: o escudo repele o monstro (e os vizinhos) em vez de deixar a chama ser consumida
+            if (wardTorch(e)) continue;
             const damage = (model.torchDamage ?? CORE_MODEL.damageTakenPerMonster) * (e.elite ? 2 : 1);
             if (model.explosion) burst(e, model);
             createExplosion(e.x, e.y, e.color, 8);
             removeEnemy(i, e);
             hurtTorch(damage, e.x, e.y);
             if (state.phase !== 'HUNT') return;
-            onTorchTouched();
             continue;
         }
 
@@ -560,6 +587,27 @@ function tryReflect(p) {
     audio.playReflect();
     createExplosion(p.x, p.y, '#7dd3fc', 8);
     shakeScreen(3);
+    return true;
+}
+
+// Torch Ward: vira o tiro contra o monstro mais próximo (como o Mirror Ward, mas a favor da tocha)
+function reflectAtMonsters(p) {
+    let target = null;
+    let best = Infinity;
+    for (const e of state.enemies) {
+        const d = Math.hypot(e.x - p.x, e.y - p.y);
+        if (d < best) { best = d; target = e; }
+    }
+    if (!target) return false;
+    const angle = Math.atan2(target.y - p.y, target.x - p.x);
+    const speed = Math.hypot(p.vx, p.vy) * MIRROR_WARD.speedMultiplier;
+    p.reflected = true;
+    p.target = target;
+    p.vx = Math.cos(angle) * speed;
+    p.vy = Math.sin(angle) * speed;
+    p.damage = Math.max(MIRROR_WARD.minimumDamage, p.damage * MIRROR_WARD.damageMultiplier);
+    audio.playReflect();
+    createExplosion(p.x, p.y, '#fde68a', 8);
     return true;
 }
 
@@ -633,6 +681,12 @@ export function updateEnemyProjectiles(dt) {
         if (hitClone) {
             damageShadowClone(hitClone, p.damage, p.x - p.vx * 0.05, p.y - p.vy * 0.05, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
             enemyProjectiles.splice(i, 1);
+            continue;
+        }
+
+        // Torch Ward: o escudo da tocha devolve o tiro que vinha para ela
+        if (p.torchDamage && Math.hypot(state.coreX - p.x, state.coreY - p.y) < p.radius + CORE_MODEL.collisionRadius + 26
+            && state.torchWard.charges > 0 && reflectAtMonsters(p) && wardSpendForShot(p.x, p.y)) {
             continue;
         }
 

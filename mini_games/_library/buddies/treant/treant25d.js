@@ -170,7 +170,10 @@ function parts(pose, rig) {
 // vale a versão em bolas e galhos que está mais acima, que continua aqui como reserva.
 const ATLAS = { walk: 6, punch: 4, dirs: 8, size: 176 };
 const atlas = new Image();
-atlas.src = new URL('./treant_atlas.webp', import.meta.url).href;
+// Caminho da imagem: ao lado deste arquivo; no pacote com bundle (game.min.js na raiz) o import.meta.url não aponta mais para a pasta
+// library, então a imagem é buscada em library/... a partir da página
+atlas.src = import.meta.url.includes('/library/') ? new URL('./treant_atlas.webp', import.meta.url).href
+    : new URL('library/buddies/treant/treant_atlas.webp', document.baseURI).href;
 const ready = () => atlas.complete && atlas.naturalWidth > 0;
 const sprites = new WeakMap();
 const dirOf = (angle) => Math.round((((angle % TAU) + TAU) % TAU) / TAU * ATLAS.dirs) % ATLAS.dirs;

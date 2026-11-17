@@ -22,6 +22,10 @@
         button:hover, button:focus-visible { border-color: #fbbf24; outline: none; }
         button.primary { background: #3a2f17; border-color: #5c5137; }
         label.check { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; }
+        .turn { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; }
+        .turn input[type=range] { width: 120px; }
+        .turn output { min-width: 34px; color: #fbbf24; }
+        .turn button { padding: 3px 8px; }
         .layout { display: grid; grid-template-columns: minmax(0, 1fr) 470px; gap: 12px; padding: 12px 16px 40px; }
         @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
         .views { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(220px, calc(50% - 5px)), 1fr)); align-content: start; }
@@ -84,6 +88,15 @@
         <select id="kind" aria-label="Heróis ou monstros"><option value="hero">Heróis</option><option value="monster">Monstros</option></select>
         <label class="check" id="topdownBox" hidden><input id="topdown" type="checkbox"> Topdown (desenho de cima)</label>
         <select id="model" aria-label="Personagem"></select>
+        <span class="turn" title="Gira o monstro nas vistas do Last Torch (0° = direita, 90° = de frente para a câmera, 180° = esquerda, 270° = de costas)">
+            <label class="check"><input id="faceManual" type="checkbox"> Girar</label>
+            <input id="faceAngle" type="range" min="0" max="360" step="5" value="90">
+            <output id="faceOut">90°</output>
+            <button type="button" data-face="0" title="Para a direita">→</button>
+            <button type="button" data-face="90" title="De frente para a câmera">↓</button>
+            <button type="button" data-face="180" title="Para a esquerda">←</button>
+            <button type="button" data-face="270" title="De costas">↑</button>
+        </span>
         <label class="check"><input id="pause" type="checkbox"> Pausar</label>
         <button id="copy" class="primary">Copiar alterados</button>
         <button id="reset">Desfazer tudo</button>
@@ -681,7 +694,9 @@
             views.push({ o, fig, canvas, g: canvas.getContext('2d'), anim, body, t: 0, lap: -1, monster: { x: 0, y: 0, vx: 0, vy: 0, angle: 0, hp: 100, maxHp: 100, radius: 14, phase: 0, shootTimer: 99 } });
         });
 
-        const faceOf = (v) => (typeof v.o.facing === 'function' ? v.o.facing(v.t) : v.o.facing);
+        // Giro manual (barra de cima): fixa o ângulo do monstro nas vistas do Last Torch (as do palco do RPG e a da morte ficam como são)
+        let faceManual = null;
+        const faceOf = (v) => (faceManual !== null && v.o.cam !== RPG && !v.o.death ? faceManual : typeof v.o.facing === 'function' ? v.o.facing(v.t) : v.o.facing);
 
         function tick(v, dt) {
             const o = v.o;
@@ -958,7 +973,15 @@
             try { await navigator.clipboard.writeText(text); $('deathCopy').textContent = 'Copiado!'; } catch { $('deathOut').select(); $('deathCopy').textContent = 'Selecione e copie abaixo'; }
             setTimeout(() => { $('deathCopy').textContent = 'Copiar morte'; }, 1600);
         });
+        const setTurn = () => {
+            const on = $('faceManual').checked; const deg = parseFloat($('faceAngle').value) || 0;
+            faceManual = on ? deg * Math.PI / 180 : null; $('faceOut').textContent = `${deg}°`;
+        };
+        $('faceManual').addEventListener('change', setTurn);
+        $('faceAngle').addEventListener('input', () => { $('faceManual').checked = true; setTurn(); });
+        document.querySelectorAll('[data-face]').forEach(b => b.addEventListener('click', () => { $('faceAngle').value = b.dataset.face; $('faceManual').checked = true; setTurn(); }));
         buildDeathPanel();
+
 
         let last = null;
         function frame(real) {

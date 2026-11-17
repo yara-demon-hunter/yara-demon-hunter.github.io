@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório · Fênix de fogo</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; height: 100%; background: #04070b; color: #cfd6e0; font-family: system-ui, sans-serif; overflow: hidden; }
+        #stage { position: fixed; inset: 0; }
+        #stage canvas { display: block; width: 100%; height: 100%; }
+        #panel { position: fixed; top: 10px; right: 10px; width: 270px; max-height: calc(100% - 20px); overflow-y: auto; padding: 12px 14px;
+            background: rgba(10, 12, 16, .86); border: 1px solid #2a2f38; border-radius: 10px; font-size: 13px; line-height: 1.35; }
+        #panel h1 { margin: 0 0 2px; font-size: 15px; color: #fdba74; }
+        #panel .sub { margin: 0 0 8px; font-size: 11px; color: #8b93a0; }
+        #panel h2 { margin: 12px 0 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #fbbf24; }
+        #panel label { display: flex; gap: 8px; align-items: center; margin: 3px 0; cursor: pointer; }
+        #panel label small { color: #7a8290; }
+        #panel select, #panel button { width: 100%; margin-top: 4px; padding: 6px; background: #151a22; color: #e5ded0; border: 1px solid #2f3642; border-radius: 6px; font: inherit; cursor: pointer; }
+        #panel a { color: #fbbf24; }
+        #fps { color: #7a8290; font-size: 11px; margin-top: 6px; }
+        #home { position: fixed; top: 10px; left: 10px; z-index: 5; padding: 6px 10px; background: rgba(10, 12, 16, .86); border: 1px solid #2a2f38; border-radius: 8px; color: #fbbf24; text-decoration: none; font-size: 13px; }
+        #loading { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #07090c; color: #a39b86; font-size: 15px; text-align: center; padding: 20px; white-space: pre-line; }
+    </style>
+    <!-- Laboratório (fora dos jogos): ver README.md e metodologia_fotorrealismo.md. Three.js copiado em vendor/three (sem internet).
+         Abrir: na pasta mini_games, `python3 -m http.server 8010` e http://localhost:8010/_library/tools/lab/fenix_foto.html -->
+    <script type="importmap">
+        { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+    </script>
+</head>
+<body>
+    <div id="stage"></div>
+    <a id="home" href="index.html">← Laboratório</a>
+    <aside id="panel">
+        <h1>Fênix de fogo</h1>
+        <p class="sub">Asas abertas, batendo, pegando fogo. 100% procedural. <a href="metodologia_fotorrealismo.md">Metodologia</a></p>
+        <h2>Fogo</h2>
+        <label><input type="radio" name="cor" id="corFogo" checked> Laranja</label>
+        <label><input type="radio" name="cor" id="corAzul"> Azul <small>(Blue Torch)</small></label>
+        <label><input type="checkbox" id="bate" checked> Asas batendo</label>
+        <h2>1 · Material</h2>
+        <label><input type="checkbox" id="pbr" checked> PBR + ruído <small>(penas)</small></label>
+        <h2>3 · Luz e sombra</h2>
+        <label><input type="checkbox" id="luz" checked> Luz do fogo no entorno <small>(GI aprox.)</small></label>
+        <label><input type="checkbox" id="ao" checked> Ambient Occlusion</label>
+        <h2>4 · Micro-detalhes</h2>
+        <label><input type="checkbox" id="fogo" checked> Chamas e fagulhas <small>(instancing)</small></label>
+        <h2>7 · Câmera</h2>
+        <label><input type="checkbox" id="bloom" checked> Bloom</label>
+        <label><input type="checkbox" id="aces" checked> Tone mapping ACES</label>
+        <h2>Qualidade</h2>
+        <select id="quality"><option value="0.5">Baixa</option><option value="0.75">Média</option><option value="1" selected>Alta</option></select>
+        <label style="margin-top:8px"><input type="checkbox" id="spin" checked> Câmera girando sozinha</label>
+        <button id="shot">📷 Salvar foto (PNG)</button>
+        <div id="fps"></div>
+    </aside>
+    <div id="loading">Gerando as penas e a fênix…\n(tudo por código)</div>
+    <script type="module" src="fenix_foto.js"></script>
+</body>
+</html>

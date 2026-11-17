@@ -1,4 +1,4 @@
-import { PHOENIX_VISUALS as V } from './phoenix_visual.js';
+import { PHOENIX_VISUALS as BASE } from './phoenix_visual.js';
 import { drawGlow } from '../../core/glow.js';
 import { renderNow } from '../../core/clock.js';
 
@@ -9,6 +9,9 @@ function makeCanvas(width, height, draw) {
     if (draw) draw(canvas.getContext('2d'));
     return canvas;
 }
+
+// As cores e medidas em uso: a paleta da fênix, ou outra enquanto drawPhoenixArtWith desenha (ver hearth_phoenix)
+let V = BASE;
 
 // --- FÊNIX (buddy) ---
 // Ave de fogo que anda com o herói (no Last Torch, o Phoenix Pact). A arte tem muitas penas e degradês: é desenhada uma vez por quadro da batida de
@@ -251,6 +254,17 @@ export function drawPhoenixArt(g, phase) {
     drawBody(g, phase);
     drawHead(g, phase);
     drawWing(g, phase, -3, -7, V.near, 0);
+}
+
+// Desenha a ave com outra paleta (as chaves de PHOENIX_VISUALS que mudarem: cores das penas, corpo, bico...). Só durante esta chamada.
+export function drawPhoenixArtWith(g, phase, palette) {
+    const saved = V;
+    V = { ...BASE, ...palette };
+    try {
+        drawPhoenixArt(g, phase);
+    } finally {
+        V = saved;
+    }
 }
 
 // --- ATLAS ---

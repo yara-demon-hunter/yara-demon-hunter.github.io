@@ -266,7 +266,7 @@ export class SoundEngine {
         this.burst({ filter: 'lowpass', freq: 1400, to: 300, attack: 0.02, decay: 0.3, gain: 0.16 });
     }
 
-    // Vigil: escudo sobe e estoura
+    // Torch Ward: escudo sobe e estoura
     playShield() {
         if (!this.ctx) return;
         this.tone({ type: 'sine', freq: 330, to: 660, decay: 0.26, gain: 0.12 });

@@ -3,13 +3,14 @@ import { ctx, passives, state } from '../core/state.js';
 import {
     drawPhoenixSprite as drawSprite, phoenixBeak, preparePhoenix as prepare, renderPhoenixBuddy
 } from '../../library/buddies/phoenix/phoenix.js';
+import { hearthPhoenixBeak, prepareHearthPhoenix, renderHearthPhoenix } from '../../library/buddies/hearth_phoenix/hearth_phoenix.js';
 
 // --- FÊNIX (Phoenix Pact) ---
 // O desenho da ave é um buddy da biblioteca (library/buddies/phoenix). Aqui fica só o que é do jogo: decidir o tamanho do
 // sprite pela tela e mostrar a ave quando o poder existe e ela está em campo (state.phoenix, js/systems/skills_flame.js).
 const smallScreen = () => Math.min(window.innerWidth, window.innerHeight) < WORLD.mobileMaxShortSide;
 
-export { phoenixBeak };
+export { phoenixBeak, hearthPhoenixBeak };
 
 // Monta o atlas antes de a ave aparecer (o navegador sobe a imagem para a placa de vídeo no primeiro desenho)
 export function preparePhoenix() {
@@ -19,6 +20,15 @@ export function preparePhoenix() {
 export function drawPhoenixSprite(x, y, size, facing, tilt, alpha = 1) {
     prepare(smallScreen());
     drawSprite(ctx, x, y, size, facing, tilt, alpha);
+}
+
+// A fênix da tocha (Hearth Phoenix): o mesmo desenho, rodeando a chama
+export function renderHearthBird() {
+    const bird = state.hearthBird;
+    if (passives.hearthPhoenix.lvl <= 0 || !bird.placed) return;
+    const kind = passives.blueTorch.lvl > 0 ? 'blue' : 'fire';
+    prepareHearthPhoenix(kind, smallScreen());
+    renderHearthPhoenix(ctx, bird, kind, state.quality);
 }
 
 export function renderPhoenixBird() {

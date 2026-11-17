@@ -10,7 +10,7 @@ import { moveDash } from './dash.js';
 import { isFireCasting } from './knives.js';
 import { addNumber, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { beginDeath } from './night.js';
-import { absorbHit, tryPhoenix } from './skills_flame.js';
+import { tryPhoenix } from './skills_flame.js';
 import { getDamageTakenRatio, getPlayerMaxSpeed } from './stats.js';
 
 // Ponto (x, y) empurrado para a borda da área bloqueada da tocha, se estiver dentro dela.
@@ -41,10 +41,6 @@ function aroundTorch(dirX, dirY) {
 // Contato e tiros passam por aqui. Devolve false se o golpe não pegou (invulnerável).
 export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
     if (player.iFrames > 0 || state.phase !== 'HUNT') return false;
-    if (absorbHit()) {
-        player.iFrames = invulnerableSeconds;
-        return false;
-    }
     const damage = amount * getDamageTakenRatio() * furyDamageRatio();
     player.hp -= damage;
     player.iFrames = invulnerableSeconds;

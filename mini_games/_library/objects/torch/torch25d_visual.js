@@ -43,6 +43,15 @@ export const TORCH25D_VISUALS = {
     },
     // O brilho no ar em volta do fogo (somado à cena), como o da fogueira antiga
     halo: { color: 'rgba(251, 146, 60, 0.9)', radius: 64, alpha: 0.7 },
+    // A chama AZUL (opcional: createTorch25D({ blue: true })): só as cores do fogo mudam; poste e gaiola são os mesmos
+    blue: {
+        fireHot: '#e0f2fe', fireWarm: '#3b82f6', fireEdge: '#1e3a8a',
+        swirlColors: ['rgba(29, 78, 216, 0.85)', 'rgba(59, 130, 246, 0.85)', 'rgba(147, 197, 253, 0.9)'],
+        colors: ['#1d4ed8', '#3b82f6', '#7dd3fc', '#eff6ff'],
+        emberColor: '#bae6fd',
+        core: ['rgba(239, 246, 255, ', 'rgba(186, 230, 253, '],       // miolo claro: início do rgba, sem o alfa
+        halo: 'rgba(96, 165, 250, 0.9)'
+    },
     // Quadros do atlas do fogo, por nível de detalhe [0, 1, 2] (mais quadros = mais formatos; ~200 KB a mais no detalhe 0)
     frames: [20, 12, 8]
 };

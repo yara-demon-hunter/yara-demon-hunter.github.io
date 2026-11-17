@@ -38,8 +38,11 @@ function aimAngle(e) {
 }
 
 // Círculo no chão que estoura depois de delay segundos
-export function addSlam(x, y, radius, delay, damage, color = null, torchDamage = 0) {
-    state.telegraphs.push({ kind: 'circle', x, y, radius, age: 0, seconds: delay, damage, color, torchDamage });
+// shockColor (opcional): cor do anel quando estoura. Devolve o aviso (quem o criou pode cancelá-lo se morrer antes)
+export function addSlam(x, y, radius, delay, damage, color = null, torchDamage = 0, shockColor = null) {
+    const t = { kind: 'circle', x, y, radius, age: 0, seconds: delay, damage, color, torchDamage, shockColor };
+    state.telegraphs.push(t);
+    return t;
 }
 
 const ACTIONS = {
@@ -349,8 +352,8 @@ export function updateTelegraphs(dt) {
         telegraphs.splice(i, 1);
 
         if (t.kind === 'circle') {
-            addShockwave(t.x, t.y, { radius: t.radius, color: '#f87171', width: 7, seconds: 0.3 });
-            createExplosion(t.x, t.y, '#f97316', 16);
+            addShockwave(t.x, t.y, { radius: t.radius, color: t.shockColor ?? '#f87171', width: 7, seconds: 0.3 });
+            createExplosion(t.x, t.y, t.shockColor ? '#a8a29e' : '#f97316', 16);
             shakeScreen(5);
             audio.playBlast();
             if (Math.hypot(player.x - t.x, player.y - t.y) < t.radius) hurtPlayer(t.damage, t.x, t.y, 0.5);

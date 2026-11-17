@@ -119,12 +119,13 @@ export const TREE_NODES = [
       levelText: (mods) => `+${mods.torchHp} torch health, heals ${mods.torchRegen} health/s`,
       mods: { torchHp: 20, torchRegen: 0.09 } },
     { id: 'phoenixPact', branch: 'flame', kind: 'passive', key: 'phoenixPact', x: 3, y: 0, requires: [req('undyingFlame', 2)] },
-    // Linha da guarda: quem fica parado é recompensado
-    { id: 'steadyStance', branch: 'flame', kind: 'mod', x: 1, y: 1, requires: [req('torchKeeper')],
-      name: 'Steady Stance', icon: '⛰️', desc: 'Your blade is faster while you stand your ground.',
-      levelText: (mods) => `+${formatPercent(mods.stillAttack)} attack speed standing still`, mods: { stillAttack: 0.08 } },
-    { id: 'vigil', branch: 'flame', kind: 'passive', key: 'vigil', x: 2, y: 1, requires: [req('steadyStance', 2)] },
-    { id: 'backdraft', branch: 'flame', kind: 'passive', key: 'backdraft', x: 3, y: 1, requires: [req('vigil')] },
+    // Linha da guarda: a tocha protege a si mesma (escudo que se renova) e queima azul
+    { id: 'torchWard', branch: 'flame', kind: 'power', key: 'torchWard', x: 1, y: 1, requires: [req('torchKeeper')] },
+    { id: 'bankedCoals', branch: 'flame', kind: 'mod', x: 2, y: 1, requires: [req('torchWard', 2)],
+      name: 'Banked Coals', icon: '🪨', desc: 'The torch takes less damage from everything that touches it.',
+      levelText: (mods) => `-${formatPercent(mods.torchGuard)} damage to the torch`, mods: { torchGuard: 0.06 } },
+    { id: 'blueTorch', branch: 'flame', kind: 'passive', key: 'blueTorch', x: 3, y: 1, requires: [req('bankedCoals', 2)] },
+    { id: 'hearthPhoenix', branch: 'flame', kind: 'passive', key: 'hearthPhoenix', x: 4, y: 1, requires: [req('blueTorch')] },
     // Linha da muralha
     { id: 'torchBolts', branch: 'flame', kind: 'power', key: 'torchBolts', x: 1, y: 2, requires: [req('torchKeeper', 2)] },
     { id: 'sunEvolve', branch: 'flame', kind: 'evolve', key: 'torchBolts', x: 2, y: 2, requires: [req('torchBolts', 5)] },

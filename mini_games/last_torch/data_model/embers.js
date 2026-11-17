@@ -18,13 +18,13 @@ export const EMBER_REWARD = {
 // startPoints não é um mod: soma aos pontos de skill do começo da noite (startingSkillPoints).
 export const ALTAR = {
     // Corpo
-    vitality: { name: 'Vitality', icon: '❤️', desc: '+5% hero health per level', costs: [10, 18, 30, 48, 75], mods: { maxHp: 0.05 } },
+    vitality: { name: 'Vitality', icon: '❤️', desc: '+2% hero health per level', costs: [10, 18, 30, 48, 75], mods: { maxHp: 0.02 } },
     swiftness: { name: 'Swiftness', icon: '👟', desc: '+2% move speed per level', costs: [12, 22, 36, 56, 85], mods: { moveSpeed: 0.02 } },
     // Ataque
-    might: { name: 'Might', icon: '⚔️', desc: '+5% damage per level', costs: [10, 18, 30, 48, 75], mods: { damage: 0.05 } },
-    arcane: { name: 'Arcane', icon: '🔮', desc: '+5% magic damage per level', costs: [10, 18, 30, 48, 75], mods: { spellDamage: 0.05 } },
+    might: { name: 'Might', icon: '⚔️', desc: '+2% damage per level', costs: [10, 18, 30, 48, 75], mods: { damage: 0.02 } },
+    arcane: { name: 'Arcane', icon: '🔮', desc: '+2% magic damage per level', costs: [10, 18, 30, 48, 75], mods: { spellDamage: 0.02 } },
     reach: { name: 'Reach', icon: '📏', desc: '+5% dagger range per level', costs: [10, 18, 30, 48, 75], mods: { knifeRange: 0.05 } },
-    furyPower: { name: 'Fury Power', icon: '🌋', desc: '+3% damage during Fury per level', costs: [14, 26, 42, 64, 95], mods: { furyPower: 0.03 } },
+    furyPower: { name: 'Fury Power', icon: '🌋', desc: '+2% damage during Fury per level', costs: [14, 26, 42, 64, 95], mods: { furyPower: 0.02 } },
     // Dash
     longDash: { name: 'Long Dash', icon: '💨', desc: '+6% dash distance per level', costs: [10, 18, 30, 48, 75], mods: { dashDistance: 0.06 } },
     extraDash: { name: 'Extra Dash', icon: '⚡', desc: '+1 dash charge', costs: [90], mods: { dashCharges: 1 } },

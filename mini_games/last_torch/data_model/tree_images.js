@@ -44,8 +44,6 @@ export const TREE_IMAGES = {
     shadowRaven: img('shadow-raven'),
     mirrorWard: img('return-fire'),
     shadowShackle: img('shadow-shackle'),
-    vigil: img('vigil'),
-    backdraft: img('backdraft'),
     fireRing: img('hearth-ring'),
     fireRingEvolve: img('solar-wall'),
     emberEvolve: img('hellwalker'),

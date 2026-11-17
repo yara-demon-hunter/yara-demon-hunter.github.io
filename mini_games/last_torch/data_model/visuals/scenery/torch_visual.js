@@ -33,5 +33,11 @@ export const TORCH_VISUALS = {
         fillLeft: '#e11d48',
         fillRight: '#fb923c',
         border: 'rgba(253, 186, 116, 0.6)'
+    },
+    // Barrinha com a Blue Torch
+    hpBarBlue: {
+        fillLeft: '#1d4ed8',
+        fillRight: '#60a5fa',
+        border: 'rgba(147, 197, 253, 0.7)'
     }
 };

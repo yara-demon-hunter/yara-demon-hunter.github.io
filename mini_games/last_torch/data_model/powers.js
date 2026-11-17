@@ -175,6 +175,25 @@ export const POWER_MODELS = {
         ],
         range: 360, speed: 420, turnRate: 7, radius: 6
     },
+    torchWard: {
+        name: 'Torch Ward', icon: '🛡️', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `A shield of flame guards the torch and renews every ${level.cooldown}s (up to ${level.charges} stored). It absorbs a hit meant for the torch, throwing back and stunning every monster within ${level.radius} range. Each shield also sends one enemy projectile flying back at the monsters.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `Shield every ${level.cooldown}s · holds ${level.charges} · ${level.radius} repel range · ${formatNumber(level.stun)}s stun`
+            );
+        },
+        levels: [
+            { cooldown: 10, charges: 1, radius: 110, knockback: 380, stun: 0.5 },
+            { cooldown: 9, charges: 1, radius: 130, knockback: 440, stun: 0.7 },
+            { cooldown: 8, charges: 2, radius: 150, knockback: 500, stun: 0.9 },
+            { cooldown: 7, charges: 2, radius: 175, knockback: 560, stun: 1.1 },
+            { cooldown: 6, charges: 2, radius: 200, knockback: 640, stun: 1.4 }
+        ]
+    },
     soulNova: {
         name: 'Soul Nova', icon: '💫', maxLvl: 5,
         get desc() {

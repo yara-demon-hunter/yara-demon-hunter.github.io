@@ -597,16 +597,22 @@ function bake() {
     const ELEV = 40 * Math.PI / 180, VIEW = 9.6, alvo = new THREE.Vector3(0, 2.75, 0);
     const cam = new THREE.OrthographicCamera(-VIEW / 2, VIEW / 2, VIEW / 2, -VIEW / 2, 0.1, 80);
     cam.position.set(0, alvo.y + Math.sin(ELEV) * 30, Math.cos(ELEV) * 30); cam.lookAt(alvo); cam.updateMatrixWorld();
-    const pose = (walkPhase, swing) => {
-        const w = Math.sin(walkPhase), a = swing > 0 ? -swing * 2.5 : w * 0.16;
-        membros.legL.rotation.x = swing > 0 ? 0 : w * 0.2; membros.legR.rotation.x = swing > 0 ? 0 : -w * 0.2;
-        membros.armL.rotation.x = swing > 0 ? a : -w * 0.16; membros.armR.rotation.x = swing > 0 ? a : w * 0.16;
-        if (swing > 0) { membros.armL.rotation.z = -swing * 0.25; membros.armR.rotation.z = swing * 0.25; } else { membros.armL.rotation.z = 0; membros.armR.rotation.z = 0; }
-        grupoMonstro.position.y = swing > 0 ? 0 : Math.abs(Math.cos(walkPhase)) * 0.04;
-        parts.torso.rotation.y = swing > 0 ? 0 : w * 0.025;
+    grupoMonstro.rotation.order = 'YXZ';      // primeiro gira para o lado, depois inclina para a frente (golpe no chão)
+    // modo: 'andar' (passada), 'subir' (golpe: as duas mãos sobem), 'bater' (as duas mãos no chão, corpo inclinado), 'jogar' (só uma mão sobe)
+    const pose = (walkPhase, k, modo = 'andar') => {
+        const w = Math.sin(walkPhase);
+        let lx = 0, rx = 0, lz = 0, rz = 0, legL = 0, legR = 0, lean = 0, bob = 0, twist = 0;
+        if (modo === 'andar') { legL = w * 0.2; legR = -w * 0.2; lx = -w * 0.16; rx = w * 0.16; bob = Math.abs(Math.cos(walkPhase)) * 0.04; twist = w * 0.025; }
+        else if (modo === 'subir') { lx = rx = -k * 2.5; lz = -k * 0.25; rz = k * 0.25; }
+        else if (modo === 'bater') { lx = rx = -0.85; lz = -0.12; rz = 0.12; lean = 0.14; }
+        else if (modo === 'jogar') { rx = -k * 2.4; rz = k * 0.35; lean = k * 0.05; }
+        membros.legL.rotation.x = legL; membros.legR.rotation.x = legR;
+        membros.armL.rotation.x = lx; membros.armR.rotation.x = rx; membros.armL.rotation.z = lz; membros.armR.rotation.z = rz;
+        grupoMonstro.position.y = bob; grupoMonstro.rotation.x = lean; parts.torso.rotation.y = twist;
     };
-    window.__bake = (andar, soco, dirs, tam) => {
-        const quadros = andar + soco, cv = document.createElement('canvas');
+    // Colunas: andar (andar quadros), subir (soco), 1 de bater e joga quadros de jogar (só uma mão)
+    window.__bake = (andar, soco, dirs, tam, joga = 3) => {
+        const quadros = andar + soco + 1 + joga, cv = document.createElement('canvas');
         cv.width = tam * quadros; cv.height = tam * dirs;
         const c = cv.getContext('2d'), grande = tam * 2, rt = renderer;
         rt.setPixelRatio(1); rt.setSize(grande, grande);
@@ -615,7 +621,10 @@ function bake() {
         for (let d = 0; d < dirs; d++) {
             grupoMonstro.rotation.y = Math.PI / 2 - (d / dirs) * Math.PI * 2;
             for (let f = 0; f < quadros; f++) {
-                if (f < andar) pose((f / andar) * Math.PI * 2, 0); else pose(0, (f - andar + 1) / soco);
+                if (f < andar) pose((f / andar) * Math.PI * 2, 0, 'andar');
+                else if (f < andar + soco) pose(0, (f - andar + 1) / soco, 'subir');
+                else if (f === andar + soco) pose(0, 1, 'bater');
+                else pose(0, (f - andar - soco) / joga, 'jogar');
                 U.uTime.value = 0; rt.render(scene, cam);
                 tc.clearRect(0, 0, tam, tam); tc.drawImage(rt.domElement, 0, 0, tam, tam);
                 // Bloom barato do núcleo e das brasas: cópia só das partes claras, borrada, somada por cima

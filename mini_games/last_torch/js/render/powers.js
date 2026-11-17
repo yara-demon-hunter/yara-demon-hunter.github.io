@@ -107,7 +107,7 @@ export function renderBolts() {
     ctx.globalCompositeOperation = 'lighter';
     state.bolts.forEach(b => {
         if (b.fire) return;
-        const look = b.soul ? SKILLS_VISUALS.soulBolt : B;
+        const look = b.soul ? SKILLS_VISUALS.soulBolt : b.blue ? V.blueBolt : B;
         const speed = Math.hypot(b.vx, b.vy) || 1;
         const bx = -b.vx / speed;
         const by = -b.vy / speed;

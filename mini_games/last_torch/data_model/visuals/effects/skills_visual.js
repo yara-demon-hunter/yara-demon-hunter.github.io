@@ -35,6 +35,13 @@ export const SKILLS_VISUALS = {
         evolvedGlow: 'rgba(254, 240, 138, 0.55)',
         line: 'rgba(253, 186, 116, 0.55)'
     },
+    blueFireRing: {
+        colors: ['rgba(29, 78, 216, 0.75)', 'rgba(59, 130, 246, 0.8)', 'rgba(125, 211, 252, 0.8)'],
+        evolvedColors: ['rgba(224, 242, 254, 0.8)', 'rgba(255, 255, 255, 0.8)', 'rgba(147, 197, 253, 0.8)'],
+        glow: 'rgba(37, 99, 235, 0.45)', evolvedGlow: 'rgba(147, 197, 253, 0.55)', line: 'rgba(147, 197, 253, 0.55)'
+    },
+    ward: { fill: 'rgba(251, 191, 36, 0.08)', ring: 'rgba(253, 230, 138, 0.85)', glow: 'rgba(245, 158, 11, 0.4)', spark: 'rgba(251, 146, 60, 0.75)', radius: 40, lift: 30 },
+    blueWard: { fill: 'rgba(59, 130, 246, 0.09)', ring: 'rgba(191, 219, 254, 0.9)', glow: 'rgba(37, 99, 235, 0.45)', spark: 'rgba(125, 211, 252, 0.8)' },
     shield: { fill: 'rgba(251, 191, 36, 0.07)', ring: 'rgba(253, 230, 138, 0.8)', glow: 'rgba(245, 158, 11, 0.4)', tongue: 'rgba(251, 146, 60, 0.75)', radius: 32 },
     phoenix: { colors: ['rgba(249, 115, 22, 0.8)', 'rgba(253, 224, 71, 0.85)', 'rgba(220, 38, 38, 0.75)'], feathers: 8, span: 150, dive: 0.2 },
 

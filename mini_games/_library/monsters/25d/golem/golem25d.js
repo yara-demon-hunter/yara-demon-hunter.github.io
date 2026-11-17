@@ -154,9 +154,20 @@ function head(rig, pose) {
 // golem_atlas.webp foi gravado a partir do golem 3D do laboratório (tools/lab/monstro_foto.js?bake=1, ver art_reference/character.md):
 // 8 direções (linhas, de 45 em 45 graus, começando para a direita e girando para baixo) x 10 quadros (colunas): 6 de passada e
 // 4 de soco (braços subindo). Se a imagem ainda não carregou, desenha a versão em bolas, que continua aqui como reserva.
-const ATLAS = { walk: 6, punch: 4, dirs: 8, size: 160 };
+// Colunas: 6 de passada, 4 de golpe (as duas mãos subindo), 1 de impacto (as duas mãos no chão) e 3 de jogar a pedra (só uma mão sobe)
+const ATLAS = { walk: 6, punch: 4, hit: 1, throw: 3, dirs: 8, size: 192 };
+// Qual coluna desenhar: impacto > jogar > golpe subindo > passada
+const columnOf = ({ slamHit, throwK = 0, swing = 0 }, phase) => {
+    if (slamHit) return ATLAS.walk + ATLAS.punch;
+    if (throwK > 0.02) return ATLAS.walk + ATLAS.punch + ATLAS.hit + Math.min(ATLAS.throw - 1, Math.ceil(throwK * ATLAS.throw) - 1);
+    if (swing > 0.02) return ATLAS.walk + Math.min(ATLAS.punch - 1, Math.ceil(swing * ATLAS.punch) - 1);
+    return Math.floor(phase) % ATLAS.walk;
+};
 const atlas = new Image();
-atlas.src = new URL('./golem_atlas.webp', import.meta.url).href;
+// Caminho da imagem: ao lado deste arquivo; mas no pacote com bundle (game.min.js na raiz) o import.meta.url não aponta mais para a pasta
+// library, então a imagem é buscada em library/... a partir da página (o pacote e o site mantêm a pasta library junto da página)
+atlas.src = import.meta.url.includes('/library/') ? new URL('./golem_atlas.webp', import.meta.url).href
+    : new URL('library/monsters/25d/golem/golem_atlas.webp', document.baseURI).href;
 const sprites = new WeakMap();
 
 // Peça única com o sprite do atlas, para quem desenha pelo boneco (Ateliê, outros jogos): o ponto, o tamanho e o quadro saem do rig
@@ -169,9 +180,7 @@ function spriteRigPart(rig) {
         draw() {
             const turn = ((rig.anim.facing % TAU) + TAU) % TAU;
             const dir = Math.round(turn / TAU * ATLAS.dirs) % ATLAS.dirs;
-            const k = swingNow();
-            const col = k > 0.02 ? ATLAS.walk + Math.min(ATLAS.punch - 1, Math.ceil(k * ATLAS.punch) - 1)
-                : Math.floor((((rig.anim.stride % TAU) + TAU) % TAU) / TAU * ATLAS.walk) % ATLAS.walk;
+            const col = columnOf({ swing: swingNow() }, (((rig.anim.stride % TAU) + TAU) % TAU) / TAU * ATLAS.walk);
             const size = unit * S.spriteUnits;
             const at = rig.project(0, 0, S.center);
             ctx.drawImage(atlas, col * ATLAS.size, dir * ATLAS.size, ATLAS.size, ATLAS.size, at.x - size / 2, at.y - size / 2 + size * S.spriteLift, size, size);
@@ -211,8 +220,7 @@ export function renderGolem25D(e) {
     // Direção: o ângulo (0 = direita, cresce para baixo na tela) em 8 fatias
     const turn = ((e.angle % TAU) + TAU) % TAU;
     st.dir = Math.round(turn / TAU * ATLAS.dirs) % ATLAS.dirs;
-    const swingK = e.swing ?? 0;
-    const col = swingK > 0.02 ? ATLAS.walk + Math.min(ATLAS.punch - 1, Math.ceil(swingK * ATLAS.punch) - 1) : Math.floor(st.phase) % ATLAS.walk;
+    const col = columnOf({ swing: e.swing ?? 0, slamHit: e.slamHit, throwK: e.throwArm ?? 0 }, st.phase);
     const size = e.radius * S.spriteScale;
     // Sombra e aura no chão, depois a imagem centrada no corpo
     if (!e.baking) {

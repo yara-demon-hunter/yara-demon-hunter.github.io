@@ -45,7 +45,7 @@ export const GOLEM_25D_VISUALS = {
     cracks: 7,
 
     // Versão em sprites: tamanho da imagem em raios do monstro, quanto sobe (fração do tamanho) e quantos px andados por passo
-    spriteScale: 6,
+    spriteScale: 8,
     spriteUnits: 30,               // tamanho da imagem em unidades do boneco (para o Ateliê e quem desenha pelo boneco)
     spriteLift: -0.04,
     spriteFeet: 0.18,              // onde ficam os pés, abaixo do centro (fração do tamanho): a sombra se prende aqui

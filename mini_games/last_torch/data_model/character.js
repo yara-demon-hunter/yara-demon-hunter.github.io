@@ -49,8 +49,8 @@ export function createPlayerState() {
         move: null, castAge: -1,
         // De onde partiu o dash e onde ficou a última nuvem do rasto de fumaça (Smoke Bomb)
         dashFromX: 0, dashFromY: 0, smokeX: 0, smokeY: 0,
-        // Vigil: tempo parado, postura, escudo erguido e recarga
-        stillTime: 0, vigilStance: false, shield: 0, shieldCooldown: 0,
+        // Tempo parado (Steady Hand) e a pose ajoelhada da biblioteca (vigilStance, hoje sempre desligada)
+        stillTime: 0, vigilStance: false,
         mouseFollow: true           // herói anda até o cursor (desliga ao usar o teclado)
     };
 }

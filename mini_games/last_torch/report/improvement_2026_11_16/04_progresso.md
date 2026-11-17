@@ -192,3 +192,32 @@ Espremer o modelo antigo deu uma "gorda fina". O Treant do laboratório foi **re
 ## 17/11/2026 — Volta o Treant robusto; o esguio fica guardado
 
 A pedido do dono, o jogo voltou ao Treant encorpado de casca de madeira (atlas regravado, medidas de sprite de antes). O Treant esguio ficou no laboratório (`treant_esguio.*`, cartão "alternativa") com o atlas pronto em `exemplos/treant_esguio_atlas.webp`.
+
+## 17/11/2026 — Correção: sprites do Golem e do Treant não apareciam no pacote com bundle
+
+No pacote standalone (esbuild, `game.min.js` na raiz) o `import.meta.url` não aponta mais para a pasta `library/`, então o atlas era procurado no lugar errado e o jogo caía no desenho básico de reserva. Agora, se o `import.meta.url` não tem `/library/`, a imagem vem de `library/...` a partir da página. Verificado no pacote **com bundle**: os dois atlas carregam (200) e não há erro. Quem gerou o pacote antes disso precisa gerar de novo.
+
+## 17/11/2026 — Olhos vermelhos na névoa
+
+Monstros longe da tocha (mais de 230 de distância; força total aos 340) ganham um par de olhos vermelhos brilhando por cima da névoa, avisando que vêm vindo; some quando chegam na luz. Os que ainda estão fora da tela aparecem na borda, mais fracos. Pisca de vez em quando; tamanho cresce com o raio do monstro (o golem tem olhos maiores). Teto de pares por nível de detalhe (26/16/8). Dados em `data_model/visuals/effects/far_eyes_visual.js` (`enabled` liga/desliga), desenho em `js/render/far_eyes.js`. Verificado no desktop e no celular, sem erros. Não medido: custo em celular fraco.
+
+Ajuste dos olhos na névoa: agora cada monstro tem a posição da própria cabeça (`byType` em `far_eyes_visual.js`: up, forward e gap em raios do monstro), os olhos acompanham o lado para onde ele olha (de frente abrem na horizontal, de lado ficam juntos, de costas ficam mais fracos), o Treant e o Golem têm olhos âmbar e o Cavaleiro Sem Cabeça não tem olhos. O olho é desenhado normal (não aditivo) para aparecer até em cima do crânio claro do Colosso. Verificado em foto de todos os tipos, de frente e de lado.
+
+## 17/11/2026 — Olhos na névoa ajustáveis no Ateliê
+
+Os olhos vermelhos de cada monstro/boss agora moram na biblioteca (`_library/monsters/25d/eyes.js`, `MONSTER_EYES`; o jogo lê o mesmo, com o mapa tipo → id em `far_eyes_visual.js`). No tuner de monstros (e de heróis, para os bosses humanos) há o quadro **"Olhos na névoa"**: acima do centro, à frente, distância entre os olhos, cor do olho e do brilho; os olhos aparecem por cima do monstro nas vistas do Last Torch (caixa "Mostrar na prévia") e **"Copiar olhos"** gera só os monstros alterados, para mandar ao Claude (ou colar em `eyes.js` e rodar o sync). Verificado no Ateliê (copiar) e no jogo, sem erros.
+
+## 17/11/2026 — Olhos vermelhos na névoa removidos
+
+A pedido do dono, a função dos olhos vermelhos na névoa foi **removida** por completo (jogo, biblioteca e painel do Ateliê); as seções acima sobre ela ficam só como histórico. Ficou o **giro lateral** do tuner (barra de cima: "Girar", controle de 0° a 360° e botões → ↓ ← ↑), que vale para as vistas do Last Torch.
+
+## 17/11/2026 — Golem joga pedras
+
+O Golem agora joga uma pedra pequena (raio 7, velocidade 130, dano 0,6 do dano dele, 3 na tocha) a **meia distância** (entre 160 e 340 do alvo; colado nele ele soca, longe demais ele só anda), a cada 4,5 s, erguendo os braços 0,5 s antes. Dados em `GOLEM` (`monsters.js`: `shootMinRange`, `shootRange`, `throwWindup`, `projectile*`); `shootMinRange` e `throwWindup` são novos em `updateAttacks` (`enemies.js`) e valem para qualquer monstro. A pedra gira em voo (`monster_sprites.js`: `drawRock`, `entities.js`). Verificado no jogo (Chrome headless): ele joga, a pedra aparece e voa, sem erros. Equilíbrio (dano, frequência) ainda por jogar.
+
+## 17/11/2026 — Golem: pedra com uma mão e pancada em área com as duas
+
+- **Pedra:** agora ergue só **uma mão** (a direita do boneco) nos últimos 0,5 s antes de jogar (`e.throwArm`, 3 quadros novos no sprite).
+- **Perto dele:** em vez do soco em leque, **bate as duas mãos no chão** num golpe em área de raio **175** (`punch.area`/`areaRadius` em `GOLEM`). Um círculo vermelho no chão mostra onde vai pegar durante os 1,4 s de preparação (braços subindo); quando as mãos batem (quadro de impacto, corpo inclinado) estoura um anel de pedra e quem estiver dentro leva dano (também a tocha, 8, e os clones). Quem sair do círculo antes (dash) não leva. Se o golem morre no meio, o aviso some junto.
+- Atlas regravado: 14 colunas (6 passada, 4 subir, 1 impacto, 3 jogar) por 8 direções, 192 px, ~470 KB. `addSlam` (boss_ai.js) ganhou `shockColor` e devolve o aviso; `punch.area` vale para qualquer monstro com `punch`.
+- Verificado no jogo (Chrome headless): o círculo aparece com os braços subindo, o impacto causa dano uma vez só, a pedra sai com uma mão levantada, sem erros. Dano do golpe em área (2,4x) ainda por equilibrar.

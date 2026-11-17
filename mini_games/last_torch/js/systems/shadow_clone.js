@@ -15,7 +15,7 @@ import { characterStat, getAtkCooldown, getAtkDamage, getAtkRadius, getKnockback
 // (js/systems/combat.js) e volta ao posto. Cada monstro chama uma sombra só, então as três da evolução
 // espalham o serviço. Os monstros não correm atrás delas, mas quem esbarra nelas ou acerta um tiro nelas as machuca
 // (js/systems/enemies.js chama damageShadowClone); caída, a sombra explode em adagas (burstKnives) e volta ao posto depois
-// de SHADOW_CLONE.respawnSeconds. Com o Oath of Whispers surge uma sombra nova a cada 5 mortes, até 8.
+// de SHADOW_CLONE.respawnSeconds. Com o Oath of Whispers surge uma sombra nova a cada 5 mortes, até 5.
 const TAU = Math.PI * 2;
 
 export function getCloneCount() {
