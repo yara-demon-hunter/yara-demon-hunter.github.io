@@ -133,6 +133,15 @@ puts "Upload the contents of this folder; index.html is the entry point."
 # o navegador bloqueia módulos em file://). Ctrl+C para parar.
 if ARGV.include?("--serve")
   port = (ARGV.find { |arg| arg.start_with?("--port=") } || "--port=8000").split("=").last
-  puts "Jogue em http://localhost:#{port}  (Ctrl+C para parar)"
-  exec("python3", "-m", "http.server", port, "--directory", build_output.to_s)
+  puts "Jogue em http://localhost:#{port}  (Ctrl+C para parar). Para conferir o layout, abra http://localhost:#{port}/?fluid=debug"
+  # Sem cache: o navegador não pode reaproveitar um game.min.js ou css/game.css antigo depois de gerar o pacote de novo
+  server = "import sys, functools\n" \
+           "from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer\n" \
+           "class H(SimpleHTTPRequestHandler):\n" \
+           "    def end_headers(self):\n" \
+           "        self.send_header('Cache-Control', 'no-store')\n" \
+           "        super().end_headers()\n" \
+           "    def log_message(self, *a): pass\n" \
+           "ThreadingHTTPServer(('127.0.0.1', int(sys.argv[1])), functools.partial(H, directory=sys.argv[2])).serve_forever()\n"
+  exec("python3", "-c", server, port, build_output.to_s)
 end

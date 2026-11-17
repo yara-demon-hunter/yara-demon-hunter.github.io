@@ -113,6 +113,17 @@ Primeiro envio com 7 telas e todas as posições de referência batendo com o CS
 Aplicado, por faixa de largura (telas altas, acima de 520 px): **1024×768** (controles de toque por variáveis e HUD com `translate`/`scale`), **1280×720** (retoques: barra do boss, barra da onda, pontuação e sequência) e **1920×1080** (cartão do herói, medalhão, botão de ajustes, barra do boss, pontuação e sequência bem maiores). Faixas: 1024–1151, 1152–1599 e 1600+ px; telas intermediárias usam a mais próxima.
 Medido: nos 3 tamanhos cada peça ficou a no máximo 0,2 px do ajuste do dono; os 7 tamanhos do envio anterior e o 360×640 não mudaram. Não verificado: tela real.
 
+## 17/11/2026 — Layout fluido: tudo responsivo a partir de 3 perfis
+
+Problema do dono: os ajustes viravam faixas por tamanho de tela, e uma tela entre duas ajustadas ficava torta. Solução: **layout fluido** (`js/ui/fluid_layout.js` + `data_model/fluid_layout.js`). O CSS voltou à base limpa; os ajustes do dono (12 telas) viraram pontos de referência em três perfis (portrait, landscape, desktop, mais um balde interno para tablet em pé); entre dois pontos o jogo interpola e fora deles escala proporcionalmente. O HUD usa `translate`/`scale`; os controles, variáveis CSS. O tuner agora tem só 3 telas de referência e soma ao layout fluido. Ferramentas de conversão em `_sandbox/tools/`.
+- **Verificado:** o jogo reproduz os 12 tamanhos ajustados (no máximo 1,2 px), 17 tamanhos intermediários (iPhone SE/8/X, 393×852, 430×932, iPad, 568×320, 667×375, 1366×768, 2560×1440...) sem peça fora da tela nem controles sobrepostos, e varreduras de altura e largura sem saltos. Corrigido de passagem: o cartão do herói esticava em celular deitado com menos de 640 px de largura.
+- **Observação:** peças que o dono não ajustou numa tela (ex.: cartão do herói no 844×390) ficam no padrão ali, e a interpolação passa por esse ponto.
+- **Não verificado:** celular real.
+
+## 17/11/2026 — Primeiro envio do tuner sobre o layout fluido
+
+Os 3 perfis de referência foram retocados: **desktop 1280×720** (barra do boss 107%, pontuação 114%, sequência 116%), **portrait 390×844** (joystick 93%, adaga 80%, dash deslocado) e **landscape 844×390** (barra do boss, pontuação 95%, sequência 117%). Só esses pontos mudaram na tabela `data_model/fluid_layout.js`; as demais telas e os outros pontos de referência ficaram iguais, e todas as telas intermediárias passam a acompanhar. O jogo carrega sem erros nas três telas. Não verificado: celular real.
+
 ## Decisão do dono (17/11)
 
 Sem tutorial de joystick/dash: a interface é simples. Os itens "primeiros monstros mais fracos" e "primeiro nível em 15 s" ficam para depois de o dono jogar o pacote e dizer se o começo está difícil ou lento. A Fase 2 está feita no que importa.

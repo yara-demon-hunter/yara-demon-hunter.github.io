@@ -5,9 +5,9 @@
 // módulos que o jogo carregou: outro caminho criaria uma segunda cópia do estado.
 const load = (path) => import(new URL(path, document.baseURI).href);
 
-const [{ state, player }, { save }, { startGame }, { HEROES }, { createBoss }, { updateHUD, flushHud }] = await Promise.all([
+const [{ state, player }, { save }, { startGame }, { HEROES }, { createBoss }, { updateHUD, flushHud }, { getFluid }] = await Promise.all([
     load('js/core/state.js'), load('js/core/save.js'), load('js/ui/screens.js'),
-    load('data_model/heroes.js'), load('data_model/bosses.js'), load('js/ui/hud.js')
+    load('data_model/heroes.js'), load('data_model/bosses.js'), load('js/ui/hud.js'), load('js/ui/fluid_layout.js')
 ]);
 
 // O PLAY nasce desligado até os módulos chegarem; a primeira visita já começa sozinha
@@ -64,5 +64,7 @@ window.tunerApi = {
         refresh();
     },
     isFrozen: () => frozen,
+    // [dx, dy, escala] que o layout fluido aplicou a uma peça do HUD (os controles de toque usam variáveis, não translate/scale)
+    fluid: (id) => (['joystick', 'knifeButton', 'dashButton'].includes(id) ? null : getFluid(id)),
     refresh
 };

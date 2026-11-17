@@ -225,6 +225,9 @@
 #bossHpContainer { display: flex; align-items: center; gap: 0.45rem; margin-left: auto; flex: 0 0 auto; width: min(14.5rem, 36%); align-self: center; padding: 0.3rem 0.5rem; }
 #bossHpContainer.hidden { display: none; }
 .boss-info { flex: 1; min-width: 0; }
+/* Retrato do boss: um quadrado pequeno ao lado do nome e da barra (a arte é a do bestiário) */
+.boss-portrait { flex: 0 0 auto; width: 2.1rem; height: 2.1rem; border: 1px solid rgba(248, 113, 113, 0.65); border-radius: 0.4rem; background: #0b1018; overflow: hidden; display: grid; place-items: center; font-size: 1.1rem; }
+.boss-portrait canvas { display: block; width: 100%; height: 100%; }
 #bossHpContainer .hud-label { font-size: 0.62rem; }
 #bossHpContainer .hud-bar { height: 0.38rem; }
 
@@ -371,7 +374,7 @@
     #hud { padding: max(0.25rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) 0 max(0.5rem, env(safe-area-inset-left)); }
     #hudTop { gap: 0.4rem; }
     .hud-panel { border-radius: 0.5rem; background: rgba(15, 23, 42, 0.72); }
-    #heroCard { width: 12.8rem; gap: 0.4rem; padding: 0.2rem 0.4rem; }
+    #heroCard { width: 12.8rem; flex: 0 0 auto; gap: 0.4rem; padding: 0.2rem 0.4rem; }
     #heroPortrait { width: 2rem; height: 2rem; border-radius: 0.3rem; }
     .status-btn { width: 2.4rem; height: 2.4rem; }
     .hud-badge { top: -0.1rem; right: -0.35rem; font-size: 0.58rem; }
@@ -444,129 +447,10 @@
    (ao lado ela ficava espremida em ~1/3 da tela) */
 @media (orientation: portrait) and (max-width: 639px) {
     #hudTop { flex-wrap: wrap; }
-    /* Barra do boss com 70% da largura e letras menores, para a sequência de mortes caber ao lado dela (HUD tuner, 360x640) */
-    #bossHpContainer { order: 9; flex: 0 0 70%; width: 70%; margin-left: 0; padding: 0.6rem 0.4rem; gap: 0.3rem; }
-    #bossHpContainer .hud-label { font-size: 0.5rem; }
-    #bossHpContainer .hud-bar { height: 0.36rem; }
-    /* Coluna da direita: a sequência de mortes na altura da barra do boss e a pontuação logo abaixo dela */
-    #hudStreak { top: 4.3rem; right: 0.6rem; }
-    #hudScore { top: 8.9rem; }
-}
-/* Tela baixa (até ~700 px): a coluna da direita sobe e a sequência encolhe um pouco (HUD tuner, 360x640) */
-@media (orientation: portrait) and (max-width: 639px) and (max-height: 700px) {
-    #hudStreak { top: 3.756rem; right: 0.769rem; scale: 0.88; transform-origin: right top; }
-    #hudScore { top: 7.744rem; right: 0.737rem; font-size: 1.173rem; }
-}
-/* Celulares mais largos (390 em diante): a barra do boss é um pouco maior (HUD tuner, 390x844) */
-@media (orientation: portrait) and (min-width: 385px) and (max-width: 639px) {
-    #bossHpContainer { flex-basis: 75.5%; width: 75.5%; }
-    #bossHpContainer .hud-label { font-size: 0.54rem; }
-}
-/* Celular em pé por faixa de altura (HUD tuner, 17/11/2026): barra do boss, sequência e pontuação como o dono deixou.
-   A partir de 881 px (412x915) vale o padrão acima. */
-@media (orientation: portrait) and (max-width: 639px) and (max-height: 700px) {
-    #bossHpContainer { flex-basis: 74.15%; width: 74.15%; margin: -0.094rem 0 0 0.025rem; padding: 0.64rem 0.43rem; }
-    #bossHpContainer .hud-label { font-size: 0.535rem; }
-    #bossHpContainer .hud-bar { height: 0.385rem; }
-}
-@media (orientation: portrait) and (max-width: 639px) and (min-height: 701px) and (max-height: 790px) {
-    #bossHpContainer { flex-basis: 75.6%; width: 75.6%; margin: -0.1rem 0 0 0.05rem; padding: 0.65rem 0.43rem; }
-    #bossHpContainer .hud-label { font-size: 0.54rem; }
-    #bossHpContainer .hud-bar { height: 0.39rem; }
-    #hudStreak { top: 4.02rem; right: 0.94rem; }
-    #hudScore { top: 8.66rem; right: 0.86rem; font-size: 1.14rem; }
-}
-@media (orientation: portrait) and (max-width: 639px) and (min-height: 791px) and (max-height: 880px) {
-    #bossHpContainer { flex-basis: 77%; width: 77%; margin: -0.075rem 0 0 -0.225rem; }
-    #bossHpContainer .hud-label { font-size: 0.55rem; }
-    #hudStreak { top: 3.69rem; right: 0.75rem; }
-    #hudScore { top: 8.19rem; right: 0.91rem; font-size: 1.12rem; }
-}
-/* Tablet em pé (768x1024 no tuner): a barra do boss fica no topo, à direita do centro e maior; a sequência e a pontuação
-   também crescem e a pontuação desce para baixo da sequência */
-@media (orientation: portrait) and (min-width: 640px) and (max-width: 1023px) {
-    #bossHpContainer { position: absolute; left: 55%; top: 1.5rem; margin: 0; width: 19.9rem; padding: 0.41rem 0.69rem; }
-    #bossHpContainer .hud-label { font-size: 0.85rem; }
+    /* Linha própria, com a largura toda e mais alta que larga a barra do boss do desktop: o layout fluido
+       (js/ui/fluid_layout.js) a encolhe para ~75% da largura, e o espaço interno encolhe junto */
+    #bossHpContainer { order: 9; flex: 1 1 100%; width: 100%; margin-left: 0; padding: 0.86rem 0.58rem; }
+    #bossHpContainer .hud-label { font-size: 0.72rem; }
     #bossHpContainer .hud-bar { height: 0.52rem; }
-    #hudStreak { top: 5.143rem; right: 1.407rem; scale: 1.57; transform-origin: right top; }
-    #hudScore { top: 12.225rem; right: 2.044rem; font-size: 1.5875rem; }
-}
-/* Desktop (1280x720 no tuner): a barra do boss fica no topo, perto do centro e 38% maior */
-@media (min-width: 1024px) and (min-height: 521px) and (orientation: landscape) {
-    #bossHpContainer { position: absolute; left: 52%; top: 0.9rem; transform: translateX(-50%); margin: 0; width: 20rem; padding: 0.42rem 0.69rem; }
-    #bossHpContainer .hud-label { font-size: 0.86rem; }
-    #bossHpContainer .hud-bar { height: 0.52rem; }
-}
-
-/* Celular em pé a partir de 881 px de altura (412x915): a pontuação cresce 14% (HUD tuner, 17/11/2026) */
-@media (orientation: portrait) and (max-width: 639px) and (min-height: 881px) {
-    #hudScore { top: 8.799rem; right: 0.955rem; font-size: 1.083rem; }
-}
-
-/* Celular deitado: o HUD por FAIXA DE LARGURA, com os valores exatos que o dono deixou no HUD tuner (17/11/2026) em
-   640x360, 740x360, 844x390 e 915x412. Usa `translate` e `scale`, as mesmas propriedades do tuner, que somam ao
-   layout da peça sem desmontar a linha do topo. Telas intermediárias usam a faixa mais próxima. */
-/* Deitado 1: até 690 px (640x360) */
-@media (max-height: 520px) and (orientation: landscape) and (max-width: 690px) {
-    #heroCard { scale: 0.86; }
-    #btnPause { translate: -16.5px -0.41px; scale: 0.89; }
-    #hudButtons { translate: -22.1px 1.23px; scale: 0.87; }
-    #bossHpContainer { translate: 27.56px -3.07px; scale: 0.76; }
-    #hudBottom { translate: -9.73px -1.21px; scale: 0.8; }
-    #hudScore { translate: 3.31px 44.98px; }
-    #hudStreak { translate: 4.02px -18.91px; }
-}
-/* Deitado 2: 691 a 790 px (740x360) */
-@media (max-height: 520px) and (orientation: landscape) and (min-width: 691px) and (max-width: 790px) {
-    #heroCard { translate: -16.89px 1.99px; scale: 0.74; }
-    #btnPause { translate: -41.21px 2.16px; scale: 0.87; }
-    #hudButtons { translate: -44.92px 2.94px; scale: 0.82; }
-    #bossHpContainer { translate: 10.64px 0px; scale: 0.83; }
-    #hudBottom { translate: -26.69px -2.36px; scale: 0.78; }
-    #hudScore { translate: 0.59px 54.56px; }
-    #hudStreak { translate: -2.46px -14.57px; scale: 1.12; }
-}
-/* Deitado 3: 791 a 880 px (844x390) */
-@media (max-height: 520px) and (orientation: landscape) and (min-width: 791px) and (max-width: 880px) {
-    #bossHpContainer { translate: 7.28px -0.75px; scale: 0.88; }
-    #hudScore { translate: 1.64px 61.18px; scale: 1.12; }
-    #hudStreak { translate: -5.13px -7.26px; scale: 1.2; }
-}
-/* Deitado 4: a partir de 881 px (915x412) */
-@media (max-height: 520px) and (orientation: landscape) and (min-width: 881px) {
-    #heroCard { translate: -13.01px 0.62px; scale: 0.82; }
-    #btnPause { translate: -30.27px 4.16px; }
-    #hudButtons { translate: -32.99px 5.06px; }
-    #bossHpContainer { scale: 0.92; }
-    #hudBottom { translate: -8.18px 2.54px; scale: 0.89; }
-    #hudScore { translate: 1px 62.67px; scale: 1.17; }
-    #hudStreak { translate: -2.79px -10.53px; scale: 1.17; }
-}
-
-/* Tablet deitado e computador: o HUD por FAIXA DE LARGURA, com os valores exatos que o dono deixou no HUD tuner (17/11/2026)
-   em 1024x768, 1280x720 e 1920x1080, por cima da barra do boss já posicionada acima (translate e scale somam ao layout). */
-/* 1024 a 1151 px (1024x768) */
-@media (min-width: 1024px) and (min-height: 521px) and (orientation: landscape) and (max-width: 1151px) {
-    #heroCard { translate: -4.92px -3.26px; scale: 0.88; }
-    #btnPause { translate: -21.05px 0.67px; }
-    #hudButtons { translate: -11.43px -1.19px; scale: 1.28; }
-    #bossHpContainer { translate: 317.31px -0.19px; }
-    #hudScore { translate: -16.35px 121.82px; scale: 1.45; }
-    #hudStreak { translate: -25.49px -0.22px; scale: 1.36; }
-}
-/* 1152 a 1599 px (1280x720) */
-@media (min-width: 1024px) and (min-height: 521px) and (orientation: landscape) and (min-width: 1152px) and (max-width: 1599px) {
-    #bossHpContainer { translate: -15.41px -1.53px; }
-    #hudBottom { translate: -7.03px 5.04px; scale: 0.89; }
-    #hudScore { translate: -13.22px 57.76px; scale: 1.19; }
-    #hudStreak { translate: -27.36px -55.29px; scale: 1.4; }
-}
-/* a partir de 1600 px (1920x1080) */
-@media (min-width: 1024px) and (min-height: 521px) and (orientation: landscape) and (min-width: 1600px) {
-    #heroCard { translate: 73.73px 20.1px; scale: 1.42; }
-    #btnPause { translate: 143.45px 22.07px; scale: 1.74; }
-    #hudButtons { translate: 194.02px 22.61px; scale: 2.17; }
-    #bossHpContainer { translate: 47.58px 12.79px; scale: 1.5; }
-    #hudScore { translate: -27.33px 113.43px; scale: 1.77; }
-    #hudStreak { translate: -65.55px -19.66px; scale: 1.92; }
+    .boss-portrait { width: 2.6rem; height: 2.6rem; }
 }

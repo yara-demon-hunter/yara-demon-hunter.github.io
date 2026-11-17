@@ -138,6 +138,8 @@ Achados do dono em 17/11, olhando o responsivo.
 - [x] celulares deitados ajustados (640×360, 740×360, 844×390, 915×412) e tablet em pé 768×1024 reajustado
 - [x] tablet deitado 1024×768, desktop 1280×720 (reajustado) e desktop 1920×1080 ajustados
 - [ ] **usar o tuner** em outras resoluções, se o dono quiser (ex.: 1366×768, 2560×1440) e mandar o texto copiado
+- [x] layout fluido: 3 perfis, tudo responsivo (nenhuma tela "entre faixas")
+- [x] tuner reduzido a 3 telas de referência, somando ao layout fluido
 - [ ] depois de a IA aplicar, usar **Reset ALL screens** no tuner
 
 ## Antes de relançar

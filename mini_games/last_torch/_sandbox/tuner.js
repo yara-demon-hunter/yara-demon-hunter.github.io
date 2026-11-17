@@ -19,7 +19,10 @@ async function cssFingerprint() {
         text += body;
         for (const m of body.matchAll(/@import\s+url\(['"]?([^'")]+)['"]?\)/g)) await grab(new URL(m[1], url).href);
     }
-    try { await grab(new URL('/css/game.css', location.origin).href); } catch { return null; }
+    try {
+        await grab(new URL('/css/game.css', location.origin).href);
+        await grab(new URL('/data_model/fluid_layout.js', location.origin).href);
+    } catch { return null; }
     let h = 0;
     for (let i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) | 0;
     return String(h >>> 0);
@@ -41,20 +44,12 @@ const ELEMENTS = [
     { id: 'mouseHint', label: 'Mouse hint', desktop: true }
 ];
 
-// [rótulo, largura, altura, toque]
+// Os três perfis do jogo (js/ui/fluid_layout.js): o dono ajusta UMA tela de cada e o jogo usa os valores, proporcionalmente, em
+// todas as outras. [rótulo, largura, altura, toque]
 const PRESETS = [
-    ['Phone 360×640 · portrait', 360, 640, true],
-    ['Phone 360×740 · portrait', 360, 740, true],
-    ['Phone 390×844 · portrait', 390, 844, true],
-    ['Phone 412×915 · portrait', 412, 915, true],
-    ['Tablet 768×1024 · portrait', 768, 1024, true],
-    ['Phone 640×360 · landscape', 640, 360, true],
-    ['Phone 740×360 · landscape', 740, 360, true],
-    ['Phone 844×390 · landscape', 844, 390, true],
-    ['Phone 915×412 · landscape', 915, 412, true],
-    ['Tablet 1024×768 · landscape', 1024, 768, true],
-    ['Desktop 1280×720', 1280, 720, false],
-    ['Desktop 1920×1080', 1920, 1080, false]
+    ['Portrait · phone 390×844', 390, 844, true],
+    ['Landscape · phone 844×390', 844, 390, true],
+    ['Desktop 1280×720', 1280, 720, false]
 ];
 
 const keyOf = (w, h, touch) => `${w}x${h}${touch ? 't' : 'd'}`;
@@ -166,26 +161,32 @@ export function mountTuner(root) {
     const doc = () => frame?.contentDocument ?? null;
     const target = (id) => doc()?.getElementById(id) ?? null;
 
+    // O jogo já posiciona as peças do HUD pelo layout fluido (translate e scale em linha); o ajuste do tuner soma por cima:
+    // deslocamentos se somam e os tamanhos se multiplicam. Os controles de toque usam variáveis, então ali não há nada a somar.
+    const fluidOf = (id) => frame?.contentWindow?.tunerApi?.fluid?.(id) ?? [0, 0, 1];
+    function paint(node, id, c) {
+        const [fx, fy, fs] = fluidOf(id);
+        const dx = fx + (c?.dx ?? 0), dy = fy + (c?.dy ?? 0), size = fs * (c?.s ?? 1);
+        if (dx || dy) node.style.translate = `${dx}px ${dy}px`; else node.style.removeProperty('translate');
+        if (Math.abs(size - 1) > 0.0005) node.style.scale = String(size); else node.style.removeProperty('scale');
+    }
     function applyOne(id) {
         const node = target(id);
         if (!node) return;
-        const c = changesHere()[id];
-        if (c && (c.dx !== 0 || c.dy !== 0)) node.style.translate = `${c.dx}px ${c.dy}px`; else node.style.removeProperty('translate');
-        if (c && c.s !== 1) node.style.scale = String(c.s); else node.style.removeProperty('scale');
-        node.style.visibility = c?.hide ? 'hidden' : '';
+        paint(node, id, changesHere()[id]);
+        node.style.visibility = changesHere()[id]?.hide ? 'hidden' : '';
     }
     const applyAll = () => ELEMENTS.forEach(e => applyOne(e.id));
 
-    // Posição do elemento SEM os ajustes do tuner (para dizer, no texto copiado, onde ele está hoje)
+    // Posição do elemento SEM os ajustes do tuner (só o layout fluido do jogo): é o "onde o jogo a coloca hoje" do texto copiado
     function baseRect(id) {
         const node = target(id);
         if (!node) return null;
         const t = node.style.translate, s = node.style.scale;
-        node.style.removeProperty('translate');
-        node.style.removeProperty('scale');
+        paint(node, id, null);
         const r = node.getBoundingClientRect();
-        if (t) node.style.translate = t;
-        if (s) node.style.scale = s;
+        if (t) node.style.translate = t; else node.style.removeProperty('translate');
+        if (s) node.style.scale = s; else node.style.removeProperty('scale');
         return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)];
     }
 
@@ -381,8 +382,9 @@ export function mountTuner(root) {
         if (!keys.length) return '';
         const lines = [
             'LAST TORCH - HUD TUNER (only what was changed)',
-            'Moves are CSS px from where the game puts the piece today; size is a % around the piece center.',
-            'Please apply these in the game CSS for each screen size (media queries / orientation), keeping other sizes as they are.',
+            'Moves are CSS px from where the game puts the piece today (the game layout is already fluid: portrait, landscape and',
+            'desktop reference screens, interpolated for every other size); size is a % around the piece center.',
+            'Please add each screen below as a reference point (or update it) in the fluid layout table, keeping the other points.',
             ''
         ];
         const json = {};
