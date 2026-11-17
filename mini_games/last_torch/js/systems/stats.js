@@ -140,7 +140,7 @@ export function getWarmthHeal() {
 }
 // Tudo da Fúria vem do `fury` do personagem escolhido (data_model/characters/<id>.js); o nível da skill Fury (frenzyNova) sobe por cima
 export function getFrenzyDamageBonus() {
-    return attributes.frenzyNova.lvl * getFury().damageBonusPerLevel;
+    return attributes.frenzyNova.lvl * getFury().damageBonusPerLevel + mod('furyPower');
 }
 export function getFrenzyDuration() {
     const fury = getFury();
@@ -175,7 +175,7 @@ export function getDashCharges() {
     return characterStat('dashCharges') + mod('dashCharges');
 }
 export function getDashDistance() {
-    return getCurrentCharacterBase().player.dash.distance;
+    return getCurrentCharacterBase().player.dash.distance * (1 + mod('dashDistance'));
 }
 export function getDashSeconds() {
     return getCurrentCharacterBase().player.dash.seconds;

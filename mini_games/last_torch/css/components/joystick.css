@@ -57,10 +57,10 @@
     display: none;
     position: absolute;
     z-index: 15;
-    right: var(--touch-right);
-    bottom: var(--touch-bottom);
-    width: var(--touch-size);
-    height: var(--touch-size);
+    right: var(--knife-right, var(--touch-right));
+    bottom: var(--knife-bottom, var(--touch-bottom));
+    width: calc(var(--knife-size, var(--touch-base)) * var(--touch-scale));
+    height: calc(var(--knife-size, var(--touch-base)) * var(--touch-scale));
     border: 2px solid rgba(103, 232, 249, 0.4);
     border-radius: 50%;
     background: rgba(15, 23, 42, 0.35);
@@ -107,10 +107,10 @@
     display: none;
     position: absolute;
     z-index: 15;
-    right: calc(var(--touch-right) + var(--touch-size) * 0.86);
-    bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.8);
-    width: calc(var(--touch-size) * 0.78);
-    height: calc(var(--touch-size) * 0.78);
+    right: var(--dash-right, calc(var(--touch-right) + var(--touch-size) * 0.86));
+    bottom: var(--dash-bottom, calc(var(--touch-bottom) + var(--touch-size) * 0.8));
+    width: calc(var(--dash-size, calc(var(--touch-base) * 0.78)) * var(--touch-scale));
+    height: calc(var(--dash-size, calc(var(--touch-base) * 0.78)) * var(--touch-scale));
     align-items: center;
     justify-content: center;
     font-size: calc(var(--touch-icon) * 0.95);
@@ -193,8 +193,8 @@
         --touch-right: max(1.6rem, calc(env(safe-area-inset-right) + 1rem));
     }
     #dashButton {
-        right: calc(var(--touch-right) + var(--touch-size) * 0.11);
-        bottom: calc(var(--touch-bottom) + var(--touch-size) * 1.22);
+        right: var(--dash-right, calc(var(--touch-right) + var(--touch-size) * 0.11));
+        bottom: var(--dash-bottom, calc(var(--touch-bottom) + var(--touch-size) * 1.22));
     }
 }
 

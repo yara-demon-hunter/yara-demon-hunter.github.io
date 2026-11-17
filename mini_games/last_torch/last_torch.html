@@ -94,8 +94,10 @@ permalink: /mini_games/last_torch/last_torch.html
 
         <!-- Vida do boss: no canto direito do topo, só quando há um boss em campo -->
         <div id="bossHpContainer" class="hidden hud-panel hud-stat hud-boss">
-            <div class="hud-label" style="--tone: #f87171;"><span id="bossNameText">☠️ BOSS</span><span id="bossHpText">1000</span></div>
-            <div class="hud-bar hud-bar-red"><div id="bossHpBar" class="hud-fill" style="background: linear-gradient(90deg, #dc2626, #f43f5e, #f59e0b)"></div></div>
+            <div class="boss-info">
+                <div class="hud-label" style="--tone: #f87171;"><span id="bossNameText">☠️ BOSS</span><span id="bossHpText">1000</span></div>
+                <div class="hud-bar hud-bar-red"><div id="bossHpBar" class="hud-fill" style="background: linear-gradient(90deg, #dc2626, #f43f5e, #f59e0b)"></div></div>
+            </div>
         </div>
     </div>
 
@@ -141,6 +143,7 @@ permalink: /mini_games/last_torch/last_torch.html
 <div id="toasts" aria-live="polite"></div>
 <!-- Dica em cima da tocha ("a tocha cura"): aparece e some sozinha (js/ui/hints.js; estilo em css/components/banner.css) -->
 <div id="torchHint" class="torch-hint" aria-live="polite"><b></b><span></span></div>
+<div id="treeHand" class="tree-hand" aria-hidden="true"><i></i><span>👆</span><b>Upgrade your skills</b></div>
 
 <!-- START SCREEN: dark forest at night. Styles in css/components/start-screen.css -->
 <div id="startScreen">
@@ -167,7 +170,7 @@ permalink: /mini_games/last_torch/last_torch.html
 
         <!-- Escuridão: só depois de vencer a noite -->
         <div id="darknessPicker" class="darkness-picker hidden">
-            <span>DARKNESS</span>
+            <span>DARKNESS <em id="darknessPoints"></em></span>
             <button id="btnDarkDown" aria-label="Lower darkness">◀</button>
             <b id="darknessValue">1</b>
             <button id="btnDarkUp" aria-label="Raise darkness">▶</button>
@@ -182,6 +185,10 @@ permalink: /mini_games/last_torch/last_torch.html
             <button id="btnSanctuary" class="start-btn-small">
                 <span class="link-icon" aria-hidden="true">🏛️</span>
                 <span class="link-text"><span>SANCTUARY</span><em id="startSanctuaryCount">0/0 earned</em></span>
+            </button>
+            <button id="btnAltar" class="start-btn-small">
+                <span class="link-icon" aria-hidden="true">🔥</span>
+                <span class="link-text"><span>ALTAR</span><em id="startAltarCount">0 embers</em></span>
             </button>
         </div>
         </div>
@@ -448,6 +455,7 @@ permalink: /mini_games/last_torch/last_torch.html
                 <div id="finalBuild"></div>
             </div>
             <div class="summary-col">
+                <div id="summaryEmbers"></div>
                 <div id="summaryUnlocks"></div>
                 <div id="summaryGoal"></div>
             </div>
@@ -455,6 +463,7 @@ permalink: /mini_games/last_torch/last_torch.html
         <div class="summary-actions">
             <button id="btnRestart" class="start-btn">HUNT AGAIN</button>
             <button id="btnEndless" class="start-btn start-btn-dark hidden">STAY IN THE DARK</button>
+            <button id="btnAltarSummary" class="start-btn-small"><span>🔥 ALTAR</span></button>
             <button id="btnSanctuarySummary" class="start-btn-small"><span>🏛️ SANCTUARY</span></button>
             <button id="btnShare" class="start-btn-small"><span>↗ SHARE</span></button>
             <button id="btnMenu" class="start-btn-small"><span>MENU</span></button>
@@ -478,6 +487,22 @@ permalink: /mini_games/last_torch/last_torch.html
             <button id="btnCloseSanctuary" class="screen-close" aria-label="Close">✕</button>
         </header>
         <div id="sanctuaryList" class="custom-scroll"></div>
+    </div>
+</div>
+
+<!-- ALTAR: melhorias permanentes pagas com Brasas. Styles in css/components/altar.css -->
+<div id="altarScreen" class="game-screen hidden" role="dialog" aria-label="Altar">
+    <div class="altar-panel">
+        <header class="sanc-head">
+            <div>
+                <p class="screen-eyebrow">THE FLAME REMEMBERS</p>
+                <h2 class="screen-title">ALTAR</h2>
+            </div>
+            <div class="altar-embers">🔥 <b id="altarEmbers">0</b></div>
+            <button id="btnCloseAltar" class="screen-close" aria-label="Close">✕</button>
+        </header>
+        <p class="altar-sub">Every night earns embers, even the ones you lose. Spend them on upgrades that last.</p>
+        <div id="altarList" class="custom-scroll"></div>
     </div>
 </div>
 

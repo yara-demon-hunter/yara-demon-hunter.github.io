@@ -184,3 +184,57 @@ body:has(#campScreen:not(.hidden)) #toasts { left: 26%; }
     93% { opacity: 1; transform: translate(-50%, -100%); }
     100% { opacity: 0; transform: translate(-50%, -100%); }
 }
+
+/* Mãozinha que aponta para o medalhão de skills na onda 1 (js/ui/hints.js): só desenho, não pega toque nem cobre a ação.
+   Fica logo abaixo do medalhão, toca nele de baixo para cima e solta um anel, em ciclo, até o jogador abrir a árvore. */
+.tree-hand {
+    position: fixed;
+    z-index: 25;
+    display: none;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+.tree-hand.is-showing { display: block; }
+.tree-hand span {
+    position: absolute;
+    left: -0.94rem;
+    top: 0.15rem;
+    font-size: 1.87rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+    animation: treeHandTap 1.2s ease-in-out infinite;
+}
+.tree-hand i {
+    position: absolute;
+    left: -1.6rem;
+    top: -2.9rem;
+    width: 3.2rem;
+    height: 3.2rem;
+    border: 2px solid #fde68a;
+    border-radius: 50%;
+    opacity: 0;
+    animation: treeHandRing 1.2s ease-out infinite;
+}
+@keyframes treeHandTap {
+    0%, 100% { transform: translateY(0.5rem); }
+    45% { transform: translateY(-0.55rem); }
+    60% { transform: translateY(-0.55rem) scale(0.92); }
+}
+@keyframes treeHandRing {
+    0%, 40% { opacity: 0; transform: scale(0.7); }
+    55% { opacity: 0.9; transform: scale(0.95); }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+.tree-hand b {
+    position: absolute;
+    right: 1.15rem;
+    top: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid rgba(253, 230, 138, 0.6);
+    border-radius: 0.5rem;
+    background: rgba(8, 12, 16, 0.88);
+    color: #fde68a;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}

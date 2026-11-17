@@ -13,3 +13,17 @@ python3 mini_games/last_torch/_sandbox/serve.py        # http://localhost:8800/
 - Opções padrão: **modo deus** ligado para o herói, o boss e a tocha (vida cheia a cada quadro; dá para desligar na hora, mesmo no meio da luta) e **100 pontos de skill** para começar.
 - Lista **Monsters**: clique em um ou mais monstros para pô-los na luta (quantos de cada: campo ao lado; nascem em círculo em volta do herói). Para lutar só com eles, clique de novo no boss escolhido para desmarcá-lo. O **modo deus dos monstros** também vem ligado (eles não morrem).
 - **Preview: hero unlocked:** botões com cada herói mostram a tela de prêmio de personagem liberado (a mesma do jogo). A caixa "mid-run" mostra a versão do acampamento. Clique em LATER, PLAY AS ou Esc/Enter para fechar e voltar ao painel.
+
+## Aba HUD tuner (ajustar a tela de jogo)
+
+Segunda aba do painel (**📐 HUD tuner**). Mostra o jogo de verdade num iframe do tamanho de qualquer celular, tablet ou monitor.
+
+- **Três perfis, três telas de referência:** *Portrait · phone 390×844*, *Landscape · phone 844×390* e *Desktop 1280×720*. Você ajusta uma tela de cada perfil e o jogo usa os valores **proporcionalmente** em todas as outras telas (layout fluido, `js/ui/fluid_layout.js`). Para ver como ficou em outro tamanho, use **Custom size** (largura × altura) e **⟳** para girar. A caixa **touch** liga os controles de toque: o servidor entrega o jogo sob `/__touch/` (o CSS ganha `(pointer: coarse)` sempre verdadeiro) ou `/__desk/` (como no computador).
+- **Cena:** barra do boss, sequência de mortes, selo de pontos de skill e o botão **▶ Play / ⏸ Pause** sobre o palco (o jogo começa pausado; a barra de espaço também alterna). O modo deus fica ligado: nada mata o herói nem a tocha.
+- **Peças:** cada elemento do HUD e dos controles ganha uma alça tracejada. **Arraste** na tela, use as **setas** (1 px; Shift = 10 px) ou os campos X, Y e Tamanho (%). Também dá para esconder a peça.
+- **Os ajustes** são só as propriedades `translate` e `scale` dentro do iframe: não mudam nenhum arquivo do jogo. Ficam guardados no `localStorage` do sandbox, por resolução.
+- **📋 COPY ALL CHANGES** copia **só o que foi alterado**, por resolução (movimento em px, tamanho em %, e onde o jogo tem a peça hoje), mais um JSON. Cole na conversa com a IA para ela aplicar no CSS. **Copy this screen only** copia só a resolução atual; **Reset piece** e **Reset this screen** desfazem.
+
+**Ajustes que já foram aplicados não contam duas vezes.** O tuner guarda, junto com os ajustes, uma impressão digital do CSS do jogo e da tabela do layout fluido. Se ao abrir o CSS mudou (a IA aplicou os ajustes), os ajustes antigos deixam de ser somados por cima, aparece um aviso e eles ficam numa cópia (**Restore them anyway** traz de volta, se a mudança no CSS foi outra). **Reset ALL screens** continua disponível para zerar à mão. No texto copiado, a posição "game has it at" da tela aberta é medida na hora.
+
+Os ajustes do tuner **somam** ao layout fluido do jogo (deslocamentos se somam, tamanhos se multiplicam). Para aplicar um envio novo na tabela, veja `tools/README.md`.

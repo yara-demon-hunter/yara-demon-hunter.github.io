@@ -1,3 +1,4 @@
+import { hideTreeHand } from './hints.js';
 import { EVOLUTIONS } from '../../data_model/powers.js';
 import { attributes, audio, passives, state } from '../core/state.js';
 import { getOwnedPowers } from '../systems/tree.js';
@@ -157,6 +158,7 @@ export function openStatus(from = 'PLAYING', onBack = null) {
     returnState = from;
     afterReturn = onBack;
     state.gameState = 'PAUSED';
+    hideTreeHand();
     document.getElementById('statusLevel').innerText = `LEVEL ${state.playerLevel}`;
     document.getElementById('statusHour').innerText = `Wave ${state.turn} · ${getHourName(state.turn)}`;
     document.getElementById('statusHero').innerText = ` · ${getHero().name}`;

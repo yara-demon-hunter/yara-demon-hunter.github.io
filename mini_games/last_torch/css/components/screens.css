@@ -16,7 +16,7 @@
 }
 .game-screen.hidden { display: none; }
 #gameOverScreen { z-index: 40; }
-#sanctuaryScreen, #heroScreen { z-index: 45; }
+#sanctuaryScreen, #heroScreen, #altarScreen { z-index: 45; }
 /* Botão ✕ das telas */
 .screen-close {
     min-width: 2.6rem;

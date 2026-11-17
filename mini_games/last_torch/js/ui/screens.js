@@ -4,6 +4,7 @@ import { EVOLUTIONS } from '../../data_model/powers.js';
 import { preloadTreeImages, treeImageFor, paintIcon } from '../../data_model/tree_images.js';
 import { DARKNESS, getHourName, startingSkillPoints } from '../../data_model/night.js';
 import { START } from '../../data_model/start.js';
+import { ALTAR, ALTAR_KEYS, affordableCount, altarCost, altarStartPoints, emberTotal } from '../../data_model/embers.js';
 import { save, persist } from '../core/save.js';
 import { clearRun, loadRun, saveRun } from '../core/run_save.js';
 import { HEROES } from '../../data_model/heroes.js';
@@ -31,7 +32,7 @@ import { prepareScenery } from '../render/scenery.js';
 import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_sprites.js';
 import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
-import { startHints } from './hints.js';
+import { hideTreeHand, startHints } from './hints.js';
 import { renderHeroPicker } from './heroes.js';
 import { renderHeroStats } from './hero_stats.js';
 import { resetQuickPick } from './quick_pick.js';
@@ -84,7 +85,7 @@ export function startGame() {
     state.multiKill = 0;
     state.multiTimer = 0;
     // Cada nível de Escuridão rende 2 pontos de skill inicial (Escuridão 1 = 2, 2 = 4, 3 = 6, ...): só no começo (DARKNESS.startPointsPerLevel)
-    state.skillPoints = startingSkillPoints(save.darkness);
+    state.skillPoints = startingSkillPoints(save.darkness) + altarStartPoints(save);
     state.levelPointsCarry = 0;
     state.tree = {};
     state.pickupPity = 0;
@@ -159,7 +160,7 @@ export function startGame() {
     paintHeroPortrait(document.getElementById('heroPortrait'), hero);
 
     state.gameState = 'PLAYING';
-    ['startScreen', 'gameOverScreen', 'shopScreen', 'pickScreen', 'campScreen', 'sanctuaryScreen', 'heroScreen'].forEach(id => {
+    ['startScreen', 'gameOverScreen', 'shopScreen', 'pickScreen', 'campScreen', 'sanctuaryScreen', 'heroScreen', 'altarScreen'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
     startHour();
@@ -230,14 +231,34 @@ export function reportProgress() {
 }
 
 // Número subindo aos poucos, com um tique de som
-function countUp(el, to, ms = 800) {
+function countUp(el, to, ms = 800, prefix = '') {
     const start = performance.now();
     const step = (now) => {
         const k = Math.min(1, (now - start) / ms);
-        el.innerText = Math.round(to * (1 - Math.pow(1 - k, 3)));
+        el.innerText = prefix + Math.round(to * (1 - Math.pow(1 - k, 3)));
         if (k < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
+}
+
+// Fim da noite: as Brasas ganhas e o que dá para comprar com elas (o botão leva ao Altar)
+function renderEmbers(earned) {
+    const box = document.getElementById('summaryEmbers');
+    const buyable = ALTAR_KEYS.filter(key => altarCost(save, key) !== null && altarCost(save, key) <= save.embers);
+    box.innerHTML = '<div class="embers-gain"><span>🔥 EMBERS</span><b></b></div><p class="embers-total"></p><p class="embers-buy"></p>';
+    countUp(box.querySelector('b'), earned, 800, '+');
+    box.querySelector('.embers-total').textContent = `You have ${save.embers}`;
+    box.querySelector('.embers-buy').textContent = buyable.length
+        ? `You can buy: ${buyable.map(key => ALTAR[key].name).join(', ')}`
+        : 'Keep hunting: embers buy permanent upgrades at the Altar';
+    box.classList.toggle('can-buy', buyable.length > 0);
+    document.getElementById('btnAltarSummary').classList.toggle('is-ready', buyable.length > 0);
+}
+
+// Botão do Altar na tela inicial: mostra as Brasas e brilha quando há algo para comprar
+function renderAltarLink() {
+    document.getElementById('startAltarCount').innerText = `${save.embers} embers`;
+    document.getElementById('btnAltar').classList.toggle('is-ready', affordableCount(save) > 0);
 }
 
 // O objetivo mais próximo: é o que faz "só mais uma" parecer razoável
@@ -282,10 +303,22 @@ function bankRun() {
     save.stats.elites += run.elites - (run.elitesBanked ?? 0);
     run.killsBanked = run.kills;
     run.elitesBanked = run.elites;
+    return payEmbers();
+}
+
+// Brasas da noite (data_model/embers.js): paga o que ainda não foi pago, então sair no meio e continuar não duplica
+function payEmbers() {
+    const { run } = state;
+    const total = emberTotal(run, state.turn, Boolean(run.victory));
+    const earned = Math.max(0, total - (run.embersBanked ?? 0));
+    run.embersBanked = (run.embersBanked ?? 0) + earned;
+    save.embers += earned;
+    return earned;
 }
 
 // Sair para o menu no meio da noite: o que foi feito fica guardado, a caçada se perde
 export function quitToMenu() {
+    hideTreeHand();
     bankRun();
     pushStats();
     checkAchievements({ toast: false, announce: true, flush: false });      // o prêmio do herói aparece no menu, logo abaixo
@@ -302,7 +335,8 @@ export function triggerGameOver(reason) {
     const { run } = state;
     const newRecord = state.totalScore > save.stats.bestScore && save.stats.bestScore > 0;
 
-    bankRun();
+    hideTreeHand();                // o HUD para de atualizar na tela final: a mãozinha do medalhão precisa sumir aqui
+    const embersEarned = bankRun();
     clearRun();                    // a noite acabou: nada para continuar (a noite sem fim guarda de novo no próximo acampamento)
     if (reason === 'DAWN') {
         save.stats.victories++;
@@ -349,6 +383,7 @@ export function triggerGameOver(reason) {
         unlocks.appendChild(item);
     });
 
+    renderEmbers(embersEarned);
     renderGoal();
     document.getElementById('btnEndless').classList.toggle('hidden', reason !== 'DAWN');
     screen.classList.remove('hidden');
@@ -389,11 +424,14 @@ export function renderStartScreen() {
     document.getElementById('recordStreak').innerText = record(stats.bestStreak);
 
     const hero = getHero();
+    renderAltarLink();
     document.getElementById('startSanctuaryCount').innerText = `${ACHIEVEMENTS.filter(a => save.achievements[a.id]).length}/${ACHIEVEMENTS.length} earned`;
     renderHeroPicker();
     renderHeroStats();
     const dark = document.getElementById('darknessPicker');
-    dark.classList.toggle('hidden', save.maxDarkness <= 1);
+    // O seletor aparece depois da primeira vitória, ou antes se o Altar já dá pontos iniciais (aí só mostra o total, sem setas)
+    dark.classList.toggle('hidden', save.maxDarkness <= 1 && altarStartPoints(save) === 0);
+    dark.classList.toggle('no-arrows', save.maxDarkness <= 1);
     // CONTINUE: aparece se há uma noite guardada, dizendo em que onda ela parou
     const run = loadRun();
     const resumable = run && HEROES[run.hero] && !HEROES[run.hero].shelved;
@@ -401,8 +439,9 @@ export function renderStartScreen() {
     btnContinue.classList.toggle('hidden', !resumable);
     if (resumable) btnContinue.innerHTML = `CONTINUE<em>${HEROES[run.hero].name} · Wave ${run.turn}${run.kind === 'camp' ? ' · camp' : ''}</em>`;
     document.getElementById('darknessValue').innerText = save.darkness;
-    const startPoints = startingSkillPoints(save.darkness);
+    const startPoints = startingSkillPoints(save.darkness) + altarStartPoints(save);
     dark.title = `Start with ${startPoints} skill point${startPoints === 1 ? '' : 's'}`;
+    document.getElementById('darknessPoints').innerText = `(${startPoints} skill pt${startPoints === 1 ? '' : 's'})`;
     paintHeroPortrait(document.getElementById('heroPortrait'), hero);
 }
 
@@ -413,10 +452,12 @@ export function changeDarkness(step) {
 }
 
 export function returnToMenu() {
+    hideTreeHand();
     document.getElementById('gameOverScreen').classList.add('hidden');
     document.getElementById('shopScreen').classList.add('hidden');
     document.getElementById('sanctuaryScreen').classList.add('hidden');
     document.getElementById('heroScreen').classList.add('hidden');
+    document.getElementById('altarScreen').classList.add('hidden');
     document.getElementById('startScreen').classList.remove('hidden');
     state.gameState = 'START';
     audio.setPaused(false);

@@ -3,6 +3,8 @@ import { BOSS_MODELS, RIVAL_OF } from '../../data_model/bosses.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { releaseTouchControls } from '../core/input.js';
 import { state } from '../core/state.js';
+import { save } from '../core/save.js';
+import { START } from '../../data_model/start.js';
 import { getHero } from '../systems/modifiers.js';
 
 // --- DIÁLOGO DO DUELO ---
@@ -134,7 +136,9 @@ export function playDuelDialogue(bossType, moment, onDone) {
     const final = bossType.endsWith('_FINAL');
     const key = final ? bossType.slice(0, -'_FINAL'.length) : bossType;
     const set = DUEL_DIALOGUES[key];
-    const script = (set?.byHero?.[getHero().model] ?? set)?.[final ? 'final' : 'first']?.[moment];
+    let script = (set?.byHero?.[getHero().model] ?? set)?.[final ? 'final' : 'first']?.[moment];
+    // Primeira noite: duelo curto (START.firstNightDuelLines); a revanche final nunca é cortada
+    if (script && !final && save.stats.runs === 0 && START.firstNightDuelLines > 0) script = script.slice(0, START.firstNightDuelLines);
     play(script, key, false, onDone);
 }
 
