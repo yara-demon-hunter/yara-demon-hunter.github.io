@@ -1,3 +1,4 @@
+import { hideTreeHand } from './hints.js';
 import { CAMP } from '../../data_model/passives.js';
 import { BOSS_MODELS, chooseBossType, isBossTurn } from '../../data_model/bosses.js';
 import { getHourName } from '../../data_model/night.js';
@@ -85,6 +86,7 @@ function renderNext() {
 // resumed: voltando de um CONTINUE, o acampamento já aconteceu (ouro recolhido, tocha alimentada): não repete
 export function openCamp(resumed = false) {
     state.gameState = 'CAMP';
+    hideTreeHand();            // fim da onda 1: a mãozinha do medalhão não fica atrás do acampamento
     resetStreak();
     if (!resumed) {
         collectAllGold();

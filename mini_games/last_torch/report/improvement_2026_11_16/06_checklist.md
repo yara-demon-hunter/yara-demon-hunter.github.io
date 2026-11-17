@@ -44,22 +44,22 @@ Detalhes: [02_plano_de_acao.md](02_plano_de_acao.md) · números: [04_progresso.
 - [ ] testado em celular real, em pé e deitado
 
 ## Fase 3 — Progresso permanente (D1)
-- [ ] Brasas ao fim de toda noite (vitória ou morte)
-- [ ] Brasas no save
-- [ ] tela do Altar no menu
-- [ ] +5% vida (5 níveis)
-- [ ] +5% dano (5 níveis)
-- [ ] +1 ponto de skill no início (5 níveis)
-- [ ] tocha mais forte (5 níveis)
-- [ ] 1ª compra possível depois de 1 noite
-- [ ] balanceamento conferido
+- [x] Brasas ao fim de toda noite (vitória ou morte)
+- [x] Brasas no save
+- [x] tela do Altar no menu
+- [x] +5% vida (5 níveis)
+- [x] +5% dano (5 níveis)
+- [x] +1 ponto de skill no início (3 níveis)
+- [x] tocha mais forte (5 níveis)
+- [x] 1ª compra possível depois de 1 noite (8 Brasas por noite, a 1ª melhoria custa 10)
+- [ ] balanceamento conferido (jogar com tudo no máximo; valores em `data_model/embers.js`)
 
 ## Fase 3b — Tela de fim de noite
-- [ ] Brasas ganhas com animação
-- [ ] "Você pode comprar…"
+- [x] Brasas ganhas com animação
+- [x] "Você pode comprar…"
 - [ ] próximo herói e quanto falta
 - [ ] o que espera amanhã (baú, desafio)
-- [ ] botão HUNT AGAIN grande
+- [x] botão HUNT AGAIN grande (já existia)
 - [ ] CONTINUE bem visível no menu
 
 ## Fase 4 — Motivo diário (D1 e D7)

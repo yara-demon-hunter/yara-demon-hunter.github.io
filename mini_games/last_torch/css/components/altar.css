@@ -1,0 +1,87 @@
+/* --- ALTAR: melhorias permanentes pagas com Brasas (js/ui/altar.js) --- */
+#altarScreen { background: radial-gradient(ellipse 90% 80% at 50% 115%, rgba(154, 52, 18, 0.55), rgba(5, 6, 10, 0.97) 70%), #05060a; }
+.altar-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    max-width: 44rem;
+    height: min(100%, 30rem);
+}
+.altar-embers {
+    margin-left: auto;
+    padding: 0.2rem 0.7rem;
+    border: 1px solid rgba(251, 146, 60, 0.55);
+    border-radius: 999px;
+    background: rgba(124, 45, 18, 0.35);
+    color: #fde4c8;
+    font-size: 0.9rem;
+}
+.altar-embers b { color: #fdba74; font-size: 1.05rem; }
+.altar-sub { color: #94a3b8; font-size: 0.72rem; line-height: 1.35; }
+#altarList {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(19rem, 100%), 1fr));
+    gap: 0.5rem;
+    align-content: start;
+}
+.altar-card {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 0.8rem;
+    background: rgba(8, 12, 16, 0.78);
+}
+.altar-card.is-ready { border-color: rgba(251, 146, 60, 0.7); box-shadow: 0 0 14px rgba(251, 146, 60, 0.18); }
+.altar-card.is-max { border-color: rgba(251, 191, 36, 0.5); }
+.altar-icon { flex-shrink: 0; width: 2.2rem; font-size: 1.7rem; line-height: 1; text-align: center; }
+.altar-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem; }
+.altar-text b { color: #e7e0cf; font-size: 0.85rem; }
+.altar-text span { color: #aeb8c6; font-size: 0.7rem; line-height: 1.3; }
+.altar-pips { display: flex; gap: 0.25rem; margin-top: 0.15rem; }
+.altar-pips i { width: 0.8rem; height: 0.4rem; border-radius: 0.2rem; background: rgba(148, 163, 184, 0.22); }
+.altar-pips i.is-on { background: #fb923c; box-shadow: 0 0 6px rgba(251, 146, 60, 0.6); }
+.altar-buy {
+    flex-shrink: 0;
+    min-width: 4.4rem;
+    min-height: 2.4rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid rgba(251, 146, 60, 0.7);
+    border-radius: 0.6rem;
+    background: rgba(124, 45, 18, 0.55);
+    color: #fde4c8;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+.altar-buy:disabled { border-color: rgba(148, 163, 184, 0.2); background: rgba(30, 41, 59, 0.5); color: #64748b; }
+.altar-card.is-max .altar-buy:disabled { color: #fde68a; }
+
+/* Botões do Altar: brilham quando há algo para comprar */
+#btnAltar.is-ready, #btnAltarSummary.is-ready {
+    border-color: rgba(251, 146, 60, 0.8);
+    animation: altarReady 1.4s ease-in-out infinite;
+}
+@keyframes altarReady {
+    0%, 100% { box-shadow: 0 0 0 rgba(251, 146, 60, 0); }
+    50% { box-shadow: 0 0 14px rgba(251, 146, 60, 0.55); }
+}
+
+/* Fim da noite: Brasas ganhas */
+#summaryEmbers {
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(251, 146, 60, 0.45);
+    border-radius: 0.7rem;
+    background: rgba(66, 24, 8, 0.5);
+}
+#summaryEmbers.can-buy { border-color: rgba(251, 146, 60, 0.85); }
+.embers-gain { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; }
+.embers-gain span { color: #fdba74; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.14em; }
+.embers-gain b { color: #fde4c8; font-size: 1.5rem; }
+.embers-total { color: #d6cdb8; font-size: 0.68rem; }
+.embers-buy { margin-top: 0.15rem; color: #fde68a; font-size: 0.68rem; font-weight: 700; }
+#summaryEmbers:not(.can-buy) .embers-buy { color: #94a3b8; font-weight: 500; }

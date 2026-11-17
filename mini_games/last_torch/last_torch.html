@@ -184,6 +184,10 @@ permalink: /mini_games/last_torch/last_torch.html
                 <span class="link-icon" aria-hidden="true">🏛️</span>
                 <span class="link-text"><span>SANCTUARY</span><em id="startSanctuaryCount">0/0 earned</em></span>
             </button>
+            <button id="btnAltar" class="start-btn-small">
+                <span class="link-icon" aria-hidden="true">🔥</span>
+                <span class="link-text"><span>ALTAR</span><em id="startAltarCount">0 embers</em></span>
+            </button>
         </div>
         </div>
     </div>
@@ -449,6 +453,7 @@ permalink: /mini_games/last_torch/last_torch.html
                 <div id="finalBuild"></div>
             </div>
             <div class="summary-col">
+                <div id="summaryEmbers"></div>
                 <div id="summaryUnlocks"></div>
                 <div id="summaryGoal"></div>
             </div>
@@ -456,6 +461,7 @@ permalink: /mini_games/last_torch/last_torch.html
         <div class="summary-actions">
             <button id="btnRestart" class="start-btn">HUNT AGAIN</button>
             <button id="btnEndless" class="start-btn start-btn-dark hidden">STAY IN THE DARK</button>
+            <button id="btnAltarSummary" class="start-btn-small"><span>🔥 ALTAR</span></button>
             <button id="btnSanctuarySummary" class="start-btn-small"><span>🏛️ SANCTUARY</span></button>
             <button id="btnShare" class="start-btn-small"><span>↗ SHARE</span></button>
             <button id="btnMenu" class="start-btn-small"><span>MENU</span></button>
@@ -479,6 +485,22 @@ permalink: /mini_games/last_torch/last_torch.html
             <button id="btnCloseSanctuary" class="screen-close" aria-label="Close">✕</button>
         </header>
         <div id="sanctuaryList" class="custom-scroll"></div>
+    </div>
+</div>
+
+<!-- ALTAR: melhorias permanentes pagas com Brasas. Styles in css/components/altar.css -->
+<div id="altarScreen" class="game-screen hidden" role="dialog" aria-label="Altar">
+    <div class="altar-panel">
+        <header class="sanc-head">
+            <div>
+                <p class="screen-eyebrow">THE FLAME REMEMBERS</p>
+                <h2 class="screen-title">ALTAR</h2>
+            </div>
+            <div class="altar-embers">🔥 <b id="altarEmbers">0</b></div>
+            <button id="btnCloseAltar" class="screen-close" aria-label="Close">✕</button>
+        </header>
+        <p class="altar-sub">Every night earns embers, even the ones you lose. Spend them on upgrades that last.</p>
+        <div id="altarList" class="custom-scroll"></div>
     </div>
 </div>
 

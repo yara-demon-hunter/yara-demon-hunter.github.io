@@ -21,7 +21,9 @@ function createSave() {
         // quickPickChosen: o jogador já ligou ou desligou a escolha ao subir de nível em Settings; sem isso vale o padrão (data_model/start.js)
         settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, moveKeys: false, quickPick: START.quickPickDefault, quickPickChosen: false, touch: { scale: 1, positions: {} } },
         seenTutorial: false,
-        seenTreeHint: false
+        seenTreeHint: false,
+        embers: 0,                  // Brasas: a moeda que fica entre as noites (data_model/embers.js)
+        altar: {}                   // melhorias permanentes compradas no Altar: chave -> nível
     };
 }
 
@@ -30,9 +32,10 @@ function load() {
     try {
         const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
         if (!saved) return fresh;
-        // Saves antigos: brasas e melhorias do Hearth não existem mais (o Hearth virou o Santuário)
-        delete saved.embers;
+        // Saves antigos: as melhorias do Hearth (`upgrades`) não existem mais. As Brasas voltaram em nov/2026 como `embers`,
+        // com o Altar (`altar`); um `embers` que não seja número vem de outra época e é descartado.
         delete saved.upgrades;
+        if (typeof saved.embers !== 'number') delete saved.embers;
         if (saved.settings) delete saved.settings.keyboard;
         // Campos novos em versões futuras entram com o valor padrão
         return {
