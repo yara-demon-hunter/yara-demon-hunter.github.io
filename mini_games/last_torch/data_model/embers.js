@@ -30,7 +30,10 @@ export const ALTAR = {
     extraDash: { name: 'Extra Dash', icon: '⚡', desc: '+1 dash charge', costs: [90], mods: { dashCharges: 1 } },
     // Começo da noite e tocha
     insight: { name: 'Insight', icon: '✨', desc: '+1 skill point at the start of the night', costs: [14, 30, 60, 100, 150], startPoints: 1 },
-    torch: { name: 'Hearth Flame', icon: '🔥', desc: '+10 torch health per level', costs: [10, 18, 30, 48, 75], mods: { torchHp: 10 } }
+    torch: { name: 'Hearth Flame', icon: '🔥', desc: '+10 torch health per level', costs: [10, 18, 30, 48, 75], mods: { torchHp: 10 } },
+    // A segunda chance da tocha: uma vez por noite, quando o herói cai, a tocha gasta parte da chama e o traz de volta
+    // (js/systems/player.js, números em CORE_MODEL.secondWind). Sem esta melhoria, morreu morreu.
+    torchCall: { name: "Torch's Call", icon: '🕯️', desc: 'Once per night, when you fall, the torch pays 25% of its flame to bring you back', costs: [160] }
 };
 export const ALTAR_KEYS = Object.keys(ALTAR);
 

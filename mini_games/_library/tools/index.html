@@ -55,6 +55,16 @@
                 <span>Os 13 monstros 2.5D e os 12 desenhos de cima do Last Torch, cada um com as suas cores e medidas.</span>
                 <em>tuner.html · monstros</em>
             </a>
+            <a class="card" href="tuner.html?model=buddy_treant">
+                <span class="icon">🍂</span><b>Mortes</b>
+                <span>Como cada monstro morre: pedaços que voam (ossos, casca, folhas), mancha no chão e, para quem tomba, a queda com poeira. Painel "Morte" no tuner de monstros.</span>
+                <em>tuner.html · painel Morte · death.js</em>
+            </a>
+            <a class="card" href="lab/index.html">
+                <span class="icon">🧪</span><b>Laboratório</b>
+                <span>Monstros novos em 3D (WebGL) com as 7 técnicas de fotorrealismo, cada uma com liga/desliga. Escolha entre o Golem e o Treant. Não afeta os jogos.</span>
+                <em>lab/ · precisa de servidor local</em>
+            </a>
             <a class="card" href="buddy_viewer.html">
                 <span class="icon">🐺</span><b>Buddies</b>
                 <span>Quem anda e luta ao lado do herói: fênix, corvo, caveira voadora (animados aqui) e os lobos (no tuner).</span>
@@ -133,7 +143,7 @@
         try {
             group('Heróis', HEROES.map(([id, name]) => [`tuner.html?model=${id}`, name]));
             group('Monstros', MONSTERS.map(([id, name]) => [`tuner.html?model=${id}`, name]));
-            group('Buddies', [['buddy_viewer.html', 'Fênix, corvo, caveira e carvalho', 'animados'], ['tuner.html?model=buddy_shadow_wolf', 'Shadow Wolf', '2.5D'], ['tuner.html?model=white_wolf', 'White Wolf', '2.5D'], ['tuner.html?model=buddy_treant', 'Treant (árvore andante)', '2.5D']]);
+            group('Buddies', [['buddy_viewer.html', 'Fênix, corvo, caveira e carvalho', 'animados'], ['tuner.html?model=buddy_shadow_wolf', 'Shadow Wolf', '2.5D'], ['tuner.html?model=white_wolf', 'White Wolf', '2.5D'], ['tuner.html?model=buddy_treant', 'Treant (árvore andante)', '2.5D'], ['tuner.html?model=treant_classico', 'Treant ANTIGO (comparar)', '2.5D']]);
             group('Cenários', sceneryIds().map(id => {
                 const pieces = createScenery(id).visual.props;
                 return [`scenery_tuner.html?scenery=${id}`, id, pieces ? `${pieces.length} peças` : 'desenho próprio'];

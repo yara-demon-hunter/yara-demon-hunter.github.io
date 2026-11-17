@@ -1,6 +1,16 @@
 // --- DADOS VISUAIS: Sensação de impacto. ---
 // Tudo que responde a um golpe: clarão no monstro, números de dano, pedaços, manchas no chão, ondas
 // de choque. Lidos por js/systems/effects.js e js/render/effects.js. Só afeta o desenho.
+import { DEATH_PHYSICS, MONSTER_DEATH } from '../../../library/monsters/25d/death.js';
+
+// Tipo de monstro do jogo → pasta da biblioteca (library/monsters/25d/<id>). O Necromante tem cores próprias (abaixo).
+const DEATH_OF_TYPE = {
+    SKELETON: 'skeleton', SKELETON_CRAWLER: 'skeleton_crawler', BAT: 'bat', VAMPIRE: 'vampire', WITCH: 'witch', MOTH: 'moth',
+    BLOATER: 'bloater', WRAITH: 'wraith', SHADOW_WOLF: 'shadow_wolf', ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight',
+    BONE_COLOSSUS: 'bone_colossus', TREANT: 'treant', GOLEM: 'golem'
+};
+const MONSTER_DEATH_BY_TYPE = Object.fromEntries(Object.entries(DEATH_OF_TYPE).map(([type, id]) => [type, MONSTER_DEATH[id]]));
+
 export const JUICE_VISUALS = {
     hitFlashSeconds: 0.09,
     hitRecoil: 3,               // quanto o monstro treme ao ser atingido
@@ -35,30 +45,12 @@ export const JUICE_VISUALS = {
 
     // Pedaços que voam ao morrer
     gibs: {
-        maxActive: [44, 26, 12],    // por nível de detalhe
-        gravity: 520,
-        bounce: 0.35,
-        speedMin: 70,
-        speedMax: 240,
-        liftMin: 90,
-        liftMax: 240,
-        lifeMin: 0.7,
-        lifeMax: 1.3
+        maxActive: [64, 40, 14],    // por nível de detalhe (pedaços são retângulos simples; o Treant sozinho solta ~40)
+        ...DEATH_PHYSICS            // gravidade, quique e velocidades: library/monsters/25d/death.js
     },
     // Quantidade e cores dos pedaços por monstro
     deathBits: {
-        SKELETON: { count: 6, colors: ['#e7e0cf', '#b9b09a', '#8f8772'], shape: 'bone', stain: 'rgba(14, 12, 9, 0.5)' },
-        SKELETON_CRAWLER: { count: 7, colors: ['#e0d8c2', '#b2a98f', '#857d69'], shape: 'bone', stain: 'rgba(14, 12, 9, 0.5)' },
-        BAT: { count: 4, colors: ['#3b1d5c', '#7c3aed', '#2a1740'], shape: 'shard', stain: 'rgba(24, 8, 44, 0.5)' },
-        VAMPIRE: { count: 6, colors: ['#7f1d1d', '#1c1917', '#b91c1c'], shape: 'shard', stain: 'rgba(48, 6, 10, 0.62)' },
-        WITCH: { count: 6, colors: ['#581c87', '#f50bca', '#2e1065'], shape: 'shard', stain: 'rgba(30, 8, 48, 0.55)' },
-        MOTH: { count: 4, colors: ['#d6b98a', '#8a6d47', '#f5e6c8'], shape: 'shard', stain: 'rgba(30, 22, 12, 0.42)' },
-        BLOATER: { count: 8, colors: ['#a3e635', '#4d7c0f', '#d9f99d'], shape: 'blob', stain: 'rgba(30, 48, 6, 0.62)' },
-        WRAITH: { count: 5, colors: ['#a5f3fc', '#0e7490', '#ecfeff'], shape: 'shard', stain: 'rgba(6, 30, 38, 0.42)' },
-        SHADOW_WOLF: { count: 6, colors: ['#2e2c3f', '#8ea3bf', '#0b0a12'], shape: 'shard', stain: 'rgba(10, 8, 20, 0.55)' },
-        ZOMBIE_WOLF: { count: 6, colors: ['#2b2744', '#a78bfa', '#0d0b17'], shape: 'shard', stain: 'rgba(20, 10, 40, 0.55)' },
-        HEADLESS_KNIGHT: { count: 9, colors: ['#4f576b', '#2b3140', '#a5f3fc'], shape: 'shard', stain: 'rgba(10, 12, 20, 0.6)' },
-        BONE_COLOSSUS: { count: 16, colors: ['#c9bfa3', '#8a806a', '#fb923c'], shape: 'bone', stain: 'rgba(30, 24, 14, 0.6)' },
+        ...MONSTER_DEATH_BY_TYPE,      // os monstros: library/monsters/25d/death.js (inclui a queda do Treant)
         NECROMANCER: { count: 6, colors: ['#86efac', '#14532d', '#e7e0cf'], shape: 'bone', stain: 'rgba(6, 30, 16, 0.55)' },
         ROCK: { count: 9, colors: ['#78716c', '#57534e', '#a8a29e'], shape: 'shard', stain: 'rgba(12, 10, 8, 0.4)' },
         HERO: { count: 20, colors: ['#07222d', '#0b2f3c', '#38bdf8', '#e8eef2'], shape: 'shard', stain: 'rgba(4, 14, 20, 0.6)' },

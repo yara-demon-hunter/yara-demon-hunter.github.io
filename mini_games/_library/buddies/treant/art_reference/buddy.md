@@ -9,7 +9,7 @@
 | Peça | Descrição |
 |---|---|
 | Pernas | duas raízes grossas, com passos lentos e pesados e três dedos de raiz em cada pé |
-| Tronco | casca com veios, musgo no ombro; cara entalhada com sobrancelhas franzidas, olhos âmbar brilhando e boca funda |
+| Tronco | casca com veios, musgo no ombro; cara entalhada (desde 17/11/2026): oco escuro, sobrancelhas pesadas e franzidas, olhos âmbar com pupila em fenda, nó de madeira no lugar do nariz, boca em fenda com dentes de lasca, barba de musgo e um broto na testa; fica mais baixa no tronco (`faceDrop`) porque, vista de cima, a copa cobre o alto |
 | Braços | galhos que balançam no passo (e erguem, `e.swing`), mão de dedos finos com folhas na ponta |
 | Copa | monte de bolas de folhas, escuras por baixo e claras em cima, sustentada por dois galhos |
 

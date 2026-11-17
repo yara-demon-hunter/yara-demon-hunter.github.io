@@ -59,6 +59,16 @@
         .filter { width: 100%; margin: 4px 0 8px; }
         .hint { font-size: 12px; color: #7a725f; margin: 4px 0 8px; line-height: 1.4; }
         code { color: #c9c0aa; }
+        .death { margin: 0 0 12px; padding: 8px 10px; background: #120f09; border: 1px solid #3a3322; border-radius: 8px; }
+        .death summary { cursor: pointer; font-size: 13px; font-weight: 700; color: #fbbf24; }
+        .death summary small { color: #7a725f; font-weight: 400; }
+        .death-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+        .death h4 { margin: 10px 0 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #a39b86; }
+        .death .row { display: grid; grid-template-columns: 1fr 86px; gap: 6px; align-items: center; margin: 3px 0; font-size: 12px; }
+        .death .row input, .death .row select { width: 100%; background: #0c0a06; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 5px; padding: 3px 5px; font: inherit; }
+        .death .row.wide { grid-template-columns: 1fr; }
+        .death .row.changed span { color: #fbbf24; }
+        .death #deathOut { width: 100%; margin-top: 8px; background: #0c0a06; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 6px; font: 11px ui-monospace, monospace; padding: 6px; }
         #out { width: 100%; min-height: 120px; margin-top: 6px; background: #0c0a06; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 6px; font: 12px ui-monospace, monospace; padding: 6px; }
     </style>
 </head>
@@ -86,6 +96,16 @@
                 Os campinhos dos lados da barra são o mínimo e o máximo dela: mude à vontade (ficam azuis e guardados).
                 Para gravar: <b>Copiar alterados</b>, cole as linhas no arquivo indicado em <code>mini_games/_library/</code>
                 e rode <code>ruby mini_games/_library/sync.rb</code>. Os ajustes ficam guardados neste navegador até você desfazer.</p>
+            <details id="deathPanel" class="death" open>
+                <summary>Morte <small>(pedaços e queda)</small></summary>
+                <div class="death-bar">
+                    <button id="deathPlay" class="primary">▶ Morrer</button>
+                    <label class="check"><input id="deathLoop" type="checkbox" checked> Repetir</label>
+                    <button id="deathCopy">Copiar morte</button>
+                </div>
+                <div id="deathBody"></div>
+                <textarea id="deathOut" readonly rows="6" placeholder="A morte copiada aparece aqui também"></textarea>
+            </details>
             <div id="controls"></div>
             <textarea id="out" readonly placeholder="Os valores copiados aparecem aqui também"></textarea>
         </aside>
@@ -140,6 +160,8 @@
         import '../monsters/25d/vampire/vampire25d.js';
         import { BONE_COLOSSUS_25D_VISUALS } from '../monsters/25d/bone_colossus/bone_colossus25d_visual.js';
         import '../monsters/25d/bone_colossus/bone_colossus25d.js';
+        import { GOLEM_25D_VISUALS } from '../monsters/25d/golem/golem25d_visual.js';
+        import '../monsters/25d/golem/golem25d.js';
         import { HEADLESS_KNIGHT_25D_VISUALS } from '../monsters/25d/headless_knight/headless_knight25d_visual.js';
         import '../monsters/25d/headless_knight/headless_knight25d.js';
         import { ZOMBIE_WOLF_25D_VISUALS } from '../monsters/25d/zombie_wolf/zombie_wolf25d_visual.js';
@@ -182,6 +204,7 @@
         import { renderVampire } from '../monsters/topdown/vampire/vampire.js';
         import { DEMON_LORD_VISUALS as TD_DEMON_LORD } from '../monsters/topdown/demon_lord/demon_lord_visual.js';
         import { renderDemonLord } from '../monsters/topdown/demon_lord/demon_lord.js';
+        import { MONSTER_DEATH, groupsOf, setupGib, stepGib, drawGib, fallPose } from '../monsters/25d/death.js';
 
         const $ = (id) => document.getElementById(id);
         setHost({ animating: () => true, target: () => null });
@@ -209,9 +232,11 @@
             white_wolf: 'buddies/white_wolf/white_wolf25d_visual.js',
             buddy_shadow_wolf: 'buddies/shadow_wolf/shadow_wolf25d_visual.js',
             buddy_treant: 'buddies/treant/treant25d_visual.js',
+            treant_classico: 'buddies/treant/treant25d_visual.js',
             zombie_wolf: 'monsters/25d/zombie_wolf/zombie_wolf25d_visual.js',
             headless_knight: 'monsters/25d/headless_knight/headless_knight25d_visual.js',
             bone_colossus: 'monsters/25d/bone_colossus/bone_colossus25d_visual.js',
+            golem: 'monsters/25d/golem/golem25d_visual.js',
             vampire: 'monsters/25d/vampire/vampire25d_visual.js',
             demon_lord: 'monsters/25d/demon_lord/demon_lord25d_visual.js',
             body: 'characters/hunter/hero25d_visual.js',
@@ -228,6 +253,7 @@
         COLOR_FILES.white_wolf = 'buddies/white_wolf/white_wolf_visual.js';
         COLOR_FILES.buddy_shadow_wolf = 'buddies/shadow_wolf/shadow_wolf_visual.js';
         COLOR_FILES.buddy_treant = 'buddies/treant/treant25d_visual.js';
+        COLOR_FILES.treant_classico = 'buddies/treant/treant25d_visual.js';
         COLOR_FILES.wraith = 'monsters/topdown/wraith/wraith_visual.js';
         COLOR_FILES.moth = 'monsters/topdown/moth/moth_visual.js';
         COLOR_FILES.bat = 'monsters/topdown/bat/bat_visual.js';
@@ -251,12 +277,14 @@
         RADIUS.demon_lord = 32;
         RADIUS.vampire = 18;
         RADIUS.bone_colossus = 54;
+        RADIUS.golem = 27;
         RADIUS.headless_knight = 20;
         RADIUS.zombie_wolf = 13;
         RADIUS.shadow_wolf = 12;
         RADIUS.white_wolf = 12;
         RADIUS.buddy_shadow_wolf = 12;
         RADIUS.buddy_treant = 12;
+        RADIUS.treant_classico = 12;
         RADIUS.wraith = 12;
         RADIUS.moth = 10;
         RADIUS.bat = 10;
@@ -281,9 +309,11 @@
             ['white_wolf', 'Buddy: Lobo Branco', WHITE_WOLF_25D_VISUALS, 'rig'],
             ['buddy_shadow_wolf', 'Buddy: Lobo Sombrio', SHADOW_WOLF_BUDDY_25D_VISUALS, 'rig'],
             ['buddy_treant', 'Buddy: Treant (árvore andante)', TREANT_25D_VISUALS, 'rig'],
+            ['treant_classico', 'Treant ANTIGO (bolas e galhos, para comparar)', TREANT_25D_VISUALS, 'rig'],
             ['zombie_wolf', 'Lobo Zumbi', ZOMBIE_WOLF_25D_VISUALS, 'rig'],
             ['headless_knight', 'Cavaleiro Sem Cabeça', HEADLESS_KNIGHT_25D_VISUALS, 'rig'],
             ['bone_colossus', 'Colosso de Ossos', BONE_COLOSSUS_25D_VISUALS, 'rig'],
+            ['golem', 'Golem de Brasa e Musgo', GOLEM_25D_VISUALS, 'rig'],
             ['vampire', 'Vampiro', VAMPIRE_25D_VISUALS, 'rig'],
             ['demon_lord', 'Demon Lord (boss)', DEMON_LORD_25D_VISUALS, 'rig'],
             ['td_bat', 'Morcego', TD_BAT, 'topdown'],
@@ -618,6 +648,8 @@
             ['Parado', { cam: LT, facing: -Math.PI / 4, zoom: 6, footY: 0.62 }],
             ['Golpes', { cam: LT, facing: 0.5, zoom: 6, swing: true, footY: 0.62 }],
             ['Tamanho do jogo', { cam: LT, facing: (t) => t * 0.8, zoom: GAME_SCALE, walk: true, footY: 0.55 }],
+            ['Morte', 'como o monstro morre no Last Torch: pedaços e queda (ajuste no painel "Morte", ao lado)'],
+            ['Morrendo', { cam: LT, facing: Math.PI / 2, footY: 0.62, death: true }],
             ['Palco do yara-rpg', 'de lado, inclinada 34°'],
             ['Rosto · para a direita', { cam: RPG, facing: STAGE_RIGHT, zoom: 15, footY: 1.4, face: true }],
             ['Rosto · para a esquerda', { cam: RPG, facing: STAGE_LEFT, zoom: 15, footY: 1.4, face: true }],
@@ -654,6 +686,10 @@
         function tick(v, dt) {
             const o = v.o;
             v.t += dt;
+            if (o.death) {
+                tickDeath(v, dt);
+                return;
+            }
             const face = faceOf(v);
             if (o.swing) {
                 // Um golpe a cada 1,1 s, passando pelo combo 1 → 2 → 3
@@ -678,6 +714,10 @@
             const key = $('model').value;
             g.fillStyle = '#17140d';
             g.fillRect(0, 0, w, h);
+            if (o.death) {
+                drawDeath(v, w, h);
+                return;
+            }
             if (o.topdown) {
                 // O desenho 2D de cima, andando como o monstro do jogo. fit: o monstro ocupa essa fração da vista
                 const td = TOPDOWN[key];
@@ -725,6 +765,201 @@
             }
         }
 
+
+        // --- MORTE ---
+        // A definição de cada monstro mora em monsters/25d/death.js (MONSTER_DEATH): é a mesma que o Last Torch usa.
+        // Aqui ela se ajusta ao vivo; "Copiar morte" gera o bloco para colar nesse arquivo. Fica guardada neste navegador.
+        const deathKey = () => ((['buddy_treant', 'treant_classico'].includes($('model').value)) ? 'treant' : $('model').value);
+        const DEATH_STORE = 'library-tuner-death';
+        const DEATH_ORIGINAL = JSON.parse(JSON.stringify(MONSTER_DEATH));
+        try {
+            Object.entries(JSON.parse(localStorage.getItem(DEATH_STORE) || '{}')).forEach(([k, def]) => { if (MONSTER_DEATH[k]) MONSTER_DEATH[k] = def; });
+        } catch { /* sem armazenamento */ }
+        const persistDeath = () => {
+            const edited = {};
+            Object.keys(MONSTER_DEATH).forEach(k => { if (JSON.stringify(MONSTER_DEATH[k]) !== JSON.stringify(DEATH_ORIGINAL[k])) edited[k] = MONSTER_DEATH[k]; });
+            try { localStorage.setItem(DEATH_STORE, JSON.stringify(edited)); } catch { /* só nesta aba */ }
+        };
+        const FALL_DEFAULT = { seconds: 1, tiltSeconds: 0.5, tilt: 1.2, shake: 0.08, sink: 0.4, squash: 0.85, fade: 0.4, pivot: 1 };
+        const DUST_DEFAULT = { radius: 2.4, seconds: 0.5, width: 8, color: 'rgba(163, 150, 110, 0.7)' };
+        const SHAPES = ['bone', 'rock', 'log', 'wood', 'leaf', 'shard', 'blob'];
+        const DEATH_PX = 2;     // a vista mostra o monstro 2 vezes maior que no jogo
+
+        // O estado da morte de cada vista: o monstro vivo, depois caindo, com os pedaços
+        function startDeath(v) {
+            const def = MONSTER_DEATH[deathKey()];
+            const d = v.d;
+            d.dying = true; d.age = 0; d.landed = false; d.gibs.length = 0; d.dir = Math.random() < 0.5 ? -1 : 1; d.dust = -1; d.restart = false;
+            if (!def) return;
+            const radius = RADIUS[$('model').value] ?? 14;
+            groupsOf(def).forEach(group => {
+                for (let i = 0; i < group.count; i++) d.gibs.push(setupGib({}, group, 0, 0, radius / 14));
+            });
+        }
+        function tickDeath(v, dt) {
+            const d = (v.d ??= { t: 0, dying: false, age: 0, landed: false, gibs: [], dir: 1, dust: -1, restart: false });
+            const def = MONSTER_DEATH[deathKey()];
+            if (d.restart) { d.restart = false; d.dying = false; d.t = 0; d.gibs.length = 0; }
+            if (!d.dying) {
+                d.t += dt;
+                if (d.t > 0.9) startDeath(v);      // o monstro fica de pé por um instante e morre
+                return;
+            }
+            d.age += dt;
+            for (let i = d.gibs.length - 1; i >= 0; i--) if (!stepGib(d.gibs[i], dt)) d.gibs.splice(i, 1);
+            if (def?.fall && !d.landed && d.age >= def.fall.tiltSeconds) { d.landed = true; d.dust = 0; }
+            if (d.dust >= 0 && def?.dust) d.dust += dt;
+            const end = Math.max(def?.fall?.seconds ?? 0, 2.4) + 0.8;
+            if (d.age > end && $('deathLoop').checked) { d.dying = false; d.t = 0; d.gibs.length = 0; }
+        }
+        function drawDeath(v, w, h) {
+            const o = v.o, g = v.g, key = $('model').value;
+            const d = v.d;
+            if (typeOf(key) !== 'rig' || !MONSTER_DEATH[deathKey()]) {
+                g.fillStyle = '#7a725f'; g.font = '13px system-ui'; g.textAlign = 'center';
+                g.fillText(typeOf(key) === 'rig' ? 'Este monstro ainda não tem morte definida' : 'Escolha um monstro 2.5D', w / 2, h / 2);
+                return;
+            }
+            const def = MONSTER_DEATH[deathKey()];
+            const radius = RADIUS[key] ?? 14;
+            const scale = radius * blockOf(key).scalePerRadius * DEATH_PX;
+            const ox = w / 2, oy = h * (o.footY ?? 0.62);
+            setCtx(g);
+            const pose = d?.dying && def.fall ? fallPose(def.fall, d.age) : null;
+            if (!d?.dying || def.fall) {
+                g.save();
+                g.globalAlpha = pose ? pose.alpha : 1;
+                if (pose) {
+                    const foot = radius * def.fall.pivot * DEPTH();
+                    g.translate(ox + pose.shake * radius * DEATH_PX, oy + foot);
+                    g.rotate(pose.rot * (d.dir ?? 1));
+                    g.scale(1, pose.sy);
+                    g.translate(0, -foot + pose.dy * radius * DEATH_PX);
+                    g.translate(-ox, -oy);
+                }
+                g.translate(ox - v.body.x, oy - v.body.y);
+                const before = V.scale;
+                V.scale = scale;
+                try { renderHero25D(v.body, v.anim, blockOf(key).colors, null, key); } finally { V.scale = before; g.restore(); }
+            }
+            if (d?.dust >= 0 && def.dust && d.dust < def.dust.seconds) {
+                const p = d.dust / def.dust.seconds;
+                g.save(); g.globalAlpha = 1 - p; g.strokeStyle = def.dust.color; g.lineWidth = Math.max(0.5, def.dust.width * (1 - p));
+                g.beginPath(); g.arc(ox, oy + radius * 0.5 * DEATH_PX, Math.max(1, radius * def.dust.radius * DEATH_PX * p), 0, Math.PI * 2); g.stroke(); g.restore();
+            }
+            if (d?.dying) {
+                g.save();
+                g.translate(ox, oy);
+                g.scale(DEATH_PX, DEATH_PX);
+                d.gibs.forEach(gib => drawGib(g, gib));
+                g.restore();
+                g.globalAlpha = 1;
+            }
+        }
+        window.__death = () => views.find(x => x.o.death)?.d;      // (gancho de teste)
+        window.__views = views;                                    // (gancho de teste)
+        const DEPTH = () => 1;      // (o pé gira no ponto de apoio; sem achatamento extra na vista)
+
+        // Painel de ajuste da morte do monstro escolhido
+        const deathRow = (label, input, wide = false) => {
+            const row = document.createElement('label'); row.className = 'row' + (wide ? ' wide' : '');
+            const span = document.createElement('span'); span.textContent = label;
+            row.append(span, input); return row;
+        };
+        function buildDeathPanel() {
+            const body = $('deathBody'); body.innerHTML = '';
+            const key = deathKey(); const def = MONSTER_DEATH[key];
+            const isRig = typeOf($('model').value) === 'rig';
+            $('deathPanel').hidden = !isRig;
+            if (!isRig) return;
+            if (!def) { body.innerHTML = '<p class="hint">Este monstro ainda não tem morte definida em death.js.</p>'; return; }
+            const orig = DEATH_ORIGINAL[key] ?? {};
+            const changed = () => { persistDeath(); buildDeathPanel(); const v = views.find(x => x.o.death); if (v?.d) v.d.restart = true; };
+            const num = (obj, field, step, label, ref) => {
+                const i = Object.assign(document.createElement('input'), { type: 'number', step, value: obj[field] ?? (field === 'count' ? 0 : 1) });
+                i.addEventListener('change', () => { obj[field] = parseFloat(i.value) || 0; changed(); });
+                const row = deathRow(label ?? field, i);
+                if (ref !== undefined && JSON.stringify(ref) !== JSON.stringify(obj[field] ?? (field === 'count' ? 0 : 1))) row.classList.add('changed');
+                return row;
+            };
+            groupsOf(def).forEach((group, gi) => {
+                const ogroup = groupsOf(orig)[gi] ?? {};
+                const h = document.createElement('h4'); h.textContent = `Pedaços ${groupsOf(def).length > 1 ? gi + 1 : ''}`; body.appendChild(h);
+                body.appendChild(num(group, 'count', 1, 'quantidade', ogroup.count));
+                const sel = document.createElement('select'); SHAPES.forEach(s => sel.add(new Option(s, s))); sel.value = group.shape;
+                sel.addEventListener('change', () => { group.shape = sel.value; changed(); });
+                body.appendChild(deathRow('forma', sel));
+                [['size', 'tamanho ×'], ['speed', 'velocidade ×'], ['lift', 'impulso para cima ×'], ['life', 'duração ×'], ['gravity', 'gravidade ×']].forEach(([f, l]) => {
+                    if (group[f] === undefined) group[f] = 1;
+                    body.appendChild(num(group, f, 0.05, l, ogroup[f] ?? 1));
+                });
+                const colors = Object.assign(document.createElement('input'), { type: 'text', value: (group.colors || []).join(', ') });
+                colors.addEventListener('change', () => { group.colors = colors.value.split(',').map(s => s.trim()).filter(Boolean); changed(); });
+                body.appendChild(deathRow('cores (separadas por vírgula)', colors, true));
+            });
+            const h2 = document.createElement('h4'); h2.textContent = 'Mancha no chão'; body.appendChild(h2);
+            const stain = Object.assign(document.createElement('input'), { type: 'text', value: def.stain ?? '' });
+            stain.addEventListener('change', () => { def.stain = stain.value; changed(); });
+            body.appendChild(deathRow('cor da mancha', stain, true));
+            const h3 = document.createElement('h4'); h3.textContent = 'Queda do corpo'; body.appendChild(h3);
+            const fallOn = Object.assign(document.createElement('input'), { type: 'checkbox', checked: !!def.fall });
+            fallOn.addEventListener('change', () => { if (fallOn.checked) { def.fall = { ...FALL_DEFAULT }; } else { delete def.fall; delete def.dust; } changed(); });
+            const fallRow = document.createElement('label'); fallRow.className = 'row wide'; fallRow.append(fallOn, document.createTextNode(' O corpo tomba (sem isso ele some na hora)'));
+            body.appendChild(fallRow);
+            if (def.fall) {
+                [['seconds', 0.05, 'duração total (s)'], ['tiltSeconds', 0.05, 'tempo até cair (s)'], ['tilt', 0.05, 'ângulo de queda (rad)'], ['shake', 0.01, 'tremor (raios)'],
+                    ['sink', 0.05, 'afunda (raios)'], ['pivot', 0.05, 'pé de apoio (raios abaixo)'], ['squash', 0.02, 'achata (1 = não)'], ['fade', 0.02, 'some no final (fração)']]
+                    .forEach(([f, s, l]) => body.appendChild(num(def.fall, f, s, l, orig.fall?.[f])));
+                const dustOn = Object.assign(document.createElement('input'), { type: 'checkbox', checked: !!def.dust });
+                dustOn.addEventListener('change', () => { if (dustOn.checked) def.dust = { ...DUST_DEFAULT }; else delete def.dust; changed(); });
+                const dustRow = document.createElement('label'); dustRow.className = 'row wide'; dustRow.append(dustOn, document.createTextNode(' Poeira ao bater no chão'));
+                body.appendChild(dustRow);
+                if (def.dust) {
+                    [['radius', 0.1, 'raio (× raio do monstro)'], ['seconds', 0.05, 'duração (s)'], ['width', 1, 'espessura']].forEach(([f, s, l]) => body.appendChild(num(def.dust, f, s, l, orig.dust?.[f])));
+                    const dc = Object.assign(document.createElement('input'), { type: 'text', value: def.dust.color });
+                    dc.addEventListener('change', () => { def.dust.color = dc.value; changed(); });
+                    body.appendChild(deathRow('cor da poeira', dc, true));
+                }
+            }
+        }
+        // O bloco para colar em monsters/25d/death.js (mesmo estilo do arquivo)
+        const lit = (v) => (typeof v === 'string' ? `'${v}'` : Array.isArray(v) ? `[${v.map(lit).join(', ')}]` : typeof v === 'object' && v ? `{ ${Object.entries(v).map(([k, x]) => `${k}: ${lit(x)}`).join(', ')} }` : String(v));
+        function deathText() {
+            const key = deathKey(); const def = MONSTER_DEATH[key];
+            if (!def) return '// Sem morte definida';
+            const groups = groupsOf(def).map(g => {
+                const o = { count: g.count, colors: g.colors, shape: g.shape };
+                ['size', 'speed', 'lift', 'life', 'gravity'].forEach(f => { if (g[f] !== undefined && g[f] !== 1) o[f] = g[f]; });
+                return `            ${lit(o)}`;
+            });
+            const lines = [`    ${key}: {`, '        groups: [', groups.join(',\n'), '        ],', `        stain: ${lit(def.stain)}${def.fall ? ',' : ''}`];
+            if (def.fall) { lines.push(`        fall: ${lit(def.fall)}${def.dust ? ',' : ''}`); if (def.dust) lines.push(`        dust: ${lit(def.dust)}`); }
+            lines.push('    },');
+            return `// Cole em mini_games/_library/monsters/25d/death.js (MONSTER_DEATH) e rode ruby mini_games/_library/sync.rb\n${lines.join('\n')}`;
+        }
+        const dieNow = () => {
+            const v = views.find(x => x.o.death);
+            if (!v) return;
+            if ($('pause').checked) $('pause').checked = false;        // pausado, nada se mexe
+            v.d ??= { t: 0, dying: false, age: 0, landed: false, gibs: [], dir: 1, dust: -1 };
+            startDeath(v);
+        };
+        $('deathPlay').addEventListener('click', dieNow);
+        // O mesmo botão na própria vista, ao lado do nome (mais fácil de achar)
+        const deathFig = views.find(x => x.o.death)?.fig;
+        if (deathFig) {
+            const again = Object.assign(document.createElement('button'), { textContent: '▶ Morrer', className: 'primary' });
+            again.style.marginLeft = '8px';
+            again.addEventListener('click', dieNow);
+            deathFig.querySelector('figcaption').appendChild(again);
+        }
+        $('deathCopy').addEventListener('click', async () => {
+            const text = deathText(); $('deathOut').value = text;
+            try { await navigator.clipboard.writeText(text); $('deathCopy').textContent = 'Copiado!'; } catch { $('deathOut').select(); $('deathCopy').textContent = 'Selecione e copie abaixo'; }
+            setTimeout(() => { $('deathCopy').textContent = 'Copiar morte'; }, 1600);
+        });
+        buildDeathPanel();
+
         let last = null;
         function frame(real) {
             const dt = last === null || $('pause').checked ? 0 : Math.min(0.05, (real - last) / 1000);
@@ -759,6 +994,8 @@
             history.replaceState(null, '', `?model=${$('model').value}`);
             buildControls();
             showViews();
+            buildDeathPanel();
+            const dv = views.find(x => x.o.death); if (dv?.d) { dv.d.restart = true; }
             $('out').value = '';
         });
         $('kind').addEventListener('change', () => {

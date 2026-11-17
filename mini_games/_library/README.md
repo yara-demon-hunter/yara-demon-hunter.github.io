@@ -67,6 +67,7 @@ monsters/
   25d/creature25d.js       monstros sem corpo de gente (registerCreature) e peças comuns: polígonos, chama, tronco,
                            montante, corrente que afina
   25d/wolf25d.js           corpo de lobo em galope, comum ao shadow_wolf e ao zombie_wolf
+  25d/death.js             COMO CADA MONSTRO MORRE: os pedaços que voam (ossos, casca, folhas), a mancha no chão e, para quem tomba (Treant), a queda com poeira (MONSTER_DEATH), mais a física e o desenho dos pedaços. O Last Torch lê daqui; ajuste no painel "Morte" de tools/tuner.html (Monstros) e cole o bloco copiado neste arquivo
 ```
 
 Cada pasta de personagem ou monstro pode ter `art_reference/` com as imagens e a ficha (`character.md`). Elas nunca

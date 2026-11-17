@@ -35,8 +35,9 @@ export const MONSTER_SPRITES = {
     HEADLESS_KNIGHT: { extent: 2.3, bakeSeconds: 1, playSeconds: 1, speed: 26 },
     // Passada do esqueleto a 22 de velocidade: 1,8 Hz x 22/70 = ~0,57 ciclos por segundo
     // live: em campo é desenhado ao vivo (o golpe mexe braço, tronco e espada); o sprite serve ao bestiário e à sombra
-    BONE_COLOSSUS: { extent: 2.6, bakeSeconds: 1 / 0.566, playSeconds: 1.8, speed: 22, live: true },
-    TREANT: { extent: 3.3, bakeSeconds: 1.1, playSeconds: 1.1, speed: 11 }
+    BONE_COLOSSUS: { extent: 2.6, bakeSeconds: 1 / 0.566, playSeconds: 1.8, speed: 14, live: true },
+    TREANT: { extent: 3.3, bakeSeconds: 1.1, playSeconds: 1.1, speed: 7 },
+    GOLEM: { extent: 3.3, bakeSeconds: 1.1, playSeconds: 1.1, speed: 5 }
 };
 
 // Sprites dos monstros 2.5D. Como o boneco tem "cima" fixo na tela, o sprite não gira: cada monstro é gravado em
@@ -65,9 +66,10 @@ export const MONSTER_SPRITES_25D = {
     BUDDY_WHITE_WOLF: { extent: 20, bakeSeconds: 1 / 2.8, playSeconds: 0.38, speed: 100 },
     // O treant: o carvalho evoluído andando (Ancient Grove); ciclo de passos lento e pesado
     BUDDY_TREANT: { extent: 30, bakeSeconds: 1, playSeconds: 1.1, speed: 40 },
-    TREANT: { extent: 30, bakeSeconds: 1.1, playSeconds: 1.1, speed: 11, live: true },
+    TREANT: { extent: 30, bakeSeconds: 1.1, playSeconds: 1.1, speed: 7, live: true },
+    GOLEM: { extent: 32, bakeSeconds: 1.1, playSeconds: 1.1, speed: 5, live: true },
     ZOMBIE_WOLF: { extent: 19, bakeSeconds: 1 / 2.6, playSeconds: 0.4, speed: 85 },
     HEADLESS_KNIGHT: { extent: 23, bakeSeconds: 1, playSeconds: 1, speed: 26 },
     // live: em campo é desenhado ao vivo (o golpe mexe braço, tronco e espada); o sprite serve ao bestiário
-    BONE_COLOSSUS: { extent: 26, bakeSeconds: 1.667, playSeconds: 1.8, speed: 22, live: true, directions: 4, frames: 1 }
+    BONE_COLOSSUS: { extent: 26, bakeSeconds: 1.667, playSeconds: 1.8, speed: 14, live: true, directions: 4, frames: 1 }
 };

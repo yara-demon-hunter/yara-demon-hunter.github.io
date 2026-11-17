@@ -3,6 +3,12 @@ import { TREANT_25D_VISUALS as S } from './treant25d_visual.js';
 import { registerCreature, glowAt, facesCamera } from '../../monsters/25d/creature25d.js';
 import { renderMonster25D } from '../../monsters/25d/monster25d.js';
 import { mix } from '../../characters/hunter/kit25d.js';
+import { ctx } from '../../core/canvas.js';
+import { host } from '../../core/host.js';
+import { renderNow } from '../../core/clock.js';
+import { drawGlow } from '../../core/glow.js';
+
+const TAU = Math.PI * 2;
 
 // --- TREANT 2.5D (buddy: a árvore andante) ---
 // A árvore do Wicked Oak depois da Ancient Grove: sai andando e luta. Duas pernas de raiz com passos pesados (a passada vem do
@@ -82,18 +88,49 @@ function body(rig, pose) {
             }
             ball([1.2, S.trunkWidth * 0.34, top[2] - 0.6], 1.4, C.moss);
             ball([1.4, -S.trunkWidth * 0.22, base[2] + 3], 1.1, C.moss);
-            // Cara entalhada no alto do tronco: sobrancelhas franzidas, olhos âmbar brilhando e uma boca funda
-            const fz = S.chestHeight - 4.2 + bounce;
+            // Cara entalhada no tronco, mais baixa que o pescoço: vista de cima, a copa cobre o alto do tronco, e uma cara lá
+            // em cima nunca aparecia. Um oco escuro, sobrancelhas pesadas e franzidas, olhos âmbar com pupila em fenda, um nó
+            // de madeira no lugar do nariz, uma boca em fenda com dentes de lasca, barba de musgo e um broto na testa.
+            const fz = S.chestHeight - S.faceDrop + bounce;
             const front = S.trunkWidth * 0.5;
-            for (const side of [-1, 1]) {
-                const eye = [front, side * 2.2, fz];
-                if (!facesCamera(rig, eye, [0, 0, fz], 0.1)) continue;
-                limb([[front - 0.2, side * 3.6, fz + 1.6], [front, side * 1.2, fz + 0.9]], 0.75, C.ink);
-                glowAt(rig, eye, C.eyeGlow, 3.4, 0.9);
-                ball(eye, 0.85, C.eye);
+            const u = S.faceScale;
+            const f = (a, b, z) => [front + a, b * u, fz + z * u];                 // ponto na cara (a: para fora, b: lado, z: altura)
+            if (facesCamera(rig, f(0, 0, 0), [0, 0, fz], 0.1)) {
+                // O oco: o rosto afundado na casca, mais largo em cima e fechando para o queixo
+                ball(f(-0.2, 0, 0.4), 3.9 * u, C.barkDark);
+                ball(f(-0.2, 0, -2.4), 3 * u, C.barkDark);
+                ball(f(-0.1, 0, 2.6), 3 * u, C.barkDark);
+                for (const side of [-1, 1]) {
+                    // Sobrancelha: um bloco escuro com a quina de cima clara, descendo para o meio (cara de bravo)
+                    limb([f(0, side * 4.6, 2.9), f(0.5, side * 0.8, 1.2)], 1.9 * u, C.ink);
+                    limb([f(0.2, side * 4.4, 3.5), f(0.7, side * 1, 1.9)], 0.75 * u, C.barkLight);
+                    // Olho: órbita escura, brilho âmbar e a pupila em fenda
+                    const eye = f(0.5, side * 2.4, 0.3);
+                    ball(eye, 1.55 * u, C.ink);
+                    glowAt(rig, eye, C.eyeGlow, 2.7 * u, 0.8);
+                    ball(eye, 1.05 * u, C.eye);
+                    limb([f(0.75, side * 2.4, 0.9), f(0.75, side * 2.4, -0.3)], 0.32 * u, C.ink);
+                    // Bochecha: um nó e uma cicatriz na casca
+                    ball(f(0.2, side * 4.2, -2), 0.9 * u, C.barkLight);
+                    limb([f(0.1, side * 3.4, -3.4), f(0.1, side * 4.6, -4.6)], 0.4 * u, C.barkDark);
+                }
+                // Nariz: um nó grosso de madeira, com sombra embaixo
+                ball(f(0.7, 0, -1.6), 1.15 * u, C.ink);
+                ball(f(0.95, 0, -1.3), 0.95 * u, C.barkLight);
+                // Boca: uma fenda larga e torta, com dentes de lasca para cima e para baixo
+                const m = -4.3;
+                limb([f(0.2, -3.4, m + 0.9), f(0.35, -1.8, m - 0.1), f(0.4, 0, m - 0.5), f(0.35, 1.8, m - 0.1), f(0.2, 3.4, m + 0.9)], 1.8 * u, C.mouth);
+                for (const k of [-2.4, -0.9, 0.9, 2.4]) {
+                    const sag = Math.abs(k) * 0.12;
+                    limb([f(0.55, k, m + 0.45 - sag), f(0.55, k * 1.02, m - 0.55 - sag)], 0.55 * u, C.tooth);
+                }
+                // Barba de musgo caindo do queixo
+                for (const k of [-2.6, -1.2, 0, 1.2, 2.6]) limb([f(0.3, k, m - 1.1), f(0.15, k * 1.1, m - 3.0 - (1 - Math.abs(k) / 3) * 1.2)], 0.7 * u, C.moss);
+                // Broto na testa: um galhinho com duas folhas
+                limb([f(0.1, 0, 3.6), f(-0.2, 0.7, 5.4)], 0.5 * u, C.barkDark);
+                ball(f(-0.2, 0.7, 5.5), 0.9 * u, C.leafLight);
+                ball(f(-0.2, -0.5, 4.9), 0.7 * u, C.leaf);
             }
-            const mouth = [front, 0, fz - 3.3];
-            if (facesCamera(rig, mouth, [0, 0, fz], 0.1)) limb([[front, -2.2, fz - 3.1], [front + 0.1, 0, fz - 3.8], [front, 2.2, fz - 3.1]], 1.05, C.mouth);
         }
     };
 }
@@ -128,10 +165,76 @@ function parts(pose, rig) {
     return order;
 }
 
-registerCreature('buddy_treant', S, parts);
+// --- A VERSÃO EM SPRITES (a que vale no jogo, para o monstro e para o buddy) ---
+// treant_atlas.webp foi gravado do Treant 3D do laboratório (tools/lab/treant_foto.js?bake=1, noite): 8 direções (linhas, de 45 em 45 graus,
+// começando para a direita e girando para baixo) x 10 quadros (colunas): 6 de passada e 4 de soco. Se a imagem ainda não carregou,
+// vale a versão em bolas e galhos que está mais acima, que continua aqui como reserva.
+const ATLAS = { walk: 6, punch: 4, dirs: 8, size: 176 };
+const atlas = new Image();
+atlas.src = new URL('./treant_atlas.webp', import.meta.url).href;
+const ready = () => atlas.complete && atlas.naturalWidth > 0;
+const sprites = new WeakMap();
+const dirOf = (angle) => Math.round((((angle % TAU) + TAU) % TAU) / TAU * ATLAS.dirs) % ATLAS.dirs;
+const colOf = (swingK, phase) => swingK > 0.02 ? ATLAS.walk + Math.min(ATLAS.punch - 1, Math.ceil(swingK * ATLAS.punch) - 1) : Math.floor(phase) % ATLAS.walk;
+
+// Peça única com o sprite, para quem desenha pelo boneco (Ateliê, outros jogos)
+function spriteRigPart(rig) {
+    const c0 = rig.project(0, 0, 0);
+    const c1 = rig.project(0, 0, 1);
+    const unit = Math.hypot(c1.x - c0.x, c1.y - c0.y);
+    return {
+        depth: c0.depth,
+        draw() {
+            const phase = (((rig.anim.stride % TAU) + TAU) % TAU) / TAU * ATLAS.walk;
+            const size = unit * S.spriteUnits;
+            const at = rig.project(0, 0, S.center);
+            ctx.drawImage(atlas, colOf(swingNow(), phase) * ATLAS.size, dirOf(rig.anim.facing) * ATLAS.size, ATLAS.size, ATLAS.size, at.x - size / 2, at.y - size / 2 + size * S.spriteLift, size, size);
+        }
+    };
+}
+// A versão ANTIGA (bolas e galhos), guardada para comparar no Ateliê (tuner.html?model=treant_classico): sempre desenha as peças, nunca o sprite
+registerCreature('treant_classico', S, parts);
+
+registerCreature('buddy_treant', S, (pose, rig) => ready() ? [spriteRigPart(rig)] : parts(pose, rig));
+
+// Um quadro parado (corpo que tomba na morte): desenha no ponto (0, 0) do contexto atual, no tamanho de um monstro de raio radius
+export function treantStill(facing, radius) {
+    if (!ready()) return false;
+    const size = radius * S.spriteScale;
+    ctx.drawImage(atlas, 0, dirOf(facing) * ATLAS.size, ATLAS.size, ATLAS.size, -size / 2, -size / 2 + size * S.spriteLift, size, size);
+    return true;
+}
 
 export function renderTreant25D(e) {
-    swing = e.swing ?? 0;
-    renderMonster25D(e, 'buddy_treant', S);
-    swing = null;
+    if (!ready()) {
+        swing = e.swing ?? 0;
+        renderMonster25D(e, 'buddy_treant', S);
+        swing = null;
+        return;
+    }
+    const now = renderNow();
+    let st = sprites.get(e);
+    if (!st) sprites.set(e, st = { x: e.x, y: e.y, phase: Math.random() * ATLAS.walk });
+    const dist = Math.hypot(e.x - st.x, e.y - st.y);
+    st.x = e.x; st.y = e.y;
+    if (host.animating()) st.phase = (st.phase + dist / S.pixelsPerCycle * ATLAS.walk) % ATLAS.walk;
+    if (e.bakeFrame !== undefined) st.phase = e.bakeFrame * ATLAS.walk;
+    const size = e.radius * S.spriteScale;
+    if (!e.baking) {
+        drawGlow(ctx, S.colors.aura, e.x, e.y, size * 0.5, S.auraAlpha);
+        // Sombra mole presa aos pés
+        ctx.save();
+        ctx.translate(e.x, e.y + size * S.spriteFeet);
+        ctx.scale(1, 0.5);
+        const sh = ctx.createRadialGradient(0, 0, 0, 0, 0, size * S.shadowRadius);
+        sh.addColorStop(0, 'rgba(0, 0, 0, 0.5)');
+        sh.addColorStop(0.6, 'rgba(0, 0, 0, 0.28)');
+        sh.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = sh;
+        ctx.beginPath();
+        ctx.arc(0, 0, size * S.shadowRadius, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+    }
+    ctx.drawImage(atlas, colOf(e.swing ?? 0, st.phase) * ATLAS.size, dirOf(e.angle) * ATLAS.size, ATLAS.size, ATLAS.size, e.x - size / 2, e.y - size / 2 + size * S.spriteLift, size, size);
 }

@@ -58,6 +58,8 @@ Detalhes: [02_plano_de_acao.md](02_plano_de_acao.md) · números: [04_progresso.
 - [x] +1 ponto de skill no início (5 níveis)
 - [x] tela inicial mostra os pontos iniciais ao lado da Escuridão, entre parênteses
 - [x] tocha mais forte (5 níveis)
+- [x] Torch's Call: a segunda chance da tocha virou melhoria do Altar (160 Brasas); sem ela, morreu morreu
+- [x] ao morrer com Brasas para gastar, o Altar abre sozinho ("TRY AGAIN, BUT STRONGER") com botão HUNT AGAIN
 - [x] 1ª compra possível depois de 1 noite (8 Brasas por noite, a 1ª melhoria custa 10)
 - [ ] balanceamento conferido (jogar com tudo no máximo; valores em `data_model/embers.js`)
 

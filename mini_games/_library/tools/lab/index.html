@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório · escolha o monstro</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #07090c; color: #d6cfbf; font-family: system-ui, sans-serif; }
+        .wrap { max-width: 920px; margin: 0 auto; padding: 28px 16px 60px; }
+        .back { color: #fbbf24; text-decoration: none; font-size: 14px; }
+        h1 { margin: 14px 0 4px; font-size: 28px; color: #fdba74; }
+        .lead { margin: 0 0 24px; color: #8b93a0; font-size: 15px; line-height: 1.5; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+        a.card { display: flex; flex-direction: column; gap: 8px; padding: 0 0 14px; overflow: hidden; text-decoration: none; color: inherit; background: #10141b; border: 1px solid #232a35; border-radius: 14px; transition: border-color .12s, transform .12s; }
+        a.card:hover, a.card:focus-visible { border-color: #fbbf24; transform: translateY(-2px); outline: none; }
+        .thumb { height: 180px; background-size: cover; background-position: center top; border-bottom: 1px solid #232a35; display: grid; place-items: center; font-size: 56px; }
+        .card b { padding: 0 16px; font-size: 19px; color: #fde68a; }
+        .card span { padding: 0 16px; font-size: 13px; color: #98a1ae; line-height: 1.45; }
+        .card em { padding: 0 16px; margin-top: auto; font-style: normal; font-size: 12px; color: #6b7482; }
+        .note { margin-top: 26px; padding: 12px 14px; font-size: 13px; line-height: 1.6; color: #8b93a0; background: #0b0e13; border: 1px solid #232a35; border-radius: 10px; }
+        code { color: #c9c0aa; }
+    </style>
+</head>
+<body>
+    <!-- Escolha de monstro do laboratório (fora dos jogos). Para ligar um monstro novo: um cartão aqui e uma página <nome>_foto.html. -->
+    <div class="wrap">
+        <a class="back" href="../index.html">← Ateliê</a>
+        <h1>Laboratório</h1>
+        <p class="lead">Monstros 3D feitos só por código (WebGL), para ver o resultado final antes de levar ao jogo. Escolha qual abrir. Cada um tem caixas para ligar e desligar as técnicas de fotorrealismo.</p>
+        <div class="cards">
+            <a class="card" href="monstro_foto.html">
+                <div class="thumb" style="background-image:url('exemplos/golem_tudo_ligado.png')"></div>
+                <b>Golem de Brasa e Musgo</b>
+                <span>Gigante de pedra rachada com lava nas frestas, musgo e um núcleo brilhando. Ambiente de fim de tarde. Já está no jogo.</span>
+                <em>monstro_foto.html</em>
+            </a>
+            <a class="card" href="treant_foto.html">
+                <div class="thumb" style="background-image:url('exemplos/treant_noite.png')">🌳</div>
+                <b>Treant (árvore andante, a do jogo)</b>
+                <span>A árvore guardiã com copa de folhas e rosto simpático. Floresta escura de noite, com luar, vagalumes e névoa, como o jogo.</span>
+                <em>treant_foto.html</em>
+            </a>
+            <a class="card" href="treant_esguio.html">
+                <div class="thumb" style="background-image:url('exemplos/treant_esguio_noite.png')">🌲</div>
+                <b>Treant esguio (alternativa)</b>
+                <span>Versão remodelada como árvore fina e alta: tronco esguio, braços de galho e copa larga. Guardada para uso futuro; o jogo usa o Treant acima.</span>
+                <em>treant_esguio.html · atlas pronto em exemplos/treant_esguio_atlas.webp</em>
+            </a>
+        </div>
+        <p class="note">Abra pelo servidor local: na pasta <code>mini_games</code>, <code>python3 -m http.server 8010</code>, e <code>http://localhost:8010/_library/tools/lab/</code>.
+            Detalhes em <code>README.md</code> e <code>metodologia_fotorrealismo.md</code> nesta pasta.</p>
+    </div>
+</body>
+</html>

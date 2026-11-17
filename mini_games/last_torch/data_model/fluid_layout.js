@@ -45,10 +45,10 @@ export const FLUID_LAYOUT = {
           hud: {heroCard: [-4.92, -3.26, 0.88], btnPause: [-21.06, 0.67, 1], hudButtons: [-11.43, -1.19, 1.2801], bossHpContainer: [-42.22, -9.79, 1.3793], hudBottom: [0.0, 0.0, 1], hudScore: [-16.35, 121.82, 1.4501], hudStreak: [-25.49, -0.22, 1.36]},
           ctl: {joystick: [122.77, 97.61, 63.34], knifeButton: [92.98, 82.79, 88.91], dashButton: [61.89, 175.36, 156.52]} },
         { at: 1280, screen: '1280x720',
-          hud: {heroCard: [0.0, 0.0, 1], btnPause: [0.0, 0.0, 1], hudButtons: [0.0, 0.0, 1], bossHpContainer: [-488.66, -10.92, 1.4759], hudBottom: [-7.03, 5.04, 0.89], hudScore: [-10.45, 74.67, 1.3562], hudStreak: [-34.63, -43.89, 1.6239]},
+          hud: {heroCard: [-6.54, -0.0, 0.82], btnPause: [-24.58, 1.79, 0.9601], hudButtons: [-17.41, 1.06, 0.8301], bossHpContainer: [-488.65, -10.92, 1.4759], hudBottom: [-7.03, 5.04, 0.89], hudScore: [-10.45, 74.67, 1.3562], hudStreak: [-34.63, -43.89, 1.6239]},
           ctl: {} },
         { at: 1920, screen: '1920x1080',
-          hud: {heroCard: [73.73, 20.1, 1.42], btnPause: [143.44, 22.07, 1.7401], hudButtons: [194.02, 22.61, 2.1701], bossHpContainer: [-822.03, 3.19, 2.069], hudBottom: [0.0, 0.0, 1], hudScore: [-27.33, 113.43, 1.7701], hudStreak: [-65.55, -19.66, 1.9199]},
+          hud: {heroCard: [73.73, 20.1, 1.2638], btnPause: [143.44, 22.07, 1.4966], hudButtons: [200.27, 25.4, 1.671], bossHpContainer: [-822.02, 3.19, 1.7794], hudBottom: [0.0, 0.0, 1], hudScore: [-27.33, 113.43, 1.7701], hudStreak: [-65.55, -19.66, 1.9198]},
           ctl: {} }
     ] }
 };

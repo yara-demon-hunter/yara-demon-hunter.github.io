@@ -35,13 +35,24 @@ function drawTorso(rig, pose, bottom, top, wb, wt) {
         limb([[top.a - top.A, 0, top.z - 0.5], [bottom.a - bottom.A, 0, bottom.z + 1]], 0.6, C.skinShade);
         return;
     }
-    // Peitorais (luz), o sulco do meio e o abdômen
-    for (const side of [-1, 1]) ball([top.a + top.A * 0.75, side * top.B * 0.55 * S.chestWiden, top.z - 2.4], 2.3, C.skinLight);
-    limb([[top.a + top.A, 0, top.z - 1], [bottom.a + bottom.A, 0, bottom.z + 1]], 0.4, C.skinShade);
-    for (const z of [0.3, 0.5]) {
-        const zz = bottom.z + (top.z - bottom.z) * z;
-        limb([[bottom.a + bottom.A, -1.6, zz], [bottom.a + bottom.A * 1.05, 0, zz - 0.2], [bottom.a + bottom.A, 1.6, zz]], 0.3, C.skinShade);
+    // Peito em blocos (nada de curva, que lembrava um busto): duas placas retas de peitoral, com uma faixa de sombra embaixo,
+    // o sulco do meio e o abdômen em quadrados, 2 colunas por 3 linhas. t vai de 0 (quadril) a 1 (ombros).
+    const front = (t) => bottom.a + bottom.A + (top.a + top.A - bottom.a - bottom.A) * t;
+    const half = (t) => (bottom.B + (top.B * S.chestWiden - bottom.B) * t) * 0.9;
+    const zAt = (t) => bottom.z + (top.z - bottom.z) * t;
+    const slab = (side, t0, t1, b0, b1, fill, stroke, width) => poly(rig, [
+        [front(t0), side * b0, zAt(t0)], [front(t0), side * b1(t0), zAt(t0)],
+        [front(t1), side * b1(t1), zAt(t1)], [front(t1), side * b0, zAt(t1)]
+    ], fill, stroke, width);
+    for (const side of [-1, 1]) {
+        slab(side, 0.88, 0.58, 0.45, (t) => half(t) * 0.86, C.skinLight, C.skinShade, 0.4);
+        slab(side, 0.58, 0.51, 0.45, (t) => half(t) * 0.86, C.skinShade, null);           // a borda de baixo da placa
+        for (let row = 0; row < 3; row++) {
+            const t0 = 0.45 - row * 0.15;
+            slab(side, t0, t0 - 0.12, 0.45, (t) => half(t) * 0.62, C.skin, C.skinShade, 0.3);
+        }
     }
+    limb([[front(0.95), 0, zAt(0.95)], [front(0.04), 0, zAt(0.04)]], 0.5, C.skinShade);
 }
 
 // Asas e cauda (as "costas" do boneco)

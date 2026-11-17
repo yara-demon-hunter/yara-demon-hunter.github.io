@@ -16,6 +16,7 @@ export const TREANT_25D_VISUALS = {
         leafDark: '#1b5a2c',
         leafLight: '#74d66b',
         eye: '#fbbf24',
+        tooth: '#e8d8b0',
         eyeGlow: 'rgba(251, 191, 36, 0.95)',
         mouth: '#140a04',
         ink: '#120a05',
@@ -32,6 +33,10 @@ export const TREANT_25D_VISUALS = {
     stride: 4.2,
     footLift: 2.4,
     bounce: 0.5,
+    // Cara (treant25d.js, body): faceDrop = quanto ela desce do alto do tronco (a copa cobre o alto, vista de cima) e
+    // faceScale = o tamanho dela
+    faceDrop: 8.6,
+    faceScale: 1.3,
     // Braços de galho
     armWidth: 2.6,
     armLength: 15,
@@ -39,6 +44,15 @@ export const TREANT_25D_VISUALS = {
     crownHeight: 33,
     crownRadius: 8.5,
     crownBlobs: 9,
+
+    // Versão em sprites (treant25d.js): tamanho da imagem em raios do monstro, quanto sobe e onde ficam os pés (frações do tamanho), sombra,
+    // px andados por passo e tamanho em unidades do boneco (Ateliê)
+    spriteScale: 6.7,
+    spriteLift: -0.06,
+    spriteFeet: 0.21,
+    shadowRadius: 0.16,
+    pixelsPerCycle: 8,
+    spriteUnits: 34,
 
     auraRadius: 22,
     auraAlpha: 0.2,

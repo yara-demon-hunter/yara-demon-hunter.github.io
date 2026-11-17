@@ -132,6 +132,7 @@ export const state = {
 
     // Efeitos (js/systems/effects.js, desenhados em js/render/effects.js)
     gibs: [],
+    corpses: [],               // corpos que tombam ao morrer (Treant)
     stains: [],
     shockwaves: [],
     floaters: [],

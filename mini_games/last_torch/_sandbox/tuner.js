@@ -49,7 +49,7 @@ const ELEMENTS = [
 const PRESETS = [
     ['Portrait · phone 390×844', 390, 844, true],
     ['Landscape · phone 844×390', 844, 390, true],
-    ['Desktop 1280×720', 1280, 720, false]
+    ['Desktop 1920×1080', 1920, 1080, false]
 ];
 
 const keyOf = (w, h, touch) => `${w}x${h}${touch ? 't' : 'd'}`;

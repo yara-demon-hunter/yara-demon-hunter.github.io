@@ -19,7 +19,7 @@ import { HERO_25D_VISUALS } from '../../library/characters/hunter/hero25d_visual
 import { passives, player } from '../core/state.js';
 import { getHero } from '../systems/modifiers.js';
 import {
-    renderClearWave, renderDawn, renderFloaters, renderGibs, renderScreenFlash,
+    renderClearWave, renderDawn, renderCorpses, renderFloaters, renderGibs, renderScreenFlash,
     renderShockwaves, renderStains, renderTelegraphs, renderTorchAlarm, renderWarmth
 } from './effects.js';
 import { setWorldView } from './fx/stamp.js';
@@ -173,6 +173,7 @@ export function render() {
     renderGoldDrops();
     renderPickups();
     renderBladeSlashes();
+    renderCorpses();
     renderEnemyProjectiles();
     // A tocha continua sendo o corte de profundidade; em cada lado, herói e inimigos são ordenados juntos pelo Y do chão.
     const heroBehind = !player.hidden && player.y < state.coreY;

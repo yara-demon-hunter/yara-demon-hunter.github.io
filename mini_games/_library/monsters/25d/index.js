@@ -25,7 +25,9 @@ import { renderVampire25D } from './vampire/vampire25d.js';
 import { DEMON_LORD_25D_VISUALS } from './demon_lord/demon_lord25d_visual.js';
 import { renderDemonLord25D } from './demon_lord/demon_lord25d.js';
 import { TREANT_MONSTER_25D_VISUALS } from './treant/treant25d_visual.js';
-import { renderTreantMonster25D } from './treant/treant25d.js';
+import { renderTreantMonster25D, treantStill } from './treant/treant25d.js';
+import { GOLEM_25D_VISUALS } from './golem/golem25d_visual.js';
+import { renderGolem25D, golemStill } from './golem/golem25d.js';
 
 // --- OS MONSTROS 2.5D, EM UM LUGAR SÓ ---
 // id da pasta (monsters/25d/<id>) → { visuals: medidas e cores, render: desenha a partir do monstro do jogo }.
@@ -44,7 +46,8 @@ export const MONSTERS_25D = {
     bone_colossus: { visuals: BONE_COLOSSUS_25D_VISUALS, render: renderBoneColossus25D },
     vampire: { visuals: VAMPIRE_25D_VISUALS, render: renderVampire25D },
     demon_lord: { visuals: DEMON_LORD_25D_VISUALS, render: renderDemonLord25D },
-    treant: { visuals: TREANT_MONSTER_25D_VISUALS, render: renderTreantMonster25D }
+    treant: { visuals: TREANT_MONSTER_25D_VISUALS, render: renderTreantMonster25D, still: treantStill },
+    golem: { visuals: GOLEM_25D_VISUALS, render: renderGolem25D, still: golemStill }
 };
 
 export { knightHeadPosition25D };

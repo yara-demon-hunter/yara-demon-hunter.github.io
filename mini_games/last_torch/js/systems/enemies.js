@@ -8,7 +8,7 @@ import { audio, passives, player, shadowClones, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { updateBossAI, updateShadowAI } from './boss_ai.js';
 import { dealDamage } from './damage.js';
-import { addGibs, addShockwave, addStain, createExplosion, hitStop, shakeScreen, zoomPunch } from './effects.js';
+import { addCorpse, addGibs, addShockwave, addStain, createExplosion, hitStop, shakeScreen, zoomPunch } from './effects.js';
 import { dropGold } from './gold.js';
 import { mod } from './modifiers.js';
 import { checkHourEnd, onBossKilled } from './night.js';
@@ -286,6 +286,7 @@ function deathEffects(e, model) {
     }
     addGibs(e.type, e.x, e.y, scale);
     addStain(e.type, e.x, e.y, e.radius * 1.1);
+    addCorpse(e);
 }
 
 function removeEnemy(i, e) {

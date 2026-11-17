@@ -75,7 +75,7 @@ export const STAT_GROUPS = [
             { attr: 'playerHp' },
             { icon: '🛡️', name: 'Damage Taken', note: 'Every hit on you lands this much softer.', amount: () => 1 - getDamageTakenRatio(), format: reduction },
             { icon: '🍖', name: 'Heal per Kill', note: 'Health you recover with every kill.', amount: getKillHeal, format: (n) => `+${n.toFixed(1)}` },
-            { icon: '📿', name: 'Revives Left', note: 'Times you can still rise when you fall.', amount: () => state.revives + (state.secondWind && save.darkness <= CORE_MODEL.secondWind.maxDarkness ? 1 : 0), format: whole },
+            { icon: '📿', name: 'Revives Left', note: 'Times you can still rise when you fall.', amount: () => state.revives + (state.secondWind ? 1 : 0), format: whole },
             modRow('thorns', '🌵', 'Thorns', 'Monsters that touch you take this share of your damage.', plain),
             modRow('provoke', '📣', 'Monster Lure', 'Monsters leave the torch to chase you from farther away.')
         ]

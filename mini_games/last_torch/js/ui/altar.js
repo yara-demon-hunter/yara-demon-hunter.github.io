@@ -1,6 +1,6 @@
 import { ALTAR, ALTAR_KEYS, altarCost, altarLevel, altarMaxLevel } from '../../data_model/embers.js';
 import { save, persist } from '../core/save.js';
-import { audio } from '../core/state.js';
+import { audio, state } from '../core/state.js';
 import { renderStartScreen } from './screens.js';
 import { showToast } from './banner.js';
 
@@ -51,20 +51,45 @@ export function buyUpgrade(key) {
     showToast(ALTAR[key].icon, `${ALTAR[key].name} ${save.altar[key]}/${altarMaxLevel(key)}`, 'Active from the next night');
 }
 
-export function openAltar() {
-    document.getElementById('altarScreen').classList.remove('hidden');
+// retry: o Altar abre por cima da tela de fim da noite ("tente de novo, mais forte"): tem o botão HUNT AGAIN e, ao fechar,
+// volta ao resumo em vez de ir ao menu
+let retry = false;
+const $ = (id) => document.getElementById(id);
+
+export function openAltar({ retry: afterNight = false } = {}) {
+    retry = afterNight;
+    const won = state.run?.victory;
+    $('altarEyebrow').textContent = afterNight ? (won ? 'THE LIGHT HOLDS' : 'THE FLAME REMEMBERS') : 'THE FLAME REMEMBERS';
+    $('altarTitle').textContent = afterNight ? (won ? 'COME BACK STRONGER' : 'TRY AGAIN, BUT STRONGER') : 'ALTAR';
+    $('altarSub').textContent = afterNight
+        ? 'Spend your embers on upgrades that last, then hunt again.'
+        : 'Every night earns embers, even the ones you lose. Spend them on upgrades that last.';
+    $('btnAltarRetry').classList.toggle('hidden', !afterNight);
+    $('altarScreen').classList.remove('hidden');
     renderAltar();
     audio.init();
     audio.setMood('camp');
 }
 
 export function closeAltar() {
-    document.getElementById('altarScreen').classList.add('hidden');
+    $('altarScreen').classList.add('hidden');
+    if (retry) {
+        retry = false;
+        return;
+    }
     renderStartScreen();
     audio.setMood('menu');
 }
 
+// HUNT AGAIN: usa o mesmo botão da tela de fim da noite (recomeça com as melhorias novas)
+function huntAgain() {
+    $('altarScreen').classList.add('hidden');
+    retry = false;
+    $('btnRestart').click();
+}
+
 export function setupAltar() {
+    $('btnAltarRetry').addEventListener('click', huntAgain);
     document.getElementById('altarList').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-key]');
         if (button && !button.disabled) buyUpgrade(button.dataset.key);

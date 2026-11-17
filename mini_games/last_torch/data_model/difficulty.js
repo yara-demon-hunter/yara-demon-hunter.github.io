@@ -53,6 +53,7 @@ export const TURN_DIFFICULTY = {
         NECROMANCER: 6,
         HEADLESS_KNIGHT: 6,
         TREANT: 3,
+        GOLEM: 4,
         BONE_COLOSSUS: 8
     }
 };

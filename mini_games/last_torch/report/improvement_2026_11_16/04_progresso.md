@@ -124,9 +124,71 @@ Problema do dono: os ajustes viravam faixas por tamanho de tela, e uma tela entr
 
 Os 3 perfis de referência foram retocados: **desktop 1280×720** (barra do boss 107%, pontuação 114%, sequência 116%), **portrait 390×844** (joystick 93%, adaga 80%, dash deslocado) e **landscape 844×390** (barra do boss, pontuação 95%, sequência 117%). Só esses pontos mudaram na tabela `data_model/fluid_layout.js`; as demais telas e os outros pontos de referência ficaram iguais, e todas as telas intermediárias passam a acompanhar. O jogo carrega sem erros nas três telas. Não verificado: celular real.
 
+## 17/11/2026 — Segunda chance no Altar e Altar na morte
+
+- **Torch's Call (Altar, 160 Brasas, 1 nível):** a segunda chance da tocha (uma vez por noite ela gasta 25% da chama e traz o herói de volta) deixou de ser automática. Sem comprar, morreu morreu; comprada, vale em qualquer Escuridão (o limite de Escuridão 1 foi removido).
+- **Altar na morte:** depois de um instante no resumo, se há Brasas para gastar, o Altar abre sozinho com "TRY AGAIN, BUT STRONGER" e um botão HUNT AGAIN; fechar volta ao resumo. Se o prêmio de um herói liberado está na tela, o Altar espera o jogador fechá-lo. Não abre na vitória nem sem Brasas. O botão ALTAR do resumo abre o mesmo modo.
+- **Verificado** no Chrome: sem a melhoria não há segunda chance, com ela há; o Altar abre na morte, depois do prêmio do herói; comprar e HUNT AGAIN recomeça na onda 1 com a compra no save; na vitória não abre sozinho; sem erros. Não testado: a segunda chance em si durante uma queda real (só a condição de ela valer).
+
+## 17/11/2026 — Retoque do desktop 1280×720 no tuner
+
+Cartão do herói (82%, −6,5 px), medalhão (96%, −24,6 px) e botão de ajustes (83%, −17,4 px) reajustados. Só o ponto de referência 1280×720 do perfil desktop mudou na tabela; os demais pontos e perfis ficaram iguais, e as telas desktop intermediárias acompanham.
+
+## 17/11/2026 — Desktop 1920×1080 passa a ser a tela de referência do desktop
+
+O dono joga em 1920×1080, e o ajuste que fez no 1280×720 nunca chegava a ele (o jogo usa o ponto da largura exata; entre pontos interpola). O tuner agora usa **Desktop 1920×1080** como referência. Primeiro ajuste nele: cartão do herói 89%, medalhão 86%, botão de ajustes 77% (+6,25/+2,78 px) e barra do boss 86%; no ponto do 1920 isso dá cartão 126%, medalhão 150% e botão de ajustes 167% do tamanho original do CSS. O ponto do 1280×720 continua na tabela para janelas desse tamanho.
+
+## 17/11/2026 — Morte do Treant e quadro de morte no Ateliê
+
+O Treant só desaparecia. Agora o corpo **tomba** de lado, bate no chão com poeira, afunda e some, enquanto casca e folhas (que caem leves e balançam) voam e deixam uma mancha verde-escura. A definição de morte de todos os monstros 2.5D foi para a biblioteca (`_library/monsters/25d/death.js`), e o Last Torch passou a lê-la de lá; no Ateliê, o tuner de **Monstros** ganhou o painel **Morte** (vista "Morrendo", botão ▶ Morrer, repetir, ajuste de pedaços/queda/poeira e "Copiar morte"). Verificado no Chrome: o Treant cria o corpo e os pedaços (casca e folha), o esqueleto continua soltando ossos, o painel edita e copia, sem erros. Não verificado: o impacto no desempenho em celular fraco (o corpo é 1 sprite, no máximo 8 de cada vez, desligado no menor nível de detalhe).
+
+## 17/11/2026 — Peito do Demon Lord em blocos
+
+As duas bolas claras do peito (que lembravam um busto) viraram duas placas retas de peitoral, com faixa de sombra embaixo e o sulco do meio, e o abdômen ficou em quadrados (2 colunas por 3 linhas). Mudança em `_library/monsters/25d/demon_lord/demon_lord25d.js` (função `drawTorso`), sincronizada com o Last Torch e o yara-rpg. Verificado no Ateliê (vista de frente, antes e depois). Não verificado: o aspecto dentro do jogo em movimento.
+
+## 17/11/2026 — Mais explosão na morte do Treant e ossos no lobo zumbi
+
+A morte do Treant ganhou **toras** de madeira (cilindro com a face cortada), mais casca e 26 folhas, todas saindo mais rápidas e mais altas ("explodindo"), além da queda do tronco; o **lobo zumbi** passou a soltar ossos (6) junto das lascas. O limite de pedaços ao mesmo tempo subiu de 44/26/12 para 64/40/14 (por nível de detalhe), porque no nível do celular o Treant sozinho passava do teto e cortava as folhas. Tudo na biblioteca (`death.js`) e ajustável no painel "Morte" do Ateliê. Verificado no jogo: toras, cascas, folhas e ossos aparecem; sem erros. Não verificado: desempenho em celular fraco com vários pedaços.
+
+## 17/11/2026 — Rosto novo do Treant
+
+O rosto do Treant foi refeito e **desceu no tronco**: vista de cima pela câmera do jogo, a copa cobria o alto do tronco e a cara antiga (dois pontinhos e um risco) nunca aparecia. Agora tem um oco escuro, sobrancelhas pesadas e franzidas, olhos âmbar com pupila em fenda, nariz de nó de madeira, boca em fenda com dentes de lasca, barba de musgo e um broto na testa (`faceDrop` e `faceScale` em `treant25d_visual.js`). É o mesmo desenho do buddy, então o buddy também mudou. Verificado no Ateliê (de perto e no tamanho do jogo) e no jogo, com o Treant virado para a câmera. O rosto só se vê quando ele vem de cima para baixo; de costas, aparece a copa. Não verificado: celular real.
+
 ## Decisão do dono (17/11)
 
 Sem tutorial de joystick/dash: a interface é simples. Os itens "primeiros monstros mais fracos" e "primeiro nível em 15 s" ficam para depois de o dono jogar o pacote e dizer se o começo está difícil ou lento. A Fase 2 está feita no que importa.
 
 ## Próximo passo
 Fase 2: primeiro minuto no celular. Antes, jogar o pacote novo por uma noite para confirmar que nada quebrou, e enviar à CrazyGames.
+
+## 17/11/2026 — Laboratório de fotorrealismo (fora dos jogos)
+
+Criado `_library/tools/lab/` (só no Ateliê; o sync não copia, nenhum jogo é afetado): a metodologia das 7 técnicas (`metodologia_fotorrealismo.md`) e um monstro novo, o **Golem de Brasa e Musgo**, em WebGL/Three.js (copiado em `vendor/`, funciona sem internet) com liga/desliga por técnica. Feito: PBR procedural, triplanar, AO, instancing (Poisson), névoa, pós-processamento. Aproximado: GI, SSS, god rays. Fora: Gaussian Splatting e reflexos em tela. Verificado só em Chrome headless com WebGL por software, sem erros; não medi GPU real nem celular. Cartão "Laboratório" na página inicial do Ateliê.
+
+## 17/11/2026 — Golem de Brasa e Musgo entra no jogo (2.5D)
+
+Novo monstro **GOLEM** (wave 4+, até 2 vivos, 320 de vida +110 por turno, mesmo soco lento do Treant, bestiário "Ember Golem"). Arte em `_library/monsters/25d/golem/` (só bolas e membros do boneco 2.5D: pedra com luz em cima, musgo nos ombros/pés/cabeça, rachaduras de lava, núcleo e olhos com glow, chifres), com ficha em `art_reference/character.md` e painel no tuner (`?model=golem`). Morte: desmorona, tomba pouco e afunda, com **pedras** voando (nova forma `rock` em `death.js`), lascas de lava, folhas de musgo e poeira. Verificado no jogo (Chrome headless): aparece, anda, morre com pedras voando, sem erros. Não verificado: desempenho em celular, equilíbrio de dificuldade. De cima o golem lê como pedras empilhadas; cabeça e rosto aparecem melhor na câmera do Ateliê.
+
+## 17/11/2026 — Golem com a arte do laboratório (sprites animados)
+
+A versão em bolas ficou chapada. Agora o jogo usa **sprites gravados do golem 3D do laboratório** (`golem_atlas.webp`, 250 KB, 8 direções x 6 quadros de passada + 4 de soco): ele anda, vira para o lado que caminha, ergue os braços no soco e tomba na morte (o corpo que cai usa o mesmo sprite), com as pedras voando. A versão em bolas virou reserva. Para regravar: `tools/lab/bake_golem.py`. Verificado no jogo em Chrome headless, sem erros. Não verificado: celular real e equilíbrio. Limites: o bestiário ainda mostra a versão em bolas; a luz do sprite é fixa.
+
+## 17/11/2026 — Treant com a arte do laboratório (sprites animados, floresta de noite)
+
+Segundo personagem do laboratório: o **Treant** (`tools/lab/treant_foto.*`), numa floresta escura de noite (luar, vagalumes, névoa), com rosto simpático. Gravado em `buddies/treant/treant_atlas.webp` (235 KB, 8 direções x 6 passos + 4 de soco) e ligado ao jogo no mesmo molde do Golem: vale para o monstro e para o buddy; a versão em bolas é reserva; o corpo que tomba na morte usa o mesmo sprite (toras e folhas voando como antes). O laboratório ganhou uma tela de escolha (`tools/lab/index.html`) com os dois monstros. Verificado no jogo (Chrome headless): anda, morre tombando, sem erros. Não verificado: celular real; o Ateliê (tuner do buddy) usa o sprite pelo mesmo caminho do golem, mas só conferi o jogo.
+
+## 17/11/2026 — Treant de madeira e monstros gigantes mais lentos
+
+O Treant do laboratório trocou a casca de pedra rachada por **casca de madeira** (sulcos verticais compridos, cristas escuras e liquens; formas do tronco menos rochosas) e o atlas foi regravado. Velocidades (px/s, antes da escala da onda): Golem 8–11 → **4–5,5**, Treant 9–12 → **6–8**, Colosso de Ossos 22 → **14**. Medido no jogo (4 s, onda 5): Golem 15 px, Treant 27 px, Colosso 48 px, Esqueleto 231 px. A passada dos sprites (`pixelsPerCycle` 8) acompanha. Equilíbrio de dificuldade ainda por jogar.
+
+## 17/11/2026 — Treant magro e alto
+
+No laboratório (`treant_foto.js`) o Treant foi afinado (x 0,62, z 0,66) e esticado (y 1,3): mais comprido que largo; atlas regravado com enquadramento maior e `spriteScale` 8,3 (`treant25d_visual.js`), então fica uns 30% mais alto e uns 25% mais fino na tela. A versão antiga (`treant_classico`) não mudou. Verificado no jogo e no Ateliê.
+
+## 17/11/2026 — Treant remodelado como árvore esguia
+
+Espremer o modelo antigo deu uma "gorda fina". O Treant do laboratório foi **remodelado**: tronco fino e contínuo que afina para cima, um nó pequeno no tronco com o rosto simpático, braços de galho finos e contínuos (ombro, cotovelo, mão e gravetos), duas raízes finas como pernas e uma copa larga e aérea em cima (silhueta de árvore: tronco fino, copa grande). Atlas regravado (`spriteScale` 7,1). Verificado no laboratório, no Ateliê e no jogo. De cima, a copa cobre a maior parte do rosto.
+
+## 17/11/2026 — Volta o Treant robusto; o esguio fica guardado
+
+A pedido do dono, o jogo voltou ao Treant encorpado de casca de madeira (atlas regravado, medidas de sprite de antes). O Treant esguio ficou no laboratório (`treant_esguio.*`, cartão "alternativa") com o atlas pronto em `exemplos/treant_esguio_atlas.webp`.

@@ -101,7 +101,7 @@ function heroDown() {
 // para junto dela, com os monstros jogados para longe. Ensina o que a tocha é: a outra vida do jogador.
 function trySecondWind() {
     const W = CORE_MODEL.secondWind;
-    if (!state.secondWind || save.darkness > W.maxDarkness || state.coreHp <= 1) return false;
+    if (!state.secondWind || state.coreHp <= 1) return false;
     state.secondWind = false;
     state.run.revivesUsed++;
     const fromX = player.x;

@@ -402,7 +402,7 @@ export function renderEnemies(pass = null, splitY = 0, renderActor = null, actor
         // Sombras do rival: o mesmo boneco dele (js/render/rival.js)
         if (e.isBoss || e.shadowOwner) drawBoss(e);
         else if (getMonsterSprite(e.type).spec.live) {
-            if (USE_25D && e.type === 'TREANT') MONSTERS_25D.treant.render(e);
+            if (USE_25D && (e.type === 'TREANT' || e.type === 'GOLEM')) MONSTERS_25D[e.type.toLowerCase()].render(e);
             else (USE_25D ? MONSTERS_25D.bone_colossus.render : renderBoneColossus)(e);
         }
     }

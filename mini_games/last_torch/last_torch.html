@@ -495,14 +495,16 @@ permalink: /mini_games/last_torch/last_torch.html
     <div class="altar-panel">
         <header class="sanc-head">
             <div>
-                <p class="screen-eyebrow">THE FLAME REMEMBERS</p>
-                <h2 class="screen-title">ALTAR</h2>
+                <p id="altarEyebrow" class="screen-eyebrow">THE FLAME REMEMBERS</p>
+                <h2 id="altarTitle" class="screen-title">ALTAR</h2>
             </div>
             <div class="altar-embers">🔥 <b id="altarEmbers">0</b></div>
             <button id="btnCloseAltar" class="screen-close" aria-label="Close">✕</button>
         </header>
-        <p class="altar-sub">Every night earns embers, even the ones you lose. Spend them on upgrades that last.</p>
+        <p id="altarSub" class="altar-sub">Every night earns embers, even the ones you lose. Spend them on upgrades that last.</p>
         <div id="altarList" class="custom-scroll"></div>
+        <!-- Só aparece quando o Altar abre depois da morte (js/ui/altar.js): joga de novo na hora -->
+        <button id="btnAltarRetry" class="start-btn altar-retry hidden">HUNT AGAIN ▶</button>
     </div>
 </div>
 

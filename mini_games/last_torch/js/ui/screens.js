@@ -4,7 +4,7 @@ import { EVOLUTIONS } from '../../data_model/powers.js';
 import { preloadTreeImages, treeImageFor, paintIcon } from '../../data_model/tree_images.js';
 import { DARKNESS, getHourName, startingSkillPoints } from '../../data_model/night.js';
 import { START } from '../../data_model/start.js';
-import { ALTAR, ALTAR_KEYS, affordableCount, altarCost, altarStartPoints, emberTotal } from '../../data_model/embers.js';
+import { ALTAR, ALTAR_KEYS, affordableCount, altarCost, altarLevel, altarStartPoints, emberTotal } from '../../data_model/embers.js';
 import { save, persist } from '../core/save.js';
 import { clearRun, loadRun, saveRun } from '../core/run_save.js';
 import { HEROES } from '../../data_model/heroes.js';
@@ -114,6 +114,7 @@ export function startGame() {
     state.goldDrops = [];
     state.pickups = [];
     state.gibs = [];
+    state.corpses = [];
     state.stains = [];
     state.shockwaves = [];
     state.floaters = [];
@@ -135,7 +136,7 @@ export function startGame() {
 
     refreshModifiers();
     state.revives = mod('revives');
-    state.secondWind = true;       // a tocha traz o herói de volta uma vez por noite (CORE_MODEL.secondWind)
+    state.secondWind = altarLevel(save, 'torchCall') > 0;       // só quem comprou o Torch's Call no Altar (CORE_MODEL.secondWind)
     resetTorch();
 
     player.maxHp = getMaxPlayerHp();
@@ -253,6 +254,23 @@ function renderEmbers(earned) {
         : 'Keep hunting: embers buy permanent upgrades at the Altar';
     box.classList.toggle('can-buy', buyable.length > 0);
     document.getElementById('btnAltarSummary').classList.toggle('is-ready', buyable.length > 0);
+}
+
+// Morreu: depois de um instante no resumo, o Altar abre sozinho ("tente de novo, mais forte") se há Brasas para gastar.
+// Não abre na vitória. Se o prêmio de um herói liberado está na tela, espera o jogador fechá-lo (até ~1 minuto); e só abre
+// enquanto o jogador ainda está na tela do fim da noite (quem já apertou HUNT AGAIN não é interrompido).
+function openAltarAfterDeath(reason) {
+    if (reason === 'DAWN' || affordableCount(save) === 0) return;
+    let tries = 0;
+    const attempt = () => {
+        if (state.gameState !== 'GAMEOVER' || ++tries > 150) return;
+        if (document.querySelector('.hero-unlock')) {
+            setTimeout(attempt, 400);
+            return;
+        }
+        import('./altar.js').then(m => m.openAltar({ retry: true }));
+    };
+    setTimeout(attempt, 1800);
 }
 
 // Botão do Altar na tela inicial: mostra as Brasas e brilha quando há algo para comprar
@@ -385,6 +403,7 @@ export function triggerGameOver(reason) {
 
     renderEmbers(embersEarned);
     renderGoal();
+    openAltarAfterDeath(reason);
     document.getElementById('btnEndless').classList.toggle('hidden', reason !== 'DAWN');
     screen.classList.remove('hidden');
     audio.setMood(reason === 'DAWN' ? 'dawn' : 'menu');

@@ -2,6 +2,7 @@ import { LEVEL_UP_VISUALS } from '../../data_model/visuals/effects/level_up_visu
 import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
 import { save } from '../core/save.js';
 import { player, state } from '../core/state.js';
+import { groupsOf, setupGib, stepGib } from '../../library/monsters/25d/death.js';
 
 // --- EFEITOS VISUAIS (Partículas, Screen Shake e sensação de impacto) ---
 export function shakeScreen(intensity) {
@@ -138,31 +139,14 @@ export function addDamageNumber(x, y, value, crit = false, style = null) {
     );
 }
 
-// Pedaços que voam na morte: cada um tem altura (z), quica uma vez e fica no chão até sumir
+// Pedaços que voam na morte: cada um tem altura (z), quica uma vez e fica no chão até sumir. Um monstro pode ter mais de um
+// grupo de pedaços (o Treant solta casca e folhas); as formas e a física são da biblioteca (library/monsters/25d/death.js)
 export function addGibs(type, x, y, scale = 1) {
     const bits = J.deathBits[type];
     if (!bits) return;
-    const G = J.gibs;
-    const count = Math.min(Math.round(bits.count * scale), G.maxActive[state.quality] - state.gibs.length);
-    for (let i = 0; i < count; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = G.speedMin + Math.random() * (G.speedMax - G.speedMin);
-        const life = G.lifeMin + Math.random() * (G.lifeMax - G.lifeMin);
-        const g = freeGibs.pop() ?? {};
-        g.x = x;
-        g.y = y;
-        g.z = 6;
-        g.vx = Math.cos(angle) * speed;
-        g.vy = Math.sin(angle) * speed;
-        g.vz = G.liftMin + Math.random() * (G.liftMax - G.liftMin);
-        g.rotation = Math.random() * Math.PI * 2;
-        g.spin = (Math.random() - 0.5) * 16;
-        g.size = (2.2 + Math.random() * 3.4) * Math.min(1.6, 0.8 + scale * 0.2);
-        g.color = bits.colors[Math.floor(Math.random() * bits.colors.length)];
-        g.shape = bits.shape;
-        g.life = life;
-        g.maxLife = life;
-        state.gibs.push(g);
+    for (const group of groupsOf(bits)) {
+        const count = Math.min(Math.round(group.count * scale), J.gibs.maxActive[state.quality] - state.gibs.length);
+        for (let i = 0; i < count; i++) state.gibs.push(setupGib(freeGibs.pop() ?? {}, group, x, y, scale));
     }
 }
 
@@ -189,29 +173,52 @@ export function updateRealTimeEffects(dt) {
 }
 
 function updateGibs(dt) {
-    const G = J.gibs;
     const { gibs } = state;
     for (let i = gibs.length - 1; i >= 0; i--) {
-        const g = gibs[i];
-        g.life -= dt;
-        if (g.life <= 0) {
-            recycle(gibs, i, freeGibs);
-            continue;
-        }
-        if (g.z > 0 || g.vz > 0) {
-            g.x += g.vx * dt;
-            g.y += g.vy * dt;
-            g.z += g.vz * dt;
-            g.vz -= G.gravity * dt;
-            g.rotation += g.spin * dt;
-            if (g.z <= 0) {
-                g.z = 0;
-                g.vz = -g.vz * G.bounce;
-                g.vx *= 0.5;
-                g.vy *= 0.5;
-                g.spin *= 0.4;
-                if (g.vz < 26) g.vz = 0;
+        if (!stepGib(gibs[i], dt)) recycle(gibs, i, freeGibs);
+    }
+}
+
+// O corpo que TOMBA (Treant): o monstro sai de campo na hora, e esta cópia dele cai de lado, bate no chão com poeira, afunda e
+// some (library/monsters/25d/death.js: fall e dust). Poucos de cada vez e nada no menor nível de detalhe
+const MAX_CORPSES = 8;
+const freeCorpses = [];
+export function addCorpse(e) {
+    const bits = J.deathBits[e.type];
+    if (!bits?.fall || state.quality >= 2 || e.isBoss) return;
+    if (state.corpses.length >= MAX_CORPSES) freeCorpses.push(state.corpses.shift());
+    const c = freeCorpses.pop() ?? {};
+    c.x = e.x;
+    c.y = e.y;
+    c.type = e.type;
+    c.facing = e.facing ?? e.angle;
+    c.radius = e.radius;
+    c.fall = bits.fall;
+    c.dust = bits.dust;
+    c.age = 0;
+    c.landed = false;
+    c.dir = Math.random() < 0.5 ? -1 : 1;
+    state.corpses.push(c);
+}
+
+function updateCorpses(dt) {
+    const { corpses } = state;
+    for (let i = corpses.length - 1; i >= 0; i--) {
+        const c = corpses[i];
+        c.age += dt;
+        if (!c.landed && c.age >= c.fall.tiltSeconds) {
+            c.landed = true;
+            if (c.dust) {
+                const y = c.y + c.radius * 0.5;
+                addShockwave(c.x, y, { radius: c.radius * c.dust.radius, color: c.dust.color, width: c.dust.width, seconds: c.dust.seconds });
+                createExplosion(c.x, y, c.dust.color, 8);
             }
+            shakeScreen(2.5);
+        }
+        if (c.age >= c.fall.seconds) {
+            freeCorpses.push(c);
+            const last = corpses.pop();
+            if (i < corpses.length) corpses[i] = last;
         }
     }
 }
@@ -248,6 +255,7 @@ export function updateEffects(dt) {
     }
 
     updateGibs(dt);
+    updateCorpses(dt);
     updateList(state.shockwaves, dt);
     updateList(state.dashGhosts, dt);
     for (let i = floaters.length - 1; i >= 0; i--) {

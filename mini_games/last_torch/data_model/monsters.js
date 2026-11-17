@@ -241,8 +241,8 @@ export const MONSTER_MODELS = {
         maxAlive: 1,                     // no máximo um em campo
         hpBase: 650,
         hpPerTurn: 180,
-        speedMin: 22,
-        speedMax: 22,
+        speedMin: 14,
+        speedMax: 14,
         radius: 54,
         color: '#c9bfa3',
         damage: 40,
@@ -272,8 +272,8 @@ export const MONSTER_MODELS = {
         maxAlive: 2,
         hpBase: 250,
         hpPerTurn: 90,
-        speedMin: 9,
-        speedMax: 12,
+        speedMin: 6,
+        speedMax: 8,
         radius: 27,
         color: '#5b3b22',
         damage: 24,
@@ -288,6 +288,28 @@ export const MONSTER_MODELS = {
         xpRewardPerTurn: 5,
         // Soco lento de curto alcance: o braço se ergue sem aviso no chão e o dano chega no fim da preparação.
         punch: { cooldownSeconds: 4.8, windupSeconds: 1.35, strikeSeconds: 0.18, recoverySeconds: 0.55, range: 112, halfAngle: 0.52, damageMultiplier: 2.8 }
+    },
+    // Golem de Brasa e Musgo: gigante de pedra, lento e muito resistente; o mesmo soco do Treant. Só a partir da wave 4.
+    GOLEM: {
+        spawnWeight: 0.06,
+        maxAlive: 2,
+        hpBase: 320,
+        hpPerTurn: 110,
+        speedMin: 4,
+        speedMax: 5.5,
+        radius: 28,
+        color: '#6b625a',
+        damage: 26,
+        knockbackResist: 1,
+        immovable: true,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 80,
+        goldBase: 60,
+        goldVariance: 0.35,
+        xpRewardBase: 40,
+        xpRewardPerTurn: 6,
+        punch: { cooldownSeconds: 5, windupSeconds: 1.4, strikeSeconds: 0.18, recoverySeconds: 0.6, range: 115, halfAngle: 0.52, damageMultiplier: 2.9 }
     },
     // Necromante: fica longe e levanta esqueletos até alguém ir buscá-lo.
     NECROMANCER: {
@@ -330,7 +352,7 @@ export const BUDDY_MODELS = {
     BUDDY_TREANT: { radius: 18, color: '#5b3b22' }
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS', 'TREANT'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS', 'TREANT', 'GOLEM'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];

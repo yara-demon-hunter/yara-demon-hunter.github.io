@@ -80,12 +80,7 @@ export function setupButtons() {
     });
     on('btnCloseSanctuary', closeSanctuary);
     on('btnAltar', openAltar);
-    on('btnAltarSummary', () => {
-        document.getElementById('gameOverScreen').classList.add('hidden');
-        document.getElementById('startScreen').classList.remove('hidden');
-        state.gameState = 'START';
-        openAltar();
-    });
+    on('btnAltarSummary', () => openAltar({ retry: true }));
     on('btnCloseAltar', closeAltar);
     setupAltar();
     on('btnMenu', returnToMenu);

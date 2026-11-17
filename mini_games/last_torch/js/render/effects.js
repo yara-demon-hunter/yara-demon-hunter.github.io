@@ -8,6 +8,9 @@ import { easeOutBack, easeOutCubic } from '../../library/core/easing.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { drawNumber } from './fx/numbers.js';
 import { getDashedRing } from './fx/rings.js';
+import { drawGib, fallPose } from '../../library/monsters/25d/death.js';
+import { MONSTERS_25D } from '../../library/monsters/25d/index.js';
+import { getMonsterSprite, spriteFrame } from './monster_sprites.js';
 
 // --- EFEITOS: manchas, pedaços, ondas de choque, avisos no chão, números, clarão ---
 const TAU = Math.PI * 2;
@@ -69,23 +72,29 @@ export function renderTorchAlarm() {
 }
 
 export function renderGibs() {
-    for (const g of state.gibs) {
-        ctx.globalAlpha = Math.min(1, (g.life / g.maxLife) * 2.5);
-        ctx.fillStyle = g.color;
-        const s = g.size;
-        ctx.translate(g.x, g.y - g.z);
-        ctx.rotate(g.rotation);
-        if (g.shape === 'bone') {
-            ctx.fillRect(-s * 1.2, -s * 0.34, s * 2.4, s * 0.68);
-            ctx.fillRect(-s * 1.4, -s * 0.6, s * 0.6, s * 1.2);
-            ctx.fillRect(s * 0.8, -s * 0.6, s * 0.6, s * 1.2);
-        } else {
-            ctx.fillRect(-s * 0.7, -s * 0.5, s * 1.4, s);
-        }
-        ctx.rotate(-g.rotation);
-        ctx.translate(-g.x, -(g.y - g.z));
-    }
+    for (const g of state.gibs) drawGib(ctx, g);
     ctx.globalAlpha = 1;
+}
+
+// Corpo que tomba (Treant): o próprio sprite do monstro, tombando em volta do pé, achatando, afundando e sumindo.
+// Mesma conta do quadro "Morte" do Ateliê (library/monsters/25d/death.js: fallPose)
+export function renderCorpses() {
+    for (const c of state.corpses) {
+        const sprite = getMonsterSprite(c.type);
+        const size = sprite.worldSize * (c.radius / sprite.radius);
+        const frame = spriteFrame(sprite, c.facing, 0);
+        const pose = fallPose(c.fall, c.age);
+        const foot = c.radius * c.fall.pivot;
+        ctx.save();
+        ctx.globalAlpha = pose.alpha;
+        ctx.translate(c.x + pose.shake * c.radius, c.y + foot);
+        ctx.rotate(pose.rot * c.dir);
+        ctx.scale(1, pose.sy);
+        ctx.translate(0, -foot + pose.dy * c.radius);
+        // Monstros em sprites próprios (o golem) têm a própria imagem parada
+        if (!MONSTERS_25D[c.type.toLowerCase()]?.still?.(c.facing, c.radius)) ctx.drawImage(sprite.atlas, frame.sx, frame.sy, sprite.cell, sprite.cell, -size / 2, -size / 2, size, size);
+        ctx.restore();
+    }
 }
 
 export function renderShockwaves() {

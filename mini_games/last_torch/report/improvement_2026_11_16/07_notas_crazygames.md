@@ -7,9 +7,13 @@ Update notes
 
 NEW
 - Embers & Altar: every night now earns Embers, win or lose. Spend them at the new Altar
-  (start screen and end-of-night screen) on 10 permanent upgrades: health, damage, magic damage,
+  (start screen and end-of-night screen) on 11 permanent upgrades: health, damage, magic damage,
   move speed, dagger range, Fury power, dash distance, an extra dash charge, starting skill
-  points and torch health. Your progress carries over to the next night.
+  points, torch health and Torch's Call. Your progress carries over to the next night.
+- The torch's second chance is now an Altar upgrade, Torch's Call: buy it to be brought back
+  once per night. Without it, a fall is final.
+- When you fall, the Altar opens ("Try again, but stronger") so you can spend your Embers and
+  hunt again right away.
 - Starting skill points are now shown next to Darkness on the start screen.
 
 BETTER FIRST MINUTES
@@ -28,6 +32,7 @@ MOBILE & SCREEN SIZES
   no longer overflow.
 
 FIXES
+- Treant has a new carved face and now topples over and bursts into logs, bark and leaves instead of vanishing; the Zombie Wolf now drops bones like the skeletons.
 - Hero card no longer stretches on narrow landscape phones.
 - Light Path tab no longer spills out of the skill tree frame on small screens.
 ```
@@ -37,5 +42,6 @@ FIXES
 ```
 New: Embers & Altar (permanent upgrades after every night, win or lose). Faster loading,
 a hint hand in Wave 1, and HUD/touch controls that adapt to every screen size and orientation.
-Skill tree and start screen fixed on small screens.
+Skill tree and start screen fixed on small screens. The torch's second chance is now an Altar
+upgrade, and the Altar opens when you fall.
 ```

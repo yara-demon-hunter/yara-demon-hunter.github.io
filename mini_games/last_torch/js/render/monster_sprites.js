@@ -77,6 +77,7 @@ const ART_TOPDOWN = {
     ZOMBIE_WOLF: { visual: ZOMBIE_WOLF_VISUALS, draw: renderZombieWolf },
     HEADLESS_KNIGHT: { visual: HEADLESS_KNIGHT_VISUALS, draw: renderHeadlessKnight },
     BONE_COLOSSUS: { visual: BONE_COLOSSUS_VISUALS, draw: renderBoneColossus },
+    GOLEM: { visual: TREANT_MONSTER_25D_VISUALS, draw: (e) => drawOakBuddy(ctx, e.x, e.y, { t: renderNow() / 1000, ancient: true, walking: true, facing: 1 }) },
     TREANT: { visual: TREANT_MONSTER_25D_VISUALS, draw: (e) => drawOakBuddy(ctx, e.x, e.y, { t: renderNow() / 1000, ancient: true, walking: true, facing: 1 }) }
 };
 
@@ -85,7 +86,7 @@ const ART_TOPDOWN = {
 // do chão vêm do "underlay" (bakeUnderlay), que lê visual: o 2.5D mede a aura em unidades do boneco, então vira
 // "raios do monstro" aqui; a sombra o próprio boneco já desenha.
 const FOLDER_25D = {
-    SKELETON: 'skeleton', SKELETON_CRAWLER: 'skeleton_crawler', BAT: 'bat', VAMPIRE: 'vampire', WITCH: 'witch', TREANT: 'treant',
+    SKELETON: 'skeleton', SKELETON_CRAWLER: 'skeleton_crawler', BAT: 'bat', VAMPIRE: 'vampire', WITCH: 'witch', TREANT: 'treant', GOLEM: 'golem',
     NECROMANCER: 'witch', MOTH: 'moth', BLOATER: 'bloater', WRAITH: 'wraith', SHADOW_WOLF: 'shadow_wolf',
     ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight', BONE_COLOSSUS: 'bone_colossus'
 };
