@@ -102,6 +102,12 @@ Detalhes: [02_plano_de_acao.md](02_plano_de_acao.md) · números: [04_progresso.
 ## Fase 6 — Interface no celular em pé (conversão e playtime do mobile)
 Achados do dono em 17/11, olhando o responsivo.
 
+**Tela inicial**
+- [x] título menor, para ganhar espaço
+- [x] pontos de skill iniciais depois da palavra DARKNESS (e não entre as setas)
+- [x] botões Sanctuary e Altar não vazam mais (ícone 15% menor, letras mais juntas, texto com reticências)
+- [x] dicas dos heróis bloqueados cabem no cartão (em até 2 linhas)
+
 **Árvore de skills**
 - [x] Light Path vaza para fora do quadro da árvore (as 6 abas agora dividem a largura)
 - [x] textos longos de skill encolhem os nós e forçam rolagem (o detalhe tem altura máxima e o texto rola dentro dele; o mapa não encolhe mais)
@@ -120,15 +126,16 @@ Achados do dono em 17/11, olhando o responsivo.
 - [x] deitado e desktop continuam como estão, sem regressão (conferido por captura)
 
 **Tuner da tela de jogo**
-- [ ] **como uma aba nova no sandbox** (`mini_games/last_torch/_sandbox`), e não uma ferramenta separada
-- [ ] ferramenta como a dos personagens, só para a tela de jogo (HUD e controles)
-- [ ] mexer no tamanho de cada elemento
-- [ ] arrastar botões e peças do HUD
-- [ ] ver em pé e deitado, em tamanhos de celular diferentes
-- [ ] escolher a resolução de teste (vários celulares em pé e deitado, tablet, desktop) e ajustar em cada uma
-- [ ] botão "copiar" que leva **só os parâmetros alterados**, por resolução, para colar aqui e pedir à IA que aplique
-- [ ] botão para zerar o que foi mexido (voltar ao padrão)
-- [ ] checar o que já existe: o editor de controles de toque das Settings (`touch.scale` e `touch.positions`)
+- [x] **como uma aba nova no sandbox** (`mini_games/last_torch/_sandbox`), e não uma ferramenta separada
+- [x] ferramenta como a dos personagens, só para a tela de jogo (HUD e controles)
+- [x] mexer no tamanho de cada elemento
+- [x] arrastar botões e peças do HUD
+- [x] ver em pé e deitado, em tamanhos de celular diferentes
+- [x] escolher a resolução de teste (vários celulares em pé e deitado, tablet, desktop) e ajustar em cada uma
+- [x] botão "copiar" que leva **só os parâmetros alterados**, por resolução, para colar aqui e pedir à IA que aplique
+- [x] botão para zerar o que foi mexido (voltar ao padrão)
+- [x] checar o que já existe: o editor de controles de toque das Settings (o tuner é separado e só ajusta o CSS; o jogador continua tendo o dele)
+- [ ] **usar o tuner** em várias resoluções e mandar o texto copiado para a IA aplicar
 
 ## Antes de relançar
 - [ ] conferir o mínimo de pontos das regras novas (4 métricas)

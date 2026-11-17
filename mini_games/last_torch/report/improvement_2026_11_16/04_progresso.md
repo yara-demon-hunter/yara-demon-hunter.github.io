@@ -56,6 +56,13 @@ O jogo já teve Brasas e o Hearth (11 melhorias), tirados em 30/10 por informaç
 - Verificado em 390×844, 360×740, 360×640 e 412×915 (árvore) e em 4 formatos (boss), sem erros no console. Não verificado: celular real.
 - **Falta da Fase 6:** revisar os outros menus apertados e o tuner da tela de jogo (aba no sandbox).
 
+## 17/11/2026 — Fase 6: tuner da tela de jogo e tela inicial
+
+- **Tuner (aba "HUD tuner" do sandbox):** o jogo real num iframe de qualquer tamanho; alças arrastáveis em cada peça do HUD e dos controles, campos de posição e tamanho, e **COPY** que leva só o que mudou, por resolução. Para simular celular o servidor serve o jogo também sob `/__touch/` (CSS com `(pointer: coarse)` sempre verdadeiro). Arquivos: `_sandbox/tuner.js`, `tuner.css`, `frame.js`, `serve.py`, `sandbox.js`. Uso no `_sandbox/README.md`.
+- **Verificado** no Chrome (1500×900): abrir a aba, arrastar o cartão do herói, mudar o tamanho do medalhão, ligar o boss, copiar (o texto saiu só com as duas peças alteradas) e trocar de resolução (390×844 em pé, 844×390 deitado), sem erros.
+- **Tela inicial:** título ~22% menor; "DARKNESS (N skill pts)" com os pontos depois da palavra; Sanctuary e Altar sem vazar em 6 tamanhos de tela; dicas dos heróis dentro do cartão.
+- **Não verificado:** celular real; arrastar com o dedo no tuner (testado só com mouse).
+
 ## Decisão do dono (17/11)
 
 Sem tutorial de joystick/dash: a interface é simples. Os itens "primeiros monstros mais fracos" e "primeiro nível em 15 s" ficam para depois de o dono jogar o pacote e dizer se o começo está difícil ou lento. A Fase 2 está feita no que importa.

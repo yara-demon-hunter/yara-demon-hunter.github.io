@@ -11,6 +11,7 @@ import { startHour } from '/js/systems/night.js';
 import { startGame } from '/js/ui/screens.js';
 import { flushHeroUnlocks, queueHeroUnlock } from '/js/ui/hero_unlock.js';
 import { ACHIEVEMENTS } from '/data_model/sanctuary.js';
+import { mountTuner } from '/_sandbox/tuner.js';
 
 const choice = { hero: ACTIVE_HEROES[0], boss: 'AZAEL' };
 const picked = new Set();               // monstros escolhidos para a luta (vários, clicando)
@@ -30,6 +31,8 @@ panel.innerHTML = `
   <div class="card">
     <h2>🧪 Last Torch Sandbox</h2>
     <p class="note">Test arena: nothing here touches the game or its save.</p>
+    <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button></div>
+    <div id="sbArena">
     <h3>Hero</h3><div class="sb-row" id="sbHeroes"></div>
     <h3>Boss <small>(click again to unselect: monsters only)</small></h3><div class="sb-row" id="sbBosses"></div>
     <h3>Monsters <small>(click to add to the fight)</small></h3><div class="sb-row" id="sbMonsters"></div>
@@ -46,6 +49,8 @@ panel.innerHTML = `
     <h3>Preview: hero unlocked <small>(the real reward screen)</small></h3>
     <div class="sb-row" id="sbUnlocks"></div>
     <label class="sb-field">As seen mid-run, at camp (no PLAY AS button) <input id="sbUnlockCamp" type="checkbox"></label>
+    </div>
+    <div id="sbTuner" class="hidden"></div>
   </div>`;
 document.body.appendChild(panel);
 
@@ -206,6 +211,20 @@ function godLoop() {
     requestAnimationFrame(godLoop);
 }
 requestAnimationFrame(godLoop);
+
+// Abas: Arena (luta de teste) e HUD tuner (carrega o jogo num iframe só na primeira vez que a aba abre)
+let tuner = null;
+panel.querySelectorAll('.sb-tabs button').forEach(button => {
+    button.onclick = () => {
+        const isTuner = button.dataset.tab === 'tuner';
+        panel.querySelectorAll('.sb-tabs button').forEach(b => b.classList.toggle('on', b === button));
+        panel.querySelector('#sbArena').classList.toggle('hidden', isTuner);
+        panel.querySelector('#sbTuner').classList.toggle('hidden', !isTuner);
+        panel.querySelector('.card').classList.toggle('is-wide', isTuner);
+        tuner ??= mountTuner(panel.querySelector('#sbTuner'));
+        if (isTuner) tuner.show(); else tuner.hide();
+    };
+});
 
 value('#sbGo').onclick = fight;
 toggle.onclick = () => panel.classList.toggle('hidden');

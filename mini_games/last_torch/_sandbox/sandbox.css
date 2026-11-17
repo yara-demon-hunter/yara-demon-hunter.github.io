@@ -34,3 +34,13 @@
 #sbTools button { flex: 1; padding: 6px; border-radius: 8px; border: 1px solid #334155; background: #111a2e; color: #cbd5e1; cursor: pointer; font-size: 12px; }
 
 #sbPanel h3 small { color: #94a3b8; font-weight: 400; font-size: 11px; }
+
+/* Abas do painel: Arena (a luta de teste) e HUD tuner (ajuste da tela de jogo, _sandbox/tuner.js) */
+.sb-tabs { display: flex; gap: 6px; margin: 4px 0 14px; }
+.sb-tabs button {
+    flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid #334155; background: #111a2e; color: #94a3b8;
+    font: 600 13px Inter, sans-serif; cursor: pointer;
+}
+.sb-tabs button.on { border-color: #ef4444; background: #2a0f14; color: #fecaca; }
+#sbPanel .card.is-wide { width: min(1500px, 100%); }
+#sbTuner.hidden, #sbArena.hidden { display: none; }

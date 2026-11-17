@@ -65,7 +65,7 @@
 }
 .start-title {
     font-family: 'Cinzel', Georgia, 'Times New Roman', serif;
-    font-size: clamp(2.2rem, 9.5vw, 3.7rem);
+    font-size: clamp(1.7rem, 7.4vw, 2.9rem);
     white-space: nowrap;
     font-weight: 800;
     letter-spacing: 0.14em;
@@ -83,8 +83,8 @@
     color: #fdba74;
 }
 .start-tagline {
-    margin: 0.7rem 0 1.4rem;
-    font-size: 1.05rem;
+    margin: 0.45rem 0 0.9rem;
+    font-size: 0.95rem;
     font-style: italic;
     color: #cbd5e1;
 }
@@ -157,7 +157,8 @@
     color: #fca5a5;
 }
 .darkness-picker b { font-family: 'Cinzel', serif; font-size: 1.1rem; min-width: 1.2rem; }
-.darkness-picker em { color: #fdba74; font-size: 0.72rem; font-style: normal; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; }
+.darkness-picker > span { white-space: nowrap; }
+.darkness-picker em { margin-left: 0.2rem; color: #fdba74; font-size: 0.68rem; font-style: normal; font-weight: 700; letter-spacing: 0.04em; }
 .darkness-picker.no-arrows button { display: none; }
 
 .start-btn-small {
@@ -242,7 +243,14 @@
     font-weight: 600;
     letter-spacing: 0;
     color: #fdba74;
-    white-space: nowrap;
+    /* Em até 2 linhas dentro do cartão: numa tela estreita a frase inteira passava para o cartão do lado */
+    max-width: 100%;
+    line-height: 1.1;
+    text-align: center;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 .hero-select:has(~ #btnStart:disabled) { opacity: 0.45; pointer-events: none; }
 
@@ -250,9 +258,10 @@
 .start-links { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
 .start-links .start-btn-small { flex: 1; min-width: 0; justify-content: flex-start; text-align: left; }
 .start-links .hero-portrait { width: 2rem; height: 2rem; }
-.link-icon { flex-shrink: 0; width: 2rem; font-size: 1.5rem; line-height: 1; text-align: center; }
+.link-icon { flex-shrink: 0; width: 1.7rem; font-size: 1.275rem; line-height: 1; text-align: center; }
 .link-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
-.link-text > span { font-size: 0.76rem; }
+.link-text > span { overflow: hidden; font-size: 0.74rem; letter-spacing: 0.08em; text-overflow: ellipsis; white-space: nowrap; }
+.start-links .start-btn-small { gap: 0.4rem; padding-inline: 0.55rem; }
 .link-text em {
     overflow: hidden;
     font-family: 'Inter', sans-serif;
@@ -302,7 +311,7 @@
     .hero-pick-hint { display: none; }
     .start-links .start-btn-small { padding: 0.3rem 0.6rem; }
     .start-links .hero-portrait { width: 1.7rem; height: 1.7rem; }
-    .link-icon { width: 1.7rem; font-size: 1.25rem; }
+    .link-icon { width: 1.45rem; font-size: 1.06rem; }
     .link-text > span { font-size: 0.66rem; }
     .link-text em { font-size: 0.6rem; }
 }

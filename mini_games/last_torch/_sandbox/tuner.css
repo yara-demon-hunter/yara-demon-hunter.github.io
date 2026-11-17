@@ -1,0 +1,40 @@
+/* HUD tuner: palco com o jogo num iframe + painel lateral. Só existe no sandbox. */
+.tn { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; height: calc(100vh - 215px); min-height: 440px; }
+.tn-stage { position: relative; display: grid; place-items: center; overflow: hidden; border: 1px solid #334155; border-radius: 10px; background: #060b16 repeating-conic-gradient(#0b1220 0% 25%, #080e1b 0% 50%) 50% / 24px 24px; }
+/* O aparelho tem o tamanho real em pixels do jogo; o transform o encolhe para caber no palco */
+.tn-device { position: absolute; left: 50%; top: 50%; transform-origin: center center; margin: 0; translate: -50% -50%; box-shadow: 0 0 0 2px #475569, 0 12px 40px rgba(0, 0, 0, .6); background: #000; }
+.tn-device iframe { display: block; border: 0; background: #000; }
+#tnHandles { position: absolute; inset: 0; pointer-events: none; }
+.tn-h { position: absolute; border: 1px dashed rgba(250, 204, 21, .55); border-radius: 4px; pointer-events: auto; cursor: grab; touch-action: none; }
+.tn-h span { position: absolute; left: 0; top: -1.3em; padding: 0 4px; border-radius: 3px; background: rgba(15, 23, 42, .9); color: #fde68a; font: 600 10px/1.3 Inter, sans-serif; white-space: nowrap; opacity: 0; }
+.tn-h:hover span, .tn-h.is-selected span { opacity: 1; }
+.tn-h:hover { background: rgba(250, 204, 21, .12); }
+.tn-h.is-changed { border-color: rgba(52, 211, 153, .9); }
+.tn-h.is-selected { border: 2px solid #f43f5e; background: rgba(244, 63, 94, .12); }
+.tn-h:active { cursor: grabbing; }
+
+.tn-side { min-height: 0; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 6px; font: 13px/1.35 Inter, sans-serif; color: #e2e8f0; }
+.tn-side h3 { margin: 10px 0 2px; font-size: 11px; letter-spacing: .08em; color: #94a3b8; text-transform: uppercase; }
+.tn-side h3 small { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.tn-side select, .tn-side input[type=number] { background: #111a2e; color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; padding: 5px 6px; font: inherit; }
+.tn-side select { width: 100%; }
+.tn-custom { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tn-custom input[type=number] { width: 70px; }
+.tn-custom button { padding: 4px 9px; border-radius: 6px; border: 1px solid #334155; background: #111a2e; color: #e2e8f0; cursor: pointer; }
+.tn-check { display: flex; align-items: center; gap: 8px; }
+.tn-list { display: flex; flex-wrap: wrap; gap: 5px; }
+.tn-item { padding: 5px 9px; border-radius: 7px; border: 1px solid #334155; background: #111a2e; color: #cbd5e1; font: inherit; font-size: 12px; cursor: pointer; }
+.tn-item.on { border-color: #f43f5e; background: #2a0f14; color: #fecaca; }
+.tn-item.changed::after { content: ' •'; color: #34d399; }
+.tn-fields { display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid #334155; border-radius: 8px; background: #0b1220; }
+.tn-field { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tn-field input[type=number] { width: 84px; }
+.tn-slider input { width: 100%; }
+.tn-base { margin: 2px 0 0; color: #94a3b8; font-size: 11px; }
+.tn-actions { display: flex; gap: 6px; }
+.tn-actions button, .tn-copy-one { flex: 1; padding: 7px; border-radius: 8px; border: 1px solid #334155; background: #111a2e; color: #cbd5e1; cursor: pointer; font: inherit; font-size: 12px; }
+.tn-copy { padding: 12px; border-radius: 10px; border: 1px solid #22c55e; background: #14532d; color: #fff; font: 700 14px Inter, sans-serif; cursor: pointer; }
+.tn-status { margin: 0; color: #fbbf24; font-size: 12px; min-height: 1.3em; }
+.tn-out { width: 100%; background: #060b16; color: #94a3b8; border: 1px solid #334155; border-radius: 6px; font: 11px/1.35 ui-monospace, monospace; resize: vertical; }
+
+@media (max-width: 900px) { .tn { grid-template-columns: 1fr; height: auto; } .tn-stage { height: 60vh; } }
