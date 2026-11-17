@@ -6,11 +6,11 @@ Conceito dos ramos de skill, formatos dos nós e regras de custo: [SKILLS.md](SK
 ```bash
 ruby mini_games/last_torch/build-standalone.rb
 
-# Testing
-python3 -m http.server 8000 --directory mini_games/last_torch/standalone-build
+# Gerar e jogar (abre em http://localhost:8000; não abra o index.html direto do disco, ele trava no loading)
+ruby mini_games/last_torch/build-standalone.rb --serve
 ```
 
-O build junta os ~290 módulos JS em `game.min.js` e o CSS em `css/game.css` usando o **esbuild** (371 pedidos de rede viram 9; no 4G lento o carregamento caiu de 6,9 s para 4,0 s). O script procura o binário na variável `ESBUILD`, no PATH ou em `tools/esbuild`; sem ele o pacote sai como antes (módulos soltos + `modulepreload`), e `NO_BUNDLE=1` força isso. Baixar o binário (sem Node): `curl -sL https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.25.0.tgz | tar xz` e usar `package/bin/esbuild`. Não commitar o binário. Em desenvolvimento o site continua usando os módulos soltos.
+O build junta os ~290 módulos JS em `game.min.js` e o CSS em `css/game.css` com o **esbuild** (371 pedidos de rede viram 9; no 4G lento o carregamento caiu de 6,9 s para 4,0 s). Não precisa instalar nada: na primeira vez o script baixa o esbuild (versão fixa) para `~/.cache/last_torch/` e reaproveita depois. Se a rede falhar, ele avisa e gera o pacote com módulos soltos (mais lento); confira que `standalone-build/game.min.js` existe antes de enviar. `ESBUILD=/caminho` usa outro binário e `NO_BUNDLE=1` força os módulos soltos (bom para depurar). Em desenvolvimento o site continua usando os módulos soltos.
 
 O pacote leva só as imagens `-small` (as versões de 1024px ficam para páginas e prévias) e lista todos os módulos em `modulepreload`.
 

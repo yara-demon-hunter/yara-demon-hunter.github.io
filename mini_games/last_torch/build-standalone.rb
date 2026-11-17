@@ -30,9 +30,29 @@ modules.each do |path|
 end
 
 # Junta todos os módulos em UM arquivo (esbuild): são ~290 pedidos de rede, e no 4G cada um custa uma ida e volta.
-# Sem o esbuild o pacote sai como antes (módulos soltos + modulepreload). Onde achar: variável ESBUILD, o PATH ou tools/esbuild.
-esbuild = [ENV["ESBUILD"], `command -v esbuild 2>/dev/null`.strip, source_game.join("tools/esbuild").to_s]
-          .compact.reject(&:empty?).find { |path| File.executable?(path) }
+# Sem o esbuild o pacote sai como antes (módulos soltos + modulepreload). Onde achar: variável ESBUILD, o PATH ou download automático.
+# Não achou? Baixa uma vez (versão fixa, do registro npm) para ~/.cache/last_torch/ e reaproveita nas próximas.
+ESBUILD_VERSION = "0.25.0"
+def download_esbuild
+  cache = File.join(Dir.home, ".cache", "last_torch", "esbuild-#{ESBUILD_VERSION}")
+  binary = File.join(cache, "package", "bin", "esbuild")
+  return binary if File.executable?(binary)
+
+  platform = { "x86_64-linux" => "linux-x64", "aarch64-linux" => "linux-arm64", "arm64-darwin" => "darwin-arm64",
+               "x86_64-darwin" => "darwin-x64" }.find { |key, _| RUBY_PLATFORM.include?(key.split("-").first) && RUBY_PLATFORM.include?(key.split("-").last) }&.last
+  return nil unless platform
+
+  puts "Baixando o esbuild #{ESBUILD_VERSION} (só na primeira vez)..."
+  FileUtils.mkdir_p(cache)
+  url = "https://registry.npmjs.org/@esbuild/#{platform}/-/#{platform}-#{ESBUILD_VERSION}.tgz"
+  ok = system("curl", "-fsSL", url, "-o", File.join(cache, "esbuild.tgz")) &&
+       system("tar", "xzf", File.join(cache, "esbuild.tgz"), "-C", cache)
+  File.executable?(binary) && ok ? binary : nil
+end
+
+esbuild = [ENV["ESBUILD"], `command -v esbuild 2>/dev/null`.strip].compact.reject(&:empty?).find { |path| File.executable?(path) }
+esbuild ||= download_esbuild unless ENV["NO_BUNDLE"]
+warn "AVISO: esbuild indisponível, o pacote sai com módulos soltos (mais lento no celular)." if esbuild.nil? && !ENV["NO_BUNDLE"]
 bundle = !esbuild.nil? && ENV["NO_BUNDLE"].nil?
 unless bundle
   preloads = (modules - [entry]).map do |path|
@@ -108,3 +128,11 @@ bytes = files.sum { |path| File.size(path) }
 puts "Standalone game package created: #{build_output}"
 puts "#{files.length - 1} files, #{format('%.2f', bytes / 1_048_576.0)} MiB"
 puts "Upload the contents of this folder; index.html is the entry point."
+
+# `--serve`: depois de gerar, abre o pacote em http://localhost:8000 (o jogo não roda abrindo o index.html do disco:
+# o navegador bloqueia módulos em file://). Ctrl+C para parar.
+if ARGV.include?("--serve")
+  port = (ARGV.find { |arg| arg.start_with?("--port=") } || "--port=8000").split("=").last
+  puts "Jogue em http://localhost:#{port}  (Ctrl+C para parar)"
+  exec("python3", "-m", "http.server", port, "--directory", build_output.to_s)
+end
