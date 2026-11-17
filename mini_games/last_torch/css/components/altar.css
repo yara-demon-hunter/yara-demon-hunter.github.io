@@ -85,3 +85,11 @@
 .embers-total { color: #d6cdb8; font-size: 0.68rem; }
 .embers-buy { margin-top: 0.15rem; color: #fde68a; font-size: 0.68rem; font-weight: 700; }
 #summaryEmbers:not(.can-buy) .embers-buy { color: #94a3b8; font-weight: 500; }
+
+/* Celular em pé: o painel usa a altura toda (são 10 melhorias) e perde o título pequeno, que quebrava em duas linhas */
+@media (orientation: portrait) {
+    .altar-panel { height: 100%; max-height: 100%; gap: 0.45rem; }
+    .altar-panel .screen-eyebrow { display: none; }
+    #altarList { grid-template-columns: 1fr; gap: 0.35rem; padding-bottom: 0.5rem; }
+    .altar-card { padding: 0.45rem 0.65rem; }
+}

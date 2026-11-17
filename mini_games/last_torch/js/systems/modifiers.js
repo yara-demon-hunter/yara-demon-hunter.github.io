@@ -17,6 +17,7 @@ import { attributes, passives, powers, state } from '../core/state.js';
 //          provoke (distância em que os monstros largam a tocha), noWarmthHeal e noKnives (travas),
 //          killGold (ouro extra por morte), knifeRange e knifeSpeed (bônus de alcance e velocidade da adaga; o alcance base é do personagem),
 //          axeQuake (liga o Axe Quake no lugar da adaga: js/systems/quake.js)
+//          dashDistance (alcance do dash), furyPower (dano extra enquanto a Fúria dura; vem do Altar)
 //          oakGrowth (o carvalho cresce mais rápido), wolfPower (dano e vida dos lobos do Nature)
 //   tocha: torchHp (pontos), torchRegen (pontos por segundo), torchGuard, warmthBurn (x dano de feitiço por segundo)
 //   pontos de skill: levelPoints (por nível, fração acumula), chestPoints (por baú)

@@ -157,6 +157,8 @@
     color: #fca5a5;
 }
 .darkness-picker b { font-family: 'Cinzel', serif; font-size: 1.1rem; min-width: 1.2rem; }
+.darkness-picker em { color: #fdba74; font-size: 0.72rem; font-style: normal; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; }
+.darkness-picker.no-arrows button { display: none; }
 
 .start-btn-small {
     display: flex;

@@ -429,7 +429,9 @@ export function renderStartScreen() {
     renderHeroPicker();
     renderHeroStats();
     const dark = document.getElementById('darknessPicker');
-    dark.classList.toggle('hidden', save.maxDarkness <= 1);
+    // O seletor aparece depois da primeira vitória, ou antes se o Altar já dá pontos iniciais (aí só mostra o total, sem setas)
+    dark.classList.toggle('hidden', save.maxDarkness <= 1 && altarStartPoints(save) === 0);
+    dark.classList.toggle('no-arrows', save.maxDarkness <= 1);
     // CONTINUE: aparece se há uma noite guardada, dizendo em que onda ela parou
     const run = loadRun();
     const resumable = run && HEROES[run.hero] && !HEROES[run.hero].shelved;
@@ -439,6 +441,7 @@ export function renderStartScreen() {
     document.getElementById('darknessValue').innerText = save.darkness;
     const startPoints = startingSkillPoints(save.darkness) + altarStartPoints(save);
     dark.title = `Start with ${startPoints} skill point${startPoints === 1 ? '' : 's'}`;
+    document.getElementById('darknessPoints').innerText = `(${startPoints} skill pt${startPoints === 1 ? '' : 's'})`;
     paintHeroPortrait(document.getElementById('heroPortrait'), hero);
 }
 
@@ -449,6 +452,7 @@ export function changeDarkness(step) {
 }
 
 export function returnToMenu() {
+    hideTreeHand();
     document.getElementById('gameOverScreen').classList.add('hidden');
     document.getElementById('shopScreen').classList.add('hidden');
     document.getElementById('sanctuaryScreen').classList.add('hidden');

@@ -48,8 +48,15 @@ Detalhes: [02_plano_de_acao.md](02_plano_de_acao.md) · números: [04_progresso.
 - [x] Brasas no save
 - [x] tela do Altar no menu
 - [x] +5% vida (5 níveis)
+- [x] +2% velocidade de movimento (5 níveis)
+- [x] +5% dano mágico (5 níveis)
+- [x] +5% alcance da adaga (5 níveis)
+- [x] +3% dano durante a Fúria (5 níveis)
+- [x] +6% distância do dash (5 níveis)
+- [x] +1 carga de dash (1 nível)
 - [x] +5% dano (5 níveis)
-- [x] +1 ponto de skill no início (3 níveis)
+- [x] +1 ponto de skill no início (5 níveis)
+- [x] tela inicial mostra os pontos iniciais ao lado da Escuridão, entre parênteses
 - [x] tocha mais forte (5 níveis)
 - [x] 1ª compra possível depois de 1 noite (8 Brasas por noite, a 1ª melhoria custa 10)
 - [ ] balanceamento conferido (jogar com tudo no máximo; valores em `data_model/embers.js`)
@@ -91,6 +98,32 @@ Detalhes: [02_plano_de_acao.md](02_plano_de_acao.md) · números: [04_progresso.
 - [ ] 2–3 capas novas testadas em miniatura
 - [ ] vídeo de 15–20 s só com ação
 - [ ] trocar no portal
+
+## Fase 6 — Interface no celular em pé (conversão e playtime do mobile)
+Achados do dono em 17/11, olhando o responsivo.
+
+**Árvore de skills**
+- [ ] Light Path vaza para fora do quadro da árvore
+- [ ] textos longos de skill encolhem os nós e forçam rolagem: limitar o texto (e/ou mover o detalhe para um painel) e manter o tamanho dos nós
+- [ ] conferir os 6 ramos em pé e deitado, sem rolar para ver a árvore
+
+**Menus apertados**
+- [ ] revisar espaçamento e tamanho de toque: status, árvore, acampamento, heróis, Altar, Santuário, fim da noite
+- [ ] menos texto por tela no celular em pé
+
+**Barra de vida do boss**
+- [ ] em pé: ficar **abaixo** da barra de status do herói, não ao lado apertada
+- [ ] retrato do boss ao lado da barra (já existem retratos de alguns: `BOSS_MODELS.portraitImage`)
+- [ ] bosses sem retrato: placeholder em `images/` para o dono trocar depois
+- [ ] deitado e desktop continuam como estão (ou melhorados), sem regressão
+
+**Tuner da tela de jogo**
+- [ ] ferramenta como a dos personagens, só para a tela de jogo (HUD e controles)
+- [ ] mexer no tamanho de cada elemento
+- [ ] arrastar botões e peças do HUD
+- [ ] ver em pé e deitado, em tamanhos de celular diferentes
+- [ ] botão "copiar" que gera as medidas/posições para colar e pedir à IA que aplique
+- [ ] checar o que já existe: o editor de controles de toque das Settings (`touch.scale` e `touch.positions`)
 
 ## Antes de relançar
 - [ ] conferir o mínimo de pontos das regras novas (4 métricas)
