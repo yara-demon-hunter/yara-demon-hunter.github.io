@@ -134,7 +134,9 @@ Achados do dono em 17/11, olhando o responsivo.
 - [x] botão para zerar o que foi mexido (voltar ao padrão)
 - [x] checar o que já existe: o editor de controles de toque das Settings (o tuner é separado e só ajusta o CSS; o jogador continua tendo o dele)
 - [x] 360×640 em pé ajustado pelo dono e aplicado a todos os celulares em pé (boss 70% da largura, controles ~30% menores, coluna sequência/pontuação)
-- [ ] **usar o tuner** nas outras resoluções (deitado, tablet, desktop) e mandar o texto copiado para a IA aplicar
+- [x] ajustes do dono aplicados: celulares em pé (360×640, 360×740, 390×844, 412×915), tablet em pé (768×1024) e barra do boss no desktop (1280×720)
+- [ ] **usar o tuner** nas resoluções que faltam (celular deitado, tablet deitado, desktop 1920×1080) e mandar o texto copiado
+- [ ] depois de a IA aplicar, usar **Reset ALL screens** no tuner
 
 ## Antes de relançar
 - [ ] conferir o mínimo de pontos das regras novas (4 métricas)

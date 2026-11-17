@@ -72,6 +72,16 @@ O dono ajustou o 360×640 em pé no tuner e a IA reproduziu o mesmo estilo em to
 - **Verificado:** em 360×640, 360×740, 390×844, 412×915 e 430×932 as medidas bateram com as do dono no 360×640 (joystick, adaga, dash, pontuação e barra do boss) e não há erros. Os cantos do dash e da adaga se encostam um pouco, como no ajuste do dono.
 - **Não verificado:** celular real.
 
+## 17/11/2026 — Ajustes do dono por resolução aplicados ao CSS
+
+O dono ajustou 6 telas no tuner; a IA aplicou como regras proporcionais, não como pixels soltos:
+- **Celulares em pé (até 599 px):** o tamanho dos controles cresce com a altura da tela (`clamp(3.8rem, 9.4dvh, 5.2rem)`: ~61 px em 640, ~82 px em 915); a adaga é 92% do joystick e o dash 55%. A coluna sequência/pontuação sobe e a sequência encolhe a 88% em telas de até 700 px de altura; a barra do boss cresce para 75,5% da largura a partir de 385 px.
+- **Tablet em pé (a partir de 600 px):** controles do tamanho padrão, mais altos; barra do boss 38% maior à direita do centro; sequência 34% e pontuação 32% maiores.
+- **Desktop 1280×720:** barra do boss 38% maior, no topo, perto do centro (52%).
+- **Verificado:** posição final de cada peça medida nos 6 tamanhos contra o alvo do dono: quase tudo dentro de ±5 px; tablet e desktop dentro de ±1 px; o dash varia até 9 px (imprecisão do arrasto). Sem erros no console.
+- **Lição:** os deslocamentos do tuner valem sobre o CSS da hora e ficam guardados no navegador; por isso há agora o botão **Reset ALL screens**, para usar depois de cada aplicação.
+- **Não verificado:** celular real, tablet real.
+
 ## Decisão do dono (17/11)
 
 Sem tutorial de joystick/dash: a interface é simples. Os itens "primeiros monstros mais fracos" e "primeiro nível em 15 s" ficam para depois de o dono jogar o pacote e dizer se o começo está difícil ou lento. A Fase 2 está feita no que importa.

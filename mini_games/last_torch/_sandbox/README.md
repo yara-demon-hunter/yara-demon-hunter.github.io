@@ -23,3 +23,5 @@ Segunda aba do painel (**📐 HUD tuner**). Mostra o jogo de verdade num iframe 
 - **Peças:** cada elemento do HUD e dos controles ganha uma alça tracejada. **Arraste** na tela, use as **setas** (1 px; Shift = 10 px) ou os campos X, Y e Tamanho (%). Também dá para esconder a peça.
 - **Os ajustes** são só as propriedades `translate` e `scale` dentro do iframe: não mudam nenhum arquivo do jogo. Ficam guardados no `localStorage` do sandbox, por resolução.
 - **📋 COPY ALL CHANGES** copia **só o que foi alterado**, por resolução (movimento em px, tamanho em %, e onde o jogo tem a peça hoje), mais um JSON. Cole na conversa com a IA para ela aplicar no CSS. **Copy this screen only** copia só a resolução atual; **Reset piece** e **Reset this screen** desfazem.
+
+**Depois que a IA aplicar os ajustes no CSS do jogo, use _Reset ALL screens_.** Os deslocamentos ficam guardados no navegador e se somam ao CSS atual: se não forem zerados, valem duas vezes. O campo "game has it at" do texto copiado é a posição de quando a peça foi mexida pela primeira vez, e pode estar desatualizado; os deslocamentos valem sobre o CSS da hora.

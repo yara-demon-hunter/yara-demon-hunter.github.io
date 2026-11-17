@@ -180,22 +180,50 @@
     }
 }
 
-/* Celular em pé: a tela é estreita, então os controles ficam menores (~70% do que eram) e o dash fica à esquerda e um
-   pouco acima da adaga, bem menor que ela. Medidas tiradas do HUD tuner (360x640, 17/11/2026), em rem e em proporções
-   do tamanho do controle, para valerem em qualquer celular em pé. */
+/* Celular em pé: os controles crescem com a ALTURA da tela (telas altas têm mais espaço para o polegar): ~61 px em 640 de
+   altura, ~82 px a partir de ~900. A adaga é um pouco menor que o joystick e o dash, pequeno, fica à esquerda e acima dela.
+   Medidas tiradas do HUD tuner (360x640, 360x740, 390x844 e 412x915, 17/11/2026), em proporções do tamanho do joystick. */
 @media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) {
     :root {
-        --touch-base: 3.8rem;
-        --touch-base-knob: 1.75rem;
-        --touch-base-icon: 0.9rem;
+        --touch-base: clamp(3.8rem, 9.4dvh, 5.2rem);
+        --touch-base-knob: calc(var(--touch-base) * 0.46);
+        --touch-base-icon: calc(var(--touch-base) * 0.24);
         --touch-ring: 5px;
-        --touch-bottom: max(3.5rem, calc(env(safe-area-inset-bottom) + 2.7rem));
-        --touch-left: max(1.9rem, calc(env(safe-area-inset-left) + 1.3rem));
-        --touch-right: max(1rem, calc(env(safe-area-inset-right) + 0.5rem));
+        --touch-bottom: max(3.5rem, 8.6dvh, calc(env(safe-area-inset-bottom) + 2.7rem));
+        --touch-left: max(1.75rem, calc(env(safe-area-inset-left) + 1.3rem));
+        --touch-right: calc(var(--touch-left) * 0.9);
+    }
+    #knifeButton {
+        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.1);
+        width: calc(var(--touch-size) * 0.92);
+        height: calc(var(--touch-size) * 0.92);
     }
     #dashButton {
-        right: calc(var(--touch-right) + var(--touch-size) * 0.9);
-        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.93);
+        right: calc(var(--touch-right) + var(--touch-size) * 0.84);
+        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.85);
+        width: calc(var(--touch-size) * 0.55);
+        height: calc(var(--touch-size) * 0.55);
+    }
+}
+/* Celulares um pouco mais largos (390 em diante): o joystick se afasta mais da borda */
+@media (pointer: coarse) and (orientation: portrait) and (min-width: 385px) and (max-width: 599px) {
+    :root { --touch-left: max(2.5rem, calc(env(safe-area-inset-left) + 1.3rem)); }
+}
+/* Tablet em pé (768x1024 no tuner): os controles ficam do tamanho padrão, mais altos e mais para dentro; a adaga e o dash menores */
+@media (pointer: coarse) and (orientation: portrait) and (min-width: 600px) {
+    :root {
+        --touch-bottom: max(5.9rem, 9.2dvh);
+        --touch-left: max(4.25rem, 8.9vw);
+        --touch-right: max(4.6rem, 9.7vw);
+    }
+    #knifeButton {
+        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.156);
+        width: calc(var(--touch-size) * 0.83);
+        height: calc(var(--touch-size) * 0.83);
+    }
+    #dashButton {
+        right: calc(var(--touch-right) + var(--touch-size) * 0.74);
+        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.72);
         width: calc(var(--touch-size) * 0.62);
         height: calc(var(--touch-size) * 0.62);
     }

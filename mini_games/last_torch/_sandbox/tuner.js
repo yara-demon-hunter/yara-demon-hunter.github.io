@@ -94,6 +94,7 @@ export function mountTuner(root) {
             <button id="tnResetPiece">Reset piece</button>
             <button id="tnResetScreen">Reset this screen</button>
           </div>
+          <button id="tnResetAll" class="tn-copy-one" title="Use this after the AI applied your changes to the game CSS, so they are not applied twice">Reset ALL screens (after the AI applied them)</button>
           <button id="tnCopy" class="tn-copy">📋 COPY ALL CHANGES</button>
           <button id="tnCopyOne" class="tn-copy-one">Copy this screen only</button>
           <p id="tnStatus" class="tn-status"></p>
@@ -382,6 +383,12 @@ export function mountTuner(root) {
     renderPause();
     $('tnResetPiece').onclick = () => { const all = changesHere(); delete all[selected]; if (!Object.keys(all).length) delete data[key()]; writeStore(data); applyOne(selected); renderFields(); renderList(); renderStatus(); };
     $('tnResetScreen').onclick = () => { delete data[key()]; writeStore(data); applyAll(); renderFields(); renderList(); renderStatus(); };
+    // Depois que a IA aplicar os ajustes no CSS do jogo, os deslocamentos guardados aqui passariam a valer DUAS vezes
+    $('tnResetAll').onclick = () => {
+        if (!confirm('Clear every adjustment on every screen? Do this after the changes were applied to the game CSS.')) return;
+        Object.keys(data).forEach(k => delete data[k]);
+        writeStore(data); applyAll(); renderFields(); renderList(); renderStatus();
+    };
     $('tnCopy').onclick = () => copy(null);
     $('tnCopyOne').onclick = () => copy(key());
 
