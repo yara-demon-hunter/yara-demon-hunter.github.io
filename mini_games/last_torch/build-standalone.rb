@@ -28,19 +28,60 @@ modules.each do |path|
     modules << resolved unless modules.include?(resolved)
   end
 end
-preloads = (modules - [entry]).map do |path|
-  %(    <link rel="modulepreload" href="./#{path.relative_path_from(source_game)}">\n)
+
+# Junta todos os módulos em UM arquivo (esbuild): são ~290 pedidos de rede, e no 4G cada um custa uma ida e volta.
+# Sem o esbuild o pacote sai como antes (módulos soltos + modulepreload). Onde achar: variável ESBUILD, o PATH ou tools/esbuild.
+esbuild = [ENV["ESBUILD"], `command -v esbuild 2>/dev/null`.strip, source_game.join("tools/esbuild").to_s]
+          .compact.reject(&:empty?).find { |path| File.executable?(path) }
+bundle = !esbuild.nil? && ENV["NO_BUNDLE"].nil?
+unless bundle
+  preloads = (modules - [entry]).map do |path|
+    %(    <link rel="modulepreload" href="./#{path.relative_path_from(source_game)}">\n)
+  end
+  html = html.sub("</head>", "#{preloads.join}</head>")
 end
-html = html.sub("</head>", "#{preloads.join}</head>")
 
 FileUtils.rm_rf(build_output)
 FileUtils.mkdir_p(build_output)
-build_output.join("index.html").write(html)
 
 # library: a cópia da biblioteca de personagens e monstros (mini_games/_library, copiada pelo sync)
 %w[js css data_model library images].each do |directory|
   FileUtils.cp_r(source_game.join(directory), build_output.join(directory))
 end
+if bundle
+  out = build_output.join("game.min.js")
+  ok = system(esbuild, source_game.join("js/game.js").to_s, "--bundle", "--minify", "--format=esm", "--target=es2020",
+              "--legal-comments=none", "--log-level=warning", "--outfile=#{out}")
+  abort "esbuild failed" unless ok && out.file?
+  # Os módulos soltos não são mais necessários: só ficam css, imagens e o bundle (o código está dentro dele)
+  %w[js library data_model].each do |directory|
+    Dir.glob(build_output.join(directory, "**/*.js")).each { |path| FileUtils.rm_f(path) }
+  end
+  # CSS: game.css importa 19 arquivos, e cada @import só é descoberto depois do anterior chegar (uma cadeia de idas e
+  # voltas). Junta tudo em css/game.css; o esbuild não reescreve as url() externas, então os caminhos relativos
+  # (escritos a partir de css/base e css/components) são ajustados aqui para css/.
+  css_out = build_output.join("css/game.css")
+  ok = system(esbuild, source_game.join("css/game.css").to_s, "--bundle", "--minify", "--external:*.webp", "--external:*.png",
+              "--external:*.woff2", "--log-level=warning", "--outfile=#{css_out}")
+  abort "esbuild (css) failed" unless ok && css_out.file?
+  css = css_out.read.gsub("url(../fonts/", "url(fonts/").gsub("url(../../images/", "url(../images/")
+  abort "CSS: unexpected relative url left" if css.match?(%r{url\(\.\./\.\./|url\(\.\./fonts/|@import})
+  css_out.write(css)
+  Dir.glob(build_output.join("css/{base,components}")).each { |directory| FileUtils.rm_rf(directory) }
+  Dir.glob(build_output.join("**/*"), File::FNM_DOTMATCH).sort_by { |path| -path.length }.each do |path|
+    Dir.rmdir(path) if File.directory?(path) && Dir.empty?(path)
+  end
+  html = html.sub('<script type="module" src="./js/game.js"></script>', '<script type="module" src="./game.min.js"></script>')
+  # A barra de carregamento contava os modulepreload; com um arquivo só ela anda por tempo e termina em finishLoading()
+  html = html.sub("var expected = links.length || 140;", "var expected = 1;")
+  html = html.sub("function tick() { done++; show(done / expected); }",
+                  "function tick() { done++; show(done / expected); }\n    var creep = setInterval(function () { show(shown + (0.9 - shown) * 0.08); }, 120);")
+  html = html.sub("window.finishLoading = function () {", "window.finishLoading = function () {\n        clearInterval(creep);")
+  html = html.sub('<link rel="modulepreload"', '<link rel="modulepreload"') # nada a fazer; mantém o formato
+  fonts = %w[inter-latin cinzel-latin].map { |name| %(    <link rel="preload" href="./css/fonts/#{name}.woff2" as="font" type="font/woff2" crossorigin>\n) }
+  html = html.sub("</head>", %(    <link rel="modulepreload" href="./game.min.js">\n#{fonts.join}</head>))
+end
+build_output.join("index.html").write(html)
 Dir.glob(build_output.join("**/*.md")).each { |path| FileUtils.rm_f(path) }
 FileUtils.rm_f(build_output.join("library/.synced-from-library"))
 # As versões grandes são para páginas e prévias: o jogo só carrega as -small (data_model/tree_images.js)

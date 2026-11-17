@@ -89,7 +89,7 @@ export function treeImageFor(key, evolved = false) {
 
 // Baixa a arte com antecedência: sem isso, em rede lenta, a árvore abre com os ícones chegando um a um
 export function preloadTreeImages() {
-    [...Object.values(TREE_IMAGES), ...Object.values(BRANCH_IMAGES)].forEach(src => { new Image().src = src; });
+    [...Object.values(TREE_IMAGES), ...Object.values(BRANCH_IMAGES)].forEach(src => { const image = new Image(); image.fetchPriority = 'low'; image.src = src; });
 }
 
 // Mostra a imagem no elemento, ou o emoji se não houver. A URL é absoluta porque o CSS a resolveria a partir da própria pasta

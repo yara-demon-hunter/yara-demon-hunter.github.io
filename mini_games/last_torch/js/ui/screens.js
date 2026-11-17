@@ -430,7 +430,9 @@ export function setupScreens() {
     checkAchievements({ toast: false });
     renderStartScreen();
     scheduleMonsterSprites();
-    preloadTreeImages();
+    // Os ~70 ícones da árvore (650 KB) só começam a baixar depois que a caçada já roda: no 4G eles disputavam a banda
+    // com o que o primeiro minuto precisa. O primeiro ponto de skill chega por volta dos 15 s, e eles já estarão a caminho.
+    setTimeout(preloadTreeImages, 4000);
     const play = document.getElementById('btnStart');
     play.textContent = 'PLAY';
     play.disabled = false;
