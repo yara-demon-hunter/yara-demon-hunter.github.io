@@ -103,19 +103,21 @@ Detalhes: [02_plano_de_acao.md](02_plano_de_acao.md) · números: [04_progresso.
 Achados do dono em 17/11, olhando o responsivo.
 
 **Árvore de skills**
-- [ ] Light Path vaza para fora do quadro da árvore
-- [ ] textos longos de skill encolhem os nós e forçam rolagem: limitar o texto (e/ou mover o detalhe para um painel) e manter o tamanho dos nós
-- [ ] conferir os 6 ramos em pé e deitado, sem rolar para ver a árvore
+- [x] Light Path vaza para fora do quadro da árvore (as 6 abas agora dividem a largura)
+- [x] textos longos de skill encolhem os nós e forçam rolagem (o detalhe tem altura máxima e o texto rola dentro dele; o mapa não encolhe mais)
+- [x] conferir os 6 ramos em pé (390×844, 360×740, 360×640, 412×915)
+- [ ] conferir os 6 ramos deitado
 
 **Menus apertados**
 - [ ] revisar espaçamento e tamanho de toque: status, árvore, acampamento, heróis, Altar, Santuário, fim da noite
 - [ ] menos texto por tela no celular em pé
 
 **Barra de vida do boss**
-- [ ] em pé: ficar **abaixo** da barra de status do herói, não ao lado apertada
-- [ ] retrato do boss ao lado da barra (já existem retratos de alguns: `BOSS_MODELS.portraitImage`)
-- [ ] bosses sem retrato: placeholder em `images/` para o dono trocar depois
-- [ ] deitado e desktop continuam como estão (ou melhorados), sem regressão
+- [x] em pé: ficar **abaixo** da barra de status do herói, não ao lado apertada
+- [x] retrato do boss ao lado da barra (todos os bosses já tinham retrato gerado do sprite, o do bestiário)
+- [-] placeholder para bosses sem retrato (não precisou; sem retrato aparece a caveira)
+- [ ] trocar os retratos gerados por arte própria, se o dono quiser
+- [x] deitado e desktop continuam como estão, sem regressão (conferido por captura)
 
 **Tuner da tela de jogo**
 - [ ] **como uma aba nova no sandbox** (`mini_games/last_torch/_sandbox`), e não uma ferramenta separada
@@ -123,7 +125,9 @@ Achados do dono em 17/11, olhando o responsivo.
 - [ ] mexer no tamanho de cada elemento
 - [ ] arrastar botões e peças do HUD
 - [ ] ver em pé e deitado, em tamanhos de celular diferentes
-- [ ] botão "copiar" que gera as medidas/posições para colar e pedir à IA que aplique
+- [ ] escolher a resolução de teste (vários celulares em pé e deitado, tablet, desktop) e ajustar em cada uma
+- [ ] botão "copiar" que leva **só os parâmetros alterados**, por resolução, para colar aqui e pedir à IA que aplique
+- [ ] botão para zerar o que foi mexido (voltar ao padrão)
 - [ ] checar o que já existe: o editor de controles de toque das Settings (`touch.scale` e `touch.positions`)
 
 ## Antes de relançar

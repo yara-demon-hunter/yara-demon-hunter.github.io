@@ -7,6 +7,7 @@ import { player, state } from '../core/state.js';
 import { getAxeQuake, getRootSnare, getDashCharges, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
 import { hasBuyableNode } from '../systems/tree.js';
 import { updateTreeHand } from './hints.js';
+import { getBossPortrait } from '../render/monster_sprites.js';
 
 // --- HUD ---
 // Escrever no DOM é caro: força o navegador a recalcular estilo e layout. Por isso os sistemas só
@@ -18,7 +19,7 @@ const ui = {
     level: el('levelText'), xpText: el('xpText'), xpBar: el('xpBar'),
     kills: el('killsHud'), coins: el('coinsText'), score: el('hudScore'),
     turn: el('turnLabel'), hourName: el('hourName'), scoreBar: el('scoreBar'), pips: el('nightPips'),
-    bossBox: el('bossHpContainer'), bossName: el('bossNameText'), bossHp: el('bossHpText'), bossBar: el('bossHpBar'),
+    bossBox: el('bossHpContainer'), bossPortrait: el('bossPortrait'), bossName: el('bossNameText'), bossHp: el('bossHpText'), bossBar: el('bossHpBar'),
     heroCard: el('heroCard'), screenFx: el('screenFx'), statusButton: el('btnPause'), statusBadge: el('statusBadge'),
     streakBox: el('hudStreak'), streakCount: el('streakCount'), streakBar: el('streakBar'), streakLabel: el('streakLabel'),
     knifeButton: el('knifeButton'), dashButton: el('dashButton'), dashCharges: el('dashCharges')
@@ -181,6 +182,25 @@ function updateNightPips() {
     });
 }
 
+// Retrato do boss ao lado da barra de vida: o mesmo do bestiário, pintado só quando o boss muda.
+// Sem retrato pronto, fica a caveira.
+let portraitOf = null;
+function paintBossPortrait(type) {
+    if (portraitOf === type) return;
+    portraitOf = type;
+    const box = ui.bossPortrait;
+    box.replaceChildren();
+    const sprite = getBossPortrait(type);
+    if (!sprite) {
+        box.textContent = '☠️';
+        return;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 64;
+    canvas.getContext('2d').drawImage(sprite.atlas, 0, 0, sprite.cell, sprite.cell, 0, 0, 64, 64);
+    box.appendChild(canvas);
+}
+
 // Barra de vida do boss: acompanha cada golpe (js/systems/damage.js), no ritmo do HUD
 export function syncBossBar() {
     dirty = true;
@@ -216,6 +236,7 @@ function writeHud() {
     // Boss HUD
     setFlag(ui.bossBox, 'hidden', !currentBoss);
     if (currentBoss) {
+        paintBossPortrait(currentBoss.type);
         setText(ui.bossName, `☠️ ${currentBoss.name.toUpperCase()}`);
         setText(ui.bossHp, `${Math.max(0, Math.ceil(currentBoss.hp))}`);
         setBar(ui.bossBar, currentBoss.hp / currentBoss.maxHp);
