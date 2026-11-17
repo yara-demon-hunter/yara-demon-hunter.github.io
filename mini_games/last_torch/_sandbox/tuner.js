@@ -4,6 +4,26 @@
 // (por resolução) para colar na conversa com a IA, que aplica no CSS do jogo. Nada aqui altera o jogo: os ajustes são só as
 // propriedades `translate` e `scale` do elemento dentro do iframe, e ficam guardados no localStorage do sandbox.
 const STORE_KEY = 'lt_tuner_v1';
+const CSS_KEY = 'lt_tuner_css';          // impressão digital do CSS do jogo quando os ajustes foram feitos
+const BACKUP_KEY = 'lt_tuner_backup';    // ajustes antigos guardados quando o CSS mudou (para restaurar, se preciso)
+
+// Impressão digital do CSS do jogo (game.css e tudo o que ele importa). Se mudou desde os ajustes, eles provavelmente já
+// foram aplicados no CSS pela IA: reaplicá-los por cima contaria cada um DUAS vezes.
+async function cssFingerprint() {
+    const seen = new Set();
+    let text = '';
+    async function grab(url) {
+        if (seen.has(url)) return;
+        seen.add(url);
+        const body = await (await fetch(url, { cache: 'no-store' })).text();
+        text += body;
+        for (const m of body.matchAll(/@import\s+url\(['"]?([^'")]+)['"]?\)/g)) await grab(new URL(m[1], url).href);
+    }
+    try { await grab(new URL('/css/game.css', location.origin).href); } catch { return null; }
+    let h = 0;
+    for (let i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) | 0;
+    return String(h >>> 0);
+}
 
 // Peças ajustáveis (id do elemento no last_torch.html). touch: só existe em tela de toque; desktop: só no computador.
 const ELEMENTS = [
@@ -52,8 +72,12 @@ function el(tag, className, text) {
 function readStore() {
     try { return JSON.parse(localStorage.getItem(STORE_KEY)) ?? {}; } catch { return {}; }
 }
+let currentCss = null;
 function writeStore(data) {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch { /* sem armazenamento: só vale nesta aba */ }
+    try {
+        localStorage.setItem(STORE_KEY, JSON.stringify(data));
+        if (currentCss) localStorage.setItem(CSS_KEY, currentCss);
+    } catch { /* sem armazenamento: só vale nesta aba */ }
 }
 
 // Só o que mudou: posição (dx, dy) e tamanho (s). Tudo igual ao padrão = nada a copiar
@@ -67,6 +91,7 @@ export function mountTuner(root) {
     let raf = 0;
     let scale = 1;
     let paused = true;                        // o jogo começa PAUSADO: rodando sozinho atrapalha o ajuste
+    let cssNow = null;                        // impressão digital do CSS atual do jogo
 
     root.innerHTML = `
       <div class="tn">
@@ -98,10 +123,31 @@ export function mountTuner(root) {
           <button id="tnCopy" class="tn-copy">📋 COPY ALL CHANGES</button>
           <button id="tnCopyOne" class="tn-copy-one">Copy this screen only</button>
           <p id="tnStatus" class="tn-status"></p>
+          <div id="tnCssNotice" class="tn-notice" hidden>
+            The game CSS changed since your last adjustments (they were probably applied by the AI), so they are no longer
+            added on top: otherwise each one would count twice. <button id="tnRestore">Restore them anyway</button>
+          </div>
           <textarea id="tnOut" class="tn-out" readonly rows="6" placeholder="What you changed shows up here, ready to paste."></textarea>
         </aside>
       </div>`;
     const $ = (id) => root.querySelector(`#${id}`);
+
+    // CSS mudou desde os ajustes guardados? Então eles saem de cena (ficam numa cópia, com botão para restaurar)
+    const cssChecked = cssFingerprint().then(fp => {
+        cssNow = currentCss = fp;
+        let saved = null;
+        try { saved = localStorage.getItem(CSS_KEY); } catch { /* sem armazenamento */ }
+        const hasData = Object.keys(data).length > 0;
+        if (fp && hasData && saved && saved !== fp) {
+            try { localStorage.setItem(BACKUP_KEY, JSON.stringify(data)); } catch { /* sem armazenamento */ }
+            Object.keys(data).forEach(k => delete data[k]);
+            writeStore(data);
+            $('tnCssNotice').hidden = false;
+        } else if (fp) {
+            try { localStorage.setItem(CSS_KEY, fp); } catch { /* sem armazenamento */ }
+        }
+        applyAll(); renderList(); renderFields(); renderStatus();
+    });
 
     function renderPause() {
         const b = $('tnPause');
@@ -180,6 +226,7 @@ export function mountTuner(root) {
             const wait = setInterval(() => {
                 if (!frame.contentWindow?.tunerApi?.ready) return;
                 clearInterval(wait);
+                cssChecked.then(() => { applyScene(); applyAll(); renderFields(); });
                 applyScene();
                 applyAll();
                 renderFields();
@@ -317,13 +364,15 @@ export function mountTuner(root) {
     }
 
     // ---------- O texto copiado: só o que mudou ----------
-    function describeChange(id, c) {
+    function describeChange(id, c, onScreen) {
         const label = ELEMENTS.find(e => e.id === id)?.label ?? id;
         const parts = [];
         if (c.dx !== 0 || c.dy !== 0) parts.push(`move x ${signed(c.dx)}px, y ${signed(c.dy)}px`);
         if (c.s !== 1) parts.push(`size ${Math.round(c.s * 100)}%`);
         if (c.hide) parts.push('hidden');
-        const base = c.base ? `   [game has it at left ${c.base[0]}, top ${c.base[1]}, ${c.base[2]}x${c.base[3]}]` : '';
+        // Na tela aberta agora, a posição é medida na hora (o registro guardado pode ser de um CSS antigo)
+        const where = (onScreen && baseRect(id)) || c.base;
+        const base = where ? `   [game has it at left ${where[0]}, top ${where[1]}, ${where[2]}x${where[3]}]` : '';
         return `  - ${label} (#${id}): ${parts.join(', ')}${base}`;
     }
 
@@ -344,7 +393,7 @@ export function mountTuner(root) {
             ELEMENTS.forEach(e => {
                 const c = data[k][e.id];
                 if (!isChanged(c)) return;
-                lines.push(describeChange(e.id, c));
+                lines.push(describeChange(e.id, c, k === key()));
                 const out = {};
                 if (c.dx !== 0) out.dx = c.dx;
                 if (c.dy !== 0) out.dy = c.dy;
@@ -388,6 +437,14 @@ export function mountTuner(root) {
         if (!confirm('Clear every adjustment on every screen? Do this after the changes were applied to the game CSS.')) return;
         Object.keys(data).forEach(k => delete data[k]);
         writeStore(data); applyAll(); renderFields(); renderList(); renderStatus();
+    };
+    $('tnRestore').onclick = () => {
+        let backup = {};
+        try { backup = JSON.parse(localStorage.getItem(BACKUP_KEY)) ?? {}; } catch { /* nada guardado */ }
+        Object.assign(data, backup);
+        writeStore(data);
+        $('tnCssNotice').hidden = true;
+        applyAll(); renderList(); renderFields(); renderStatus();
     };
     $('tnCopy').onclick = () => copy(null);
     $('tnCopyOne').onclick = () => copy(key());

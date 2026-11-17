@@ -52,6 +52,10 @@ window.tunerApi = {
         state.streak = count;
         state.streakTimer = count > 0 ? 9999 : 0;
         refresh();
+        // Com o jogo pausado o laço que mostra a sequência não roda: liga direto, para a peça ficar onde fica no jogo
+        document.getElementById('hudStreak')?.classList.toggle('is-visible', count > 0);
+        const label = document.getElementById('streakCount');
+        if (label && count > 0) label.textContent = count;
     },
     points(count) { state.skillPoints = count; refresh(); },
     freeze(on) {

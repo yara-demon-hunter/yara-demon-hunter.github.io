@@ -57,10 +57,10 @@
     display: none;
     position: absolute;
     z-index: 15;
-    right: var(--touch-right);
-    bottom: var(--touch-bottom);
-    width: var(--touch-size);
-    height: var(--touch-size);
+    right: var(--knife-right, var(--touch-right));
+    bottom: var(--knife-bottom, var(--touch-bottom));
+    width: calc(var(--knife-size, var(--touch-base)) * var(--touch-scale));
+    height: calc(var(--knife-size, var(--touch-base)) * var(--touch-scale));
     border: 2px solid rgba(103, 232, 249, 0.4);
     border-radius: 50%;
     background: rgba(15, 23, 42, 0.35);
@@ -107,10 +107,10 @@
     display: none;
     position: absolute;
     z-index: 15;
-    right: calc(var(--touch-right) + var(--touch-size) * 0.86);
-    bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.8);
-    width: calc(var(--touch-size) * 0.78);
-    height: calc(var(--touch-size) * 0.78);
+    right: var(--dash-right, calc(var(--touch-right) + var(--touch-size) * 0.86));
+    bottom: var(--dash-bottom, calc(var(--touch-bottom) + var(--touch-size) * 0.8));
+    width: calc(var(--dash-size, calc(var(--touch-base) * 0.78)) * var(--touch-scale));
+    height: calc(var(--dash-size, calc(var(--touch-base) * 0.78)) * var(--touch-scale));
     align-items: center;
     justify-content: center;
     font-size: calc(var(--touch-icon) * 0.95);
@@ -180,52 +180,174 @@
     }
 }
 
-/* Celular em pé: os controles crescem com a ALTURA da tela (telas altas têm mais espaço para o polegar): ~61 px em 640 de
-   altura, ~82 px a partir de ~900. A adaga é um pouco menor que o joystick e o dash, pequeno, fica à esquerda e acima dela.
-   Medidas tiradas do HUD tuner (360x640, 360x740, 390x844 e 412x915, 17/11/2026), em proporções do tamanho do joystick. */
+/* Celular em pé: posição e tamanho de cada controle por FAIXA DE ALTURA da tela, com os valores exatos que o dono
+   deixou no HUD tuner (17/11/2026) em 360x640, 360x740, 390x844 e 412x915. Telas intermediárias usam a faixa mais próxima.
+   Cada controle tem tamanho e posição próprios (variáveis abaixo); o tamanho escolhido em Settings (--touch-scale)
+   continua multiplicando os três. A barra de gestos do celular (safe-area) nunca cobre um controle. */
 @media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) {
     :root {
-        --touch-base: clamp(3.8rem, 9.4dvh, 5.2rem);
         --touch-base-knob: calc(var(--touch-base) * 0.46);
         --touch-base-icon: calc(var(--touch-base) * 0.24);
         --touch-ring: 5px;
-        --touch-bottom: max(3.5rem, 8.6dvh, calc(env(safe-area-inset-bottom) + 2.7rem));
-        --touch-left: max(1.75rem, calc(env(safe-area-inset-left) + 1.3rem));
-        --touch-right: calc(var(--touch-left) * 0.9);
+        /* Faixa 1: até 700 px de altura (360x640) */
+        --touch-base: 4.031rem;
+        --touch-left: 2.656rem;
+        --touch-bottom: max(4.081rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+        --knife-size: 3.888rem;
+        --knife-right: 2.6rem;
+        --knife-bottom: max(4.35rem, calc(env(safe-area-inset-bottom) + 1.9rem));
+        --dash-size: 2.375rem;
+        --dash-right: 6.262rem;
+        --dash-bottom: max(7.569rem, calc(env(safe-area-inset-bottom) + 4.6rem));
     }
     #knifeButton {
-        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.1);
-        width: calc(var(--touch-size) * 0.92);
-        height: calc(var(--touch-size) * 0.92);
+        right: max(var(--knife-right), env(safe-area-inset-right));
+        bottom: var(--knife-bottom);
+        width: calc(var(--knife-size) * var(--touch-scale));
+        height: calc(var(--knife-size) * var(--touch-scale));
     }
     #dashButton {
-        right: calc(var(--touch-right) + var(--touch-size) * 0.84);
-        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.85);
-        width: calc(var(--touch-size) * 0.55);
-        height: calc(var(--touch-size) * 0.55);
+        right: var(--dash-right);
+        bottom: var(--dash-bottom);
+        width: calc(var(--dash-size) * var(--touch-scale));
+        height: calc(var(--dash-size) * var(--touch-scale));
     }
 }
-/* Celulares um pouco mais largos (390 em diante): o joystick se afasta mais da borda */
-@media (pointer: coarse) and (orientation: portrait) and (min-width: 385px) and (max-width: 599px) {
-    :root { --touch-left: max(2.5rem, calc(env(safe-area-inset-left) + 1.3rem)); }
+/* Faixa 2: 701 a 790 px de altura (360x740) */
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) and (min-height: 701px) {
+    :root {
+        --touch-base: 4.825rem;
+        --touch-left: 2.231rem;
+        --touch-bottom: max(4.281rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+        --knife-size: 4.119rem;
+        --knife-right: 1.963rem;
+        --knife-bottom: max(4.363rem, calc(env(safe-area-inset-bottom) + 1.9rem));
+        --dash-size: 2.369rem;
+        --dash-right: 5.719rem;
+        --dash-bottom: max(7.869rem, calc(env(safe-area-inset-bottom) + 4.6rem));
+    }
 }
-/* Tablet em pé (768x1024 no tuner): os controles ficam do tamanho padrão, mais altos e mais para dentro; a adaga e o dash menores */
+/* Faixa 3: 791 a 880 px de altura (390x844) */
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) and (min-height: 791px) {
+    :root {
+        --touch-base: 5.891rem;
+        --touch-left: 2.789rem;
+        --touch-bottom: max(4.334rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+        --knife-size: 4.743rem;
+        --knife-right: 2.623rem;
+        --knife-bottom: max(4.721rem, calc(env(safe-area-inset-bottom) + 1.9rem));
+        --dash-size: 2.605rem;
+        --dash-right: 6.754rem;
+        --dash-bottom: max(9.144rem, calc(env(safe-area-inset-bottom) + 4.6rem));
+    }
+}
+/* Faixa 4: a partir de 881 px de altura (412x915) */
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 599px) and (min-height: 881px) {
+    :root {
+        --touch-base: 5.875rem;
+        --touch-left: 3.209rem;
+        --touch-bottom: max(4.854rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+        --knife-size: 4.963rem;
+        --knife-right: 3.081rem;
+        --knife-bottom: max(5.590rem, calc(env(safe-area-inset-bottom) + 1.9rem));
+        --dash-size: 2.872rem;
+        --dash-right: 7.367rem;
+        --dash-bottom: max(9.973rem, calc(env(safe-area-inset-bottom) + 4.6rem));
+    }
+}
+/* Tablet em pé (768x1024 no tuner, 17/11/2026): controles com os valores exatos do dono */
 @media (pointer: coarse) and (orientation: portrait) and (min-width: 600px) {
     :root {
-        --touch-bottom: max(5.9rem, 9.2dvh);
-        --touch-left: max(4.25rem, 8.9vw);
-        --touch-right: max(4.6rem, 9.7vw);
+        --touch-left: 4.894rem;
+        --touch-bottom: 5.326rem;
+        --knife-size: 6.432rem;
+        --knife-right: 5.643rem;
+        --knife-bottom: 6.188rem;
+        --dash-size: 4.228rem;
+        --dash-right: 11.036rem;
+        --dash-bottom: 11.628rem;
     }
-    #knifeButton {
-        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.156);
-        width: calc(var(--touch-size) * 0.83);
-        height: calc(var(--touch-size) * 0.83);
+}
+
+/* Celular deitado: posição e tamanho de cada controle por FAIXA DE LARGURA, com os valores exatos que o dono deixou no
+   HUD tuner (17/11/2026) em 640x360, 740x360, 844x390 e 915x412. Telas intermediárias usam a faixa mais próxima. */
+/* Faixa deitado 1: até 690 px de largura (640x360) */
+@media (pointer: coarse) and (max-height: 520px) and (orientation: landscape) and (max-width: 690px) {
+    :root {
+        --touch-base: 4rem;
+        --touch-base-knob: calc(var(--touch-base) * 0.5);
+        --touch-base-icon: calc(var(--touch-base) * 0.275);
+        --touch-left: max(2.894rem, calc(env(safe-area-inset-left) + 1.25rem));
+        --touch-bottom: max(2.535rem, calc(env(safe-area-inset-bottom) + 1rem));
+        --knife-size: 3.560rem;
+        --knife-right: max(2.599rem, calc(env(safe-area-inset-right) + 1.25rem));
+        --knife-bottom: max(2.431rem, calc(env(safe-area-inset-bottom) + 1.2rem));
+        --dash-size: 2.152rem;
+        --dash-right: max(5.975rem, calc(env(safe-area-inset-right) + 5rem));
+        --dash-bottom: max(5.283rem, calc(env(safe-area-inset-bottom) + 3rem));
     }
-    #dashButton {
-        right: calc(var(--touch-right) + var(--touch-size) * 0.74);
-        bottom: calc(var(--touch-bottom) + var(--touch-size) * 0.72);
-        width: calc(var(--touch-size) * 0.62);
-        height: calc(var(--touch-size) * 0.62);
+}
+/* Faixa deitado 2: 691 a 790 px (740x360) */
+@media (pointer: coarse) and (max-height: 520px) and (orientation: landscape) and (min-width: 691px) and (max-width: 790px) {
+    :root {
+        --touch-base: 4rem;
+        --touch-base-knob: calc(var(--touch-base) * 0.5);
+        --touch-base-icon: calc(var(--touch-base) * 0.275);
+        --touch-left: max(3.396rem, calc(env(safe-area-inset-left) + 1.25rem));
+        --touch-bottom: max(3.388rem, calc(env(safe-area-inset-bottom) + 1rem));
+        --knife-size: 4rem;
+        --knife-right: max(3.034rem, calc(env(safe-area-inset-right) + 1.25rem));
+        --knife-bottom: max(2.887rem, calc(env(safe-area-inset-bottom) + 1.2rem));
+        --dash-size: 2.246rem;
+        --dash-right: max(7.094rem, calc(env(safe-area-inset-right) + 5rem));
+        --dash-bottom: max(6.188rem, calc(env(safe-area-inset-bottom) + 3rem));
+    }
+}
+/* Faixa deitado 3: 791 a 880 px (844x390) */
+@media (pointer: coarse) and (max-height: 520px) and (orientation: landscape) and (min-width: 791px) and (max-width: 880px) {
+    :root {
+        --touch-base: 4.760rem;
+        --touch-base-knob: calc(var(--touch-base) * 0.5);
+        --touch-base-icon: calc(var(--touch-base) * 0.275);
+        --touch-left: max(3.843rem, calc(env(safe-area-inset-left) + 1.25rem));
+        --touch-bottom: max(2.522rem, calc(env(safe-area-inset-bottom) + 1rem));
+        --knife-size: 3.600rem;
+        --knife-right: max(4.052rem, calc(env(safe-area-inset-right) + 1.25rem));
+        --knife-bottom: max(3.277rem, calc(env(safe-area-inset-bottom) + 1.2rem));
+        --dash-size: 2.183rem;
+        --dash-right: max(7.645rem, calc(env(safe-area-inset-right) + 5rem));
+        --dash-bottom: max(6.194rem, calc(env(safe-area-inset-bottom) + 3rem));
+    }
+}
+/* Faixa deitado 4: a partir de 881 px (915x412) */
+@media (pointer: coarse) and (max-height: 520px) and (orientation: landscape) and (min-width: 881px) {
+    :root {
+        --touch-base: 4.440rem;
+        --touch-base-knob: calc(var(--touch-base) * 0.5);
+        --touch-base-icon: calc(var(--touch-base) * 0.275);
+        --touch-left: max(4.378rem, calc(env(safe-area-inset-left) + 1.25rem));
+        --touch-bottom: max(3.022rem, calc(env(safe-area-inset-bottom) + 1rem));
+        --knife-size: 3.600rem;
+        --knife-right: max(4.768rem, calc(env(safe-area-inset-right) + 1.25rem));
+        --knife-bottom: max(3.349rem, calc(env(safe-area-inset-bottom) + 1.2rem));
+        --dash-size: 2.308rem;
+        --dash-right: max(8.304rem, calc(env(safe-area-inset-right) + 5rem));
+        --dash-bottom: max(6.119rem, calc(env(safe-area-inset-bottom) + 3rem));
+    }
+}
+
+/* Tablet deitado (1024x768 no tuner, 17/11/2026): controles com os valores exatos do dono */
+@media (pointer: coarse) and (orientation: landscape) and (min-width: 1024px) and (min-height: 521px) {
+    :root {
+        --touch-base: 7.673rem;
+        --touch-left: max(6.101rem, calc(env(safe-area-inset-left) + 1.25rem));
+        --touch-bottom: max(3.959rem, calc(env(safe-area-inset-bottom) + 1rem));
+        --knife-size: 5.812rem;
+        --knife-right: max(5.174rem, calc(env(safe-area-inset-right) + 1.25rem));
+        --knife-bottom: max(5.557rem, calc(env(safe-area-inset-bottom) + 1.2rem));
+        --dash-size: 3.869rem;
+        --dash-right: max(10.960rem, calc(env(safe-area-inset-right) + 5rem));
+        --dash-bottom: max(9.783rem, calc(env(safe-area-inset-bottom) + 3rem));
     }
 }
 

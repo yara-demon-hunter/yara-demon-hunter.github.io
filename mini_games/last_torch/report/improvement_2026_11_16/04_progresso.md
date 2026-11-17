@@ -82,6 +82,37 @@ O dono ajustou 6 telas no tuner; a IA aplicou como regras proporcionais, não co
 - **Lição:** os deslocamentos do tuner valem sobre o CSS da hora e ficam guardados no navegador; por isso há agora o botão **Reset ALL screens**, para usar depois de cada aplicação.
 - **Não verificado:** celular real, tablet real.
 
+## 17/11/2026 — Segundo ajuste do 360×640 (telas baixas, até 700 px de altura)
+
+Aplicado só às telas baixas (o 360×740 e maiores não mudaram): joystick 62 px, mais para dentro (25 px da borda, 59 px de baixo); adaga 54 px; dash 28 px; sequência de mortes volta para a altura da barra do boss (4rem, 88%); pontuação desce para 8rem. Medido: o 360×640 bateu com o ajuste do dono com no máximo 0,5 px.
+Os valores da barra do boss e do dash vieram iguais aos da vez anterior porque o tuner ainda guardava os ajustes antigos e os somou ao CSS novo; foi aplicado o que o dono viu na tela. **Use _Reset ALL screens_** no tuner antes do próximo ajuste.
+
+## 17/11/2026 — Terceiro envio do tuner: celulares em pé por faixa de altura
+
+- Os controles e o HUD dos celulares em pé passaram a ser definidos por **faixa de altura** (até 700, 701–790, 791–880, 881+ px), cada uma com os valores exatos que o dono deixou em 360×640, 360×740, 390×844 e 412×915. Cada controle (joystick, adaga, dash) tem tamanho e posição próprios em variáveis CSS; o tamanho de Settings continua multiplicando.
+- **Medido:** as 6 peças dos 4 celulares ficaram a no máximo 0,1 px do que o dono viu no tuner. Tablet (768×1024) e desktop (1280×720) não mudaram.
+- **Não aplicado:** tablet e desktop, porque os valores vieram idênticos aos do envio anterior (ajustes antigos ainda guardados no tuner, não mudança nova). Aplicar de novo levaria a barra do boss do desktop para fora da tela.
+
+## 17/11/2026 — Quarto envio do tuner: 360×640 (faixa até 700 px de altura)
+
+Primeiro envio feito sobre o CSS atual, sem soma em dobro (o tuner agora ignora ajustes guardados quando o CSS muda). Mudanças só na faixa de até 700 px de altura: joystick maior (64 px) e mais para dentro; adaga 62 px; dash 38 px, mais para a esquerda e para cima; barra do boss 74,15% da largura; sequência e pontuação um pouco mais para cima/dentro. Medido: o 360×640 bateu com o ajuste do dono (diferença de no máximo 0,4 px); as outras telas não mudaram.
+O "left 282" da sequência no texto do dono era a posição de referência antiga; o tuner agora mostra 274, igual ao jogo.
+
+## 17/11/2026 — Quinto envio do tuner: celulares deitados, tablet e retoques
+
+Primeiro envio com 7 telas e todas as posições de referência batendo com o CSS atual (a correção do tuner funcionou). Aplicado:
+- **Celulares em pé 390×844 e 412×915:** joystick, adaga e dash reposicionados por faixa de altura; pontuação do 412×915 14% maior.
+- **Tablet em pé 768×1024:** controles, sequência (157%) e pontuação (127%) reposicionados.
+- **Celulares deitados (novo):** controles por faixa de largura (≤690, 691–790, 791–880, 881+ px) e HUD por faixa com `translate` e `scale`, as mesmas propriedades do tuner: cartão do herói, medalhão, botão de ajustes, barra do boss, barra da onda, pontuação e sequência.
+- **Estrutura:** os botões da adaga e do dash passaram a usar variáveis (`--knife-*`, `--dash-*`) com o padrão antigo como reserva, então só as faixas as alteram.
+- **Medido:** nos 7 tamanhos, cada peça ficou a no máximo 0,7 px do ajuste do dono (o medalhão pulsa); 360×640 e desktop não mudaram. Sem erros no console.
+- **Não verificado:** celular e tablet reais; telas de tamanho diferente dos testados usam a faixa mais próxima.
+
+## 17/11/2026 — Sexto envio do tuner: tablet deitado e desktops
+
+Aplicado, por faixa de largura (telas altas, acima de 520 px): **1024×768** (controles de toque por variáveis e HUD com `translate`/`scale`), **1280×720** (retoques: barra do boss, barra da onda, pontuação e sequência) e **1920×1080** (cartão do herói, medalhão, botão de ajustes, barra do boss, pontuação e sequência bem maiores). Faixas: 1024–1151, 1152–1599 e 1600+ px; telas intermediárias usam a mais próxima.
+Medido: nos 3 tamanhos cada peça ficou a no máximo 0,2 px do ajuste do dono; os 7 tamanhos do envio anterior e o 360×640 não mudaram. Não verificado: tela real.
+
 ## Decisão do dono (17/11)
 
 Sem tutorial de joystick/dash: a interface é simples. Os itens "primeiros monstros mais fracos" e "primeiro nível em 15 s" ficam para depois de o dono jogar o pacote e dizer se o começo está difícil ou lento. A Fase 2 está feita no que importa.

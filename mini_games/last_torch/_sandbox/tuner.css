@@ -42,3 +42,6 @@
 /* Botão de pausa sobre o palco: o jogo começa pausado e roda só quando se pede */
 .tn-pause { position: absolute; left: 10px; top: 10px; z-index: 5; padding: 8px 14px; border-radius: 9px; border: 1px solid #22c55e; background: rgba(20, 83, 45, .92); color: #fff; font: 700 13px Inter, sans-serif; cursor: pointer; }
 .tn-pause.is-paused { border-color: #f59e0b; background: rgba(120, 53, 15, .92); }
+.tn-notice { padding: 8px 10px; border: 1px solid #f59e0b; border-radius: 8px; background: rgba(120, 53, 15, .35); color: #fde68a; font-size: 12px; line-height: 1.4; }
+.tn-notice button { margin-top: 6px; padding: 5px 9px; border-radius: 6px; border: 1px solid #f59e0b; background: #111a2e; color: #fde68a; cursor: pointer; font: inherit; }
+.tn-notice[hidden] { display: none; }
