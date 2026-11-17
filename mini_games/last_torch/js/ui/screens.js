@@ -377,6 +377,7 @@ export function triggerGameOver(reason) {
     document.getElementById('finalHourName').innerText = getHourName(state.turn);
     document.getElementById('finalLevel').innerText = state.playerLevel;
     document.getElementById('finalKills').innerText = run.kills;
+    document.getElementById('finalKillsTotal').innerText = `${save.stats.kills.toLocaleString('en-US')} total`;
     document.getElementById('finalStreak').innerText = run.bestStreak;
     document.getElementById('finalScoreLabel').innerText = newRecord ? 'NEW RECORD' : 'Score';
     document.getElementById('finalScoreLabel').classList.toggle('is-record', newRecord);

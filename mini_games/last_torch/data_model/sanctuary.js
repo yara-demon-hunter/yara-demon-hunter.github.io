@@ -14,6 +14,7 @@ export const ACHIEVEMENTS = [
     { id: 'hour3', group: 'trophy', icon: '🌒', name: 'Into the Hush', desc: 'Reach Wave 3.', stat: 'bestHour', target: 3 },
     { id: 'hour4', group: 'trophy', icon: '🌕', name: 'Blood Moon', desc: 'Reach Wave 4.', stat: 'bestHour', target: 4, hero: 'avgustino' },
     { id: 'kills300', group: 'trophy', icon: '⚰️', name: 'Reaper', desc: 'Slay 200 monsters.', stat: 'kills', target: 200 },
+    { id: 'kills1000', group: 'trophy', icon: '🔱', name: 'Thousand Souls', desc: 'Slay 1,000 monsters across all your nights.', stat: 'kills', target: 1000 },
     { id: 'demon', group: 'trophy', icon: '😈', name: 'Demon Slayer', desc: 'Slay the Demon Lord.', stat: 'boss_DEMON_LORD', target: 1, hero: 'reaver' },
     { id: 'evolve', group: 'trophy', icon: '✨', name: 'Transcendence', desc: 'Evolve a power.', stat: 'evolutions', target: 1 },
     { id: 'chests10', group: 'trophy', icon: '🗝️', name: 'Treasure Hunter', desc: 'Open 10 chests.', stat: 'chests', target: 10 },
