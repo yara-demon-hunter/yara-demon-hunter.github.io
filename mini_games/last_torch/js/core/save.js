@@ -16,14 +16,17 @@ function createSave() {
         stats: {
             runs: 0, kills: 0, bestHour: 0, bestScore: 0, bestStreak: 0, victories: 0,
             elites: 0, evolutions: 0, bestDarknessWon: 0, bosses: 0, chests: 0,
-            bestMultiKill: 0, perfectDodges: 0, flawlessHours: 0
+            bestMultiKill: 0, perfectDodges: 0, flawlessHours: 0,
+            fiveStarWaves: 0,           // ondas diferentes com ★★★★★ no resultado (conquistas)
+            bestNightKills: 0, bestNightStars: 0, bestNightEmbers: 0   // recordes de uma noite (tela final)
         },
         // quickPickChosen: o jogador já ligou ou desligou a escolha ao subir de nível em Settings; sem isso vale o padrão (data_model/start.js)
         settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, moveKeys: false, quickPick: START.quickPickDefault, quickPickChosen: false, touch: { scale: 1, positions: {} } },
         seenTutorial: false,
         seenTreeHint: false,
         embers: 0,                  // Brasas: a moeda que fica entre as noites (data_model/embers.js)
-        altar: {}                   // melhorias permanentes compradas no Altar: chave -> nível
+        altar: {},                  // melhorias permanentes compradas no Altar: chave -> nível
+        waveBests: {}               // recorde de cada onda (número da onda -> { score, stars, kills, rush, gold }), no resultado da onda
     };
 }
 

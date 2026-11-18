@@ -194,6 +194,12 @@ function createTreeView(cfg) {
             line.textContent = part.trim();
             return line;
         }));
+        if (info.warning) {
+            const warn = document.createElement('span');
+            warn.className = 'tdetail-warn';
+            warn.textContent = `⚠ ${info.warning}`;
+            desc.appendChild(warn);
+        }
         if (detail('Branch')) detail('Branch').textContent = branches[node.branch].style;
         const nextLine = detail('Next');
         // Os aumentos ficam só na prévia verde abaixo; não repetir antes/depois em azul.

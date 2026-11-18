@@ -56,6 +56,28 @@ function renderRecords(list) {
     list.appendChild(box);
 }
 
+// Estrelas de cada onda: o melhor resultado já tirado em cada uma das 12 (save.waveBests, gravado em js/ui/camp.js), com o recorde de
+// pontos. Fica nas Façanhas, logo abaixo dos recordes: é o que o jogador volta para completar.
+const WAVES = 12;
+function renderWaveStars(list) {
+    const bests = save.waveBests ?? {};
+    const total = Object.values(bests).reduce((sum, b) => sum + Math.min(5, b.stars ?? 0), 0);
+    const box = el('div', 'sanc-waves');
+    box.append(el('p', 'sanc-waves-title', `WAVE STARS · ${total}/${WAVES * 5} ★`));
+    const grid = el('div', 'sanc-waves-grid');
+    for (let w = 1; w <= WAVES; w++) {
+        const best = bests[w];
+        const stars = Math.min(5, best?.stars ?? 0);
+        const cell = el('div', `sanc-wave${best ? '' : ' is-unknown'}${stars === 5 ? ' is-perfect' : ''}`);
+        const row = el('span', 'sanc-wave-stars');
+        row.innerHTML = `<b>${'★'.repeat(stars)}</b>${'★'.repeat(5 - stars)}`;
+        cell.append(el('i', '', `Wave ${w}`), row, el('em', '', best ? number(best.score) : '—'));
+        grid.appendChild(cell);
+    }
+    box.appendChild(grid);
+    list.appendChild(box);
+}
+
 // Sprite pronto da partida (primeiro quadro); sem ele, o ícone
 function beastArt(info) {
     const box = el('span', 'beast-art');
@@ -111,7 +133,10 @@ function renderSanctuary() {
     list.scrollTop = 0;
     if (tab === 'bestiary') renderBestiary(list);
     else {
-        if (tab === 'feats') renderRecords(list);
+        if (tab === 'feats') {
+            renderRecords(list);
+            renderWaveStars(list);
+        }
         renderAchievements(list, GROUPS[tab]);
     }
 }

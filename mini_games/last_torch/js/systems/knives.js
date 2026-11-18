@@ -79,10 +79,10 @@ function releaseKnife(thrower = player) {
     const count = passives.fanOfKnives.lvl > 0 ? FAN_OF_KNIVES.count : 1;
     const spread = (FAN_OF_KNIVES.spreadDegrees * Math.PI) / 180;
     const ricochet = getPowerLevel(powers.ricochet);
-    const lance = getPowerLevel(powers.chargedThrow);
-    const power = state.knifeThrowPower >= POWER_MODELS.chargedThrow.minCharge ? state.knifeThrowPower : 0;
-    // A carga da Charged Dagger Throw se divide entre as adagas do leque
-    const damage = getKnifeDamage() * (1 + power * (lance?.damage ?? 0) / count);
+    const charge = getFireCharge();
+    const power = charge && state.knifeThrowPower >= charge.minCharge ? state.knifeThrowPower : 0;
+    // A carga da Fireballs se divide entre as bolas do leque
+    const damage = getKnifeDamage() * (1 + power * (charge?.damage ?? 0) / count);
     const knockback = getKnockback() * characterStat('knifeKnockbackRatio');
 
     for (let i = 0; i < count; i++) {
@@ -93,9 +93,9 @@ function releaseKnife(thrower = player) {
             vy: Math.sin(angle) * speed,
             angle, speed, maxRange, damage, knockback,
             travelled: 0,
-            bounces: ricochet?.bounces ?? 0,
-            pierces: Math.round(power * (lance?.pierces ?? 0)),
-            scale: 1 + power * (POWER_MODELS.chargedThrow.maxScale - 1),
+            bounces: power > 0 ? 0 : ricochet?.bounces ?? 0,      // a bola carregada não ricocheteia
+            pierces: 0,
+            scale: 1 + power * ((charge?.maxScale ?? 1) - 1),
             fire: passives.fireballs.lvl > 0,
             magic: isMagicKnife(),
             style: getThrownStyle(),
@@ -143,10 +143,15 @@ export function getKnifeRange() {
     return getKnifeBaseRange() * (1 + mod('knifeRange'));
 }
 
-// Charged Dagger Throw: fração da carga atual (0 a 1)
+// Fireballs: dados da carga (segurar o botão), ou null sem a skill
+function getFireCharge() {
+    return passives.fireballs.lvl > 0 ? FIREBALLS.charge : null;
+}
+
+// Fireballs: fração da carga atual (0 a 1)
 export function getKnifeChargeRatio() {
-    const lance = getPowerLevel(powers.chargedThrow);
-    return lance ? Math.min(1, state.knifeCharge / lance.seconds) : 0;
+    const charge = getFireCharge();
+    return charge ? Math.min(1, state.knifeCharge / charge.seconds) : 0;
 }
 
 // Botão da adaga (toque): arrastando mira na direção do arraste. Num toque rápido a mira é automática:
@@ -210,10 +215,10 @@ export function updateKnives(dt) {
     // Botão da adaga (toque): segurando só mira (linha tracejada); ao soltar arremessa uma vez na
     // direção mirada, se a recarga já terminou
     const { stick, held, x, y } = state.knifeInput;
-    const lance = getPowerLevel(powers.chargedThrow);
+    const charge = getFireCharge();
     const ready = state.knifeTimer <= 0 && state.knifePending === null;
-    // Charged Dagger Throw: segurar carrega (só com a adaga pronta) em vez de repetir o arremesso
-    if (lance && ready && (held || stick.active) && mod('noKnives') <= 0) state.knifeCharge = Math.min(lance.seconds, state.knifeCharge + dt);
+    // Fireballs: segurar carrega (só com a adaga pronta) em vez de repetir o arremesso
+    if (charge && ready && (held || stick.active) && mod('noKnives') <= 0) state.knifeCharge = Math.min(charge.seconds, state.knifeCharge + dt);
 
     if (stick.active || stick.fire) aimWithStick(stick);
     if (stick.fire) {
@@ -234,7 +239,7 @@ export function updateKnives(dt) {
         }
     }
 
-    if (lance) {
+    if (charge) {
         if (!held && !stick.active && state.knifeCharge > 0) throwKnife(x, y);
     } else if (held && state.knifeTimer <= 0 && state.knifePending === null) {
         throwKnife(x, y);

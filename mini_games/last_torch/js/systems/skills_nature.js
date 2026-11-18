@@ -227,14 +227,15 @@ function updateShelterOak(dt) {
             }
         }
         if (oak.stage === 'sapling' || oak.stage === 'young') {
+            const grow = oakGrowth();
             oak.growthAge += dt * (1 + mod('oakGrowth'));
-            if (oak.stage === 'sapling' && oak.growthAge >= M.saplingSeconds) {
+            if (oak.stage === 'sapling' && oak.growthAge >= grow.sapling) {
                 oak.stage = 'young';
                 oak.transition = 0.45;
                 createExplosion(oak.x, oak.y - 14, '#4ade80', 8);
                 addShockwave(oak.x, oak.y, { radius: 34, color: COLOR, width: 4, seconds: 0.35 });
             }
-            if (oak.growthAge >= M.adultSeconds) {
+            if (oak.growthAge >= grow.adult) {
                 oak.stage = 'adult';
                 oak.age = 0;
                 oak.transition = 0.45;
@@ -654,7 +655,7 @@ function updateRoseThorns(dt) {
 // --- MORTE DE UM MONSTRO (chamado por js/systems/powers.js, onEnemyKilled) ---
 export function onNatureKill(e) {
     // Cada monstro morto (de qualquer jeito) adianta o crescimento das mudas e das árvores pequenas (a anterior à semente nova)
-    for (const oak of N.oaks) if (oak.stage !== 'elder') oak.growthAge += POWER_MODELS.shelterOak.killGrowthSeconds * (1 + mod('oakGrowth'));
+    for (const oak of N.oaks) if (oak.stage !== 'elder') oak.growthAge += oakGrowth().perKill * (1 + mod('oakGrowth'));
     // Dark Roses: morreu marcado, rosas de espinho brotam onde caiu
     if (e.roseMark > 0 && N.thorns.length < 14) {
         N.thorns.push({ x: e.x, y: e.y, age: 0, tick: 0.2, variant: Math.floor(Math.random() * 3) });
@@ -722,4 +723,11 @@ export function clearNatureSkills(all = false) {
         w.dead = false;
         w.hp = w.maxHp;
     }
+}
+
+// Tempos de crescimento do carvalho pelo nível da skill (POWER_MODELS.shelterOak.levels[n].grow); evoluído = os do nível máximo
+function oakGrowth() {
+    const levels = POWER_MODELS.shelterOak.levels;
+    const lvl = Math.max(1, Math.min(levels.length, powers.shelterOak.lvl || 1));
+    return levels[lvl - 1].grow;
 }

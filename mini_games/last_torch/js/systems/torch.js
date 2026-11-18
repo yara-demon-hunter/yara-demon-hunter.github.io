@@ -25,6 +25,7 @@ export function hurtTorch(amount, x, y) {
     // Torch Ward: o escudo paga o golpe
     if (wardTorch()) return;
     amount *= 1 - mod('torchGuard');
+    state.waveStats.torchDamage += Math.min(amount, state.coreHp);     // para as estrelas do resultado da onda
     state.coreHp = Math.max(0, state.coreHp - amount);
     shakeScreen(8);
     audio.playTorchHit();

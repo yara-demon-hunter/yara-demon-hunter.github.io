@@ -398,3 +398,6 @@
 @media (orientation: portrait) and (max-width: 599px) and (max-height: 700px) {
     .tree-detail { max-height: 31dvh; }
 }
+
+/* Aviso em vermelho na descrição de uma skill (ex.: Fireballs não ricocheteia) */
+.tdetail-warn { display: block; margin-top: 0.35rem; color: #f87171; font-weight: 700; }

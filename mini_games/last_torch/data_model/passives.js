@@ -102,7 +102,8 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby, setting it ablaze and leaving the ground burning. Everything that improves your daggers still counts, and your magic damage multiplies the fireball on top (its hits show in blue). The price: you stand still for a moment, unable to do anything, while the fire grows in your hand.'
+        desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby, setting it ablaze and leaving the ground burning. Everything that improves your daggers still counts, and your magic damage multiplies the fireball on top (its hits show in blue). The price: you stand still for a moment, unable to do anything, while the fire grows in your hand. Hold the dagger button to charge it into a huge fireball that deals up to 4x damage and bursts over a wide area.',
+        warning: 'Charged fireballs do not ricochet, and Ricochet is lost while you hold the fire.'
     },
     fireTornado: {
         name: 'Fire Tornado',
@@ -500,6 +501,10 @@ export const FLAME_BLADE = {
 
 // Fireballs: a adaga continua sendo adaga (dano, alcance, Death Mark, carga, Ricochet); ao acertar, explode
 export const FIREBALLS = {
+    // Segurar o botão da adaga carrega a bola (era a Charged Dagger Throw): até `seconds` segurando, ela cresce até `maxScale` vezes e
+    // leva `damage` x o dano a mais; abaixo de minCharge é um arremesso normal. A bola carregada explode no primeiro monstro (não
+    // atravessa) e NÃO ricocheteia.
+    charge: { seconds: 1.4, minCharge: 0.25, damage: 3, maxScale: 2.4 },
     castSeconds: 0.55,          // a bola cresce na mão e o herói fica parado, sem golpear nem dar dash
     splashRadius: 70,           // cresce com o tamanho da adaga carregada
     splashRatio: 0.6,           // dano nos vizinhos, em fração do dano da adaga

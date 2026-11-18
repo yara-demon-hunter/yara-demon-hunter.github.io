@@ -34,7 +34,6 @@ export const TREE_IMAGES = {
     oathHearth: img('oath-of-the-hearth'),
     oathRuin: img('oath-of-ruin'),
     emberTrail: img('ember-steps'),
-    chargedThrow: img('charged-dagger-throw'),
     corpseBurst: img('corpse-burst'),
     orbitBlades: img('spectral-blades'),
     orbitEvolve: img('balde-tempest'),

@@ -20,6 +20,8 @@ export const ACHIEVEMENTS = [
     { id: 'chests10', group: 'trophy', icon: '🗝️', name: 'Treasure Hunter', desc: 'Open 10 chests.', stat: 'chests', target: 10 },
     { id: 'hour6', group: 'trophy', icon: '🕯️', name: 'Deep Dark', desc: 'Reach Wave 6.', stat: 'bestHour', target: 6 },
     { id: 'elites10', group: 'trophy', icon: '💀', name: 'Trophy Hunter', desc: 'Slay 10 elites.', stat: 'elites', target: 10 },
+    { id: 'stars5x3', group: 'trophy', icon: '🌟', name: 'Starlit', desc: 'Earn 5 stars on 3 different waves.', stat: 'fiveStarWaves', target: 3 },
+    { id: 'stars5all', group: 'trophy', icon: '✨', name: 'Constellation', desc: 'Earn 5 stars on all 12 waves.', stat: 'fiveStarWaves', target: 12 },
     { id: 'kills2000', group: 'trophy', icon: '🪦', name: 'Harvester', desc: 'Slay 1,200 monsters.', stat: 'kills', target: 1200 },
     { id: 'countess', group: 'trophy', icon: '🧛', name: 'Sunlight', desc: 'Slay the Blood Countess.', stat: 'boss_BLOOD_COUNTESS', target: 1, hero: 'warden' },
     { id: 'dawn', group: 'trophy', icon: '🌅', name: 'Dawn', desc: 'Survive until dawn.', stat: 'victories', target: 1, hero: 'azael' },

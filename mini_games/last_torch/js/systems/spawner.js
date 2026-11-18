@@ -185,6 +185,8 @@ export function updateSpawner(dt) {
         if (state.bossPending <= 0) spawnBoss();
         return;
     }
+    // Boss em campo: nenhum monstro comum nasce (só o que o próprio boss invoca). Ao cair, a onda fecha (js/systems/night.js > afterBoss)
+    if (state.currentBoss) return;
 
     const plan = state.hourPlan;
     const progress = waveProgress(state.scoreTurn, state.targetScore, state.waveTime);

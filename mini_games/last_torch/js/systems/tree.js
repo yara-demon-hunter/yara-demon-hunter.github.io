@@ -1,7 +1,7 @@
 import { CAMP } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
 import { RELIC_BY_ID } from '../../data_model/relics.js';
-import { TREE_BY_ID, TREE_COSTS, TREE_NODES } from '../../data_model/tree.js';
+import { ACTIVE_SKILLS, TREE_BY_ID, TREE_COSTS, TREE_NODES } from '../../data_model/tree.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, powers, state } from '../core/state.js';
 import { prepareRaven } from '../render/raven.js';
@@ -64,15 +64,17 @@ export function getNodeCost(node) {
     if (node.kind === 'relic') return getRelicPrice(node);
     if (node.cost) return node.cost;
     const costs = TREE_COSTS[node.branch];
-    if (node.kind === 'power') return costs.power;
-    return node.kind === 'passive' || node.kind === 'evolve' ? costs.special : costs.basic;
+    // Skills que agem sozinhas em campo custam mais (data_model/tree.js > ACTIVE_SKILLS)
+    const extra = isActiveSkill(node) ? ACTIVE_SKILLS.extraCost : 0;
+    if (node.kind === 'power') return costs.power + extra;
+    return (node.kind === 'passive' || node.kind === 'evolve' ? costs.special : costs.basic) + extra;
 }
 
 // Nome, ícone e descrição de um nó, vindos de onde ele mora
 export function getNodeInfo(node) {
     if (node.kind === 'passive' || node.kind === 'relic') {
         const p = passives[node.key];
-        return { name: p.name, icon: p.icon, desc: p.desc };
+        return { name: p.name, icon: p.icon, desc: p.desc, warning: p.warning };
     }
     if (node.kind === 'stat') {
         const a = attributes[node.key];
@@ -281,6 +283,11 @@ export function getRestrictionText(node) {
     return (hero.mods?.noKnives ?? 0) > 0
         ? `${hero.name} fights without daggers: this skill is not for him.`
         : 'The Oath of Slaughter sealed your daggers: this skill can no longer be used.';
+}
+
+function isActiveSkill(node) {
+    if (node.kind === 'power') return ACTIVE_SKILLS.powers.includes(node.key);
+    return node.kind === 'passive' && ACTIVE_SKILLS.passives.includes(node.key);
 }
 
 // Lista completa do que um nó pede, com o que o jogador já tem: { label, have, need, met }.

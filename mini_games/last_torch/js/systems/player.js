@@ -42,6 +42,7 @@ function aroundTorch(dirX, dirY) {
 export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds) {
     if (player.iFrames > 0 || state.phase !== 'HUNT') return false;
     const damage = amount * getDamageTakenRatio() * furyDamageRatio();
+    state.waveStats.heroDamage += Math.max(0, Math.min(damage, player.hp));   // para as estrelas do resultado da onda
     player.hp -= damage;
     player.iFrames = invulnerableSeconds;
     state.hourHit = true;

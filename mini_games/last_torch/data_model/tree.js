@@ -20,6 +20,18 @@
 // segue aberta (js/systems/tree.js, isRestricted).
 const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
 
+// Skills ativas: as que agem sozinhas em campo (atiram, explodem, invocam). Não há limite de quantas: elas só custam
+// `extraCost` ponto a mais por nível que o padrão do ramo, para que empilhar várias seja quase impossível numa noite
+// (~86 pontos numa partida inteira: dá para levar umas 3 ou 4 ativas no máximo, e o resto vira escolha).
+// As de efeito passivo (status, adaga, golpe) mantêm o preço do ramo.
+export const ACTIVE_SKILLS = {
+    extraCost: 1,
+    powers: ['earthbreaker', 'torchBolts', 'fireRing', 'emberTrail', 'chillAura', 'soulNova', 'starfall', 'graveWisp', 'chainLightning',
+        'creepingHex', 'voidRift', 'corpseBurst', 'orbitBlades', 'graspingRoots', 'shelterOak', 'leechVine', 'sporePods', 'spiritWolves',
+        'holyGround', 'holyWater', 'smite', 'churchBell'],
+    passives: ['hearthPhoenix', 'fireTornado', 'phoenixPact', 'shadowRaven']
+};
+
 export const TREE_POINTS = {
     perLevel: 2                 // pontos por nível do herói
 };
@@ -82,18 +94,17 @@ export const TREE_NODES = [
 
     // --- SOMBRA: o ladrão. Técnica, combos, esquiva e ouro. Barato: o preço é saber jogar. Cinco linhas (y de 0 a 4) ---
     { id: 'moveSpeed', branch: 'shadow', kind: 'stat', key: 'moveSpeed', x: 0, y: 1.5, requires: [] },
-    // Linha das adagas
-    { id: 'ricochet', needs: 'knives', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 0, requires: [req('moveSpeed')] },
-    { id: 'mirrorWard', branch: 'shadow', kind: 'passive', key: 'mirrorWard', x: 2, y: 0, requires: [req('ricochet', 2)] },
-    { id: 'daggerMastery', needs: 'knives', branch: 'shadow', kind: 'mod', x: 3, y: 0, requires: [req('mirrorWard')],
+    // Linha de cima: Return Fire -> Shadow Raven
+    { id: 'mirrorWard', branch: 'shadow', kind: 'passive', key: 'mirrorWard', x: 1, y: 0, requires: [req('moveSpeed')] },
+    { id: 'shadowRaven', branch: 'shadow', kind: 'passive', key: 'shadowRaven', x: 2, y: 0, requires: [req('mirrorWard')] },
+    // Linha das adagas, tudo numa linha só: Ricochet -> Death Mark -> Dagger Mastery -> Fan of Knives
+    { id: 'ricochet', needs: 'knives', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 1, requires: [req('moveSpeed')] },
+    { id: 'deathMark', needs: 'knives', branch: 'shadow', kind: 'power', key: 'deathMark', x: 2, y: 1, requires: [req('ricochet', 2)] },
+    { id: 'daggerMastery', needs: 'knives', branch: 'shadow', kind: 'mod', x: 3, y: 1, requires: [req('deathMark', 2)],
       name: 'Dagger Mastery', icon: '🔪', desc: 'Your daggers cut deeper, fly farther and faster, and recharge sooner.',
       levelText: (mods) => `+${formatPercent(mods.knifeDamage)} dagger damage, +${formatPercent(mods.knifeRange)} range, +${formatPercent(mods.knifeSpeed)} speed, ${formatPercent(mods.knifeCooldown)} shorter recharge`,
       mods: { knifeDamage: 0.15, knifeRange: 0.12, knifeSpeed: 0.05, knifeCooldown: 0.06 } },
-    { id: 'fanOfKnives', needs: 'knives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 4, y: 0, requires: [req('daggerMastery', 2)] },
-    // Linha da técnica: marcar e carregar
-    { id: 'deathMark', needs: 'knives', branch: 'shadow', kind: 'power', key: 'deathMark', x: 1, y: 1, requires: [req('moveSpeed')] },
-    { id: 'chargedThrow', needs: 'knives', branch: 'shadow', kind: 'power', key: 'chargedThrow', x: 3, y: 1, requires: [req('deathMark', 2)] },
-    { id: 'shadowRaven', branch: 'shadow', kind: 'passive', key: 'shadowRaven', x: 2, y: 1, requires: [req('deathMark', 2)] },
+    { id: 'fanOfKnives', needs: 'knives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 4, y: 1, requires: [req('daggerMastery', 2)] },
     // Caminho das sombras: Move Speed -> Shadow Clone -> Umbral Bond (5/5) -> Shadow Legion -> Juramento
     { id: 'shadowClone', branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 1, y: 2, requires: [req('moveSpeed', 2)] },
     { id: 'shadowBond', branch: 'shadow', kind: 'power', key: 'shadowBond', x: 2, y: 2, requires: [req('shadowClone')] },
@@ -126,9 +137,9 @@ export const TREE_NODES = [
     { id: 'blueTorch', branch: 'flame', kind: 'passive', key: 'blueTorch', x: 4, y: 1, requires: [req('hearthPhoenix')] },
     // Linha da muralha
     { id: 'torchBolts', branch: 'flame', kind: 'power', key: 'torchBolts', x: 1, y: 2, requires: [req('torchKeeper', 2)] },
-    { id: 'sunEvolve', branch: 'flame', kind: 'evolve', key: 'torchBolts', x: 2, y: 2, requires: [req('torchBolts', 5)] },
+    { id: 'sunEvolve', branch: 'flame', kind: 'evolve', key: 'torchBolts', x: 2, y: 2, requires: [req('torchBolts', 5)], cost: 5 },
     { id: 'fireRing', branch: 'flame', kind: 'power', key: 'fireRing', x: 3, y: 2, requires: [req('sunEvolve')] },
-    { id: 'fireRingEvolve', branch: 'flame', kind: 'evolve', key: 'fireRing', x: 4, y: 2, requires: [req('fireRing', 5)] },
+    { id: 'fireRingEvolve', branch: 'flame', kind: 'evolve', key: 'fireRing', x: 4, y: 2, requires: [req('fireRing', 5)], cost: 5 },
     // Linha da brasa
     { id: 'emberTrail', branch: 'flame', kind: 'power', key: 'emberTrail', x: 1, y: 3, cost: 2, requires: [req('torchKeeper')] },
     { id: 'emberEvolve', branch: 'flame', kind: 'evolve', key: 'emberTrail', x: 2, y: 3, cost: 3, requires: [req('emberTrail', 5)] },
@@ -160,7 +171,7 @@ export const TREE_NODES = [
       name: 'Dark Knowledge', icon: '📚', desc: 'Forbidden words hit harder.',
       levelText: (mods) => `+${formatPercent(mods.spellDamage)} spell damage`, mods: { spellDamage: 0.1 } },
     { id: 'voidRift', branch: 'curse', kind: 'power', key: 'voidRift', x: 3, y: 2, requires: [req('darkKnowledge', 2)] },
-    { id: 'voidRiftEvolve', branch: 'curse', kind: 'evolve', key: 'voidRift', x: 4, y: 2, requires: [req('voidRift', 5)] },
+    { id: 'voidRiftEvolve', branch: 'curse', kind: 'evolve', key: 'voidRift', x: 4, y: 2, requires: [req('voidRift', 5)], cost: 5 },
     // Linha da morte
     { id: 'corpseBurst', branch: 'curse', kind: 'power', key: 'corpseBurst', x: 1, y: 3, requires: [req('arcaneStudy')] },
     { id: 'corpseEvolve', branch: 'curse', kind: 'evolve', key: 'corpseBurst', x: 2, y: 3, requires: [req('corpseBurst', 5)] },
@@ -207,7 +218,7 @@ export const TREE_NODES = [
     { id: 'smiteEvolve', branch: 'light', kind: 'evolve', key: 'smite', x: 2, y: 2, requires: [req('smite', 5)] },
     // Linha 4, o sino: Church Bell -> Cathedral Toll (defende a tocha)
     { id: 'churchBell', branch: 'light', kind: 'power', key: 'churchBell', x: 1, y: 3, requires: [req('silentVigil')] },
-    { id: 'bellEvolve', branch: 'light', kind: 'evolve', key: 'churchBell', x: 2, y: 3, requires: [req('churchBell', 5)] },
+    { id: 'bellEvolve', branch: 'light', kind: 'evolve', key: 'churchBell', x: 2, y: 3, requires: [req('churchBell', 5)], cost: 4 },
     { id: 'oathFaith', branch: 'light', kind: 'passive', key: 'oathFaith', oath: true, x: 6, y: 1.5, requires: [req('groundEvolve'), req('smiteEvolve')] },
 
     { id: 'oathWild', branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 6, y: 1.5, requires: [req('thornBurst'), req('leechVine')] }

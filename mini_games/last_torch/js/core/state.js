@@ -125,6 +125,7 @@ export const state = {
     currentBoss: null,
     multiKill: 0,               // mortes dentro da janela atual (matar vários de uma vez)
     multiTimer: 0,
+    waveStats: { kills0: 0, gold0: 0, rush: 0, torchDamage: 0, heroDamage: 0 },   // resultado da onda: mortes e ouro no começo dela, maior sequência e dano sofrido nela
     hourHit: false,             // o herói levou dano nesta hora
     goldVacuum: false,          // fim da hora: todas as moedas voam até o herói
     lastStand: false,           // cota da hora fechada: não nasce mais nada, falta matar o que sobrou
@@ -200,7 +201,7 @@ export const state = {
     knifeThrowTime: -100000,
     knifeThrowAngle: 0,
     knifePending: null,
-    knifeCharge: 0,             // segundos segurando a adaga (Charged Dagger Throw)
+    knifeCharge: 0,             // segundos segurando a adaga (Fireballs)
     knifeThrowPower: 0,         // carga do arremesso em andamento (0 a 1)
 
     spawnTimer: 0

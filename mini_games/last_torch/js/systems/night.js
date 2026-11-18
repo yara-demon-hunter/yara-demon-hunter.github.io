@@ -37,6 +37,7 @@ export function startHour() {
     state.goldVacuum = false;
     state.lastStand = false;
     state.hourHit = false;
+    state.waveStats = { kills0: state.run.kills, gold0: state.run.goldEarned, rush: 0, torchDamage: 0, heroDamage: 0 };
     state.clearWaveRadius = 0;
     state.phoenixSpent = false;
     resetFieldForNewTurn();
@@ -187,10 +188,23 @@ function afterBoss() {
         beginDawn();
         return;
     }
-    // Os ataques do boss morrem com ele; os monstros que ele trouxe, não
+    // Boss morto (e a conversa, se houver, acabou): a onda acaba na hora. Os ataques somem e todo monstro que sobrou explode;
+    // ninguém precisa caçar os últimos nem esperar mais nenhum nascer. Sem ouro nem XP por eles (o prêmio foi o boss).
     state.enemyProjectiles.length = 0;
     state.telegraphs.length = 0;
-    beginLastStand();
+    purgeMonsters();
+    beginClear();
+}
+
+// Todos os monstros em campo explodem de uma vez (fim da onda depois do boss)
+function purgeMonsters() {
+    for (const e of state.enemies) {
+        createExplosion(e.x, e.y, '#fb923c', 10);
+        addShockwave(e.x, e.y, { radius: e.radius * 2.6, color: '#fde68a', width: 4, seconds: 0.35 });
+    }
+    state.enemies.length = 0;
+    state.currentBoss = null;
+    shakeScreen(10);
 }
 
 // --- AMANHECER ---

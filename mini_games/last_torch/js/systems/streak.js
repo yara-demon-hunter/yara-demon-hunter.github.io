@@ -12,6 +12,7 @@ export function addStreakKill() {
     state.streak++;
     state.streakTimer = STREAK.windowSeconds;
     if (state.streak > state.run.bestStreak) state.run.bestStreak = state.streak;
+    if (state.streak > state.waveStats.rush) state.waveStats.rush = state.streak;
     noteBest('bestStreak', state.streak);
     addMultiKill();
 

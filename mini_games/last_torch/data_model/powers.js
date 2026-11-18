@@ -131,30 +131,6 @@ export const POWER_MODELS = {
             { hp: 1.25, damage: 1.5, area: 125 }
         ]
     },
-    chargedThrow: {
-        name: 'Charged Dagger Throw', icon: '🌟', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            const pierceText = level.pierces >= 99 ? 'all targets' : `${level.pierces} targets`;
-            return `Hold the dagger button to charge it for up to ${formatNumber(level.seconds)}s. A fully charged dagger deals ${formatPercent(level.damage)} bonus damage and pierces ${pierceText}.`;
-        },
-        get upgrades() {
-            return this.levels.map(level => {
-                const pierceText = level.pierces >= 99 ? 'all targets' : `${level.pierces} targets`;
-                return `${formatNumber(level.seconds)}s full charge · +${formatPercent(level.damage)} charged damage · pierces ${pierceText}`;
-            });
-        },
-        // seconds = tempo até a carga cheia; damage = bônus de dano na carga cheia; pierces = monstros atravessados
-        levels: [
-            { seconds: 1.2, damage: 1, pierces: 2 },
-            { seconds: 1.2, damage: 1.5, pierces: 2 },
-            { seconds: 1.2, damage: 1.5, pierces: 3 },
-            { seconds: 0.85, damage: 1.5, pierces: 3 },
-            { seconds: 0.6, damage: 2.6, pierces: 99 }
-        ],
-        minCharge: 0.25,        // abaixo desta fração é um arremesso normal (toque rápido)
-        maxScale: 1.7           // tamanho da adaga na carga cheia
-    },
     torchBolts: {
         name: 'Flame Sentinel', icon: '🔥', maxLvl: 5,
         get desc() {
@@ -557,7 +533,7 @@ export const POWER_MODELS = {
         name: 'Wicked Oak', icon: '🌳', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree after ${formatNumber(this.saplingSeconds)}s and a full oak after ${formatNumber(this.adultSeconds)}s; every monster you kill speeds its growth up by ${formatNumber(this.killGrowthSeconds)}s. Evolve the skill and the full oak becomes the Ancient Grove: a huge ancient tree, bigger and stronger, that hits harder and reaches farther. There is only ever one tree, and it stays with you through every wave of the night, regaining some health between waves. The grown oak walks, very slowly, toward the fight and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; if it falls, a new seed can be planted.`;
+            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree and then a full oak that walks: after ${this.levels[0].grow.adult}s at level 1, only ${level.grow.adult}s at max level; every monster you kill speeds its growth up a little (more at higher levels). Evolve the skill and the full oak becomes the Ancient Grove: a huge ancient tree, bigger and stronger, that hits harder and reaches farther. There is only ever one tree, and it stays with you through every wave of the night, regaining some health between waves. The grown oak walks, very slowly, toward the fight and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; if it falls, a new seed can be planted.`;
         },
         get upgrades() {
             return this.levels.map(level =>
@@ -565,18 +541,20 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { count: 1, cooldown: 16, seconds: 10, hp: 140, reach: 80, damage: 0.85, lashSeconds: 0.95 },
-            { count: 1, cooldown: 15, seconds: 11, hp: 180, reach: 86, damage: 1, lashSeconds: 0.9 },
-            { count: 1, cooldown: 14, seconds: 12, hp: 230, reach: 92, damage: 1.15, lashSeconds: 0.9 },
-            { count: 1, cooldown: 13, seconds: 13, hp: 280, reach: 100, damage: 1.35, lashSeconds: 0.85 },
-            { count: 1, cooldown: 12, seconds: 14, hp: 340, reach: 108, damage: 1.55, lashSeconds: 0.8 }
+            // grow: segundos de muda e até a árvore adulta (a que anda) e o quanto cada morte adianta; mais nível = cresce mais rápido.
+            // No nível 1 a árvore leva ~1 onda e meia para andar; no 5, menos de uma (2026-11-18: antes era 20 s / 100 s e 1,5 s por morte em
+            // qualquer nível, e com as ondas cheias ela já andava no meio da onda 1)
+            { count: 1, cooldown: 16, seconds: 10, hp: 140, reach: 80, damage: 0.85, lashSeconds: 0.95, grow: { sapling: 50, adult: 320, perKill: 0.25 } },
+            { count: 1, cooldown: 15, seconds: 11, hp: 180, reach: 86, damage: 1, lashSeconds: 0.9, grow: { sapling: 42, adult: 260, perKill: 0.3 } },
+            { count: 1, cooldown: 14, seconds: 12, hp: 230, reach: 92, damage: 1.15, lashSeconds: 0.9, grow: { sapling: 34, adult: 200, perKill: 0.35 } },
+            { count: 1, cooldown: 13, seconds: 13, hp: 280, reach: 100, damage: 1.35, lashSeconds: 0.85, grow: { sapling: 27, adult: 150, perKill: 0.4 } },
+            { count: 1, cooldown: 12, seconds: 14, hp: 340, reach: 108, damage: 1.55, lashSeconds: 0.8, grow: { sapling: 20, adult: 110, perKill: 0.5 } }
         ],
         plantRange: 300,        // só planta com monstro a esta distância do herói (não gasta a árvore à toa)
         seedDamage: 0.12,       // drena pouco a pouco a vida do monstro marcado, em dano de feitiço por segundo
         seedTickSeconds: 0.5,
-        saplingSeconds: 20,     // muda vira árvore pequena (antes 10)
-        adultSeconds: 100,      // árvore pequena amadurece em uma árvore completa (antes 45); a árvore agora dura a noite toda
-        killGrowthSeconds: 1.5, // cada monstro morto adianta o crescimento de toda muda ou árvore pequena neste tanto
+        // O tempo de crescimento (muda → árvore pequena → adulta, a que anda) vem do nível: `grow` em cada nível acima.
+        // O estágio seguinte (o carvalho ancestral) só vem comprando a evolução Ancient Grove.
         healingRadius: 58,
         healingPerSecond: 1,
         wakeRatio: 1.5,         // acorda com monstro a até wakeRatio x reach da árvore e volta a dormir sem ninguém por perto

@@ -127,3 +127,16 @@
     .beast b { font-size: 0.64rem; }
     .beast span:last-child { font-size: 0.54rem; }
 }
+
+/* Estrelas de cada onda (js/ui/sanctuary.js > renderWaveStars): 12 cartõezinhos, melhor resultado e recorde de pontos */
+.sanc-waves { grid-column: 1 / -1; }
+.sanc-waves-title { margin: 0.2rem 0 0.35rem; color: #fbbf24; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; }
+.sanc-waves-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.35rem; }
+.sanc-wave { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.35rem 0.2rem; border-radius: 8px; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; }
+.sanc-wave i { font-style: normal; font-size: 0.62rem; color: #94a3b8; letter-spacing: 0.06em; }
+.sanc-wave-stars { font-size: 0.72rem; letter-spacing: -1px; color: #334155; white-space: nowrap; }
+.sanc-wave-stars b { color: #fbbf24; font-weight: inherit; }
+.sanc-wave em { font-style: normal; font-size: 0.66rem; color: #e2e8f0; font-variant-numeric: tabular-nums; }
+.sanc-wave.is-unknown { opacity: 0.5; }
+.sanc-wave.is-perfect { border-color: rgba(251, 191, 36, 0.7); box-shadow: 0 0 10px rgba(251, 191, 36, 0.25); }
+@media (max-width: 560px) { .sanc-waves-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

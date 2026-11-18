@@ -56,7 +56,7 @@ function renderCard(node, index) {
     card.innerHTML = '<span class="pick-icon"></span><b></b><span class="pick-text"></span><em></em>';
     paintIcon(card.querySelector('.pick-icon'), TREE_IMAGES[node.id], info.icon);
     card.querySelector('b').textContent = info.name;
-    card.querySelector('.pick-text').textContent = info.desc;
+    card.querySelector('.pick-text').textContent = info.warning ? `${info.desc} ⚠ ${info.warning}` : info.desc;
     card.querySelector('em').textContent = levels > 1 ? `${branch.name} · +${levels} LEVELS` : branch.name;
     return card;
 }

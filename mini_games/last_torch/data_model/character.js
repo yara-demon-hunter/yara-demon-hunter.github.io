@@ -13,7 +13,7 @@ export const CHARACTER_MODEL = {
     trailLength: 6,
     trailFadePerSecond: 4,
     // XP para o próximo nível: base + linear x n + quadratic x n², com n = nível - 1
-    xpCurve: { base: 110, linear: 75, quadratic: 4 },
+    xpCurve: { base: 260, linear: 110, quadratic: 5 },   // 2026-11-18: era 110/75/4 (nível 10 já na onda 1, ~48 no fim); agora ~8 na onda 1 e ~43 no fim
     levelUpHealRatio: 0.12,
     // Calor da tocha: perto dela o herói se recupera aos poucos
     // Ouro no chão só vem até o herói dentro deste raio (no fim da hora vem tudo)

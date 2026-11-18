@@ -1,6 +1,26 @@
 // --- A NOITE ---
 // Uma partida é uma noite de `hours` horas. Cada hora fecha ao somar os pontos da hora (ou ao matar
 // o boss dela) e termina no acampamento. Sobreviver à última hora traz o amanhecer (vitória).
+// Resultado e prêmio do fim da onda (js/ui/camp.js mostra a contagem em js/ui/wave_results.js).
+// ESTRELAS = 5 metas, uma estrela cada. O dano SOFRIDO na onda conta (curar depois não apaga): soma do dano levado ÷ vida máxima.
+//   ★ tocha levou no máximo `damageGoals[0]` · ★ tocha no máximo `damageGoals[1]` (as duas estrelas da tocha)
+//   ★ herói levou no máximo `damageGoals[0]` · ★ herói no máximo `damageGoals[1]`
+//   ★ sequência de mortes (Rush) de pelo menos rushGoalBase + rushGoalPerWave x onda
+// Mais de 20% de dano na tocha OU no herói = sem 5 estrelas. Ouro = (goldBase + goldPerWave x onda) x starGold[estrelas];
+// ★★★★★ também dá perfectSkillPoints.
+// PONTUAÇÃO DA ONDA (recorde de cada onda em save.waveBests): kills x 10, maior Rush x 25, ouro pego x 1,
+// (100 - % de dano da tocha) x 10, (100 - % de dano do herói) x 5.
+export const WAVE_SPOILS = {
+    damageGoals: [0.5, 0.2],
+    rushGoalBase: 20,
+    rushGoalPerWave: 4,
+    score: { kills: 10, rush: 25, gold: 1, torch: 10, hero: 5 },
+    goldBase: 60,
+    goldPerWave: 30,
+    starGold: [0.5, 0.8, 1.1, 1.5, 2, 2.6],
+    perfectSkillPoints: 1
+};
+
 export const NIGHT = {
     hours: 12,
     clearSeconds: 4,            // tela limpa: tempo máximo para pegar os itens do chão antes do acampamento

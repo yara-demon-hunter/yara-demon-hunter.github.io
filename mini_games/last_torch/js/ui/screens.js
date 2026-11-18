@@ -4,7 +4,7 @@ import { EVOLUTIONS } from '../../data_model/powers.js';
 import { preloadTreeImages, treeImageFor, paintIcon } from '../../data_model/tree_images.js';
 import { DARKNESS, getHourName, startingSkillPoints } from '../../data_model/night.js';
 import { START } from '../../data_model/start.js';
-import { ALTAR, ALTAR_KEYS, affordableCount, altarCost, altarLevel, altarStartPoints, emberTotal } from '../../data_model/embers.js';
+import { ALTAR, ALTAR_KEYS, affordableCount, altarCost, altarLevel, altarStartPoints, emberBreakdown, emberTotal } from '../../data_model/embers.js';
 import { save, persist } from '../core/save.js';
 import { clearRun, loadRun, saveRun } from '../core/run_save.js';
 import { HEROES } from '../../data_model/heroes.js';
@@ -78,7 +78,9 @@ export function startGame() {
     state.frenzyActiveTimer = 0;
     state.frenzyDuration = 0;
 
-    state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0 };
+    state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, stars: 0,
+        // recordes antes desta noite: a tela final mostra NEW BEST no que for batido
+        startBests: { hour: save.stats.bestHour, kills: save.stats.bestNightKills ?? 0, stars: save.stats.bestNightStars ?? 0, embers: save.stats.bestNightEmbers ?? 0 } };
     state.streak = 0;
     state.rushPaid = {};
     state.streakTimer = 0;
@@ -242,12 +244,61 @@ function countUp(el, to, ms = 800, prefix = '') {
     requestAnimationFrame(step);
 }
 
-// Fim da noite: as Brasas ganhas e o que dá para comprar com elas (o botão leva ao Altar)
+// Fim da noite: a conta das Brasas linha por linha, contando com o "tic" da moeda (o mesmo do resultado da onda), o total,
+// os recordes da noite batidos (NEW BEST) e o que dá para comprar no Altar (o botão leva até lá)
+const EMBER_ROW_MS = 420;
 function renderEmbers(earned) {
     const box = document.getElementById('summaryEmbers');
+    const { run } = state;
     const buyable = ALTAR_KEYS.filter(key => altarCost(save, key) !== null && altarCost(save, key) <= save.embers);
-    box.innerHTML = '<div class="embers-gain"><span>🔥 EMBERS</span><b></b></div><p class="embers-total"></p><p class="embers-buy"></p>';
-    countUp(box.querySelector('b'), earned, 800, '+');
+    const rows = emberBreakdown(run, state.turn, Boolean(run.victory));
+    // Recordes de uma noite (o anterior veio de run.startBests; quem continuou uma noite salva pode não ter)
+    const before = run.startBests ?? {};
+    const stats = save.stats;
+    const records = [
+        ['Wave', state.turn, before.hour],
+        ['Kills', run.kills, before.kills],
+        ['Stars', run.stars ?? 0, before.stars],
+        ['Embers', earned, before.embers]
+    ].filter(([, now, old]) => old !== undefined && now > old && old > 0);
+    stats.bestNightKills = Math.max(stats.bestNightKills ?? 0, run.kills);
+    stats.bestNightStars = Math.max(stats.bestNightStars ?? 0, run.stars ?? 0);
+    stats.bestNightEmbers = Math.max(stats.bestNightEmbers ?? 0, earned);
+    persist();
+    box.innerHTML = `<div class="embers-gain"><span>🔥 EMBERS</span><b>+0</b></div>
+        <div class="embers-rows">${rows.map(r => `<div class="embers-row"><span>${r.label}</span><em>${r.detail}</em><b>+0</b></div>`).join('')}</div>
+        <p class="embers-records"></p><p class="embers-total"></p><p class="embers-buy"></p>`;
+    const rowEls = [...box.querySelectorAll('.embers-row')];
+    const totalEl = box.querySelector('.embers-gain b');
+    const start = performance.now();
+    let lastTick = -1;
+    const end = rows.length * EMBER_ROW_MS;
+    const step = (now) => {
+        if (!box.isConnected) return;
+        const t = now - start;
+        let sum = 0;
+        rows.forEach((r, i) => {
+            const k = Math.max(0, Math.min(1, (t - i * EMBER_ROW_MS) / EMBER_ROW_MS));
+            const v = Math.round(r.embers * (1 - Math.pow(1 - k, 3)));
+            rowEls[i].classList.toggle('is-on', k > 0);
+            rowEls[i].querySelector('b').innerText = `+${v}`;
+            sum += v;
+        });
+        totalEl.innerText = `+${Math.min(sum, earned)}`;
+        if (t < end && Math.floor(t / 70) !== lastTick) {
+            lastTick = Math.floor(t / 70);
+            audio.playCoin();
+        }
+        if (t < end) requestAnimationFrame(step);
+        else {
+            totalEl.innerText = `+${earned}`;
+            if (records.length) {
+                box.querySelector('.embers-records').innerHTML = records.map(([name, now]) => `<span class="embers-new">NEW BEST · ${name} ${now}</span>`).join('');
+                audio.playLevelUp();
+            }
+        }
+    };
+    requestAnimationFrame(step);
     box.querySelector('.embers-total').textContent = `You have ${save.embers}`;
     box.querySelector('.embers-buy').textContent = buyable.length
         ? `You can buy: ${buyable.map(key => ALTAR[key].name).join(', ')}`
@@ -259,6 +310,8 @@ function renderEmbers(earned) {
 // Morreu: depois de um instante no resumo, o Altar abre sozinho ("tente de novo, mais forte") se há Brasas para gastar.
 // Não abre na vitória. Se o prêmio de um herói liberado está na tela, espera o jogador fechá-lo (até ~1 minuto); e só abre
 // enquanto o jogador ainda está na tela do fim da noite (quem já apertou HUNT AGAIN não é interrompido).
+// Espera a conta das Brasas terminar e dá tempo de ler o que ganhou antes de o Altar cobrir a tela (o botão ALTAR abre na hora)
+const ALTAR_AFTER_DEATH_MS = 7500;
 function openAltarAfterDeath(reason) {
     if (reason === 'DAWN' || affordableCount(save) === 0) return;
     let tries = 0;
@@ -270,7 +323,7 @@ function openAltarAfterDeath(reason) {
         }
         import('./altar.js').then(m => m.openAltar({ retry: true }));
     };
-    setTimeout(attempt, 1800);
+    setTimeout(attempt, ALTAR_AFTER_DEATH_MS);
 }
 
 // Botão do Altar na tela inicial: mostra as Brasas e brilha quando há algo para comprar

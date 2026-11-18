@@ -286,11 +286,31 @@ export function chooseBossType(turn, heroModel = 'hunter') {
 // Boss segura o empurrão: perde 85% dele (um monstro comum leva o empurrão inteiro). Quem tiver knockbackResist próprio usa o seu
 const BOSS_KNOCKBACK_RESIST = 0.85;
 
+// Bosses vivem mais (2026-11-18): medido com o piloto do sandbox (Fast Run, herói que só ataca), as lutas duravam 15 a 35 s
+// (The Long Night ~80 s): o boss morria antes de mostrar os ataques. A vida de cada um é multiplicada por isto. Alvo com o piloto:
+// rival da 1ª hora ~30 s, Demon Lord ~45 s, Brutos ~50 s, Blood Countess ~65 s, The Long Night ~2 min, revanche final ~75 s
+// (um jogador que desvia leva cerca do dobro). O rival da 1ª hora sobe menos: é onde o jogador novo ainda aprende.
+// +15% em todos (2026-11-18): sem monstros comuns durante o boss, a luta é o foco e pode durar mais.
+const BOSS_FOCUS_BONUS = 1.15;
+export const BOSS_HP_SCALE = { DEMON_LORD: 2.4 * BOSS_FOCUS_BONUS, BRUTOS: 2.2 * BOSS_FOCUS_BONUS, BLOOD_COUNTESS: 1.8 * BOSS_FOCUS_BONUS, LONG_NIGHT: 1.8 * BOSS_FOCUS_BONUS };
+const FIRST_HOUR_BOSS_HP_SCALE = 1.7 * BOSS_FOCUS_BONUS;
+const FINAL_BOSS_HP_SCALE = 2 * BOSS_FOCUS_BONUS;
+const OTHER_BOSS_HP_SCALE = 2 * BOSS_FOCUS_BONUS;
+function bossHpScale(type, turn) {
+    if (BOSS_HP_SCALE[type]) return BOSS_HP_SCALE[type];
+    if (type.endsWith('_FINAL')) return FINAL_BOSS_HP_SCALE;
+    return turn <= 1 ? FIRST_HOUR_BOSS_HP_SCALE : OTHER_BOSS_HP_SCALE;
+}
+
 export function createBoss(type, turn, x, y, random = Math.random) {
     const model = BOSS_MODELS[type];
     if (!model) throw new Error(`Unknown boss type: ${type}`);
+    const enemy = createEnemy(model, type, turn, x, y, random);
+    const scale = bossHpScale(type, turn);
+    enemy.hp = Math.round(enemy.hp * scale);
+    enemy.maxHp = Math.round(enemy.maxHp * scale);
     return {
-        ...createEnemy(model, type, turn, x, y, random),
+        ...enemy,
         knockbackResist: model.knockbackResist ?? BOSS_KNOCKBACK_RESIST,
         unstoppable: !!model.unstoppable,     // não é atrasado, preso nem empurrado (Captain Brutos)
         isBoss: true,

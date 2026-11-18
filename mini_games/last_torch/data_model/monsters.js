@@ -268,9 +268,9 @@ export const MONSTER_MODELS = {
     },
     // Treant: criatura enorme, lenta e resistente; só aparece a partir da wave 3.
     TREANT: {
-        spawnWeight: 0.07,
+        spawnWeight: 0.04,
         maxAlive: 2,
-        hpBase: 250,
+        hpBase: 450,
         hpPerTurn: 90,
         speedMin: 12,
         speedMax: 20,
@@ -291,9 +291,9 @@ export const MONSTER_MODELS = {
     },
     // Golem de Brasa e Musgo: gigante de pedra, lento e muito resistente; o mesmo soco do Treant. Só a partir da wave 4.
     GOLEM: {
-        spawnWeight: 0.06,
+        spawnWeight: 0.04,
         maxAlive: 2,
-        hpBase: 320,
+        hpBase: 350,
         hpPerTurn: 110,
         speedMin: 10,
         speedMax: 15,

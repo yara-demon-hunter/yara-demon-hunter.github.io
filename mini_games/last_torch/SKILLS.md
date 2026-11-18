@@ -78,6 +78,12 @@ O formato diz o tipo do nó, em qualquer árvore:
 | Losango | evolução | Transforma um poder no nível máximo |
 | Hexágono | Juramento | Um por noite, muda o jeito de jogar |
 
+## Skills ativas custam mais
+
+Não há limite de quantas skills o jogador leva, mas as **skills ativas** (as que agem sozinhas em campo: atiram, explodem, invocam, como Flame Sentinel, Hearth Ring, Grave Wisp, Holy Water, Flaming Phoenix, Fire Tornado, Phoenix Pact, Shadow Raven; lista em `ACTIVE_SKILLS` de `data_model/tree.js`) custam **1 ponto a mais por nível** que o padrão do ramo. Com ~86 pontos numa partida inteira, dá para levar umas 3 ou 4 ativas fortes; empilhar várias fica quase impossível. Status, adaga e golpe mantêm o preço do ramo.
+
+As evoluções mais fortes custam 1 ponto a mais que o padrão do ramo: Sun Spire, Solar Wall e Event Horizon (5) e Cathedral Toll evoluído (4).
+
 ## Mapa atual
 
 Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill nova deve continuar a linha do seu tema.
@@ -90,8 +96,8 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Corpo: Hero Health (vida, -4% de dano recebido e provocar de mais longe; 2 pontos por nível), Blood Edge, War Cry*
   - Oath of Slaughter*
 - **Shadow** (raiz: Move Speed)
-  - Adagas: Ricochet, Return Fire (o antigo Mirror Ward, rebate o tiro inimigo), Dagger Mastery (dano, alcance, velocidade e recarga), Fan of Knives
-  - Técnica: Death Mark*, Charged Dagger Throw (Soul Lance e Soul Spear unidos)
+  - Linha de cima: Return Fire (o antigo Mirror Ward, rebate o tiro inimigo), Shadow Raven
+  - Adagas, tudo numa linha: Ricochet, Death Mark*, Dagger Mastery (dano, alcance, velocidade e recarga), Fan of Knives
   - Sombras: Shadow Clone*, Umbral Bond*, Shadow Legion*. Move Speed, Shadow Clone, Umbral Bond (5/5), Shadow Legion (3 pontos), Juramento
   - Esquiva: Phantom Rush, Night Reaper*, Shadow Shackle*, Smoke Bomb*. Move Speed, Phantom Rush, Night Reaper, Shadow Shackle, Smoke Bomb, Juramento
   - Oath of Whispers*
@@ -121,7 +127,6 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | War Cry | Passiva | Cercado, ruge: joga os monstros para longe, atordoa e fortalece temporariamente a lâmina | Braços abertos, cabeça para trás |
 | Executioner | Passiva | A lâmina termina monstros enfraquecidos em um golpe (bosses são imunes) | X vermelho |
 | Death Mark | Poder | A adaga marca. A lâmina detona; o dash detona mais forte e devolve a carga. Toda detonação recarrega a adaga | Mira girando, X violeta |
-| Charged Dagger Throw | Poder | Segure o botão da adaga para carregar: quanto mais tempo, mais dano e mais monstros atravessados. No nível máximo carrega num piscar e atravessa tudo (o antigo Soul Spear) | Anel que se fecha, adaga brilhando |
 | Shadow Clone | Passiva | Uma sombra guarda uma área em volta da tocha e não sai dela. Espera no posto; quando um monstro chega perto, anda em linha reta até ele, golpeia com o combo do herói e volta. Os monstros não correm atrás dela, mas quem esbarra ou acerta um tiro a machuca; ela tem vida e volta depois de um tempo | Sombra violeta, barra de vida e área tracejada no chão |
 | Shadow Legion | Evolução | Abre com Umbral Bond no nível máximo. Mais sombras guardam a tocha, cada uma cuidando de um monstro | Sombras no anel |
 | Shadow Raven | Passiva | Abre com Death Mark. Um corvo pequeno voa no ombro do herói, mergulha no monstro mais perto, bica com dano da lâmina e volta. O monstro bicado fica marcado e leva mais dano em todo golpe (lâmina, adaga, feitiço, sombras) enquanto a marca durar | Corvo violeta-escuro; mira vermelha tracejada com cruz |
@@ -137,7 +142,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Flaming Phoenix | Passiva | Uma fênix de fogo rodeia a tocha e atira bolas de fogo nos monstros perto da chama e, a cada 8 s, cospe um jato de fogo contínuo em cone (lança-chamas) que queima tudo no caminho (fogo da tocha: a Blue Torch também vale) | Fênix, bolas de fogo, jato de fogo |
 | Blue Torch | Passiva | A tocha, a luz e todos os golpes dela ficam azuis; luz +25%, calor +20%, fogo da tocha +30%, e quem está no calor fica lento e leva +15% de dano só dos golpes de fogo da tocha | Chama, brilho, projéteis e anel azuis |
 | Flaming Sword | Passiva | A espada pega fogo: todo corte, inclusive das sombras, deixa o monstro queimando. Monstro em chamas que morre passa o fogo a quem está por perto; o Oath of the Hearth fortalece a chama | Línguas de fogo na lâmina, corte laranja |
-| Fireballs | Passiva | As adagas viram bolas de fogo: o herói para com a bola crescendo na mão, como o Lorde Demônio, sem andar, golpear nem dar dash; ao acertar, ela explode, fere os vizinhos, deixa todos em chamas e o chão queimando. Por baixo continuam adagas, então Dagger Mastery, Fan of Knives, Ricochet, Death Mark, Charged Dagger Throw e a explosão das sombras valem igual. O Oath of Slaughter também as bloqueia | Bola de fogo com cauda |
+| Fireballs | Passiva | As adagas viram bolas de fogo (e segurar o botão da adaga carrega uma bola gigante, até 4× o dano e 2,4× o tamanho, que não ricocheteia: aviso em vermelho na descrição; era a mecânica do Charged Dagger Throw, removido): o herói para com a bola crescendo na mão, como o Lorde Demônio, sem andar, golpear nem dar dash; ao acertar, ela explode, fere os vizinhos, deixa todos em chamas e o chão queimando. Por baixo continuam adagas, então Dagger Mastery, Fan of Knives, Ricochet, Death Mark e a explosão das sombras valem igual. O Oath of Slaughter também as bloqueia | Bola de fogo com cauda |
 | Phoenix Pact | Passiva | Uma fênix voa no ombro do herói e atira bolas de fogo que queimam o alvo e os vizinhos. Quando ele cai, ela morre para levantá-lo e renasce depois | Fênix; ao morrer, mergulha no herói e vira asas de fogo |
 | Hearth Ring | Poder | Um anel de fogo achado no fundo da escuridão cria um círculo de fogo em volta da tocha para proteger quem o usa; quem cruza queima e anda mais devagar | Anel de chamas |
 | Solar Wall | Evolução | O anel vira muralha branca que sobe de tempos em tempos, jogando monstros longe | Labareda |
@@ -149,7 +154,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 
 ## Skills seladas (sem adaga)
 
-Algumas skills só funcionam com adaga: Ricochet, Death Mark, Charged Dagger Throw, Dagger Mastery, Fan of Knives e Fireballs (as adagas viram bolas de fogo). Elas levam `needs: 'knives'` em `data_model/tree.js`. Quando o jogador não lança adaga (mod `noKnives`: o **Captain Brutos**, ou quem jurou o **Oath of Slaughter**), esses nós ficam **selados**:
+Algumas skills só funcionam com adaga: Ricochet, Death Mark, Dagger Mastery, Fan of Knives e Fireballs (as adagas viram bolas de fogo). Elas levam `needs: 'knives'` em `data_model/tree.js`. Quando o jogador não lança adaga (mod `noKnives`: o **Captain Brutos**, ou quem jurou o **Oath of Slaughter**), esses nós ficam **selados**:
 
 - **Não é o cadeado.** O cadeado diz "ainda não" (falta o nó anterior). O selo diz "não é para este personagem": borda sólida cor de ferrugem, ícone apagado e um risco diagonal laranja, sem corrente. O painel de detalhe mostra a etiqueta `NO DAGGERS`, o motivo e o passe livre.
 - **Passe livre.** Um nó selado conta como cumprido para os nós que o pedem, e a ligação que sai dele fica acesa. Assim a cadeia não trava: com o Brutos, Return Fire (que pede Ricochet) e Shadow Raven (que pede Death Mark) abrem normalmente, e o Oath of the Hearth não fica preso por Fireballs.

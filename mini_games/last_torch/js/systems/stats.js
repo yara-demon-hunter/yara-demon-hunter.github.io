@@ -154,7 +154,7 @@ export function getFrenzyDuration() {
 export function getFuryChargePerHit() {
     return getFury().chargePerHit * (1 + mod('furyCharge'));
 }
-// Dano de uma adaga, antes da carga do Charged Dagger Throw
+// Dano de uma adaga, antes da carga da Fireballs
 // Com Fireballs a adaga vira magia: tudo da adaga continua valendo e o dano mágico entra por cima
 export function getKnifeDamage() {
     const ricochet = getPowerLevel(powers.ricochet);

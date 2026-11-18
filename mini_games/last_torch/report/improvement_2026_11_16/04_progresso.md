@@ -292,3 +292,50 @@ Solução (preço **fixo**, nunca sobe com a onda):
 - Relíquia: preço sobe pela coluna na árvore (as iniciais baratas, as do fim caras): **300 · 900 · 2.000 · 3.800 · 6.500**; as fortes da coluna ficam acima (Last Prayer 3.300, Second Prayer 4.800, Stone Heart 7.500). Total da loja: 108.500.
 - Ouro por abate: `killGoldScale` 0,65 → **0,3** (`data_model/gold.js`).
 Teste (Fast Run ×20, piloto imortal, compra a mais barata primeiro = caso mais generoso): onda 1 → 1 a 2 relíquias; depois 1 a 4 por onda; 29 de 45 relíquias na onda 11 (antes: 45 na onda 9). Um jogador de verdade, que mata menos e escolhe as caras, ficará bem abaixo. A variação entre rodadas é grande (±3 relíquias). Para afinar: preços em `passives.js` (`cost` de cada relíquia) e `killGoldScale`.
+
+## 2026-11-18 · Equilíbrio geral: bosses, XP, skills fortes e espaços de skill ativa
+
+Medido com o Fast Run (piloto, herói imortal, 12 ondas):
+- **Bosses morriam rápido demais** (15 a 35 s; The Long Night ~80 s). Agora a vida de cada boss é multiplicada (`BOSS_HP_SCALE` em `bosses.js`): rival da 1ª hora ×1,7, Demon Lord ×2,4, Brutos ×2,2, Blood Countess ×1,8, The Long Night ×1,8, revanche final ×2, outros ×2. Com o piloto: 41 · 61 · 58 · 93 · 72 (antes do ×1,8 da Long Night) · 45 s. Um jogador que desvia leva perto do dobro.
+- **XP**: o herói chegava ao nível 10 na onda 1 (uma chuva de "level up" e a build pronta cedo demais) e ~48 no fim. Curva 110/75/4 → 260/110/5 (`character.js`): nível ~8 na onda 1, ~43 no fim (~86 pontos; a árvore inteira custa 573).
+- **Skills fortes mais caras**: Sun Spire, Solar Wall, Event Horizon 4 → 5 pontos; Cathedral Toll evoluído 3 → 4.
+- **Espaços de skill ativa**: no máximo 6 skills que agem sozinhas em campo (`ACTIVE_SKILLS` em `data_model/tree.js`, regra em `js/systems/tree.js`); a 7ª fica fechada com "Active skill slot (6/6 used)". Evoluir ou subir de nível não gasta espaço. Força escolha de build e limita a bagunça na tela. Testado: comprar a 7ª foi recusado.
+- Bagunça medida: os itens na tela são em maioria partículas de morte (≈17 em média numa onda 8) e não tiros de skill; as skills que atiram sem parar já foram espaçadas antes (Flame Sentinel, Sun Spire, Grave Wisp, Storm Sigil, fênix).
+O piloto imortal morre na onda 2 quando pode morrer (não desvia nem cura), então a dificuldade "de verdade" para humano não foi medida: confirmar jogando.
+
+- **Limite de 6 skills ativas removido** (confundia). No lugar: as skills ativas (`ACTIVE_SKILLS` em `data_model/tree.js`) custam +1 ponto por nível (`extraCost`; ex. Flame Sentinel 3 → 4, Holy Water 2 → 3, Fire Tornado 4 → 5); as de status/adaga/golpe ficam como estavam. Com ~86 pontos por partida, cabem umas 3 ou 4 ativas fortes.
+- **Prêmio de fim de onda** (`WAVE_SPOILS` em `data_model/night.js`, `grantWaveSpoils` em `js/ui/camp.js`): ao chegar no acampamento, estrelas pela vida que sobrou na tocha (★ sobreviveu, ★★ ≥ 60 %, ★★★ ≥ 90 %), ouro = (60 + 30 × onda) × 1 / 1,6 / 2,4 e, com ★★★, +1 ponto de skill. Aparece num aviso e no título do acampamento ("WAVE 3 ★★☆"), sem ocupar espaço novo. Testado no celular e no desktop: onda 1 ★★★ = +216 de ouro e +1 ponto.
+
+## 2026-11-18 · Resultado da onda (contagem estilo fim de fase)
+
+Ao chegar no acampamento aparece um cartão (`js/ui/wave_results.js`, `css/components/wave_results.css`) que conta, com o "tic" da moeda: Kills, Best Rush, Gold (pego na onda), Torch % e Hero % → cada um vira pontos (×10, ×25, ×1, ×10, ×5) → **SCORE** da onda → 3 estrelas carimbando → prêmio (ouro e, com ★★★, +1 ponto de skill). ~3 s; um toque pula para o fim, outro fecha (fecha sozinho depois).
+- **Estrelas = 3 metas**, mostradas na própria linha: Torch 60%+, Hero 50%+, Best Rush (20 + 4 × onda)+. Ouro do prêmio = (60 + 30 × onda) × 0,6 / 1 / 1,6 / 2,4 por 0 a 3 estrelas (`WAVE_SPOILS`, `data_model/night.js`).
+- **Recorde por onda** no save (`save.waveBests[onda] = { score, stars }`): o cartão mostra "Best on this wave: X" e, se bater, **NEW BEST!** com o som de nível.
+- Contadores da onda: `state.waveStats` (zerado em `startHour`; a maior sequência vem de `addStreakKill`).
+Testado no celular (390×780), paisagem (844×390) e desktop: cabe sem rolar; NEW BEST testado com recorde falso.
+
+- **Resultado da onda com 5 estrelas** (pedido do usuário): o dano SOFRIDO na onda conta (soma do dano ÷ vida máxima; curar não apaga). ★ tocha ≤ 50 % · ★ tocha ≤ 20 % · ★ herói ≤ 50 % · ★ herói ≤ 20 % · ★ Rush (20 + 4 × onda)+. Mais de 20 % de dano na tocha ou no herói = sem 5 estrelas. Linhas "Torch damage ≤50/20%" e "Hero damage ≤50/20%" com as estrelinhas de cada uma; pontos (100 − dano %) × 10 / × 5. Prêmio: ouro × 0,5 / 0,8 / 1,1 / 1,5 / 2 / 2,6 por 0 a 5 estrelas; ★★★★★ dá +1 ponto de skill. Contadores em `state.waveStats.torchDamage/heroDamage` (`hurtTorch`, `hurtPlayer`). Testado no celular e em paisagem.
+
+## 2026-11-18 · Brasas contadas na tela final, recordes da noite, estrelas no Santuário, fim da onda no boss
+
+- **Tela final (morte ou amanhecer)**: as Brasas viram uma conta linha por linha, contando com o "tic" da moeda: Night +8, Waves cleared (n × 6), Kills (n ÷ 10), Bosses (n × 15), **Stars (n ★ × 1, novo)**, Dawn +120 (`emberBreakdown` em `data_model/embers.js`; `emberTotal` usa a mesma conta). Depois, selos **NEW BEST** para o que bateu o recorde de uma noite: onda, kills, estrelas e Brasas (`save.stats.bestNight*`; o anterior fica em `run.startBests`). Testado no celular e no desktop.
+- **Conquistas novas** (Troféus): 🌟 Starlit (5 estrelas em 3 ondas diferentes) e ✨ Constellation (5 estrelas nas 12 ondas), por `save.stats.fiveStarWaves` (contado dos recordes por onda).
+- **Santuário → Façanhas**: grade "WAVE STARS · x/60 ★" com as 12 ondas, o melhor de estrelas e o recorde de pontos de cada; as de 5 estrelas brilham (`renderWaveStars`).
+- **Boss morto = fim da onda**: depois do boss (e da conversa, se houver) todos os monstros em campo explodem e a onda fecha na hora (antes: "FINISH THEM", caçar os que sobraram). Sem ouro/XP por eles. Testado: depois do boss da onda 1 a fase foi direto para o fim, com 0 monstros.
+
+- Tempo de leitura: o resultado da onda some sozinho depois de 8 s (era 2,6 s; um toque fecha antes) e conta um pouco mais devagar; na morte, o Altar só abre sozinho 7,5 s depois (era 1,8 s e cobria a conta das Brasas).
+
+- **Altar mais caro**: níveis [15 · 40 · 80 · 140 · 220] (era [10 · 18 · 30 · 48 · 75]); Swiftness e Fury Power [20 · 50 · 95 · 160 · 250]; Insight [25 · 70 · 140 · 230 · 350]. Brasas por morte: 1 a cada 20 (era 10; com ondas de 3 min há ~4.000 mortes numa noite inteira). Altar inteiro: ~5.100 Brasas (era ~1.900); uma noite rende ~40 (morte cedo) a ~520 (amanhecer): antes dava para completar em ~3 vitórias, agora leva dezenas de noites. O 1º nível de cada um continua saindo com uma noite curta.
+
+- **Wicked Oak (Rowan) cresce mais devagar e pelo nível**: cada nível tem `grow` (muda → árvore pequena → adulta que anda, e quanto cada morte adianta): nível 1 = 50 s / 320 s / 0,25 s por morte; nível 5 = 20 s / 110 s / 0,5 s (antes: 20 s / 100 s / 1,5 s por morte em qualquer nível, e com as ondas cheias ela já andava no meio da onda 1). O carvalho ancestral continua só com a evolução Ancient Grove. Teste com nível 1: virou árvore pequena aos 93 s da onda 1 e não chegou a andar nessa onda.
+
+- **Shadow Path reorganizado**: 1ª linha Return Fire → Shadow Raven; 2ª linha, todas as de adaga: Ricochet → Death Mark → Dagger Mastery → Fan of Knives → Charged Dagger Throw (cada uma pede a anterior: Ricochet 2, Death Mark 2, Dagger Mastery 2, Fan of Knives). Clones e esquiva sem mudança. Conferido na árvore (desktop).
+
+## 2026-11-18 · Charged Dagger Throw removido; a carga passou para a Fireballs
+
+A adaga carregada perfurava tudo (no nível 5, "todos os alvos") e nunca chegava ao ricochete, então anulava o Ricochet. A skill saiu (modelo, nó da árvore, imagem e referências). **Fireballs** ganhou a mecânica: segurar o botão da adaga carrega a bola por até 1,4 s (`FIREBALLS.charge` em `passives.js`); carga cheia = 2,4× o tamanho e 4× o dano (a explosão cresce junto) e a bola **não ricocheteia nem atravessa**; um toque rápido continua sendo uma bola normal, com Ricochet. A descrição da Fireballs tem um aviso em vermelho (campo `warning`, também na escolha rápida). Testado: toque = escala 1, 4 saltos; carga cheia = escala 2,4, dano 93 contra 23, 0 saltos. A linha de adagas da Shadow termina na Fan of Knives.
+
+## 2026-11-18 · Boss sozinho, ondas 20% mais curtas
+- Com o boss em campo não nasce monstro comum (`updateSpawner`: `if (state.currentBoss) return`); só o que o boss invoca. Os que já estavam em campo continuam. Ao cair o boss, a onda fecha como já fazia (monstros explodem, tempo para pegar baú e itens).
+- `waveMinSeconds` 180 → 144 (`difficulty.js`): o boss da onda 1 apareceu aos ~146 s (antes ~181 s); a densidade crescente (`spawnGrowth`) acompanha o novo tempo. Teste no Fast Run: durante o boss os monstros comuns só diminuíram (10 → 1) e depois do boss a fase foi direto para o fim da onda.
+- Bosses com +15% de vida (`BOSS_FOCUS_BONUS` em `bosses.js`), já que a luta agora é o foco (sem monstros comuns): multiplicadores finais rival 1ª hora ×1,96, Demon Lord ×2,76, Brutos ×2,53, Blood Countess ×2,07, The Long Night ×2,07, revanche final e outros ×2,3.

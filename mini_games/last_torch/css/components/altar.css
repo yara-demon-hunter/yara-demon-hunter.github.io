@@ -85,7 +85,17 @@
 #summaryEmbers.can-buy { border-color: rgba(251, 146, 60, 0.85); }
 .embers-gain { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; }
 .embers-gain span { color: #fdba74; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.14em; }
-.embers-gain b { color: #fde4c8; font-size: 1.5rem; }
+.embers-gain b { color: #fde4c8; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+/* A conta das Brasas (js/ui/screens.js > renderEmbers): uma linha por fonte, contando */
+.embers-rows { display: flex; flex-direction: column; gap: 0.12rem; margin: 0.3rem 0 0.2rem; }
+.embers-row { display: grid; grid-template-columns: 1fr auto 3.2em; gap: 0.5rem; align-items: baseline; font-size: 0.78rem; opacity: 0.3; transition: opacity 0.15s; }
+.embers-row.is-on { opacity: 1; }
+.embers-row span { color: #e2d3bd; }
+.embers-row em { font-style: normal; color: #94a3b8; font-size: 0.7rem; }
+.embers-row b { color: #fdba74; text-align: right; font-variant-numeric: tabular-nums; }
+.embers-records { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.2rem 0 0; min-height: 0; }
+.embers-records:empty { display: none; }
+.embers-new { padding: 0.12rem 0.45rem; border-radius: 999px; background: rgba(74, 222, 128, 0.14); border: 1px solid rgba(74, 222, 128, 0.5); color: #86efac; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; }
 .embers-total { color: #d6cdb8; font-size: 0.68rem; }
 .embers-buy { margin-top: 0.15rem; color: #fde68a; font-size: 0.68rem; font-weight: 700; }
 #summaryEmbers:not(.can-buy) .embers-buy { color: #94a3b8; font-weight: 500; }
