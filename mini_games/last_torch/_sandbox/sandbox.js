@@ -5,7 +5,8 @@ import { CORE_MODEL } from '/data_model/core.js';
 import { MONSTER_MODELS } from '/data_model/monsters.js';
 import { ACTIVE_HEROES, HEROES } from '/data_model/heroes.js';
 import { save } from '/js/core/save.js';
-import { player, state } from '/js/core/state.js';
+import { passives, player, powers, state } from '/js/core/state.js';
+import { POWER_MODELS } from '/data_model/powers.js';
 import { addMonster, spawnBoss } from '/js/systems/spawner.js';
 import { startHour } from '/js/systems/night.js';
 import { startGame } from '/js/ui/screens.js';
@@ -17,6 +18,25 @@ import { mountFastRun } from '/_sandbox/fastrun.js';
 const choice = { hero: ACTIVE_HEROES[0], boss: 'AZAEL' };
 let arenaOn = false;                    // as travas de modo deus só valem numa luta da Arena (nunca na aba Fast run)
 const picked = new Set();               // monstros escolhidos para a luta (vários, clicando)
+// Buddies (companheiros): cada um liga a skill que o faz existir (nível máximo), como se o herói a tivesse comprado
+const BUDDIES = [
+    { key: 'phoenixPact', label: '🔥 Phoenix', sub: 'Phoenix Pact', on: () => { passives.phoenixPact.lvl = 1; } },
+    { key: 'hearthPhoenix', label: '🔥 Flaming Phoenix', sub: 'circles the torch', on: () => { passives.hearthPhoenix.lvl = 1; } },
+    { key: 'blueTorch', label: '🔵 Blue Torch phoenix', sub: 'needs Flaming Phoenix', on: () => { passives.hearthPhoenix.lvl = 1; passives.blueTorch.lvl = 1; } },
+    { key: 'shadowRaven', label: '🐦‍⬛ Shadow Raven', sub: 'raven', on: () => { passives.shadowRaven.lvl = 1; } },
+    { key: 'graveWisp', label: '💀 Grave Wisp', sub: 'flying skull', on: () => { powers.graveWisp.lvl = powers.graveWisp.maxLvl ?? 5; } },
+    { key: 'shadowWolf', label: '🐺 Shadow Wolf', sub: 'Rowan\'s wolf', on: () => { powers.spiritWolves.lvl = 5; } },
+    { key: 'whiteWolf', label: '🌕 The White Wolf', sub: 'evolved wolf', on: () => { powers.spiritWolves.lvl = 5; powers.spiritWolves.evolved = true; } }
+];
+const OAK_STAGES = [
+    { key: '', label: 'No tree' },
+    { key: 'sapling', label: '🌱 Sapling' },
+    { key: 'young', label: '🌿 Young tree' },
+    { key: 'adult', label: '🌳 Wicked Oak (adult)' },
+    { key: 'elder', label: '🌲 Ancient Grove (evolved)' }
+];
+const buddyPicked = new Set();
+const oakChoice = { stage: '' };
 const heroMods = new Map();            // mods originais dos heróis, para o modo deus não vazar para a próxima luta
 
 const bosses = Object.entries(BOSS_MODELS)
@@ -38,6 +58,9 @@ panel.innerHTML = `
     <h3>Hero</h3><div class="sb-row" id="sbHeroes"></div>
     <h3>Boss <small>(click again to unselect: monsters only)</small></h3><div class="sb-row" id="sbBosses"></div>
     <h3>Monsters <small>(click to add to the fight)</small></h3><div class="sb-row" id="sbMonsters"></div>
+    <h3>Buddies <small>(click to add: each one turns on its skill)</small></h3><div class="sb-row" id="sbBuddies"></div>
+    <h3>Druid tree <small>(Wicked Oak stage; Ancient Grove = evolved skill)</small></h3><div class="sb-row" id="sbOak"></div>
+    <label class="sb-field">Keep the tree at that stage (no growing) <input id="sbFreezeOak" type="checkbox" checked></label>
     <h3>Options</h3>
     <label class="sb-field">How many of each monster <input id="sbCount" type="number" min="1" max="30" value="4"></label>
     <label class="sb-field">Hour (boss strength) <input id="sbHour" type="number" min="1" max="12" value="1"></label>
@@ -89,6 +112,44 @@ function fillMonsters() {
     });
 }
 fillMonsters();
+
+function fillBuddies() {
+    const host = panel.querySelector('#sbBuddies');
+    host.innerHTML = '';
+    BUDDIES.forEach(b => {
+        const el = document.createElement('button');
+        el.className = 'sb-opt' + (buddyPicked.has(b.key) ? ' on' : '');
+        el.innerHTML = `${b.label}<small>${b.sub}</small>`;
+        el.onclick = () => { buddyPicked.has(b.key) ? buddyPicked.delete(b.key) : buddyPicked.add(b.key); fillBuddies(); };
+        host.appendChild(el);
+    });
+    const oak = panel.querySelector('#sbOak');
+    oak.innerHTML = '';
+    OAK_STAGES.forEach(o => {
+        const el = document.createElement('button');
+        el.className = 'sb-opt' + (oakChoice.stage === o.key ? ' on' : '');
+        el.textContent = o.label;
+        el.onclick = () => { oakChoice.stage = o.key; fillBuddies(); };
+        oak.appendChild(el);
+    });
+}
+fillBuddies();
+
+// A árvore do druida nasce já no estágio escolhido, perto do herói (os mesmos campos de growOak em js/systems/skills_nature.js)
+function plantOak(stage) {
+    const M = POWER_MODELS.shelterOak;
+    powers.shelterOak.lvl = 5;
+    powers.shelterOak.evolved = stage === 'elder';
+    const level = M.levels[4];
+    const growth = { sapling: 0, young: M.saplingSeconds, adult: M.adultSeconds, elder: M.adultSeconds }[stage];
+    state.nature.oaks.length = 0;
+    state.nature.oaks.push({
+        x: player.x + 110, y: player.y - 40, stage, growthAge: growth, age: stage === 'sapling' || stage === 'young' ? 0 : 99, seconds: level.seconds, transition: 0,
+        healRadius: M.healingRadius, hp: level.hp, maxHp: level.hp, reach: level.reach, damage: level.damage, lashSeconds: level.lashSeconds, lash: 0,
+        awake: 0, awakeGoal: 0, shake: 0, lures: M.lureRadius, swipes: [], faceX: 0, faceY: 1, walkPhase: 0, atkAge: 99, walkK: 0,
+        evolved: stage === 'elder'
+    });
+}
 
 // Prévia do prêmio de personagem liberado: o mesmo evento do jogo (js/ui/hero_unlock.js), para qualquer herói
 function previewUnlock(key) {
@@ -156,6 +217,9 @@ function fight() {
             addMonster(type, player.x + Math.cos(a) * r, player.y + Math.sin(a) * r);
         }
     });
+    // Buddies e árvore escolhidos (depois do startGame, que zera as skills)
+    BUDDIES.filter(b => buddyPicked.has(b.key)).forEach(b => b.on());
+    if (oakChoice.stage) plantOak(oakChoice.stage);
     player.hp = player.maxHp;
     panel.classList.add('hidden');
 }
@@ -193,6 +257,12 @@ function godLoop() {
     if (arenaOn && state.phase === 'HUNT') {
         if (value('#sbGod').checked && player.hp > 0) player.hp = player.maxHp;
         if (value('#sbGodTorch').checked && state.coreHp > 0) state.coreHp = state.coreHpMax;
+        if (value('#sbFreezeOak').checked) {
+            for (const oak of state.nature.oaks) {
+                if (oak.stage === 'sapling') oak.growthAge = 0;
+                else if (oak.stage === 'young') oak.growthAge = POWER_MODELS.shelterOak.saplingSeconds;
+            }
+        }
         for (const e of state.enemies) {
             lockHp(e, e.isBoss ? bossGod : monsterGod);
             const god = e.isBoss ? bossGod() : monsterGod();

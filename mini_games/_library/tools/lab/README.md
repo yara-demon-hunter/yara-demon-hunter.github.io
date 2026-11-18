@@ -9,6 +9,8 @@ afeta o Last Torch nem o yara-rpg.
 | `monstro_foto.html` e `monstro_foto.js` | O teste: o **Golem de Brasa e Musgo**, um monstro novo, 100% procedural, em WebGL |
 | `fenix_foto.html` e `fenix_foto.js` | A **Fênix de fogo** (Flaming Phoenix) em 3D: asas abertas batendo, a ave inteira em chamas, laranja ou azul (Blue Torch). Penas PBR, chamas sem estado, bloom. Já está no jogo |
 | `bake_fenix.py` | Grava os atlas da fênix (`fenix_fogo_atlas.webp`, `fenix_azul_atlas.webp`) em `buddies/hearth_phoenix/`; abre a página com `?bake=1` (servidor na porta 18900) |
+| `arvore_foto.html` e `arvore_foto.js` | A **Árvore Ancestral** (Ancient Grove, skill do druida) em 3D: tronco com rosto-runa, copa de folhas instanciadas, duas raízes-pernas que andam, galhos-braços que balançam e chicoteiam; modos Andando, Atacando e Parada. Ainda não está no jogo |
+| `bake_arvore.py` | Grava o atlas (`exemplos/arvore_ancestral_atlas.webp`): 5 ângulos (frente, frente-lado, lado, costas-lado, costas) x 12 quadros de andar + 10 de ataque; abre a página com `?bake=1` (servidor na porta 18900) |
 | `index.html` | A tela de escolha: um cartão por monstro do laboratório |
 | `treant_foto.html` e `treant_foto.js` | O **Treant** (árvore andante), 100% procedural, numa floresta escura de **noite** (luar, vagalumes, névoa). Rosto simpático de propósito |
 | `treant_esguio.html` e `treant_esguio.js` | **Treant esguio**: a versão alternativa, remodelada como árvore fina e alta. Guardada; o sprite pronto está em `exemplos/treant_esguio_atlas.webp` (para usar, copie por cima de `buddies/treant/treant_atlas.webp` e ponha `spriteScale` 7,1, `spriteFeet` 0,27, `shadowRadius` 0,1, `spriteUnits` 36 em `treant25d_visual.js`) |

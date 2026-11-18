@@ -51,7 +51,7 @@ export const TREANT_25D_VISUALS = {
     spriteLift: -0.06,
     spriteFeet: 0.21,
     shadowRadius: 0.16,
-    pixelsPerCycle: 8,
+    pixelsPerCycle: 18,      // px andados por ciclo de 12 quadros (lento e pesado)
     spriteUnits: 34,
 
     auraRadius: 22,

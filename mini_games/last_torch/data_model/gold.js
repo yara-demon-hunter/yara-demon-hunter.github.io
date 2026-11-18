@@ -17,9 +17,11 @@ export const GOLD_DROP = {
     pickupRadius: 16             // distância para coletar (somada ao raio do herói)
 };
 
-// Economia: o ouro por abate vale esta fração do valor dos monstros (goldBase). Com as ondas de 3 min há muito mais abates
-// por onda (~150), então o ouro por abate caiu e as relíquias subiram (CAMP.costMultiplier, em passives.js).
-// Meta: uma onda paga ~3 relíquias (mais óleo ou descanso). Medido com bot em 2026-11-18: antes ~1.300 de ouro por onda 1.
+// Economia: o ouro por abate vale esta fração do valor dos monstros (goldBase). Junto com o preço das relíquias (passives.js, cada uma
+// com preço fixo que sobe pela coluna na árvore de relíquias: 300 · 900 · 2.000 · 3.800 · 6.500), a meta é: o jogador compra algo quase
+// toda onda (1 a 3 relíquias), mas ninguém completa a loja (45 relíquias, ~108 mil de ouro) numa partida inteira.
+// Medido em 2026-11-18 com o piloto do sandbox (herói imortal, compra sempre a mais barata: o caso mais generoso): 1 a 4 compras
+// por onda e ~29 das 45 relíquias na onda 11; jogador de verdade deve ficar bem abaixo disso.
 export const GOLD_ECONOMY = {
-    killGoldScale: 0.65
+    killGoldScale: 0.3
 };

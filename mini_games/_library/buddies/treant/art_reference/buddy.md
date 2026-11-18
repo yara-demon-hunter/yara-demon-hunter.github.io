@@ -14,3 +14,6 @@
 | Copa | monte de bolas de folhas, escuras por baixo e claras em cima, sustentada por dois galhos |
 
 Medidas e cores: `treant25d_visual.js`; desenho: `treant25d.js`. Ajustes em `tools/tuner.html?model=buddy_treant`. Imagens de referência: `images/` (vazia por ora).
+
+## Buddy Treant = Árvore Ancestral 3D (18/11/2026)
+A pedido do dono, o **buddy** Treant (`BUDDIES_25D.treant`, `tuner.html?model=buddy_treant`) agora é a Árvore Ancestral 3D da forma Ancient Grove (`buddies/oak/ancient_tree25d.js`, atlas `oak/ancient_tree_atlas.webp`). O boneco robusto de casca deste diretório passou a ser só o **monstro** Treant (`treant_sprite` no tuner).

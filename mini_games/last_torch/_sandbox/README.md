@@ -12,6 +12,7 @@ python3 mini_games/last_torch/_sandbox/serve.py        # http://localhost:8800/
 - Botão **🧪 Sandbox** (canto inferior esquerdo): reabre o painel para trocar de herói ou boss.
 - Opções padrão: **modo deus** ligado para o herói, o boss e a tocha (vida cheia a cada quadro; dá para desligar na hora, mesmo no meio da luta) e **100 pontos de skill** para começar.
 - Lista **Monsters**: clique em um ou mais monstros para pô-los na luta (quantos de cada: campo ao lado; nascem em círculo em volta do herói). Para lutar só com eles, clique de novo no boss escolhido para desmarcá-lo. O **modo deus dos monstros** também vem ligado (eles não morrem).
+- Lista **Buddies**: clique em um ou mais (Phoenix Pact, Flaming Phoenix, Blue Torch, Shadow Raven, Grave Wisp, Shadow Wolf, White Wolf); cada um liga a skill que o faz existir, no nível máximo. **Druid tree**: a árvore do druida já nasce no estágio escolhido (muda, árvore jovem, Wicked Oak adulto ou Ancient Grove evoluída), perto do herói; a caixa **Keep the tree at that stage** impede que ela cresça (para ver cada fase com calma).
 - **Preview: hero unlocked:** botões com cada herói mostram a tela de prêmio de personagem liberado (a mesma do jogo). A caixa "mid-run" mostra a versão do acampamento. Clique em LATER, PLAY AS ou Esc/Enter para fechar e voltar ao painel.
 
 ## Aba HUD tuner (ajustar a tela de jogo)

@@ -187,6 +187,8 @@
         import '../buddies/shadow_wolf/shadow_wolf25d.js';
         import { TREANT_25D_VISUALS } from '../buddies/treant/treant25d_visual.js';
         import '../buddies/treant/treant25d.js';
+        import { ANCIENT_TREE_25D_VISUALS } from '../buddies/oak/ancient_tree25d_visual.js';
+        import '../buddies/oak/ancient_tree25d.js';
         import { WRAITH_25D_VISUALS } from '../monsters/25d/wraith/wraith25d_visual.js';
         import '../monsters/25d/wraith/wraith25d.js';
         import { MOTH_25D_VISUALS } from '../monsters/25d/moth/moth25d_visual.js';
@@ -244,7 +246,9 @@
             shadow_wolf: 'monsters/25d/shadow_wolf/shadow_wolf25d_visual.js',
             white_wolf: 'buddies/white_wolf/white_wolf25d_visual.js',
             buddy_shadow_wolf: 'buddies/shadow_wolf/shadow_wolf25d_visual.js',
-            buddy_treant: 'buddies/treant/treant25d_visual.js',
+            buddy_treant: 'buddies/oak/ancient_tree25d_visual.js',
+            treant_sprite: 'buddies/treant/treant25d_visual.js',
+            treant_sprite_v1: 'buddies/treant/treant25d_visual.js',
             treant_classico: 'buddies/treant/treant25d_visual.js',
             zombie_wolf: 'monsters/25d/zombie_wolf/zombie_wolf25d_visual.js',
             headless_knight: 'monsters/25d/headless_knight/headless_knight25d_visual.js',
@@ -265,7 +269,9 @@
         COLOR_FILES.shadow_wolf = 'monsters/topdown/shadow_wolf/shadow_wolf_visual.js';
         COLOR_FILES.white_wolf = 'buddies/white_wolf/white_wolf_visual.js';
         COLOR_FILES.buddy_shadow_wolf = 'buddies/shadow_wolf/shadow_wolf_visual.js';
-        COLOR_FILES.buddy_treant = 'buddies/treant/treant25d_visual.js';
+        COLOR_FILES.buddy_treant = 'buddies/oak/ancient_tree25d_visual.js';
+        COLOR_FILES.treant_sprite = 'buddies/treant/treant25d_visual.js';
+        COLOR_FILES.treant_sprite_v1 = 'buddies/treant/treant25d_visual.js';
         COLOR_FILES.treant_classico = 'buddies/treant/treant25d_visual.js';
         COLOR_FILES.wraith = 'monsters/topdown/wraith/wraith_visual.js';
         COLOR_FILES.moth = 'monsters/topdown/moth/moth_visual.js';
@@ -297,6 +303,8 @@
         RADIUS.white_wolf = 12;
         RADIUS.buddy_shadow_wolf = 12;
         RADIUS.buddy_treant = 12;
+        RADIUS.treant_sprite = 12;
+        RADIUS.treant_sprite_v1 = 12;
         RADIUS.treant_classico = 12;
         RADIUS.wraith = 12;
         RADIUS.moth = 10;
@@ -321,7 +329,9 @@
             ['shadow_wolf', 'Lobo Sombrio', SHADOW_WOLF_25D_VISUALS, 'rig'],
             ['white_wolf', 'Buddy: Lobo Branco', WHITE_WOLF_25D_VISUALS, 'rig'],
             ['buddy_shadow_wolf', 'Buddy: Lobo Sombrio', SHADOW_WOLF_BUDDY_25D_VISUALS, 'rig'],
-            ['buddy_treant', 'Buddy: Treant (árvore andante)', TREANT_25D_VISUALS, 'rig'],
+            ['buddy_treant', 'Buddy: Árvore Ancestral 3D (NOVA)', ANCIENT_TREE_25D_VISUALS, 'rig'],
+            ['treant_sprite', 'Treant monstro (sprite atual, 12+6 quadros)', TREANT_25D_VISUALS, 'rig'],
+            ['treant_sprite_v1', 'Treant monstro (sprite anterior, 6+4 quadros, comparar)', TREANT_25D_VISUALS, 'rig'],
             ['treant_classico', 'Treant ANTIGO (bolas e galhos, para comparar)', TREANT_25D_VISUALS, 'rig'],
             ['zombie_wolf', 'Lobo Zumbi', ZOMBIE_WOLF_25D_VISUALS, 'rig'],
             ['headless_knight', 'Cavaleiro Sem Cabeça', HEADLESS_KNIGHT_25D_VISUALS, 'rig'],
@@ -784,7 +794,7 @@
         // --- MORTE ---
         // A definição de cada monstro mora em monsters/25d/death.js (MONSTER_DEATH): é a mesma que o Last Torch usa.
         // Aqui ela se ajusta ao vivo; "Copiar morte" gera o bloco para colar nesse arquivo. Fica guardada neste navegador.
-        const deathKey = () => ((['buddy_treant', 'treant_classico'].includes($('model').value)) ? 'treant' : $('model').value);
+        const deathKey = () => ((['treant_sprite', 'treant_sprite_v1', 'treant_classico'].includes($('model').value)) ? 'treant' : $('model').value);
         const DEATH_STORE = 'library-tuner-death';
         const DEATH_ORIGINAL = JSON.parse(JSON.stringify(MONSTER_DEATH));
         try {

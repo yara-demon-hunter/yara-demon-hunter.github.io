@@ -14,19 +14,20 @@ export { drawRavenSprite, prepareRaven, renderRavenBuddy } from './raven/raven.j
 export { drawHearthPhoenixSprite, hearthPhoenixBeak, hearthPhoenixView, prepareHearthPhoenix, renderHearthPhoenix } from './hearth_phoenix/hearth_phoenix.js';
 export { HEARTH_PHOENIX_VISUALS } from './hearth_phoenix/hearth_phoenix_visual.js';
 export { RAVEN_VISUALS } from './raven/raven_visual.js';
-export { drawOakBuddy, drawRootFeet, getCrown as getOakCrown, getEvilCrown as getOakEvilCrown, getEvilTrunk as getOakEvilTrunk, getTrunk as getOakTrunk } from './oak/oak.js';
+export { drawAncientTree, prepareAncientTree, ancientTreeView, ANCIENT3D, drawOakBuddy, drawRootFeet, getCrown as getOakCrown, getEvilCrown as getOakEvilCrown, getEvilTrunk as getOakEvilTrunk, getTrunk as getOakTrunk } from './oak/oak.js';
 export { drawGraveWisp } from './grave_wisp/grave_wisp.js';
 export { GRAVE_WISP_VISUALS } from './grave_wisp/grave_wisp_visual.js';
 
 import { SHADOW_WOLF_BUDDY_25D_VISUALS } from './shadow_wolf/shadow_wolf25d_visual.js';
 import { renderShadowWolfBuddy25D } from './shadow_wolf/shadow_wolf25d.js';
-import { TREANT_25D_VISUALS } from './treant/treant25d_visual.js';
-import { renderTreant25D } from './treant/treant25d.js';
+import './treant/treant25d.js';
+import { ANCIENT_TREE_25D_VISUALS } from './oak/ancient_tree25d_visual.js';
+import { renderAncientTreeBuddy25D } from './oak/ancient_tree25d.js';
 import { WHITE_WOLF_25D_VISUALS } from './white_wolf/white_wolf25d_visual.js';
 import { renderWhiteWolf25D } from './white_wolf/white_wolf25d.js';
 
 export const BUDDIES_25D = {
     shadow_wolf: { visuals: SHADOW_WOLF_BUDDY_25D_VISUALS, render: renderShadowWolfBuddy25D },
     white_wolf: { visuals: WHITE_WOLF_25D_VISUALS, render: renderWhiteWolf25D },
-    treant: { visuals: TREANT_25D_VISUALS, render: renderTreant25D }
+    treant: { visuals: ANCIENT_TREE_25D_VISUALS, render: renderAncientTreeBuddy25D }
 };

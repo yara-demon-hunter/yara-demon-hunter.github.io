@@ -113,12 +113,20 @@ function updateLeechVine(dt) {
 // --- CARVALHO MALIGNO ---
 // Uma semente drena o monstro com mais vida ao alcance. Quando ele morre, a muda nasce no local e amadurece:
 // primeiro cura o herói dentro do círculo, depois vira a árvore que atrai e chicoteia monstros.
+// A árvore 3D olha para onde anda ou bate: a direção vai virando aos poucos (o desenho escolhe o ângulo pelo vetor)
+function faceToward(oak, dx, dy, dt, speed) {
+    const d = Math.hypot(dx, dy) || 1;
+    const f = Math.min(1, dt * 7 * speed);
+    oak.faceX += (dx / d - oak.faceX) * f;
+    oak.faceY += (dy / d - oak.faceY) * f;
+}
 function growOak(x, y, level) {
     N.oaks.push({
         x, y: y - 6, stage: 'sapling', growthAge: 0, age: 0, seconds: level.seconds, transition: 0,
         healRadius: POWER_MODELS.shelterOak.healingRadius, hp: level.hp, maxHp: level.hp,
         reach: level.reach, damage: level.damage, lashSeconds: level.lashSeconds, lash: 0, awake: 0, awakeGoal: 0, shake: 0,
         lures: POWER_MODELS.shelterOak.lureRadius, swipes: [],
+        faceX: 0, faceY: 1, walkPhase: 0, atkAge: 99,
         evolved: powers.shelterOak.evolved
     });
     addShockwave(x, y, { radius: POWER_MODELS.shelterOak.healingRadius, color: COLOR, width: 4, seconds: 0.45 });
@@ -246,7 +254,8 @@ function updateShelterOak(dt) {
             oak.age += dt;
             // Quarto estágio: o carvalho adulto continua crescendo (tempo + mortes) até ficar furioso de vez
             oak.growthAge += dt * (1 + mod('oakGrowth'));
-            if (oak.stage === 'adult' && oak.growthAge >= M.elder.seconds) {
+            // A forma Ancient Grove (a árvore ancestral 3D) só vem com a evolução da skill: o carvalho adulto vira ancestral na hora em que ela é comprada
+            if (oak.stage === 'adult' && powers.shelterOak.evolved) {
                 oak.stage = 'elder';
                 oak.transition = 0.45;
                 createExplosion(oak.x, oak.y - 34, '#4ade80', 18);
@@ -282,6 +291,8 @@ function updateShelterOak(dt) {
                 oak.x = Math.max(30, Math.min(state.width - 30, oak.x + Math.cos(a) * speed * dt));
                 oak.y = Math.max(40, Math.min(state.height - 20, oak.y + Math.sin(a) * speed * dt));
                 oak.walking = true;
+                faceToward(oak, Math.cos(a), Math.sin(a), dt, 1);
+                oak.walkPhase = (oak.walkPhase + dt / 1.5) % 1;
             }
         }
         // Raízes andando no desenho: entram e saem aos poucos (0 a 1)
@@ -309,11 +320,14 @@ function updateShelterOak(dt) {
                         dealDamage(e, damage, { noCrit: true, style: 'spell' });
                         if (k < 4) oak.swipes.push({ x: e.x, y: e.y, age: 0, side: k % 2 ? 1 : -1 });
                     });
+                    oak.atkAge = 0;
+                    faceToward(oak, hit[0].x - oak.x, hit[0].y - oak.y, dt, 1);
                     oak.shake = 0.22;          // só a árvore balança: o chicote não empurra os monstros nem treme a tela
                     audio.playSlice();
                 } else oak.lash = 0.15;
             }
         }
+        oak.atkAge += dt;
         for (const sw of oak.swipes) sw.age += dt;
         // Monstros que alcançam o tronco batem nele (cada um no seu ritmo) e recuam
         for (const e of state.enemies) {

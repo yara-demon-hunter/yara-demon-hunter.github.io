@@ -278,21 +278,21 @@ export const PASSIVE_SKILL_MODELS = {
     },
 
     // Mãos de ladrão (ramo Fortune da árvore de relíquias)
-    lightFingers: { name: 'Light Fingers', icon: '🧤', cost: 500, maxLvl: 1, desc: 'Coins and loot leap into your hands: your pickup range doubles.', mods: { magnet: 1 } },
-    pickpocket: { name: 'Pickpocket', icon: '👛', cost: 500, maxLvl: 1, desc: 'Every monster you kill drops 2 extra gold.', mods: { killGold: 2 } },
-    coinRush: { name: 'Coin Rush', icon: '💰', cost: 700, maxLvl: 1, desc: 'Every coin you grab shaves 0.05s off your dagger and dash recharge. Gold buys speed.', mods: { coinHaste: 0.05 } },
-    thiefNose: { name: "Thief's Nose", icon: '👃', cost: 700, maxLvl: 1, desc: 'You smell what others miss: monsters drop items 60% more often.', mods: { pickupRate: 0.6 } },
+    lightFingers: { name: 'Light Fingers', icon: '🧤', cost: 300, maxLvl: 1, desc: 'Coins and loot leap into your hands: your pickup range doubles.', mods: { magnet: 1 } },
+    pickpocket: { name: 'Pickpocket', icon: '👛', cost: 900, maxLvl: 1, desc: 'Every monster you kill drops 2 extra gold.', mods: { killGold: 2 } },
+    coinRush: { name: 'Coin Rush', icon: '💰', cost: 2000, maxLvl: 1, desc: 'Every coin you grab shaves 0.05s off your dagger and dash recharge. Gold buys speed.', mods: { coinHaste: 0.05 } },
+    thiefNose: { name: "Thief's Nose", icon: '👃', cost: 3800, maxLvl: 1, desc: 'You smell what others miss: monsters drop items 60% more often.', mods: { pickupRate: 0.6 } },
     masterThief: {
         name: 'Master Thief',
         icon: '🦝',
-        cost: 700,
+        cost: 6500,
         maxLvl: 1,
         desc: 'Dash through monsters to pick their pockets. A Perfect Dodge steals a fistful of gold.'
     },
     greedyIdol: {
         name: 'Greedy Idol',
         icon: '🗿',
-        cost: 250,
+        cost: 300,
         maxLvl: 1,
         desc: '+35% gold, but -12% max health.',
         mods: { gold: 0.35, maxHp: -0.12 }
@@ -300,7 +300,7 @@ export const PASSIVE_SKILL_MODELS = {
     emberFlask: {
         name: 'Ember Flask',
         icon: '🏺',
-        cost: 350,
+        cost: 300,
         maxLvl: 1,
         desc: 'The torch slowly recovers: +1 health every 8 seconds.',
         mods: { torchRegen: 0.12 }
@@ -308,7 +308,7 @@ export const PASSIVE_SKILL_MODELS = {
     secondPrayer: {
         name: 'Second Prayer',
         icon: '📿',
-        cost: 1500,
+        cost: 4800,
         maxLvl: 1,
         desc: 'Rise once with half your health when you fall.',
         mods: { revives: 1 }
@@ -316,7 +316,7 @@ export const PASSIVE_SKILL_MODELS = {
     boneCharm: {
         name: 'Bone Charm',
         icon: '🦴',
-        cost: 700,
+        cost: 2000,
         maxLvl: 1,
         desc: '+1 dash charge.',
         mods: { dashCharges: 1 }
@@ -324,7 +324,7 @@ export const PASSIVE_SKILL_MODELS = {
     witchEye: {
         name: "Witch's Eye",
         icon: '👁️',
-        cost: 1000,
+        cost: 2000,
         maxLvl: 1,
         desc: 'Every third level grants an extra skill point.',
         mods: { levelPoints: 0.34 }
@@ -332,7 +332,7 @@ export const PASSIVE_SKILL_MODELS = {
     berserkDraught: {
         name: 'Berserk Draught',
         icon: '🧪',
-        cost: 700,
+        cost: 300,
         maxLvl: 1,
         desc: '+60% damage while under 35% health.',
         mods: { lowHpDamage: 0.6 }
@@ -340,7 +340,7 @@ export const PASSIVE_SKILL_MODELS = {
     thornCrown: {
         name: 'Crown of Thorns',
         icon: '👑',
-        cost: 700,
+        cost: 900,
         maxLvl: 1,
         desc: 'Monsters that touch you take 150% of your blade damage.',
         mods: { thorns: 1.5 }
@@ -348,7 +348,7 @@ export const PASSIVE_SKILL_MODELS = {
     ironHeart: {
         name: 'Iron Heart',
         icon: '🫀',
-        cost: 1000,
+        cost: 2000,
         maxLvl: 1,
         desc: 'Take 18% less damage.',
         mods: { damageTaken: -0.18 }
@@ -356,7 +356,7 @@ export const PASSIVE_SKILL_MODELS = {
     luckyCoin: {
         name: 'Lucky Coin',
         icon: '🍀',
-        cost: 500,
+        cost: 900,
         maxLvl: 1,
         desc: 'Chests give +1 skill point and you find 10% more gold.',
         mods: { chestPoints: 1, gold: 0.1 }
@@ -364,7 +364,7 @@ export const PASSIVE_SKILL_MODELS = {
     hunterMark: {
         name: 'Hunter Mark',
         icon: '🎖️',
-        cost: 700,
+        cost: 900,
         maxLvl: 1,
         desc: 'Daggers deal +50% damage and recharge 20% faster.',
         mods: { knifeDamage: 0.5, knifeCooldown: 0.2 }
@@ -372,7 +372,7 @@ export const PASSIVE_SKILL_MODELS = {
     warmCloak: {
         name: 'Warm Cloak',
         icon: '🧥',
-        cost: 600,
+        cost: 900,
         maxLvl: 1,
         desc: 'The warmth of the torch reaches 15% farther and heals you 4.5% faster.',
         mods: { warmth: 0.15 }
@@ -380,42 +380,42 @@ export const PASSIVE_SKILL_MODELS = {
     furyStone: {
         name: 'Fury Stone',
         icon: '💢',
-        cost: 700,
+        cost: 2000,
         maxLvl: 1,
         desc: 'Fury lasts 2 seconds longer and charges 5% faster.',
         mods: { furyDuration: 2, furyCharge: 0.05 }
     },
     // --- RELÍQUIAS DA NATUREZA: reforçam o ramo Nature (carvalho, raízes, esporos, lobos, regeneração) ---
-    acornPouch: { name: 'Acorn Pouch', icon: '🌰', cost: 200, maxLvl: 1, desc: 'Seeds, saplings and oaks grow 30% faster.', mods: { oakGrowth: 0.3 } },
-    mossyStone: { name: 'Mossy Stone', icon: '🪨', cost: 200, maxLvl: 1, desc: 'Roots hold monsters 30% longer.', mods: { rootSeconds: 0.3 } },
-    sporeJar: { name: 'Spore Jar', icon: '🫙', cost: 700, maxLvl: 1, desc: 'Spore clouds and poison hit 25% harder.', mods: { poison: 0.25 } },
-    wolfTotem: { name: 'Wolf Totem', icon: '🐾', cost: 1000, maxLvl: 1, desc: 'Your wolf bites 20% harder and has 20% more health.', mods: { wolfPower: 0.2 } },
-    dewVial: { name: 'Dew Vial', icon: '💧', cost: 500, maxLvl: 1, desc: 'Recover 0.5 health per second.', mods: { hpRegen: 0.5 } },
-    sunpetal: { name: 'Sunpetal', icon: '🌼', cost: 700, maxLvl: 1, desc: '+12% spell damage, -6% spell recharge.', mods: { spellDamage: 0.12, spellHaste: 0.06 } },
-    lotusBloom: { name: 'Lotus Bloom', icon: '🪷', cost: 1000, maxLvl: 1, desc: '+10% max health and recover 0.4 health per second.', mods: { maxHp: 0.1, hpRegen: 0.4 } },
-    autumnCharm: { name: 'Autumn Charm', icon: '🍂', cost: 1000, maxLvl: 1, desc: '+10% spell damage, -10% spell recharge, +10% XP.', mods: { spellDamage: 0.1, spellHaste: 0.1, xp: 0.1 } },
+    acornPouch: { name: 'Acorn Pouch', icon: '🌰', cost: 300, maxLvl: 1, desc: 'Seeds, saplings and oaks grow 30% faster.', mods: { oakGrowth: 0.3 } },
+    mossyStone: { name: 'Mossy Stone', icon: '🪨', cost: 900, maxLvl: 1, desc: 'Roots hold monsters 30% longer.', mods: { rootSeconds: 0.3 } },
+    sporeJar: { name: 'Spore Jar', icon: '🫙', cost: 2000, maxLvl: 1, desc: 'Spore clouds and poison hit 25% harder.', mods: { poison: 0.25 } },
+    wolfTotem: { name: 'Wolf Totem', icon: '🐾', cost: 3800, maxLvl: 1, desc: 'Your wolf bites 20% harder and has 20% more health.', mods: { wolfPower: 0.2 } },
+    dewVial: { name: 'Dew Vial', icon: '💧', cost: 300, maxLvl: 1, desc: 'Recover 0.5 health per second.', mods: { hpRegen: 0.5 } },
+    sunpetal: { name: 'Sunpetal', icon: '🌼', cost: 900, maxLvl: 1, desc: '+12% spell damage, -6% spell recharge.', mods: { spellDamage: 0.12, spellHaste: 0.06 } },
+    lotusBloom: { name: 'Lotus Bloom', icon: '🪷', cost: 2000, maxLvl: 1, desc: '+10% max health and recover 0.4 health per second.', mods: { maxHp: 0.1, hpRegen: 0.4 } },
+    autumnCharm: { name: 'Autumn Charm', icon: '🍂', cost: 3800, maxLvl: 1, desc: '+10% spell damage, -10% spell recharge, +10% XP.', mods: { spellDamage: 0.1, spellHaste: 0.1, xp: 0.1 } },
     // --- RELÍQUIAS POR CLASSE: cada uma reforça um ramo da árvore de skills (Blade, Shadow, Flame, Curse) ---
-    sharpenedEdge: { name: 'Sharpened Edge', icon: '🪚', cost: 1000, maxLvl: 1, desc: 'For blade fighters: +15% blade damage, +8% attack speed.', mods: { bladeDamage: 0.15, attackSpeed: 0.08 } },
-    shadeQuiver: { name: 'Shade Quiver', icon: '🪶', cost: 1000, maxLvl: 1, desc: 'For shadow stalkers: +20% dagger damage, -8% dagger recharge, +4% critical chance.', mods: { knifeDamage: 0.2, knifeCooldown: 0.08, critChance: 0.04 } },
-    occultTome: { name: 'Occult Tome', icon: '🪬', cost: 1000, maxLvl: 1, desc: 'For curse casters: +15% spell damage, -8% spell recharge.', mods: { spellDamage: 0.15, spellHaste: 0.08 } },
-    emberLantern: { name: 'Ember Lantern', icon: '🪔', cost: 700, maxLvl: 1, desc: 'For flame keepers: the torch heals 0.12/s and its warmth reaches 10% farther.', mods: { torchRegen: 0.12, warmth: 0.1 } },
-    phantomVeil: { name: 'Phantom Veil', icon: '🧣', cost: 1000, maxLvl: 1, desc: 'For shadow dodgers: -12% dash recharge, +5% move speed.', mods: { dashCooldown: 0.12, moveSpeed: 0.05 } },
-    wizardsWand: { name: "Wizard's Wand", icon: '🪄', cost: 1000, maxLvl: 1, desc: 'For curse casters: +20% spell damage, -6% spell recharge.', mods: { spellDamage: 0.2, spellHaste: 0.06 } },
-    owlsWisdom: { name: "Owl's Wisdom", icon: '🦉', cost: 1500, maxLvl: 1, desc: 'For curse casters: -12% spell recharge, +10% XP.', mods: { spellHaste: 0.12, xp: 0.1 } },
-    stoneHeart: { name: 'Stone Heart', icon: '💎', cost: 1500, maxLvl: 1, desc: 'For blade bruisers: +15% max health, -6% damage taken.', mods: { maxHp: 0.15, damageTaken: -0.06 } },
-    merchantSeal: { name: "Merchant's Seal", icon: '⚖️', cost: 1000, maxLvl: 1, desc: '+20% gold, items drop 15% more often.', mods: { gold: 0.2, pickupRate: 0.15 } },
-    gildedSignet: { name: 'Gilded Signet', icon: '💍', cost: 1000, maxLvl: 1, desc: '+10% gold, +10% XP.', mods: { gold: 0.1, xp: 0.1 } },
-    hearthstone: { name: 'Hearthstone', icon: '🧱', cost: 500, maxLvl: 1, desc: '+30 torch health.', mods: { torchHp: 30 } },
-    oldScars: { name: 'Old Scars', icon: '🩹', cost: 500, maxLvl: 1, desc: '+20 hero health.', mods: { maxHpFlat: 20 } },
-    whetstone: { name: 'Whetstone', icon: '⚒️', cost: 700, maxLvl: 1, desc: '+12% damage.', mods: { damage: 0.12 } },
-    wornBoots: { name: 'Worn Boots', icon: '👢', cost: 800, maxLvl: 1, desc: '+6% move speed.', mods: { moveSpeed: 0.06 } },
-    coinPurse: { name: 'Coin Purse', icon: '🪙', cost: 250, maxLvl: 1, desc: '+15% gold.', mods: { gold: 0.15 } },
-    hunterLore: { name: 'Hunter Lore', icon: '📖', cost: 500, maxLvl: 1, desc: '+10% XP.', mods: { xp: 0.1 } },
-    smolderingRage: { name: 'Smoldering Rage', icon: '🧨', cost: 500, maxLvl: 1, desc: '+20% Fury charge.', mods: { furyCharge: 0.2 } },
+    sharpenedEdge: { name: 'Sharpened Edge', icon: '🪚', cost: 6500, maxLvl: 1, desc: 'For blade fighters: +15% blade damage, +8% attack speed.', mods: { bladeDamage: 0.15, attackSpeed: 0.08 } },
+    shadeQuiver: { name: 'Shade Quiver', icon: '🪶', cost: 6500, maxLvl: 1, desc: 'For shadow stalkers: +20% dagger damage, -8% dagger recharge, +4% critical chance.', mods: { knifeDamage: 0.2, knifeCooldown: 0.08, critChance: 0.04 } },
+    occultTome: { name: 'Occult Tome', icon: '🪬', cost: 300, maxLvl: 1, desc: 'For curse casters: +15% spell damage, -8% spell recharge.', mods: { spellDamage: 0.15, spellHaste: 0.08 } },
+    emberLantern: { name: 'Ember Lantern', icon: '🪔', cost: 3800, maxLvl: 1, desc: 'For flame keepers: the torch heals 0.12/s and its warmth reaches 10% farther.', mods: { torchRegen: 0.12, warmth: 0.1 } },
+    phantomVeil: { name: 'Phantom Veil', icon: '🧣', cost: 6500, maxLvl: 1, desc: 'For shadow dodgers: -12% dash recharge, +5% move speed.', mods: { dashCooldown: 0.12, moveSpeed: 0.05 } },
+    wizardsWand: { name: "Wizard's Wand", icon: '🪄', cost: 900, maxLvl: 1, desc: 'For curse casters: +20% spell damage, -6% spell recharge.', mods: { spellDamage: 0.2, spellHaste: 0.06 } },
+    owlsWisdom: { name: "Owl's Wisdom", icon: '🦉', cost: 2000, maxLvl: 1, desc: 'For curse casters: -12% spell recharge, +10% XP.', mods: { spellHaste: 0.12, xp: 0.1 } },
+    stoneHeart: { name: 'Stone Heart', icon: '💎', cost: 7500, maxLvl: 1, desc: 'For blade bruisers: +15% max health, -6% damage taken.', mods: { maxHp: 0.15, damageTaken: -0.06 } },
+    merchantSeal: { name: "Merchant's Seal", icon: '⚖️', cost: 6500, maxLvl: 1, desc: '+20% gold, items drop 15% more often.', mods: { gold: 0.2, pickupRate: 0.15 } },
+    gildedSignet: { name: 'Gilded Signet', icon: '💍', cost: 3800, maxLvl: 1, desc: '+10% gold, +10% XP.', mods: { gold: 0.1, xp: 0.1 } },
+    hearthstone: { name: 'Hearthstone', icon: '🧱', cost: 300, maxLvl: 1, desc: '+30 torch health.', mods: { torchHp: 30 } },
+    oldScars: { name: 'Old Scars', icon: '🩹', cost: 900, maxLvl: 1, desc: '+20 hero health.', mods: { maxHpFlat: 20 } },
+    whetstone: { name: 'Whetstone', icon: '⚒️', cost: 300, maxLvl: 1, desc: '+12% damage.', mods: { damage: 0.12 } },
+    wornBoots: { name: 'Worn Boots', icon: '👢', cost: 3800, maxLvl: 1, desc: '+6% move speed.', mods: { moveSpeed: 0.06 } },
+    coinPurse: { name: 'Coin Purse', icon: '🪙', cost: 300, maxLvl: 1, desc: '+15% gold.', mods: { gold: 0.15 } },
+    hunterLore: { name: 'Hunter Lore', icon: '📖', cost: 900, maxLvl: 1, desc: '+10% XP.', mods: { xp: 0.1 } },
+    smolderingRage: { name: 'Smoldering Rage', icon: '🧨', cost: 3800, maxLvl: 1, desc: '+20% Fury charge.', mods: { furyCharge: 0.2 } },
     // grantPoints: pontos de skill entregues uma vez, na compra
-    huntersNotes: { name: "Hunter's Notes", icon: '📜', cost: 1000, maxLvl: 1, desc: 'Gain 2 skill points right away.', grantPoints: 2 },
-    treasureSense: { name: 'Treasure Sense', icon: '🗝️', cost: 700, maxLvl: 1, desc: 'Chests give +1 skill point.', mods: { chestPoints: 1 } },
-    lastPrayer: { name: 'Last Prayer', icon: '🙏', cost: 1500, maxLvl: 1, desc: 'Rise once more when you fall.', mods: { revives: 1 } }
+    huntersNotes: { name: "Hunter's Notes", icon: '📜', cost: 3800, maxLvl: 1, desc: 'Gain 2 skill points right away.', grantPoints: 2 },
+    treasureSense: { name: 'Treasure Sense', icon: '🗝️', cost: 2000, maxLvl: 1, desc: 'Chests give +1 skill point.', mods: { chestPoints: 1 } },
+    lastPrayer: { name: 'Last Prayer', icon: '🙏', cost: 3300, maxLvl: 1, desc: 'Rise once more when you fall.', mods: { revives: 1 } }
 };
 
 // Natureza: o estouro de espinhos e a casca do carvalho (js/systems/skills_nature.js)
@@ -427,7 +427,7 @@ export const THORN_ROSES = { markSeconds: 10, patchSeconds: 6, radius: 34, damag
 // --- ACAMPAMENTO ---
 // Fim de cada hora: o ouro compra relíquias na árvore do acampamento e também alimenta a tocha.
 export const CAMP = {
-    costMultiplier: 1,              // o preço de cada relíquia já está escrito em `cost` dela (500 / 700 / 1000 / 1500)
+    costMultiplier: 1,              // o preço de cada relíquia já está escrito em `cost` dela: sobe pela coluna na árvore de relíquias (300 · 900 · 2.000 · 3.800 · 6.500)
     costGrowthPerHour: 0,           // 0 = preço fixo em todas as ondas (o ouro por onda já cresce com mais abates)
     priceStep: 10,                  // preços arredondados para múltiplos disto
     freeTorchHeal: 0,               // a tocha recupera isto de graça ao chegar no acampamento (zero: quem cura é o Feed)

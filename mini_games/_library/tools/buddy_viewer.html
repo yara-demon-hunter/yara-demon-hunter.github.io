@@ -39,12 +39,12 @@
         Depois de mudar um <code>_visual.js</code>, rode <code>ruby mini_games/_library/sync.rb</code>.</p>
 </div>
 <script type="module">
-    import { preparePhoenix, renderPhoenixBuddy, prepareRaven, renderRavenBuddy, drawGraveWisp, drawOakBuddy } from '../buddies/index.js';
+    import { preparePhoenix, renderPhoenixBuddy, prepareRaven, renderRavenBuddy, drawGraveWisp, drawOakBuddy, drawAncientTree, prepareAncientTree } from '../buddies/index.js';
 
     const grid = document.getElementById('grid');
     const W = 360;
     const H = 270;
-    const state = { phoenix: { action: false, rise: false }, raven: { action: false, rise: false }, wisp: { action: false }, oak: { action: false, ancient: false, walk: true } };
+    const state = { phoenix: { action: false, rise: false }, raven: { action: false, rise: false }, wisp: { action: false }, oak: { action: false, ancient: false, walk: true }, tree3d: { walk: true, attack: false, spin: true } };
 
     function card(id, title, text, extra) {
         const box = document.createElement('div');
@@ -93,6 +93,13 @@
     toggle(ok.row, 'Última fase (Ancient Grove)', 'oak', 'ancient');
     toggle(ok.row, 'Andando (pezinhos)', 'oak', 'walk');
     ok.row.lastChild.classList.add('on');
+    // Árvore Ancestral 3D (a nova, do Laboratório), para comparar com o carvalho 2D acima
+    const t3 = card('tree3d', 'Árvore Ancestral 3D (nova)', 'A forma Ancient Grove refeita em 3D no Laboratório (tools/lab/arvore_foto.html): atlas com 5 ângulos, andar e ataque. Gira sozinha para mostrar todos os lados; desligue o giro para ver só de frente.');
+    toggle(t3.row, 'Andando', 'tree3d', 'walk');
+    toggle(t3.row, 'Atacando (chicote)', 'tree3d', 'attack');
+    toggle(t3.row, 'Girando', 'tree3d', 'spin');
+    t3.row.children[0].classList.add('on'); t3.row.children[2].classList.add('on');
+    prepareAncientTree();
     // Lobos (2.5D): abrem no tuner
     for (const [id, title, text] of [
         ['buddy_shadow_wolf', 'Shadow Wolf', 'O lobo do Rowan: negro, peludo, agachado, olhos vermelhos e chama roxa escura. Boneco 2.5D.'],
@@ -103,7 +110,7 @@
         link(c.row, 'Abrir no tuner (ajustar ao vivo)', `tuner.html?model=${id}`);
     }
 
-    const sizes = { phoenix: ph.canvas, raven: rv.canvas, wisp: ws.canvas, oak: ok.canvas };
+    const sizes = { phoenix: ph.canvas, raven: rv.canvas, wisp: ws.canvas, oak: ok.canvas, tree3d: t3.canvas };
     const t0 = performance.now();
     preparePhoenix(false);
     prepareRaven(false);
@@ -120,6 +127,11 @@
             if (key === 'phoenix') renderPhoenixBuddy(g, { x: cx, y: cy, facing: 1, tilt: Math.sin(t * 1.4) * 0.12, flash: state.phoenix.action ? 1 : 0, rise }, 0);
             if (key === 'raven') renderRavenBuddy(g, { x: cx, y: cy, facing: 1, tilt: Math.sin(t * 1.6) * 0.1 - (state.raven.action ? 0.3 : 0), dive: state.raven.action ? 1 : 0, rise });
             if (key === 'oak') { g.setTransform(3, 0, 0, 3, 0, 0); drawOakBuddy(g, W / 3, 160, { t, awake: state.oak.action ? 1 : 0, ancient: state.oak.ancient, walking: state.oak.walk, facing: 1 }); }
+            if (key === 'tree3d') {
+                const st = state.tree3d, a = st.spin ? t * 0.7 : Math.PI / 2;     // a=PI/2: de frente (olhando para baixo na tela)
+                g.setTransform(2.4, 0, 0, 2.4, 0, 0);
+                drawAncientTree(g, W / 2.4, H * 2 / 2.4 - 40, 1.4, { x: Math.cos(a), y: Math.sin(a) }, st.walk ? (t / 1.5) % 1 : 0, st.attack ? (t % 1) : 99);
+            }
             if (key === 'wisp') drawGraveWisp(g, cx, cy, t, state.wisp.action ? 1 : 0);
         }
         requestAnimationFrame(frame);

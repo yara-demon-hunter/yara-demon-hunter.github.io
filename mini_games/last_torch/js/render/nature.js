@@ -3,7 +3,7 @@ import { POWER_MODELS } from '../../data_model/powers.js';
 import { ctx, player, powers, state } from '../core/state.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { makeCanvas } from './fx/sprites.js';
-import { ANCIENT_CROWN_H, ANCIENT_CROWN_W, ANCIENT_TRUNK_H, ANCIENT_TRUNK_W, CROWN_H, CROWN_W, TRUNK_H, TRUNK_W, drawAncientMist, drawAncientRoots, getAncientCrown, getAncientTrunk, getCrown, getEvilCrown, getEvilTrunk, getTrunk } from '../../library/buddies/oak/oak.js';
+import { ANCIENT_CROWN_H, ANCIENT_CROWN_W, ANCIENT_TRUNK_H, ANCIENT_TRUNK_W, CROWN_H, CROWN_W, TRUNK_H, TRUNK_W, drawAncientMist, drawAncientRoots, getAncientCrown, getAncientTrunk, drawAncientTree, getCrown, getEvilCrown, getEvilTrunk, getTrunk } from '../../library/buddies/oak/oak.js';
 import { resetWorldView, stamp } from './fx/stamp.js';
 import { drawRoseMark, drawThornPatch } from '../../library/weapons/thrown.js';
 import { getMonsterSprite, spriteFrame } from './monster_sprites.js';
@@ -41,6 +41,7 @@ function oakCanopyAlpha(oak, width, height, k) {
         return dx * dx + dy * dy < 1;
     };
     if (overlapsBehind(player)) return 0.72;
+    if (overlapsBehind({ x: state.coreX, y: state.coreY, radius: 16, hp: 1 })) return 0.72;
     for (const enemy of state.enemies) if (overlapsBehind(enemy)) return 0.72;
     return 0.9;
 }
@@ -191,8 +192,6 @@ export function renderNatureGround() {
     if (N.oaks.length === 0 && N.pods.length === 0 && N.clouds.length === 0) return;
     const t = performance.now() / 1000;
     for (const oak of N.oaks) {
-        const grow = oakScale(oak);
-        const fade = 1;              // a árvore não some mais com o tempo
         renderHealingRing(oak, t);
     }
     ctx.globalAlpha = 1;
@@ -442,7 +441,15 @@ export function renderNatureFront() {
         ctx.fill();
         ctx.restore();
     }
-    for (const oak of N.oaks) {
+    for (const oak of N.oaks) if (oak.y >= state.coreY) drawOak(oak);
+}
+
+// Carvalhos ATRÁS da tocha (pés mais acima na tela que a tocha): desenhados antes dela, para a tocha nunca ficar escondida por uma árvore que está atrás
+export function renderNatureBehindCore() {
+    for (const oak of N.oaks) if (oak.y < state.coreY) drawOak(oak);
+}
+
+function drawOak(oak) {
         const grow = oakScale(oak);
         const fade = 1;              // a árvore não some mais com o tempo
         const t = performance.now() / 1000;
@@ -457,9 +464,12 @@ export function renderNatureFront() {
         const ch = (ancient ? ANCIENT_CROWN_H : CROWN_H) * k;
         ctx.globalAlpha = fade;
         if (oak.walkK > 0.02 && !ancient) renderWalkingRoots(oak, k, t);
+        // Forma final: a árvore 3D do Laboratório (atlas por ângulo). Enquanto o atlas carrega, cai no desenho 2D antigo
+        let drew3d = false;
         if (ancient) {
             drawAncientMist(ctx, oak.x + sway, oak.y, k, t);
-            drawAncientRoots(ctx, oak.x + sway, oak.y + 2 * k, k, t, oak.walkK ?? 0);
+            drew3d = drawAncientTree(ctx, oak.x + sway, oak.y + 2 * k, k, { x: oak.faceX, y: oak.faceY }, oak.walkPhase, oak.atkAge, oakCanopyAlpha(oak, 120, 70, k) / 0.9);
+            if (!drew3d) drawAncientRoots(ctx, oak.x + sway, oak.y + 2 * k, k, t, oak.walkK ?? 0);
         }
         if (oak.stage === 'sapling') {
             ctx.fillStyle = '#78350f';
@@ -469,14 +479,14 @@ export function renderNatureFront() {
             ctx.ellipse(oak.x - 3 * k, oak.y - 8 * k, 4 * k, 2 * k, -0.5, 0, TAU);
             ctx.ellipse(oak.x + 3 * k, oak.y - 10 * k, 4 * k, 2 * k, 0.5, 0, TAU);
             ctx.fill();
-        } else {
+        } else if (!drew3d) {
             ctx.drawImage(ancient ? getAncientTrunk() : getTrunk(), oak.x - tw / 2 + sway, oak.y - th + 5 * k, tw, th);
         }
         if (oak.awake > 0.02 && !ancient) {
             ctx.globalAlpha = fade * oak.awake;
             ctx.drawImage(getEvilTrunk(), oak.x - tw / 2 + sway, oak.y - th + 5 * k, tw, th);
         }
-        if (oak.stage !== 'sapling') {
+        if (oak.stage !== 'sapling' && !drew3d) {
             ctx.globalAlpha = fade * oakCanopyAlpha(oak, cw, ch, k);
             ctx.drawImage(ancient ? getAncientCrown() : getCrown(), oak.x - cw / 2 + sway * 1.6, oak.y - (ancient ? 72 : 66) * k - ch / 2, cw, ch);
         }
@@ -521,7 +531,6 @@ export function renderNatureFront() {
         ctx.fillRect(oak.x - 16, oak.y + 9, 32, 3.5);
         ctx.fillStyle = oak.awake > 0.5 ? '#f87171' : '#4ade80';
         ctx.fillRect(oak.x - 16, oak.y + 9, 32 * ratio, 3.5);
-    }
 }
 // Raízes andando: dois pés principais alternam apoio e elevação; raízes menores acompanham o arrasto.
 const ROOT_STROKES = [['#160e08', 4.2], ['#382314', 3], ['#76502b', 1.8], ['#a07842', 0.7]];

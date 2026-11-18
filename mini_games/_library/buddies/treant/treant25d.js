@@ -165,62 +165,70 @@ function parts(pose, rig) {
 }
 
 // --- A VERSÃO EM SPRITES (a que vale no jogo, para o monstro e para o buddy) ---
-// treant_atlas.webp foi gravado do Treant 3D do laboratório (tools/lab/treant_foto.js?bake=1, noite): 8 direções (linhas, de 45 em 45 graus,
-// começando para a direita e girando para baixo) x 10 quadros (colunas): 6 de passada e 4 de soco. Se a imagem ainda não carregou,
-// vale a versão em bolas e galhos que está mais acima, que continua aqui como reserva.
-const ATLAS = { walk: 6, punch: 4, dirs: 8, size: 176 };
-const atlas = new Image();
-// Caminho da imagem: ao lado deste arquivo; no pacote com bundle (game.min.js na raiz) o import.meta.url não aponta mais para a pasta
-// library, então a imagem é buscada em library/... a partir da página
-atlas.src = import.meta.url.includes('/library/') ? new URL('./treant_atlas.webp', import.meta.url).href
-    : new URL('library/buddies/treant/treant_atlas.webp', document.baseURI).href;
-const ready = () => atlas.complete && atlas.naturalWidth > 0;
+// treant_atlas.webp foi gravado do Treant 3D do laboratório (tools/lab/treant_foto.js?bake=1, bake_treant.py): 8 direções (linhas, de 45 em 45 graus,
+// começando para a direita e girando para baixo) x 18 quadros (colunas): 12 de passada (pé que sobe, corpo que sobe e desce, copa em pêndulo) e
+// 6 de soco (recua, bate, volta), 144 px por quadro. Se a imagem ainda não carregou, vale a versão em bolas e galhos mais acima, que continua como reserva.
+// A versão anterior do sprite (6 + 4 quadros, 176 px) fica em tools/lab/exemplos/treant_atlas_v1.webp só para comparar no Ateliê
+// (tuner.html?model=treant_sprite_v1); ela só é baixada quando alguém a pede, nunca no jogo.
+const TAU_ = TAU;
+function loadAtlas(cfg, url) {
+    const image = new Image();
+    let started = false;
+    return { ...cfg, image, start() { if (!started) { started = true; image.src = url(); } return this; }, ready() { return image.complete && image.naturalWidth > 0; } };
+}
+const inLibrary = /\/_?library\//.test(import.meta.url);
+const NOVO = loadAtlas({ walk: 12, punch: 6, dirs: 8, size: 144 }, () => inLibrary ? new URL('./treant_atlas.webp', import.meta.url).href : new URL('library/buddies/treant/treant_atlas.webp', document.baseURI).href).start();
+// Caminho no jogo com bundle (game.min.js na raiz): o import.meta.url não aponta mais para a pasta library, então a imagem é buscada a partir da página
+const V1 = loadAtlas({ walk: 6, punch: 4, dirs: 8, size: 176 }, () => new URL('../../tools/lab/exemplos/treant_atlas_v1.webp', import.meta.url).href);
+const ready = () => NOVO.ready();
 const sprites = new WeakMap();
-const dirOf = (angle) => Math.round((((angle % TAU) + TAU) % TAU) / TAU * ATLAS.dirs) % ATLAS.dirs;
-const colOf = (swingK, phase) => swingK > 0.02 ? ATLAS.walk + Math.min(ATLAS.punch - 1, Math.ceil(swingK * ATLAS.punch) - 1) : Math.floor(phase) % ATLAS.walk;
+const dirOf = (angle, A = NOVO) => Math.round((((angle % TAU_) + TAU_) % TAU_) / TAU_ * A.dirs) % A.dirs;
+const colOf = (swingK, phase, A = NOVO) => swingK > 0.02 ? A.walk + Math.min(A.punch - 1, Math.ceil(swingK * A.punch) - 1) : Math.floor(phase) % A.walk;
 
 // Peça única com o sprite, para quem desenha pelo boneco (Ateliê, outros jogos)
-function spriteRigPart(rig) {
+function spriteRigPart(rig, A = NOVO) {
     const c0 = rig.project(0, 0, 0);
     const c1 = rig.project(0, 0, 1);
     const unit = Math.hypot(c1.x - c0.x, c1.y - c0.y);
     return {
         depth: c0.depth,
         draw() {
-            const phase = (((rig.anim.stride % TAU) + TAU) % TAU) / TAU * ATLAS.walk;
+            const phase = (((rig.anim.stride % TAU_) + TAU_) % TAU_) / TAU_ * A.walk;
             const size = unit * S.spriteUnits;
             const at = rig.project(0, 0, S.center);
-            ctx.drawImage(atlas, colOf(swingNow(), phase) * ATLAS.size, dirOf(rig.anim.facing) * ATLAS.size, ATLAS.size, ATLAS.size, at.x - size / 2, at.y - size / 2 + size * S.spriteLift, size, size);
+            ctx.drawImage(A.image, colOf(swingNow(), phase, A) * A.size, dirOf(rig.anim.facing, A) * A.size, A.size, A.size, at.x - size / 2, at.y - size / 2 + size * S.spriteLift, size, size);
         }
     };
 }
 // A versão ANTIGA (bolas e galhos), guardada para comparar no Ateliê (tuner.html?model=treant_classico): sempre desenha as peças, nunca o sprite
 registerCreature('treant_classico', S, parts);
 
-registerCreature('buddy_treant', S, (pose, rig) => ready() ? [spriteRigPart(rig)] : parts(pose, rig));
+registerCreature('treant_sprite', S, (pose, rig) => ready() ? [spriteRigPart(rig)] : parts(pose, rig));
+// O sprite da versão anterior (6 + 4 quadros), só para comparar no Ateliê
+registerCreature('treant_sprite_v1', S, (pose, rig) => V1.start().ready() ? [spriteRigPart(rig, V1)] : parts(pose, rig));
 
 // Um quadro parado (corpo que tomba na morte): desenha no ponto (0, 0) do contexto atual, no tamanho de um monstro de raio radius
 export function treantStill(facing, radius) {
     if (!ready()) return false;
     const size = radius * S.spriteScale;
-    ctx.drawImage(atlas, 0, dirOf(facing) * ATLAS.size, ATLAS.size, ATLAS.size, -size / 2, -size / 2 + size * S.spriteLift, size, size);
+    ctx.drawImage(NOVO.image, 0, dirOf(facing) * NOVO.size, NOVO.size, NOVO.size, -size / 2, -size / 2 + size * S.spriteLift, size, size);
     return true;
 }
 
 export function renderTreant25D(e) {
     if (!ready()) {
         swing = e.swing ?? 0;
-        renderMonster25D(e, 'buddy_treant', S);
+        renderMonster25D(e, 'treant_classico', S);
         swing = null;
         return;
     }
     const now = renderNow();
     let st = sprites.get(e);
-    if (!st) sprites.set(e, st = { x: e.x, y: e.y, phase: Math.random() * ATLAS.walk });
+    if (!st) sprites.set(e, st = { x: e.x, y: e.y, phase: Math.random() * NOVO.walk });
     const dist = Math.hypot(e.x - st.x, e.y - st.y);
     st.x = e.x; st.y = e.y;
-    if (host.animating()) st.phase = (st.phase + dist / S.pixelsPerCycle * ATLAS.walk) % ATLAS.walk;
-    if (e.bakeFrame !== undefined) st.phase = e.bakeFrame * ATLAS.walk;
+    if (host.animating()) st.phase = (st.phase + dist / S.pixelsPerCycle * NOVO.walk) % NOVO.walk;
+    if (e.bakeFrame !== undefined) st.phase = e.bakeFrame * NOVO.walk;
     const size = e.radius * S.spriteScale;
     if (!e.baking) {
         drawGlow(ctx, S.colors.aura, e.x, e.y, size * 0.5, S.auraAlpha);
@@ -238,5 +246,5 @@ export function renderTreant25D(e) {
         ctx.fill();
         ctx.restore();
     }
-    ctx.drawImage(atlas, colOf(e.swing ?? 0, st.phase) * ATLAS.size, dirOf(e.angle) * ATLAS.size, ATLAS.size, ATLAS.size, e.x - size / 2, e.y - size / 2 + size * S.spriteLift, size, size);
+    ctx.drawImage(NOVO.image, colOf(e.swing ?? 0, st.phase) * NOVO.size, dirOf(e.angle) * NOVO.size, NOVO.size, NOVO.size, e.x - size / 2, e.y - size / 2 + size * S.spriteLift, size, size);
 }

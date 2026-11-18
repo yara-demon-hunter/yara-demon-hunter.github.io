@@ -284,3 +284,11 @@ Terceira aba do sandbox (`_sandbox/fastrun.js`): escolhe o herói, caixa "Never 
 
 - Relíquias: cada uma tem agora o preço escrito em `cost` (`passives.js`), em 4 degraus fixos, iguais em todas as ondas (`costMultiplier` 1, `costGrowthPerHour` 0): **500** (13 relíquias, as mais simples), **700** (15), **1000** (13) e **1500** (4: Last Prayer, Second Prayer, Stone Heart, Owl's Wisdom). Antes valiam 140 a 580. O degrau veio do preço antigo (≤70 → 500, ≤100 → 700, ≤130 → 1000, o resto → 1500). Medição com o piloto do sandbox (herói imortal, mata tudo): ouro ganho acumulado ao fim das ondas 1 a 6 ≈ 1.060 · 2.520 · 3.990 · 6.000 · 8.830 · 11.470, ou seja ~1.000 na onda 1 e ~2.500 a 3.000 por onda depois: o piloto compra ~2 relíquias já na onda 1. Para forçar escolhas de verdade o preço ou o ouro por onda ainda precisam de ajuste fino jogando.
 - Altar: Extra Dash removido; Swiftness passou de +2% para +1% de velocidade por nível. (Quem já tinha brasas gastas no Extra Dash as perde: o nível salvo é ignorado.)
+
+## 2026-11-18 · Economia: ouro e preço das relíquias equilibrados com o Fast Run
+
+Problema: com 500/700/1000/1500 o piloto comprava as 45 relíquias até a onda 9 (4 a 7 por onda; o ouro cresce muito nas ondas finais: de ~1.200 na onda 1 para 30 mil na 11).
+Solução (preço **fixo**, nunca sobe com a onda):
+- Relíquia: preço sobe pela coluna na árvore (as iniciais baratas, as do fim caras): **300 · 900 · 2.000 · 3.800 · 6.500**; as fortes da coluna ficam acima (Last Prayer 3.300, Second Prayer 4.800, Stone Heart 7.500). Total da loja: 108.500.
+- Ouro por abate: `killGoldScale` 0,65 → **0,3** (`data_model/gold.js`).
+Teste (Fast Run ×20, piloto imortal, compra a mais barata primeiro = caso mais generoso): onda 1 → 1 a 2 relíquias; depois 1 a 4 por onda; 29 de 45 relíquias na onda 11 (antes: 45 na onda 9). Um jogador de verdade, que mata menos e escolhe as caras, ficará bem abaixo. A variação entre rodadas é grande (±3 relíquias). Para afinar: preços em `passives.js` (`cost` de cada relíquia) e `killGoldScale`.

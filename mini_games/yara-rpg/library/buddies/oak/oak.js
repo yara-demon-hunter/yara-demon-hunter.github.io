@@ -22,6 +22,46 @@ export const ANCIENT_TRUNK_W = 48;
 export const ANCIENT_TRUNK_H = 64;
 export const ANCIENT_CROWN_W = 130;
 export const ANCIENT_CROWN_H = 92;
+
+// --- ÁRVORE ANCESTRAL 3D (forma Ancient Grove) ---
+// Atlas gravado da árvore 3D do Laboratório (tools/lab/arvore_foto.js, bake_arvore.py): 5 linhas = de que lado se vê (0 frente, 1 frente-lado,
+// 2 lado, 3 costas-lado, 4 costas; olhando para a direita, à esquerda o jogo espelha) e 20 colunas = 12 quadros de andar + 8 de ataque.
+export const ANCIENT3D = { cell: 144, walk: 12, attack: 8, walkSeconds: 1.5, attackSeconds: 0.42, attackFrom: 2, size: 132, feet: 56 };
+let ancient3d = null;
+const ancientBase = /\/_?library\//.test(import.meta.url) ? new URL('./', import.meta.url).href : new URL('library/buddies/oak/', document.baseURI).href;
+export function prepareAncientTree() {
+    if (ancient3d) return ancient3d;
+    const image = new Image();
+    ancient3d = { image, ready: false };
+    image.onload = () => { ancient3d.ready = true; };
+    image.src = new URL('ancient_tree_atlas.webp', ancientBase).href;
+    return ancient3d;
+}
+// Linha do atlas pela direção que a árvore olha (dx, dy na tela, y para baixo)
+export function ancientTreeView(dx, dy) {
+    const a = Math.atan2(dy, Math.abs(dx)) / (Math.PI / 2);
+    const m = Math.abs(a);
+    if (m < 0.25) return 2;
+    if (m < 0.75) return a > 0 ? 1 : 3;
+    return a > 0 ? 0 : 4;
+}
+// Desenha a árvore (pés em x, y). k = escala do jogo; walkPhase 0..1 (ciclo de passos); attackAge = segundos desde o golpe (ou muito grande)
+export function drawAncientTree(g, x, y, k, face, walkPhase, attackAge, alpha = 1) {
+    const atlas = prepareAncientTree();
+    if (!atlas.ready) return false;
+    const A = ANCIENT3D;
+    let col = Math.floor(walkPhase * A.walk) % A.walk;
+    if (attackAge < A.attackSeconds) col = A.walk + Math.min(A.attack - 1, A.attackFrom + Math.floor(attackAge / A.attackSeconds * (A.attack - A.attackFrom)));
+    const row = ancientTreeView(face.x, face.y);
+    const side = A.size * k;
+    g.save();
+    g.translate(x, y - A.feet * k);
+    if (face.x < 0) g.scale(-1, 1);
+    g.globalAlpha *= alpha;
+    g.drawImage(atlas.image, col * A.cell, row * A.cell, A.cell, A.cell, -side / 2, -side / 2, side, side);
+    g.restore();
+    return true;
+}
 let trunkSprite = null;
 let crownSprite = null;
 let ancientTrunkSprite = null;

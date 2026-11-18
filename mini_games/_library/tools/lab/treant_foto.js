@@ -660,13 +660,30 @@ function bake() {
     const ELEV = 40 * Math.PI / 180, VIEW = 10.6, alvo = new THREE.Vector3(0, 3.7, 0);
     const cam = new THREE.OrthographicCamera(-VIEW / 2, VIEW / 2, VIEW / 2, -VIEW / 2, 0.1, 80);
     cam.position.set(0, alvo.y + Math.sin(ELEV) * 30, Math.cos(ELEV) * 30); cam.lookAt(alvo); cam.updateMatrixWorld();
+    // Pose com peso: passo longo com o pé que sobe, corpo que sobe e desce, tronco que gira contra o quadril, braços que balançam contra as pernas,
+    // copa que atrasa (pêndulo) e, no soco, recuo, golpe e volta. swing 0 = andando; 0..1 = andamento do soco
+    const suave = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
     const pose = (walkPhase, swing) => {
-        const w = Math.sin(walkPhase), a = swing > 0 ? -swing * 2.5 : w * 0.16;
-        membros.legL.rotation.x = swing > 0 ? 0 : w * 0.2; membros.legR.rotation.x = swing > 0 ? 0 : -w * 0.2;
-        membros.armL.rotation.x = swing > 0 ? a : -w * 0.16; membros.armR.rotation.x = swing > 0 ? a : w * 0.16;
-        if (swing > 0) { membros.armL.rotation.z = -swing * 0.25; membros.armR.rotation.z = swing * 0.25; } else { membros.armL.rotation.z = 0; membros.armR.rotation.z = 0; }
-        grupoMonstro.position.y = swing > 0 ? 0 : Math.abs(Math.cos(walkPhase)) * 0.04;
-        parts.torso.rotation.y = swing > 0 ? 0 : w * 0.025; copa.rotation.z = swing > 0 ? 0 : w * 0.03;
+        const w = Math.sin(walkPhase), c = Math.cos(walkPhase);
+        const kw = suave(0, 0.45, swing), ks = suave(0.45, 0.7, swing), kr = suave(0.78, 1, swing);
+        const punch = swing > 0;
+        const lean = punch ? -0.12 * kw + 0.32 * ks - 0.2 * kr : 0.02 * Math.abs(c);
+        // Pernas: a que vai para frente sobe (alt)
+        membros.legL.rotation.x = punch ? 0.18 * ks * (1 - kr) : w * 0.22; membros.legR.rotation.x = punch ? -0.2 * ks * (1 - kr) : -w * 0.22;
+        membros.legL.position.y = 2.0 + (punch ? 0 : Math.max(0, -c) * 0.14); membros.legR.position.y = 2.0 + (punch ? 0 : Math.max(0, c) * 0.14);
+        // Braços: contra as pernas; no soco recuam, batem e voltam
+        const a = 0.9 * kw - 3.2 * ks + 2.3 * kr;
+        membros.armL.rotation.x = punch ? a : -w * 0.2; membros.armR.rotation.x = punch ? a : w * 0.2;
+        membros.armL.rotation.z = punch ? -0.25 * ks * (1 - kr) : -0.04 - Math.abs(w) * 0.02; membros.armR.rotation.z = punch ? 0.25 * ks * (1 - kr) : 0.04 + Math.abs(w) * 0.02;
+        // Corpo: sobe no meio do passo, desce quando o pé pousa; tronco gira contra o quadril e balança de lado
+        const bob = punch ? -0.07 * ks * (1 - kr) : Math.abs(c) * 0.04;
+        grupoMonstro.position.y = bob;
+        parts.pelvis.rotation.set(0, punch ? 0 : -w * 0.025, punch ? 0 : w * 0.012);
+        parts.torso.rotation.set(lean, punch ? 0 : w * 0.03, punch ? 0 : -w * 0.014);
+        parts.cabeca.rotation.set(lean * 0.6, punch ? 0 : -w * 0.012, punch ? 0 : -w * 0.008);
+        // Copa: pêndulo com atraso (balança contra o tronco, sobe e desce ao contrário do corpo)
+        copa.rotation.set(punch ? -lean * 0.9 : -0.01 * Math.sin(walkPhase * 2 + 1), 0, punch ? Math.sin(swing * 28) * 0.035 * ks : -w * 0.02);
+        copa.position.y = -bob * 0.6;
     };
     window.__bake = (andar, soco, dirs, tam) => {
         const quadros = andar + soco, cv = document.createElement('canvas');
