@@ -246,3 +246,21 @@ Passiva nova no ramo Flame, custo 4: a cada 20 s um furacão de fogo se forma so
 ## 2026-11-18 · Ondas de no mínimo 3 minutos, com mais monstros ao longo da onda
 
 `TURN_DIFFICULTY.waveMinSeconds = 180` e `spawnGrowth = 0.9` (`difficulty.js`). A onda (e a chamada do boss) só fecha quando a cota de pontos E os 3 minutos passaram: `waveProgress` = o menor entre pontos/cota e tempo/180 (usado em `spawner.js`, `night.js` e na barra do HUD; hordas e elites também disparam por ele, então se espalham pelos 3 minutos). O intervalo entre monstros encolhe com o tempo (`waveSpawnBoost`: de ×1 a ×1,9 aos 180 s). Teste com cota já cumprida: a onda 1 fechou aos 181 s e a taxa de nascimento subiu de ~0,7 para ~1 monstro/s. Balanceamento com jogador de verdade não feito (a onda 1 fica mais densa no fim).
+
+## 2026-11-18 · Bots de balanceamento e ajuste de skills
+
+Bot (build de uma skill maxada, onda 5, 170 s, herói perto da tocha, vida do herói travada; mede kills e quanto a tocha sobrevive; 2 a 3 rodadas, ruído grande: o `base` varia de 11 a 60 kills). Sinais repetidos: **Hearth Ring / Solar Wall**, **Event Horizon**, **Phoenix Pact**, Cathedral Toll e Flaming Phoenix no topo; **Corpse Burst, Soul Nova e Torch Ward** (e o Fire Tornado, antes do ajuste) no fim. Mudanças:
+- Fire Tornado: recarga 20 → 32 s; raio fixo em 190 (o raio máximo do Hearth Ring), não mais o calor da tocha.
+- Blessed Rain: a cada 40 s (era 25).
+- Nerfs: Hearth Ring dps [0,3 · 0,4 · 0,5 · 0,6 · 0,8] (era 0,35 … 1); Solar Wall dps 1,1 (era 1,3); Event Horizon recarga 9 s e dano 4 (era 7 s e 4,5).
+- Buffs: Corpse Burst dano [1,3 · 1,3 · 1,6 · 1,6 · 2]; Soul Nova recargas [6 · 6 · 5 · 5 · 4].
+Depois do ajuste o Hearth Ring ainda lidera no bot; o resultado individual é ruidoso, vale confirmar jogando.
+
+## 2026-11-18 · Menos bagunça na tela: skills que atiram sem parar ficam mais lentas e fortes por tiro
+
+Princípio: poucos disparos grandes em vez de muitos pequenos. Recarga ×1,4 a ×3 e dano por tiro subindo para o dano por segundo cair só uns 10 a 20 %.
+- Flame Sentinel: recargas [3,2 · 2,6 · 2,6 · 2,6 · 2,2] (era [2,1 · 1,5 · 1,5 · 1,5 · 1,3]), dano por bola [1,5 · 1,5 · 1,5 · 2,1 · 2,1].
+- Sun Spire (evolução): 5 bolas a cada 2,4 s com dano 4,6 (era a cada 0,8 s com 1,7: ~6 bolas/s caiam para ~2/s).
+- Grave Wisp: recargas ×1,5, dano ×1,4. Storm Sigil e Wrath of Heaven: recargas ×1,35, dano ×1,3.
+- Flaming Phoenix: bola a cada 2,6 s com 1,7× (era 1,8 s e 1,2×). Phoenix Pact: bola a cada 2,4 s com 2,2× (era 1,5 s e 1,4×).
+Bot (ruidoso): as skills seguem úteis (Sun Spire, Flaming Phoenix, Phoenix Pact no topo).

@@ -16,3 +16,10 @@ export const GOLD_DROP = {
     vacuumMaxSpeed: 1500,
     pickupRadius: 16             // distância para coletar (somada ao raio do herói)
 };
+
+// Economia: o ouro por abate vale esta fração do valor dos monstros (goldBase). Com as ondas de 3 min há muito mais abates
+// por onda (~150), então o ouro por abate caiu e as relíquias subiram (CAMP.costMultiplier, em passives.js).
+// Meta: uma onda paga ~3 relíquias (mais óleo ou descanso). Medido com bot em 2026-11-18: antes ~1.300 de ouro por onda 1.
+export const GOLD_ECONOMY = {
+    killGoldScale: 0.65
+};

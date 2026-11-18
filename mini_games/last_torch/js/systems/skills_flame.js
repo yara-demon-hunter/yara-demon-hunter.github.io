@@ -426,7 +426,7 @@ function updateFireTornado(dt) {
             return;
         }
         // Pronto: só se forma quando há monstro dentro do círculo de calor da tocha (senão espera, sem gastar a recarga)
-        const reach = getWarmthRadius();
+        const reach = FIRE_TORNADO.radius;
         if (!state.enemies.some((e) => e.hp > 0 && Math.hypot(e.x - state.coreX, e.y - state.coreY) <= reach + e.radius)) return;
         T.left = F.durationSeconds;
         T.age = 0;
@@ -441,7 +441,7 @@ function updateFireTornado(dt) {
     T.age += dt;
     T.wait = Math.max(0, T.wait - dt);
     T.tick -= dt;
-    const reach = getWarmthRadius();
+    const reach = FIRE_TORNADO.radius;
     const pulse = T.tick <= 0;
     if (pulse) {
         T.tick = F.tickSeconds;

@@ -10,6 +10,7 @@ import { addSlam, updateBossAI, updateShadowAI } from './boss_ai.js';
 import { dealDamage } from './damage.js';
 import { addCorpse, addGibs, addShockwave, addStain, createExplosion, hitStop, shakeScreen, zoomPunch } from './effects.js';
 import { dropGold } from './gold.js';
+import { GOLD_ECONOMY } from '../../data_model/gold.js';
 import { mod } from './modifiers.js';
 import { checkHourEnd, onBossKilled } from './night.js';
 import { dropChest, maybeDropPickup } from './pickups.js';
@@ -336,7 +337,7 @@ function killEnemy(i, e, model) {
 
     // XP é direto; o ouro cai em moedas no chão
     gainXp((model.xpRewardBase + state.turn * model.xpRewardPerTurn) * (e.elite ? 5 : 1) * (1 + mod('xp')));
-    const gold = (rollMonsterGold(model) + mod('killGold')) * (e.elite ? 6 : 1) * (1 + mod('gold')) * (1 + getStreakGoldBonus());
+    const gold = (rollMonsterGold(model) + mod('killGold')) * (e.elite ? 6 : 1) * (1 + mod('gold')) * (1 + getStreakGoldBonus()) * GOLD_ECONOMY.killGoldScale;
     dropGold(e.x, e.y, Math.max(1, Math.round(gold)));
 
     if (model.explosion) burst(e, model);

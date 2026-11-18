@@ -1,6 +1,5 @@
 import { ctx, passives, state } from '../core/state.js';
 import { drawGlow } from '../../library/core/glow.js';
-import { getWarmthRadius } from '../systems/stats.js';
 import { FIRE_TORNADO } from '../../data_model/passives.js';
 
 // --- FIRE TORNADO (visual) ---
@@ -24,7 +23,7 @@ export function renderFireTornado() {
     const grow = Math.min(1, T.age / 0.8);
     const fade = Math.min(1, T.left / 0.7);
     const power = (1 - (1 - grow) ** 3) * fade;
-    const R = getWarmthRadius() * (0.25 + 0.75 * grow);
+    const R = FIRE_TORNADO.radius * (0.25 + 0.75 * grow);
     const t = T.age + FIRE_TORNADO.durationSeconds - T.left;
     const cx = state.coreX, cy = state.coreY;
     const low = state.quality >= 2;

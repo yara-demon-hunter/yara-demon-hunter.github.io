@@ -53,9 +53,11 @@ export function getNodeCurrency(node) {
     return node.kind === 'relic' ? 'gold' : 'points';
 }
 
-// Relíquia: preço base, corrigido pela hora. Quanto mais tarde, mais cara
+// Relíquia: preço fixo (igual em todas as ondas, em múltiplos de CAMP.priceStep) para o jogador ter um número para mirar.
+// CAMP.costGrowthPerHour só encarece se alguém voltar a ligá-lo (hoje 0).
 export function getRelicPrice(node) {
-    return Math.round(passives[node.key].cost * CAMP.costMultiplier * (1 + CAMP.costGrowthPerHour * (state.turn - 1)));
+    const raw = passives[node.key].cost * CAMP.costMultiplier * (1 + CAMP.costGrowthPerHour * (state.turn - 1));
+    return Math.max(CAMP.priceStep, Math.round(raw / CAMP.priceStep) * CAMP.priceStep);
 }
 
 export function getNodeCost(node) {

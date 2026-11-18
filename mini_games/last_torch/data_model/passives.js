@@ -111,7 +111,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         get desc() {
-            return `Every ${FIRE_TORNADO.cooldownSeconds}s a tornado of fire forms over the torch and rages for ${FIRE_TORNADO.durationSeconds}s, scorching everything inside the dashed circle of its warmth for ${formatMultiplier(FIRE_TORNADO.damage)} torch fire damage every ${FIRE_TORNADO.tickSeconds}s and setting it ablaze. It counts as the torch's fire.`;
+            return `Every ${FIRE_TORNADO.cooldownSeconds}s a tornado of fire forms over the torch and rages for ${FIRE_TORNADO.durationSeconds}s, scorching everything within ${FIRE_TORNADO.radius} range of the torch (as far as a maxed Hearth Ring reaches) for ${formatMultiplier(FIRE_TORNADO.damage)} torch fire damage every ${FIRE_TORNADO.tickSeconds}s and setting it ablaze. It counts as the torch's fire.`;
         }
     },
     hearthPhoenix: {
@@ -427,8 +427,9 @@ export const THORN_ROSES = { markSeconds: 10, patchSeconds: 6, radius: 34, damag
 // --- ACAMPAMENTO ---
 // Fim de cada hora: o ouro compra relíquias na árvore do acampamento e também alimenta a tocha.
 export const CAMP = {
-    costMultiplier: 1.8,
-    costGrowthPerHour: 0.15,        // relíquias ficam mais caras a cada hora
+    costMultiplier: 2.9,
+    costGrowthPerHour: 0,           // 0 = preço fixo em todas as ondas (o ouro por onda já cresce com mais abates)
+    priceStep: 10,                  // preços arredondados para múltiplos disto
     freeTorchHeal: 0,               // a tocha recupera isto de graça ao chegar no acampamento (zero: quem cura é o Feed)
     fuel: { heal: 22, cost: 40, costPerHour: 12, costPerUse: 25 },
     rest: { healRatio: 0.4, cost: 30, costPerHour: 9, costPerUse: 20 }
@@ -521,8 +522,9 @@ export const BLUE_TORCH = {
 
 // Fire Tornado: a cada tanto um furacão de fogo se forma sobre a tocha e castiga tudo dentro do círculo tracejado dela (o calor da tocha)
 export const FIRE_TORNADO = {
-    cooldownSeconds: 20,
+    cooldownSeconds: 32,
     durationSeconds: 5,
+    radius: 190,                // alcance fixo: o mesmo raio máximo do Hearth Ring (não segue o calor da tocha)
     tickSeconds: 0.25,
     damage: 1.1,                // x dano do fogo da tocha, por pulso, em cada monstro dentro do círculo
     burnSeconds: 2,             // quem foi pego segue queimando
@@ -532,11 +534,11 @@ export const FIRE_TORNADO = {
 
 // Flaming Phoenix: a fênix da tocha rodeia a chama e atira nos monstros perto dela (o fogo da tocha: a Blue Torch também vale)
 export const HEARTH_PHOENIX = {
-    cooldownSeconds: 1.8,
+    cooldownSeconds: 2.6,
     range: 360,                 // a partir da tocha
     speed: 330,
     turnRate: 8,
-    boltDamage: 1.2,            // x dano de feitiço
+    boltDamage: 1.7,            // x dano de feitiço
     hoverY: -170,               // acima da chama
     orbit: 125,                 // raio do voo em volta da tocha
     orbitFlat: 0.5,             // achatamento da elipse (1 = círculo)
@@ -568,11 +570,11 @@ export const PHOENIX_PACT = {
     followSpeed: 6,
     riseSeconds: 0.9,           // tempo para renascer da brasa
     // Bola de fogo
-    cooldownSeconds: 1.5,
+    cooldownSeconds: 2.4,
     range: 340,
     speed: 330,
     turnRate: 8,
-    boltDamage: 1.4,            // x dano de feitiço
+    boltDamage: 2.2,            // x dano de feitiço
     splashRadius: 52,
     splashRatio: 0.5,           // dano nos vizinhos, em relação ao golpe
     burnRatio: 0.35,            // queimadura por segundo, em relação ao golpe

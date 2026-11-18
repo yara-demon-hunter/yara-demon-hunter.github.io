@@ -167,11 +167,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { cooldown: 2.1, count: 1, damage: 1 },
-            { cooldown: 1.5, count: 1, damage: 1 },
-            { cooldown: 1.5, count: 2, damage: 1 },
-            { cooldown: 1.5, count: 2, damage: 1.4 },
-            { cooldown: 1.3, count: 3, damage: 1.4 }
+            { cooldown: 5.5, count: 1, damage: 1.5 },
+            { cooldown: 5.0, count: 1, damage: 1.5 },
+            { cooldown: 4.5, count: 2, damage: 1.5 },
+            { cooldown: 4.0, count: 2, damage: 2.1 },
+            { cooldown: 3.5, count: 3, damage: 2.1 }
         ],
         range: 360, speed: 420, turnRate: 7, radius: 6
     },
@@ -206,11 +206,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { cooldown: 7, radius: 130, damage: 1.2 },
-            { cooldown: 7, radius: 170, damage: 1.2 },
-            { cooldown: 5.5, radius: 170, damage: 1.2 },
-            { cooldown: 5.5, radius: 170, damage: 1.8 },
-            { cooldown: 4.5, radius: 200, damage: 1.8 }
+            { cooldown: 6, radius: 130, damage: 1.2 },
+            { cooldown: 6, radius: 170, damage: 1.2 },
+            { cooldown: 5, radius: 170, damage: 1.2 },
+            { cooldown: 5, radius: 170, damage: 1.8 },
+            { cooldown: 4, radius: 200, damage: 1.8 }
         ],
         knockback: 520
     },
@@ -226,11 +226,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { chance: 0.2, radius: 62, damage: 1 },
-            { chance: 0.3, radius: 62, damage: 1 },
-            { chance: 0.3, radius: 80, damage: 1.2 },
-            { chance: 0.4, radius: 80, damage: 1.2 },
-            { chance: 0.5, radius: 96, damage: 1.5 }
+            { chance: 0.2, radius: 62, damage: 1.3 },
+            { chance: 0.3, radius: 62, damage: 1.3 },
+            { chance: 0.3, radius: 80, damage: 1.6 },
+            { chance: 0.4, radius: 80, damage: 1.6 },
+            { chance: 0.5, radius: 96, damage: 2 }
         ],
         knockback: 240
     },
@@ -246,11 +246,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { cooldown: 3, jumps: 3, damage: 0.9 },
-            { cooldown: 3, jumps: 5, damage: 0.9 },
-            { cooldown: 2.2, jumps: 5, damage: 0.9 },
-            { cooldown: 2.2, jumps: 5, damage: 1.25 },
-            { cooldown: 1.9, jumps: 8, damage: 1.25 }
+            { cooldown: 4, jumps: 3, damage: 1.2 },
+            { cooldown: 4, jumps: 5, damage: 1.2 },
+            { cooldown: 3, jumps: 5, damage: 1.2 },
+            { cooldown: 3, jumps: 5, damage: 1.6 },
+            { cooldown: 2.6, jumps: 8, damage: 1.6 }
         ],
         range: 300, jumpRange: 170
     },
@@ -345,11 +345,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { radius: 150, dps: 0.35, slow: 0.3 },
-            { radius: 150, dps: 0.5, slow: 0.3 },
+            { radius: 150, dps: 0.3, slow: 0.3 },
+            { radius: 150, dps: 0.4, slow: 0.3 },
             { radius: 170, dps: 0.5, slow: 0.4 },
-            { radius: 170, dps: 0.75, slow: 0.4 },
-            { radius: 190, dps: 1, slow: 0.5 }
+            { radius: 170, dps: 0.6, slow: 0.4 },
+            { radius: 190, dps: 0.8, slow: 0.5 }
         ],
         width: 24, tickSeconds: 0.3
     },
@@ -365,11 +365,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { cooldown: 1.8, count: 1, damage: 1.2 },
-            { cooldown: 1.4, count: 1, damage: 1.2 },
-            { cooldown: 1.4, count: 2, damage: 1.2 },
-            { cooldown: 1.4, count: 2, damage: 1.6 },
-            { cooldown: 1.2, count: 3, damage: 1.6 }
+            { cooldown: 2.7, count: 1, damage: 1.7 },
+            { cooldown: 2.1, count: 1, damage: 1.7 },
+            { cooldown: 2.1, count: 2, damage: 1.7 },
+            { cooldown: 2.1, count: 2, damage: 2.2 },
+            { cooldown: 1.8, count: 3, damage: 2.2 }
         ],
         range: 460, speed: 380, turnRate: 6
     },
@@ -696,7 +696,7 @@ export const EVOLUTIONS = {
         levels: { cooldown: 16, count: 0, radius: 70, damage: 1.7, seconds: 3, puddleSeconds: 4, puddleDps: 0.5 },
         // A chuva: a cada `every` segundos, por `seconds`. Todo monstro na tela leva `dps` (dano de magia por segundo, de
         // tickSeconds em tickSeconds) e fica abençoado; uma gota grande estoura em cima de um monstro a cada `dropSeconds`
-        rain: { every: 25, seconds: 9, tickSeconds: 0.5, dps: 0.6, dropSeconds: 0.22, radius: 44, damage: 0.6 },
+        rain: { every: 40, seconds: 9, tickSeconds: 0.5, dps: 0.6, dropSeconds: 0.22, radius: 44, damage: 0.6 },
         baptism: { radius: 70, damage: 1.2 }
     },
     smite: {
@@ -809,7 +809,7 @@ export const EVOLUTIONS = {
             const { radius, dps, slow } = this.levels;
             return `The ring becomes a wall of white fire, burning for ${formatMultiplier(dps)} spell damage per second and slowing by ${formatPercent(slow)}. Every ${formatNumber(this.flare.seconds)}s it flares for ${formatMultiplier(this.flare.damage)} spell damage and knocks monsters back. Range: ${radius}.`;
         },
-        levels: { radius: 200, dps: 1.3, slow: 0.55 },
+        levels: { radius: 200, dps: 1.1, slow: 0.55 },
         flare: { seconds: 4.5, damage: 1.5, knockback: 520, reach: 46 }
     },
     voidRift: {
@@ -818,7 +818,7 @@ export const EVOLUTIONS = {
             const { cooldown, radius, pull, damage, seconds } = this.levels;
             return `Every ${formatNumber(cooldown)}s, the rift pulls enemies within ${radius} range with force ${pull}, then collapses for ${formatMultiplier(damage)} spell damage. A second rift opens after ${formatNumber(this.secondRift.seconds)}s for ${formatMultiplier(this.secondRift.damage)} spell damage. The rift lasts ${formatNumber(seconds)}s.`;
         },
-        levels: { cooldown: 7, radius: 190, pull: 280, damage: 4.5, seconds: 1.5 },
+        levels: { cooldown: 9, radius: 190, pull: 280, damage: 4, seconds: 1.5 },
         secondRift: { seconds: 0.7, damage: 0.6 }
     },
     phantomDash: {
@@ -843,7 +843,7 @@ export const EVOLUTIONS = {
             const { cooldown, jumps, damage } = this.levels;
             return `Lightning strikes every ${formatNumber(cooldown)}s, leaping to ${jumps} targets for ${formatMultiplier(damage)} spell damage.`;
         },
-        levels: { cooldown: 1.9, jumps: 8, damage: 1.3 }
+        levels: { cooldown: 2.6, jumps: 8, damage: 1.7 }
     },
     soulNova: {
         name: 'Absolute Zero', icon: '🧊',
@@ -860,7 +860,7 @@ export const EVOLUTIONS = {
             const { cooldown, count, damage } = this.levels;
             return `The torch rains ${count} bolts every ${formatNumber(cooldown)}s, each dealing ${formatMultiplier(damage)} spell damage.`;
         },
-        levels: { cooldown: 0.8, count: 5, damage: 1.7 }
+        levels: { cooldown: 3, count: 5, damage: 4.6 }
     }
 };
 
