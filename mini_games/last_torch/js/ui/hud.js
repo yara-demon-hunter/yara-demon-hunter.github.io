@@ -2,6 +2,7 @@ import { getHero, mod } from '../systems/modifiers.js';
 import { NIGHT, getHourName } from '../../data_model/night.js';
 import { STREAK, rushTier } from '../../data_model/streak.js';
 import { isBossTurn } from '../../data_model/bosses.js';
+import { waveProgress } from '../../data_model/difficulty.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { player, state } from '../core/state.js';
 import { getAxeQuake, getRootSnare, getDashCharges, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
@@ -210,7 +211,7 @@ function writeHud() {
     const hour = state.turn;
     setText(ui.turn, hour <= NIGHT.hours ? `WAVE ${hour}/${NIGHT.hours}` : `WAVE ${hour}`);
     setText(ui.hourName, state.lastStand ? `${state.enemies.length} LEFT` : getHourName(hour));
-    setBar(ui.scoreBar, state.hourPlan?.bossCalled ? 1 : state.scoreTurn / Math.max(1, state.targetScore));
+    setBar(ui.scoreBar, state.hourPlan?.bossCalled ? 1 : waveProgress(state.scoreTurn, state.targetScore, state.waveTime));
     updateNightPips();
 
     // Boss HUD

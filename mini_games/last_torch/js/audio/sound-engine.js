@@ -355,6 +355,12 @@ export class SoundEngine {
         this.burst({ filter: 'bandpass', freq: 1200, to: 500, q: 1, decay: 0.12, gain: 0.14 });
     }
 
+    // Jato de fogo (o sopro da Flaming Phoenix): um sopro grave em pulsos
+    playFlame() {
+        if (!this.ctx || this.throttled('flame', 0.1)) return;
+        this.burst({ filter: 'lowpass', freq: 900, to: 350, q: 0.7, decay: 0.2, gain: 0.1 });
+    }
+
     // --- PROGRESSO ---
     // Moeda: em sequência, cada uma um tom acima
     playCoin() {

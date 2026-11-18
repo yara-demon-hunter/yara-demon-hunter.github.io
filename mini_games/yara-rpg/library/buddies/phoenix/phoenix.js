@@ -268,10 +268,55 @@ export function drawPhoenixArtWith(g, phase, palette) {
     }
 }
 
-// --- ATLAS ---
-let atlas = null;
+// --- PALETA AZUL (Blue Torch) ---
+// A mesma ave com todas as cores giradas no matiz (laranja → azul): vale para hex e rgba(), em listas e objetos, sem repetir a paleta à mão
+const BLUE_SHIFT = 190;
+function shiftColor(c) {
+    let r, g, b, a = 1;
+    let m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(c);
+    if (m) {
+        const h = m[1].length === 3 ? m[1].replace(/./g, (x) => x + x) : m[1];
+        [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+    } else if ((m = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/.exec(c))) {
+        r = +m[1]; g = +m[2]; b = +m[3]; a = m[4] === undefined ? 1 : +m[4];
+    } else return c;
+    r /= 255; g /= 255; b /= 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+    let h = 0;
+    if (d) h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h = (h * 60 + BLUE_SHIFT + 360) % 360;
+    const sat = d ? d / (1 - Math.abs(2 * l - 1)) : 0;
+    const k = (n) => (n + h / 30) % 12;
+    const f = (n) => Math.round((l - sat * Math.min(l, 1 - l) * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1))) * 255);
+    return `rgba(${f(0)}, ${f(8)}, ${f(4)}, ${a})`;
+}
+function shiftAll(v) {
+    if (typeof v === 'string') return shiftColor(v);
+    if (Array.isArray(v)) return v.map(shiftAll);
+    if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, shiftAll(x)]));
+    return v;
+}
+const SHIFT_KEYS = ['glow', 'glowHot', 'near', 'far', 'covert', 'vein', 'flame', 'body', 'beak', 'eye', 'crest', 'tail', 'tailEye'];
+const palettes = {};
+function paletteOf(kind) {
+    if (kind !== 'blue') return BASE;
+    return palettes.blue ??= { ...BASE, ...Object.fromEntries(SHIFT_KEYS.map((k) => [k, shiftAll(BASE[k])])) };
+}
 
-function buildAtlas(mobile) {
+// --- ATLAS ---
+const atlases = {};
+
+function buildAtlas(mobile, kind) {
+    const saved = V;
+    V = paletteOf(kind);
+    try {
+        return buildAtlasWith(mobile, kind);
+    } finally {
+        V = saved;
+    }
+}
+
+function buildAtlasWith(mobile, kind) {
     const B = V.bounds;
     const pixels = mobile ? V.pixels.mobile : V.pixels.desktop;
     const cellW = Math.ceil(B.width * pixels);
@@ -290,23 +335,23 @@ function buildAtlas(mobile) {
             g.drawImage(layer, f * cellW, 0);
         }
     });
-    atlas = { canvas, cellW, cellH };
-    return atlas;
+    atlases[kind] = { canvas, cellW, cellH };
+    return atlases[kind];
 }
 
 // Monta o atlas e o desenha uma vez fora da tela: o navegador sobe a imagem para a placa de vídeo no primeiro
 // desenho, e é melhor que isso aconteça aqui do que no primeiro quadro em que a ave aparece
 // mobile: tela pequena (sprite com menos pixels); o jogo decide
-export function preparePhoenix(mobile = false) {
-    if (atlas) return atlas;
-    buildAtlas(mobile);
+export function preparePhoenix(mobile = false, kind = 'fire') {
+    if (atlases[kind]) return atlases[kind];
+    const atlas = buildAtlas(mobile, kind);
     makeCanvas(1, 1).getContext('2d').drawImage(atlas.canvas, 0, 0, atlas.cellW, atlas.cellH, 0, 0, 1, 1);
     return atlas;
 }
 
 // Ave em (x, y) no mundo, desenhada em g. size multiplica o tamanho normal; facing: 1 = direita, -1 = esquerda.
-export function drawPhoenixSprite(g, x, y, size, facing, tilt, alpha = 1) {
-    const { canvas, cellW, cellH } = preparePhoenix();
+export function drawPhoenixSprite(g, x, y, size, facing, tilt, alpha = 1, kind = 'fire') {
+    const { canvas, cellW, cellH } = preparePhoenix(false, kind);
     const B = V.bounds;
     const frame = Math.floor(renderNow() / 1000 * V.framesPerSecond) % V.frames;
     const scale = V.scale * size;
@@ -326,28 +371,29 @@ export function phoenixBeak(x, y, facing) {
 
 // A fênix em campo: brilho, ave e fagulhas caindo da cauda. Nasce crescendo de uma brasa.
 // bird: { x, y, facing, tilt, flash, rise }; quality: 2 = detalhe baixo (menos fagulhas)
-export function renderPhoenixBuddy(g, bird, quality = 0) {
+export function renderPhoenixBuddy(g, bird, quality = 0, kind = 'fire') {
     const { x, y, facing, tilt, flash, rise } = bird;
+    const P = paletteOf(kind);
     const t = renderNow() / 1000;
     const hot = Math.max(0, 1 - rise) + (flash > 0 ? 0.6 : 0);
     g.save();
     g.globalCompositeOperation = 'lighter';
-    drawGlow(g, V.glow, x, y - 4, 46 + Math.sin(t * 5) * 3 + hot * 34, 0.7);
-    if (hot > 0) drawGlow(g, V.glowHot, x, y - 8, 20 + hot * 18, Math.min(1, hot));
+    drawGlow(g, P.glow, x, y - 4, 46 + Math.sin(t * 5) * 3 + hot * 34, 0.7);
+    if (hot > 0) drawGlow(g, P.glowHot, x, y - 8, 20 + hot * 18, Math.min(1, hot));
     const embers = quality >= 2 ? 3 : V.embers;
     for (let i = 0; i < embers; i++) {
         const u = (t * 0.55 + i / embers) % 1;
         const ex = x - facing * (8 + u * 16) + Math.sin(t * 3 + i * 2.4) * (4 + u * 7);
         const ey = y + 12 + u * 42;
-        drawGlow(g, V.glowHot, ex, ey, 3.4 * (1 - u) + 0.8, 0.9 * (1 - u));
+        drawGlow(g, P.glowHot, ex, ey, 3.4 * (1 - u) + 0.8, 0.9 * (1 - u));
     }
     g.restore();
-    drawPhoenixSprite(g, x, y, 0.2 + 0.8 * Math.min(1, rise) ** 0.6, facing, tilt);
+    drawPhoenixSprite(g, x, y, 0.2 + 0.8 * Math.min(1, rise) ** 0.6, facing, tilt, 1, kind);
     if (flash > 0) {
         const beak = phoenixBeak(x, y, facing);
         g.save();
         g.globalCompositeOperation = 'lighter';
-        drawGlow(g, V.glowHot, beak.x, beak.y, 13, 1);
+        drawGlow(g, P.glowHot, beak.x, beak.y, 13, 1);
         g.restore();
     }
 }

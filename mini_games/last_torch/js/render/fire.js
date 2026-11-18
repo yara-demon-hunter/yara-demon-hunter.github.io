@@ -1,11 +1,19 @@
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
-import { ctx } from '../core/state.js';
+import { ctx, passives } from '../core/state.js';
 import { drawGlow } from '../../library/core/glow.js';
 
-const F = SKILLS_VISUALS.fire;
+const FIRE = SKILLS_VISUALS.fire;
+// Com a Blue Torch todo fogo do herói (espada, bolas de fogo, chama nos monstros) é azul
+const BLUE = {
+    outer: '#1d4ed8', mid: '#60a5fa', core: '#e0f2fe', hotOuter: '#3b82f6', hotMid: '#93c5fd',
+    glow: 'rgba(37, 99, 235, 0.55)', slash: ['#3b82f6', '#60a5fa', '#bfdbfe']
+};
+const BLUE_FIRE = { ...FIRE, ...BLUE };
+export const fireLook = () => (passives.blueTorch.lvl > 0 ? BLUE_FIRE : FIRE);
 
 // Língua de fogo subindo de (x, y). seed separa o tremor de cada uma.
 export function drawFlameTongue(x, y, size, t, seed, hot = false) {
+    const F = fireLook();
     const flicker = 0.75 + 0.25 * Math.sin(t * 13 + seed * 2.7);
     const height = size * 2.1 * flicker;
     const sway = Math.sin(t * 9 + seed) * size * 0.35;
@@ -27,6 +35,7 @@ export function drawFlameTongue(x, y, size, t, seed, hot = false) {
 
 // Bola de fogo: núcleo claro, chama em volta e cauda para trás de `angle`
 export function drawFireOrb(x, y, radius, t, angle = -Math.PI / 2, tail = 0) {
+    const F = fireLook();
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     drawGlow(ctx, F.glow, x, y, radius * 3, 0.8);

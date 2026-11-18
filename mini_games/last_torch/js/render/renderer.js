@@ -25,6 +25,7 @@ import {
 import { setWorldView } from './fx/stamp.js';
 import { renderRavenBird } from './raven.js';
 import { renderHearthBird, renderPhoenixBird } from './phoenix.js';
+import { renderFireTornado } from './fire_tornado.js';
 import { renderPickups } from './pickups.js';
 import { renderShackle } from './shackle.js';
 import { heroAnim } from './player.js';
@@ -179,6 +180,7 @@ export function render() {
     renderEnemies('behind', state.coreY, heroBehind ? renderHeroBlock : null, player.y);
     renderCore();
     renderTorchWard();
+    renderFireTornado();
     renderHearthBird();
     renderEnemies('front', state.coreY, heroBehind ? null : renderHeroBlock, player.y);
     renderRoots();

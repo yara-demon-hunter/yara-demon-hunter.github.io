@@ -1,4 +1,4 @@
-import { getTurnDifficulty } from '../../data_model/difficulty.js';
+import { getTurnDifficulty, waveProgress } from '../../data_model/difficulty.js';
 import { BOSS_MODELS, hasDuel } from '../../data_model/bosses.js';
 import { NIGHT, getHourName, rollOmen } from '../../data_model/night.js';
 import { save, persist } from '../core/save.js';
@@ -57,7 +57,7 @@ export function startHour() {
 export function checkHourEnd() {
     const plan = state.hourPlan;
     if (state.phase !== 'HUNT' || state.lastStand || plan.bossCalled) return;
-    if (state.scoreTurn < state.targetScore) return;
+    if (waveProgress(state.scoreTurn, state.targetScore, state.waveTime) < 1) return;
     if (plan.boss) callBoss(plan);
     else beginLastStand();
 }

@@ -7,7 +7,7 @@ afeta o Last Torch nem o yara-rpg.
 |---|---|
 | [metodologia_fotorrealismo.md](metodologia_fotorrealismo.md) | A metodologia das 7 técnicas, o mapa de como o teste aplica cada uma e o que ficou de fora |
 | `monstro_foto.html` e `monstro_foto.js` | O teste: o **Golem de Brasa e Musgo**, um monstro novo, 100% procedural, em WebGL |
-| `fenix_foto.html` e `fenix_foto.js` | A **Fênix de fogo** (Hearth Phoenix) em 3D: asas abertas batendo, a ave inteira em chamas, laranja ou azul (Blue Torch). Penas PBR, chamas sem estado, bloom. Já está no jogo |
+| `fenix_foto.html` e `fenix_foto.js` | A **Fênix de fogo** (Flaming Phoenix) em 3D: asas abertas batendo, a ave inteira em chamas, laranja ou azul (Blue Torch). Penas PBR, chamas sem estado, bloom. Já está no jogo |
 | `bake_fenix.py` | Grava os atlas da fênix (`fenix_fogo_atlas.webp`, `fenix_azul_atlas.webp`) em `buddies/hearth_phoenix/`; abre a página com `?bake=1` (servidor na porta 18900) |
 | `index.html` | A tela de escolha: um cartão por monstro do laboratório |
 | `treant_foto.html` e `treant_foto.js` | O **Treant** (árvore andante), 100% procedural, numa floresta escura de **noite** (luar, vagalumes, névoa). Rosto simpático de propósito |

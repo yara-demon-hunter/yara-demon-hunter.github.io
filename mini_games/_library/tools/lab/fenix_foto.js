@@ -1,4 +1,4 @@
-// --- LABORATÓRIO: Fênix de fogo (a Hearth Phoenix em 3D) ---
+// --- LABORATÓRIO: Fênix de fogo (a Flaming Phoenix em 3D) ---
 // Mesma metodologia do golem e do treant (metodologia_fotorrealismo.md): tudo por código, nada de imagem nem modelo baixado. A fênix tem as asas
 // abertas, bate-as e arde inteira. Fora dos jogos; usa o Three.js copiado em vendor/three. O sprite do jogo sai daqui (?bake=1, bake_fenix.py).
 //
@@ -274,7 +274,7 @@ function construirAve() {
      [-0.35, 0.12, 0.1], [-0.35, 0.12, -0.1], [-0.1, 0.22, 0.1], [-0.1, 0.22, -0.1], [0.1, 0.0, 0.16], [0.1, 0.0, -0.16], [-0.25, -0.02, 0.08], [-0.25, -0.02, -0.08],
      [0.25, 0.05, 0.12], [0.25, 0.05, -0.12], [0.2, 0.28, 0], [0.45, 0.32, 0.08], [0.45, 0.32, -0.08], [0.6, 0.55, 0.06], [0.6, 0.55, -0.06], [0.78, 0.62, 0.05], [0.78, 0.62, -0.05],
      [0.1, 0.3, 0.2], [0.1, 0.3, -0.2], [0.0, 0.1, 0.3], [0.0, 0.1, -0.3], [-0.45, 0.0, 0.05], [-0.45, 0.0, -0.05]]
-        .forEach(([x, y, z]) => marcador(ave, x, y, z, 2.4));
+        .forEach(([x, y, z]) => marcador(ave, x, y, z, 1.6));
 }
 let matBico; const olhos = [];
 
@@ -299,7 +299,7 @@ function pose(p, bate = true) {
 }
 
 // ======================= 4 · CHAMAS E FAGULHAS (sem estado) =======================
-const NP = 560;
+const NP = 440;
 let tabela = null;       // posições dos emissores em G fases do ciclo
 const G = 40;
 function amostrarEmissores() {
@@ -339,7 +339,7 @@ function atualizarFogo(t) {
         P.s.scale.set(tam, tam * (P.fagulha ? 1 : 2.1), 1);
         const m = P.s.material, c = a < 0.35 ? lerpC(paleta.chama[0], paleta.chama[1], a / 0.35) : lerpC(paleta.chama[1], paleta.chama[2], (a - 0.35) / 0.65);
         m.color.setRGB(c[0], c[1] * 0.92, c[2] * 0.85);
-        m.opacity = P.fagulha ? (1 - a) * 0.9 : Math.pow(1 - a, 1.3) * 0.42;
+        m.opacity = P.fagulha ? (1 - a) * 0.9 : Math.pow(1 - a, 1.3) * 0.16;
         m.rotation = Math.sin(TAU * (a + P.f1)) * 0.3;
     }
 }
@@ -379,7 +379,7 @@ function compositor(w, h) {
     composer.addPass(passAO);
     passFogo = new RenderPass(cenaFogo, camera); passFogo.clear = false; passFogo.clearDepth = true;
     composer.addPass(passFogo);
-    passBloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.8, 0.6, 0.55);
+    passBloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.5, 0.5, 0.7);
     composer.addPass(passBloom);
     composer.addPass(new OutputPass());
 }
@@ -423,7 +423,7 @@ function loop(ms) {
 }
 
 // ======================= SPRITES (?bake=1) =======================
-// Fundo preto, câmera quase ortográfica de três quartos. window.__bake(cor, quadros, tam) devolve o atlas: uma linha de quadros com fundo transparente.
+// Fundo preto, câmera quase ortográfica de três quartos. window.__bake(cor, quadros, tam, yaws) devolve o atlas: uma linha de quadros por giro (yaws, em graus) com fundo transparente.
 // No fim o preto vira transparência (alfa = luz do pixel), para o jogo desenhar a chama normalmente por cima do chão claro.
 function bake() {
     document.getElementById('panel')?.remove(); document.getElementById('home')?.remove();
@@ -437,19 +437,21 @@ function bake() {
     cam.lookAt(alvo); cam.updateMatrixWorld();
     composer.passes[0].camera = cam; passAO.camera = cam; passFogo.camera = cam;
     luzFogo.position.set(0.3, 0.6, 1.6); luzFogo2.position.set(-0.6, -0.2, -1.2);
-    window.__bake = (cor, quadros, tam) => {
+    window.__bake = (cor, quadros, tam, yaws = [0]) => {
+        ave.rotation.order = 'YXZ';
         aplicarPaleta(cor);
         const grande = tam * 2;
         renderer.setPixelRatio(1); renderer.setSize(grande, grande); composer.setPixelRatio(1); composer.setSize(grande, grande);
-        const cv = document.createElement('canvas'); cv.width = tam * quadros; cv.height = tam;
+        const cv = document.createElement('canvas'); cv.width = tam * quadros; cv.height = tam * yaws.length;
         const c = cv.getContext('2d'); 
-        for (let f = 0; f < quadros; f++) {
+        for (let r = 0; r < yaws.length; r++) for (let f = 0; f < quadros; f++) {
+            ave.rotation.y = yaws[r] * Math.PI / 180;
             pose(f / quadros, true); atualizarFogo(f / quadros * CICLO);
             luzFogo.intensity = 7; luzFogo2.intensity = 3;
             composer.render();
-            c.drawImage(renderer.domElement, f * tam, 0, tam, tam);
+            c.drawImage(renderer.domElement, f * tam, r * tam, tam, tam);
             // O preto do fundo tem um resto de névoa e ruído: tira o piso e apaga as bordas do quadro, para o jogo (que soma luz) não mostrar um quadrado
-            const img = c.getImageData(f * tam, 0, tam, tam), d = img.data;
+            const img = c.getImageData(f * tam, r * tam, tam, tam), d = img.data;
             for (let y = 0; y < tam; y++) for (let x = 0; x < tam; x++) {
                 const i = (y * tam + x) * 4, e = Math.min(smooth(0, 0.2, x / tam), smooth(0, 0.2, 1 - x / tam), smooth(0, 0.2, y / tam), smooth(0, 0.2, 1 - y / tam));
                 for (let k = 0; k < 3; k++) d[i + k] = Math.max(0, (d[i + k] - 26) * 1.12) * e;
@@ -457,10 +459,16 @@ function bake() {
                 const luz = Math.max(d[i], d[i + 1], d[i + 2]), alfa = Math.min(1, luz / 255 * 1.7);
                 if (alfa > 0) { for (let k = 0; k < 3; k++) d[i + k] = Math.min(255, d[i + k] / alfa); d[i + 3] = alfa * 255; } else d[i + 3] = 0;
             }
-            c.putImageData(img, f * tam, 0);
+            c.putImageData(img, f * tam, r * tam);
         }
         return cv.toDataURL('image/webp', 0.86);
     };
+    // Onde o bico cai em cada quadro (pixels a partir do centro, para o jogo soltar o fogo dele): window.__beak(yaws, tam)
+    window.__beak = (yaws, tam) => yaws.map((yw) => {
+        ave.rotation.order = 'YXZ'; ave.rotation.y = yw * Math.PI / 180; pose(0, true);
+        const p = new THREE.Vector3(0.98, 0.51, 0); ave.localToWorld(p); p.project(cam);
+        return [Math.round(p.x * tam / 2 * 10) / 10, Math.round(-p.y * tam / 2 * 10) / 10];
+    });
     window.__lab = { bake: true, ok: true };
 }
 

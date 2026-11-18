@@ -1,6 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
-import { BLUE_TORCH, FIREBALLS, HEARTH_PHOENIX, FLAME_BLADE, PHOENIX_PACT } from '../../data_model/passives.js';
+import { BLUE_TORCH, FIREBALLS, FIRE_TORNADO, HEARTH_PHOENIX, FLAME_BLADE, PHOENIX_PACT } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
@@ -9,7 +9,7 @@ import { blast, dealDamage, ignite } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { wander, followRate } from './companions.js';
 import { mod } from './modifiers.js';
-import { hearthPhoenixBeak, phoenixBeak } from '../render/phoenix.js';
+import { hearthPhoenixBeak, hearthPhoenixView, phoenixBeak } from '../render/phoenix.js';
 import { addGroundFire, nearestEnemy, ready } from './powers.js';
 import { getSpellCooldown, getSpellDamage, getTorchFireDamage, getWarmthRadius } from './stats.js';
 
@@ -278,35 +278,90 @@ function updateHearthPhoenix(dt) {
     }
     const H = HEARTH_PHOENIX;
     const t = state.runTime;
-    const a = t * 0.9;
+    const a = t * H.orbitSpeed;
     const homeX = state.coreX + Math.cos(a) * H.orbit;
-    const homeY = state.coreY + H.hoverY + Math.sin(a) * H.orbit * 0.35;
+    const homeY = state.coreY + H.hoverY + Math.sin(a) * H.orbit * H.orbitFlat;
     if (!bird.placed) {
         bird.x = state.coreX;
         bird.y = state.coreY - 40;
         bird.placed = true;
         bird.rise = 0;
+        bird.breath = 0;
+        bird.breathCd = 4;
         createExplosion(bird.x, bird.y, '#fde047', 12);
         addShockwave(bird.x, bird.y, { radius: 50, color: '#fb923c', width: 4, seconds: 0.4 });
         audio.playPhoenixRise();
     }
     const pull = Math.min(1, dt * followRate(H.followSpeed));
     const vx = (homeX - bird.x) * pull;
+    const vy = (homeY - bird.y) * pull;
     bird.x += vx;
-    bird.y += (homeY - bird.y) * pull;
+    bird.y += vy;
     bird.tilt += (Math.max(-0.3, Math.min(0.3, vx * 0.05)) - bird.tilt) * Math.min(1, dt * 8);
     bird.rise = Math.min(1, bird.rise + dt / H.riseSeconds);
     if (bird.flash > 0) bird.flash -= dt;
     if (bird.look > 0) bird.look -= dt;
-    else bird.facing = vx >= 0 ? 1 : -1;
+    else if (Math.abs(vx) > 0.02) bird.facing = vx >= 0 ? 1 : -1;
 
-    if (bird.rise < 1 || !ready('hearthPhoenix', dt, getSpellCooldown(H.cooldownSeconds))) return;
+    // Para onde ela olha: o jato ou o tiro (alvo) ou a direção do voo. Daí vêm o lado do desenho e a boca do fogo.
+    if (bird.breath > 0) {
+        bird.dirX = Math.cos(bird.breathAng);
+        bird.dirY = Math.sin(bird.breathAng);
+    } else if (bird.look <= 0 && dt > 0) {
+        const n = Math.hypot(vx, vy) || 1;
+        const k = Math.min(1, dt * 5);
+        bird.dirX += (vx / n - bird.dirX) * k;
+        bird.dirY += (vy / n - bird.dirY) * k;
+    }
+    // Trocar de desenho (lado) ou de direção só depois de um tempo parada: evita o sprite piscar entre duas visões quando ela gira
+    bird.hold = (bird.hold ?? 0) - dt;
+    if (bird.hold <= 0) {
+        const view = hearthPhoenixView(bird.dirX, bird.dirY);
+        const face = Math.abs(bird.dirX) > 0.2 ? (bird.dirX >= 0 ? 1 : -1) : bird.facing;
+        if (view !== bird.view || face !== bird.facing) {
+            bird.view = view;
+            bird.facing = face;
+            bird.hold = bird.breath > 0 ? 0.5 : 0.25;
+        }
+    }
+    // A boca do fogo anda macia até o bico (sem pulos quando o desenho troca)
+    const beak = hearthPhoenixBeak(bird.x, bird.y, bird.facing, bird.view);
+    const bk = Math.min(1, dt * 30);
+    bird.beakX = bird.beakX === undefined ? beak.x : bird.beakX + (beak.x - bird.beakX) * bk;
+    bird.beakY = bird.beakY === undefined ? beak.y : bird.beakY + (beak.y - bird.beakY) * bk;
+
+    if (state.phase !== 'HUNT') bird.breath = 0;
+    if (bird.rise < 1) return;
+    if (bird.breath > 0) {
+        updateHearthBreath(bird, dt, H);
+        return;
+    }
+    bird.breathCd -= dt;
+    if (bird.breathCd <= 0) {
+        const foe = nearestEnemy(state.coreX, state.coreY, H.range);
+        if (foe) {
+            const from = hearthPhoenixBeak(bird.x, bird.y, bird.facing, bird.view);
+            bird.breath = H.breathSeconds;
+            bird.breathAng = Math.atan2(foe.y - from.y, foe.x - from.x);
+            bird.breathCd = getSpellCooldown(H.breathCooldown);
+            bird.breathTick = 0;
+            bird.look = 0;
+            audio.playPhoenixRise();
+            return;
+        }
+    }
+
+    if (!ready('hearthPhoenix', dt, getSpellCooldown(H.cooldownSeconds))) return;
     const target = nearestEnemy(state.coreX, state.coreY, H.range);
     if (!target) return;
+    const ang0 = Math.atan2(target.y - bird.y, target.x - bird.x);
+    bird.dirX = Math.cos(ang0);
+    bird.dirY = Math.sin(ang0);
+    bird.view = hearthPhoenixView(bird.dirX, bird.dirY);
     bird.facing = target.x >= bird.x ? 1 : -1;
     bird.look = 0.6;
     bird.flash = 0.16;
-    const from = hearthPhoenixBeak(bird.x, bird.y, bird.facing);
+    const from = hearthPhoenixBeak(bird.x, bird.y, bird.facing, bird.view);
     const ang = Math.atan2(target.y - from.y, target.x - from.x);
     const blue = isBlueTorch();
     state.bolts.push({
@@ -319,6 +374,95 @@ function updateHearthPhoenix(dt) {
         onHit: burstPhoenixFire
     });
     audio.playBolt();
+}
+
+// O sopro: o jato segue o monstro mais perto e queima todos no cone (dano em pulsos, e quem é pego continua em chamas)
+function updateHearthBreath(bird, dt, H) {
+    bird.breath -= dt;
+    const from = { x: bird.beakX, y: bird.beakY };
+    const foe = nearestEnemy(from.x, from.y, H.breathRange + 60);
+    if (foe) {
+        const want = Math.atan2(foe.y - from.y, foe.x - from.x);
+        let diff = want - bird.breathAng;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        const turn = H.breathTurn * dt;
+        bird.breathAng += Math.max(-turn, Math.min(turn, diff));
+    }
+    bird.breathTick -= dt;
+    if (bird.breathTick > 0) return;
+    bird.breathTick = H.breathTick;
+    audio.playFlame();
+    const damage = getTorchFireDamage() * H.breathDamage;
+    const half = H.breathArc / 2;
+    for (const e of state.enemies) {
+        if (e.hp <= 0) continue;
+        const dx = e.x - from.x, dy = e.y - from.y;
+        const d = Math.hypot(dx, dy);
+        if (d > H.breathRange + e.radius) continue;
+        let diff = Math.atan2(dy, dx) - bird.breathAng;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        // quem está perto precisa de mais folga de ângulo (o corpo dele tem largura)
+        if (Math.abs(diff) > half + Math.atan2(e.radius, Math.max(d, 1))) continue;
+        dealDamage(e, damage, { noCrit: true, quiet: true });
+        ignite(e, damage * 0.8, H.breathBurnSeconds);
+    }
+}
+
+// --- FIRE TORNADO ---
+// De tempos em tempos um furacão de fogo se forma sobre a tocha e castiga tudo dentro do círculo tracejado (o calor da tocha)
+function updateFireTornado(dt) {
+    const T = state.fireTornado;
+    // Fora da caçada (fim da onda, acampamento) o furacão se desfaz na hora; sem a skill também
+    if (passives.fireTornado.lvl <= 0 || state.phase !== 'HUNT') {
+        T.left = 0;
+        if (passives.fireTornado.lvl <= 0) T.wait = null;
+        return;
+    }
+    const F = FIRE_TORNADO;
+    if (T.left <= 0) {
+        if (T.wait === null) T.wait = F.firstDelaySeconds;      // acabou de aprender (ou de começar a noite)
+        if (T.wait > 0) {
+            T.wait = Math.max(0, T.wait - dt);
+            return;
+        }
+        // Pronto: só se forma quando há monstro dentro do círculo de calor da tocha (senão espera, sem gastar a recarga)
+        const reach = getWarmthRadius();
+        if (!state.enemies.some((e) => e.hp > 0 && Math.hypot(e.x - state.coreX, e.y - state.coreY) <= reach + e.radius)) return;
+        T.left = F.durationSeconds;
+        T.age = 0;
+        T.tick = 0;
+        T.wait = getSpellCooldown(F.cooldownSeconds);
+        shakeScreen(6);
+        audio.playPhoenixRise();
+        addShockwave(state.coreX, state.coreY, { radius: reach, color: '#fb923c', width: 5, seconds: 0.5 });
+        return;
+    }
+    T.left -= dt;
+    T.age += dt;
+    T.wait = Math.max(0, T.wait - dt);
+    T.tick -= dt;
+    const reach = getWarmthRadius();
+    const pulse = T.tick <= 0;
+    if (pulse) {
+        T.tick = F.tickSeconds;
+        audio.playFlame();
+    }
+    const damage = getTorchFireDamage() * F.damage;
+    for (const e of state.enemies) {
+        if (e.hp <= 0) continue;
+        const dx = state.coreX - e.x, dy = state.coreY - e.y;
+        const d = Math.hypot(dx, dy);
+        if (d > reach + e.radius) continue;
+        // o redemoinho puxa para dentro (os mais pesados, chefes, nem sentem)
+        if (!e.isBoss && !e.immovable && d > 30) {
+            const k = Math.min(F.pull * dt, d - 30) / d;
+            e.x += dx * k;
+            e.y += dy * k;
+        }
+        if (!pulse) continue;
+        dealDamage(e, damage, { noCrit: true, quiet: true, torchFire: true });
+        ignite(e, damage * 0.6, F.burnSeconds);
+    }
 }
 
 // --- JURAMENTO DA CHAMA ---
@@ -380,6 +524,7 @@ export function updateFlameSkills(dt) {
     updateTorchWard(dt);
     updateBlueTorch(dt);
     updateHearthPhoenix(dt);
+    updateFireTornado(dt);
     updateWarmthBurn(dt);
     updatePhoenix(dt);
     const fx = state.phoenixFx;

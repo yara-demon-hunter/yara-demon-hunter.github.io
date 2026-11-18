@@ -157,7 +157,8 @@ export const state = {
     oathAnnounced: false,       // o aviso de Juramento disponível já apareceu nesta noite
     bloodlust: { stacks: 0, timer: 0 },
     warCryTimer: 0,             // bônus de dano depois do rugido
-    hearthBird: { x: 0, y: 0, placed: false, facing: 1, look: 0, tilt: 0, flash: 0, rise: 1 },
+    hearthBird: { x: 0, y: 0, placed: false, facing: 1, look: 0, tilt: 0, flash: 0, rise: 1, dirX: 1, dirY: 0, view: 0, breath: 0, hold: 0, beakX: undefined, beakY: undefined, breathAng: 0, breathCd: 4, breathTick: 0 },
+    fireTornado: { wait: null, left: 0, age: 0, tick: 0 },   // Fire Tornado: espera até o próximo, tempo restante do furacão, idade (para o visual) e tempo até o próximo pulso
     torchWard: { charges: 0, timer: 0, flash: 0 },   // Torch Ward: escudos guardados, tempo para o próximo e clarão da última defesa
     phoenixSpent: false,        // a fênix já morreu nesta hora
     phoenixFx: null,

@@ -121,11 +121,9 @@ export const TREE_NODES = [
     { id: 'phoenixPact', branch: 'flame', kind: 'passive', key: 'phoenixPact', x: 3, y: 0, requires: [req('undyingFlame', 2)] },
     // Linha da guarda: a tocha protege a si mesma (escudo que se renova) e queima azul
     { id: 'torchWard', branch: 'flame', kind: 'power', key: 'torchWard', x: 1, y: 1, requires: [req('torchKeeper')] },
-    { id: 'bankedCoals', branch: 'flame', kind: 'mod', x: 2, y: 1, requires: [req('torchWard', 2)],
-      name: 'Banked Coals', icon: '🪨', desc: 'The torch takes less damage from everything that touches it.',
-      levelText: (mods) => `-${formatPercent(mods.torchGuard)} damage to the torch`, mods: { torchGuard: 0.06 } },
-    { id: 'blueTorch', branch: 'flame', kind: 'passive', key: 'blueTorch', x: 3, y: 1, requires: [req('bankedCoals', 2)] },
-    { id: 'hearthPhoenix', branch: 'flame', kind: 'passive', key: 'hearthPhoenix', x: 4, y: 1, requires: [req('blueTorch')] },
+    { id: 'fireTornado', branch: 'flame', kind: 'passive', key: 'fireTornado', x: 2, y: 1, requires: [req('torchWard', 2)] },
+    { id: 'hearthPhoenix', branch: 'flame', kind: 'passive', key: 'hearthPhoenix', x: 3, y: 1, requires: [req('fireTornado')] },
+    { id: 'blueTorch', branch: 'flame', kind: 'passive', key: 'blueTorch', x: 4, y: 1, requires: [req('hearthPhoenix')] },
     // Linha da muralha
     { id: 'torchBolts', branch: 'flame', kind: 'power', key: 'torchBolts', x: 1, y: 2, requires: [req('torchKeeper', 2)] },
     { id: 'sunEvolve', branch: 'flame', kind: 'evolve', key: 'torchBolts', x: 2, y: 2, requires: [req('torchBolts', 5)] },

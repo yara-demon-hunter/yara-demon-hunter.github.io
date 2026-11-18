@@ -97,7 +97,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Oath of Whispers*
 - **Flame** (raiz: Torch Keeper)
   - Calor: Warm Hearth, Undying Flame, Phoenix Pact*
-  - Guarda: Torch Ward*, Banked Coals*, Blue Torch*, Hearth Phoenix*
+  - Guarda: Torch Ward*, Fire Tornado*, Flaming Phoenix*, Blue Torch*
   - Muralha: Flame Sentinel, Sun Spire, Hearth Ring*, Solar Wall*
   - Brasa: Ember Steps (fogo nos passos e dano dentro do calor da tocha), Hellwalker
   - Armas: Flaming Sword* (sai do Hellwalker), Fireballs* (vem depois da Flaming Sword; nada mais depende dela)
@@ -132,9 +132,9 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Night Reaper | Evolução | Uma sombra refaz o caminho do dash, cortando de novo | Silhueta violeta |
 | Coin Rush | Relíquia | Cada moeda adianta o dash e a adaga | 🧤 Fortune |
 | Master Thief | Relíquia | Atravessar monstros com o dash rouba ouro; Perfect Dodge rouba um punhado | Moedas saltando |
-| Banked Coals | Efeito | A tocha leva menos dano de tudo | - |
+| Fire Tornado | Passiva | A cada 20 s um furacão de fogo se forma sobre a tocha e por 5 s castiga (e puxa para o centro) tudo dentro do círculo tracejado; custa 4 | Furacão, fogo |
 | Torch Ward | Poder (5 níveis) | A cada 10s (até 6s) a tocha ganha um escudo de chama, até 2 guardados. Ele paga o golpe que seria da tocha e repele e atordoa os monstros em volta; cada escudo também devolve um tiro inimigo contra os monstros | Redoma de chama sobre a tocha, uma casca por escudo |
-| Hearth Phoenix | Passiva | Uma fênix de fogo rodeia a tocha e atira bolas de fogo nos monstros perto da chama (fogo da tocha: a Blue Torch também vale) | Fênix, bolas de fogo |
+| Flaming Phoenix | Passiva | Uma fênix de fogo rodeia a tocha e atira bolas de fogo nos monstros perto da chama e, a cada 8 s, cospe um jato de fogo contínuo em cone (lança-chamas) que queima tudo no caminho (fogo da tocha: a Blue Torch também vale) | Fênix, bolas de fogo, jato de fogo |
 | Blue Torch | Passiva | A tocha, a luz e todos os golpes dela ficam azuis; luz +25%, calor +20%, fogo da tocha +30%, e quem está no calor fica lento e leva +15% de dano só dos golpes de fogo da tocha | Chama, brilho, projéteis e anel azuis |
 | Flaming Sword | Passiva | A espada pega fogo: todo corte, inclusive das sombras, deixa o monstro queimando. Monstro em chamas que morre passa o fogo a quem está por perto; o Oath of the Hearth fortalece a chama | Línguas de fogo na lâmina, corte laranja |
 | Fireballs | Passiva | As adagas viram bolas de fogo: o herói para com a bola crescendo na mão, como o Lorde Demônio, sem andar, golpear nem dar dash; ao acertar, ela explode, fere os vizinhos, deixa todos em chamas e o chão queimando. Por baixo continuam adagas, então Dagger Mastery, Fan of Knives, Ricochet, Death Mark, Charged Dagger Throw e a explosão das sombras valem igual. O Oath of Slaughter também as bloqueia | Bola de fogo com cauda |

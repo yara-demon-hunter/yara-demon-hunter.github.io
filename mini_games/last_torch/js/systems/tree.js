@@ -259,7 +259,7 @@ function isSealedForHero(node) {
 
 // Skills que causam dano de MAGIA (dependem do `magicDamage` do personagem): os poderes, passivas e evoluções dos ramos de
 // feitiço (Maldição, Natureza, Luz) e as da Chama que usam magia. Quem tem magicDamage 0 (Captain Brutos) as tem seladas.
-const MAGIC_FLAME_KEYS = new Set(['torchBolts', 'fireRing', 'emberTrail', 'phoenixPact', 'hearthPhoenix', 'fireballs']);
+const MAGIC_FLAME_KEYS = new Set(['torchBolts', 'fireRing', 'emberTrail', 'phoenixPact', 'hearthPhoenix', 'fireTornado', 'fireballs']);
 function isMagicNode(node) {
     if (node.kind === 'mod' || node.kind === 'stat' || node.oath) return false;
     if (node.branch === 'curse' || node.branch === 'nature' || node.branch === 'light') return true;

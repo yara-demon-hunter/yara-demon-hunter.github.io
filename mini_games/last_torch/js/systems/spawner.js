@@ -3,7 +3,7 @@ import { ELITE_TYPES, rollElite } from '../../data_model/elites.js';
 import { HOUR_EVENTS, NIGHT, rollHourHordes } from '../../data_model/night.js';
 import { BOSS_MODELS, BOSS_SPAWNING, chooseBossType, createBoss, hasDuel, isBossTurn } from '../../data_model/bosses.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, chooseMonsterType, createMonster } from '../../data_model/monsters.js';
-import { isMonsterUnlocked } from '../../data_model/difficulty.js';
+import { isMonsterUnlocked, waveProgress, waveSpawnBoost } from '../../data_model/difficulty.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner, showToast } from '../ui/banner.js';
 import { playDuelDialogue, whenHunting } from '../ui/dialogue.js';
@@ -187,7 +187,7 @@ export function updateSpawner(dt) {
     }
 
     const plan = state.hourPlan;
-    const progress = state.scoreTurn / state.targetScore;
+    const progress = waveProgress(state.scoreTurn, state.targetScore, state.waveTime);
     plan.hordes.forEach(h => {
         if (!h.fired && progress >= h.at) {
             h.fired = true;
@@ -205,7 +205,7 @@ export function updateSpawner(dt) {
     if (state.spawnTimer <= 0) {
         spawnRegular();
         const difficulty = getTurnDifficulty(state.turn);
-        const interval = difficulty.spawnIntervalSeconds / (1 + mod('spawnRate'));
+        const interval = difficulty.spawnIntervalSeconds / (1 + mod('spawnRate')) / waveSpawnBoost(state.waveTime);
         state.spawnTimer = state.currentBoss ? interval * TURN_DIFFICULTY.bossSpawnIntervalMultiplier : interval;
     }
 }

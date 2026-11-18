@@ -221,3 +221,28 @@ O Golem agora joga uma pedra pequena (raio 7, velocidade 130, dano 0,6 do dano d
 - **Perto dele:** em vez do soco em leque, **bate as duas mãos no chão** num golpe em área de raio **175** (`punch.area`/`areaRadius` em `GOLEM`). Um círculo vermelho no chão mostra onde vai pegar durante os 1,4 s de preparação (braços subindo); quando as mãos batem (quadro de impacto, corpo inclinado) estoura um anel de pedra e quem estiver dentro leva dano (também a tocha, 8, e os clones). Quem sair do círculo antes (dash) não leva. Se o golem morre no meio, o aviso some junto.
 - Atlas regravado: 14 colunas (6 passada, 4 subir, 1 impacto, 3 jogar) por 8 direções, 192 px, ~470 KB. `addSlam` (boss_ai.js) ganhou `shockColor` e devolve o aviso; `punch.area` vale para qualquer monstro com `punch`.
 - Verificado no jogo (Chrome headless): o círculo aparece com os braços subindo, o impacto causa dano uma vez só, a pedra sai com uma mão levantada, sem erros. Dano do golpe em área (2,4x) ainda por equilibrar.
+
+## 2026-11-17 · Flaming Phoenix: voo maior, mais ângulos e jato de fogo
+
+- Voo: raio da órbita 38 → 125 (elipse achatada 0,5, velocidade 0,7), em `HEARTH_PHOENIX` (`passives.js`).
+- Sprites: atlas com 5 visões (lado, frente-lado, frente, costas-lado, costas) × 12 quadros de 144 px (~350 KB cada cor). A visão sai da direção do voo; ao atirar, olha para o alvo.
+- Ataque novo: a cada 8 s ela cospe um jato de fogo (lança-chamas) de 1,6 s em cone de 270 de alcance, que segue o monstro mais perto, dá dano em pulsos de 0,15 s e deixa em chamas. As bolas de fogo continuam entre os jatos. Visual sem estado (brilhos em 'lighter'), 44 partículas (26 em qualidade alta de fumaça/efeitos), som `playFlame`.
+- Testado no Chrome headless: 4 visões usadas, 4 monstros queimando, sem erros. Não medido em celular real.
+
+- Ajuste do jato (mesmo dia): fim das tremidinhas (a vista e o lado da ave só trocam depois de 0,25 s, 0,5 s durante o jato; o tremor de tela do início foi tirado; a boca do fogo anda macia). O fogo agora sai do bico de verdade: a posição do bico em cada vista foi medida no Laboratório (`window.__beak` em `fenix_foto.js`) e vai em `beak` de `hearth_phoenix_visual.js` (antes era chute, e o y estava abaixo do centro).
+
+## 2026-11-18 · Blue Torch: todo o fogo do herói fica azul
+
+Com a Blue Torch: chamas da espada de fogo e o corte, bolas de fogo (Fireballs e da Flaming Phoenix), chama em cima dos monstros queimando e fogo no chão (normal e evoluído) ficam azuis (`fireLook()` em `js/render/fire.js`; chão em `js/render/powers.js`); o fogo dos inimigos segue vermelho. A fênix do Phoenix Pact ganha atlas azul próprio, com as cores da paleta giradas no matiz (`buddies/phoenix/phoenix.js`, `kind: 'blue'`). Testado no Chrome headless, sem erros.
+
+- Torch Ward ganhou arte: a imagem antiga do Vigil (encapuzado de braços cruzados com a espada, no redemoinho de fogo; estava sem uso) foi renomeada para `images/buttons/torch-ward(-small).webp` e ligada ao nó `torchWard` em `tree_images.js` (árvore, escolha rápida, status e ficha da skill). O nome da skill já era Torch Ward.
+
+## 2026-11-18 · Fire Tornado (no lugar do Banked Coals)
+
+Passiva nova no ramo Flame, custo 4: a cada 20 s um furacão de fogo se forma sobre a tocha e dura 5 s; pulsos de 0,25 s dão 1,1× o dano do fogo da tocha em tudo dentro do círculo tracejado (o calor), deixam em chamas e puxam para o centro (chefes não). Dados em `FIRE_TORNADO` (`passives.js`), lógica em `updateFireTornado` (`skills_flame.js`), visual sem estado em `js/render/fire_tornado.js` (funil + braços em espiral + anel; azul com a Blue Torch; menos brilhos em qualidade baixa). O Banked Coals saiu da árvore (o mod `torchGuard` segue existindo para os Juramentos); a Flaming Phoenix agora pede o Fire Tornado. Testado no Chrome headless: 4 de 6 monstros dentro morreram/feriram, sem erros. Dano não balanceado em jogo.
+
+- Fire Tornado: só se forma quando há monstro dentro do círculo de calor (pronta, ela espera sem gastar a recarga); no fim da onda (fase fora de HUNT) some na hora (lógica e desenho). O mesmo vale para o jato da Flaming Phoenix, que também continuava desenhado fora da caçada.
+
+## 2026-11-18 · Ondas de no mínimo 3 minutos, com mais monstros ao longo da onda
+
+`TURN_DIFFICULTY.waveMinSeconds = 180` e `spawnGrowth = 0.9` (`difficulty.js`). A onda (e a chamada do boss) só fecha quando a cota de pontos E os 3 minutos passaram: `waveProgress` = o menor entre pontos/cota e tempo/180 (usado em `spawner.js`, `night.js` e na barra do HUD; hordas e elites também disparam por ele, então se espalham pelos 3 minutos). O intervalo entre monstros encolhe com o tempo (`waveSpawnBoost`: de ×1 a ×1,9 aos 180 s). Teste com cota já cumprida: a onda 1 fechou aos 181 s e a taxa de nascimento subiu de ~0,7 para ~1 monstro/s. Balanceamento com jogador de verdade não feito (a onda 1 fica mais densa no fim).

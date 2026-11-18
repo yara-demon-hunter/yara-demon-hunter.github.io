@@ -23,7 +23,7 @@ import { HERO_25D_VISUALS as BODY_25D } from '../../library/characters/hunter/he
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { FAN_OF_KNIVES } from '../../data_model/passives.js';
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
-import { drawFireOrb } from './fire.js';
+import { drawFireOrb, fireLook } from './fire.js';
 import { ctx, passives, player, state } from '../core/state.js';
 import { getKnifeChargeRatio, getKnifeRange } from '../systems/knives.js';
 import { OATH_VISUALS } from '../../data_model/visuals/characters/oath_visual.js';
@@ -128,7 +128,7 @@ export function renderBladeSlashes() {
     // Sob um Juramento o corte tem a cor dele
     const gear = getHeroGear();
     const oathSlash = gear ? OATH_VISUALS[gear].slash : null;
-    const fireSlash = passives.flameBlade.lvl > 0 ? SKILLS_VISUALS.fire.slash : null;
+    const fireSlash = passives.flameBlade.lvl > 0 ? fireLook().slash : null;
 
     state.bladeSlashes.forEach(s => {
         const look = s.spin ? SLASH_VISUALS.whirl : (SLASH_VISUALS[s.comboStep] || SLASH_VISUALS[1]);

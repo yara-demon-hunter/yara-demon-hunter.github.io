@@ -36,6 +36,8 @@ export function clearSkillEffects() {
     clearNatureSkills();
     clearLightSkills();
     state.phoenixFx = null;
+    state.fireTornado.left = 0;
+    state.hearthBird.breath = 0;
 }
 
 // Começo de noite: nada do herói da noite anterior sobrevive
@@ -53,6 +55,8 @@ export function resetSkills() {
     state.phoenixSpent = false;
     state.phoenix.placed = false;
     state.hearthBird.placed = false;
+    state.fireTornado.wait = null;
+    state.fireTornado.left = 0;
     state.raven.placed = false;
     state.shackleTimer = 0;
     player.move = null;

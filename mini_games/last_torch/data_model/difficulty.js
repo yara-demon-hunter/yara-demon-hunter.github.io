@@ -32,6 +32,11 @@ export const TURN_DIFFICULTY = {
     targetScorePerTurn: 125,
     targetScorePerTurnSquared: 3,
 
+    // Duração mínima da onda: ela só fecha (e chama o boss) depois deste tempo E de a cota de pontos ser atingida.
+    // Dentro dela os monstros vão ficando mais frequentes: o intervalo entre eles encolhe até 1 / (1 + spawnGrowth) no fim do tempo mínimo.
+    waveMinSeconds: 180,
+    spawnGrowth: 0.9,
+
     // Limite de monstros vivos ao mesmo tempo (desempenho e leitura da tela)
     maxAliveEnemies: 42,
 
@@ -57,6 +62,16 @@ export const TURN_DIFFICULTY = {
         BONE_COLOSSUS: 8
     }
 };
+
+// Quanto da onda já passou (0 a 1): o menor entre a cota de pontos e o tempo mínimo. Hordas, elites, a barra do HUD e o fim da onda usam isto.
+export function waveProgress(score, target, waveTime) {
+    return Math.min(score / Math.max(1, target), waveTime / TURN_DIFFICULTY.waveMinSeconds);
+}
+
+// Quanto mais a onda avança, mais depressa nascem monstros (multiplica a taxa de spawn)
+export function waveSpawnBoost(waveTime) {
+    return 1 + TURN_DIFFICULTY.spawnGrowth * Math.min(1, waveTime / TURN_DIFFICULTY.waveMinSeconds);
+}
 
 // Multiplicadores e intervalo de spawn de um turno (turno 1 = mais fácil)
 export function getTurnDifficulty(turn) {

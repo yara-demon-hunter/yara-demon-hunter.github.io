@@ -104,14 +104,24 @@ export const PASSIVE_SKILL_MODELS = {
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby, setting it ablaze and leaving the ground burning. Everything that improves your daggers still counts, and your magic damage multiplies the fireball on top (its hits show in blue). The price: you stand still for a moment, unable to do anything, while the fire grows in your hand.'
     },
+    fireTornado: {
+        name: 'Fire Tornado',
+        icon: '🌪️',
+        cost: 130,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        get desc() {
+            return `Every ${FIRE_TORNADO.cooldownSeconds}s a tornado of fire forms over the torch and rages for ${FIRE_TORNADO.durationSeconds}s, scorching everything inside the dashed circle of its warmth for ${formatMultiplier(FIRE_TORNADO.damage)} torch fire damage every ${FIRE_TORNADO.tickSeconds}s and setting it ablaze. It counts as the torch's fire.`;
+        }
+    },
     hearthPhoenix: {
-        name: 'Hearth Phoenix',
+        name: 'Flaming Phoenix',
         icon: '🐦‍🔥',
         cost: 130,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         get desc() {
-            return `A fire phoenix rises from the torch and circles it, hurling fireballs every ${HEARTH_PHOENIX.cooldownSeconds}s at monsters near the flame for ${formatMultiplier(HEARTH_PHOENIX.boltDamage)} spell damage. They count as the torch's fire.`;
+            return `A fire phoenix rises from the torch and circles it, hurling fireballs every ${HEARTH_PHOENIX.cooldownSeconds}s at monsters near the flame for ${formatMultiplier(HEARTH_PHOENIX.boltDamage)} spell damage, and every ${HEARTH_PHOENIX.breathCooldown}s it breathes a ${HEARTH_PHOENIX.breathSeconds}s torrent of fire that scorches everything in its path. They count as the torch's fire.`;
         }
     },
     blueTorch: {
@@ -509,7 +519,18 @@ export const BLUE_TORCH = {
     color: '#60a5fa'
 };
 
-// Hearth Phoenix: a fênix da tocha rodeia a chama e atira nos monstros perto dela (o fogo da tocha: a Blue Torch também vale)
+// Fire Tornado: a cada tanto um furacão de fogo se forma sobre a tocha e castiga tudo dentro do círculo tracejado dela (o calor da tocha)
+export const FIRE_TORNADO = {
+    cooldownSeconds: 20,
+    durationSeconds: 5,
+    tickSeconds: 0.25,
+    damage: 1.1,                // x dano do fogo da tocha, por pulso, em cada monstro dentro do círculo
+    burnSeconds: 2,             // quem foi pego segue queimando
+    pull: 55,                   // quanto o furacão puxa os monstros para o centro (pixels por segundo)
+    firstDelaySeconds: 8        // a primeira vez que se forma, depois de aprender
+};
+
+// Flaming Phoenix: a fênix da tocha rodeia a chama e atira nos monstros perto dela (o fogo da tocha: a Blue Torch também vale)
 export const HEARTH_PHOENIX = {
     cooldownSeconds: 1.8,
     range: 360,                 // a partir da tocha
@@ -517,9 +538,20 @@ export const HEARTH_PHOENIX = {
     turnRate: 8,
     boltDamage: 1.2,            // x dano de feitiço
     hoverY: -170,               // acima da chama
-    orbit: 38,                  // raio do voo em volta da tocha
-    followSpeed: 5,
-    riseSeconds: 0.9
+    orbit: 125,                 // raio do voo em volta da tocha
+    orbitFlat: 0.5,             // achatamento da elipse (1 = círculo)
+    orbitSpeed: 0.7,            // voltas em radianos por segundo
+    followSpeed: 4,
+    riseSeconds: 0.9,
+    // Sopro de fogo: de tempos em tempos ela para de lançar bolas e cospe um jato de chamas contínuo no monstro mais perto
+    breathCooldown: 8,          // segundos entre sopros
+    breathSeconds: 1.6,         // duração do jato
+    breathRange: 270,           // comprimento do jato a partir do bico
+    breathArc: 0.6,             // abertura do cone (radianos, do lado de fora de um lado ao outro)
+    breathTick: 0.15,           // segundos entre os danos
+    breathDamage: 0.55,         // x dano do fogo da tocha, por pulso (em todos no cone)
+    breathBurnSeconds: 3,       // quem foi pego segue queimando
+    breathTurn: 2.2             // velocidade com que o jato acompanha o alvo (rad/s)
 };
 
 // Phoenix Pact: a fênix voa no ombro do herói e atira bolas de fogo. Quando ele cai, ela morre para levantá-lo

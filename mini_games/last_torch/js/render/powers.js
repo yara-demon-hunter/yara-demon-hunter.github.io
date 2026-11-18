@@ -1,7 +1,7 @@
 import { getPowerLevel } from '../../data_model/powers.js';
 import { POWERS_VISUALS as V } from '../../data_model/visuals/effects/powers_visual.js';
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
-import { ctx, player, powers, state } from '../core/state.js';
+import { ctx, passives, player, powers, state } from '../core/state.js';
 import { drawFireOrb } from './fire.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { getDashedRing } from './fx/rings.js';
@@ -11,7 +11,15 @@ import { resetWorldView, stamp } from './fx/stamp.js';
 // --- PODERES (desenho procedural) ---
 const TAU = Math.PI * 2;
 
+// Fogo no chão do herói com a Blue Torch (o fogo dos inimigos continua vermelho)
+const BLUE_GROUND = {
+    colors: ['rgba(29, 78, 216, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(147, 197, 253, 0.85)'],
+    evolved: ['rgba(30, 64, 175, 0.85)', 'rgba(56, 189, 248, 0.9)', 'rgba(224, 242, 254, 0.95)'],
+    glow: 'rgba(37, 99, 235, 0.75)'
+};
+
 export function renderGroundFires() {
+    const blue = passives.blueTorch.lvl > 0;
     const t = performance.now() / 1000;
     const F = V.fire;
     ctx.save();
@@ -19,8 +27,8 @@ export function renderGroundFires() {
     state.groundFires.forEach((f, i) => {
         const k = Math.min(1, f.life / (f.maxLife * 0.35));
         const r = f.radius * (0.55 + 0.45 * k);
-        const colors = f.hostile ? F.hostileColors : f.evolved ? F.evolvedColors : F.colors;
-        drawGlow(ctx, f.hostile ? F.hostileGlow : F.glow, f.x, f.y, r * 1.5, 0.28 * k);
+        const colors = f.hostile ? F.hostileColors : blue ? (f.evolved ? BLUE_GROUND.evolved : BLUE_GROUND.colors) : f.evolved ? F.evolvedColors : F.colors;
+        drawGlow(ctx, f.hostile ? F.hostileGlow : blue ? BLUE_GROUND.glow : F.glow, f.x, f.y, r * 1.5, 0.28 * k);
         for (let n = 0; n < F.tongues; n++) {
             const a = t * (2.2 + n) + i * 1.9 + n * 2.1;
             const wobble = 0.7 + 0.3 * Math.sin(t * 11 + i + n * 2);
