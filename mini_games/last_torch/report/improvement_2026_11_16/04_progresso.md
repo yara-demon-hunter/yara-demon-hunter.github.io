@@ -266,3 +266,21 @@ Princípio: poucos disparos grandes em vez de muitos pequenos. Recarga ×1,4 a �
 Bot (ruidoso): as skills seguem úteis (Sun Spire, Flaming Phoenix, Phoenix Pact no topo).
 
 - Fire Tornado, arte nova (`js/render/fire_tornado.js`): funil de verdade (20 anéis de chama girando, estreito embaixo e largo em cima, com sombra de fumaça para dar corpo), línguas de fogo subindo pela borda, vórtice discreto no chão e fagulhas girando; azul com a Blue Torch; menos peças em qualidade baixa. Continua sem estado e sem imagem (só canvas).
+
+- Círculo vermelho tracejado de alcance do herói (`drawRangeCircle`, js/render/arena.js): espessura 2 → 3,2 e cor mais forte (alfa 0,65 → 0,92), para ler melhor no celular; vale no desktop e no círculo dos clones.
+
+## 2026-11-18 · A barra de Fúria só enche com golpe de espada
+
+Antes, além do golpe de espada (`chargePerHit` = 3 por monstro atingido), a barra também enchia com **toda morte** (`chargePerKill` 1,5, de qualquer fonte: magia, adaga, tocha, clones, fogo), com a **execução** do Executioner (+4) e com o **esquiva perfeita** do dash (+14). Os três foram removidos (e o campo `chargePerKill`, `getFuryChargePerKill`, `EXECUTIONER.furyCharge`, `PERFECT_FURY` e a linha "Charge per Kill" do painel de status). Agora só o golpe da espada do herói (`combat.js`) chama `chargeUlt`; os bônus `furyCharge` (relíquias, skills, Juramentos) só multiplicam isso. Teste: 5 monstros mortos por dano direto (sem espada) = barra em 0; golpes de espada = barra enche. A Fúria vai demorar mais para encher: se ficar rara, subir `chargePerHit` em `data_model/characters/<herói>.js`.
+
+- Blade Path: Keen Eye foi para o fim da linha do aço (Attack Speed → Slash Width → Whirlwind → Keen Eye; pede a Whirlwind). Nerf: +7% → +5% chance de crítico e +25% → +18% dano crítico por nível (nível 5: +25% e +90%, era +35% e +125%).
+
+- Holy Water: no máximo 1 frasco por vez (níveis 4 e 5 trocaram o 2º frasco por dano: 1,8× e 2,2×). Com a Blessed Rain os frascos continuam sendo jogados (usam os números do nível comprado) e a chuva vem por cima, a cada 40 s. Teste: com a evolução, o monstro perdeu vida só dos frascos nos primeiros 14 s (antes da 1ª chuva), sem erros.
+
+## 2026-11-18 · Sandbox: aba Fast run
+Terceira aba do sandbox (`_sandbox/fastrun.js`): escolhe o herói, caixa "Never die" (herói e tocha) e velocidades ×1/×2/×4/×10 por uma barra sobre o jogo, com piloto automático opcional. As travas de modo deus da Arena passaram a valer só em luta da Arena. Testado: ×2/×4/×10 = 2,0/3,7/9,3 s de jogo por s real; em 30 s a ×10 o piloto matou 212 monstros e a onda passou. Ver `_sandbox/README.md`.
+
+## 2026-11-18 · Preços das relíquias fixos em degraus + ajustes do Altar
+
+- Relíquias: cada uma tem agora o preço escrito em `cost` (`passives.js`), em 4 degraus fixos, iguais em todas as ondas (`costMultiplier` 1, `costGrowthPerHour` 0): **500** (13 relíquias, as mais simples), **700** (15), **1000** (13) e **1500** (4: Last Prayer, Second Prayer, Stone Heart, Owl's Wisdom). Antes valiam 140 a 580. O degrau veio do preço antigo (≤70 → 500, ≤100 → 700, ≤130 → 1000, o resto → 1500). Medição com o piloto do sandbox (herói imortal, mata tudo): ouro ganho acumulado ao fim das ondas 1 a 6 ≈ 1.060 · 2.520 · 3.990 · 6.000 · 8.830 · 11.470, ou seja ~1.000 na onda 1 e ~2.500 a 3.000 por onda depois: o piloto compra ~2 relíquias já na onda 1. Para forçar escolhas de verdade o preço ou o ouro por onda ainda precisam de ajuste fino jogando.
+- Altar: Extra Dash removido; Swiftness passou de +2% para +1% de velocidade por nível. (Quem já tinha brasas gastas no Extra Dash as perde: o nível salvo é ignorado.)

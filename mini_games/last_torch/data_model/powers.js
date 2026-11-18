@@ -69,7 +69,7 @@ export const POWER_MODELS = {
             );
         },
         levels: [{}, {}, {}, {}, {}],
-        mods: { critChance: 0.07, critDamage: 0.25 }
+        mods: { critChance: 0.05, critDamage: 0.18 }
     },
     ricochet: {
         name: 'Ricochet', icon: '🎯', maxLvl: 5,
@@ -451,8 +451,8 @@ export const POWER_MODELS = {
             { cooldown: 6.5, count: 1, radius: 54, damage: 1.1, seconds: 4, puddleSeconds: 3, puddleDps: 0.35 },
             { cooldown: 6, count: 1, radius: 58, damage: 1.3, seconds: 4.5, puddleSeconds: 3.5, puddleDps: 0.4 },
             { cooldown: 5.5, count: 1, radius: 62, damage: 1.5, seconds: 5, puddleSeconds: 4, puddleDps: 0.45 },
-            { cooldown: 5.5, count: 2, radius: 64, damage: 1.5, seconds: 5.5, puddleSeconds: 4.5, puddleDps: 0.5 },
-            { cooldown: 5, count: 2, radius: 68, damage: 1.7, seconds: 6, puddleSeconds: 5, puddleDps: 0.55 }
+            { cooldown: 5.5, count: 1, radius: 64, damage: 1.8, seconds: 5.5, puddleSeconds: 4.5, puddleDps: 0.5 },
+            { cooldown: 5, count: 1, radius: 68, damage: 2.2, seconds: 6, puddleSeconds: 5, puddleDps: 0.55 }
         ],
         range: 340,
         puddleRatio: 0.9,       // tamanho da poça = raio do estouro x este número
@@ -690,9 +690,9 @@ export const EVOLUTIONS = {
         name: 'Blessed Rain', icon: '🌧️',
         get desc() {
             const R = this.rain;
-            return `No more vials: every ${formatNumber(R.every)}s a holy rain falls over the whole field for ${formatNumber(R.seconds)}s. Every monster on screen burns for ${formatMultiplier(R.dps)} spell damage per second and stays blessed (takes more damage from everything), and big drops splash where monsters stand for ${formatMultiplier(R.damage)} spell damage, soaking the ground. Baptism: a blessed monster that dies explodes in a burst of light for ${formatMultiplier(this.baptism.damage)} spell damage.`;
+            return `Your vials keep flying, and every ${formatNumber(R.every)}s a holy rain falls over the whole field for ${formatNumber(R.seconds)}s. Every monster on screen burns for ${formatMultiplier(R.dps)} spell damage per second and stays blessed (takes more damage from everything), and big drops splash where monsters stand for ${formatMultiplier(R.damage)} spell damage, soaking the ground. Baptism: a blessed monster that dies explodes in a burst of light for ${formatMultiplier(this.baptism.damage)} spell damage.`;
         },
-        // Os frascos param na evolução: só a chuva. levels: o que a chuva usa das poças e da bênção
+        // Os frascos continuam na evolução (com os números do nível comprado); a chuva vem por cima. levels: o que a chuva usa das poças e da bênção
         levels: { cooldown: 16, count: 0, radius: 70, damage: 1.7, seconds: 3, puddleSeconds: 4, puddleDps: 0.5 },
         // A chuva: a cada `every` segundos, por `seconds`. Todo monstro na tela leva `dps` (dano de magia por segundo, de
         // tickSeconds em tickSeconds) e fica abençoado; uma gota grande estoura em cima de um monstro a cada `dropSeconds`

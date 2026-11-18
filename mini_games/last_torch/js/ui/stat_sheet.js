@@ -7,7 +7,7 @@ import { getKnifeRange } from '../systems/knives.js';
 import { getHero, mod } from '../systems/modifiers.js';
 import {
     getCritChance, getCritMultiplier, getDamageTakenRatio, getDashCharges, getDashCooldown, getKillHeal, getKnifeCooldown,
-    getFrenzyDamageBonus, getFrenzyDuration, getFuryChargePerHit, getFuryChargePerKill, getKnifeDamage, getMagnetRadius, getSpellCooldown, getSpellDamage, getWarmthDamage, getWarmthHeal, getWarmthRadius
+    getFrenzyDamageBonus, getFrenzyDuration, getFuryChargePerHit, getKnifeDamage, getMagnetRadius, getSpellCooldown, getSpellDamage, getWarmthDamage, getWarmthHeal, getWarmthRadius
 } from '../systems/stats.js';
 
 // --- FICHA DE STATS ---
@@ -183,7 +183,6 @@ export function getFuryGroup() {
         furyDamage,
         ...rows(),
         row('🔋', 'Charge per Hit', 'How much of the Fury bar (out of 100) each monster hit by your blade fills.', getFuryChargePerHit().toFixed(1)),
-        row('☠️', 'Charge per Kill', 'How much of the Fury bar each kill in a streak fills.', getFuryChargePerKill().toFixed(1)),
         modRow('furyCharge', FURY_BUILD_STATS.charge.icon, FURY_BUILD_STATS.charge.name, 'The Fury bar fills faster (relics, skills, oaths).')
     ] };
 }

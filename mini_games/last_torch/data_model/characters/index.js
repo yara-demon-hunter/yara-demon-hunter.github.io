@@ -106,7 +106,7 @@ function buildPlayer(character) {
     };
     const fury = character.fury;
     if (!fury || !FURY_KEYS[fury.kind]) throw new Error(`Personagem ${character.id}: falta a Fúria (fury.kind: ${Object.keys(FURY_KEYS).join(', ')})`);
-    for (const key of ['chargePerHit', 'chargePerKill', 'durationSeconds', 'durationPerLevel', 'damageBonusPerLevel', ...FURY_KEYS[fury.kind]]) {
+    for (const key of ['chargePerHit', 'durationSeconds', 'durationPerLevel', 'damageBonusPerLevel', ...FURY_KEYS[fury.kind]]) {
         if (fury[key] === undefined) throw new Error(`Personagem ${character.id}: falta "${key}" em fury`);
     }
     // Os valores absolutos vão direto para o jogo (js/systems/stats.js lê do personagem escolhido)

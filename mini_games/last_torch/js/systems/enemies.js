@@ -87,10 +87,7 @@ function updateLunge(e, L, dist, angle, dt) {
         e.lungeTimer = L.aimSeconds;
         e.lungeX = Math.cos(angle);
         e.lungeY = Math.sin(angle);
-        state.telegraphs.push({
-            kind: 'line', x: e.x, y: e.y, angle, owner: e,
-            length: L.speed * L.seconds + 24, age: 0, seconds: L.aimSeconds
-        });
+        // Sem linha de aviso no chão: só a pose de mira do monstro (aimSeconds, curto) anuncia o dash
         return true;
     }
     return false;

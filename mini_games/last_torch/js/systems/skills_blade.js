@@ -2,7 +2,6 @@ import { EXECUTIONER, WAR_CRY } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { isFireCasting } from './knives.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
-import { chargeUlt } from './combat.js';
 import { blast, dealDamage } from './damage.js';
 import { addGibs, addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
 import { addGroundFire } from './powers.js';
@@ -202,7 +201,6 @@ export function tryExecute(e) {
     e.hp = 0;
     state.executions.push({ x: e.x, y: e.y, angle: Math.random() * TAU, age: 0, seconds: 0.26, radius: e.radius });
     createExplosion(e.x, e.y, '#dc2626', 10);
-    chargeUlt(EXECUTIONER.furyCharge);
     hitStop(0.035);
     shakeScreen(3);
     audio.playExecute();

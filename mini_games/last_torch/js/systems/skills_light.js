@@ -90,17 +90,18 @@ function throwVial(x, y, level, blessed = true) {
 function updateHolyWater(dt) {
     const M = POWER_MODELS.holyWater;
     const level = getPowerLevel(powers.holyWater);
-    // Blessed Rain (evoluída): os frascos param, só a chuva
-    if (level && !powers.holyWater.evolved && ready('holyWater', dt, getSpellCooldown(level.cooldown))) {
+    // Os frascos seguem mesmo com a Blessed Rain (evoluída): eles usam sempre os números do nível comprado, não os da chuva
+    const vials = powers.holyWater.lvl > 0 ? M.levels[powers.holyWater.lvl - 1] : null;
+    if (vials && ready('holyWater', dt, getSpellCooldown(vials.cooldown))) {
         const skip = new Set();
-        for (let i = 0; i < level.count; i++) {
+        for (let i = 0; i < vials.count; i++) {
             const t = nearestEnemy(player.x, player.y, M.range, skip);
             if (!t) break;
             skip.add(t);
             // Chuva abençoada: os frascos caem espalhados em volta do alvo
             const spread = powers.holyWater.evolved && i > 0 ? 40 : 0;
             const a = Math.random() * TAU;
-            throwVial(t.x + Math.cos(a) * spread, t.y + Math.sin(a) * spread, level);
+            throwVial(t.x + Math.cos(a) * spread, t.y + Math.sin(a) * spread, vials);
         }
         if (skip.size > 0) {
             startCast();

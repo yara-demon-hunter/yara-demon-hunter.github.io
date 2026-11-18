@@ -27,3 +27,12 @@ Segunda aba do painel (**📐 HUD tuner**). Mostra o jogo de verdade num iframe 
 **Ajustes que já foram aplicados não contam duas vezes.** O tuner guarda, junto com os ajustes, uma impressão digital do CSS do jogo e da tabela do layout fluido. Se ao abrir o CSS mudou (a IA aplicou os ajustes), os ajustes antigos deixam de ser somados por cima, aparece um aviso e eles ficam numa cópia (**Restore them anyway** traz de volta, se a mudança no CSS foi outra). **Reset ALL screens** continua disponível para zerar à mão. No texto copiado, a posição "game has it at" da tela aberta é medida na hora.
 
 Os ajustes do tuner **somam** ao layout fluido do jogo (deslocamentos se somam, tamanhos se multiplicam). Para aplicar um envio novo na tabela, veja `tools/README.md`.
+
+## Aba Fast run (partida acelerada)
+
+Terceira aba do painel (**⏩ Fast run**): escolha o **herói**, deixe ligada (ou desligue) a caixa **Never die (hero and torch)** e clique em **Start run**. Começa uma partida normal (sem boss isolado, sem pontos de skill extras) e uma barra sobre o jogo, no canto inferior esquerdo, troca a velocidade a qualquer momento: **×1, ×2, ×4, ×10 e ×20**.
+
+- Acelerar = rodar a lógica do jogo (`update`) mais vezes por quadro; o desenho continua uma vez por quadro. Em ×10 e ×20 a máquina precisa dar conta de ~10 e ~20 atualizações por quadro (num PC fraco pode ficar abaixo disso).
+- A barra mostra a onda, o tempo da onda em andamento (m:ss de **tempo de jogo**, não de relógio), uma linha com o tempo de cada onda terminada (`W1 3:05 · W2 3:12 … total`), as mortes e o nível, e tem a caixa **autopilot**: o herói anda perto da tocha, ataca quem chega, gasta os pontos de skill, passa as conversas sozinho. **O acampamento (relíquias, loja) fica por sua conta**: o jogo espera você escolher e sair; a caixa **auto camp** da barra faz o piloto sair dele sozinho. Desligue para jogar você mesmo (vale em qualquer velocidade). Se o herói morrer (sem Never die), a barra mostra onde parou.
+- O som é suspenso fora do ×1 (viraria chiado) e volta no ×1. O **✕** esconde a barra.
+- As travas do modo deus da aba Arena (monstros que não morrem, etc.) só valem numa luta da Arena; a Fast run é uma partida normal.

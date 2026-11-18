@@ -1,7 +1,6 @@
 import { DASH_SKILL } from '../../data_model/skills.js';
 import { save } from '../core/save.js';
 import { audio, joystick, keys, player, state } from '../core/state.js';
-import { chargeUlt } from './combat.js';
 import { isFireCasting } from './knives.js';
 import { addFloater, hitStop, slowMotion } from './effects.js';
 import { bumpStat } from './sanctuary.js';
@@ -12,7 +11,6 @@ import { characterStat, getDashCharges, getDashCooldown, getDashDistance, getDas
 // Esquiva curta e invulnerável, com cargas. Vai para onde o jogador está indo; parado, para onde
 // o mouse aponta ou o herói olha. Esquivar no último instante recompensa com Fúria.
 const PERFECT_DISTANCE = 48;
-const PERFECT_FURY = 14;
 const HAS_JOYSTICK = window.matchMedia('(pointer: coarse)').matches;
 
 export function resetDash() {
@@ -75,7 +73,6 @@ export function tryDash() {
 
     if (isNearMiss()) {
         addFloater(player.x, player.y - 46, 'PERFECT DODGE', '#67e8f9');
-        chargeUlt(PERFECT_FURY);
         hitStop(0.05);
         slowMotion(0.4, 0.3);
         audio.playPerfect();

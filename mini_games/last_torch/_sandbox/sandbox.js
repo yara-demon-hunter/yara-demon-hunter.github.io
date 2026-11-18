@@ -12,8 +12,10 @@ import { startGame } from '/js/ui/screens.js';
 import { flushHeroUnlocks, queueHeroUnlock } from '/js/ui/hero_unlock.js';
 import { ACHIEVEMENTS } from '/data_model/sanctuary.js';
 import { mountTuner } from '/_sandbox/tuner.js';
+import { mountFastRun } from '/_sandbox/fastrun.js';
 
 const choice = { hero: ACTIVE_HEROES[0], boss: 'AZAEL' };
+let arenaOn = false;                    // as travas de modo deus só valem numa luta da Arena (nunca na aba Fast run)
 const picked = new Set();               // monstros escolhidos para a luta (vários, clicando)
 const heroMods = new Map();            // mods originais dos heróis, para o modo deus não vazar para a próxima luta
 
@@ -31,7 +33,7 @@ panel.innerHTML = `
   <div class="card">
     <h2>🧪 Last Torch Sandbox</h2>
     <p class="note">Test arena: nothing here touches the game or its save.</p>
-    <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button></div>
+    <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button></div>
     <div id="sbArena">
     <h3>Hero</h3><div class="sb-row" id="sbHeroes"></div>
     <h3>Boss <small>(click again to unselect: monsters only)</small></h3><div class="sb-row" id="sbBosses"></div>
@@ -51,6 +53,7 @@ panel.innerHTML = `
     <label class="sb-field">As seen mid-run, at camp (no PLAY AS button) <input id="sbUnlockCamp" type="checkbox"></label>
     </div>
     <div id="sbTuner" class="hidden"></div>
+    <div id="sbFast" class="hidden"></div>
   </div>`;
 document.body.appendChild(panel);
 
@@ -114,6 +117,7 @@ Object.entries(HEROES).filter(([, h]) => !h.shelved).forEach(([key, hero]) => {
 function value(id) { return panel.querySelector(id); }
 
 function fight() {
+    arenaOn = true;
     const hour = Math.max(1, Math.min(12, +value('#sbHour').value || 1));
     // Herói: só na memória desta página (save não é gravado)
     if (!save.unlockedHeroes.includes(choice.hero)) save.unlockedHeroes.push(choice.hero);
@@ -178,7 +182,7 @@ function guardEnemies() {
     const splice = guarded.splice.bind(guarded);
     guarded.splice = (i, n, ...items) => {
         const target = guarded[i];
-        if (target && !target.isBoss && target.hp > 0 && n === 1 && Math.hypot(target.x - state.coreX, target.y - state.coreY) < target.radius + CORE_MODEL.collisionRadius + RIM + 4) return [];
+        if (arenaOn && target && !target.isBoss && target.hp > 0 && n === 1 && Math.hypot(target.x - state.coreX, target.y - state.coreY) < target.radius + CORE_MODEL.collisionRadius + RIM + 4) return [];
         return splice(i, n, ...items);
     };
 }
@@ -186,7 +190,7 @@ const bossGod = () => value('#sbGodBoss').checked;
 const monsterGod = () => value('#sbGodMonsters').checked;
 function godLoop() {
     guardEnemies();
-    if (state.phase === 'HUNT') {
+    if (arenaOn && state.phase === 'HUNT') {
         if (value('#sbGod').checked && player.hp > 0) player.hp = player.maxHp;
         if (value('#sbGodTorch').checked && state.coreHp > 0) state.coreHp = state.coreHpMax;
         for (const e of state.enemies) {
@@ -212,17 +216,23 @@ function godLoop() {
 }
 requestAnimationFrame(godLoop);
 
-// Abas: Arena (luta de teste) e HUD tuner (carrega o jogo num iframe só na primeira vez que a aba abre)
+// Abas: Arena (luta de teste), HUD tuner (carrega o jogo num iframe só na primeira vez que a aba abre) e Fast run (partida acelerada)
 let tuner = null;
+let fast = null;
 panel.querySelectorAll('.sb-tabs button').forEach(button => {
     button.onclick = () => {
-        const isTuner = button.dataset.tab === 'tuner';
+        const tab = button.dataset.tab;
         panel.querySelectorAll('.sb-tabs button').forEach(b => b.classList.toggle('on', b === button));
-        panel.querySelector('#sbArena').classList.toggle('hidden', isTuner);
-        panel.querySelector('#sbTuner').classList.toggle('hidden', !isTuner);
-        panel.querySelector('.card').classList.toggle('is-wide', isTuner);
-        tuner ??= mountTuner(panel.querySelector('#sbTuner'));
-        if (isTuner) tuner.show(); else tuner.hide();
+        panel.querySelector('#sbArena').classList.toggle('hidden', tab !== 'arena');
+        panel.querySelector('#sbTuner').classList.toggle('hidden', tab !== 'tuner');
+        panel.querySelector('#sbFast').classList.toggle('hidden', tab !== 'fast');
+        panel.querySelector('.card').classList.toggle('is-wide', tab === 'tuner');
+        if (tab === 'fast') fast ??= mountFastRun(panel.querySelector('#sbFast'), {
+            hidePanel: () => panel.classList.add('hidden'),
+            showPanel: () => panel.classList.remove('hidden'),
+            onStart: () => { arenaOn = false; heroMods.forEach((mods, key) => { HEROES[key].mods = mods; }); heroMods.clear(); }
+        });
+        if (tab === 'tuner') { tuner ??= mountTuner(panel.querySelector('#sbTuner')); tuner.show(); } else tuner?.hide();
     };
 });
 

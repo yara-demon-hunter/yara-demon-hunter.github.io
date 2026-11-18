@@ -19,7 +19,7 @@ export const EMBER_REWARD = {
 export const ALTAR = {
     // Corpo
     vitality: { name: 'Vitality', icon: '❤️', desc: '+2% hero health per level', costs: [10, 18, 30, 48, 75], mods: { maxHp: 0.02 } },
-    swiftness: { name: 'Swiftness', icon: '👟', desc: '+2% move speed per level', costs: [12, 22, 36, 56, 85], mods: { moveSpeed: 0.02 } },
+    swiftness: { name: 'Swiftness', icon: '👟', desc: '+1% move speed per level', costs: [12, 22, 36, 56, 85], mods: { moveSpeed: 0.01 } },
     // Ataque
     might: { name: 'Might', icon: '⚔️', desc: '+2% damage per level', costs: [10, 18, 30, 48, 75], mods: { damage: 0.02 } },
     arcane: { name: 'Arcane', icon: '🔮', desc: '+2% magic damage per level', costs: [10, 18, 30, 48, 75], mods: { spellDamage: 0.02 } },
@@ -27,7 +27,6 @@ export const ALTAR = {
     furyPower: { name: 'Fury Power', icon: '🌋', desc: '+2% damage during Fury per level', costs: [14, 26, 42, 64, 95], mods: { furyPower: 0.02 } },
     // Dash
     longDash: { name: 'Long Dash', icon: '💨', desc: '+6% dash distance per level', costs: [10, 18, 30, 48, 75], mods: { dashDistance: 0.06 } },
-    extraDash: { name: 'Extra Dash', icon: '⚡', desc: '+1 dash charge', costs: [90], mods: { dashCharges: 1 } },
     // Começo da noite e tocha
     insight: { name: 'Insight', icon: '✨', desc: '+1 skill point at the start of the night', costs: [14, 30, 60, 100, 150], startPoints: 1 },
     torch: { name: 'Hearth Flame', icon: '🔥', desc: '+10 torch health per level', costs: [10, 18, 30, 48, 75], mods: { torchHp: 10 } },

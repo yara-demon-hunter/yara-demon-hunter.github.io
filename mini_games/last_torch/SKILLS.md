@@ -85,7 +85,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 
 - **Blade** (raiz: Blade Damage)
   - Fúria: Fury (duração, dano e carga da barra), Bloodlust*, Crimson Tide*, Executioner*
-  - Aço: Attack Speed, Keen Eye, Slash Width, Whirlwind
+  - Aço: Attack Speed, Slash Width, Whirlwind, Keen Eye
   - Força: Attack Range, Knockback, Earthbreaker*, Cataclysm*
   - Corpo: Hero Health (vida, -4% de dano recebido e provocar de mais longe; 2 pontos por nível), Blood Edge, War Cry*
   - Oath of Slaughter*

@@ -77,8 +77,8 @@ export function renderHpBars() {
 // Círculo vermelho tracejado de alcance em volta de (x, y); alpha < 1 deixa mais apagado
 function drawRangeCircle(x, y, radius, alpha = 1) {
     ctx.globalAlpha = alpha;
-    ctx.strokeStyle = state.frenzyActiveTimer > 0 ? 'rgba(236, 72, 153, 0.75)' : 'rgba(239, 68, 68, 0.65)';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = state.frenzyActiveTimer > 0 ? 'rgba(244, 90, 170, 0.95)' : 'rgba(248, 70, 70, 0.92)';
+    ctx.lineWidth = 3.2;       // um pouco mais grosso e forte: no celular a linha sumia no cenário
     ctx.translate(x, y);
     ctx.stroke(getDashedRing(radius, 8));
     ctx.translate(-x, -y);

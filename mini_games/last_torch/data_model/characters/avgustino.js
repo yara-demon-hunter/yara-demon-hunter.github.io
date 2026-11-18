@@ -81,7 +81,6 @@ export const AVGUSTINO = {
         name: 'Divine Sanctuary',
         // --- CARGA E DURAÇÃO (toda Fúria tem; é o que cada personagem ajusta no seu jeito de carregar) ---
         chargePerHit: 3,            // carga da barra por monstro atingido pela lâmina (a barra tem 100)
-        chargePerKill: 1.5,         // carga por morte na sequência
         durationSeconds: 7,        // quanto dura com a skill Fury no nível 1
         durationPerLevel: 0.5,      // segundos a mais por nível da skill Fury
         damageBonusPerLevel: 0.12,  // dano da lâmina durante a Fúria: +12% por nível da skill Fury

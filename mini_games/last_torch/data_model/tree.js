@@ -63,9 +63,9 @@ export const TREE_NODES = [
     { id: 'bloodlustEvolve', branch: 'blade', kind: 'evolve', key: 'bloodlust', x: 3, y: 0, requires: [req('bloodlust', 5)] },
     // Linha do aço: o golpe cada vez mais largo e mortal
     { id: 'atkSpeed', branch: 'blade', kind: 'stat', key: 'atkSpeed', x: 1, y: 1, requires: [req('damage')] },
-    { id: 'keenEye', branch: 'blade', kind: 'power', key: 'keenEye', x: 2, y: 1, requires: [req('atkSpeed', 2)] },
-    { id: 'slashArc', branch: 'blade', kind: 'stat', key: 'slashArc', x: 3, y: 1, requires: [req('keenEye', 2)] },
-    { id: 'shadowWhirl', branch: 'blade', kind: 'passive', key: 'shadowWhirl', x: 4, y: 1, requires: [req('slashArc', 2)] },
+    { id: 'slashArc', branch: 'blade', kind: 'stat', key: 'slashArc', x: 2, y: 1, requires: [req('atkSpeed', 2)] },
+    { id: 'shadowWhirl', branch: 'blade', kind: 'passive', key: 'shadowWhirl', x: 3, y: 1, requires: [req('slashArc', 2)] },
+    { id: 'keenEye', branch: 'blade', kind: 'power', key: 'keenEye', x: 4, y: 1, requires: [req('shadowWhirl')] },
     { id: 'executioner', branch: 'blade', kind: 'passive', key: 'executioner', x: 4, y: 0, requires: [req('bloodlustEvolve')] },
     // Linha da força: quebrar o chão
     { id: 'radius', branch: 'blade', kind: 'stat', key: 'radius', x: 1, y: 2, requires: [req('damage')] },
