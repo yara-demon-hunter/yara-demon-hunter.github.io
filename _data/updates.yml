@@ -1,3 +1,36 @@
+- date: "2026-11-18"
+  title:
+    en: "Last Torch: balance for relics, the Altar and skills"
+    pt: "Last Torch: equilíbrio de relíquias, Altar e skills"
+  summary:
+    en: "Fixed-price relics that grow along the tree, a pricier Altar, costlier active skills, less on-screen clutter, a new Shadow Path and a chargeable Fireballs."
+    pt: "Relíquias com preço fixo que sobe pela árvore, Altar mais caro, skills ativas mais caras, menos bagunça na tela, Shadow Path novo e a Fireballs que carrega."
+  url:
+    en: "/en/updates/last-torch-balance-relics-skills/"
+    pt: "/pt/updates/last-torch-equilibrio-reliquias-skills/"
+
+- date: "2026-11-17"
+  title:
+    en: "Last Torch: real boss fights and a 5-star wave result"
+    pt: "Last Torch: ondas com boss de verdade e resultado com 5 estrelas"
+  summary:
+    en: "Longer waves with more monsters, bosses without regular monsters getting in the way, a 5-star wave result with records, the Ember tally and stars in the Sanctuary."
+    pt: "Ondas com mais tempo e monstros, boss sem monstros atrapalhando, resultado da onda com 5 estrelas e recordes, a conta das Brasas e as estrelas no Santuário."
+  url:
+    en: "/en/updates/last-torch-waves-boss-stars/"
+    pt: "/pt/updates/last-torch-ondas-boss-estrelas/"
+
+- date: "2026-11-15"
+  title:
+    en: "Last Torch: Golem, wooden Treant and the Flaming Phoenix"
+    pt: "Last Torch: Golem, Treant de madeira e a Fênix Flamejante"
+  summary:
+    en: "New 3D creatures (the Ember and Moss Golem and a wooden Treant), the Flaming Phoenix with a fire breath, the Fire Tornado and the Blue Torch turning all fire blue."
+    pt: "Criaturas novas em 3D (Golem de Brasa e Musgo e o Treant de madeira), a Fênix Flamejante com sopro de fogo, o Fire Tornado e a Blue Torch deixando todo o fogo azul."
+  url:
+    en: "/en/updates/last-torch-golem-treant-phoenix/"
+    pt: "/pt/updates/last-torch-golem-treant-fenix/"
+
 - date: "2026-11-13"
   title:
     en: "Last Torch: new trailers"

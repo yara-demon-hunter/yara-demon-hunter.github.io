@@ -4,7 +4,7 @@ title: Project Updates
 lang: en
 translation_id: updates
 description: Follow news, changes, and new pages from the Yara, Demon Hunter project.
-last_updated: 2026-11-13
+last_updated: 2026-11-18
 hide_recent_updates: true
 ---
 
