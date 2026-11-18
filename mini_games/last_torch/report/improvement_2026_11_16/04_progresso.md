@@ -264,3 +264,5 @@ Princípio: poucos disparos grandes em vez de muitos pequenos. Recarga ×1,4 a �
 - Grave Wisp: recargas ×1,5, dano ×1,4. Storm Sigil e Wrath of Heaven: recargas ×1,35, dano ×1,3.
 - Flaming Phoenix: bola a cada 2,6 s com 1,7× (era 1,8 s e 1,2×). Phoenix Pact: bola a cada 2,4 s com 2,2× (era 1,5 s e 1,4×).
 Bot (ruidoso): as skills seguem úteis (Sun Spire, Flaming Phoenix, Phoenix Pact no topo).
+
+- Fire Tornado, arte nova (`js/render/fire_tornado.js`): funil de verdade (20 anéis de chama girando, estreito embaixo e largo em cima, com sombra de fumaça para dar corpo), línguas de fogo subindo pela borda, vórtice discreto no chão e fagulhas girando; azul com a Blue Torch; menos peças em qualidade baixa. Continua sem estado e sem imagem (só canvas).

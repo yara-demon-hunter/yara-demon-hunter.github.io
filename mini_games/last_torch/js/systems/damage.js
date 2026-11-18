@@ -28,7 +28,8 @@ function inSmoke(e) {
 }
 
 export function dealDamage(e, amount, o = {}) {
-    if (e.hp <= 0 || e.invulnerable) return 0;
+    // Imune enquanto investe (lungeState 2 = o dash do Wraith e do Zombie Wolf): a resposta ao golpe é desviar, não trocar tiro
+    if (e.hp <= 0 || e.invulnerable || e.lungeState === 2) return 0;
     // Golpe sem dano (a Fúria sob o Oath of the Wild): só empurra, sem piscar nem número
     if (amount <= 0) {
         if (o.kbX || o.kbY) {
