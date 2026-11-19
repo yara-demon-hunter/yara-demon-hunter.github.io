@@ -115,7 +115,7 @@ function renderBuild() {
         level: p.lvl
     })), ...skills], 'No powers yet. Learn them in the skill tree.');
     renderBuildList('passiveList', Object.values(passives).filter(p => p.type !== 'skill' && p.lvl > 0).map(p => ({
-        icon: p.icon, name: p.name, desc: p.desc, level: 0
+        key: p.key, icon: p.icon, name: p.name, desc: p.desc, level: 0
     })), 'No relics yet. Buy them at the camp, between waves.');
     showBuildNote(null);
 }

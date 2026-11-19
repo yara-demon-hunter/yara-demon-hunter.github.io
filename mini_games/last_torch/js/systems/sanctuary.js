@@ -96,3 +96,22 @@ export function recordBeast(type) {
     if (info && save.stats.runs > 0) showToast(info.icon, 'New in the bestiary', info.name);
     persist();
 }
+
+// --- RANKS: as melhores noites e o recorde de cada herói (aba Ranks do Santuário) ---
+// Guarda a noite que acabou no top 10 (por score) e no recorde do herói. Devolve a posição no top 10 (1 a 10) ou null.
+export const TOP_RUNS = 10;
+export function recordNight({ score, wave, hero, kills, victory, darkness }) {
+    save.heroBests ??= {};
+    const hb = save.heroBests[hero] ??= { score: 0, wave: 0, nights: 0 };
+    hb.score = Math.max(hb.score, score);
+    hb.wave = Math.max(hb.wave, wave);
+    hb.nights++;
+    if (score <= 0) return null;
+    save.topRuns ??= [];
+    const entry = { score, wave, hero, kills, victory, darkness, date: Date.now() };
+    save.topRuns.push(entry);
+    save.topRuns.sort((a, b) => b.score - a.score);
+    save.topRuns.length = Math.min(save.topRuns.length, TOP_RUNS);
+    const rank = save.topRuns.indexOf(entry);
+    return rank >= 0 ? rank + 1 : null;
+}

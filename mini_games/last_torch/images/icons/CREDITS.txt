@@ -1,0 +1,17 @@
+Icons from game-icons.net, licensed under Creative Commons Attribution 3.0 (CC BY 3.0): https://creativecommons.org/licenses/by/3.0/
+Changes: recolored and resized. Original icons by (each author's icons listed):
+
+- badges: purse
+- carl-olsen: flame
+- caro-asercion: coinflip, deer-head, mason-jar
+- darkzaitzev: hooded-figure
+- delapouite: all-seeing-eye, biceps, coins-pile, dagger-rose, diamond-ring, enrage, falling-star, gloves, graveyard, heart-armor, nose-front, prayer-beads, quiver, robber, running-shoe, scroll-quill, stone-pile, sunflower, torch, upgrade
+- felbrigg: dodge
+- lorc: acorn, ankh, anvil, battle-axe, bloody-sword, boots, broken-heart, bubbling-flask, burning-book, campfire, candle-light, coffin, comet-spark, crossed-bones, crossed-slashes, crossed-swords, crown-of-thorns, crowned-skull, crystal-wand, daemon-skull, eclipse, evil-book, evil-moon, explosion-rays, fire-bomb, fire-bottle, fire-breath, fire-dash, ghost, grim-reaper, lantern-flame, laurel-crown, lotus-flower, magic-swirl, maple-leaf, moon, ninja-mask, open-book, owl, plain-dagger, prayer, rune-stone, scar-wound, sewing-needle, shadow-follower, shield-echoes, star-swirl, stone-block, sun, sunbeams, sunrise, target-arrows, third-eye, totem-head, wax-seal, whirlwind, wolf-head
+- lucasms: cloak
+- sbed: key, vial
+- skoll: blood, open-treasure-chest
+- various-artists: infinity
+- zeromancer: heart-plus
+
+License file and author links: https://github.com/game-icons/icons

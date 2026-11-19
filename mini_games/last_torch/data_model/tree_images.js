@@ -1,4 +1,6 @@
 import { TREE_NODES } from './tree.js';
+import { RELIC_NODES } from './relics.js';
+import { ICON_IMAGES } from './icon_images.js';
 
 // Arte das skills na árvore (nó -> imagem pequena de 128px em images/buttons). Nó sem imagem usa o emoji da skill.
 // A versão grande (1024px) fica ao lado, sem o -small, para páginas e prévias.
@@ -73,6 +75,8 @@ export const TREE_IMAGES = {
     smiteEvolve: img('divine-wrath'),
     oathFaith: img('oath-of-faith')
 };
+// Relíquias: ícones do game-icons.net (data_model/icon_images.js), pelo id do nó
+for (const node of RELIC_NODES) if (ICON_IMAGES[node.key] && !TREE_IMAGES[node.id]) TREE_IMAGES[node.id] = ICON_IMAGES[node.key];
 
 // Arte de cada ramo. Ramo sem imagem usa o emoji de TREE_BRANCHES.
 export const BRANCH_IMAGES = {
@@ -87,8 +91,11 @@ export const BRANCH_IMAGES = {
 // Imagem da skill pela chave do poder, passiva ou atributo (evolved: a evolução tem a própria arte)
 export function treeImageFor(key, evolved = false) {
     const node = TREE_NODES.find(n => n.key === key && (n.kind === 'evolve') === evolved);
-    return node ? TREE_IMAGES[node.id] ?? null : null;
+    if (node) return TREE_IMAGES[node.id] ?? null;
+    // Relíquia (não está na árvore de skills): o ícone dela, na cor do ramo (aba Build, status)
+    return !evolved && RELIC_KEYS.has(key) ? ICON_IMAGES[key] ?? null : null;
 }
+const RELIC_KEYS = new Set(RELIC_NODES.map(n => n.key));
 
 // Baixa a arte com antecedência: sem isso, em rede lenta, a árvore abre com os ícones chegando um a um
 export function preloadTreeImages() {

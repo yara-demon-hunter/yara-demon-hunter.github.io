@@ -13,9 +13,9 @@ export const RELIC_LAYOUT = {
 
 export const RELIC_BRANCHES = {
     fortune: { name: 'FORTUNE', icon: '💰', color: '#fcd34d' },
-    ward: { name: 'WARD', icon: '🛡️', color: '#6ee7b7' },
-    wrath: { name: 'WRATH', icon: '😈', color: '#fb7185' },
-    thicket: { name: 'THICKET', icon: '🪵', color: '#86efac' }
+    ward: { name: 'WARD', icon: '🛡️', color: '#a8b8d0' },
+    wrath: { name: 'WRATH', icon: '😈', color: '#e879f9' },
+    thicket: { name: 'THICKET', icon: '🪵', color: '#4ade80' }
 };
 
 export const RELIC_NODES = [

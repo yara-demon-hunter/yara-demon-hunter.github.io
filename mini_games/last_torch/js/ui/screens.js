@@ -16,7 +16,7 @@ import { prepareRaven } from '../render/raven.js';
 import { prepareShackle } from '../render/shackle.js';
 import { getTorchMaxHp } from '../systems/torch.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
-import { checkAchievements, pushStats, rewardText } from '../systems/sanctuary.js';
+import { checkAchievements, pushStats, recordNight, rewardText } from '../systems/sanctuary.js';
 import { flushHeroUnlocks } from './hero_unlock.js';
 import { getOwnedPowers, hasBuyableNode } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
@@ -254,6 +254,7 @@ function countUp(el, to, ms = 800, prefix = '') {
 // Fim da noite: a conta das Brasas linha por linha, contando com o "tic" da moeda (o mesmo do resultado da onda), o total,
 // os recordes da noite batidos (NEW BEST) e o que dá para comprar no Altar (o botão leva até lá)
 const EMBER_ROW_MS = 420;
+let nightRank = null;            // posição da noite que acabou no top 10 (js/systems/sanctuary.js > recordNight)
 function renderEmbers(earned) {
     const box = document.getElementById('summaryEmbers');
     const { run } = state;
@@ -298,8 +299,9 @@ function renderEmbers(earned) {
         if (t < end) requestAnimationFrame(step);
         else {
             totalEl.innerText = `+${earned}`;
-            if (records.length) {
-                box.querySelector('.embers-records').innerHTML = records.map(([name, now]) => `<span class="embers-new">NEW BEST · ${name} ${now}</span>`).join('');
+            const rankTag = nightRank ? `<span class="embers-new is-rank">🏆 #${nightRank} BEST NIGHT</span>` : '';
+            if (records.length || rankTag) {
+                box.querySelector('.embers-records').innerHTML = rankTag + records.map(([name, now]) => `<span class="embers-new">NEW BEST · ${name} ${now}</span>`).join('');
                 audio.playLevelUp();
             }
         }
@@ -471,6 +473,8 @@ export function triggerGameOver(reason) {
 
     hideTreeHand();                // o HUD para de atualizar na tela final: a mãozinha do medalhão precisa sumir aqui
     const embersEarned = bankRun();
+    // Ranks: a noite entra no top 10 e no recorde do herói (a posição aparece na tela final)
+    nightRank = recordNight({ score: state.totalScore, wave: state.turn, hero: save.hero, kills: run.kills, victory: reason === 'DAWN', darkness: save.darkness });
     clearRun();                    // a noite acabou: nada para continuar (a noite sem fim guarda de novo no próximo acampamento)
     if (reason === 'DAWN') {
         save.stats.victories++;
@@ -569,7 +573,7 @@ export function renderStartScreen() {
     const resumable = run && HEROES[run.hero] && !HEROES[run.hero].shelved;
     const btnContinue = document.getElementById('btnContinue');
     btnContinue.classList.toggle('hidden', !resumable);
-    if (resumable) btnContinue.innerHTML = `CONTINUE<em>${HEROES[run.hero].name} · Wave ${run.turn}${run.kind === 'camp' ? ' · camp' : ''}</em>`;
+    if (resumable) btnContinue.innerHTML = `▶ CONTINUE<em>${HEROES[run.hero].name} · Wave ${run.turn}${run.kind === 'camp' ? ' · camp' : ''}</em>`;
     document.getElementById('darknessValue').innerText = save.darkness;
     const startPoints = startingSkillPoints(save.darkness) + altarStartPoints(save);
     dark.title = `Start with ${startPoints} skill point${startPoints === 1 ? '' : 's'}`;

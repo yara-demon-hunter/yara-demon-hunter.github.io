@@ -3,6 +3,8 @@ import { save, persist } from '../core/save.js';
 import { audio, state } from '../core/state.js';
 import { renderStartScreen } from './screens.js';
 import { showToast } from './banner.js';
+import { ICON_IMAGES } from '../../data_model/icon_images.js';
+import { paintIcon } from '../../data_model/tree_images.js';
 
 // --- ALTAR (tela) ---
 // Quatro melhorias permanentes, pagas com Brasas (data_model/embers.js). Uma tela só, sem abas: cada cartão mostra o nível,
@@ -35,7 +37,9 @@ function renderAltar() {
         const buy = el('button', 'altar-buy', cost === null ? 'MAX' : `🔥 ${cost}`);
         buy.dataset.key = key;
         buy.disabled = cost === null || save.embers < cost;
-        card.append(el('span', 'altar-icon', model.icon), text, buy);
+        const icon = el('span', 'altar-icon');
+        paintIcon(icon, ICON_IMAGES[`altar_${key}`], model.icon);
+        card.append(icon, text, buy);
         list.appendChild(card);
     });
 }

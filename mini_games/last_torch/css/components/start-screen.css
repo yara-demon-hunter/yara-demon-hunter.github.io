@@ -532,3 +532,9 @@
     .start-nav-btn .nav-ico { font-size: 1.05rem; }
     .start-nav-btn em { font-size: 0.52rem; }
 }
+
+/* Quatro botões na barra: Gift, Altar, Ranks, Sanctuary */
+.start-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+#startScreen #btnContinue { font-size: 1.15rem; letter-spacing: 0.16em; }
+#startScreen #btnContinue em { letter-spacing: 0.06em; }

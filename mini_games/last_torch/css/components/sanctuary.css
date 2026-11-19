@@ -153,3 +153,47 @@
     .sanc-records { padding: 0.2rem 0.4rem; }
     .sanc-records b { font-size: 0.85rem; }
 }
+
+/* --- RANKS (js/ui/sanctuary.js > renderRanks) --- */
+.rank-title { margin: 0.5rem 0 0.1rem; font-family: 'Inter', sans-serif; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.14em; color: #fdba74; }
+.rank-title:first-child { margin-top: 0; }
+.rank-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.35rem; }
+.rank-stat { display: flex; flex-direction: column; align-items: center; padding: 0.35rem 0.2rem; border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 0.6rem; background: rgba(8, 12, 16, 0.7); text-align: center; }
+.rank-stat b { font-family: 'Cinzel', serif; font-size: 0.95rem; color: #e7e0cf; }
+.rank-stat span { font-family: 'Inter', sans-serif; font-size: 0.52rem; color: #8b98a8; text-transform: uppercase; letter-spacing: 0.04em; }
+.rank-row { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; gap: 0.55rem; padding: 0.35rem 0.6rem; border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 0.7rem; background: rgba(8, 12, 16, 0.7); }
+.rank-row.is-hero { grid-template-columns: auto minmax(0, 1fr) auto; }
+.rank-row.is-top1 { border-color: rgba(250, 204, 21, 0.7); background: rgba(66, 46, 8, 0.55); }
+.rank-row.is-top2 { border-color: rgba(203, 213, 225, 0.55); }
+.rank-row.is-top3 { border-color: rgba(217, 119, 6, 0.55); }
+.rank-row.is-locked { opacity: 0.45; }
+.rank-pos { width: 1.6rem; text-align: center; font: 800 0.8rem 'Inter', sans-serif; color: #94a3b8; }
+.rank-pic { width: 2.2rem; height: 2.2rem; border-radius: 0.5rem; object-fit: cover; border: 1px solid rgba(148, 163, 184, 0.35); }
+.rank-row.is-locked .rank-pic { filter: grayscale(1) brightness(0.5); }
+.rank-info { display: flex; flex-direction: column; min-width: 0; }
+.rank-info b { color: #e7e0cf; font-size: 0.74rem; }
+.rank-info span { color: #94a3b8; font-size: 0.6rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-score { font-family: 'Cinzel', serif; font-size: 0.95rem; color: #fde68a; }
+.rank-empty { padding: 0.6rem; text-align: center; color: #94a3b8; font-size: 0.7rem; }
+/* Quatro abas: no celular em pé ficam mais curtas e, se ainda faltar espaço, rolam de lado */
+@media (max-width: 599px) and (orientation: portrait) {
+    #sanctuaryTabs { overflow-x: auto; scrollbar-width: none; }
+    #sanctuaryTabs button { flex: 0 0 auto; padding: 0.35rem 0.5rem; font-size: 0.6rem; letter-spacing: 0.06em; }
+    #sanctuaryTabs button i { font-size: 0.55rem; }
+    .rank-stats { gap: 0.25rem; }
+}
+/* Ranks: uma coluna (a lista do Santuário é uma grade nas outras abas); no desktop, mais estreita e centrada */
+#sanctuaryList.is-ranks { display: flex; flex-direction: column; gap: 0.35rem; }
+#sanctuaryList.is-ranks > * { width: 100%; max-width: 40rem; margin-left: auto; margin-right: auto; }
+#sanctuaryList.is-ranks .sanc-waves-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+@media (max-width: 599px) and (orientation: portrait) {
+    #sanctuaryList.is-ranks .sanc-waves-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Ranks usa a tela do Santuário sem as abas */
+#sanctuaryScreen.is-ranks-mode #sanctuaryTabs { display: none; }
+#sanctuaryList:not(.is-ranks):not(.is-beasts) > .rank-title { grid-column: 1 / -1; }
+
+/* Ícone em imagem (game-icons.net): mesmo tamanho do emoji */
+.sanc-icon.has-image { display: block; width: 1.9rem; height: 1.9rem; }
+@media (max-height: 520px) and (orientation: landscape) { .sanc-icon.has-image { width: 1.5rem; height: 1.5rem; } }

@@ -111,3 +111,6 @@
 
 /* Altar aberto depois da morte: botão grande para jogar de novo, sempre à vista no fim do painel */
 .altar-retry { flex-shrink: 0; margin-top: 0.1rem; }
+.embers-new.is-rank { background: rgba(250, 204, 21, 0.16); border-color: rgba(250, 204, 21, 0.6); color: #fde68a; }
+
+.altar-icon.has-image { display: block; width: 2.3rem; height: 2.3rem; }

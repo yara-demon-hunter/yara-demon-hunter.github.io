@@ -1,16 +1,18 @@
 import { ACHIEVEMENTS, achievementEmbers, getBestiary } from '../../data_model/sanctuary.js';
-import { HEROES } from '../../data_model/heroes.js';
+import { ACTIVE_HEROES, HEROES } from '../../data_model/heroes.js';
+import { TOP_RUNS } from '../systems/sanctuary.js';
 import { save, persist } from '../core/save.js';
 import { audio } from '../core/state.js';
 import { getBossPortrait, getMonsterSprite } from '../render/monster_sprites.js';
 import { renderStartScreen } from './screens.js';
+import { ICON_IMAGES } from '../../data_model/icon_images.js';
+import { paintIcon } from '../../data_model/tree_images.js';
 
 // --- SANTUÁRIO (tela) ---
-// Três abas sobre o que o jogador já fez: troféus (marcos), façanhas (habilidade dentro da noite) e o bestiário.
+// Duas abas: as conquistas (a jornada e as façanhas de habilidade, numa lista só, em duas seções) e o bestiário. Os RANKS (números e
+// top 10) têm entrada própria no menu e reusam esta mesma tela, sem as abas (openRanks).
 // O registro fica em js/systems/sanctuary.js; aqui só se lê o save e se desenha.
-let tab = 'trophies';
-
-const GROUPS = { trophies: 'trophy', feats: 'feat' };
+let tab = 'achievements';
 const number = (n) => n.toLocaleString('en-US');
 
 function el(tag, className, text) {
@@ -42,25 +44,16 @@ function renderAchievements(list, group) {
             bar.append(fill);
             text.append(bar);
         }
-        item.append(el('span', 'sanc-icon', a.icon), text, el('span', 'sanc-tag', done ? 'DONE' : `${number(value)}/${number(a.target)}`));
+        const icon = el('span', 'sanc-icon');
+        paintIcon(icon, ICON_IMAGES[a.id], a.icon);
+        item.append(icon, text, el('span', 'sanc-tag', done ? 'DONE' : `${number(value)}/${number(a.target)}`));
         list.appendChild(item);
     });
 }
 
-// Recordes: o que o jogador tem para bater
-function renderRecords(list) {
-    const { stats } = save;
-    const box = el('div', 'sanc-records');
-    [['Most at once', stats.bestMultiKill], ['Best streak', stats.bestStreak], ['Best wave', stats.bestHour], ['Best score', stats.bestScore]].forEach(([label, value]) => {
-        const chip = el('div', 'sanc-record');
-        chip.append(el('span', '', label), el('b', '', number(value ?? 0)));
-        box.appendChild(chip);
-    });
-    list.appendChild(box);
-}
 
 // Estrelas de cada onda: o melhor resultado já tirado em cada uma das 12 (save.waveBests, gravado em js/ui/camp.js), com o recorde de
-// pontos. Fica nas Façanhas, logo abaixo dos recordes: é o que o jogador volta para completar.
+// pontos. Fica na aba Ranks, no fim: é o que o jogador volta para completar.
 const WAVES = 12;
 function renderWaveStars(list) {
     const bests = save.waveBests ?? {};
@@ -112,14 +105,9 @@ function renderBestiary(list) {
 }
 
 function renderTabCounts() {
-    const count = (group) => {
-        const items = ACHIEVEMENTS.filter(a => a.group === group);
-        return `${items.filter(isDone).length}/${items.length}`;
-    };
     const beasts = getBestiary();
     const counts = {
-        trophies: count('trophy'),
-        feats: count('feat'),
+        achievements: `${ACHIEVEMENTS.filter(isDone).length}/${ACHIEVEMENTS.length}`,
         bestiary: `${beasts.filter(b => save.bestiary[b.key]?.kills > 0).length}/${beasts.length}`
     };
     document.querySelectorAll('#sanctuaryTabs button').forEach(button => {
@@ -133,33 +121,91 @@ function renderSanctuary() {
     const list = document.getElementById('sanctuaryList');
     list.replaceChildren();
     list.classList.toggle('is-beasts', tab === 'bestiary');
+    list.classList.toggle('is-ranks', tab === 'ranks');
     list.scrollTop = 0;
     if (tab === 'bestiary') renderBestiary(list);
+    else if (tab === 'ranks') renderRanks(list);
     else {
-        if (tab === 'feats') {
-            renderRecords(list);
-            renderWaveStars(list);
-        }
-        renderAchievements(list, GROUPS[tab]);
+        // Uma lista só, em duas seções: a jornada (marcos que se acumulam entre noites) e as façanhas (habilidade dentro da noite)
+        section(list, 'JOURNEY · milestones across your nights');
+        renderAchievements(list, 'trophy');
+        section(list, 'SKILL · feats inside a single night');
+        renderAchievements(list, 'feat');
     }
 }
 
-// Recordes (antes na tela inicial); recorde ainda sem dado aparece como "-"
-function renderBestRecords() {
-    const record = (value) => (value > 0 ? number(value) : '-');
-    document.getElementById('recordHour').innerText = record(save.stats.bestHour);
-    document.getElementById('recordScore').innerText = record(save.stats.bestScore);
-    document.getElementById('recordStreak').innerText = record(save.stats.bestStreak);
+// --- RANKS: só números e progresso ---
+// Estatísticas da conta, as 10 melhores noites (com o retrato do herói), o recorde de cada herói (o que nunca jogou fica em
+// branco, para dar vontade) e as estrelas de cada onda. Dados: save.topRuns e save.heroBests (js/systems/sanctuary.js > recordNight).
+const HUNTER_ART = 'images/characters/demon-hunter-small.webp';
+const artOf = (key) => HEROES[key]?.portraitImage ?? HUNTER_ART;
+function section(list, title) {
+    list.appendChild(el('p', 'rank-title', title));
+}
+function renderRanks(list) {
+    const { stats } = save;
+    section(list, 'YOUR NUMBERS');
+    const grid = el('div', 'rank-stats');
+    [['Best wave', stats.bestHour], ['Best score', stats.bestScore], ['Best streak', stats.bestStreak], ['Most at once', stats.bestMultiKill],
+        ['Monsters slain', stats.kills], ['Nights', stats.runs], ['Dawns', stats.victories], ['Bosses', stats.bosses]].forEach(([label, value]) => {
+        const chip = el('div', 'rank-stat');
+        chip.append(el('b', '', value > 0 ? number(value) : '-'), el('span', '', label));
+        grid.appendChild(chip);
+    });
+    list.appendChild(grid);
+
+    section(list, `BEST NIGHTS · TOP ${TOP_RUNS}`);
+    const runs = save.topRuns ?? [];
+    if (!runs.length) list.appendChild(el('p', 'rank-empty', 'Hunt a night to write your first record here.'));
+    runs.forEach((r, i) => {
+        const row = el('div', `rank-row${i < 3 ? ` is-top${i + 1}` : ''}`);
+        const pic = el('img', 'rank-pic');
+        pic.src = artOf(r.hero);
+        pic.alt = HEROES[r.hero]?.name ?? '';
+        const info = el('div', 'rank-info');
+        info.append(el('b', '', HEROES[r.hero]?.name ?? '?'), el('span', '', `${r.victory ? 'Dawn' : `Wave ${r.wave}`}${r.darkness > 1 ? ` · Darkness ${r.darkness}` : ''} · ${number(r.kills ?? 0)} kills`));
+        row.append(el('span', 'rank-pos', ['🥇', '🥈', '🥉'][i] ?? `#${i + 1}`), pic, info, el('strong', 'rank-score', number(r.score)));
+        list.appendChild(row);
+    });
+
+    section(list, 'HEROES');
+    ACTIVE_HEROES.forEach(key => {
+        const hero = HEROES[key];
+        const owned = hero.free === true || save.unlockedHeroes.includes(key);
+        const best = save.heroBests?.[key];
+        const row = el('div', `rank-row is-hero${owned ? '' : ' is-locked'}`);
+        const pic = el('img', 'rank-pic');
+        pic.src = artOf(key);
+        pic.alt = hero.name;
+        const info = el('div', 'rank-info');
+        info.append(el('b', '', hero.name), el('span', '', !owned ? 'Locked' : best ? `Best wave ${best.wave} · ${number(best.nights)} night${best.nights === 1 ? '' : 's'}` : 'Never hunted with him yet'));
+        row.append(pic, info, el('strong', 'rank-score', owned && best ? number(best.score) : owned ? '—' : '🔒'));
+        list.appendChild(row);
+    });
+
+    renderWaveStars(list);
 }
 
-export function openSanctuary() {
-    document.getElementById('sanctuaryScreen').classList.remove('hidden');
-    save.sanctuarySeen = ACHIEVEMENTS.filter(a => save.achievements[a.id]).length;      // a bolinha do menu some
-    persist();
-    renderBestRecords();
+function openScreen(mode) {
+    const screen = document.getElementById('sanctuaryScreen');
+    screen.classList.toggle('is-ranks-mode', mode === 'ranks');
+    document.getElementById('sanctuaryTitle').textContent = mode === 'ranks' ? 'RANKS' : 'SANCTUARY';
+    tab = mode === 'ranks' ? 'ranks' : tab === 'ranks' ? 'achievements' : tab;
+    screen.classList.remove('hidden');
     renderSanctuary();
     audio.init();
     audio.setMood('camp');
+}
+
+export function openSanctuary() {
+    save.sanctuarySeen = ACHIEVEMENTS.filter(a => save.achievements[a.id]).length;      // a bolinha do menu some
+    persist();
+    openScreen('sanctuary');
+}
+
+// Ranks: a mesma tela, sem as abas (entrada própria no menu)
+export function openRanks() {
+    openScreen('ranks');
 }
 
 export function closeSanctuary() {

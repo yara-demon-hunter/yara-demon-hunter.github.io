@@ -190,6 +190,7 @@ permalink: /mini_games/last_torch/last_torch.html
             <button id="btnGift" class="start-nav-btn" type="button"><span class="nav-ico">🎁</span><em>Gift</em><i class="nav-dot hidden"></i></button>
             <button id="btnAltar" class="start-nav-btn" type="button"><span class="nav-ico">🔥</span><em>Altar</em><i class="nav-dot hidden"></i><small id="startAltarCount"></small></button>
             <button id="btnSanctuary" class="start-nav-btn" type="button"><span class="nav-ico">🏛️</span><em>Sanctuary</em><i class="nav-dot hidden"></i><small id="startSanctuaryCount"></small></button>
+            <button id="btnRanks" class="start-nav-btn" type="button"><span class="nav-ico">🏆</span><em>Ranks</em><i class="nav-dot hidden"></i></button>
         </nav>
         </div>
     </div>
@@ -416,6 +417,7 @@ permalink: /mini_games/last_torch/last_torch.html
                 </div>
             </section>
         </div>
+        <p class="settings-credit">Trophy, Altar and relic icons: game-icons.net by Lorc, Delapouite and contributors (CC BY 3.0)</p>
         <!-- Voltar à caçada e sair para o menu, lado a lado -->
         <div class="settings-actions">
             <button id="btnResumeSettings" class="start-btn">BACK TO THE HUNT ▶</button>
@@ -488,21 +490,14 @@ permalink: /mini_games/last_torch/last_torch.html
         <header class="sanc-head">
             <div>
                 <p class="screen-eyebrow">WHAT THE FIRE REMEMBERS</p>
-                <h2 class="screen-title">SANCTUARY</h2>
+                <h2 id="sanctuaryTitle" class="screen-title">SANCTUARY</h2>
             </div>
             <div id="sanctuaryTabs">
-                <button data-tab="trophies">TROPHIES <i></i></button>
-                <button data-tab="feats">FEATS <i></i></button>
+                <button data-tab="achievements">ACHIEVEMENTS <i></i></button>
                 <button data-tab="bestiary">BESTIARY <i></i></button>
             </div>
             <button id="btnCloseSanctuary" class="screen-close" aria-label="Close">✕</button>
         </header>
-        <!-- Recordes: moraram na tela inicial; agora ficam aqui, sempre à vista acima da lista -->
-        <div id="sanctuaryRecords" class="sanc-records">
-            <div><span>Best wave</span><b id="recordHour">-</b></div>
-            <div><span>Best score</span><b id="recordScore">-</b></div>
-            <div><span>Best streak</span><b id="recordStreak">-</b></div>
-        </div>
         <div id="sanctuaryList" class="custom-scroll"></div>
     </div>
 </div>

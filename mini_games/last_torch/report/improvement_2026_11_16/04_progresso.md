@@ -514,3 +514,40 @@ Análise e refação da tela inicial, no padrão dos jogos de celular:
 - **Escuridão** em pílula. A faixa "Next" (próximo herói) chegou a entrar e saiu a pedido do dono.
 - **Primeira visita:** a tela de seleção volta a aparecer para todos (`START.skipMenuOnFirstVisit = false`). **Atenção:** a CrazyGames recomenda jogo novo direto na partida (ajuda a Gameplay Conversion); comparar a conversão depois de publicar.
 - **Verificado** em 1280×720, 360×640, 390×844 e 844×390: presente abre/fecha e a bolinha some ao abrir o baú; a do Santuário some ao visitá-lo; Brasas abrem o Altar; PLAY começa; uma noite com Gudran e Avgustino no celular sem erros.
+
+## 2026-11-19 · Aba RANKS no Santuário
+
+Ideia do dono: tirar os números das Feats e ter um ranking com a foto do herói, para o jogador ver o progresso e querer jogar mais.
+- **Nova aba RANKS** (`renderRanks`, `js/ui/sanctuary.js`): **YOUR NUMBERS** (melhor onda, score, sequência, mais de uma vez, monstros mortos, noites, amanheceres, bosses); **BEST NIGHTS · TOP 10** com a foto do herói, onda, mortes e score (🥇🥈🥉 nos três primeiros); **HEROES**, o recorde de cada herói (o que nunca jogou: "Never hunted with him yet"; bloqueado apagado com 🔒); e as **estrelas por onda**, que saíram das Feats.
+- **Feats** ficou só com as façanhas; a faixa de recordes do topo do Santuário saiu (os números estão na aba nova).
+- **Gravação:** cada noite que termina entra em `save.topRuns` (top 10 por score) e `save.heroBests` (`recordNight`, `js/systems/sanctuary.js`). Na tela final, se entrou no top 10: **"🏆 #2 BEST NIGHT"**.
+- **Verificado:** aba em desktop e celular (abas mais curtas no celular, com rolagem lateral se faltar espaço), uma noite de teste com 16.000 entrou como #2 e subiu o recorde do herói; sem erros.
+
+## 2026-11-19 · Conquistas numa aba só e Ranks no menu
+
+- **Trophies e Feats viraram uma aba só: ACHIEVEMENTS**, uma lista com duas seções ("JOURNEY · milestones across your nights" e "SKILL · feats inside a single night"). O Santuário ficou com 2 abas: **Achievements** e **Bestiary**.
+- **RANKS saiu das abas** e ganhou **botão próprio na barra do menu** (🎁 Gift · 🔥 Altar · 🏛️ Sanctuary · 🏆 Ranks), que abre a mesma tela do Santuário sem as abas e com o título "RANKS" (`openRanks`, `js/ui/sanctuary.js`).
+- Verificado em desktop, celular em pé e deitado: abas, título, seções e ida e volta entre Santuário e Ranks, sem erros.
+
+- **Emojis do Santuário sem repetição (19/11):** Rampage 🩸→🌋, Constellation ✨→🌠, Untouched 🛡️→🫧 (conquistas) e, no bestiário, Zombie Wolf 🐺→🧟 e Bone Colossus 🦴→🗿. Conferido: nenhum ícone repetido entre conquistas e bestiário.
+
+- Mais cinco trocas (as conquistas repetiam ícones de monstros do bestiário): Trophy Hunter 💀→🎯, Sunlight 🧛→🌞, Blood Answers Blood ☠️→🗡️, The Flame Will Not Die 🛡️→🏮, Ghost 👻→🌫️. Agora **nenhum ícone se repete** em todo o Santuário (50 ícones únicos).
+
+## 2026-11-19 · Ícones no lugar dos emojis (game-icons.net)
+
+Pedido do dono: não ficar repetindo emoji e ter mais opção para troféus, Altar e relíquias. Baixei a biblioteca **game-icons.net** (4.176 ícones de fantasia, CC BY 3.0; em pasta isolada fora do projeto) e escolhi **91 ícones**: 36 conquistas, 10 melhorias do Altar e 45 relíquias. Cada um foi pintado numa cor da categoria (troféus dourado, façanhas azul, Altar laranja, relíquias creme) e salvo em 128 px em `images/icons/` (1,1 MB no total).
+- **Código:** `data_model/icon_images.js` (chave → arquivo; chave = id da conquista, `altar_<melhoria>` ou a chave da relíquia), `paintIcon` no Santuário e no Altar, e as relíquias entram em `TREE_IMAGES`. Item sem ícone cai no emoji, como antes.
+- **Crédito (CC BY 3.0):** `images/icons/CREDITS.txt` (autores e ícones usados) e uma linha em Settings ("game-icons.net by Lorc, Delapouite and contributors (CC BY 3.0)"), em texto simples: o gerador do pacote recusa links externos (a CrazyGames não aceita).
+- **Verificado:** Santuário 36/36 e Altar 10/10 com imagem (desktop e celular), relíquias no acampamento (45), sem erros nem 404.
+- **Não trocado ainda:** emojis de skills já com arte própria; o brasão da conquista no prêmio de herói liberado (`hero_unlock.js`); os ramos de relíquia (💰🛡️😈🪵).
+
+## 2026-11-19 · Tela de resultado da onda maior e CONTINUE com ▶
+
+- **Resultado da onda ~30% maior** (`wave_results.css`): cartão de 340 para 440 px no desktop, textos e estrelas ~30% maiores (linhas 14→18 px, estrelas 30→39 px, pontuação 24→31 px) para dar para ler o que está acontecendo. Celular em pé: a largura já é a da tela, então os textos crescem ~15% e a meta da estrela ("≤75/40%") vai numa linha abaixo do nome em vez de quebrar a linha no meio. Celular deitado: cartão mais largo (520 px) e textos ~15% maiores, sem passar da altura da tela (262 de 390 px). Conferido nos três tamanhos.
+- **CONTINUE** ganhou o **▶** como o PLAY ("▶ CONTINUE · Gudran · Wave 3"), com tamanho de letra um pouco maior.
+
+## 2026-11-19 · Cor por seção nas relíquias
+
+Os ícones das 45 relíquias foram pintados na cor do ramo: **Fortune amarelo** (#fcd34d), **Ward cinza azulado** (#a8b8d0), **Wrath rosa/roxo** (#e879f9) e **Thicket verde** (#4ade80). As cores dos rótulos dos ramos em `data_model/relics.js` (`RELIC_BRANCHES`) foram alinhadas (antes o Ward era verde-água e o Wrath vermelho). Conferido na árvore de relíquias do acampamento, desktop e celular.
+
+- **Aba Build (19/11):** a lista de relíquias mostrava os emojis antigos. `treeImageFor` agora também devolve o ícone da relíquia (`data_model/tree_images.js`, via `RELIC_KEYS` + `ICON_IMAGES`) e `status.js` passa a chave de cada relíquia; os ícones saem na cor do ramo (amarelo, cinza azulado, rosa/roxo, verde), iguais aos da árvore do acampamento. Conferido em desktop e celular.

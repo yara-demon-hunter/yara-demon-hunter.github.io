@@ -9,7 +9,9 @@ function createSave() {
     return {
         unlockedHeroes: ['hunter'],
         achievements: {},           // id da conquista -> true
-        achievementPaid: {},        // id da conquista -> true quando as Brasas dela já foram pagas (data_model/sanctuary.js > ACHIEVEMENT_EMBERS)
+        achievementPaid: {},
+        topRuns: [],                // as 10 melhores noites: { score, wave, hero, kills, victory, darkness, date } (aba Ranks do Santuário)
+        heroBests: {},              // recorde de cada herói: id -> { score, wave, nights }        // id da conquista -> true quando as Brasas dela já foram pagas (data_model/sanctuary.js > ACHIEVEMENT_EMBERS)
         bestiary: {},               // tipo de monstro -> { kills }
         hero: 'hunter',
         darkness: 1,                // nível de Escuridão escolhido

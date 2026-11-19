@@ -3,7 +3,7 @@ import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
 import { buyHero, chooseHero, closeHeroes, pickHeroOnStart } from './heroes.js';
 import { inPortal, enterFullscreen, showIosHint } from './orientation.js';
 import { choosePick, isPicking, setupQuickPick } from './quick_pick.js';
-import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
+import { closeSanctuary, openRanks, openSanctuary, setSanctuaryTab } from './sanctuary.js';
 import { closeAltar, openAltar, setupAltar } from './altar.js';
 import { changeDarkness, keepHunting, quitToMenu, returnToMenu, shareResult, startGame, continueRun } from './screens.js';
 import { openSettings, toggleSetting } from './settings.js';
@@ -80,6 +80,7 @@ export function setupButtons() {
     });
     on('btnCloseSanctuary', closeSanctuary);
     on('btnAltar', openAltar);
+    on('btnRanks', openRanks);
     on('btnAltarSummary', () => openAltar({ retry: true }));
     on('btnCloseAltar', closeAltar);
     setupAltar();
