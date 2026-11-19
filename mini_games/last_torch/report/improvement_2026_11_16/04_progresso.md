@@ -485,3 +485,32 @@ Pedido do dono: pouco, para não ajudar demais, mas dar motivo para conquistar o
 - **Pagamento:** uma vez por troféu (`save.achievementPaid`), em `checkAchievements`. **Retroativo:** quem já tinha troféus recebe tudo na primeira abertura depois da atualização, com um aviso "Trophy rewards +N embers". Não paga de novo ao reabrir.
 - **Onde aparece:** aviso do troféu e lista da tela final ("... +25 🔥"), e o Santuário mostra "🔥 +25" (cinza "received" depois de pago).
 - **Verificado:** save antigo com 4 troféus recebeu 35 (100 → 135) e reabrir não pagou de novo; um troféu novo pagou na hora; total 785; Santuário em desktop e celular, sem erros.
+
+## 2026-11-19 · Recordes no Santuário e botão de comprar herói
+
+- **Recordes (Best wave / score / streak)** saíram da tela inicial e foram para o **Santuário**, numa faixa fina fixa acima da lista (`#sanctuaryRecords`, `renderBestRecords` em `js/ui/sanctuary.js`). A tela inicial ganhou uns 5 rem de altura, o que ajuda no celular em pé.
+- **Herói à venda por Brasas** (`hero_stats.js`): em vez de uma barra "Collect embers", o painel mostra "🔒 NOME · FOR SALE", o saldo ("You have 🔥 185") e um **botão sempre à vista**: apagado e com o que falta ("🔥 350 · NEED 165 MORE") até juntar o preço, e "BUY NOME · 🔥 350" quando dá; o jogador decide se gasta. Conferido em desktop, celular em pé (360×640) e deitado: o botão compra, desconta e libera o herói com o prêmio.
+- **Incidente corrigido no caminho:** uma edição minha apagou sem querer o bloco das barras de atributo (`STATS`, `furyEstimate`, `values`) e o jogo parou de carregar; restaurei do git e conferi que carrega e roda.
+
+## 2026-11-19 · Tela inicial compacta
+
+No celular em pé a tela não cabia (título cortado em cima, Sanctuary/Altar cortados embaixo) e os cartões de herói, grandes e com nome e dica, competiam por atenção. Agora:
+- **Heróis numa fileira de retratos** (sem nome nem dica; bloqueado com cadeado e, se for por Brasas, o preço numa etiqueta). O **nome do herói escolhido** vai no topo do painel de atributos (`.hs-name`).
+- **Linha de ação** `[🏛️ 6/36] [ PLAY ] [🔥 560]`: Santuário e Altar viraram botões quadrados pequenos dos lados do PLAY (contadores curtos; o Altar continua brilhando quando há compra).
+- **Baú diário** mais fino; **título** menor no celular em pé; a frase "Protect the torch until dawn." some em telas baixas em pé.
+- Feito como um bloco final no `start-screen.css` (vale sobre as regras antigas) + HTML da linha de ação + contadores em `screens.js`.
+- **Conferido** em 1280×720, 360×640, 390×844 e 844×390, também com herói bloqueado à venda, seletor de Escuridão e CONTINUE: tudo cabe sem rolar, sem erros.
+
+- **Herói à venda (19/11):** voltou a **barra de progresso** das Brasas ("🔥 Embers 200/500 · 40%"), e embaixo um **botão em pílula pequeno** no meio: apagado com "NEED 300 MORE 🔥" até completar, e "BUY · 🔥 500" clicável quando a barra enche.
+
+## 2026-11-19 · Menu 2.0
+
+Análise e refação da tela inicial, no padrão dos jogos de celular:
+- **Topo:** logo pequeno à esquerda e as **Brasas sempre à vista** à direita (toque abre o Altar).
+- **Herói em destaque:** retrato grande do escolhido (ou do bloqueado tocado, apagado com cadeado), nome e papel ("Druid · nature"; à venda: "For sale · 🔥 500"). Embaixo, a fileira de retratos e o painel de atributos.
+- **PLAY que chama:** laranja vivo, "▶ PLAY", brilho pulsando e afunda ao apertar.
+- **Barra de navegação** embaixo: 🎁 Gift, 🔥 Altar, 🏛️ Sanctuary, com **bolinha vermelha** quando há algo a fazer (baú pronto, compra possível no Altar, troféu novo desde a última visita ao Santuário: `save.sanctuarySeen`).
+- **Presente:** o baú diário saiu do meio da tela e virou uma **janela**, que abre sozinha uma vez por visita ao menu quando o baú está pronto (não na primeira visita, para o jogador novo ir direto ao PLAY).
+- **Escuridão** em pílula. A faixa "Next" (próximo herói) chegou a entrar e saiu a pedido do dono.
+- **Primeira visita:** a tela de seleção volta a aparecer para todos (`START.skipMenuOnFirstVisit = false`). **Atenção:** a CrazyGames recomenda jogo novo direto na partida (ajuda a Gameplay Conversion); comparar a conversão depois de publicar.
+- **Verificado** em 1280×720, 360×640, 390×844 e 844×390: presente abre/fecha e a bolinha some ao abrir o baú; a do Santuário some ao visitá-lo; Brasas abrem o Altar; PLAY começa; uma noite com Gudran e Avgustino no celular sem erros.

@@ -151,48 +151,56 @@ permalink: /mini_games/last_torch/last_torch.html
     <div class="start-torch" aria-hidden="true"></div>
 
     <div class="start-content">
-        <h1 class="start-title"><span class="start-title-kicker">DEMON HUNTER:</span>LAST TORCH</h1>
+        <!-- Topo: logo pequeno e as Brasas sempre à vista (o toque abre o Altar) -->
+        <div class="start-top">
+            <h1 class="start-title"><span class="start-title-kicker">DEMON HUNTER:</span>LAST TORCH</h1>
+            <button id="btnEmbers" class="start-embers" type="button" aria-label="Embers: open the Altar">🔥 <b id="startEmbers">0</b></button>
+        </div>
         <p class="start-tagline">Protect the torch until dawn.</p>
 
         <div class="start-body">
-        <div id="startRecords" class="start-records">
-            <div><span>Best wave</span><b id="recordHour">-</b></div>
-            <div><span>Best score</span><b id="recordScore">-</b></div>
-            <div><span>Best streak</span><b id="recordStreak">-</b></div>
-        </div>
 
-        <!-- Escolha do herói: só os ativos (ACTIVE_HEROES). Os cartões são montados em js/ui/heroes.js -->
+        <!-- Escolha do herói: vitrine do escolhido, fileira de retratos e atributos (js/ui/heroes.js, hero_stats.js, screens.js) -->
         <div class="hero-select">
+            <div id="heroShowcase" class="hero-show">
+                <div class="hero-show-art"><img id="heroShowImg" alt=""><span id="heroShowLock" class="hero-show-lock hidden">🔒</span></div>
+                <div class="hero-show-text"><b id="heroShowName"></b><span id="heroShowTag"></span></div>
+            </div>
             <div id="heroPicker" class="hero-picker" role="radiogroup" aria-label="Choose your hunter"></div>
             <!-- Barras de atributo do herói escolhido (js/ui/hero_stats.js) -->
             <div id="heroAttrs" class="hero-attrs"></div>
         </div>
 
-        <!-- Escuridão: só depois de vencer a noite -->
+        <!-- O PLAY nasce desligado: js/ui/screens.js o acende quando o jogo termina de chegar pela rede -->
+        <!-- CONTINUE: só aparece com uma noite guardada (js/core/run_save.js, js/ui/screens.js) -->
+        <button id="btnContinue" class="start-btn start-btn-continue hidden">CONTINUE</button>
+        <button id="btnStart" class="start-btn start-play" disabled>LOADING</button>
+
+        <!-- Escuridão: só depois de vencer a noite (ou com pontos do Altar) -->
         <div id="darknessPicker" class="darkness-picker hidden">
             <span>DARKNESS <em id="darknessPoints"></em></span>
             <button id="btnDarkDown" aria-label="Lower darkness">◀</button>
             <b id="darknessValue">1</b>
             <button id="btnDarkUp" aria-label="Raise darkness">▶</button>
         </div>
-
-        <!-- O PLAY nasce desligado: js/ui/screens.js o acende quando o jogo termina de chegar pela rede -->
-        <!-- CONTINUE: só aparece com uma noite guardada (js/core/run_save.js, js/ui/screens.js) -->
-        <!-- BAÚ DIÁRIO: abre com um toque; aberto, diz o que o de amanhã paga (js/ui/daily.js, css/components/daily.css) -->
-        <div id="startDaily" class="daily hidden"></div>
-        <button id="btnContinue" class="start-btn start-btn-continue hidden">CONTINUE</button>
-        <button id="btnStart" class="start-btn" disabled>LOADING</button>
         <p id="iosHint" class="hidden">Full screen on iPhone: tap Share, then <b>Add to Home Screen</b>, and open it from there.</p>
-        <div class="start-links">
-            <button id="btnSanctuary" class="start-btn-small">
-                <span class="link-icon" aria-hidden="true">🏛️</span>
-                <span class="link-text"><span>SANCTUARY</span><em id="startSanctuaryCount">0/0 earned</em></span>
-            </button>
-            <button id="btnAltar" class="start-btn-small">
-                <span class="link-icon" aria-hidden="true">🔥</span>
-                <span class="link-text"><span>ALTAR</span><em id="startAltarCount">0 embers</em></span>
-            </button>
+
+        <!-- Barra de navegação: presente, Altar e Santuário, com a bolinha vermelha quando há algo a fazer (js/ui/screens.js) -->
+        <nav class="start-nav" aria-label="Menu">
+            <button id="btnGift" class="start-nav-btn" type="button"><span class="nav-ico">🎁</span><em>Gift</em><i class="nav-dot hidden"></i></button>
+            <button id="btnAltar" class="start-nav-btn" type="button"><span class="nav-ico">🔥</span><em>Altar</em><i class="nav-dot hidden"></i><small id="startAltarCount"></small></button>
+            <button id="btnSanctuary" class="start-nav-btn" type="button"><span class="nav-ico">🏛️</span><em>Sanctuary</em><i class="nav-dot hidden"></i><small id="startSanctuaryCount"></small></button>
+        </nav>
         </div>
+    </div>
+
+    <!-- PRESENTE: o baú diário numa janela (abre sozinha quando o baú está pronto, uma vez por visita ao menu) -->
+    <div id="giftPopup" class="gift-popup hidden" role="dialog" aria-label="Daily chest">
+        <div class="gift-card">
+            <button id="btnCloseGift" class="screen-close" aria-label="Close">✕</button>
+            <p class="screen-eyebrow">A GIFT FROM THE FLAME</p>
+            <!-- BAÚ DIÁRIO (js/ui/daily.js, css/components/daily.css) -->
+            <div id="startDaily" class="daily hidden"></div>
         </div>
     </div>
 </div>
@@ -489,6 +497,12 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
             <button id="btnCloseSanctuary" class="screen-close" aria-label="Close">✕</button>
         </header>
+        <!-- Recordes: moraram na tela inicial; agora ficam aqui, sempre à vista acima da lista -->
+        <div id="sanctuaryRecords" class="sanc-records">
+            <div><span>Best wave</span><b id="recordHour">-</b></div>
+            <div><span>Best score</span><b id="recordScore">-</b></div>
+            <div><span>Best streak</span><b id="recordStreak">-</b></div>
+        </div>
         <div id="sanctuaryList" class="custom-scroll"></div>
     </div>
 </div>

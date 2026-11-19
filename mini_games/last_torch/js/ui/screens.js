@@ -35,8 +35,10 @@ import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_
 import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
 import { hideTreeHand, startHints } from './hints.js';
-import { heroOffer, renderHeroPicker } from './heroes.js';
-import { renderHeroStats } from './hero_stats.js';
+import { heroOffer, isOwned, renderHeroPicker } from './heroes.js';
+import { previewHero, renderHeroStats } from './hero_stats.js';
+import { TREE_BRANCHES } from '../../data_model/tree.js';
+import { dailyStatus } from '../../data_model/daily.js';
 import { resetQuickPick } from './quick_pick.js';
 import { updateHUD } from './hud.js';
 import { renderDaily, setupDaily } from './daily.js';
@@ -338,11 +340,55 @@ function openAltarAfterDeath(reason) {
     setTimeout(attempt, ALTAR_AFTER_DEATH_MS);
 }
 
-// Botão do Altar na tela inicial: mostra as Brasas e brilha quando há algo para comprar
+// Brasas no topo e as bolinhas da barra de navegação (presente pronto, compra no Altar, troféu novo no Santuário)
 function renderAltarLink() {
-    document.getElementById('startAltarCount').innerText = `${save.embers} embers`;
+    document.getElementById('startEmbers').innerText = save.embers.toLocaleString('en-US');
     document.getElementById('btnAltar').classList.toggle('is-ready', affordableCount(save) > 0);
+    renderNavDots();
 }
+
+const earnedTrophies = () => ACHIEVEMENTS.filter(a => save.achievements[a.id]).length;
+export function renderNavDots() {
+    const dot = (id, on) => document.querySelector(`#${id} .nav-dot`)?.classList.toggle('hidden', !on);
+    dot('btnGift', !dailyStatus(save).claimed);
+    dot('btnAltar', affordableCount(save) > 0);
+    dot('btnSanctuary', earnedTrophies() > (save.sanctuarySeen ?? 0));
+}
+
+// --- PRESENTE (baú diário numa janela) ---
+// Abre sozinho uma vez por visita ao menu quando o baú está pronto (menos na primeira visita: aí o jogador vai direto ao PLAY)
+let giftShown = false;
+export function openGift() {
+    renderDaily();
+    document.getElementById('giftPopup').classList.remove('hidden');
+}
+export function closeGift() {
+    document.getElementById('giftPopup').classList.add('hidden');
+}
+function maybeAutoGift() {
+    if (giftShown || save.stats.runs === 0 || dailyStatus(save).claimed) return;
+    giftShown = true;
+    setTimeout(() => { if (state.gameState === 'START') openGift(); }, 450);
+}
+
+// --- VITRINE DO HERÓI ---
+// O escolhido (ou o bloqueado que o jogador tocou) em destaque: retrato grande, nome e o papel (ramo de afinidade)
+const HUNTER_ART = 'images/characters/demon-hunter-small.webp';
+function renderShowcase() {
+    const key = previewHero() ?? (isOwned(save.hero) ? save.hero : 'hunter');
+    const hero = HEROES[key];
+    const locked = !isOwned(key);
+    const img = document.getElementById('heroShowImg');
+    const src = hero.portraitImage ?? HUNTER_ART;
+    if (img.getAttribute('src') !== src) img.src = src;
+    img.alt = hero.name;
+    document.getElementById('heroShowcase').classList.toggle('is-locked', locked);
+    document.getElementById('heroShowLock').classList.toggle('hidden', !locked);
+    document.getElementById('heroShowName').textContent = hero.name.toUpperCase();
+    const role = hero.affinity ? `${TREE_BRANCHES[hero.affinity].style.split(':')[0]} · ${TREE_BRANCHES[hero.affinity].name.toLowerCase()}` : 'Hunter · every path';
+    document.getElementById('heroShowTag').textContent = locked ? (hero.emberPrice ? `For sale · 🔥 ${hero.emberPrice}` : 'Locked') : role;
+}
+
 
 // O objetivo mais próximo: é o que faz "só mais uma" parecer razoável
 function nearestGoal() {
@@ -507,19 +553,13 @@ export function keepHunting() {
 
 // --- TELA INICIAL ---
 export function renderStartScreen() {
-    const { stats } = save;
-    // Recorde ainda sem dado aparece como "-"
-    const record = (value) => (value > 0 ? value.toLocaleString('en-US') : '-');
-    document.getElementById('recordHour').innerText = record(stats.bestHour);
-    document.getElementById('recordScore').innerText = record(stats.bestScore);
-    document.getElementById('recordStreak').innerText = record(stats.bestStreak);
-
     const hero = getHero();
     renderAltarLink();
     renderDaily();
-    document.getElementById('startSanctuaryCount').innerText = `${ACHIEVEMENTS.filter(a => save.achievements[a.id]).length}/${ACHIEVEMENTS.length} earned`;
     renderHeroPicker();
     renderHeroStats();
+    renderShowcase();
+    maybeAutoGift();
     const dark = document.getElementById('darknessPicker');
     // O seletor aparece depois da primeira vitória, ou antes se o Altar já dá pontos iniciais (aí só mostra o total, sem setas)
     dark.classList.toggle('hidden', save.maxDarkness <= 1 && altarStartPoints(save) === 0);
@@ -565,13 +605,17 @@ export function setupScreens() {
         renderAltarLink();
         renderEmberWallet();
     });
+    document.getElementById('btnGift').addEventListener('click', openGift);
+    document.getElementById('btnCloseGift').addEventListener('click', closeGift);
+    document.getElementById('giftPopup').addEventListener('click', (e) => { if (e.target.id === 'giftPopup') closeGift(); });
+    document.getElementById('btnEmbers').addEventListener('click', () => import('./altar.js').then(m => m.openAltar()));
     renderStartScreen();
     scheduleMonsterSprites();
     // Os ~70 ícones da árvore (650 KB) só começam a baixar depois que a caçada já roda: no 4G eles disputavam a banda
     // com o que o primeiro minuto precisa. O primeiro ponto de skill chega por volta dos 15 s, e eles já estarão a caminho.
     setTimeout(preloadTreeImages, 4000);
     const play = document.getElementById('btnStart');
-    play.textContent = 'PLAY';
+    play.textContent = '▶ PLAY';
     play.disabled = false;
     window.finishLoading?.();
     // Quem fechou a aba no meio da primeira noite ainda tem runs === 0, mas tem uma noite guardada: vê o menu com o CONTINUE

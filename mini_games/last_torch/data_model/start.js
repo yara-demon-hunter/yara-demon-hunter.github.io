@@ -9,6 +9,6 @@
 // de chegar. Da segunda noite em diante o duelo vem inteiro. 0 = sem corte.
 export const START = {
     firstNightDuelLines: 1,
-    skipMenuOnFirstVisit: true,
+    skipMenuOnFirstVisit: false,    // 19/11/2026: desligado a pedido do dono (a tela de seleção deixa o jogador curioso pelos outros heróis)
     quickPickDefault: false
 };

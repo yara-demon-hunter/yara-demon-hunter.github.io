@@ -1,6 +1,6 @@
 import { ACHIEVEMENTS, achievementEmbers, getBestiary } from '../../data_model/sanctuary.js';
 import { HEROES } from '../../data_model/heroes.js';
-import { save } from '../core/save.js';
+import { save, persist } from '../core/save.js';
 import { audio } from '../core/state.js';
 import { getBossPortrait, getMonsterSprite } from '../render/monster_sprites.js';
 import { renderStartScreen } from './screens.js';
@@ -144,8 +144,19 @@ function renderSanctuary() {
     }
 }
 
+// Recordes (antes na tela inicial); recorde ainda sem dado aparece como "-"
+function renderBestRecords() {
+    const record = (value) => (value > 0 ? number(value) : '-');
+    document.getElementById('recordHour').innerText = record(save.stats.bestHour);
+    document.getElementById('recordScore').innerText = record(save.stats.bestScore);
+    document.getElementById('recordStreak').innerText = record(save.stats.bestStreak);
+}
+
 export function openSanctuary() {
     document.getElementById('sanctuaryScreen').classList.remove('hidden');
+    save.sanctuarySeen = ACHIEVEMENTS.filter(a => save.achievements[a.id]).length;      // a bolinha do menu some
+    persist();
+    renderBestRecords();
     renderSanctuary();
     audio.init();
     audio.setMood('camp');

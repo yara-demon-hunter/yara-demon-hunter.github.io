@@ -115,28 +115,6 @@
 }
 
 /* Recordes: sempre na tela inicial */
-.start-records {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    margin: 0 0 1.2rem;
-    padding: 0.8rem;
-    background: rgba(8, 12, 16, 0.72);
-    border: 1px solid rgba(148, 163, 184, 0.16);
-    border-radius: 0.9rem;
-}
-.start-records span {
-    display: block;
-    color: #8b98a8;
-    font-size: 0.66rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-.start-records b {
-    font-family: 'Cinzel', serif;
-    font-size: 1.4rem;
-    color: #e7e0cf;
-}
 
 /* Nível de Escuridão: liberado ao vencer a noite */
 .darkness-picker {
@@ -282,8 +260,6 @@
     .start-title { font-size: clamp(1.4rem, 8vh, 2.25rem); line-height: 1; }
     .start-title-kicker { font-size: 0.34em; margin-bottom: 0.08em; }
     .start-tagline { margin: 0.15rem 0 0.4rem; font-size: 0.7rem; }
-    .start-records { margin-bottom: 0.35rem; padding: 0.25rem 0.5rem; }
-    .start-records b { font-size: 0.9rem; }
     .darkness-picker { margin-bottom: 0.25rem; }
     .start-btn { padding: 0.45rem 0.7rem; font-size: 0.95rem; }
     .start-links { margin-top: 0.25rem; }
@@ -403,4 +379,156 @@
 .hs-path.is-all { color: #fde68a; border-color: rgba(253, 230, 138, 0.4); }
 @media (max-height: 520px) and (orientation: landscape) {
     .hs-paths { margin-top: 0.2rem; font-size: 0.46rem; }
+}
+
+/* Herói à venda por Brasas: o saldo e o botão de comprar (js/ui/hero_stats.js) */
+.hs-shop { display: flex; flex-direction: column; gap: 0.3rem; align-items: stretch; }
+.hs-shop-have { font-family: 'Inter', sans-serif; font-size: 0.64rem; font-weight: 600; color: #94a3b8; text-align: center; }
+.hs-shop-have b { color: #fdba74; }
+.hs-buy.is-short { background: rgba(30, 41, 59, 0.7); border-color: rgba(148, 163, 184, 0.3); color: #94a3b8; animation: none; cursor: default; }
+
+/* ===== TELA INICIAL COMPACTA (19/11/2026) =====
+   Heróis numa fileira de retratos (sem nome nem dica: o nome do escolhido vai no topo do painel), uma linha de ação
+   [Santuário] [PLAY] [Altar] e menos espaço em volta de tudo. Vem por último para valer sobre as regras antigas. */
+#startScreen .hero-select { gap: 0.45rem; margin-bottom: 0.6rem; }
+#startScreen .hero-picker { display: flex; flex-wrap: nowrap; justify-content: center; gap: 0.5rem; width: 100%; }
+#startScreen .hero-pick { position: relative; flex: 0 0 auto; width: 4.6rem; height: auto; max-width: none; aspect-ratio: 1; padding: 0.25rem; gap: 0; }
+#startScreen .hero-pick .hero-portrait { width: 100%; height: 100%; aspect-ratio: 1; }
+#startScreen .hero-pick-name, #startScreen .hero-pick-hint { display: none; }
+#startScreen .hero-pick .hero-pick-lock-price { display: block; font-size: 0.5rem; bottom: -0.2rem; }
+#startScreen .hero-pick .hero-pick-lock { font-size: 1.1rem; }
+.hs-name { margin-bottom: 0.35rem; text-align: center; font-family: 'Cinzel', Georgia, serif; font-size: 0.95rem; font-weight: 800; letter-spacing: 0.12em; color: #fdba74; }
+
+/* Linha de ação */
+.start-actions { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr) 3.6rem; gap: 0.5rem; align-items: stretch; width: 100%; max-width: 22rem; margin: 0 auto; }
+.start-body > .start-actions { width: 100%; }
+.start-actions #btnStart { width: 100%; margin: 0; }
+.start-icon-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem; padding: 0.25rem; font-size: 1.15rem; line-height: 1; color: #d6cdb8; background: rgba(8, 12, 16, 0.72); border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 0.75rem; cursor: pointer; }
+.start-icon-btn:hover { filter: brightness(1.2); }
+.start-icon-btn em { font-family: 'Inter', sans-serif; font-size: 0.58rem; font-weight: 800; font-style: normal; letter-spacing: 0.02em; color: #d6cdb8; }
+.start-actions:has(#btnStart:disabled) .start-icon-btn { opacity: 0.45; pointer-events: none; }
+#startDaily { max-width: 22rem; margin-left: auto; margin-right: auto; }
+
+/* Celular em pé: título menor, retratos dividem a largura, baú mais fino */
+@media (max-width: 599px) and (orientation: portrait) {
+    #startScreen .start-title { font-size: clamp(1.9rem, 10vw, 2.6rem); }
+    #startScreen .hero-picker { gap: clamp(0.25rem, 1.5vw, 0.45rem); }
+    #startScreen .hero-pick { flex: 1 1 0; width: auto; min-width: 0; max-width: 4.2rem; padding: 0.15rem; border-radius: 0.6rem; }
+    #startScreen .daily-open, #startScreen .daily-done { padding: 0.3rem 0.55rem; }
+    .start-actions { grid-template-columns: 3.2rem minmax(0, 1fr) 3.2rem; }
+}
+@media (max-width: 599px) and (orientation: portrait) and (max-height: 700px) {
+    #startScreen .start-tagline { display: none; }
+}
+
+/* Celular deitado: os retratos numa fileira na coluna da esquerda */
+@media (max-height: 500px) and (orientation: landscape) {
+    #startScreen .hero-picker { display: flex; }
+    #startScreen .hero-pick { flex: 1 1 0; width: auto; min-width: 0; max-width: 3.4rem; height: auto; padding: 0.12rem; }
+    .hs-name { margin-bottom: 0.2rem; font-size: 0.72rem; }
+    .start-actions { grid-template-columns: 2.9rem minmax(0, 1fr) 2.9rem; gap: 0.35rem; }
+    .start-icon-btn { font-size: 0.95rem; }
+    .start-icon-btn em { font-size: 0.5rem; }
+}
+
+/* Botão de comprar herói: pílula pequena no meio, cara de aplicativo (não ocupa a largura toda) */
+.hs-shop { align-items: center; }
+.hs-shop .hs-req { align-self: stretch; }
+.hs-shop .hs-buy { width: auto; align-self: center; margin-top: 0.15rem; padding: 0.28rem 0.95rem; border-radius: 999px; font-size: 0.64rem; letter-spacing: 0.05em; }
+.hs-shop .hs-buy.is-short { padding: 0.24rem 0.8rem; font-size: 0.58rem; }
+
+/* ===== MENU 2.0 (19/11/2026) =====
+   Como os jogos de celular: barra do topo com o logo e a moeda, o herói em destaque, a fileira de heróis, a próxima meta,
+   um PLAY que chama, a Escuridão como pílula e uma barra de navegação embaixo com bolinhas vermelhas quando há algo a fazer.
+   O presente (baú diário) vira uma janela. Vem por último: vale sobre as regras antigas da tela. */
+#startScreen .start-content { max-width: 27rem; display: flex; flex-direction: column; gap: 0.5rem; }
+#startScreen .start-body { display: flex; flex-direction: column; gap: 0.55rem; }
+
+/* Topo */
+.start-top { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+#startScreen .start-title { margin: 0; text-align: left; font-size: 1.7rem; line-height: 1; }
+#startScreen .start-title-kicker { font-size: 0.36em; }
+#startScreen .start-tagline { margin: 0; text-align: center; font-size: 0.72rem; }
+.start-embers { flex-shrink: 0; display: flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.75rem; border: 1px solid rgba(251, 146, 60, 0.55); border-radius: 999px; background: rgba(66, 24, 8, 0.65); color: #fde4c8; font: 800 0.85rem 'Inter', sans-serif; cursor: pointer; }
+.start-embers b { font-variant-numeric: tabular-nums; }
+
+/* Herói em destaque */
+#startScreen .hero-select { gap: 0.45rem; margin: 0; }
+.hero-show { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+.hero-show-art { position: relative; width: 7.5rem; aspect-ratio: 1; border-radius: 1rem; overflow: hidden; border: 2px solid rgba(234, 88, 12, 0.85); box-shadow: 0 0 26px rgba(234, 88, 12, 0.35); background: #0b0f14; }
+.hero-show-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-show.is-locked .hero-show-art { border-color: rgba(148, 163, 184, 0.5); box-shadow: none; }
+.hero-show.is-locked .hero-show-art img { filter: grayscale(0.8) brightness(0.45); }
+.hero-show-lock { position: absolute; inset: 0; display: grid; place-items: center; font-size: 2rem; }
+.hero-show-lock.hidden { display: none; }
+.hero-show-text { display: flex; flex-direction: column; align-items: center; line-height: 1.15; }
+.hero-show-text b { font-family: 'Cinzel', Georgia, serif; font-size: 1.15rem; letter-spacing: 0.12em; color: #fdba74; }
+.hero-show-text span { font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 600; color: #94a3b8; }
+
+/* Fileira de heróis: retratos menores */
+#startScreen .hero-pick { width: 3.6rem; }
+
+/* PLAY que chama: laranja vivo, brilho pulsando */
+#startScreen .start-play { width: 100%; max-width: none; margin: 0; padding: 0.75rem 1rem; font-size: 1.45rem; letter-spacing: 0.22em; color: #fff7ed; text-shadow: 0 2px 0 rgba(124, 45, 18, 0.8); background: linear-gradient(180deg, #fb923c 0%, #ea580c 55%, #c2410c 100%); border: 1px solid #fdba74; border-radius: 0.9rem; box-shadow: 0 6px 0 #7c2d12, 0 0 28px rgba(251, 146, 60, 0.55); animation: playPulse 1.8s ease-in-out infinite; }
+#startScreen .start-play:disabled { animation: none; filter: grayscale(0.7) brightness(0.6); }
+#startScreen .start-play:active { transform: translateY(3px); box-shadow: 0 3px 0 #7c2d12, 0 0 20px rgba(251, 146, 60, 0.5); }
+@keyframes playPulse {
+    0%, 100% { box-shadow: 0 6px 0 #7c2d12, 0 0 18px rgba(251, 146, 60, 0.4); }
+    50% { box-shadow: 0 6px 0 #7c2d12, 0 0 36px rgba(251, 146, 60, 0.85); }
+}
+#startScreen #btnContinue { width: 100%; max-width: none; margin: 0; }
+
+/* Escuridão: pílula */
+#startScreen .darkness-picker { margin: 0 auto; padding: 0.15rem 0.6rem; gap: 0.4rem; font-size: 0.62rem; border-radius: 999px; }
+
+/* Barra de navegação */
+.start-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; margin-top: 0.2rem; padding-top: 0.5rem; border-top: 1px solid rgba(148, 163, 184, 0.14); }
+.start-nav-btn { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.3rem 0.2rem; border: 0; border-radius: 0.7rem; background: transparent; color: #cbd5e1; cursor: pointer; }
+.start-nav-btn:hover { background: rgba(148, 163, 184, 0.08); }
+.start-nav-btn .nav-ico { font-size: 1.35rem; line-height: 1; }
+.start-nav-btn em { font-family: 'Inter', sans-serif; font-size: 0.6rem; font-weight: 700; font-style: normal; letter-spacing: 0.05em; text-transform: uppercase; }
+.start-nav-btn small { display: none; }
+.nav-dot { position: absolute; top: 0.15rem; right: calc(50% - 1.1rem); width: 0.6rem; height: 0.6rem; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 2px #04070a, 0 0 8px rgba(239, 68, 68, 0.8); animation: navDot 1.2s ease-in-out infinite; }
+.nav-dot.hidden { display: none; }
+@keyframes navDot { 50% { transform: scale(1.25); } }
+/* O Altar já tinha o brilho de "dá para comprar": na barra, só a bolinha */
+#startScreen #btnAltar.is-ready { animation: none; box-shadow: none; border: 0; }
+.start-body > .start-nav, .start-body > .start-play, .start-body > #btnContinue { width: 100%; max-width: none; }
+
+/* Presente: janela por cima do menu */
+.gift-popup { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 1rem; background: rgba(2, 4, 8, 0.72); }
+.gift-popup.hidden { display: none; }
+.gift-card { position: relative; width: min(100%, 22rem); padding: 1rem 0.9rem 0.9rem; border: 1px solid rgba(251, 191, 36, 0.5); border-radius: 1rem; background: rgba(20, 12, 6, 0.95); box-shadow: 0 0 40px rgba(251, 146, 60, 0.3); text-align: center; animation: giftIn 0.25s ease-out; }
+.gift-card .screen-close { position: absolute; top: 0.5rem; right: 0.5rem; }
+.gift-card .screen-eyebrow { margin-bottom: 0.6rem; }
+@keyframes giftIn { from { transform: scale(0.85); opacity: 0; } }
+
+/* Celular em pé: tudo cabe numa tela */
+@media (max-width: 599px) and (orientation: portrait) {
+    #startScreen .start-title { font-size: clamp(1.35rem, 7vw, 1.7rem); }
+    .hero-show-art { width: clamp(5.5rem, 26vw, 7.5rem); }
+    #startScreen .hero-pick { width: auto; }
+}
+@media (max-width: 599px) and (orientation: portrait) and (max-height: 700px) {
+    .hero-show-art { width: 5.2rem; }
+    #startScreen .start-content { gap: 0.35rem; }
+    #startScreen .start-body { gap: 0.4rem; }
+}
+
+/* Celular deitado: duas colunas; à esquerda o herói (lado a lado: retrato e nome), à direita PLAY e a barra */
+@media (max-height: 500px) and (orientation: landscape) {
+    #startScreen .start-content { max-width: 46rem; gap: 0.3rem; }
+    #startScreen .start-body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); column-gap: 1rem; row-gap: 0.4rem; align-items: center; }
+    #startScreen .start-body > * { grid-column: 2; }
+    #startScreen .start-body > .hero-select { grid-column: 1; grid-row: 1 / span 6; }
+    #startScreen .start-tagline { display: none; }
+    #startScreen .start-title { font-size: 1.3rem; }
+    .hero-show { flex-direction: row; justify-content: center; gap: 0.6rem; }
+    .hero-show-art { width: 3.6rem; border-radius: 0.7rem; }
+    .hero-show-text { align-items: flex-start; }
+    .hero-show-text b { font-size: 0.95rem; }
+    #startScreen .start-play { padding: 0.5rem 0.8rem; font-size: 1.1rem; }
+    .start-nav { padding-top: 0.3rem; }
+    .start-nav-btn .nav-ico { font-size: 1.05rem; }
+    .start-nav-btn em { font-size: 0.52rem; }
 }

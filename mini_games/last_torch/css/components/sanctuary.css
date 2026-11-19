@@ -144,3 +144,12 @@
 /* Brasas que o troféu paga (js/ui/sanctuary.js) */
 .sanc-text em.sanc-reward { display: inline-block; margin-top: 0.2rem; font-style: normal; font-size: 0.62rem; font-weight: 800; color: #fdba74; }
 .sanc-text em.sanc-reward.is-paid { color: #64748b; font-weight: 600; }
+
+/* Recordes no topo do Santuário: três números numa faixa fina */
+.sanc-records { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; padding: 0.4rem 0.6rem; background: rgba(8, 12, 16, 0.72); border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 0.7rem; text-align: center; flex-shrink: 0; }
+.sanc-records span { display: block; color: #8b98a8; font-size: 0.56rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.sanc-records b { font-family: 'Cinzel', serif; font-size: 1.05rem; color: #e7e0cf; }
+@media (max-height: 520px) and (orientation: landscape) {
+    .sanc-records { padding: 0.2rem 0.4rem; }
+    .sanc-records b { font-size: 0.85rem; }
+}
