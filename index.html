@@ -22,7 +22,7 @@ sitemap_lastmod: 2026-10-13
     <div class="hero__content">
 
         <p class="hero__eyebrow">
-            A Dark Fantasy Web Serial
+            A Dark Fantasy Universe
         </p>
 
         <h1 class="hero__title">
@@ -31,8 +31,10 @@ sitemap_lastmod: 2026-10-13
         </h1>
 
         <p class="hero__tagline">
-            Some nights are not meant to be survived.
+            Read the curse. Explore the mist. Play the danger.
         </p>
+
+        <p class="hero__promise">Free stories, world lore and browser games — no download required.</p>
 
         <div class="hero__languages">
 
@@ -41,7 +43,7 @@ sitemap_lastmod: 2026-10-13
                 class="hero__language"
             >
                 <strong>English</strong>
-                <span>Start with Book 1</span>
+                <span>Stories, games &amp; world</span>
             </a>
 
             <a
@@ -49,7 +51,7 @@ sitemap_lastmod: 2026-10-13
                 class="hero__language"
             >
                 <strong>Português</strong>
-                <span>Comece pelo Livro 1</span>
+                <span>Histórias, jogos e mundo</span>
             </a>
 
         </div>
@@ -63,20 +65,18 @@ sitemap_lastmod: 2026-10-13
         <p class="section-label">A dark fantasy universe</p>
         <h2 id="home-hub-title">Read the story. Play the world.</h2>
         <p>
-            Yara, Demon Hunter is a dark fantasy story by Miguel Amaral, born between 2020 and 2021 and
-            released chapter by chapter. A bell rings too late in a valley surrounded by mist, and what
-            hides in the forest begins to change the lives of a small village. Everything here is free:
-            the book, the mini games, the character archive and the world atlas.
+            A bell rings too late in a valley surrounded by mist. What hides in the forest will change a
+            small village forever — and you decide how to enter its world. Follow the serial, uncover the
+            archive, or face the fog in a game. Everything here is free.
         </p>
         <p lang="pt-BR">
-            Yara, Caçadora de Demônios é uma história de fantasia sombria de Miguel Amaral, nascida entre
-            2020 e 2021 e publicada capítulo a capítulo. Um sino toca tarde demais em um vale cercado pela
-            névoa, e o que se esconde na floresta começa a mudar a vida de uma pequena aldeia. Tudo aqui é
-            grátis: o livro, os mini games, o arquivo de personagens e o atlas do mundo.
+            Yara, Caçadora de Demônios é um universo de fantasia sombria. Um sino toca tarde demais em um
+            vale coberto pela névoa, e o que se esconde na floresta mudará uma pequena aldeia para sempre.
+            Leia a série, descubra o arquivo ou enfrente a névoa num jogo. Tudo aqui é gratuito.
         </p>
     </section>
 
-    {% assign home_sections = "books|Books|Livros|Read the book chapter by chapter.|Leia o livro capítulo a capítulo.|/assets/images/common/books/book-1/cover.jpeg;mini-games|Mini Games|Mini Games|An RPG, a duel arena and a torch to protect.|Um RPG, uma arena e uma tocha para proteger.|/assets/images/common/mini-game/last_torch/cover.webp;characters|Characters|Personagens|Meet the people and monsters of the story.|Conheça as pessoas e os monstros da história.|/assets/images/common/characters/zeph/zeph.webp;world|World Atlas|Atlas do Mundo|Explore the village, the forest and beyond.|Explore a aldeia, a floresta e o que há além.|/assets/images/common/world/gudran_village/gudran_village.png" | split: ";" %}
+    {% assign home_sections = "mini-games|Play the games|Jogue os games|Protect the torch, survive the forest and grow stronger in free browser adventures.|Proteja a tocha, sobreviva à floresta e fique mais forte em aventuras grátis no navegador.|/assets/images/common/mini-game/last_torch_cover.jpeg;books|Read the serial|Leia a série|Start with the prologue and uncover the mystery chapter by chapter.|Comece pelo prólogo e descubra o mistério capítulo a capítulo.|/assets/images/common/books/book-1/cover.jpeg;characters|Meet the unknown|Conheça o desconhecido|Find allies, creatures and suspects before they appear in the story.|Encontre aliados, criaturas e suspeitos antes que apareçam na história.|/assets/images/common/mini-game/yara_rpg/characters/yara.webp;world|Enter the mist|Entre na névoa|Explore the village, the forest and the places hidden beyond the bell.|Explore a aldeia, a floresta e os lugares escondidos além do sino.|/assets/images/common/world/gudran_village/gudran_village.png" | split: ";" %}
     <section class="home-hub__grid" aria-label="Site sections">
         {% for row in home_sections %}
             {% assign s = row | split: "|" %}
@@ -93,6 +93,22 @@ sitemap_lastmod: 2026-10-13
                 </div>
             </article>
         {% endfor %}
+    </section>
+
+    <section class="home-hub__featured" aria-labelledby="home-featured-title">
+        <div class="home-hub__featured-art">
+            <img src="{{ '/assets/images/common/mini-game/yara_rpg/regions/dark-forest.webp' | relative_url }}" alt="Dark forest from Yara, Demon Hunter" loading="lazy">
+        </div>
+        <div class="home-hub__featured-content">
+            <p class="section-label">Play inside the universe</p>
+            <h2 id="home-featured-title">The fog does not stay on the page.</h2>
+            <p>Choose a game and step into Yara's world. Defend the Last Torch, survive the mist in an RPG, or challenge a rival in the arena.</p>
+            <p lang="pt-BR">Escolha um game e entre no mundo de Yara. Defenda a Última Tocha, sobreviva à névoa num RPG ou desafie um rival na arena.</p>
+            <div class="home-card__links">
+                <a href="{{ '/en/mini-games/' | relative_url }}">Play in English</a>
+                <a href="{{ '/pt/mini-games/' | relative_url }}">Jogar em Português</a>
+            </div>
+        </div>
     </section>
 
     <section class="home-hub__updates" aria-labelledby="home-updates-title">
