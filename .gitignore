@@ -17,3 +17,7 @@ mini_games/last_torch/standalone-build/
 
 # Ignore folder (all files inside it) for local documentation
 local_docs/
+
+# Ambiente Python dos testes do Last Torch
+.venv/
+mini_games/last_torch/_tests/out/

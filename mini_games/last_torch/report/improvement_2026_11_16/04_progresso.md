@@ -577,3 +577,23 @@ Com o resultado da onda 12 no amanhecer, o **cartão de estrelas** e o **resumo 
 ## 2026-11-19 · Retratos novos do Demon Hunter e do Avgustino
 
 Com a arte atualizada em `_library/characters/{hunter,avgustino}/art_reference/images/` (`demon-hunter.webp` e `avgustino.webp`, agora pintadas, não mais em pixel art), gerei os arquivos do jogo: `images/characters/demon-hunter.webp` (1024 px, 43 KB), `demon-hunter-small.webp` e `avgustino-small.webp` (256 px, 8 KB cada). Os antigos ficaram de cópia fora do projeto. O recorte do rosto no HUD (`26% 8% / 220%`) continua enquadrando a máscara. Conferido no menu, na vitrine, na fileira de heróis e no HUD do celular.
+
+## 2026-11-19 · Tela de vitória (final de verdade) ao zerar a noite
+
+Pedido do dono: ao zerar o jogo, mostrar as ondas sendo calculadas, **sem HUNT AGAIN nem STAY IN THE DARK**, e uma tela final com o herói, os números e as 12 ondas com as estrelas, terminando num botão MENU.
+- **Fluxo no amanhecer:** 1) cartão de resultado da onda 12 (estrelas, pontuação); 2) ao fechá-lo, a **tela de vitória** (`js/ui/victory.js`, `css/components/victory.css`), que toma o lugar do resumo comum (`triggerGameOver("DAWN")` em `screens.js` desvia para ela).
+- **Conteúdo:** "THE NIGHT IS OVER · DAWN"; a figura do herói grande com o nome e, se entrou no top 10, "🏆 #N BEST NIGHT"; 8 números contando (🏆 score, 💀 mortes, ⭐ nível máximo, ✨ skills aprendidas, 👑 bosses, 🔥 Brasas da noite, ⚡ maior sequência, ⏱️ tempo); "YOUR NIGHT · 44/60 ★" com as 12 ondas e as estrelas de cada uma (as de 5 estrelas ganham borda dourada); e um só botão, **MENU**, que volta ao menu.
+- A noite sem fim (STAY IN THE DARK) deixa de ser oferecida por essa tela; o código dela (`continueEndless`) continua no jogo. As telas de derrota não mudaram.
+- **Sandbox:** o botão Dawn da aba Screens mostra o fluxo todo (com estrelas variadas e skills compradas). Achado no caminho: o sandbox escondia a tela inicial para sempre (`#startScreen { display: none !important }`), então MENU, Start menu e Gift não apareciam; agora a aba Screens a mostra quando o jogo a abre.
+- **Verificado** em 1280×800, 390×844 e 844×390: o cartão vem antes, a vitória depois, HUNT AGAIN e STAY IN THE DARK não aparecem, MENU leva ao menu; sem erros.
+
+## 2026-11-19 · Tela de derrota enxuta e SHARE na vitória
+
+- **Derrota (`gameOverScreen`):** saíram os botões **Altar, Sanctuary e Share** e o **baú diário** (ele fica no menu). Agora são só **HUNT AGAIN e MENU lado a lado** (1,4 : 1; fixos no rodapé no celular em pé). Para ter menos informação: no máximo **2 troféus novos** na tela (o resto vira "+5 more trophies in the Sanctuary", em `screens.js`) e **uma só barra de meta** (o herói à venda mais perto ou a conquista mais perto, a que estiver mais adiantada). O Altar continua abrindo sozinho depois da queda quando há Brasas para gastar.
+- **Vitória (`victory.js`):** novo botão **↗ SHARE** ao lado do MENU. Desenha o card (1080×1350, formato de post: título, DAWN, o herói, os 8 números e as 12 ondas com as estrelas) num canvas e: no celular abre o compartilhar do sistema com a imagem; no computador baixa o PNG `last-torch-dawn.png`. Conferido: o arquivo é gerado e baixado (imagem vista), derrota em 1280×800, 390×844 e 844×390 sem erros.
+- **Atenção:** dentro do iframe da CrazyGames o download pode ser bloqueado pelo portal; no celular o compartilhar do sistema funciona sem isso. Não consegui testar no portal.
+
+## Varredura automática de falhas (_tests)
+- Nova pasta `_tests/` com `qa_sweep.py` e README: auditoria dos dados + telas × 4 tamanhos (+ `--play`).
+- Primeira rodada achou: menu inicial invisível no sandbox, e botões "INTO THE DARK", vitória e fim de noite abaixo da dobra no celular → botões presos no rodapé (camp, summary em paisagem, victory).
+- Pendente: no `--play` todos os heróis "morrem na onda 1 mesmo imortais"; ver se é o bot (imortalidade) ou o jogo.

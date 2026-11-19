@@ -321,7 +321,6 @@ function renderEmberWallet() {
         ? `You can buy: ${buyable.map(key => ALTAR[key].name).join(', ')}`
         : 'Keep hunting: embers buy permanent upgrades at the Altar';
     box.classList.toggle('can-buy', buyable.length > 0);
-    document.getElementById('btnAltarSummary').classList.toggle('is-ready', buyable.length > 0);
 }
 
 // Morreu: depois de um instante no resumo, o Altar abre sozinho ("tente de novo, mais forte") se há Brasas para gastar.
@@ -418,11 +417,13 @@ function renderGoal() {
         box.appendChild(row);
     };
     // Herói à venda por Brasas: quanto falta (a meta de médio prazo das Brasas, ao lado do Altar)
-    Object.keys(HEROES).forEach(key => {
-        const offer = heroOffer(key);
-        if (offer) add(`🔥 ${HEROES[key].name}`, offer.ready ? 'Ready to unlock in the menu!' : `${offer.price - offer.have} embers to go`, Math.min(1, offer.have / offer.price));
-    });
-    if (goal) add(`${goal.a.icon} ${goal.a.name}`, goal.a.desc, goal.progress);
+    // Uma meta só (a mais perto de sair): o herói à venda mais próximo ou a conquista mais próxima
+    const offers = Object.keys(HEROES).map(key => ({ key, offer: heroOffer(key) })).filter(o => o.offer)
+        .sort((a, b) => b.offer.have / b.offer.price - a.offer.have / a.offer.price);
+    const best = offers[0];
+    if (best && (!goal || best.offer.have / best.offer.price >= goal.progress)) {
+        add(`🔥 ${HEROES[best.key].name}`, best.offer.ready ? 'Ready to unlock in the menu!' : `${best.offer.price - best.offer.have} embers to go`, Math.min(1, best.offer.have / best.offer.price));
+    } else if (goal) add(`${goal.a.icon} ${goal.a.name}`, goal.a.desc, goal.progress);
 }
 
 const END_TEXTS = {
@@ -514,7 +515,9 @@ export function triggerGameOver(reason) {
 
     const unlocks = document.getElementById('summaryUnlocks');
     unlocks.innerHTML = '';
-    unlocked.forEach(a => {
+    // Pouca informação para quem perdeu: no máximo 2 troféus novos na tela (o resto vira uma linha "+N more", e está no Santuário)
+    const MAX_UNLOCKS = 2;
+    unlocked.slice(0, MAX_UNLOCKS).forEach(a => {
         const item = document.createElement('div');
         item.className = 'unlock-row';
         item.innerHTML = '<b></b><span></span>';
@@ -522,6 +525,12 @@ export function triggerGameOver(reason) {
         item.querySelector('span').textContent = rewardText(a);
         unlocks.appendChild(item);
     });
+    if (unlocked.length > MAX_UNLOCKS) {
+        const more = document.createElement('div');
+        more.className = 'unlock-row unlock-more';
+        more.textContent = `+${unlocked.length - MAX_UNLOCKS} more trophies in the Sanctuary`;
+        unlocks.appendChild(more);
+    }
 
     renderEmbers(embersEarned);
     renderDaily();

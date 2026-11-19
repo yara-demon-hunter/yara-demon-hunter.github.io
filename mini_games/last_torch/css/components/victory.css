@@ -29,7 +29,10 @@
 .vic-wave span b { color: #fbbf24; font-weight: inherit; }
 .vic-wave.is-perfect { border-color: rgba(250, 204, 21, 0.7); box-shadow: 0 0 12px rgba(250, 204, 21, 0.25); }
 @keyframes vicIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
-.vic-menu { width: min(100%, 18rem); margin-top: 0.3rem; }
+.vic-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: min(100%, 26rem); margin-top: 0.3rem; }
+.vic-actions .start-btn { margin: 0; width: 100%; }
+/* Se a tela rolar (celular), os botões ficam presos no rodapé */
+.vic-actions { position: sticky; bottom: 0; z-index: 2; padding: 0.4rem 0 0.3rem; background: linear-gradient(to top, rgba(6, 4, 10, 0.97) 70%, rgba(6, 4, 10, 0)); }
 
 /* Celular em pé: uma coluna */
 @media (max-width: 640px) and (orientation: portrait) {

@@ -36,6 +36,15 @@ export function mountScreens(host, { hidePanel }) {
       <div class="sb-row" id="scSave"></div>
       <p class="note" id="scNote"></p>`;
     const q = (s) => host.querySelector(s);
+
+    // O sandbox esconde a tela inicial (a arena abre direto: sandbox.css). Aqui o menu precisa aparecer quando o JOGO o abre (botão MENU
+    // da vitória, Start menu, Gift...): enquanto a tela inicial não tem a classe "hidden", uma regra a mostra por cima da do sandbox
+    const menuStyle = document.createElement('style');
+    document.head.appendChild(menuStyle);
+    const startEl = document.getElementById('startScreen');
+    const syncMenu = () => { menuStyle.textContent = startEl.classList.contains('hidden') ? '' : '#startScreen { display: flex !important; }'; };
+    new MutationObserver(syncMenu).observe(startEl, { attributes: true, attributeFilter: ['class'] });
+    setInterval(syncMenu, 250);   // a classe pode já estar sem "hidden" (menu "aberto" por baixo) e então nada muda
     const num = (id, min, max) => Math.max(min, Math.min(max, +q(id).value || 0));
     const note = (text) => { q('#scNote').textContent = text; };
 

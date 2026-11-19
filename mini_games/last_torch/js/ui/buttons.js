@@ -22,7 +22,6 @@ export function setupButtons() {
 
     setupTouchLayout();
     showIosHint();
-    document.getElementById('btnShare').classList.toggle('hidden', inPortal);
 
     // No celular (fora de portal): tela cheia, que precisa de um toque do jogador para ser permitida.
     // Também ao voltar da pausa, caso o jogador tenha saído da tela cheia.
@@ -72,20 +71,12 @@ export function setupButtons() {
 
     // Santuário e escolha do herói
     on('btnSanctuary', openSanctuary);
-    on('btnSanctuarySummary', () => {
-        document.getElementById('gameOverScreen').classList.add('hidden');
-        document.getElementById('startScreen').classList.remove('hidden');
-        state.gameState = 'START';
-        openSanctuary();
-    });
     on('btnCloseSanctuary', closeSanctuary);
     on('btnAltar', openAltar);
     on('btnRanks', openRanks);
-    on('btnAltarSummary', () => openAltar({ retry: true }));
     on('btnCloseAltar', closeAltar);
     setupAltar();
     on('btnMenu', returnToMenu);
-    on('btnShare', shareResult);
     document.getElementById('sanctuaryTabs').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-tab]');
         if (button) setSanctuaryTab(button.dataset.tab);

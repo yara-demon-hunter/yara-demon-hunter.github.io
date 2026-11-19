@@ -80,6 +80,8 @@
     .camp-body { grid-template-columns: minmax(0, 1fr); }
     .camp-relics .tree-area { flex: none; height: 18rem; }
     .camp-side { overflow-y: visible; }
+    /* A tela rola: "INTO THE DARK" fica presa no rodapé, sempre à vista */
+    .camp-foot { position: sticky; bottom: 0; z-index: 2; padding: 0.4rem 0 0.3rem; background: linear-gradient(to top, rgba(6, 8, 12, 0.97) 75%, rgba(6, 8, 12, 0)); }
 }
 /* Celular de lado: árvore à esquerda e todo o resto à direita, tudo à vista sem rolar */
 @media (max-height: 520px) and (orientation: landscape) {

@@ -77,12 +77,10 @@
 .goal-row u { display: block; height: 100%; background: linear-gradient(90deg, #ea580c, #fde68a); }
 .summary-actions {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);       /* HUNT AGAIN e MENU lado a lado */
     gap: 0.5rem;
 }
-.summary-actions .start-btn { grid-column: 1 / -1; }
-.summary-actions .start-btn-small { margin-top: 0; justify-content: center; }
-.summary-actions:has(#btnShare.hidden) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.summary-actions .start-btn { grid-column: auto; margin: 0; }
 
 @media (max-width: 600px) and (orientation: portrait) {
     .summary-grid { grid-template-columns: minmax(0, 1fr); }
@@ -94,9 +92,6 @@
         padding: 0.5rem 0 0.4rem;
         background: linear-gradient(to top, rgba(3, 3, 6, 0.97) 75%, rgba(3, 3, 6, 0));
     }
-    /* Baú diário mais fino na tela final em pé (sem as bolinhas) */
-    #summaryDaily .daily-pips { display: none; }
-    #summaryDaily .daily-open, #summaryDaily .daily-done { grid-template-areas: "icon text reward"; }
 }
 @media (max-height: 520px) and (orientation: landscape) {
     .summary { gap: 0.3rem; }
@@ -114,7 +109,6 @@
     .goal-row b { font-size: 0.58rem; }
     .summary-actions .start-btn { padding: 0.45rem 1rem; font-size: 0.85rem; }
     .summary-actions .start-btn-small { padding: 0.3rem 0.6rem; font-size: 0.66rem; }
-    .summary-actions { grid-template-columns: 1.8fr 1fr 1fr 1fr; }
-    .summary-actions .start-btn { grid-column: auto; }
-    .summary-actions:has(#btnShare.hidden) { grid-template-columns: 1.8fr 1fr 1fr; }
+    .summary-actions { grid-template-columns: 1.4fr 1fr; position: sticky; bottom: 0; z-index: 2; padding: 0.3rem 0 0.2rem; background: linear-gradient(to top, rgba(3, 3, 6, 0.97) 75%, rgba(3, 3, 6, 0)); }
 }
+.unlock-more { text-align: center; color: #94a3b8; font-size: 0.64rem; border-color: rgba(148, 163, 184, 0.25); background: rgba(8, 12, 16, 0.5); animation: none; }
