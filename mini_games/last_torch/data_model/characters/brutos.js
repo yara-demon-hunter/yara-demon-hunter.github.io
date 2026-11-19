@@ -6,6 +6,9 @@ import { BRUTOS_VISUALS } from '../../library/characters/brutos/brutos_visual.js
 
 export const BRUTOS = {
     id: 'brutos',
+    // Caminhos (árvore): +5% de dano no Blade Path (golpe da lâmina e skills do ramo); o Shadow Path é proibido para ele
+    affinity: 'blade',
+    sealedBranches: ['shadow'],
     model: 'brutos',                // boneco 2.5D (js/render/bodies.js)
     order: 2,                       // posição na tela de escolha
 

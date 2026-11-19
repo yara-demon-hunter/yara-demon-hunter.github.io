@@ -5,6 +5,9 @@ import { AZAEL_VISUALS } from '../../library/characters/azael/azael_visual.js';
 
 export const AZAEL = {
     id: 'azael',
+    // Caminhos (árvore): +5% de dano nas skills do Shadow Path; o Light Path é proibido para ele (é um demônio)
+    affinity: 'shadow',
+    sealedBranches: ['light'],
     model: 'azael',                 // boneco 2.5D (js/render/bodies.js)
     order: 3,                       // posição na tela de escolha
 

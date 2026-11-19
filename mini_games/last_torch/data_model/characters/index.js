@@ -20,11 +20,12 @@
 import { AVGUSTINO } from './avgustino.js';
 import { AZAEL } from './azael.js';
 import { BRUTOS } from './brutos.js';
+import { GUDRAN } from './gudran.js';
 import { HUNTER } from './hunter.js';
 import { ROWAN } from './rowan.js';
 
 // Todos os personagens. A posição na tela de escolha vem do `order` de cada um, não desta lista.
-export const CHARACTER_LIST = [HUNTER, ROWAN, AVGUSTINO, AZAEL, BRUTOS];
+export const CHARACTER_LIST = [HUNTER, ROWAN, AVGUSTINO, GUDRAN, AZAEL, BRUTOS];
 
 // Os stats que todo personagem tem de declarar. kind: 'absolute' (valor do personagem, o jogo lê direto dele),
 // 'percent' (bônus em %: 20 vira 0.2 no modificador `mod`) ou 'flag' (true/false vira modificador 1/0).
@@ -96,12 +97,21 @@ function buildPlayer(character) {
         }
         mods.rootSnare = 1;
     }
+    // Habilidade do Gudran: Escudo de Runas no botão da adaga (js/systems/arcane.js)
+    const runeShield = character.abilities?.runeShield ?? null;
+    if (runeShield) {
+        for (const key of ['cooldownSeconds', 'seconds', 'runes', 'radius', 'runeRadius', 'spin', 'damage', 'hitSeconds', 'knockback']) {
+            if (typeof runeShield[key] !== 'number') throw new Error(`Personagem ${character.id}: falta "${key}" em abilities.runeShield`);
+        }
+        mods.runeShield = 1;
+    }
     // Fúria do personagem (character.fury): o tipo e os números dela (js/systems/fury.js)
     const FURY_KEYS = {
         swordRain: ['name', 'stepSeconds', 'fallSeconds', 'radius', 'damage', 'range', 'giantFallSeconds', 'giantRadius', 'giantDamage', 'giantKnockback'],
         bloodWaltz: ['name', 'cuts', 'cutSeconds', 'cutRange', 'cutDamage', 'healRatio', 'trailSeconds'],
         stomp: ['name', 'extraSeconds', 'stepSeconds', 'radius', 'damage', 'knockback', 'stunSeconds', 'shake', 'damageTakenCut'],
         forestGuardian: ['name', 'damageReduction', 'radius', 'damage', 'tickSeconds', 'slow'],
+        beam: ['name', 'damageReduction', 'width', 'damage', 'tickSeconds', 'turnSpeed', 'demonBonus', 'knockback'],
         consecration: ['name', 'damageReduction', 'radius', 'damage', 'tickSeconds', 'slow', 'healPerSecond', 'torchHealPerSecond', 'demonBonus', 'finaleDamage', 'finaleRadius']
     };
     const fury = character.fury;
@@ -120,6 +130,7 @@ function buildPlayer(character) {
         knifeRange: stats.knifeRange,
         axeQuake,
         rootSnare,
+        runeShield,
         fury,
         moveSpeed: stats.speed,
         dash: { distance: stats.dashDistance, seconds: stats.dashSeconds }
@@ -173,7 +184,7 @@ export const HERO_ENTRIES = Object.fromEntries(CHARACTER_LIST.map(character => {
         colors: character.colors,
         portrait: character.portrait
     };
-    for (const key of ['model', 'perk', 'portraitImage', 'unlockHint', 'thrown', 'sealedBranches', 'sealedSkills']) if (character[key] !== undefined) entry[key] = character[key];
+    for (const key of ['model', 'perk', 'portraitImage', 'unlockHint', 'emberPrice', 'thrown', 'basicAttack', 'affinity', 'affinityMods', 'affinityLabel', 'sealedBranches', 'sealedSkills']) if (character[key] !== undefined) entry[key] = character[key];
     return [character.id, entry];
 }));
 

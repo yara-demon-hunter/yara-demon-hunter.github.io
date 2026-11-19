@@ -7,9 +7,14 @@ import { ROWAN_VISUALS } from '../../library/characters/rowan/rowan_visual.js';
 
 export const ROWAN = {
     id: 'rowan',
+    // Caminhos (árvore): no Nature Path, em vez de +5% de dano, as raízes seguram 20% mais tempo (affinityMods); o Flame Path é
+    // proibido (e o Blade, porque o cajado não corta)
+    affinity: 'nature',
+    affinityMods: { rootSeconds: 0.2 },
+    affinityLabel: 'ROOTS +20%',
+    sealedBranches: ['blade', 'flame'],
     model: 'rowan',                 // boneco 2.5D (js/render/bodies.js)
     // Árvore de skills: o cajado não corta. O ramo Blade fica selado (menos a skill Fury, que é da Fúria de todos) e também a Flaming Sword
-    sealedBranches: ['blade'],
     sealedSkills: ['flameBlade'],
     thrown: 'rose',                 // o que lança com a mão livre: 'rose' no lugar da adaga (_library/weapons/thrown.js)
     order: 1.5,                     // posição na tela de escolha: logo depois do Demon Hunter (é o primeiro a ser liberado)

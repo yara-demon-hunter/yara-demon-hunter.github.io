@@ -238,6 +238,7 @@ export function resetFieldForNewTurn() {
     state.particles.length = 0;
     state.bladeSlashes.length = 0;
     state.knives.length = 0;
+    state.arcaneBolts.length = 0;
     state.knifePending = null;
     state.goldDrops.length = 0;
     state.pickups.length = 0;

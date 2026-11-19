@@ -104,8 +104,12 @@ export function updateHeroAnim(a, body) {
         // Giro suave para o lado do movimento (não durante o golpe). No arremesso vira rápido para o alvo.
         const before = a.facing;
         const throwing = a.throwsKnives && heroHooks.throwing(now);
+        // Cajado erguido (staffCast, Gudran): vira rápido para o alvo, como no golpe, mesmo andando para o outro lado
+        const casting = body.move?.kind === 'staffCast';
         if (throwing) {
             a.facing = lerpAngle(a.facing, heroHooks.throwAngle(), Math.min(1, dt * 25));
+        } else if (casting) {
+            a.facing = lerpAngle(a.facing, body.angle, Math.min(1, dt * 18));
         } else if (Math.hypot(dx, dy) > 0.3 && !a.swingActive) {
             a.facing = lerpAngle(a.facing, Math.atan2(dy, dx), Math.min(1, dt * V.turnSmoothing));
         }
@@ -129,7 +133,7 @@ export function updateHeroAnim(a, body) {
 
     // Novo golpe: o passo executado é o valor anterior do combo
     if (body.comboStep !== a.lastComboStep) {
-        const executedStep = a.lastComboStep;
+        const executedStep = Number.isFinite(a.lastComboStep) ? a.lastComboStep : 1;
         a.lastComboStep = body.comboStep;
         a.facing = body.angle;
         startSwing(a, executedStep, body);

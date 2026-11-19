@@ -6,6 +6,9 @@ Texto pronto para colar, em inglês. Cobre o que mudou desde o relatório de 16/
 Update notes
 
 NEW
+- Daily Chest: open it once a day for free Embers. Come back on consecutive days to grow the
+  reward, up to a big Day 7 chest.
+- Father Avgustino now joins you for Embers: save 350 to unlock him.
 - Embers & Altar: every night now earns Embers, win or lose. Spend them at the new Altar
   (start screen and end-of-night screen) on 11 permanent upgrades: health, damage, magic damage,
   move speed, dagger range, Fury power, dash distance, an extra dash charge, starting skill

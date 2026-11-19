@@ -1,7 +1,7 @@
 import { CAMP } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
 import { RELIC_BY_ID } from '../../data_model/relics.js';
-import { ACTIVE_SKILLS, TREE_BY_ID, TREE_COSTS, TREE_NODES } from '../../data_model/tree.js';
+import { ACTIVE_SKILLS, TREE_BRANCHES, TREE_BY_ID, TREE_COSTS, TREE_NODES } from '../../data_model/tree.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, powers, state } from '../core/state.js';
 import { prepareRaven } from '../render/raven.js';
@@ -243,7 +243,14 @@ const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || n
 // Skill que só funciona com adaga (needs: 'knives') e o jogador não lança adaga (mod noKnives): o nó fica selado.
 // Não se compra, e conta como cumprido para quem o pede (passe livre). Vale para o herói que não tem adaga (Captain
 // Brutos) e para quem jurou o Oath of Slaughter; níveis já comprados ficam, só não sobem mais.
+// Grupo exclusivo (exclusive em data_model/tree.js): quem já aprendeu uma skill do grupo não pode aprender as outras
+export function excludedBy(node) {
+    if (!node.exclusive || getNodeLevel(node) > 0) return null;
+    return TREE_NODES.find(other => other !== node && other.exclusive === node.exclusive && getNodeLevel(other) > 0) ?? null;
+}
+
 export function isRestricted(node) {
+    if (excludedBy(node)) return true;
     // hero: skill de um herói só (Dark Roses): fica selada para os outros
     if (node.hero && getHero().id !== node.hero) return true;
     // notFor: skill que um herói não pode usar (o druida não usa Fireballs: as rosas dele não queimam)
@@ -275,9 +282,12 @@ function characterMagic() {
 
 // Por que está selado, para a tela: de quem é a escolha (o herói ou o Juramento)
 export function getRestrictionText(node) {
+    const rival = excludedBy(node);
+    if (rival) return `Your blade is already enchanted with ${getNodeInfo(rival).name}: it holds only one enchantment.`;
     if (node?.hero && getHero().id !== node.hero) return `Only ${node.hero[0].toUpperCase()}${node.hero.slice(1)} can learn this skill.`;
     if (node?.notFor?.includes(getHero().id)) return `${getHero().name} cannot use this skill: his roses do not burn.`;
     const hero = getHero();
+    if (hero.sealedBranches?.includes(node.branch) && node.branch !== 'blade' && node.id !== 'frenzyNova') return `${hero.name} cannot walk the ${TREE_BRANCHES[node.branch].path.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase())}.`;
     if (isSealedForHero(node)) return node.branch === 'blade' ? `${hero.name} carries no blade: the Blade Path is not for him.` : `${hero.name} cannot use this skill: his weapon does not cut.`;
     if (isMagicNode(node) && characterMagic() <= 0) return `${hero.name} has no magic: this skill is not for him.`;
     return (hero.mods?.noKnives ?? 0) > 0

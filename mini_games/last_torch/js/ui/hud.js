@@ -5,7 +5,7 @@ import { isBossTurn } from '../../data_model/bosses.js';
 import { waveProgress } from '../../data_model/difficulty.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { player, state } from '../core/state.js';
-import { getAxeQuake, getRootSnare, getDashCharges, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
+import { getAxeQuake, getRootSnare, getRuneShield, getDashCharges, getDashCooldown, getKnifeCooldown } from '../systems/stats.js';
 import { hasBuyableNode } from '../systems/tree.js';
 import { updateTreeHand } from './hints.js';
 
@@ -68,15 +68,16 @@ export function updateKnifeButton() {
     // Captain Brutos: o botão da adaga vira o Axe Quake (o anel é a recarga do golpe)
     // Rowan: o botão vira o Root Snare. Os dois usam o mesmo relógio (state.quake.timer)
     const snareHero = mod('rootSnare') > 0;
-    const quakeHero = mod('axeQuake') > 0 || snareHero;
+    const runeHero = mod('runeShield') > 0;            // Gudran: o botão vira o Escudo de Runas
+    const quakeHero = mod('axeQuake') > 0 || snareHero || runeHero;
     const roseHero = !quakeHero && getHero().thrown === 'rose';       // Rowan: lança rosas no lugar da adaga
-    const kind = snareHero ? 'snare' : quakeHero ? 'quake' : roseHero ? 'rose' : 'knife';
+    const kind = runeHero ? 'runes' : snareHero ? 'snare' : quakeHero ? 'quake' : roseHero ? 'rose' : 'knife';
     if (knifeShown.quake !== kind) {
         knifeShown.quake = kind;
-        ui.knifeButton.setAttribute('aria-label', snareHero ? 'Root Snare' : quakeHero ? 'Axe Quake' : roseHero ? 'Throw rose' : 'Throw dagger');
-        document.getElementById('knifeButtonKnob').textContent = snareHero ? '🌿' : quakeHero ? '🪓' : roseHero ? '🌹' : '🗡️';
+        ui.knifeButton.setAttribute('aria-label', runeHero ? 'Rune Shield' : snareHero ? 'Root Snare' : quakeHero ? 'Axe Quake' : roseHero ? 'Throw rose' : 'Throw dagger');
+        document.getElementById('knifeButtonKnob').textContent = runeHero ? '🔷' : snareHero ? '🌿' : quakeHero ? '🪓' : roseHero ? '🌹' : '🗡️';
     }
-    const abilitySeconds = snareHero ? getRootSnare().cooldownSeconds : getAxeQuake()?.cooldownSeconds ?? 1;
+    const abilitySeconds = runeHero ? getRuneShield().cooldownSeconds : snareHero ? getRootSnare().cooldownSeconds : getAxeQuake()?.cooldownSeconds ?? 1;
     const ratio = quakeHero ? Math.min(1, state.quake.timer / abilitySeconds) : Math.min(1, state.knifeTimer / getKnifeCooldown());
     const cd = Math.ceil(ratio * CD_STEPS) / CD_STEPS;
     if (knifeShown.cd !== cd) {
@@ -175,10 +176,16 @@ function updateNightPips() {
             ui.pips.appendChild(pip);
         }
     }
+    // Onda terminada: as estrelas que tirou nela (resultado da onda, js/ui/camp.js) em cima da marca, e a cor diz como foi
+    const waveStars = state.run?.waveStars ?? {};
     [...ui.pips.children].forEach((pip, i) => {
         const hour = i + 1;
+        const stars = hour < state.turn ? waveStars[hour] : undefined;
         pip.classList.toggle('is-done', hour < state.turn);
         pip.classList.toggle('is-now', hour === state.turn);
+        pip.dataset.stars = stars ?? '';
+        pip.className = pip.className.replace(/\bstars-\d\b/g, '').trim();
+        if (stars !== undefined) pip.classList.add(`stars-${stars}`);
     });
 }
 

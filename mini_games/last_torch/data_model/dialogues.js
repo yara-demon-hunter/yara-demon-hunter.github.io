@@ -34,6 +34,33 @@ export const DUEL_DIALOGUES = {
         },
         // Falas próprias de outros heróis contra o Azael (byHero[model], com a mesma forma de first e final)
         byHero: {
+            // Gudran, o velho senhor do castelo: arrogante, acostumado a ser obedecido
+            gudran: {
+                first: {
+                    before: [
+                        { who: 'rival', text: 'An old man with a stick, tending a candle. The dark will eat you whole.' },
+                        { who: 'hero', text: 'I ruled a kingdom, boy. I have buried better demons than you.' },
+                        { who: 'rival', text: 'Then show me what a king is worth against the night.' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'The old fool... You hit harder than any man should.' },
+                        { who: 'hero', text: 'Kneel, or come back and kneel later.' },
+                        { who: 'rival', text: 'Before dawn. Count on it.' }
+                    ]
+                },
+                final: {
+                    before: [
+                        { who: 'rival', text: 'Still on your feet, old lord? The night is almost over.' },
+                        { who: 'hero', text: 'This kingdom will always be mine. Even this small one.' },
+                        { who: 'rival', text: 'One of us will not see the dawn.' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'Again... A king without a crown, and I still cannot break you.' },
+                        { who: 'hero', text: 'A crown is only metal. Authority is what remains.' },
+                        { who: 'rival', text: '...Keep your flame, my lord. This night is yours.' }
+                    ]
+                }
+            },
             brutos: {
                 first: {
                     before: [

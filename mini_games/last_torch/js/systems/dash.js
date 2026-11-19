@@ -2,6 +2,7 @@ import { DASH_SKILL } from '../../data_model/skills.js';
 import { save } from '../core/save.js';
 import { audio, joystick, keys, player, state } from '../core/state.js';
 import { isFireCasting } from './knives.js';
+import { beamActive } from './fury.js';
 import { addFloater, hitStop, slowMotion } from './effects.js';
 import { bumpStat } from './sanctuary.js';
 import { leaveSmokeTrail, onDashEnd, onDashStart, stealOnPerfectDodge, strikeDashPath } from './skills_shadow.js';
@@ -55,6 +56,7 @@ function isNearMiss() {
 }
 
 export function tryDash() {
+    if (beamActive()) return false;         // Lord's Decree: plantado e invulnerável, só mira (nada de dash)
     if (state.gameState !== 'PLAYING' || (state.phase !== 'HUNT' && state.phase !== 'CLEAR')) return;
     if (player.dashCharges <= 0 || player.dashTimer > 0 || isFireCasting()) return;
 

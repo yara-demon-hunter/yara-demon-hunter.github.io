@@ -234,7 +234,30 @@ function fallStance(stance, k) {
     stance.free = { hand: [2, -4.6, 5 - sag * 2], w: p };
 }
 
-const STANCES = { slam: slamStance, quake: quakeStance, roar: roarStance, oath: oathStance, guard: guardStance, drink: drinkStance, fall: fallStance };
+// Cajado erguido (Gudran): a mão sobe até acima do ombro com o cajado quase em pé (esfera sobre a cabeça); no impacto o cajado
+// tomba um pouco para a frente (a esfera aponta para o alvo, de onde sai o raio), segura e volta ao repouso
+function staffCastStance(stance, k) {
+    const M = MOVES.staffCast;
+    const up = [0.3, 0.05, 0.95];
+    const aim = [0.82, 0.05, 0.57];
+    let w;
+    let d;
+    if (k < M.impactAt) {
+        const p = k / M.impactAt;
+        w = p * p * (3 - 2 * p);                        // sobe devagar e chega macio
+        d = up;
+    } else {
+        const p = Math.min(1, (k - M.impactAt) / 0.12);
+        w = k < M.holdEnd ? 1 : 1 - easeOutQuad((k - M.holdEnd) / (1 - M.holdEnd));
+        d = up.map((v, i) => v + (aim[i] - v) * easeOutQuad(p));
+    }
+    const size = Math.hypot(...d) || 1;
+    stance.sword = { hand: [3.6, 2.2, 15 + 3.5 * w], dir: d.map(v => v / size), w };
+    stance.lean -= M.lean * w;
+    stance.rise += 0.3 * w;
+}
+
+const STANCES = { staffCast: staffCastStance, slam: slamStance, quake: quakeStance, roar: roarStance, oath: oathStance, guard: guardStance, drink: drinkStance, fall: fallStance };
 
 function applyStance(stance, body, blend) {
     if (anim.dash > 0.01) {

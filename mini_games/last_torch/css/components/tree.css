@@ -401,3 +401,14 @@
 
 /* Aviso em vermelho na descrição de uma skill (ex.: Fireballs não ricocheteia) */
 .tdetail-warn { display: block; margin-top: 0.35rem; color: #f87171; font-weight: 700; }
+
+/* Afinidade do herói (js/ui/tree.js): o ramo dele com "+5%" dourado; o proibido apagado com ⛔ */
+.tree-tab.is-affinity { position: relative; box-shadow: inset 0 0 0 1.5px rgba(253, 230, 138, 0.75); }
+/* Estrela dourada no canto de cima à esquerda (a bolinha da direita continua sendo a contagem) */
+.tree-tab.is-affinity::before { content: '★'; position: absolute; top: 0.1rem; left: 0.25rem; color: #fde68a; font-size: 0.7rem; line-height: 1; text-shadow: 0 0 4px rgba(0, 0, 0, 0.8); }
+.tree-tab.is-forbidden { opacity: 0.4; filter: grayscale(0.8); }
+.tree-band-tag { font-family: 'Inter', sans-serif; font-size: 0.5rem; font-weight: 800; letter-spacing: 0.06em; border-radius: 999px; padding: 0.05rem 0.35rem; }
+.tree-band-tag:empty { display: none; }
+.tree-band-tag.is-plus { color: #1c1917; background: #fde68a; }
+.tree-band-tag.is-no { color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.5); }
+.tree-branch.is-forbidden .tree-grid { opacity: 0.45; }

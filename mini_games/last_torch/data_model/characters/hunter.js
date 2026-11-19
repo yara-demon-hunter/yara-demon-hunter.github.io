@@ -4,6 +4,7 @@
 // Como os números funcionam e como criar um personagem: data_model/characters/index.js.
 export const HUNTER = {
     id: 'hunter',
+    // Caminhos (árvore): nenhum bônus, mas é o único com TODOS os ramos abertos
     order: 1,                       // posição na tela de escolha
 
     // --- QUEM É ---

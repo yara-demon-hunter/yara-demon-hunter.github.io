@@ -178,6 +178,8 @@ permalink: /mini_games/last_torch/last_torch.html
 
         <!-- O PLAY nasce desligado: js/ui/screens.js o acende quando o jogo termina de chegar pela rede -->
         <!-- CONTINUE: só aparece com uma noite guardada (js/core/run_save.js, js/ui/screens.js) -->
+        <!-- BAÚ DIÁRIO: abre com um toque; aberto, diz o que o de amanhã paga (js/ui/daily.js, css/components/daily.css) -->
+        <div id="startDaily" class="daily hidden"></div>
         <button id="btnContinue" class="start-btn start-btn-continue hidden">CONTINUE</button>
         <button id="btnStart" class="start-btn" disabled>LOADING</button>
         <p id="iosHint" class="hidden">Full screen on iPhone: tap Share, then <b>Add to Home Screen</b>, and open it from there.</p>
@@ -456,6 +458,7 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
             <div class="summary-col">
                 <div id="summaryEmbers"></div>
+                <div id="summaryDaily" class="daily hidden"></div>
                 <div id="summaryUnlocks"></div>
                 <div id="summaryGoal"></div>
             </div>

@@ -1,7 +1,7 @@
 import { HEROES } from '../../data_model/heroes.js';
-import { TREE_BY_ID, TREE_NODES } from '../../data_model/tree.js';
+import { AFFINITY_BONUS, TREE_BY_ID, TREE_NODES } from '../../data_model/tree.js';
 import { DARKNESS } from '../../data_model/night.js';
-import { getPowerLevel } from '../../data_model/powers.js';
+import { POWER_BOOST, getPowerLevel } from '../../data_model/powers.js';
 import { altarMods } from '../../data_model/embers.js';
 import { save } from '../core/save.js';
 import { attributes, passives, powers, state } from '../core/state.js';
@@ -48,6 +48,15 @@ export function refreshModifiers() {
 
     addAll(getHero().mods);
     addAll(altarMods(save));
+    // Afinidade do herói com um ramo (affinity no arquivo dele): os poderes desse ramo batem AFFINITY_BONUS mais forte
+    // (data_model/powers.js > POWER_BOOST); no Blade Path, que é o da lâmina, o golpe da lâmina também
+    for (const key in POWER_BOOST) delete POWER_BOOST[key];
+    const affinity = getHero().affinity;
+    if (affinity && getHero().affinityMods) addAll(getHero().affinityMods);
+    else if (affinity) {
+        TREE_NODES.forEach(n => { if (n.branch === affinity && (n.kind === 'power' || n.kind === 'evolve')) POWER_BOOST[n.key] = AFFINITY_BONUS; });
+        if (affinity === 'blade') addAll({ bladeDamage: AFFINITY_BONUS });
+    }
     Object.values(passives).forEach(p => { if (p.lvl > 0) addAll(p.mods); });
     Object.entries(state.tree).forEach(([id, lvl]) => addAll(TREE_BY_ID[id]?.mods, lvl));
     TREE_NODES.forEach(n => { if (n.kind === 'stat' && n.mods) addAll(n.mods, attributes[n.key].lvl - 1); });

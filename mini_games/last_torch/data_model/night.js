@@ -11,7 +11,7 @@
 // PONTUAÇÃO DA ONDA (recorde de cada onda em save.waveBests): kills x 10, maior Rush x 25, ouro pego x 1,
 // (100 - % de dano da tocha) x 10, (100 - % de dano do herói) x 5.
 export const WAVE_SPOILS = {
-    damageGoals: [0.5, 0.2],
+    damageGoals: [0.75, 0.4],   // estrelas de dano (tocha e herói): sofrer no máximo 75% e 40% da vida na onda (era 50% e 20%: 5 estrelas quase nunca saíam)
     rushGoalBase: 20,
     rushGoalPerWave: 4,
     score: { kills: 10, rush: 25, gold: 1, torch: 10, hero: 5 },

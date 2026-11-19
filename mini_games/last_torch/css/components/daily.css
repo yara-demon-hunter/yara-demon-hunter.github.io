@@ -1,0 +1,57 @@
+/* --- BAÚ DIÁRIO (js/ui/daily.js) ---
+   Uma faixa: na tela inicial acima do PLAY, na tela final abaixo das Brasas. Fechado brilha; aberto mostra o de amanhã. */
+.daily { width: 100%; }
+.daily.hidden { display: none; }
+.daily-open, .daily-done {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "icon text reward" "icon pips pips";
+    align-items: center;
+    column-gap: 0.55rem;
+    row-gap: 0.2rem;
+    width: 100%;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    border-radius: 0.7rem;
+    background: rgba(40, 24, 8, 0.6);
+    color: #fde4c8;
+    font: inherit;
+    text-align: left;
+}
+.daily-done { grid-template-areas: "icon text" "icon pips"; grid-template-columns: auto minmax(0, 1fr); }
+.daily-open { cursor: pointer; border-color: rgba(251, 191, 36, 0.85); animation: dailyReady 1.4s ease-in-out infinite; }
+.daily-open:hover { background: rgba(66, 36, 8, 0.75); }
+@keyframes dailyReady {
+    0%, 100% { box-shadow: 0 0 0 rgba(251, 191, 36, 0); }
+    50% { box-shadow: 0 0 16px rgba(251, 191, 36, 0.55); }
+}
+.daily-icon { grid-area: icon; font-size: 1.5rem; line-height: 1; }
+.daily-open .daily-icon { animation: dailyShake 1.4s ease-in-out infinite; }
+@keyframes dailyShake {
+    0%, 80%, 100% { transform: rotate(0); }
+    85% { transform: rotate(-12deg); }
+    90% { transform: rotate(10deg); }
+    95% { transform: rotate(-6deg); }
+}
+.daily-text { grid-area: text; display: flex; flex-direction: column; min-width: 0; }
+.daily-text b { color: #fde68a; font-size: 0.74rem; letter-spacing: 0.12em; }
+.daily-text em { color: #d6cdb8; font-size: 0.66rem; font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.daily-reward { grid-area: reward; padding: 0.25rem 0.55rem; border-radius: 0.5rem; background: #b45309; color: #fff7ed; font-size: 0.74rem; font-weight: 800; white-space: nowrap; }
+.daily-pips { grid-area: pips; display: flex; gap: 0.25rem; }
+.daily-pips i { flex: 1; height: 0.3rem; border-radius: 999px; background: rgba(148, 163, 184, 0.25); }
+.daily-pips i.is-big { flex: 1.6; }
+.daily-pips i.is-done { background: linear-gradient(90deg, #ea580c, #fbbf24); }
+.daily-pips i.is-today { background: rgba(251, 191, 36, 0.55); }
+
+/* Tela inicial: espaço entre a faixa e o PLAY/CONTINUE */
+#startDaily { margin-bottom: 0.5rem; }
+#summaryDaily { margin-top: 0.45rem; }
+
+/* Celular em pé ou tela baixa: faixa mais fina */
+@media (max-height: 520px), (max-width: 420px) {
+    .daily-open, .daily-done { padding: 0.3rem 0.55rem; }
+    .daily-icon { font-size: 1.2rem; }
+    .daily-text b { font-size: 0.66rem; }
+    .daily-reward { font-size: 0.68rem; padding: 0.2rem 0.45rem; }
+    #startDaily { margin-bottom: 0.35rem; }
+}

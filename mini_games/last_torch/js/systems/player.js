@@ -8,6 +8,7 @@ import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { moveDash } from './dash.js';
 import { isFireCasting } from './knives.js';
+import { beamActive } from './fury.js';
 import { addNumber, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { beginDeath } from './night.js';
 import { tryPhoenix } from './skills_flame.js';
@@ -151,7 +152,7 @@ export function updatePlayer(dt) {
 
     if (player.dashTimer > 0) {
         moveDash(dt);
-    } else if (isFireCasting()) {
+    } else if (isFireCasting() || beamActive()) {
         // Conjurando a bola de fogo: fica plantado; o destino continua valendo para depois
     } else if (joyMag > 0) {
         // Analógico: inclinar menos anda mais devagar

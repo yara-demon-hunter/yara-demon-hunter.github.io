@@ -1,4 +1,4 @@
-import { audio, player, state } from '../core/state.js';
+import { audio, joystick, player, state } from '../core/state.js';
 import { dealDamage } from './damage.js';
 import { addNumber, addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
 import { getBladeDamage, getMaxPlayerHp, getSpellDamage } from './stats.js';
@@ -28,6 +28,9 @@ export function furyDamage(amount) {
 export const consecration = { on: false, x: 0, y: 0, radius: 0, age: 0, pulse: 0, finale: 0, finaleRadius: 0 };
 export const CONSECRATION_FINALE_SECONDS = 0.9;     // a cruz de luz do fim: desce, crava no chão e some
 
+// Raio do Gudran (Lord's Decree): o cajado aponta e o raio cruza a tela; js/render/arcane.js desenha
+export const furyBeam = { on: false, angle: 0, age: 0, pulse: 0 };
+
 const run = { kind: null, fury: null, left: 0, timer: 0, side: 1, last: null };
 
 // Espadas da Chuva de Espadas: um conjunto fixo, reaproveitado em círculo (js/render/fury.js desenha)
@@ -42,6 +45,7 @@ export function resetFury() {
     for (const t of furyTrails) t.life = 0;
     for (const s of furySwords) s.on = false;
     consecration.on = false;
+    furyBeam.on = false;
     run.kind = null;
     run.fury = null;
     run.left = 0;
@@ -84,6 +88,16 @@ export function startFury(fury) {
         addShockwave(player.x, player.y, { radius: fury.radius, color: '#fde68a', width: 10, seconds: 0.6 });
         createExplosion(player.x, player.y, '#fef3c7', 18);
         audio.playBlast();
+    } else if (fury.kind === 'beam') {
+        run.timer = 0;
+        // Começa apontando para o alvo (ou o monstro mais perto), e daí gira com a mira
+        const aim = Math.hypot(player.targetX - player.x, player.targetY - player.y) > 8 ? Math.atan2(player.targetY - player.y, player.targetX - player.x) : player.angle;
+        Object.assign(furyBeam, { on: true, angle: aim, age: 0, pulse: 0 });
+        screenFlash('#93c5fd', 0.3);
+        zoomPunch(0.03);
+        addShockwave(player.x, player.y, { radius: 60, color: '#93c5fd', width: 9, seconds: 0.5 });
+        createExplosion(player.x, player.y, '#bfdbfe', 16);
+        audio.playBlast();
     } else if (fury.kind === 'stomp') {
         run.timer = 0;
         shakeScreen(fury.shake * 1.6);
@@ -98,12 +112,16 @@ export function furyDamageRatio() {
     if (run.kind === 'stomp') return 1 - run.fury.damageTakenCut;
     if (run.kind === 'forestGuardian') return 1 - run.fury.damageReduction;
     if (run.kind === 'consecration' && insideConsecration(player.x, player.y)) return 1 - run.fury.damageReduction;
+    if (run.kind === 'beam') return 1 - run.fury.damageReduction;
     return 1;
 }
 
 export function insideConsecration(x, y) {
     return consecration.on && Math.hypot(x - consecration.x, y - consecration.y) < consecration.radius;
 }
+
+// O raio está no ar: o herói fica plantado e só mira (js/systems/player.js) e o ataque básico para (combat.js)
+export const beamActive = () => furyBeam.on && state.frenzyActiveTimer > 0;
 
 export function forestGuardianActive() {
     return run.kind === 'forestGuardian' && state.frenzyActiveTimer > 0;
@@ -329,6 +347,18 @@ export function updateFury(dt) {
         }
         return;
     }
+    if (run.kind === 'beam') {
+        if (state.frenzyActiveTimer <= 0 || player.hp <= 0) {
+            if (player.hp > 0) {
+                addShockwave(player.x, player.y, { radius: 50, color: '#93c5fd', width: 6, seconds: 0.4 });
+                screenFlash('#bfdbfe', 0.2);
+            }
+            resetFury();
+            return;
+        }
+        updateBeam(dt);
+        return;
+    }
     if (run.kind === 'consecration') {
         const F = run.fury;
         if (state.frenzyActiveTimer <= 0 || player.hp <= 0) {
@@ -392,5 +422,44 @@ export function updateFury(dt) {
             }
         }
         if (run.timer <= 0) run.timer = F.tickSeconds;
+    }
+}
+
+// --- RAIO DO GUDRAN ---
+// A mira vem do mouse (o ponto para onde ele iria) ou do joystick; o raio gira até ela na velocidade turnSpeed, como um farol. O
+// herói não anda enquanto atira (js/systems/player.js). A cada pulso, todo monstro a menos de width/2 da linha leva dano de magia.
+export const BEAM_LENGTH = 2400;
+function updateBeam(dt) {
+    const F = run.fury;
+    let want = null;
+    if (Math.hypot(joystick.x, joystick.y) > 0.15) want = Math.atan2(joystick.y, joystick.x);
+    else if (Math.hypot(player.targetX - player.x, player.targetY - player.y) > 8) want = Math.atan2(player.targetY - player.y, player.targetX - player.x);
+    if (want !== null) {
+        let diff = want - furyBeam.angle;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        const step = F.turnSpeed * dt;
+        furyBeam.angle += Math.max(-step, Math.min(step, diff));
+    }
+    furyBeam.age += dt;
+    player.angle = furyBeam.angle;
+    player.castAge = 0.05;                     // a mão livre fica erguida enquanto ele atira
+    player.iFrames = Math.max(player.iFrames, 0.15);   // o escudo azul: invulnerável enquanto o raio dura
+    run.timer -= dt;
+    if (run.timer > 0) return;
+    run.timer = F.tickSeconds;
+    furyBeam.pulse = 1;
+    const dx = Math.cos(furyBeam.angle);
+    const dy = Math.sin(furyBeam.angle);
+    const half = F.width / 2;
+    for (const e of state.enemies) {
+        if (e.hp <= 0) continue;
+        const along = (e.x - player.x) * dx + (e.y - player.y) * dy;
+        if (along < 0) continue;
+        const across = Math.abs((e.x - player.x) * -dy + (e.y - player.y) * dx);
+        if (across > half + e.radius) continue;
+        dealDamage(e, furyDamage(getSpellDamage() * F.damage * (isDemon(e) ? 1 + F.demonBonus : 1)),
+            { noCrit: true, quiet: true, number: true, style: 'spell', kbX: dx * F.knockback, kbY: dy * F.knockback });
+        createExplosion(e.x, e.y - e.radius, '#93c5fd', 2);
     }
 }

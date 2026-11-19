@@ -23,6 +23,8 @@ import { resetDash } from '../systems/dash.js';
 import { resetQuake } from '../systems/quake.js';
 import { resetFury } from '../systems/fury.js';
 import { resetDruid } from '../systems/druid.js';
+import { resetConversion } from '../systems/conversion.js';
+import { resetArcane } from '../systems/arcane.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
 import { continueEndless, startHour } from '../systems/night.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
@@ -33,10 +35,11 @@ import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_
 import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
 import { hideTreeHand, startHints } from './hints.js';
-import { renderHeroPicker } from './heroes.js';
+import { heroOffer, renderHeroPicker } from './heroes.js';
 import { renderHeroStats } from './hero_stats.js';
 import { resetQuickPick } from './quick_pick.js';
 import { updateHUD } from './hud.js';
+import { renderDaily, setupDaily } from './daily.js';
 
 // Retrato do herói: arte própria (portraitImage) ou a do Caçador com o filtro de cor dele
 export function paintHeroPortrait(node, hero) {
@@ -110,6 +113,8 @@ export function startGame() {
     resetQuake();
     resetFury();
     resetDruid();
+    resetConversion();
+    resetArcane();
     state.knifePending = null;
     state.knifeCharge = 0;
     state.knifeInput.stick.fire = false;
@@ -250,7 +255,6 @@ const EMBER_ROW_MS = 420;
 function renderEmbers(earned) {
     const box = document.getElementById('summaryEmbers');
     const { run } = state;
-    const buyable = ALTAR_KEYS.filter(key => altarCost(save, key) !== null && altarCost(save, key) <= save.embers);
     const rows = emberBreakdown(run, state.turn, Boolean(run.victory));
     // Recordes de uma noite (o anterior veio de run.startBests; quem continuou uma noite salva pode não ter)
     const before = run.startBests ?? {};
@@ -299,6 +303,14 @@ function renderEmbers(earned) {
         }
     };
     requestAnimationFrame(step);
+    renderEmberWallet();
+}
+
+// "You have N" e "You can buy" da tela final: refeitos também quando o baú diário é aberto ali
+function renderEmberWallet() {
+    const box = document.getElementById('summaryEmbers');
+    if (!box.querySelector('.embers-total')) return;
+    const buyable = ALTAR_KEYS.filter(key => altarCost(save, key) !== null && altarCost(save, key) <= save.embers);
     box.querySelector('.embers-total').textContent = `You have ${save.embers}`;
     box.querySelector('.embers-buy').textContent = buyable.length
         ? `You can buy: ${buyable.map(key => ALTAR[key].name).join(', ')}`
@@ -356,6 +368,11 @@ function renderGoal() {
         row.querySelector('u').style.width = `${Math.round(ratio * 100)}%`;
         box.appendChild(row);
     };
+    // Herói à venda por Brasas: quanto falta (a meta de médio prazo das Brasas, ao lado do Altar)
+    Object.keys(HEROES).forEach(key => {
+        const offer = heroOffer(key);
+        if (offer) add(`🔥 ${HEROES[key].name}`, offer.ready ? 'Ready to unlock in the menu!' : `${offer.price - offer.have} embers to go`, Math.min(1, offer.have / offer.price));
+    });
     if (goal) add(`${goal.a.icon} ${goal.a.name}`, goal.a.desc, goal.progress);
 }
 
@@ -456,6 +473,7 @@ export function triggerGameOver(reason) {
     });
 
     renderEmbers(embersEarned);
+    renderDaily();
     renderGoal();
     openAltarAfterDeath(reason);
     document.getElementById('btnEndless').classList.toggle('hidden', reason !== 'DAWN');
@@ -498,6 +516,7 @@ export function renderStartScreen() {
 
     const hero = getHero();
     renderAltarLink();
+    renderDaily();
     document.getElementById('startSanctuaryCount').innerText = `${ACHIEVEMENTS.filter(a => save.achievements[a.id]).length}/${ACHIEVEMENTS.length} earned`;
     renderHeroPicker();
     renderHeroStats();
@@ -542,6 +561,10 @@ export function setupScreens() {
     audio.applySettings();
     // Reconcilia recompensas antigas antes de montar os cartões do menu.
     checkAchievements({ toast: false });
+    setupDaily(() => {
+        renderAltarLink();
+        renderEmberWallet();
+    });
     renderStartScreen();
     scheduleMonsterSprites();
     // Os ~70 ícones da árvore (650 KB) só começam a baixar depois que a caçada já roda: no 4G eles disputavam a banda

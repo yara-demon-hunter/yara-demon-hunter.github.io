@@ -6,9 +6,11 @@ import { updateHUD } from '../ui/hud.js';
 import { dealDamage, ignite } from './damage.js';
 import { createExplosion, hitStop, shakeScreen } from './effects.js';
 import { isFireCasting } from './knives.js';
+import { fireArcaneBolt } from './arcane.js';
 import { launchCrescent, tryExecute } from './skills_blade.js';
 import { detonateMark } from './skills_shadow.js';
-import { startFury } from './fury.js';
+import { beamActive, startFury } from './fury.js';
+import { startMove } from './moves.js';
 import { getHero, mod } from './modifiers.js';
 import { showFuryCutIn } from '../ui/fury_cutin.js';
 import {
@@ -108,7 +110,7 @@ export function chargeUlt(amount) {
 
 // Ativação automática da Fúria. A barra e a duração são iguais para todos; o especial é de cada personagem (js/systems/fury.js).
 // O especial de cada herói (inclusive a Chuva de Espadas do Demon Hunter) roda em fury.js; aqui só o disparo e o anúncio.
-const FURY_COLORS = { swordRain: '#f0abfc', bloodWaltz: '#f87171', stomp: '#cbd5e1', forestGuardian: '#4ade80', consecration: '#fde68a' };
+const FURY_COLORS = { swordRain: '#f0abfc', bloodWaltz: '#f87171', stomp: '#cbd5e1', forestGuardian: '#4ade80', consecration: '#fde68a', beam: '#93c5fd' };
 export function triggerFrenzyUlt() {
     state.ultEnergy = 0;
     const fury = getFury();
@@ -134,7 +136,7 @@ export function updateAutoAttack(dt) {
     const attackRad = getAtkRadius();
     const currentArcHalf = getSlashArcRadian() / 2;
 
-    if (player.attackTimer > 0 || isFireCasting()) return;
+    if (player.attackTimer > 0 || isFireCasting() || beamActive()) return;
 
     const targetEnemy = findNearestEnemy(player.x, player.y, attackRad);
     if (!targetEnemy) return;
@@ -142,6 +144,19 @@ export function updateAutoAttack(dt) {
     player.attackTimer = getAtkCooldown();
     const atkAngle = Math.atan2(targetEnemy.y - player.y, targetEnemy.x - player.x);
     player.angle = atkAngle;
+
+    // Herói sem lâmina (Gudran): não golpeia. Ergue o cajado devagar (movimento staffCast do boneco) e, quando a esfera chega ao
+    // alto, o raio de energia azul sai da ponta (js/systems/arcane.js). Sem arco de corte nem varredura
+    if (getHero().basicAttack === 'arcane') {
+        if (player.move) return;
+        // Contador próprio do combo (o comboStep do herói, se mudasse, dispararia a varredura de espada do boneco)
+        const step = player.arcaneStep = ((player.arcaneStep ?? 0) % 3) + 1;
+        startMove('staffCast', () => {
+            const target = state.enemies.includes(targetEnemy) && targetEnemy.hp > 0 ? targetEnemy : findNearestEnemy(player.x, player.y, attackRad + 40);
+            if (target) fireArcaneBolt(target, step);
+        });
+        return;
+    }
 
     // Skill passiva Giro Sombrio: o 3º golpe vira um giro de 360°
     const whirl = player.comboStep === 3 && passives.shadowWhirl.lvl > 0;

@@ -133,6 +133,10 @@ export const state = {
 
     // Efeitos (js/systems/effects.js, desenhados em js/render/effects.js)
     gibs: [],
+    arcaneBolts: [],
+    runeShield: { left: 0, angle: 0, age: 0 },   // Escudo de Runas do Gudran: tempo restante, giro e idade (para o desenho)           // raios de energia do cajado do Gudran (js/systems/arcane.js)
+    converts: [],              // monstros convertidos pelo Avgustino (Conversion): lutam do lado do herói (js/systems/conversion.js)
+    conversion: { timer: 0, fx: [] },   // tempo até a próxima reza e os clarões das rezas
     corpses: [],               // corpos que tombam ao morrer (Treant)
     stains: [],
     shockwaves: [],

@@ -1,6 +1,43 @@
 import { getCharacterBase } from '../../data_model/characters/index.js';
 import { ACTIVE_HEROES, HEROES } from '../../data_model/heroes.js';
 import { save } from '../core/save.js';
+import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
+import { TREE_BRANCHES, affinityLabel } from '../../data_model/tree.js';
+
+// Herói bloqueado que o jogador tocou: o painel mostra como desbloqueá-lo em vez das barras (js/ui/heroes.js liga e desliga)
+let preview = null;
+export const previewHero = () => preview;
+export function setPreviewHero(key) {
+    preview = key;
+}
+
+// Requisitos de um herói bloqueado, com o progresso: as conquistas que o liberam (data_model/sanctuary.js) e o preço em Brasas
+export function unlockRequirements(key) {
+    const hero = HEROES[key];
+    const list = ACHIEVEMENTS.filter(a => a.hero === key).map(a => ({
+        icon: a.icon, label: a.desc.replace(/\.$/, ''), have: Math.min(save.stats[a.stat] ?? 0, a.target), need: a.target
+    }));
+    if (hero.emberPrice) list.push({ icon: '🔥', label: 'Collect embers', have: Math.min(save.embers, hero.emberPrice), need: hero.emberPrice, embers: true });
+    return list;
+}
+
+function renderRequirements(panel, key) {
+    const hero = HEROES[key];
+    const reqs = unlockRequirements(key);
+    const ready = hero.emberPrice && save.embers >= hero.emberPrice;
+    const rows = reqs.map(r => {
+        const percent = Math.round((r.have / r.need) * 100);
+        return `<div class="hs-req${percent >= 100 ? ' is-done' : ''}">
+            <span class="hs-req-label">${r.icon} ${r.label}</span>
+            <span class="hs-req-count">${r.have.toLocaleString('en-US')}/${r.need.toLocaleString('en-US')} · ${percent}%</span>
+            <div class="hs-bar"><i style="width:${Math.max(3, percent)}%"></i></div>
+        </div>`;
+    }).join('');
+    panel.innerHTML = `<div class="hs-lock-title">🔒 ${hero.name.toUpperCase()} · HOW TO UNLOCK</div>
+        <div class="hs-reqs">${rows || '<div class="hs-req"><span class="hs-req-label">Coming soon</span></div>'}</div>
+        ${ready ? `<button class="hs-buy" type="button" data-buy-hero="${key}">UNLOCK · 🔥 ${hero.emberPrice}</button>` : ''}
+        ${hero.perk ? `<div class="hs-perk"><strong>${hero.perk.name}</strong><span>${hero.perk.text}</span></div>` : ''}`;
+}
 
 // --- BARRAS DE ATRIBUTO DO HERÓI (tela inicial) ---
 // Como no Wild Push Smash: cada barra é o valor do herói em proporção ao melhor dos heróis ativos (a barra cheia é
@@ -62,6 +99,9 @@ function furyEstimate(h, b) {
         case 'forestGuardian':
             damage = magic * F.damage * Math.ceil(seconds / F.tickSeconds);
             break;
+        case 'beam':
+            damage = magic * F.damage * Math.ceil(seconds / F.tickSeconds);
+            break;
         case 'consecration':
             damage = magic * (F.damage * Math.ceil(seconds / F.tickSeconds) + F.finaleDamage);
             break;
@@ -81,6 +121,10 @@ const values = (key) => {
 export function renderHeroStats() {
     const panel = document.getElementById('heroAttrs');
     if (!panel) return;
+    const locked = preview && HEROES[preview] && !save.unlockedHeroes.includes(preview) && HEROES[preview].free !== true;
+    panel.classList.toggle('is-locked-view', Boolean(locked));
+    if (locked) return renderRequirements(panel, preview);
+    preview = null;
     const key = ACTIVE_HEROES.includes(save.hero) ? save.hero : 'hunter';
     const hero = HEROES[key];
     const all = ACTIVE_HEROES.map(values);
@@ -95,6 +139,12 @@ export function renderHeroStats() {
             : '';
         return `<div class="hs-row"${title ? ` title="${title}" aria-label="${title}"` : ''}><span>${stat.label}</span><div class="hs-bar"><i style="width:${percent}%"></i></div></div>`;
     }).join('');
-    panel.innerHTML = `<div class="hs-bars">${rows}</div>`
+    // Caminhos da árvore: o ramo de afinidade (+5%) e os proibidos, numa linha só
+    const pathName = (k) => TREE_BRANCHES[k].name;
+    const sealed = (hero.sealedBranches ?? []);
+    const paths = hero.affinity || sealed.length
+        ? `${hero.affinity ? `<span class="hs-path is-plus" style="--tone:${TREE_BRANCHES[hero.affinity].color}">${TREE_BRANCHES[hero.affinity].icon} ${pathName(hero.affinity)} ${hero.affinityMods ? affinityLabel(hero) : `${affinityLabel(hero)} DMG`}</span>` : ''}${sealed.map(k => `<span class="hs-path is-no">⛔ ${pathName(k)}</span>`).join('')}`
+        : '<span class="hs-path is-all">✦ ALL PATHS OPEN</span>';
+    panel.innerHTML = `<div class="hs-bars">${rows}</div><div class="hs-paths">${paths}</div>`
         + (hero.perk ? `<div class="hs-perk"><strong>${hero.perk.name}</strong><span>${hero.perk.text}</span></div>` : '');
 }

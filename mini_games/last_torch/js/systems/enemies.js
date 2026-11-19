@@ -26,6 +26,8 @@ import { lerpAngle } from '../../library/core/easing.js';
 import { knightHeadOf } from '../core/monster_art.js';
 import { getAtkDamage } from './stats.js';
 import { hurtTorch } from './torch.js';
+import { hurtConvert, provokingConvert } from './conversion.js';
+import { CONVERSION } from '../../data_model/passives.js';
 
 // Modelo de dados do inimigo (monstro comum ou boss)
 const getEnemyModel = type => MONSTER_MODELS[type] || BOSS_MODELS[type];
@@ -415,8 +417,10 @@ export function updateEnemies(dt) {
         // monstro por perto vai bater nele. Boss não se deixa enganar
         const lured = lure && !e.isBoss && !model.ignoresPlayer && Math.hypot(lure.x - e.x, lure.y - e.y) < lure.lures;
         const huntsPlayer = !model.ignoresPlayer && distToPlayer < provoked;
-        const targetX = lured ? lure.x : huntsPlayer ? player.x : state.coreX;
-        const targetY = lured ? lure.y : huntsPlayer ? player.y : state.coreY;
+        // Convertido do Avgustino por perto (Conversion): provoca o monstro comum, que vai bater nele. Boss não se deixa provocar
+        const ally = !lured && !e.isBoss && !e.shadowOwner && !model.ignoresPlayer ? provokingConvert(e) : null;
+        const targetX = lured ? lure.x : ally ? ally.x : huntsPlayer ? player.x : state.coreX;
+        const targetY = lured ? lure.y : ally ? ally.y : huntsPlayer ? player.y : state.coreY;
         const distToTarget = Math.hypot(targetX - e.x, targetY - e.y);
         const distCore = Math.hypot(state.coreX - e.x, state.coreY - e.y);
 
@@ -447,7 +451,9 @@ export function updateEnemies(dt) {
             const blockedByTorch = e.isBoss && distCore < CORE_MODEL.bossStopDistance + e.radius;
 
             // Preso por raízes (Natureza): não anda, mas continua atacando o que estiver ao alcance
-            if (!lunging && !holdsDistance && !blockedByTorch && !slamming && !punching && !(e.rooted > 0)) {
+            // Provocado por um convertido: para encostado nele (sem isso todos entravam no meio dele e pareciam travados)
+            const touchingAlly = ally && distToTarget < ally.radius + e.radius + 2;
+            if (!lunging && !holdsDistance && !blockedByTorch && !slamming && !punching && !touchingAlly && !(e.rooted > 0)) {
                 const speed = e.speed * (1 - slow);
                 e.x += Math.cos(toTargetAngle) * speed * dt;
                 e.y += Math.sin(toTargetAngle) * speed * dt;
@@ -495,6 +501,13 @@ export function updateEnemies(dt) {
                 e.flameTimer = 0.4;
                 addHostileFire(e.x, e.y);
             }
+        }
+
+        // Golpe no convertido que o provocou (no contato, com intervalo próprio)
+        if (e.allyHitCd > 0) e.allyHitCd -= dt;
+        if (hunting && ally && !(e.allyHitCd > 0) && Math.hypot(ally.x - e.x, ally.y - e.y) < ally.radius + e.radius + 4) {
+            e.allyHitCd = CONVERSION.enemyHitSeconds;
+            hurtConvert(ally, e.damage);
         }
 
         // Colisão com Herói
@@ -628,7 +641,7 @@ function updateReflectedProjectile(p, i, dt) {
     for (const e of enemies) {
         if (Math.hypot(e.x - p.x, e.y - p.y) < e.radius + p.radius) {
             dealDamage(e, p.damage, { kbX: p.vx * 0.4, kbY: p.vy * 0.4 });
-            createExplosion(p.x, p.y, '#7dd3fc', 12);
+            createExplosion(p.x, p.y, p.hitColor ?? '#7dd3fc', 12);
             audio.playExplode();
             enemyProjectiles.splice(i, 1);
             return;

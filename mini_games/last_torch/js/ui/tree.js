@@ -1,9 +1,10 @@
-import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES } from '../../data_model/tree.js';
+import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES, affinityLabel } from '../../data_model/tree.js';
 import { BRANCH_IMAGES, TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { getFuryUpgradeRows } from './stat_sheet.js';
 import { state } from '../core/state.js';
-import { buyNode, getNodeInfo, getNodeState, getNodeUpgradeRows, getRestrictionText } from '../systems/tree.js';
+import { getHero } from '../systems/modifiers.js';
+import { buyNode, excludedBy, getNodeInfo, getNodeState, getNodeUpgradeRows, getRestrictionText } from '../systems/tree.js';
 
 // --- ÁRVORES (tela) ---
 // Uma fábrica monta cada árvore: skills (tela de status) e relíquias (acampamento). O mapa é montado uma
@@ -48,7 +49,7 @@ function createTreeView(cfg) {
         block.className = 'tree-branch';
         block.style.setProperty('--tone', b.color);
         block.style.setProperty('--branch-rows', rows);
-        block.innerHTML = '<div class="tree-band"><span class="tree-band-icon"></span><span class="tree-band-name"></span></div><div class="tree-grid"></div>';
+        block.innerHTML = '<div class="tree-band"><span class="tree-band-icon"></span><span class="tree-band-name"></span><b class="tree-band-tag"></b></div><div class="tree-grid"></div>';
         paintIcon(block.querySelector('.tree-band-icon'), BRANCH_IMAGES[key], b.icon);
         block.querySelector('.tree-band-name').textContent = b.path ?? b.name;
         const grid = block.querySelector('.tree-grid');
@@ -135,6 +136,7 @@ function createTreeView(cfg) {
 
     function levelText(node, st) {
         // Selado (sem adaga): não é cadeado, é "não é para este personagem"
+        if (st.restricted && excludedBy(node)) return 'ENCHANTED';
         if (st.restricted) return st.level > 0 ? `NO DAGGERS · Lv. ${st.level}/${st.max}` : 'NO DAGGERS';
         if (node.kind === 'evolve') return st.maxed ? 'EVOLVED' : 'EVOLUTION';
         if (node.kind === 'relic') return st.maxed ? 'OWNED' : 'RELIC';
@@ -244,11 +246,26 @@ function createTreeView(cfg) {
     function renderBranches() {
         // Abas: o mapa cabe só o ramo da vez, então o tamanho das células segue a altura dele
         if (rail) map.style.setProperty('--rows-active', branchRows(activeBranch));
-        blocks.forEach((block, key) => block.classList.toggle('is-active', key === activeBranch));
+        blocks.forEach((block, key) => {
+            block.classList.toggle('is-active', key === activeBranch);
+            // Rótulo do ramo (desktop): "+5%" no ramo de afinidade do herói, "⛔ LOCKED" no proibido
+            const hero = getHero();
+            const sealed = !!hero.sealedBranches?.includes(key);
+            const tag = block.querySelector('.tree-band-tag');
+            tag.textContent = sealed ? '⛔ LOCKED' : hero.affinity === key ? (hero.affinityMods ? affinityLabel(hero) : `${affinityLabel(hero)} DMG`) : '';
+            tag.className = `tree-band-tag${sealed ? ' is-no' : hero.affinity === key ? ' is-plus' : ''}`;
+            block.classList.toggle('is-forbidden', sealed);
+        });
+        const hero = getHero();
         tabs.forEach((tab, key) => {
             const ready = branchNodes(key).filter(node => getNodeState(node).canBuy).length;
+            const sealed = !!hero.sealedBranches?.includes(key);
             tab.classList.toggle('is-on', key === activeBranch);
-            tab.querySelector('i').textContent = ready || '';
+            // Afinidade do herói: o ramo dele ganha a estrela dourada no canto (CSS); o proibido fica apagado com ⛔ na bolinha
+            tab.classList.toggle('is-affinity', hero.affinity === key);
+            tab.classList.toggle('is-forbidden', sealed);
+            tab.querySelector('i').textContent = sealed ? '⛔' : ready || '';
+            tab.title = sealed ? 'Locked for this hero' : hero.affinity === key ? `Affinity: ${affinityLabel(hero)}` : '';
         });
     }
 

@@ -182,13 +182,35 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { cooldown: 6, radius: 130, damage: 1.2 },
-            { cooldown: 6, radius: 170, damage: 1.2 },
-            { cooldown: 5, radius: 170, damage: 1.2 },
-            { cooldown: 5, radius: 170, damage: 1.8 },
-            { cooldown: 4, radius: 200, damage: 1.8 }
+            { cooldown: 15, radius: 130, damage: 1.2 },
+            { cooldown: 14, radius: 170, damage: 1.2 },
+            { cooldown: 13, radius: 170, damage: 1.2 },
+            { cooldown: 12, radius: 170, damage: 1.8 },
+            { cooldown: 11, radius: 200, damage: 1.8 }
         ],
         knockback: 520
+    },
+    // Absolute Zero (era a evolução da Soul Nova, agora uma skill própria no lugar dela): um pulso de frio que fere e CONGELA tudo em volta
+    // (bosses só levam o dano). Cada nível encurta a recarga, alarga o pulso e congela por mais tempo.
+    absoluteZero: {
+        name: 'Absolute Zero', icon: '🧊', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `A pulse of absolute cold bursts from you every ${formatNumber(level.cooldown)}s, dealing ${formatMultiplier(level.damage)} spell damage within ${level.radius} range and freezing monsters solid for ${formatNumber(level.freeze)}s. Bosses take the damage but do not freeze.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `Pulse every ${formatNumber(level.cooldown)}s · ${level.radius} radius · ${formatMultiplier(level.damage)} spell damage · frozen ${formatNumber(level.freeze)}s`
+            );
+        },
+        levels: [
+            { cooldown: 14, radius: 170, damage: 1.4, freeze: 1.5 },
+            { cooldown: 13, radius: 190, damage: 1.6, freeze: 1.8 },
+            { cooldown: 12, radius: 210, damage: 1.8, freeze: 2.1 },
+            { cooldown: 11, radius: 230, damage: 2.0, freeze: 2.3 },
+            { cooldown: 10, radius: 250, damage: 2.2, freeze: 2.5 }
+        ],
+        knockback: 140
     },
     corpseBurst: {
         name: 'Corpse Burst', icon: '💥', maxLvl: 5,
@@ -829,8 +851,8 @@ export const EVOLUTIONS = {
             const { cooldown, radius, damage } = this.levels;
             return `Your pulse bursts every ${formatNumber(cooldown)}s, dealing ${formatMultiplier(damage)} spell damage within ${radius} range and freezing enemies for ${formatNumber(this.freezeSeconds)}s.`;
         },
-        levels: { cooldown: 4, radius: 250, damage: 2.2 },
-        freezeSeconds: 1.6
+        levels: { cooldown: 10, radius: 250, damage: 2.2 },
+        freezeSeconds: 2.5
     },
     torchBolts: {
         name: 'Sun Spire', icon: '☀️',
@@ -849,8 +871,16 @@ export function createPowers() {
 }
 
 // Dados do nível atual de um poder (já com a evolução, se tiver)
+// Bônus de dano por poder (afinidade do herói com o ramo dele): chave do poder -> +x. Preenchido em js/systems/modifiers.js
+export const POWER_BOOST = {};
+
 export function getPowerLevel(power) {
     if (power.lvl <= 0) return null;
     const base = POWER_MODELS[power.key].levels[power.lvl - 1];
-    return power.evolved ? { ...base, ...EVOLUTIONS[power.key].levels } : base;
+    const level = power.evolved ? { ...base, ...EVOLUTIONS[power.key].levels } : base;
+    const boost = POWER_BOOST[power.key];
+    if (!boost) return level;
+    const out = { ...level };
+    for (const k of ['damage', 'dps', 'burnDamage', 'tickDamage']) if (typeof out[k] === 'number') out[k] *= 1 + boost;
+    return out;
 }

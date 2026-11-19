@@ -1,6 +1,6 @@
 import { audio, state } from '../core/state.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
-import { chooseHero, closeHeroes, pickHeroOnStart } from './heroes.js';
+import { buyHero, chooseHero, closeHeroes, pickHeroOnStart } from './heroes.js';
 import { inPortal, enterFullscreen, showIosHint } from './orientation.js';
 import { choosePick, isPicking, setupQuickPick } from './quick_pick.js';
 import { closeSanctuary, openSanctuary, setSanctuaryTab } from './sanctuary.js';
@@ -88,6 +88,11 @@ export function setupButtons() {
     document.getElementById('sanctuaryTabs').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-tab]');
         if (button) setSanctuaryTab(button.dataset.tab);
+    });
+    // Painel de requisitos de um herói bloqueado: botão de comprar com Brasas
+    document.getElementById('heroAttrs').addEventListener('click', (e) => {
+        const button = e.target.closest('[data-buy-hero]');
+        if (button) buyHero(button.dataset.buyHero);
     });
     document.getElementById('heroPicker').addEventListener('click', (e) => {
         const card = e.target.closest('.hero-pick');

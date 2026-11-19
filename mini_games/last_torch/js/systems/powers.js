@@ -197,6 +197,26 @@ function updateSoulNova(dt) {
     audio.playNova();
 }
 
+// --- ABSOLUTE ZERO ---
+// Pulso de frio: fere e congela (e.frozen: o bloco de gelo de js/render/entities.js) todo monstro em volta; boss só leva o dano
+function updateAbsoluteZero(dt) {
+    const level = getPowerLevel(powers.absoluteZero);
+    if (!level || !ready('absoluteZero', dt, getSpellCooldown(level.cooldown))) return;
+    const M = POWER_MODELS.absoluteZero;
+    const damage = getSpellDamage() * level.damage;
+    state.enemies.forEach(e => {
+        if (Math.hypot(e.x - player.x, e.y - player.y) > level.radius + e.radius) return;
+        const a = Math.atan2(e.y - player.y, e.x - player.x);
+        dealDamage(e, damage, { kbX: Math.cos(a) * M.knockback, kbY: Math.sin(a) * M.knockback, noCrit: true, style: 'spell' });
+        if (!e.isBoss) e.frozen = Math.max(e.frozen ?? 0, level.freeze);
+    });
+    addShockwave(player.x, player.y, { radius: level.radius, color: '#a5f3fc', width: 9, seconds: 0.45 });
+    addShockwave(player.x, player.y, { radius: level.radius * 0.6, color: '#ffffff', width: 3, seconds: 0.3 });
+    shakeScreen(4);
+    startCast();
+    audio.playNova();
+}
+
 // --- LUA FRIA ---
 function updateChillAura(dt) {
     const level = getPowerLevel(powers.chillAura);
@@ -315,6 +335,7 @@ export function updatePowers(dt) {
     updateGroundFires(dt);
     updateChainLightning(dt);
     updateSoulNova(dt);
+    updateAbsoluteZero(dt);
     updateChillAura(dt);
     updateStarfall(dt);
     updateTorchBolts(dt);

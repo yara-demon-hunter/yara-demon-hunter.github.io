@@ -67,14 +67,14 @@ Detalhes: [02_plano_de_acao.md](02_plano_de_acao.md) · números: [04_progresso.
 - [x] Brasas ganhas com animação
 - [x] "Você pode comprar…"
 - [ ] próximo herói e quanto falta
-- [ ] o que espera amanhã (baú, desafio)
+- [x] o que espera amanhã (baú de amanhã, quanto paga, em quantas horas)
 - [x] botão HUNT AGAIN grande (já existia)
 - [ ] CONTINUE bem visível no menu
 
 ## Fase 4 — Motivo diário (D1 e D7)
-- [ ] baú diário
-- [ ] sequência de 7 dias (zera se pular)
-- [ ] prêmio especial no dia 7
+- [x] baú diário (menu e tela final)
+- [x] sequência de 7 dias (zera se pular)
+- [x] prêmio especial no dia 7 (200 Brasas = Torch's Call)
 - [ ] desafio do dia (Presságios + semente da data)
 - [ ] desafio muda à meia-noite
 - [ ] resultado do dia ao lado do melhor e dos dias anteriores

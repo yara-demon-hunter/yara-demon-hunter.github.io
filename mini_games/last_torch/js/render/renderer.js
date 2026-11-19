@@ -11,6 +11,7 @@ import {
     renderGoldDrops
 } from './entities.js';
 import { renderFuryTrails, renderFurySwords } from './fury.js';
+import { renderArcane, renderFuryBeam, renderRuneShield } from './arcane.js';
 import { renderSceneryAmbient, renderSceneryGround, renderSceneryOverlay, renderScenerySway } from './scenery.js';
 import { renderLevelUpBack, renderLevelUpFront } from './level_up.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
@@ -192,6 +193,9 @@ export function render() {
     renderGibs();
     renderKnifeAim();
     renderKnives();
+    renderArcane();
+    renderFuryBeam();
+    renderRuneShield();
     renderBolts();
     renderPlayerTrail();
     renderDashGhosts();

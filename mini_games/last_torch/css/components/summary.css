@@ -86,6 +86,17 @@
 
 @media (max-width: 600px) and (orientation: portrait) {
     .summary-grid { grid-template-columns: minmax(0, 1fr); }
+    /* A tela rola: os botões ficam presos no rodapé, então HUNT AGAIN está sempre à vista */
+    .summary-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+        padding: 0.5rem 0 0.4rem;
+        background: linear-gradient(to top, rgba(3, 3, 6, 0.97) 75%, rgba(3, 3, 6, 0));
+    }
+    /* Baú diário mais fino na tela final em pé (sem as bolinhas) */
+    #summaryDaily .daily-pips { display: none; }
+    #summaryDaily .daily-open, #summaryDaily .daily-done { grid-template-areas: "icon text reward"; }
 }
 @media (max-height: 520px) and (orientation: landscape) {
     .summary { gap: 0.3rem; }

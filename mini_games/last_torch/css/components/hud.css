@@ -151,6 +151,29 @@
 #nightPips i.is-done { background: #f59e0b; }
 #nightPips i.is-now { background: #fde68a; box-shadow: 0 0 6px #fbbf24; }
 #nightPips i.is-boss.is-now { background: #f87171; box-shadow: 0 0 6px #ef4444; }
+/* Estrelas da onda terminada (js/ui/hud.js): "★N" embaixo da marca; a cor vai do cinza (0-1) ao dourado brilhando (5) */
+#nightPips i { position: relative; }
+#nightPips i[data-stars]:not([data-stars=""])::after {
+    content: '★' attr(data-stars);
+    position: absolute;
+    left: 50%;
+    top: 0.34rem;
+    transform: translateX(-50%);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+}
+#nightPips i.stars-0::after, #nightPips i.stars-1::after { color: #94a3b8; }
+#nightPips:has(i[data-stars]:not([data-stars=""])) { margin-bottom: 0.6rem; }
+#nightPips i.stars-0, #nightPips i.stars-1 { background: #78716c; }
+#nightPips i.stars-2, #nightPips i.stars-3 { background: #f59e0b; }
+#nightPips i.stars-2::after, #nightPips i.stars-3::after { color: #fbbf24; }
+#nightPips i.stars-4 { background: #fcd34d; }
+#nightPips i.stars-4::after { color: #fde68a; }
+#nightPips i.stars-5 { background: #fef3c7; box-shadow: 0 0 6px #fbbf24; }
+#nightPips i.stars-5::after { color: #fef3c7; text-shadow: 0 0 6px #fbbf24; }
 
 /* Pontuação */
 #hudScore {

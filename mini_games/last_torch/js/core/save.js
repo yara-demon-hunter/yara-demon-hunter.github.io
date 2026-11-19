@@ -26,6 +26,7 @@ function createSave() {
         seenTreeHint: false,
         embers: 0,                  // Brasas: a moeda que fica entre as noites (data_model/embers.js)
         altar: {},                  // melhorias permanentes compradas no Altar: chave -> nível
+        daily: null,                // baú diário: { lastDay, streak } (data_model/daily.js)
         waveBests: {}               // recorde de cada onda (número da onda -> { score, stars, kills, rush, gold }), no resultado da onda
     };
 }

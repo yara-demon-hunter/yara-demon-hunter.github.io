@@ -162,6 +162,14 @@ export function getFuryGroup() {
             row('💛', 'Healing', 'Health per second for him inside the circle (the torch heals too).', `${fury.healPerSecond}/s`),
             row('✨', 'Finale', 'When the circle fades a cross of light bursts: magic damage times this.', times(dmg(fury.finaleDamage)))
         ],
+        beam: () => [
+            row('🔷', 'Beam Damage', 'Damage dealt to every monster in the beam, again and again = your magic damage times this.', times(dmg(fury.damage))),
+            row('😈', 'Demons', 'Elites and bosses take this much more from the beam.', `+${Math.round(fury.demonBonus * 100)}%`),
+            row('⏱️', 'Pulse', 'Time between beam hits.', secondsShort(fury.tickSeconds)),
+            row('📏', 'Width', 'How wide the beam is.', `${fury.width}px`),
+            row('🔄', 'Turn Speed', 'How fast the beam turns to follow your aim.', `${fury.turnSpeed} rad/s`),
+            row('🛡️', 'Blue Shield', 'A blue shield makes him invulnerable while he fires.', 'Invulnerable')
+        ],
         forestGuardian: () => [
             row('🛡️', 'Damage Taken', 'The leaf shield makes every hit on him softer.', `-${Math.round(fury.damageReduction * 100)}%`),
             row('🍃', 'Leaf Damage', 'Damage dealt to every monster in reach, again and again = your magic damage times this.', times(dmg(fury.damage))),
@@ -176,6 +184,7 @@ export function getFuryGroup() {
         bloodWaltz: 'a chain of fast cuts, leaping from monster to monster',
         stomp: 'stomps the ground around him, stunning monsters',
         consecration: 'a circle of holy light that burns and slows monsters, heals him and the torch, and ends in a cross of light',
+        beam: 'a blue beam that crosses the whole screen: he stands still and turns it with your aim, burning everything in its path',
         forestGuardian: 'a leaf shield that hurts and slows the monsters around him'
     }[fury.kind];
     return { title: `Special Attack (Fury): ${fury.name.toUpperCase()}`, summary, rows: [

@@ -185,7 +185,7 @@ function updateLunge(e, model, ai, dt) {
         e.angle = L.line.angle;
         if (L.wait <= 0) {
             // Golpe de espada no arranque (o boneco detecta a troca de comboStep)
-            e.comboStep = (e.comboStep % 3) + 1;
+            e.comboStep = ((e.comboStep ?? 1) % 3) + 1;
             addShockwave(e.x, e.y, { radius: 70, color: model.color, width: 4, seconds: 0.25 });
             audio.playDash();
         }
@@ -237,7 +237,7 @@ function updateRivalMelee(e, model, ai, dt) {
     ai.meleeAngle = aimAngle(e);
     ai.meleeHit = model.meleeHitDelaySeconds;
     e.angle = ai.meleeAngle;
-    e.comboStep = (e.comboStep % 3) + 1;
+    e.comboStep = ((e.comboStep ?? 1) % 3) + 1;
     audio.playBossAttack();
 }
 

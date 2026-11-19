@@ -309,6 +309,7 @@
     .hero-pick .hero-portrait { width: auto; height: 1.9rem; aspect-ratio: 1; }
     .hero-pick-name { font-size: clamp(0.42rem, 1.5vw, 0.56rem); letter-spacing: 0; }
     .hero-pick-hint { display: none; }
+    .hero-pick .hero-pick-lock-price { display: block; }
     .start-links .start-btn-small { padding: 0.3rem 0.6rem; }
     .start-links .hero-portrait { width: 1.7rem; height: 1.7rem; }
     .link-icon { width: 1.45rem; font-size: 1.06rem; }
@@ -349,3 +350,42 @@
 .start-btn-continue { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; background: linear-gradient(180deg, #14532d, #052e16); border-color: rgba(74, 222, 128, 0.55); box-shadow: 0 0 22px rgba(22, 163, 74, 0.35), inset 0 1px 0 rgba(187, 247, 208, 0.25); color: #dcfce7; }
 .start-btn-continue.hidden { display: none; }
 .start-btn-continue em { font-family: 'Inter', sans-serif; font-size: 0.7rem; font-style: normal; font-weight: 600; letter-spacing: 0.08em; text-indent: 0; color: #86efac; }
+
+/* Herói à venda por Brasas (js/ui/heroes.js): o preço fica em laranja; com Brasas suficientes o cartão brilha e um toque compra */
+.hero-pick-hint.is-price { color: #fdba74; font-weight: 800; }
+.hero-pick.is-buyable { cursor: pointer; color: #fde68a; border-color: rgba(251, 146, 60, 0.85); animation: altarReady 1.4s ease-in-out infinite; }
+.hero-pick.is-buyable .hero-pick-hint { color: #fff7ed; background: #b45309; border-radius: 0.35rem; padding: 0.1rem 0.3rem; }
+.hero-pick.is-buyable .hero-pick-hint { white-space: nowrap; }
+/* Preço dentro do cadeado: só na tela deitada, onde a dica fica escondida */
+.hero-pick-lock-price { display: none; position: absolute; left: -0.6rem; right: -0.6rem; bottom: -0.35rem; padding: 0 0.15rem; border-radius: 0.3rem; background: #7c2d12; color: #fde4c8; font-size: 0.42rem; font-style: normal; font-weight: 800; line-height: 1.4; text-align: center; white-space: nowrap; }
+.hero-pick.is-buyable .hero-pick-lock-price { background: #b45309; }
+
+/* Herói bloqueado tocado (js/ui/hero_stats.js): o painel das barras vira "como desbloquear", com cada requisito e o progresso */
+.hero-pick.is-locked { cursor: pointer; }
+.hero-pick.is-viewing { border-color: rgba(148, 163, 184, 0.75); box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35); }
+.hero-attrs.is-locked-view { border-color: rgba(148, 163, 184, 0.4); }
+.hs-lock-title { font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; color: #e2e8f0; margin-bottom: 0.35rem; }
+.hs-reqs { display: flex; flex-direction: column; gap: 0.35rem; }
+.hs-req { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.15rem 0.5rem; align-items: baseline; font-family: 'Inter', sans-serif; }
+.hs-req-label { font-size: 0.66rem; font-weight: 700; color: #d6cdb8; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hs-req-count { font-size: 0.6rem; font-weight: 700; color: #94a3b8; font-variant-numeric: tabular-nums; }
+.hs-req .hs-bar { grid-column: 1 / -1; height: 0.45rem; }
+.hs-req .hs-bar i { background: linear-gradient(90deg, #ea580c, #fde68a); }
+.hs-req.is-done .hs-req-count { color: #86efac; }
+.hs-buy { margin-top: 0.45rem; width: 100%; padding: 0.35rem 0.6rem; border: 1px solid rgba(251, 146, 60, 0.85); border-radius: 0.5rem; background: #b45309; color: #fff7ed; font: 800 0.72rem 'Inter', sans-serif; letter-spacing: 0.06em; cursor: pointer; animation: altarReady 1.4s ease-in-out infinite; }
+@media (max-height: 520px) and (orientation: landscape) {
+    .hs-lock-title { font-size: 0.52rem; margin-bottom: 0.2rem; }
+    .hs-req-label { font-size: 0.54rem; }
+    .hs-req-count { font-size: 0.5rem; }
+    .hs-buy { margin-top: 0.25rem; padding: 0.2rem 0.5rem; font-size: 0.6rem; }
+}
+
+/* Caminhos da árvore do herói (js/ui/hero_stats.js): afinidade (+5%) e ramos proibidos, numa linha */
+.hs-paths { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem 0.4rem; margin-top: 0.35rem; font-family: 'Inter', sans-serif; font-size: 0.56rem; font-weight: 800; letter-spacing: 0.06em; }
+.hs-path { padding: 0.08rem 0.4rem; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.3); color: #94a3b8; }
+.hs-path.is-plus { color: var(--tone); border-color: color-mix(in srgb, var(--tone) 60%, transparent); background: color-mix(in srgb, var(--tone) 12%, transparent); }
+.hs-path.is-no { color: #fca5a5; border-color: rgba(248, 113, 113, 0.35); }
+.hs-path.is-all { color: #fde68a; border-color: rgba(253, 230, 138, 0.4); }
+@media (max-height: 520px) and (orientation: landscape) {
+    .hs-paths { margin-top: 0.2rem; font-size: 0.46rem; }
+}

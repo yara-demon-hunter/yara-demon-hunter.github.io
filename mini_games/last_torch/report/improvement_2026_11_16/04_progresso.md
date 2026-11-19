@@ -339,3 +339,134 @@ A adaga carregada perfurava tudo (no nível 5, "todos os alvos") e nunca chegava
 - Com o boss em campo não nasce monstro comum (`updateSpawner`: `if (state.currentBoss) return`); só o que o boss invoca. Os que já estavam em campo continuam. Ao cair o boss, a onda fecha como já fazia (monstros explodem, tempo para pegar baú e itens).
 - `waveMinSeconds` 180 → 144 (`difficulty.js`): o boss da onda 1 apareceu aos ~146 s (antes ~181 s); a densidade crescente (`spawnGrowth`) acompanha o novo tempo. Teste no Fast Run: durante o boss os monstros comuns só diminuíram (10 → 1) e depois do boss a fase foi direto para o fim da onda.
 - Bosses com +15% de vida (`BOSS_FOCUS_BONUS` em `bosses.js`), já que a luta agora é o foco (sem monstros comuns): multiplicadores finais rival 1ª hora ×1,96, Demon Lord ×2,76, Brutos ×2,53, Blood Countess ×2,07, The Long Night ×2,07, revanche final e outros ×2,3.
+
+## 2026-11-18 · Baú diário com sequência de 7 dias (D1 e D7)
+
+Item 2 do mínimo antes do relançamento (5.9). Um baú por dia (data local), pago em Brasas: **20 · 30 · 40 · 55 · 70 · 90 · 200** do dia 1 ao 7 (o dia 1 já paga a 1ª melhoria do Altar; o dia 7 paga o Torch's Call). Abrir em dias seguidos sobe a sequência; pular um dia volta ao dia 1 ("Streak lost"); depois do dia 7 recomeça no 1.
+- **Onde:** faixa acima do PLAY na tela inicial e abaixo das Brasas na tela final. Fechado: brilha, 🎁 balança, "OPEN · 🔥 N". Aberto: **COME BACK TOMORROW · Day N chest: 🔥 X · in Nh** (o gancho para o D1).
+- **Arquivos:** `data_model/daily.js` (prêmios e regras), `js/ui/daily.js`, `css/components/daily.css`, `save.daily = { lastDay, streak }` em `save.js`, ligações em `screens.js` e `last_torch.html`.
+- **Celular em pé:** os botões da tela final (HUNT AGAIN, Altar...) ficam presos no rodapé (`position: sticky`), porque a faixa empurrava o HUNT AGAIN para fora da tela no 360×640.
+- **Verificado** no pacote (Chrome headless, 1280×720, 360×640, 390×844, 844×390): ontem dia 2 → hoje abre o dia 3 (+40); abrir na tela final atualiza "You have N" e "You can buy"; sem erros no console.
+- **Não verificado:** celular real; virada da meia-noite com o jogo aberto (a faixa só se atualiza ao voltar ao menu ou ao fim da noite).
+
+## 2026-11-18 · Avgustino só por Brasas (350)
+
+Decisão do dono: Brutos e Azael continuam por conquista (são enfrentados no jogo), o Rowan continua por "Survive Wave 1", e o **Avgustino passa a sair só por Brasas**, como meta de médio prazo (alguns dias de noites + baú diário).
+- `emberPrice: 350` em `data_model/characters/avgustino.js`; a conquista Blood Moon (onda 4) segue como troféu, mas não libera mais herói. Quem já o tinha continua com ele.
+- **Cartão bloqueado:** "🔥 120/350"; com Brasas suficientes o cartão brilha, mostra "🔥350" e um toque compra, com o mesmo prêmio "NEW HERO UNLOCKED" das conquistas (`heroOffer`/`buyHero` em `js/ui/heroes.js`). No celular deitado o preço fica dentro do cadeado.
+- **Tela final:** linha de meta "🔥 Father Avgustino · N embers to go" com barra, acima da conquista mais próxima.
+- Verificado no pacote (1280×720, 360×640, 844×390): 400 → compra → 50 Brasas, herói liberado, prêmio aparece; onda 5 não libera mais; save antigo com o herói continua com ele; sem erros.
+
+## 2026-11-18 · Conversion: o Avgustino converte monstros com uma reza
+
+Ideia do dono. Passiva nova, **só do Avgustino**, no ramo Light (linha 5, pede Silent Vigil; conta como skill ativa, +1 ponto). A cada 9 s (a 1ª aos 3 s) ele reza pelo monstro **comum** mais perto (até 260): um feixe de luz desce, "CONVERTED", sino. O monstro sai da horda **sem morrer** (sem ouro/XP) e passa para o lado dele **até o fim da noite**, com ×3 de vida.
+- **Acumulam:** até 6 ao mesmo tempo (um que morre libera a vaga). Ficam com auréola e anel dourado; a barra de vida só aparece quando apanham. Fora da caçada voltam com a vida cheia; 2 s sem apanhar, curam 4%/s.
+- **Lutam:** vão atrás do monstro mais perto (até 360) e batem a cada 0,8 s com 1,4× o dano que tinham; sem inimigo, seguem o herói. As mortes que causam valem como do herói.
+- **Provocam:** monstros comuns a até 220 de um convertido vão atrás dele e o machucam no contato. Bosses, elites e sombras do rival não são convertidos nem provocados.
+- **Arquivos:** `CONVERSION` em `data_model/passives.js`, nó em `data_model/tree.js`, `js/systems/conversion.js`, provocação em `enemies.js`, desenho em `js/render/entities.js`, `state.converts`.
+- **Verificado** (Chrome headless, 90 s na onda 1, herói parado com dano recebido −90%): os convertidos chegam a 4–5 juntos, apanham dos provocados, se curam e morrem; sem erros. **Não verificado:** jogando de verdade; equilíbrio nas ondas finais; Continue de uma noite salva (os convertidos não são guardados e se perdem).
+
+## 2026-11-18 · Herói bloqueado mostra como desbloquear
+
+Pedido do dono. O cartão de herói bloqueado agora é clicável: o toque troca o painel das barras por **"🔒 NOME · HOW TO UNLOCK"**, com cada requisito (ícone, texto, "x/y · %" e barra) e, embaixo, a habilidade do herói. Os requisitos vêm das conquistas que liberam o herói (`ACHIEVEMENTS` com `hero`) e do `emberPrice`; com Brasas suficientes aparece **UNLOCK · 🔥 350** no painel (a compra saiu do toque no cartão). Tocar num herói liberado volta às barras. Arquivos: `js/ui/hero_stats.js` (`unlockRequirements`), `js/ui/heroes.js`, `js/ui/buttons.js`, `start-screen.css`. Verificado em 1280×720, 360×640 e 844×390, sem erros. Hoje cada herói tem um requisito só; para ter vários (ex.: "Beat the game" + "Kill 300 vampires"), basta outra conquista com o mesmo `hero`.
+
+## 2026-11-18 · Estrelas de dano mais fáceis
+
+Pedido do dono: 5 estrelas quase nunca saíam (o dano soma na onda inteira e curar não apaga). `WAVE_SPOILS.damageGoals` [0,5 · 0,2] → **[0,75 · 0,4]** (`data_model/night.js`): ★ tocha ≤75%, ★ tocha ≤40%, ★ herói ≤75%, ★ herói ≤40%, ★ Rush. O cartão do resultado já lê o valor ("≤75/40%"). Não medido com jogador de verdade; se ainda ficar raro, o próximo passo é a estrela de Rush (20 + 4 × onda).
+
+## 2026-11-18 · Estrelas de cada onda na barra de ondas
+
+Ideia do dono: o jogador se situar ("nessa onda fui bem"). Embaixo de cada marca de onda já terminada na barra do HUD aparece **★N** (as estrelas do resultado daquela onda), e a marca muda de cor: cinza (0–1), laranja (2–3), amarelo (4), claro brilhando (5). Guardado em `state.run.waveStars` (`grantWaveSpoils`, `js/ui/camp.js`), desenhado em `js/ui/hud.js` + `css/components/hud.css` (só CSS, sem custo no jogo). A barra só ganha altura depois da primeira onda com estrelas. Verificado em 1280×720, 360×640 e 844×390, sem erros.
+
+## 2026-11-18 · Conversion: cada convertido luta com o próprio golpe, e sem travar
+
+Pedido do dono: o convertido só "encostava" (dano invisível) e os monstros pareciam travados.
+- **Golpes próprios** (`fight` em `js/systems/conversion.js`): atiradores (bruxa, cavaleiro sem cabeça, necromante, pedra do golem) param a uma distância e atiram um tiro que persegue o monstro (o tiro refletido do Mirror Ward, com o desenho do próprio monstro e halo dourado; nunca fere o herói). Treant: soco em leque com os braços subindo. Golem: pancada em área com as duas mãos de perto e pedra de longe. Espectro e lobo zumbi: miram e investem atravessando, ferindo cada monstro no caminho. Inchado: corre até a horda e explode (morre no estouro). Os outros mordem com um tranco para a frente e faíscas douradas.
+- **Sem travar:** o monstro provocado para encostado no convertido (antes entrava no meio dele e todos se empilhavam), e convertidos e monstros se empurram.
+- **Verificado** (Chrome headless, um de cada tipo contra 6 esqueletos): todos convertem e atacam do seu jeito (golem 3 pancadas + pedra, treant 4 socos, espectro 6 e lobo 4 investidas, cavaleiro 5 tiros, inchado explode); sem erros. **Não verificado:** jogando de verdade; equilíbrio (a bruxa, frágil, morre rápido; o inchado é um uso só).
+
+## 2026-11-18 · Gudran, novo herói (500 Brasas)
+
+Pedido do dono: trazer o Gudran do yara-rpg (chefe final do Castelo de Gudran) como herói, por **500 Brasas**.
+- **Arte:** o yara-rpg só tinha um retrato em pixel art (`images/special_monsters/gudran.webp`), não um boneco. Copiei-o para `images/characters/gudran-small.webp` (24 KB) e fiz um **boneco 2.5D novo** na biblioteca (`_library/characters/gudran/`: `gudran_visual.js`, `gudran25d.js`, `art_reference/` com a ficha e o retrato), derivado do Avgustino (túnica longa em três peças, braços, pernas): sem chapéu, cabelo branco em massa única que cai atrás, sobrancelhas brancas franzidas, olhos escuros, bigode e barba longos, túnica preta com barra, gola, punhos e cinto **dourados**, pingente de gema azul e **cajado com esfera azul** (`weapons/staff`). Sincronizado nos dois jogos (`sync.rb`) e adicionado ao tuner da biblioteca (`tools/tuner.html?model=gudran`).
+- **Jogo:** `data_model/characters/gudran.js` (`emberPrice: 500`, `order: 3.5`), lista em `characters/index.js`, `heroes.js`, `render/bodies.js`, paleta de sombra para o Shadow Clone e falas próprias do duelo contra o Azael (`dialogues.js`).
+- **Números:** canhão de vidro: 80 de vida (os outros 90–), velocidade 110, magia 42 (a maior; Avgustino 30), alcance da lâmina 58 e da adaga 340, dano de lâmina 20. **Fúria:** a mesma mecânica `consecration` do Avgustino, com o nome "Lord's Decree" e cor azul (uma Fúria nova pediria código novo). A adaga é a comum, com dano de magia.
+- **Verificado** (Chrome headless): tocar no cartão bloqueado mostra o requisito, comprar com 520 Brasas deixa 20 e libera o herói com o prêmio; jogar com ele roda uma noite sem erros (desktop e celular em pé). O desenho foi conferido no tuner, nas duas câmeras.
+- **Não verificado / a melhorar:** o desenho é uma primeira versão (as mechas de cabelo viram "lâminas" cinzas nas vistas de lado; falta o manto largo e bordado da arte); equilíbrio jogando; as falas contra os outros bosses usam as padrão; no celular em pé a fileira de 6 heróis ficou apertada.
+
+## 2026-11-19 · Gudran: ataque de energia azul, esfera arcana e a Runa Soberana
+
+Pedido do dono: o Gudran não corta, só usa magia; no lugar da adaga ele lança outra coisa; e uma passiva só dele no Curse Path.
+- **Ataque básico arcano** (`basicAttack: 'arcane'` no `gudran.js`, `js/systems/arcane.js`, `js/render/arcane.js`): ele ergue o cajado (a mesma animação de golpe do boneco, sem o arco de corte) e solta um **raio de energia azul** no monstro mais perto, dentro de 230 px (o círculo vermelho dele). Dano de **magia** (número azul) = 70% da magia dele; o 3º raio do combo é maior (×1,7) e empurra mais. Cada acerto carrega a Fúria e conta para o execute. Números em `ARCANE_BOLT` (`passives.js`).
+- **Esfera arcana no lugar da adaga** (`thrown: 'arcane'`, `_library/weapons/arcane_orb/`): uma esfera azul brilhante, mais lenta e maior que a adaga, que **atravessa o primeiro monstro**. É um estilo do arremesso, então as skills de adaga (Ricochet, Fan of Knives, Dagger Mastery) valem para ela, e ela aparece na mão livre dele.
+- **Runa Soberana** (Curse Path, só do Gudran, linha 5, pede Arcane Study, 4 pontos): os raios furam +1 monstro e **estouram em luz azul** onde acabam (60% do dano do raio, raio 70 px). Dados em `sovereignRune` (`passives.js`), nó em `tree.js` (`hero: 'gudran'`).
+- **Árvore:** o ramo Blade e a Flaming Sword ficam selados para ele (como no Rowan), porque ele não tem lâmina.
+- **Verificado** (Chrome headless): os raios saem e matam, a Fúria carrega, a esfera tem estilo `arcane` e 1 furo, o nó da runa custa 4 e o Blade está selado; sem erros. **Não verificado:** equilíbrio jogando; o ícone da Runa na árvore (usa o emoji 🔷, sem imagem); o desenho da esfera de perto.
+
+## 2026-11-19 · Gudran: segunda versão da arte (folha de poses)
+
+Com a folha `Gudran-poses.jpeg`: **manto largo nos ombros** com borda dourada bordada, **barba única larga que afunila em ponta**, cabelo branco que cai atrás (as mechas deixaram de ser cinzas), **mangas de sino** com punho dourado e **duas faixas douradas bordadas** na frente da túnica. Conferido no tuner. Falta: o cajado com o gancho em meia-lua (usa a espiral do cajado do Rowan), as costas com o manto cobrindo mais, e a pose de conjurar com faíscas na esfera.
+
+## 2026-11-19 · Gudran: Fúria em raio azul e ataque básico mais rápido, sem "cajadada"
+
+- **Fúria "Lord's Decree" agora é um raio** (`kind: 'beam'`, `js/systems/fury.js` + `renderFuryBeam` em `js/render/arcane.js`): ele aponta o cajado e solta um raio azul contínuo que **cruza a tela inteira** por ~7 s. Ele fica **plantado** e só mira: o raio gira atrás do mouse (ou do joystick) a 2,6 rad/s, como um farol. A cada 0,15 s todo monstro na linha leva 32% da magia (bosses e elites +25%); leva 40% menos dano enquanto atira; o ataque básico para durante o raio. Números em `fury` de `gudran.js`.
+- **Ataque básico mais rápido:** `attackCooldown` 0,75 → 0,5 (≈ 1,7 raios/s medidos), dano do raio 70% → 60% da magia.
+- **Sem cajadada:** o boneco do Gudran ganhou uma pose própria (`swordRest` em `gudran25d.js`): em repouso o cajado fica em pé; ao atacar ele só **ergue o cajado com a esfera à frente**, e o raio sai da esfera (com um clarão), sem varrer. Os raios nascem mais alto, na ponta do cajado.
+- **Verificado** (Chrome headless): o raio liga, acerta os 6 monstros alinhados, o herói não sai do lugar, gira para baixo seguindo a mira e acerta os de lá, termina no fim da Fúria; sem erros. **Não verificado:** a pose do cajado erguido de perto no jogo; mira por joystick no celular; equilíbrio.
+
+## 2026-11-19 · Gudran: escudo azul invulnerável durante o raio
+
+Durante o Lord's Decree um **escudo azul** envolve o Gudran (bolha com brilho, borda que pulsa e arcos girando) e ele fica **invulnerável** enquanto o raio dura (`player.iFrames` mantido em `updateBeam`, `js/systems/fury.js`; desenho em `renderFuryBeam`). Testado com um monstro colado nele por 2 s: a vida não mudou. A tocha continua podendo ser atacada.
+
+Durante o raio ele também **não pode dar dash nem lançar a esfera arcana** (`tryDash` e `throwKnife` retornam se `beamActive()`), além de não andar nem atacar: só mira. Testado: dash e esfera bloqueados durante o raio e liberados depois.
+
+## 2026-11-19 · Gudran: ataque erguendo o cajado (sem varredura de espada)
+
+O ataque básico usava o golpe de espada do motor: a varredura e as cópias fantasmas da arma faziam parecer "outro cajado dando um golpe de lado". Agora há um movimento próprio no motor dos heróis, **staffCast** (`_library/characters/hunter/hero25d.js` + `hero25d_visual.js > moves`): ele ergue o cajado devagar com a esfera acima da cabeça (0,5 s), no alto o cajado aponta para a frente e **o raio sai da esfera** (impacto), segura e abaixa. O jogo dispara o raio no impacto (`startMove` em `combat.js`) e usa um contador de combo próprio (`player.arcaneStep`), porque mudar o `comboStep` disparava a varredura. **Mais lento:** 1 raio por segundo (`attackCooldown` 1,0), mais forte (100% da magia). Conferido em 4 quadros no jogo (repouso, erguendo, impacto, volta), sem cópias fantasmas.
+
+## 2026-11-19 · Gudran: Escudo de Runas no clique (no lugar da esfera)
+
+Escolha do dono. O clique (ou o botão do canto no celular) agora ergue o **Escudo de Runas**: 6 runas azuis giram em volta dele por 4 s; quem encosta leva 60% da magia e é jogado para fora (o mesmo monstro só leva outro toque depois de 0,45 s). Recarga 8 s, no mesmo relógio do Axe Quake e do Root Snare (o anel do botão mostra a recarga, ícone 🔷). Não sai durante o raio da Fúria. Números em `abilities.runeShield` (`gudran.js`), lógica em `updateRuneShield` (`js/systems/arcane.js`), desenho em `renderRuneShield`. Com isso ele passa a ser `noKnives`: **as skills de adaga ficam seladas**, além do ramo **Blade** (conferido no teste). A esfera azul fica só na mão livre, como enfeite. Testado: o escudo liga, 8 monstros em volta levaram dano, nenhuma adaga sai; sem erros.
+
+## 2026-11-19 · Gudran vira para o alvo ao atacar andando
+
+Andando de costas para o monstro ele atacava sem se virar (o giro para o alvo vinha só com o golpe de espada). Agora, durante o `staffCast`, o boneco gira rápido para o alvo (`hero_anim.js`, mesmo jeito do arremesso) e, quando o ataque termina, volta a olhar para onde anda. Conferido em 4 quadros: andando para a esquerda com o monstro à direita, ele vira, atira para a direita e volta.
+
+## 2026-11-19 · Gelo mais bem feito
+
+O monstro congelado (Soul Nova evoluída, `e.frozen`) era só um círculo azul. Agora é um **bloco de gelo** (`renderIce`, `js/render/entities.js`): poliedro irregular (um diferente por monstro), com degradê, facetas, reflexo em faixa, contorno claro, **cristais** em volta e **brilhos** piscando; névoa fria no chão. Ao congelar, o bloco cresce com um pequeno repique e **cacos voam para fora** com um anel de gelo no chão; nos últimos 0,9 s aparecem **rachaduras** piscando e, no último 0,5 s, ele esmaece e derrete. Só polígonos e riscos (sem imagem), só nos poucos monstros congelados. Conferido em 4 momentos no jogo, sem erros.
+
+## 2026-11-19 · Soul Nova desligada
+
+Pedido do dono: a **Soul Nova** (e a evolução que congela) saiu da árvore do Curse Path, **comentada** em `data_model/tree.js` (os dois nós `soulNova` e `novaEvolve`, com a instrução para voltar). Nenhum outro nó dependia dela (sem links quebrados, conferido no jogo). O dado e o código dela (`powers.js`, `renderIce`) ficam, só que sem nó na árvore ninguém a aprende; o gelo novo fica sem uso até outra skill congelar.
+
+## 2026-11-19 · Absolute Zero como skill própria
+
+O Absolute Zero era a **evolução** da Soul Nova (desligada). Virou uma skill própria (`absoluteZero` em `data_model/powers.js`, lógica `updateAbsoluteZero` em `js/systems/powers.js`), no lugar da Soul Nova na árvore do Curse Path, ligada ao **Cold Moon (Chill Aura) nível 2** como a Soul Nova era. 5 níveis: recarga 14 → 10 s, raio 170 → 250, dano 1,4× → 2,2× da magia, congelamento 1,5 → 2,5 s (o último nível iguala o antigo Absolute Zero). Boss só leva o dano. Custo 4 pontos (poder ativo do ramo). Usa o bloco de gelo novo. Testado: nó fechado sem o Cold Moon 2, abre com ele, o pulso congelou 5 monstros aos 7 s; sem erros.
+
+## 2026-11-19 · Caminhos por personagem: afinidade (+5%) e ramos proibidos
+
+Pedido do dono. Cada herói tem `affinity` (ramo com +5% de dano) e `sealedBranches` (ramos proibidos) no próprio arquivo:
+
+| Herói | +5% | Proibido |
+|---|---|---|
+| Demon Hunter | — | nenhum (todos abertos) |
+| Avgustino | Light | Curse |
+| Gudran | Curse | Light (e Blade: sem lâmina) |
+| Rowan | Nature | Flame (e Blade: cajado não corta) |
+| Azael | Shadow | Light |
+| Brutos | Blade (inclui o golpe da lâmina) | Shadow |
+
+- **Bônus:** `AFFINITY_BONUS` (0,05) em `data_model/tree.js`; os poderes e evoluções do ramo batem 5% mais forte (`POWER_BOOST`, aplicado em `getPowerLevel`, preenchido em `refreshModifiers`); no Blade Path também +5% de dano da lâmina. Medido: Holy Water do Avgustino 1,10× → 1,155×. As passivas do ramo (não poderes) não recebem o bônus.
+- **Proibido:** usa o selo que já existia (`isRestricted`), com o texto "X cannot walk the Curse Path."; a skill Fury, do ramo Blade, continua aberta para todos.
+- **Onde aparece:** tela de escolha, abaixo das barras ("🌙 CURSE +5%  ⛔ BLADE  ⛔ LIGHT"; Demon Hunter: "✦ ALL PATHS OPEN"); árvore no desktop, etiqueta no rótulo do ramo ("+5% DMG" / "⛔ LOCKED", ramo apagado); árvore no celular, aba com "+5%" e aba proibida apagada com ⛔. Conferido nos 6 heróis, desktop e celular, sem erros.
+
+- **Rowan (19/11):** no lugar do +5% de dano no Nature Path, as **raízes seguram 20% mais tempo** (`affinityMods: { rootSeconds: 0.2 }` e `affinityLabel: "ROOTS +20%"` no `rowan.js`; vale para todo `rootEnemy`: Root Snare, Grasping Roots, carvalho...). Qualquer herói com `affinityMods` troca o bônus de dano por esses modificadores; os rótulos usam `affinityLabel`. Testado: Rowan `rootSeconds` 0,2 e nenhum bônus de dano; Avgustino segue com +5%.
+
+- **Correção no celular (19/11):** nas abas da árvore o texto do bônus ia para a bolinha de contagem e virava um bloco por cima do ícone ("ROOTS +20% · 1"). Agora a bolinha mostra só a contagem (ou ⛔ no ramo proibido) e o ramo preferido ganha uma **★ dourada** no canto e borda dourada (o texto completo fica na tela de escolha e no rótulo do ramo no desktop). Conferido em 360×640, 390×844 e 844×390.
+
+## 2026-11-19 · Teste automático e correção do rival
+
+Um robô jogou noites com Demon Hunter, Gudran e Rowan (desktop). Achou um erro de desenho com o Rowan, que aparecia a cada quadro quando o rival (Azael) atacava: `comboStep` do boss podia ser indefinido e virar `NaN` (`boss_ai.js`), quebrando a animação do boneco (`hero_anim.js`). Corrigido nos dois pontos (`?? 1` e proteção no motor). Os outros heróis não deram erro, sem números inválidos nem monstros em excesso.
+
+**Pendente:** testar os outros heróis no celular; a tela inicial em pé com 6 heróis ficou apertada (ideia: grade 3×2 e compactar o resto da tela).

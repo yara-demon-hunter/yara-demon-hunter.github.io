@@ -117,6 +117,8 @@ function grantWaveSpoils(wave) {
     const record = { score: Math.max(score, best?.score ?? 0), stars: Math.max(count, best?.stars ?? 0) };
     save.waveBests[wave] = record;
     state.run.stars = (state.run.stars ?? 0) + count;
+    // Estrelas de cada onda desta noite: aparecem nas marcas da barra de ondas do HUD (js/ui/hud.js)
+    (state.run.waveStars ??= {})[wave] = count;
     // Conquistas do Santuário: em quantas ondas diferentes já tirou ★★★★★
     save.stats.fiveStarWaves = Object.values(save.waveBests).filter(b => b.stars >= 5).length;
     persist();

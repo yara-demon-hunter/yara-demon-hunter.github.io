@@ -131,6 +131,7 @@ export function renderBladeSlashes() {
     const fireSlash = passives.flameBlade.lvl > 0 ? fireLook().slash : null;
 
     state.bladeSlashes.forEach(s => {
+        if (s.arcane) return;          // golpe do cajado do Gudran: só a animação do boneco, o raio é desenhado em renderArcane
         const look = s.spin ? SLASH_VISUALS.whirl : (SLASH_VISUALS[s.comboStep] || SLASH_VISUALS[1]);
         const progress = easeOutCubic(1 - (s.life / s.maxLife));
         const fadeOut = Math.min(1, (s.life / s.maxLife) * 3);
@@ -192,10 +193,17 @@ export function renderBladeSlashes() {
 export function renderEnemyProjectiles() {
     if (state.enemyProjectiles.length === 0) return;
     for (const p of state.enemyProjectiles) {
-        if (p.reflected) {
+        if (p.reflected && !p.allyShot) {
             resetWorldView();
             renderReflectedBolt(p);
             continue;
+        }
+        // Tiro de um convertido do Avgustino: o desenho do próprio monstro, com um halo dourado
+        if (p.allyShot) {
+            resetWorldView();
+            ctx.globalCompositeOperation = 'lighter';
+            drawGlow(ctx, '#fde68a', p.x, p.y, p.radius * 2.6, 0.55);
+            ctx.globalCompositeOperation = 'source-over';
         }
         const sprite = getBoltSprite(p.owner, p.color, p.radius);
         const k = p.radius / sprite.radius;
@@ -319,6 +327,154 @@ const HEALTH_BAR_OFFSETS = {
     BONE_COLOSSUS: BONE_COLOSSUS_VISUALS.healthBarOffset
 };
 
+// --- GELO (Soul Nova evoluída congela o monstro: e.frozen) ---
+// Um bloco de gelo de verdade em vez de um círculo: ao congelar, cacos voam para fora e o bloco cresce com um pequeno repique; fica
+// um poliedro irregular (cada monstro tem o seu, a partir de e.phase) com facetas, reflexo, cristais na base e brilhos piscando; perto
+// de derreter, racha e pisca. Só polígonos e riscos, sem sprite, e só nos poucos monstros congelados.
+const ICE_SIDES = 9;
+function iceNoise(seed, i) {
+    return 0.5 + 0.5 * Math.sin(seed * 12.9898 + i * 78.233 + i * i * 0.37);
+}
+
+function renderIce(e) {
+    e.iceStart ??= state.runTime;
+    const age = state.runTime - e.iceStart;
+    const seed = e.phase ?? 0;
+    const grow = Math.min(1, age / 0.22);
+    const pop = grow < 1 ? 1 - Math.pow(1 - grow, 3) + Math.sin(grow * Math.PI) * 0.12 : 1;      // sobe e repica
+    const melt = e.frozen < 0.5 ? e.frozen / 0.5 : 1;                                           // no último meio segundo derrete
+    const r = e.radius * 1.25 * pop;
+    const x = e.x;
+    const y = e.y;
+    ctx.save();
+
+    // Névoa fria no chão
+    ctx.globalAlpha = 0.35 * melt;
+    ctx.fillStyle = '#bae6fd';
+    ctx.beginPath();
+    ctx.ellipse(x, y + e.radius * 0.55, r * 1.25, r * 0.45, 0, 0, TAU);
+    ctx.fill();
+
+    // O bloco: polígono irregular
+    const pts = [];
+    for (let i = 0; i < ICE_SIDES; i++) {
+        const a = (i / ICE_SIDES) * TAU + iceNoise(seed, i) * 0.25;
+        const rr = r * (0.78 + iceNoise(seed, i + 9) * 0.4);
+        pts.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr * 0.92 - e.radius * 0.1]);
+    }
+    const path = () => {
+        ctx.beginPath();
+        pts.forEach(([px, py], i) => (i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)));
+        ctx.closePath();
+    };
+    const grad = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
+    grad.addColorStop(0, 'rgba(240, 249, 255, 0.78)');
+    grad.addColorStop(0.5, 'rgba(147, 210, 245, 0.5)');
+    grad.addColorStop(1, 'rgba(56, 140, 220, 0.62)');
+    ctx.globalAlpha = 0.92 * melt;
+    ctx.fillStyle = grad;
+    path();
+    ctx.fill();
+
+    // Facetas (do centro às pontas) e reflexo em faixa, recortados no bloco
+    ctx.save();
+    path();
+    ctx.clip();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 0; i < ICE_SIDES; i += 2) {
+        ctx.moveTo(x - r * 0.1, y - e.radius * 0.1);
+        ctx.lineTo(pts[i][0], pts[i][1]);
+    }
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.beginPath();
+    ctx.moveTo(x - r * 0.9, y - r * 0.15);
+    ctx.lineTo(x - r * 0.35, y - r * 0.95);
+    ctx.lineTo(x - r * 0.05, y - r * 0.95);
+    ctx.lineTo(x - r * 0.6, y - r * 0.05);
+    ctx.closePath();
+    ctx.fill();
+    // Rachaduras: aparecem quando está para derreter
+    if (e.frozen < 0.9) {
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 + 0.4 * Math.sin(state.runTime * 40)})`;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(x - r * 0.2, y - r * 0.8);
+        ctx.lineTo(x + r * 0.05, y - r * 0.3);
+        ctx.lineTo(x - r * 0.15, y + r * 0.05);
+        ctx.lineTo(x + r * 0.25, y + r * 0.6);
+        ctx.stroke();
+    }
+    ctx.restore();
+
+    // Contorno claro
+    ctx.strokeStyle = 'rgba(224, 242, 254, 0.95)';
+    ctx.lineWidth = 1.6;
+    path();
+    ctx.stroke();
+
+    // Cristais na base e no alto: espetos de gelo
+    ctx.fillStyle = 'rgba(224, 242, 254, 0.9)';
+    for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * TAU + seed;
+        const bx = x + Math.cos(a) * r * 0.82;
+        const by = y + Math.sin(a) * r * 0.78 - e.radius * 0.1;
+        const len = r * (0.28 + iceNoise(seed, i + 20) * 0.3);
+        ctx.beginPath();
+        ctx.moveTo(bx - Math.sin(a) * 2.2, by + Math.cos(a) * 2.2);
+        ctx.lineTo(bx + Math.cos(a) * len, by + Math.sin(a) * len);
+        ctx.lineTo(bx + Math.sin(a) * 2.2, by - Math.cos(a) * 2.2);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // Cacos que voam para fora no instante do congelamento
+    if (age < 0.45) {
+        const k = age / 0.45;
+        ctx.globalAlpha = (1 - k) * 0.95;
+        ctx.fillStyle = '#e0f2fe';
+        for (let i = 0; i < 8; i++) {
+            const a = (i / 8) * TAU + iceNoise(seed, i + 40);
+            const d = r * (0.9 + k * 1.5);
+            const sx = x + Math.cos(a) * d;
+            const sy = y + Math.sin(a) * d * 0.9 - k * 6;
+            ctx.beginPath();
+            ctx.moveTo(sx + Math.cos(a) * 4, sy + Math.sin(a) * 4);
+            ctx.lineTo(sx - Math.sin(a) * 2, sy + Math.cos(a) * 2);
+            ctx.lineTo(sx + Math.sin(a) * 2, sy - Math.cos(a) * 2);
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.strokeStyle = '#bae6fd';
+        ctx.lineWidth = 2.5 * (1 - k);
+        ctx.beginPath();
+        ctx.ellipse(x, y + e.radius * 0.4, r * (0.8 + k * 1.1), r * (0.8 + k * 1.1) * 0.45, 0, 0, TAU);
+        ctx.stroke();
+    }
+
+    // Brilhos piscando (estrelas de quatro pontas)
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 3; i++) {
+        const tw = Math.max(0, Math.sin(state.runTime * 5 + seed * 3 + i * 2.1));
+        if (tw < 0.2) continue;
+        const sx = x + (iceNoise(seed, i + 60) - 0.5) * r * 1.3;
+        const sy = y + (iceNoise(seed, i + 70) - 0.6) * r * 1.2;
+        const sz = 2 + tw * 3.5;
+        ctx.globalAlpha = tw * melt;
+        ctx.beginPath();
+        ctx.moveTo(sx - sz, sy);
+        ctx.lineTo(sx + sz, sy);
+        ctx.moveTo(sx, sy - sz);
+        ctx.lineTo(sx, sy + sz);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
 // Tudo que vem por cima do corpo: clarão do golpe, gelo, mira, aviso de estouro e vida
 function renderEnemyOverlays(t) {
     for (const e of state.enemies) {
@@ -328,12 +484,8 @@ function renderEnemyOverlays(t) {
             drawGlow(ctx, '#ffffff', e.x, e.y, e.radius * 1.5, (e.hitFlash / J.hitFlashSeconds) * 0.75);
             ctx.globalCompositeOperation = 'source-over';
         }
-        if (e.frozen > 0) {
-            ctx.fillStyle = POWERS_VISUALS.frost.color;
-            ctx.beginPath();
-            ctx.arc(e.x, e.y, e.radius * 1.15, 0, TAU);
-            ctx.fill();
-        }
+        if (e.frozen > 0) renderIce(e);
+        else if (e.iceStart !== undefined) e.iceStart = undefined;
         if (!e.isBoss) {
             if (e.type === 'WITCH' || e.type === 'NECROMANCER') {
                 const charge = 1 - e.shootTimer / WITCH_VISUALS.chargeSeconds;
@@ -382,8 +534,10 @@ export function renderEnemies(pass = null, splitY = 0, renderActor = null, actor
     depthSplit = splitY;
     const t = performance.now() / 1000;
     // Desenha de trás para frente: o ator mais abaixo na tela deve cobrir o que está mais acima.
-    const ordered = state.enemies.filter(inPass).sort((a, b) => a.y - b.y);
+    // Os convertidos do Avgustino (Conversion) entram na mesma ordem de profundidade: são monstros, só que do lado do herói
+    const ordered = (state.converts.length ? state.enemies.concat(state.converts) : state.enemies).filter(inPass).sort((a, b) => a.y - b.y);
     renderUnderlays();
+    renderConvertRings(t);
 
     for (const e of ordered) {
         if (e.elite) renderEliteMark(e);
@@ -409,6 +563,76 @@ export function renderEnemies(pass = null, splitY = 0, renderActor = null, actor
     }
     if (renderActor && !actorRendered) renderActor();
     renderEnemyOverlays(t);
+    renderConvertMarks(t);
+}
+
+// --- CONVERTIDOS (Conversion, js/systems/conversion.js) ---
+// Embaixo: um anel dourado no chão. Em cima: auréola, barra de vida pequena e o clarão da reza (um feixe de luz que desce).
+const CONVERT_GOLD = '#fde68a';
+function renderConvertRings(t) {
+    if (state.converts.length === 0) return;
+    ctx.save();
+    ctx.strokeStyle = CONVERT_GOLD;
+    ctx.lineWidth = 2;
+    for (const a of state.converts) {
+        if (!inPass(a)) continue;
+        ctx.globalAlpha = 0.45 + Math.sin(t * 3 + a.x * 0.01) * 0.15;
+        ctx.beginPath();
+        ctx.ellipse(a.x, a.y + a.radius * 0.35, a.radius * 1.15, a.radius * 0.5, 0, 0, TAU);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function renderConvertMarks(t) {
+    const fx = state.conversion.fx;
+    if (state.converts.length === 0 && fx.length === 0) return;
+    ctx.save();
+    for (const a of state.converts) {
+        if (!inPass(a)) continue;
+        const top = a.y - a.radius * 1.9 + Math.sin(t * 2.4 + a.x * 0.02) * 2;
+        ctx.globalAlpha = 0.9;
+        ctx.strokeStyle = CONVERT_GOLD;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.ellipse(a.x, top, a.radius * 0.6, a.radius * 0.2, 0, 0, TAU);
+        ctx.stroke();
+        if (a.hitFlash > 0) {
+            ctx.globalCompositeOperation = 'lighter';
+            drawGlow(ctx, '#ffffff', a.x, a.y, a.radius * 1.4, 0.6);
+            ctx.globalCompositeOperation = 'source-over';
+        }
+        // Vida: só aparece depois de apanhar
+        if (a.hp < a.maxHp) {
+            const w = a.radius * 1.6;
+            ctx.globalAlpha = 0.85;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+            ctx.fillRect(a.x - w / 2, top + a.radius * 0.35, w, 3);
+            ctx.fillStyle = CONVERT_GOLD;
+            ctx.fillRect(a.x - w / 2, top + a.radius * 0.35, w * Math.max(0, a.hp / a.maxHp), 3);
+        }
+    }
+    // Reza: feixe de luz descendo e anel abrindo; quando um convertido cai, só o anel se apagando
+    ctx.globalCompositeOperation = 'lighter';
+    for (const f of fx) {
+        const k = f.age / 0.9;
+        const fade = 1 - k;
+        if (!f.fade) {
+            const grad = ctx.createLinearGradient(f.x, f.y - 220, f.x, f.y);
+            grad.addColorStop(0, 'rgba(253, 230, 138, 0)');
+            grad.addColorStop(1, `rgba(253, 230, 138, ${0.55 * fade})`);
+            ctx.fillStyle = grad;
+            ctx.fillRect(f.x - 16 * fade - 4, f.y - 220, (16 * fade + 4) * 2, 220);
+            drawGlow(ctx, CONVERT_GOLD, f.x, f.y, 60, 0.7 * fade);
+        }
+        ctx.globalAlpha = fade;
+        ctx.strokeStyle = CONVERT_GOLD;
+        ctx.lineWidth = 3 * fade + 0.5;
+        ctx.beginPath();
+        ctx.ellipse(f.x, f.y, 20 + 70 * k, (20 + 70 * k) * 0.45, 0, 0, TAU);
+        ctx.stroke();
+    }
+    ctx.restore();
 }
 
 // Charged Dagger Throw: anel que se fecha em volta do herói enquanto a adaga carrega

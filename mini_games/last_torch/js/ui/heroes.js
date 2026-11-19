@@ -3,10 +3,32 @@ import { ACTIVE_HEROES, HEROES, ORDERED_HEROES } from '../../data_model/heroes.j
 import { save, persist } from '../core/save.js';
 import { audio } from '../core/state.js';
 import { paintHeroPortrait, renderStartScreen } from './screens.js';
+import { flushHeroUnlocks, queueHeroUnlock } from './hero_unlock.js';
+import { previewHero, setPreviewHero } from './hero_stats.js';
 
-// Herói liberado: por conquista do Santuário ou de graça (free em data_model/heroes.js)
-function isOwned(key) {
+// Herói liberado: por conquista do Santuário, comprado com Brasas (emberPrice) ou de graça (free em data_model/heroes.js)
+export function isOwned(key) {
     return HEROES[key].free === true || save.unlockedHeroes.includes(key);
+}
+
+// Herói à venda por Brasas e ainda bloqueado: { price, have, ready }
+export function heroOffer(key) {
+    const price = HEROES[key]?.emberPrice;
+    if (!price || HEROES[key].shelved || isOwned(key)) return null;
+    return { price, have: save.embers, ready: save.embers >= price };
+}
+
+// Compra: desconta as Brasas, libera e mostra o mesmo prêmio de herói novo das conquistas
+export function buyHero(key) {
+    const offer = heroOffer(key);
+    if (!offer?.ready) return;
+    save.embers -= offer.price;
+    save.unlockedHeroes.push(key);
+    setPreviewHero(null);
+    persist();
+    renderStartScreen();
+    queueHeroUnlock(key, null);
+    flushHeroUnlocks();
 }
 
 // --- ESCOLHA NA TELA INICIAL ---
@@ -17,24 +39,43 @@ export function renderHeroPicker() {
     picker.replaceChildren(...ACTIVE_HEROES.map(key => {
         const hero = HEROES[key];
         const owned = isOwned(key);
+        const offer = heroOffer(key);
         const picked = owned && key === current;
-        const card = el('button', `hero-pick${picked ? ' is-picked' : ''}${owned ? '' : ' is-locked'}`);
-        card.disabled = !owned;
+        const viewing = !owned && previewHero() === key;
+        // Bloqueado também é clicável: o toque mostra, no lugar das barras, o que falta para desbloquear (js/ui/hero_stats.js)
+        const card = el('button', `hero-pick${picked ? ' is-picked' : ''}${owned ? '' : ' is-locked'}${offer?.ready ? ' is-buyable' : ''}${viewing ? ' is-viewing' : ''}`);
         card.dataset.hero = key;
         card.setAttribute('role', 'radio');
         card.setAttribute('aria-checked', String(picked));
         const portrait = el('span', 'hero-portrait');
         paintHeroPortrait(portrait, hero);
-        card.title = owned ? hero.tagline : `Locked: ${hero.unlockHint ?? ''}`;
-        if (!owned) portrait.append(el('span', 'hero-pick-lock', '🔒'));
+        card.title = owned ? hero.tagline : offer ? `Unlock with ${offer.price} embers` : `Locked: ${hero.unlockHint ?? ''}`;
+        const label = offer && (offer.ready ? `🔥${offer.price}` : `🔥${Math.min(offer.have, offer.price)}/${offer.price}`);
+        if (!owned) {
+            const lock = el('span', 'hero-pick-lock', '🔒');
+            // Na tela deitada a dica some (falta altura): o preço vai dentro do cadeado (css/components/start-screen.css)
+            if (label) lock.append(el('em', 'hero-pick-lock-price', label));
+            portrait.append(lock);
+        }
         card.append(portrait, el('span', 'hero-pick-name', hero.name.toUpperCase()));
-        if (!owned && hero.unlockHint) card.append(el('span', 'hero-pick-hint', hero.unlockHint));
+        if (offer) card.append(el('span', 'hero-pick-hint is-price', label));
+        else if (!owned && hero.unlockHint) card.append(el('span', 'hero-pick-hint', hero.unlockHint));
         return card;
     }));
 }
 
 export function pickHeroOnStart(key) {
-    if (!HEROES[key] || HEROES[key].shelved || !isOwned(key) || save.hero === key) return;
+    if (!HEROES[key] || HEROES[key].shelved) return;
+    // Bloqueado: mostra os requisitos (a compra fica no botão do painel)
+    if (!isOwned(key)) {
+        setPreviewHero(key);
+        audio.init();
+        audio.playCardPick?.('common');
+        renderStartScreen();
+        return;
+    }
+    if (previewHero()) setPreviewHero(null);
+    if (save.hero === key) return renderStartScreen();
     save.hero = key;
     persist();
     audio.init();

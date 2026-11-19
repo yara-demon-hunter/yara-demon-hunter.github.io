@@ -14,6 +14,7 @@
 // tudo o que falta de uma vez. Só a ligação com o nó anterior abre um nó: não há exigência de matar monstros.
 // O custo vem de TREE_COSTS (por ramo e tipo de nó). `cost` no nó só para uma exceção. maxLvl padrão 5.
 // notFor: ['rowan'] sela a skill para esses heróis, como o hero (a Fireballs, que mexeria nas rosas dele): selada, não se compra.
+// exclusive: 'grupo' põe a skill num grupo em que só uma pode ser aprendida (a lâmina só aceita um encantamento: Flaming Sword ou Blessed Blade); a outra fica selada, com passe livre.
 // needs: 'knives' marca a skill que só funciona com adaga. Quem não lança adaga (mod noKnives: o Captain Brutos, ou o
 // Oath of Slaughter jurado) tem esses nós SELADOS (não é o cadeado: o cadeado é "ainda não", o selo é "não é para
 // este personagem"): não se compram e valem como cumpridos para os nós que vêm depois (passe livre), então a cadeia
@@ -26,10 +27,10 @@ const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
 // As de efeito passivo (status, adaga, golpe) mantêm o preço do ramo.
 export const ACTIVE_SKILLS = {
     extraCost: 1,
-    powers: ['earthbreaker', 'torchBolts', 'fireRing', 'emberTrail', 'chillAura', 'soulNova', 'starfall', 'graveWisp', 'chainLightning',
+    powers: ['earthbreaker', 'torchBolts', 'fireRing', 'emberTrail', 'chillAura', 'soulNova', 'absoluteZero', 'starfall', 'graveWisp', 'chainLightning',
         'creepingHex', 'voidRift', 'corpseBurst', 'orbitBlades', 'graspingRoots', 'shelterOak', 'leechVine', 'sporePods', 'spiritWolves',
         'holyGround', 'holyWater', 'smite', 'churchBell'],
-    passives: ['hearthPhoenix', 'fireTornado', 'phoenixPact', 'shadowRaven']
+    passives: ['hearthPhoenix', 'fireTornado', 'phoenixPact', 'shadowRaven', 'conversion']
 };
 
 export const TREE_POINTS = {
@@ -52,6 +53,11 @@ export const TREE_LAYOUT = {
     tiers: 7,
     branchGap: 0.3
 };
+
+// Afinidade do herói (affinity no arquivo dele): as skills desse ramo dão este tanto a mais de dano
+export const AFFINITY_BONUS = 0.05;
+// Quem tem affinityMods (o Rowan: raízes seguram mais) troca o +5% de dano por esses modificadores; affinityLabel é o texto curto dele
+export const affinityLabel = (hero) => hero.affinityLabel ?? `+${Math.round(AFFINITY_BONUS * 100)}%`;
 
 export const TREE_BRANCHES = {
     blade: { name: 'BLADE', path: 'BLADE PATH', icon: '🤺', color: '#f87171', style: 'Warrior: raw strength, kill everything.' },
@@ -144,7 +150,7 @@ export const TREE_NODES = [
     { id: 'emberTrail', branch: 'flame', kind: 'power', key: 'emberTrail', x: 1, y: 3, cost: 2, requires: [req('torchKeeper')] },
     { id: 'emberEvolve', branch: 'flame', kind: 'evolve', key: 'emberTrail', x: 2, y: 3, cost: 3, requires: [req('emberTrail', 5)] },
     // As armas pegam fogo: saem do Hellwalker
-    { id: 'flameBlade', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
+    { id: 'flameBlade', exclusive: 'bladeEnchant', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
     // As bolas de fogo vêm depois da espada em chamas: nada mais depende delas (heróis sem adaga as têm seladas e a cadeia segue)
     { id: 'fireballs', needs: 'knives', notFor: ['rowan'], branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
     { id: 'oathHearth', branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('phoenixPact'), req('fireRingEvolve')] },
@@ -155,8 +161,10 @@ export const TREE_NODES = [
       levelText: (mods) => `+${formatPercent(mods.xp)} XP`, mods: { xp: 0.05 } },
     // Linha do gelo e da força
     { id: 'chillAura', branch: 'curse', kind: 'power', key: 'chillAura', x: 1, y: 0, requires: [req('arcaneStudy')] },
-    { id: 'soulNova', branch: 'curse', kind: 'power', key: 'soulNova', x: 2, y: 0, requires: [req('chillAura', 2)] },
-    { id: 'novaEvolve', branch: 'curse', kind: 'evolve', key: 'soulNova', x: 3, y: 0, requires: [req('soulNova', 5)] },
+    // Soul Nova (e a evolução que congela) DESLIGADA em 19/11/2026. No lugar dela entra o Absolute Zero, skill própria que congela. Para voltar a Soul Nova, tire os //
+    { id: 'absoluteZero', branch: 'curse', kind: 'power', key: 'absoluteZero', x: 2, y: 0, requires: [req('chillAura', 2)] },
+    // { id: 'soulNova', branch: 'curse', kind: 'power', key: 'soulNova', x: 2, y: 0, requires: [req('chillAura', 2)] },
+    // { id: 'novaEvolve', branch: 'curse', kind: 'evolve', key: 'soulNova', x: 3, y: 0, requires: [req('soulNova', 5)] },
     { id: 'starfall', branch: 'curse', kind: 'power', key: 'starfall', x: 4, y: 0, requires: [req('chainLightning', 2)] },
     // Linha da tempestade: à distância
     { id: 'graveWisp', branch: 'curse', kind: 'power', key: 'graveWisp', x: 1, y: 1, requires: [req('arcaneStudy')] },
@@ -177,6 +185,8 @@ export const TREE_NODES = [
     { id: 'corpseEvolve', branch: 'curse', kind: 'evolve', key: 'corpseBurst', x: 2, y: 3, requires: [req('corpseBurst', 5)] },
     { id: 'orbitBlades', branch: 'curse', kind: 'power', key: 'orbitBlades', x: 3, y: 3, requires: [req('darkKnowledge', 2)] },
     { id: 'orbitEvolve', branch: 'curse', kind: 'evolve', key: 'orbitBlades', x: 4, y: 3, requires: [req('orbitBlades', 5)] },
+    // Linha 5, só do Gudran (selada para os outros): a Runa Soberana, que dá furo e explosão aos raios do cajado
+    { id: 'sovereignRune', hero: 'gudran', branch: 'curse', kind: 'passive', key: 'sovereignRune', x: 1, y: 4, requires: [req('arcaneStudy')] },
     { id: 'oathRuin', branch: 'curse', kind: 'passive', key: 'oathRuin', oath: true, x: 6, y: 1.5, requires: [req('wrathEvolve'), req('voidRiftEvolve')] },
 
     // --- NATUREZA: o druida. Controle e paciência: prender no chão, drenar a vida, esconder-se atrás do que cresce ---
@@ -204,21 +214,23 @@ export const TREE_NODES = [
     { id: 'silentVigil', branch: 'light', kind: 'mod', x: 0, y: 1.5, requires: [],
       name: 'Silent Vigil', icon: '🕯️', desc: 'Every blessed monster that falls restores your faith, and your spells grow stronger.',
       levelText: (mods) => `Killing a blessed monster heals ${mods.blessedKillHeal} · +${formatPercent(mods.spellDamage)} spell damage`, mods: { blessedKillHeal: 0.8, spellDamage: 0.04 } },
-    // Quatro linhas ao lado do Silent Vigil; a da água benta termina na Blessed Blade (só do Avgustino) e a última é o sino da tocha. Duas delas (chão e ira) terminam no Oath of Faith.
+    // Quatro linhas ao lado do Silent Vigil; a da água benta termina na Blessed Rain, a última é o sino da tocha e uma quinta linha (Conversão -> Blessed Blade) é só do Avgustino. Duas delas (chão e ira) terminam no Oath of Faith.
     // Linha 1, o chão: Sacred Ground -> Consecrated Earth
     { id: 'holyGround', branch: 'light', kind: 'power', key: 'holyGround', x: 1, y: 0, requires: [req('silentVigil')] },
     { id: 'groundEvolve', branch: 'light', kind: 'evolve', key: 'holyGround', x: 2, y: 0, requires: [req('holyGround', 5)] },
     // Linha 2, a água benta: Holy Water -> Blessed Rain -> Blessed Blade
     { id: 'holyWater', branch: 'light', kind: 'power', key: 'holyWater', x: 1, y: 1, requires: [req('silentVigil')] },
     { id: 'waterEvolve', branch: 'light', kind: 'evolve', key: 'holyWater', x: 2, y: 1, requires: [req('holyWater', 5)] },
-    // ...e, depois da chuva, a lâmina benta: só do Avgustino (selada para os outros)
-    { id: 'blessedBlade', hero: 'avgustino', branch: 'light', kind: 'passive', key: 'blessedBlade', x: 3, y: 1, requires: [req('waterEvolve')] },
+    // (a lâmina benta, só do Avgustino, agora vem depois da Conversão: linha 5)
+    { id: 'blessedBlade', exclusive: 'bladeEnchant', hero: 'avgustino', branch: 'light', kind: 'passive', key: 'blessedBlade', x: 2, y: 4, requires: [req('conversion')] },
     // Linha 3, a ira: Smite -> Divine Wrath
     { id: 'smite', branch: 'light', kind: 'power', key: 'smite', x: 1, y: 2, requires: [req('silentVigil')] },
     { id: 'smiteEvolve', branch: 'light', kind: 'evolve', key: 'smite', x: 2, y: 2, requires: [req('smite', 5)] },
     // Linha 4, o sino: Church Bell -> Cathedral Toll (defende a tocha)
     { id: 'churchBell', branch: 'light', kind: 'power', key: 'churchBell', x: 1, y: 3, requires: [req('silentVigil')] },
     { id: 'bellEvolve', branch: 'light', kind: 'evolve', key: 'churchBell', x: 2, y: 3, requires: [req('churchBell', 5)], cost: 4 },
+    // Linha 5, só do Avgustino (selada para os outros): Conversão -> Blessed Blade
+    { id: 'conversion', hero: 'avgustino', branch: 'light', kind: 'passive', key: 'conversion', x: 1, y: 4, requires: [req('silentVigil')], cost:5 },
     { id: 'oathFaith', branch: 'light', kind: 'passive', key: 'oathFaith', oath: true, x: 6, y: 1.5, requires: [req('groundEvolve'), req('smiteEvolve')] },
 
     { id: 'oathWild', branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 6, y: 1.5, requires: [req('thornBurst'), req('leechVine')] }

@@ -205,6 +205,44 @@ export const PASSIVE_SKILL_MODELS = {
         },
         magicRatio: 0.2     // parte do dano de magia que cada golpe da lâmina soma (baixa: é um tempero, não o total da magia)
     },
+    // Conversão (só o Avgustino): de tempos em tempos ele reza por um monstro comum perto dele, que passa para o lado dele
+    // até o fim da noite. Os convertidos se acumulam (até maxAllies), lutam contra os outros e os provocam: os monstros
+    // comuns por perto vão bater neles em vez de no herói. Lógica em js/systems/conversion.js; desenho em js/render/entities.js.
+    conversion: {
+        name: 'Conversion',
+        icon: '🙏',
+        cost: 0,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        get desc() {
+            return `Every ${this.cooldownSeconds}s you pray over a common monster near you and it joins your side for the rest of the night, with its normal health (full, even if it was wounded). It never heals. Converts stack up to ${this.maxAllies}: they fight the monsters near them and provoke them, so the horde attacks them instead of you. Bosses and elites cannot be converted. Only Avgustino can learn this.`;
+        },
+        cooldownSeconds: 20,     // entre uma reza e outra (a primeira vem logo: firstDelaySeconds)
+        firstDelaySeconds: 3,
+        range: 260,             // distância do herói até o monstro que ele converte
+        maxAllies: 6,           // quantos convertidos ao mesmo tempo (acumulam pela noite; um que morre libera a vaga)
+        damageScale: 1.4,       // dano por golpe = dano dele × isto
+        hitSeconds: 0.8,        // tempo entre golpes do convertido
+        speedScale: 1.15,       // um pouco mais rápido que antes, para acompanhar o herói
+        seekRange: 360,         // o convertido procura monstros até esta distância dele
+        provokeRadius: 220,     // monstros comuns até esta distância de um convertido vão atrás dele
+        followDistance: 90,     // sem inimigo por perto, fica a esta distância do herói
+        enemyHitSeconds: 0.7    // tempo entre golpes de um monstro no convertido
+    },
+    // Runa Soberana (só o Gudran, no Curse Path): os raios arcanos do cajado furam o primeiro monstro e estouram onde acabam
+    sovereignRune: {
+        name: 'Sovereign Rune',
+        icon: '🔷',
+        cost: 0,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        get desc() {
+            return `Your arcane bolts pierce ${this.pierce} extra monster${this.pierce === 1 ? '' : 's'} and burst in blue light where they end, hurting everything within ${this.burstRadius} range for ${formatPercent(this.burstDamage)} of the bolt's damage. Only Gudran can learn this.`;
+        },
+        pierce: 1,
+        burstRadius: 70,
+        burstDamage: 0.6
+    },
     oathFaith: {
         name: 'Oath of Faith',
         icon: '🕯️',
@@ -491,6 +529,21 @@ export const MASTER_THIEF = {
 // Flaming Sword: o corte deixa o monstro queimando (fração do dano do golpe, por segundo)
 // Blessed Blade (Avgustino): a parte da magia que cada golpe da lâmina soma (js/systems/combat.js)
 export const BLESSED_BLADE = PASSIVE_SKILL_MODELS.blessedBlade;
+export const CONVERSION = PASSIVE_SKILL_MODELS.conversion;
+export const SOVEREIGN_RUNE = PASSIVE_SKILL_MODELS.sovereignRune;
+
+// Ataque básico arcano (Gudran e qualquer herói com basicAttack: 'arcane'): no lugar do golpe de lâmina, ele ergue o cajado e solta
+// um raio de energia azul no monstro mais perto. Dano de MAGIA (número azul). Cada 3º raio é maior e empurra mais.
+export const ARCANE_BOLT = {
+    damageRatio: 1.0,       // dano do raio = dano de magia × isto (um raio por segundo, mais forte que um golpe)
+    comboRatio: 1.7,        // o 3º raio do combo bate x vezes mais forte
+    speed: 520,             // px/s
+    radius: 5,              // tamanho do raio
+    comboRadius: 8,
+    knockback: 70,
+    flightHeight: 30,       // altura do voo na tela (px): sai da esfera do cajado erguido, acima da cabeça
+    spawnForward: 22
+};
 
 export const FLAME_BLADE = {
     burnRatio: 0.4,

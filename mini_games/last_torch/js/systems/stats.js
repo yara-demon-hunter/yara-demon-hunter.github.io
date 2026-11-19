@@ -111,6 +111,9 @@ export function getFury() {
 export function getRootSnare() {
     return getCurrentCharacterBase().player.rootSnare;
 }
+export function getRuneShield() {
+    return getCurrentCharacterBase().player.runeShield;
+}
 
 export function getAxeQuake() {
     return getCurrentCharacterBase().player.axeQuake;

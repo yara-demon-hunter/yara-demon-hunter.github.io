@@ -12,13 +12,14 @@ import { markEnemy } from './skills_shadow.js';
 import { markWithRose } from './skills_nature.js';
 import { characterStat, getKnifeBaseRange, isMagicKnife, getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
 import { getHero } from './modifiers.js';
+import { beamActive } from './fury.js';
 
 // O que o herói lança: adaga, ou a rosa do Rowan (a Rosa Negra, com a skill Dark Roses). Só muda o desenho: dano, alcance e
 // todas as skills de adaga valem igual para a rosa
 export function getThrownStyle() {
     const thrown = getHero().thrown;
     if (thrown === 'rose') return passives.darkRoses.lvl > 0 ? 'darkRose' : 'rose';
-    return thrown === 'cross' ? 'cross' : 'dagger';
+    return thrown === 'cross' || thrown === 'arcane' ? thrown : 'dagger';
 }
 
 const KNIFE_RELEASE_SECONDS = K.throwSeconds * K.letGoFraction;
@@ -30,6 +31,10 @@ const KNIFE_TAP_BUFFER_SECONDS = 0.35;
 // Começa o arremesso na direção da mira (mouse ou dedo): a mão esquerda recua e a adaga
 // só sai no instante em que é solta (KNIFE_VISUALS.letGoFraction da animação).
 export function throwKnife(aimX, aimY) {
+    if (beamActive()) {         // Lord's Decree: durante o raio nada é lançado, só se mira
+        state.knifeCharge = 0;
+        return;
+    }
     // Oath of Slaughter: a mão que lançava adagas só empunha a espada
     if (mod('noKnives') > 0) {
         state.knifeCharge = 0;
@@ -94,7 +99,7 @@ function releaseKnife(thrower = player) {
             angle, speed, maxRange, damage, knockback,
             travelled: 0,
             bounces: power > 0 ? 0 : ricochet?.bounces ?? 0,      // a bola carregada não ricocheteia
-            pierces: 0,
+            pierces: getThrownStyle() === 'arcane' ? 1 : 0,       // a esfera arcana atravessa o primeiro monstro
             scale: 1 + power * ((charge?.maxScale ?? 1) - 1),
             fire: passives.fireballs.lvl > 0,
             magic: isMagicKnife(),
