@@ -4,13 +4,14 @@ Changes: recolored and resized. Original icons by (each author's icons listed):
 - badges: purse
 - carl-olsen: flame
 - caro-asercion: coinflip, deer-head, mason-jar
+- cathelineau: tree-face, witch-face
 - darkzaitzev: hooded-figure
-- delapouite: all-seeing-eye, biceps, coins-pile, dagger-rose, diamond-ring, enrage, falling-star, gloves, graveyard, heart-armor, nose-front, prayer-beads, quiver, robber, running-shoe, scroll-quill, stone-pile, sunflower, torch, upgrade
+- delapouite: all-seeing-eye, biceps, coins-pile, dagger-rose, diamond-ring, enrage, falling-star, giant, gloves, graveyard, half-body-crawling, heart-armor, nose-front, prayer-beads, quiver, robber, rock-golem, running-shoe, scroll-quill, stars-stack, stone-pile, sunflower, torch, upgrade, vampire-dracula
 - felbrigg: dodge
-- lorc: acorn, ankh, anvil, battle-axe, bloody-sword, boots, broken-heart, bubbling-flask, burning-book, campfire, candle-light, coffin, comet-spark, crossed-bones, crossed-slashes, crossed-swords, crown-of-thorns, crowned-skull, crystal-wand, daemon-skull, eclipse, evil-book, evil-moon, explosion-rays, fire-bomb, fire-bottle, fire-breath, fire-dash, ghost, grim-reaper, lantern-flame, laurel-crown, lotus-flower, magic-swirl, maple-leaf, moon, ninja-mask, open-book, owl, plain-dagger, prayer, rune-stone, scar-wound, sewing-needle, shadow-follower, shield-echoes, star-swirl, stone-block, sun, sunbeams, sunrise, target-arrows, third-eye, totem-head, wax-seal, whirlwind, wolf-head
+- lorc: acorn, ankh, anvil, balloons, battle-axe, bloody-sword, boots, broken-heart, bubbling-flask, burning-book, butterfly, campfire, candle-light, coffin, comet-spark, crossed-bones, crossed-slashes, crossed-swords, crown-of-thorns, crowned-skull, crystal-wand, daemon-skull, decapitation, direwolf, eclipse, evil-bat, evil-book, evil-moon, explosion-rays, fire-bomb, fire-bottle, fire-breath, fire-dash, ghost, grim-reaper, lantern-flame, laurel-crown, lotus-flower, magic-swirl, maple-leaf, moon, ninja-mask, open-book, owl, plain-dagger, prayer, rune-stone, scar-wound, sewing-needle, shadow-follower, shield-echoes, spectre, star-swirl, stone-block, sun, sunbeams, sunrise, target-arrows, third-eye, totem-head, wax-seal, werewolf, whirlwind, wolf-head
 - lucasms: cloak
 - sbed: key, vial
-- skoll: blood, open-treasure-chest
+- skoll: blood, open-treasure-chest, raise-skeleton, skeleton
 - various-artists: infinity
 - zeromancer: heart-plus
 

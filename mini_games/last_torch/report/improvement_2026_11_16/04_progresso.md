@@ -551,3 +551,29 @@ Pedido do dono: não ficar repetindo emoji e ter mais opção para troféus, Alt
 Os ícones das 45 relíquias foram pintados na cor do ramo: **Fortune amarelo** (#fcd34d), **Ward cinza azulado** (#a8b8d0), **Wrath rosa/roxo** (#e879f9) e **Thicket verde** (#4ade80). As cores dos rótulos dos ramos em `data_model/relics.js` (`RELIC_BRANCHES`) foram alinhadas (antes o Ward era verde-água e o Wrath vermelho). Conferido na árvore de relíquias do acampamento, desktop e celular.
 
 - **Aba Build (19/11):** a lista de relíquias mostrava os emojis antigos. `treeImageFor` agora também devolve o ícone da relíquia (`data_model/tree_images.js`, via `RELIC_KEYS` + `ICON_IMAGES`) e `status.js` passa a chave de cada relíquia; os ícones saem na cor do ramo (amarelo, cinza azulado, rosa/roxo, verde), iguais aos da árvore do acampamento. Conferido em desktop e celular.
+
+## 2026-11-19 · Ranks em abas
+
+A tela Ranks, que era uma lista só com quatro seções, virou **quatro abas** (as que o dono listou): **BEST NIGHTS** (a primeira que abre, top 10 com a foto do herói), **HEROES**, **WAVE STARS** e **STATS** (antes "Your numbers"; nome mais curto, cabe no celular). O Santuário continua com Achievements e Bestiary; cada tela mostra só as abas dela (`.tab-rank` / `.tab-sanc`). Conferido em desktop, celular em pé e deitado, sem erros.
+
+## 2026-11-19 · 3 estrelas em tudo e conquistas de monstros
+
+- **Rising Star ⭐** (`stars3all`): 3 estrelas ou mais nas 12 ondas (40 Brasas), ao lado da Constellation (5 estrelas em todas, 80). O progresso vem dos recordes por onda, então vale para quem já tinha jogado.
+- **Nova seção MONSTERS** na aba Achievements: 15 conquistas de abate por tipo (esqueleto 500, esqueleto rastejante 300, morcego 1.000, lobo sombrio 200, vampiro 150, bruxa 100, mariposa 300, inchado 150, lobo zumbi 100, espectro 100, cavaleiro sem cabeça 50, colosso de ossos 25, golem 50, treant 50, necromante 30), 10 a 25 Brasas cada (235 no total). Contam o abate do bestiário (`save.bestiary[tipo].kills`), então quem já abateu recebe o progresso (e o prêmio) retroativamente. Ícones do game-icons.net **em vermelho**, mais apagados antes de sair (`achievementValue` em `data_model/sanctuary.js`).
+- Testado com um save antigo (620 esqueletos, 340 morcegos, 12 golems): Bone Collector saiu e pagou, Bat Hunter mostra 340/1.000, Rock Breaker 12/50. Sem erros em desktop e celular.
+
+## 2026-11-19 · Sandbox: aba Screens
+
+Pedido do dono: ver as telas sem jogar tudo. Nova aba **🖼️ Screens** no sandbox (`_sandbox/screens.js`): escolhe herói, onda, score, abates, bosses, estrelas e Escuridão e abre na hora o fim de noite (herói caiu, tocha apagou, amanhecer com STAY IN THE DARK), o resultado da onda com as estrelas + acampamento, o acampamento sozinho, o menu, o presente, o Ranks e o Altar depois de uma queda; mais +500 Brasas, liberar heróis e "Brand new player". Conferido: todas as telas abrem sem erro e mostram os números escolhidos. Uso no `_sandbox/README.md`. A pasta não entra no pacote.
+
+## 2026-11-19 · Correção: a onda 12 nunca dava estrelas
+
+Achado pelo Sandbox (aba Screens): ao matar o boss da última onda o jogo ia direto ao amanhecer e **nunca calculava o resultado da onda 12** (`grantWaveSpoils` só rodava no acampamento). Consequência: as conquistas **Constellation** (5 estrelas em todas as 12 ondas) e **Rising Star** (3 em todas) eram **impossíveis**, e a onda 12 nunca entrava no recorde nem nas Brasas por estrela. Agora `beginDawn` (`js/systems/night.js`) chama `grantWaveSpoils(state.turn)` (exportada de `camp.js`): o cartão de resultado com as estrelas aparece durante o amanhecer e a tela de vitória vem por baixo, já contando as estrelas e o recorde. O botão Dawn do Sandbox faz o mesmo. Conferido: 5 estrelas acesas, `waveBests[12]` gravado e a tela de vitória aparece depois de tocar.
+
+## 2026-11-19 · Amanhecer: uma tela de cada vez (resultado da onda, depois o resumo)
+
+Com o resultado da onda 12 no amanhecer, o **cartão de estrelas** e o **resumo da noite com as Brasas** apareciam um por cima do outro. Agora o amanhecer **espera o cartão fechar** antes de abrir o resumo (`isWaveResultsOpen` em `wave_results.js`, usado em `updateDawn`, `night.js`): primeiro as estrelas e a pontuação da onda, e só depois (toque ou 8 s) o resumo com as Brasas (que já contam as estrelas na linha "Stars"). O botão Dawn do Sandbox segue a mesma ordem. Conferido: aos 6,5 s só o cartão está na tela; ao fechá-lo, o resumo aparece.
+
+## 2026-11-19 · Retratos novos do Demon Hunter e do Avgustino
+
+Com a arte atualizada em `_library/characters/{hunter,avgustino}/art_reference/images/` (`demon-hunter.webp` e `avgustino.webp`, agora pintadas, não mais em pixel art), gerei os arquivos do jogo: `images/characters/demon-hunter.webp` (1024 px, 43 KB), `demon-hunter-small.webp` e `avgustino-small.webp` (256 px, 8 KB cada). Os antigos ficaram de cópia fora do projeto. O recorte do rosto no HUD (`26% 8% / 220%`) continua enquadrando a máscara. Conferido no menu, na vitrine, na fileira de heróis e no HUD do celular.

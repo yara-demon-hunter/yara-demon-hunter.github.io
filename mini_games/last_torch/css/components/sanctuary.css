@@ -191,9 +191,15 @@
 }
 
 /* Ranks usa a tela do Santuário sem as abas */
-#sanctuaryScreen.is-ranks-mode #sanctuaryTabs { display: none; }
+/* Cada tela mostra só as abas dela: Santuário (achievements, bestiary) ou Ranks (noites, heróis, ondas, números) */
+#sanctuaryScreen .tab-rank { display: none; }
+#sanctuaryScreen.is-ranks-mode .tab-rank { display: block; }
+#sanctuaryScreen.is-ranks-mode .tab-sanc { display: none; }
 #sanctuaryList:not(.is-ranks):not(.is-beasts) > .rank-title { grid-column: 1 / -1; }
 
 /* Ícone em imagem (game-icons.net): mesmo tamanho do emoji */
 .sanc-icon.has-image { display: block; width: 1.9rem; height: 1.9rem; }
 @media (max-height: 520px) and (orientation: landscape) { .sanc-icon.has-image { width: 1.5rem; height: 1.5rem; } }
+
+/* Monstros: o ícone vermelho aparece mesmo antes de a conquista sair (só mais apagado) */
+.sanc-item.is-monster:not(.is-done) .sanc-icon { filter: none; opacity: 0.6; }

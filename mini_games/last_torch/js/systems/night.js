@@ -4,7 +4,8 @@ import { NIGHT, getHourName, rollOmen } from '../../data_model/night.js';
 import { save, persist } from '../core/save.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
-import { openCamp } from '../ui/camp.js';
+import { grantWaveSpoils, openCamp } from '../ui/camp.js';
+import { isWaveResultsOpen } from '../ui/wave_results.js';
 import { updateHUD } from '../ui/hud.js';
 import { triggerGameOver } from '../ui/screens.js';
 import { addGibs, addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, slowMotion, zoomPunch } from './effects.js';
@@ -213,6 +214,9 @@ function beginDawn() {
     state.phaseTimer = NIGHT.dawnSeconds;
     state.dawn = 0;
     state.run.victory = true;
+    // A última onda também tem resultado (estrelas, pontos, recorde da onda): sem isto a onda 12 nunca ganhava estrelas e as conquistas
+    // de estrelas em todas as ondas eram impossíveis. O cartão aparece durante o amanhecer.
+    grantWaveSpoils(state.turn);
     state.clearWaveRadius = 0;
     state.goldVacuum = true;
     state.enemyProjectiles.length = 0;
@@ -229,7 +233,8 @@ function updateDawn(dt) {
         if (Math.hypot(enemies[i].x - coreX, enemies[i].y - coreY) < state.clearWaveRadius) purgeEnemy(i);
     }
     state.phaseTimer -= dt;
-    if (state.phaseTimer <= 0) {
+    // Uma tela de cada vez: primeiro o resultado da onda 12 (estrelas), depois o resumo da noite (Brasas). O amanhecer espera o cartão fechar
+    if (state.phaseTimer <= 0 && !isWaveResultsOpen()) {
         collectAllPickups();
         triggerGameOver('DAWN');
     }

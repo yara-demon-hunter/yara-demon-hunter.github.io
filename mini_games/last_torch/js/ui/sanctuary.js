@@ -1,4 +1,4 @@
-import { ACHIEVEMENTS, achievementEmbers, getBestiary } from '../../data_model/sanctuary.js';
+import { ACHIEVEMENTS, achievementEmbers, achievementValue, getBestiary } from '../../data_model/sanctuary.js';
 import { ACTIVE_HEROES, HEROES } from '../../data_model/heroes.js';
 import { TOP_RUNS } from '../systems/sanctuary.js';
 import { save, persist } from '../core/save.js';
@@ -27,8 +27,8 @@ const isDone = (a) => Boolean(save.achievements[a.id]);
 function renderAchievements(list, group) {
     ACHIEVEMENTS.filter(a => a.group === group).forEach(a => {
         const done = isDone(a);
-        const value = Math.min(a.target, save.stats[a.stat] ?? 0);
-        const item = el('div', `sanc-item${done ? ' is-done' : ''}`);
+        const value = Math.min(a.target, achievementValue(a, save));
+        const item = el('div', `sanc-item${done ? ' is-done' : ''}${a.group === 'monster' ? ' is-monster' : ''}`);
         const text = el('div', 'sanc-text');
         text.append(
             el('b', '', a.name),
@@ -108,7 +108,8 @@ function renderTabCounts() {
     const beasts = getBestiary();
     const counts = {
         achievements: `${ACHIEVEMENTS.filter(isDone).length}/${ACHIEVEMENTS.length}`,
-        bestiary: `${beasts.filter(b => save.bestiary[b.key]?.kills > 0).length}/${beasts.length}`
+        bestiary: `${beasts.filter(b => save.bestiary[b.key]?.kills > 0).length}/${beasts.length}`,
+        nights: '', heroes: '', waves: '', stats: ''
     };
     document.querySelectorAll('#sanctuaryTabs button').forEach(button => {
         button.classList.toggle('is-on', button.dataset.tab === tab);
@@ -121,16 +122,18 @@ function renderSanctuary() {
     const list = document.getElementById('sanctuaryList');
     list.replaceChildren();
     list.classList.toggle('is-beasts', tab === 'bestiary');
-    list.classList.toggle('is-ranks', tab === 'ranks');
+    list.classList.toggle('is-ranks', RANK_TABS.includes(tab));
     list.scrollTop = 0;
     if (tab === 'bestiary') renderBestiary(list);
-    else if (tab === 'ranks') renderRanks(list);
+    else if (RANK_TABS.includes(tab)) renderRanks(list);
     else {
         // Uma lista só, em duas seções: a jornada (marcos que se acumulam entre noites) e as façanhas (habilidade dentro da noite)
         section(list, 'JOURNEY · milestones across your nights');
         renderAchievements(list, 'trophy');
         section(list, 'SKILL · feats inside a single night');
         renderAchievements(list, 'feat');
+        section(list, 'MONSTERS · hunt every kind');
+        renderAchievements(list, 'monster');
     }
 }
 
@@ -142,7 +145,16 @@ const artOf = (key) => HEROES[key]?.portraitImage ?? HUNTER_ART;
 function section(list, title) {
     list.appendChild(el('p', 'rank-title', title));
 }
+// As quatro abas dos Ranks: as melhores noites (a primeira), os heróis, as estrelas por onda e os números da conta
+const RANK_TABS = ['nights', 'heroes', 'waves', 'stats'];
 function renderRanks(list) {
+    if (tab === 'heroes') renderHeroRanks(list);
+    else if (tab === 'waves') renderWaveStars(list);
+    else if (tab === 'stats') renderStats(list);
+    else renderBestNights(list);
+}
+
+function renderStats(list) {
     const { stats } = save;
     section(list, 'YOUR NUMBERS');
     const grid = el('div', 'rank-stats');
@@ -153,7 +165,9 @@ function renderRanks(list) {
         grid.appendChild(chip);
     });
     list.appendChild(grid);
+}
 
+function renderBestNights(list) {
     section(list, `BEST NIGHTS · TOP ${TOP_RUNS}`);
     const runs = save.topRuns ?? [];
     if (!runs.length) list.appendChild(el('p', 'rank-empty', 'Hunt a night to write your first record here.'));
@@ -167,8 +181,10 @@ function renderRanks(list) {
         row.append(el('span', 'rank-pos', ['🥇', '🥈', '🥉'][i] ?? `#${i + 1}`), pic, info, el('strong', 'rank-score', number(r.score)));
         list.appendChild(row);
     });
+}
 
-    section(list, 'HEROES');
+function renderHeroRanks(list) {
+    section(list, 'HEROES · your best with each');
     ACTIVE_HEROES.forEach(key => {
         const hero = HEROES[key];
         const owned = hero.free === true || save.unlockedHeroes.includes(key);
@@ -182,15 +198,15 @@ function renderRanks(list) {
         row.append(pic, info, el('strong', 'rank-score', owned && best ? number(best.score) : owned ? '—' : '🔒'));
         list.appendChild(row);
     });
-
-    renderWaveStars(list);
 }
 
 function openScreen(mode) {
     const screen = document.getElementById('sanctuaryScreen');
     screen.classList.toggle('is-ranks-mode', mode === 'ranks');
     document.getElementById('sanctuaryTitle').textContent = mode === 'ranks' ? 'RANKS' : 'SANCTUARY';
-    tab = mode === 'ranks' ? 'ranks' : tab === 'ranks' ? 'achievements' : tab;
+    // Santuário: abre na última aba dele; Ranks: sempre nas melhores noites
+    if (mode === 'ranks') tab = 'nights';
+    else if (RANK_TABS.includes(tab)) tab = 'achievements';
     screen.classList.remove('hidden');
     renderSanctuary();
     audio.init();

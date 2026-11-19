@@ -86,7 +86,7 @@ function renderNext() {
 
 // Resultado do fim da onda (data_model/night.js > WAVE_SPOILS): 3 metas = 3 estrelas, ouro e (★★★) ponto de skill, e a pontuação
 // da onda, comparada com o recorde daquela onda. Devolve as estrelas, que vão para o título do acampamento; a contagem aparece por cima.
-function grantWaveSpoils(wave) {
+export function grantWaveSpoils(wave) {
     const W = WAVE_SPOILS;
     const ws = state.waveStats ?? { kills0: 0, gold0: 0, rush: 0, torchDamage: 0, heroDamage: 0 };
     const [loose, tight] = W.damageGoals;

@@ -21,6 +21,7 @@ export const ACHIEVEMENTS = [
     { id: 'hour6', group: 'trophy', icon: '🕯️', name: 'Deep Dark', desc: 'Reach Wave 6.', stat: 'bestHour', target: 6 },
     { id: 'elites10', group: 'trophy', icon: '🎯', name: 'Trophy Hunter', desc: 'Slay 10 elites.', stat: 'elites', target: 10 },
     { id: 'stars5x3', group: 'trophy', icon: '🌟', name: 'Starlit', desc: 'Earn 5 stars on 3 different waves.', stat: 'fiveStarWaves', target: 3 },
+    { id: 'stars3all', group: 'trophy', icon: '⭐', name: 'Rising Star', desc: 'Earn 3 stars or more on all 12 waves.', stat: 'threeStarWaves', target: 12 },
     { id: 'stars5all', group: 'trophy', icon: '🌠', name: 'Constellation', desc: 'Earn 5 stars on all 12 waves.', stat: 'fiveStarWaves', target: 12 },
     { id: 'kills2000', group: 'trophy', icon: '🪦', name: 'Harvester', desc: 'Slay 1,200 monsters.', stat: 'kills', target: 1200 },
     { id: 'countess', group: 'trophy', icon: '🌞', name: 'Sunlight', desc: 'Slay the Blood Countess.', stat: 'boss_BLOOD_COUNTESS', target: 1, hero: 'warden' },
@@ -47,7 +48,24 @@ export const ACHIEVEMENTS = [
     { id: 'dodge25', group: 'feat', icon: '🧵', name: 'Needle and Thread', desc: 'Dodge 25 attacks at the last moment.', stat: 'perfectDodges', target: 25 },
     { id: 'flawless5', group: 'feat', icon: '🌫️', name: 'Ghost', desc: 'Finish 5 waves without taking a hit.', stat: 'flawlessHours', target: 5 },
     { id: 'streak100', group: 'feat', icon: '💫', name: 'Unstoppable', desc: 'Reach a 70 kill streak.', stat: 'bestStreak', target: 70, hero: 'shade' },
-    { id: 'multi10', group: 'feat', icon: '☄️', name: 'Annihilation', desc: 'Slay 10 monsters at once.', stat: 'bestMultiKill', target: 10 }
+    { id: 'multi10', group: 'feat', icon: '☄️', name: 'Annihilation', desc: 'Slay 10 monsters at once.', stat: 'bestMultiKill', target: 10 },
+
+    // --- MONSTROS (bestiário: quantos de cada tipo você já abateu; save.bestiary[tipo].kills) ---
+    { id: 'beast_SKELETON', group: 'monster', icon: '💀', name: 'Bone Collector', desc: 'Slay 500 skeletons.', beast: 'SKELETON', target: 500 },
+    { id: 'beast_SKELETON_CRAWLER', group: 'monster', icon: '🦴', name: 'Crawl Space', desc: 'Slay 300 crawling skeletons.', beast: 'SKELETON_CRAWLER', target: 300 },
+    { id: 'beast_BAT', group: 'monster', icon: '🦇', name: 'Bat Hunter', desc: 'Slay 1000 bats.', beast: 'BAT', target: 1000 },
+    { id: 'beast_SHADOW_WOLF', group: 'monster', icon: '🐺', name: 'Wolf Slayer', desc: 'Slay 200 shadow wolves.', beast: 'SHADOW_WOLF', target: 200 },
+    { id: 'beast_VAMPIRE', group: 'monster', icon: '🧛', name: 'Stake Through the Heart', desc: 'Slay 150 vampires.', beast: 'VAMPIRE', target: 150 },
+    { id: 'beast_WITCH', group: 'monster', icon: '🧙', name: 'Witch Hunter', desc: 'Slay 100 witches.', beast: 'WITCH', target: 100 },
+    { id: 'beast_MOTH', group: 'monster', icon: '🦋', name: 'Moth to the Flame', desc: 'Slay 300 moths.', beast: 'MOTH', target: 300 },
+    { id: 'beast_BLOATER', group: 'monster', icon: '🎈', name: 'Popped', desc: 'Slay 150 bloaters.', beast: 'BLOATER', target: 150 },
+    { id: 'beast_ZOMBIE_WOLF', group: 'monster', icon: '🐺', name: 'Putrid Pack', desc: 'Slay 100 zombie wolves.', beast: 'ZOMBIE_WOLF', target: 100 },
+    { id: 'beast_WRAITH', group: 'monster', icon: '👻', name: 'Exorcist', desc: 'Slay 100 wraiths.', beast: 'WRAITH', target: 100 },
+    { id: 'beast_HEADLESS_KNIGHT', group: 'monster', icon: '🛡️', name: 'Headhunter', desc: 'Slay 50 headless knights.', beast: 'HEADLESS_KNIGHT', target: 50 },
+    { id: 'beast_BONE_COLOSSUS', group: 'monster', icon: '🦴', name: 'Giant Killer', desc: 'Slay 25 bone colossi.', beast: 'BONE_COLOSSUS', target: 25 },
+    { id: 'beast_GOLEM', group: 'monster', icon: '🪨', name: 'Rock Breaker', desc: 'Slay 50 ember golems.', beast: 'GOLEM', target: 50 },
+    { id: 'beast_TREANT', group: 'monster', icon: '🌳', name: 'Lumberjack', desc: 'Slay 50 treants.', beast: 'TREANT', target: 50 },
+    { id: 'beast_NECROMANCER', group: 'monster', icon: '☠️', name: 'Undertaker', desc: 'Slay 30 necromancers.', beast: 'NECROMANCER', target: 30 }
 ];
 
 // Brasas que cada troféu paga, uma vez só (js/systems/sanctuary.js, checkAchievements). Pouco de propósito (o total é ~800, uns 15% do
@@ -55,10 +73,22 @@ export const ACHIEVEMENTS = [
 // que libera um herói guardado (shelved) paga normal.
 export const ACHIEVEMENT_EMBERS = {
     firstNight: 10, hour3: 10, hour4: 10, kills300: 15, kills1000: 25, demon: 25, evolve: 15, chests10: 15, hour6: 20, elites10: 15,
-    stars5x3: 30, stars5all: 80, kills2000: 40, countess: 30, darkness3: 30,
+    stars3all: 40, stars5x3: 30, stars5all: 80, kills2000: 40, countess: 30, darkness3: 30,
     sworn1: 20, sworn2: 20, sworn3: 20, sworn4: 20, sworn5: 20, hour20: 50, darkness8: 80,
+    beast_SKELETON: 15, beast_SKELETON_CRAWLER: 10, beast_BAT: 20, beast_SHADOW_WOLF: 15, beast_VAMPIRE: 15, beast_WITCH: 10, beast_MOTH: 10, beast_BLOATER: 10, beast_ZOMBIE_WOLF: 10, beast_WRAITH: 15, beast_HEADLESS_KNIGHT: 20, beast_BONE_COLOSSUS: 25, beast_GOLEM: 20, beast_TREANT: 20, beast_NECROMANCER: 20,
     multi3: 5, dodge5: 5, multi4: 10, flawless1: 10, streak30: 15, multi6: 15, streak40: 20, dodge25: 20, flawless5: 25, streak100: 30, multi10: 30
 };
+
+// Quanto o jogador já tem para esta conquista: um número do save.stats, o abate de um tipo de monstro (beast, do bestiário) ou o
+// número de ondas com 3 ou 5 estrelas (calculado dos recordes por onda, então vale também para quem já tinha jogado)
+export function achievementValue(a, save) {
+    if (a.beast) return save.bestiary?.[a.beast]?.kills ?? 0;
+    if (a.stat === 'threeStarWaves' || a.stat === 'fiveStarWaves') {
+        const min = a.stat === 'fiveStarWaves' ? 5 : 3;
+        return Object.values(save.waveBests ?? {}).filter(b => (b.stars ?? 0) >= min).length;
+    }
+    return save.stats[a.stat] ?? 0;
+}
 
 // Brasas que o troféu paga (0 se ele já libera um herói jogável)
 export function achievementEmbers(a, heroes) {

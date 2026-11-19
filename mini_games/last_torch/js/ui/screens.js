@@ -1,5 +1,5 @@
 import { CHARACTER_MODEL, getXpToNextLevel } from '../../data_model/character.js';
-import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
+import { ACHIEVEMENTS, achievementValue } from '../../data_model/sanctuary.js';
 import { EVOLUTIONS } from '../../data_model/powers.js';
 import { preloadTreeImages, treeImageFor, paintIcon } from '../../data_model/tree_images.js';
 import { DARKNESS, getHourName, startingSkillPoints } from '../../data_model/night.js';
@@ -397,7 +397,7 @@ function nearestGoal() {
     let best = null;
     ACHIEVEMENTS.forEach(a => {
         if (save.achievements[a.id]) return;
-        const progress = Math.min(0.999, (save.stats[a.stat] ?? 0) / a.target);
+        const progress = Math.min(0.999, achievementValue(a, save) / a.target);
         if (!best || progress > best.progress) best = { a, progress };
     });
     return best;

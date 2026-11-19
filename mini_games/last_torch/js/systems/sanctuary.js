@@ -1,4 +1,4 @@
-import { ACHIEVEMENTS, achievementEmbers, getBestiary } from '../../data_model/sanctuary.js';
+import { ACHIEVEMENTS, achievementEmbers, achievementValue, getBestiary } from '../../data_model/sanctuary.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { save, persist } from '../core/save.js';
 import { state } from '../core/state.js';
@@ -34,7 +34,7 @@ function payAchievementEmbers() {
 export function checkAchievements({ toast = true, announce = toast, flush = true } = {}) {
     const done = [];
     ACHIEVEMENTS.forEach(a => {
-        const earned = save.achievements[a.id] || (save.stats[a.stat] ?? 0) >= a.target;
+        const earned = save.achievements[a.id] || achievementValue(a, save) >= a.target;
         if (!earned) return;
 
         let changed = false;

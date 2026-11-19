@@ -14,6 +14,9 @@ const TICK_SECONDS = 0.07;
 const fmt = (n) => Math.round(n).toLocaleString('en-US');
 const ease = (k) => 1 - (1 - k) ** 3;
 
+// O cartão está na tela? (o amanhecer espera ele fechar antes de mostrar o resumo da noite: uma tela de cada vez)
+export const isWaveResultsOpen = () => !!document.querySelector('.wave-results');
+
 export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, points }) {
     document.querySelector('.wave-results')?.remove();
     const root = document.createElement('div');

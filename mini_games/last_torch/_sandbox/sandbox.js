@@ -14,6 +14,7 @@ import { flushHeroUnlocks, queueHeroUnlock } from '/js/ui/hero_unlock.js';
 import { ACHIEVEMENTS } from '/data_model/sanctuary.js';
 import { mountTuner } from '/_sandbox/tuner.js';
 import { mountFastRun } from '/_sandbox/fastrun.js';
+import { mountScreens } from '/_sandbox/screens.js';
 
 const choice = { hero: ACTIVE_HEROES[0], boss: 'AZAEL' };
 let arenaOn = false;                    // as travas de modo deus só valem numa luta da Arena (nunca na aba Fast run)
@@ -53,7 +54,7 @@ panel.innerHTML = `
   <div class="card">
     <h2>🧪 Last Torch Sandbox</h2>
     <p class="note">Test arena: nothing here touches the game or its save.</p>
-    <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button></div>
+    <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button><button data-tab="screens">🖼️ Screens</button></div>
     <div id="sbArena">
     <h3>Hero</h3><div class="sb-row" id="sbHeroes"></div>
     <h3>Boss <small>(click again to unselect: monsters only)</small></h3><div class="sb-row" id="sbBosses"></div>
@@ -77,6 +78,7 @@ panel.innerHTML = `
     </div>
     <div id="sbTuner" class="hidden"></div>
     <div id="sbFast" class="hidden"></div>
+    <div id="sbScreens" class="hidden"></div>
   </div>`;
 document.body.appendChild(panel);
 
@@ -289,6 +291,7 @@ requestAnimationFrame(godLoop);
 // Abas: Arena (luta de teste), HUD tuner (carrega o jogo num iframe só na primeira vez que a aba abre) e Fast run (partida acelerada)
 let tuner = null;
 let fast = null;
+let screens = null;
 panel.querySelectorAll('.sb-tabs button').forEach(button => {
     button.onclick = () => {
         const tab = button.dataset.tab;
@@ -296,6 +299,8 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
         panel.querySelector('#sbArena').classList.toggle('hidden', tab !== 'arena');
         panel.querySelector('#sbTuner').classList.toggle('hidden', tab !== 'tuner');
         panel.querySelector('#sbFast').classList.toggle('hidden', tab !== 'fast');
+        panel.querySelector('#sbScreens').classList.toggle('hidden', tab !== 'screens');
+        if (tab === 'screens') screens ??= mountScreens(panel.querySelector('#sbScreens'), { hidePanel: () => panel.classList.add('hidden') });
         panel.querySelector('.card').classList.toggle('is-wide', tab === 'tuner');
         if (tab === 'fast') fast ??= mountFastRun(panel.querySelector('#sbFast'), {
             hidePanel: () => panel.classList.add('hidden'),

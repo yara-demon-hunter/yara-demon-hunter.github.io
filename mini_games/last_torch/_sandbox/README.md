@@ -37,3 +37,14 @@ Terceira aba do painel (**⏩ Fast run**): escolha o **herói**, deixe ligada (o
 - A barra mostra a onda, o tempo da onda em andamento (m:ss de **tempo de jogo**, não de relógio), uma linha com o tempo de cada onda terminada (`W1 3:05 · W2 3:12 … total`), as mortes e o nível, e tem a caixa **autopilot**: o herói anda perto da tocha, ataca quem chega, gasta os pontos de skill, passa as conversas sozinho. **O acampamento (relíquias, loja) fica por sua conta**: o jogo espera você escolher e sair; a caixa **auto camp** da barra faz o piloto sair dele sozinho. Desligue para jogar você mesmo (vale em qualquer velocidade). Se o herói morrer (sem Never die), a barra mostra onde parou.
 - O som é suspenso fora do ×1 (viraria chiado) e volta no ×1. O **✕** esconde a barra.
 - As travas do modo deus da aba Arena (monstros que não morrem, etc.) só valem numa luta da Arena; a Fast run é uma partida normal.
+
+## Aba Screens (abrir as telas sem jogar até lá)
+
+Quarta aba do painel (**🖼️ Screens**): abre uma tela do jogo na hora, com os números que você escolher, para ver o que acontece quando o jogador morre, passa uma onda ou zera o jogo, sem jogar uma noite inteira. Usa as funções reais do jogo (`triggerGameOver`, `openCamp`, `returnToMenu`...), então a tela é exatamente a do jogador.
+
+- **Escolhas:** herói, onda, pontuação, monstros abatidos, bosses vencidos, estrelas da onda (0 a 5) e nível de Escuridão. A caixa **Hide the "new hero unlocked" popup** (ligada) marca os troféus que liberam heróis como já ganhos, porque passar da onda 1 liberaria o Rowan e o prêmio cobriria a tela; desmarque para ver o prêmio de verdade.
+- **End of the night:** 💀 o herói caiu, 🔥 a tocha apagou, 🌅 o amanhecer (tela de vitória com STAY IN THE DARK). Dá para clicar nos botões dessas telas (HUNT AGAIN, ALTAR, MENU...) e ver o que vem depois.
+- **Between waves:** ⭐ onda concluída (cartão de resultado com as estrelas escolhidas e depois o acampamento) e 🏕️ só o acampamento.
+- **Menus:** início, presente diário, Ranks e o Altar aberto logo depois de uma queda ("try again, but stronger").
+- **Save do sandbox:** +500 Brasas, liberar todos os heróis e **🆕 Brand new player** (apaga o save deste sandbox e recarrega, para ver a experiência de quem nunca jogou).
+- Depois de abrir uma tela, **🧪 Sandbox** (canto inferior esquerdo) volta ao painel. O save do sandbox é separado do do jogo (outra porta = outro `localStorage`).
