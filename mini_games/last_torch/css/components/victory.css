@@ -1,0 +1,56 @@
+/* --- TELA DE VITÓRIA (js/ui/victory.js) --- */
+.victory { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 1rem; overflow-y: auto;
+    background: radial-gradient(ellipse 90% 60% at 50% 110%, rgba(251, 146, 60, 0.45), transparent 70%), radial-gradient(ellipse at 50% 20%, #1c1407, #05060a 75%);
+    opacity: 0; transition: opacity 0.4s ease; }
+.victory.is-in { opacity: 1; }
+.vic-card { width: min(100%, 52rem); display: flex; flex-direction: column; align-items: center; gap: 0.7rem; text-align: center; transform: translateY(12px); transition: transform 0.4s ease; }
+.victory.is-in .vic-card { transform: none; }
+.vic-eyebrow { margin: 0; font: 800 0.72rem 'Inter', sans-serif; letter-spacing: 0.24em; color: #fbbf24; }
+.vic-title { margin: -0.3rem 0 0; font: 800 clamp(2.4rem, 8vw, 3.6rem)/1 'Cinzel', Georgia, serif; letter-spacing: 0.18em; color: #fff7d6; text-shadow: 0 0 30px rgba(251, 191, 36, 0.6); }
+.vic-body { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); gap: 1.2rem; width: 100%; align-items: center; }
+.vic-hero { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+.vic-art { width: min(14rem, 60vw); aspect-ratio: 1; border-radius: 1.2rem; overflow: hidden; border: 2px solid rgba(251, 191, 36, 0.85); box-shadow: 0 0 40px rgba(251, 146, 60, 0.55); background: #0b0f14; animation: vicGlow 2.4s ease-in-out infinite; }
+.vic-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@keyframes vicGlow { 50% { box-shadow: 0 0 60px rgba(251, 191, 36, 0.8); } }
+.vic-name { font: 800 1.3rem 'Cinzel', Georgia, serif; letter-spacing: 0.14em; color: #fdba74; }
+.vic-sub { font: 600 0.72rem 'Inter', sans-serif; color: #94a3b8; }
+.vic-rank { margin-top: 0.2rem; padding: 0.15rem 0.6rem; border-radius: 999px; background: rgba(250, 204, 21, 0.16); border: 1px solid rgba(250, 204, 21, 0.6); color: #fde68a; font: 800 0.68rem 'Inter', sans-serif; letter-spacing: 0.06em; }
+.vic-side { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+.vic-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.4rem; }
+.vic-stat { display: flex; flex-direction: column; align-items: center; gap: 0.05rem; padding: 0.45rem 0.2rem; border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 0.7rem; background: rgba(12, 10, 6, 0.75); }
+.vic-ico { font-size: 1.1rem; line-height: 1; }
+.vic-stat b { font: 800 1.05rem 'Cinzel', serif; color: #fff7d6; font-variant-numeric: tabular-nums; }
+.vic-stat em { font: 600 0.56rem 'Inter', sans-serif; font-style: normal; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+.vic-waves-title { margin: 0.2rem 0 0; font: 800 0.66rem 'Inter', sans-serif; letter-spacing: 0.16em; color: #fbbf24; text-align: left; }
+.vic-waves { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.3rem; }
+.vic-wave { display: flex; flex-direction: column; align-items: center; padding: 0.3rem 0.1rem; border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 0.55rem; background: rgba(8, 12, 16, 0.75); opacity: 0; animation: vicIn 0.35s ease forwards; animation-delay: calc(0.5s + var(--d)); }
+.vic-wave i { font: 600 0.56rem 'Inter', sans-serif; font-style: normal; color: #94a3b8; }
+.vic-wave span { font-size: 0.62rem; letter-spacing: -0.5px; color: rgba(148, 163, 184, 0.3); }
+.vic-wave span b { color: #fbbf24; font-weight: inherit; }
+.vic-wave.is-perfect { border-color: rgba(250, 204, 21, 0.7); box-shadow: 0 0 12px rgba(250, 204, 21, 0.25); }
+@keyframes vicIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+.vic-menu { width: min(100%, 18rem); margin-top: 0.3rem; }
+
+/* Celular em pé: uma coluna */
+@media (max-width: 640px) and (orientation: portrait) {
+    .vic-body { grid-template-columns: minmax(0, 1fr); gap: 0.7rem; }
+    .vic-art { width: min(9rem, 42vw); }
+    .vic-stats { gap: 0.3rem; }
+    .vic-stat { padding: 0.35rem 0.1rem; }
+    .vic-stat b { font-size: 0.92rem; }
+    .vic-stat em { font-size: 0.5rem; }
+    .vic-waves { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+/* Celular deitado: pouca altura */
+@media (max-height: 500px) and (orientation: landscape) {
+    .victory { padding: 0.5rem 1rem; }
+    .vic-card { gap: 0.35rem; }
+    .vic-title { font-size: 1.8rem; }
+    .vic-art { width: 6.5rem; }
+    .vic-name { font-size: 1rem; }
+    .vic-stat { padding: 0.25rem 0.1rem; }
+    .vic-stat b { font-size: 0.85rem; }
+    .vic-ico { font-size: 0.9rem; }
+    .vic-wave { padding: 0.18rem 0.1rem; }
+    .vic-menu { padding: 0.4rem 1rem; }
+}

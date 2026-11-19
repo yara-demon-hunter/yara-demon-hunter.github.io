@@ -42,6 +42,7 @@ import { dailyStatus } from '../../data_model/daily.js';
 import { resetQuickPick } from './quick_pick.js';
 import { updateHUD } from './hud.js';
 import { renderDaily, setupDaily } from './daily.js';
+import { showVictory } from './victory.js';
 
 // Retrato do herói: arte própria (portraitImage) ou a do Caçador com o filtro de cor dele
 export function paintHeroPortrait(node, hero) {
@@ -527,6 +528,21 @@ export function triggerGameOver(reason) {
     renderGoal();
     openAltarAfterDeath(reason);
     document.getElementById('btnEndless').classList.toggle('hidden', reason !== 'DAWN');
+    // Zerou a noite: um final de verdade (o herói, os números e as 12 ondas com as estrelas) no lugar do resumo, só com MENU
+    if (reason === 'DAWN') {
+        const learned = getOwnedPowers().length + Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0).length;
+        showVictory({
+            hero: getHero(),
+            darkness: save.darkness,
+            waves: Array.from({ length: 12 }, (_, i) => run.waveStars?.[i + 1] ?? 0),
+            stats: { score: state.totalScore, kills: run.kills, level: state.playerLevel, skills: learned, bosses: run.bosses, embers: embersEarned, streak: run.bestStreak, seconds: state.runTime },
+            rank: nightRank,
+            onMenu: returnToMenu
+        });
+        audio.setMood('dawn');
+        flushHeroUnlocks();
+        return;
+    }
     screen.classList.remove('hidden');
     audio.setMood(reason === 'DAWN' ? 'dawn' : 'menu');
     if (reason !== 'DAWN') audio.playGameOver();

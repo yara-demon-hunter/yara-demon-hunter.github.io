@@ -7,6 +7,7 @@ import { WAVE_SPOILS } from '/data_model/night.js';
 import { ACHIEVEMENTS } from '/data_model/sanctuary.js';
 import { save, persist } from '/js/core/save.js';
 import { player, state } from '/js/core/state.js';
+import { buyNode, getBuyableNodes } from '/js/systems/tree.js';
 import { grantWaveSpoils, openCamp } from '/js/ui/camp.js';
 import { openAltar } from '/js/ui/altar.js';
 import { openRanks } from '/js/ui/sanctuary.js';
@@ -108,6 +109,12 @@ export function mountScreens(host, { hidePanel }) {
         // Como no jogo: o resultado da onda 12 (com as estrelas escolhidas) aparece durante o amanhecer, e a tela de vitória vem depois
         state.turn = 12;
         state.run.victory = true;
+        // Uma noite "vivida": estrelas variadas nas ondas 1 a 11 e algumas skills compradas, para a tela de vitória ter o que mostrar
+        const pick = num('#scStars', 0, 5);
+        state.run.waveStars = Object.fromEntries(Array.from({ length: 11 }, (_, i) => [i + 1, Math.max(0, Math.min(5, pick + ((i * 7) % 5) - 2))]));
+        state.skillPoints = 20;
+        for (let i = 0; i < 10; i++) { const b = getBuyableNodes(); if (b.length) buyNode(b[i % b.length].id); }
+        state.run.bestStreak = 48;
         setWaveStars(12, num('#scStars', 0, 5));
         grantWaveSpoils(12);
         // O resumo da noite espera o cartão fechar (como no jogo: uma tela de cada vez)
