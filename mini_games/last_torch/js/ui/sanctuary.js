@@ -1,4 +1,4 @@
-import { ACHIEVEMENTS, getBestiary } from '../../data_model/sanctuary.js';
+import { ACHIEVEMENTS, achievementEmbers, getBestiary } from '../../data_model/sanctuary.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { save } from '../core/save.js';
 import { audio } from '../core/state.js';
@@ -32,6 +32,9 @@ function renderAchievements(list, group) {
             el('b', '', a.name),
             el('span', '', a.hero && !HEROES[a.hero].shelved ? `${a.desc} Unlocks ${HEROES[a.hero].name}.` : a.desc)
         );
+        // Brasas que o troféu paga (apagadas quando já foram recebidas)
+        const reward = achievementEmbers(a, HEROES);
+        if (reward > 0) text.append(el('em', `sanc-reward${done ? ' is-paid' : ''}`, `🔥 ${done ? '' : '+'}${reward}${done ? ' received' : ''}`));
         if (!done) {
             const bar = el('i', 'sanc-bar');
             const fill = el('u');

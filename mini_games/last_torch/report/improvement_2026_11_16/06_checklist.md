@@ -86,7 +86,7 @@ Detalhes: [02_plano_de_acao.md](02_plano_de_acao.md) · números: [04_progresso.
 
 ## Fase 4b — Metas e competição (D1 e D7)
 - [ ] silhueta + condição dos heróis bloqueados
-- [ ] troféus pagam Brasas
+- [x] troféus pagam Brasas (19/11: ~785 no total, 5 a 100 cada; heróis por troféu pagam 0)
 - [ ] recordes pessoais (onda, mortes, sequência)
 - [ ] aviso "NOVO RECORDE"
 - [ ] botão de compartilhar resultado do desafio

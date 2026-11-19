@@ -50,6 +50,22 @@ export const ACHIEVEMENTS = [
     { id: 'multi10', group: 'feat', icon: '☄️', name: 'Annihilation', desc: 'Slay 10 monsters at once.', stat: 'bestMultiKill', target: 10 }
 ];
 
+// Brasas que cada troféu paga, uma vez só (js/systems/sanctuary.js, checkAchievements). Pouco de propósito (o total é ~800, uns 15% do
+// Altar): é um motivo a mais para conseguir o troféu, não um atalho. Quem libera um herói paga 0 (o prêmio já é o herói); troféu
+// que libera um herói guardado (shelved) paga normal.
+export const ACHIEVEMENT_EMBERS = {
+    firstNight: 10, hour3: 10, hour4: 10, kills300: 15, kills1000: 25, demon: 25, evolve: 15, chests10: 15, hour6: 20, elites10: 15,
+    stars5x3: 30, stars5all: 80, kills2000: 40, countess: 30, darkness3: 30,
+    sworn1: 20, sworn2: 20, sworn3: 20, sworn4: 20, sworn5: 20, hour20: 50, darkness8: 80,
+    multi3: 5, dodge5: 5, multi4: 10, flawless1: 10, streak30: 15, multi6: 15, streak40: 20, dodge25: 20, flawless5: 25, streak100: 30, multi10: 30
+};
+
+// Brasas que o troféu paga (0 se ele já libera um herói jogável)
+export function achievementEmbers(a, heroes) {
+    if (a.hero && heroes[a.hero] && !heroes[a.hero].shelved) return 0;
+    return ACHIEVEMENT_EMBERS[a.id] ?? 0;
+}
+
 // Mortes quase ao mesmo tempo (um golpe, uma explosão, as lâminas girando): cada morte dentro da janela soma
 export const MULTI_KILL = {
     windowSeconds: 0.3,

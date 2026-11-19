@@ -1,4 +1,4 @@
-import { ACHIEVEMENTS, getBestiary } from '../../data_model/sanctuary.js';
+import { ACHIEVEMENTS, achievementEmbers, getBestiary } from '../../data_model/sanctuary.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { save, persist } from '../core/save.js';
 import { state } from '../core/state.js';
@@ -9,7 +9,23 @@ import { flushHeroUnlocks, queueHeroUnlock } from '../ui/hero_unlock.js';
 // Tudo que vale para além da noite: recordes, façanhas e o bestiário. O desenho fica em js/ui/sanctuary.js.
 // Os sistemas do jogo só chamam as funções daqui quando algo digno de nota acontece.
 export function rewardText(a) {
-    return a.hero && !HEROES[a.hero].shelved ? `New hero: ${HEROES[a.hero].name}` : a.desc;
+    if (a.hero && !HEROES[a.hero].shelved) return `New hero: ${HEROES[a.hero].name}`;
+    const embers = achievementEmbers(a, HEROES);
+    return embers > 0 ? `${a.desc} +${embers} 🔥` : a.desc;
+}
+
+// Paga as Brasas dos troféus ganhos que ainda não pagaram (uma vez cada). Quem já tinha troféus de antes recebe tudo na primeira
+// vez que o jogo abre depois da atualização. Devolve o total pago.
+function payAchievementEmbers() {
+    save.achievementPaid ??= {};
+    let total = 0;
+    ACHIEVEMENTS.forEach(a => {
+        if (!save.achievements[a.id] || save.achievementPaid[a.id]) return;
+        save.achievementPaid[a.id] = true;
+        total += achievementEmbers(a, HEROES);
+    });
+    if (total > 0) save.embers += total;
+    return total;
 }
 
 // Conquistas completadas agora. toast: avisa na tela (na tela final elas já aparecem na lista).
@@ -33,8 +49,14 @@ export function checkAchievements({ toast = true, announce = toast, flush = true
         }
         if (changed) done.push(a);
     });
-    if (done.length === 0) return done;
+    const paid = payAchievementEmbers();
+    if (done.length === 0 && paid === 0) return done;
     persist();
+    // Troféus de antes que pagam agora (ao abrir o jogo): um aviso só com o total
+    if (done.length === 0) {
+        if (toast || !announce) showToast('🏆', 'Trophy rewards', `+${paid} embers for the trophies you already earned`);
+        return done;
+    }
     // Herói liberado: o prêmio com a foto no lugar do aviso simples (espera a caçada acabar, se for o caso)
     const heroes = announce ? done.filter(a => a.hero && !HEROES[a.hero].shelved) : [];
     heroes.forEach(a => queueHeroUnlock(a.hero, a));

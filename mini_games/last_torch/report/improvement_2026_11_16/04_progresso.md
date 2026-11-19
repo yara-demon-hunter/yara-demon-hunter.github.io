@@ -476,3 +476,12 @@ Um robô jogou noites com Demon Hunter, Gudran e Rowan (desktop). Achou um erro 
 O dono atualizou `images/buttons/conversion.webp` (mãos em oração) e `sovereign-rune.webp` (pedra com runa azul). Gerei as versões pequenas de 128 px (`*-small.webp`, 4 a 5 KB) e liguei aos nós `conversion` e `sovereignRune` em `data_model/tree_images.js`. Conferido na árvore do Avgustino (Light Path) e do Gudran (Curse Path): os dois ícones aparecem no lugar do emoji.
 
 - **Gudran (19/11):** o **Shadow Path** também ficou proibido para ele (`sealedBranches: [blade, light, shadow]`).
+
+## 2026-11-19 · Troféus pagam Brasas
+
+Pedido do dono: pouco, para não ajudar demais, mas dar motivo para conquistar os troféus.
+- **Valores** (`ACHIEVEMENT_EMBERS` em `data_model/sanctuary.js`): troféus 10 a 80 (primeira noite e ondas iniciais 10; mortes 15 a 40; ondas 6/20 20 e 50; Juramentos 20 cada; evoluir, baús e elites 15; 5 estrelas 30 e 80; Escuridão 3 e 8 30 e 80), façanhas 5 a 30 (Triple Cut 5 até Annihilation 30). **Total 785 Brasas**, uns 15% do Altar (~5.100).
+- **Heróis:** troféu que libera um herói jogável paga 0 (Rowan, Brutos, Azael); o que libera herói guardado paga normal.
+- **Pagamento:** uma vez por troféu (`save.achievementPaid`), em `checkAchievements`. **Retroativo:** quem já tinha troféus recebe tudo na primeira abertura depois da atualização, com um aviso "Trophy rewards +N embers". Não paga de novo ao reabrir.
+- **Onde aparece:** aviso do troféu e lista da tela final ("... +25 🔥"), e o Santuário mostra "🔥 +25" (cinza "received" depois de pago).
+- **Verificado:** save antigo com 4 troféus recebeu 35 (100 → 135) e reabrir não pagou de novo; um troféu novo pagou na hora; total 785; Santuário em desktop e celular, sem erros.

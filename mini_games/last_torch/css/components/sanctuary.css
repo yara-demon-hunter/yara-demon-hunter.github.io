@@ -140,3 +140,7 @@
 .sanc-wave.is-unknown { opacity: 0.5; }
 .sanc-wave.is-perfect { border-color: rgba(251, 191, 36, 0.7); box-shadow: 0 0 10px rgba(251, 191, 36, 0.25); }
 @media (max-width: 560px) { .sanc-waves-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* Brasas que o troféu paga (js/ui/sanctuary.js) */
+.sanc-text em.sanc-reward { display: inline-block; margin-top: 0.2rem; font-style: normal; font-size: 0.62rem; font-weight: 800; color: #fdba74; }
+.sanc-text em.sanc-reward.is-paid { color: #64748b; font-weight: 600; }
