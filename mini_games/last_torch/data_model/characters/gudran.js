@@ -8,9 +8,9 @@ import { GUDRAN_VISUALS } from '../../library/characters/gudran/gudran_visual.js
 
 export const GUDRAN = {
     id: 'gudran',
-    // Caminhos (árvore): +5% de dano nas skills do Curse Path; o Light Path é proibido (e o Blade, porque não tem lâmina)
+    // Caminhos (árvore): +5% de dano nas skills do Curse Path; o Light Path e o Shadow Path são proibidos (e o Blade, porque não tem lâmina)
     affinity: 'curse',
-    sealedBranches: ['blade', 'light'],
+    sealedBranches: ['blade', 'light', 'shadow'],
     model: 'gudran',             // boneco 2.5D (js/render/bodies.js)
     // Não tem lâmina: o ataque básico é um raio de energia azul do cajado (js/systems/arcane.js). No lugar da adaga, o clique (ou o
     // botão do canto) ergue o Escudo de Runas (abilities.runeShield). A esfera azul (thrown) só aparece na mão livre. Árvore: o ramo Blade e a Flaming Sword ficam selados (como no Rowan); o dele é o Curse Path.

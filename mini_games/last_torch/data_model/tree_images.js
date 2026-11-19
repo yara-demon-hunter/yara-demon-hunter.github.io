@@ -60,6 +60,7 @@ export const TREE_IMAGES = {
     oakEvolve: img('ancient-grove'),
     oathWild: img('oath-of-the-wild'),
     darkRoses: img('dark-rose'),
+    sovereignRune: img('sovereign-rune'),
     // Light Path
     silentVigil: img('silent-vigil'),
     holyGround: img('sacred-ground'),
@@ -67,6 +68,7 @@ export const TREE_IMAGES = {
     holyWater: img('holy-water'),
     waterEvolve: img('blessed-rain'),
     blessedBlade: img('blessed-sword'),
+    conversion: img('conversion'),
     smite: img('holy-smite'),
     smiteEvolve: img('divine-wrath'),
     oathFaith: img('oath-of-faith')

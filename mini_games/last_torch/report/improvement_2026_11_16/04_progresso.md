@@ -452,7 +452,7 @@ Pedido do dono. Cada herói tem `affinity` (ramo com +5% de dano) e `sealedBranc
 |---|---|---|
 | Demon Hunter | — | nenhum (todos abertos) |
 | Avgustino | Light | Curse |
-| Gudran | Curse | Light (e Blade: sem lâmina) |
+| Gudran | Curse | Light e Shadow (e Blade: sem lâmina) |
 | Rowan | Nature | Flame (e Blade: cajado não corta) |
 | Azael | Shadow | Light |
 | Brutos | Blade (inclui o golpe da lâmina) | Shadow |
@@ -470,3 +470,9 @@ Pedido do dono. Cada herói tem `affinity` (ramo com +5% de dano) e `sealedBranc
 Um robô jogou noites com Demon Hunter, Gudran e Rowan (desktop). Achou um erro de desenho com o Rowan, que aparecia a cada quadro quando o rival (Azael) atacava: `comboStep` do boss podia ser indefinido e virar `NaN` (`boss_ai.js`), quebrando a animação do boneco (`hero_anim.js`). Corrigido nos dois pontos (`?? 1` e proteção no motor). Os outros heróis não deram erro, sem números inválidos nem monstros em excesso.
 
 **Pendente:** testar os outros heróis no celular; a tela inicial em pé com 6 heróis ficou apertada (ideia: grade 3×2 e compactar o resto da tela).
+
+## 2026-11-19 · Arte nova da Conversion e da Sovereign Rune
+
+O dono atualizou `images/buttons/conversion.webp` (mãos em oração) e `sovereign-rune.webp` (pedra com runa azul). Gerei as versões pequenas de 128 px (`*-small.webp`, 4 a 5 KB) e liguei aos nós `conversion` e `sovereignRune` em `data_model/tree_images.js`. Conferido na árvore do Avgustino (Light Path) e do Gudran (Curse Path): os dois ícones aparecem no lugar do emoji.
+
+- **Gudran (19/11):** o **Shadow Path** também ficou proibido para ele (`sealedBranches: [blade, light, shadow]`).

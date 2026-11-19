@@ -403,11 +403,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { cooldown: 10, radius: 125, pull: 150, damage: 3, seconds: 1.3 },
-            { cooldown: 10, radius: 125, pull: 195, damage: 3, seconds: 1.3 },
-            { cooldown: 8, radius: 125, pull: 195, damage: 3, seconds: 1.3 },
-            { cooldown: 8, radius: 125, pull: 195, damage: 4.5, seconds: 1.3 },
-            { cooldown: 6.5, radius: 150, pull: 220, damage: 4.5, seconds: 1.3 }
+            { cooldown: 20, radius: 125, pull: 150, damage: 3, seconds: 1.3 },
+            { cooldown: 19, radius: 125, pull: 195, damage: 3, seconds: 1.3 },
+            { cooldown: 18, radius: 125, pull: 195, damage: 3, seconds: 1.3 },
+            { cooldown: 17, radius: 125, pull: 195, damage: 4.5, seconds: 1.3 },
+            { cooldown: 16, radius: 150, pull: 220, damage: 4.5, seconds: 1.3 }
         ],
         reach: 1.7,             // atrai até reach x radius do centro
         knockback: 110
@@ -818,7 +818,7 @@ export const EVOLUTIONS = {
             const { cooldown, radius, pull, damage, seconds } = this.levels;
             return `Every ${formatNumber(cooldown)}s, the rift pulls enemies within ${radius} range with force ${pull}, then collapses for ${formatMultiplier(damage)} spell damage. A second rift opens after ${formatNumber(this.secondRift.seconds)}s for ${formatMultiplier(this.secondRift.damage)} spell damage. The rift lasts ${formatNumber(seconds)}s.`;
         },
-        levels: { cooldown: 9, radius: 190, pull: 280, damage: 4, seconds: 1.5 },
+        levels: { cooldown: 15, radius: 190, pull: 280, damage: 4, seconds: 1.5 },
         secondRift: { seconds: 0.7, damage: 0.6 }
     },
     phantomDash: {
