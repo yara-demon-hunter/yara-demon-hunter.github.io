@@ -81,13 +81,14 @@ export const MONSTER_MODELS = {
         radius: 13,
         color: '#f50bca',
         damage: 12,
-        initialShootCooldownSeconds: 4,
-        shootCooldownSeconds: 6.5,       // segundos entre um tiro e outro
+        initialShootCooldownSeconds: 5,
+        shootCooldownSeconds: 9,         // segundos entre um tiro e outro
+        shootRange: 200,                 // só atira daqui para perto (antes acertava a tocha de muito longe)
         projectileSpeed: 160,
         projectileRadius: 5,
         projectileDamageMultiplier: 0.8,
         projectileTorchDamage: 5,
-        keepDistance: 165,               // para de andar a esta distância do alvo e atira
+        keepDistance: 170,               // para de andar a esta distância do alvo e atira
         scoreReward: 30,
         goldBase: 10,
         goldVariance: 0.5,
@@ -304,12 +305,12 @@ export const MONSTER_MODELS = {
         immovable: true,
         // Joga uma pedra (pequena) a meia distância: nem colado nele (aí ele soca) nem longe demais
         projectileSpeed: 130,
-        projectileRadius: 7,
+        projectileRadius: 10,
         projectileDamageMultiplier: 0.6,
         projectileColor: '#8a7f72',
         projectileTorchDamage: 3,
         shootMinRange: 160,
-        shootRange: 340,
+        shootRange: 400,
         throwWindup: 0.5,                // ergue os braços nesse tempo antes de jogar
         initialShootCooldownSeconds: 3,
         shootCooldownSeconds: 4.5,
@@ -320,7 +321,7 @@ export const MONSTER_MODELS = {
         xpRewardPerTurn: 6,
         // Golpe em área: bate as duas mãos no chão. Perto dele (range) ele ergue os braços (windupSeconds) enquanto um círculo no chão (areaRadius)
         // mostra onde vai pegar; as mãos batem quando o círculo estoura. Quem sair do círculo antes (dash) não leva dano.
-        punch: { area: true, areaRadius: 175, torchDamage: 8, cooldownSeconds: 5, windupSeconds: 1.4, strikeSeconds: 0.25, recoverySeconds: 0.7, range: 115, damageMultiplier: 2.4 }
+        punch: { area: true, areaRadius: 125, torchDamage: 8, cooldownSeconds: 5, windupSeconds: 1.4, strikeSeconds: 0.25, recoverySeconds: 0.7, range: 115, damageMultiplier: 2.4 }
     },
     // Necromante: fica longe e levanta esqueletos até alguém ir buscá-lo.
     NECROMANCER: {
@@ -332,10 +333,11 @@ export const MONSTER_MODELS = {
         radius: 13,
         color: '#86efac',
         damage: 12,
-        keepDistance: 290,
+        keepDistance: 230,
+        shootRange: 250,                 // só levanta esqueletos daqui para perto
         summon: { type: 'SKELETON', count: 2, spread: 46 },
-        initialShootCooldownSeconds: 3,
-        shootCooldownSeconds: 6.5,
+        initialShootCooldownSeconds: 4,
+        shootCooldownSeconds: 9,
         scoreReward: 60,
         goldBase: 20,
         goldVariance: 0.5,

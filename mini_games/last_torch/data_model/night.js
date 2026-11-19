@@ -6,14 +6,14 @@
 //   ★ tocha levou no máximo `damageGoals[0]` · ★ tocha no máximo `damageGoals[1]` (as duas estrelas da tocha)
 //   ★ herói levou no máximo `damageGoals[0]` · ★ herói no máximo `damageGoals[1]`
 //   ★ sequência de mortes (Rush) de pelo menos rushGoalBase + rushGoalPerWave x onda
-// Mais de 20% de dano na tocha OU no herói = sem 5 estrelas. Ouro = (goldBase + goldPerWave x onda) x starGold[estrelas];
+// Mais de damageGoals[1] de dano na tocha OU no herói = sem 5 estrelas. Ouro = (goldBase + goldPerWave x onda) x starGold[estrelas];
 // ★★★★★ também dá perfectSkillPoints.
 // PONTUAÇÃO DA ONDA (recorde de cada onda em save.waveBests): kills x 10, maior Rush x 25, ouro pego x 1,
 // (100 - % de dano da tocha) x 10, (100 - % de dano do herói) x 5.
 export const WAVE_SPOILS = {
-    damageGoals: [0.75, 0.4],   // estrelas de dano (tocha e herói): sofrer no máximo 75% e 40% da vida na onda (era 50% e 20%: 5 estrelas quase nunca saíam)
-    rushGoalBase: 20,
-    rushGoalPerWave: 4,
+    damageGoals: [0.85, 0.5],   // estrelas de dano (tocha e herói): sofrer no máximo 85% e 50% da vida na onda (já foi 50% e 20%, depois 75% e 40%: 5 estrelas ainda eram difíceis)
+    rushGoalBase: 15,           // onda 1: 18 mortes seguidas; onda 12: 51 (antes 24 e 68)
+    rushGoalPerWave: 3,
     score: { kills: 10, rush: 25, gold: 1, torch: 10, hero: 5 },
     goldBase: 60,
     goldPerWave: 30,
