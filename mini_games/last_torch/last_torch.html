@@ -473,7 +473,7 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
         </div>
         <div class="summary-actions">
-            <button id="btnRestart" class="start-btn">HUNT AGAIN</button>
+            <button id="btnRestart" class="start-btn">▶ HUNT AGAIN</button>
             <button id="btnEndless" class="start-btn start-btn-dark hidden">STAY IN THE DARK</button>
             <button id="btnMenu" class="start-btn start-btn-dark">MENU</button>
         </div>
@@ -516,7 +516,10 @@ permalink: /mini_games/last_torch/last_torch.html
         <p id="altarSub" class="altar-sub">Every night earns embers, even the ones you lose. Spend them on upgrades that last.</p>
         <div id="altarList" class="custom-scroll"></div>
         <!-- Só aparece quando o Altar abre depois da morte (js/ui/altar.js): joga de novo na hora -->
-        <button id="btnAltarRetry" class="start-btn altar-retry hidden">HUNT AGAIN ▶</button>
+        <div id="altarRetryRow" class="altar-retry-row hidden">
+            <button id="btnAltarRetry" class="start-btn altar-retry">▶ HUNT AGAIN</button>
+            <button id="btnAltarMenu" class="start-btn start-btn-dark altar-retry">MENU</button>
+        </div>
     </div>
 </div>
 

@@ -114,7 +114,20 @@ export function mountScreens(host, { hidePanel }) {
     // Fim da noite: as três telas finais do jogo
     add('#scEnd', '💀 The hero fell', 'game over screen', go(() => triggerGameOver('PLAYER'), 'the hero fell'));
     add('#scEnd', '🔥 The torch went out', 'game over screen', go(() => triggerGameOver('CORE'), 'the torch went out'));
+    add('#scEnd', '🏆 Fall with ALL new records', 'NEW RECORD + every NEW BEST line', go(() => {
+        // Finge que os recordes anteriores eram mínimos e que esta noite foi enorme; devolve o recorde de pontuação real depois
+        const oldBest = save.stats.bestScore;
+        save.stats.bestScore = 1;
+        state.run.startBests = { hour: 1, kills: 1, stars: 1, embers: 1, streak: 1 };
+        state.run.kills = 400; state.run.stars = 30; state.run.bestStreak = 60;
+        state.turn = Math.max(state.turn, 9);
+        state.totalScore = Math.max(state.totalScore, 50000);
+        triggerGameOver('PLAYER');
+        save.stats.bestScore = Math.max(oldBest, state.totalScore);
+    }, 'the game over screen with every record broken'));
     add('#scEnd', '🌅 Dawn: you finished the game', 'victory screen (STAY IN THE DARK)', go(() => {
+        let oldBest = 0;
+        const forceRecord = false;
         // Como no jogo: o resultado da onda 12 (com as estrelas escolhidas) aparece durante o amanhecer, e a tela de vitória vem depois
         state.turn = 12;
         state.run.victory = true;
@@ -124,6 +137,13 @@ export function mountScreens(host, { hidePanel }) {
         state.skillPoints = 20;
         for (let i = 0; i < 10; i++) { const b = getBuyableNodes(); if (b.length) buyNode(b[i % b.length].id); }
         state.run.bestStreak = 48;
+        if (forceRecord) {
+            // Recorde forçado: os recordes anteriores viram mínimos; a pontuação real volta ao normal depois da tela
+            oldBest = save.stats.bestScore;
+            save.stats.bestScore = 1;
+            state.run.startBests = { hour: 1, kills: 1, stars: 1, embers: 1, streak: 1 };
+            state.totalScore = Math.max(state.totalScore, 50000);
+        }
         setWaveStars(12, num('#scStars', 0, 5));
         grantWaveSpoils(12);
         // O resumo da noite espera o cartão fechar (como no jogo: uma tela de cada vez)
@@ -132,6 +152,38 @@ export function mountScreens(host, { hidePanel }) {
             if (performance.now() - t0 < 4500 || document.querySelector('.wave-results')) return;
             clearInterval(wait);
             triggerGameOver('DAWN');
+            if (forceRecord) save.stats.bestScore = Math.max(oldBest, state.totalScore);
+        }, 200);
+    }, 'the dawn (results card first; the victory screen comes after you close it)'));
+
+    add('#scEnd', '🏆 Dawn with a NEW RECORD', 'victory screen + record confetti', go(() => {
+        let oldBest = 0;
+        const forceRecord = true;
+        // Como no jogo: o resultado da onda 12 (com as estrelas escolhidas) aparece durante o amanhecer, e a tela de vitória vem depois
+        state.turn = 12;
+        state.run.victory = true;
+        // Uma noite "vivida": estrelas variadas nas ondas 1 a 11 e algumas skills compradas, para a tela de vitória ter o que mostrar
+        const pick = num('#scStars', 0, 5);
+        state.run.waveStars = Object.fromEntries(Array.from({ length: 11 }, (_, i) => [i + 1, Math.max(0, Math.min(5, pick + ((i * 7) % 5) - 2))]));
+        state.skillPoints = 20;
+        for (let i = 0; i < 10; i++) { const b = getBuyableNodes(); if (b.length) buyNode(b[i % b.length].id); }
+        state.run.bestStreak = 48;
+        if (forceRecord) {
+            // Recorde forçado: os recordes anteriores viram mínimos; a pontuação real volta ao normal depois da tela
+            oldBest = save.stats.bestScore;
+            save.stats.bestScore = 1;
+            state.run.startBests = { hour: 1, kills: 1, stars: 1, embers: 1, streak: 1 };
+            state.totalScore = Math.max(state.totalScore, 50000);
+        }
+        setWaveStars(12, num('#scStars', 0, 5));
+        grantWaveSpoils(12);
+        // O resumo da noite espera o cartão fechar (como no jogo: uma tela de cada vez)
+        const t0 = performance.now();
+        const wait = setInterval(() => {
+            if (performance.now() - t0 < 4500 || document.querySelector('.wave-results')) return;
+            clearInterval(wait);
+            triggerGameOver('DAWN');
+            if (forceRecord) save.stats.bestScore = Math.max(oldBest, state.totalScore);
         }, 200);
     }, 'the dawn (results card first; the victory screen comes after you close it)'));
 

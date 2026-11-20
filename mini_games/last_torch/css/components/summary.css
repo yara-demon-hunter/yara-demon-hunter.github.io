@@ -112,3 +112,4 @@
     .summary-actions { grid-template-columns: 1.4fr 1fr; position: sticky; bottom: 0; z-index: 2; padding: 0.3rem 0 0.2rem; background: linear-gradient(to top, rgba(3, 3, 6, 0.97) 75%, rgba(3, 3, 6, 0)); }
 }
 .unlock-more { text-align: center; color: #94a3b8; font-size: 0.64rem; border-color: rgba(148, 163, 184, 0.25); background: rgba(8, 12, 16, 0.5); animation: none; }
+

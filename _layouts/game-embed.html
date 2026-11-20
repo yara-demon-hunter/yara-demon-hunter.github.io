@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="{% if page.lang == 'pt' %}pt-BR{% else %}en{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include head-resources.html %}
+    {% include seo-meta.html %}
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/mini-games.css' | relative_url }}">
+</head>
+<body class="game-embed-shell">
+    <main class="game-embed-fullscreen">
+        <nav class="game-embed-fullscreen__bar" aria-label="{% if page.lang == 'pt' %}Navegação do jogo{% else %}Game navigation{% endif %}">
+            <a href="{{ page.back_url | relative_url }}">← {% if page.lang == 'pt' %}Voltar aos mini games{% else %}Back to mini games{% endif %}</a>
+            <span>{{ page.game_title }}</span>
+        </nav>
+        {{ content }}
+        <aside class="game-embed-fullscreen__rotate-hint" aria-live="polite">
+            <span aria-hidden="true">↻</span>
+            {% if page.lang == 'pt' %}Vire o telefone para jogar melhor.{% else %}Turn your phone sideways for the best experience.{% endif %}
+        </aside>
+    </main>
+</body>
+</html>

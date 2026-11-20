@@ -17,6 +17,7 @@ import { prepareShackle } from '../render/shackle.js';
 import { getTorchMaxHp } from '../systems/torch.js';
 import { attributes, audio, passives, player, powers, state } from '../core/state.js';
 import { checkAchievements, pushStats, recordNight, rewardText } from '../systems/sanctuary.js';
+import { celebrateRecord } from './record_celebration.js';
 import { flushHeroUnlocks } from './hero_unlock.js';
 import { getOwnedPowers, hasBuyableNode } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
@@ -88,7 +89,7 @@ export function startGame() {
 
     state.run = { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0, stars: 0,
         // recordes antes desta noite: a tela final mostra NEW BEST no que for batido
-        startBests: { hour: save.stats.bestHour, kills: save.stats.bestNightKills ?? 0, stars: save.stats.bestNightStars ?? 0, embers: save.stats.bestNightEmbers ?? 0 } };
+        startBests: { hour: save.stats.bestHour, kills: save.stats.bestNightKills ?? 0, stars: save.stats.bestNightStars ?? 0, embers: save.stats.bestNightEmbers ?? 0, streak: save.stats.bestStreak ?? 0 } };
     state.streak = 0;
     state.rushPaid = {};
     state.streakTimer = 0;
@@ -269,7 +270,8 @@ function renderEmbers(earned) {
         ['Wave', state.turn, before.hour],
         ['Kills', run.kills, before.kills],
         ['Stars', run.stars ?? 0, before.stars],
-        ['Embers', earned, before.embers]
+        ['Embers', earned, before.embers],
+        ['Streak', run.bestStreak, before.streak]
     ].filter(([, now, old]) => old !== undefined && now > old && old > 0);
     stats.bestNightKills = Math.max(stats.bestNightKills ?? 0, run.kills);
     stats.bestNightStars = Math.max(stats.bestNightStars ?? 0, run.stars ?? 0);
@@ -507,6 +509,7 @@ export function triggerGameOver(reason) {
     document.getElementById('finalScoreLabel').innerText = newRecord ? 'NEW RECORD' : 'Score';
     document.getElementById('finalScoreLabel').classList.toggle('is-record', newRecord);
     countUp(document.getElementById('finalScore'), state.totalScore);
+    if (newRecord) celebrateRecord({ score: state.totalScore, rank: nightRank });
 
     const build = document.getElementById('finalBuild');
     build.innerHTML = '';

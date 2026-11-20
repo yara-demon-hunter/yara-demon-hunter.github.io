@@ -1,0 +1,20 @@
+/* --- NOVO RECORDE (js/ui/record_celebration.js): confete por cima da tela final, sem bloquear os botões --- */
+.record-burst { position: fixed; inset: 0; z-index: 150; pointer-events: none; overflow: hidden; opacity: 0; transition: opacity 0.35s ease; }
+.record-burst.is-in { opacity: 1; }
+.record-burst.is-out { opacity: 0; }
+.record-badge {
+    position: absolute; left: 50%; top: 32%; transform: translate(-50%, -50%);
+    padding: 0.7rem 1.6rem 0.8rem; text-align: center; border-radius: 1rem;
+    background: radial-gradient(circle at 50% 30%, rgba(60, 40, 8, 0.95), rgba(10, 8, 4, 0.92));
+    border: 2px solid #fbbf24; box-shadow: 0 0 34px rgba(251, 191, 36, 0.6);
+    animation: recPop 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.35) both, recGlow 1.6s ease-in-out 0.7s infinite;
+}
+.record-trophy { font-size: 2.4rem; line-height: 1; animation: recBounce 0.9s ease-in-out infinite; }
+.record-title { font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.35rem; letter-spacing: 0.14em; color: #fde68a; text-shadow: 0 0 14px rgba(251, 191, 36, 0.8); }
+.record-score { font-size: 1.7rem; font-weight: 900; color: #fff7d6; }
+.record-rank { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; color: #fbbf24; }
+.record-rank:empty { display: none; }
+@keyframes recPop { from { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-8deg); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes recGlow { 50% { box-shadow: 0 0 50px rgba(251, 191, 36, 0.9); } }
+@keyframes recBounce { 50% { transform: translateY(-5px) scale(1.12); } }
+@media (prefers-reduced-motion: reduce) { .record-badge, .record-trophy { animation: none; } .record-burst .hu-confetti { display: none; } }

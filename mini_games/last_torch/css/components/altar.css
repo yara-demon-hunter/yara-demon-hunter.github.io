@@ -114,3 +114,8 @@
 .embers-new.is-rank { background: rgba(250, 204, 21, 0.16); border-color: rgba(250, 204, 21, 0.6); color: #fde68a; }
 
 .altar-icon.has-image { display: block; width: 2.3rem; height: 2.3rem; }
+
+/* HUNT AGAIN (grande) e MENU lado a lado */
+.altar-retry-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 0.5rem; flex-shrink: 0; }
+.altar-retry-row.hidden { display: none; }
+.altar-retry-row .altar-retry { margin-top: 0.1rem; width: 100%; }

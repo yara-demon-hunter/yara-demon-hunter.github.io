@@ -68,7 +68,7 @@ export function openAltar({ retry: afterNight = false } = {}) {
     $('altarSub').textContent = afterNight
         ? 'Spend your embers on upgrades that last, then hunt again.'
         : 'Every night earns embers, even the ones you lose. Spend them on upgrades that last.';
-    $('btnAltarRetry').classList.toggle('hidden', !afterNight);
+    $('altarRetryRow').classList.toggle('hidden', !afterNight);
     $('altarScreen').classList.remove('hidden');
     renderAltar();
     audio.init();
@@ -92,7 +92,15 @@ function huntAgain() {
     $('btnRestart').click();
 }
 
+// MENU: sai do Altar e usa o mesmo botão MENU da tela de fim da noite
+function backToMenu() {
+    $('altarScreen').classList.add('hidden');
+    retry = false;
+    $('btnMenu').click();
+}
+
 export function setupAltar() {
+    $('btnAltarMenu').addEventListener('click', backToMenu);
     $('btnAltarRetry').addEventListener('click', huntAgain);
     document.getElementById('altarList').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-key]');

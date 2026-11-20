@@ -23,11 +23,13 @@
 
 .mini-games-hub__grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 22px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
 }
 
 .mini-game-card {
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     border: 1px solid rgba(195, 164, 102, 0.25);
     border-radius: 18px;
@@ -36,7 +38,7 @@
 }
 
 .mini-game-card__art {
-    min-height: 245px;
+    min-height: 125px;
     background-color: #171819;
     background-position: center 36%;
     background-size: cover;
@@ -64,12 +66,52 @@
         url('/assets/images/common/mini-game/wild_push_smash/covers/cover.jpeg');
 }
 
+.mini-game-card--demon-village .mini-game-card__art {
+    background-image:
+        linear-gradient(0deg, rgba(23, 13, 22, 0.45), rgba(23, 13, 22, 0.08)),
+        url('https://img.gamepix.com/games/demon-village/icon/demon-village.png?w=512');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: #2a1b29;
+}
+
+.mini-game-card--war-the-knights .mini-game-card__art {
+    background-image:
+        linear-gradient(0deg, rgba(24, 21, 17, 0.42), rgba(24, 21, 17, 0.08)),
+        url('https://img.gamepix.com/games/war-the-knights/icon/war-the-knights.png?w=512');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: #29231a;
+}
+
+.mini-game-card--kingdom-survivor .mini-game-card__art {
+    background-image:
+        linear-gradient(0deg, rgba(20, 22, 19, 0.42), rgba(20, 22, 19, 0.08)),
+        url('https://img.gamepix.com/games/kingdom-survivor-1/icon/kingdom-survivor-1.png?w=512');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: #20251e;
+}
+
+.mini-game-card--ninja-samurai-runner .mini-game-card__art {
+    background-image:
+        linear-gradient(0deg, rgba(14, 19, 25, 0.42), rgba(14, 19, 25, 0.08)),
+        url('https://img.gamepix.com/games/ninja-samurai-runner-online/icon/ninja-samurai-runner-online.png?w=512');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: #17222d;
+}
+
 .mini-game-card__body {
-    padding: 24px;
+    padding: 14px;
 }
 
 .mini-game-card__eyebrow {
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     color: #d3ad60;
     font-size: 0.76rem;
     font-weight: 700;
@@ -78,25 +120,36 @@
 }
 
 .mini-game-card__body h2 {
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     color: #f3e8d0;
     font-family: 'Cinzel', Georgia, serif;
-    font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 1.06rem;
+    line-height: 1.25;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 .mini-game-card__body > p:not(.mini-game-card__eyebrow) {
-    min-height: 3.2em;
+    display: -webkit-box;
+    overflow: hidden;
+    min-height: 0;
+    margin: 0;
     color: #b7b2a8;
-    line-height: 1.6;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 .mini-game-card__button {
     display: inline-flex;
-    min-height: 44px;
+    min-height: 38px;
     align-items: center;
     justify-content: center;
-    margin-top: 10px;
-    padding: 0 18px;
+    margin-top: 8px;
+    padding: 0 14px;
     border: 1px solid #a78342;
     border-radius: 9px;
     background: #392d1b;
@@ -153,6 +206,130 @@
 .game-guide__lead {
     max-width: 760px;
     font-size: 1.08rem;
+}
+
+.game-embed-page__thumbnail {
+    display: block;
+    width: 105px;
+    height: 105px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(243, 207, 117, 0.55);
+    border-radius: 16px;
+    background: #171819;
+    image-rendering: pixelated;
+}
+
+.game-embed-page__frame {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    max-width: 100%;
+    border: 1px solid rgba(195, 164, 102, 0.35);
+    border-radius: 14px;
+    background: #101112;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.23);
+}
+
+.game-embed-page__frame iframe {
+    display: block;
+    width: 480px;
+    max-width: 100%;
+    border: 0;
+}
+
+.game-embed-shell {
+    min-width: 0;
+    min-height: 100vh;
+    margin: 0;
+    background: #101112;
+}
+
+.game-embed-fullscreen {
+    width: 100%;
+    min-height: 100vh;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+}
+
+.game-embed-fullscreen__bar {
+    position: fixed;
+    z-index: 1;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid rgba(195, 164, 102, 0.35);
+    border-radius: 8px;
+    background: rgba(23, 24, 25, 0.88);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    color: #f3e8d0;
+    font-family: 'Cinzel', Georgia, serif;
+    backdrop-filter: blur(8px);
+}
+
+.game-embed-fullscreen__bar a {
+    color: #f1d28e;
+    font-family: system-ui, sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.game-embed-fullscreen__bar a:hover {
+    color: #fff0b5;
+}
+
+.game-embed-fullscreen__game {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
+    border: 0;
+    background: #101112;
+}
+
+.game-embed-fullscreen__rotate-hint {
+    display: none;
+}
+
+@media (max-width: 560px) {
+    .game-embed-fullscreen__bar span {
+        display: none;
+    }
+}
+
+@media (max-width: 760px) and (orientation: portrait) {
+    .game-embed-fullscreen__rotate-hint {
+        position: fixed;
+        z-index: 2;
+        right: 16px;
+        bottom: 16px;
+        left: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border: 1px solid rgba(243, 207, 117, 0.55);
+        border-radius: 10px;
+        background: rgba(23, 24, 25, 0.9);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+        color: #f3e8d0;
+        font-size: 0.9rem;
+        text-align: center;
+        backdrop-filter: blur(8px);
+    }
+
+    .game-embed-fullscreen__rotate-hint span {
+        color: #f1d28e;
+        font-size: 1.5rem;
+        line-height: 1;
+    }
 }
 
 .game-guide__actions {
@@ -728,14 +905,19 @@
         grid-template-columns: 1fr;
     }
 
+    .mini-game-card {
+        display: grid;
+        grid-template-columns: 118px minmax(0, 1fr);
+    }
+
     .mini-game-card__art {
-        min-height: 210px;
+        min-height: 100%;
     }
 }
 
 @media (min-width: 721px) and (max-width: 980px) {
     .mini-games-hub__grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
