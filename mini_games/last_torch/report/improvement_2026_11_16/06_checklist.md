@@ -66,7 +66,7 @@ Detalhes: [02_plano_de_acao.md](02_plano_de_acao.md) · números: [04_progresso.
 ## Fase 3b — Tela de fim de noite
 - [x] Brasas ganhas com animação
 - [x] "Você pode comprar…"
-- [ ] próximo herói e quanto falta
+- [x] próximo herói e quanto falta (meta única no fim da noite: herói à venda por Brasas ou conquista mais próxima, com barra)
 - [x] o que espera amanhã (baú de amanhã, quanto paga, em quantas horas)
 - [x] botão HUNT AGAIN grande (já existia)
 - [ ] CONTINUE bem visível no menu

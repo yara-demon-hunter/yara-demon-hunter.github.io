@@ -3,6 +3,7 @@
 #   title   nome para mostrar
 #   hosts   endereços externos que o build deixa passar (o SDK); qualquer outro link https:// continua barrado
 #   size    largura x altura pedidas pelo portal (só informativo; o jogo é fluido)
+#   files   arquivos criados ao lado do index.html (nome: conteúdo)
 #   head    HTML colocado no <head> do index.html (o SDK). {{GAME_ID}} vira o game_id
 gamemonetize:
   title: GameMonetize
@@ -24,3 +25,17 @@ crazygames:
   hosts: [sdk.crazygames.com]
   head: |
     <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+
+playgama:
+  title: Playgama
+  hosts: [bridge.playgama.com]
+  # O Bridge lê este arquivo; a pausa entre anúncios é controlada pelo próprio jogo (platform.js), então aqui só o mínimo
+  files:
+    playgama-bridge-config.json: |
+      {
+          "advertisement": {
+              "minimumDelayBetweenInterstitial": 120
+          }
+      }
+  head: |
+    <script src="https://bridge.playgama.com/v2/stable/playgama-bridge.js"></script>

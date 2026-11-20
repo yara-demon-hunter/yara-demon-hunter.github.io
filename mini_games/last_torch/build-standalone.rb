@@ -135,6 +135,8 @@ if bundle
   html = html.sub("</head>", %(    <link rel="modulepreload" href="./game.min.js">\n#{fonts.join}</head>))
 end
 build_output.join("index.html").write(html)
+# Arquivos que o SDK da plataforma pede ao lado do index.html (ex.: playgama-bridge-config.json); vêm de "files:" em platforms.yml
+(platform&.dig("files") || {}).each { |name, content| build_output.join(name).write(content) }
 Dir.glob(build_output.join("**/*.md")).each { |path| FileUtils.rm_f(path) }
 FileUtils.rm_f(build_output.join("library/.synced-from-library"))
 # As versões grandes são para páginas e prévias: o jogo só carrega as -small (data_model/tree_images.js)

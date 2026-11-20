@@ -4,8 +4,9 @@
 import crazygames from './adapters/crazygames.js';
 import gamemonetize from './adapters/gamemonetize.js';
 import none from './adapters/none.js';
+import playgama from './adapters/playgama.js';
 
-const ADAPTERS = { none, gamemonetize, crazygames };
+const ADAPTERS = { none, gamemonetize, crazygames, playgama };
 const name = ADAPTERS[window.PLATFORM_NAME] ? window.PLATFORM_NAME : 'none';
 const adapter = ADAPTERS[name];
 
