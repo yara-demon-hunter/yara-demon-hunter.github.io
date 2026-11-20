@@ -476,6 +476,7 @@ export function triggerGameOver(reason) {
     platform.gameplayStop();
     state.gameState = 'GAMEOVER';
     const { run } = state;
+    platform.gameResult({ victory: !!run.victory, score: state.totalScore, night: state.turn });
     const newRecord = state.totalScore > save.stats.bestScore && save.stats.bestScore > 0;
 
     hideTreeHand();                // o HUD para de atualizar na tela final: a mãozinha do medalhão precisa sumir aqui

@@ -3,10 +3,11 @@
 // build: ele grava window.PLATFORM_NAME no index.html (ver build-standalone.rb e BUILDSTANDALONE.md). Sem isso vale "none": nada acontece.
 import crazygames from './adapters/crazygames.js';
 import gamemonetize from './adapters/gamemonetize.js';
+import gamepix from './adapters/gamepix.js';
 import none from './adapters/none.js';
 import playgama from './adapters/playgama.js';
 
-const ADAPTERS = { none, gamemonetize, crazygames, playgama };
+const ADAPTERS = { none, gamemonetize, crazygames, playgama, gamepix };
 const name = ADAPTERS[window.PLATFORM_NAME] ? window.PLATFORM_NAME : 'none';
 const adapter = ADAPTERS[name];
 
@@ -48,6 +49,8 @@ export const platform = {
         playing = false;
         try { adapter.gameplayStop(); } catch { }
     },
+    // Resultado da noite: { victory, score, night }. Os portais usam para placar e "momentos" (feliz/triste)
+    gameResult(result) { try { adapter.gameResult?.(result); } catch { } },
     onPause(fn) { pauseHandlers.push(fn); },
     onResume(fn) { resumeHandlers.push(fn); },
     // Anúncio entre uma noite e outra. Só chame depois de uma ação do jogador (ex.: HUNT AGAIN), nunca por tempo.

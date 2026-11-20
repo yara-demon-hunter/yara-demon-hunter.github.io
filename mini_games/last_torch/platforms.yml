@@ -39,3 +39,17 @@ playgama:
       }
   head: |
     <script src="https://bridge.playgama.com/v2/stable/playgama-bridge.js"></script>
+
+gamepix:
+  title: GamePix
+  hosts: [integration.gamepix.com]
+  head: |
+    <script src="https://integration.gamepix.com/sdk/v3/gamepix.sdk.js"></script>
+    <script>
+    // O portal chama estas funções NO jogo assim que ele abre: têm de existir já aqui, antes do jogo carregar.
+    // Cada uma vira o evento de janela "platform:event", que js/platform/adapters/gamepix.js escuta.
+    window.GamePix = window.GamePix || {};
+    ["pause", "resume", "soundOn", "soundOff"].forEach(function (name) {
+        window.GamePix[name] = function () { window.dispatchEvent(new CustomEvent("platform:event", { detail: name })); };
+    });
+    </script>
