@@ -106,6 +106,16 @@
     background-color: #17222d;
 }
 
+.mini-game-card--nitrovenant-2 .mini-game-card__art {
+    background-image:
+        linear-gradient(0deg, rgba(24, 19, 17, 0.42), rgba(24, 19, 17, 0.08)),
+        url('https://img.gamepix.com/games/nitrovenant-2/icon/nitrovenant-2.png?w=512');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: #2a201c;
+}
+
 .mini-game-card__body {
     padding: 14px;
 }
