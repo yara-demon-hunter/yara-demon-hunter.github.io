@@ -602,3 +602,7 @@ Pedido do dono: ao zerar o jogo, mostrar as ondas sendo calculadas, **sem HUNT A
 - `boss_ai.js`: fases por vida (`phases` em cada boss: 100%/66%/33%), golpe sorteado da fase (sem repetir os 2 últimos), janela de punição (boss aberto 1,3 s depois de golpe pesado: +30% dano, anel dourado).
 - Golpes novos: mark e combo (Azael), traps e columns (Demon Hunter), stomp (Brutos), meteors e claw (Demon Lord), bloom (Condessa), eclipse (Long Night). Rivais começam com kit curto na hora 1; a revanche começa completa.
 - Fora desta rodada: rival copiar skill do jogador, laço de sangue da Condessa, escuridão/buraco negro da Long Night, machado-bumerangue do Brutos.
+
+## Camada de plataforma (GameMonetize e outros)
+- `js/platform/` (interface única + adaptadores none/gamemonetize/crazygames), `platforms.yml` e `build-standalone.rb --platform=NOME|all|--list`; guia em `BUILDSTANDALONE.md`.
+- Anúncio entre noites no HUNT AGAIN (intervalo mínimo de 2 min); pausa/som ligados ao evento de pausa do portal; `gameplayStart/Stop` nas noites.

@@ -4,9 +4,35 @@
 
 require "fileutils"
 require "pathname"
+require "rbconfig"
+require "json"
+require "yaml"
 
 source_game = Pathname(__dir__).expand_path
-build_output = source_game.join("standalone-build")
+platforms = YAML.safe_load(source_game.join("platforms.yml").read)
+
+# --- PLATAFORMA ---
+# Sem argumento: pacote limpo em standalone-build/ (sem SDK). --platform=NOME: pacote com o SDK daquele portal em
+# platform-builds/NOME/ + platform-builds/NOME.zip. --platform=all gera todos. --list mostra os nomes.
+platform_arg = ARGV.find { |a| a.start_with?("--platform=") }&.split("=", 2)&.last
+platform_arg ||= ARGV[ARGV.index("--platform") + 1] if ARGV.include?("--platform")
+if ARGV.include?("--list")
+  puts "Plataformas (--platform=NOME ou --platform=all):"
+  platforms.each { |key, cfg| puts "  #{key.ljust(14)} #{cfg['title']}" }
+  exit
+end
+if platform_arg == "all"
+  platforms.each_key do |key|
+    system(RbConfig.ruby, __FILE__, "--platform=#{key}") || abort("Falhou: #{key}")
+  end
+  exit
+end
+platform = platform_arg && (platforms[platform_arg] || abort("Plataforma desconhecida: #{platform_arg}. Use --list."))
+if platform
+  build_output = source_game.join("platform-builds", platform_arg)
+else
+  build_output = source_game.join("standalone-build")
+end
 marker = build_output.join(".generated-by-last-torch-build")
 
 if build_output.exist? && !marker.file?
@@ -64,6 +90,13 @@ end
 FileUtils.rm_rf(build_output)
 FileUtils.mkdir_p(build_output)
 
+# Plataforma: o nome (window.PLATFORM_NAME escolhe o adaptador em js/platform/platform.js) e o SDK dela
+if platform
+  head = platform["head"].to_s.gsub("{{GAME_ID}}", platform["game_id"].to_s)
+  # No fim do <head> (o <meta charset> precisa ficar nos primeiros 1024 bytes); os módulos do jogo só rodam depois do HTML pronto
+  html = html.sub("</head>") { "    <script>window.PLATFORM_NAME = #{platform_arg.to_json};</script>\n#{head.gsub(/^/, '    ')}</head>" }
+end
+
 # library: a cópia da biblioteca de personagens e monstros (mini_games/_library, copiada pelo sync)
 %w[js css data_model library images].each do |directory|
   FileUtils.cp_r(source_game.join(directory), build_output.join(directory))
@@ -112,7 +145,9 @@ end
 text_files = Dir.glob(build_output.join("**/*.{html,css,js}"))
 problems = text_files.flat_map do |path|
   File.readlines(path, encoding: "UTF-8").each_with_index.filter_map do |line, index|
-    leftover = line.match?(/\{%|\{\{/) || line.gsub("http://www.w3.org/2000/svg", "").match?(%r{https?://|['"(]//})
+    clean = line.gsub("http://www.w3.org/2000/svg", "")
+    (platform&.dig("hosts") || []).each { |host| clean = clean.gsub("https://#{host}", "") }     # o SDK da plataforma é a única exceção
+    leftover = line.match?(/\{%|\{\{/) || clean.match?(%r{https?://|['"(]//})
     "#{path}:#{index + 1}: #{line.strip}" if leftover
   end
 end
@@ -128,6 +163,13 @@ bytes = files.sum { |path| File.size(path) }
 puts "Standalone game package created: #{build_output}"
 puts "#{files.length - 1} files, #{format('%.2f', bytes / 1_048_576.0)} MiB"
 puts "Upload the contents of this folder; index.html is the entry point."
+if platform
+  zip = build_output.dirname.join("#{platform_arg}.zip")
+  FileUtils.rm_f(zip)
+  system("zip", "-qr", zip.to_s, ".", "-x", ".generated-by-last-torch-build", chdir: build_output.to_s) || abort("zip falhou (instale o comando zip)")
+  puts "Plataforma #{platform['title']}: envie #{zip} (#{format('%.2f', zip.size / 1_048_576.0)} MiB); index.html na raiz do zip."
+  puts "Tamanho pedido: #{platform['size'].join('x')}" if platform["size"]
+end
 
 # `--serve`: depois de gerar, abre o pacote em http://localhost:8000 (o jogo não roda abrindo o index.html do disco:
 # o navegador bloqueia módulos em file://). Ctrl+C para parar.

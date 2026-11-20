@@ -27,6 +27,7 @@ import { resetConversion } from '../systems/conversion.js';
 import { resetArcane } from '../systems/arcane.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
 import { continueEndless, startHour } from '../systems/night.js';
+import { platform } from '../platform/platform.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { resetTorch } from '../systems/torch.js';
 import { prepareCore } from '../render/arena.js';
@@ -55,6 +56,7 @@ export function paintHeroPortrait(node, hero) {
 
 // --- INÍCIO DE PARTIDA ---
 export function startGame() {
+    platform.gameplayStart();
     clearRun();                    // outra partida: o registro de CONTINUAR da anterior não vale mais
     audio.init();
     prepareScenery();
@@ -469,6 +471,7 @@ export function quitToMenu() {
 
 // --- FIM DA NOITE ---
 export function triggerGameOver(reason) {
+    platform.gameplayStop();
     state.gameState = 'GAMEOVER';
     const { run } = state;
     const newRecord = state.totalScore > save.stats.bestScore && save.stats.bestScore > 0;
@@ -546,7 +549,8 @@ export function triggerGameOver(reason) {
             waves: Array.from({ length: 12 }, (_, i) => run.waveStars?.[i + 1] ?? 0),
             stats: { score: state.totalScore, kills: run.kills, level: state.playerLevel, skills: learned, bosses: run.bosses, embers: embersEarned, streak: run.bestStreak, seconds: state.runTime },
             rank: nightRank,
-            onMenu: returnToMenu
+            // MENU depois do amanhecer: anúncio entre partidas, depois o menu
+            onMenu: () => platform.showInterstitial().finally(returnToMenu)
         });
         audio.setMood('dawn');
         flushHeroUnlocks();
@@ -576,6 +580,7 @@ export async function shareResult() {
 }
 
 export function keepHunting() {
+    platform.gameplayStart();
     document.getElementById('gameOverScreen').classList.add('hidden');
     continueEndless();
 }
@@ -613,6 +618,7 @@ export function changeDarkness(step) {
 }
 
 export function returnToMenu() {
+    platform.gameplayStop();
     hideTreeHand();
     document.getElementById('gameOverScreen').classList.add('hidden');
     document.getElementById('shopScreen').classList.add('hidden');
@@ -647,6 +653,8 @@ export function setupScreens() {
     play.textContent = '▶ PLAY';
     play.disabled = false;
     window.finishLoading?.();
+    platform.init();
+    platform.loadingDone();
     // Quem fechou a aba no meio da primeira noite ainda tem runs === 0, mas tem uma noite guardada: vê o menu com o CONTINUE
     if (START.skipMenuOnFirstVisit && save.stats.runs === 0 && !loadRun()) startFirstVisit();
 }

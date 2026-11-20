@@ -3,16 +3,12 @@
 Conceito dos ramos de skill, formatos dos nós e regras de custo: [SKILLS.md](SKILLS.md).
 
 ## Gerar standalone version
+Gerar o pacote para portais (CrazyGames, GameMonetize...), com ou sem SDK, escolher a plataforma e adicionar outras: [BUILDSTANDALONE.md](BUILDSTANDALONE.md).
+
 ```bash
-ruby mini_games/last_torch/build-standalone.rb
-
-# Gerar e jogar (abre em http://localhost:8000; não abra o index.html direto do disco, ele trava no loading)
-ruby mini_games/last_torch/build-standalone.rb --serve
+ruby mini_games/last_torch/build-standalone.rb                          # pacote limpo
+ruby mini_games/last_torch/build-standalone.rb --platform=gamemonetize  # pacote + .zip com o SDK
 ```
-
-O build junta os ~290 módulos JS em `game.min.js` e o CSS em `css/game.css` com o **esbuild** (371 pedidos de rede viram 9; no 4G lento o carregamento caiu de 6,9 s para 4,0 s). Não precisa instalar nada: na primeira vez o script baixa o esbuild (versão fixa) para `~/.cache/last_torch/` e reaproveita depois. Se a rede falhar, ele avisa e gera o pacote com módulos soltos (mais lento); confira que `standalone-build/game.min.js` existe antes de enviar. `ESBUILD=/caminho` usa outro binário e `NO_BUNDLE=1` força os módulos soltos (bom para depurar). Em desenvolvimento o site continua usando os módulos soltos.
-
-O pacote leva só as imagens `-small` (as versões de 1024px ficam para páginas e prévias) e lista todos os módulos em `modulepreload`.
 
 ## O jogo
 

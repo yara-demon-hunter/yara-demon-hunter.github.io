@@ -21,3 +21,4 @@ local_docs/
 # Ambiente Python dos testes do Last Torch
 .venv/
 mini_games/last_torch/_tests/out/
+mini_games/last_torch/platform-builds/

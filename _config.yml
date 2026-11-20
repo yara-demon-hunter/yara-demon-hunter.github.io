@@ -19,6 +19,7 @@ exclude:
   - mini_games/yara-rpg/blender
   # Biblioteca de personagens e monstros: só a fonte; cada jogo carrega a própria cópia (<jogo>/library, feita pelo sync)
   - mini_games/_library
+  - mini_games/last_torch/platform-builds
   # Imagens de referência de arte dos mini games: só guiam o desenho em código, nenhuma página as carrega
   - mini_games/yara-rpg/art_reference
   - mini_games/wild-push-smash/art_reference

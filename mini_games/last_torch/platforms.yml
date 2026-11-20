@@ -1,0 +1,26 @@
+# Plataformas do build (ruby mini_games/last_torch/build-standalone.rb --platform=NOME). Explicação: BUILDSTANDALONE.md
+# A chave é o nome do adaptador em js/platform/adapters/NOME.js.
+#   title   nome para mostrar
+#   hosts   endereços externos que o build deixa passar (o SDK); qualquer outro link https:// continua barrado
+#   size    largura x altura pedidas pelo portal (só informativo; o jogo é fluido)
+#   head    HTML colocado no <head> do index.html (o SDK). {{GAME_ID}} vira o game_id
+gamemonetize:
+  title: GameMonetize
+  game_id: qtuer1a4hfie166p0zrfagp8qqxcrt1v
+  size: [800, 600]
+  hosts: [api.gamemonetize.com]
+  head: |
+    <script>
+    window.SDK_OPTIONS = {
+        gameId: "{{GAME_ID}}",
+        // Cada evento do SDK vira o evento "platform:event" da janela: js/platform/adapters/gamemonetize.js reage a ele
+        onEvent: function (event) { window.dispatchEvent(new CustomEvent("platform:event", { detail: event.name })); }
+    };
+    </script>
+    <script src="https://api.gamemonetize.com/sdk.js"></script>
+
+crazygames:
+  title: CrazyGames (adaptador ainda sem teste no portal)
+  hosts: [sdk.crazygames.com]
+  head: |
+    <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>

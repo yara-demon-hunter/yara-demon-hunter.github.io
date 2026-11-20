@@ -10,6 +10,7 @@ import { openSettings, toggleSetting } from './settings.js';
 import { setupTouchLayout } from './touch_layout.js';
 import { openStatus, resumeGame, setStatusTab, showBuildNote } from './status.js';
 import { skillTree } from './tree.js';
+import { platform } from '../platform/platform.js';
 
 // --- EVENTOS DA INTERFACE (BOTOES) ---
 export function setupButtons() {
@@ -29,6 +30,12 @@ export function setupButtons() {
         enterFullscreen();
         startGame();
     };
+    // HUNT AGAIN (depois de uma noite): o anúncio do portal entra aqui, por ação do jogador e respeitando o intervalo mínimo
+    const startAfterNight = async () => {
+        enterFullscreen();
+        if (state.gameState === 'GAMEOVER') await platform.showInterstitial();
+        startGame();
+    };
     const resume = () => {
         enterFullscreen();
         resumeGame();
@@ -38,7 +45,7 @@ export function setupButtons() {
         enterFullscreen();
         continueRun();
     });
-    on('btnRestart', start);
+    on('btnRestart', startAfterNight);
     on('btnPause', (e) => {
         e.currentTarget.blur();
         openStatus();
@@ -76,7 +83,8 @@ export function setupButtons() {
     on('btnRanks', openRanks);
     on('btnCloseAltar', closeAltar);
     setupAltar();
-    on('btnMenu', returnToMenu);
+    // MENU depois de uma noite: outro ponto de anúncio entre partidas (a trava de 2 min evita dois seguidos)
+    on('btnMenu', async () => { await platform.showInterstitial(); returnToMenu(); });
     document.getElementById('sanctuaryTabs').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-tab]');
         if (button) setSanctuaryTab(button.dataset.tab);
@@ -138,7 +146,7 @@ export function setupButtons() {
             } else if (state.gameState === 'PLAYING') openStatus();
             else if (state.gameState === 'PAUSED') resumeGame();
         } else if (e.code === 'Enter' && !e.target.closest?.('button')) {
-            if (state.gameState === 'GAMEOVER') start();
+            if (state.gameState === 'GAMEOVER') startAfterNight();
             else if (state.gameState === 'CAMP') leaveCamp();
             else if (state.gameState === 'START' && !menuScreenOpen()) start();
         }
@@ -154,4 +162,7 @@ export function setupButtons() {
     });
     // Clicou fora do jogo (iframe do portal, outra janela): a aba continua visível, mas o jogador saiu
     window.addEventListener('blur', pauseHunt);
+    // Pausa pedida pelo portal (anúncio abrindo): pausa a caçada e cala o som; a volta só religa o som, o jogador retoma sozinho
+    platform.onPause(() => { pauseHunt(); audio.setHidden(true); });
+    platform.onResume(() => audio.setHidden(document.hidden));
 }
