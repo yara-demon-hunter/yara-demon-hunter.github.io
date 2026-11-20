@@ -46,28 +46,23 @@ export const MONSTER_DEATH = {
     },
     headless_knight: plain(9, ['#4f576b', '#2b3140', '#a5f3fc'], 'shard', 'rgba(10, 12, 20, 0.6)'),
     bone_colossus: plain(16, ['#c9bfa3', '#8a806a', '#fb923c'], 'bone', 'rgba(30, 24, 14, 0.6)'),
-    // Golem: não tomba, desmorona. Pedras grandes voam para todo lado, lascas de lava e poeira
+    // Golem: explode em pedras (grandes e pequenas) e algumas brasas; não tomba
     golem: {
         groups: [
-            { count: 9, colors: ['#6b625a', '#9a8f82', '#3b352f'], shape: 'rock', size: 1.8, speed: 1.3, lift: 1.3, life: 1.5 },
-            { count: 8, colors: ['#8a8074', '#4a433c'], shape: 'rock', size: 1, speed: 1.6, lift: 1.1 },
-            { count: 7, colors: ['#ff6a13', '#ffc14d', '#ff3d00'], shape: 'shard', size: 0.9, speed: 1.2, lift: 1.5, life: 1.2 },
-            { count: 5, colors: ['#4f8a1f', '#79b83a'], shape: 'leaf', size: 0.9, speed: 0.9, gravity: 0.4 }
+            { count: 12, colors: ['#6b625a', '#9a8f82', '#3b352f'], shape: 'rock', size: 1.9, speed: 1.3, lift: 1.3, life: 1.5 },
+            { count: 12, colors: ['#8a8074', '#4a433c'], shape: 'rock', size: 1, speed: 1.6, lift: 1.1 },
+            { count: 4, colors: ['#ff6a13', '#ffc14d', '#ff3d00'], shape: 'shard', size: 0.8, speed: 1.2, lift: 1.5, life: 1.1 }
         ],
-        stain: 'rgba(30, 20, 14, 0.6)',
-        fall: { seconds: 1, tiltSeconds: 0.55, tilt: 0.4, shake: 0.12, sink: 0.7, squash: 0.7, fade: 0.4, pivot: 1.0 },
-        dust: { radius: 2.8, seconds: 0.55, width: 9, color: 'rgba(140, 126, 108, 0.7)' }
+        stain: 'rgba(30, 20, 14, 0.6)'
     },
-    // Treant: a árvore estremece, tomba de lado e se desfaz em casca e folhas; as folhas descem devagar
+    // Treant: explode em troncos de madeira e uma nuvem de folhas que descem devagar; não tomba
     treant: {
         groups: [
-            { count: 7, colors: ['#6b4423', '#5b3b22', '#7a5230'], shape: 'log', size: 1.7, speed: 1.4, lift: 1.25, life: 1.7 },
-            { count: 8, colors: ['#5b3b22', '#3f2815', '#7a5230'], shape: 'wood', size: 1.5, speed: 1.1 },
+            { count: 9, colors: ['#6b4423', '#5b3b22', '#7a5230'], shape: 'log', size: 1.7, speed: 1.4, lift: 1.25, life: 1.7 },
+            { count: 6, colors: ['#5b3b22', '#3f2815', '#7a5230'], shape: 'wood', size: 1.4, speed: 1.1 },
             { count: 26, colors: ['#4ade80', '#22c55e', '#166534'], shape: 'leaf', size: 1.2, speed: 1, lift: 1.15, life: 2, gravity: 0.3 }
         ],
-        stain: 'rgba(24, 40, 12, 0.55)',
-        fall: { seconds: 1.05, tiltSeconds: 0.55, tilt: 1.2, shake: 0.09, sink: 0.5, squash: 0.82, fade: 0.42, pivot: 1.0 },
-        dust: { radius: 2.6, seconds: 0.5, width: 8, color: 'rgba(163, 150, 110, 0.7)' }
+        stain: 'rgba(24, 40, 12, 0.55)'
     }
 };
 
