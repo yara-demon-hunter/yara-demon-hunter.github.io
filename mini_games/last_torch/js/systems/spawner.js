@@ -178,7 +178,7 @@ export function updateSpawner(dt) {
         state.waveTime += dt;
         updateWaveEta(dt);
     }
-    if (state.phase !== 'HUNT' || state.lastStand) return;
+    if (state.phase !== 'HUNT' || state.lastStand || state.bossSlain) return;
 
     if (state.bossPending > 0) {
         state.bossPending -= dt;

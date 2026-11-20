@@ -33,6 +33,23 @@ function fireShot(e, model, angle, speedScale = 1) {
     });
 }
 
+const clampX = (x) => Math.max(40, Math.min(state.width - 40, x));
+const clampY = (y) => Math.max(70, Math.min(state.height - 40, y));
+
+// Ação marcada para daqui a alguns segundos (o golpe que "volta" depois do aviso)
+function later(ai, seconds, fn) {
+    (ai.later ??= []).push({ t: seconds, fn });
+}
+
+// Depois de um golpe pesado o boss fica aberto por um instante: leva mais dano (dealDamage) e um anel dourado avisa
+const OPEN_SECONDS = 1.3;
+function openWindow(e, model) {
+    e.openTimer = OPEN_SECONDS;
+    addShockwave(e.x, e.y, { radius: e.radius * 2.2, color: '#fde047', width: 4, seconds: 0.4 });
+}
+// Golpes que deixam o boss aberto (o tempo é o do aviso no chão)
+const OPENS_AFTER = { slam: 1.5, quake: 1.4, stomp: 1.6, meteors: 2.2, bloom: 2.0, eclipse: 2.2, traps: 2.4, columns: 1.6, mark: 1.7 };
+
 function aimAngle(e) {
     return Math.atan2(player.y - e.y, player.x - e.x);
 }
@@ -132,15 +149,117 @@ const ACTIONS = {
     // Investida (rivais): mira uma linha até o herói e depois a atravessa com a espada (updateLunge)
     lunge(e, model, ai) {
         const angle = aimAngle(e);
+        const windup = ai.inChain ? model.lungeWindupSeconds * 0.6 : model.lungeWindupSeconds;
         const toX = Math.max(60, Math.min(state.width - 60, e.x + Math.cos(angle) * model.lungeLength));
         const toY = Math.max(90, Math.min(state.height - 60, e.y + Math.sin(angle) * model.lungeLength));
         const line = {
             kind: 'line', owner: e, x: e.x, y: e.y, angle,
-            length: Math.hypot(toX - e.x, toY - e.y), age: 0, seconds: model.lungeWindupSeconds
+            length: Math.hypot(toX - e.x, toY - e.y), age: 0, seconds: windup
         };
         // A linha de aviso não é mais desenhada (não entra em state.telegraphs): o jogador lê a investida pelo
         // boneco, que para e mira durante lungeWindupSeconds. `line` só guarda o ângulo e o alcance.
-        ai.lunge = { line, fromX: e.x, fromY: e.y, toX, toY, wait: model.lungeWindupSeconds, t: 0, hit: false };
+        ai.lunge = { line, fromX: e.x, fromY: e.y, toX, toY, wait: windup, t: 0, hit: false };
+    },
+    // Azael: marca o chão onde o herói está (a sombra estoura ali) e reaparece colado nele para o corte
+    mark(e, model, ai) {
+        const tx = player.x, ty = player.y;
+        addSlam(tx, ty, 70, 1.3, e.damage * 0.8, null, 0, '#ef4444');
+        createExplosion(e.x, e.y, model.color, 18);
+        later(ai, 1.3, () => {
+            const a = Math.random() * TAU;
+            createExplosion(e.x, e.y, model.color, 22);
+            e.x = clampX(player.x + Math.cos(a) * 70);
+            e.y = clampY(player.y + Math.sin(a) * 70);
+            e.chainX = e.x;
+            e.chainY = e.y;
+            e.angle = aimAngle(e);
+            e.comboStep = ((e.comboStep ?? 1) % 3) + 1;
+            addShockwave(e.x, e.y, { radius: 90, color: model.color, width: 5, seconds: 0.3 });
+            addSlam(player.x, player.y, 66, 0.5, e.damage * 1.1, null, 0, '#ef4444');
+            audio.playDash();
+        });
+    },
+    // Azael: três investidas seguidas, cada uma com um aviso mais curto
+    combo(e, model, ai) {
+        ai.chain = 2;
+        ai.inChain = false;
+        ACTIONS.lunge(e, model, ai);
+    },
+    // Demon Hunter: círculos sagrados armados em volta do herói, com o pavio longo (dá para sair deles)
+    traps(e, model) {
+        const n = model.trapCount ?? 5;
+        for (let i = 0; i < n; i++) {
+            const a = Math.random() * TAU;
+            const d = i === 0 ? 0 : 90 + Math.random() * 90;
+            addSlam(clampX(player.x + Math.cos(a) * d), clampY(player.y + Math.sin(a) * d), 54, 2 + i * 0.12, e.damage * 0.9, null, model.slamTorchDamage ?? 0, '#7dd3fc');
+        }
+        audio.playBossAttack();
+    },
+    // Demon Hunter: colunas de luz em fila, do boss até o herói
+    columns(e, model) {
+        const a = aimAngle(e);
+        for (let i = 1; i <= 6; i++) {
+            addSlam(clampX(e.x + Math.cos(a) * (50 + i * 70)), clampY(e.y + Math.sin(a) * (50 + i * 70)), 46, 0.6 + i * 0.16, e.damage * 0.9, null, 0, '#7dd3fc');
+        }
+        audio.playBossAttack();
+    },
+    // Brutos: o machado racha o chão numa linha que avança na direção do herói
+    stomp(e, model) {
+        const a = aimAngle(e);
+        e.angle = a;
+        e.comboStep = ((e.comboStep ?? 1) % 3) + 1;
+        for (let i = 1; i <= 6; i++) {
+            addSlam(clampX(e.x + Math.cos(a) * (40 + i * 85)), clampY(e.y + Math.sin(a) * (40 + i * 85)), 70, 0.5 + i * 0.14, e.damage * 1.1, null, 6, '#a8a29e');
+        }
+        shakeScreen(6);
+        audio.playBossAttack();
+    },
+    // Demon Lord: chuva de meteoros em volta do herói (um deles cai na tocha)
+    meteors(e, model) {
+        for (let i = 0; i < 7; i++) {
+            const a = Math.random() * TAU;
+            const d = i === 0 ? 0 : 60 + Math.random() * 170;
+            const onTorch = i === 1;
+            const x = onTorch ? state.coreX : clampX(player.x + Math.cos(a) * d);
+            const y = onTorch ? state.coreY : clampY(player.y + Math.sin(a) * d);
+            addSlam(x, y, 58, 1.1 + i * 0.2, e.damage * 0.9, null, onTorch ? (model.slamTorchDamage ?? 6) : 0, '#fb923c');
+        }
+        audio.playBossAttack();
+    },
+    // Demon Lord: garra larga, um leque de fogo à frente dele
+    claw(e, model) {
+        const a = aimAngle(e);
+        const n = 9;
+        for (let i = 0; i < n; i++) fireShot(e, model, a + (i - (n - 1) / 2) * 0.15, 1.25);
+        addShockwave(e.x, e.y, { radius: e.radius * 2.8, color: model.color, width: 6, seconds: 0.3 });
+        audio.playBossAttack();
+    },
+    // Condessa / Long Night: onda de círculos que se abre do boss para fora, com brechas entre eles
+    bloom(e, model) {
+        const x0 = e.x, y0 = e.y;
+        for (let k = 0; k < 3; k++) {
+            const n = 6 + k * 3;
+            const off = Math.random() * TAU;
+            for (let i = 0; i < n; i++) {
+                const a = off + (i / n) * TAU;
+                const d = 110 + k * 110;
+                const x = x0 + Math.cos(a) * d, y = y0 + Math.sin(a) * d;
+                if (x < 30 || x > state.width - 30 || y < 50 || y > state.height - 30) continue;
+                addSlam(x, y, 48, 0.9 + k * 0.45, e.damage * 0.8, null, 0, '#fb7185');
+            }
+        }
+        addShockwave(e.x, e.y, { radius: e.radius * 3, color: model.color, width: 5, seconds: 0.4 });
+        audio.playBossAttack();
+    },
+    // Long Night: um eclipse enorme em cima do herói (é preciso sair dele) e fragmentos em volta
+    eclipse(e, model) {
+        addSlam(player.x, player.y, 190, 1.7, e.damage * 1.2, null, 0, '#7c3aed');
+        for (let i = 0; i < 4; i++) {
+            const a = Math.random() * TAU, d = 150 + Math.random() * 150;
+            addSlam(clampX(player.x + Math.cos(a) * d), clampY(player.y + Math.sin(a) * d), 60, 1.2 + i * 0.15, e.damage * 0.8, null, 0, '#7c3aed');
+        }
+        screenFlash(model.color, 0.2);
+        audio.playBossAttack();
     },
     // Some numa nuvem e reaparece longe do herói
     blink(e, model) {
@@ -210,6 +329,15 @@ function updateLunge(e, model, ai, dt) {
         e.invulnerable = false;
         ai.lunge = null;
         createExplosion(e.x, e.y, model.color, 14);
+        // Combo: mais uma investida logo em seguida (aviso mais curto); só a última deixa o boss aberto
+        if (ai.chain > 0) {
+            ai.chain--;
+            ai.inChain = true;
+            ACTIONS.lunge(e, model, ai);
+            return;
+        }
+        ai.inChain = false;
+        openWindow(e, model);
         e.shootTimer = model.patternGapSeconds * (e.enraged ? model.enrageGapMultiplier : 1);
     }
 }
@@ -313,6 +441,31 @@ export function updateBossAI(e, model, dt) {
 
     if (!e.enraged && e.hp < e.maxHp * model.enrageRatio) enrage(e, model);
 
+    // Fases: abaixo de cada limite o boss troca a lista de golpes (e ganha golpes novos)
+    const nextPhase = model.phases?.[(e.bossPhase ?? 0) + 1];
+    if (nextPhase && e.hp < e.maxHp * nextPhase.at) {
+        e.bossPhase = (e.bossPhase ?? 0) + 1;
+        ai.shots = 0;
+        ai.last = ai.last2 = null;
+        e.shootTimer = 1.2;
+        hitStop(0.08);
+        shakeScreen(10);
+        screenFlash(model.color, 0.3);
+        addShockwave(e.x, e.y, { radius: 200, color: model.color, width: 7, seconds: 0.5 });
+        showBanner('', `${model.name.toUpperCase()} · ${nextPhase.label ?? 'NEW POWER'}`, '', 'danger');
+        audio.playBossRoar();
+    }
+    if (e.openTimer > 0) e.openTimer -= dt;
+    if (ai.later?.length) {
+        for (let i = ai.later.length - 1; i >= 0; i--) {
+            const l = ai.later[i];
+            l.t -= dt;
+            if (l.t > 0) continue;
+            ai.later.splice(i, 1);
+            if (state.phase === 'HUNT' && e.hp > 0) l.fn();
+        }
+    }
+
     if (ai.lunge) {
         updateLunge(e, model, ai, dt);
         return;
@@ -336,9 +489,18 @@ export function updateBossAI(e, model, dt) {
     e.shootTimer -= dt;
     if (e.shootTimer > 0) return;
 
-    const action = model.patterns[ai.step % model.patterns.length];
+    // Sorteia o próximo golpe da fase (sem repetir os dois últimos, e sem "sombras" se elas ainda estão em campo)
+    const pool = model.phases ? model.phases[Math.min(e.bossPhase ?? 0, model.phases.length - 1)].patterns : model.patterns;
+    const shadowsUp = state.enemies.some(o => o.shadowOwner === e);
+    let options = pool.filter(a => a !== ai.last && a !== ai.last2 && !(a === 'shadows' && shadowsUp));
+    if (!options.length) options = pool.filter(a => !(a === 'shadows' && shadowsUp));
+    if (!options.length) options = pool;
+    const action = options[Math.floor(Math.random() * options.length)];
+    ai.last2 = ai.last;
+    ai.last = action;
     ai.step++;
     ACTIONS[action](e, model, ai);
+    if (OPENS_AFTER[action]) later(ai, OPENS_AFTER[action], () => openWindow(e, model));
     e.shootTimer = model.patternGapSeconds * (e.enraged ? model.enrageGapMultiplier : 1);
 }
 

@@ -110,7 +110,13 @@ export const HUNTER = {
         strafeSpeed: 70,
         burstCount: 4,
         patternGapSeconds: 2.1,
-        patterns: ['volley', 'lunge', 'shadows', 'slam', 'lunge', 'volley', 'ring'],
+        // Kit curto na hora 1; cada fase abaixo libera golpes novos (columns = colunas de luz; traps = círculos armados)
+        patterns: ['volley', 'slam', 'columns'],
+        phases: [
+            { at: 1, patterns: ['volley', 'slam', 'columns', 'volley'] },
+            { at: 0.66, label: 'HOLY GROUND', patterns: ['volley', 'lunge', 'slam', 'columns', 'traps'] },
+            { at: 0.33, label: 'FULL POWER', patterns: ['traps', 'columns', 'shadows', 'lunge', 'slam', 'ring', 'volley'] }
+        ],
         ringCount: 14,
         slamCount: 3,
         slamRadius: 70,

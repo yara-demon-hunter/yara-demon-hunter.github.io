@@ -113,7 +113,13 @@ export const AZAEL = {
         keepRange: 0,
         burstCount: 3,
         patternGapSeconds: 1.9,
-        patterns: ['lunge', 'volley', 'shadows', 'lunge', 'blink', 'lunge', 'ring'],
+        // Kit curto na hora 1; cada fase abaixo libera golpes novos (mark = marca e reaparece; combo = 3 investidas)
+        patterns: ['lunge', 'volley', 'mark'],
+        phases: [
+            { at: 1, patterns: ['lunge', 'volley', 'mark', 'lunge'] },
+            { at: 0.66, label: 'SHADOW STEP', patterns: ['lunge', 'combo', 'mark', 'blink', 'volley'] },
+            { at: 0.33, label: 'FULL POWER', patterns: ['combo', 'mark', 'shadows', 'blink', 'ring', 'lunge', 'volley'] }
+        ],
         ringCount: 12,
         projectileSpeed: 300,
         enrageSpeedMultiplier: 1.35

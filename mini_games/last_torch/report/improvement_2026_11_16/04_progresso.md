@@ -597,3 +597,8 @@ Pedido do dono: ao zerar o jogo, mostrar as ondas sendo calculadas, **sem HUNT A
 - Nova pasta `_tests/` com `qa_sweep.py` e README: auditoria dos dados + telas × 4 tamanhos (+ `--play`).
 - Primeira rodada achou: menu inicial invisível no sandbox, e botões "INTO THE DARK", vitória e fim de noite abaixo da dobra no celular → botões presos no rodapé (camp, summary em paisagem, victory).
 - Pendente: no `--play` todos os heróis "morrem na onda 1 mesmo imortais"; ver se é o bot (imortalidade) ou o jogo.
+
+## Bosses com fases e golpes novos
+- `boss_ai.js`: fases por vida (`phases` em cada boss: 100%/66%/33%), golpe sorteado da fase (sem repetir os 2 últimos), janela de punição (boss aberto 1,3 s depois de golpe pesado: +30% dano, anel dourado).
+- Golpes novos: mark e combo (Azael), traps e columns (Demon Hunter), stomp (Brutos), meteors e claw (Demon Lord), bloom (Condessa), eclipse (Long Night). Rivais começam com kit curto na hora 1; a revanche começa completa.
+- Fora desta rodada: rival copiar skill do jogador, laço de sangue da Condessa, escuridão/buraco negro da Long Night, machado-bumerangue do Brutos.

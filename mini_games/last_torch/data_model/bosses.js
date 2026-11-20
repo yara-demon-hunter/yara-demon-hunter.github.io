@@ -81,6 +81,11 @@ export const BOSS_MODELS = {
         initialShootCooldownSeconds: 1.5,
         patternGapSeconds: 2.6,
         patterns: ['volley', 'ring', 'volley', 'slam', 'summon'],
+        phases: [
+            { at: 1, patterns: ['volley', 'ring', 'volley', 'slam', 'summon'] },
+            { at: 0.66, label: 'FIRE RAIN', patterns: ['volley', 'meteors', 'claw', 'slam', 'summon'] },
+            { at: 0.33, label: 'INFERNO', patterns: ['meteors', 'claw', 'ring', 'meteors', 'slam', 'summon', 'volley'] }
+        ],
         ringCount: 14,
         slamCount: 3,
         slamRadius: 74,
@@ -122,6 +127,11 @@ export const BOSS_MODELS = {
         initialShootCooldownSeconds: 1.5,
         patternGapSeconds: 2.2,
         patterns: ['blink', 'volley', 'spiral', 'blink', 'ring', 'summon'],
+        phases: [
+            { at: 1, patterns: ['blink', 'volley', 'spiral', 'summon'] },
+            { at: 0.66, label: 'BLOOD BLOOM', patterns: ['blink', 'bloom', 'volley', 'spiral', 'summon'] },
+            { at: 0.33, label: 'CRIMSON TIDE', patterns: ['blink', 'bloom', 'spiral', 'ring', 'bloom', 'summon', 'volley'] }
+        ],
         ringCount: 18,
         spiralShots: 18,
         spiralIntervalSeconds: 0.12,
@@ -168,6 +178,11 @@ export const BOSS_MODELS = {
         initialShootCooldownSeconds: 1.5,
         patternGapSeconds: 1.9,
         patterns: ['ring', 'slam', 'spiral', 'volley', 'summon', 'slam', 'ring', 'blink'],
+        phases: [
+            { at: 1, patterns: ['ring', 'slam', 'spiral', 'volley', 'summon', 'blink'] },
+            { at: 0.66, label: 'ECLIPSE', patterns: ['eclipse', 'slam', 'spiral', 'bloom', 'summon', 'blink', 'ring'] },
+            { at: 0.33, label: 'THE DARK ITSELF', patterns: ['eclipse', 'bloom', 'spiral', 'eclipse', 'slam', 'summon', 'ring', 'blink'] }
+        ],
         ringCount: 18,
         slamCount: 5,
         slamRadius: 84,
@@ -203,12 +218,23 @@ function rematch(key, changes) {
 }
 rematch('AZAEL', {
     hpBase: 6000, patternGapSeconds: 1.4, burstCount: 5, ringCount: 16, meleeCooldownSeconds: 0.6,
-    patterns: ['lunge', 'volley', 'shadows', 'lunge', 'blink', 'lunge', 'ring', 'lunge', 'blink'],
+    // Revanche: já começa com o kit completo e ainda ganha fases
+    patterns: ['lunge', 'combo', 'mark', 'volley', 'blink'],
+    phases: [
+        { at: 1, patterns: ['lunge', 'combo', 'mark', 'volley', 'blink'] },
+        { at: 0.66, label: 'SHADOW LEGION', patterns: ['lunge', 'combo', 'mark', 'shadows', 'blink', 'ring'] },
+        { at: 0.33, label: 'FULL POWER', patterns: ['combo', 'mark', 'shadows', 'blink', 'ring', 'combo', 'volley', 'lunge'] }
+    ],
     scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
 });
 rematch('DEMON_HUNTER', {
     hpBase: 6000, patternGapSeconds: 1.6, burstCount: 6, ringCount: 18, slamCount: 5, meleeCooldownSeconds: 0.8,
-    patterns: ['volley', 'lunge', 'shadows', 'slam', 'ring', 'lunge', 'volley', 'slam'],
+    patterns: ['volley', 'lunge', 'traps', 'columns', 'slam'],
+    phases: [
+        { at: 1, patterns: ['volley', 'lunge', 'traps', 'columns', 'slam'] },
+        { at: 0.66, label: 'HOLY WRATH', patterns: ['volley', 'lunge', 'traps', 'columns', 'shadows', 'slam', 'ring'] },
+        { at: 0.33, label: 'FULL POWER', patterns: ['traps', 'columns', 'shadows', 'lunge', 'slam', 'ring', 'volley', 'traps'] }
+    ],
     scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
 });
 

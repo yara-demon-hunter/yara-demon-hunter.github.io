@@ -26,6 +26,7 @@ import { buildHourPlan, prepareBossSummon, resetFieldForNewTurn, spawnOpening } 
 const DEATH_SLOW = 0.28;
 
 export function startHour() {
+    state.bossSlain = false;
     const hour = state.turn;
     resetStreak();
     state.phase = 'HUNT';
@@ -173,6 +174,9 @@ export function onBossKilled(e, model) {
 
     // Rival: os ataques dele somem já, e a conversa entre os dois vem antes de a noite seguir
     if (hasDuel(model)) {
+        // Boss caído: nada mais nasce e o que estava em campo explode já (antes, na pausa até a conversa, o spawner soltava hordas novas)
+        state.bossSlain = true;
+        purgeMonsters();
         state.enemyProjectiles.length = 0;
         state.telegraphs.length = 0;
         setTimeout(() => whenHunting(() => playDuelDialogue(e.type, 'after', afterBoss)), DUEL_DIALOGUE_DELAY_MS);

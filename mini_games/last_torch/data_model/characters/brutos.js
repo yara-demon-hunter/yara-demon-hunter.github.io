@@ -147,7 +147,12 @@ export const BRUTOS = {
         quakeDamageMultiplier: 1.4,
         quakeTorchDamage: 8,
         patternGapSeconds: 2.4,
-        patterns: ['quake', 'lunge', 'quake', 'quake', 'lunge'],
+        patterns: ['quake', 'lunge', 'quake', 'stomp'],
+        phases: [
+            { at: 1, patterns: ['quake', 'lunge', 'quake', 'stomp'] },
+            { at: 0.66, label: 'STAMPEDE', patterns: ['quake', 'stomp', 'lunge', 'stomp'] },
+            { at: 0.33, label: 'RAMPAGE', patterns: ['stomp', 'quake', 'lunge', 'stomp', 'quake', 'lunge'] }
+        ],
         enrageRatio: 0.4,
         enrageGapMultiplier: 0.75,
         enrageSpeedMultiplier: 1.25,

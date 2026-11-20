@@ -42,6 +42,7 @@ export function dealDamage(e, amount, o = {}) {
     const crit = o.crit || (!o.noCrit && (Math.random() < getCritChance() || (inSmoke(e) && Math.random() < SMOKE_BOMB.critChance)));
     const dmg = amount * (crit ? getCritMultiplier() : 1) * (e.ravenMark > 0 ? 1 + SHADOW_RAVEN.markDamage : 1)
         * (e.rooted > 0 ? 1 + rootedBonus() : 1)
+        * (e.openTimer > 0 ? 1.3 : 1)                                           // boss aberto depois de um golpe pesado: +30%
         * (e.blessed > 0 ? 1 + POWER_MODELS.holyWater.blessBonus : 1)       // Holy Water: abençoado leva mais de tudo
         * (e.chilled > 0 && o.torchFire ? 1 + BLUE_TORCH.brittle : 1);       // Blue Torch: gelado leva mais só dos golpes de fogo da tocha
 

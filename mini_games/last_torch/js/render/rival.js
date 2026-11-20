@@ -65,7 +65,7 @@ export function renderRival(e) {
     const colors = shadow
         ? shadowColorsOf(model.heroModel)
         : (HEROES[model.heroKey]?.colors ?? BODIES[model.heroModel]?.vis.colors);
-    drawGlow(ctx, model.color, e.x, e.y, e.radius * 2.4, shadow ? 0.22 : e.enraged ? 0.55 : 0.32);
+    drawGlow(ctx, e.openTimer > 0 ? '#fde047' : model.color, e.x, e.y, e.radius * 2.4, e.openTimer > 0 ? 0.6 : shadow ? 0.22 : e.enraged ? 0.55 : 0.32);
     ctx.save();
     if (shadow) ctx.globalAlpha = SHADOW_CLONE_VISUALS.alpha;
     ctx.translate(e.x, e.y);
