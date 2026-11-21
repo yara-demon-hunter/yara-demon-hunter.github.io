@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca · Editor de cenário</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0c0a06; color: #d6cfbf; font-family: system-ui, sans-serif; }
+        header {
+            position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+            padding: 10px 16px; background: #0c0a06; border-bottom: 1px solid #3a3322;
+        }
+        header h1 { margin: 0 8px 0 0; font-size: 18px; color: #fde68a; }
+        header a.home { color: #c9c0aa; text-decoration: none; font-size: 14px; border: 1px solid #3a3322; border-radius: 6px; padding: 5px 9px; }
+        header a.home:hover { border-color: #fbbf24; }
+        select, button, input[type=text], input[type=number] {
+            background: #17140d; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 14px;
+        }
+        button { cursor: pointer; font-weight: 600; }
+        button:hover, button:focus-visible { border-color: #fbbf24; outline: none; }
+        button.primary { background: #3a2f17; border-color: #5c5137; }
+        button.on { border-color: #fbbf24; background: #3a2f17; color: #fde68a; }
+        label.check { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; }
+        .layout { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 12px; padding: 12px 16px 40px; }
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+        main { display: flex; flex-direction: column; align-items: center; min-width: 0; gap: 8px; }
+        canvas { display: block; background: #000; border: 1px solid #2a2418; border-radius: 8px; touch-action: none; cursor: crosshair; }
+        canvas.grab { cursor: grab; }
+        canvas.grabbing { cursor: grabbing; }
+        #status { font-size: 13px; color: #a39b86; min-height: 18px; }
+        aside { position: sticky; top: calc(var(--header-h, 52px) + 12px); max-height: calc(100vh - var(--header-h, 52px) - 24px); overflow: auto; background: #110e08; border: 1px solid #2a2418; border-radius: 8px; padding: 10px 12px; }
+        @media (max-width: 900px) { aside { position: static; max-height: none; } }
+        h2 { font-size: 13px; color: #fbbf24; margin: 12px 0 6px; text-transform: uppercase; letter-spacing: .06em; }
+        h2:first-child { margin-top: 0; }
+        .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+        .chips button { font-size: 12.5px; padding: 4px 8px; }
+        .chips button small { color: #8a826c; font-weight: 400; margin-left: 4px; }
+        .row { display: grid; grid-template-columns: 70px 1fr 64px; gap: 6px; align-items: center; margin: 4px 0; font-size: 12.5px; }
+        .row input[type=range] { width: 100%; accent-color: #fbbf24; }
+        .row input[type=number] { width: 64px; padding: 3px 4px; font-size: 12px; }
+        .hint { font-size: 12px; color: #7a725f; margin: 4px 0 8px; line-height: 1.45; }
+        .list { max-height: 150px; overflow: auto; border: 1px solid #2a2418; border-radius: 6px; }
+        .list div { padding: 3px 8px; font-size: 12.5px; cursor: pointer; display: flex; justify-content: space-between; }
+        .list div:hover { background: #1c170d; }
+        .list div.sel { background: #3a2f17; color: #fde68a; }
+        code { color: #c9c0aa; }
+        #out { width: 100%; min-height: 130px; margin-top: 6px; background: #0c0a06; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 6px; font: 11.5px ui-monospace, monospace; padding: 6px; }
+        .btns { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+    </style>
+</head>
+<body>
+    <!-- Ferramenta de desenvolvimento da biblioteca (não é copiada para os jogos pelo sync).
+         Editor de cenário à mão: escolha uma peça (cottage, well, tombstone...), clique no cenário para pôr, arraste para mover.
+         Os objetos entram em `visual.placed` (scenery/compose.js), com posição em FRAÇÃO do mundo (valem em qualquer tela).
+         Ficam guardados neste navegador; para gravar no cenário: "Copiar layout", cole em <id>_visual.js e rode o sync.
+         Como abrir: `python3 mini_games/_library/tools/serve.py` (permite 📁 Gravar no arquivo) e abra http://localhost:8010/_library/tools/scenery_editor.html -->
+    <header>
+        <a class="home" href="index.html">← Ateliê</a>
+        <h1>Editor de cenário</h1>
+        <select id="scenery" aria-label="Cenário"></select>
+        <select id="preset" aria-label="Tela">
+            <option value="desk">Computador 16:9</option>
+            <option value="mobL">Celular deitado</option>
+            <option value="mobP">Celular em pé</option>
+        </select>
+        <select id="quality" aria-label="Nível de detalhe">
+            <option value="0">Detalhe 0 (cheio)</option>
+            <option value="1">Detalhe 1</option>
+            <option value="2">Detalhe 2 (mínimo)</option>
+        </select>
+        <label class="check"><input id="pause" type="checkbox"> Pausar</label>
+        <label class="check"><input id="handles" type="checkbox" checked> Alças</label>
+        <label class="check"><input id="refs" type="checkbox" checked> Tocha</label>
+        <button id="saveFile" class="primary" title="Grava o layout no projeto (scenery/layouts/<id>.js) e sincroniza os jogos: o editor, o sandbox e o jogo passam a mostrar sempre este cenário">📁 Gravar no arquivo</button>
+        <button id="save" title="Guarda SÓ neste navegador (já acontece sozinho a cada mudança). Para gravar no projeto, use 📁 Gravar no arquivo">💾 Salvar (navegador)</button>
+        <button id="download" title="Baixa um arquivo .json com o layout deste cenário (backup, ou para levar a outro navegador)">⬇ Arquivo</button>
+        <button id="open" title="Abre um arquivo .json baixado antes e usa como layout deste cenário">⬆ Abrir</button>
+        <input id="openFile" type="file" accept=".json,application/json" hidden>
+        <button id="copy" class="primary">Copiar layout</button>
+    </header>
+    <div class="layout">
+        <main>
+            <canvas id="view"></canvas>
+            <div id="saved" style="font-size:12.5px;color:#86efac;min-height:16px"></div>
+            <div id="fileinfo" style="font-size:12.5px;color:#a39b86;min-height:16px"></div>
+            <div id="status"></div>
+        </main>
+        <aside>
+            <h2>1. Escolha uma peça</h2>
+            <input id="filter" type="text" placeholder="Filtrar (ex.: cottage, tomb)" style="width:100%;margin-bottom:6px">
+            <div id="palette" class="chips"></div>
+            <p class="hint">Clique numa peça e depois no cenário para pôr (pode pôr várias; <b>Esc</b> ou clicar de novo na peça para parar).
+                <b>Clicar num objeto nunca cria outro</b>: seleciona e arrasta (vale também para o que o cenário já tinha, marcado com círculo azul: ao pegar um, todos os da mesma entrada da receita viram editáveis). Clicar num lugar vazio com uma peça escolhida põe a peça, e segurando o botão você ajusta onde ela fica.</p>
+
+            <h2>2. Objeto selecionado</h2>
+            <div id="selbox"><p class="hint">Nenhum. Clique num objeto do cenário.</p></div>
+
+            <h2>3. O que a receita já gerou</h2>
+            <p class="hint">O cenário nasce de uma receita (quantas peças de cada tipo, onde). Clique em <b>Editar</b> para transformar o que ela gerou em
+                objetos que você seleciona, move e apaga como os outros. O chão, a estrada, o rio e o portão são a base e não entram aqui.
+                <b>Voltar à receita</b> desfaz. As posições são as da tela escolhida no topo, em <b>Detalhe 0</b>.</p>
+            <div id="recipe" class="list" style="max-height:230px"></div>
+
+            <h2>Objetos colocados (<span id="count">0</span>)</h2>
+            <div id="list" class="list"></div>
+            <div class="btns">
+                <button id="clear">Apagar todos</button>
+                <button id="undo">Desfazer (Ctrl+Z)</button>
+            </div>
+
+            <h2>Texto do layout</h2>
+            <p class="hint"><b>Copiar layout</b> escreve a lista abaixo e a copia. Cole no <code>&lt;id&gt;_visual.js</code> do cenário e rode
+                <code>ruby mini_games/_library/sync.rb</code>. Para trazer um layout de volta, cole aqui e use <b>Aplicar texto</b>.</p>
+            <textarea id="out" placeholder="placed: [ ... ]"></textarea>
+            <div class="btns"><button id="apply">Aplicar texto</button></div>
+            <p class="hint"><b>Teclas:</b> setas movem 1 px (Shift = 10) · <b>[</b> e <b>]</b> mudam o tamanho · <b>Q</b>/<b>E</b> giram 5° (Shift = 15°, só peças estáticas: cerca, laje, tábua...) · <b>F</b> espelha (estáticas) · <b>Ctrl+C</b>/<b>Ctrl+V</b> copia e cola o objeto onde o mouse está · <b>R</b> sorteia outra
+                aparência · <b>D</b> duplica · <b>Delete</b> apaga.</p>
+        </aside>
+    </div>
+
+    <script>
+        window.__clock = 0;
+        performance.now = () => window.__clock;
+        setTimeout(() => {
+            if (window.__ready) return;
+            document.querySelector('main').innerHTML = `<p style="padding:24px;color:#fbbf24;line-height:1.6">
+                O editor não carregou${location.protocol === 'file:' ? ': a página foi aberta direto do disco, e o navegador bloqueia os módulos assim' : ' (veja o console, F12)'}.<br>
+                No terminal, na pasta <code>mini_games</code>: <code>python3 -m http.server 8010</code><br>
+                e abra <code>http://localhost:8010/_library/tools/scenery_editor.html</code></p>`;
+        }, 2500);
+    </script>
+    <script type="module">
+        import { setCtx } from '../core/canvas.js';
+        import { createScenery, sceneryIds } from '../scenery/index.js';
+        import { getProp, propIds } from '../scenery/props/index.js';
+        import { getLayout } from '../scenery/layouts.js';
+
+        const $ = (id) => document.getElementById(id);
+        const canvas = $('view');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        setCtx(ctx);
+
+        const PRESETS = { desk: { w: 1664, h: 936 }, mobL: { w: 1354, h: 624 }, mobP: { w: 624, h: 1354 } };
+        const TORCH = { max: 0.62, min: 0.13, curve: 0.85, solid: 0.55, flicker: 0.03, heroRadius: 210, heroSolid: 0.35, heroStrength: 0.92 };
+        const SOURCE = { glowColor: '255, 150, 60', glowAlpha: 0.3, radiusRatio: TORCH.max };
+
+        let scenery = null;
+        let visual = null;
+        let placed = [];
+        let canWrite = false;        // o servidor do Ateliê (tools/serve.py) consegue gravar no projeto
+        let fileAt = 0;              // quando o layout do arquivo foi gravado (0 = não há layout no arquivo)
+        let localAt = 0;             // quando o trabalho foi guardado neste navegador
+        let baked = [];              // índices das entradas da receita convertidas em objetos editáveis
+        let analysis = [];           // o que a receita gera (scenery.bake)
+        let selected = -1;
+        let armed = null;            // id da peça escolhida na paleta
+        let drag = null;             // { dx, dy } enquanto arrasta
+        let pointer = null;          // posição do mouse em unidades do mundo
+        let storeKey = '';
+        const history = [];          // para Ctrl+Z
+
+        const round = (v, n = 4) => +v.toFixed(n);
+        const status = (t) => { $('status').textContent = t; };
+
+        // --- PEÇAS ---
+        function sizeOf(pl) {
+            const id = pl.prop;
+            const prop = getProp(id);
+            if (prop.kind === 'animated') {
+                const entry = pl.from !== undefined ? visual.props[pl.from] : null;
+                const a = { size: 1.5, ...prop.anim, ...(entry ? { size: entry.size ?? 1 } : null) };
+                return { w: prop.cell[0] * a.size, h: prop.cell[1] * a.size, up: prop.anchor[1] };
+            }
+            const s = prop.previewSize ?? 40;
+            return { w: s, h: s, up: 0.6 };
+        }
+        // Área de clique: um círculo em volta do corpo do objeto (que sobe a partir do ponto de ancoragem)
+        function hitOf(pl) {
+            const { w, h, up } = sizeOf(pl);
+            const s = pl.scale ?? 1;
+            const animated = getProp(pl.prop).kind === 'animated';
+            const r = Math.max(12, Math.min(w, h) * (animated ? 0.5 : 0.38) * s);
+            return { cx: pl.x * env.width, cy: pl.y * env.height - h * 0.25 * s * (up > 0.5 ? 1 : 0.4), r };
+        }
+        function pickAt(x, y) {
+            for (let i = placed.length - 1; i >= 0; i--) {
+                const { cx, cy, r } = hitOf(placed[i]);
+                if (Math.hypot(x - cx, y - cy) <= r) return i;
+            }
+            return -1;
+        }
+        // Peças que a receita gerou e que dá para pegar direto com o mouse (as ainda não convertidas). A cobertura do chão (musgo, folhas e
+        // pedrinhas: centenas de marcas minúsculas) fica de fora; essas só pelo botão Editar da seção 3. Capim, samambaia etc. entram (são dezenas).
+        const GROUND_COVER = new Set(['moss', 'leaves', 'pebbles']);
+        function recipeItems() {
+            return analysis.filter(a => !baked.includes(a.entry) && !GROUND_COVER.has(a.prop)
+                && analysis.filter(b => b.entry === a.entry).length <= 80);
+        }
+        function pickRecipeAt(x, y) {
+            const list = recipeItems();
+            for (let i = list.length - 1; i >= 0; i--) {
+                const a = list[i];
+                const { cx, cy, r } = hitOf({ prop: a.prop, x: a.x, y: a.y, from: a.entry, scale: a.scale });
+                if (Math.hypot(x - cx, y - cy) <= r) return a;
+            }
+            return null;
+        }
+        // Qualquer objeto sob o mouse: um colocado (devolve o índice) ou um da receita (converte a entrada inteira e devolve o índice dele)
+        function grabAt(x, y) {
+            const i = pickAt(x, y);
+            if (i >= 0) return i;
+            const hit = pickRecipeAt(x, y);
+            if (!hit) return -1;
+            const found = analysis.filter(a => a.entry === hit.entry);
+            const start = bakeEntry(hit.entry, found, true);
+            return start + found.indexOf(hit);
+        }
+
+        // --- ESTADO E ARMAZENAMENTO ---
+        const hhmm = (t) => new Date(t).toLocaleTimeString('pt-BR');
+        function persist(explicit = false) {
+            try {
+                const savedAt = Date.now();
+                localStorage.setItem(storeKey, JSON.stringify({ placed, baked, savedAt }));
+                localAt = savedAt;
+                $('saved').style.color = '#86efac';
+                $('saved').textContent = `${explicit ? '💾 Salvo' : '✓ Salvo sozinho'} neste navegador às ${hhmm(savedAt)} · ${placed.length} objetos`;
+                markSavedScenes();
+                renderFileInfo();
+            } catch {
+                $('saved').style.color = '#fca5a5';
+                $('saved').textContent = '⚠ Não consegui salvar neste navegador (armazenamento bloqueado). Use "⬇ Arquivo" para não perder o trabalho.';
+            }
+        }
+        function renderFileInfo() {
+            const info = $('fileinfo');
+            if (!canWrite) {
+                info.style.color = '#a39b86';
+                info.textContent = 'Para gravar no arquivo do projeto, abra o Ateliê por: python3 mini_games/_library/tools/serve.py';
+                return;
+            }
+            const dirty = localAt > fileAt;
+            info.style.color = dirty ? '#fbbf24' : '#a39b86';
+            info.textContent = fileAt
+                ? `📁 Arquivo gravado às ${hhmm(fileAt)} (${new Date(fileAt).toLocaleDateString('pt-BR')})${dirty ? ' · ⚠ há mudanças que ainda não estão no arquivo' : ' · em dia'}`
+                : (placed.length || baked.length ? '📁 Nada gravado no arquivo ainda · ⚠ use "Gravar no arquivo"' : '📁 Nada gravado no arquivo ainda');
+        }
+        // Na lista de cenários, um ● marca os que têm trabalho guardado
+        // Na lista de cenários: ✓ = gravado no arquivo do projeto e em dia · ● = há trabalho que NÃO está no arquivo (só neste navegador) · nada = original
+        const fileState = {};        // o que o arquivo tem agora, por cenário (atualizado quando grava; o módulo do layout fica em cache)
+        const fileAtOf = (id) => fileState[id] ? fileState[id].savedAt : (getLayout(id)?.savedAt ?? 0);
+        function markSavedScenes() {
+            [...$('scenery').options].forEach(o => {
+                let local = null;
+                try { local = JSON.parse(localStorage.getItem(`scenery_editor:${o.value}`) || 'null'); } catch { local = null; }
+                if (Array.isArray(local)) local = { placed: local, baked: [], savedAt: 0 };
+                const hasLocal = Boolean(local && (local.placed?.length || local.baked?.length));
+                const inFile = fileAtOf(o.value) > 0;
+                const pending = hasLocal && (!inFile || (local.savedAt ?? 0) > fileAtOf(o.value));
+                o.textContent = pending ? `${o.value} ●` : inFile ? `${o.value} ✓` : o.value;
+            });
+            $('scenery').title = '✓ = gravado no arquivo do projeto (em dia)  ·  ● = tem trabalho que ainda NÃO está no arquivo (só neste navegador)  ·  sem marca = cenário original';
+        }
+        function snapshot() {
+            history.push(JSON.stringify({ placed, baked }));
+            if (history.length > 60) history.shift();
+        }
+        let rebuildTimer = 0;
+        let lastRebuild = 0;
+        function rebuild(now = false) {
+            visual.placed = placed;
+            visual.baked = baked;
+            clearTimeout(rebuildTimer);
+            const wait = now ? 0 : Math.max(0, 200 - (Date.now() - lastRebuild));
+            rebuildTimer = setTimeout(() => { lastRebuild = Date.now(); scenery.invalidate(); }, wait);
+        }
+        function commit(now = true) {
+            persist();
+            rebuild(now);
+            renderSide();
+        }
+
+        function loadScenery(id) {
+            scenery = createScenery(id);
+            visual = scenery.visual;
+            storeKey = `scenery_editor:${id}`;
+            let saved = null;
+            try { saved = JSON.parse(localStorage.getItem(storeKey)); } catch { saved = null; }
+            // O que o cenário traz (já com o layout gravado no arquivo, se houver: createScenery aplica) e o que ficou no navegador
+            const fromFile = { placed: structuredClone(visual.placed ?? []), baked: structuredClone(visual.baked ?? []) };
+            if (Array.isArray(saved)) saved = { placed: saved, baked: [] };          // formato antigo: só a lista
+            const layout = getLayout(id) && fileAtOf(id) > 0 ? getLayout(id) : undefined;
+            fileAt = fileAtOf(id);
+            const hasLocal = saved && Array.isArray(saved.placed);
+            // O arquivo manda, a menos que o navegador tenha mudanças mais novas que ele
+            const useLocal = hasLocal && (!layout || (saved.savedAt ?? 0) > fileAt);
+            const data = useLocal ? saved : fromFile;
+            localAt = hasLocal ? (saved.savedAt ?? 0) : 0;
+            const resumed = (useLocal && (saved.placed.length || saved.baked?.length)) || (!useLocal && layout);
+            placed = data.placed.filter(p => propIds().includes(p.prop));
+            baked = Array.isArray(data.baked) ? data.baked : [];
+            history.length = 0;
+            selected = -1;
+            armed = null;
+            visual.placed = placed;
+            visual.baked = baked;
+            analysis = [];
+            renderPalette();
+            renderSide();
+            const url = new URL(location.href);
+            url.searchParams.set('scenery', id);
+            window.history.replaceState(null, '', url);
+            scenery.invalidate();
+            runAnalysis();
+            if (resumed) {
+                $('saved').style.color = '#86efac';
+                $('saved').textContent = useLocal
+                    ? `↩ Retomado de onde você parou: ${placed.length} objetos${saved.savedAt ? ` (salvo neste navegador às ${hhmm(saved.savedAt)}, ${new Date(saved.savedAt).toLocaleDateString('pt-BR')})` : ''}`
+                    : `↩ Carregado do arquivo do projeto: ${placed.length} objetos`;
+            } else $('saved').textContent = '';
+            markSavedScenes();
+            renderFileInfo();
+        }
+
+        // --- PAINEL ---
+        function renderPalette() {
+            const box = $('palette');
+            const q = $('filter').value.trim().toLowerCase();
+            box.innerHTML = '';
+            propIds().forEach(id => {
+                const prop = getProp(id);
+                if (q && !(`${id} ${prop.name}`.toLowerCase().includes(q))) return;
+                const b = document.createElement('button');
+                b.className = armed === id ? 'on' : '';
+                b.innerHTML = `${prop.name}<small>${prop.kind === 'animated' ? 'anim.' : 'est.'}</small>`;
+                b.title = id;
+                b.onclick = () => { armed = armed === id ? null : id; renderPalette(); status(armed ? `Clique no cenário para pôr: ${prop.name}` : ''); };
+                box.appendChild(b);
+            });
+        }
+
+        function renderSide() {
+            $('count').textContent = placed.length;
+            renderRecipe();
+            const list = $('list');
+            list.innerHTML = '';
+            placed.forEach((pl, i) => {
+                const d = document.createElement('div');
+                d.className = i === selected ? 'sel' : '';
+                d.innerHTML = `<span>${getProp(pl.prop).name}</span><span>${round(pl.x, 2)}, ${round(pl.y, 2)}</span>`;
+                d.onclick = () => { selected = i; renderSide(); };
+                list.appendChild(d);
+            });
+            const box = $('selbox');
+            if (selected < 0 || !placed[selected]) { box.innerHTML = '<p class="hint">Nenhum. Clique num objeto do cenário.</p>'; return; }
+            const pl = placed[selected];
+            const prop = getProp(pl.prop);
+            box.innerHTML = `<div style="font-size:13px;margin-bottom:4px"><b>${prop.name}</b> <code>${pl.prop}</code></div>
+                <div class="row"><span>Tamanho</span><input id="sScale" type="range" min="0.3" max="3" step="0.05" value="${pl.scale ?? 1}"><input id="sScaleN" type="number" min="0.3" max="3" step="0.05" value="${pl.scale ?? 1}"></div>
+                ${prop.kind === 'static'
+                    ? `<div class="row"><span>Girar (°)</span><input id="sRot" type="range" min="-180" max="180" step="1" value="${pl.rot ?? 0}"><input id="sRotN" type="number" min="-180" max="180" step="1" value="${pl.rot ?? 0}"></div>`
+                    : '<p class="hint" style="margin:2px 0">Esta peça é animada (vem de um atlas de quadros): só as estáticas giram.</p>'}
+                <div class="row"><span>X</span><input id="sX" type="range" min="0" max="1" step="0.001" value="${pl.x}"><input id="sXN" type="number" min="0" max="1" step="0.001" value="${round(pl.x)}"></div>
+                <div class="row"><span>Y</span><input id="sY" type="range" min="0" max="1" step="0.001" value="${pl.y}"><input id="sYN" type="number" min="0" max="1" step="0.001" value="${round(pl.y)}"></div>
+                <div class="btns">
+                    ${prop.kind === 'static' ? `<label class="check"><input id="sFlip" type="checkbox" ${pl.flip ? 'checked' : ''}> espelhar</label>` : ''}
+                    <button id="sSeed">🎲 outra aparência</button><button id="sDup">Duplicar</button><button id="sDel">Apagar</button>
+                </div>`;
+            const set = (key, v, now = false) => { snapshot(); placed[selected][key] = v; persist(); rebuild(now); };
+            const bind = (range, num, key) => {
+                $(range).oninput = (e) => { $(num).value = e.target.value; set(key, +e.target.value); };
+                $(num).onchange = (e) => { $(range).value = e.target.value; set(key, +e.target.value, true); };
+            };
+            bind('sScale', 'sScaleN', 'scale');
+            if ($('sRot')) bind('sRot', 'sRotN', 'rot');
+            bind('sX', 'sXN', 'x');
+            bind('sY', 'sYN', 'y');
+            if ($('sFlip')) $('sFlip').onchange = (e) => set('flip', e.target.checked || undefined, true);
+            $('sSeed').onclick = reroll;
+            $('sDup').onclick = duplicate;
+            $('sDel').onclick = remove;
+        }
+
+        // --- RECEITA ---
+        // Roda a receita só para saber onde ela põe cada peça (nada é desenhado). Depende do tamanho do mundo (tela escolhida).
+        function runAnalysis() {
+            if (!env.width) return;
+            try { analysis = scenery.bake(env.width, env.height, 0); } catch (err) { analysis = []; status(`Não consegui analisar a receita: ${err.message}`); }
+            renderRecipe();
+        }
+        function renderRecipe() {
+            const box = $('recipe');
+            box.innerHTML = '';
+            (visual.props ?? []).forEach((entry, idx) => {
+                const found = analysis.filter(a => a.entry === idx);
+                const isBaked = baked.includes(idx);
+                const own = placed.filter(p => p.from === idx).length;
+                const d = document.createElement('div');
+                const prop = getProp(entry.prop);
+                d.innerHTML = `<span>${prop.name} <small style="color:#8a826c">${prop.kind === 'animated' ? 'anim.' : 'est.'}</small></span>`;
+                const b = document.createElement('button');
+                b.style.cssText = 'font-size:12px;padding:2px 8px';
+                if (isBaked) {
+                    b.textContent = `Voltar à receita (${own})`;
+                    b.onclick = () => unbakeEntry(idx);
+                } else {
+                    b.textContent = `Editar ${found.length}`;
+                    b.disabled = found.length === 0;
+                    b.onclick = () => bakeEntry(idx, found);
+                }
+                d.appendChild(b);
+                d.style.cursor = 'default';
+                box.appendChild(d);
+            });
+        }
+        const r3 = (v) => Math.round(v * 1000) / 1000;
+        const roundAttrs = (v) => (typeof v === 'number' ? r3(v) : Array.isArray(v) ? v.map(roundAttrs) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, roundAttrs(x)])) : v);
+        function bakeEntry(idx, found, quiet = false) {
+            if (!quiet && found.length > 80 && !confirm(`Esta entrada gerou ${found.length} peças. Transformar todas em objetos editáveis deixa a lista pesada. Continuar?`)) return;
+            snapshot();
+            const start = placed.length;
+            found.forEach(f => {
+                const o = { prop: f.prop, x: round(f.x), y: round(f.y), from: idx };
+                if (f.kind === 'static') o.attrs = roundAttrs(f.attrs);
+                else { o.variant = f.variant; o.scale = r3(f.scale); o.phase = r3(f.phase); }
+                placed.push(o);
+            });
+            baked.push(idx);
+            commit();
+            status(`${found.length} objetos de "${getProp(found[0].prop).name}" agora são editáveis (Voltar à receita desfaz).`);
+            return start;
+        }
+        function unbakeEntry(idx) {
+            snapshot();
+            placed = placed.filter(p => p.from !== idx);
+            baked = baked.filter(i => i !== idx);
+            selected = -1;
+            commit();
+        }
+
+        // --- AÇÕES ---
+        const newSeed = () => 1 + Math.floor(Math.random() * 9999);
+        function addAt(id, x, y) {
+            snapshot();
+            placed.push({ prop: id, x: round(x / env.width), y: round(y / env.height), seed: newSeed(), scale: 1 });
+            selected = placed.length - 1;
+            commit();
+        }
+        function remove() {
+            if (selected < 0) return;
+            snapshot();
+            placed.splice(selected, 1);
+            selected = -1;
+            commit();
+        }
+        function duplicate() {
+            if (selected < 0) return;
+            snapshot();
+            const c = structuredClone(placed[selected]);      // mantém from/attrs: a cópia é igualzinha
+            c.x = Math.min(1, round(c.x + 24 / env.width));
+            c.y = Math.min(1, round(c.y + 16 / env.height));
+            c.seed = newSeed();
+            placed.push(c);
+            selected = placed.length - 1;
+            commit();
+        }
+        function reroll() {
+            if (selected < 0) return;
+            snapshot();
+            placed[selected].seed = newSeed();
+            commit();
+        }
+        // Copiar e colar: Ctrl+C guarda o objeto selecionado; Ctrl+V põe uma cópia igualzinha onde o mouse está (ou ao lado, se o mouse saiu da tela)
+        let clipboard = null;
+        function copySelected() {
+            if (selected < 0) return false;
+            clipboard = structuredClone(placed[selected]);
+            status(`Copiado: ${getProp(clipboard.prop).name}. Ctrl+V cola onde o mouse estiver.`);
+            return true;
+        }
+        function paste() {
+            if (!clipboard) return;
+            snapshot();
+            const c = structuredClone(clipboard);
+            if (pointer) { c.x = round(Math.max(0, Math.min(1, pointer.x / env.width))); c.y = round(Math.max(0, Math.min(1, pointer.y / env.height))); }
+            else { c.x = Math.min(1, round(c.x + 24 / env.width)); c.y = Math.min(1, round(c.y + 16 / env.height)); }
+            placed.push(c);
+            selected = placed.length - 1;
+            commit();
+        }
+        function undo() {
+            const last = history.pop();
+            if (!last) return;
+            ({ placed, baked } = JSON.parse(last));
+            selected = Math.min(selected, placed.length - 1);
+            commit();
+        }
+
+        // --- MOUSE ---
+        const toWorld = (e) => {
+            const r = canvas.getBoundingClientRect();
+            return { x: (e.clientX - r.left) / view.scale, y: (e.clientY - r.top) / view.scale };
+        };
+        function startDrag(e, p, i) {
+            selected = i;
+            drag = { dx: placed[i].x * env.width - p.x, dy: placed[i].y * env.height - p.y };
+            try { canvas.setPointerCapture(e.pointerId); } catch { /* sem captura: o arraste ainda funciona dentro do canvas */ }
+            canvas.className = 'grabbing';
+        }
+        canvas.addEventListener('pointerdown', (e) => {
+            const p = toWorld(e);
+            if (e.button === 2) { armed = null; renderPalette(); return; }
+            // Clicar num objeto (colocado ou da receita) sempre o seleciona e arrasta, mesmo com uma peça escolhida: nunca cria outro por cima
+            const i = grabAt(p.x, p.y);
+            if (i >= 0) {
+                snapshot();
+                startDrag(e, p, i);
+                renderSide();
+                return;
+            }
+            if (armed) {
+                addAt(armed, p.x, p.y);
+                startDrag(e, p, selected);       // segurando o botão, já dá para ajustar onde ficou
+                return;
+            }
+            selected = -1;
+            renderSide();
+        });
+        canvas.addEventListener('pointermove', (e) => {
+            pointer = toWorld(e);
+            if (drag && selected >= 0) {
+                const pl = placed[selected];
+                pl.x = round(Math.max(0, Math.min(1, (pointer.x + drag.dx) / env.width)));
+                pl.y = round(Math.max(0, Math.min(1, (pointer.y + drag.dy) / env.height)));
+                rebuild(false);
+            } else {
+                canvas.className = (pickAt(pointer.x, pointer.y) >= 0 || pickRecipeAt(pointer.x, pointer.y)) ? 'grab' : '';
+            }
+        });
+        canvas.addEventListener('pointerup', () => {
+            if (!drag) return;
+            drag = null;
+            canvas.className = '';
+            commit();
+        });
+        canvas.addEventListener('pointerleave', () => { pointer = null; });
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        window.addEventListener('keydown', (e) => {
+            if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName) && !['Escape'].includes(e.key)) return;
+            const pl = placed[selected];
+            if (e.key === 'Escape') { armed = null; renderPalette(); status(''); return; }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); persist(true); status('Salvo (Ctrl+S).'); return; }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') { if (copySelected()) e.preventDefault(); return; }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') { if (clipboard) { e.preventDefault(); paste(); } return; }
+            if (!pl) return;
+            const step = e.shiftKey ? 10 : 1;
+            const move = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+            if (move) {
+                e.preventDefault();
+                snapshot();
+                pl.x = round(Math.max(0, Math.min(1, pl.x + move[0] / env.width)));
+                pl.y = round(Math.max(0, Math.min(1, pl.y + move[1] / env.height)));
+                commit(false);
+            } else if ((e.key.toLowerCase() === 'q' || e.key.toLowerCase() === 'e') && getProp(pl.prop).kind === 'static') {
+                snapshot();
+                const turn = (e.shiftKey ? 15 : 5) * (e.key.toLowerCase() === 'e' ? 1 : -1);
+                pl.rot = ((((pl.rot ?? 0) + turn + 180) % 360) + 360) % 360 - 180;
+                commit(false);
+            } else if (e.key === '[' || e.key === ']') {
+                snapshot();
+                pl.scale = round(Math.max(0.3, Math.min(3, (pl.scale ?? 1) + (e.key === ']' ? 0.05 : -0.05))), 2);
+                commit(false);
+            } else if (e.key.toLowerCase() === 'f' && getProp(pl.prop).kind === 'static') { snapshot(); pl.flip = pl.flip ? undefined : true; commit(); }
+            else if (e.key.toLowerCase() === 'r') reroll();
+            else if (e.key.toLowerCase() === 'd') duplicate();
+            else if (e.key === 'Delete' || e.key === 'Backspace') remove();
+        });
+
+        // --- TEXTO ---
+        function layoutText() {
+            const rows = placed.map(p => {
+                const parts = [`prop: '${p.prop}'`, `x: ${round(p.x)}`, `y: ${round(p.y)}`];
+                if (p.from !== undefined) parts.push(`from: ${p.from}`);
+                if (p.attrs) parts.push(`attrs: ${JSON.stringify(p.attrs)}`);
+                if (p.seed !== undefined) parts.push(`seed: ${p.seed}`);
+                if (p.variant !== undefined) parts.push(`variant: ${p.variant}`);
+                if (p.phase !== undefined) parts.push(`phase: ${p.phase}`);
+                if (p.scale && p.scale !== 1) parts.push(`scale: ${round(p.scale, 3)}`);
+                if (p.rot) parts.push(`rot: ${round(p.rot, 1)}`);
+                if (p.flip) parts.push('flip: true');
+                return `        { ${parts.join(', ')} }`;
+            });
+            const head = baked.length ? `    // Entradas da receita convertidas em objetos (índices em props)\n    baked: [${baked.join(', ')}],\n` : '';
+            return `${head}    // Objetos do editor (x e y em fração do mundo)\n    placed: [\n${rows.join(',\n')}\n    ],`;
+        }
+        $('copy').addEventListener('click', async () => {
+            const text = layoutText();
+            $('out').value = text;
+            try { await navigator.clipboard.writeText(text); $('copy').textContent = 'Copiado!'; }
+            catch { $('out').select(); $('copy').textContent = 'Selecione e copie abaixo'; }
+            setTimeout(() => { $('copy').textContent = 'Copiar layout'; }, 1600);
+        });
+        // Aceita a lista de entradas { prop: 'x', ... } em JS (com ou sem o "placed: [ ]" em volta) ou JSON
+        $('apply').addEventListener('click', () => {
+            try {
+                const t = $('out').value.trim().replace(/^\s*\/\/.*$/gm, '').trim();
+                // Texto no formato do Copiar layout: "baked: [...], placed: [...]" (ou só a lista)
+                const data = t.startsWith('[') ? { placed: new Function(`return (${t});`)() } : new Function(`return ({${t}});`)();
+                const list = data.placed;
+                if (!Array.isArray(list)) throw new Error('não achei a lista placed');
+                list.forEach(p => { if (!propIds().includes(p.prop)) throw new Error(`peça desconhecida: ${p.prop}`); });
+                snapshot();
+                baked = Array.isArray(data.baked) ? data.baked : [];
+                placed = list.map(p => (p.attrs || p.variant !== undefined ? p : { ...p, seed: p.seed ?? newSeed() }));
+                selected = -1;
+                commit();
+                status(`Aplicado: ${placed.length} objetos.`);
+            } catch (err) { status(`Texto inválido: ${err.message}`); }
+        });
+        $('saveFile').addEventListener('click', async () => {
+            if (!canWrite) {
+                alert('Este servidor só mostra páginas e não consegue gravar no projeto.\n\n1. Feche o servidor atual (o http.server da porta 8010).\n2. No terminal, rode:\n   python3 mini_games/_library/tools/serve.py\n3. Abra de novo http://localhost:8010/_library/tools/scenery_editor.html\n\nSeu trabalho está salvo neste navegador (💾) e não se perde.');
+                return;
+            }
+            persist();
+            $('saveFile').disabled = true;
+            try {
+                const res = await fetch('/__save_layout', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Atelie': '1' },
+                    body: JSON.stringify({ scenery: $('scenery').value, placed, baked })
+                });
+                const out = await res.json();
+                if (!res.ok || !out.ok) throw new Error(out.error || `erro ${res.status}`);
+                fileAt = out.savedAt;
+                fileState[$('scenery').value] = { savedAt: out.savedAt };
+                // O navegador passa a ter a mesma data do arquivo: nada "pendente"
+                try { localStorage.setItem(storeKey, JSON.stringify({ placed, baked, savedAt: out.savedAt || Date.now() })); } catch { /* ok */ }
+                localAt = out.savedAt || Date.now();
+                renderFileInfo();
+                markSavedScenes();
+                status(out.file
+                    ? `Gravado em ${out.file}. Sincronização com os jogos: ${out.sync}. Abra o cenário no sandbox (aba Arena) para ver no jogo.`
+                    : `Layout vazio: o arquivo deste cenário foi apagado (volta ao original). Sincronização: ${out.sync}.`);
+            } catch (err) {
+                status(`Não consegui gravar no arquivo: ${err.message}`);
+            } finally {
+                $('saveFile').disabled = false;
+            }
+        });
+        $('save').addEventListener('click', () => { persist(true); status(canWrite ? 'Salvo neste navegador. Para gravar no projeto (e o jogo ver), use "📁 Gravar no arquivo".' : 'Salvo neste navegador (não é o arquivo do projeto). Para gravar no projeto, abra o Ateliê pelo serve.py: veja a mensagem ao lado de "📁 Gravar no arquivo".'); });
+        $('download').addEventListener('click', () => {
+            const blob = new Blob([JSON.stringify({ scenery: $('scenery').value, placed, baked }, null, 1)], { type: 'application/json' });
+            const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `${$('scenery').value}_layout.json` });
+            a.click();
+            URL.revokeObjectURL(a.href);
+            status('Arquivo baixado. Use "⬆ Abrir" para trazê-lo de volta.');
+        });
+        $('open').addEventListener('click', () => $('openFile').click());
+        $('openFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            e.target.value = '';
+            if (!file) return;
+            try {
+                const d = JSON.parse(await file.text());
+                if (!Array.isArray(d.placed)) throw new Error('não achei a lista placed');
+                d.placed.forEach(p => { if (!propIds().includes(p.prop)) throw new Error(`peça desconhecida: ${p.prop}`); });
+                if (d.scenery && d.scenery !== $('scenery').value && !confirm(`Este arquivo é do cenário "${d.scenery}", mas você está em "${$('scenery').value}". Abrir mesmo assim?`)) return;
+                snapshot();
+                placed = d.placed;
+                baked = Array.isArray(d.baked) ? d.baked : [];
+                selected = -1;
+                commit();
+                persist(true);
+                status(`Aberto: ${placed.length} objetos.`);
+            } catch (err) { status(`Arquivo inválido: ${err.message}`); }
+        });
+        $('clear').addEventListener('click', () => { if (placed.length && confirm('Apagar todos os objetos colocados?')) { snapshot(); placed = []; selected = -1; commit(); } });
+        $('undo').addEventListener('click', undo);
+        $('filter').addEventListener('input', renderPalette);
+
+        // --- DESENHO (mesmo motor do tuner de cenários) ---
+        const lights = [
+            { x: 0, y: 0, radius: 0, solid: TORCH.solid, strength: 1, shape: 'plateau' },
+            { x: 0, y: 0, radius: TORCH.heroRadius, solid: TORCH.heroSolid, strength: TORCH.heroStrength, shape: 'ring' }
+        ];
+        const env = {
+            width: 0, height: 0, res: 1, quality: 0, danger: 0, dawn: 0, scaled: false, source: SOURCE,
+            lights(t) {
+                const radius = Math.min(env.width, env.height) * TORCH.max;
+                const flicker = 1 + Math.sin(t * 11) * TORCH.flicker * 0.5 + Math.sin(t * 23.7) * TORCH.flicker * 0.5;
+                lights[0].x = env.width / 2;
+                lights[0].y = env.height / 2;
+                lights[0].radius = radius * flicker;
+                lights[1].x = env.width / 2;
+                lights[1].y = env.height / 2 - 90;
+                return lights;
+            }
+        };
+        let view = { scale: 1, dpr: 1 };
+        function fit() {
+            const { w, h } = PRESETS[$('preset').value];
+            const header = document.querySelector('header').offsetHeight;
+            document.documentElement.style.setProperty('--header-h', header + 'px');
+            const availW = document.querySelector('main').clientWidth || window.innerWidth;
+            const availH = window.matchMedia('(max-width: 900px)').matches ? window.innerHeight * 0.5 : window.innerHeight - header - 60;
+            const scale = Math.min(availW / w, availH / h);
+            const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+            view = { scale, dpr };
+            canvas.style.width = Math.floor(w * scale) + 'px';
+            canvas.style.height = Math.floor(h * scale) + 'px';
+            canvas.width = Math.round(w * scale * dpr);
+            canvas.height = Math.round(h * scale * dpr);
+            env.width = w;
+            env.height = h;
+            scenery?.invalidate();
+        }
+
+        function drawHandles() {
+            if ($('refs').checked) {
+                ctx.fillStyle = 'rgba(251, 146, 60, 0.9)';
+                ctx.beginPath(); ctx.arc(env.width / 2, env.height / 2, 12, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff7ed';
+                ctx.beginPath(); ctx.arc(env.width / 2, env.height / 2, 5, 0, Math.PI * 2); ctx.fill();
+            }
+            if ($('handles').checked) {
+                recipeItems().forEach(a => {
+                    const { cx, cy, r } = hitOf({ prop: a.prop, x: a.x, y: a.y, from: a.entry, scale: a.scale });
+                    ctx.setLineDash([2, 4]);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = 'rgba(147, 197, 253, 0.4)';
+                    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+                    ctx.setLineDash([]);
+                });
+                placed.forEach((pl, i) => {
+                    const { cx, cy, r } = hitOf(pl);
+                    ctx.setLineDash([5, 4]);
+                    ctx.lineWidth = i === selected ? 2.2 : 1;
+                    ctx.strokeStyle = i === selected ? '#fde047' : 'rgba(255, 255, 255, 0.35)';
+                    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = i === selected ? '#fde047' : 'rgba(255, 255, 255, 0.5)';
+                    ctx.beginPath(); ctx.arc(pl.x * env.width, pl.y * env.height, i === selected ? 3.5 : 2.2, 0, Math.PI * 2); ctx.fill();
+                });
+            }
+            if (armed && pointer) {
+                ctx.strokeStyle = 'rgba(253, 224, 71, 0.9)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(pointer.x - 12, pointer.y); ctx.lineTo(pointer.x + 12, pointer.y);
+                ctx.moveTo(pointer.x, pointer.y - 12); ctx.lineTo(pointer.x, pointer.y + 12);
+                ctx.stroke();
+                ctx.fillStyle = '#fde047';
+                ctx.font = '13px system-ui';
+                ctx.fillText(getProp(armed).name, pointer.x + 14, pointer.y - 10);
+            }
+        }
+
+        let last = 0;
+        function frame(real) {
+            requestAnimationFrame(frame);
+            if (!$('pause').checked) window.__clock += Math.min(100, real - (last || real));
+            last = real;
+            const res = view.scale * view.dpr;
+            env.res = res;
+            env.quality = +$('quality').value;
+            ctx.setTransform(res, 0, 0, res, 0, 0);
+            scenery.renderGround(env);
+            scenery.renderSway(env);
+            scenery.renderAmbient(env);
+            scenery.renderOverlay(env);
+            drawHandles();
+        }
+
+        // --- INÍCIO ---
+        sceneryIds().forEach(id => { $('scenery').appendChild(Object.assign(document.createElement('option'), { value: id, textContent: id })); });
+        const params = new URLSearchParams(location.search);
+        if (sceneryIds().includes(params.get('scenery'))) $('scenery').value = params.get('scenery');
+        if (PRESETS[params.get('preset')]) $('preset').value = params.get('preset');
+        loadScenery($('scenery').value);
+        markSavedScenes();
+        fit();
+        runAnalysis();
+        $('scenery').addEventListener('change', () => { loadScenery($('scenery').value); });
+        $('preset').addEventListener('change', () => { fit(); runAnalysis(); });
+        $('quality').addEventListener('change', () => scenery.invalidate());
+        window.addEventListener('resize', fit);
+        window.__editor = { get placed() { return placed; }, get baked() { return baked; }, get analysis() { return analysis; }, addAt, get env() { return env; } };
+        fetch('/__layout_api').then(r => r.ok ? r.json() : null).then(j => { canWrite = Boolean(j?.ok); renderFileInfo(); }).catch(() => renderFileInfo());
+        window.__ready = true;
+        requestAnimationFrame(frame);
+    </script>
+</body>
+</html>

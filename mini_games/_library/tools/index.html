@@ -38,7 +38,7 @@
     <!-- Página-mãe das ferramentas de desenvolvimento da biblioteca (não é copiada para os jogos pelo sync).
          Um cartão para cada tuner e atalhos diretos para cada herói, monstro, cenário e peça. As listas de cenários e de
          peças saem do próprio registro da biblioteca: item novo aparece aqui sozinho.
-         Como abrir: na pasta mini_games, `python3 -m http.server 8010` e abra http://localhost:8010/_library/tools/ -->
+         Como abrir: `python3 mini_games/_library/tools/serve.py` (grava layouts do editor de cenário) ou, só para ver, na pasta mini_games `python3 -m http.server 8010`; e abra http://localhost:8010/_library/tools/ -->
     <div class="wrap">
         <h1>Ateliê</h1>
         <p class="lead">Onde se vê e se ajusta a arte da biblioteca: heróis, monstros, cenários e as peças que compõem os cenários.
@@ -74,6 +74,11 @@
                 <span class="icon">🌲</span><b>Cenários</b>
                 <span>O cenário inteiro renderizado pelo motor: base, receita de peças, névoa, vento e luz, em computador e celular.</span>
                 <em>scenery_tuner.html</em>
+            </a>
+            <a class="card" href="scenery_editor.html?scenery=village_gate">
+                <span class="icon">✋</span><b>Editor de cenário</b>
+                <span>Monte um cenário à mão: escolha uma peça (chalé, poço, lápide...), clique para pôr e arraste para mover, mudar o tamanho ou espelhar. Copia o layout para o arquivo do cenário.</span>
+                <em>scenery_editor.html</em>
             </a>
             <a class="card" href="object_tuner.html?object=torch">
                 <span class="icon">🔥</span><b>Objetos</b>

@@ -1,6 +1,7 @@
 // GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/scenery/scenery.js e rode o sync.
 import { ctx } from '../core/canvas.js';
 import { createRandom } from '../core/random.js';
+import { getLayout } from './layouts.js';
 import {
     bakeSourceGlow, buildFireflies, buildFogBlobs, buildFogTile, buildVignette, cutLight, drawFireflies, drawFogLayer,
     ellipticDistance, fogDensity, makeCanvas
@@ -48,6 +49,12 @@ export function createScenery(id) {
     const def = registry.get(id);
     if (!def) throw new Error(`Cenário "${id}" não está registrado (sceneryIds(): ${sceneryIds().join(', ') || 'vazio'})`);
     const F = def.visual;
+    // Layout gravado pelo editor (scenery/layouts/<id>.js): objetos colocados e entradas da receita convertidas. Cópia: ninguém muda o arquivo por aqui.
+    const layout = getLayout(id);
+    if (layout) {
+        F.placed = structuredClone(layout.placed ?? []);
+        F.baked = structuredClone(layout.baked ?? []);
+    }
     const cache = {
         key: '', ground: null, vignette: null, fogSprite: null, fogTile: null, fog: [], fireflies: [], fireflyTime: 0,
         sway: [], fogCanvas: null, fogCtx: null, fogScaleX: 1, fogScaleY: 1, fogDrawnAt: 0
@@ -166,5 +173,25 @@ export function createScenery(id) {
         cache.key = '';
     }
 
-    return { id: def.id, name: def.name, visual: F, prepare, invalidate, renderGround, renderSway, renderAmbient, renderOverlay };
+    // Para o editor: roda a receita sem desenhar nada para o cenário e devolve a posição de cada peça que ela gerou
+    // ({ entry, prop, kind, x, y (frações do mundo), attrs | variant, scale, phase }). Mesma sequência de sorteios do prepare().
+    function bake(w, h, quality = 0) {
+        if (!def.state) return [];
+        const env = { width: w, height: h, res: 1, quality, source: null };
+        const rand = createRandom(F.seed);
+        const scratch = makeCanvas(w, h, { alpha: false });
+        def.state.capture = [];
+        try {
+            def.paintGround(scratch.getContext('2d', { alpha: false }), w, h, rand, env);
+            buildFogBlobs(F, w, h, rand);
+            buildFogTile(F, rand);
+            buildFireflies(F, w, h, rand, quality);
+            if (def.buildSway) def.buildSway(w, h, rand, quality, env);
+            return def.state.capture;
+        } finally {
+            def.state.capture = null;
+        }
+    }
+
+    return { id: def.id, name: def.name, visual: F, prepare, invalidate, bake, renderGround, renderSway, renderAmbient, renderOverlay };
 }

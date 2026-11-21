@@ -161,7 +161,7 @@ cima) e a do palco do yara-rpg (de lado, rosto em 3/4). Os controles deslizantes
 o boneco muda na hora. O Demon Hunter é o boneco base: o bloco dele (`hero25d_visual.js`) é o corpo de todos.
 
 ```bash
-cd mini_games && python3 -m http.server 8010
+python3 mini_games/_library/tools/serve.py        # (ou, sem gravar layouts: cd mini_games && python3 -m http.server 8010)
 # abra http://localhost:8010/_library/tools/tuner.html  (?model=azael, brutos, yara, zeph, oskar)
 ```
 

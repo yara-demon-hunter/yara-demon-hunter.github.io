@@ -10,6 +10,9 @@ import { POWER_MODELS } from '/data_model/powers.js';
 import { addMonster, spawnBoss } from '/js/systems/spawner.js';
 import { startHour } from '/js/systems/night.js';
 import { startGame } from '/js/ui/screens.js';
+import { setScenery } from '/js/render/scenery.js';
+import { WORLD } from '/data_model/world.js';
+import { createScenery, sceneryIds } from '/library/scenery/index.js';
 import { flushHeroUnlocks, queueHeroUnlock } from '/js/ui/hero_unlock.js';
 import { ACHIEVEMENTS } from '/data_model/sanctuary.js';
 import { mountTuner } from '/_sandbox/tuner.js';
@@ -57,6 +60,7 @@ panel.innerHTML = `
     <p class="note">Test arena: nothing here touches the game or its save.</p>
     <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button><button data-tab="screens">🖼️ Screens</button><button data-tab="moves">🗡️ Boss moves</button></div>
     <div id="sbArena">
+    <h3>Scenery <small>(applies right away, even mid-fight)</small></h3><div class="sb-row" id="sbScenery"></div>
     <h3>Hero</h3><div class="sb-row" id="sbHeroes"></div>
     <h3>Boss <small>(click again to unselect: monsters only)</small></h3><div class="sb-row" id="sbBosses"></div>
     <h3>Monsters <small>(click to add to the fight)</small></h3><div class="sb-row" id="sbMonsters"></div>
@@ -101,6 +105,27 @@ function fill(id, items, key) {
         host.appendChild(b);
     });
 }
+// Cenário: troca na hora (o jogo real só lê WORLD.scenery; aqui o sandbox lembra a última escolha)
+const sceneryChoice = { scenery: (() => { try { return localStorage.getItem('sbScenery'); } catch { return null; } })() };
+if (!sceneryIds().includes(sceneryChoice.scenery)) sceneryChoice.scenery = WORLD.scenery;
+function fillScenery() {
+    const host = panel.querySelector('#sbScenery');
+    host.innerHTML = '';
+    sceneryIds().forEach(id => {
+        const b = document.createElement('button');
+        b.className = 'sb-opt' + (sceneryChoice.scenery === id ? ' on' : '');
+        b.innerHTML = `${createScenery(id).name}<small>${id}${id === WORLD.scenery ? ' · game default' : ''}</small>`;
+        b.onclick = () => {
+            sceneryChoice.scenery = id;
+            try { localStorage.setItem('sbScenery', id); } catch { /* sem armazenamento: só não lembra */ }
+            setScenery(id);
+            fillScenery();
+        };
+        host.appendChild(b);
+    });
+}
+setScenery(sceneryChoice.scenery);
+fillScenery();
 fill('#sbHeroes', ACTIVE_HEROES.map(k => ({ key: k, label: HEROES[k].name, sub: HEROES[k].tagline })), 'hero');
 fill('#sbBosses', bosses.map(b => ({ key: b.key, label: b.label, sub: b.sub })), 'boss');
 

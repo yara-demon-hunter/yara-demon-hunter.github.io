@@ -11,7 +11,12 @@ import { drawGlow } from '../../library/core/glow.js';
 // é regra do Last Torch, a tocha: o raio da luz acompanha a vida do núcleo, e o herói também ilumina em volta.
 // Manual: mini_games/_library/scenery/README.md.
 
-const scenery = createScenery(WORLD.scenery);
+let scenery = createScenery(WORLD.scenery);
+
+// Troca o cenário em tempo de execução. O jogo não chama: é para o sandbox (aba Arena) testar cenários da biblioteca.
+export function setScenery(id) {
+    scenery = createScenery(id);
+}
 
 const torch = { lightRadius: 0, lightTime: 0, currentLight: 0 };
 
