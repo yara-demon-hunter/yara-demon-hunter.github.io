@@ -144,6 +144,33 @@ Achados do dono em 17/11, olhando o responsivo.
 - [x] tuner reduzido a 3 telas de referência, somando ao layout fluido
 - [ ] depois de a IA aplicar, usar **Reset ALL screens** no tuner
 
+## Fase 7 — Mudanças visíveis para o relançamento (ideias de 21/11)
+Objetivo: o revisor e o jogador perceberem uma versão nova logo nos primeiros minutos. Desafio diário e missões já estão na Fase 4.
+
+**Conteúdo novo (o que mais parece "versão nova")**
+- [ ] bioma/mapa novo (fundo, monstros e boss próprios; usar a biblioteca de cenários)
+- [ ] modo Rush de 6 horas (partida curta, bom para celular)
+- [ ] modo com modificadores (escuridão total, monstros rápidos, só tocha)
+- [ ] 4º herói jogável com mecânica própria (usar a biblioteca de personagens)
+- [ ] boss novo (hora 6 ou 9)
+
+**Retenção**
+- [-] metas por noite / rastreador de conquista no HUD: testados e descartados (21/11), informação demais na tela, principalmente no celular
+- [ ] primeira noite guiada sem texto, apontando para o item
+- [ ] tela de morte: "faltam X Brasas para o próximo upgrade" + HUNT AGAIN em destaque
+
+**Itens que a plataforma valoriza**
+- [ ] idiomas: inglês, português, espanhol
+- [ ] gamepad e teclado completos, com controles na pausa
+- [ ] SDK da CrazyGames (gameplayStart/Stop; anúncio premiado na segunda chance). Por último, e só se o dono pedir
+
+**Polimento barato**
+- [ ] impacto, tremor de tela e sons novos nos bosses
+- [ ] cena de abertura e de vitória
+- [ ] texto da atualização listando as mudanças
+
+**Recomendação:** desafio diário (Fase 4) + bioma novo com boss + metas por noite; idiomas em quarto.
+
 ## Antes de relançar
 - [ ] conferir o mínimo de pontos das regras novas (4 métricas)
 - [ ] build novo gerado e testado
