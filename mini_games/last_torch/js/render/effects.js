@@ -117,6 +117,19 @@ export function renderShockwaves() {
 export function renderTelegraphs() {
     const T = J.telegraph;
     ctx.save();
+    // Chão Sagrado do Demon Hunter: círculo verde que pulsa; some devagar no fim
+    const z = state.bossZone;
+    if (z) {
+        const k = Math.min(1, z.age / 0.4, (z.seconds - z.age) / 0.6);
+        const pulse = 0.5 + 0.5 * Math.sin(z.age * 6);
+        ctx.fillStyle = `rgba(74, 222, 128, ${(0.16 + 0.08 * pulse) * k})`;
+        ctx.strokeStyle = `rgba(187, 247, 208, ${0.85 * k})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(z.x, z.y, z.radius, z.radius * 0.8, 0, 0, TAU);
+        ctx.fill();
+        ctx.stroke();
+    }
     state.telegraphs.forEach(t => {
         if (t.age < 0) return;
         const p = Math.min(1, t.age / t.seconds);
@@ -125,11 +138,27 @@ export function renderTelegraphs() {
             ctx.save();
             ctx.translate(t.x, t.y);
             ctx.rotate(t.angle);
-            ctx.fillStyle = T.lineGlow;
+            ctx.fillStyle = t.red ? 'rgba(239, 68, 68, 0.28)' : T.lineGlow;
             ctx.fillRect(0, -7, t.length, 14);
-            ctx.fillStyle = T.lineCore;
+            ctx.fillStyle = t.red ? 'rgba(254, 202, 202, 0.95)' : T.lineCore;
             ctx.globalAlpha = 0.35 + p * 0.65;
             ctx.fillRect(0, -1 - p, t.length * easeOutCubic(p), 2 + p * 2);
+            ctx.restore();
+            return;
+        }
+        if (t.kind === 'scar') {
+            // Corte deixado pela investida: risco vermelho fino e brilhante que some depressa
+            const fade = 1 - p;
+            ctx.save();
+            ctx.lineCap = 'round';
+            ctx.globalAlpha = fade * 0.5;
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 12 * fade + 2;
+            ctx.beginPath(); ctx.moveTo(t.x, t.y); ctx.lineTo(t.toX, t.toY); ctx.stroke();
+            ctx.globalAlpha = fade;
+            ctx.strokeStyle = '#fecaca';
+            ctx.lineWidth = 3 * fade + 1;
+            ctx.beginPath(); ctx.moveTo(t.x, t.y); ctx.lineTo(t.toX, t.toY); ctx.stroke();
             ctx.restore();
             return;
         }

@@ -174,6 +174,9 @@ export const state = {
     // Corrente do Shadow Shackle: recarga e a corrente em campo { target, reach, held, age }. Só existe uma: a recarga é maior que o tempo preso
     shackleTimer: 0,
     shackle: null,
+    bossFx: null,                 // névoa/escuridão de um boss: { kind: 'fog' | 'dark', boss, age, seconds }
+    bossZone: null,               // chão sagrado do Demon Hunter: { boss, x, y, radius, age, seconds }
+    bossShackle: null,            // corrente do Demon Hunter no herói: { boss, reach, held, age }
     crescents: [],
     cracks: [],
     aftershocks: [],

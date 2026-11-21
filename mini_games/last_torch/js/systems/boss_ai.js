@@ -63,7 +63,12 @@ export function addSlam(x, y, radius, delay, damage, color = null, torchDamage =
 }
 
 const TELL_SECONDS = 0.55;
-const TELLED = new Set(['volley', 'ring', 'spiral']);
+const LUNGE_WINDUP_SCALE = 1.5;     // aviso da investida 50% mais longo
+const LUNGE_TIME_SCALE = 1.5;       // e a corrida em si 50% mais lenta
+const TELLED = new Set(['volley', 'ring', 'spiral', 'shackle', 'fireshield', 'bloodfog', 'darkness', 'holyground', 'mirror']);
+// Correntes do Demon Hunter (a skill Shadow Shackle virada contra o herói): voam a 700 px/s e prendem por 1,5 s.
+// Quem estiver em dash (ou invulnerável) na hora em que a ponta chega escapa: a corrente erra e se desfaz.
+export const BOSS_SHACKLE = { speed: 700, holdSeconds: 1.5 };
 
 const ACTIONS = {
     // Rajada mirada: um tiro a cada burstIntervalSeconds
@@ -102,21 +107,14 @@ const ACTIONS = {
         addSlam(e.x, e.y, model.quakeRadius, model.quakeDelaySeconds, e.damage * model.quakeDamageMultiplier, null, model.quakeTorchDamage ?? 0);
         audio.playBossAttack();
     },
-    // Círculos no chão: o primeiro no herói, os outros em volta dele
-    slam(e, model) {
-        for (let i = 0; i < model.slamCount; i++) {
-            const a = Math.random() * TAU;
-            const d = i === 0 ? 0 : 70 + Math.random() * 120;
-            addSlam(
-                Math.max(40, Math.min(state.width - 40, player.x + Math.cos(a) * d)),
-                Math.max(40, Math.min(state.height - 40, player.y + Math.sin(a) * d)),
-                model.slamRadius,
-                model.slamDelaySeconds + i * 0.14,
-                e.damage * model.slamDamageMultiplier,
-                null,
-                model.slamTorchDamage ?? 0
-            );
-        }
+    // Martelada: um círculo GRANDE em cima do herói, e mais dois que seguem onde ele estiver (um a cada 0,7 s).
+    // Diferente dos meteoros: poucos, grandes e que perseguem, em vez de vários pequenos espalhados.
+    slam(e, model, ai) {
+        const radius = model.slamRadius * 1.5;
+        const hit = () => addSlam(player.x, player.y, radius, model.slamDelaySeconds * 0.8, e.damage * model.slamDamageMultiplier * 1.1, null, 0);
+        hit();
+        later(ai, 0.7, hit);
+        later(ai, 1.4, hit);
         audio.playBossAttack();
     },
     summon(e, model) {
@@ -152,15 +150,16 @@ const ACTIONS = {
     // Investida (rivais): mira uma linha até o herói e depois a atravessa com a espada (updateLunge)
     lunge(e, model, ai) {
         const angle = aimAngle(e);
-        const windup = ai.inChain ? model.lungeWindupSeconds * 0.6 : model.lungeWindupSeconds;
+        // Investida mais lenta e legível: aviso maior (no combo, o aviso encurta menos, para dar tempo de escapar)
+        const windup = (ai.inChain ? model.lungeWindupSeconds * 0.85 : model.lungeWindupSeconds) * LUNGE_WINDUP_SCALE;
         const toX = Math.max(60, Math.min(state.width - 60, e.x + Math.cos(angle) * model.lungeLength));
         const toY = Math.max(90, Math.min(state.height - 60, e.y + Math.sin(angle) * model.lungeLength));
         const line = {
             kind: 'line', owner: e, x: e.x, y: e.y, angle,
             length: Math.hypot(toX - e.x, toY - e.y), age: 0, seconds: windup
         };
-        // A linha de aviso não é mais desenhada (não entra em state.telegraphs): o jogador lê a investida pelo
-        // boneco, que para e mira durante lungeWindupSeconds. `line` só guarda o ângulo e o alcance.
+        // Sem linha de aviso no chão (de propósito): o brilho crescendo no boss anuncia o golpe, e o risco vermelho só aparece
+        // depois, como o corte que ele deixou (ver 'scar' em updateLunge)
         ai.lunge = { line, fromX: e.x, fromY: e.y, toX, toY, wait: windup, t: 0, hit: false };
     },
     // Azael: marca o chão onde o herói está (a sombra estoura ali) e reaparece colado nele para o corte
@@ -197,6 +196,73 @@ const ACTIONS = {
             addSlam(clampX(player.x + Math.cos(a) * d), clampY(player.y + Math.sin(a) * d), 54, 2 + i * 0.12, e.damage * 0.9, null, model.slamTorchDamage ?? 0, '#7dd3fc');
         }
         audio.playBossAttack();
+    },
+    // --- GOLPES DE VARIAÇÃO: pausas, espaço e respostas às skills (nada aqui aumenta muito a dificuldade) ---
+    // Cansaço: o boss para ofegante por 1,6 s, aberto (+30% de dano). É a hora de bater
+    rest(e, model) {
+        e.holdStill = 1.6;
+        e.chainX = e.x;
+        e.chainY = e.y;
+        e.tired = 1.6;
+        e.openTimer = 1.6;
+        addShockwave(e.x, e.y, { radius: e.radius * 2.2, color: '#fde047', width: 4, seconds: 0.4 });
+    },
+    // Machado preso (Brutos): crava o machado no chão e fica parado e aberto por 1,5 s
+    anchor(e, model) {
+        e.angle = aimAngle(e);
+        e.comboStep = ((e.comboStep ?? 1) % 3) + 1;
+        e.holdStill = 1.5;
+        e.chainX = e.x;
+        e.chainY = e.y;
+        e.tired = 1.5;
+        e.openTimer = 1.5;
+        addShockwave(e.x, e.y, { radius: e.radius * 2.6, color: '#a8a29e', width: 6, seconds: 0.45 });
+        createExplosion(e.x, e.y, '#a8a29e', 14);
+        shakeScreen(5);
+        audio.playBossAttack();
+    },
+    // Escudo de Fogo (Demon Lord): 3 s de chamas em volta dele. Imune, e queima quem encosta; depois fica aberto
+    fireshield(e) {
+        e.fireShield = 3;
+        e.invulnerable = true;
+        audio.playBossAttack();
+    },
+    // Névoa de Sangue (Condessa): 4 s de névoa vermelha; o boss fica quase invisível e o herói anda 35% mais devagar (stats.js). Sem dano
+    bloodfog(e) {
+        state.bossFx = { kind: 'fog', boss: e, age: 0, seconds: 4 };
+        audio.playBossAttack();
+    },
+    // Escuridão (Long Night): 4 s com a luz da tocha encolhida. Fique perto dela. Não causa dano
+    darkness(e) {
+        state.bossFx = { kind: 'dark', boss: e, age: 0, seconds: 4 };
+        audio.playBossAttack();
+    },
+    // Chão Sagrado (Demon Hunter): um círculo verde no chão por 5 s. Cura o boss se ele ficar dentro e fere o herói que entra
+    holyground(e, model) {
+        state.bossZone = { boss: e, x: e.x, y: e.y, radius: 85, age: 0, seconds: 5, tick: 0, damage: e.damage * 0.35 };
+        addShockwave(e.x, e.y, { radius: 85, color: '#4ade80', width: 5, seconds: 0.5 });
+        audio.playBossAttack();
+    },
+    // Adaga Devolvida: 2,5 s em que toda adaga que o acerta volta contra o herói (sem ferir o boss)
+    mirror(e) {
+        e.reflectTimer = 2.5;
+        audio.playBossAttack();
+    },
+    // Espelho (Azael): imita o último movimento do herói. Dash recente: investida (com aviso); adaga recente: uma adaga só
+    echo(e, model, ai) {
+        const dashedLast = (player.lastDashAt ?? -1e9) > (state.knifeThrowTime ?? -1e9);
+        addShockwave(e.x, e.y, { radius: e.radius * 2.4, color: '#a5f3fc', width: 4, seconds: 0.4 });
+        if (dashedLast) ACTIONS.lunge(e, model, ai);
+        else {
+            ai.shots = 1;
+            ai.interval = 0.3;
+            ai.fire = () => fireShot(e, model, aimAngle(e));
+        }
+    },
+    // Demon Hunter: a corrente da Shadow Shackle sai dele e prende o herói no chão por 1,5 s (dash na hora certa escapa)
+    shackle(e) {
+        state.bossShackle = { boss: e, reach: 0, held: false, age: 0 };
+        audio.playShackle(false);
     },
     // Demon Hunter: colunas de luz em fila, do boss até o herói
     columns(e, model) {
@@ -302,10 +368,12 @@ function updateLunge(e, model, ai, dt) {
     }
     if (L.wait > 0) {
         L.wait -= dt;
+        e.tellRatio = Math.min(1, 1 - Math.max(0, L.wait) / L.line.seconds);      // brilho que cresce até o arranque
         e.x = L.fromX;
         e.y = L.fromY;
         e.angle = L.line.angle;
         if (L.wait <= 0) {
+            e.tellRatio = 0;
             // Golpe de espada no arranque (o boneco detecta a troca de comboStep)
             e.comboStep = ((e.comboStep ?? 1) % 3) + 1;
             addShockwave(e.x, e.y, { radius: 70, color: model.color, width: 4, seconds: 0.25 });
@@ -316,18 +384,20 @@ function updateLunge(e, model, ai, dt) {
     e.invulnerable = true;      // imune durante o avanço (js/systems/damage.js): não morre atravessando os golpes do herói
     const prevX = e.x;
     const prevY = e.y;
-    L.t = Math.min(1, L.t + dt / model.lungeSeconds);
+    L.t = Math.min(1, L.t + dt / (model.lungeSeconds * LUNGE_TIME_SCALE));
     e.x = L.fromX + (L.toX - L.fromX) * L.t;
     e.y = L.fromY + (L.toY - L.fromY) * L.t;
     e.angle = L.line.angle;
     e.chainX = e.x;
     e.chainY = e.y;
-    e.dashTimer = model.lungeSeconds * (1 - L.t);
+    e.dashTimer = model.lungeSeconds * LUNGE_TIME_SCALE * (1 - L.t);
     // O avanço é tão rápido que num quadro ele passa por cima do herói: confere o trecho percorrido, não só o ponto final
     if (!L.hit && distanceToSegment(player.x, player.y, prevX, prevY, e.x, e.y) < e.radius + model.lungeHitRadius) {
         L.hit = hurtPlayer(e.damage * model.lungeDamageMultiplier, e.x, e.y, 0.6);
     }
     if (L.t >= 1) {
+        // O corte vermelho que ficou no chão por onde ele passou
+        state.telegraphs.push({ kind: 'scar', x: L.fromX, y: L.fromY, toX: L.toX, toY: L.toY, age: 0, seconds: 0.7 });
         e.dashTimer = 0;
         e.invulnerable = false;
         ai.lunge = null;
@@ -439,6 +509,20 @@ function enrage(e, model) {
     audio.playBossRoar();
 }
 
+// Sandbox (aba Boss moves): faz o boss executar um golpe agora, do mesmo jeito que o sorteio faria (com o aviso, quando tem)
+export function forceBossAction(e, model, action) {
+    if (!ACTIONS[action]) return false;
+    const ai = e.ai ?? (e.ai = { step: 0, shots: 0, interval: 0, wait: 0, fire: null });
+    if (ai.lunge) return false;
+    ai.shots = 0;
+    ai.pending = null;
+    if (TELLED.has(action)) {
+        ai.pending = action;
+        ai.tell = TELL_SECONDS;
+    } else ACTIONS[action](e, model, ai);
+    return true;
+}
+
 export function updateBossAI(e, model, dt) {
     const ai = e.ai ?? (e.ai = { step: 0, shots: 0, interval: 0, wait: 0, fire: null });
 
@@ -461,6 +545,22 @@ export function updateBossAI(e, model, dt) {
         audio.playBossRoar();
     }
     if (e.openTimer > 0) e.openTimer -= dt;
+    if (e.holdStill > 0) e.holdStill -= dt;
+    if (e.tired > 0) e.tired -= dt;
+    if (e.reflectTimer > 0) e.reflectTimer -= dt;
+    if (e.fireShield > 0) {
+        e.fireShield -= dt;
+        // Quem encosta no escudo leva uma queimadura (de 0,6 em 0,6 s)
+        e.shieldTick = (e.shieldTick ?? 0) - dt;
+        if (e.shieldTick <= 0 && Math.hypot(player.x - e.x, player.y - e.y) < e.radius + 46) {
+            e.shieldTick = 0.6;
+            hurtPlayer(e.damage * 0.3, e.x, e.y, 0.5);
+        }
+        if (e.fireShield <= 0) {
+            e.invulnerable = false;
+            openWindow(e, model);
+        }
+    }
     if (ai.later?.length) {
         for (let i = ai.later.length - 1; i >= 0; i--) {
             const l = ai.later[i];
@@ -476,6 +576,20 @@ export function updateBossAI(e, model, dt) {
         return;
     }
     if (model.renderAs === 'RIVAL') updateRival(e, model, ai, dt);
+
+    // Aviso dos golpes de tiro: o boss "carrega" por TELL_SECONDS (brilho que cresce, ver renderEnemyOverlays) antes de disparar.
+    // Os golpes de chão (círculos) e a investida já têm o próprio aviso, então ficam de fora.
+    if (ai.pending) {
+        ai.tell -= dt;
+        e.tellRatio = Math.min(1, 1 - ai.tell / TELL_SECONDS);
+        if (ai.tell > 0) return;
+        const action = ai.pending;
+        ai.pending = null;
+        e.tellRatio = 0;
+        ACTIONS[action](e, model, ai);
+        e.shootTimer = model.patternGapSeconds * (e.enraged ? model.enrageGapMultiplier : 1);
+        return;
+    }
 
     // Ataque em andamento (rajada, espiral): um tiro por intervalo
     if (ai.shots > 0) {
@@ -493,20 +607,6 @@ export function updateBossAI(e, model, dt) {
 
     e.shootTimer -= dt;
     if (e.shootTimer > 0) return;
-
-    // Aviso dos golpes de tiro: o boss "carrega" por TELL_SECONDS (brilho que cresce, ver renderEnemyOverlays) antes de disparar.
-    // Os golpes de chão (círculos) e a investida já têm o próprio aviso, então ficam de fora.
-    if (ai.pending) {
-        ai.tell -= dt;
-        e.tellRatio = Math.min(1, 1 - ai.tell / TELL_SECONDS);
-        if (ai.tell > 0) return;
-        const action = ai.pending;
-        ai.pending = null;
-        e.tellRatio = 0;
-        ACTIONS[action](e, model, ai);
-        e.shootTimer = model.patternGapSeconds * (e.enraged ? model.enrageGapMultiplier : 1);
-        return;
-    }
 
     // Sorteia o próximo golpe da fase (sem repetir os dois últimos, e sem "sombras" se elas ainda estão em campo)
     const pool = model.phases ? model.phases[Math.min(e.bossPhase ?? 0, model.phases.length - 1)].patterns : model.patterns;
@@ -530,7 +630,70 @@ export function updateBossAI(e, model, dt) {
 }
 
 // Avisos no chão: círculos que estouram e linhas (espectro), mais as covas que levantam esqueletos
+function releaseBossShackle() {
+    state.bossShackle = null;
+    player.shackledTimer = 0;
+}
+
+// Névoa, escuridão e chão sagrado: efeitos de campo dos golpes de variação (o desenho está em render/atmosphere.js e render/effects.js)
+function updateBossFields(dt) {
+    const fx = state.bossFx;
+    if (fx) {
+        fx.age += dt;
+        if (fx.age >= fx.seconds || state.phase !== 'HUNT' || fx.boss.hp <= 0) state.bossFx = null;
+    }
+    const z = state.bossZone;
+    if (!z) return;
+    z.age += dt;
+    const boss = z.boss;
+    if (z.age >= z.seconds || state.phase !== 'HUNT' || boss.hp <= 0) {
+        state.bossZone = null;
+        return;
+    }
+    if (Math.hypot(boss.x - z.x, boss.y - z.y) < z.radius) boss.hp = Math.min(boss.maxHp, boss.hp + boss.maxHp * 0.008 * dt);
+    z.tick -= dt;
+    if (z.tick <= 0 && Math.hypot(player.x - z.x, player.y - z.y) < z.radius) {
+        z.tick = 0.7;
+        hurtPlayer(z.damage, z.x, z.y, 0.5);
+    }
+}
+
+function updateBossShackle(dt) {
+    const s = state.bossShackle;
+    if (!s) return;
+    if (state.phase !== 'HUNT' || s.boss.hp <= 0 || player.hp <= 0) {
+        releaseBossShackle();
+        return;
+    }
+    if (s.held) {
+        s.age += dt;
+        player.shackledTimer = Math.max(0, BOSS_SHACKLE.holdSeconds - s.age);
+        if (s.age >= BOSS_SHACKLE.holdSeconds) {
+            createExplosion(player.x, player.y, '#a78bfa', 8);
+            releaseBossShackle();
+        }
+        return;
+    }
+    s.reach += BOSS_SHACKLE.speed * dt;
+    if (s.reach < Math.hypot(player.x - s.boss.x, player.y - s.boss.y)) return;
+    if (player.dashTimer > 0 || player.iFrames > 0) {
+        // Errou: o herói estava no meio do dash
+        addShockwave(player.x, player.y, { radius: 40, color: '#a78bfa', width: 3, seconds: 0.25 });
+        state.bossShackle = null;
+        return;
+    }
+    s.held = true;
+    s.age = 0;
+    player.shackledTimer = BOSS_SHACKLE.holdSeconds;
+    createExplosion(player.x, player.y, '#a78bfa', 10);
+    addShockwave(player.x, player.y, { radius: 56, color: '#a78bfa', width: 4, seconds: 0.3 });
+    shakeScreen(3);
+    audio.playShackle(true);
+}
+
 export function updateTelegraphs(dt) {
+    updateBossShackle(dt);
+    updateBossFields(dt);
     const { telegraphs } = state;
     for (let i = telegraphs.length - 1; i >= 0; i--) {
         const t = telegraphs[i];

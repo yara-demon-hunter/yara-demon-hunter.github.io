@@ -38,7 +38,10 @@ export const BOSS_PALETTES = {
         eye: '#c084fc',
         eyeGlow: 'rgba(192, 132, 252, 0.95)',
         teeth: '#e9d5ff',
-        aura: '#4c1d95'
+        aura: '#4c1d95',
+        // A bola que carrega na mão: roxa, da cor da bola que ele lança (o padrão do Demon Lord é fogo vermelho e laranja)
+        fire: { core: '#f3e8ff', inner: '#c084fc', mid: '#7c3aed', outer: '#4c1d95' },
+        fireGlow: 'rgba(124, 58, 237, 0.7)'
     }
 };
 

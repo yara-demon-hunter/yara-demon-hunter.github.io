@@ -243,6 +243,8 @@ export function resetFieldForNewTurn() {
     state.goldDrops.length = 0;
     state.pickups.length = 0;
     state.telegraphs.length = 0;
+    state.bossFx = state.bossZone = state.bossShackle = null;
+    player.shackledTimer = 0;
     state.groundFires.length = 0;
     state.lightning.length = 0;
     state.bolts.length = 0;

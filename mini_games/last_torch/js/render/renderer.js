@@ -37,7 +37,7 @@ import {
 import { renderReflectWard } from './reflect.js';
 import { renderGuardianWard, renderSnares } from './druid.js';
 import { renderLightFront, renderLightGround } from './light.js';
-import { renderCastShadows, renderTorchLight, renderVignette } from './atmosphere.js';
+import { renderBossFx, renderCastShadows, renderTorchLight, renderVignette } from './atmosphere.js';
 import { renderNatureBehindCore, renderNatureFront, renderNatureGround, renderRoots, renderSpiritWolves } from './nature.js';
 import { renderShadowClone } from './shadow_clone.js';
 import { getHeroGear, getOathPalette } from './hero_gear.js';
@@ -219,6 +219,7 @@ export function render() {
     renderShockwaves();
     renderSceneryAmbient();
     renderSceneryOverlay();
+    renderBossFx();
     renderVignette();
     renderDawn();
     renderClearWave();

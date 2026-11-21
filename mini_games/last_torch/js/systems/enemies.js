@@ -567,7 +567,7 @@ export function updateEnemies(dt) {
         }
 
         // Shadow Shackle: vale por último para desfazer tudo que tentou mover o monstro (passos, empurrões, Rift, separação)
-        if (e.chained) {
+        if (e.chained || e.holdStill > 0) {
             e.x = e.chainX;
             e.y = e.chainY;
             e.vx = 0;

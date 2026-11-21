@@ -114,8 +114,8 @@ export const HUNTER = {
         patterns: ['volley', 'slam', 'columns'],
         phases: [
             { at: 1, patterns: ['volley', 'slam', 'columns', 'volley'] },
-            { at: 0.66, label: 'HOLY GROUND', patterns: ['volley', 'lunge', 'slam', 'columns', 'traps'] },
-            { at: 0.33, label: 'FULL POWER', patterns: ['traps', 'columns', 'shadows', 'lunge', 'slam', 'ring', 'volley'] }
+            { at: 0.66, label: 'HOLY GROUND', patterns: ['volley', 'lunge', 'shackle', 'slam', 'columns'] },
+            { at: 0.33, label: 'FULL POWER', patterns: ['columns', 'shackle', 'shadows', 'lunge', 'slam', 'ring', 'volley'] }
         ],
         ringCount: 14,
         slamCount: 3,

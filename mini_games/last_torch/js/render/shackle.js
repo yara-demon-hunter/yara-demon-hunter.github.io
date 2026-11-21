@@ -5,6 +5,8 @@ import { renderNow } from '../../library/core/clock.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { makeCanvas } from './fx/sprites.js';
 
+const BOSS_SHACKLE_HOLD = 1.5;      // o mesmo de BOSS_SHACKLE em js/systems/boss_ai.js
+
 // --- CORRENTE ---
 // Shadow Shackle: a corrente sai do herói, voa até o monstro e o prende a estacas no chão. Cada elo é um drawImage
 // de um sprite pronto (de frente e de lado, alternados), como as outras artes que aparecem em campo.
@@ -122,9 +124,9 @@ function stakePoint(e, i) {
 }
 
 // Monstro preso: estacas no chão e uma corrente de cada estaca até ele
-function drawHold(e, age) {
+function drawHold(e, age, holdSeconds = SHADOW_SHACKLE.holdSeconds) {
     const S = prepareShackle();
-    const left = SHADOW_SHACKLE.holdSeconds - age;
+    const left = holdSeconds - age;
     // Crava de uma vez ao prender; no fim pisca, avisando que vai soltar
     const grow = Math.min(1, age / 0.14);
     const blink = left < V.fadeSeconds ? 0.55 + 0.45 * Math.sin(age * 22) : 1;
@@ -148,7 +150,31 @@ function drawHold(e, age) {
     ctx.restore();
 }
 
+// Corrente do Demon Hunter no herói: sai da mão dele, voa até o herói e o prende a estacas no chão
+function renderBossShackle() {
+    const s = state.bossShackle;
+    if (!s) return;
+    const target = { x: player.x, y: player.y, radius: 18 };
+    if (s.held) {
+        drawHold(target, s.age, BOSS_SHACKLE_HOLD);
+        return;
+    }
+    const b = s.boss;
+    const fromX = b.x;
+    const fromY = b.y - 14;
+    const dist = Math.hypot(player.x - fromX, player.y - fromY) || 1;
+    const k = Math.min(1, s.reach / dist);
+    const tipX = fromX + (player.x - fromX) * k;
+    const tipY = fromY + (player.y - fromY) * k;
+    drawChain(fromX, fromY, tipX, tipY, s.reach * V.sag * (1 - k), 1);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    drawGlow(ctx, V.glowHot, tipX, tipY, 13, 0.9);
+    ctx.restore();
+}
+
 export function renderShackle() {
+    renderBossShackle();
     const s = state.shackle;
     if (!s) return;
     const e = s.target;

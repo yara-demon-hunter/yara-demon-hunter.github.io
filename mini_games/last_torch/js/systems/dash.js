@@ -58,12 +58,13 @@ function isNearMiss() {
 export function tryDash() {
     if (beamActive()) return false;         // Lord's Decree: plantado e invulnerável, só mira (nada de dash)
     if (state.gameState !== 'PLAYING' || (state.phase !== 'HUNT' && state.phase !== 'CLEAR')) return;
-    if (player.dashCharges <= 0 || player.dashTimer > 0 || isFireCasting()) return;
+    if (player.dashCharges <= 0 || player.dashTimer > 0 || isFireCasting() || player.shackledTimer > 0) return;
 
     const dir = getDashDirection();
     player.dashCharges--;
     if (player.dashRecharge <= 0) player.dashRecharge = getDashCooldown();
     player.dashTimer = getDashSeconds();
+    player.lastDashAt = performance.now();         // o Espelho do Azael imita o último movimento do herói
     player.dashX = dir.x;
     player.dashY = dir.y;
     player.dashStruck = null;

@@ -137,3 +137,28 @@ export function renderVignette() {
     ctx.drawImage(vignette, 0, 0, w, h);
     ctx.restore();
 }
+
+
+// Névoa de Sangue e Escuridão (golpes de variação dos bosses, js/systems/boss_ai.js): um véu sobre o jogo, sem estado próprio
+export function renderBossFx() {
+    const fx = state.bossFx;
+    if (!fx) return;
+    const k = Math.max(0, Math.min(1, fx.age / 0.5, (fx.seconds - fx.age) / 0.5));       // entra e sai devagar
+    // Em coordenadas do mundo (a câmera do jogo está ativa neste ponto do quadro); o retângulo é maior que qualquer tela
+    const big = 6000;
+    ctx.save();
+    if (fx.kind === 'fog') {
+        ctx.globalAlpha = 0.32 * k;
+        ctx.fillStyle = '#7f1d1d';
+        ctx.fillRect(-big, -big, big * 2, big * 2);
+        ctx.restore();
+        return;
+    }
+    // Escuridão: só um círculo em volta da tocha continua claro (a luz encolhida)
+    const grad = ctx.createRadialGradient(state.coreX, state.coreY, 70, state.coreX, state.coreY, 210);
+    grad.addColorStop(0, 'rgba(3, 0, 12, 0)');
+    grad.addColorStop(1, `rgba(3, 0, 12, ${0.88 * k})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(-big, -big, big * 2, big * 2);
+    ctx.restore();
+}

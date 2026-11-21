@@ -125,6 +125,8 @@ function beginClear() {
     state.goldVacuum = true;
     state.enemyProjectiles.length = 0;
     state.telegraphs.length = 0;
+    state.bossFx = state.bossZone = state.bossShackle = null;
+    player.shackledTimer = 0;
     state.streakTimer = Math.max(state.streakTimer, NIGHT.clearSeconds);
 
     screenFlash('#fed7aa', 0.5);
@@ -179,6 +181,8 @@ export function onBossKilled(e, model) {
         purgeMonsters();
         state.enemyProjectiles.length = 0;
         state.telegraphs.length = 0;
+    state.bossFx = state.bossZone = state.bossShackle = null;
+    player.shackledTimer = 0;
         setTimeout(() => whenHunting(() => playDuelDialogue(e.type, 'after', afterBoss)), DUEL_DIALOGUE_DELAY_MS);
         return;
     }
@@ -197,6 +201,8 @@ function afterBoss() {
     // ninguém precisa caçar os últimos nem esperar mais nenhum nascer. Sem ouro nem XP por eles (o prêmio foi o boss).
     state.enemyProjectiles.length = 0;
     state.telegraphs.length = 0;
+    state.bossFx = state.bossZone = state.bossShackle = null;
+    player.shackledTimer = 0;
     purgeMonsters();
     beginClear();
 }
@@ -225,6 +231,8 @@ function beginDawn() {
     state.goldVacuum = true;
     state.enemyProjectiles.length = 0;
     state.telegraphs.length = 0;
+    state.bossFx = state.bossZone = state.bossShackle = null;
+    player.shackledTimer = 0;
     showBanner('', 'DAWN', 'The torch survived the night', 'gold');
     audio.setMood('dawn');
 }

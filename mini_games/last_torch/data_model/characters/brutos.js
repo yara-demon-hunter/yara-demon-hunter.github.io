@@ -142,10 +142,13 @@ export const BRUTOS = {
         lungeWindupSeconds: 0.8,     // aviso longo do dash
         lungeHitRadius: 34,
         lungeDamageMultiplier: 1.3,
-        quakeRadius: 110,
+        quakeRadius: 132,        // 110 +20%
         quakeDelaySeconds: 0.9,
         quakeDamageMultiplier: 1.4,
         quakeTorchDamage: 8,
+        // Passiva Escudo Refletor: a lâmina arremessada que o acerta volta contra o herói (sem ferir o boss). Recarga entre devoluções:
+        // no meio tempo as lâminas acertam normalmente, então dá para vencer o escudo com ritmo ou golpes de perto
+        reflect: { cooldownSeconds: 1.6, damageMultiplier: 0.8, speedMultiplier: 1.1 },
         patternGapSeconds: 2.4,
         patterns: ['quake', 'lunge', 'quake', 'stomp'],
         phases: [

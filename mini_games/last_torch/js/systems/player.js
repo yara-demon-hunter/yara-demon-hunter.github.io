@@ -150,7 +150,10 @@ export function updatePlayer(dt) {
 
     const joyMag = Math.hypot(joystick.x, joystick.y);
 
-    if (player.dashTimer > 0) {
+    if (player.shackledTimer > 0) {
+        // Preso pela corrente do Demon Hunter: não anda nem dá dash (o golpe e o arremesso continuam)
+        player.dashTimer = 0;
+    } else if (player.dashTimer > 0) {
         moveDash(dt);
     } else if (isFireCasting() || beamActive()) {
         // Conjurando a bola de fogo: fica plantado; o destino continua valendo para depois

@@ -63,3 +63,16 @@
 .sb-speed-info { display: flex; align-items: center; gap: 8px; margin-top: 5px; color: #94a3b8; flex-wrap: wrap; }
 .sb-speed-info label { display: flex; align-items: center; gap: 4px; }
 .sb-speed-times { margin-top: 5px; color: #86efac; font-size: 11px; max-width: 340px; }
+
+/* Aba Boss moves: barra de golpes sobre o jogo */
+#sbMovesBar {
+    position: fixed; left: 8px; right: 8px; bottom: 44px; z-index: 9999; padding: 8px; border-radius: 10px; background: rgba(2, 6, 23, .88);
+    border: 1px solid #334155; font: 600 12px/1.2 Inter, sans-serif; color: #e2e8f0;
+}
+#sbMovesBar.hidden { display: none; }
+.sb-moves-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.sb-moves-head span { flex: 1; color: #86efac; }
+#sbMovesBar button {
+    padding: 8px 12px; border-radius: 6px; border: 1px solid #334155; background: #111a2e; color: #cbd5e1; cursor: pointer; font: inherit;
+}
+#sbMovesBar .sb-row button:active { background: #7f1d1d; border-color: #ef4444; }

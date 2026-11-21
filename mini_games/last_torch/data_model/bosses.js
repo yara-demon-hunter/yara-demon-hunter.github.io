@@ -12,6 +12,8 @@ import { RIVAL_OF, bossModelOf } from './characters/index.js';
 // herói faz de fato (já descontando o tempo desviando): Demon Lord ~1 min (35/s), Blood Countess ~2 min (70/s),
 // The Long Night ~5 min (100/s). Mudou o ritmo do herói? Ajuste o hpBase na mesma proporção.
 
+// Golpes tirados de campo (ajuste de nov/2026): bloom (Condessa, Long Night), mark (Azael) e traps (Demon Hunter) saíram das listas de
+// patterns. O código deles continua em js/systems/boss_ai.js; para devolver, é só pôr o nome de volta na lista.
 // --- RIVAL (primeiro boss da noite) ---
 // Na primeira hora da noite (BOSS_SPAWNING.schedule) o herói enfrenta o outro herói jogável: quem joga
 // com o Demon Hunter luta com o Azael, e quem joga com o Azael luta com o Demon Hunter (ver chooseBossType).
@@ -129,8 +131,8 @@ export const BOSS_MODELS = {
         patterns: ['blink', 'volley', 'spiral', 'blink', 'ring', 'summon'],
         phases: [
             { at: 1, patterns: ['blink', 'volley', 'spiral', 'summon'] },
-            { at: 0.66, label: 'BLOOD BLOOM', patterns: ['blink', 'bloom', 'volley', 'spiral', 'summon'] },
-            { at: 0.33, label: 'CRIMSON TIDE', patterns: ['blink', 'bloom', 'spiral', 'ring', 'bloom', 'summon', 'volley'] }
+            { at: 0.66, label: 'BLOOD BLOOM', patterns: ['blink', 'volley', 'spiral', 'summon'] },
+            { at: 0.33, label: 'CRIMSON TIDE', patterns: ['blink', 'spiral', 'ring', 'summon', 'volley'] }
         ],
         ringCount: 18,
         spiralShots: 18,
@@ -180,8 +182,8 @@ export const BOSS_MODELS = {
         patterns: ['ring', 'slam', 'spiral', 'volley', 'summon', 'slam', 'ring', 'blink'],
         phases: [
             { at: 1, patterns: ['ring', 'slam', 'spiral', 'volley', 'summon', 'blink'] },
-            { at: 0.66, label: 'ECLIPSE', patterns: ['eclipse', 'slam', 'spiral', 'bloom', 'summon', 'blink', 'ring'] },
-            { at: 0.33, label: 'THE DARK ITSELF', patterns: ['eclipse', 'bloom', 'spiral', 'eclipse', 'slam', 'summon', 'ring', 'blink'] }
+            { at: 0.66, label: 'ECLIPSE', patterns: ['eclipse', 'slam', 'spiral', 'summon', 'blink', 'ring'] },
+            { at: 0.33, label: 'THE DARK ITSELF', patterns: ['eclipse', 'spiral', 'eclipse', 'slam', 'summon', 'ring', 'blink'] }
         ],
         ringCount: 18,
         slamCount: 5,
@@ -219,21 +221,21 @@ function rematch(key, changes) {
 rematch('AZAEL', {
     hpBase: 6000, patternGapSeconds: 1.4, burstCount: 5, ringCount: 16, meleeCooldownSeconds: 0.6,
     // Revanche: já começa com o kit completo e ainda ganha fases
-    patterns: ['lunge', 'combo', 'mark', 'volley', 'blink'],
+    patterns: ['lunge', 'combo', 'volley', 'blink'],
     phases: [
-        { at: 1, patterns: ['lunge', 'combo', 'mark', 'volley', 'blink'] },
-        { at: 0.66, label: 'SHADOW LEGION', patterns: ['lunge', 'combo', 'mark', 'shadows', 'blink', 'ring'] },
-        { at: 0.33, label: 'FULL POWER', patterns: ['combo', 'mark', 'shadows', 'blink', 'ring', 'combo', 'volley', 'lunge'] }
+        { at: 1, patterns: ['lunge', 'combo', 'volley', 'blink'] },
+        { at: 0.66, label: 'SHADOW LEGION', patterns: ['lunge', 'combo', 'shadows', 'blink', 'ring'] },
+        { at: 0.33, label: 'FULL POWER', patterns: ['combo', 'shadows', 'blink', 'ring', 'combo', 'volley', 'lunge'] }
     ],
     scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
 });
 rematch('DEMON_HUNTER', {
     hpBase: 6000, patternGapSeconds: 1.6, burstCount: 6, ringCount: 18, slamCount: 5, meleeCooldownSeconds: 0.8,
-    patterns: ['volley', 'lunge', 'traps', 'columns', 'slam'],
+    patterns: ['volley', 'lunge', 'columns', 'slam'],
     phases: [
-        { at: 1, patterns: ['volley', 'lunge', 'traps', 'columns', 'slam'] },
-        { at: 0.66, label: 'HOLY WRATH', patterns: ['volley', 'lunge', 'traps', 'columns', 'shadows', 'slam', 'ring'] },
-        { at: 0.33, label: 'FULL POWER', patterns: ['traps', 'columns', 'shadows', 'lunge', 'slam', 'ring', 'volley', 'traps'] }
+        { at: 1, patterns: ['volley', 'lunge', 'columns', 'slam'] },
+        { at: 0.66, label: 'HOLY WRATH', patterns: ['volley', 'lunge', 'shackle', 'columns', 'shadows', 'slam', 'ring'] },
+        { at: 0.33, label: 'FULL POWER', patterns: ['columns', 'shackle', 'shadows', 'lunge', 'slam', 'ring', 'volley'] }
     ],
     scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
 });
@@ -342,4 +344,34 @@ export function createBoss(type, turn, x, y, random = Math.random) {
         isBoss: true,
         name: model.name
     };
+}
+
+
+// --- GOLPES DE VARIAÇÃO (nov/2026) ---
+// Golpes que não deixam a luta mais difícil, só mais variada: pausas em que o boss fica aberto, golpes que mudam o espaço e golpes
+// que respondem às skills do herói (o código de cada um está em js/systems/boss_ai.js). Entram nas fases depois da primeira (e na
+// lista simples dos bosses sem fases). O Cansaço ('rest') entra em todas as listas de todos os bosses.
+const VARIATION_MOVES = {
+    // 'fireshield' (Escudo de Fogo do Demon Lord) saiu das listas; o código continua em boss_ai.js
+    DEMON_LORD: [],
+    BRUTOS: ['anchor'],
+    BLOOD_COUNTESS: ['bloodfog', 'mirror'],
+    LONG_NIGHT: ['darkness'],
+    DEMON_HUNTER: ['mirror'],               // 'holyground' (Chão Sagrado) saiu das listas; o código continua em boss_ai.js
+    DEMON_HUNTER_FINAL: ['mirror'],
+    // 'echo' (Espelho do Azael) saiu das listas; o código continua em boss_ai.js
+};
+// O Cansaço ('rest') saiu de todos os bosses (nov/2026); o código continua em boss_ai.js. Para devolver: trocar por new Set() e
+// reativar a linha que o adiciona abaixo
+const NO_REST = new Set(Object.keys(BOSS_MODELS));
+for (const [type, model] of Object.entries(BOSS_MODELS)) {
+    if (model.isShadow) continue;
+    const special = VARIATION_MOVES[type] ?? [];
+    const lists = model.phases
+        ? model.phases.map(ph => ({ list: ph.patterns, first: ph.at >= 1 }))
+        : [{ list: model.patterns, first: false }];
+    for (const { list, first } of lists) {
+        if (!NO_REST.has(type) && !list.includes('rest')) list.push('rest');
+        if (!first) special.forEach(m => { if (!list.includes(m)) list.push(m); });
+    }
 }

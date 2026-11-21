@@ -5,7 +5,8 @@ import { getThrownWeapon } from '../../library/weapons/thrown.js';
 import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, joystick, passives, player, powers, state } from '../core/state.js';
 import { dealDamage } from './damage.js';
-import { createExplosion } from './effects.js';
+import { BOSS_MODELS } from '../../data_model/bosses.js';
+import { addShockwave, createExplosion } from './effects.js';
 import { mod } from './modifiers.js';
 import { burstFireball } from './skills_flame.js';
 import { markEnemy } from './skills_shadow.js';
@@ -214,6 +215,25 @@ function bounceKnife(k, hit) {
     return true;
 }
 
+// Boss com a passiva de devolver projétil (Brutos, model.reflect): a lâmina volta contra o herói, com recarga entre uma devolução e outra
+function reflectKnife(k, boss) {
+    // Passiva do modelo (Brutos) ou o golpe 'mirror' (Condessa, Demon Hunter): durante 2,5 s toda lâmina volta
+    const R = boss.isBoss ? (BOSS_MODELS[boss.type]?.reflect ?? (boss.reflectTimer > 0 ? { cooldownSeconds: 0.3, damageMultiplier: 0.7, speedMultiplier: 0.9 } : null)) : null;
+    if (!R || state.runTime - (boss.lastReflect ?? -99) < R.cooldownSeconds) return false;
+    boss.lastReflect = state.runTime;
+    const angle = Math.atan2(player.y - k.y, player.x - k.x);
+    const speed = k.speed * R.speedMultiplier;
+    state.enemyProjectiles.push({
+        owner: boss.type, color: BOSS_MODELS[boss.type].color, range: 0, travelled: 0,
+        x: k.x, y: k.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        radius: 7, damage: boss.damage * R.damageMultiplier, torchDamage: 0
+    });
+    addShockwave(boss.x, boss.y, { radius: boss.radius * 1.8, color: '#fde047', width: 5, seconds: 0.3 });
+    createExplosion(k.x, k.y, '#fde047', 8);
+    audio.playHit(1);
+    return true;
+}
+
 export function updateKnives(dt) {
     state.knifeTimer = Math.max(0, state.knifeTimer - dt);
 
@@ -259,6 +279,10 @@ export function updateKnives(dt) {
 
         const hit = enemies.find(e => e.hp > 0 && !k.struck?.has(e)
             && Math.hypot(e.x - k.x, e.y - k.y) < e.radius + KNIFE_SKILL.radius * k.scale);
+        if (hit && reflectKnife(k, hit)) {
+            knives.splice(i, 1);
+            continue;
+        }
         if (hit) {
             dealDamage(hit, k.damage, { style: k.fire || k.magic ? 'spell' : null, kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
             markEnemy(hit);

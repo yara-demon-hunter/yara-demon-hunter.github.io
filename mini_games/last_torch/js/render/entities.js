@@ -220,6 +220,19 @@ export function renderEnemyProjectiles() {
 
 // Corpo procedural: só bosses, que são poucos e têm animações de ataque próprias
 function drawBoss(e) {
+    // Névoa de Sangue: enquanto dura, o boss que a lançou fica quase invisível
+    if (state.bossFx?.kind === 'fog' && state.bossFx.boss === e) {
+        const k = Math.min(1, state.bossFx.age / 0.4, (state.bossFx.seconds - state.bossFx.age) / 0.4);
+        ctx.save();
+        ctx.globalAlpha = 1 - 0.75 * Math.max(0, k);
+        drawBossArt(e);
+        ctx.restore();
+        return;
+    }
+    drawBossArt(e);
+}
+
+function drawBossArt(e) {
     const model = BOSS_MODELS[e.type];
     if (model.renderAs === 'RIVAL') renderRival(e);
     else if (USE_25D) withBossPalette25D(model.renderAs, model.palette, e);
@@ -505,6 +518,18 @@ function renderEnemyOverlays(t) {
         if (e.isBoss && e.tellRatio > 0) {
             // O boss carrega o tiro: o brilho cresce e fica mais forte até disparar
             drawGlow(ctx, e.color, e.x, e.y, e.radius * (1.3 + e.tellRatio * 1.1), 0.25 + e.tellRatio * 0.6);
+        }
+        if (e.isBoss) {
+            ctx.globalCompositeOperation = 'lighter';
+            if (e.fireShield > 0) {
+                // Escudo de Fogo: chamas pulsando em volta do boss
+                const pulse = 0.75 + 0.25 * Math.sin(t * 14);
+                drawGlow(ctx, '#f97316', e.x, e.y, e.radius * 2.1 * pulse, 0.9);
+                drawGlow(ctx, '#fde047', e.x, e.y, e.radius * 1.3, 0.6);
+            }
+            if (e.reflectTimer > 0) drawGlow(ctx, '#fde68a', e.x, e.y, e.radius * 1.9, 0.55 + 0.25 * Math.sin(t * 10));
+            if (e.tired > 0) drawGlow(ctx, '#fde047', e.x, e.y, e.radius * (1.2 + 0.25 * Math.sin(t * 5)), 0.3);
+            ctx.globalCompositeOperation = 'source-over';
         }
         if (!e.isBoss) {
             if (e.type === 'WITCH' || e.type === 'NECROMANCER') {
