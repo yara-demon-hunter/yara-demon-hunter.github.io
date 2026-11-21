@@ -23,7 +23,7 @@ import { createRandom } from '../core/random.js';
 //   animadas:     frames (lista por detalhe: menos quadros = atlas menor), variants, size (entra no desenho e na célula: o
 //                 atlas nasce nítido), cycleSeconds (duração do balanço ou do pulso)
 //
-// OBJETOS COLOCADOS À MÃO (editor: tools/scenery_editor.html): `visual.placed` é uma lista de { prop, x, y, seed, scale?, flip?, rot? (graus, só estáticas) }, com x e y em
+// OBJETOS COLOCADOS À MÃO (editor: tools/scenery_editor.html): `visual.placed` é uma lista de { prop, x, y, seed, scale?, flip?, rot? (graus, só estáticas), front? (estática na frente das animadas) }, com x e y em
 // FRAÇÃO do mundo (0 a 1: valem em qualquer tela). Entram depois da receita; as estáticas são pintadas no chão e as animadas viram atlas
 // (um por peça; parâmetros em `prop.anim` ou PLACED_ANIM). `visual.placedPalette[<id da peça>]` troca a paleta dos colocados.
 //
@@ -95,7 +95,7 @@ export function composeScenery({ id, name, visual, paintBase }) {
         // Se vieram da receita (from), levam a paleta da entrada e os atributos sorteados (attrs); senão, uma aparência pela seed.
         (visual.placed ?? []).forEach(pl => {
             const prop = getProp(pl.prop);
-            if (prop.kind !== 'static') return;
+            if (prop.kind !== 'static' || pl.front) return;          // `front`: vai para a camada da frente (buildSway)
             const p = { ...prop.visual, ...(pl.from !== undefined ? visual.props[pl.from]?.palette : null), ...visual.placedPalette?.[pl.prop] };
             const x = pl.x * w;
             const y = pl.y * h;
@@ -153,38 +153,55 @@ export function composeScenery({ id, name, visual, paintBase }) {
             }
         });
         if (state.capture) return { items, bytes };
-        // Colocadas à mão (animadas): um atlas por peça (e por entrada da receita de onde vieram), uma posição por objeto
-        const groups = new Map();
-        (visual.placed ?? []).forEach(pl => {
-            if (getProp(pl.prop).kind !== 'animated') return;
-            const key = `${pl.prop}#${pl.from ?? ''}`;
-            groups.set(key, [...(groups.get(key) ?? []), pl]);
-        });
+        // Colocadas à mão, na ORDEM da lista (a ordem é a sobreposição: o último fica na frente). Vão para a camada das peças animadas:
+        //  - animadas: um atlas por peça (e por entrada da receita de onde vieram), uma posição por objeto;
+        //  - estáticas com `front: true`: viram um sprite de um quadro só, para poderem ficar NA FRENTE de casas e braseiros (as estáticas
+        //    normais são pintadas no chão, que fica sempre atrás das animadas).
+        const sheets = new Map();
         let g2 = 0;
-        groups.forEach((list) => {
-            const first = list[0];
-            const prop = getProp(first.prop);
-            const entry = first.from !== undefined ? visual.props[first.from] : null;
-            const a = entry
-                ? { frames: entry.frames, size: entry.size ?? 1, cycleSeconds: entry.cycleSeconds, variants: entry.variants ?? prop.variants }
-                : { ...PLACED_ANIM, variants: prop.variants, ...prop.anim };
-            const p = { ...prop.visual, ...entry?.palette, ...(entry ? null : visual.placedPalette?.[first.prop]) };
-            const sheet = buildSpriteSheet({
-                cell: [prop.cell[0] * a.size, prop.cell[1] * a.size], anchor: prop.anchor, frames: perQuality(a.frames, quality),
-                variants: a.variants, res: env.res, seed: visual.seed + 9000 + g2++ * 977,
-                paint: (g, r, phase) => {
-                    g.scale(a.size, a.size);
-                    prop.paint(g, r, phase, p);
-                }
-            });
-            bytes += sheet.bytes;
-            list.forEach(pl => {
-                const x = pl.x * w;
-                const y = pl.y * h;
-                items.push({
-                    sheet, x, y, variant: Math.abs(pl.variant ?? pl.seed ?? 0) % a.variants, scale: pl.scale ?? 1, cycle: a.cycleSeconds,
-                    offset: (x * visual.windWaveLength + y * visual.windWaveLength * 0.4) / TAU + (pl.phase ?? 0)
+        (visual.placed ?? []).forEach(pl => {
+            const prop = getProp(pl.prop);
+            if (prop.kind === 'static') {
+                if (!pl.front) return;
+                const p = { ...prop.visual, ...(pl.from !== undefined ? visual.props[pl.from]?.palette : null), ...visual.placedPalette?.[pl.prop] };
+                const s = pl.scale ?? 1;
+                const half = (prop.previewSize ?? 40) * 0.75 * s + 16;            // cabe a peça girada em qualquer ângulo
+                const sheet = buildSpriteSheet({
+                    cell: [half * 2, half * 2], anchor: [0.5, 0.5], frames: 1, variants: 1, res: env.res, seed: visual.seed + 12000 + g2++ * 977,
+                    paint: (g) => {
+                        if (pl.rot) g.rotate(pl.rot * Math.PI / 180);
+                        g.scale((pl.flip ? -1 : 1) * s, s);
+                        prop.draw(g, 0, 0, pl.attrs ?? prop.roll(createRandom(pl.seed ?? 1), p), p);
+                    }
                 });
+                bytes += sheet.bytes;
+                items.push({ sheet, x: pl.x * w, y: pl.y * h, variant: 0, scale: 1, cycle: 1, offset: 0 });
+                return;
+            }
+            const key = `${pl.prop}#${pl.from ?? ''}`;
+            if (!sheets.has(key)) {
+                const entry = pl.from !== undefined ? visual.props[pl.from] : null;
+                const a = entry
+                    ? { frames: entry.frames, size: entry.size ?? 1, cycleSeconds: entry.cycleSeconds, variants: entry.variants ?? prop.variants }
+                    : { ...PLACED_ANIM, variants: prop.variants, ...prop.anim };
+                const p = { ...prop.visual, ...entry?.palette, ...(entry ? null : visual.placedPalette?.[pl.prop]) };
+                const sheet = buildSpriteSheet({
+                    cell: [prop.cell[0] * a.size, prop.cell[1] * a.size], anchor: prop.anchor, frames: perQuality(a.frames, quality),
+                    variants: a.variants, res: env.res, seed: visual.seed + 9000 + g2++ * 977,
+                    paint: (g, r, phase) => {
+                        g.scale(a.size, a.size);
+                        prop.paint(g, r, phase, p);
+                    }
+                });
+                bytes += sheet.bytes;
+                sheets.set(key, { sheet, a });
+            }
+            const { sheet, a } = sheets.get(key);
+            const x = pl.x * w;
+            const y = pl.y * h;
+            items.push({
+                sheet, x, y, variant: Math.abs(pl.variant ?? pl.seed ?? 0) % a.variants, scale: pl.scale ?? 1, cycle: a.cycleSeconds,
+                offset: (x * visual.windWaveLength + y * visual.windWaveLength * 0.4) / TAU + (pl.phase ?? 0)
             });
         });
         return { items, bytes };

@@ -115,7 +115,10 @@
                 <code>ruby mini_games/_library/sync.rb</code>. Para trazer um layout de volta, cole aqui e use <b>Aplicar texto</b>.</p>
             <textarea id="out" placeholder="placed: [ ... ]"></textarea>
             <div class="btns"><button id="apply">Aplicar texto</button></div>
-            <p class="hint"><b>Teclas:</b> setas movem 1 px (Shift = 10) · <b>[</b> e <b>]</b> mudam o tamanho · <b>Q</b>/<b>E</b> giram 5° (Shift = 15°, só peças estáticas: cerca, laje, tábua...) · <b>F</b> espelha (estáticas) · <b>Ctrl+C</b>/<b>Ctrl+V</b> copia e cola o objeto onde o mouse está · <b>R</b> sorteia outra
+            <p class="hint"><b>Sobreposição:</b> as peças estáticas (poço, cerca, lápide, pedra...) são pintadas no chão e ficam <i>atrás</i> das animadas (casas, braseiros, junco).
+                Para uma estática ficar na frente de uma casa, marque <b>Na frente das casas e peças animadas</b> no objeto. Entre objetos da mesma camada, o último da lista
+                fica na frente: use os botões de <b>Ordem</b> (▲ ▼) ou PageUp/PageDown. A lista abaixo mostra ⬆ nos que estão na frente.</p>
+            <p class="hint"><b>Teclas:</b> setas movem 1 px (Shift = 10) · <b>[</b> e <b>]</b> mudam o tamanho · <b>Q</b>/<b>E</b> giram 5° (Shift = 15°, só peças estáticas: cerca, laje, tábua...) · <b>F</b> espelha (estáticas) · <b>Ctrl+C</b>/<b>Ctrl+V</b> copia e cola o objeto onde o mouse está · <b>PageUp</b>/<b>PageDown</b> sobem e descem na sobreposição (Shift = para a ponta) · <b>R</b> sorteia outra
                 aparência · <b>D</b> duplica · <b>Delete</b> apaga.</p>
         </aside>
     </div>
@@ -184,10 +187,16 @@
             const r = Math.max(12, Math.min(w, h) * (animated ? 0.5 : 0.38) * s);
             return { cx: pl.x * env.width, cy: pl.y * env.height - h * 0.25 * s * (up > 0.5 ? 1 : 0.4), r };
         }
+        // Camadas (o que o motor faz): as estáticas normais são pintadas no chão, ATRÁS das animadas (casas, braseiros...); as estáticas
+        // marcadas "na frente" e as animadas ficam na camada de cima. Dentro de uma camada, o último da lista fica na frente.
+        const layerOf = (pl) => (getProp(pl.prop).kind === 'animated' || pl.front ? 'top' : 'ground');
         function pickAt(x, y) {
-            for (let i = placed.length - 1; i >= 0; i--) {
-                const { cx, cy, r } = hitOf(placed[i]);
-                if (Math.hypot(x - cx, y - cy) <= r) return i;
+            for (const layer of ['top', 'ground']) {
+                for (let i = placed.length - 1; i >= 0; i--) {
+                    if (layerOf(placed[i]) !== layer) continue;
+                    const { cx, cy, r } = hitOf(placed[i]);
+                    if (Math.hypot(x - cx, y - cy) <= r) return i;
+                }
             }
             return -1;
         }
@@ -349,7 +358,7 @@
             placed.forEach((pl, i) => {
                 const d = document.createElement('div');
                 d.className = i === selected ? 'sel' : '';
-                d.innerHTML = `<span>${getProp(pl.prop).name}</span><span>${round(pl.x, 2)}, ${round(pl.y, 2)}</span>`;
+                d.innerHTML = `<span>${getProp(pl.prop).name}${pl.front ? ' ⬆' : ''}</span><span>${round(pl.x, 2)}, ${round(pl.y, 2)}</span>`;
                 d.onclick = () => { selected = i; renderSide(); };
                 list.appendChild(d);
             });
@@ -364,6 +373,10 @@
                     : '<p class="hint" style="margin:2px 0">Esta peça é animada (vem de um atlas de quadros): só as estáticas giram.</p>'}
                 <div class="row"><span>X</span><input id="sX" type="range" min="0" max="1" step="0.001" value="${pl.x}"><input id="sXN" type="number" min="0" max="1" step="0.001" value="${round(pl.x)}"></div>
                 <div class="row"><span>Y</span><input id="sY" type="range" min="0" max="1" step="0.001" value="${pl.y}"><input id="sYN" type="number" min="0" max="1" step="0.001" value="${round(pl.y)}"></div>
+                ${prop.kind === 'static' ? `<label class="check" title="As peças estáticas ficam no chão, atrás de casas e braseiros. Marque para esta ficar NA FRENTE deles."><input id="sFront" type="checkbox" ${pl.front ? 'checked' : ''}> Na frente das casas e peças animadas</label>` : '<p class="hint" style="margin:2px 0">Esta peça animada fica sempre acima das estáticas que estão no chão.</p>'}
+                <div class="row" style="grid-template-columns:70px 1fr"><span>Ordem</span><span class="btns" style="margin:0">
+                    <button id="oFront" title="Para a frente de tudo da mesma camada (Shift+PageUp)">⤒</button><button id="oUp" title="Sobe um (PageUp)">▲ frente</button><button id="oDown" title="Desce um (PageDown)">▼ trás</button><button id="oBack" title="Para trás de tudo da mesma camada (Shift+PageDown)">⤓</button>
+                </span></div>
                 <div class="btns">
                     ${prop.kind === 'static' ? `<label class="check"><input id="sFlip" type="checkbox" ${pl.flip ? 'checked' : ''}> espelhar</label>` : ''}
                     <button id="sSeed">🎲 outra aparência</button><button id="sDup">Duplicar</button><button id="sDel">Apagar</button>
@@ -378,6 +391,18 @@
             bind('sX', 'sXN', 'x');
             bind('sY', 'sYN', 'y');
             if ($('sFlip')) $('sFlip').onchange = (e) => set('flip', e.target.checked || undefined, true);
+            if ($('sFront')) $('sFront').onchange = (e) => {
+                snapshot();
+                const pl2 = placed[selected];
+                if (e.target.checked) { pl2.front = true; placed.push(placed.splice(selected, 1)[0]); selected = placed.length - 1; }   // entra no topo da camada da frente
+                else delete pl2.front;
+                commit();
+                status(e.target.checked ? 'Agora está na frente das casas e peças animadas (no topo).' : 'Voltou para o chão, atrás das peças animadas.');
+            };
+            $('oFront').onclick = () => moveOrder(1, true);
+            $('oUp').onclick = () => moveOrder(1, false);
+            $('oDown').onclick = () => moveOrder(-1, false);
+            $('oBack').onclick = () => moveOrder(-1, true);
             $('sSeed').onclick = reroll;
             $('sDup').onclick = duplicate;
             $('sDel').onclick = remove;
@@ -490,6 +515,24 @@
             selected = placed.length - 1;
             commit();
         }
+        // Ordem de sobreposição: troca de lugar na lista com o vizinho da MESMA camada (ou vai para a ponta). O último fica na frente.
+        function moveOrder(dir, toEnd) {
+            if (selected < 0) return;
+            const layer = layerOf(placed[selected]);
+            let target = -1;
+            if (toEnd) {
+                for (let j = dir > 0 ? placed.length - 1 : 0; dir > 0 ? j > selected : j < selected; j -= dir) if (layerOf(placed[j]) === layer) { target = j; break; }
+            } else {
+                for (let j = selected + dir; j >= 0 && j < placed.length; j += dir) if (layerOf(placed[j]) === layer) { target = j; break; }
+            }
+            if (target < 0) { status(dir > 0 ? 'Já está na frente de tudo da camada.' : 'Já está atrás de tudo da camada.'); return; }
+            snapshot();
+            const [item] = placed.splice(selected, 1);
+            placed.splice(target, 0, item);
+            selected = target;
+            commit(false);
+            status(toEnd ? (dir > 0 ? 'Na frente de tudo da camada.' : 'Atrás de tudo da camada.') : (dir > 0 ? 'Subiu um (mais na frente).' : 'Desceu um (mais atrás).'));
+        }
         function undo() {
             const last = history.pop();
             if (!last) return;
@@ -565,6 +608,9 @@
                 pl.x = round(Math.max(0, Math.min(1, pl.x + move[0] / env.width)));
                 pl.y = round(Math.max(0, Math.min(1, pl.y + move[1] / env.height)));
                 commit(false);
+            } else if (e.key === 'PageUp' || e.key === 'PageDown') {
+                e.preventDefault();
+                moveOrder(e.key === 'PageUp' ? 1 : -1, e.shiftKey);
             } else if ((e.key.toLowerCase() === 'q' || e.key.toLowerCase() === 'e') && getProp(pl.prop).kind === 'static') {
                 snapshot();
                 const turn = (e.shiftKey ? 15 : 5) * (e.key.toLowerCase() === 'e' ? 1 : -1);
@@ -591,6 +637,7 @@
                 if (p.phase !== undefined) parts.push(`phase: ${p.phase}`);
                 if (p.scale && p.scale !== 1) parts.push(`scale: ${round(p.scale, 3)}`);
                 if (p.rot) parts.push(`rot: ${round(p.rot, 1)}`);
+                if (p.front) parts.push('front: true');
                 if (p.flip) parts.push('flip: true');
                 return `        { ${parts.join(', ')} }`;
             });

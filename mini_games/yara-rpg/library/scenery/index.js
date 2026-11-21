@@ -6,7 +6,6 @@ import './layouts/index.js';
 // por id com createScenery(id). Cenário novo: uma linha aqui.
 import './dark_forest/dark_forest.js';
 import './dark_forest_2/dark_forest_2.js';
-import './dark_forest_3/dark_forest_3.js';
 import './river_crossing/river_crossing.js';
 import './swamp/swamp.js';
 import './village_gate/village_gate.js';
