@@ -294,7 +294,8 @@ function buildPose(t, body) {
     const lean = V.runLean * run + (throwK >= 0 ? hooks.throwVisual.throwLean * Math.sin(Math.PI * throwK) : 0) + stance.lean;
     const breath = Math.sin((t / H.breathPeriodSeconds) * Math.PI * 2) * V.breathAmount * (1 - run);
     // Alguns bonecos sobem e descem no ritmo da corrida (runBob)
-    const bob = B?.runBob ? B.runBob(anim, run) : 0;
+    // Os demais sobem um pouco a cada passada (um pico por passo: o ritmo das pernas), para o corpo ter peso
+    const bob = B?.runBob ? B.runBob(anim, run) : (0.5 - 0.5 * Math.cos(anim.stride * 2)) * 0.6 * run;
     const pose = {
         ...stance,
         t,

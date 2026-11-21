@@ -3,7 +3,7 @@ import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
 import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
 import { audio, player, powers, state } from '../core/state.js';
 import { syncBossBar } from '../ui/hud.js';
-import { addDamageNumber, addShockwave, createExplosion, shakeScreen } from './effects.js';
+import { addDamageNumber, addShockwave, createExplosion, hitStop, shakeScreen } from './effects.js';
 import { onCritical } from './powers.js';
 import { mod } from './modifiers.js';
 import { getCritChance, getCritMultiplier } from './stats.js';
@@ -66,6 +66,10 @@ export function dealDamage(e, amount, o = {}) {
     if (crit) {
         audio.playCrit();
         createExplosion(e.x, e.y, '#fde047', 4);
+        // Peso do crítico: pausa e tremor curtos, mais fortes no boss (o hit stop tem recarga própria, então não vira soluço)
+        const boss = e === state.currentBoss;
+        hitStop(boss ? 0.1 : 0.07);
+        shakeScreen(boss ? 6 : 3);
         onCritical(e);
     }
     if (e === state.currentBoss) syncBossBar();

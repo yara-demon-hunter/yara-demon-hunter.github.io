@@ -9,7 +9,7 @@ import { updateHUD } from '../ui/hud.js';
 import { moveDash } from './dash.js';
 import { isFireCasting } from './knives.js';
 import { beamActive } from './fury.js';
-import { addNumber, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion } from './effects.js';
+import { addNumber, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion, spawnDust } from './effects.js';
 import { beginDeath } from './night.js';
 import { tryPhoenix } from './skills_flame.js';
 import { getDamageTakenRatio, getPlayerMaxSpeed } from './stats.js';
@@ -196,7 +196,17 @@ export function updatePlayer(dt) {
     const pos = pushOutOfTorch(player.x, player.y);
     player.x = pos.x;
     player.y = pos.y;
-    player.stillTime = Math.hypot(player.x - fromX, player.y - fromY) < 0.2 ? player.stillTime + dt : 0;
+    const moved = Math.hypot(player.x - fromX, player.y - fromY);
+    player.stillTime = moved < 0.2 ? player.stillTime + dt : 0;
+    // Poeira a cada passo (a distância andada manda, então acompanha a velocidade real); no dash, uma nuvem maior
+    if (moved >= 0.2) {
+        player.stepDust = (player.stepDust ?? 0) + moved;
+        const dashing = player.dashTimer > 0;
+        if (player.stepDust >= (dashing ? 14 : 34)) {
+            player.stepDust = 0;
+            spawnDust(player.x, player.y + 12, dashing ? 3 : 1, dashing ? 1.8 : 1);
+        }
+    }
     const target = pushOutOfTorch(player.targetX, player.targetY);
     player.targetX = target.x;
     player.targetY = target.y;

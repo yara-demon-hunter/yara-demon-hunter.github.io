@@ -62,6 +62,9 @@ export function addSlam(x, y, radius, delay, damage, color = null, torchDamage =
     return t;
 }
 
+const TELL_SECONDS = 0.55;
+const TELLED = new Set(['volley', 'ring', 'spiral']);
+
 const ACTIONS = {
     // Rajada mirada: um tiro a cada burstIntervalSeconds
     volley(e, model, ai) {
@@ -447,6 +450,8 @@ export function updateBossAI(e, model, dt) {
         e.bossPhase = (e.bossPhase ?? 0) + 1;
         ai.shots = 0;
         ai.last = ai.last2 = null;
+        ai.pending = null;
+        e.tellRatio = 0;
         e.shootTimer = 1.2;
         hitStop(0.08);
         shakeScreen(10);
@@ -489,6 +494,20 @@ export function updateBossAI(e, model, dt) {
     e.shootTimer -= dt;
     if (e.shootTimer > 0) return;
 
+    // Aviso dos golpes de tiro: o boss "carrega" por TELL_SECONDS (brilho que cresce, ver renderEnemyOverlays) antes de disparar.
+    // Os golpes de chão (círculos) e a investida já têm o próprio aviso, então ficam de fora.
+    if (ai.pending) {
+        ai.tell -= dt;
+        e.tellRatio = Math.min(1, 1 - ai.tell / TELL_SECONDS);
+        if (ai.tell > 0) return;
+        const action = ai.pending;
+        ai.pending = null;
+        e.tellRatio = 0;
+        ACTIONS[action](e, model, ai);
+        e.shootTimer = model.patternGapSeconds * (e.enraged ? model.enrageGapMultiplier : 1);
+        return;
+    }
+
     // Sorteia o próximo golpe da fase (sem repetir os dois últimos, e sem "sombras" se elas ainda estão em campo)
     const pool = model.phases ? model.phases[Math.min(e.bossPhase ?? 0, model.phases.length - 1)].patterns : model.patterns;
     const shadowsUp = state.enemies.some(o => o.shadowOwner === e);
@@ -499,6 +518,12 @@ export function updateBossAI(e, model, dt) {
     ai.last2 = ai.last;
     ai.last = action;
     ai.step++;
+    if (TELLED.has(action)) {
+        ai.pending = action;
+        ai.tell = TELL_SECONDS;
+        audio.playHorn();
+        return;
+    }
     ACTIONS[action](e, model, ai);
     if (OPENS_AFTER[action]) later(ai, OPENS_AFTER[action], () => openWindow(e, model));
     e.shootTimer = model.patternGapSeconds * (e.enraged ? model.enrageGapMultiplier : 1);

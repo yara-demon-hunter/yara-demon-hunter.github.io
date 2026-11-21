@@ -53,6 +53,25 @@ export function createExplosion(x, y, color, count = 10) {
     }
 }
 
+// Poeira dos pés: poucos quadradinhos pálidos, lentos e curtos (reaproveitam as partículas, sem custo novo de desenho)
+export function spawnDust(x, y, count = 1, spread = 1) {
+    count = Math.min(count, MAX_PARTICLES[state.quality] - state.particles.length);
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = (10 + Math.random() * 28) * spread;
+        const p = freeParticles.pop() ?? {};
+        p.x = x + (Math.random() - 0.5) * 6;
+        p.y = y;
+        p.vx = Math.cos(angle) * speed;
+        p.vy = Math.sin(angle) * speed * 0.5 - 8;
+        p.life = 0.25 + Math.random() * 0.2;
+        p.maxLife = 0.5;
+        p.color = '#b8a58a';
+        p.size = 2 + Math.random() * 2;
+        state.particles.push(p);
+    }
+}
+
 // --- TEMPO ---
 // Hit stop: congela a lógica por um instante para o golpe "pesar". Tem recarga: com ataque rápido
 // virariam engasgos em vez de impacto.

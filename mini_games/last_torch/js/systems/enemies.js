@@ -257,17 +257,20 @@ function updateAttacks(e, model, angle, dt, distToTarget) {
     // (o brilho do elmo, os braços do golem erguendo)
     if ((model.shootRange && distToTarget > model.shootRange) || (model.shootMinRange && distToTarget < model.shootMinRange)) {
         e.shootTimer = Math.max(e.shootTimer, 0.6);
+        e.outOfRange = true;           // a arte não mostra a carga: o tempo fica parado, e o brilho ficaria preso sem tiro nenhum
         if (model.throwWindup) e.throwArm = 0;
         return;
     }
+    e.outOfRange = false;
     e.shootTimer -= dt;
     // Golem: uma mão sobe nos últimos throwWindup segundos antes da pedra (e.throwArm, 0..1)
     if (model.throwWindup) e.throwArm = e.shootTimer < model.throwWindup ? 1 - Math.max(0, e.shootTimer) / model.throwWindup : 0;
     if (e.shootTimer > 0) return;
     e.shootTimer = model.shootCooldownSeconds;
     e.throwArm = 0;
-    if (!model.summon) shoot(e, model, angle);
-    else if (!state.lastStand) raiseDead(e, model);
+    // Necromante: levanta mortos (menos com a hora fechada) e atira uma alma no mesmo feitiço
+    if (model.summon && (!state.lastStand || state.sandbox)) raiseDead(e, model);
+    if (model.projectileSpeed) shoot(e, model, angle);
 }
 
 // Inchado: estoura ferindo o herói e os monstros em volta. O boss fica de fora: o dano é uma fração da

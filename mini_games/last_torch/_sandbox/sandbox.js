@@ -206,6 +206,7 @@ function fight() {
     state.hourPlan.boss = withBoss ? choice.boss : null;
     state.hourPlan.bossCalled = true;
     state.skillPoints = Math.max(0, +value('#sbPoints').value || 0);
+    state.sandbox = true;                                         // o necromante levanta mortos mesmo com a hora fechada (no jogo ele para)
     if (value('#sbAlone').checked) state.lastStand = true;       // nada mais nasce
     state.bossSpawnAt = null;
     if (withBoss) spawnBoss();

@@ -255,6 +255,22 @@ function stampMonster(e, t) {
         const flash = e.hitFlash / J.hitFlashSeconds;
         x += (e.recoilX ?? 0) * J.hitRecoil * flash;
         y += (e.recoilY ?? 0) * J.hitRecoil * flash;
+        // Esticar no golpe: o corpo achata e alarga por um instante (só nos sem direção, que não giram)
+        if (!sprite.directions) {
+            width *= 1 + 0.35 * flash;
+            height *= 1 - 0.25 * flash;
+        }
+    }
+    // Peso: o passo acompanha a velocidade real. O grande pisa devagar e afunda mais; o pequeno é rápido e saltitante.
+    // Voadores já têm o seu balanço (floatAmount) e ficam de fora
+    if (!spec.floatAmount) {
+        const moving = e.rooted > 0 ? 0 : Math.min(1, (e.speed ?? 0) / 80);
+        if (moving > 0.05) {
+            const weight = Math.min(1.6, Math.max(0.6, e.radius / 14));
+            const gait = t * (9 / weight) + e.phase;
+            y -= Math.abs(Math.sin(gait)) * e.radius * 0.1 * weight * moving;
+            rotation += Math.sin(gait) * 0.05 * weight * moving;
+        }
     }
     if (spec.wobbleAmount) rotation += Math.sin(t * spec.wobbleHz * TAU + e.phase) * spec.wobbleAmount;
     if (spec.floatAmount) y -= Math.sin(t * spec.floatHz * TAU + e.phase) * e.radius * spec.floatAmount * 1.5;
@@ -486,15 +502,19 @@ function renderEnemyOverlays(t) {
         }
         if (e.frozen > 0) renderIce(e);
         else if (e.iceStart !== undefined) e.iceStart = undefined;
+        if (e.isBoss && e.tellRatio > 0) {
+            // O boss carrega o tiro: o brilho cresce e fica mais forte até disparar
+            drawGlow(ctx, e.color, e.x, e.y, e.radius * (1.3 + e.tellRatio * 1.1), 0.25 + e.tellRatio * 0.6);
+        }
         if (!e.isBoss) {
             if (e.type === 'WITCH' || e.type === 'NECROMANCER') {
-                const charge = 1 - e.shootTimer / WITCH_VISUALS.chargeSeconds;
+                const charge = e.outOfRange ? 0 : 1 - e.shootTimer / WITCH_VISUALS.chargeSeconds;
                 if (charge > 0) renderCastGlow(e, charge);
             } else if (e.type === 'WRAITH' && e.lungeState === 1) {
                 drawGlow(ctx, WRAITH_VISUALS.colors.aimAura, e.x, e.y, e.radius * 2.6, 0.5);
             } else if (e.type === 'ZOMBIE_WOLF' && e.lungeState === 1) {
                 drawGlow(ctx, ZOMBIE_WOLF_VISUALS.colors.aimAura, e.x, e.y, e.radius * 2.6, 0.55);
-            } else if (e.type === 'HEADLESS_KNIGHT' && e.shootTimer > 0 && e.shootTimer < HEADLESS_KNIGHT_VISUALS.chargeSeconds) {
+            } else if (e.type === 'HEADLESS_KNIGHT' && !e.outOfRange && e.shootTimer > 0 && e.shootTimer < HEADLESS_KNIGHT_VISUALS.chargeSeconds) {
                 // A cabeça acende os olhos antes do tiro
                 const head = knightHeadOf(e);
                 const charge = 1 - e.shootTimer / HEADLESS_KNIGHT_VISUALS.chargeSeconds;

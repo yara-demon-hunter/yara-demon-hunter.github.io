@@ -471,6 +471,14 @@ function bakeBolt(owner, color, radius) {
     const previous = setDrawTarget(target);
     if (rock) drawRock(p);
     else if (owner === 'WITCH') renderWitchBolt(p);
+    // Necromante: a mesma bola da bruxa, com a paleta verde dele (inclusive o brilho de fora)
+    else if (owner === 'NECROMANCER') {
+        const bolt = WITCH_VISUALS.bolt;
+        const glow = bolt.glowColor;
+        bolt.glowColor = NECROMANCER_COLORS.orbGlow;
+        withColors(WITCH_VISUALS, NECROMANCER_COLORS, () => renderWitchBolt(p));
+        bolt.glowColor = glow;
+    }
     else if (owner === 'DEMON_LORD') renderDemonFireball(p);
     else if (BOSS_MODELS[owner]?.projectileStyle === 'dagger') drawBossDagger(p);
     else drawOrb(p);

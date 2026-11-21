@@ -336,6 +336,10 @@ export const MONSTER_MODELS = {
         keepDistance: 290,
         shootRange: 370,                 // só levanta esqueletos daqui para perto (maior que keepDistance, senão ele para fora do alcance)
         summon: { type: 'SKELETON', count: 2, spread: 46 },
+        projectileSpeed: 150,            // além de levantar mortos, atira uma alma
+        projectileRadius: 5,
+        projectileDamageMultiplier: 0.7,
+        projectileTorchDamage: 4,
         initialShootCooldownSeconds: 3,
         shootCooldownSeconds: 6.5,
         scoreReward: 60,
