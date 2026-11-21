@@ -37,6 +37,7 @@ import {
 import { renderReflectWard } from './reflect.js';
 import { renderGuardianWard, renderSnares } from './druid.js';
 import { renderLightFront, renderLightGround } from './light.js';
+import { renderCastShadows, renderTorchLight, renderVignette } from './atmosphere.js';
 import { renderNatureBehindCore, renderNatureFront, renderNatureGround, renderRoots, renderSpiritWolves } from './nature.js';
 import { renderShadowClone } from './shadow_clone.js';
 import { getHeroGear, getOathPalette } from './hero_gear.js';
@@ -175,6 +176,7 @@ export function render() {
     renderPickups();
     renderBladeSlashes();
     renderCorpses();
+    renderCastShadows();
     renderEnemyProjectiles();
     // A tocha continua sendo o corte de profundidade; em cada lado, herói e inimigos são ordenados juntos pelo Y do chão.
     const heroBehind = !player.hidden && player.y < state.coreY;
@@ -185,6 +187,7 @@ export function render() {
     renderFireTornado();
     renderHearthBird();
     renderEnemies('front', state.coreY, heroBehind ? null : renderHeroBlock, player.y);
+    renderTorchLight();
     renderRoots();
     renderSpiritWolves();
     renderMonsterCurses();
@@ -216,6 +219,7 @@ export function render() {
     renderShockwaves();
     renderSceneryAmbient();
     renderSceneryOverlay();
+    renderVignette();
     renderDawn();
     renderClearWave();
     renderHpBars();

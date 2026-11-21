@@ -38,7 +38,7 @@ import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
 import { hideTreeHand, startHints } from './hints.js';
 import { heroOffer, isOwned, renderHeroPicker } from './heroes.js';
-import { previewHero, renderHeroStats } from './hero_stats.js';
+import { previewHero, renderHeroStats, unlockProgressLabel } from './hero_stats.js';
 import { TREE_BRANCHES } from '../../data_model/tree.js';
 import { dailyStatus } from '../../data_model/daily.js';
 import { resetQuickPick } from './quick_pick.js';
@@ -392,7 +392,7 @@ function renderShowcase() {
     document.getElementById('heroShowLock').classList.toggle('hidden', !locked);
     document.getElementById('heroShowName').textContent = hero.name.toUpperCase();
     const role = hero.affinity ? `${TREE_BRANCHES[hero.affinity].style.split(':')[0]} · ${TREE_BRANCHES[hero.affinity].name.toLowerCase()}` : 'Hunter · every path';
-    document.getElementById('heroShowTag').textContent = locked ? (hero.emberPrice ? `For sale · 🔥 ${hero.emberPrice}` : 'Locked') : role;
+    document.getElementById('heroShowTag').textContent = locked ? (hero.emberPrice ? `For sale · 🔥 ${hero.emberPrice}` : (unlockProgressLabel(key)?.text ?? 'Locked')) : role;
 }
 
 

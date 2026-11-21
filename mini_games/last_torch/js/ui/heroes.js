@@ -4,7 +4,7 @@ import { save, persist } from '../core/save.js';
 import { audio } from '../core/state.js';
 import { paintHeroPortrait, renderStartScreen } from './screens.js';
 import { flushHeroUnlocks, queueHeroUnlock } from './hero_unlock.js';
-import { previewHero, setPreviewHero } from './hero_stats.js';
+import { previewHero, setPreviewHero, unlockRequirements, unlockProgressLabel } from './hero_stats.js';
 
 // Herói liberado: por conquista do Santuário, comprado com Brasas (emberPrice) ou de graça (free em data_model/heroes.js)
 export function isOwned(key) {
@@ -50,15 +50,18 @@ export function renderHeroPicker() {
         const portrait = el('span', 'hero-portrait');
         paintHeroPortrait(portrait, hero);
         card.title = owned ? hero.tagline : offer ? `Unlock with ${offer.price} embers` : `Locked: ${hero.unlockHint ?? ''}`;
-        const label = offer && (offer.ready ? `🔥${offer.price}` : `🔥${Math.min(offer.have, offer.price)}/${offer.price}`);
+        // Herói de conquista: o cartão mostra o quanto falta (ex.: 0%), no mesmo lugar do preço dos heróis de Brasas
+        const goal = !owned && !offer ? unlockProgressLabel(key) : null;
+        const label = offer ? (offer.ready ? `🔥${offer.price}` : `🔥${Math.min(offer.have, offer.price)}/${offer.price}`) : goal?.chip;
         if (!owned) {
             const lock = el('span', 'hero-pick-lock', '🔒');
             // Na tela deitada a dica some (falta altura): o preço vai dentro do cadeado (css/components/start-screen.css)
-            if (label) lock.append(el('em', 'hero-pick-lock-price', label));
+            if (label) lock.append(el('em', `hero-pick-lock-price${goal ? ' is-goal' : ''}`, label));
             portrait.append(lock);
         }
         card.append(portrait, el('span', 'hero-pick-name', hero.name.toUpperCase()));
         if (offer) card.append(el('span', 'hero-pick-hint is-price', label));
+        else if (goal) card.append(el('span', 'hero-pick-hint is-goal', goal.chip));
         else if (!owned && hero.unlockHint) card.append(el('span', 'hero-pick-hint', hero.unlockHint));
         return card;
     }));

@@ -19,6 +19,15 @@ export function unlockRequirements(key) {
     }));
 }
 
+// Resumo do progresso de um herói de conquista: { chip: '0%', text: 'Survive Wave 1 · 0/2' } (ou null se não há conquista ligada)
+export function unlockProgressLabel(key) {
+    const reqs = unlockRequirements(key);
+    if (!reqs.length) return null;
+    const percent = Math.round(reqs.reduce((sum, r) => sum + r.have / r.need, 0) / reqs.length * 100);
+    const first = reqs.find(r => r.have < r.need) ?? reqs[0];
+    return { chip: `${percent}%`, text: `${first.label} · ${first.have.toLocaleString('en-US')}/${first.need.toLocaleString('en-US')}` };
+}
+
 function renderRequirements(panel, key) {
     const hero = HEROES[key];
     const reqs = unlockRequirements(key);

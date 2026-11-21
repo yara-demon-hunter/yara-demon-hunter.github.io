@@ -350,6 +350,8 @@
 /* Preço dentro do cadeado: só na tela deitada, onde a dica fica escondida */
 .hero-pick-lock-price { display: none; position: absolute; left: -0.6rem; right: -0.6rem; bottom: -0.35rem; padding: 0 0.15rem; border-radius: 0.3rem; background: #7c2d12; color: #fde4c8; font-size: 0.42rem; font-style: normal; font-weight: 800; line-height: 1.4; text-align: center; white-space: nowrap; }
 .hero-pick.is-buyable .hero-pick-lock-price { background: #b45309; }
+/* Herói de conquista: o chip mostra o progresso (%), em tom frio para não parecer preço */
+.hero-pick-lock-price.is-goal { background: #1e3a5f; color: #bfdbfe; }
 
 /* Herói bloqueado tocado (js/ui/hero_stats.js): o painel das barras vira "como desbloquear", com cada requisito e o progresso */
 .hero-pick.is-locked { cursor: pointer; }

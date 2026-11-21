@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório · Demon Hunter (modelo .glb)</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; height: 100%; background: #05080b; color: #cfd6e0; font-family: system-ui, sans-serif; overflow: hidden; }
+        #stage { position: fixed; inset: 0; }
+        #stage canvas { display: block; width: 100%; height: 100%; }
+        #panel { position: fixed; top: 10px; right: 10px; width: 280px; max-height: calc(100% - 20px); overflow-y: auto; padding: 12px 14px; background: rgba(7, 12, 16, .88); border: 1px solid #283946; border-radius: 10px; font-size: 13px; line-height: 1.35; }
+        #panel h1 { margin: 0 0 2px; font-size: 16px; color: #c4efff; }
+        #panel .sub { margin: 0 0 8px; font-size: 11px; color: #8998a3; }
+        #panel h2 { margin: 12px 0 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #75c9ed; }
+        #panel label { display: flex; gap: 8px; align-items: center; margin: 4px 0; cursor: pointer; }
+        #panel label.col { flex-direction: column; align-items: stretch; gap: 2px; }
+        #panel input[type="range"] { width: 100%; accent-color: #38bdf8; }
+        #panel select, #panel button { width: 100%; margin-top: 5px; padding: 7px; background: #10232d; color: #d9f3ff; border: 1px solid #315569; border-radius: 6px; font: inherit; cursor: pointer; }
+        #info { margin-top: 8px; color: #72808b; font-size: 11px; white-space: pre-line; }
+        #home { position: fixed; top: 10px; left: 10px; z-index: 5; padding: 6px 10px; background: rgba(7, 12, 16, .86); border: 1px solid #2a3943; border-radius: 8px; color: #b9e8fb; text-decoration: none; font-size: 13px; }
+        #drop { position: fixed; inset: 0; z-index: 4; display: grid; place-items: center; padding: 24px; text-align: center; pointer-events: none; }
+        #drop .box { max-width: 460px; padding: 22px 24px; border: 2px dashed #315569; border-radius: 14px; background: rgba(7, 12, 16, .82); color: #b9d4e2; font-size: 15px; line-height: 1.55; pointer-events: auto; }
+        #drop b { color: #c4efff; } #drop code { color: #8fd3f0; } #drop.hidden { display: none; }
+        body.dragging #drop .box { border-color: #38bdf8; background: rgba(20, 50, 70, .9); }
+        @media (max-width: 640px) { #panel { width: 210px; font-size: 12px; } }
+    </style>
+    <!-- Laboratório (fora dos jogos). Three.js copiado em vendor/three (sem internet). Abrir pelo servidor: ver README.md -->
+    <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }</script>
+</head>
+<body>
+    <div id="stage"></div><a id="home" href="index.html">← Laboratório</a>
+    <div id="drop"><div class="box"><b>Demon Hunter 3D</b><br>Arraste aqui o arquivo <code>.glb</code> do herói<br>ou <label style="display:inline"><u style="cursor:pointer">escolha o arquivo</u><input id="file" type="file" accept=".glb,.gltf" hidden></label>.<br><small>Para carregar sozinho, salve como <code>demon_hunter/hunter.glb</code>.</small></div></div>
+    <aside id="panel">
+        <h1>Demon Hunter · 3D</h1>
+        <p class="sub">Visualizador do modelo 3D (.glb) do herói: luz de noite, animação e gravação do atlas para o jogo.</p>
+        <h2>Animação</h2>
+        <select id="clip"></select>
+        <label><input id="turn" type="checkbox"> Girar sozinho</label>
+        <label class="col">Velocidade <input id="speed" type="range" min="0" max="2" step=".05" value="1"></label>
+        <h2>Luz</h2>
+        <label class="col">Lua (luz fria) <input id="moon" type="range" min="0" max="3" step=".05" value="1.2"></label>
+        <label class="col">Tocha (luz quente) <input id="torch" type="range" min="0" max="6" step=".1" value="2.2"></label>
+        <label class="col">Contraluz azul <input id="rim" type="range" min="0" max="4" step=".05" value="1.6"></label>
+        <label><input id="bloom" type="checkbox" checked> Brilho (bloom) na espada e nos olhos</label>
+        <h2>Modelo</h2>
+        <label class="col">Altura (escala) <input id="size" type="range" min="0.5" max="1.6" step=".01" value="1"></label>
+        <label><input id="wire" type="checkbox"> Ver a malha (wireframe)</label>
+        <button id="shot" type="button">Salvar foto (PNG)</button>
+        <div id="info">Sem modelo carregado.</div>
+    </aside>
+    <script type="module" src="demon_hunter_glb.js"></script>
+</body>
+</html>
