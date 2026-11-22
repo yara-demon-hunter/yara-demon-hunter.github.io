@@ -7,6 +7,7 @@ const TAU = Math.PI * 2;
 // Chalé de camponês em 2,5D: telhado inclinado grande por cima, parede da frente com vigas, porta e uma janela acesa que tremula,
 // chaminé de pedra soltando fumaça em ciclo. Animada (atlas): phase de 0 a 1 é um ciclo da fumaça e da chama da janela.
 registerProp({
+    occludes: true,        // esconde quem passa atrás (o jogo redesenha o prédio por cima do herói); no editor dá para desligar por objeto
     id: 'cottage', name: 'Chalé de camponês', kind: 'animated', anim: { frames: [6, 4, 3], size: 1.5, cycleSeconds: 3.2 }, visual: COTTAGE_VISUALS,
     cell: [112, 104], anchor: [0.5, 0.86], variants: 3,
     paint(g, r, phase, p) {

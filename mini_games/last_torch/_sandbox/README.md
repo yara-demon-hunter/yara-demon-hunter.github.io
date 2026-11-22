@@ -10,6 +10,7 @@ python3 mini_games/last_torch/_sandbox/serve.py        # http://localhost:8800/
 - A pasta começa com `_`, então o Jekyll não a publica, e `build-standalone.rb` não a copia.
 - Porta diferente da do jogo = `localStorage` separado: o save da arena nunca toca o do jogo.
 - Botão **🧪 Sandbox** (canto inferior esquerdo): reabre o painel para trocar de herói ou boss.
+- Caixa **Show contact areas**: desenha as áreas do cenário (as do editor de cenários): vermelho = contato (ninguém passa), azul = área de trás, verde = onde os monstros nascem e roxo = onde o chefe nasce.
 - Lista **Scenery** (aba Arena, no topo): todos os cenários da biblioteca; clicar troca na hora, até no meio da luta, e vale também para a aba Fast run. O sandbox lembra a última escolha (o jogo real continua lendo só `WORLD.scenery`; a troca usa `setScenery()` em `js/render/scenery.js`, que o jogo não chama). Cenário novo: rode `ruby mini_games/_library/sync.rb` para ele aparecer aqui.
 - Opções padrão: **modo deus** ligado para o herói, o boss e a tocha (vida cheia a cada quadro; dá para desligar na hora, mesmo no meio da luta) e **100 pontos de skill** para começar.
 - Lista **Monsters**: clique em um ou mais monstros para pô-los na luta (quantos de cada: campo ao lado; nascem em círculo em volta do herói). Para lutar só com eles, clique de novo no boss escolhido para desmarcá-lo. O **modo deus dos monstros** também vem ligado (eles não morrem).

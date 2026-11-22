@@ -68,6 +68,7 @@ monsters/
                            montante, corrente que afina
   25d/wolf25d.js           corpo de lobo em galope, comum ao shadow_wolf e ao zombie_wolf
   25d/death.js             COMO CADA MONSTRO MORRE: os pedaços que voam (ossos, casca, folhas), a mancha no chão e, para quem tomba (Treant), a queda com poeira (MONSTER_DEATH), mais a física e o desenho dos pedaços. O Last Torch lê daqui; ajuste no painel "Morte" de tools/tuner.html (Monstros) e cole o bloco copiado neste arquivo
+  25d/spawn.js             COMO CADA MONSTRO NASCE: o jeito (sai do chão com poeira, surge em fumaça, surge no ar ou portal), a duração, a cor e o tamanho do efeito no chão (MONSTER_SPAWN), mais a pose do corpo enquanto nasce (spawnPose) e o desenho do efeito (drawSpawnFx). O Last Torch lê daqui (monstros que nascem numa zona de nascimento do cenário); ajuste no painel "Nascimento" de tools/tuner.html (Monstros) e cole a linha copiada neste arquivo
 ```
 
 Cada pasta de personagem ou monstro pode ter `art_reference/` com as imagens e a ficha (`character.md`). Elas nunca

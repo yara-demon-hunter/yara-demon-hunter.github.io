@@ -17,6 +17,7 @@ import { updateQuake } from './systems/quake.js';
 import { updateDruid } from './systems/druid.js';
 import { updateConversion } from './systems/conversion.js';
 import { updateArcane } from './systems/arcane.js';
+import { applyColliders } from './systems/colliders.js';
 import { updateNight } from './systems/night.js';
 import { updatePickups } from './systems/pickups.js';
 import { updatePlayer } from './systems/player.js';
@@ -100,6 +101,7 @@ export function update(dt) {
     if (state.gameState !== 'PLAYING') return;
 
     updateEnemyProjectiles(dt);
+    applyColliders();                    // áreas de contato do cenário: ninguém (herói, monstros, tiros) atravessa
     updateTelegraphs(dt);
 
     updateGold(dt);

@@ -23,7 +23,7 @@ import { createRandom } from '../core/random.js';
 //   animadas:     frames (lista por detalhe: menos quadros = atlas menor), variants, size (entra no desenho e na célula: o
 //                 atlas nasce nítido), cycleSeconds (duração do balanço ou do pulso)
 //
-// OBJETOS COLOCADOS À MÃO (editor: tools/scenery_editor.html): `visual.placed` é uma lista de { prop, x, y, seed, scale?, flip?, rot? (graus, só estáticas), front? (estática na frente das animadas) }, com x e y em
+// OBJETOS COLOCADOS À MÃO (editor: tools/scenery_editor.html): `visual.placed` é uma lista de { prop, x, y, seed, scale?, flip?, rot? (graus, só estáticas), front? (estática na frente das animadas), palette? (cores só deste objeto), occlude? (esconde quem passa atrás: padrão da peça), id? (para uma área de trás se ligar a ele) }, com x e y em
 // FRAÇÃO do mundo (0 a 1: valem em qualquer tela). Entram depois da receita; as estáticas são pintadas no chão e as animadas viram atlas
 // (um por peça; parâmetros em `prop.anim` ou PLACED_ANIM). `visual.placedPalette[<id da peça>]` troca a paleta dos colocados.
 //
@@ -46,6 +46,10 @@ function allowed(entry, x, y, w, h) {
     const a = entry.avoidRect;
     return !(a && x >= a[0] * w && x <= a[2] * w && y >= a[1] * h && y <= a[3] * h);
 }
+// Objeto colocado que ESCONDE quem passa atrás dele (casa, catedral): a peça declara `occludes: true` e o objeto pode mudar com `occlude`.
+// Vira um sprite (não é pintado no chão) e o jogo o redesenha por cima do herói quando ele está atrás (last_torch/js/render/scenery.js).
+const occludes = (pl, prop) => (pl.occlude ?? prop.occludes) === true;
+const spriteRect = (sheet, x, y, scale) => ({ x0: x - sheet.anchor[0] * sheet.cell[0] * scale, y0: y - sheet.anchor[1] * sheet.cell[1] * scale, x1: x + (1 - sheet.anchor[0]) * sheet.cell[0] * scale, y1: y + (1 - sheet.anchor[1]) * sheet.cell[1] * scale });
 const perQuality = (value, quality) => (Array.isArray(value) ? value[quality] : value);
 
 // Os valores padrão da peça, com o que a receita trocou por cima. Lê a cada chamada: o tuner edita ao vivo.
@@ -95,8 +99,8 @@ export function composeScenery({ id, name, visual, paintBase }) {
         // Se vieram da receita (from), levam a paleta da entrada e os atributos sorteados (attrs); senão, uma aparência pela seed.
         (visual.placed ?? []).forEach(pl => {
             const prop = getProp(pl.prop);
-            if (prop.kind !== 'static' || pl.front) return;          // `front`: vai para a camada da frente (buildSway)
-            const p = { ...prop.visual, ...(pl.from !== undefined ? visual.props[pl.from]?.palette : null), ...visual.placedPalette?.[pl.prop] };
+            if (prop.kind !== 'static' || pl.front || occludes(pl, prop)) return;          // `front` e as que escondem quem passa atrás: sprites (buildSway)
+            const p = { ...prop.visual, ...(pl.from !== undefined ? visual.props[pl.from]?.palette : null), ...visual.placedPalette?.[pl.prop], ...pl.palette };
             const x = pl.x * w;
             const y = pl.y * h;
             const s = pl.scale ?? 1;
@@ -161,11 +165,12 @@ export function composeScenery({ id, name, visual, paintBase }) {
         let g2 = 0;
         (visual.placed ?? []).forEach(pl => {
             const prop = getProp(pl.prop);
+            const occ = occludes(pl, prop);
             if (prop.kind === 'static') {
-                if (!pl.front) return;
-                const p = { ...prop.visual, ...(pl.from !== undefined ? visual.props[pl.from]?.palette : null), ...visual.placedPalette?.[pl.prop] };
+                if (!pl.front && !occ) return;
+                const p = { ...prop.visual, ...(pl.from !== undefined ? visual.props[pl.from]?.palette : null), ...visual.placedPalette?.[pl.prop], ...pl.palette };
                 const s = pl.scale ?? 1;
-                const half = (prop.previewSize ?? 40) * 0.75 * s + 16;            // cabe a peça girada em qualquer ângulo
+                const half = (prop.extent ? prop.extent(p) : (prop.previewSize ?? 40)) * 0.75 * s + 16;            // cabe a peça girada em qualquer ângulo
                 const sheet = buildSpriteSheet({
                     cell: [half * 2, half * 2], anchor: [0.5, 0.5], frames: 1, variants: 1, res: env.res, seed: visual.seed + 12000 + g2++ * 977,
                     paint: (g) => {
@@ -175,16 +180,18 @@ export function composeScenery({ id, name, visual, paintBase }) {
                     }
                 });
                 bytes += sheet.bytes;
-                items.push({ sheet, x: pl.x * w, y: pl.y * h, variant: 0, scale: 1, cycle: 1, offset: 0 });
+                const sx = pl.x * w;
+                const sy = pl.y * h;
+                items.push({ sheet, x: sx, y: sy, variant: 0, scale: 1, cycle: 1, offset: 0, ...(occ ? { occ: { id: pl.id }, rect: spriteRect(sheet, sx, sy, 1) } : null) });
                 return;
             }
-            const key = `${pl.prop}#${pl.from ?? ''}`;
+            const key = `${pl.prop}#${pl.from ?? ''}#${pl.palette ? JSON.stringify(pl.palette) : ''}`;      // cores próprias = outro atlas
             if (!sheets.has(key)) {
                 const entry = pl.from !== undefined ? visual.props[pl.from] : null;
                 const a = entry
                     ? { frames: entry.frames, size: entry.size ?? 1, cycleSeconds: entry.cycleSeconds, variants: entry.variants ?? prop.variants }
                     : { ...PLACED_ANIM, variants: prop.variants, ...prop.anim };
-                const p = { ...prop.visual, ...entry?.palette, ...(entry ? null : visual.placedPalette?.[pl.prop]) };
+                const p = { ...prop.visual, ...entry?.palette, ...(entry ? null : visual.placedPalette?.[pl.prop]), ...pl.palette };
                 const sheet = buildSpriteSheet({
                     cell: [prop.cell[0] * a.size, prop.cell[1] * a.size], anchor: prop.anchor, frames: perQuality(a.frames, quality),
                     variants: a.variants, res: env.res, seed: visual.seed + 9000 + g2++ * 977,
@@ -201,10 +208,16 @@ export function composeScenery({ id, name, visual, paintBase }) {
             const y = pl.y * h;
             items.push({
                 sheet, x, y, variant: Math.abs(pl.variant ?? pl.seed ?? 0) % a.variants, scale: pl.scale ?? 1, cycle: a.cycleSeconds,
-                offset: (x * visual.windWaveLength + y * visual.windWaveLength * 0.4) / TAU + (pl.phase ?? 0)
+                offset: (x * visual.windWaveLength + y * visual.windWaveLength * 0.4) / TAU + (pl.phase ?? 0),
+                ...(occ ? { occ: { id: pl.id }, rect: spriteRect(sheet, x, y, pl.scale ?? 1) } : null)
             });
         });
         return { items, bytes };
+    }
+
+    // Um sprite só (o jogo redesenha por cima do herói os que escondem quem passa atrás)
+    function drawItem(ctx, t, it) {
+        drawSheetFrame(ctx, it.sheet, it.variant, frameAt(it.sheet, t, it.cycle, it.offset), it.x, it.y, it.scale);
     }
 
     function drawSway(ctx, t, built) {
@@ -215,5 +228,5 @@ export function composeScenery({ id, name, visual, paintBase }) {
         }
     }
 
-    return { id, name, visual, paintGround, buildSway, drawSway, state };
+    return { id, name, visual, paintGround, buildSway, drawSway, drawItem, state };
 }

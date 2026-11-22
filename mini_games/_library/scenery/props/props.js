@@ -6,6 +6,10 @@
 // DOIS TIPOS (as duas técnicas do projeto):
 //   kind 'static'    carimbada no chão UMA vez, ao montar o cenário. Custo por quadro: zero.
 //     previewSize           (opcional) lado da amostra no tuner de peças, em unidades do mundo
+//     ranges                (opcional) { chave do visual: [mín., máx., passo, rótulo] }: controles de medida POR OBJETO no editor de cenários (vão do
+//                           portão, comprimento da cerca...). O valor escolhido vai em objeto.palette e a peça o lê de `p`, como as cores.
+//     occludes              (opcional) true = o objeto esconde quem passa ATRÁS dele (casa, catedral): vira sprite e o jogo o redesenha por cima do herói
+//     extent(p)             (opcional) maior dimensão da peça com a paleta p: dá o tamanho da área de clique e do sprite na frente
 //     roll(r, p)            sorteia os atributos da peça (tamanho, formato, cor). r = aleatório com semente
 //     draw(g, x, y, a, p)   desenha em (x, y) do mundo; a = o que o roll devolveu
 //   kind 'animated'  vira um atlas de poucos quadros (buildSpriteSheet, no kit); em cena é 1 drawImage por peça.

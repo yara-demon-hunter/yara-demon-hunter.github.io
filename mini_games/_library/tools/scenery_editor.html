@@ -37,6 +37,12 @@
         .chips { display: flex; flex-wrap: wrap; gap: 5px; }
         .chips button { font-size: 12.5px; padding: 4px 8px; }
         .chips button small { color: #8a826c; font-weight: 400; margin-left: 4px; }
+        .chips button.sel { border-color: #60a5fa; box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35); color: #bfdbfe; }
+        .chips button.sel.on { border-color: #fbbf24; }
+        details.cat { border-bottom: 1px solid #2a2418; padding: 2px 0 6px; }
+        details.cat > summary { cursor: pointer; font-size: 13px; color: #e7dfcc; padding: 5px 0; font-weight: 700; }
+        details.cat > summary small { color: #8a826c; font-weight: 400; }
+        details.cat.has-sel > summary { color: #93c5fd; }
         .row { display: grid; grid-template-columns: 70px 1fr 64px; gap: 6px; align-items: center; margin: 4px 0; font-size: 12.5px; }
         .row input[type=range] { width: 100%; accent-color: #fbbf24; }
         .row input[type=number] { width: 64px; padding: 3px 4px; font-size: 12px; }
@@ -73,6 +79,7 @@
         <label class="check"><input id="pause" type="checkbox"> Pausar</label>
         <label class="check"><input id="handles" type="checkbox" checked> Alças</label>
         <label class="check"><input id="refs" type="checkbox" checked> Tocha</label>
+        <label class="check" title="Mostra as áreas de contato (onde ninguém passa) por cima do cenário, em qualquer modo"><input id="showAreas" type="checkbox" checked> Áreas <span id="areaBadge" style="color:#fca5a5"></span></label>
         <button id="saveFile" class="primary" title="Grava o layout no projeto (scenery/layouts/<id>.js) e sincroniza os jogos: o editor, o sandbox e o jogo passam a mostrar sempre este cenário">📁 Gravar no arquivo</button>
         <button id="save" title="Guarda SÓ neste navegador (já acontece sozinho a cada mudança). Para gravar no projeto, use 📁 Gravar no arquivo">💾 Salvar (navegador)</button>
         <button id="download" title="Baixa um arquivo .json com o layout deste cenário (backup, ou para levar a outro navegador)">⬇ Arquivo</button>
@@ -88,11 +95,14 @@
             <div id="status"></div>
         </main>
         <aside>
+            <div class="btns" id="modeBar" style="margin:0 0 8px"><button id="modeObj" class="on">🧩 Objetos</button><button id="modeArea">🛡 Áreas de contato</button></div>
+            <div id="objPanel">
             <h2>1. Escolha uma peça</h2>
             <input id="filter" type="text" placeholder="Filtrar (ex.: cottage, tomb)" style="width:100%;margin-bottom:6px">
-            <div id="palette" class="chips"></div>
+            <div id="palette"></div>
+            <p class="hint">As peças estão por tipo (casas, muros, plantas, pedras...). <b>Ao clicar num objeto no cenário, a peça dele fica destacada em azul aqui</b>, e a lista se abre no tipo certo.</p>
             <p class="hint">Clique numa peça e depois no cenário para pôr (pode pôr várias; <b>Esc</b> ou clicar de novo na peça para parar).
-                <b>Clicar num objeto nunca cria outro</b>: seleciona e arrasta (vale também para o que o cenário já tinha, marcado com círculo azul: ao pegar um, todos os da mesma entrada da receita viram editáveis). Clicar num lugar vazio com uma peça escolhida põe a peça, e segurando o botão você ajusta onde ela fica.</p>
+                <b>Objetos um dentro do outro:</b> clique perto do <b>centro</b> do que quer pegar; <b>Shift+clique</b> passa para o próximo empilhado no mesmo ponto. <b>Clicar num objeto nunca cria outro</b>: seleciona e arrasta (vale também para o que o cenário já tinha, marcado com círculo azul: ao pegar um, todos os da mesma entrada da receita viram editáveis). Clicar num lugar vazio com uma peça escolhida põe a peça, e segurando o botão você ajusta onde ela fica.</p>
 
             <h2>2. Objeto selecionado</h2>
             <div id="selbox"><p class="hint">Nenhum. Clique num objeto do cenário.</p></div>
@@ -109,6 +119,23 @@
                 <button id="clear">Apagar todos</button>
                 <button id="undo">Desfazer (Ctrl+Z)</button>
             </div>
+            </div>
+
+            <div id="areaPanel" hidden>
+            <h2>Áreas de contato</h2>
+            <p class="hint">São as áreas por onde <b>ninguém passa</b>: o herói, os monstros (chefes também) e os tiros. Desenhe retângulos e círculos sobre casas, muros, cercas, rochas... O que vale é a <b>base</b> do objeto: o telhado de uma casa pode ficar por cima de quem passa. As áreas são gravadas junto com o layout e o jogo as lê de lá.</p>
+            <div class="btns" style="margin-top:6px"><button id="kindContact" class="on" title="Área por onde ninguém passa">🛡 Contato</button><button id="kindBehind" title="Região onde, se o herói estiver, ele fica ATRÁS dos prédios (casa, catedral): eles o cobrem e ele aparece translúcido">🕶 Área de trás (azul)</button><button id="kindSpawn" title="Região onde os monstros NASCEM (ou onde o chefe nasce)">🟢 Nascimento</button></div>
+            <p id="spawnHint" class="hint" hidden><b>Área verde:</b> é onde os monstros nascem. Sem nenhuma, eles nascem pela borda do mundo, como sempre. Cada zona tem um <b>peso</b> (a chance de ser sorteada) e pode listar <b>quais monstros</b> nascem nela (vazio = todos). Uma zona <b>de chefe</b> (roxa) é onde o círculo de invocação do chefe aparece. A linha tracejada vai da zona até a tocha: <b>vermelha</b> = uma área de contato a cruza (o monstro ficaria preso).</p>
+            <p id="behindPick" class="hint" hidden><b>Área azul:</b> onde o herói estiver <b>dentro</b> dela, ele fica <b>atrás</b> dos prédios (casas, catedral): eles o cobrem e ele aparece translúcido. Fora de qualquer área azul, ele aparece normal. Só o que você desenha vale: o jogo não adivinha nada.</p>
+            <div class="btns"><button id="toolSel" class="on">☝ Selecionar</button><button id="toolRect">▭ Retângulo</button><button id="toolCircle">◯ Círculo</button></div>
+            <p class="hint" id="toolHint"></p>
+            <h2>Área selecionada</h2>
+            <div id="areaSel"><p class="hint">Nenhuma. Clique numa área.</p></div>
+            <h2>Áreas (<span id="areaCount">0</span>)</h2>
+            <div id="areaList" class="list"></div>
+            <div class="btns"><button id="areaClear">Apagar todas</button><button id="areaUndo">Desfazer (Ctrl+Z)</button></div>
+            <p class="hint"><b>Áreas uma dentro da outra:</b> o clique pega a <b>menor</b> que contém o ponto; <b>Shift+clique</b> passa para a seguinte. <b>Dica:</b> o ponto azul na borda de cima de um retângulo arredonda os cantos (até virar cápsula). <b>Teclas:</b> setas movem 1 px (Shift = 10) · <b>Ctrl+C</b>/<b>Ctrl+V</b> copia e cola onde o mouse está · <b>Delete</b> apaga · <b>Esc</b> volta para Selecionar · Arraste a <b>alça do canto</b> para redimensionar e a <b>bolinha de cima</b> para girar (Shift = de 15 em 15 graus).</p>
+            </div>
 
             <h2>Texto do layout</h2>
             <p class="hint"><b>Copiar layout</b> escreve a lista abaixo e a copia. Cole no <code>&lt;id&gt;_visual.js</code> do cenário e rode
@@ -118,7 +145,7 @@
             <p class="hint"><b>Sobreposição:</b> as peças estáticas (poço, cerca, lápide, pedra...) são pintadas no chão e ficam <i>atrás</i> das animadas (casas, braseiros, junco).
                 Para uma estática ficar na frente de uma casa, marque <b>Na frente das casas e peças animadas</b> no objeto. Entre objetos da mesma camada, o último da lista
                 fica na frente: use os botões de <b>Ordem</b> (▲ ▼) ou PageUp/PageDown. A lista abaixo mostra ⬆ nos que estão na frente.</p>
-            <p class="hint"><b>Teclas:</b> setas movem 1 px (Shift = 10) · <b>[</b> e <b>]</b> mudam o tamanho · <b>Q</b>/<b>E</b> giram 5° (Shift = 15°, só peças estáticas: cerca, laje, tábua...) · <b>F</b> espelha (estáticas) · <b>Ctrl+C</b>/<b>Ctrl+V</b> copia e cola o objeto onde o mouse está · <b>PageUp</b>/<b>PageDown</b> sobem e descem na sobreposição (Shift = para a ponta) · <b>R</b> sorteia outra
+            <p class="hint"><b>Teclas:</b> setas movem 1 px (Shift = 10) · <b>[</b> e <b>]</b> mudam o tamanho · <b>Q</b>/<b>E</b> giram 5° (Shift = 15°, só peças estáticas: cerca, laje, tábua...) · <b>F</b> espelha (estáticas) · <b>Ctrl+C</b>/<b>Ctrl+V</b> copia e cola o objeto onde o mouse está · <b>🎨 Cores</b>: no painel do objeto · <b>PageUp</b>/<b>PageDown</b> sobem e descem na sobreposição (Shift = para a ponta) · <b>R</b> sorteia outra
                 aparência · <b>D</b> duplica · <b>Delete</b> apaga.</p>
         </aside>
     </div>
@@ -152,7 +179,17 @@
         let scenery = null;
         let visual = null;
         let placed = [];
-        let canWrite = false;        // o servidor do Ateliê (tools/serve.py) consegue gravar no projeto
+        let colliders = [];          // áreas de contato: { shape:'rect'|'circle', x, y (fração do mundo), w, h | r (unidades), rot (graus), blocks:{hero,monsters,heroShots,monsterShots} }
+        let mode = 'objects';         // 'objects' | 'areas'
+        let selArea = -1;
+        let areaTool = 'select';      // 'select' | 'rect' | 'circle'
+        let areaDrag = null;          // arraste em andamento (mover, redimensionar, girar ou desenhar)
+        let areaClip = null;
+        let areaNewKind = 'contact';  // tipo da PRÓXIMA área desenhada: 'contact' (ninguém passa) ou 'behind' (área de trás de um objeto)
+        let areaLink = '';            // id do objeto a que a próxima área de trás se liga
+        let colorsOpen = false;      // o painel de cores continua aberto quando o painel do objeto é refeito
+        let canWrite = false;
+        let serverFeatures = [];     // o que o servidor do Ateliê sabe gravar (um serve.py antigo não grava áreas de contato)        // o servidor do Ateliê (tools/serve.py) consegue gravar no projeto
         let fileAt = 0;              // quando o layout do arquivo foi gravado (0 = não há layout no arquivo)
         let localAt = 0;             // quando o trabalho foi guardado neste navegador
         let baked = [];              // índices das entradas da receita convertidas em objetos editáveis
@@ -183,8 +220,11 @@
         function hitOf(pl) {
             const { w, h, up } = sizeOf(pl);
             const s = pl.scale ?? 1;
-            const animated = getProp(pl.prop).kind === 'animated';
-            const r = Math.max(12, Math.min(w, h) * (animated ? 0.5 : 0.38) * s);
+            const def = getProp(pl.prop);
+            const animated = def.kind === 'animated';
+            // Peças alongáveis (cerca, portão): a área de clique acompanha o comprimento escolhido
+            const r = def.extent ? Math.max(12, def.extent(effectivePalette(pl)) * 0.45 * s)
+                : Math.max(12, Math.min(w, h) * (animated ? 0.5 : 0.38) * s);
             return { cx: pl.x * env.width, cy: pl.y * env.height - h * 0.25 * s * (up > 0.5 ? 1 : 0.4), r };
         }
         // Camadas (o que o motor faz): as estáticas normais são pintadas no chão, ATRÁS das animadas (casas, braseiros...); as estáticas
@@ -217,14 +257,37 @@
             return null;
         }
         // Qualquer objeto sob o mouse: um colocado (devolve o índice) ou um da receita (converte a entrada inteira e devolve o índice dele)
-        function grabAt(x, y) {
-            const i = pickAt(x, y);
-            if (i >= 0) return i;
-            const hit = pickRecipeAt(x, y);
-            if (!hit) return -1;
-            const found = analysis.filter(a => a.entry === hit.entry);
-            const start = bakeEntry(hit.entry, found, true);
-            return start + found.indexOf(hit);
+        // Todos os objetos cujo círculo de seleção está sob o mouse (colocados e da receita). O que está mais perto do CENTRO do próprio círculo
+        // vem primeiro: assim um objeto pequeno dentro do círculo de um grande é pego clicando no centro dele, mesmo que o grande esteja por cima.
+        // Empate: o da camada da frente e o último da lista.
+        function candidatesAt(x, y) {
+            const list = [];
+            placed.forEach((pl, i) => {
+                const { cx, cy, r } = hitOf(pl);
+                const d = Math.hypot(x - cx, y - cy);
+                if (d <= r) list.push({ kind: 'placed', i, score: d / r, top: layerOf(pl) === 'top' ? 1 : 0 });
+            });
+            recipeItems().forEach(a => {
+                const { cx, cy, r } = hitOf({ prop: a.prop, x: a.x, y: a.y, from: a.entry, scale: a.scale });
+                const d = Math.hypot(x - cx, y - cy);
+                if (d <= r) list.push({ kind: 'recipe', a, score: d / r, top: 0, i: -1 });
+            });
+            return list.sort((p, q) => p.score - q.score || q.top - p.top || q.i - p.i);
+        }
+        // Escolhe o objeto sob o mouse e devolve o índice dele em `placed` (converte a entrada da receita, se for de lá).
+        // cycle (Shift+clique): passa para o PRÓXIMO objeto empilhado no mesmo ponto.
+        function grabAt(x, y, cycle = false) {
+            const list = candidatesAt(x, y);
+            if (!list.length) return -1;
+            let pick = list[0];
+            if (cycle) {
+                const cur = list.findIndex(c => c.kind === 'placed' && c.i === selected);
+                pick = list[(cur + 1) % list.length];
+            }
+            if (pick.kind === 'placed') return pick.i;
+            const found = analysis.filter(a => a.entry === pick.a.entry);
+            const start = bakeEntry(pick.a.entry, found, true);
+            return start + found.indexOf(pick.a);
         }
 
         // --- ESTADO E ARMAZENAMENTO ---
@@ -232,7 +295,7 @@
         function persist(explicit = false) {
             try {
                 const savedAt = Date.now();
-                localStorage.setItem(storeKey, JSON.stringify({ placed, baked, savedAt }));
+                localStorage.setItem(storeKey, JSON.stringify({ placed, baked, colliders, savedAt }));
                 localAt = savedAt;
                 $('saved').style.color = '#86efac';
                 $('saved').textContent = `${explicit ? '💾 Salvo' : '✓ Salvo sozinho'} neste navegador às ${hhmm(savedAt)} · ${placed.length} objetos`;
@@ -250,11 +313,16 @@
                 info.textContent = 'Para gravar no arquivo do projeto, abra o Ateliê por: python3 mini_games/_library/tools/serve.py';
                 return;
             }
+            if (colliders.length && !serverFeatures.includes('colliders')) {
+                info.style.color = '#fca5a5';
+                info.textContent = '⚠ Este servidor é de uma versão antiga e NÃO grava as áreas de contato: feche-o (Ctrl+C no terminal) e rode de novo python3 mini_games/_library/tools/serve.py';
+                return;
+            }
             const dirty = localAt > fileAt;
             info.style.color = dirty ? '#fbbf24' : '#a39b86';
             info.textContent = fileAt
                 ? `📁 Arquivo gravado às ${hhmm(fileAt)} (${new Date(fileAt).toLocaleDateString('pt-BR')})${dirty ? ' · ⚠ há mudanças que ainda não estão no arquivo' : ' · em dia'}`
-                : (placed.length || baked.length ? '📁 Nada gravado no arquivo ainda · ⚠ use "Gravar no arquivo"' : '📁 Nada gravado no arquivo ainda');
+                : (placed.length || baked.length || colliders.length ? '📁 Nada gravado no arquivo ainda · ⚠ use "Gravar no arquivo"' : '📁 Nada gravado no arquivo ainda');
         }
         // Na lista de cenários, um ● marca os que têm trabalho guardado
         // Na lista de cenários: ✓ = gravado no arquivo do projeto e em dia · ● = há trabalho que NÃO está no arquivo (só neste navegador) · nada = original
@@ -265,7 +333,7 @@
                 let local = null;
                 try { local = JSON.parse(localStorage.getItem(`scenery_editor:${o.value}`) || 'null'); } catch { local = null; }
                 if (Array.isArray(local)) local = { placed: local, baked: [], savedAt: 0 };
-                const hasLocal = Boolean(local && (local.placed?.length || local.baked?.length));
+                const hasLocal = Boolean(local && (local.placed?.length || local.baked?.length || local.colliders?.length));
                 const inFile = fileAtOf(o.value) > 0;
                 const pending = hasLocal && (!inFile || (local.savedAt ?? 0) > fileAtOf(o.value));
                 o.textContent = pending ? `${o.value} ●` : inFile ? `${o.value} ✓` : o.value;
@@ -273,7 +341,7 @@
             $('scenery').title = '✓ = gravado no arquivo do projeto (em dia)  ·  ● = tem trabalho que ainda NÃO está no arquivo (só neste navegador)  ·  sem marca = cenário original';
         }
         function snapshot() {
-            history.push(JSON.stringify({ placed, baked }));
+            history.push(JSON.stringify({ placed, baked, colliders }));
             if (history.length > 60) history.shift();
         }
         let rebuildTimer = 0;
@@ -281,6 +349,7 @@
         function rebuild(now = false) {
             visual.placed = placed;
             visual.baked = baked;
+            visual.colliders = colliders;
             clearTimeout(rebuildTimer);
             const wait = now ? 0 : Math.max(0, 200 - (Date.now() - lastRebuild));
             rebuildTimer = setTimeout(() => { lastRebuild = Date.now(); scenery.invalidate(); }, wait);
@@ -289,6 +358,7 @@
             persist();
             rebuild(now);
             renderSide();
+            renderAreas();
         }
 
         function loadScenery(id) {
@@ -298,26 +368,33 @@
             let saved = null;
             try { saved = JSON.parse(localStorage.getItem(storeKey)); } catch { saved = null; }
             // O que o cenário traz (já com o layout gravado no arquivo, se houver: createScenery aplica) e o que ficou no navegador
-            const fromFile = { placed: structuredClone(visual.placed ?? []), baked: structuredClone(visual.baked ?? []) };
+            const fromFile = { placed: structuredClone(visual.placed ?? []), baked: structuredClone(visual.baked ?? []), colliders: structuredClone(visual.colliders ?? []) };
             if (Array.isArray(saved)) saved = { placed: saved, baked: [] };          // formato antigo: só a lista
             const layout = getLayout(id) && fileAtOf(id) > 0 ? getLayout(id) : undefined;
             fileAt = fileAtOf(id);
             const hasLocal = saved && Array.isArray(saved.placed);
             // O arquivo manda, a menos que o navegador tenha mudanças mais novas que ele
-            const useLocal = hasLocal && (!layout || (saved.savedAt ?? 0) > fileAt);
+            // Se o navegador tem algo DIFERENTE do arquivo e não é mais velho que ele, é trabalho que não chegou ao arquivo: não perde
+            const differs = Boolean(hasLocal && layout && JSON.stringify([saved.placed, saved.baked ?? [], saved.colliders ?? []]) !== JSON.stringify([fromFile.placed, fromFile.baked, fromFile.colliders]));
+            const useLocal = hasLocal && (!layout || (saved.savedAt ?? 0) > fileAt || (differs && (saved.savedAt ?? 0) >= fileAt));
+            if (useLocal && layout && (saved.savedAt ?? 0) <= fileAt) saved.savedAt = fileAt + 1;     // conta como mais novo que o arquivo: o aviso "não gravado" aparece
             const data = useLocal ? saved : fromFile;
             localAt = hasLocal ? (saved.savedAt ?? 0) : 0;
-            const resumed = (useLocal && (saved.placed.length || saved.baked?.length)) || (!useLocal && layout);
+            const resumed = (useLocal && (saved.placed.length || saved.baked?.length || saved.colliders?.length)) || (!useLocal && layout);
             placed = data.placed.filter(p => propIds().includes(p.prop));
             baked = Array.isArray(data.baked) ? data.baked : [];
+            colliders = Array.isArray(data.colliders) ? data.colliders : [];
             history.length = 0;
             selected = -1;
+            selArea = -1;
             armed = null;
             visual.placed = placed;
             visual.baked = baked;
+            visual.colliders = colliders;
             analysis = [];
             renderPalette();
             renderSide();
+            renderAreas();
             const url = new URL(location.href);
             url.searchParams.set('scenery', id);
             window.history.replaceState(null, '', url);
@@ -331,26 +408,74 @@
             } else $('saved').textContent = '';
             markSavedScenes();
             renderFileInfo();
+            if (colliders.length) {
+                $('showAreas').checked = true;
+                status(`🛡 ${colliders.length} área(s) de contato deste cenário aparecem em vermelho. Para editar, use o botão "Áreas de contato".`);
+            }
         }
 
         // --- PAINEL ---
+        // Categorias da paleta (id da peça -> grupo). Uma peça pode declarar `category` na definição; as que não estão aqui caem em "Outros".
+        const CATEGORIES = [
+            { id: 'building', icon: '🏠', label: 'Casas e construções', props: ['cottage', 'cathedral', 'cathedral_grand', 'well'] },
+            { id: 'walls', icon: '🧱', label: 'Muros e cercas', props: ['fence', 'fence_v', 'iron_fence', 'iron_gate'] },
+            { id: 'bridge', icon: '🌉', label: 'Pontes', props: ['bridge'] },
+            { id: 'plants', icon: '🌿', label: 'Plantas', props: ['fern', 'grass', 'bush', 'reed', 'mushroom', 'moss', 'leaves', 'stump', 'root'] },
+            { id: 'stones', icon: '🪨', label: 'Pedras e chão', props: ['rock', 'pebbles', 'cobble', 'flagstone'] },
+            { id: 'grave', icon: '⚰️', label: 'Cemitério', props: ['tombstone', 'bones'] },
+            { id: 'light', icon: '🔥', label: 'Luz e fogo', props: ['brazier', 'wisp'] },
+            { id: 'water', icon: '💧', label: 'Água', props: ['puddle', 'ripple'] },
+            { id: 'things', icon: '🧺', label: 'Objetos do dia a dia', props: ['cart', 'barrel', 'haystack', 'plank'] }
+        ];
+        const categoryOf = (id) => getProp(id).category ?? CATEGORIES.find(c => c.props.includes(id))?.id ?? 'other';
+        const catOpen = {};          // lembra quais categorias estão abertas
         function renderPalette() {
             const box = $('palette');
             const q = $('filter').value.trim().toLowerCase();
+            const selProp = selected >= 0 ? placed[selected]?.prop : null;
+            const counts = {};
+            placed.forEach(o => { counts[o.prop] = (counts[o.prop] ?? 0) + 1; });
+            const groups = [...CATEGORIES, { id: 'other', icon: '✨', label: 'Outros', props: [] }];
             box.innerHTML = '';
-            propIds().forEach(id => {
-                const prop = getProp(id);
-                if (q && !(`${id} ${prop.name}`.toLowerCase().includes(q))) return;
-                const b = document.createElement('button');
-                b.className = armed === id ? 'on' : '';
-                b.innerHTML = `${prop.name}<small>${prop.kind === 'animated' ? 'anim.' : 'est.'}</small>`;
-                b.title = id;
-                b.onclick = () => { armed = armed === id ? null : id; renderPalette(); status(armed ? `Clique no cenário para pôr: ${prop.name}` : ''); };
-                box.appendChild(b);
+            groups.forEach(cat => {
+                const ids = propIds().filter(id => categoryOf(id) === cat.id)
+                    .sort((a, b) => (cat.props.indexOf(a) + 1 || 99) - (cat.props.indexOf(b) + 1 || 99))
+                    .filter(id => !q || `${id} ${getProp(id).name}`.toLowerCase().includes(q));
+                if (!ids.length) return;
+                const det = document.createElement('details');
+                det.className = 'cat' + (selProp && ids.includes(selProp) ? ' has-sel' : '');
+                det.dataset.cat = cat.id;
+                // aberta se: o usuário abriu, tem filtro, ou o objeto selecionado é desta categoria
+                det.open = Boolean(q) || catOpen[cat.id] !== false || (selProp && ids.includes(selProp));
+                det.innerHTML = `<summary>${cat.icon} ${cat.label} <small>(${ids.length})</small></summary>`;
+                det.addEventListener('toggle', () => { if (!q) catOpen[cat.id] = det.open; });
+                const chips = document.createElement('div');
+                chips.className = 'chips';
+                ids.forEach(id => {
+                    const prop = getProp(id);
+                    const b = document.createElement('button');
+                    b.className = (armed === id ? 'on' : '') + (selProp === id ? ' sel' : '');
+                    b.dataset.prop = id;
+                    b.innerHTML = `${prop.name}<small>${prop.kind === 'animated' ? 'anim.' : 'est.'}${counts[id] ? ` ×${counts[id]}` : ''}</small>`;
+                    b.title = `${id}${selProp === id ? ' (é o tipo do objeto selecionado)' : ''}`;
+                    b.onclick = () => { armed = armed === id ? null : id; renderPalette(); status(armed ? `Clique no cenário para pôr: ${prop.name}` : ''); };
+                    chips.appendChild(b);
+                });
+                det.appendChild(chips);
+                box.appendChild(det);
             });
         }
 
+        let lastSelProp = null;
         function renderSide() {
+            renderPalette();
+            // Objeto selecionado: a peça dele aparece destacada na paleta (e a lista rola até ela, se o tipo mudou)
+            const selProp = selected >= 0 ? placed[selected]?.prop : null;
+            if (selProp && selProp !== lastSelProp) {
+                const chip = $('palette').querySelector(`button[data-prop="${selProp}"]`);
+                if (chip) chip.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+            lastSelProp = selProp ?? null;
             $('count').textContent = placed.length;
             renderRecipe();
             const list = $('list');
@@ -373,7 +498,14 @@
                     : '<p class="hint" style="margin:2px 0">Esta peça é animada (vem de um atlas de quadros): só as estáticas giram.</p>'}
                 <div class="row"><span>X</span><input id="sX" type="range" min="0" max="1" step="0.001" value="${pl.x}"><input id="sXN" type="number" min="0" max="1" step="0.001" value="${round(pl.x)}"></div>
                 <div class="row"><span>Y</span><input id="sY" type="range" min="0" max="1" step="0.001" value="${pl.y}"><input id="sYN" type="number" min="0" max="1" step="0.001" value="${round(pl.y)}"></div>
+                <label class="check" title="Quando o herói passa ATRÁS deste objeto, ele o cobre e o herói aparece translúcido. Padrão: ligado em casas e catedrais."><input id="sOcclude" type="checkbox" ${occludesNow(pl) ? 'checked' : ''}> Esconde quem passa atrás (herói translúcido; vale onde há área azul)</label>
                 ${prop.kind === 'static' ? `<label class="check" title="As peças estáticas ficam no chão, atrás de casas e braseiros. Marque para esta ficar NA FRENTE deles."><input id="sFront" type="checkbox" ${pl.front ? 'checked' : ''}> Na frente das casas e peças animadas</label>` : '<p class="hint" style="margin:2px 0">Esta peça animada fica sempre acima das estáticas que estão no chão.</p>'}
+                ${prop.ranges ? `<div id="measureBox" style="margin:6px 0"><div style="color:#fbbf24;font-size:13px;margin-bottom:2px">📏 Medidas deste objeto <span class="hint" style="font-size:11px">(alonga sem mudar o tamanho)</span></div><div id="measureRows"></div></div>` : ''}
+                <details id="sColors" ${colorsOpen ? 'open' : ''} style="margin:6px 0"><summary style="cursor:pointer;color:#fbbf24;font-size:13px">🎨 Cores deste objeto</summary>
+                    <div id="colorRows"></div>
+                    <div class="btns"><button id="cReset" title="Tira as cores e medidas próprias deste objeto: volta ao padrão do cenário">Cores e medidas originais</button>
+                    <button id="cAll" title="Copia as cores e medidas deste objeto para TODOS os objetos do mesmo tipo neste cenário">Aplicar a todos: ${prop.name}</button></div>
+                </details>
                 <div class="row" style="grid-template-columns:70px 1fr"><span>Ordem</span><span class="btns" style="margin:0">
                     <button id="oFront" title="Para a frente de tudo da mesma camada (Shift+PageUp)">⤒</button><button id="oUp" title="Sobe um (PageUp)">▲ frente</button><button id="oDown" title="Desce um (PageDown)">▼ trás</button><button id="oBack" title="Para trás de tudo da mesma camada (Shift+PageDown)">⤓</button>
                 </span></div>
@@ -398,6 +530,25 @@
                 else delete pl2.front;
                 commit();
                 status(e.target.checked ? 'Agora está na frente das casas e peças animadas (no topo).' : 'Voltou para o chão, atrás das peças animadas.');
+            };
+            $('sColors').addEventListener('toggle', () => { colorsOpen = $('sColors').open; });
+            renderMeasureRows();
+            renderColorRows();
+            $('cReset').onclick = () => { snapshot(); delete placed[selected].palette; commit(); };
+            $('cAll').onclick = () => {
+                const src = placed[selected];
+                if (!src.palette) { status('Este objeto está com as cores e medidas originais: nada para copiar.'); return; }
+                snapshot();
+                let n = 0;
+                placed.forEach(o => { if (o.prop === src.prop && o !== src) { o.palette = structuredClone(src.palette); n++; } });
+                commit();
+                status(`Cores e medidas copiadas para os outros ${n} objetos "${getProp(src.prop).name}".`);
+            };
+            $('sOcclude').onchange = (e) => {
+                snapshot();
+                const cur = placed[selected];
+                if (e.target.checked === (getProp(cur.prop).occludes === true)) delete cur.occlude; else cur.occlude = e.target.checked;
+                commit();
             };
             $('oFront').onclick = () => moveOrder(1, true);
             $('oUp').onclick = () => moveOrder(1, false);
@@ -465,6 +616,99 @@
             commit();
         }
 
+        // --- CORES ---
+        // Cada peça tem uma paleta (as cores do <id>_visual.js dela). O cenário pode trocar algumas na receita; aqui você troca as de UM objeto
+        // (pl.palette) ou de todos do mesmo tipo. Vale: padrão da peça < paleta da receita < paleta do objeto.
+        const COLOR_RE = /^(#[0-9a-f]{6}|rgba?\(.+\)|\d+\s*,\s*\d+\s*,\s*\d+)$/i;
+        const isColor = (v) => typeof v === 'string' && COLOR_RE.test(v.trim());
+        const hex2 = (n) => Math.max(0, Math.min(255, Math.round(+n))).toString(16).padStart(2, '0');
+        function parseColor(str) {
+            let m = str.match(/^#([0-9a-f]{6})$/i);
+            if (m) return { kind: 'hex', hex: str.toLowerCase(), a: 1 };
+            m = str.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/);
+            if (m) return { kind: 'rgba', hex: '#' + hex2(m[1]) + hex2(m[2]) + hex2(m[3]), a: m[4] === undefined ? 1 : +m[4] };
+            m = str.match(/^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)$/);
+            return { kind: 'triplet', hex: '#' + hex2(m[1]) + hex2(m[2]) + hex2(m[3]), a: 1 };
+        }
+        function formatColor(kind, hex, a) {
+            const n = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+            return kind === 'hex' ? hex : kind === 'triplet' ? n.join(', ') : `rgba(${n.join(', ')}, ${+(+a).toFixed(3)})`;
+        }
+        // A paleta que o objeto usa agora (com a da receita, se veio dela)
+        function effectivePalette(pl) {
+            const prop = getProp(pl.prop);
+            return { ...prop.visual, ...(pl.from !== undefined ? visual.props[pl.from]?.palette : null), ...visual.placedPalette?.[pl.prop], ...pl.palette };
+        }
+        // Medidas por objeto (prop.ranges): vão do portão, comprimento da cerca... Vão em objeto.palette, como as cores.
+        function renderMeasureRows() {
+            const box = $('measureRows');
+            if (!box) return;
+            box.innerHTML = '';
+            const pl = placed[selected];
+            if (!pl) return;
+            const def = getProp(pl.prop);
+            const eff = effectivePalette(pl);
+            Object.entries(def.ranges ?? {}).forEach(([key, [min, max, step, label]]) => {
+                const row = document.createElement('div');
+                row.className = 'row';
+                row.style.gridTemplateColumns = '120px 1fr 56px';
+                const changed = Boolean(pl.palette && key in pl.palette);
+                row.innerHTML = `<span style="font-size:12px;${changed ? 'color:#fde68a' : ''}">${label}${changed ? ' ●' : ''}</span>
+                    <input type="range" min="${min}" max="${max}" step="${step}" value="${eff[key]}"><input type="number" min="${min}" max="${max}" step="${step}" value="${eff[key]}" style="width:56px">`;
+                const [range, num] = row.querySelectorAll('input');
+                let lastSnap = 0;
+                const apply = (v, now) => {
+                    if (Date.now() - lastSnap > 800) { snapshot(); lastSnap = Date.now(); }
+                    const cur = placed[selected];
+                    cur.palette = { ...cur.palette, [key]: +v };
+                    persist();
+                    rebuild(now);
+                };
+                range.addEventListener('input', () => { num.value = range.value; apply(range.value, false); });
+                num.addEventListener('change', () => { range.value = num.value; apply(num.value, true); });
+                box.appendChild(row);
+            });
+        }
+        function renderColorRows() {
+            const box = $('colorRows');
+            if (!box) return;
+            box.innerHTML = '';
+            const pl = placed[selected];
+            if (!pl) return;
+            const base = getProp(pl.prop).visual;
+            const eff = effectivePalette(pl);
+            let any = false;
+            Object.keys(base).forEach(key => {
+                const value = eff[key];
+                const list = Array.isArray(value) ? value : [value];
+                if (!list.every(isColor)) return;
+                list.forEach((c, i) => {
+                    any = true;
+                    const parsed = parseColor(c);
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    row.style.gridTemplateColumns = '120px 44px 1fr';
+                    const changed = Boolean(pl.palette && key in pl.palette);
+                    row.innerHTML = `<span style="font-family:ui-monospace,monospace;font-size:11.5px;${changed ? 'color:#fde68a' : ''}">${key}${Array.isArray(value) ? `[${i}]` : ''}${changed ? ' ●' : ''}</span>`;
+                    const input = Object.assign(document.createElement('input'), { type: 'color', value: parsed.hex });
+                    input.style.cssText = 'width:44px;height:24px;padding:0;border:1px solid #3a3322;border-radius:4px;background:none';
+                    let lastSnap = 0;
+                    input.addEventListener('input', () => {
+                        if (Date.now() - lastSnap > 800) { snapshot(); lastSnap = Date.now(); }
+                        const out = formatColor(parsed.kind, input.value, parsed.a);
+                        const cur = placed[selected];
+                        cur.palette = { ...cur.palette, [key]: Array.isArray(value) ? Object.assign([...(cur.palette?.[key] ?? value)], { [i]: out }) : out };
+                        persist();
+                        rebuild(false);
+                    });
+                    input.addEventListener('change', () => { renderColorRows(); });
+                    row.appendChild(input);
+                    box.appendChild(row);
+                });
+            });
+            if (!any) box.innerHTML = '<p class="hint">Esta peça não tem cores para trocar.</p>';
+        }
+
         // --- AÇÕES ---
         const newSeed = () => 1 + Math.floor(Math.random() * 9999);
         function addAt(id, x, y) {
@@ -484,6 +728,7 @@
             if (selected < 0) return;
             snapshot();
             const c = structuredClone(placed[selected]);      // mantém from/attrs: a cópia é igualzinha
+            delete c.id;                                       // o id é do original (as áreas de trás se ligam a ele)
             c.x = Math.min(1, round(c.x + 24 / env.width));
             c.y = Math.min(1, round(c.y + 16 / env.height));
             c.seed = newSeed();
@@ -509,6 +754,7 @@
             if (!clipboard) return;
             snapshot();
             const c = structuredClone(clipboard);
+            delete c.id;
             if (pointer) { c.x = round(Math.max(0, Math.min(1, pointer.x / env.width))); c.y = round(Math.max(0, Math.min(1, pointer.y / env.height))); }
             else { c.x = Math.min(1, round(c.x + 24 / env.width)); c.y = Math.min(1, round(c.y + 16 / env.height)); }
             placed.push(c);
@@ -536,9 +782,396 @@
         function undo() {
             const last = history.pop();
             if (!last) return;
-            ({ placed, baked } = JSON.parse(last));
+            const prev = JSON.parse(last);
+            placed = prev.placed;
+            baked = prev.baked;
+            colliders = prev.colliders ?? [];
             selected = Math.min(selected, placed.length - 1);
+            selArea = Math.min(selArea, colliders.length - 1);
             commit();
+        }
+
+        // --- OBJETOS QUE ESCONDEM QUEM PASSA ATRÁS (casa, catedral) ---
+        // O objeto "esconde" (cobre o herói) quando o herói está dentro de uma área azul (kind 'behind'); fora dela, nada acontece.
+        const occludesNow = (pl) => (pl.occlude ?? getProp(pl.prop).occludes) === true;
+        function setKind(k) {
+            areaNewKind = k;
+            $('kindContact').classList.toggle('on', k === 'contact');
+            $('kindBehind').classList.toggle('on', k === 'behind');
+            $('kindSpawn').classList.toggle('on', k === 'spawn');
+            $('behindPick').hidden = k !== 'behind';
+            $('spawnHint').hidden = k !== 'spawn';
+        }
+
+        // --- ÁREAS DE CONTATO ---
+        // x e y = centro em fração do mundo (valem em qualquer tela); w, h e r em unidades do mundo, como o tamanho dos objetos.
+        // O jogo (js/systems/colliders.js) usa a MESMA geometria: um retângulo girado `rot` graus em volta do centro, ou um círculo.
+        const DEG = Math.PI / 180;
+        const newArea = (shape, x, y, size) => ({
+            shape, x: round(x / env.width), y: round(y / env.height),
+            ...(shape === 'rect' ? { w: Math.round(size[0]), h: Math.round(size[1]), rot: 0 } : { r: Math.round(size) }),
+            ...(areaNewKind === 'behind' ? { kind: 'behind' } : areaNewKind === 'spawn' ? { kind: 'spawn', weight: 1, types: [], boss: false } : { blocks: { hero: true, monsters: true, heroShots: true, monsterShots: true } })
+        });
+        // (círculo: guarda só `r`; a elipse ganha `ry` quando a alça de baixo é puxada)
+        const areaCenter = (c) => ({ cx: c.x * env.width, cy: c.y * env.height });
+        function areaLocal(c, px, py) {            // ponto do mundo -> coordenadas da própria área (sem o giro)
+            const { cx, cy } = areaCenter(c);
+            const a = (c.rot ?? 0) * DEG;
+            const dx = px - cx;
+            const dy = py - cy;
+            return { lx: dx * Math.cos(a) + dy * Math.sin(a), ly: -dx * Math.sin(a) + dy * Math.cos(a) };
+        }
+        function areaWorld(c, lx, ly) {            // coordenadas da área -> mundo
+            const { cx, cy } = areaCenter(c);
+            const a = (c.rot ?? 0) * DEG;
+            return { x: cx + lx * Math.cos(a) - ly * Math.sin(a), y: cy + lx * Math.sin(a) + ly * Math.cos(a) };
+        }
+        function areaHandles(c) {                  // onde ficam as alças da área selecionada
+            return c.shape === 'rect'
+                ? { resize: areaWorld(c, c.w / 2, c.h / 2), rotate: areaWorld(c, 0, -c.h / 2 - 26), corner: areaWorld(c, -c.w / 2 + crOf(c), -c.h / 2) }
+                : { resize: areaWorld(c, c.r, 0), resizeY: areaWorld(c, 0, c.ry ?? c.r), rotate: areaWorld(c, 0, -(c.ry ?? c.r) - 26) };
+        }
+        const crOf = (c) => Math.max(0, Math.min(c.cr ?? 0, c.w / 2, c.h / 2));        // raio dos cantos de um retângulo (0 = reto)
+        function roundRectPath(g, w, h, cr) {
+            const x = -w / 2;
+            const y = -h / 2;
+            g.moveTo(x + cr, y);
+            g.arcTo(x + w, y, x + w, y + h, cr); g.arcTo(x + w, y + h, x, y + h, cr);
+            g.arcTo(x, y + h, x, y, cr); g.arcTo(x, y, x + w, y, cr);
+            g.closePath();
+        }
+        function areaContains(c, px, py, pad = 3) {
+            const { lx, ly } = areaLocal(c, px, py);
+            if (c.shape === 'rect') {
+                const cr = crOf(c);
+                const qx = Math.max(-(c.w / 2 - cr), Math.min(c.w / 2 - cr, lx));
+                const qy = Math.max(-(c.h / 2 - cr), Math.min(c.h / 2 - cr, ly));
+                return Math.hypot(lx - qx, ly - qy) <= cr + pad;
+            }
+            const ry = c.ry ?? c.r;
+            return (lx / (c.r + pad)) ** 2 + (ly / (ry + pad)) ** 2 <= 1;           // círculo ou elipse
+        }
+        const areaPad = () => 8 / view.scale;      // o tamanho das alças acompanha o zoom da tela
+        function areaPick(px, py, cycle = false) {
+            if (selArea >= 0 && colliders[selArea]) {
+                const hs = areaHandles(colliders[selArea]);
+                if (Math.hypot(px - hs.resize.x, py - hs.resize.y) <= areaPad() * 1.4) return { kind: 'resize', i: selArea };
+                if (hs.resizeY && Math.hypot(px - hs.resizeY.x, py - hs.resizeY.y) <= areaPad() * 1.4) return { kind: 'resizeY', i: selArea };
+                if (hs.corner && Math.hypot(px - hs.corner.x, py - hs.corner.y) <= areaPad() * 1.4) return { kind: 'corner', i: selArea };
+                if (hs.rotate && Math.hypot(px - hs.rotate.x, py - hs.rotate.y) <= areaPad() * 1.4) return { kind: 'rotate', i: selArea };
+            }
+            // Áreas uma dentro da outra: a MENOR que contém o ponto ganha (a de dentro); Shift+clique passa para a próxima
+            const size = (c) => (c.shape === 'rect' ? c.w * c.h : Math.PI * c.r * (c.ry ?? c.r));
+            const inside = colliders.map((c, i) => ({ c, i })).filter(({ c }) => areaContains(c, px, py)).sort((a, b) => size(a.c) - size(b.c) || b.i - a.i);
+            if (!inside.length) return null;
+            if (cycle) {
+                const cur = inside.findIndex(h => h.i === selArea);
+                return { kind: 'move', i: inside[(cur + 1) % inside.length].i };
+            }
+            return { kind: 'move', i: inside[0].i };
+        }
+        function setTool(t) {
+            areaTool = t;
+            areaDrag = null;
+            $('toolSel').classList.toggle('on', t === 'select');
+            $('toolRect').classList.toggle('on', t === 'rect');
+            $('toolCircle').classList.toggle('on', t === 'circle');
+            $('toolHint').textContent = t === 'rect' ? 'Arraste no cenário de um canto ao canto oposto.' : t === 'circle' ? 'Arraste do centro até a borda do círculo.' : 'Clique numa área para selecionar; arraste para mover.';
+            canvas.style.cursor = t === 'select' ? '' : 'crosshair';
+        }
+        function setMode(m) {
+            mode = m;
+            armed = null;
+            $('objPanel').hidden = m !== 'objects';
+            $('areaPanel').hidden = m !== 'areas';
+            $('modeObj').classList.toggle('on', m === 'objects');
+            $('modeArea').classList.toggle('on', m === 'areas');
+            if (m === 'areas') { selected = -1; renderSide(); setTool('select'); } else { canvas.style.cursor = ''; renderPalette(); }
+            renderAreas();
+            status(m === 'areas' ? 'Áreas de contato: escolha Retângulo ou Círculo e arraste no cenário.' : '');
+        }
+        function areaPointerDown(e) {
+            const p = toWorld(e);
+            if (e.button === 2) { setTool('select'); return; }
+            try { canvas.setPointerCapture(e.pointerId); } catch { /* ok */ }
+            if (areaTool !== 'select') { areaDrag = { kind: 'draw', x0: p.x, y0: p.y, x1: p.x, y1: p.y }; return; }
+            const hit = areaPick(p.x, p.y, e.shiftKey);
+            if (!hit) { selArea = -1; renderAreas(); return; }
+            snapshot();
+            selArea = hit.i;
+            const c = colliders[hit.i];
+            const { cx, cy } = areaCenter(c);
+            areaDrag = { kind: hit.kind, dx: cx - p.x, dy: cy - p.y };
+            renderAreas();
+        }
+        function areaPointerMove() {
+            const p = pointer;
+            if (!p) return;
+            if (!areaDrag) {
+                canvas.style.cursor = areaTool !== 'select' ? 'crosshair' : areaPick(p.x, p.y) ? 'grab' : '';
+                return;
+            }
+            if (areaDrag.kind === 'draw') { areaDrag.x1 = p.x; areaDrag.y1 = p.y; return; }
+            const c = colliders[selArea];
+            if (!c) return;
+            const clamp01 = (v) => round(Math.max(0, Math.min(1, v)));
+            if (areaDrag.kind === 'move') {
+                c.x = clamp01((p.x + areaDrag.dx) / env.width);
+                c.y = clamp01((p.y + areaDrag.dy) / env.height);
+            } else if (areaDrag.kind === 'resize') {
+                const { lx, ly } = areaLocal(c, p.x, p.y);
+                if (c.shape === 'rect') { c.w = Math.max(6, Math.round(Math.abs(lx) * 2)); c.h = Math.max(6, Math.round(Math.abs(ly) * 2)); }
+                else if (c.ry === undefined) c.r = Math.max(4, Math.round(Math.hypot(lx, ly)));      // ainda círculo: o raio muda nos dois sentidos
+                else c.r = Math.max(4, Math.round(Math.abs(lx)));                                     // elipse: só o raio horizontal
+            } else if (areaDrag.kind === 'corner') {
+                const { lx } = areaLocal(c, p.x, p.y);
+                c.cr = Math.max(0, Math.min(Math.round(lx + c.w / 2), Math.floor(Math.min(c.w, c.h) / 2)));     // arrastar o ponto azul ao longo da borda de cima arredonda os cantos
+                if (c.cr === 0) delete c.cr;
+            } else if (areaDrag.kind === 'resizeY') {
+                const { ly } = areaLocal(c, p.x, p.y);
+                c.ry = Math.max(4, Math.round(Math.abs(ly)));          // puxar a alça de baixo transforma o círculo em elipse
+            } else if (areaDrag.kind === 'rotate') {
+                const { cx, cy } = areaCenter(c);
+                let deg = Math.atan2(p.y - cy, p.x - cx) / DEG + 90;
+                deg = ((deg + 540) % 360) - 180;
+                c.rot = shiftDown ? Math.round(deg / 15) * 15 : Math.round(deg);
+            }
+        }
+        let shiftDown = false;
+        window.addEventListener('keydown', (e) => { if (e.key === 'Shift') shiftDown = true; });
+        window.addEventListener('keyup', (e) => { if (e.key === 'Shift') shiftDown = false; });
+        function areaPointerUp() {
+            if (!areaDrag) return;
+            const d = areaDrag;
+            areaDrag = null;
+            if (d.kind === 'draw') {
+                snapshot();
+                if (areaTool === 'rect') {
+                    const w = Math.abs(d.x1 - d.x0);
+                    const h = Math.abs(d.y1 - d.y0);
+                    if (w < 6 || h < 6) return;
+                    colliders.push(newArea('rect', (d.x0 + d.x1) / 2, (d.y0 + d.y1) / 2, [w, h]));
+                } else {
+                    const r = Math.hypot(d.x1 - d.x0, d.y1 - d.y0);
+                    if (r < 4) return;
+                    colliders.push(newArea('circle', d.x0, d.y0, r));
+                }
+                selArea = colliders.length - 1;
+                setTool('select');
+            }
+            persist();
+            renderAreas();
+        }
+        function areaKey(e) {
+            const c = colliders[selArea];
+            if (e.key === 'Escape') { setTool('select'); return; }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') { if (c) { areaClip = structuredClone(c); status('Área copiada. Ctrl+V cola onde o mouse estiver.'); e.preventDefault(); } return; }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+                if (!areaClip) return;
+                e.preventDefault();
+                snapshot();
+                const n = structuredClone(areaClip);
+                if (pointer) { n.x = round(pointer.x / env.width); n.y = round(pointer.y / env.height); } else { n.x = round(n.x + 24 / env.width); n.y = round(n.y + 16 / env.height); }
+                colliders.push(n);
+                selArea = colliders.length - 1;
+                persist(); renderAreas();
+                return;
+            }
+            if (!c) return;
+            const step = e.shiftKey ? 10 : 1;
+            const move = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+            if (move) { e.preventDefault(); snapshot(); c.x = round(Math.max(0, Math.min(1, c.x + move[0] / env.width))); c.y = round(Math.max(0, Math.min(1, c.y + move[1] / env.height))); persist(); renderAreas(); }
+            else if (e.key === 'Delete' || e.key === 'Backspace') { snapshot(); colliders.splice(selArea, 1); selArea = -1; persist(); renderAreas(); }
+        }
+        function renderAreas() {
+            if (!$('areaList')) return;
+            $('areaCount').textContent = colliders.length;
+            $('areaBadge').textContent = colliders.length ? `(${colliders.length})` : '';
+            const list = $('areaList');
+            list.innerHTML = '';
+            colliders.forEach((c, i) => {
+                const d = document.createElement('div');
+                d.className = i === selArea ? 'sel' : '';
+                d.innerHTML = `<span>${c.kind === 'behind' ? '🕶 ' : c.kind === 'spawn' ? (c.boss ? '👑 ' : '🟢 ') + (spawnBlocked(c) ? '⚠ ' : '') : CONTACT_TONE[contactType(c)][2] + ' '}${c.shape === 'rect' ? (crOf(c) > 0 && crOf(c) >= Math.floor(Math.min(c.w, c.h) / 2) ? '💊 Cápsula' : crOf(c) > 0 ? '▢ Ret. arredondado' : '▭ Retângulo') : (c.ry !== undefined && c.ry !== c.r ? '⬭ Elipse' : '◯ Círculo')} ${c.shape === 'rect' ? `${c.w}×${c.h}` : (c.ry !== undefined && c.ry !== c.r ? `${c.r}×${c.ry}` : `r ${c.r}`)}</span><span>${round(c.x, 2)}, ${round(c.y, 2)}</span>`;
+                d.onclick = () => { selArea = i; renderAreas(); };
+                list.appendChild(d);
+            });
+            const box = $('areaSel');
+            const c = colliders[selArea];
+            if (!c) { box.innerHTML = '<p class="hint">Nenhuma. Clique numa área.</p>'; return; }
+            const num = (id, label, v, min, max, step) => `<div class="row"><span>${label}</span><input id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${v}"><input id="${id}N" type="number" min="${min}" max="${max}" step="${step}" value="${v}"></div>`;
+            box.innerHTML = `<div style="font-size:13px;margin-bottom:4px"><b>${c.kind === 'behind' ? '🕶 Área de trás · ' : c.kind === 'spawn' ? (c.boss ? '👑 Nascimento do chefe · ' : '🟢 Nascimento · ') : { wall: '🧱 Parede · ', body: '🚧 Só corpos · ', shield: '🛡 Só tiros · ', hero: '🧍 Só o herói · ', none: '◌ Não barra nada · ' }[contactType(c)]}${c.shape === 'rect' ? (crOf(c) > 0 ? 'Retângulo arredondado' : 'Retângulo') : (c.ry !== undefined && c.ry !== c.r ? 'Elipse' : 'Círculo')}</b>${c.shape === 'circle' ? ' <span class="hint" style="font-size:11px">(puxe a alça de baixo para esticar em elipse)</span>' : ''}</div>
+                ${num('aX', 'X', round(c.x), 0, 1, 0.001)}${num('aY', 'Y', round(c.y), 0, 1, 0.001)}
+                ${c.shape === 'rect' ? num('aW', 'Largura', c.w, 6, 1200, 1) + num('aH', 'Altura', c.h, 6, 1200, 1) + num('aCr', 'Cantos arredondados', crOf(c), 0, Math.floor(Math.min(c.w, c.h) / 2), 1) + '<div class="btns"><button id="aSquare">Cantos retos</button><button id="aPill">Cápsula</button></div>' + num('aR', 'Giro (°)', c.rot ?? 0, -180, 180, 1) : num('aRad', 'Raio X', c.r, 4, 800, 1) + num('aRadY', 'Raio Y', c.ry ?? c.r, 4, 800, 1) + num('aR', 'Giro (°)', c.rot ?? 0, -180, 180, 1) + '<div class="btns"><button id="aRound">Voltar a círculo</button></div>'}
+                ${c.kind === 'spawn' ? `<div id="spawnBox" style="margin:6px 0">
+                    <div class="row"><span>Peso</span><input id="sWeight" type="range" min="0" max="10" step="0.5" value="${c.weight ?? 1}"><input id="sWeightN" type="number" min="0" max="10" step="0.5" value="${c.weight ?? 1}"></div>
+                    <label class="check"><input id="sBoss" type="checkbox" ${c.boss ? 'checked' : ''}> Zona do CHEFE (é aqui que o círculo de invocação dele aparece)</label>
+                    <div id="sTypes" ${c.boss ? 'hidden' : ''} style="margin-top:4px"><span style="font-size:12.5px;color:#a39b86">Monstros que nascem aqui (nenhum marcado = todos):</span><div class="chips" id="sTypeChips" style="margin-top:3px"></div></div></div>` : ''}
+                <div style="margin:6px 0" ${c.kind === 'behind' || c.kind === 'spawn' ? 'hidden' : ''}>
+                    <div style="font-size:12.5px;color:#a39b86;margin-bottom:3px">Tipo (modelos prontos):</div>
+                    <div class="btns" style="margin:0 0 4px"><button id="pWall" title="Barra tudo: corpos e tiros">🧱 Parede</button><button id="pBody" title="Barra herói e monstros; os tiros passam por cima (mureta, rio, buraco)">🚧 Só corpos</button><button id="pShield" title="Só barra os tiros; os corpos passam (escudo, cobertura)">🛡 Só tiros</button><button id="pHero" title="Só o herói não passa; monstros e tiros passam">🧍 Só o herói</button></div>
+                    <div style="font-size:12.5px;color:#a39b86">Ou escolha o que ela barra:</div>
+                    <label class="check"><input id="bHero" type="checkbox" ${blocksOf(c).hero ? 'checked' : ''}> herói</label>
+                    <label class="check"><input id="bMon" type="checkbox" ${blocksOf(c).monsters ? 'checked' : ''}> monstros e chefes</label>
+                    <label class="check"><input id="bHShot" type="checkbox" ${blocksOf(c).heroShots ? 'checked' : ''}> tiros do herói</label>
+                    <label class="check"><input id="bMShot" type="checkbox" ${blocksOf(c).monsterShots ? 'checked' : ''}> tiros dos monstros</label></div>
+                <div class="btns"><button id="aDup">Duplicar</button><button id="aDel">Apagar</button></div>`;
+            const bind = (id, key, isInt) => {
+                const range = $(id);
+                const numEl = $(id + 'N');
+                const apply = (v) => { snapshotThrottled(); colliders[selArea][key] = isInt ? Math.round(+v) : +v; persist(); };
+                range.oninput = () => { numEl.value = range.value; apply(range.value); };
+                numEl.onchange = () => { range.value = numEl.value; apply(numEl.value); };
+            };
+            bind('aX', 'x'); bind('aY', 'y');
+            if (c.shape === 'rect') {
+                bind('aW', 'w', true); bind('aH', 'h', true); bind('aR', 'rot', true); bind('aCr', 'cr', true);
+                $('aSquare').onclick = () => { snapshot(); delete colliders[selArea].cr; persist(); renderAreas(); };
+                $('aPill').onclick = () => { snapshot(); const k = colliders[selArea]; k.cr = Math.floor(Math.min(k.w, k.h) / 2); persist(); renderAreas(); };
+            } else {
+                bind('aRad', 'r', true); bind('aRadY', 'ry', true); bind('aR', 'rot', true);
+                $('aRound').onclick = () => { snapshot(); delete colliders[selArea].ry; persist(); renderAreas(); };
+            }
+            const setBlock = (key, id) => { $(id).onchange = (e) => { snapshot(); colliders[selArea].blocks = { ...blocksOf(colliders[selArea]), [key]: e.target.checked }; persist(); renderAreas(); }; };
+            const preset = (id, blocks) => { const el = $(id); if (el) el.onclick = () => { snapshot(); colliders[selArea].blocks = { ...blocks }; persist(); renderAreas(); }; };
+            preset('pWall', { hero: true, monsters: true, heroShots: true, monsterShots: true });
+            preset('pBody', { hero: true, monsters: true, heroShots: false, monsterShots: false });
+            preset('pShield', { hero: false, monsters: false, heroShots: true, monsterShots: true });
+            preset('pHero', { hero: true, monsters: false, heroShots: false, monsterShots: false });
+            if (c.kind === 'spawn') {
+                const keep = () => { persist(); };
+                const wr = $('sWeight'); const wn = $('sWeightN');
+                wr.oninput = () => { wn.value = wr.value; snapshotThrottled(); colliders[selArea].weight = +wr.value; keep(); };
+                wn.onchange = () => { wr.value = wn.value; snapshotThrottled(); colliders[selArea].weight = +wn.value; keep(); };
+                $('sBoss').onchange = (e) => { snapshot(); colliders[selArea].boss = e.target.checked; if (e.target.checked) colliders[selArea].types = []; persist(); renderAreas(); };
+                const chips = $('sTypeChips');
+                MONSTER_TYPES.forEach(([key, label]) => {
+                    const b = document.createElement('button');
+                    const on = () => (colliders[selArea].types ?? []).includes(key);
+                    b.textContent = label;
+                    b.className = on() ? 'on' : '';
+                    b.onclick = () => {
+                        snapshot();
+                        const cur = colliders[selArea];
+                        cur.types = on() ? cur.types.filter(t => t !== key) : [...(cur.types ?? []), key];
+                        persist(); b.className = on() ? 'on' : '';
+                    };
+                    chips.appendChild(b);
+                });
+            } else if (c.kind !== 'behind') { setBlock('hero', 'bHero'); setBlock('monsters', 'bMon'); setBlock('heroShots', 'bHShot'); setBlock('monsterShots', 'bMShot'); }
+            $('aDup').onclick = () => { snapshot(); const n = structuredClone(colliders[selArea]); n.x = round(Math.min(1, n.x + 24 / env.width)); n.y = round(Math.min(1, n.y + 16 / env.height)); colliders.push(n); selArea = colliders.length - 1; persist(); renderAreas(); };
+            $('aDel').onclick = () => { snapshot(); colliders.splice(selArea, 1); selArea = -1; persist(); renderAreas(); };
+        }
+        let lastAreaSnap = 0;
+        function snapshotThrottled() { if (Date.now() - lastAreaSnap > 800) { snapshot(); lastAreaSnap = Date.now(); } }
+        $('kindContact').addEventListener('click', () => setKind('contact'));
+        $('kindBehind').addEventListener('click', () => setKind('behind'));
+        $('kindSpawn').addEventListener('click', () => setKind('spawn'));
+        $('modeObj').addEventListener('click', () => setMode('objects'));
+        $('modeArea').addEventListener('click', () => setMode('areas'));
+        $('toolSel').addEventListener('click', () => setTool('select'));
+        $('toolRect').addEventListener('click', () => setTool('rect'));
+        $('toolCircle').addEventListener('click', () => setTool('circle'));
+        $('areaClear').addEventListener('click', () => { if (colliders.length && confirm('Apagar todas as áreas de contato?')) { snapshot(); colliders = []; selArea = -1; persist(); renderAreas(); } });
+        $('areaUndo').addEventListener('click', undo);
+        // O que uma área de contato barra (um `shots` antigo vale para os dois tipos de tiro) e o tipo dela: parede, só corpos ou escudo (só tiros)
+        const blocksOf = (c) => ({
+            hero: c.blocks?.hero !== false, monsters: c.blocks?.monsters !== false,
+            heroShots: (c.blocks?.heroShots ?? c.blocks?.shots) !== false, monsterShots: (c.blocks?.monsterShots ?? c.blocks?.shots) !== false
+        });
+        function contactType(c) {
+            const b = blocksOf(c);
+            const bodies = b.hero || b.monsters;
+            const shots = b.heroShots || b.monsterShots;
+            if (bodies && !shots && b.hero && !b.monsters) return 'hero';
+            return bodies && shots ? 'wall' : bodies ? 'body' : shots ? 'shield' : 'none';
+        }
+        const CONTACT_TONE = { wall: ['rgba(239, 68, 68, 0.26)', 'rgba(248, 113, 113, 0.95)', '🧱'], body: ['rgba(245, 158, 11, 0.26)', 'rgba(251, 191, 36, 0.95)', '🚧'], shield: ['rgba(20, 184, 166, 0.26)', 'rgba(94, 234, 212, 0.95)', '🛡'], hero: ['rgba(167, 139, 250, 0.28)', 'rgba(196, 181, 253, 0.95)', '🧍'], none: ['rgba(148, 163, 184, 0.18)', 'rgba(203, 213, 225, 0.7)', '◌'] };
+        const blocksIcons = (c) => { const b = blocksOf(c); return `${b.hero ? '🧍' : ''}${b.monsters ? '👹' : ''}${b.heroShots ? '🏹' : ''}${b.monsterShots ? '☄' : ''}`; };
+        // Os monstros do Last Torch (para escolher quais nascem numa zona). A chave é o tipo do jogo (MONSTER_MODELS).
+        const MONSTER_TYPES = [['SKELETON', 'Esqueleto'], ['SKELETON_CRAWLER', 'Esqueleto rastejante'], ['BAT', 'Morcego'], ['MOTH', 'Mariposa'], ['VAMPIRE', 'Vampiro'], ['WITCH', 'Bruxa'], ['BLOATER', 'Inchado'], ['WRAITH', 'Espectro'], ['NECROMANCER', 'Necromante'], ['SHADOW_WOLF', 'Lobo sombrio'], ['ZOMBIE_WOLF', 'Lobo zumbi'], ['HEADLESS_KNIGHT', 'Cavaleiro sem cabeça'], ['BONE_COLOSSUS', 'Colosso de ossos'], ['TREANT', 'Treant'], ['GOLEM', 'Golem']];
+        // A linha reta da zona até a tocha (o centro do mundo) cruza alguma área de contato que barra monstros? Eles andam em linha reta: ficariam presos.
+        function spawnBlocked(z) {
+            const tx = env.width / 2;
+            const ty = env.height / 2;
+            const { cx, cy } = areaCenter(z);
+            const walls = colliders.filter(a => (a.kind ?? 'contact') === 'contact' && a.blocks?.monsters !== false);
+            if (!walls.length) return false;
+            const n = Math.max(2, Math.ceil(Math.hypot(tx - cx, ty - cy) / 8));
+            for (let i = 0; i <= n; i++) {
+                const x = cx + ((tx - cx) * i) / n;
+                const y = cy + ((ty - cy) * i) / n;
+                if (walls.some(a => areaContains(a, x, y, 0))) return true;
+            }
+            return false;
+        }
+        function drawAreas() {
+            if (!$('showAreas').checked && mode !== 'areas') return;
+            const lw = 1.5 / view.scale;
+            const trace = (c) => {
+                const { cx, cy } = areaCenter(c);
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate((c.rot ?? 0) * DEG);
+                ctx.beginPath();
+                if (c.shape === 'rect') { if (crOf(c) > 0) roundRectPath(ctx, c.w, c.h, crOf(c)); else ctx.rect(-c.w / 2, -c.h / 2, c.w, c.h); } else ctx.ellipse(0, 0, c.r, c.ry ?? c.r, 0, 0, Math.PI * 2);
+                ctx.restore();
+            };
+            colliders.forEach((c, i) => {
+                const sel = i === selArea && mode === 'areas';
+                trace(c);
+                ctx.fillStyle = sel ? 'rgba(250, 204, 21, 0.30)' : c.kind === 'behind' ? 'rgba(56, 189, 248, 0.24)' : c.kind === 'spawn' ? (c.boss ? 'rgba(217, 70, 239, 0.26)' : 'rgba(34, 197, 94, 0.26)') : CONTACT_TONE[contactType(c)][0];
+                ctx.fill();
+                ctx.lineWidth = lw;
+                ctx.strokeStyle = sel ? '#fde047' : c.kind === 'behind' ? 'rgba(125, 211, 252, 0.95)' : c.kind === 'spawn' ? (c.boss ? 'rgba(240, 171, 252, 0.95)' : 'rgba(134, 239, 172, 0.95)') : CONTACT_TONE[contactType(c)][1];
+                ctx.stroke();
+            });
+            // zonas de nascimento: a linha até a tocha (verde = livre; vermelha tracejada = uma parede barra o caminho)
+            colliders.filter(z => z.kind === 'spawn').forEach(z => {
+                const { cx, cy } = areaCenter(z);
+                const blocked = spawnBlocked(z);
+                ctx.setLineDash([8 / view.scale, 6 / view.scale]);
+                ctx.lineWidth = 1.6 / view.scale;
+                ctx.strokeStyle = blocked ? 'rgba(248, 113, 113, 0.95)' : (z.boss ? 'rgba(240, 171, 252, 0.7)' : 'rgba(134, 239, 172, 0.65)');
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(env.width / 2, env.height / 2); ctx.stroke();
+                ctx.setLineDash([]);
+            });
+            if (mode !== 'areas') return;
+            const c = colliders[selArea];
+            if (c) {
+                const hs = areaHandles(c);
+                const pad = areaPad() * 0.7;
+                ctx.fillStyle = '#fde047';
+                ctx.strokeStyle = '#1c1917';
+                ctx.lineWidth = lw;
+                ctx.fillRect(hs.resize.x - pad, hs.resize.y - pad, pad * 2, pad * 2);
+                ctx.strokeRect(hs.resize.x - pad, hs.resize.y - pad, pad * 2, pad * 2);
+                if (hs.corner) {                       // a alça dos cantos arredondados (bolinha azul na borda de cima)
+                    ctx.fillStyle = '#7dd3fc';
+                    ctx.beginPath(); ctx.arc(hs.corner.x, hs.corner.y, pad * 0.9, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#fde047';
+                }
+                if (hs.resizeY) {                      // a segunda alça do círculo: puxe para esticar em elipse
+                    ctx.fillRect(hs.resizeY.x - pad, hs.resizeY.y - pad, pad * 2, pad * 2);
+                    ctx.strokeRect(hs.resizeY.x - pad, hs.resizeY.y - pad, pad * 2, pad * 2);
+                }
+                if (hs.rotate) {
+                    const top = areaWorld(c, 0, c.shape === 'rect' ? -c.h / 2 : -(c.ry ?? c.r));
+                    ctx.beginPath(); ctx.moveTo(top.x, top.y); ctx.lineTo(hs.rotate.x, hs.rotate.y); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(hs.rotate.x, hs.rotate.y, pad, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                }
+            }
+            const d = areaDrag;
+            if (d?.kind === 'draw') {
+                ctx.setLineDash([6 / view.scale, 4 / view.scale]);
+                ctx.strokeStyle = '#fde047';
+                ctx.lineWidth = lw;
+                ctx.beginPath();
+                if (areaTool === 'rect') ctx.rect(Math.min(d.x0, d.x1), Math.min(d.y0, d.y1), Math.abs(d.x1 - d.x0), Math.abs(d.y1 - d.y0));
+                else ctx.arc(d.x0, d.y0, Math.hypot(d.x1 - d.x0, d.y1 - d.y0), 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
         }
 
         // --- MOUSE ---
@@ -553,10 +1186,11 @@
             canvas.className = 'grabbing';
         }
         canvas.addEventListener('pointerdown', (e) => {
+            if (mode === 'areas') { areaPointerDown(e); return; }
             const p = toWorld(e);
             if (e.button === 2) { armed = null; renderPalette(); return; }
             // Clicar num objeto (colocado ou da receita) sempre o seleciona e arrasta, mesmo com uma peça escolhida: nunca cria outro por cima
-            const i = grabAt(p.x, p.y);
+            const i = grabAt(p.x, p.y, e.shiftKey);
             if (i >= 0) {
                 snapshot();
                 startDrag(e, p, i);
@@ -573,16 +1207,18 @@
         });
         canvas.addEventListener('pointermove', (e) => {
             pointer = toWorld(e);
+            if (mode === 'areas') { areaPointerMove(); return; }
             if (drag && selected >= 0) {
                 const pl = placed[selected];
                 pl.x = round(Math.max(0, Math.min(1, (pointer.x + drag.dx) / env.width)));
                 pl.y = round(Math.max(0, Math.min(1, (pointer.y + drag.dy) / env.height)));
                 rebuild(false);
             } else {
-                canvas.className = (pickAt(pointer.x, pointer.y) >= 0 || pickRecipeAt(pointer.x, pointer.y)) ? 'grab' : '';
+                canvas.className = candidatesAt(pointer.x, pointer.y).length ? 'grab' : '';
             }
         });
         canvas.addEventListener('pointerup', () => {
+            if (mode === 'areas') { areaPointerUp(); return; }
             if (!drag) return;
             drag = null;
             canvas.className = '';
@@ -594,9 +1230,10 @@
         window.addEventListener('keydown', (e) => {
             if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName) && !['Escape'].includes(e.key)) return;
             const pl = placed[selected];
-            if (e.key === 'Escape') { armed = null; renderPalette(); status(''); return; }
+            if (e.key === 'Escape') { armed = null; areaTool = 'select'; areaDrag = null; renderPalette(); renderAreas(); status(''); return; }
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); persist(true); status('Salvo (Ctrl+S).'); return; }
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
+            if (mode === 'areas') { areaKey(e); return; }
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') { if (copySelected()) e.preventDefault(); return; }
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') { if (clipboard) { e.preventDefault(); paste(); } return; }
             if (!pl) return;
@@ -638,11 +1275,16 @@
                 if (p.scale && p.scale !== 1) parts.push(`scale: ${round(p.scale, 3)}`);
                 if (p.rot) parts.push(`rot: ${round(p.rot, 1)}`);
                 if (p.front) parts.push('front: true');
+                if (p.occlude !== undefined) parts.push(`occlude: ${p.occlude}`);
+                if (p.palette) parts.push(`palette: ${JSON.stringify(p.palette)}`);
                 if (p.flip) parts.push('flip: true');
                 return `        { ${parts.join(', ')} }`;
             });
             const head = baked.length ? `    // Entradas da receita convertidas em objetos (índices em props)\n    baked: [${baked.join(', ')}],\n` : '';
-            return `${head}    // Objetos do editor (x e y em fração do mundo)\n    placed: [\n${rows.join(',\n')}\n    ],`;
+            const areas = colliders.length
+                ? `\n    // Áreas de contato: ninguém passa (x e y = centro, em fração do mundo; w, h, r em unidades; rot em graus)\n    colliders: [\n${colliders.map(c => `        ${JSON.stringify(c)}`).join(',\n')}\n    ],`
+                : '';
+            return `${head}    // Objetos do editor (x e y em fração do mundo)\n    placed: [\n${rows.join(',\n')}\n    ],${areas}`;
         }
         $('copy').addEventListener('click', async () => {
             const text = layoutText();
@@ -662,6 +1304,7 @@
                 list.forEach(p => { if (!propIds().includes(p.prop)) throw new Error(`peça desconhecida: ${p.prop}`); });
                 snapshot();
                 baked = Array.isArray(data.baked) ? data.baked : [];
+                colliders = Array.isArray(data.colliders) ? data.colliders : [];
                 placed = list.map(p => (p.attrs || p.variant !== undefined ? p : { ...p, seed: p.seed ?? newSeed() }));
                 selected = -1;
                 commit();
@@ -674,18 +1317,24 @@
                 return;
             }
             persist();
+            if (colliders.length && !serverFeatures.includes('colliders')) {
+                alert('O servidor do Ateliê que está rodando é de uma versão antiga e não grava as áreas de contato (elas se perderiam).\n\n1. No terminal onde ele roda, aperte Ctrl+C.\n2. Rode de novo: python3 mini_games/_library/tools/serve.py\n3. Recarregue esta página (Ctrl+Shift+R) e clique em Gravar de novo.\n\nSuas áreas estão guardadas neste navegador.');
+                return;
+            }
             $('saveFile').disabled = true;
             try {
                 const res = await fetch('/__save_layout', {
                     method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Atelie': '1' },
-                    body: JSON.stringify({ scenery: $('scenery').value, placed, baked })
+                    body: JSON.stringify({ scenery: $('scenery').value, placed, baked, colliders })
                 });
                 const out = await res.json();
                 if (!res.ok || !out.ok) throw new Error(out.error || `erro ${res.status}`);
+                // O servidor diz quantas áreas gravou: se não bater, o arquivo ficou incompleto (não finja que está em dia)
+                if (out.colliders !== colliders.length) throw new Error(`o servidor gravou ${out.colliders ?? 0} de ${colliders.length} áreas: reinicie o serve.py`);
                 fileAt = out.savedAt;
                 fileState[$('scenery').value] = { savedAt: out.savedAt };
                 // O navegador passa a ter a mesma data do arquivo: nada "pendente"
-                try { localStorage.setItem(storeKey, JSON.stringify({ placed, baked, savedAt: out.savedAt || Date.now() })); } catch { /* ok */ }
+                try { localStorage.setItem(storeKey, JSON.stringify({ placed, baked, colliders, savedAt: out.savedAt || Date.now() })); } catch { /* ok */ }
                 localAt = out.savedAt || Date.now();
                 renderFileInfo();
                 markSavedScenes();
@@ -700,7 +1349,7 @@
         });
         $('save').addEventListener('click', () => { persist(true); status(canWrite ? 'Salvo neste navegador. Para gravar no projeto (e o jogo ver), use "📁 Gravar no arquivo".' : 'Salvo neste navegador (não é o arquivo do projeto). Para gravar no projeto, abra o Ateliê pelo serve.py: veja a mensagem ao lado de "📁 Gravar no arquivo".'); });
         $('download').addEventListener('click', () => {
-            const blob = new Blob([JSON.stringify({ scenery: $('scenery').value, placed, baked }, null, 1)], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify({ scenery: $('scenery').value, placed, baked, colliders }, null, 1)], { type: 'application/json' });
             const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `${$('scenery').value}_layout.json` });
             a.click();
             URL.revokeObjectURL(a.href);
@@ -719,6 +1368,7 @@
                 snapshot();
                 placed = d.placed;
                 baked = Array.isArray(d.baked) ? d.baked : [];
+                colliders = Array.isArray(d.colliders) ? d.colliders : [];
                 selected = -1;
                 commit();
                 persist(true);
@@ -773,7 +1423,7 @@
                 ctx.fillStyle = '#fff7ed';
                 ctx.beginPath(); ctx.arc(env.width / 2, env.height / 2, 5, 0, Math.PI * 2); ctx.fill();
             }
-            if ($('handles').checked) {
+            if ($('handles').checked && mode !== 'areas') {
                 recipeItems().forEach(a => {
                     const { cx, cy, r } = hitOf({ prop: a.prop, x: a.x, y: a.y, from: a.entry, scale: a.scale });
                     ctx.setLineDash([2, 4]);
@@ -820,6 +1470,7 @@
             scenery.renderAmbient(env);
             scenery.renderOverlay(env);
             drawHandles();
+            drawAreas();
         }
 
         // --- INÍCIO ---
@@ -835,8 +1486,8 @@
         $('preset').addEventListener('change', () => { fit(); runAnalysis(); });
         $('quality').addEventListener('change', () => scenery.invalidate());
         window.addEventListener('resize', fit);
-        window.__editor = { get placed() { return placed; }, get baked() { return baked; }, get analysis() { return analysis; }, addAt, get env() { return env; } };
-        fetch('/__layout_api').then(r => r.ok ? r.json() : null).then(j => { canWrite = Boolean(j?.ok); renderFileInfo(); }).catch(() => renderFileInfo());
+        window.__editor = { get placed() { return placed; }, get baked() { return baked; }, get analysis() { return analysis; }, get colliders() { return colliders; }, addAt, get env() { return env; } };
+        fetch('/__layout_api').then(r => r.ok ? r.json() : null).then(j => { canWrite = Boolean(j?.ok); serverFeatures = j?.features ?? []; renderFileInfo(); }).catch(() => renderFileInfo());
         window.__ready = true;
         requestAnimationFrame(frame);
     </script>

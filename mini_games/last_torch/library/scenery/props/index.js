@@ -22,10 +22,15 @@ import './ripple/ripple.js';
 import './wisp/wisp.js';
 import './brazier/brazier.js';
 import './tombstone/tombstone.js';
+import './cathedral/cathedral.js';
+import './cathedral_grand/cathedral_grand.js';
 import './cottage/cottage.js';
 import './well/well.js';
 import './haystack/haystack.js';
 import './cart/cart.js';
 import './barrel/barrel.js';
+import './iron_fence/iron_fence.js';
+import './iron_gate/iron_gate.js';
+import './bridge/bridge.js';
 
 export { getProp, propIds, registerProp } from './props.js';

@@ -403,6 +403,13 @@ export function updateEnemies(dt) {
         const e = enemies[i];
         const model = getEnemyModel(e.type);
 
+        // Nascendo (zona de nascimento do cenário): fica parado e não ataca até o efeito acabar (library/monsters/25d/spawn.js)
+        if (e.emerge) {
+            e.emerge.age += dt;
+            if (e.emerge.age >= e.emerge.seconds) e.emerge = null;
+            else { e.vx = e.vy = 0; continue; }
+        }
+
         if (e.hitFlash > 0) e.hitFlash -= dt;
         if (e.orbitCd > 0) e.orbitCd -= dt;
         if (e.marked > 0) e.marked -= dt;

@@ -11,6 +11,8 @@ import { updateHUD } from '../ui/hud.js';
 import { addShockwave, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { getHero, mod } from './modifiers.js';
 import { clearSkillEffects } from './skills.js';
+import { spawnDefOf } from '../../library/monsters/25d/spawn.js';
+import { pickBossSpawnPoint, pickSpawnPoint } from './spawn_zones.js';
 
 const MIN_HORDE = 3;
 
@@ -38,20 +40,30 @@ function applyEnemyMods(e) {
 }
 
 // Todo monstro entra por aqui (spawner, invocações, hordas)
-export function addMonster(type, x, y) {
+// opts.emerge: o monstro NASCE à vista (zona de nascimento do cenário): o efeito e a pose vêm de library/monsters/25d/spawn.js, e enquanto
+// nasce ele não anda nem ataca (js/systems/enemies.js)
+export function addMonster(type, x, y, opts = {}) {
     const e = applyEnemyMods(createMonster(type, state.turn, x, y));
+    const def = opts.emerge ? spawnDefOf(type) : null;
+    if (def) e.emerge = { age: 0, seconds: def.seconds, def };
     state.enemies.push(e);
     return e;
 }
 
+// Onde nasce um monstro deste tipo: numa zona de nascimento do cenário, se houver; senão, pela borda do mundo (o jeito de sempre)
+function spawnSpot(type) {
+    const zone = pickSpawnPoint(type);
+    return zone ? { ...zone, emerge: true } : { ...edgePoint(), emerge: false };
+}
+
 function spawnRegular() {
     if (state.enemies.length >= TURN_DIFFICULTY.maxAliveEnemies) return;
-    const { x, y } = edgePoint();
     let type = chooseMonsterType(state.turn);
     // Alguns tipos têm limite em campo (o cavaleiro): passado dele, nasce um esqueleto
     const cap = MONSTER_MODELS[type].maxAlive;
     if (cap && state.enemies.filter(e => e.type === type).length >= cap) type = 'SKELETON';
-    const e = addMonster(type, x, y);
+    const { x, y, emerge } = spawnSpot(type);
+    const e = addMonster(type, x, y, { emerge });
     const arrival = MONSTER_MODELS[type].arrival;
     if (arrival) {
         showBanner('', arrival.title, arrival.sub, 'danger');
@@ -64,8 +76,9 @@ function spawnRegular() {
 // Elite: maior, mais duro, solta um baú ao morrer
 export function spawnElite() {
     const types = ELITE_TYPES.filter(type => isMonsterUnlocked(type, state.turn));
-    const { x, y } = edgePoint();
-    const e = addMonster(types[Math.floor(Math.random() * types.length)], x, y);
+    const type = types[Math.floor(Math.random() * types.length)];
+    const { x, y, emerge } = spawnSpot(type);
+    const e = addMonster(type, x, y, { emerge });
     const elite = rollElite();
     e.elite = elite;
     e.hp = e.maxHp = Math.round(e.maxHp * elite.hp);
@@ -97,9 +110,9 @@ function spawnWall(h) {
 }
 
 function spawnSwarm(h) {
-    const { x, y } = edgePoint();
+    const { x, y, emerge } = spawnSpot(h.type);
     for (let i = 0; i < h.count; i++) {
-        addMonster(h.type, x + (Math.random() - 0.5) * 90, y + (Math.random() - 0.5) * 90);
+        addMonster(h.type, x + (Math.random() - 0.5) * 90, y + (Math.random() - 0.5) * 90, { emerge });
     }
 }
 
@@ -132,6 +145,8 @@ function spawnHorde(h) {
 }
 
 function bossSpawnPoint() {
+    const zone = pickBossSpawnPoint();            // zona de chefe do cenário: o círculo de invocação aparece ali (o nascimento dele continua o de sempre)
+    if (zone) return { x: zone.x, y: zone.y };        // exatamente onde o usuário desenhou (o HUD não empurra o ponto)
     const a = Math.random() * Math.PI * 2;
     const spawnDist = Math.max(state.width, state.height) * BOSS_SPAWNING.spawnScreenRatio;
     return {

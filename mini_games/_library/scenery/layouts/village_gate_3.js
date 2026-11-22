@@ -3,7 +3,7 @@
 import { registerLayout } from '../layouts.js';
 
 registerLayout('village_gate_3', {
-  savedAt: 1795275946873,
+  savedAt: 1795309094541,
   baked: [11, 3, 15, 16, 2, 6, 13, 5, 10, 4, 9, 14, 12, 7],
   placed: [
     {"prop": "cottage", "x": 0.1002, "y": 0.0769, "from": 11, "variant": 1, "scale": 1.016, "phase": 0.027},
@@ -138,5 +138,9 @@ registerLayout('village_gate_3', {
     {"prop": "grass", "x": 0.6616, "y": 0.089, "from": 7, "variant": 2, "scale": 1.1, "phase": 0.007},
     {"prop": "grass", "x": 0.6242, "y": 0.2257, "from": 7, "variant": 1, "scale": 1.135, "phase": 0.079},
     {"prop": "haystack", "x": 0.748, "y": 0.3275, "from": 13, "attrs": {"rad": 11.717, "strokes": [[0.923, 0.839], [0.968, 0.381], [0.942, 0.701], [0.258, 0.882], [0.683, 0.615], [0.037, 0.88], [0.726, 0.249], [0.464, 0.721], [0.216, 0.669]]}, "front": true}
+  ],
+  // Áreas de contato: ninguém passa (x, y = centro em fração do mundo; w, h, r em unidades; rot em graus)
+  colliders: [
+
   ]
 });

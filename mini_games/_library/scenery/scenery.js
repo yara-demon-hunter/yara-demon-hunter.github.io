@@ -53,10 +53,11 @@ export function createScenery(id) {
     if (layout) {
         F.placed = structuredClone(layout.placed ?? []);
         F.baked = structuredClone(layout.baked ?? []);
+        F.colliders = structuredClone(layout.colliders ?? []);        // áreas de contato (o jogo as lê: js/systems/colliders.js)
     }
     const cache = {
         key: '', ground: null, vignette: null, fogSprite: null, fogTile: null, fog: [], fireflies: [], fireflyTime: 0,
-        sway: [], fogCanvas: null, fogCtx: null, fogScaleX: 1, fogScaleY: 1, fogDrawnAt: 0
+        sway: [], occluders: [], fogCanvas: null, fogCtx: null, fogScaleX: 1, fogScaleY: 1, fogDrawnAt: 0
     };
 
     // Monta (ou remonta, se o tamanho, a resolução ou o detalhe mudaram) tudo o que é pré-desenhado.
@@ -81,6 +82,7 @@ export function createScenery(id) {
         cache.fogTile = buildFogTile(F, rand);
         cache.fireflies = buildFireflies(F, w, h, rand, quality);
         cache.sway = def.buildSway ? def.buildSway(w, h, rand, quality, env) : [];
+        cache.occluders = (cache.sway.items ?? []).filter(it => it.occ);       // objetos que escondem quem passa atrás (o jogo os redesenha por cima)
         cache.fogCanvas = makeCanvas(w * F.fogResolution, h * F.fogResolution);
         cache.fogScaleX = cache.fogCanvas.width / w;
         cache.fogScaleY = cache.fogCanvas.height / h;
@@ -108,6 +110,15 @@ export function createScenery(id) {
     function renderSway(env) {
         if (!def.drawSway || cache.sway.length === 0) return;
         def.drawSway(ctx, performance.now() / 1000, cache.sway, env);
+    }
+
+    // Os sprites que escondem quem passa atrás ({ occ: { id }, rect: { x0, y0, x1, y1 }, x, y (o pé) ... }) e o desenho de um deles.
+    // O jogo (last_torch/js/render/scenery.js) decide quando redesenhar por cima do herói.
+    function occluders() {
+        return cache.occluders;
+    }
+    function drawOccluder(it) {
+        def.drawItem(ctx, performance.now() / 1000, it);
     }
 
     // Camada 3
@@ -192,5 +203,5 @@ export function createScenery(id) {
         }
     }
 
-    return { id: def.id, name: def.name, visual: F, prepare, invalidate, bake, renderGround, renderSway, renderAmbient, renderOverlay };
+    return { id: def.id, name: def.name, visual: F, prepare, invalidate, bake, occluders, drawOccluder, renderGround, renderSway, renderAmbient, renderOverlay };
 }

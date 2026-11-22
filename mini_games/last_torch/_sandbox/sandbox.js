@@ -10,7 +10,7 @@ import { POWER_MODELS } from '/data_model/powers.js';
 import { addMonster, spawnBoss } from '/js/systems/spawner.js';
 import { startHour } from '/js/systems/night.js';
 import { startGame } from '/js/ui/screens.js';
-import { setScenery } from '/js/render/scenery.js';
+import { setScenery, showColliders } from '/js/render/scenery.js';
 import { WORLD } from '/data_model/world.js';
 import { createScenery, sceneryIds } from '/library/scenery/index.js';
 import { flushHeroUnlocks, queueHeroUnlock } from '/js/ui/hero_unlock.js';
@@ -72,6 +72,7 @@ panel.innerHTML = `
     <label class="sb-field">Hour (boss strength) <input id="sbHour" type="number" min="1" max="12" value="1"></label>
     <label class="sb-field">Skill points to start with <input id="sbPoints" type="number" min="0" max="999" value="100"></label>
     <label class="sb-field">Only the boss (no other monsters) <input id="sbAlone" type="checkbox" checked></label>
+    <label class="sb-field">Show contact areas (red; the ones drawn in the scenery editor) <input id="sbAreas" type="checkbox"></label>
     <label class="sb-field">God mode: hero (never dies) <input id="sbGod" type="checkbox" checked></label>
     <label class="sb-field">God mode: boss (never dies) <input id="sbGodBoss" type="checkbox" checked></label>
     <label class="sb-field">God mode: torch (never goes out) <input id="sbGodTorch" type="checkbox" checked></label>
@@ -353,5 +354,6 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
     };
 });
 
+value('#sbAreas').onchange = (e) => showColliders(e.target.checked);
 value('#sbGo').onclick = fight;
 toggle.onclick = () => panel.classList.toggle('hidden');

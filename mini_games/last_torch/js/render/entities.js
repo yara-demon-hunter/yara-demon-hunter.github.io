@@ -35,6 +35,7 @@ import { getDashedRing } from './fx/rings.js';
 import { getThrownWeapon } from '../../library/weapons/thrown.js';
 import { COIN_SIZE, DAGGER_LENGTH, DAGGER_WIDTH, getCoinAtlas, getDaggerSprite } from './fx/sprites.js';
 import { resetWorldView, stamp } from './fx/stamp.js';
+import { drawSpawnFx, spawnPose } from '../../library/monsters/25d/spawn.js';
 import { colossusCharge, renderBoneColossus } from '../../library/monsters/topdown/bone_colossus/bone_colossus.js';
 import { getBoltSprite, getMonsterSprite, spriteFrame, withBossPalette25D, withColors } from './monster_sprites.js';
 import { renderReflectedBolt } from './reflect.js';
@@ -303,6 +304,14 @@ function stampMonster(e, t) {
 
     const cycle = (t / spec.playSeconds + e.phase / TAU) % 1;
     const frame = spriteFrame(sprite, rotation, cycle);
+    if (e.emerge) {
+        // Nascendo: o corpo surge (opacidade, sobe do chão, cresce) enquanto o efeito do nascimento roda no chão (library/monsters/25d/spawn.js)
+        const pose = spawnPose(e.emerge.def, e.emerge.age);
+        ctx.globalAlpha = pose.alpha;
+        stamp(atlas, frame.sx, frame.sy, cell, cell, x + Math.sin(e.emerge.age * 60) * pose.shake * e.radius, y + pose.dy * e.radius, frame.rotation, width * pose.scale, height * pose.scale);
+        ctx.globalAlpha = 1;
+        return;
+    }
     stamp(atlas, frame.sx, frame.sy, cell, cell, x, y, frame.rotation, width, height);
 }
 
@@ -583,6 +592,7 @@ export function renderEnemies(pass = null, splitY = 0, renderActor = null, actor
     const ordered = (state.converts.length ? state.enemies.concat(state.converts) : state.enemies).filter(inPass).sort((a, b) => a.y - b.y);
     renderUnderlays();
     renderConvertRings(t);
+    for (const e of ordered) if (e.emerge) drawSpawnFx(ctx, e.emerge.def, e.emerge.age, e.x, e.y + e.radius * 0.5, e.radius);      // o efeito de nascer, no chão
 
     for (const e of ordered) {
         if (e.elite) renderEliteMark(e);

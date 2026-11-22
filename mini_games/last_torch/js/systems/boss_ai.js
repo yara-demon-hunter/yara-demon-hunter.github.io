@@ -6,6 +6,7 @@ import { showBanner } from '../ui/banner.js';
 import { addShockwave, createExplosion, hitStop, screenFlash, shakeScreen } from './effects.js';
 import { hurtPlayer } from './player.js';
 import { addMonster } from './spawner.js';
+import { clipSegment } from './colliders.js';
 import { hurtTorch } from './torch.js';
 
 // --- ATAQUES DOS BOSSES ---
@@ -152,8 +153,12 @@ const ACTIONS = {
         const angle = aimAngle(e);
         // Investida mais lenta e legível: aviso maior (no combo, o aviso encurta menos, para dar tempo de escapar)
         const windup = (ai.inChain ? model.lungeWindupSeconds * 0.85 : model.lungeWindupSeconds) * LUNGE_WINDUP_SCALE;
-        const toX = Math.max(60, Math.min(state.width - 60, e.x + Math.cos(angle) * model.lungeLength));
-        const toY = Math.max(90, Math.min(state.height - 60, e.y + Math.sin(angle) * model.lungeLength));
+        let toX = Math.max(60, Math.min(state.width - 60, e.x + Math.cos(angle) * model.lungeLength));
+        let toY = Math.max(90, Math.min(state.height - 60, e.y + Math.sin(angle) * model.lungeLength));
+        // Uma parede (área de contato) no caminho: a investida termina nela. O risco vermelho nunca passa de onde o chefe chega de verdade
+        const reach = clipSegment(e.x, e.y, toX, toY, e.radius * 0.85, 'monsters');
+        toX = reach.x;
+        toY = reach.y;
         const line = {
             kind: 'line', owner: e, x: e.x, y: e.y, angle,
             length: Math.hypot(toX - e.x, toY - e.y), age: 0, seconds: windup

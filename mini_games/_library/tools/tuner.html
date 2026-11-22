@@ -119,6 +119,16 @@
                 <div id="deathBody"></div>
                 <textarea id="deathOut" readonly rows="6" placeholder="A morte copiada aparece aqui também"></textarea>
             </details>
+            <details id="spawnPanel" class="death" open>
+                <summary>Nascimento <small>(como o monstro aparece no Last Torch)</small></summary>
+                <div class="death-bar">
+                    <button id="spawnPlay" class="primary">▶ Nascer</button>
+                    <label class="check"><input id="spawnLoop" type="checkbox" checked> Repetir</label>
+                    <button id="spawnCopy">Copiar nascimento</button>
+                </div>
+                <div id="spawnBody"></div>
+                <textarea id="spawnOut" readonly rows="4" placeholder="O nascimento copiado aparece aqui também"></textarea>
+            </details>
             <div id="controls"></div>
             <textarea id="out" readonly placeholder="Os valores copiados aparecem aqui também"></textarea>
         </aside>
@@ -222,6 +232,7 @@
         import { DEMON_LORD_VISUALS as TD_DEMON_LORD } from '../monsters/topdown/demon_lord/demon_lord_visual.js';
         import { renderDemonLord } from '../monsters/topdown/demon_lord/demon_lord.js';
         import { MONSTER_DEATH, groupsOf, setupGib, stepGib, drawGib, fallPose } from '../monsters/25d/death.js';
+        import { MONSTER_SPAWN, SPAWN_STYLES, spawnPose, drawSpawnFx } from '../monsters/25d/spawn.js';
 
         const $ = (id) => document.getElementById(id);
         setHost({ animating: () => true, target: () => null });
@@ -677,6 +688,8 @@
             ['Tamanho do jogo', { cam: LT, facing: (t) => t * 0.8, zoom: GAME_SCALE, walk: true, footY: 0.55 }],
             ['Morte', 'como o monstro morre no Last Torch: pedaços e queda (ajuste no painel "Morte", ao lado)'],
             ['Morrendo', { cam: LT, facing: Math.PI / 2, footY: 0.62, death: true }],
+            ['Nascimento', 'como o monstro aparece no Last Torch: efeito no chão e o corpo surgindo (ajuste no painel "Nascimento", ao lado)'],
+            ['Nascendo', { cam: LT, facing: Math.PI / 2, footY: 0.62, spawn: true }],
             ['Palco do yara-rpg', 'de lado, inclinada 34°'],
             ['Rosto · para a direita', { cam: RPG, facing: STAGE_RIGHT, zoom: 15, footY: 1.4, face: true }],
             ['Rosto · para a esquerda', { cam: RPG, facing: STAGE_LEFT, zoom: 15, footY: 1.4, face: true }],
@@ -710,13 +723,17 @@
 
         // Giro manual (barra de cima): fixa o ângulo do monstro nas vistas do Last Torch (as do palco do RPG e a da morte ficam como são)
         let faceManual = null;
-        const faceOf = (v) => (faceManual !== null && v.o.cam !== RPG && !v.o.death ? faceManual : typeof v.o.facing === 'function' ? v.o.facing(v.t) : v.o.facing);
+        const faceOf = (v) => (faceManual !== null && v.o.cam !== RPG && !v.o.death && !v.o.spawn ? faceManual : typeof v.o.facing === 'function' ? v.o.facing(v.t) : v.o.facing);
 
         function tick(v, dt) {
             const o = v.o;
             v.t += dt;
             if (o.death) {
                 tickDeath(v, dt);
+                return;
+            }
+            if (o.spawn) {
+                tickSpawn(v, dt);
                 return;
             }
             const face = faceOf(v);
@@ -745,6 +762,10 @@
             g.fillRect(0, 0, w, h);
             if (o.death) {
                 drawDeath(v, w, h);
+                return;
+            }
+            if (o.spawn) {
+                drawSpawn(v, w, h);
                 return;
             }
             if (o.topdown) {
@@ -794,6 +815,121 @@
             }
         }
 
+
+        // --- NASCIMENTO ---
+        // A definição de cada monstro mora em monsters/25d/spawn.js (MONSTER_SPAWN): é a mesma que o Last Torch usa.
+        // Aqui ela se ajusta ao vivo; "Copiar nascimento" gera a linha para colar nesse arquivo. Fica guardada neste navegador.
+        const spawnKey = () => ((['treant_sprite', 'treant_sprite_v1', 'treant_classico'].includes($('model').value)) ? 'treant' : $('model').value);
+        const SPAWN_STORE = 'library-tuner-spawn';
+        const SPAWN_ORIGINAL = JSON.parse(JSON.stringify(MONSTER_SPAWN));
+        try { Object.entries(JSON.parse(localStorage.getItem(SPAWN_STORE) || '{}')).forEach(([k, def]) => { MONSTER_SPAWN[k] = def; }); } catch { /* sem armazenamento */ }
+        const persistSpawn = () => {
+            const edited = {};
+            Object.keys(MONSTER_SPAWN).forEach(k => { if (JSON.stringify(MONSTER_SPAWN[k]) !== JSON.stringify(SPAWN_ORIGINAL[k])) edited[k] = MONSTER_SPAWN[k]; });
+            try { localStorage.setItem(SPAWN_STORE, JSON.stringify(edited)); } catch { /* só nesta aba */ }
+        };
+        const SPAWN_PX = 2;      // a vista mostra o monstro 2 vezes maior que no jogo
+        const SPAWN_HOLD = 0.9;  // quanto o monstro fica de pé, já nascido, antes de repetir
+        function tickSpawn(v, dt) {
+            const s = (v.s ??= { age: 0 });
+            const def = MONSTER_SPAWN[spawnKey()];
+            if (!def) return;
+            s.age += dt;
+            if (s.age > def.seconds + SPAWN_HOLD) s.age = $('spawnLoop').checked ? 0 : def.seconds + SPAWN_HOLD;
+        }
+        function drawSpawn(v, w, h) {
+            const o = v.o, g = v.g, key = $('model').value;
+            const def = MONSTER_SPAWN[spawnKey()];
+            if (typeOf(key) !== 'rig' || !def) {
+                g.fillStyle = '#7a725f'; g.font = '13px system-ui'; g.textAlign = 'center';
+                g.fillText(typeOf(key) === 'rig' ? 'Este monstro ainda não tem nascimento definido' : 'Escolha um monstro 2.5D', w / 2, h / 2);
+                return;
+            }
+            const age = v.s?.age ?? 0;
+            const radius = RADIUS[key] ?? 14;
+            const scale = radius * blockOf(key).scalePerRadius * SPAWN_PX;
+            const ox = w / 2, oy = h * (o.footY ?? 0.62);
+            const foot = radius * SPAWN_PX * 0.55;      // o ponto do chão onde o monstro pisa
+            setCtx(g);
+            drawSpawnFx(g, def, age, ox, oy + foot, radius * SPAWN_PX);
+            if (age < def.seconds + SPAWN_HOLD) {
+                const pose = spawnPose(def, age);
+                g.save();
+                g.globalAlpha = pose.alpha;
+                g.translate(ox + pose.shake * radius * SPAWN_PX * Math.sin(age * 60), oy + foot + pose.dy * radius * SPAWN_PX);
+                g.scale(pose.scale, pose.scale);
+                g.translate(-ox, -(oy + foot));
+                g.translate(ox - v.body.x, oy - v.body.y);
+                const before = V.scale;
+                V.scale = scale;
+                try { renderHero25D(v.body, v.anim, blockOf(key).colors, null, key); } finally { V.scale = before; g.restore(); }
+            }
+        }
+        window.__spawn = () => views.find(x => x.o.spawn)?.s;      // (gancho de teste)
+
+        // Painel de ajuste do nascimento do monstro escolhido
+        function buildSpawnPanel() {
+            const body = $('spawnBody'); body.innerHTML = '';
+            const key = spawnKey(); const def = MONSTER_SPAWN[key];
+            const isRig = typeOf($('model').value) === 'rig';
+            $('spawnPanel').hidden = !isRig;
+            if (!isRig) return;
+            if (!def) {
+                body.innerHTML = '<p class="hint">Este monstro ainda não tem nascimento definido em spawn.js (ele aparece de uma vez no jogo).</p>';
+                const add = Object.assign(document.createElement('button'), { textContent: 'Criar um nascimento para ele' });
+                add.addEventListener('click', () => { MONSTER_SPAWN[key] = { style: 'portal', seconds: 0.9, color: 'rgba(250, 204, 21, 0.9)', size: 1.7 }; persistSpawn(); buildSpawnPanel(); });
+                body.appendChild(add);
+                return;
+            }
+            const orig = SPAWN_ORIGINAL[key] ?? {};
+            const changed = () => { persistSpawn(); buildSpawnPanel(); const v = views.find(x => x.o.spawn); if (v) v.s = { age: 0 }; };
+            const row = (label, input, wide = false) => {
+                const r = document.createElement('label'); r.className = 'row' + (wide ? ' wide' : '');
+                const sp = document.createElement('span'); sp.textContent = label; r.append(sp, input); return r;
+            };
+            const sel = document.createElement('select');
+            Object.entries(SPAWN_STYLES).forEach(([k, label]) => sel.add(new Option(label, k)));
+            sel.value = def.style;
+            sel.addEventListener('change', () => { def.style = sel.value; if (def.style === 'rise' && def.rise === undefined) def.rise = 1.3; changed(); });
+            const r0 = row('jeito', sel); if (orig.style !== def.style) r0.classList.add('changed'); body.appendChild(r0);
+            const num = (field, step, label) => {
+                const i = Object.assign(document.createElement('input'), { type: 'number', step, value: def[field] ?? 0 });
+                i.addEventListener('change', () => { def[field] = parseFloat(i.value) || 0; changed(); });
+                const r = row(label, i); if (orig[field] !== def[field]) r.classList.add('changed'); return r;
+            };
+            body.appendChild(num('seconds', 0.05, 'duração (s)'));
+            body.appendChild(num('size', 0.1, 'tamanho do efeito (× raio)'));
+            if (def.style === 'rise') body.appendChild(num('rise', 0.1, 'começa abaixo do chão (× raio)'));
+            const color = Object.assign(document.createElement('input'), { type: 'text', value: def.color });
+            color.addEventListener('change', () => { def.color = color.value; changed(); });
+            const rc = row('cor (poeira / fumaça / brilho)', color, true); if (orig.color !== def.color) rc.classList.add('changed'); body.appendChild(rc);
+        }
+        function spawnText() {
+            const key = spawnKey(); const def = MONSTER_SPAWN[key];
+            if (!def) return '// Sem nascimento definido';
+            const o = { style: def.style, seconds: def.seconds, color: def.color, size: def.size };
+            if (def.style === 'rise') o.rise = def.rise;
+            return `// Cole em mini_games/_library/monsters/25d/spawn.js (MONSTER_SPAWN) e rode ruby mini_games/_library/sync.rb\n    ${key}: ${lit(o)},`;
+        }
+        const spawnNow = () => {
+            const v = views.find(x => x.o.spawn);
+            if (!v) return;
+            if ($('pause').checked) $('pause').checked = false;
+            v.s = { age: 0 };
+        };
+        $('spawnPlay').addEventListener('click', spawnNow);
+        const spawnFig = views.find(x => x.o.spawn)?.fig;
+        if (spawnFig) {
+            const again = Object.assign(document.createElement('button'), { textContent: '▶ Nascer', className: 'primary' });
+            again.style.marginLeft = '8px';
+            again.addEventListener('click', spawnNow);
+            spawnFig.querySelector('figcaption').appendChild(again);
+        }
+        $('spawnCopy').addEventListener('click', async () => {
+            const text = spawnText(); $('spawnOut').value = text;
+            try { await navigator.clipboard.writeText(text); $('spawnCopy').textContent = 'Copiado!'; } catch { $('spawnOut').select(); $('spawnCopy').textContent = 'Selecione e copie abaixo'; }
+            setTimeout(() => { $('spawnCopy').textContent = 'Copiar nascimento'; }, 1600);
+        });
 
         // --- MORTE ---
         // A definição de cada monstro mora em monsters/25d/death.js (MONSTER_DEATH): é a mesma que o Last Torch usa.
@@ -995,6 +1131,7 @@
         $('faceAngle').addEventListener('input', () => { $('faceManual').checked = true; setTurn(); });
         document.querySelectorAll('[data-face]').forEach(b => b.addEventListener('click', () => { $('faceAngle').value = b.dataset.face; $('faceManual').checked = true; setTurn(); }));
         buildDeathPanel();
+        buildSpawnPanel();
 
 
         let last = null;
@@ -1032,7 +1169,9 @@
             buildControls();
             showViews();
             buildDeathPanel();
+            buildSpawnPanel();
             const dv = views.find(x => x.o.death); if (dv?.d) { dv.d.restart = true; }
+            const sv = views.find(x => x.o.spawn); if (sv) sv.s = { age: 0 };
             $('out').value = '';
         });
         $('kind').addEventListener('change', () => {

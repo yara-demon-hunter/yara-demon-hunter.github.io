@@ -26,6 +26,10 @@ export const WORLD = {
     startQuality: { desktop: 0, mobile: 1 },
     qualityPixelScale: [1, 0.9, 0.72],
 
+    // Quem passa ATRÁS de um prédio (casa, catedral: objetos que escondem): o prédio é redesenhado por cima do herói e uma cópia dele aparece
+    // translúcida por cima do prédio. ghostAlpha = quão visível (0 some, 1 opaco).
+    occlusion: { ghostAlpha: 0.42 },
+
     // Cor das faixas que sobram quando a proporção da tela passa dos limites
     letterboxColor: '#01040a',
     // Largura (unidades do mundo) do degradê que funde a borda do mundo com as faixas

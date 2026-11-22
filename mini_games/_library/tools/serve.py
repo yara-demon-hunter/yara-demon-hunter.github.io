@@ -6,7 +6,7 @@
 Abre http://localhost:8010/_library/tools/ . Serve a pasta mini_games (como o `python3 -m http.server 8010` que o manual
 descrevia) e, a mais, deixa o editor de cenário GRAVAR o layout no projeto:
 
-  POST /__save_layout   { scenery, placed, baked }  ->  mini_games/_library/scenery/layouts/<id>.js  (+ layouts/index.js)
+  POST /__save_layout   { scenery, placed, baked, colliders }  ->  mini_games/_library/scenery/layouts/<id>.js  (+ layouts/index.js)
                                                          e roda `ruby mini_games/_library/sync.rb` para os jogos receberem a cópia
 
 Só escreve dentro de _library/scenery/layouts/. Só aceita pedidos feitos pela própria página (cabeçalho X-Atelie, Host local):
@@ -66,6 +66,35 @@ def validate(data) -> str | None:
             return "posição inválida"
     if not all(isinstance(i, int) for i in baked):
         return "baked inválido"
+    colliders = data.get("colliders", [])
+    if not isinstance(colliders, list) or len(colliders) > 2000:
+        return "colliders precisa ser uma lista"
+    num = (int, float)
+    for c in colliders:
+        if not isinstance(c, dict) or c.get("shape") not in ("rect", "circle"):
+            return "área de contato inválida"
+        needed = ("x", "y", "w", "h") if c["shape"] == "rect" else ("x", "y", "r")
+        if not all(isinstance(c.get(k), num) and not isinstance(c.get(k), bool) for k in needed):
+            return "medidas da área de contato inválidas"
+        if "rot" in c and not isinstance(c["rot"], num):
+            return "giro da área de contato inválido"
+        if "ry" in c and (not isinstance(c["ry"], num) or isinstance(c["ry"], bool)):
+            return "raio Y da área de contato inválido"
+        if "cr" in c and (not isinstance(c["cr"], num) or isinstance(c["cr"], bool)):
+            return "raio dos cantos da área de contato inválido"
+        if c.get("kind", "contact") not in ("contact", "behind", "spawn"):
+            return "tipo da área inválido"
+        if "weight" in c and (not isinstance(c["weight"], num) or isinstance(c["weight"], bool) or c["weight"] < 0):
+            return "peso da zona de nascimento inválido"
+        if "boss" in c and not isinstance(c["boss"], bool):
+            return "marca de chefe inválida"
+        if "types" in c and (not isinstance(c["types"], list) or len(c["types"]) > 80 or not all(isinstance(t, str) and len(t) <= 40 for t in c["types"])):
+            return "tipos de monstro da zona inválidos"
+        if "object" in c and (not isinstance(c["object"], str) or len(c["object"]) > 40):
+            return "objeto da área de trás inválido"
+        blocks = c.get("blocks", {})
+        if not isinstance(blocks, dict) or not all(isinstance(v, bool) for v in blocks.values()):
+            return "bloqueios da área de contato inválidos"
     return None
 
 
@@ -74,17 +103,19 @@ def write_layout(data: dict) -> dict:
     path = LAYOUTS / f"{sid}.js"
     LAYOUTS.mkdir(exist_ok=True)
     placed, baked = data["placed"], data.get("baked", [])
+    colliders = data.get("colliders", [])
     saved_at = int(time.time() * 1000)
-    if not placed and not baked:
+    if not placed and not baked and not colliders:
         path.unlink(missing_ok=True)
         rebuild_index()
         return {"savedAt": 0, "file": None}
     rows = ",\n".join("    " + json.dumps(item, ensure_ascii=False, separators=(", ", ": ")) for item in placed)
+    crows = ",\n".join("    " + json.dumps(item, ensure_ascii=False, separators=(", ", ": ")) for item in colliders)
     text = (
         f"// Layout do cenário \"{sid}\" gravado pelo editor (tools/scenery_editor.html, via tools/serve.py).\n"
         "// x e y em fração do mundo. Para voltar ao cenário original, apague este arquivo (ou grave um layout vazio no editor).\n"
         "import { registerLayout } from '../layouts.js';\n\n"
-        f"registerLayout('{sid}', {{\n  savedAt: {saved_at},\n  baked: {json.dumps(baked)},\n  placed: [\n{rows}\n  ]\n}});\n"
+        f"registerLayout('{sid}', {{\n  savedAt: {saved_at},\n  baked: {json.dumps(baked)},\n  placed: [\n{rows}\n  ],\n  // Áreas de contato: ninguém passa (x, y = centro em fração do mundo; w, h, r em unidades; rot em graus)\n  colliders: [\n{crows}\n  ]\n}});\n"
     )
     tmp = path.with_suffix(".js.tmp")
     tmp.write_text(text, encoding="utf-8")
@@ -125,7 +156,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.split("?")[0] == "/__layout_api":
-            return self.send_json(200, {"ok": True})
+            return self.send_json(200, {"ok": True, "features": ["colliders"]})
         return super().do_GET()
 
     def do_POST(self):
@@ -145,7 +176,7 @@ class Handler(SimpleHTTPRequestHandler):
         if error:
             return self.send_json(400, {"ok": False, "error": error})
         result = write_layout(data)
-        self.send_json(200, {"ok": True, **result, "sync": run_sync()})
+        self.send_json(200, {"ok": True, **result, "colliders": len(data.get("colliders", [])), "objects": len(data["placed"]), "sync": run_sync()})
 
 
 if __name__ == "__main__":

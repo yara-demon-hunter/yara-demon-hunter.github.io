@@ -12,7 +12,7 @@ import {
 } from './entities.js';
 import { renderFuryTrails, renderFurySwords } from './fury.js';
 import { renderArcane, renderFuryBeam, renderRuneShield } from './arcane.js';
-import { renderSceneryAmbient, renderSceneryGround, renderSceneryOverlay, renderScenerySway } from './scenery.js';
+import { renderSceneryAmbient, renderSceneryGround, renderSceneryOccluders, renderSceneryOverlay, renderScenerySway } from './scenery.js';
 import { renderLevelUpBack, renderLevelUpFront } from './level_up.js';
 import { renderPlayer, renderPlayerTrail } from './player.js';
 import { renderPlayer25D } from './player25d.js';
@@ -187,6 +187,7 @@ export function render() {
     renderFireTornado();
     renderHearthBird();
     renderEnemies('front', state.coreY, heroBehind ? null : renderHeroBlock, player.y);
+    renderSceneryOccluders();            // o herói atrás de um prédio: o prédio cobre e o herói aparece translúcido por cima
     renderTorchLight();
     renderRoots();
     renderSpiritWolves();
