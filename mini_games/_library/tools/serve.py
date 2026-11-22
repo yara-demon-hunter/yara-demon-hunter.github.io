@@ -6,7 +6,8 @@
 Abre http://localhost:8010/_library/tools/ . Serve a pasta mini_games (como o `python3 -m http.server 8010` que o manual
 descrevia) e, a mais, deixa o editor de cenário GRAVAR o layout no projeto:
 
-  POST /__save_layout   { scenery, placed, baked, colliders }  ->  mini_games/_library/scenery/layouts/<id>.js  (+ layouts/index.js)
+  POST /__save_layout   { scenery, profile?, placed, baked, colliders }  ->  mini_games/_library/scenery/layouts/<id>.js  (+ layouts/index.js)
+                        profile = desktop (padrão) | landscape | portrait (celular deitado / em pé): grava <id>--<tipo>.js
                                                          e roda `ruby mini_games/_library/sync.rb` para os jogos receberem a cópia
 
 Só escreve dentro de _library/scenery/layouts/. Só aceita pedidos feitos pela própria página (cabeçalho X-Atelie, Host local):
@@ -25,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[2]            # mini_games
 REPO = ROOT.parent
 SCENERY = ROOT / "_library" / "scenery"
 LAYOUTS = SCENERY / "layouts"
+PROFILES = ("desktop", "landscape", "portrait")      # tipos de tela: desktop = <id>.js; os outros = <id>--<tipo>.js
 ID_RE = re.compile(r"^[a-z0-9_]+$")
 MAX_BODY = 4 * 1024 * 1024
 
@@ -54,6 +56,8 @@ def validate(data) -> str | None:
     sid = data.get("scenery")
     if not isinstance(sid, str) or not ID_RE.match(sid) or not (SCENERY / sid).is_dir():
         return "cenário desconhecido"
+    if data.get("profile", "desktop") not in PROFILES:
+        return "tipo de tela desconhecido"
     placed, baked = data.get("placed"), data.get("baked", [])
     if not isinstance(placed, list) or not isinstance(baked, list):
         return "placed e baked precisam ser listas"
@@ -82,8 +86,12 @@ def validate(data) -> str | None:
             return "raio Y da área de contato inválido"
         if "cr" in c and (not isinstance(c["cr"], num) or isinstance(c["cr"], bool)):
             return "raio dos cantos da área de contato inválido"
-        if c.get("kind", "contact") not in ("contact", "behind", "spawn"):
+        if "fit" in c and (not isinstance(c["fit"], list) or len(c["fit"]) != 2 or not all(isinstance(v, num) and not isinstance(v, bool) and v > 0 for v in c["fit"])):
+            return "medida de referência (fit) da área inválida"
+        if c.get("kind", "contact") not in ("contact", "behind", "spawn", "slow"):
             return "tipo da área inválido"
+        if "slow" in c and (not isinstance(c["slow"], num) or isinstance(c["slow"], bool) or not 0 < c["slow"] <= 0.95):
+            return "lentidão da área inválida"
         if "weight" in c and (not isinstance(c["weight"], num) or isinstance(c["weight"], bool) or c["weight"] < 0):
             return "peso da zona de nascimento inválido"
         if "boss" in c and not isinstance(c["boss"], bool):
@@ -100,7 +108,8 @@ def validate(data) -> str | None:
 
 def write_layout(data: dict) -> dict:
     sid = data["scenery"]
-    path = LAYOUTS / f"{sid}.js"
+    profile = data.get("profile", "desktop")
+    path = LAYOUTS / (f"{sid}.js" if profile == "desktop" else f"{sid}--{profile}.js")
     LAYOUTS.mkdir(exist_ok=True)
     placed, baked = data["placed"], data.get("baked", [])
     colliders = data.get("colliders", [])
@@ -115,7 +124,7 @@ def write_layout(data: dict) -> dict:
         f"// Layout do cenário \"{sid}\" gravado pelo editor (tools/scenery_editor.html, via tools/serve.py).\n"
         "// x e y em fração do mundo. Para voltar ao cenário original, apague este arquivo (ou grave um layout vazio no editor).\n"
         "import { registerLayout } from '../layouts.js';\n\n"
-        f"registerLayout('{sid}', {{\n  savedAt: {saved_at},\n  baked: {json.dumps(baked)},\n  placed: [\n{rows}\n  ],\n  // Áreas de contato: ninguém passa (x, y = centro em fração do mundo; w, h, r em unidades; rot em graus)\n  colliders: [\n{crows}\n  ]\n}});\n"
+        f"registerLayout('{sid}', {{\n  profile: '{profile}',\n  savedAt: {saved_at},\n  baked: {json.dumps(baked)},\n  placed: [\n{rows}\n  ],\n  // Áreas de contato: ninguém passa (x, y = centro em fração do mundo; w, h, r em unidades; rot em graus)\n  colliders: [\n{crows}\n  ]\n}});\n"
     )
     tmp = path.with_suffix(".js.tmp")
     tmp.write_text(text, encoding="utf-8")
@@ -156,7 +165,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.split("?")[0] == "/__layout_api":
-            return self.send_json(200, {"ok": True, "features": ["colliders"]})
+            return self.send_json(200, {"ok": True, "features": ["colliders", "profiles"]})
         return super().do_GET()
 
     def do_POST(self):
@@ -176,7 +185,7 @@ class Handler(SimpleHTTPRequestHandler):
         if error:
             return self.send_json(400, {"ok": False, "error": error})
         result = write_layout(data)
-        self.send_json(200, {"ok": True, **result, "colliders": len(data.get("colliders", [])), "objects": len(data["placed"]), "sync": run_sync()})
+        self.send_json(200, {"ok": True, **result, "profile": data.get("profile", "desktop"), "colliders": len(data.get("colliders", [])), "objects": len(data["placed"]), "sync": run_sync()})
 
 
 if __name__ == "__main__":

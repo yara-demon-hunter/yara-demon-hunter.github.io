@@ -58,6 +58,7 @@ panel.innerHTML = `
   <div class="card">
     <h2>🧪 Last Torch Sandbox</h2>
     <p class="note">Test arena: nothing here touches the game or its save.</p>
+    <div class="sb-format"><label>Screen format (all tabs): <select id="sbFormat"><option value="desktop">Desktop (full window)</option><option value="landscape">Phone · landscape 844×390</option><option value="portrait">Phone · portrait 390×844</option></select></label></div>
     <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button><button data-tab="screens">🖼️ Screens</button><button data-tab="moves">🗡️ Boss moves</button></div>
     <div id="sbArena">
     <h3>Scenery <small>(applies right away, even mid-fight)</small></h3><div class="sb-row" id="sbScenery"></div>
@@ -353,6 +354,17 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
         if (tab === 'tuner') { tuner ??= mountTuner(panel.querySelector('#sbTuner')); tuner.show(); } else tuner?.hide();
     };
 });
+
+// Formato de tela do sandbox inteiro: o servidor lê o cookie e, nos formatos de celular, entrega a página dentro de uma moldura do tamanho do aparelho
+{
+    const current = document.cookie.split(';').map(s => s.trim()).find(s => s.startsWith('sbx_format='))?.split('=')[1] ?? 'desktop';
+    const select = value('#sbFormat');
+    select.value = ['landscape', 'portrait'].includes(current) ? current : 'desktop';
+    select.onchange = () => {
+        document.cookie = `sbx_format=${select.value}; path=/; max-age=31536000; SameSite=Lax`;
+        window.top.location.href = '/';
+    };
+}
 
 value('#sbAreas').onchange = (e) => showColliders(e.target.checked);
 value('#sbGo').onclick = fight;

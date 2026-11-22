@@ -14,7 +14,25 @@ import { drawGlow } from '../../library/core/glow.js';
 let scenery = createScenery(WORLD.scenery);
 
 // Áreas de contato do cenário (layout gravado pelo editor; js/systems/colliders.js as usa). Lista vazia = cenário sem áreas.
+// Medidas de uma área no mundo ATUAL. Áreas com `fit: [largura, altura]` (a do mundo em que foram desenhadas) ESTICAM com o mundo, como o rio
+// que o cenário pinta em frações da tela; as outras (um túmulo, uma casa) mantêm o tamanho, já que o objeto também não encolhe.
+export function fittedSize(c, W, H) {
+    const kx = Array.isArray(c.fit) && c.fit[0] > 0 ? W / c.fit[0] : 1;
+    const ky = Array.isArray(c.fit) && c.fit[1] > 0 ? H / c.fit[1] : 1;
+    const w = (c.w ?? 0) * kx;
+    const h = (c.h ?? 0) * ky;
+    const r = (c.r ?? 0) * kx;
+    return { w, h, r, ry: (c.ry ?? c.r ?? 0) * ky, cr: Math.max(0, Math.min((c.cr ?? 0) * Math.min(kx, ky), w / 2, h / 2)), kx, ky };
+}
+
+// O tipo de tela do jogo agora: o mundo do desktop, do celular deitado ou do celular em pé (cada um tem seu layout; ver library/scenery/layouts.js)
+export function currentProfile() {
+    if (!state.view.mobile) return 'desktop';
+    return state.width >= state.height ? 'landscape' : 'portrait';
+}
+
 export function getSceneryColliders() {
+    scenery.setProfile(currentProfile());
     return scenery.visual.colliders;
 }
 
@@ -77,6 +95,7 @@ const env = {
 function syncEnv() {
     env.width = state.width;
     env.height = state.height;
+    env.profile = currentProfile();
     env.res = state.view.scale * state.view.pixelRatio;
     env.quality = state.quality;
     env.danger = 1 - Math.max(0, Math.min(1, state.coreHp / state.coreHpMax));
@@ -119,6 +138,7 @@ const zones = { source: null, w: 0, h: 0, list: [] };
 
 // As áreas de trás (kind 'behind' em colliders) em coordenadas do mundo atual
 function behindZones() {
+    scenery.setProfile(currentProfile());
     const raw = scenery.visual.colliders;
     if (!raw || raw.length === 0) return zones.list.length ? (zones.list = [], zones.list) : zones.list;
     if (zones.source === raw && zones.w === state.width && zones.h === state.height) return zones.list;
@@ -129,12 +149,13 @@ function behindZones() {
     for (const c of raw) {
         if (c.kind !== 'behind') continue;
         const rot = (c.rot ?? 0) * Math.PI / 180;
-        zones.list.push({ rect: c.shape === 'rect', cx: c.x * state.width, cy: c.y * state.height, hw: (c.w ?? 0) / 2, hh: (c.h ?? 0) / 2, r: c.r ?? 0, ry: c.ry ?? c.r ?? 0, cr: Math.max(0, Math.min(c.cr ?? 0, (c.w ?? 0) / 2, (c.h ?? 0) / 2)), cos: Math.cos(rot), sin: Math.sin(rot) });
+        const f = fittedSize(c, state.width, state.height);
+        zones.list.push({ rect: c.shape === 'rect', cx: c.x * state.width, cy: c.y * state.height, hw: f.w / 2, hh: f.h / 2, r: f.r, ry: f.ry, cr: f.cr, cos: Math.cos(rot), sin: Math.sin(rot) });
     }
     return zones.list;
 }
 
-function inZone(z, x, y) {
+export function inZone(z, x, y) {
     const dx = x - z.cx;
     const dy = y - z.cy;
     const lx = dx * z.cos + dy * z.sin;
@@ -233,13 +254,13 @@ function drawColliderOutlines() {
         ctx.translate(c.x * state.width, c.y * state.height);
         ctx.rotate((c.rot ?? 0) * Math.PI / 180);
         ctx.beginPath();
+        const f = fittedSize(c, state.width, state.height);
         if (c.shape === 'rect') {
-            const cr = Math.max(0, Math.min(c.cr ?? 0, c.w / 2, c.h / 2));
-            if (cr > 0) ctx.roundRect(-c.w / 2, -c.h / 2, c.w, c.h, cr); else ctx.rect(-c.w / 2, -c.h / 2, c.w, c.h);
-        } else ctx.ellipse(0, 0, c.r, c.ry ?? c.r, 0, 0, Math.PI * 2);
-        ctx.fillStyle = c.kind === 'behind' ? 'rgba(56, 189, 248, 0.20)' : c.kind === 'spawn' ? (c.boss ? 'rgba(217, 70, 239, 0.22)' : 'rgba(34, 197, 94, 0.22)') : contactTone(c)[0];
+            if (f.cr > 0) ctx.roundRect(-f.w / 2, -f.h / 2, f.w, f.h, f.cr); else ctx.rect(-f.w / 2, -f.h / 2, f.w, f.h);
+        } else ctx.ellipse(0, 0, f.r, f.ry, 0, 0, Math.PI * 2);
+        ctx.fillStyle = c.kind === 'behind' ? 'rgba(56, 189, 248, 0.20)' : c.kind === 'slow' ? 'rgba(163, 230, 53, 0.22)' : c.kind === 'spawn' ? (c.boss ? 'rgba(217, 70, 239, 0.22)' : 'rgba(34, 197, 94, 0.22)') : contactTone(c)[0];
         ctx.fill();
-        ctx.strokeStyle = c.kind === 'behind' ? 'rgba(125, 211, 252, 0.95)' : c.kind === 'spawn' ? (c.boss ? 'rgba(240, 171, 252, 0.95)' : 'rgba(134, 239, 172, 0.95)') : contactTone(c)[1];
+        ctx.strokeStyle = c.kind === 'behind' ? 'rgba(125, 211, 252, 0.95)' : c.kind === 'slow' ? 'rgba(190, 242, 100, 0.95)' : c.kind === 'spawn' ? (c.boss ? 'rgba(240, 171, 252, 0.95)' : 'rgba(134, 239, 172, 0.95)') : contactTone(c)[1];
         ctx.stroke();
         ctx.restore();
     }

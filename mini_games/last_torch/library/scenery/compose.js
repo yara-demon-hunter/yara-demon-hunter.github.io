@@ -49,6 +49,11 @@ function allowed(entry, x, y, w, h) {
 }
 // Objeto colocado que ESCONDE quem passa atrás dele (casa, catedral): a peça declara `occludes: true` e o objeto pode mudar com `occlude`.
 // Vira um sprite (não é pintado no chão) e o jogo o redesenha por cima do herói quando ele está atrás (last_torch/js/render/scenery.js).
+// Peças animadas com `desync: true` (ondulações, correnteza) não batem no mesmo ritmo: cada objeto ganha, pela POSIÇÃO (sem gastar sorteio, o resto do
+// cenário não muda), um ponto de partida e uma duração de ciclo próprios.
+const hash01 = (x, y, k = 0) => { const s = Math.sin(x * 12.9898 + y * 78.233 + k * 37.719) * 43758.5453; return s - Math.floor(s); };
+const desyncOf = (prop, x, y, cycle) => (prop.desync ? { offset: hash01(x, y), cycle: cycle * (0.75 + 0.6 * hash01(x, y, 1)) } : null);
+
 const occludes = (pl, prop) => (pl.occlude ?? prop.occludes) === true;
 const spriteRect = (sheet, x, y, scale) => ({ x0: x - sheet.anchor[0] * sheet.cell[0] * scale, y0: y - sheet.anchor[1] * sheet.cell[1] * scale, x1: x + (1 - sheet.anchor[0]) * sheet.cell[0] * scale, y1: y + (1 - sheet.anchor[1]) * sheet.cell[1] * scale });
 const perQuality = (value, quality) => (Array.isArray(value) ? value[quality] : value);
@@ -153,7 +158,8 @@ export function composeScenery({ id, name, visual, paintBase }) {
                 items.push({
                     sheet, x, y, variant, scale, cycle: entry.cycleSeconds,
                     // Defasagem pela posição: as rajadas atravessam a tela da esquerda para a direita
-                    offset: (x * visual.windWaveLength + y * visual.windWaveLength * 0.4) / TAU + jitter
+                    offset: (x * visual.windWaveLength + y * visual.windWaveLength * 0.4) / TAU + jitter,
+                    ...desyncOf(prop, x, y, entry.cycleSeconds)
                 });
             }
         });
@@ -210,6 +216,7 @@ export function composeScenery({ id, name, visual, paintBase }) {
             items.push({
                 sheet, x, y, variant: Math.abs(pl.variant ?? pl.seed ?? 0) % a.variants, scale: pl.scale ?? 1, cycle: a.cycleSeconds,
                 offset: (x * visual.windWaveLength + y * visual.windWaveLength * 0.4) / TAU + (pl.phase ?? 0),
+                ...desyncOf(prop, x, y, a.cycleSeconds),
                 ...(occ ? { occ: { id: pl.id }, rect: spriteRect(sheet, x, y, pl.scale ?? 1) } : null)
             });
         });

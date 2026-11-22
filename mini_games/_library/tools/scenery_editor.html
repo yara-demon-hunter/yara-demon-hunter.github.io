@@ -71,14 +71,11 @@
             <option value="mobL">Celular deitado</option>
             <option value="mobP">Celular em pé</option>
         </select>
-        <select id="quality" aria-label="Nível de detalhe">
-            <option value="0">Detalhe 0 (cheio)</option>
-            <option value="1">Detalhe 1</option>
-            <option value="2">Detalhe 2 (mínimo)</option>
-        </select>
+        <button id="copyDesk" type="button" hidden title="Traz para esta tela o layout do desktop (objetos, áreas, tudo), para você só acertar o que mudou de lugar. Substitui o que há aqui.">⤵ Copiar do desktop</button>
         <label class="check"><input id="pause" type="checkbox"> Pausar</label>
         <label class="check"><input id="handles" type="checkbox" checked> Alças</label>
         <label class="check"><input id="refs" type="checkbox" checked> Tocha</label>
+        <label class="check" title="Tira a névoa, o tom da noite e a escuridão em volta da tocha, só aqui no editor (o jogo continua igual), para ver o cenário com clareza enquanto você monta."><input id="nofog" type="checkbox"> Sem névoa</label>
         <label class="check" title="Mostra as áreas de contato (onde ninguém passa) por cima do cenário, em qualquer modo"><input id="showAreas" type="checkbox" checked> Áreas <span id="areaBadge" style="color:#fca5a5"></span></label>
         <button id="saveFile" class="primary" title="Grava o layout no projeto (scenery/layouts/<id>.js) e sincroniza os jogos: o editor, o sandbox e o jogo passam a mostrar sempre este cenário">📁 Gravar no arquivo</button>
         <button id="save" title="Guarda SÓ neste navegador (já acontece sozinho a cada mudança). Para gravar no projeto, use 📁 Gravar no arquivo">💾 Salvar (navegador)</button>
@@ -125,7 +122,7 @@
             <div id="areaPanel" hidden>
             <h2>Áreas de contato</h2>
             <p class="hint">São as áreas por onde <b>ninguém passa</b>: o herói, os monstros (chefes também) e os tiros. Desenhe retângulos e círculos sobre casas, muros, cercas, rochas... O que vale é a <b>base</b> do objeto: o telhado de uma casa pode ficar por cima de quem passa. As áreas são gravadas junto com o layout e o jogo as lê de lá.</p>
-            <div class="btns" style="margin-top:6px"><button id="kindContact" class="on" title="Área por onde ninguém passa">🛡 Contato</button><button id="kindBehind" title="Região onde, se o herói estiver, ele fica ATRÁS dos prédios (casa, catedral): eles o cobrem e ele aparece translúcido">🕶 Área de trás (azul)</button><button id="kindSpawn" title="Região onde os monstros NASCEM (ou onde o chefe nasce)">🟢 Nascimento</button></div>
+            <div class="btns" style="margin-top:6px"><button id="kindContact" class="on" title="Área por onde ninguém passa">🛡 Contato</button><button id="kindBehind" title="Região onde, se o herói estiver, ele fica ATRÁS dos prédios (casa, catedral): eles o cobrem e ele aparece translúcido">🕶 Área de trás (azul)</button><button id="kindSpawn" title="Região onde os monstros NASCEM (ou onde o chefe nasce)">🟢 Nascimento</button><button id="kindSlow" title="Região que deixa o HERÓI mais lento (poça de lodo). O dash e os monstros não são afetados">🐌 Lento</button></div>
             <p id="spawnHint" class="hint" hidden><b>Área verde:</b> é onde os monstros nascem. Sem nenhuma, eles nascem pela borda do mundo, como sempre. Cada zona tem um <b>peso</b> (a chance de ser sorteada) e pode listar <b>quais monstros</b> nascem nela (vazio = todos). Uma zona <b>de chefe</b> (roxa) é onde o círculo de invocação do chefe aparece. A linha tracejada vai da zona até a tocha: <b>vermelha</b> = uma área de contato a cruza (o monstro ficaria preso).</p>
             <p id="behindPick" class="hint" hidden><b>Área azul:</b> onde o herói estiver <b>dentro</b> dela, ele fica <b>atrás</b> dos prédios (casas, catedral): eles o cobrem e ele aparece translúcido. Fora de qualquer área azul, ele aparece normal. Só o que você desenha vale: o jogo não adivinha nada.</p>
             <div class="btns"><button id="toolSel" class="on">☝ Selecionar</button><button id="toolRect">▭ Retângulo</button><button id="toolCircle">◯ Círculo</button></div>
@@ -174,6 +171,13 @@
         setCtx(ctx);
 
         const PRESETS = { desk: { w: 1664, h: 936 }, mobL: { w: 1354, h: 624 }, mobP: { w: 624, h: 1354 } };
+        // Cada tela tem seu próprio layout (arquivo): desktop = <id>.js · celular deitado = <id>--landscape.js · celular em pé = <id>--portrait.js
+        const PROFILE_OF = { desk: 'desktop', mobL: 'landscape', mobP: 'portrait' };
+        const PROFILE_LABEL = { desktop: 'Computador', landscape: 'Celular deitado', portrait: 'Celular em pé' };
+        const PROFILES = ['desktop', 'landscape', 'portrait'];
+        const profile = () => PROFILE_OF[$('preset').value];
+        const storeKeyOf = (id, prof) => (prof === 'desktop' ? `scenery_editor:${id}` : `scenery_editor:${id}@${prof}`);
+        const readLocal = (id, prof) => { try { return JSON.parse(localStorage.getItem(storeKeyOf(id, prof))); } catch { return null; } };
         const TORCH = { max: 0.62, min: 0.13, curve: 0.85, solid: 0.55, flicker: 0.03, heroRadius: 210, heroSolid: 0.35, heroStrength: 0.92 };
         const SOURCE = { glowColor: '255, 150, 60', glowAlpha: 0.3, radiusRatio: TORCH.max };
 
@@ -326,22 +330,28 @@
             }
             const dirty = localAt > fileAt;
             info.style.color = dirty ? '#fbbf24' : '#a39b86';
-            info.textContent = fileAt
+            const sid = $('scenery').value;
+            const others = PROFILES.map(prof => `${PROFILE_LABEL[prof]} ${fileAtOf(sid, prof) > 0 ? '✓' : '—'}`).join(' · ');
+            info.textContent = `[${PROFILE_LABEL[profile()]}] ` + (fileAt
                 ? `📁 Arquivo gravado às ${hhmm(fileAt)} (${new Date(fileAt).toLocaleDateString('pt-BR')})${dirty ? ' · ⚠ há mudanças que ainda não estão no arquivo' : ' · em dia'}`
-                : (placed.length || baked.length || colliders.length ? '📁 Nada gravado no arquivo ainda · ⚠ use "Gravar no arquivo"' : '📁 Nada gravado no arquivo ainda');
+                : (placed.length || baked.length || colliders.length ? '📁 Nada gravado no arquivo ainda · ⚠ use "Gravar no arquivo"' : '📁 Nada gravado no arquivo ainda')) + `  ·  Telas com layout gravado: ${others}`;
         }
         // Na lista de cenários, um ● marca os que têm trabalho guardado
         // Na lista de cenários: ✓ = gravado no arquivo do projeto e em dia · ● = há trabalho que NÃO está no arquivo (só neste navegador) · nada = original
         const fileState = {};        // o que o arquivo tem agora, por cenário (atualizado quando grava; o módulo do layout fica em cache)
-        const fileAtOf = (id) => fileState[id] ? fileState[id].savedAt : (getLayout(id)?.savedAt ?? 0);
+        const fileAtOf = (id, prof = profile()) => fileState[`${id}@${prof}`] ? fileState[`${id}@${prof}`].savedAt : (getLayout(id, prof)?.savedAt ?? 0);
         function markSavedScenes() {
             [...$('scenery').options].forEach(o => {
-                let local = null;
-                try { local = JSON.parse(localStorage.getItem(`scenery_editor:${o.value}`) || 'null'); } catch { local = null; }
-                if (Array.isArray(local)) local = { placed: local, baked: [], savedAt: 0 };
-                const hasLocal = Boolean(local && (local.placed?.length || local.baked?.length || local.colliders?.length));
-                const inFile = fileAtOf(o.value) > 0;
-                const pending = hasLocal && (!inFile || (local.savedAt ?? 0) > fileAtOf(o.value));
+                let inFile = false;
+                let pending = false;
+                PROFILES.forEach(prof => {
+                    let local = readLocal(o.value, prof);
+                    if (Array.isArray(local)) local = { placed: local, baked: [], savedAt: 0 };
+                    const hasLocal = Boolean(local && (local.placed?.length || local.baked?.length || local.colliders?.length));
+                    const file = fileAtOf(o.value, prof) > 0;
+                    inFile ||= file;
+                    pending ||= hasLocal && (!file || (local.savedAt ?? 0) > fileAtOf(o.value, prof));
+                });
                 o.textContent = pending ? `${o.value} ●` : inFile ? `${o.value} ✓` : o.value;
             });
             $('scenery').title = '✓ = gravado no arquivo do projeto (em dia)  ·  ● = tem trabalho que ainda NÃO está no arquivo (só neste navegador)  ·  sem marca = cenário original';
@@ -367,17 +377,47 @@
             renderAreas();
         }
 
+        // O layout do desktop (o do arquivo, ou o do navegador se for mais novo), pronto para virar o ponto de partida de outra tela.
+        // Áreas com `fit` já saem com o tamanho certo para a tela de destino (como o jogo faria) e deixam de ter `fit`.
+        function desktopCopyFor(id, desktopFile, prof) {
+            const local = readLocal(id, 'desktop');
+            const useLocal = local && Array.isArray(local.placed) && (local.savedAt ?? 0) > fileAtOf(id, 'desktop');
+            const L = getLayout(id, 'desktop');
+            const file = desktopFile ?? { placed: L?.placed ?? [], baked: L?.baked ?? [], colliders: L?.colliders ?? [] };
+            const src = useLocal ? local : file;
+            const W = PRESETS[Object.keys(PROFILE_OF).find(k => PROFILE_OF[k] === prof)].w;
+            const H = PRESETS[Object.keys(PROFILE_OF).find(k => PROFILE_OF[k] === prof)].h;
+            const colliders = structuredClone(src.colliders ?? []).map(c => {
+                if (!Array.isArray(c.fit)) return c;
+                const kx = W / c.fit[0];
+                const ky = H / c.fit[1];
+                if (c.w !== undefined) c.w = Math.round(c.w * kx);
+                if (c.h !== undefined) c.h = Math.round(c.h * ky);
+                if (c.r !== undefined) c.r = Math.round(c.r * kx);
+                if (c.ry !== undefined) c.ry = Math.round(c.ry * ky);
+                if (c.cr !== undefined) c.cr = Math.round(c.cr * Math.min(kx, ky));
+                delete c.fit;
+                return c;
+            });
+            return { placed: structuredClone(src.placed ?? []), baked: structuredClone(src.baked ?? []), colliders };
+        }
+
         function loadScenery(id) {
             scenery = createScenery(id);
             visual = scenery.visual;
-            storeKey = `scenery_editor:${id}`;
-            let saved = null;
-            try { saved = JSON.parse(localStorage.getItem(storeKey)); } catch { saved = null; }
-            // O que o cenário traz (já com o layout gravado no arquivo, se houver: createScenery aplica) e o que ficou no navegador
-            const fromFile = { placed: structuredClone(visual.placed ?? []), baked: structuredClone(visual.baked ?? []), colliders: structuredClone(visual.colliders ?? []) };
+            const prof = profile();
+            storeKey = storeKeyOf(id, prof);
+            let saved = readLocal(id, prof);
+            // O que o cenário traz (já com o layout gravado no arquivo, se houver: createScenery aplica o do desktop) e o que ficou no navegador
+            const desktopFile = { placed: structuredClone(visual.placed ?? []), baked: structuredClone(visual.baked ?? []), colliders: structuredClone(visual.colliders ?? []) };
             if (Array.isArray(saved)) saved = { placed: saved, baked: [] };          // formato antigo: só a lista
-            const layout = getLayout(id) && fileAtOf(id) > 0 ? getLayout(id) : undefined;
-            fileAt = fileAtOf(id);
+            const layout = getLayout(id, prof) && fileAtOf(id, prof) > 0 ? getLayout(id, prof) : undefined;
+            // Uma tela sem layout próprio começa como CÓPIA do desktop (você só acerta o que mudou de lugar)
+            const copiedFromDesktop = prof !== 'desktop' && !layout;
+            const fromFile = prof === 'desktop' ? desktopFile
+                : layout ? { placed: structuredClone(layout.placed ?? []), baked: structuredClone(layout.baked ?? []), colliders: structuredClone(layout.colliders ?? []) }
+                : desktopCopyFor(id, desktopFile, prof);
+            fileAt = fileAtOf(id, prof);
             const hasLocal = saved && Array.isArray(saved.placed);
             // O arquivo manda, a menos que o navegador tenha mudanças mais novas que ele
             // Se o navegador tem algo DIFERENTE do arquivo e não é mais velho que ele, é trabalho que não chegou ao arquivo: não perde
@@ -412,6 +452,11 @@
                     ? `↩ Retomado de onde você parou: ${placed.length} objetos${saved.savedAt ? ` (salvo neste navegador às ${hhmm(saved.savedAt)}, ${new Date(saved.savedAt).toLocaleDateString('pt-BR')})` : ''}`
                     : `↩ Carregado do arquivo do projeto: ${placed.length} objetos`;
             } else $('saved').textContent = '';
+            if (copiedFromDesktop && !useLocal) {
+                $('saved').style.color = '#fbbf24';
+                $('saved').textContent = `📋 ${PROFILE_LABEL[prof]} ainda não tem layout próprio: partiu de uma CÓPIA do desktop (${placed.length} objetos). Acerte o que mudou de lugar e use "Gravar no arquivo".`;
+            }
+            $('copyDesk').hidden = prof === 'desktop';
             markSavedScenes();
             renderFileInfo();
             if (colliders.length) {
@@ -430,7 +475,7 @@
             { id: 'stones', icon: '🪨', label: 'Pedras e chão', props: ['rock', 'pebbles', 'cobble', 'flagstone'] },
             { id: 'grave', icon: '⚰️', label: 'Cemitério', props: ['tombstone', 'bones'] },
             { id: 'light', icon: '🔥', label: 'Luz e fogo', props: ['brazier', 'wisp'] },
-            { id: 'water', icon: '💧', label: 'Água', props: ['puddle', 'ripple', 'swamp_pool'] },
+            { id: 'water', icon: '💧', label: 'Água', props: ['puddle', 'ripple', 'water_current', 'swamp_pool', 'mud_pool', 'tar_pool', 'toxic_pool', 'rust_pool', 'mud_bubbles'] },
             { id: 'things', icon: '🧺', label: 'Objetos do dia a dia', props: ['cart', 'barrel', 'haystack', 'plank'] }
         ];
         const categoryOf = (id) => getProp(id).category ?? CATEGORIES.find(c => c.props.includes(id))?.id ?? 'other';
@@ -923,6 +968,7 @@
             $('kindContact').classList.toggle('on', k === 'contact');
             $('kindBehind').classList.toggle('on', k === 'behind');
             $('kindSpawn').classList.toggle('on', k === 'spawn');
+            $('kindSlow').classList.toggle('on', k === 'slow');
             $('behindPick').hidden = k !== 'behind';
             $('spawnHint').hidden = k !== 'spawn';
         }
@@ -934,7 +980,7 @@
         const newArea = (shape, x, y, size) => ({
             shape, x: round(x / env.width), y: round(y / env.height),
             ...(shape === 'rect' ? { w: Math.round(size[0]), h: Math.round(size[1]), rot: 0 } : { r: Math.round(size) }),
-            ...(areaNewKind === 'behind' ? { kind: 'behind' } : areaNewKind === 'spawn' ? { kind: 'spawn', weight: 1, types: [], boss: false } : { blocks: { hero: true, monsters: true, heroShots: true, monsterShots: true } })
+            ...(areaNewKind === 'behind' ? { kind: 'behind' } : areaNewKind === 'slow' ? { kind: 'slow', slow: 0.4 } : areaNewKind === 'spawn' ? { kind: 'spawn', weight: 1, types: [], boss: false } : { blocks: { hero: true, monsters: true, heroShots: true, monsterShots: true } })
         });
         // (círculo: guarda só `r`; a elipse ganha `ry` quando a alça de baixo é puxada)
         const areaCenter = (c) => ({ cx: c.x * env.width, cy: c.y * env.height });
@@ -1117,7 +1163,7 @@
             colliders.forEach((c, i) => {
                 const d = document.createElement('div');
                 d.className = i === selArea ? 'sel' : '';
-                d.innerHTML = `<span>${c.kind === 'behind' ? '🕶 ' : c.kind === 'spawn' ? (c.boss ? '👑 ' : '🟢 ') + (spawnBlocked(c) ? '⚠ ' : '') : CONTACT_TONE[contactType(c)][2] + ' '}${c.shape === 'rect' ? (crOf(c) > 0 && crOf(c) >= Math.floor(Math.min(c.w, c.h) / 2) ? '💊 Cápsula' : crOf(c) > 0 ? '▢ Ret. arredondado' : '▭ Retângulo') : (c.ry !== undefined && c.ry !== c.r ? '⬭ Elipse' : '◯ Círculo')} ${c.shape === 'rect' ? `${c.w}×${c.h}` : (c.ry !== undefined && c.ry !== c.r ? `${c.r}×${c.ry}` : `r ${c.r}`)}</span><span>${round(c.x, 2)}, ${round(c.y, 2)}</span>`;
+                d.innerHTML = `<span>${c.kind === 'behind' ? '🕶 ' : c.kind === 'slow' ? '🐌 ' : c.kind === 'spawn' ? (c.boss ? '👑 ' : '🟢 ') + (spawnBlocked(c) ? '⚠ ' : '') : CONTACT_TONE[contactType(c)][2] + ' '}${c.shape === 'rect' ? (crOf(c) > 0 && crOf(c) >= Math.floor(Math.min(c.w, c.h) / 2) ? '💊 Cápsula' : crOf(c) > 0 ? '▢ Ret. arredondado' : '▭ Retângulo') : (c.ry !== undefined && c.ry !== c.r ? '⬭ Elipse' : '◯ Círculo')} ${c.shape === 'rect' ? `${c.w}×${c.h}` : (c.ry !== undefined && c.ry !== c.r ? `${c.r}×${c.ry}` : `r ${c.r}`)}</span><span>${round(c.x, 2)}, ${round(c.y, 2)}</span>`;
                 d.onclick = () => { selArea = i; renderAreas(); };
                 list.appendChild(d);
             });
@@ -1125,14 +1171,16 @@
             const c = colliders[selArea];
             if (!c) { box.innerHTML = '<p class="hint">Nenhuma. Clique numa área.</p>'; return; }
             const num = (id, label, v, min, max, step) => `<div class="row"><span>${label}</span><input id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${v}"><input id="${id}N" type="number" min="${min}" max="${max}" step="${step}" value="${v}"></div>`;
-            box.innerHTML = `<div style="font-size:13px;margin-bottom:4px"><b>${c.kind === 'behind' ? '🕶 Área de trás · ' : c.kind === 'spawn' ? (c.boss ? '👑 Nascimento do chefe · ' : '🟢 Nascimento · ') : { wall: '🧱 Parede · ', body: '🚧 Só corpos · ', shield: '🛡 Só tiros · ', hero: '🧍 Só o herói · ', none: '◌ Não barra nada · ' }[contactType(c)]}${c.shape === 'rect' ? (crOf(c) > 0 ? 'Retângulo arredondado' : 'Retângulo') : (c.ry !== undefined && c.ry !== c.r ? 'Elipse' : 'Círculo')}</b>${c.shape === 'circle' ? ' <span class="hint" style="font-size:11px">(puxe a alça de baixo para esticar em elipse)</span>' : ''}</div>
+            box.innerHTML = `<div style="font-size:13px;margin-bottom:4px"><b>${c.kind === 'behind' ? '🕶 Área de trás · ' : c.kind === 'slow' ? '🐌 Lento · ' : c.kind === 'spawn' ? (c.boss ? '👑 Nascimento do chefe · ' : '🟢 Nascimento · ') : { wall: '🧱 Parede · ', body: '🚧 Só corpos · ', shield: '🛡 Só tiros · ', hero: '🧍 Só o herói · ', none: '◌ Não barra nada · ' }[contactType(c)]}${c.shape === 'rect' ? (crOf(c) > 0 ? 'Retângulo arredondado' : 'Retângulo') : (c.ry !== undefined && c.ry !== c.r ? 'Elipse' : 'Círculo')}</b>${c.shape === 'circle' ? ' <span class="hint" style="font-size:11px">(puxe a alça de baixo para esticar em elipse)</span>' : ''}</div>
                 ${num('aX', 'X', round(c.x), 0, 1, 0.001)}${num('aY', 'Y', round(c.y), 0, 1, 0.001)}
                 ${c.shape === 'rect' ? num('aW', 'Largura', c.w, 6, 1200, 1) + num('aH', 'Altura', c.h, 6, 1200, 1) + num('aCr', 'Cantos arredondados', crOf(c), 0, Math.floor(Math.min(c.w, c.h) / 2), 1) + '<div class="btns"><button id="aSquare">Cantos retos</button><button id="aPill">Cápsula</button></div>' + num('aR', 'Giro (°)', c.rot ?? 0, -180, 180, 1) : num('aRad', 'Raio X', c.r, 4, 800, 1) + num('aRadY', 'Raio Y', c.ry ?? c.r, 4, 800, 1) + num('aR', 'Giro (°)', c.rot ?? 0, -180, 180, 1) + '<div class="btns"><button id="aRound">Voltar a círculo</button></div>'}
                 ${c.kind === 'spawn' ? `<div id="spawnBox" style="margin:6px 0">
                     <div class="row"><span>Peso</span><input id="sWeight" type="range" min="0" max="10" step="0.5" value="${c.weight ?? 1}"><input id="sWeightN" type="number" min="0" max="10" step="0.5" value="${c.weight ?? 1}"></div>
                     <label class="check"><input id="sBoss" type="checkbox" ${c.boss ? 'checked' : ''}> Zona do CHEFE (é aqui que o círculo de invocação dele aparece)</label>
                     <div id="sTypes" ${c.boss ? 'hidden' : ''} style="margin-top:4px"><span style="font-size:12.5px;color:#a39b86">Monstros que nascem aqui (nenhum marcado = todos):</span><div class="chips" id="sTypeChips" style="margin-top:3px"></div></div></div>` : ''}
-                <div style="margin:6px 0" ${c.kind === 'behind' || c.kind === 'spawn' ? 'hidden' : ''}>
+                ${c.kind === 'slow' ? `<div class="row" style="margin:6px 0"><span>Lentidão (%)</span><input id="sSlow" type="range" min="5" max="90" step="1" value="${Math.round((c.slow ?? 0.4) * 100)}"><input id="sSlowN" type="number" min="5" max="90" step="1" value="${Math.round((c.slow ?? 0.4) * 100)}"></div>
+                    <p class="hint" style="margin:2px 0 6px">Só o herói fica mais lento aqui (monstros e dash não).</p>` : ''}
+                <div style="margin:6px 0" ${c.kind === 'behind' || c.kind === 'spawn' || c.kind === 'slow' ? 'hidden' : ''}>
                     <div style="font-size:12.5px;color:#a39b86;margin-bottom:3px">Tipo (modelos prontos):</div>
                     <div class="btns" style="margin:0 0 4px"><button id="pWall" title="Barra tudo: corpos e tiros">🧱 Parede</button><button id="pBody" title="Barra herói e monstros; os tiros passam por cima (mureta, rio, buraco)">🚧 Só corpos</button><button id="pShield" title="Só barra os tiros; os corpos passam (escudo, cobertura)">🛡 Só tiros</button><button id="pHero" title="Só o herói não passa; monstros e tiros passam">🧍 Só o herói</button></div>
                     <div style="font-size:12.5px;color:#a39b86">Ou escolha o que ela barra:</div>
@@ -1140,7 +1188,9 @@
                     <label class="check"><input id="bMon" type="checkbox" ${blocksOf(c).monsters ? 'checked' : ''}> monstros e chefes</label>
                     <label class="check"><input id="bHShot" type="checkbox" ${blocksOf(c).heroShots ? 'checked' : ''}> tiros do herói</label>
                     <label class="check"><input id="bMShot" type="checkbox" ${blocksOf(c).monsterShots ? 'checked' : ''}> tiros dos monstros</label></div>
+                <label class="check" title="Para áreas que acompanham o cenário pintado em frações da tela (um rio, uma margem): no celular, onde o mundo tem outra proporção, a área estica junto. Deixe desligado em áreas de objetos (túmulo, casa, ponte), que não mudam de tamanho."><input id="aFit" type="checkbox" ${c.fit ? 'checked' : ''}> Acompanha o tamanho da tela (rio, margem)</label>
                 <div class="btns"><button id="aDup">Duplicar</button><button id="aDel">Apagar</button></div>`;
+            $('aFit').onchange = (e) => { snapshot(); if (e.target.checked) colliders[selArea].fit = [env.width, env.height]; else delete colliders[selArea].fit; persist(); renderAreas(); };
             const bind = (id, key, isInt) => {
                 const range = $(id);
                 const numEl = $(id + 'N');
@@ -1183,6 +1233,10 @@
                     };
                     chips.appendChild(b);
                 });
+            } else if (c.kind === 'slow') {
+                const setSlow = (v) => { snapshotThrottled(); colliders[selArea].slow = Math.max(0.05, Math.min(0.9, +v / 100)); persist(); };
+                $('sSlow').oninput = () => { $('sSlowN').value = $('sSlow').value; setSlow($('sSlow').value); };
+                $('sSlowN').onchange = () => { $('sSlow').value = $('sSlowN').value; setSlow($('sSlowN').value); };
             } else if (c.kind !== 'behind') { setBlock('hero', 'bHero'); setBlock('monsters', 'bMon'); setBlock('heroShots', 'bHShot'); setBlock('monsterShots', 'bMShot'); }
             $('aDup').onclick = () => { snapshot(); const n = structuredClone(colliders[selArea]); n.x = round(Math.min(1, n.x + 24 / env.width)); n.y = round(Math.min(1, n.y + 16 / env.height)); colliders.push(n); selArea = colliders.length - 1; persist(); renderAreas(); };
             $('aDel').onclick = () => { snapshot(); colliders.splice(selArea, 1); selArea = -1; persist(); renderAreas(); };
@@ -1192,6 +1246,7 @@
         $('kindContact').addEventListener('click', () => setKind('contact'));
         $('kindBehind').addEventListener('click', () => setKind('behind'));
         $('kindSpawn').addEventListener('click', () => setKind('spawn'));
+        $('kindSlow').addEventListener('click', () => setKind('slow'));
         $('modeObj').addEventListener('click', () => setMode('objects'));
         $('modeArea').addEventListener('click', () => setMode('areas'));
         $('toolSel').addEventListener('click', () => setTool('select'));
@@ -1245,10 +1300,10 @@
             colliders.forEach((c, i) => {
                 const sel = i === selArea && mode === 'areas';
                 trace(c);
-                ctx.fillStyle = sel ? 'rgba(250, 204, 21, 0.30)' : c.kind === 'behind' ? 'rgba(56, 189, 248, 0.24)' : c.kind === 'spawn' ? (c.boss ? 'rgba(217, 70, 239, 0.26)' : 'rgba(34, 197, 94, 0.26)') : CONTACT_TONE[contactType(c)][0];
+                ctx.fillStyle = sel ? 'rgba(250, 204, 21, 0.30)' : c.kind === 'behind' ? 'rgba(56, 189, 248, 0.24)' : c.kind === 'slow' ? 'rgba(163, 230, 53, 0.24)' : c.kind === 'spawn' ? (c.boss ? 'rgba(217, 70, 239, 0.26)' : 'rgba(34, 197, 94, 0.26)') : CONTACT_TONE[contactType(c)][0];
                 ctx.fill();
                 ctx.lineWidth = lw;
-                ctx.strokeStyle = sel ? '#fde047' : c.kind === 'behind' ? 'rgba(125, 211, 252, 0.95)' : c.kind === 'spawn' ? (c.boss ? 'rgba(240, 171, 252, 0.95)' : 'rgba(134, 239, 172, 0.95)') : CONTACT_TONE[contactType(c)][1];
+                ctx.strokeStyle = sel ? '#fde047' : c.kind === 'behind' ? 'rgba(125, 211, 252, 0.95)' : c.kind === 'slow' ? 'rgba(190, 242, 100, 0.95)' : c.kind === 'spawn' ? (c.boss ? 'rgba(240, 171, 252, 0.95)' : 'rgba(134, 239, 172, 0.95)') : CONTACT_TONE[contactType(c)][1];
                 ctx.stroke();
             });
             // zonas de nascimento: a linha até a tocha (verde = livre; vermelha tracejada = uma parede barra o caminho)
@@ -1505,14 +1560,14 @@
             try {
                 const res = await fetch('/__save_layout', {
                     method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Atelie': '1' },
-                    body: JSON.stringify({ scenery: $('scenery').value, placed, baked, colliders })
+                    body: JSON.stringify({ scenery: $('scenery').value, profile: profile(), placed, baked, colliders })
                 });
                 const out = await res.json();
                 if (!res.ok || !out.ok) throw new Error(out.error || `erro ${res.status}`);
                 // O servidor diz quantas áreas gravou: se não bater, o arquivo ficou incompleto (não finja que está em dia)
                 if (out.colliders !== colliders.length) throw new Error(`o servidor gravou ${out.colliders ?? 0} de ${colliders.length} áreas: reinicie o serve.py`);
                 fileAt = out.savedAt;
-                fileState[$('scenery').value] = { savedAt: out.savedAt };
+                fileState[`${$('scenery').value}@${profile()}`] = { savedAt: out.savedAt };
                 // O navegador passa a ter a mesma data do arquivo: nada "pendente"
                 try { localStorage.setItem(storeKey, JSON.stringify({ placed, baked, colliders, savedAt: out.savedAt || Date.now() })); } catch { /* ok */ }
                 localAt = out.savedAt || Date.now();
@@ -1669,12 +1724,12 @@
             last = real;
             const res = view.scale * view.dpr;
             env.res = res;
-            env.quality = +$('quality').value;
+            env.quality = 0;                 // sempre o detalhe cheio (a opção de detalhe saiu do editor)
             ctx.setTransform(res, 0, 0, res, 0, 0);
             scenery.renderGround(env);
             scenery.renderSway(env);
             scenery.renderAmbient(env);
-            scenery.renderOverlay(env);
+            if (!$('nofog').checked) scenery.renderOverlay(env);
             drawHandles();
             drawAreas();
         }
@@ -1689,8 +1744,25 @@
         fit();
         runAnalysis();
         $('scenery').addEventListener('change', () => { loadScenery($('scenery').value); });
-        $('preset').addEventListener('change', () => { fit(); runAnalysis(); });
-        $('quality').addEventListener('change', () => scenery.invalidate());
+        $('preset').addEventListener('change', () => {
+            persist();                         // o que você estava fazendo fica guardado na tela de antes
+            fit();
+            loadScenery($('scenery').value);   // e esta tela abre com o layout dela (ou uma cópia do desktop)
+            const url = new URL(location.href);
+            url.searchParams.set('preset', $('preset').value);
+            window.history.replaceState(null, '', url);
+        });
+        $('copyDesk').addEventListener('click', () => {
+            if (!confirm(`Trocar tudo o que há em "${PROFILE_LABEL[profile()]}" (objetos e áreas) pelo layout do desktop?`)) return;
+            snapshot();
+            const copy = desktopCopyFor($('scenery').value, null, profile());
+            placed = copy.placed.filter(p => propIds().includes(p.prop));
+            baked = copy.baked;
+            colliders = copy.colliders;
+            selected = -1; selArea = -1;
+            commit();
+            status('Copiado do desktop. Acerte o que mudou de lugar e grave.');
+        });
         window.addEventListener('resize', fit);
         window.__editor = { get placed() { return placed; }, get baked() { return baked; }, get analysis() { return analysis; }, get colliders() { return colliders; }, get multi() { return [...multi]; }, addAt, get env() { return env; } };
         fetch('/__layout_api').then(r => r.ok ? r.json() : null).then(j => { canWrite = Boolean(j?.ok); serverFeatures = j?.features ?? []; renderFileInfo(); }).catch(() => renderFileInfo());

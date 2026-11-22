@@ -207,6 +207,17 @@ export class SoundEngine {
         this.burst({ filter: 'bandpass', freq: 700, to: 2800, q: 1.6, attack: 0.02, decay: 0.15, gain: 0.3 });
     }
 
+    // Lodo (área 🐌 Lento): ao entrar, um "chlop" molhado (chiado médio que sobe) e duas bolhas que sobem de tom. Fica nos médios (300 a 900 Hz) de propósito:
+    // graves de 100 a 200 Hz somem em alto-falante de notebook e de celular. Curto e com intervalo mínimo entre repetições.
+    playMud() {
+        if (!this.ctx || this.throttled('mud', 0.8)) return;
+        // O "chlop" arrastado: chiado médio que sobe devagar (como a bota saindo da lama), com três bolhas subindo de tom depois
+        this.burst({ filter: 'bandpass', freq: 260, to: 1050, q: 2, attack: 0.03, decay: 0.5, gain: 0.7 });
+        this.tone({ type: 'sine', freq: 340, to: 640, attack: 0.02, decay: 0.2, gain: 0.26 });
+        this.tone({ type: 'sine', freq: 460, to: 820, at: 0.14, attack: 0.015, decay: 0.16, gain: 0.2 });
+        this.tone({ type: 'sine', freq: 400, to: 720, at: 0.3, attack: 0.015, decay: 0.14, gain: 0.14 });
+    }
+
     playPerfect() {
         if (!this.ctx) return;
         this.tone({ type: 'sine', freq: 1046, decay: 0.2, gain: 0.12 });

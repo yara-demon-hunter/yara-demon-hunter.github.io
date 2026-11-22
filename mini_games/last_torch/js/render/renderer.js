@@ -52,9 +52,32 @@ const HERO_25D = new URLSearchParams(window.location.search).get('hero') !== 'to
 
 // Herói com a forma do Juramento da noite, se houver
 // O herói e o que anda com ele (auras, lâminas em órbita, escudo, fênix, corvo)
+const TAU = Math.PI * 2;
+
+// Lodo (área 🐌 Lento): um halo escuro de lama nos pés e dois anéis lentos que se abrem, bem discretos (a intensidade acompanha player.mudFade)
+function renderMudFeet() {
+    const fade = player.mudFade ?? 0;
+    if (fade < 0.03) return;
+    const fx = player.x;
+    const fy = player.y + 12;
+    const now = performance.now() / 1000;
+    ctx.save();
+    ctx.fillStyle = `rgba(28, 34, 14, ${0.34 * fade})`;
+    ctx.beginPath(); ctx.ellipse(fx, fy, 19, 7.5, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(150, 190, 90, 1)';
+    ctx.lineWidth = 1;
+    for (let k = 0; k < 2; k++) {
+        const t = (now * 0.9 + k * 0.5) % 1;
+        ctx.globalAlpha = (1 - t) * 0.32 * fade;
+        ctx.beginPath(); ctx.ellipse(fx, fy, 8 + t * 18, (8 + t * 18) * 0.4, 0, 0, TAU); ctx.stroke();
+    }
+    ctx.restore();
+}
+
 function renderHeroBlock() {
     if (player.hidden) return;
     ctx.save();
+    renderMudFeet();
     renderSkillAuras();
     if (HERO_25D) renderHero();
     else renderPlayer();

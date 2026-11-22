@@ -2,8 +2,8 @@
 // Lama escura com poças de água parada (pintadas na base), juncos, fogos-fátuos e cogumelos amarelo-esverdeados.
 import { DARK_FOREST_2_VISUALS as BASE } from '../dark_forest_2/dark_forest_2_visual.js';
 
-// As 12 lagoas do pântano (peça `swamp_pool`), nas posições e tamanhos que eram desenhados fixos no chão
-const POOLS = [
+// As 12 lagoas que o pântano já teve (peça `swamp_pool`), guardadas só como referência: não são mais usadas
+export const OLD_POOLS = [
         { prop: 'swamp_pool', x: 0.3673, y: 0.2773, seed: 1, rot: -11.0, palette: { rx: 48, ry: 27 } },
         { prop: 'swamp_pool', x: 0.0024, y: 0.2152, seed: 2, rot: -9.4, palette: { rx: 68, ry: 46 } },
         { prop: 'swamp_pool', x: 0.0865, y: 0.9166, seed: 3, rot: -8.0, palette: { rx: 90, ry: 48 } },
@@ -28,8 +28,7 @@ export const SWAMP_VISUALS = {
     portal: { ...BASE.portal, color: 'rgba(170, 220, 130, 0.12)' },
     // As lagoas de água parada: agora são OBJETOS (peça `swamp_pool`), nas mesmas posições e tamanhos de antes. Mova, gire, mude o tamanho, apague ou ponha
     // mais no editor (tools/scenery_editor.html). `pools` abaixo só vale para o desenho antigo, que some assim que há uma `swamp_pool` aqui.
-    placed: POOLS,
-    legacyObjects: POOLS,         // o que o desenho antigo do chão mostra, em forma de objetos: o editor oferece "Converter em objetos" (layout gravado antes disso)
+    placed: [],                   // sem lagoas (o usuário as tirou); a peça `swamp_pool` continua disponível no editor
     pools: { count: [9, 13], radius: [38, 100], water: ['#27472f', '#13291d'], mud: '#0e1409', weed: 'rgba(120, 170, 70, 0.55)', keepClear: 0.2 },
     props: [
         { prop: 'moss', per100kPx: 14 },

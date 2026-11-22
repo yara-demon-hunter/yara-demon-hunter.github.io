@@ -1,7 +1,7 @@
 // GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/scenery/scenery.js e rode o sync.
 import { ctx } from '../core/canvas.js';
 import { createRandom } from '../core/random.js';
-import { getLayout } from './layouts.js';
+import { resolveLayout } from './layouts.js';
 import {
     bakeSourceGlow, buildFireflies, buildFogBlobs, buildFogTile, buildVignette, cutLight, drawFireflies, drawFogLayer,
     ellipticDistance, fogDensity, makeCanvas
@@ -50,11 +50,26 @@ export function createScenery(id) {
     if (!def) throw new Error(`Cenário "${id}" não está registrado (sceneryIds(): ${sceneryIds().join(', ') || 'vazio'})`);
     const F = def.visual;
     // Layout gravado pelo editor (scenery/layouts/<id>.js): objetos colocados e entradas da receita convertidas. Cópia: ninguém muda o arquivo por aqui.
-    const layout = getLayout(id);
-    if (layout) {
-        F.placed = structuredClone(layout.placed ?? []);
-        F.baked = structuredClone(layout.baked ?? []);
-        F.colliders = structuredClone(layout.colliders ?? []);        // áreas de contato (o jogo as lê: js/systems/colliders.js)
+    // Cada tipo de tela (desktop, celular deitado, celular em pé) tem seu layout; sem um próprio, vale o do desktop.
+    const original = { placed: F.placed, baked: F.baked, colliders: F.colliders };
+    let profile = 'desktop';
+    let applied = Symbol('nada aplicado ainda');          // o layout em uso (undefined = nenhum: vale o que o cenário traz)
+    function setProfile(next = 'desktop') {
+        const layout = resolveLayout(id, next);
+        profile = next;
+        if (layout === applied) return false;
+        applied = layout;
+        if (layout) {
+            F.placed = structuredClone(layout.placed ?? []);
+            F.baked = structuredClone(layout.baked ?? []);
+            F.colliders = structuredClone(layout.colliders ?? []);        // áreas de contato (o jogo as lê: js/systems/colliders.js)
+        } else {
+            F.placed = original.placed;
+            F.baked = original.baked;
+            F.colliders = original.colliders;
+        }
+        cache.key = '';
+        return true;
     }
     const cache = {
         key: '', ground: null, vignette: null, fogSprite: null, fogTile: null, fog: [], fireflies: [], fireflyTime: 0,
@@ -65,6 +80,7 @@ export function createScenery(id) {
     // A ORDEM DOS SORTEIOS não pode mudar: o mesmo seed dá o mesmo cenário.
     function prepare(env) {
         const { width: w, height: h, quality, res } = env;
+        if (env.profile && env.profile !== profile) setProfile(env.profile);         // o editor não manda `profile`: ele mesmo põe os objetos no visual
         const key = `${w}x${h}|${res.toFixed(4)}|${quality}`;
         if (cache.key === key) return;
         cache.key = key;
@@ -204,5 +220,6 @@ export function createScenery(id) {
         }
     }
 
-    return { id: def.id, name: def.name, visual: F, prepare, invalidate, bake, occluders, drawOccluder, renderGround, renderSway, renderAmbient, renderOverlay };
+    setProfile(profile);
+    return { id: def.id, name: def.name, visual: F, setProfile, get profile() { return profile; }, prepare, invalidate, bake, occluders, drawOccluder, renderGround, renderSway, renderAmbient, renderOverlay };
 }

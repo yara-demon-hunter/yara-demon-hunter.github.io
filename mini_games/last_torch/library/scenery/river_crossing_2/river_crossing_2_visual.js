@@ -25,12 +25,14 @@ const BASE = {
         { prop: 'rock', per100kPx: 1.1, zone: { from: 0.41, to: 0.59 }, avoidRect: [0.38, 0.3, 0.62, 0.7] },
         { prop: 'stump', per100kPx: 0.35, zone: { from: 0.34, to: 0.66, invert: true }, avoidCenter: 90 },
         { prop: 'puddle', per100kPx: 1.4, zone: { from: 0.3, to: 0.38 }, avoidCenter: 80 },
-        { prop: 'ripple', per100kPx: [3, 1.8, 0.8], frames: [10, 6, 4], variants: 2, size: 1.4, cycleSeconds: 2.8, zone: { from: 0.42, to: 0.58 }, avoidRect: [0.38, 0.3, 0.62, 0.7] },
+        { prop: 'ripple', per100kPx: [3, 1.8, 0.8], frames: [16, 10, 7], variants: 2, size: 1.4, cycleSeconds: 6, zone: { from: 0.42, to: 0.58 }, avoidRect: [0.38, 0.3, 0.62, 0.7] },
         { prop: 'reed', per100kPx: [2.4, 1.3, 0.6], frames: [8, 6, 4], variants: 3, size: 1.5, cycleSeconds: 3.2, zone: { from: 0.33, to: 0.41 }, avoidRect: [0.38, 0.3, 0.62, 0.7] },
         { prop: 'reed', per100kPx: [2.4, 1.3, 0.6], frames: [8, 6, 4], variants: 3, size: 1.5, cycleSeconds: 3.2, zone: { from: 0.59, to: 0.67 }, avoidRect: [0.38, 0.3, 0.62, 0.7] },
         { prop: 'fern', per100kPx: [0.7, 0.4, 0.15], frames: [10, 6, 4], variants: 3, size: 1.8, cycleSeconds: 3.4, zone: { from: 0.3, to: 0.7 }, avoidCenter: 70 },
         { prop: 'grass', per100kPx: [1.2, 0.6, 0], frames: [8, 6, 4], variants: 3, size: 1.7, cycleSeconds: 3.4, zone: { from: 0.34, to: 0.66, invert: true }, avoidCenter: 70 },
-        { prop: 'mushroom', per100kPx: [0.4, 0.25, 0.12], frames: [8, 6, 4], variants: 2, size: 1.9, cycleSeconds: 2.6, zone: { from: 0.34, to: 0.66, invert: true }, avoidCenter: 70 }
+        { prop: 'mushroom', per100kPx: [0.4, 0.25, 0.12], frames: [8, 6, 4], variants: 2, size: 1.9, cycleSeconds: 2.6, zone: { from: 0.34, to: 0.66, invert: true }, avoidCenter: 70 },
+        // Correnteza: filetes de água que deslizam na direção do rio (sempre no FIM da lista: os índices das entradas já convertidas em objetos não mudam)
+        { prop: 'water_current', per100kPx: [3.2, 2, 1], frames: [20, 12, 8], variants: 3, size: 1.2, cycleSeconds: 6, zone: { from: 0.4, to: 0.6 }, avoidRect: [0.38, 0.3, 0.62, 0.7] }
     ],
     fogColor: '140, 190, 205',
     fogAlphaCenter: 0.07

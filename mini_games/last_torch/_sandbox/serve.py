@@ -34,7 +34,35 @@ TOUCH_SHIM = """<script>
 </script>"""
 
 
-def sandbox_page(frame_prefix: str | None = None) -> bytes:
+# FORMATO DE TELA do sandbox inteiro (cookie sbx_format, escolhido no painel): desktop (padrão, a página direta) ou celular deitado / em pé.
+# Nos formatos de celular a página "/" vira uma moldura (shell) com o sandbox COMPLETO dentro de um iframe do tamanho do celular
+# (390x844 ou 844x390): o jogo mede o iframe, então mundo, HUD e media queries se comportam como no aparelho. O iframe pede "/?frame=1".
+PHONE_FORMATS = {"portrait": (390, 844, "Celular em pé · 390×844"), "landscape": (844, 390, "Celular deitado · 844×390")}
+
+
+def shell_page(fmt: str) -> bytes:
+    w, h, label = PHONE_FORMATS[fmt]
+    options = "".join(f'<option value="{k}"{" selected" if k == fmt else ""}>{v[2]}</option>' for k, v in PHONE_FORMATS.items())
+    html = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Last Torch Sandbox · {label}</title>
+<style>
+html,body{{margin:0;height:100%;background:#05070d;color:#94a3b8;font:600 13px Inter,system-ui,sans-serif}}
+#bar{{height:40px;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid #1e293b}}
+#bar select{{background:#111a2e;color:#e2e8f0;border:1px solid #334155;border-radius:6px;padding:4px 8px;font:inherit}}
+#stage{{height:calc(100% - 41px);display:flex;align-items:center;justify-content:center;overflow:hidden}}
+iframe{{width:{w}px;height:{h}px;border:2px solid #334155;border-radius:14px;background:#000;flex:none;box-sizing:content-box}}
+</style></head><body>
+<div id="bar"><span>Tela do sandbox:</span><select id="fmt"><option value="desktop">Computador (janela inteira)</option>{options}</select><span>{label} — vale para todas as abas</span></div>
+<div id="stage"><iframe id="game" src="/?frame=1" title="Sandbox"></iframe></div>
+<script>
+const f=document.getElementById('game'),st=document.getElementById('stage');
+const fit=()=>{{const s=Math.min((st.clientWidth-24)/({w}+4),(st.clientHeight-16)/({h}+4),1);f.style.transform='scale('+s+')';}};
+fit();addEventListener('resize',fit);
+document.getElementById('fmt').onchange=(e)=>{{document.cookie='sbx_format='+e.target.value+'; path=/; max-age=31536000; SameSite=Lax';location.href='/';}};
+</script></body></html>"""
+    return html.encode("utf-8")
+
+
+def sandbox_page(frame_prefix: str | None = None, embed: bool = False) -> bytes:
     html = (GAME / "last_torch.html").read_text(encoding="utf-8")
     html = re.sub(r"\A---\n.*?\n---\n", "", html, flags=re.S)
     html = re.sub(r"^[ \t]*<!-- Google Analytics.*?-->\n", "", html, flags=re.M)
@@ -46,6 +74,8 @@ def sandbox_page(frame_prefix: str | None = None) -> bytes:
         html = html.replace("<head>", f'<head><base href="{frame_prefix}">{shim}', 1)
         html = html.replace("</body>", '<script type="module" src="/_sandbox/frame.js"></script></body>', 1)
     else:
+        if embed:
+            html = html.replace("<head>", f"<head>{TOUCH_SHIM}", 1)          # dentro da moldura do celular: o jogo acredita em toque
         html = html.replace("</body>", '<script type="module" src="/_sandbox/sandbox.js"></script></body>', 1)
     return html.encode("utf-8")
 
@@ -64,6 +94,13 @@ class Handler(SimpleHTTPRequestHandler):
         if prefix:
             path = "/" + path[len(prefix):]
         return super().translate_path(path)
+
+    def format_cookie(self) -> str:
+        for part in (self.headers.get("Cookie") or "").split(";"):
+            key, _, value = part.strip().partition("=")
+            if key == "sbx_format" and value in PHONE_FORMATS:
+                return value
+        return "desktop"
 
     def send_page(self, body: bytes, content_type="text/html; charset=utf-8"):
         self.send_response(200)
@@ -85,7 +122,19 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_page(css.encode("utf-8"), "text/css; charset=utf-8")
                 return
         if self.path.split("?")[0] in ("/", "/index.html", "/sandbox"):
-            self.send_page(sandbox_page())
+            fmt = self.format_cookie()
+            if "frame=1" in self.path:
+                self.send_page(sandbox_page(embed=True))
+            elif fmt != "desktop":
+                self.send_page(shell_page(fmt))
+            else:
+                self.send_page(sandbox_page())
+            return
+        if self.path.split("?")[0].endswith(".css") and self.format_cookie() != "desktop":
+            # moldura de celular: os estilos de toque ((pointer: coarse)) valem sempre, como no aparelho
+            css = Path(self.translate_path(self.path)).read_text(encoding="utf-8")
+            css = css.replace("not (pointer: coarse)", "not (min-width: 0px)").replace("(pointer: coarse)", "(min-width: 0px)")
+            self.send_page(css.encode("utf-8"), "text/css; charset=utf-8")
             return
         super().do_GET()
 

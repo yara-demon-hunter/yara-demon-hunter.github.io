@@ -7,7 +7,7 @@
 // Para cada monstro valem primeiro as zonas que listam o tipo dele; se não há, as zonas sem tipos; se também não há, ele nasce pela
 // borda do mundo como sempre (pickSpawnPoint devolve null e o spawner usa o caminho antigo). Cenário sem zonas = nada muda.
 import { state } from '../core/state.js';
-import { getSceneryColliders } from '../render/scenery.js';
+import { fittedSize, getSceneryColliders } from '../render/scenery.js';
 import { blockedAt } from './colliders.js';
 
 const compiled = { source: null, w: 0, h: 0, list: [] };
@@ -23,9 +23,10 @@ function zones() {
     for (const c of raw) {
         if (c.kind !== 'spawn') continue;
         const rot = (c.rot ?? 0) * Math.PI / 180;
+        const f = fittedSize(c, state.width, state.height);
         compiled.list.push({
             rect: c.shape === 'rect', cx: c.x * state.width, cy: c.y * state.height,
-            hw: (c.w ?? 0) / 2, hh: (c.h ?? 0) / 2, r: c.r ?? 0, ry: c.ry ?? c.r ?? 0, cr: Math.max(0, Math.min(c.cr ?? 0, (c.w ?? 0) / 2, (c.h ?? 0) / 2)),
+            hw: f.w / 2, hh: f.h / 2, r: f.r, ry: f.ry, cr: f.cr,
             cos: Math.cos(rot), sin: Math.sin(rot),
             weight: Math.max(0, c.weight ?? 1), types: Array.isArray(c.types) ? c.types : [], boss: c.boss === true
         });

@@ -36,9 +36,9 @@
 #sbPanel h3 small { color: #94a3b8; font-weight: 400; font-size: 11px; }
 
 /* Abas do painel: Arena (a luta de teste) e HUD tuner (ajuste da tela de jogo, _sandbox/tuner.js) */
-.sb-tabs { display: flex; gap: 6px; margin: 4px 0 14px; }
+.sb-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
 .sb-tabs button {
-    flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid #334155; background: #111a2e; color: #94a3b8;
+    flex: 1 1 72px; padding: 9px 12px; border-radius: 8px; border: 1px solid #334155; background: #111a2e; color: #94a3b8;
     font: 600 13px Inter, sans-serif; cursor: pointer;
 }
 .sb-tabs button.on { border-color: #ef4444; background: #2a0f14; color: #fecaca; }
@@ -76,3 +76,7 @@
     padding: 8px 12px; border-radius: 6px; border: 1px solid #334155; background: #111a2e; color: #cbd5e1; cursor: pointer; font: inherit;
 }
 #sbMovesBar .sb-row button:active { background: #7f1d1d; border-color: #ef4444; }
+
+/* Formato de tela do sandbox (desktop / celular deitado / em pé) */
+.sb-format { margin: 0 0 8px; font: 600 12px Inter, sans-serif; color: #94a3b8; }
+.sb-format select { margin-left: 6px; padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; background: #111a2e; color: #e2e8f0; font: inherit; }

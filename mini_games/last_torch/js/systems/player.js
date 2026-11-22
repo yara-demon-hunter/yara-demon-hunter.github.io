@@ -7,6 +7,7 @@ import { audio, joystick, keys, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { moveDash } from './dash.js';
+import { heroSpeedFactorAt } from './colliders.js';
 import { isFireCasting } from './knives.js';
 import { beamActive } from './fury.js';
 import { addNumber, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion, spawnDust } from './effects.js';
@@ -146,7 +147,14 @@ export function updatePlayer(dt) {
         if (keys['KeyD'] || keys['ArrowRight']) moveX += 1;
     }
 
-    const speed = getPlayerMaxSpeed();
+    // Poça de lodo (área 🐌 Lento do cenário): só o herói anda mais devagar e o dash não é afetado (moveDash tem a própria velocidade)
+    const mud = heroSpeedFactorAt(player.x, player.y);
+    const speed = getPlayerMaxSpeed() * mud;
+    // `mudFade` (0 a 1) suaviza o efeito visual do lodo; o som toca UMA vez ao entrar (sem dash: atravessar de dash é silencioso)
+    const inMud = mud < 1;
+    if (inMud && !(player.mudFade > 0.15) && player.dashTimer <= 0) audio.playMud();
+    player.mudFade = (player.mudFade ?? 0) + ((inMud ? 1 : 0) - (player.mudFade ?? 0)) * Math.min(1, dt * 7);
+    if (inMud && player.dashTimer <= 0 && Math.random() < dt * 14) spawnDust(player.x, player.y + 8, 1, 0.7, '#4f5f2c');      // respingos de lodo nos pés
 
     const joyMag = Math.hypot(joystick.x, joystick.y);
 

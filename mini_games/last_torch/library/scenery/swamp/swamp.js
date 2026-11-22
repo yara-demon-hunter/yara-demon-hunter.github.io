@@ -20,9 +20,9 @@ export function paintBase(g, w, h, rand, _env, V = F) {
     g.fillStyle = floor;
     g.fillRect(0, 0, w, h);
 
-    // As lagoas agora são OBJETOS (peça `swamp_pool`): mova, gire, mude o tamanho e apague no editor. Este desenho antigo só roda enquanto o cenário não
-    // tem nenhum objeto `swamp_pool` (layouts gravados antes disso); o sorteio continua rodando para o resto do cenário não mudar de lugar.
-    const show = !(V.placed ?? []).some(o => o.prop === 'swamp_pool');
+    // O pântano NÃO tem mais lagoas (pedido do usuário, 2026-11-22): o desenho antigo nunca aparece. O sorteio continua rodando para o resto do cenário
+    // não mudar de lugar. Para ter lagoas, ponha objetos `swamp_pool` no editor.
+    const show = false;
     const P = V.pools;
     const n = Math.round(P.count[0] + rand() * (P.count[1] - P.count[0]));
     const keep = Math.min(w, h) * P.keepClear;

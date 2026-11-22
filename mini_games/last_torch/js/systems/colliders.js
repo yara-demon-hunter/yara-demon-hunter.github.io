@@ -12,13 +12,13 @@
 // nunca feche o caminho até a tocha.
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { player, state } from '../core/state.js';
-import { getSceneryColliders } from '../render/scenery.js';
+import { fittedSize, getSceneryColliders, inZone } from '../render/scenery.js';
 import { createExplosion } from './effects.js';
 
 const DEG = Math.PI / 180;
 const EMPTY = [];
 const compiled = { source: null, w: 0, h: 0, list: EMPTY };
-const lastPos = new WeakMap();           // onde cada personagem/tiro estava no fim do quadro anterior (já fora das áreas)
+let lastPos = new WeakMap();           // onde cada personagem/tiro estava no fim do quadro anterior (já fora das áreas)
 
 // As áreas em coordenadas do mundo atual (x, y do arquivo são frações do mundo; o tamanho do mundo muda de tela para tela)
 function areas() {
@@ -30,12 +30,13 @@ function areas() {
     compiled.h = state.height;
     compiled.list = raw.filter(c => (c.kind ?? 'contact') === 'contact').map(c => {        // só as áreas de CONTATO bloqueiam (as de trás e de nascimento são outras coisas)
         const rot = (c.rot ?? 0) * DEG;
+        const f = fittedSize(c, state.width, state.height);        // `fit`: a área esticou junto com o mundo
         return {
             rect: c.shape === 'rect',
             cx: c.x * state.width, cy: c.y * state.height,
-            hw: (c.w ?? 0) / 2, hh: (c.h ?? 0) / 2, r: c.r ?? 0, ry: c.ry ?? c.r ?? 0,
-            cr: Math.max(0, Math.min(c.cr ?? 0, (c.w ?? 0) / 2, (c.h ?? 0) / 2)),         // raio dos cantos do retângulo (0 = canto reto)
-            ell: c.shape === 'circle' && c.ry !== undefined && c.ry !== c.r,        // elipse: círculo esticado (raio X = r, raio Y = ry)
+            hw: f.w / 2, hh: f.h / 2, r: f.r, ry: f.ry,
+            cr: f.cr,                                                                       // raio dos cantos do retângulo (0 = canto reto)
+            ell: c.shape === 'circle' && Math.abs(f.ry - f.r) > 0.01,        // elipse: círculo esticado (raio X = r, raio Y = ry)
             cos: Math.cos(rot), sin: Math.sin(rot),
             hero: c.blocks?.hero !== false, monsters: c.blocks?.monsters !== false,
             heroShots: (c.blocks?.heroShots ?? c.blocks?.shots) !== false,          // as adagas e poderes do herói
@@ -43,6 +44,34 @@ function areas() {
         };
     });
     return compiled.list;
+}
+
+// O mundo mudou de tamanho: as posições antigas não valem mais (senão o primeiro quadro "varreria" o personagem de volta pelas áreas)
+export function resetColliderMemory() { lastPos = new WeakMap(); }
+
+// --- ÁREAS 🐌 LENTO (poça de lodo): só o HERÓI anda mais devagar dentro delas (monstros e dash não) ---
+const slowCache = { source: null, w: 0, h: 0, list: EMPTY };
+function slowAreas() {
+    const raw = getSceneryColliders();
+    if (!raw || raw.length === 0) return EMPTY;
+    if (slowCache.source === raw && slowCache.w === state.width && slowCache.h === state.height) return slowCache.list;
+    slowCache.source = raw;
+    slowCache.w = state.width;
+    slowCache.h = state.height;
+    slowCache.list = raw.filter(c => c.kind === 'slow').map(c => {
+        const rot = (c.rot ?? 0) * DEG;
+        const f = fittedSize(c, state.width, state.height);
+        return { rect: c.shape === 'rect', cx: c.x * state.width, cy: c.y * state.height, hw: f.w / 2, hh: f.h / 2, r: f.r, ry: f.ry, cr: f.cr, cos: Math.cos(rot), sin: Math.sin(rot), slow: Math.max(0, Math.min(0.95, c.slow ?? 0.4)) };
+    });
+    return slowCache.list;
+}
+
+// Multiplicador da velocidade do herói em (x, y): 1 = normal; 0.6 = 40% mais lento. A maior lentidão entre as áreas em que ele está.
+export function heroSpeedFactorAt(x, y) {
+    const list = slowAreas();
+    let slow = 0;
+    for (let i = 0; i < list.length; i++) if (list[i].slow > slow && inZone(list[i], x, y)) slow = list[i].slow;
+    return 1 - slow;
 }
 
 const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);

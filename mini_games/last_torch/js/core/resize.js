@@ -1,6 +1,7 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { WORLD } from '../../data_model/world.js';
 import { canvas, ctx, player, shadowClones, state } from './state.js';
+import { resetColliderMemory } from '../systems/colliders.js';
 
 // Resolução interna do canvas: segue a tela até o teto do perfil. Telas 2x/3x têm 4x/9x mais pixels
 // para pintar e, numa cena escura e em movimento, quase não mostram a diferença.
@@ -56,6 +57,8 @@ export function resize() {
     // Guarda o centro antigo para manter tudo na mesma posição relativa à tocha
     const oldCoreX = state.coreX;
     const oldCoreY = state.coreY;
+    const oldWidth = state.width;
+    const oldHeight = state.height;
 
     state.width = world.width;
     state.height = world.height;
@@ -89,15 +92,18 @@ export function resize() {
         player.targetX = player.x;
         player.targetY = player.y;
     } else if (oldCoreX || oldCoreY) {
-        // Janela redimensionada no meio da partida: desloca tudo junto com o centro
-        const dx = state.coreX - oldCoreX;
-        const dy = state.coreY - oldCoreY;
+        // Janela redimensionada no meio da partida (girar o celular, a barra do navegador que some): o cenário e as áreas de contato ficam em
+        // FRAÇÕES do mundo, então todo mundo é remapeado pela mesma fração. Deslocar só pelo centro faria o herói e os monstros ficarem
+        // fora do lugar em relação às áreas (o erro cresce com a distância ao centro).
+        const fx = oldWidth > 0 ? state.width / oldWidth : 1;
+        const fy = oldHeight > 0 ? state.height / oldHeight : 1;
         [player, ...shadowClones, ...state.enemies, ...state.enemyProjectiles, ...state.goldDrops, ...state.pickups, ...state.particles].forEach(o => {
-            o.x += dx;
-            o.y += dy;
+            o.x *= fx;
+            o.y *= fy;
         });
-        player.targetX += dx;
-        player.targetY += dy;
+        player.targetX *= fx;
+        player.targetY *= fy;
+        resetColliderMemory();
     }
 }
 
