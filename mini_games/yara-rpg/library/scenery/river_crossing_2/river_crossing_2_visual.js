@@ -45,6 +45,7 @@ export const RIVER_CROSSING_2_VISUALS = {
     ground: ['#27343c', '#18232b', '#0b1117'],
     river: { ...BASE.river, from: 0.38, to: 0.62, water: ['#3b6e85', '#25495c', '#142f3f'], mud: '#1a2128', foam: 'rgba(235, 248, 255, 0.45)' },
     placed: [{ prop: 'bridge', x: 0.5, y: 0.5, seed: 1, palette: { length: 289, width: 166, plank: ['#4a4038', '#3c332c', '#55493f'], rail: '#1b1815' } }],
+    legacyObjects: [{ prop: 'bridge', x: 0.5, y: 0.5, seed: 1, palette: { length: 289, width: 166, plank: ['#4a4038', '#3c332c', '#55493f'], rail: '#1b1815' } }],   // a ponte antiga do chão, como objeto: o editor oferece "Converter em objetos"
     bridge: { ...BASE.bridge, halfWidth: 0.05, plank: ['#4a4038', '#3c332c', '#55493f'], rail: '#1b1815' },
     props: BASE.props.map(p => p.prop === 'reed' ? { ...p, palette: { blade: '#7a7a58', blade2: '#9a9468', head: '#4a3a2a' } }
         : p.prop === 'rock' ? { ...p, per100kPx: p.per100kPx * 1.6 }

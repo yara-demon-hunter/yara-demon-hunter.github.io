@@ -3,6 +3,23 @@
 // Lama escura com poças de água parada (pintadas na base), juncos, fogos-fátuos e cogumelos amarelo-esverdeados.
 import { DARK_FOREST_2_VISUALS as BASE } from '../dark_forest_2/dark_forest_2_visual.js';
 
+// As 12 lagoas do pântano (peça `swamp_pool`), nas posições e tamanhos que eram desenhados fixos no chão
+const POOLS = [
+        { prop: 'swamp_pool', x: 0.3673, y: 0.2773, seed: 1, rot: -11.0, palette: { rx: 48, ry: 27 } },
+        { prop: 'swamp_pool', x: 0.0024, y: 0.2152, seed: 2, rot: -9.4, palette: { rx: 68, ry: 46 } },
+        { prop: 'swamp_pool', x: 0.0865, y: 0.9166, seed: 3, rot: -8.0, palette: { rx: 90, ry: 48 } },
+        { prop: 'swamp_pool', x: 0.2526, y: 0.418, seed: 4, rot: 13.9, palette: { rx: 75, ry: 42 } },
+        { prop: 'swamp_pool', x: 0.2371, y: 0.5939, seed: 5, rot: 11.8, palette: { rx: 82, ry: 47 } },
+        { prop: 'swamp_pool', x: 0.7634, y: 0.7918, seed: 6, rot: -12.5, palette: { rx: 81, ry: 43 } },
+        { prop: 'swamp_pool', x: 0.5317, y: 0.8455, seed: 7, rot: 7.0, palette: { rx: 40, ry: 22 } },
+        { prop: 'swamp_pool', x: 0.7474, y: 0.459, seed: 8, rot: 8.5, palette: { rx: 47, ry: 32 } },
+        { prop: 'swamp_pool', x: 0.9588, y: 0.1259, seed: 9, rot: 10.9, palette: { rx: 84, ry: 47 } },
+        { prop: 'swamp_pool', x: 0.3082, y: 0.292, seed: 10, rot: 6.2, palette: { rx: 97, ry: 54 } },
+        { prop: 'swamp_pool', x: 0.569, y: 0.9822, seed: 11, rot: 6.5, palette: { rx: 43, ry: 29 } },
+        { prop: 'swamp_pool', x: 0.7881, y: 0.7505, seed: 12, rot: -2.7, palette: { rx: 88, ry: 60 } }
+
+];
+
 export const SWAMP_VISUALS = {
     ...BASE,
     seed: 6203,
@@ -10,6 +27,10 @@ export const SWAMP_VISUALS = {
     ground: ['#262d18', '#171e0f', '#0a0f07'],
     clearingRadiusRatio: 0.7,
     portal: { ...BASE.portal, color: 'rgba(170, 220, 130, 0.12)' },
+    // As lagoas de água parada: agora são OBJETOS (peça `swamp_pool`), nas mesmas posições e tamanhos de antes. Mova, gire, mude o tamanho, apague ou ponha
+    // mais no editor (tools/scenery_editor.html). `pools` abaixo só vale para o desenho antigo, que some assim que há uma `swamp_pool` aqui.
+    placed: POOLS,
+    legacyObjects: POOLS,         // o que o desenho antigo do chão mostra, em forma de objetos: o editor oferece "Converter em objetos" (layout gravado antes disso)
     pools: { count: [9, 13], radius: [38, 100], water: ['#27472f', '#13291d'], mud: '#0e1409', weed: 'rgba(120, 170, 70, 0.55)', keepClear: 0.2 },
     props: [
         { prop: 'moss', per100kPx: 14 },

@@ -31,5 +31,7 @@ import './barrel/barrel.js';
 import './iron_fence/iron_fence.js';
 import './iron_gate/iron_gate.js';
 import './bridge/bridge.js';
+import './swamp_pool/swamp_pool.js';
+import './dead_tree/dead_tree.js';
 
 export { getProp, propIds, registerProp } from './props.js';

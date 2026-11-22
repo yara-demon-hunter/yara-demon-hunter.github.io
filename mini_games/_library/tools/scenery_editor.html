@@ -102,7 +102,7 @@
             <div id="palette"></div>
             <p class="hint">As peças estão por tipo (casas, muros, plantas, pedras...). <b>Ao clicar num objeto no cenário, a peça dele fica destacada em azul aqui</b>, e a lista se abre no tipo certo.</p>
             <p class="hint">Clique numa peça e depois no cenário para pôr (pode pôr várias; <b>Esc</b> ou clicar de novo na peça para parar).
-                <b>Objetos um dentro do outro:</b> clique perto do <b>centro</b> do que quer pegar; <b>Shift+clique</b> passa para o próximo empilhado no mesmo ponto. <b>Clicar num objeto nunca cria outro</b>: seleciona e arrasta (vale também para o que o cenário já tinha, marcado com círculo azul: ao pegar um, todos os da mesma entrada da receita viram editáveis). Clicar num lugar vazio com uma peça escolhida põe a peça, e segurando o botão você ajusta onde ela fica.</p>
+                <b>Vários de uma vez:</b> arraste na área <b>vazia</b> para desenhar um retângulo: ficam selecionados todos os objetos cujas alças estão dentro dele (Shift soma; <b>Ctrl+clique</b> soma ou tira um; <b>Ctrl+A</b> seleciona tudo). Arraste um deles para mover todos. <b>Objetos um dentro do outro:</b> clique perto do <b>centro</b> do que quer pegar; <b>Shift+clique</b> passa para o próximo empilhado no mesmo ponto. <b>Clicar num objeto nunca cria outro</b>: seleciona e arrasta (vale também para o que o cenário já tinha, marcado com círculo azul: ao pegar um, todos os da mesma entrada da receita viram editáveis). Clicar num lugar vazio com uma peça escolhida põe a peça, e segurando o botão você ajusta onde ela fica.</p>
 
             <h2>2. Objeto selecionado</h2>
             <div id="selbox"><p class="hint">Nenhum. Clique num objeto do cenário.</p></div>
@@ -111,6 +111,7 @@
             <p class="hint">O cenário nasce de uma receita (quantas peças de cada tipo, onde). Clique em <b>Editar</b> para transformar o que ela gerou em
                 objetos que você seleciona, move e apaga como os outros. O chão, a estrada, o rio e o portão são a base e não entram aqui.
                 <b>Voltar à receita</b> desfaz. As posições são as da tela escolhida no topo, em <b>Detalhe 0</b>.</p>
+            <div id="legacyBox"></div>
             <div id="recipe" class="list" style="max-height:230px"></div>
 
             <h2>Objetos colocados (<span id="count">0</span>)</h2>
@@ -187,6 +188,11 @@
         let areaClip = null;
         let areaNewKind = 'contact';  // tipo da PRÓXIMA área desenhada: 'contact' (ninguém passa) ou 'behind' (área de trás de um objeto)
         let areaLink = '';            // id do objeto a que a próxima área de trás se liga
+        const multi = new Set();      // seleção MÚLTIPLA (os objetos de `placed`): arraste na área vazia para pegar vários
+        let marquee = null;           // o retângulo de seleção em andamento { x0, y0, x1, y1, add }
+        let gdrag = null;             // arraste do grupo inteiro
+        let groupClip = null;         // o grupo copiado (Ctrl+C com vários)
+        let lastCopyWasGroup = false;
         let colorsOpen = false;      // o painel de cores continua aberto quando o painel do objeto é refeito
         let canWrite = false;
         let serverFeatures = [];     // o que o servidor do Ateliê sabe gravar (um serve.py antigo não grava áreas de contato)        // o servidor do Ateliê (tools/serve.py) consegue gravar no projeto
@@ -420,11 +426,11 @@
             { id: 'building', icon: '🏠', label: 'Casas e construções', props: ['cottage', 'cathedral', 'cathedral_grand', 'well'] },
             { id: 'walls', icon: '🧱', label: 'Muros e cercas', props: ['fence', 'fence_v', 'iron_fence', 'iron_gate'] },
             { id: 'bridge', icon: '🌉', label: 'Pontes', props: ['bridge'] },
-            { id: 'plants', icon: '🌿', label: 'Plantas', props: ['fern', 'grass', 'bush', 'reed', 'mushroom', 'moss', 'leaves', 'stump', 'root'] },
+            { id: 'plants', icon: '🌿', label: 'Plantas', props: ['dead_tree', 'fern', 'grass', 'bush', 'reed', 'mushroom', 'moss', 'leaves', 'stump', 'root'] },
             { id: 'stones', icon: '🪨', label: 'Pedras e chão', props: ['rock', 'pebbles', 'cobble', 'flagstone'] },
             { id: 'grave', icon: '⚰️', label: 'Cemitério', props: ['tombstone', 'bones'] },
             { id: 'light', icon: '🔥', label: 'Luz e fogo', props: ['brazier', 'wisp'] },
-            { id: 'water', icon: '💧', label: 'Água', props: ['puddle', 'ripple'] },
+            { id: 'water', icon: '💧', label: 'Água', props: ['puddle', 'ripple', 'swamp_pool'] },
             { id: 'things', icon: '🧺', label: 'Objetos do dia a dia', props: ['cart', 'barrel', 'haystack', 'plank'] }
         ];
         const categoryOf = (id) => getProp(id).category ?? CATEGORIES.find(c => c.props.includes(id))?.id ?? 'other';
@@ -468,6 +474,7 @@
 
         let lastSelProp = null;
         function renderSide() {
+            for (const o of [...multi]) if (!placed.includes(o)) multi.delete(o);        // objetos que sumiram (apagados, desfazer)
             renderPalette();
             // Objeto selecionado: a peça dele aparece destacada na paleta (e a lista rola até ela, se o tipo mudou)
             const selProp = selected >= 0 ? placed[selected]?.prop : null;
@@ -482,12 +489,29 @@
             list.innerHTML = '';
             placed.forEach((pl, i) => {
                 const d = document.createElement('div');
-                d.className = i === selected ? 'sel' : '';
+                d.className = i === selected || multi.has(pl) ? 'sel' : '';
                 d.innerHTML = `<span>${getProp(pl.prop).name}${pl.front ? ' ⬆' : ''}</span><span>${round(pl.x, 2)}, ${round(pl.y, 2)}</span>`;
-                d.onclick = () => { selected = i; renderSide(); };
+                d.onclick = (e) => {
+                    if (e.ctrlKey || e.metaKey) { if (selected >= 0 && !multi.size) multi.add(placed[selected]); multi.has(pl) ? multi.delete(pl) : multi.add(pl); selected = multi.size === 1 ? placed.indexOf([...multi][0]) : -1; }
+                    else { multi.clear(); selected = i; }
+                    renderSide();
+                };
                 list.appendChild(d);
             });
             const box = $('selbox');
+            if (multi.size > 1) {
+                const counts = {};
+                multi.forEach(o => { counts[getProp(o.prop).name] = (counts[getProp(o.prop).name] ?? 0) + 1; });
+                box.innerHTML = `<div style="font-size:13px;margin-bottom:4px"><b>${multi.size} objetos selecionados</b></div>
+                    <p class="hint" style="margin:2px 0">${Object.entries(counts).map(([k, v]) => `${k} ×${v}`).join(' · ')}</p>
+                    <p class="hint">Arraste um deles para mover todos · setas movem · <b>Delete</b> apaga · <b>D</b> duplica · <b>Ctrl+C</b>/<b>Ctrl+V</b> copia e cola o grupo · <b>Ctrl+clique</b> soma ou tira um objeto · <b>Esc</b> limpa.</p>
+                    <div class="btns"><button id="gDup">Duplicar</button><button id="gCopy">Copiar</button><button id="gDel">Apagar todos</button><button id="gNone">Limpar seleção</button></div>`;
+                $('gDup').onclick = duplicateMulti;
+                $('gCopy').onclick = copyMulti;
+                $('gDel').onclick = deleteMulti;
+                $('gNone').onclick = () => { multi.clear(); renderSide(); };
+                return;
+            }
             if (selected < 0 || !placed[selected]) { box.innerHTML = '<p class="hint">Nenhum. Clique num objeto do cenário.</p>'; return; }
             const pl = placed[selected];
             const prop = getProp(pl.prop);
@@ -566,7 +590,31 @@
             try { analysis = scenery.bake(env.width, env.height, 0); } catch (err) { analysis = []; status(`Não consegui analisar a receita: ${err.message}`); }
             renderRecipe();
         }
+        // O que o cenário ainda desenha FIXO no chão (lagoas, ponte...) e já existe como objeto: um botão traz para a lista, para mover, mudar e apagar.
+        // (um layout gravado antes da peça existir não tem esses objetos, e o desenho antigo continua valendo até eles entrarem)
+        function renderLegacy() {
+            const box = $('legacyBox');
+            if (!box) return;
+            box.innerHTML = '';
+            const legacy = (visual?.legacyObjects ?? []).filter(o => !placed.some(p => p.prop === o.prop));
+            if (!legacy.length) return;
+            const names = [...new Set(legacy.map(o => getProp(o.prop).name))].join(', ');
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'margin:6px 0;padding:8px;border:1px solid #5c5137;border-radius:8px;background:#1a150a';
+            wrap.innerHTML = `<div style="font-size:12.5px;margin-bottom:6px">Este cenário ainda tem <b>${legacy.length}</b> coisa(s) desenhada(s) <b>fixas no chão</b> (${names}). Converta em objetos para pegar, mover, mudar o tamanho e apagar.</div>`;
+            const b = Object.assign(document.createElement('button'), { className: 'primary', textContent: `🔄 Converter em objetos (${legacy.length})` });
+            b.onclick = () => {
+                snapshot();
+                legacy.forEach(o => { const c = structuredClone(o); delete c.id; placed.push(c); });
+                selected = -1;
+                commit();
+                status(`${legacy.length} objeto(s) novos na lista: ${names}. O desenho fixo do chão sumiu (agora vale o objeto). Grave para guardar.`);
+            };
+            wrap.appendChild(b);
+            box.appendChild(wrap);
+        }
         function renderRecipe() {
+            renderLegacy();
             const box = $('recipe');
             box.innerHTML = '';
             (visual.props ?? []).forEach((entry, idx) => {
@@ -724,6 +772,81 @@
             selected = -1;
             commit();
         }
+        // --- SELEÇÃO MÚLTIPLA ---
+        const multiList = () => placed.filter(o => multi.has(o));
+        function setMulti(objs) {
+            multi.clear();
+            objs.forEach(o => multi.add(o));
+            selected = objs.length === 1 ? placed.indexOf(objs[0]) : -1;
+            renderSide();
+            status(objs.length > 1 ? `${objs.length} objetos selecionados.` : '');
+        }
+        function deleteMulti() {
+            if (multi.size < 2) return;
+            snapshot();
+            const n = multi.size;
+            placed = placed.filter(o => !multi.has(o));
+            multi.clear();
+            selected = -1;
+            commit();
+            status(`${n} objetos apagados.`);
+        }
+        function duplicateMulti() {
+            if (multi.size < 2) return;
+            snapshot();
+            const clones = multiList().map(o => {
+                const c = structuredClone(o);
+                delete c.id;
+                c.x = Math.min(1, round(c.x + 24 / env.width));
+                c.y = Math.min(1, round(c.y + 16 / env.height));
+                return c;
+            });
+            placed.push(...clones);
+            commit();
+            setMulti(clones);
+        }
+        function copyMulti() {
+            if (multi.size < 2) return false;
+            groupClip = multiList().map(o => structuredClone(o));
+            lastCopyWasGroup = true;
+            status(`${groupClip.length} objetos copiados. Ctrl+V cola o grupo onde o mouse estiver.`);
+            return true;
+        }
+        function pasteMulti() {
+            if (!groupClip?.length) return;
+            snapshot();
+            const cx = groupClip.reduce((a, o) => a + o.x, 0) / groupClip.length;
+            const cy = groupClip.reduce((a, o) => a + o.y, 0) / groupClip.length;
+            const dx = pointer ? pointer.x / env.width - cx : 24 / env.width;
+            const dy = pointer ? pointer.y / env.height - cy : 16 / env.height;
+            const clones = groupClip.map(o => {
+                const c = structuredClone(o);
+                delete c.id;
+                c.x = round(Math.max(0, Math.min(1, c.x + dx)));
+                c.y = round(Math.max(0, Math.min(1, c.y + dy)));
+                return c;
+            });
+            placed.push(...clones);
+            commit();
+            setMulti(clones);
+        }
+        // Os objetos cujas ALÇAS (o círculo de seleção, ou o ponto âncora) ficam dentro do retângulo. As peças ainda geradas pela receita
+        // (as que dá para pegar com o mouse) viram objetos na hora, como no clique.
+        function objectsInRect(r) {
+            const inside = (cx, cy, ax, ay) => (cx >= r.x0 && cx <= r.x1 && cy >= r.y0 && cy <= r.y1) || (ax >= r.x0 && ax <= r.x1 && ay >= r.y0 && ay <= r.y1);
+            const found = placed.filter(o => { const h = hitOf(o); return inside(h.cx, h.cy, o.x * env.width, o.y * env.height); });
+            const byEntry = new Map();
+            recipeItems().forEach(a => {
+                const h = hitOf({ prop: a.prop, x: a.x, y: a.y, from: a.entry, scale: a.scale });
+                if (inside(h.cx, h.cy, a.x * env.width, a.y * env.height)) byEntry.set(a.entry, [...(byEntry.get(a.entry) ?? []), a]);
+            });
+            byEntry.forEach((items, entry) => {
+                const all = analysis.filter(a => a.entry === entry);
+                const start = bakeEntry(entry, all, true);
+                items.forEach(it => found.push(placed[start + all.indexOf(it)]));
+            });
+            return found;
+        }
         function duplicate() {
             if (selected < 0) return;
             snapshot();
@@ -747,6 +870,7 @@
         function copySelected() {
             if (selected < 0) return false;
             clipboard = structuredClone(placed[selected]);
+            lastCopyWasGroup = false;
             status(`Copiado: ${getProp(clipboard.prop).name}. Ctrl+V cola onde o mouse estiver.`);
             return true;
         }
@@ -882,6 +1006,7 @@
         function setMode(m) {
             mode = m;
             armed = null;
+            if (m === 'areas') { multi.clear(); marquee = null; }
             $('objPanel').hidden = m !== 'objects';
             $('areaPanel').hidden = m !== 'areas';
             $('modeObj').classList.toggle('on', m === 'objects');
@@ -1192,6 +1317,22 @@
             // Clicar num objeto (colocado ou da receita) sempre o seleciona e arrasta, mesmo com uma peça escolhida: nunca cria outro por cima
             const i = grabAt(p.x, p.y, e.shiftKey);
             if (i >= 0) {
+                const obj = placed[i];
+                if (e.ctrlKey || e.metaKey) {                       // Ctrl+clique: soma ou tira este objeto da seleção
+                    if (selected >= 0 && !multi.size) multi.add(placed[selected]);
+                    multi.has(obj) ? multi.delete(obj) : multi.add(obj);
+                    selected = multi.size === 1 ? placed.indexOf([...multi][0]) : -1;
+                    renderSide();
+                    return;
+                }
+                if (multi.size > 1 && multi.has(obj)) {            // pegou um do grupo: arrasta todos
+                    snapshot();
+                    gdrag = { items: multiList().map(o => ({ o, dx: o.x * env.width - p.x, dy: o.y * env.height - p.y })) };
+                    try { canvas.setPointerCapture(e.pointerId); } catch { /* ok */ }
+                    canvas.className = 'grabbing';
+                    return;
+                }
+                multi.clear();
                 snapshot();
                 startDrag(e, p, i);
                 renderSide();
@@ -1202,12 +1343,23 @@
                 startDrag(e, p, selected);       // segurando o botão, já dá para ajustar onde ficou
                 return;
             }
-            selected = -1;
-            renderSide();
+            // Espaço vazio: começa o retângulo de seleção (Shift ou Ctrl soma ao que já estava selecionado)
+            marquee = { x0: p.x, y0: p.y, x1: p.x, y1: p.y, add: e.shiftKey || e.ctrlKey || e.metaKey };
+            try { canvas.setPointerCapture(e.pointerId); } catch { /* ok */ }
+            if (!marquee.add) { selected = -1; multi.clear(); renderSide(); }
         });
         canvas.addEventListener('pointermove', (e) => {
             pointer = toWorld(e);
             if (mode === 'areas') { areaPointerMove(); return; }
+            if (marquee) { marquee.x1 = pointer.x; marquee.y1 = pointer.y; return; }
+            if (gdrag) {
+                gdrag.items.forEach(it => {
+                    it.o.x = round(Math.max(0, Math.min(1, (pointer.x + it.dx) / env.width)));
+                    it.o.y = round(Math.max(0, Math.min(1, (pointer.y + it.dy) / env.height)));
+                });
+                rebuild(false);
+                return;
+            }
             if (drag && selected >= 0) {
                 const pl = placed[selected];
                 pl.x = round(Math.max(0, Math.min(1, (pointer.x + drag.dx) / env.width)));
@@ -1219,6 +1371,17 @@
         });
         canvas.addEventListener('pointerup', () => {
             if (mode === 'areas') { areaPointerUp(); return; }
+            if (marquee) {
+                const m = marquee;
+                marquee = null;
+                const r = { x0: Math.min(m.x0, m.x1), x1: Math.max(m.x0, m.x1), y0: Math.min(m.y0, m.y1), y1: Math.max(m.y0, m.y1) };
+                if (r.x1 - r.x0 < 5 && r.y1 - r.y0 < 5) return;                  // foi só um clique no vazio
+                const objs = objectsInRect(r);
+                const keep = m.add ? multiList() : [];
+                setMulti([...new Set([...keep, ...objs])]);
+                return;
+            }
+            if (gdrag) { gdrag = null; canvas.className = ''; commit(); return; }
             if (!drag) return;
             drag = null;
             canvas.className = '';
@@ -1230,12 +1393,29 @@
         window.addEventListener('keydown', (e) => {
             if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName) && !['Escape'].includes(e.key)) return;
             const pl = placed[selected];
-            if (e.key === 'Escape') { armed = null; areaTool = 'select'; areaDrag = null; renderPalette(); renderAreas(); status(''); return; }
+            if (e.key === 'Escape') { armed = null; areaTool = 'select'; areaDrag = null; marquee = null; if (multi.size) { multi.clear(); renderSide(); } renderPalette(); renderAreas(); status(''); return; }
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); persist(true); status('Salvo (Ctrl+S).'); return; }
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
             if (mode === 'areas') { areaKey(e); return; }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') { e.preventDefault(); setMulti([...placed]); return; }
+            if (multi.size > 1) {                                                // vários selecionados: as teclas valem para o grupo
+                const k = e.key.toLowerCase();
+                if ((e.ctrlKey || e.metaKey) && k === 'c') { e.preventDefault(); copyMulti(); return; }
+                if ((e.ctrlKey || e.metaKey) && k === 'v') { e.preventDefault(); lastCopyWasGroup && groupClip ? pasteMulti() : (clipboard && paste()); return; }
+                if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteMulti(); return; }
+                if (k === 'd') { duplicateMulti(); return; }
+                const step = e.shiftKey ? 10 : 1;
+                const mv = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+                if (mv) {
+                    e.preventDefault();
+                    snapshot();
+                    multiList().forEach(o => { o.x = round(Math.max(0, Math.min(1, o.x + mv[0] / env.width))); o.y = round(Math.max(0, Math.min(1, o.y + mv[1] / env.height))); });
+                    commit(false);
+                    return;
+                }
+            }
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') { if (copySelected()) e.preventDefault(); return; }
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') { if (clipboard) { e.preventDefault(); paste(); } return; }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') { if (lastCopyWasGroup && groupClip) { e.preventDefault(); pasteMulti(); } else if (clipboard) { e.preventDefault(); paste(); } return; }
             if (!pl) return;
             const step = e.shiftKey ? 10 : 1;
             const move = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
@@ -1443,6 +1623,32 @@
                     ctx.beginPath(); ctx.arc(pl.x * env.width, pl.y * env.height, i === selected ? 3.5 : 2.2, 0, Math.PI * 2); ctx.fill();
                 });
             }
+            if (mode !== 'areas' && (multi.size || marquee)) {
+                const vs = view.scale;
+                ctx.setLineDash([5 / vs, 4 / vs]);
+                ctx.lineWidth = 2 / vs;
+                ctx.strokeStyle = '#fde047';
+                ctx.fillStyle = '#fde047';
+                multiList().forEach(o => {
+                    const { cx, cy, r } = hitOf(o);
+                    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(o.x * env.width, o.y * env.height, 3 / vs, 0, Math.PI * 2); ctx.fill();
+                });
+                ctx.setLineDash([]);
+                if (marquee) {
+                    const x = Math.min(marquee.x0, marquee.x1);
+                    const y = Math.min(marquee.y0, marquee.y1);
+                    const w = Math.abs(marquee.x1 - marquee.x0);
+                    const h = Math.abs(marquee.y1 - marquee.y0);
+                    ctx.fillStyle = 'rgba(96, 165, 250, 0.16)';
+                    ctx.fillRect(x, y, w, h);
+                    ctx.setLineDash([6 / vs, 4 / vs]);
+                    ctx.strokeStyle = '#60a5fa';
+                    ctx.lineWidth = 1.5 / vs;
+                    ctx.strokeRect(x, y, w, h);
+                    ctx.setLineDash([]);
+                }
+            }
             if (armed && pointer) {
                 ctx.strokeStyle = 'rgba(253, 224, 71, 0.9)';
                 ctx.lineWidth = 1.5;
@@ -1486,7 +1692,7 @@
         $('preset').addEventListener('change', () => { fit(); runAnalysis(); });
         $('quality').addEventListener('change', () => scenery.invalidate());
         window.addEventListener('resize', fit);
-        window.__editor = { get placed() { return placed; }, get baked() { return baked; }, get analysis() { return analysis; }, get colliders() { return colliders; }, addAt, get env() { return env; } };
+        window.__editor = { get placed() { return placed; }, get baked() { return baked; }, get analysis() { return analysis; }, get colliders() { return colliders; }, get multi() { return [...multi]; }, addAt, get env() { return env; } };
         fetch('/__layout_api').then(r => r.ok ? r.json() : null).then(j => { canWrite = Boolean(j?.ok); serverFeatures = j?.features ?? []; renderFileInfo(); }).catch(() => renderFileInfo());
         window.__ready = true;
         requestAnimationFrame(frame);
