@@ -638,6 +638,7 @@ export function updateBossAI(e, model, dt) {
 function releaseBossShackle() {
     state.bossShackle = null;
     player.shackledTimer = 0;
+    player.rootedTimer = 0;
 }
 
 // Névoa, escuridão e chão sagrado: efeitos de campo dos golpes de variação (o desenho está em render/atmosphere.js e render/effects.js)

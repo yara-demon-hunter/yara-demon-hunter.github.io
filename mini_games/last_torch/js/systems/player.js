@@ -158,7 +158,8 @@ export function updatePlayer(dt) {
 
     const joyMag = Math.hypot(joystick.x, joystick.y);
 
-    if (player.shackledTimer > 0) {
+    if (player.rootedTimer > 0) player.rootedTimer = Math.max(0, player.rootedTimer - dt);
+    if (player.shackledTimer > 0 || player.rootedTimer > 0) {
         // Preso pela corrente do Demon Hunter: não anda nem dá dash (o golpe e o arremesso continuam)
         player.dashTimer = 0;
     } else if (player.dashTimer > 0) {

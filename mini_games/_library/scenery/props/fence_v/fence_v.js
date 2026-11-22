@@ -6,23 +6,26 @@ import { FENCE_V_VISUALS } from './fence_v_visual.js';
 // cima para baixo, e os dois trilhos viram vigas finas que sobem entre eles. Estática. Dá para girar no editor.
 registerProp({
     id: 'fence_v', name: 'Cerca de madeira (vertical)', kind: 'static', previewSize: 100, visual: FENCE_V_VISUALS,
+    ranges: { fixedLength: [0, 1200, 1, 'Comprimento (0 = sorteado)'] },
+    extent: (p) => (p.fixedLength > 0 ? p.fixedLength : (p.length[0] + p.length[1]) / 2) + 20,       // maior dimensão (área de clique e sprite)
     roll(r, p) {
         return { len: randomRange(r, p.length[0], p.length[1]), tilt: (r() - 0.5) * 0.08, broken: r() < 0.3 ? Math.floor(r() * 3) : -1 };
     },
     draw(g, x, y, a, p) {
+        const len = p.fixedLength > 0 ? p.fixedLength : a.len;       // fixedLength: comprimento EXATO (alonga ou encurta a cerca no editor, sem mudar a altura)
         g.save();
         g.translate(x, y);
         g.rotate(a.tilt);
-        const n = Math.max(2, Math.round(a.len / p.spacing));
-        const step = a.len / (n - 1);
-        const top = -a.len / 2;
+        const n = Math.max(2, Math.round(len / p.spacing));
+        const step = len / (n - 1);
+        const top = -len / 2;
         // sombra no chão, ao longo da fila
         g.fillStyle = 'rgba(0, 0, 0, 0.35)';
-        g.fillRect(-2, top + 4, 8, a.len + 4);
+        g.fillRect(-2, top + 4, 8, len + 4);
         // trilhos: duas vigas finas, uma mais alta (atrás) e outra mais baixa, ligando os mourões
         g.fillStyle = p.rail;
-        g.fillRect(-4.2, top - 9, 2.8, a.len);
-        g.fillRect(1.4, top - 3, 2.8, a.len);
+        g.fillRect(-4.2, top - 9, 2.8, len);
+        g.fillRect(1.4, top - 3, 2.8, len);
         // mourões de cima para baixo: os de baixo (mais perto) por último
         for (let i = 0; i < n; i++) {
             if (i === a.broken) continue;

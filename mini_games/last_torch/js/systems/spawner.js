@@ -260,6 +260,7 @@ export function resetFieldForNewTurn() {
     state.telegraphs.length = 0;
     state.bossFx = state.bossZone = state.bossShackle = null;
     player.shackledTimer = 0;
+    player.rootedTimer = 0;
     state.groundFires.length = 0;
     state.lightning.length = 0;
     state.bolts.length = 0;

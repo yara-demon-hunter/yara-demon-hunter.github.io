@@ -114,6 +114,20 @@ function updateTreantPunch(e, P, dist, angle, dt) {
             }
             shakeScreen(7);
             audio.playSlam(0.9);
+        } else if (e.punchTimer <= 0 && P.root) {
+            // Treant: as raízes estouram no ponto marcado; quem ainda está lá fica preso
+            e.punchState = 2;
+            e.punchTimer = P.strikeSeconds;
+            e.rootWarn = false;
+            if (Math.hypot(player.x - e.rootX, player.y - e.rootY) <= P.root.radius + CHARACTER_MODEL.collisionRadius) {
+                player.rootedTimer = Math.max(player.rootedTimer ?? 0, P.root.seconds);
+                player.rootedMax = player.rootedTimer;
+                player.dashTimer = 0;
+                audio.playShackle(true);
+            }
+            createExplosion(e.rootX, e.rootY, '#4ade80', 8);
+            addShockwave(e.rootX, e.rootY, { radius: P.root.radius, color: '#4ade80', width: 4, seconds: 0.3 });
+            shakeScreen(3);
         } else if (e.punchTimer <= 0) {
             e.punchState = 2;
             e.punchTimer = P.strikeSeconds;
@@ -158,6 +172,7 @@ function updateTreantPunch(e, P, dist, angle, dt) {
     e.punchCooldown -= dt;
     if (dist > P.range || e.punchCooldown > 0) return false;
     e.punchAngle = angle;
+    if (P.root) { e.rootX = player.x; e.rootY = player.y; e.rootWarn = true; e.rootWindup = P.windupSeconds; }       // o ponto das raízes fica marcado no começo: dá tempo de sair
     e.punchState = 1;
     e.punchTimer = P.windupSeconds;
     e.punchCooldown = P.cooldownSeconds;

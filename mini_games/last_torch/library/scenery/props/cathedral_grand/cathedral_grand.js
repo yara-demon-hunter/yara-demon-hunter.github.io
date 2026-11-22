@@ -21,9 +21,19 @@ registerProp({
         const s = Math.sin(phase * TAU);       // -1 .. 1 : posição do balanço
         const strike = Math.pow(Math.abs(s), 10);   // 1 nos extremos: é quando o sino bate
 
-        // sombra no chão
-        g.fillStyle = 'rgba(0, 0, 0, 0.42)';
-        g.beginPath(); g.ellipse(12, 7, W * 1.0, 17, 0, 0, TAU); g.fill();
+        // sombra no chão: só um pouco maior que a base (fachada + torres), suave nas pontas, com uma faixa de contato mais escura colada na parede
+        const half = tx + T + 6;
+        g.save();
+        g.translate(5, 4);
+        g.scale(1, 0.15);
+        const soft = g.createRadialGradient(0, 0, half * 0.35, 0, 0, half);
+        soft.addColorStop(0, 'rgba(0, 0, 0, 0.36)');
+        soft.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        g.fillStyle = soft;
+        g.beginPath(); g.arc(0, 0, half, 0, TAU); g.fill();
+        g.restore();
+        g.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        g.beginPath(); g.roundRect(-(tx + T), 0, (tx + T) * 2, 4, 2); g.fill();
 
         // nave (atrás) com contrafortes
         const naveTop = -H - 190;

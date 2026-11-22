@@ -58,7 +58,7 @@ function isNearMiss() {
 export function tryDash() {
     if (beamActive()) return false;         // Lord's Decree: plantado e invulnerável, só mira (nada de dash)
     if (state.gameState !== 'PLAYING' || (state.phase !== 'HUNT' && state.phase !== 'CLEAR')) return;
-    if (player.dashCharges <= 0 || player.dashTimer > 0 || isFireCasting() || player.shackledTimer > 0) return;
+    if (player.dashCharges <= 0 || player.dashTimer > 0 || isFireCasting() || player.shackledTimer > 0 || player.rootedTimer > 0) return;
 
     const dir = getDashDirection();
     player.dashCharges--;

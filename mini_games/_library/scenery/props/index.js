@@ -13,6 +13,7 @@ import './cobble/cobble.js';
 import './plank/plank.js';
 import './flagstone/flagstone.js';
 import './bones/bones.js';
+import './skull/skull.js';
 import './puddle/puddle.js';
 import './fence/fence.js';
 import './fence_v/fence_v.js';

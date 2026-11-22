@@ -287,8 +287,10 @@ export const MONSTER_MODELS = {
         goldVariance: 0.35,
         xpRewardBase: 32,
         xpRewardPerTurn: 5,
-        // Soco lento de curto alcance: o braço se ergue sem aviso no chão e o dano chega no fim da preparação.
-        punch: { cooldownSeconds: 4.8, windupSeconds: 1.35, strikeSeconds: 0.18, recoverySeconds: 0.55, range: 112, halfAngle: 0.52, damageMultiplier: 2.8 }
+        // Raízes que prendem o herói (o mesmo efeito do Grasping Roots, do ramo Natureza): o Treant ergue os braços, raízes começam a brotar no ponto
+        // onde o herói está (aviso no chão) e, se ele ainda estiver ali quando estouram, ficam `seconds` presas nele (não anda nem dá dash; ainda ataca).
+        // Sem dano direto: o perigo é ficar parado enquanto a horda chega. Para escapar, basta sair do círculo durante a preparação.
+        punch: { root: { seconds: 2.2, radius: 42 }, cooldownSeconds: 7, windupSeconds: 1.1, strikeSeconds: 0.25, recoverySeconds: 0.6, range: 320, halfAngle: 0.52, damageMultiplier: 0 }
     },
     // Golem de Brasa e Musgo: gigante de pedra, lento e muito resistente; o mesmo soco do Treant. Só a partir da wave 4.
     GOLEM: {

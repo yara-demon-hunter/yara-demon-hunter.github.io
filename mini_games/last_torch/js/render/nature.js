@@ -227,6 +227,31 @@ export function renderRoots() {
         const h = w * (ROOT_H / ROOT_W);
         ctx.drawImage(sprite, e.x - w / 2, e.y + e.radius * 0.55 - h * 0.62, w, h);
     }
+    // Raízes do Treant: o aviso no chão (círculo + raízes que vão brotando no ponto marcado) e, depois, as raízes que prendem o herói
+    for (const e of state.enemies) {
+        if (!e.rootWarn || e.punchState !== 1) continue;
+        const p = Math.max(0, Math.min(1, 1 - e.punchTimer / (e.rootWindup ?? 1)));
+        sprite ??= getRoots();
+        const w = 40 * (0.25 + p * 0.75);
+        const h = w * (ROOT_H / ROOT_W);
+        ctx.save();
+        ctx.globalAlpha = 0.25 + p * 0.55;
+        ctx.strokeStyle = '#4ade80';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath(); ctx.ellipse(e.rootX, e.rootY + 8, 42, 17, 0, 0, TAU); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.drawImage(sprite, e.rootX - w / 2, e.rootY + 10 - h * 0.62, w, h);
+        ctx.restore();
+    }
+    if (player.rootedTimer > 0) {
+        sprite ??= getRoots();
+        const max = player.rootedMax ?? player.rootedTimer;
+        const grow = Math.min(1, (max - player.rootedTimer) / 0.15 + 0.35) * Math.min(1, player.rootedTimer / 0.2);
+        const w = 46 * grow;
+        const h = w * (ROOT_H / ROOT_W);
+        ctx.drawImage(sprite, player.x - w / 2, player.y + 11 - h * 0.62, w, h);
+    }
 }
 
 // --- LOBOS ESPIRITUAIS ---

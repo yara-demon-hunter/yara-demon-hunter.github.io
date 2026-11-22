@@ -5,7 +5,7 @@ import { registerLayout } from '../layouts.js';
 
 registerLayout('dark_forest_2', {
   profile: 'portrait',
-  savedAt: 1795360682985,
+  savedAt: 1795367878826,
   baked: [4, 5, 6, 7, 3, 9, 8],
   placed: [
     {"prop": "stump", "x": 0.317, "y": 0.3046, "from": 4, "attrs": {"radius": 11.702, "sides": [0.606, 0.557, 0.577]}},
@@ -102,10 +102,10 @@ registerLayout('dark_forest_2', {
   ],
   // Áreas de contato: ninguém passa (x, y = centro em fração do mundo; w, h, r em unidades; rot em graus)
   colliders: [
-    {"shape": "circle", "x": 0.095, "y": 0.1057, "r": 48, "kind": "spawn", "weight": 1, "types": ["BAT", "SHADOW_WOLF"], "boss": false},
-    {"shape": "circle", "x": 0.8892, "y": 0.099, "r": 59, "kind": "spawn", "weight": 1, "types": ["BAT", "SHADOW_WOLF"], "boss": false},
-    {"shape": "circle", "x": 0.8853, "y": 0.887, "r": 64, "kind": "spawn", "weight": 1, "types": ["BAT", "SHADOW_WOLF"], "boss": false},
-    {"shape": "circle", "x": 0.0947, "y": 0.8878, "r": 60, "kind": "spawn", "weight": 1, "types": ["BAT", "SHADOW_WOLF"], "boss": false},
+    {"shape": "circle", "x": 0.095, "y": 0.1057, "r": 48, "kind": "spawn", "weight": 1, "types": ["BAT", "SHADOW_WOLF", "TREANT"], "boss": false},
+    {"shape": "circle", "x": 0.8892, "y": 0.099, "r": 59, "kind": "spawn", "weight": 1, "types": ["BAT", "SHADOW_WOLF", "TREANT"], "boss": false},
+    {"shape": "circle", "x": 0.8876, "y": 0.887, "r": 64, "kind": "spawn", "weight": 1, "types": ["BAT", "SHADOW_WOLF", "TREANT"], "boss": false},
+    {"shape": "circle", "x": 0.0962, "y": 0.8889, "r": 60, "kind": "spawn", "weight": 1, "types": ["BAT", "SHADOW_WOLF", "TREANT"], "boss": false},
     {"shape": "circle", "x": 0.5049, "y": 0.1518, "r": 64, "kind": "spawn", "weight": 1, "types": [], "boss": true},
     {"shape": "rect", "x": 0.0958, "y": 0.2689, "w": 76, "h": 73, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER"], "boss": false},
     {"shape": "rect", "x": 0.9041, "y": 0.2711, "w": 76, "h": 73, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER"], "boss": false},

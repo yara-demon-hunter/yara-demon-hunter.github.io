@@ -134,6 +134,7 @@ export function startGame() {
     state.telegraphs = [];
     state.bossFx = state.bossZone = state.bossShackle = null;
     player.shackledTimer = 0;
+    player.rootedTimer = 0;
     state.dashGhosts = [];
     state.groundFires = [];
     state.lightning = [];
