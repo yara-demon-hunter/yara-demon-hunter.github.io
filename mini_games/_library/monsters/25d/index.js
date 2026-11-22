@@ -24,6 +24,30 @@ import { VAMPIRE_25D_VISUALS } from './vampire/vampire25d_visual.js';
 import { renderVampire25D } from './vampire/vampire25d.js';
 import { DEMON_LORD_25D_VISUALS } from './demon_lord/demon_lord25d_visual.js';
 import { renderDemonLord25D } from './demon_lord/demon_lord25d.js';
+import { MILITIA_25D_VISUALS } from './militia/militia25d_visual.js';
+import { renderMilitia25D } from './militia/militia25d.js';
+import { PLATE_KNIGHT_25D_VISUALS } from './plate_knight/plate_knight25d_visual.js';
+import { renderPlateKnight25D } from './plate_knight/plate_knight25d.js';
+import { LANCER_25D_VISUALS } from './lancer/lancer25d_visual.js';
+import { renderLancer25D } from './lancer/lancer25d.js';
+import { DROWNED_25D_VISUALS } from './drowned/drowned25d_visual.js';
+import { renderDrowned25D } from './drowned/drowned25d.js';
+import { DEMON_25D_VISUALS } from './demon/demon25d_visual.js';
+import { renderDemon25D } from './demon/demon25d.js';
+import { SKELETON_WARRIOR_25D_VISUALS } from './skeleton_warrior/skeleton_warrior25d_visual.js';
+import { renderSkeletonWarrior25D } from './skeleton_warrior/skeleton_warrior25d.js';
+import { SKELETON_ARCHER_25D_VISUALS } from './skeleton_archer/skeleton_archer25d_visual.js';
+import { renderSkeletonArcher25D } from './skeleton_archer/skeleton_archer25d.js';
+import { RIVER_EEL_25D_VISUALS } from './river_eel/river_eel25d_visual.js';
+import { renderRiverEel25D } from './river_eel/river_eel25d.js';
+import { BOG_TOAD_25D_VISUALS } from './bog_toad/bog_toad25d_visual.js';
+import { renderBogToad25D } from './bog_toad/bog_toad25d.js';
+import { BOG_SLIME_25D_VISUALS } from './bog_slime/bog_slime25d_visual.js';
+import { renderBogSlime25D } from './bog_slime/bog_slime25d.js';
+import { ZOMBIE_25D_VISUALS } from './zombie/zombie25d_visual.js';
+import { renderZombie25D } from './zombie/zombie25d.js';
+import { ARMORED_ZOMBIE_25D_VISUALS } from './armored_zombie/armored_zombie25d_visual.js';
+import { renderArmoredZombie25D } from './armored_zombie/armored_zombie25d.js';
 import { TREANT_MONSTER_25D_VISUALS } from './treant/treant25d_visual.js';
 import { renderTreantMonster25D, treantStill } from './treant/treant25d.js';
 import { GOLEM_25D_VISUALS } from './golem/golem25d_visual.js';
@@ -47,7 +71,19 @@ export const MONSTERS_25D = {
     vampire: { visuals: VAMPIRE_25D_VISUALS, render: renderVampire25D },
     demon_lord: { visuals: DEMON_LORD_25D_VISUALS, render: renderDemonLord25D },
     treant: { visuals: TREANT_MONSTER_25D_VISUALS, render: renderTreantMonster25D, still: treantStill },
-    golem: { visuals: GOLEM_25D_VISUALS, render: renderGolem25D, still: golemStill }
+    golem: { visuals: GOLEM_25D_VISUALS, render: renderGolem25D, still: golemStill },
+    armored_zombie: { visuals: ARMORED_ZOMBIE_25D_VISUALS, render: renderArmoredZombie25D },
+    zombie: { visuals: ZOMBIE_25D_VISUALS, render: renderZombie25D },
+    bog_slime: { visuals: BOG_SLIME_25D_VISUALS, render: renderBogSlime25D },
+    bog_toad: { visuals: BOG_TOAD_25D_VISUALS, render: renderBogToad25D },
+    river_eel: { visuals: RIVER_EEL_25D_VISUALS, render: renderRiverEel25D },
+    skeleton_archer: { visuals: SKELETON_ARCHER_25D_VISUALS, render: renderSkeletonArcher25D },
+    skeleton_warrior: { visuals: SKELETON_WARRIOR_25D_VISUALS, render: renderSkeletonWarrior25D },
+    demon: { visuals: DEMON_25D_VISUALS, render: renderDemon25D },
+    drowned: { visuals: DROWNED_25D_VISUALS, render: renderDrowned25D },
+    lancer: { visuals: LANCER_25D_VISUALS, render: renderLancer25D },
+    plate_knight: { visuals: PLATE_KNIGHT_25D_VISUALS, render: renderPlateKnight25D },
+    militia: { visuals: MILITIA_25D_VISUALS, render: renderMilitia25D }
 };
 
 export { knightHeadPosition25D };

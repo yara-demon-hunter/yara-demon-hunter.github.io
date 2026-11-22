@@ -31,6 +31,10 @@ export function currentProfile() {
     return state.width >= state.height ? 'landscape' : 'portrait';
 }
 
+export function getSceneryId() {
+    return scenery.id;
+}
+
 export function getSceneryColliders() {
     scenery.setProfile(currentProfile());
     return scenery.visual.colliders;

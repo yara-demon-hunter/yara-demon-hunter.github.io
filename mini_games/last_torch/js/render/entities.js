@@ -277,7 +277,15 @@ function stampMonster(e, t) {
     }
     // Peso: o passo acompanha a velocidade real. O grande pisa devagar e afunda mais; o pequeno é rápido e saltitante.
     // Voadores já têm o seu balanço (floatAmount) e ficam de fora
-    if (!spec.floatAmount) {
+    // Saltitante (spec.hopAmount, o Sapo): sobe num pulinho a cada spec.hopHz por segundo, estica no ar e achata ao pousar; parado, fica agachado
+    if (spec.hopAmount) {
+        const moving = e.rooted > 0 || e.tongueState ? 0 : Math.min(1, (e.speed ?? 0) / 60);
+        const h = Math.max(0, Math.sin(t * spec.hopHz * TAU + e.phase)) * moving;
+        y -= h * e.radius * spec.hopAmount;
+        height *= 1 + 0.12 * h - 0.06 * (moving - h);
+        width *= 1 - 0.07 * h + 0.05 * (moving - h);
+    }
+    if (!spec.floatAmount && !spec.hopAmount) {
         const moving = e.rooted > 0 ? 0 : Math.min(1, (e.speed ?? 0) / 80);
         if (moving > 0.05) {
             const weight = Math.min(1.6, Math.max(0.6, e.radius / 14));
@@ -583,6 +591,9 @@ let depthPass = null;
 let depthSplit = 0;
 const inPass = (e) => depthPass === null || (depthPass === 'behind' ? e.y < depthSplit : e.y >= depthSplit);
 
+// Desenhado ao vivo? Os `live` sempre; os `attackLive` só enquanto atacam ou miram (o resto do tempo é sprite: barato)
+const liveNow = (e, spec) => spec.live || (spec.attackLive && (e.atk > 0 || e.aim > 0 || e.release > 0));
+
 export function renderEnemies(pass = null, splitY = 0, renderActor = null, actorY = 0) {
     depthPass = pass;
     depthSplit = splitY;
@@ -598,7 +609,7 @@ export function renderEnemies(pass = null, splitY = 0, renderActor = null, actor
         if (e.elite) renderEliteMark(e);
     }
     for (const e of ordered) {
-        if (!e.isBoss && !e.shadowOwner && !getMonsterSprite(e.type).spec.live) stampMonster(e, t);
+        if (!e.isBoss && !e.shadowOwner && !liveNow(e, getMonsterSprite(e.type).spec)) stampMonster(e, t);
     }
     resetWorldView();
 
@@ -611,14 +622,57 @@ export function renderEnemies(pass = null, splitY = 0, renderActor = null, actor
         }
         // Sombras do rival: o mesmo boneco dele (js/render/rival.js)
         if (e.isBoss || e.shadowOwner) drawBoss(e);
-        else if (getMonsterSprite(e.type).spec.live) {
-            if (USE_25D && (e.type === 'TREANT' || e.type === 'GOLEM')) MONSTERS_25D[e.type.toLowerCase()].render(e);
+        else if (liveNow(e, getMonsterSprite(e.type).spec)) {
+            const art = USE_25D ? MONSTERS_25D[e.type.toLowerCase()] : null;
+            if (art && e.type !== 'BONE_COLOSSUS') art.render(e);
             else (USE_25D ? MONSTERS_25D.bone_colossus.render : renderBoneColossus)(e);
         }
     }
     if (renderActor && !actorRendered) renderActor();
+    renderTongues();
     renderEnemyOverlays(t);
     renderConvertMarks(t);
+}
+
+// Língua do Sapo do Pântano: durante a preparação, uma linha de aviso no chão; no golpe, a língua sai, estica até o alcance e recolhe
+function renderTongues() {
+    for (const e of state.enemies) {
+        if (!e.tongueState) continue;
+        const T = e.tongueDef;
+        const a = e.tongueAngle;
+        const cx = Math.cos(a);
+        const cy = Math.sin(a);
+        const mx = e.x + cx * e.radius * 0.9;
+        const my = e.y + cy * e.radius * 0.9 - 2;
+        ctx.save();
+        if (e.tongueState === 1) {
+            const p = 1 - Math.max(0, e.tongueTimer) / T.windupSeconds;
+            ctx.strokeStyle = `rgba(244, 114, 182, ${0.25 + 0.4 * p})`;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 5]);
+            ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx + cx * T.range, my + cy * T.range); ctx.stroke();
+            ctx.setLineDash([]);
+        } else {
+            const out = e.tongueState === 2 ? 1 - Math.max(0, e.tongueTimer) / T.strikeSeconds : 1 - (1 - Math.max(0, e.tongueTimer) / T.recoverySeconds) * 1.6;
+            const len = T.range * Math.max(0, Math.min(1, out));
+            if (len > 2) {
+                const tx = mx + cx * len;
+                const ty = my + cy * len;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = '#7a1f3a';
+                ctx.lineWidth = 6;
+                ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(tx, ty); ctx.stroke();
+                ctx.strokeStyle = '#e8668a';
+                ctx.lineWidth = 3.8;
+                ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(tx, ty); ctx.stroke();
+                ctx.fillStyle = '#7a1f3a';
+                ctx.beginPath(); ctx.arc(tx, ty, 5.6, 0, TAU); ctx.fill();
+                ctx.fillStyle = '#f9a8c4';
+                ctx.beginPath(); ctx.arc(tx, ty, 4.2, 0, TAU); ctx.fill();
+            }
+        }
+        ctx.restore();
+    }
 }
 
 // --- CONVERTIDOS (Conversion, js/systems/conversion.js) ---

@@ -59,7 +59,9 @@ export const TURN_DIFFICULTY = {
         HEADLESS_KNIGHT: 6,
         TREANT: 3,
         GOLEM: 4,
-        BONE_COLOSSUS: 8
+        BONE_COLOSSUS: 8,
+        // Telas novas (só nascem na tela deles)
+        ZOMBIE: 1, ARMORED_ZOMBIE: 3, RIVER_EEL: 1, DROWNED: 2, BOG_TOAD: 1, BOG_SLIME: 2, SKELETON_WARRIOR: 1, SKELETON_ARCHER: 3, MILITIA: 1, PLATE_KNIGHT: 3, LANCER: 2, DEMON: 4
     }
 };
 

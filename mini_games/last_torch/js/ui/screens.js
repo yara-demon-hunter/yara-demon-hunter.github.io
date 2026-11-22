@@ -32,8 +32,8 @@ import { platform } from '../platform/platform.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { resetTorch } from '../systems/torch.js';
 import { prepareCore } from '../render/arena.js';
-import { prepareScenery } from '../render/scenery.js';
-import { ensureMonsterSprites, scheduleMonsterSprites } from '../render/monster_sprites.js';
+import { getSceneryId, prepareScenery } from '../render/scenery.js';
+import { ensureMonsterSprites, scheduleMonsterSprites, warmSceneryMonsters } from '../render/monster_sprites.js';
 import { showToast } from './banner.js';
 import { resetSkills } from '../systems/skills.js';
 import { hideTreeHand, startHints } from './hints.js';
@@ -63,6 +63,7 @@ export function startGame() {
     prepareScenery();
     prepareCore();
     ensureMonsterSprites();
+    warmSceneryMonsters(getSceneryId());
     state.turn = 1;
     state.scoreTurn = 0;
     state.totalScore = 0;

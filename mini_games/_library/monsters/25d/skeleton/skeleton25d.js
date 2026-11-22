@@ -5,6 +5,8 @@ import { mix, add, norm, sub, cross, flowChain, drawRibbon } from '../../../char
 import { ctx } from '../../../core/canvas.js';
 import { renderMonster25D } from '../monster25d.js';
 import { drawGlow } from '../../../core/glow.js';
+import { poly } from '../creature25d.js';
+import { meleePose, meleeState } from '../melee25d.js';
 
 // --- ESQUELETO 2.5D ---
 // O Esqueleto de topdown/skeleton/skeleton.js montado no boneco 2.5D dos heróis (characters/hunter/hero25d.js): as mesmas peças (crânio
@@ -18,6 +20,12 @@ import { drawGlow } from '../../../core/glow.js';
 // modelo 'skeleton' em renderHero25D para quem já anima o boneco por conta própria (o palco do yara-rpg, o tuner).
 
 // Monta o boneco do esqueleto com as medidas S; com S.crawl, a postura rastejante (medidas S.crawl*)
+// Esqueleto Arqueiro: o jogo informa o quanto ele já puxou a corda (aim, 0 a 1) e, por um instante depois do tiro, release (> 0 = soltou).
+// Sem informação (tuner, sprite do bestiário): arco armado, corda meio puxada. renderSkeletonModel preenche; fora do jogo vale previewAim.
+let bowNow = null;
+const aimNow = (S) => (bowNow ? bowNow.aim : S.previewAim ?? 0.5);
+const releaseNow = () => (bowNow ? bowNow.release : 0);
+
 export function skeletonBody(S) {
     const crawl = !!S.crawl;
     // Osso: contorno escuro e o osso por cima, passando pelos pontos
@@ -101,6 +109,17 @@ export function skeletonBody(S) {
                 bone(rig, pts, S.ribThickness, C.bone);
             }
         }
+        // Peitoral enferrujado preso nas costelas (S.armor): placa rachada na frente do peito
+        if (S.armor && rig.sinF > -0.25) {
+            const top2 = add(add(along(0.97), fwd, S.ribDepth * 1.05), u, 0);
+            const mid2 = add(add(along(0.62), fwd, S.ribDepth * 1.1), u, 0);
+            const low2 = add(add(along(0.3), fwd, S.ribDepth * 0.95), u, 0);
+            const w = S.ribWidth * 0.62;
+            poly(rig, [add(top2, side, -w), add(top2, side, w), add(mid2, side, w * 1.05), add(low2, side, w * 0.7), add(low2, side, -w * 0.8), add(mid2, side, -w * 1.05)], C.rust, C.boneDark, 0.45);
+            rig.limb([add(top2, u, -0.6), add(low2, u, 0.6)], 0.5, C.steelDark);
+            rig.limb([add(mid2, side, -w * 0.9), add(mid2, side, w * 0.9)], 0.45, C.steelDark);
+            rig.ball(add(mid2, side, w * 0.5), 0.45, C.steel);
+        }
         // Esterno e clavículas
         const sternumTop = add(add(along(1 - S.ribTop / spineLen), fwd, S.ribDepth * 0.9), u, 0.3);
         bone(rig, [sternumTop, add(add(sternumTop, u, -S.ribGap * 2.2), fwd, -0.2)], 0.8, C.boneShade);
@@ -111,6 +130,65 @@ export function skeletonBody(S) {
 
     // --- BRAÇOS: esticados à frente, balançando com a passada; três garras.
     // Rastejando (crawl), as mãos vão ao chão à frente, uma de cada vez, puxando o corpo ---
+    function holdHand(pose, sd, swing) {
+        const L = pose.lean;
+        // Arqueiro: a mão da corda vai do peito (arco relaxado) até o rosto (corda puxada); ao soltar volta de um golpe
+        if (S.hold === 'bow') return sd > 0 ? [L + 3.4 - aimNow(S) * 2.3 + releaseNow() * 1.2, 0.5, 8.5] : [L + 5.6, -1.0, 8.6];
+        if (sd > 0 && meleeState.p > 0) {
+            // Golpe de espada: a mão sai do repouso para a varredura (o jogo manda meleeState.p)
+            const m = meleePose('sword', meleeState.p);
+            return [L + 3.4 + m.offset[0], 3.0 + m.offset[1], 7.0 + m.offset[2]];
+        }
+        return sd > 0 ? [L + 3.4 + swing * 0.5, 3.0, 7.0] : [L + 3.2, -3.2, 7.6];
+    }
+
+    // O que a mão segura: espada e escudo (S.hold 'sword') ou arco e flecha (S.hold 'bow')
+    function holdItem(rig, side, hand) {
+        const { C, limb, ball } = rig;
+        if (S.hold === 'sword' && side > 0) {
+            const d = meleeState.p > 0 ? meleePose('sword', meleeState.p).dir : norm([0.9, 0.1, 0.38]);
+            const at = (k) => [hand[0] + d[0] * k, hand[1] + d[1] * k, hand[2] + d[2] * k];
+            limb([at(-1.6), at(0.4)], 0.9, C.grip);
+            limb([[hand[0] + d[0] * 0.6, hand[1] - 1.4, hand[2] + d[2] * 0.6], [hand[0] + d[0] * 0.6, hand[1] + 1.4, hand[2] + d[2] * 0.6]], 0.8, C.steelDark);
+            limb([at(0.8), at(S.weaponLength)], 1.6, C.steelDark);
+            limb([at(0.8), at(S.weaponLength)], 1.05, C.steel);
+            limb([at(0.9), at(S.weaponLength * 0.55)], 0.5, C.rust);
+            ball(at(S.weaponLength * 0.8), 0.45, C.rust);
+        } else if (S.hold === 'sword') {
+            const R = S.shieldRadius;
+            const c = [hand[0] + 1.2, hand[1] - 0.5, hand[2] + 0.3];
+            rig.disk(c, [0, R, 0], [0, 0, R * 1.05]);
+            ctx.fillStyle = C.shield;
+            ctx.fill();
+            ctx.strokeStyle = C.steelDark;
+            ctx.lineWidth = 0.9;
+            ctx.stroke();
+            limb([[c[0] + 0.4, c[1] - R * 0.7, c[2] + R * 0.5], [c[0] + 0.4, c[1] + R * 0.5, c[2] - R * 0.7]], 0.5, C.boneDark);
+            ball([c[0] + 0.6, c[1], c[2]], R * 0.24, C.steel);
+        } else if (S.hold === 'bow' && side < 0) {
+            const top = [hand[0] - 0.6, hand[1], hand[2] + 5.6];
+            const mid = [hand[0] + 1.5, hand[1], hand[2]];
+            const bot = [hand[0] - 0.6, hand[1], hand[2] - 5.6];
+            // O arco curva mais quando a corda está puxada
+            const pull = aimNow(S);
+            const bend = 0.4 * pull;
+            const bowTop = [top[0] + bend, top[1], top[2] - bend * 1.2];
+            const bowBot = [bot[0] + bend, bot[1], bot[2] + bend * 1.2];
+            limb([bowTop, mid, bowBot], 1.1, C.boneDark);
+            limb([bowTop, mid, bowBot], 0.7, C.wood);
+            const rel = releaseNow();
+            // Corda: em V até a mão que puxa; ao soltar ela vibra reta e a flecha já foi
+            const stringPoint = [hand[0] - 2.6 - pull * 2.3 + (rel > 0 ? 2.3 * pull + Math.sin(rel * 90) * 0.4 : 0), hand[1], hand[2]];
+            limb([bowTop, stringPoint, bowBot], 0.18, C.string);
+            // Flecha encaixada (some quando solta): da corda até um pouco à frente do arco
+            if (rel <= 0) {
+                limb([stringPoint, [hand[0] + 3.6, hand[1], hand[2]]], 0.4, C.wood);
+                poly(rig, [[hand[0] + 3.4, hand[1] - 0.5, hand[2]], [hand[0] + 4.9, hand[1], hand[2]], [hand[0] + 3.4, hand[1] + 0.5, hand[2]]], C.steel, C.boneDark, 0.2);
+                limb([[stringPoint[0], stringPoint[1], stringPoint[2]], [stringPoint[0] + 1.1, stringPoint[1], stringPoint[2]]], 0.9, C.feather);
+            }
+        }
+    }
+
     function armPose(rig, pose, sd) {
         const phase = rig.anim.stride + (sd > 0 ? Math.PI : 0);
         const swing = Math.sin(phase) * S.armSwing * (0.3 + pose.run);
@@ -119,6 +197,9 @@ export function skeletonBody(S) {
         if (crawl) {
             const lift = Math.max(0, Math.cos(phase)) * S.crawlHandLift * (0.3 + pose.run);
             hand = [shoulder[0] + S.crawlHandReach + swing, sd * S.crawlHandSpread, 0.7 + lift];
+        } else if (S.hold) {
+            // Esqueleto armado (S.hold): a espada na direita e o escudo na esquerda, ou o arco na esquerda com a corda puxada pela direita
+            hand = holdHand(pose, sd, swing);
         } else {
             hand = [shoulder[0] + S.armReach + swing, shoulder[1] + sd * S.armSpread, shoulder[2] - S.armDrop];
         }
@@ -139,10 +220,11 @@ export function skeletonBody(S) {
         // Garras: três, abrindo em leque à frente da mão
         const d = norm(sub(hand, elbow));
         const side = norm([-d[1], d[0], 0]);
-        for (const k of [-1, 0, 1]) {
+        if (!S.hold) for (const k of [-1, 0, 1]) {
             bone(rig, [add(hand, side, k * 0.3), add(add(hand, d, S.clawLength), side, k * 0.6)], 0.3, C.bone);
         }
         joint(rig, hand, S.jointRadius * 0.85, C.bone);
+        if (S.hold) holdItem(rig, Math.sign(shoulder[1]) || 1, hand);
     }
 
     // --- CRÂNIO: rachado, órbitas de chama verde, mandíbula que bate e tranco de cabeça de vez em quando ---
@@ -170,7 +252,17 @@ export function skeletonBody(S) {
             bone(rig, pts, R * 0.3, C.boneShade);
             for (let i = 1; i < 8; i += 2) ball([pts[i][0] + 0.05, pts[i][1], z + R * 0.16], R * 0.08, C.bone);
         };
-        return [{
+        const hood = S.hood ? [{
+            // Capuz rasgado: cobre as costas e o topo da cabeça (atrás do crânio quando de frente, por cima quando de costas)
+            depth: center.depth + (facing ? -0.6 : 0.6),
+            draw() {
+                ball([c[0] - R * 0.45, c[1], c[2] + R * 0.3], R * 1.12, C.hood);
+                ball([c[0] - R * 0.7, c[1], c[2] - R * 0.5], R * 0.95, C.hoodDark);
+                if (!facing) return;
+                limb([[c[0] + R * 0.1, c[1] - R * 0.95, c[2] + R * 0.75], [c[0] + R * 0.55, c[1], c[2] + R * 1.0], [c[0] + R * 0.1, c[1] + R * 0.95, c[2] + R * 0.75]], R * 0.3, C.hood);
+            }
+        }] : [];
+        return [...hood, {
             depth: center.depth,
             draw() {
                 if (!facing) jaw();
@@ -188,6 +280,13 @@ export function skeletonBody(S) {
                     for (const b of [-0.27, -0.09, 0.09, 0.27]) {
                         limb([[mx[0] + R * 0.38, c[1] + b * R, mx[2] - R * 0.12], [mx[0] + R * 0.4, c[1] + b * R, mx[2] - R * 0.32]], R * 0.07, C.boneDark);
                     }
+                }
+                // Capacete enferrujado (S.helmet): calota no alto da cabeça, aro na testa e a proteção do nariz
+                if (S.helmet) {
+                    ball([c[0] - R * 0.05, c[1], c[2] + R * 0.78], R * 0.86 + 0.3, C.boneDark);
+                    ball([c[0] - R * 0.05, c[1], c[2] + R * 0.78], R * 0.86, C.rust);
+                    limb([[c[0] + R * 0.1, c[1] - R * 0.95, c[2] + R * 0.42], [c[0] + R * 0.9, c[1], c[2] + R * 0.48], [c[0] + R * 0.1, c[1] + R * 0.95, c[2] + R * 0.42]], R * 0.2, C.steelDark);
+                    if (facing) limb([[c[0] + R * 0.9, c[1], c[2] + R * 0.48], [c[0] + R * 0.98, c[1], c[2] - R * 0.18]], R * 0.14, C.steelDark);
                 }
                 // Rachadura em zigue-zague no topo
                 limb([[c[0] - R * 0.8, c[1] + R * 0.1, c[2] + R * 0.55], [c[0] - R * 0.45, c[1] - R * 0.18, c[2] + R * 0.8],
@@ -224,6 +323,17 @@ export function skeletonBody(S) {
     // --- TRAPO: tiras podres presas atrás da bacia, arrastando com o movimento ---
     function drawRag(rig, pose) {
         const { C, anim } = rig;
+        if (S.quiver) {
+            // Aljava nas costas, com as flechas de penas para fora
+            const a = [pose.lean - 1.9, 1.2, pose.shoulderZ - 4];
+            const b = [pose.lean - 2.7, 2.0, pose.shoulderZ + 3.2];
+            rig.limb([a, b], 2.4, C.boneDark);
+            rig.limb([a, b], 1.8, C.leather);
+            for (const k of [-0.5, 0.2, 0.8]) {
+                rig.limb([[b[0] - 0.2, b[1] + k, b[2]], [b[0] - 0.5, b[1] + k * 1.2, b[2] + 2.2]], 0.28, C.wood);
+                rig.limb([[b[0] - 0.5, b[1] + k * 1.2, b[2] + 1.6], [b[0] - 0.7, b[1] + k * 1.3, b[2] + 2.5]], 0.7, C.feather);
+            }
+        }
         for (let i = 0; i < S.ragStrips; i++) {
             const b = (i / (S.ragStrips - 1) - 0.5) * S.pelvisWidth * 1.3;
             const root = [pose.lean * 0.3 - S.pelvisDepth, b, pose.hipZ - 0.3];
@@ -273,7 +383,11 @@ export function renderSkeleton25D(e) {
 
 // Desenha um monstro de osso registrado (model) com as medidas P; usado também pelo Esqueleto Rastejante
 export function renderSkeletonModel(e, model, P) {
+    bowNow = { aim: e.aim ?? 0, release: e.release ?? 0 };          // o arqueiro lê isto (puxar a corda e soltar)
+    meleeState.p = e.atk ?? 0;                                       // o guerreiro lê isto (golpe de espada)
     renderMonster25D(e, model, P, {
         colors: (P2, hurtAge) => (hurtAge < P2.hurtFlashSeconds ? { ...P2.colors, bone: P2.colors.hurtFlash } : P2.colors)
     });
+    bowNow = null;
+    meleeState.p = 0;
 }

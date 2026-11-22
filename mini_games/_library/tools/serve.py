@@ -17,6 +17,7 @@ import json
 import re
 import subprocess
 import sys
+import jspatch
 import time
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -133,6 +134,70 @@ def write_layout(data: dict) -> dict:
     return {"savedAt": saved_at, "file": str(path.relative_to(REPO))}
 
 
+LIB = REPO / "mini_games" / "_library"
+TUNER_DIRS = ("monsters/", "characters/", "buddies/", "weapons/")
+TUNER_TABLES = {"monsters/25d/death.js": "MONSTER_DEATH", "monsters/25d/spawn.js": "MONSTER_SPAWN"}
+KEY_RE = re.compile(r"^[A-Za-z_]\w*(\.\w+)*$")
+
+
+def tuner_file(rel):
+    """O arquivo .js da biblioteca que o ajuste ao vivo pode gravar (só dentro de _library/monsters, characters, buddies e weapons)."""
+    if not isinstance(rel, str) or not re.fullmatch(r"[\w./-]+\.js", rel) or ".." in rel or not rel.startswith(TUNER_DIRS):
+        raise ValueError("arquivo não permitido")
+    path = (LIB / rel).resolve()
+    if LIB.resolve() not in path.parents or not path.is_file():
+        raise ValueError(f"arquivo não encontrado: {rel}")
+    return path
+
+
+def validate_tuner(data):
+    if not isinstance(data, dict) or not isinstance(data.get("items"), list) or not data["items"] or len(data["items"]) > 40:
+        return "pedido inválido"
+    for item in data["items"]:
+        if not isinstance(item, dict):
+            return "item inválido"
+        try:
+            tuner_file(item.get("file"))
+        except ValueError as err:
+            return str(err)
+        if item.get("kind") == "props":
+            edits = item.get("edits")
+            if not isinstance(edits, dict) or not edits or len(edits) > 400:
+                return "edições inválidas"
+            for k, v in edits.items():
+                if not KEY_RE.match(k):
+                    return f"campo inválido: {k}"
+                ok = isinstance(v, (bool, int, float, str)) or (isinstance(v, list) and len(v) <= 8 and all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in v))
+                if not ok or (isinstance(v, str) and len(v) > 200):
+                    return f"valor inválido em {k}"
+        elif item.get("kind") == "entry":
+            if item["file"] not in TUNER_TABLES or not isinstance(item.get("key"), str) or not re.fullmatch(r"\w+", item["key"]):
+                return "entrada inválida"
+            text = item.get("text")
+            if not isinstance(text, str) or not text.strip().startswith("{") or len(text) > 20000:
+                return "texto da entrada inválido"
+        else:
+            return "tipo de item desconhecido"
+    return None
+
+
+def write_tuner(data):
+    done = []
+    for item in data["items"]:
+        path = tuner_file(item["file"])
+        text = path.read_text(encoding="utf-8")
+        if item["kind"] == "props":
+            new = jspatch.apply_props(text, item["edits"])
+            done.append(f"{item['file']} ({len(item['edits'])} valores)")
+        else:
+            new = jspatch.apply_entry(text, TUNER_TABLES[item["file"]], item["key"], item["text"].strip().rstrip(","))
+            done.append(f"{item['file']} ({item['key']})")
+        tmp = path.with_suffix(".js.tmp")
+        tmp.write_text(new, encoding="utf-8")
+        tmp.replace(path)
+    return done
+
+
 def run_sync() -> str:
     try:
         done = subprocess.run(["ruby", "mini_games/_library/sync.rb"], cwd=REPO, capture_output=True, text=True, timeout=90)
@@ -165,10 +230,29 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.split("?")[0] == "/__layout_api":
-            return self.send_json(200, {"ok": True, "features": ["colliders", "profiles"]})
+            return self.send_json(200, {"ok": True, "features": ["colliders", "profiles", "tuner"]})
         return super().do_GET()
 
     def do_POST(self):
+        if self.path == "/__save_tuner":
+            reason = self.refusal()
+            if reason:
+                return self.send_json(403, {"ok": False, "error": f"pedido recusado: {reason}"})
+            size = int(self.headers.get("Content-Length") or 0)
+            if size <= 0 or size > MAX_BODY:
+                return self.send_json(400, {"ok": False, "error": "tamanho inválido"})
+            try:
+                data = json.loads(self.rfile.read(size))
+            except ValueError:
+                return self.send_json(400, {"ok": False, "error": "JSON inválido"})
+            error = validate_tuner(data)
+            if error:
+                return self.send_json(400, {"ok": False, "error": error})
+            try:
+                done = write_tuner(data)
+            except ValueError as err:
+                return self.send_json(400, {"ok": False, "error": str(err)})
+            return self.send_json(200, {"ok": True, "files": done, "sync": run_sync()})
         if self.path != "/__save_layout":
             return self.send_json(404, {"ok": False, "error": "caminho desconhecido"})
         reason = self.refusal()

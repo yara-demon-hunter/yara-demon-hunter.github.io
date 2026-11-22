@@ -88,7 +88,10 @@ const ART_TOPDOWN = {
 const FOLDER_25D = {
     SKELETON: 'skeleton', SKELETON_CRAWLER: 'skeleton_crawler', BAT: 'bat', VAMPIRE: 'vampire', WITCH: 'witch', TREANT: 'treant', GOLEM: 'golem',
     NECROMANCER: 'witch', MOTH: 'moth', BLOATER: 'bloater', WRAITH: 'wraith', SHADOW_WOLF: 'shadow_wolf',
-    ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight', BONE_COLOSSUS: 'bone_colossus'
+    ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight', BONE_COLOSSUS: 'bone_colossus',
+    // Telas novas
+    ZOMBIE: 'zombie', ARMORED_ZOMBIE: 'armored_zombie', RIVER_EEL: 'river_eel', DROWNED: 'drowned', BOG_TOAD: 'bog_toad', BOG_SLIME: 'bog_slime', SKELETON_WARRIOR: 'skeleton_warrior', SKELETON_ARCHER: 'skeleton_archer',
+    MILITIA: 'militia', PLATE_KNIGHT: 'plate_knight', LANCER: 'lancer', DEMON: 'demon'
 };
 // Buddies (library/buddies): os lobos do Rowan. Mesmo caminho dos monstros, mas a pasta é a de buddies
 const BUDDY_FOLDER_25D = { BUDDY_SHADOW_WOLF: 'shadow_wolf', BUDDY_WHITE_WOLF: 'white_wolf', BUDDY_TREANT: 'treant' };
@@ -105,7 +108,8 @@ const ART = USE_25D ? ART_25D : ART_TOPDOWN;
 const SPECS = USE_25D ? MONSTER_SPRITES_25D : MONSTER_SPRITES;
 
 // Buddies (BUDDY_MODELS) não entram na fila da abertura: o sprite sai na primeira vez que alguém pede (getMonsterSprite)
-const ON_DEMAND = new Set(Object.keys(BUDDY_MODELS).filter(type => ART[type]));
+// Os monstros das telas novas (os que têm `scenery`) também: só valem na tela deles, então não pesam na abertura (warmSceneryMonsters grava os da tela antes da partida)
+const ON_DEMAND = new Set([...Object.keys(BUDDY_MODELS), ...Object.keys(MONSTER_MODELS).filter(type => MONSTER_MODELS[type].scenery)].filter(type => ART[type]));
 const modelOf = (type) => MONSTER_MODELS[type] ?? BUDDY_MODELS[type];
 
 const sprites = {};
@@ -310,6 +314,13 @@ export function ensureMonsterSprites() {
     while (queue.length > 0) bakeNext();
 }
 
+// Grava, antes da partida, os monstros que nascem nesta tela (assim ninguém trava na primeira vez que um deles aparece)
+export function warmSceneryMonsters(sceneryId) {
+    for (const type of Object.keys(MONSTER_MODELS)) {
+        if (MONSTER_MODELS[type].scenery?.includes(sceneryId)) getMonsterSprite(type);
+    }
+}
+
 export function getMonsterSprite(type) {
     if (!sprites[type] && ON_DEMAND.has(type) && bakedScale) sprites[type] = (USE_25D ? bakeMonster25D : bakeMonster)(type, bakedScale);
     return sprites[type];
@@ -460,6 +471,33 @@ function drawRock(p) {
     ctx.stroke();
 }
 
+// Flecha do Esqueleto Arqueiro: haste de madeira, ponta de aço e penas vermelhas; aponta para +x, com a ponta em p.x
+function drawArrow(p) {
+    const L = p.radius * 5.2;
+    const x0 = p.x - L;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#3a2814';
+    ctx.lineWidth = p.radius * 0.62;
+    ctx.beginPath(); ctx.moveTo(x0, p.y); ctx.lineTo(p.x - p.radius * 0.9, p.y); ctx.stroke();
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = p.radius * 0.38;
+    ctx.beginPath(); ctx.moveTo(x0, p.y); ctx.lineTo(p.x - p.radius * 0.9, p.y); ctx.stroke();
+    ctx.fillStyle = '#cbd5e1';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.moveTo(p.x + p.radius * 0.7, p.y); ctx.lineTo(p.x - p.radius * 1.1, p.y - p.radius * 0.7); ctx.lineTo(p.x - p.radius * 1.1, p.y + p.radius * 0.7); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#dc2626';
+    for (const k of [0.1, 0.55]) {
+        ctx.beginPath();
+        ctx.moveTo(x0 + p.radius * k, p.y);
+        ctx.lineTo(x0 + p.radius * (k + 1.1), p.y - p.radius * 0.85);
+        ctx.lineTo(x0 + p.radius * (k + 0.9), p.y);
+        ctx.lineTo(x0 + p.radius * (k + 1.1), p.y + p.radius * 0.85);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
 function bakeBolt(owner, color, radius) {
     const width = radius * BOLT_LENGTH;
     const height = radius * BOLT_HEIGHT;
@@ -470,6 +508,7 @@ function bakeBolt(owner, color, radius) {
     const p = { x: rock ? width / 2 : width * 0.72, y: height / 2, vx: 1, vy: 0, radius, color };
     const previous = setDrawTarget(target);
     if (rock) drawRock(p);
+    else if (owner === 'SKELETON_ARCHER') drawArrow(p);
     else if (owner === 'WITCH') renderWitchBolt(p);
     // Necromante: a mesma bola da bruxa, com a paleta verde dele (inclusive o brilho de fora)
     else if (owner === 'NECROMANCER') {

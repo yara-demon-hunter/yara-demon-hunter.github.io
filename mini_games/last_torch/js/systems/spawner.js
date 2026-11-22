@@ -11,6 +11,7 @@ import { updateHUD } from '../ui/hud.js';
 import { addShockwave, screenFlash, shakeScreen, slowMotion } from './effects.js';
 import { getHero, mod } from './modifiers.js';
 import { clearSkillEffects } from './skills.js';
+import { getSceneryId } from '../render/scenery.js';
 import { spawnDefOf } from '../../library/monsters/25d/spawn.js';
 import { pickBossSpawnPoint, pickSpawnPoint } from './spawn_zones.js';
 
@@ -58,7 +59,7 @@ function spawnSpot(type) {
 
 function spawnRegular() {
     if (state.enemies.length >= TURN_DIFFICULTY.maxAliveEnemies) return;
-    let type = chooseMonsterType(state.turn);
+    let type = chooseMonsterType(state.turn, Math.random, getSceneryId());
     // Alguns tipos têm limite em campo (o cavaleiro): passado dele, nasce um esqueleto
     const cap = MONSTER_MODELS[type].maxAlive;
     if (cap && state.enemies.filter(e => e.type === type).length >= cap) type = 'SKELETON';
@@ -241,7 +242,7 @@ export function spawnOpening() {
     for (let i = 0; i < NIGHT.openingMonsters; i++) {
         const a = Math.random() * Math.PI * 2;
         const R = NIGHT.openingRadius + Math.random() * 120;
-        addMonster(chooseMonsterType(state.turn), state.coreX + Math.cos(a) * R * 1.5, state.coreY + Math.sin(a) * R);
+        addMonster(chooseMonsterType(state.turn, Math.random, getSceneryId()), state.coreX + Math.cos(a) * R * 1.5, state.coreY + Math.sin(a) * R);
     }
 }
 

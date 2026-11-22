@@ -166,8 +166,10 @@ python3 mini_games/_library/tools/serve.py        # (ou, sem gravar layouts: cd 
 # abra http://localhost:8010/_library/tools/tuner.html  (?model=azael, brutos, yara, zeph, oskar)
 ```
 
-Para gravar: **Copiar alterados** gera as linhas já com o arquivo de cada uma; cole no `*_visual.js` indicado e rode o
-sync. A página não grava nada sozinha. `tools/` não vai para os jogos.
+Para gravar: com o servidor do Ateliê (`serve.py`, não o `http.server`), **💾 Gravar no arquivo** escreve os valores alterados direto
+nos `*_visual.js` certos (só dentro de `_library/monsters`, `characters`, `buddies` e `weapons`), cria o campo se ele ainda não existia no arquivo
+(herdado de outro bloco) e roda o sync; **💾 Gravar morte** e **💾 Gravar nascimento** trocam a entrada do monstro em `death.js` / `spawn.js`. O
+código que edita o `.js` é `tools/jspatch.py`. Sem o servidor, **Copiar alterados** continua gerando as linhas para colar à mão. `tools/` não vai para os jogos.
 
 **Buddies:** `tools/buddy_viewer.html` mostra a fênix, o corvo e a caveira animados (com botões para atirar/mergulhar/nascer) e abre os dois lobos no tuner (`tuner.html?model=buddy_shadow_wolf` e `?model=white_wolf`).
 

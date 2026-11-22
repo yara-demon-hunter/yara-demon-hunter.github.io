@@ -70,6 +70,20 @@ export const MONSTER_SPRITES_25D = {
     GOLEM: { extent: 32, bakeSeconds: 1.1, playSeconds: 1.1, speed: 5, live: true },
     ZOMBIE_WOLF: { extent: 19, bakeSeconds: 1 / 2.6, playSeconds: 0.4, speed: 85 },
     HEADLESS_KNIGHT: { extent: 23, bakeSeconds: 1, playSeconds: 1, speed: 26 },
+    // attackLive: anda como sprite e, SÓ enquanto ataca ou mira (e.atk / e.aim / e.release), é desenhado ao vivo (golpe de arma, corda do arco)
+    // Monstros das telas novas: gravados sob demanda (ON_DEMAND, em monster_sprites.js) e aquecidos ao entrar na tela deles. Os laços da arte têm 1 s.
+    ARMORED_ZOMBIE: { extent: 22, bakeSeconds: 1, playSeconds: 1.5, speed: 22 },
+    ZOMBIE: { extent: 19, bakeSeconds: 1, playSeconds: 1.3, speed: 24 },
+    RIVER_EEL: { extent: 24, bakeSeconds: 1, playSeconds: 0.8, speed: 80 },
+    DROWNED: { extent: 18, bakeSeconds: 1, playSeconds: 1.1, speed: 36 },
+    BOG_TOAD: { extent: 19, bakeSeconds: 1, playSeconds: 0.7, speed: 48, hopAmount: 0.55, hopHz: 2.2 },
+    BOG_SLIME: { extent: 17, bakeSeconds: 1, playSeconds: 1, speed: 26 },
+    SKELETON_WARRIOR: { extent: 20, bakeSeconds: 1 / 1.8, playSeconds: 0.7, speed: 50, attackLive: true },
+    SKELETON_ARCHER: { extent: 19, bakeSeconds: 1 / 1.8, playSeconds: 0.9, speed: 32, attackLive: true },
+    MILITIA: { extent: 19, bakeSeconds: 1, playSeconds: 0.8, speed: 50, attackLive: true },
+    PLATE_KNIGHT: { extent: 22, bakeSeconds: 1, playSeconds: 1.1, speed: 27, attackLive: true },
+    LANCER: { extent: 27, bakeSeconds: 1, playSeconds: 0.8, speed: 52, attackLive: true },
+    DEMON: { extent: 21, bakeSeconds: 1, playSeconds: 0.7, speed: 62 },
     // live: em campo é desenhado ao vivo (o golpe mexe braço, tronco e espada); o sprite serve ao bestiário
     BONE_COLOSSUS: { extent: 26, bakeSeconds: 1.667, playSeconds: 1.8, speed: 14, live: true, directions: 4, frames: 1 }
 };

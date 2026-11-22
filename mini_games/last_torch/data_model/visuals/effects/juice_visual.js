@@ -7,7 +7,10 @@ import { DEATH_PHYSICS, MONSTER_DEATH } from '../../../library/monsters/25d/deat
 const DEATH_OF_TYPE = {
     SKELETON: 'skeleton', SKELETON_CRAWLER: 'skeleton_crawler', BAT: 'bat', VAMPIRE: 'vampire', WITCH: 'witch', MOTH: 'moth',
     BLOATER: 'bloater', WRAITH: 'wraith', SHADOW_WOLF: 'shadow_wolf', ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight',
-    BONE_COLOSSUS: 'bone_colossus', TREANT: 'treant', GOLEM: 'golem'
+    BONE_COLOSSUS: 'bone_colossus', TREANT: 'treant', GOLEM: 'golem',
+    // Telas novas
+    ZOMBIE: 'zombie', ARMORED_ZOMBIE: 'armored_zombie', RIVER_EEL: 'river_eel', DROWNED: 'drowned', BOG_TOAD: 'bog_toad', BOG_SLIME: 'bog_slime',
+    SKELETON_WARRIOR: 'skeleton_warrior', SKELETON_ARCHER: 'skeleton_archer', MILITIA: 'militia', PLATE_KNIGHT: 'plate_knight', LANCER: 'lancer', DEMON: 'demon'
 };
 const MONSTER_DEATH_BY_TYPE = Object.fromEntries(Object.entries(DEATH_OF_TYPE).map(([type, id]) => [type, MONSTER_DEATH[id]]));
 

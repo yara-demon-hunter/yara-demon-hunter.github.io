@@ -95,6 +95,97 @@ function updateLunge(e, L, dist, angle, dt) {
     return false;
 }
 
+// Golpe de arma dos monstros com espada, machado ou lança (model.melee): ao chegar no alcance o monstro PARA, prepara (ergue a arma), golpeia e recolhe.
+// e.atk (0 a 1) é o andamento, que a arte lê (library/monsters/25d/melee25d.js). O dano sai no começo do golpe, no leque da frente (alcance + abertura).
+function updateMelee(e, M, dist, angle, dt) {
+    e.atkCooldown ??= 0.6 + Math.random() * 0.8;
+    if (e.atkState === 1) {
+        e.atkTimer -= dt;
+        e.atkAngle = angle;                                             // segue o alvo enquanto prepara
+        e.atk = 0.45 * (1 - Math.max(0, e.atkTimer) / M.windupSeconds);
+        if (e.atkTimer <= 0) {
+            e.atkState = 2;
+            e.atkTimer = M.strikeSeconds;
+            const inArc = (x, y, r = 0) => {
+                const dx = x - e.x, dy = y - e.y;
+                const diff = Math.atan2(Math.sin(Math.atan2(dy, dx) - e.atkAngle), Math.cos(Math.atan2(dy, dx) - e.atkAngle));
+                return Math.hypot(dx, dy) <= M.reach + r && Math.abs(diff) <= M.halfAngle;
+            };
+            if (inArc(player.x, player.y, CHARACTER_MODEL.collisionRadius)) hurtPlayer(e.damage * M.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            for (const clone of shadowClones) {
+                if (clone.active && inArc(clone.x, clone.y, CHARACTER_MODEL.collisionRadius)) damageShadowClone(clone, e.damage * M.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            }
+            audio.playSlice();
+        }
+        return true;
+    }
+    if (e.atkState === 2) {
+        e.atkTimer -= dt;
+        e.atk = 0.45 + 0.2 * (1 - Math.max(0, e.atkTimer) / M.strikeSeconds);
+        if (e.atkTimer <= 0) { e.atkState = 3; e.atkTimer = M.recoverySeconds; }
+        return true;
+    }
+    if (e.atkState === 3) {
+        e.atkTimer -= dt;
+        e.atk = 0.65 + 0.35 * (1 - Math.max(0, e.atkTimer) / M.recoverySeconds);
+        if (e.atkTimer <= 0) { e.atkState = 0; e.atk = 0; }
+        return true;
+    }
+    e.atk = 0;
+    e.atkCooldown -= dt;
+    if (dist > M.range || e.atkCooldown > 0) return false;
+    e.atkState = 1;
+    e.atkTimer = M.windupSeconds;
+    e.atkAngle = angle;
+    e.atkCooldown = M.cooldownSeconds;
+    return true;
+}
+
+// Língua do Sapo do Pântano (model.tongue): para, mira (linha de aviso no chão, desenhada em render/entities.js), solta a língua em linha reta e recolhe.
+// Quem estiver na linha (até `range`, com a largura `width`) leva o dano no começo do golpe.
+function updateTongue(e, T, dist, angle, dt) {
+    e.tongueCooldown ??= 0.8 + Math.random() * 1.2;
+    if (e.tongueState === 1) {
+        e.tongueTimer -= dt;
+        e.tongueAngle = angle;
+        if (e.tongueTimer <= 0) {
+            e.tongueState = 2;
+            e.tongueTimer = T.strikeSeconds;
+            const cx = Math.cos(e.tongueAngle), cy = Math.sin(e.tongueAngle);
+            const near = (x, y, r) => {
+                const dx = x - e.x, dy = y - e.y;
+                const along = dx * cx + dy * cy;
+                const side = Math.abs(-dx * cy + dy * cx);
+                return along > 0 && along <= T.range + r && side <= T.width / 2 + r;
+            };
+            if (near(player.x, player.y, CHARACTER_MODEL.collisionRadius)) hurtPlayer(e.damage * T.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            for (const clone of shadowClones) {
+                if (clone.active && near(clone.x, clone.y, CHARACTER_MODEL.collisionRadius)) damageShadowClone(clone, e.damage * T.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            }
+            audio.playSlice();
+        }
+        return true;
+    }
+    if (e.tongueState === 2) {
+        e.tongueTimer -= dt;
+        if (e.tongueTimer <= 0) { e.tongueState = 3; e.tongueTimer = T.recoverySeconds; }
+        return true;
+    }
+    if (e.tongueState === 3) {
+        e.tongueTimer -= dt;
+        if (e.tongueTimer <= 0) e.tongueState = 0;
+        return true;
+    }
+    e.tongueCooldown -= dt;
+    if (dist > T.range * 0.95 || e.tongueCooldown > 0) return false;
+    e.tongueState = 1;
+    e.tongueTimer = T.windupSeconds;
+    e.tongueAngle = angle;
+    e.tongueDef = T;
+    e.tongueCooldown = T.cooldownSeconds;
+    return true;
+}
+
 // O Treant para e ergue os braços antes do soco; sem marca no chão, como os golpes dos bosses.
 function updateTreantPunch(e, P, dist, angle, dt) {
     e.punchCooldown ??= 1.6;
@@ -267,11 +358,14 @@ function updateAttacks(e, model, angle, dt, distToTarget) {
         updateBossAI(e, model, dt);
         return;
     }
+    if (e.release > 0) e.release -= dt;
     if (!model.projectileSpeed && !model.summon) return;
     // Fora do alcance (longe demais, ou perto demais: shootMinRange) o relógio espera: ao entrar no alcance ainda sobra o tempo do aviso
     // (o brilho do elmo, os braços do golem erguendo)
     if ((model.shootRange && distToTarget > model.shootRange) || (model.shootMinRange && distToTarget < model.shootMinRange)) {
         e.shootTimer = Math.max(e.shootTimer, 0.6);
+        e.aim = 0;
+        e.holdAim = false;
         e.outOfRange = true;           // a arte não mostra a carga: o tempo fica parado, e o brilho ficaria preso sem tiro nenhum
         if (model.throwWindup) e.throwArm = 0;
         return;
@@ -280,9 +374,16 @@ function updateAttacks(e, model, angle, dt, distToTarget) {
     e.shootTimer -= dt;
     // Golem: uma mão sobe nos últimos throwWindup segundos antes da pedra (e.throwArm, 0..1)
     if (model.throwWindup) e.throwArm = e.shootTimer < model.throwWindup ? 1 - Math.max(0, e.shootTimer) / model.throwWindup : 0;
+    // Arqueiro: nos últimos aimSeconds PARA e puxa a corda (e.aim, 0 a 1); depois do tiro a corda vibra por releaseSeconds (e.release)
+    if (model.aimSeconds) {
+        e.aim = e.shootTimer < model.aimSeconds ? 1 - Math.max(0, e.shootTimer) / model.aimSeconds : 0;
+        e.holdAim = e.aim > 0;
+        if (e.holdAim) e.angle = angle;
+    }
     if (e.shootTimer > 0) return;
     e.shootTimer = model.shootCooldownSeconds;
     e.throwArm = 0;
+    if (model.aimSeconds) { e.aim = 0; e.holdAim = false; e.release = model.releaseSeconds; audio.playDash(); }
     // Necromante: levanta mortos (menos com a hora fechada) e atira uma alma no mesmo feitiço
     if (model.summon && (!state.lastStand || state.sandbox)) raiseDead(e, model);
     if (model.projectileSpeed) shoot(e, model, angle);
@@ -472,13 +573,15 @@ export function updateEnemies(dt) {
             const holdsDistance = model.keepDistance && inField && !state.lastStand && distToTarget < model.keepDistance;
             const slamming = model.torchSlam && hunting && updateTorchSlam(e, model.torchSlam, distCore, dt);
             const punching = model.punch && hunting && updateTreantPunch(e, model.punch, distToTarget, toTargetAngle, dt);
+            const meleeing = model.melee && hunting && !e.chained && !(e.rooted > 0) && updateMelee(e, model.melee, distToTarget, toTargetAngle, dt);
+            const tonguing = model.tongue && hunting && !(e.rooted > 0) && updateTongue(e, model.tongue, distToTarget, toTargetAngle, dt);
             if (state.phase !== 'HUNT' && hunting) return;
             const blockedByTorch = e.isBoss && distCore < CORE_MODEL.bossStopDistance + e.radius;
 
             // Preso por raízes (Natureza): não anda, mas continua atacando o que estiver ao alcance
             // Provocado por um convertido: para encostado nele (sem isso todos entravam no meio dele e pareciam travados)
             const touchingAlly = ally && distToTarget < ally.radius + e.radius + 2;
-            if (!lunging && !holdsDistance && !blockedByTorch && !slamming && !punching && !touchingAlly && !(e.rooted > 0)) {
+            if (!lunging && !holdsDistance && !blockedByTorch && !slamming && !punching && !meleeing && !tonguing && !e.holdAim && !touchingAlly && !(e.rooted > 0)) {
                 const speed = e.speed * (1 - slow);
                 e.x += Math.cos(toTargetAngle) * speed * dt;
                 e.y += Math.sin(toTargetAngle) * speed * dt;

@@ -352,6 +352,267 @@ export const MONSTER_MODELS = {
     }
 };
 
+// --- MONSTROS DAS TELAS NOVAS (22/11/2026): 2 por tela do mapa. `scenery` diz em que tela nascem (ver chooseMonsterType) ---
+Object.assign(MONSTER_MODELS, {
+    // Enguia do Rio (tela do rio): rápida, se lança em linha reta contra o herói. O dash é a resposta.
+    RIVER_EEL: {
+        scenery: ['river_crossing_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.4,
+        hpBase: 48,
+        hpPerTurn: 9,
+        speedMin: 70,
+        speedMax: 92,
+        radius: 11,
+        color: '#38bdf8',
+        damage: 14,
+        lunge: { cooldownSeconds: 3, aimSeconds: 0.3, seconds: 0.45, speed: 520, triggerDistance: 280 },
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 26,
+        goldBase: 11,
+        goldVariance: 0.5,
+        xpRewardBase: 20,
+        xpRewardPerTurn: 3
+    },
+    // Afogado (tela do rio): arrasta-se devagar e aguenta bastante.
+    DROWNED: {
+        scenery: ['river_crossing_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.4,
+        hpBase: 95,
+        hpPerTurn: 16,
+        speedMin: 30,
+        speedMax: 42,
+        radius: 14,
+        color: '#8fb4c4',
+        damage: 17,
+        knockbackResist: 0.25,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 34,
+        goldBase: 13,
+        goldVariance: 0.5,
+        xpRewardBase: 22,
+        xpRewardPerTurn: 3
+    },
+    // Sapo do Pântano (tela do pântano): salta de surpresa em cima do herói.
+    BOG_TOAD: {
+        scenery: ['swamp'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.4,
+        hpBase: 85,
+        hpPerTurn: 14,
+        speedMin: 40,
+        speedMax: 55,
+        radius: 15,
+        color: '#5d9438',
+        damage: 16,
+        // Língua: o sapo para, mira e solta a língua comprida (aviso no chão), que acerta quem estiver na linha
+        tongue: { range: 150, windupSeconds: 0.5, strikeSeconds: 0.22, recoverySeconds: 0.5, cooldownSeconds: 3.4, width: 11, damageMultiplier: 1.1 },
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 30,
+        goldBase: 12,
+        goldVariance: 0.5,
+        xpRewardBase: 22,
+        xpRewardPerTurn: 3
+    },
+    // Lodo Vivo (tela do pântano): lento e mole, aguenta pancada.
+    BOG_SLIME: {
+        scenery: ['swamp'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.4,
+        hpBase: 120,
+        hpPerTurn: 18,
+        speedMin: 22,
+        speedMax: 30,
+        radius: 13,
+        color: '#3f7a2c',
+        damage: 12,
+        knockbackResist: 0.3,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 32,
+        goldBase: 13,
+        goldVariance: 0.5,
+        xpRewardBase: 22,
+        xpRewardPerTurn: 3
+    },
+    // Zumbi de Armadura (cemitério): soldado morto-vivo; maior, bem mais forte e duro que o zumbi comum, e lento.
+    ARMORED_ZOMBIE: {
+        scenery: ['graveyard_2'],
+        spawnWeight: 0.25,
+        hpBase: 270,
+        hpPerTurn: 36,
+        speedMin: 18,
+        speedMax: 26,
+        radius: 18,
+        color: '#7c7468',
+        damage: 28,
+        knockbackResist: 0.6,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 55,
+        goldBase: 20,
+        goldVariance: 0.5,
+        xpRewardBase: 30,
+        xpRewardPerTurn: 4
+    },
+    // Zumbi (cemitério): lento, aguenta bastante e vem saindo da terra.
+    ZOMBIE: {
+        scenery: ['graveyard_2'],
+        spawnWeight: 0.4,
+        hpBase: 130,
+        hpPerTurn: 20,
+        speedMin: 20,
+        speedMax: 30,
+        radius: 14,
+        color: '#86a070',
+        damage: 16,
+        knockbackResist: 0.2,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 30,
+        goldBase: 12,
+        goldVariance: 0.5,
+        xpRewardBase: 22,
+        xpRewardPerTurn: 3
+    },
+    // Esqueleto Guerreiro (cemitério): com escudo e espada, mais duro que o esqueleto comum.
+    SKELETON_WARRIOR: {
+        melee: { kind: 'sword', range: 50, reach: 62, halfAngle: 0.8, windupSeconds: 0.42, strikeSeconds: 0.16, recoverySeconds: 0.4, cooldownSeconds: 1.5, damageMultiplier: 1.0 },
+        scenery: ['graveyard_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.4,
+        hpBase: 115,
+        hpPerTurn: 18,
+        speedMin: 40,
+        speedMax: 58,
+        radius: 15,
+        color: '#cfc7ae',
+        damage: 19,
+        knockbackResist: 0.3,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 34,
+        goldBase: 14,
+        goldVariance: 0.5,
+        xpRewardBase: 24,
+        xpRewardPerTurn: 3
+    },
+    // Esqueleto Arqueiro (cemitério): para a distância e atira flechas.
+    SKELETON_ARCHER: {
+        scenery: ['graveyard_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.4,
+        hpBase: 48,
+        hpPerTurn: 8,
+        speedMin: 32,
+        speedMax: 32,
+        radius: 13,
+        color: '#d6cfba',
+        damage: 12,
+        shootRange: 330,                 // só atira daqui para perto
+        keepDistance: 190,               // para de andar a esta distância do alvo e atira
+        projectileSpeed: 380,            // a flecha sai rápido
+        projectileRadius: 5,
+        projectileDamageMultiplier: 0.7,
+        projectileTorchDamage: 4,
+        projectileColor: '#c9b27a',
+        aimSeconds: 0.45,                 // para e puxa a corda por este tempo antes de soltar a flecha
+        releaseSeconds: 0.22,            // a corda vibra um instante depois do tiro
+        initialShootCooldownSeconds: 3,
+        shootCooldownSeconds: 3.2,
+        scoreReward: 30,
+        goldBase: 12,
+        goldVariance: 0.5,
+        xpRewardBase: 22,
+        xpRewardPerTurn: 3
+    },
+    // Miliciano da Vila (tela da vila): camponês armado, firme e curto de alcance.
+    MILITIA: {
+        melee: { kind: 'axe', range: 48, reach: 58, halfAngle: 0.8, windupSeconds: 0.45, strikeSeconds: 0.16, recoverySeconds: 0.45, cooldownSeconds: 1.6, damageMultiplier: 1.0 },
+        scenery: ['village_gate_3'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.4,
+        hpBase: 80,
+        hpPerTurn: 13,
+        speedMin: 42,
+        speedMax: 60,
+        radius: 14,
+        color: '#b8a06c',
+        damage: 16,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 28,
+        goldBase: 12,
+        goldVariance: 0.5,
+        xpRewardBase: 22,
+        xpRewardPerTurn: 3
+    },
+    // Cavaleiro de Placas (tela da vila): lento, blindado e resistente a empurrão.
+    PLATE_KNIGHT: {
+        melee: { kind: 'sword', range: 56, reach: 68, halfAngle: 0.85, windupSeconds: 0.55, strikeSeconds: 0.18, recoverySeconds: 0.5, cooldownSeconds: 1.9, damageMultiplier: 1.3 },
+        scenery: ['village_gate_3'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.3,
+        hpBase: 190,
+        hpPerTurn: 28,
+        speedMin: 24,
+        speedMax: 30,
+        radius: 17,
+        color: '#a9b2c0',
+        damage: 24,
+        knockbackResist: 0.7,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 48,
+        goldBase: 18,
+        goldVariance: 0.5,
+        xpRewardBase: 28,
+        xpRewardPerTurn: 3
+    },
+    // Lanceiro do Castelo (tela do castelo): estoca com a lança num avanço em linha reta.
+    LANCER: {
+        melee: { kind: 'spear', range: 78, reach: 96, halfAngle: 0.3, windupSeconds: 0.45, strikeSeconds: 0.16, recoverySeconds: 0.45, cooldownSeconds: 1.8, damageMultiplier: 1.2 },
+        scenery: ['castle_gate_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.4,
+        hpBase: 105,
+        hpPerTurn: 17,
+        speedMin: 44,
+        speedMax: 60,
+        radius: 15,
+        color: '#6d28d9',
+        damage: 20,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 38,
+        goldBase: 15,
+        goldVariance: 0.5,
+        xpRewardBase: 26,
+        xpRewardPerTurn: 3
+    },
+    // Demônio Soldado (tela do castelo): mantém distância e lança bolas de fogo.
+    DEMON: {
+        scenery: ['castle_gate_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
+        spawnWeight: 0.4,
+        hpBase: 95,
+        hpPerTurn: 15,
+        speedMin: 55,
+        speedMax: 70,
+        radius: 14,
+        color: '#b4332a',
+        damage: 18,
+        shootRange: 300,                 // só atira daqui para perto
+        keepDistance: 150,
+        projectileSpeed: 190,
+        projectileRadius: 6,
+        projectileDamageMultiplier: 0.6,
+        projectileTorchDamage: 5,
+        projectileColor: '#fb923c',
+        initialShootCooldownSeconds: 3,
+        shootCooldownSeconds: 4.5,
+        scoreReward: 42,
+        goldBase: 16,
+        goldVariance: 0.5,
+        xpRewardBase: 26,
+        xpRewardPerTurn: 3
+    },
+});
+
 // Os bosses ficam em ./bosses.js (BOSS_MODELS / BOSS_SPAWNING)
 export const MONSTER_SPAWNING = {
     edgeMargin: 34,                  // nascem logo fora da tela (unidades do mundo)
@@ -371,7 +632,8 @@ export const BUDDY_MODELS = {
     BUDDY_TREANT: { radius: 18, color: '#5b3b22' }
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS', 'TREANT', 'GOLEM'];
+const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS', 'TREANT', 'GOLEM',
+    'ZOMBIE', 'ARMORED_ZOMBIE', 'RIVER_EEL', 'DROWNED', 'BOG_TOAD', 'BOG_SLIME', 'SKELETON_WARRIOR', 'SKELETON_ARCHER', 'MILITIA', 'PLATE_KNIGHT', 'LANCER', 'DEMON'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];
@@ -415,8 +677,9 @@ export function createVampireBat(x, y, turn = 1, random = Math.random) {
 }
 
 // Sorteia entre os monstros já liberados no turno (os pesos são reescalados entre eles)
-export function chooseMonsterType(turn, random = Math.random) {
-    const available = SPAWNABLE_MONSTER_TYPES.filter(type => isMonsterUnlocked(type, turn));
+// sceneryId: a tela de agora. Monstros com `scenery` só nascem nas telas listadas; os sem `scenery` nascem em qualquer uma.
+export function chooseMonsterType(turn, random = Math.random, sceneryId = null) {
+    const available = SPAWNABLE_MONSTER_TYPES.filter(type => isMonsterUnlocked(type, turn) && (!MONSTER_MODELS[type].scenery || MONSTER_MODELS[type].scenery.includes(sceneryId)));
     const total = available.reduce((sum, type) => sum + MONSTER_MODELS[type].spawnWeight, 0);
     let roll = random() * total;
     for (const type of available) {

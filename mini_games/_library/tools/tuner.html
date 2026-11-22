@@ -98,6 +98,7 @@
             <button type="button" data-face="270" title="De costas">↑</button>
         </span>
         <label class="check"><input id="pause" type="checkbox"> Pausar</label>
+        <button id="saveFile" class="primary" hidden title="Grava os valores alterados direto no arquivo da biblioteca e sincroniza com os jogos (precisa do servidor serve.py)">💾 Gravar no arquivo</button>
         <button id="copy" class="primary">Copiar alterados</button>
         <button id="reset">Desfazer tudo</button>
     </header>
@@ -107,14 +108,15 @@
             <input id="filter" class="filter" type="text" placeholder="Filtrar (ex.: eye, ear, hair, leg)">
             <p class="hint">Mude os valores e veja o boneco na hora, nas duas câmeras. Os alterados ficam em amarelo.
                 Os campinhos dos lados da barra são o mínimo e o máximo dela: mude à vontade (ficam azuis e guardados).
-                Para gravar: <b>Copiar alterados</b>, cole as linhas no arquivo indicado em <code>mini_games/_library/</code>
-                e rode <code>ruby mini_games/_library/sync.rb</code>. Os ajustes ficam guardados neste navegador até você desfazer.</p>
+                Para gravar: <b>💾 Gravar no arquivo</b> (abrindo o Ateliê por <code>python3 mini_games/_library/tools/serve.py</code>) escreve no arquivo da biblioteca e sincroniza com os jogos.
+                Sem o servidor, use <b>Copiar alterados</b>, cole as linhas no arquivo indicado em <code>mini_games/_library/</code> e rode <code>ruby mini_games/_library/sync.rb</code>. Os ajustes ficam guardados neste navegador até você desfazer.</p>
             <details id="deathPanel" class="death" open>
                 <summary>Morte <small>(pedaços e queda)</small></summary>
                 <div class="death-bar">
                     <button id="deathPlay" class="primary">▶ Morrer</button>
                     <label class="check"><input id="deathLoop" type="checkbox" checked> Repetir</label>
                     <button id="deathCopy">Copiar morte</button>
+                    <button id="deathSave" class="primary" hidden title="Grava a morte deste monstro em death.js e sincroniza">💾 Gravar morte</button>
                 </div>
                 <div id="deathBody"></div>
                 <textarea id="deathOut" readonly rows="6" placeholder="A morte copiada aparece aqui também"></textarea>
@@ -125,6 +127,7 @@
                     <button id="spawnPlay" class="primary">▶ Nascer</button>
                     <label class="check"><input id="spawnLoop" type="checkbox" checked> Repetir</label>
                     <button id="spawnCopy">Copiar nascimento</button>
+                    <button id="spawnSave" class="primary" hidden title="Grava o nascimento deste monstro em spawn.js e sincroniza">💾 Gravar nascimento</button>
                 </div>
                 <div id="spawnBody"></div>
                 <textarea id="spawnOut" readonly rows="4" placeholder="O nascimento copiado aparece aqui também"></textarea>
@@ -189,6 +192,30 @@
         import '../monsters/25d/golem/golem25d.js';
         import { HEADLESS_KNIGHT_25D_VISUALS } from '../monsters/25d/headless_knight/headless_knight25d_visual.js';
         import '../monsters/25d/headless_knight/headless_knight25d.js';
+        import { ARMORED_ZOMBIE_25D_VISUALS } from '../monsters/25d/armored_zombie/armored_zombie25d_visual.js';
+        import '../monsters/25d/armored_zombie/armored_zombie25d.js';
+        import { ZOMBIE_25D_VISUALS } from '../monsters/25d/zombie/zombie25d_visual.js';
+        import '../monsters/25d/zombie/zombie25d.js';
+        import { BOG_SLIME_25D_VISUALS } from '../monsters/25d/bog_slime/bog_slime25d_visual.js';
+        import '../monsters/25d/bog_slime/bog_slime25d.js';
+        import { BOG_TOAD_25D_VISUALS } from '../monsters/25d/bog_toad/bog_toad25d_visual.js';
+        import '../monsters/25d/bog_toad/bog_toad25d.js';
+        import { RIVER_EEL_25D_VISUALS } from '../monsters/25d/river_eel/river_eel25d_visual.js';
+        import '../monsters/25d/river_eel/river_eel25d.js';
+        import { SKELETON_ARCHER_25D_VISUALS } from '../monsters/25d/skeleton_archer/skeleton_archer25d_visual.js';
+        import '../monsters/25d/skeleton_archer/skeleton_archer25d.js';
+        import { SKELETON_WARRIOR_25D_VISUALS } from '../monsters/25d/skeleton_warrior/skeleton_warrior25d_visual.js';
+        import '../monsters/25d/skeleton_warrior/skeleton_warrior25d.js';
+        import { DEMON_25D_VISUALS } from '../monsters/25d/demon/demon25d_visual.js';
+        import '../monsters/25d/demon/demon25d.js';
+        import { DROWNED_25D_VISUALS } from '../monsters/25d/drowned/drowned25d_visual.js';
+        import '../monsters/25d/drowned/drowned25d.js';
+        import { LANCER_25D_VISUALS } from '../monsters/25d/lancer/lancer25d_visual.js';
+        import '../monsters/25d/lancer/lancer25d.js';
+        import { PLATE_KNIGHT_25D_VISUALS } from '../monsters/25d/plate_knight/plate_knight25d_visual.js';
+        import '../monsters/25d/plate_knight/plate_knight25d.js';
+        import { MILITIA_25D_VISUALS } from '../monsters/25d/militia/militia25d_visual.js';
+        import '../monsters/25d/militia/militia25d.js';
         import { ZOMBIE_WOLF_25D_VISUALS } from '../monsters/25d/zombie_wolf/zombie_wolf25d_visual.js';
         import '../monsters/25d/zombie_wolf/zombie_wolf25d.js';
         import { SHADOW_WOLF_25D_VISUALS } from '../monsters/25d/shadow_wolf/shadow_wolf25d_visual.js';
@@ -270,6 +297,18 @@
             golem: 'monsters/25d/golem/golem25d_visual.js',
             vampire: 'monsters/25d/vampire/vampire25d_visual.js',
             demon_lord: 'monsters/25d/demon_lord/demon_lord25d_visual.js',
+            armored_zombie: 'monsters/25d/armored_zombie/armored_zombie25d_visual.js',
+            zombie: 'monsters/25d/zombie/zombie25d_visual.js',
+            bog_slime: 'monsters/25d/bog_slime/bog_slime25d_visual.js',
+            bog_toad: 'monsters/25d/bog_toad/bog_toad25d_visual.js',
+            river_eel: 'monsters/25d/river_eel/river_eel25d_visual.js',
+            skeleton_archer: 'monsters/25d/skeleton_archer/skeleton_archer25d_visual.js',
+            skeleton_warrior: 'monsters/25d/skeleton_warrior/skeleton_warrior25d_visual.js',
+            demon: 'monsters/25d/demon/demon25d_visual.js',
+            drowned: 'monsters/25d/drowned/drowned25d_visual.js',
+            lancer: 'monsters/25d/lancer/lancer25d_visual.js',
+            plate_knight: 'monsters/25d/plate_knight/plate_knight25d_visual.js',
+            militia: 'monsters/25d/militia/militia25d_visual.js',
             body: 'characters/hunter/hero25d_visual.js',
             hunterColors: 'characters/hunter/hero_visual.js'
         };
@@ -308,6 +347,18 @@
         };
         const RADIUS = { skeleton: 14, skeleton_crawler: 14, bloater: 19, witch: 13 };
         RADIUS.demon_lord = 32;
+        RADIUS.armored_zombie = 18;
+        RADIUS.zombie = 14;
+        RADIUS.bog_slime = 13;
+        RADIUS.bog_toad = 15;
+        RADIUS.river_eel = 11;
+        RADIUS.skeleton_archer = 14;
+        RADIUS.skeleton_warrior = 14;
+        RADIUS.demon = 14;
+        RADIUS.drowned = 12;
+        RADIUS.lancer = 15;
+        RADIUS.plate_knight = 16;
+        RADIUS.militia = 14;
         RADIUS.vampire = 18;
         RADIUS.bone_colossus = 54;
         RADIUS.golem = 27;
@@ -354,6 +405,18 @@
             ['golem', 'Golem de Brasa e Musgo', GOLEM_25D_VISUALS, 'rig'],
             ['vampire', 'Vampiro', VAMPIRE_25D_VISUALS, 'rig'],
             ['demon_lord', 'Demon Lord (boss)', DEMON_LORD_25D_VISUALS, 'rig'],
+            ['armored_zombie', 'Zumbi de Armadura', ARMORED_ZOMBIE_25D_VISUALS, 'rig'],
+            ['zombie', 'Zumbi', ZOMBIE_25D_VISUALS, 'rig'],
+            ['bog_slime', 'Lodo Vivo', BOG_SLIME_25D_VISUALS, 'rig'],
+            ['bog_toad', 'Sapo do Pântano', BOG_TOAD_25D_VISUALS, 'rig'],
+            ['river_eel', 'Enguia do Rio', RIVER_EEL_25D_VISUALS, 'rig'],
+            ['skeleton_archer', 'Esqueleto Arqueiro', SKELETON_ARCHER_25D_VISUALS, 'rig'],
+            ['skeleton_warrior', 'Esqueleto Guerreiro', SKELETON_WARRIOR_25D_VISUALS, 'rig'],
+            ['demon', 'Demônio Soldado', DEMON_25D_VISUALS, 'rig'],
+            ['drowned', 'Afogado', DROWNED_25D_VISUALS, 'rig'],
+            ['lancer', 'Lanceiro do Castelo', LANCER_25D_VISUALS, 'rig'],
+            ['plate_knight', 'Cavaleiro de Placas', PLATE_KNIGHT_25D_VISUALS, 'rig'],
+            ['militia', 'Miliciano da Vila', MILITIA_25D_VISUALS, 'rig'],
             ['td_bat', 'Morcego', TD_BAT, 'topdown'],
             ['td_bloater', 'Bloater', TD_BLOATER, 'topdown'],
             ['td_moth', 'Mariposa', TD_MOTH, 'topdown'],
@@ -646,6 +709,76 @@
             }
             setTimeout(() => { $('copy').textContent = 'Copiar alterados'; }, 1600);
         });
+        // --- GRAVAR DIRETO NO ARQUIVO (precisa do servidor do Ateliê: tools/serve.py) ---
+        let canWrite = false;
+        const saveStatus = (text, ok = true) => { $('out').value = text; $('out').style.color = ok ? '' : '#fca5a5'; };
+        async function postTuner(items) {
+            const res = await fetch('/__save_tuner', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Atelie': '1' }, body: JSON.stringify({ items }) });
+            const out = await res.json();
+            if (!res.ok || !out.ok) throw new Error(out.error || `erro ${res.status}`);
+            return out;
+        }
+        // O que mudou, no formato do servidor: um item por arquivo, com { 'campo.sub': valor } (vetores inteiros)
+        function changedItems() {
+            const files = {};
+            [...new Set([$('model').value, 'body', 'hunter'])].forEach(key => {
+                Object.entries(saved[key] || {}).forEach(([path, value]) => {
+                    const file = path.startsWith('colors.') && (key === 'hunter' || key === 'body') ? FILES.hunterColors
+                        : path.startsWith('colors.') && COLOR_FILES[key] ? COLOR_FILES[key] : FILES[key];
+                    const owner = key === 'body' ? 'hunter' : key;
+                    const item = (files[file] ??= { kind: 'props', file, edits: {}, owner, keys: new Set() });
+                    item.keys.add(key);
+                    const m = path.match(/^(\w+)\.(\d)$/);
+                    if (m) item.edits[m[1]] = blockOf(owner)[m[1]].map(x => +x.toFixed(3));
+                    else item.edits[path] = typeof value === 'number' ? +value.toFixed(3) : value;
+                });
+            });
+            return Object.values(files);
+        }
+        $('saveFile').addEventListener('click', async () => {
+            const items = changedItems();
+            if (!items.length) { saveStatus('Nada alterado para gravar.'); return; }
+            $('saveFile').disabled = true;
+            try {
+                const out = await postTuner(items.map(({ kind, file, edits }) => ({ kind, file, edits })));
+                items.forEach(it => it.keys.forEach(k => { delete saved[k]; }));
+                persist();
+                saveStatus(`Gravado: ${out.files.join('; ')}. Sincronização: ${out.sync}. Recarregando...`);
+                setTimeout(() => location.reload(), 700);
+            } catch (err) {
+                saveStatus(`Não consegui gravar: ${err.message}`, false);
+            } finally {
+                $('saveFile').disabled = false;
+            }
+        });
+        // Morte e nascimento: o texto copiado é "// comentário" + "    chave: { ... },"; o servidor troca a entrada dessa chave na tabela do arquivo
+        const entryOf = (text) => {
+            const body = text.split('\n').filter(l => !l.trim().startsWith('//')).join('\n');
+            const m = body.match(/^\s*(\w+):\s*([\s\S]*?),?\s*$/);
+            return m ? { key: m[1], text: m[2] } : null;
+        };
+        const wireEntrySave = (btnId, file, makeText, label) => {
+            $(btnId).addEventListener('click', async () => {
+                const e = entryOf(makeText());
+                if (!e) { saveStatus(`Não achei o que gravar em ${label}.`, false); return; }
+                $(btnId).disabled = true;
+                try {
+                    const out = await postTuner([{ kind: 'entry', file, key: e.key, text: e.text }]);
+                    saveStatus(`Gravado: ${out.files.join('; ')}. Sincronização: ${out.sync}. Recarregando...`);
+                    setTimeout(() => location.reload(), 700);
+                } catch (err) {
+                    saveStatus(`Não consegui gravar ${label}: ${err.message}`, false);
+                } finally {
+                    $(btnId).disabled = false;
+                }
+            });
+        };
+        wireEntrySave('deathSave', 'monsters/25d/death.js', () => deathText(), 'a morte');
+        wireEntrySave('spawnSave', 'monsters/25d/spawn.js', () => spawnText(), 'o nascimento');
+        fetch('/__layout_api').then(r => (r.ok ? r.json() : null)).then(j => {
+            canWrite = Boolean(j?.ok && (j.features ?? []).includes('tuner'));
+            ['saveFile', 'deathSave', 'spawnSave'].forEach(id => { $(id).hidden = !canWrite; });
+        }).catch(() => {});
         $('reset').addEventListener('click', () => {
             const key = $('model').value;
             [...new Set([key, 'body', 'hunter'])].forEach(k => {
@@ -899,7 +1032,7 @@
             };
             body.appendChild(num('seconds', 0.05, 'duração (s)'));
             body.appendChild(num('size', 0.1, 'tamanho do efeito (× raio)'));
-            if (def.style === 'rise') body.appendChild(num('rise', 0.1, 'começa abaixo do chão (× raio)'));
+            if (['rise', 'splash', 'ooze', 'grave'].includes(def.style)) body.appendChild(num('rise', 0.1, 'começa abaixo do chão (× raio)'));
             const color = Object.assign(document.createElement('input'), { type: 'text', value: def.color });
             color.addEventListener('change', () => { def.color = color.value; changed(); });
             const rc = row('cor (poeira / fumaça / brilho)', color, true); if (orig.color !== def.color) rc.classList.add('changed'); body.appendChild(rc);
@@ -907,8 +1040,8 @@
         function spawnText() {
             const key = spawnKey(); const def = MONSTER_SPAWN[key];
             if (!def) return '// Sem nascimento definido';
-            const o = { style: def.style, seconds: def.seconds, color: def.color, size: def.size };
-            if (def.style === 'rise') o.rise = def.rise;
+            // Todos os campos da definição (rise, flames...), não só os que têm controle aqui: gravar não pode perder nada
+            const o = { style: def.style, seconds: def.seconds, color: def.color, size: def.size, ...def };
             return `// Cole em mini_games/_library/monsters/25d/spawn.js (MONSTER_SPAWN) e rode ruby mini_games/_library/sync.rb\n    ${key}: ${lit(o)},`;
         }
         const spawnNow = () => {

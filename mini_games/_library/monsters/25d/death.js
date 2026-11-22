@@ -3,7 +3,7 @@
 //
 //   groups  os pedaços que voam. Cada grupo: { count, colors, shape } e, se quiser, multiplicadores: size (tamanho), speed
 //           (velocidade lateral), lift (impulso para cima), life (quanto tempo ficam), gravity (1 = cai normal; folhas caem leve)
-//           shape: 'bone' (osso), 'rock' (pedra), 'log' (tora de madeira, com a face cortada), 'wood' (casca), 'leaf' (folha que balança),
+//           shape: 'drop' (gota: água e lodo), 'ember' (brasa), 'plate' (placa de armadura), 'cloth' (trapo), 'bone' (osso), 'rock' (pedra), 'log' (tora de madeira, com a face cortada), 'wood' (casca), 'leaf' (folha que balança),
 //           'shard' e 'blob' (lasca)
 //   stain   a mancha que fica no chão
 //   fall    (opcional) o corpo não some: ele TOMBA. { seconds (duração total), tiltSeconds (tempo até cair), tilt (ângulo, rad),
@@ -43,6 +43,119 @@ export const MONSTER_DEATH = {
             { count: 6, colors: ['#e0d8c2', '#b2a98f', '#857d69'], shape: 'bone', size: 1.1, lift: 1.1 }
         ],
         stain: 'rgba(20, 10, 40, 0.55)'
+    },
+    // --- Monstros das telas novas (22/11/2026). Os de osso (esqueletos e o zumbi) explodem no mesmo tipo de osso. ---
+    skeleton_warrior: {
+        groups: [
+            { count: 10, colors: ['#e7e0cf', '#b9b09a', '#8f8772'], shape: 'bone', size: 1.15, lift: 1.2 },
+            { count: 4, colors: ['#8a5532', '#6b7280', '#3b4452'], shape: 'plate', size: 1.1 },
+            { count: 3, colors: ['#7a5a34', '#6a4a2c'], shape: 'wood', size: 1 }
+        ],
+        stain: 'rgba(14, 12, 9, 0.5)'
+    },
+    skeleton_archer: {
+        groups: [
+            { count: 10, colors: ['#e7e0cf', '#b9b09a', '#8f8772'], shape: 'bone', size: 1.1, lift: 1.2 },
+            { count: 4, colors: ['#7a5a34', '#4a3320', '#dc2626'], shape: 'wood', size: 0.8, lift: 1.3 }
+        ],
+        stain: 'rgba(14, 12, 9, 0.5)'
+    },
+    // Zumbi de Armadura: tomba pesado como o cavaleiro, soltando placas enferrujadas e carne verde
+    armored_zombie: {
+        groups: [
+            { count: 8, colors: ['#7c7468', '#3e3a33', '#8a4a2a'], shape: 'plate', size: 1.3, speed: 1.1, lift: 1.2 },
+            { count: 6, colors: ['#e7e0cf', '#b9b09a', '#8f8772'], shape: 'bone', size: 1.1 },
+            { count: 4, colors: ['#7f996a', '#52684a', '#5a1f2a'], shape: 'blob', size: 1.2, speed: 0.9 }
+        ],
+        stain: 'rgba(24, 34, 14, 0.62)',
+        fall: { seconds: 1.5, tiltSeconds: 0.6, tilt: 1.4, shake: 0.07, sink: 0.3, pivot: 0.55, squash: 0.8, fade: 0.4 },
+        dust: { radius: 2.4, seconds: 0.5, width: 5, color: '#a8a29e' }
+    },
+    // Zumbi: os mesmos ossos dos esqueletos, mais pedaços de carne verde e trapo
+    zombie: {
+        groups: [
+            { count: 10, colors: ['#e7e0cf', '#b9b09a', '#8f8772'], shape: 'bone', size: 1.15, lift: 1.2 },
+            { count: 5, colors: ['#86a070', '#55704a', '#5a1f2a'], shape: 'blob', size: 1.2, speed: 0.9 },
+            { count: 3, colors: ['#5a4a38', '#3a2f24'], shape: 'cloth', size: 1.1 }
+        ],
+        stain: 'rgba(24, 34, 14, 0.62)'
+    },
+    // Enguia: a água explode em gotas azuis e o corpo se desfaz no chão (tomba, achata e afunda num respingo)
+    river_eel: {
+        groups: [
+            { count: 12, colors: ['#38bdf8', '#7dd3fc', '#0ea5e9'], shape: 'drop', size: 1.1, lift: 1.3, speed: 1.1 },
+            { count: 8, colors: ['#e0f2fe', '#a5f3fc'], shape: 'drop', size: 0.6, lift: 1.5 }
+        ],
+        stain: 'rgba(6, 40, 66, 0.5)',
+        fall: { seconds: 1, tiltSeconds: 0.28, tilt: 0.9, shake: 0.05, sink: 0.5, pivot: 0.4, squash: 0.5, fade: 0.45 },
+        dust: { radius: 1.7, seconds: 0.4, width: 3, color: '#7dd3fc' }
+    },
+    // Afogado: desmancha em água e algas, caindo devagar e afundando
+    drowned: {
+        groups: [
+            { count: 10, colors: ['#5ea0b4', '#8fb4c4', '#2f6b4a'], shape: 'drop', size: 1.1, lift: 1.1 },
+            { count: 8, colors: ['#2f6b4a', '#4c9a6a', '#1d3a40'], shape: 'leaf', size: 1.1, gravity: 0.5, life: 1.4 }
+        ],
+        stain: 'rgba(8, 36, 44, 0.55)',
+        fall: { seconds: 1.4, tiltSeconds: 0.55, tilt: 1.25, shake: 0.04, sink: 0.7, pivot: 0.5, squash: 0.6, fade: 0.5 },
+        dust: { radius: 1.6, seconds: 0.45, width: 3, color: '#67e8f9' }
+    },
+    // Sapo: vira de barriga para cima, achatado, e estoura em gotas verdes
+    bog_toad: {
+        groups: [
+            { count: 10, colors: ['#5d9438', '#8cc85a', '#3a6524'], shape: 'drop', size: 1.1, lift: 1.2 },
+            { count: 4, colors: ['#d8e089', '#e9c46a'], shape: 'drop', size: 0.8 }
+        ],
+        stain: 'rgba(20, 40, 10, 0.6)',
+        fall: { seconds: 1.1, tiltSeconds: 0.35, tilt: 1.5, shake: 0.06, sink: 0.35, pivot: 0.45, squash: 0.5, fade: 0.4 },
+        dust: { radius: 1.5, seconds: 0.35, width: 3, color: '#a3e635' }
+    },
+    // Lodo vivo: espirra para todo lado em gotas grandes e uma mancha larga
+    bog_slime: {
+        groups: [
+            { count: 14, colors: ['#3f7a2c', '#7cc050', '#23491a'], shape: 'drop', size: 1.5, speed: 1.2, lift: 1.1 },
+            { count: 12, colors: ['#bef264', '#7cc050'], shape: 'drop', size: 0.7, speed: 1.4, lift: 1.5 }
+        ],
+        stain: 'rgba(14, 34, 10, 0.68)'
+    },
+    // Miliciano: cai de lado, com lascas de madeira (machado e escudo) e trapos
+    militia: {
+        groups: [
+            { count: 4, colors: ['#8a6238', '#6a4a2c', '#b91c1c'], shape: 'wood', size: 1.1 },
+            { count: 5, colors: ['#b8a06c', '#7a6a50'], shape: 'cloth', size: 1 }
+        ],
+        stain: 'rgba(40, 22, 12, 0.55)',
+        fall: { seconds: 1.2, tiltSeconds: 0.5, tilt: 1.35, shake: 0.05, sink: 0.3, pivot: 0.5, squash: 0.75, fade: 0.4 },
+        dust: { radius: 1.8, seconds: 0.4, width: 3.5, color: '#a8a29e' }
+    },
+    // Cavaleiro de Placas: tomba pesado, com um estrondo, soltando pedaços de armadura
+    plate_knight: {
+        groups: [
+            { count: 8, colors: ['#a9b2c0', '#5b6473', '#e1e7f0'], shape: 'plate', size: 1.3, speed: 1.1, lift: 1.2 },
+            { count: 3, colors: ['#b91c1c', '#7f1d1d'], shape: 'cloth', size: 1.1 }
+        ],
+        stain: 'rgba(10, 12, 20, 0.55)',
+        fall: { seconds: 1.5, tiltSeconds: 0.6, tilt: 1.45, shake: 0.07, sink: 0.25, pivot: 0.55, squash: 0.8, fade: 0.4 },
+        dust: { radius: 2.4, seconds: 0.5, width: 5, color: '#cbd5e1' }
+    },
+    // Lanceiro: tomba como o cavaleiro, com lascas da lança
+    lancer: {
+        groups: [
+            { count: 7, colors: ['#59627a', '#2c3344', '#98a3bd'], shape: 'plate', size: 1.2, speed: 1.1, lift: 1.2 },
+            { count: 3, colors: ['#7c3aed', '#5b21b6'], shape: 'cloth', size: 1.1 },
+            { count: 3, colors: ['#6a4a2c', '#2e2012'], shape: 'wood', size: 0.9, lift: 1.3 }
+        ],
+        stain: 'rgba(14, 10, 28, 0.55)',
+        fall: { seconds: 1.4, tiltSeconds: 0.55, tilt: 1.4, shake: 0.06, sink: 0.25, pivot: 0.55, squash: 0.8, fade: 0.4 },
+        dust: { radius: 2.2, seconds: 0.45, width: 4.5, color: '#a78bfa' }
+    },
+    // Demônio: estoura em brasas que sobem e caem devagar, e fica uma mancha queimada
+    demon: {
+        groups: [
+            { count: 18, colors: ['#fb923c', '#fbbf24', '#ef4444'], shape: 'ember', size: 1, lift: 1.4, gravity: 0.55, life: 1.3, speed: 1.1 },
+            { count: 4, colors: ['#7a1d18', '#3a0d0a'], shape: 'plate', size: 0.9 }
+        ],
+        stain: 'rgba(30, 6, 4, 0.68)'
     },
     headless_knight: plain(9, ['#4f576b', '#2b3140', '#a5f3fc'], 'shard', 'rgba(10, 12, 20, 0.6)'),
     bone_colossus: plain(16, ['#c9bfa3', '#8a806a', '#fb923c'], 'bone', 'rgba(30, 24, 14, 0.6)'),
@@ -174,6 +287,35 @@ export function drawGib(ctx, g) {
         ctx.lineTo(0, s * 0.55);
         ctx.closePath();
         ctx.fill();
+    } else if (g.shape === 'drop') {
+        // Gota (água, lodo): bolinha com um brilho no alto
+        ctx.beginPath();
+        ctx.arc(0, 0, s * 0.62, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.beginPath();
+        ctx.arc(-s * 0.2, -s * 0.22, s * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+    } else if (g.shape === 'ember') {
+        // Brasa: ponto quente que brilha e esfria; o miolo claro some antes
+        ctx.beginPath();
+        ctx.arc(0, 0, s * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255, 245, 200, 0.8)';
+        ctx.beginPath();
+        ctx.arc(0, 0, s * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+    } else if (g.shape === 'plate') {
+        // Placa de armadura: retângulo de metal com brilho em cima e sombra embaixo
+        ctx.fillRect(-s * 0.9, -s * 0.6, s * 1.8, s * 1.2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fillRect(-s * 0.9, -s * 0.6, s * 1.8, s * 0.3);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.fillRect(-s * 0.9, s * 0.3, s * 1.8, s * 0.3);
+    } else if (g.shape === 'cloth') {
+        // Trapo: tira fina e comprida
+        ctx.fillRect(-s * 1.1, -s * 0.28, s * 2.2, s * 0.56);
+        ctx.fillRect(s * 0.4, -s * 0.5, s * 0.5, s * 0.5);
     } else {
         ctx.fillRect(-s * 0.7, -s * 0.5, s * 1.4, s);
     }
