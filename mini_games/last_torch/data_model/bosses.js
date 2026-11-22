@@ -272,8 +272,10 @@ shadowOf('DEMON_HUNTER');
 export const BOSS_SPAWNING = {
     // Hora → boss da noite. RIVAL: o rival do herói (RIVAL_OF); RIVAL_FINAL: a revanche dele, que fecha a noite.
     // BRUTOS (hora 6): semi-boss do meio da noite
-    schedule: { 1: 'RIVAL', 4: 'DEMON_LORD', 6: 'BRUTOS', 8: 'BLOOD_COUNTESS', 11: 'LONG_NIGHT', 12: 'RIVAL_FINAL' },
-    lastScheduledHour: 12,
+    // 6 telas x 5 ondas: o chefe fecha cada tela (onda 5, 10, 15...). A 1ª tela (Dark Forest) termina com o rival (Azael, ou o Demon Hunter para quem joga de Azael).
+    // Dark Forest: rival · River Crossing: Brutos · Swamp: Demon Lord · Graveyard: Blood Countess · Village: The Long Night · Castle: a revanche do rival
+    schedule: { 5: 'RIVAL', 10: 'BRUTOS', 15: 'DEMON_LORD', 20: 'BLOOD_COUNTESS', 25: 'LONG_NIGHT', 30: 'RIVAL_FINAL' },
+    lastScheduledHour: 30,
     // Modo sem fim (depois da hora 12): um boss a cada everyTurns horas, nesta ordem
     everyTurns: 4,
     spawnScreenRatio: 0.5,
@@ -303,7 +305,7 @@ export function chooseBossType(turn, heroModel = 'hunter') {
     if (turn <= lastScheduledHour) {
         const slot = schedule[turn];
         // O semi-boss Brutos é o Captain Brutos: quem joga com ele não o enfrenta (a hora fica normal)
-        if (slot === 'BRUTOS' && heroModel === 'brutos') return null;
+        if (slot === 'BRUTOS' && heroModel === 'brutos') return 'DEMON_LORD';          // quem joga de Brutos não o enfrenta: a tela do rio fecha com outro chefe
         if (slot === 'RIVAL') return rival;
         if (slot === 'RIVAL_FINAL') return `${rival}_FINAL`;
         return slot ?? null;

@@ -7,7 +7,11 @@ import { persist, save } from '../core/save.js';
 import { saveRun } from '../core/run_save.js';
 import { audio, player, state } from '../core/state.js';
 import { collectAllGold } from '../systems/gold.js';
-import { startHour } from '../systems/night.js';
+import { enterScreenForTurn, startHour } from '../systems/night.js';
+import { NIGHT } from '../../data_model/night.js';
+import { effectiveTurn, screenIndexOf, startsNewScreen } from '../../data_model/campaign.js';
+import { showMapHere, showMapTransition } from './map_screen.js';
+import { CAMPAIGN_RUNTIME } from '../../data_model/campaign.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { getHero } from '../systems/modifiers.js';
 import { feedTorch } from '../systems/torch.js';
@@ -68,6 +72,8 @@ export function setupCamp() {
     relicTree.setup();
     relicTree.onChange = renderWallet;
     document.getElementById('btnCampSkills').addEventListener('click', () => openStatus('CAMP', renderCamp));
+    // Mapa: o retrato do herói em cima da tela onde ele está (a da onda que acabou de terminar)
+    document.getElementById('btnCampMap').addEventListener('click', () => showMapHere(screenIndexOf(Math.max(1, state.turn - 1)), `WAVE ${Math.max(1, state.turn - 1)} OF ${NIGHT.hours}`));
 }
 
 // O que vem na próxima hora
@@ -92,7 +98,7 @@ export function grantWaveSpoils(wave) {
     const [loose, tight] = W.damageGoals;
     const torchDmg = Math.min(100, Math.round(ws.torchDamage / Math.max(1, state.coreHpMax) * 100));
     const heroDmg = Math.min(100, Math.round(ws.heroDamage / Math.max(1, player.maxHp) * 100));
-    const rushGoal = W.rushGoalBase + W.rushGoalPerWave * wave;
+    const rushGoal = Math.round(W.rushGoalBase + W.rushGoalPerWave * effectiveTurn(wave));       // curva de 12 ondas esticada para 30
     // Cada linha diz quantas estrelas ganhou (stars) e de quantas é capaz (goals)
     const dmgStars = (pct) => (pct <= tight * 100 ? 2 : pct <= loose * 100 ? 1 : 0);
     const kills = state.run.kills - ws.kills0;
@@ -177,8 +183,18 @@ export function leaveCamp() {
     if (state.gameState !== 'CAMP') return;
     document.getElementById('campScreen').classList.add('hidden');
     state.knifeInput.stick.fire = false;
-    state.gameState = 'PLAYING';
     persist();
+    // Matou o chefe da tela: o mapa mostra o herói indo para a tela seguinte antes de a próxima onda começar
+    if (CAMPAIGN_RUNTIME.enabled && startsNewScreen(state.turn)) {
+        enterScreenForTurn(state.turn);                       // o cenário novo se monta enquanto o mapa aparece
+        showMapTransition(screenIndexOf(state.turn - 1), screenIndexOf(state.turn), () => {
+            state.gameState = 'PLAYING';
+            saveRun('hunt');
+            startHour();
+        });
+        return;
+    }
+    state.gameState = 'PLAYING';
     saveRun('hunt');
     startHour();
 }

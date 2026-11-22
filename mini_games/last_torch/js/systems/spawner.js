@@ -12,6 +12,7 @@ import { addShockwave, screenFlash, shakeScreen, slowMotion } from './effects.js
 import { getHero, mod } from './modifiers.js';
 import { clearSkillEffects } from './skills.js';
 import { getSceneryId } from '../render/scenery.js';
+import { effectiveTurn } from '../../data_model/campaign.js';
 import { spawnDefOf } from '../../library/monsters/25d/spawn.js';
 import { pickBossSpawnPoint, pickSpawnPoint } from './spawn_zones.js';
 
@@ -232,9 +233,10 @@ export function updateSpawner(dt) {
 export function buildHourPlan(hour) {
     const boss = isBossTurn(hour, getHero().model) ? chooseBossType(hour, getHero().model) : null;
     const elites = [];
-    if (hour >= HOUR_EVENTS.firstEliteHour) elites.push({ at: HOUR_EVENTS.eliteMoment, fired: false });
-    if (hour >= HOUR_EVENTS.secondEliteHour) elites.push({ at: HOUR_EVENTS.secondEliteMoment, fired: false });
-    return { boss, bossCalled: false, hordes: rollHourHordes(hour), elites };
+    const curve = effectiveTurn(hour);          // hordas e elites seguem a curva de 12 ondas esticada para 30 (data_model/campaign.js)
+    if (curve >= HOUR_EVENTS.firstEliteHour) elites.push({ at: HOUR_EVENTS.eliteMoment, fired: false });
+    if (curve >= HOUR_EVENTS.secondEliteHour) elites.push({ at: HOUR_EVENTS.secondEliteMoment, fired: false });
+    return { boss, bossCalled: false, hordes: rollHourHordes(curve), elites };
 }
 
 // Monstros do início da hora, já perto: a ação começa na hora

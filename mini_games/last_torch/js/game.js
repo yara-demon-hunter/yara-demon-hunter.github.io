@@ -31,6 +31,7 @@ import { setupButtons } from './ui/buttons.js';
 import { flushHud, updateDashButton, updateKnifeButton } from './ui/hud.js';
 import { updateQuickPick } from './ui/quick_pick.js';
 import { setupScreens } from './ui/screens.js';
+import { setupMapScreen } from './ui/map_screen.js';
 import { setupFluidLayout } from './ui/fluid_layout.js';
 
 // Teto de ~60 FPS em 120/144 Hz. Fica abaixo de 11 ms para telas de 90 Hz não caírem para 45 FPS (um quadro sim, um não)
@@ -145,4 +146,5 @@ setupFluidLayout();
 setupInput();
 setupButtons();
 setupScreens();
+setupMapScreen();
 requestAnimationFrame(gameLoop);

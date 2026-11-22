@@ -1,5 +1,6 @@
 import { BONE_COLOSSUS_VISUALS } from '../library/monsters/topdown/bone_colossus/bone_colossus_visual.js';
 import { getTurnDifficulty, isMonsterUnlocked } from './difficulty.js';
+import { effectiveTurn } from './campaign.js';
 
 export const MONSTER_MODELS = {
     SKELETON: {
@@ -649,7 +650,7 @@ export function createEnemy(model, type, turn, x, y, random = Math.random) {
         ? model.speedMin
         : model.speedMin + random() * (model.speedMax - model.speedMin);
     const speed = baseSpeed * difficulty.speedMultiplier;
-    const hp = Math.round((model.hpBase + turn * model.hpPerTurn) * difficulty.hpMultiplier);
+    const hp = Math.round((model.hpBase + effectiveTurn(turn) * model.hpPerTurn) * difficulty.hpMultiplier);       // a curva foi feita para 12 ondas (campaign.js)
 
     return {
         x, y, vx: 0, vy: 0,

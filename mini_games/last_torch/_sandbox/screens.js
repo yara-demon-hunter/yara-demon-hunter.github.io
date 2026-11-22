@@ -12,17 +12,19 @@ import { grantWaveSpoils, openCamp } from '/js/ui/camp.js';
 import { openAltar } from '/js/ui/altar.js';
 import { openRanks } from '/js/ui/sanctuary.js';
 import { openGift, returnToMenu, startGame, triggerGameOver } from '/js/ui/screens.js';
+import { CAMPAIGN } from '/data_model/campaign.js';
+import { showMapTransition } from '/js/ui/map_screen.js';
 
-export function mountScreens(host, { hidePanel }) {
+export function mountScreens(host, { hidePanel, showPanel }) {
     const v = { hero: ACTIVE_HEROES[0], wave: 4, score: 12400, kills: 260, bosses: 1, stars: 3, darkness: 1 };
     host.innerHTML = `
       <p class="note">Open any screen right now, with the numbers below. After a screen opens, press <b>🧪 Sandbox</b> (bottom-left) to come back here.</p>
       <h3>Hero</h3><div class="sb-row" id="scHeroes"></div>
       <h3>The night so far</h3>
-      <label class="sb-field">Wave reached <input id="scWave" type="number" min="1" max="12" value="${v.wave}"></label>
+      <label class="sb-field">Wave reached <input id="scWave" type="number" min="1" max="30" value="${v.wave}"></label>
       <label class="sb-field">Score <input id="scScore" type="number" min="0" step="500" value="${v.score}"></label>
       <label class="sb-field">Monsters slain <input id="scKills" type="number" min="0" value="${v.kills}"></label>
-      <label class="sb-field">Bosses beaten <input id="scBosses" type="number" min="0" max="12" value="${v.bosses}"></label>
+      <label class="sb-field">Bosses beaten <input id="scBosses" type="number" min="0" max="30" value="${v.bosses}"></label>
       <label class="sb-field">Stars on the wave (0 to 5) <input id="scStars" type="number" min="0" max="5" value="${v.stars}"></label>
       <label class="sb-field">Darkness level <input id="scDark" type="number" min="1" max="8" value="${v.darkness}"></label>
       <label class="sb-field">Hide the "new hero unlocked" popup (it would cover the screen) <input id="scNoUnlock" type="checkbox" checked></label>
@@ -30,6 +32,8 @@ export function mountScreens(host, { hidePanel }) {
       <div class="sb-row" id="scEnd"></div>
       <h3>Between waves</h3>
       <div class="sb-row" id="scWaveBtns"></div>
+      <h3>World map (between screens)</h3>
+      <div class="sb-row" id="scMap"></div>
       <h3>Menus</h3>
       <div class="sb-row" id="scMenus"></div>
       <h3>Save of this sandbox</h3>
@@ -78,10 +82,10 @@ export function mountScreens(host, { hidePanel }) {
         save.maxDarkness = Math.max(save.maxDarkness, save.darkness);
         startGame();
         state.enemies.length = 0;
-        state.turn = num('#scWave', 1, 12);
+        state.turn = num('#scWave', 1, 30);
         state.totalScore = num('#scScore', 0, 99999999);
         state.run.kills = num('#scKills', 0, 99999);
-        state.run.bosses = num('#scBosses', 0, 12);
+        state.run.bosses = num('#scBosses', 0, 30);
         state.playerLevel = 3 + state.turn * 2;
     }
 
@@ -197,6 +201,15 @@ export function mountScreens(host, { hidePanel }) {
     }, 'the wave results and the camp'));
     add('#scWaveBtns', '🏕️ Camp only', 'no results card', go(() => { state.turn += 1; state.phase = 'CLEAR'; openCamp(true); }, 'the camp'));
 
+    // Mapa entre as telas: o retrato do herói escolhido anda pelo caminho até a tela seguinte (a mesma animação que toca depois de cada chefe)
+    CAMPAIGN.screens.slice(0, -1).forEach((s, i) => {
+        const to = CAMPAIGN.screens[i + 1];
+        add('#scMap', `🗺️ ${s.name} ▶ ${to.name}`, 'plays the walk on the map', () => {
+            save.hero = v.hero;                                   // o retrato do herói escolhido acima (só na memória do sandbox)
+            hidePanel();
+            showMapTransition(i, i + 1, () => { showPanel?.(); note(`Played: ${s.name} to ${to.name}.`); });
+        });
+    });
     // Menus
     add('#scMenus', '🏠 Start menu', 'with this save', () => { hidePanel(); returnToMenu(); note('Opened: the start menu.'); });
     add('#scMenus', '🎁 Daily gift', 'the popup', () => { hidePanel(); returnToMenu(); openGift(); note('Opened: the daily gift.'); });

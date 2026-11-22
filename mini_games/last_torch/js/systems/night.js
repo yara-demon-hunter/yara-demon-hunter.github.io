@@ -16,6 +16,9 @@ import { bumpStat } from './sanctuary.js';
 import { resetStreak } from './streak.js';
 import { resetFury } from './fury.js';
 import { hasBossIntro, playBossIntro, playDuelDialogue, whenHunting } from '../ui/dialogue.js';
+import { CAMPAIGN_RUNTIME, screenOfTurn } from '../../data_model/campaign.js';
+import { getSceneryId, prepareScenery, setScenery } from '../render/scenery.js';
+import { warmSceneryMonsters } from '../render/monster_sprites.js';
 import { buildHourPlan, prepareBossSummon, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
 // --- A NOITE ---
@@ -25,7 +28,18 @@ import { buildHourPlan, prepareBossSummon, resetFieldForNewTurn, spawnOpening } 
 // morrer aqui. Na última hora, matar o boss leva ao amanhecer (DAWN). Morrer leva a DYING -> tela final.
 const DEATH_SLOW = 0.28;
 
+// A tela (cenário) da onda: muda quando a onda abre uma tela nova do mapa (data_model/campaign.js). O sandbox escolhe o cenário à mão e desliga isto.
+export function enterScreenForTurn(turn) {
+    if (!CAMPAIGN_RUNTIME.enabled) return;
+    const screen = screenOfTurn(turn);
+    if (getSceneryId() === screen.id) return;
+    setScenery(screen.id);
+    prepareScenery();
+    warmSceneryMonsters(screen.id);                // os monstros dessa tela já ficam prontos (sem travar quando o primeiro nascer)
+}
+
 export function startHour() {
+    enterScreenForTurn(state.turn);
     state.bossSlain = false;
     const hour = state.turn;
     resetStreak();

@@ -27,7 +27,7 @@ import { resetDruid } from '../systems/druid.js';
 import { resetConversion } from '../systems/conversion.js';
 import { resetArcane } from '../systems/arcane.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
-import { continueEndless, startHour } from '../systems/night.js';
+import { continueEndless, enterScreenForTurn, startHour } from '../systems/night.js';
 import { platform } from '../platform/platform.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { resetTorch } from '../systems/torch.js';
@@ -60,6 +60,8 @@ export function startGame() {
     platform.gameplayStart();
     clearRun();                    // outra partida: o registro de CONTINUAR da anterior não vale mais
     audio.init();
+    state.turn = 1;
+    enterScreenForTurn(1);                  // a partida começa na primeira tela do mapa (a anterior pode ter acabado no Castle)
     prepareScenery();
     prepareCore();
     ensureMonsterSprites();

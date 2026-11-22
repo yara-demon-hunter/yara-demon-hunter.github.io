@@ -12,6 +12,7 @@ import { startHour } from '/js/systems/night.js';
 import { startGame } from '/js/ui/screens.js';
 import { setScenery, showColliders } from '/js/render/scenery.js';
 import { WORLD } from '/data_model/world.js';
+import { CAMPAIGN_RUNTIME } from '/data_model/campaign.js';
 import { createScenery, sceneryIds } from '/library/scenery/index.js';
 import { flushHeroUnlocks, queueHeroUnlock } from '/js/ui/hero_unlock.js';
 import { ACHIEVEMENTS } from '/data_model/sanctuary.js';
@@ -20,6 +21,7 @@ import { mountFastRun } from '/_sandbox/fastrun.js';
 import { mountScreens } from '/_sandbox/screens.js';
 import { mountBossMoves } from '/_sandbox/bossmoves.js';
 
+CAMPAIGN_RUNTIME.enabled = false;           // o sandbox escolhe o cenário à mão: a troca automática por tela da campanha fica desligada
 const choice = { hero: ACTIVE_HEROES[0], boss: 'AZAEL' };
 let arenaOn = false;                    // as travas de modo deus só valem numa luta da Arena (nunca na aba Fast run)
 const picked = new Set();               // monstros escolhidos para a luta (vários, clicando)
@@ -70,7 +72,7 @@ panel.innerHTML = `
     <label class="sb-field">Keep the tree at that stage (no growing) <input id="sbFreezeOak" type="checkbox" checked></label>
     <h3>Options</h3>
     <label class="sb-field">How many of each monster <input id="sbCount" type="number" min="1" max="30" value="4"></label>
-    <label class="sb-field">Hour (boss strength) <input id="sbHour" type="number" min="1" max="12" value="1"></label>
+    <label class="sb-field">Hour (boss strength) <input id="sbHour" type="number" min="1" max="30" value="1"></label>
     <label class="sb-field">Skill points to start with <input id="sbPoints" type="number" min="0" max="999" value="100"></label>
     <label class="sb-field">Only the boss (no other monsters) <input id="sbAlone" type="checkbox" checked></label>
     <label class="sb-field">Show contact areas (red; the ones drawn in the scenery editor) <input id="sbAreas" type="checkbox"></label>
@@ -210,7 +212,7 @@ function value(id) { return panel.querySelector(id); }
 
 function fight() {
     arenaOn = true;
-    const hour = Math.max(1, Math.min(12, +value('#sbHour').value || 1));
+    const hour = Math.max(1, Math.min(30, +value('#sbHour').value || 1));
     // Herói: só na memória desta página (save não é gravado)
     if (!save.unlockedHeroes.includes(choice.hero)) save.unlockedHeroes.push(choice.hero);
     save.hero = choice.hero;
@@ -344,7 +346,7 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
         if (tab === 'moves') moves ??= mountBossMoves(panel.querySelector('#sbMoves'), {
             bosses, startDemo: startBossDemo, showPanel: () => panel.classList.remove('hidden')
         });
-        if (tab === 'screens') screens ??= mountScreens(panel.querySelector('#sbScreens'), { hidePanel: () => panel.classList.add('hidden') });
+        if (tab === 'screens') screens ??= mountScreens(panel.querySelector('#sbScreens'), { hidePanel: () => panel.classList.add('hidden'), showPanel: () => panel.classList.remove('hidden') });
         panel.querySelector('.card').classList.toggle('is-wide', tab === 'tuner');
         if (tab === 'fast') fast ??= mountFastRun(panel.querySelector('#sbFast'), {
             hidePanel: () => panel.classList.add('hidden'),

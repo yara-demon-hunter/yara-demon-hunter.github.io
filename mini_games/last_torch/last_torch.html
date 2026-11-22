@@ -226,6 +226,19 @@ permalink: /mini_games/last_torch/last_torch.html
     </div>
 </div>
 
+<!-- MAPA entre as telas (depois do chefe de cada tela). Styles in css/components/map.css, lógica em js/ui/map_screen.js -->
+<div id="mapScreen" class="game-screen hidden" role="dialog" aria-label="Map">
+    <p id="mapSub" class="screen-eyebrow"></p>
+    <h2 id="mapTitle" class="screen-title"></h2>
+    <div id="mapFrame" class="map-frame">
+        <img id="mapImg" class="map-img" alt="" draggable="false">
+        <div id="mapNodes" class="map-nodes"></div>
+        <div id="mapLabels" class="map-labels"></div>
+        <div id="mapMarker" class="map-marker"><img id="mapHero" alt="" draggable="false"></div>
+    </div>
+    <button id="btnMapContinue" class="start-btn" disabled>CONTINUE ▶</button>
+</div>
+
 <!-- ACAMPAMENTO (fim de cada hora). Styles in css/components/camp.css -->
 <div id="campScreen" class="game-screen hidden" role="dialog" aria-label="Camp">
     <div class="camp-panel">
@@ -236,6 +249,7 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
             <div class="camp-wallet">
                 <button id="btnCampSkills" class="points-chip hidden" title="Skill tree">⚡ <b id="campPoints">0</b> SKILLS</button>
+                <button id="btnCampMap" class="points-chip" title="Where you are on the map">🗺️ MAP</button>
                 <div class="camp-gold">🪙 <b id="campCoins">0</b></div>
             </div>
         </header>

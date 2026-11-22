@@ -1,0 +1,76 @@
+/* --- MAPA ENTRE AS TELAS (js/ui/map_screen.js): a imagem do mapa e o retrato do herói andando pelo caminho --- */
+#mapScreen { z-index: 44; gap: 0.5rem; }
+.map-frame {
+    position: relative;
+    /* cabe na tela inteira, na proporção da imagem (1375 x 767) */
+    width: min(94vw, calc((100vh - 9.5rem) * 1.7927));
+    aspect-ratio: 1375 / 767;
+    border-radius: 0.6rem;
+    box-shadow: 0 0.6rem 2rem rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+    flex-shrink: 0;
+    container-type: inline-size;       /* os textos do mapa medem em cqw: acompanham a largura da imagem */
+}
+.map-img { display: block; width: 100%; height: 100%; border-radius: 0.6rem; user-select: none; }
+.map-nodes { position: absolute; inset: 0; pointer-events: none; }
+.map-node {
+    position: absolute;
+    width: 1.1%;
+    aspect-ratio: 1;
+    min-width: 0.55rem;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--idle, rgba(92, 64, 36, 0.55));
+    border: 2px solid rgba(60, 40, 20, 0.7);
+}
+.map-node.is-done { background: var(--done, #f59e0b); border-color: #7c2d12; box-shadow: 0 0 0.5rem rgba(251, 191, 36, 0.8); }
+.map-node.is-ahead { background: var(--next, #b91c1c); border-color: #7f1d1d; }
+.map-node.is-next { background: var(--next, #b91c1c); animation: mapPulse 1.2s ease-in-out infinite; border-color: #7f1d1d; }
+/* chegou: vira a cor de "já passou" (amarelo alaranjado) */
+.map-node.is-next.is-done { background: var(--done, #f59e0b); animation: none; border-color: #7c2d12; box-shadow: 0 0 0.5rem rgba(251, 191, 36, 0.8); }
+@keyframes mapPulse { 50% { box-shadow: 0 0 0 0.5rem rgba(220, 38, 38, 0.25); } }
+.map-marker {
+    position: absolute;
+    width: 6.2%;
+    min-width: 2.6rem;
+    aspect-ratio: 1;
+    transform: translate(-50%, -62%);
+    pointer-events: none;
+    filter: drop-shadow(0 0.25rem 0.35rem rgba(0, 0, 0, 0.6));
+}
+.map-marker img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: var(--border-w, 3px) solid var(--border, #fbbf24);
+    background: #0b0f19;
+    box-shadow: 0 0 0.9rem rgba(251, 191, 36, 0.7);
+}
+.map-marker::after {            /* a pontinha do marcador, apontando para o lugar */
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -0.45rem;
+    transform: translateX(-50%);
+    border: 0.45rem solid transparent;
+    border-top-color: var(--border, #fbbf24);
+    border-bottom: 0;
+}
+.map-marker.is-arrived img { animation: mapArrive 0.9s ease-out; }
+@keyframes mapArrive { 40% { transform: scale(1.18); } }
+#btnMapContinue:disabled { opacity: 0.4; }
+#btnMapContinue { width: min(24rem, 92%); }
+
+/* Textos por cima do mapa (editor do mapa): --s é o tamanho em pixels da imagem (1375 de largura) */
+.map-labels { position: absolute; inset: 0; pointer-events: none; }
+.map-label {
+    position: absolute;
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+    font-size: calc(var(--s, 24) * 100cqw / 1375);
+    line-height: 1.1;
+    white-space: pre;
+    text-align: center;
+}
+.map-label.has-shadow { text-shadow: 0 0.06em 0.12em rgba(0, 0, 0, 0.55), 0 0 0.3em rgba(255, 240, 200, 0.35); }
+#mapTitle { text-transform: uppercase; }

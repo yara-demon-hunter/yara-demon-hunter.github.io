@@ -1,3 +1,4 @@
+import { CAMPAIGN, TOTAL_WAVES, screenOfTurn } from './campaign.js';
 // --- A NOITE ---
 // Uma partida é uma noite de `hours` horas. Cada hora fecha ao somar os pontos da hora (ou ao matar
 // o boss dela) e termina no acampamento. Sobreviver à última hora traz o amanhecer (vitória).
@@ -22,7 +23,7 @@ export const WAVE_SPOILS = {
 };
 
 export const NIGHT = {
-    hours: 12,
+    hours: TOTAL_WAVES,         // 6 telas x 5 ondas (data_model/campaign.js)
     clearSeconds: 4,            // tela limpa: tempo máximo para pegar os itens do chão antes do acampamento
     clearMinSeconds: 1.6,       // sem itens no chão, a transição acaba aqui (a onda e o título precisam desse tempo)
     clearWaveSpeed: 1250,       // velocidade da onda que sai da tocha (unidades por segundo)
@@ -38,8 +39,9 @@ export const HOUR_NAMES = [
     'Dead Silence', 'Hollow Dark', 'Last Dark', 'Before Dawn'
 ];
 
+// O nome da onda é o da TELA onde ela acontece (Dark Forest, River Crossing...). HOUR_NAMES ficou só de reserva.
 export function getHourName(hour) {
-    return HOUR_NAMES[hour - 1] ?? 'Endless Dark';
+    return hour > TOTAL_WAVES ? 'Endless Dark' : screenOfTurn(hour).name;
 }
 
 // --- HORDAS ---

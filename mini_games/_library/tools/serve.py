@@ -198,6 +198,96 @@ def write_tuner(data):
     return done
 
 
+MAP_FILE = REPO / "mini_games" / "last_torch" / "data_model" / "map_layout.js"
+MAP_FONTS = ("cinzel", "inter")
+COLOR_RE = re.compile(r"^(#[0-9a-fA-F]{3,8}|rgba?\([0-9., %]{3,40}\))$")
+SCENERY_IDS = ("dark_forest_2", "river_crossing_2", "swamp", "graveyard_2", "village_gate_3", "castle_gate_2")
+
+
+def _num(v, lo=-5000, hi=5000):
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and lo <= v <= hi
+
+
+def _pt(v):
+    return isinstance(v, list) and len(v) == 2 and all(_num(x, -100, 3000) for x in v)
+
+
+def validate_map(data):
+    """O layout do mapa entre as telas (last_torch/data_model/map_layout.js): só números, textos curtos e cores simples."""
+    if not isinstance(data, dict):
+        return "corpo inválido"
+    screens = data.get("screens")
+    if not isinstance(screens, list) or len(screens) != len(SCENERY_IDS):
+        return "são 6 telas"
+    for i, s in enumerate(screens):
+        if not isinstance(s, dict) or s.get("id") != SCENERY_IDS[i]:
+            return f"a tela {i + 1} precisa ser {SCENERY_IDS[i]}"
+        if not isinstance(s.get("name"), str) or not 1 <= len(s["name"]) <= 40:
+            return f"nome inválido na tela {i + 1}"
+        if not _pt(s.get("node")):
+            return f"posição inválida na tela {i + 1}"
+        leg = s.get("leg")
+        last = i == len(SCENERY_IDS) - 1
+        if last and leg is not None:
+            return "a última tela não tem caminho"
+        if not last and (not isinstance(leg, list) or not 2 <= len(leg) <= 60 or not all(_pt(p) for p in leg)):
+            return f"caminho inválido na tela {i + 1}"
+    labels = data.get("labels")
+    if not isinstance(labels, list) or len(labels) > 80:
+        return "textos inválidos"
+    for l in labels:
+        if not isinstance(l, dict) or not isinstance(l.get("text"), str) or len(l["text"]) > 200:
+            return "texto inválido"
+        if not (_num(l.get("x"), -100, 3000) and _num(l.get("y"), -100, 3000) and _num(l.get("size"), 4, 400)):
+            return "posição ou tamanho de texto inválido"
+        if not isinstance(l.get("color"), str) or not COLOR_RE.match(l["color"]):
+            return "cor de texto inválida"
+        if l.get("font", "cinzel") not in MAP_FONTS:
+            return "fonte inválida"
+        for k, lo, hi in (("rot", -360, 360), ("weight", 100, 900), ("opacity", 0, 1)):
+            if k in l and not _num(l[k], lo, hi):
+                return f"{k} inválido"
+        for k in ("shadow", "italic"):
+            if k in l and not isinstance(l[k], bool):
+                return f"{k} inválido"
+    m, n, w, t = data.get("marker"), data.get("nodes"), data.get("walk"), data.get("texts")
+    if not (isinstance(m, dict) and _num(m.get("size"), 1, 30) and _num(m.get("borderWidth"), 0, 12) and isinstance(m.get("border"), str) and COLOR_RE.match(m["border"])):
+        return "marcador inválido"
+    if not (isinstance(n, dict) and _num(n.get("size"), 0.2, 8) and all(isinstance(n.get(k), str) and COLOR_RE.match(n[k]) for k in ("done", "idle", "next"))):
+        return "bolinhas inválidas"
+    if not (isinstance(w, dict) and _num(w.get("seconds"), 0.5, 12)):
+        return "duração inválida"
+    if not (isinstance(t, dict) and all(isinstance(t.get(k), str) and len(t[k]) <= 80 for k in ("title", "sub", "button"))):
+        return "textos do mapa inválidos"
+    return None
+
+
+MAP_HEADER = """// --- O MAPA ENTRE AS TELAS: LAYOUT ---
+// Gravado pelo editor do mapa (Ateliê: _library/tools/map_editor.html, pelo servidor tools/serve.py). Pode editar à mão também.
+// Tudo em PIXELS da imagem do mapa (images/map/map.webp, 1375 x 767); o jogo converte para porcentagem, então vale em qualquer tela.
+//   screens  as 6 telas na ordem: id do cenário, nome (aparece no jogo), node (onde fica no mapa) e leg (o caminho daqui até a PRÓXIMA tela; o 1º e o
+//            último ponto são os nós das duas telas; null na última)
+//   labels   textos por cima do mapa: text, x, y (centro), size (altura da letra em pixels do mapa), color, font ('cinzel' ou 'inter'), weight, italic,
+//            rot (graus), shadow (true/false), opacity (0 a 1)
+//   marker   o retrato do herói que anda: size (% da largura do mapa), border (cor), borderWidth (px)
+//   nodes    as bolinhas das telas: size (% da largura), done (já passou), idle (ainda não), next (a próxima)
+//   walk     seconds: quanto dura a caminhada
+//   texts    title / sub / button: {to} e {from} viram o nome das telas
+"""
+
+
+def write_map(data):
+    keep = {k: data[k] for k in ("screens", "labels", "marker", "nodes", "walk", "texts")}
+    text = json.dumps(keep, indent=4, ensure_ascii=False)
+    text = re.sub(r"\[\s+(-?[\d.]+),\s+(-?[\d.]+)\s+\]", r"[\1, \2]", text)             # os pontos [x, y] numa linha só
+    text = re.sub(r'"(\w+)":', r"\1:", text)                                                   # chaves sem aspas, como no resto do projeto
+    out = MAP_HEADER + "export const MAP_LAYOUT = " + text + ";\n"
+    tmp = MAP_FILE.with_suffix(".js.tmp")
+    tmp.write_text(out, encoding="utf-8")
+    tmp.replace(MAP_FILE)
+    return str(MAP_FILE.relative_to(REPO))
+
+
 def run_sync() -> str:
     try:
         done = subprocess.run(["ruby", "mini_games/_library/sync.rb"], cwd=REPO, capture_output=True, text=True, timeout=90)
@@ -230,10 +320,25 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.split("?")[0] == "/__layout_api":
-            return self.send_json(200, {"ok": True, "features": ["colliders", "profiles", "tuner"]})
+            return self.send_json(200, {"ok": True, "features": ["colliders", "profiles", "tuner", "map"]})
         return super().do_GET()
 
     def do_POST(self):
+        if self.path == "/__save_map":
+            reason = self.refusal()
+            if reason:
+                return self.send_json(403, {"ok": False, "error": f"pedido recusado: {reason}"})
+            size = int(self.headers.get("Content-Length") or 0)
+            if size <= 0 or size > MAX_BODY:
+                return self.send_json(400, {"ok": False, "error": "tamanho inválido"})
+            try:
+                data = json.loads(self.rfile.read(size))
+            except ValueError:
+                return self.send_json(400, {"ok": False, "error": "JSON inválido"})
+            error = validate_map(data)
+            if error:
+                return self.send_json(400, {"ok": False, "error": error})
+            return self.send_json(200, {"ok": True, "file": write_map(data)})
         if self.path == "/__save_tuner":
             reason = self.refusal()
             if reason:

@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor do mapa</title>
+<!-- Editor do mapa entre as telas do Last Torch. Mexe em last_torch/data_model/map_layout.js (nós das telas, caminhos, textos por cima, marcador do herói).
+     Como abrir: python3 mini_games/_library/tools/serve.py e http://localhost:8010/_library/tools/map_editor.html
+     (precisa do serve.py para gravar; sem ele dá para editar e baixar o JSON). O jogo lê o arquivo gravado: js/ui/map_screen.js. -->
+<link rel="stylesheet" href="/last_torch/css/base/fonts.css">
+<link rel="stylesheet" href="/last_torch/css/components/map.css">
+<style>
+    :root { color-scheme: dark; --bg: #14110d; --panel: #1c1813; --line: #3a3126; --text: #e8e0cf; --muted: #a39b86; --accent: #fbbf24; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 Inter, system-ui, sans-serif; }
+    header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 5; }
+    header h1 { margin: 0 8px 0 0; font-size: 17px; }
+    header a.home { color: var(--accent); text-decoration: none; }
+    button, select, input[type=text], input[type=number] { background: #261f17; color: var(--text); border: 1px solid var(--line); border-radius: 7px; padding: 6px 10px; font: inherit; }
+    button { cursor: pointer; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #7c3a12; border-color: #b45309; font-weight: 700; }
+    button:disabled { opacity: .45; cursor: default; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 14px; padding: 12px 14px 40px; align-items: start; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+    #stageWrap { position: relative; }
+    #frame { width: 100%; cursor: crosshair; user-select: none; touch-action: none; }
+    #frame .map-label { pointer-events: auto; cursor: move; }
+    #frame .map-label.sel { outline: 2px dashed var(--accent); outline-offset: 3px; }
+    #frame .map-node { pointer-events: auto; cursor: move; }
+    #frame .map-node.sel { outline: 3px solid var(--accent); outline-offset: 2px; }
+    #ov { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    #ov .leg { fill: none; stroke: rgba(30, 64, 175, .75); stroke-width: 3; stroke-dasharray: 8 6; pointer-events: stroke; cursor: copy; }
+    #ov .leg.hot { stroke: rgba(220, 38, 38, .9); }
+    #ov .pt { fill: #38bdf8; stroke: #082f49; stroke-width: 2; pointer-events: all; cursor: move; }
+    #ov .pt.sel { fill: var(--accent); stroke: #7c2d12; }
+    #frame .map-marker { transition: none; pointer-events: none; }
+    aside { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; position: sticky; top: 60px; max-height: calc(100vh - 80px); overflow: auto; }
+    aside h2 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; }
+    aside h2:first-child { margin-top: 0; }
+    .row { display: grid; grid-template-columns: 112px 1fr; gap: 8px; align-items: center; margin: 5px 0; }
+    .row span { color: var(--muted); font-size: 12.5px; }
+    .row input[type=text], .row input[type=number], .row select { width: 100%; }
+    .row input[type=color] { width: 100%; height: 30px; padding: 0; border: 1px solid var(--line); background: none; }
+    .row input[type=range] { width: 100%; }
+    .btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .hint { color: var(--muted); font-size: 12.5px; margin: 6px 0; }
+    .list button { display: block; width: 100%; text-align: left; margin: 3px 0; }
+    .list button.on { border-color: var(--accent); background: #3a2a10; }
+    #status { color: var(--muted); font-size: 12.5px; min-height: 18px; margin-top: 6px; }
+    #status.ok { color: #86efac; } #status.err { color: #fca5a5; }
+</style>
+</head>
+<body>
+<header>
+    <a class="home" href="index.html">← Ateliê</a>
+    <h1>Editor do mapa</h1>
+    <button id="play" title="Mostra a caminhada do herói pelo caminho escolhido, como no jogo">▶ Ver animação</button>
+    <select id="playLeg" title="Qual passagem animar"></select>
+    <button id="undo">↶ Desfazer</button>
+    <button id="reset" title="Joga fora o que você mudou e volta ao que está gravado no jogo">↺ Voltar ao do jogo</button>
+    <button id="download" title="Baixa o layout em .json (backup)">⬇ JSON</button>
+    <button id="save" class="primary" hidden title="Grava em last_torch/data_model/map_layout.js (o jogo lê este arquivo)">💾 Gravar no arquivo</button>
+    <span id="saveNote" class="hint" style="margin:0"></span>
+</header>
+<div class="layout">
+    <main>
+        <div id="stageWrap">
+            <div id="frame" class="map-frame">
+                <img id="mapImg" class="map-img" src="/last_torch/images/map/map.webp" alt="" draggable="false">
+                <svg id="ov" viewBox="0 0 1375 767" preserveAspectRatio="none"></svg>
+                <div id="nodes" class="map-nodes"></div>
+                <div id="labels" class="map-labels"></div>
+                <div id="marker" class="map-marker is-arrived"><img id="markerImg" src="/last_torch/images/characters/demon-hunter-small.webp" alt="" draggable="false"></div>
+            </div>
+        </div>
+        <p class="hint"><b>Arraste</b> as bolinhas das telas, os pontos azuis do caminho e os textos. <b>Duplo clique</b> numa linha pontilhada cria um ponto; <b>Delete</b> apaga o ponto ou o texto selecionado. Setas movem 1 px (Shift = 10). <b>Ctrl+Z</b> desfaz.</p>
+        <div id="status"></div>
+    </main>
+    <aside id="side"></aside>
+</div>
+<script type="module">
+    import { MAP_LAYOUT } from '/last_torch/data_model/map_layout.js';
+
+    const $ = (id) => document.getElementById(id);
+    const MAP_W = 1375;
+    const MAP_H = 767;
+    const FONTS = { cinzel: "'Cinzel', serif", inter: "'Inter', sans-serif" };
+    const STORE = 'map_editor_layout';
+    const clone = (v) => JSON.parse(JSON.stringify(v));
+    const round = (v) => Math.round(v);
+
+    const fileLayout = clone(MAP_LAYOUT);
+    let L = clone(fileLayout);
+    let sel = null;                       // { k: 'node' | 'pt' | 'label', i, j }
+    let canWrite = false;
+    const history = [];
+
+    try {
+        const local = JSON.parse(localStorage.getItem(STORE) || 'null');
+        if (local && local.screens?.length === 6 && JSON.stringify(local) !== JSON.stringify(fileLayout)) { L = local; status('↩ Retomado do que você estava fazendo neste navegador (ainda não gravado no arquivo).', 'ok'); }
+    } catch { /* sem armazenamento */ }
+
+    function status(text, cls = '') { const el = $('status'); el.textContent = text; el.className = cls; }
+    function persist() { try { localStorage.setItem(STORE, JSON.stringify(L)); } catch { /* ok */ } }
+    function snapshot() { history.push(JSON.stringify(L)); if (history.length > 80) history.shift(); }
+    function commit() { persist(); renderStage(); }
+
+    // --- PALCO ---
+    const frame = $('frame');
+    const pct = ([x, y]) => [`${(x / MAP_W) * 100}%`, `${(y / MAP_H) * 100}%`];
+    const toMap = (e) => { const r = frame.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * MAP_W, (e.clientY - r.top) / r.height * MAP_H]; };
+
+    function renderStage() {
+        // bolinhas das telas (o mesmo desenho do jogo)
+        const nodes = $('nodes');
+        nodes.textContent = '';
+        L.screens.forEach((s, i) => {
+            const n = document.createElement('i');
+            const here = Math.max(0, Math.min(5, Number($('playLeg').value) || 0));       // como no jogo: já passou (dourada), a próxima (pulsa) e as que faltam (vermelhas)
+            n.className = 'map-node ' + (i <= here ? 'is-done' : i === here + 1 ? 'is-next' : 'is-ahead') + (sel?.k === 'node' && sel.i === i ? ' sel' : '');
+            n.dataset.kind = 'node'; n.dataset.i = i;
+            [n.style.left, n.style.top] = pct(s.node);
+            n.style.width = `${L.nodes.size}%`;
+            n.style.setProperty('--done', L.nodes.done); n.style.setProperty('--idle', L.nodes.idle); n.style.setProperty('--next', L.nodes.next);
+            n.title = `${i + 1}. ${s.name}`;
+            nodes.appendChild(n);
+        });
+        // textos
+        const labels = $('labels');
+        labels.textContent = '';
+        L.labels.forEach((l, i) => {
+            const el = document.createElement('div');
+            el.className = 'map-label' + (l.shadow === false ? '' : ' has-shadow') + (sel?.k === 'label' && sel.i === i ? ' sel' : '');
+            el.dataset.kind = 'label'; el.dataset.i = i;
+            el.textContent = l.text || '(vazio)';
+            [el.style.left, el.style.top] = pct([l.x, l.y]);
+            el.style.setProperty('--s', l.size); el.style.setProperty('--rot', `${l.rot ?? 0}deg`);
+            el.style.color = l.color; el.style.fontFamily = FONTS[l.font] ?? FONTS.cinzel; el.style.fontWeight = l.weight ?? 700;
+            el.style.fontStyle = l.italic ? 'italic' : 'normal'; el.style.opacity = l.opacity ?? 1;
+            labels.appendChild(el);
+        });
+        // marcador (estilo)
+        const marker = $('marker');
+        marker.style.width = `${L.marker.size}%`;
+        marker.style.setProperty('--border', L.marker.border);
+        marker.style.setProperty('--border-w', `${L.marker.borderWidth}px`);
+        if (!playing) [marker.style.left, marker.style.top] = pct(L.screens[Math.max(0, Math.min(5, Number($('playLeg').value) || 0))].node);       // o retrato fica sempre em cima do local do mapa
+        // caminhos e pontos
+        const ov = $('ov');
+        let svg = '';
+        L.screens.forEach((s, i) => {
+            if (!s.leg) return;
+            svg += `<polyline class="leg${Number($('playLeg').value) === i ? ' hot' : ''}" data-kind="leg" data-i="${i}" points="${s.leg.map(p => p.join(',')).join(' ')}"></polyline>`;
+        });
+        L.screens.forEach((s, i) => {
+            if (!s.leg) return;
+            s.leg.forEach((p, j) => {
+                if (j === 0 || j === s.leg.length - 1) return;       // as pontas são as bolinhas das telas
+                const on = sel?.k === 'pt' && sel.i === i && sel.j === j;
+                svg += `<circle class="pt${on ? ' sel' : ''}" data-kind="pt" data-i="${i}" data-j="${j}" cx="${p[0]}" cy="${p[1]}" r="${on ? 10 : 8}"></circle>`;
+            });
+        });
+        ov.innerHTML = svg;
+    }
+
+    // --- ARRASTAR ---
+    let drag = null;
+    frame.addEventListener('pointerdown', (e) => {
+        const t = e.target.closest('[data-kind]');
+        if (!t) { sel = null; renderStage(); renderSide(); return; }
+        const kind = t.dataset.kind;
+        const i = +t.dataset.i;
+        if (kind === 'leg') return;
+        e.preventDefault();
+        sel = { k: kind, i, j: t.dataset.j !== undefined ? +t.dataset.j : undefined };
+        const [mx, my] = toMap(e);
+        const origin = kind === 'node' ? L.screens[i].node : kind === 'pt' ? L.screens[i].leg[sel.j] : [L.labels[i].x, L.labels[i].y];
+        drag = { kind, i, j: sel.j, dx: origin[0] - mx, dy: origin[1] - my, moved: false };
+        frame.setPointerCapture(e.pointerId);
+        renderStage(); renderSide();
+    });
+    frame.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        if (!drag.moved) { snapshot(); drag.moved = true; }
+        const [mx, my] = toMap(e);
+        const x = Math.max(0, Math.min(MAP_W, round(mx + drag.dx)));
+        const y = Math.max(0, Math.min(MAP_H, round(my + drag.dy)));
+        setPos(drag.kind, drag.i, drag.j, x, y);
+        commit(); syncPosInputs();
+    });
+    const endDrag = () => { drag = null; };
+    frame.addEventListener('pointerup', endDrag);
+    frame.addEventListener('pointercancel', endDrag);
+
+    function setPos(kind, i, j, x, y) {
+        if (kind === 'node') {
+            const s = L.screens[i];
+            s.node = [x, y];
+            if (s.leg) s.leg[0] = [x, y];                                  // o caminho sai do nó
+            if (i > 0 && L.screens[i - 1].leg) L.screens[i - 1].leg[L.screens[i - 1].leg.length - 1] = [x, y];       // e o anterior chega nele
+        } else if (kind === 'pt') L.screens[i].leg[j] = [x, y];
+        else { L.labels[i].x = x; L.labels[i].y = y; }
+    }
+
+    // Duplo clique numa linha: cria um ponto ali
+    frame.addEventListener('dblclick', (e) => {
+        const t = e.target.closest('[data-kind="leg"]');
+        if (!t) return;
+        const i = +t.dataset.i;
+        const [mx, my] = toMap(e);
+        const leg = L.screens[i].leg;
+        let best = 0; let bestD = Infinity;
+        for (let j = 0; j < leg.length - 1; j++) {
+            const [ax, ay] = leg[j]; const [bx, by] = leg[j + 1];
+            const t2 = Math.max(0, Math.min(1, ((mx - ax) * (bx - ax) + (my - ay) * (by - ay)) / ((bx - ax) ** 2 + (by - ay) ** 2 || 1)));
+            const d = Math.hypot(mx - (ax + (bx - ax) * t2), my - (ay + (by - ay) * t2));
+            if (d < bestD) { bestD = d; best = j; }
+        }
+        snapshot();
+        leg.splice(best + 1, 0, [round(mx), round(my)]);
+        sel = { k: 'pt', i, j: best + 1 };
+        commit(); renderSide();
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
+        if (!sel) return;
+        if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeSel(); return; }
+        const step = e.shiftKey ? 10 : 1;
+        const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+        if (!d) return;
+        e.preventDefault();
+        snapshot();
+        const cur = sel.k === 'node' ? L.screens[sel.i].node : sel.k === 'pt' ? L.screens[sel.i].leg[sel.j] : [L.labels[sel.i].x, L.labels[sel.i].y];
+        setPos(sel.k, sel.i, sel.j, cur[0] + d[0], cur[1] + d[1]);
+        commit(); syncPosInputs();
+    });
+
+    function removeSel() {
+        if (sel?.k === 'pt') { snapshot(); L.screens[sel.i].leg.splice(sel.j, 1); sel = null; }
+        else if (sel?.k === 'label') { snapshot(); L.labels.splice(sel.i, 1); sel = null; }
+        commit(); renderSide();
+    }
+    function undo() {
+        const prev = history.pop();
+        if (!prev) return;
+        L = JSON.parse(prev); sel = null; commit(); renderSide();
+    }
+
+    // --- PAINEL ---
+    const field = (label, inner) => `<div class="row"><span>${label}</span>${inner}</div>`;
+    const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    function hexOf(c) { return /^#[0-9a-f]{6}$/i.test(c) ? c : '#ffffff'; }
+
+    function renderSide() {
+        const side = $('side');
+        let h = '';
+        if (sel?.k === 'node') {
+            const s = L.screens[sel.i];
+            h += `<h2>Tela ${sel.i + 1}</h2>${field('Nome', `<input type="text" id="p_name" value="${esc(s.name)}" maxlength="40">`)}${field('X', `<input type="number" id="p_x" value="${s.node[0]}">`)}${field('Y', `<input type="number" id="p_y" value="${s.node[1]}">`)}<p class="hint">Cenário: <code>${s.id}</code>. O nome aparece no HUD e no mapa.</p>`;
+        } else if (sel?.k === 'pt') {
+            const p = L.screens[sel.i].leg[sel.j];
+            h += `<h2>Ponto do caminho</h2>${field('X', `<input type="number" id="p_x" value="${p[0]}">`)}${field('Y', `<input type="number" id="p_y" value="${p[1]}">`)}<div class="btns"><button id="p_del">Apagar ponto</button></div>`;
+        } else if (sel?.k === 'label') {
+            const l = L.labels[sel.i];
+            h += `<h2>Texto</h2>${field('Texto', `<input type="text" id="p_text" value="${esc(l.text)}" maxlength="200">`)}${field('X', `<input type="number" id="p_x" value="${l.x}">`)}${field('Y', `<input type="number" id="p_y" value="${l.y}">`)}${field('Tamanho', `<input type="number" id="p_size" value="${l.size}" min="4" max="400">`)}${field('Cor', `<input type="color" id="p_color" value="${hexOf(l.color)}">`)}${field('Fonte', `<select id="p_font"><option value="cinzel"${l.font !== 'inter' ? ' selected' : ''}>Cinzel (títulos)</option><option value="inter"${l.font === 'inter' ? ' selected' : ''}>Inter (texto)</option></select>`)}${field('Peso', `<input type="number" id="p_weight" value="${l.weight ?? 700}" min="100" max="900" step="100">`)}${field('Giro (graus)', `<input type="number" id="p_rot" value="${l.rot ?? 0}" min="-360" max="360">`)}${field('Opacidade', `<input type="range" id="p_opacity" min="0" max="1" step="0.05" value="${l.opacity ?? 1}">`)}${field('Itálico', `<input type="checkbox" id="p_italic"${l.italic ? ' checked' : ''}>`)}${field('Sombra', `<input type="checkbox" id="p_shadow"${l.shadow === false ? '' : ' checked'}>`)}<div class="btns"><button id="p_dup">Duplicar</button><button id="p_del">Apagar texto</button></div>`;
+        } else {
+            h += `<h2>Selecione algo</h2><p class="hint">Clique numa bolinha de tela, num ponto do caminho ou num texto para editar.</p>`;
+        }
+        h += `<h2>Textos por cima do mapa</h2><div class="btns"><button id="addLabel">+ Novo texto</button></div><div class="list" id="labelList">${L.labels.map((l, i) => `<button data-label="${i}" class="${sel?.k === 'label' && sel.i === i ? 'on' : ''}">${esc(l.text || '(vazio)')}</button>`).join('') || '<p class="hint">Nenhum ainda.</p>'}</div>`;
+        h += `<h2>Telas</h2><div class="list" id="screenList">${L.screens.map((s, i) => `<button data-screen="${i}" class="${sel?.k === 'node' && sel.i === i ? 'on' : ''}">${i + 1}. ${esc(s.name)}</button>`).join('')}</div>`;
+        h += `<h2>Marcador do herói</h2>${field('Tamanho (%)', `<input type="range" id="m_size" min="2" max="14" step="0.2" value="${L.marker.size}">`)}${field('Cor da borda', `<input type="color" id="m_border" value="${hexOf(L.marker.border)}">`)}${field('Borda (px)', `<input type="number" id="m_bw" min="0" max="12" value="${L.marker.borderWidth}">`)}`;
+        h += `<h2>Bolinhas das telas</h2>${field('Tamanho (%)', `<input type="range" id="n_size" min="0.4" max="4" step="0.1" value="${L.nodes.size}">`)}${field('Já passou', `<input type="color" id="n_done" value="${hexOf(L.nodes.done)}">`)}${field('Próxima e as que faltam', `<input type="color" id="n_next" value="${hexOf(L.nodes.next)}">`)}`;
+        h += `<h2>Animação e textos</h2>${field('Duração (s)', `<input type="number" id="w_sec" min="0.5" max="12" step="0.1" value="${L.walk.seconds}">`)}${field('Título', `<input type="text" id="t_title" value="${esc(L.texts.title)}" maxlength="80">`)}${field('Subtítulo', `<input type="text" id="t_sub" value="${esc(L.texts.sub)}" maxlength="80">`)}${field('Botão', `<input type="text" id="t_btn" value="${esc(L.texts.button)}" maxlength="80">`)}<p class="hint">No título e no subtítulo, <code>{from}</code> e <code>{to}</code> viram o nome das telas.</p>`;
+        side.innerHTML = h;
+        wireSide();
+    }
+
+    function syncPosInputs() {
+        if (!sel) return;
+        const cur = sel.k === 'node' ? L.screens[sel.i].node : sel.k === 'pt' ? L.screens[sel.i].leg[sel.j] : [L.labels[sel.i].x, L.labels[sel.i].y];
+        if ($('p_x')) $('p_x').value = cur[0];
+        if ($('p_y')) $('p_y').value = cur[1];
+    }
+
+    const bind = (id, apply, event = 'input') => { const el = $(id); if (!el) return; let first = true; el.addEventListener(event, () => { if (first) { snapshot(); first = false; setTimeout(() => { first = true; }, 700); } apply(el); commit(); }); };
+
+    function wireSide() {
+        if (sel?.k === 'node') {
+            const s = L.screens[sel.i];
+            bind('p_name', (el) => { s.name = el.value; fillLegSelect(); });
+            ['p_x', 'p_y'].forEach((id, a) => bind(id, (el) => { const p = [...s.node]; p[a] = +el.value || 0; setPos('node', sel.i, undefined, p[0], p[1]); }));
+        } else if (sel?.k === 'pt') {
+            ['p_x', 'p_y'].forEach((id, a) => bind(id, (el) => { const p = [...L.screens[sel.i].leg[sel.j]]; p[a] = +el.value || 0; L.screens[sel.i].leg[sel.j] = p; }));
+            $('p_del').onclick = removeSel;
+        } else if (sel?.k === 'label') {
+            const l = L.labels[sel.i];
+            bind('p_text', (el) => { l.text = el.value; });
+            bind('p_x', (el) => { l.x = +el.value || 0; }); bind('p_y', (el) => { l.y = +el.value || 0; });
+            bind('p_size', (el) => { l.size = Math.max(4, +el.value || 4); });
+            bind('p_color', (el) => { l.color = el.value; });
+            bind('p_font', (el) => { l.font = el.value; }, 'change');
+            bind('p_weight', (el) => { l.weight = +el.value || 700; });
+            bind('p_rot', (el) => { l.rot = +el.value || 0; });
+            bind('p_opacity', (el) => { l.opacity = +el.value; });
+            bind('p_italic', (el) => { l.italic = el.checked; }, 'change');
+            bind('p_shadow', (el) => { l.shadow = el.checked; }, 'change');
+            $('p_del').onclick = removeSel;
+            $('p_dup').onclick = () => { snapshot(); L.labels.push({ ...clone(l), x: l.x + 24, y: l.y + 24 }); sel = { k: 'label', i: L.labels.length - 1 }; commit(); renderSide(); };
+        }
+        $('addLabel').onclick = () => {
+            snapshot();
+            L.labels.push({ text: 'Novo texto', x: Math.round(MAP_W / 2), y: Math.round(MAP_H / 2), size: 34, color: '#3b2a14', font: 'cinzel', weight: 700, italic: false, rot: 0, shadow: true, opacity: 1 });
+            sel = { k: 'label', i: L.labels.length - 1 }; commit(); renderSide();
+        };
+        document.querySelectorAll('[data-label]').forEach(b => { b.onclick = () => { sel = { k: 'label', i: +b.dataset.label }; renderStage(); renderSide(); }; });
+        document.querySelectorAll('[data-screen]').forEach(b => { b.onclick = () => { sel = { k: 'node', i: +b.dataset.screen }; renderStage(); renderSide(); }; });
+        bind('m_size', (el) => { L.marker.size = +el.value; }); bind('m_border', (el) => { L.marker.border = el.value; }); bind('m_bw', (el) => { L.marker.borderWidth = +el.value || 0; });
+        bind('n_size', (el) => { L.nodes.size = +el.value; }); bind('n_done', (el) => { L.nodes.done = el.value; }); bind('n_next', (el) => { L.nodes.next = el.value; });
+        bind('w_sec', (el) => { L.walk.seconds = Math.max(0.5, +el.value || 2.8); });
+        bind('t_title', (el) => { L.texts.title = el.value; }); bind('t_sub', (el) => { L.texts.sub = el.value; }); bind('t_btn', (el) => { L.texts.button = el.value; });
+    }
+
+    // --- ANIMAÇÃO (a mesma do jogo: js/ui/map_screen.js) ---
+    function fillLegSelect() {
+        const cur = $('playLeg').value;
+        $('playLeg').innerHTML = L.screens.slice(0, -1).map((s, i) => `<option value="${i}">${esc(s.name)} ▶ ${esc(L.screens[i + 1].name)}</option>`).join('');
+        if (cur !== '') $('playLeg').value = cur;
+    }
+    const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - ((-2 * t + 2) ** 2) / 2);
+    function pointAlong(points, k) {
+        const lens = []; let total = 0;
+        for (let i = 1; i < points.length; i++) { const d = Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]); lens.push(d); total += d; }
+        let want = k * total;
+        for (let i = 0; i < lens.length; i++) {
+            if (want <= lens[i] || i === lens.length - 1) { const t = lens[i] ? Math.min(1, want / lens[i]) : 0; return [points[i][0] + (points[i + 1][0] - points[i][0]) * t, points[i][1] + (points[i + 1][1] - points[i][1]) * t]; }
+            want -= lens[i];
+        }
+        return points[points.length - 1];
+    }
+    let raf = 0;
+    let playing = false;
+    $('play').onclick = () => {
+        const leg = L.screens[+$('playLeg').value]?.leg;
+        if (!leg) return;
+        cancelAnimationFrame(raf);
+        const marker = $('marker');
+        playing = true;
+        const start = performance.now() + 300;
+        const step = (now) => {
+            const k = Math.max(0, Math.min(1, (now - start) / (L.walk.seconds * 1000)));
+            [marker.style.left, marker.style.top] = pct(pointAlong(leg, easeInOut(k)));
+            if (k < 1) raf = requestAnimationFrame(step); else playing = false;
+        };
+        raf = requestAnimationFrame(step);
+    };
+    $('playLeg').onchange = renderStage;
+
+    // --- ARQUIVO ---
+    $('undo').onclick = undo;
+    $('reset').onclick = () => { if (!confirm('Jogar fora o que você mudou e voltar ao que está gravado no jogo?')) return; snapshot(); L = clone(fileLayout); sel = null; commit(); renderSide(); status('Voltou ao que está gravado no jogo.', 'ok'); };
+    $('download').onclick = () => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(L, null, 2)], { type: 'application/json' }));
+        a.download = 'map_layout.json'; a.click();
+    };
+    $('save').onclick = async () => {
+        $('save').disabled = true;
+        try {
+            const res = await fetch('/__save_map', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Atelie': '1' }, body: JSON.stringify(L) });
+            const out = await res.json();
+            if (!res.ok || !out.ok) throw new Error(out.error || `erro ${res.status}`);
+            status(`Gravado em ${out.file}. Abra o jogo (ou o sandbox, aba Screens > World map) para ver.`, 'ok');
+            $('saveNote').textContent = `gravado às ${new Date().toLocaleTimeString('pt-BR')}`;
+        } catch (err) {
+            status(`Não consegui gravar: ${err.message}`, 'err');
+        } finally { $('save').disabled = false; }
+    };
+    fetch('/__layout_api').then(r => (r.ok ? r.json() : null)).then(j => {
+        canWrite = Boolean(j?.ok && (j.features ?? []).includes('map'));
+        $('save').hidden = !canWrite;
+        if (!canWrite) $('saveNote').textContent = 'Para gravar, abra por: python3 mini_games/_library/tools/serve.py (reinicie se já estava aberto)';
+    }).catch(() => { $('saveNote').textContent = 'Para gravar, abra por: python3 mini_games/_library/tools/serve.py'; });
+
+    // --- INÍCIO ---
+    fillLegSelect();
+    frame.style.maxWidth = `min(100%, calc((100vh - 150px) * ${MAP_W / MAP_H}))`;
+    renderStage();
+    renderSide();
+    window.__mapEditor = { get layout() { return L; }, select(s) { sel = s; renderStage(); renderSide(); } };
+</script>
+</body>
+</html>

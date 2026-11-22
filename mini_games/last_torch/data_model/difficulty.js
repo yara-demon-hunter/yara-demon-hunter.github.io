@@ -1,3 +1,4 @@
+import { effectiveTurn } from './campaign.js';
 // --- DIFICULDADE POR TURNO ---
 // O turno 1 é o mais fácil e cada turno novo deixa o jogo mais duro: monstros com mais vida,
 // mais rápidos e que batem mais forte, nascendo em intervalos menores, e tipos novos entram aos poucos.
@@ -78,12 +79,13 @@ export function waveSpawnBoost(waveTime) {
 // Multiplicadores e intervalo de spawn de um turno (turno 1 = mais fácil)
 export function getTurnDifficulty(turn) {
     const D = TURN_DIFFICULTY;
-    const steps = Math.max(0, turn - 1);
+    // A curva foi feita para 12 ondas: com 30, a onda é convertida (campaign.js, effectiveTurn)
+    const steps = Math.max(0, effectiveTurn(turn) - 1);
     return {
         hpMultiplier: D.hpMultiplierFirstTurn + steps * D.hpMultiplierPerTurn,
         speedMultiplier: Math.min(D.maxSpeedMultiplier, D.speedMultiplierFirstTurn + steps * D.speedMultiplierPerTurn),
         damageMultiplier: Math.min(D.maxDamageMultiplier, D.damageMultiplierFirstTurn + steps * D.damageMultiplierPerTurn)
-            * (D.earlyDamageRelief[steps] ?? 1),
+            * (D.earlyDamageRelief[Math.floor(steps)] ?? 1),
         spawnIntervalSeconds: Math.max(
             D.minimumSpawnIntervalSeconds,
             D.spawnIntervalFirstTurnSeconds - steps * D.spawnIntervalReductionPerTurnSeconds
@@ -95,5 +97,5 @@ export function getTurnDifficulty(turn) {
 }
 
 export function isMonsterUnlocked(type, turn) {
-    return turn >= (TURN_DIFFICULTY.monsterUnlockTurn[type] ?? 1);
+    return effectiveTurn(turn) >= (TURN_DIFFICULTY.monsterUnlockTurn[type] ?? 1) - 1e-9;
 }
