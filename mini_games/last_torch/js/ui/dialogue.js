@@ -1,5 +1,5 @@
 import { BOSS_INTROS, DIALOGUE_TYPE_SECONDS, DUEL_DIALOGUES } from '../../data_model/dialogues.js';
-import { BOSS_MODELS, RIVAL_OF } from '../../data_model/bosses.js';
+import { BOSS_MODELS, BOSS_SPAWNING, RIVAL_OF, chooseBossType } from '../../data_model/bosses.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { releaseTouchControls } from '../core/input.js';
 import { state } from '../core/state.js';
@@ -144,9 +144,9 @@ export function playDuelDialogue(bossType, moment, onDone) {
 
 // Provocação antes de um boss que não é o rival: quem fala é o rival do herói (RIVAL_OF). Sem falas, segue direto.
 // As falas de cada herói (byHero) valem primeiro; sem elas, as do rival para todos
-function introScript(rival, bossType) {
+function introScript(rival, bossType, heroModel = getHero().model) {
     const set = BOSS_INTROS[rival];
-    const own = set?.byHero?.[getHero().model];
+    const own = set?.byHero?.[heroModel];
     return own?.[bossType] ?? own?.default ?? set?.[bossType] ?? set?.default;
 }
 
@@ -178,4 +178,44 @@ function play(script, rivalType, intro, onDone, arriving = null) {
     build(rivalHero, getHero(), intro);
     document.addEventListener('keydown', onKey, true);
     showLine();
+}
+
+// --- PRÉVIA (aba Dialogues do sandbox) ---
+// Todas as cenas de conversa de um herói, na ordem em que acontecem na partida, tocadas pela mesma tela do jogo (faixas de cinema, retratos, fala letra a letra).
+// heroKey: o herói que o jogador controla (o sandbox já deixa save.hero nele). Cada cena: { label, script, rivalType, intro, arriving }.
+export function listDialogueScenes(heroKey) {
+    const model = HEROES[heroKey]?.model ?? 'hunter';
+    const rivalType = RIVAL_OF[model] ?? RIVAL_OF.hunter;
+    const duelSet = DUEL_DIALOGUES[rivalType];
+    const duel = duelSet?.byHero?.[model] ?? duelSet;
+    const scenes = [];
+    const add = (label, script, intro, boss) => script && scenes.push({ label, script, rivalType, intro, arriving: boss ? { name: BOSS_MODELS[boss].name, portraitImage: BOSS_MODELS[boss].portraitImage } : null });
+    add(`Wave 3 · ${BOSS_MODELS[rivalType].name} appears`, duel?.first?.before, false);
+    add(`Wave 3 · ${BOSS_MODELS[rivalType].name} falls`, duel?.first?.after, false);
+    // Provocações antes dos outros chefes, na ordem das ondas
+    const order = Object.entries(BOSS_SPAWNING.schedule).sort((a, b) => a[0] - b[0]);
+    order.forEach(([wave, slot]) => {
+        if (slot === 'RIVAL' || slot === 'RIVAL_FINAL') return;
+        const boss = chooseBossType(+wave, model);
+        if (!boss || boss === rivalType) return;
+        add(`Wave ${wave} · ${BOSS_MODELS[boss].name} is called`, introScript(rivalType, boss, model), true, boss);
+    });
+    add(`Wave 18 · ${BOSS_MODELS[`${rivalType}_FINAL`].name}, the rematch, appears`, duel?.final?.before, false);
+    add(`Wave 18 · ${BOSS_MODELS[`${rivalType}_FINAL`].name} falls`, duel?.final?.after, false);
+    return scenes;
+}
+
+export function playScene(scene, onDone) {
+    play(scene.script, scene.rivalType, scene.intro, onDone, scene.arriving);
+}
+
+// Fecha na hora a cena que estiver aberta (o botão Parar do sandbox)
+export function stopScene() {
+    if (!root) return;
+    clearInterval(typeTimer);
+    typeTimer = null;
+    document.removeEventListener('keydown', onKey, true);
+    root.remove();
+    root = null;
+    finish = null;
 }

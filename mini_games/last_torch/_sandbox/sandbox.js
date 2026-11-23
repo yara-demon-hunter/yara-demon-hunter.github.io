@@ -20,6 +20,7 @@ import { mountTuner } from '/_sandbox/tuner.js';
 import { mountFastRun } from '/_sandbox/fastrun.js';
 import { mountScreens } from '/_sandbox/screens.js';
 import { mountBossMoves } from '/_sandbox/bossmoves.js';
+import { mountDialogues } from '/_sandbox/dialogues.js';
 
 CAMPAIGN_RUNTIME.enabled = false;           // o sandbox escolhe o cenário à mão: a troca automática por tela da campanha fica desligada
 const choice = { hero: ACTIVE_HEROES[0], boss: 'AZAEL' };
@@ -61,7 +62,7 @@ panel.innerHTML = `
     <h2>🧪 Last Torch Sandbox</h2>
     <p class="note">Test arena: nothing here touches the game or its save.</p>
     <div class="sb-format"><label>Screen format (all tabs): <select id="sbFormat"><option value="desktop">Desktop (full window)</option><option value="landscape">Phone · landscape 844×390</option><option value="portrait">Phone · portrait 390×844</option></select></label></div>
-    <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button><button data-tab="screens">🖼️ Screens</button><button data-tab="moves">🗡️ Boss moves</button></div>
+    <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button><button data-tab="screens">🖼️ Screens</button><button data-tab="moves">🗡️ Boss moves</button><button data-tab="dialogues">💬 Dialogues</button></div>
     <div id="sbArena">
     <h3>Scenery <small>(applies right away, even mid-fight)</small></h3><div class="sb-row" id="sbScenery"></div>
     <h3>Hero</h3><div class="sb-row" id="sbHeroes"></div>
@@ -89,6 +90,7 @@ panel.innerHTML = `
     <div id="sbFast" class="hidden"></div>
     <div id="sbScreens" class="hidden"></div>
     <div id="sbMoves" class="hidden"></div>
+    <div id="sbDialogues" class="hidden"></div>
   </div>`;
 document.body.appendChild(panel);
 
@@ -326,6 +328,7 @@ let tuner = null;
 let fast = null;
 let screens = null;
 let moves = null;
+let dialogues = null;
 // Demonstração de golpes: só o boss escolhido, sem monstros, com todos os modos deus ligados (o painel esconde na hora)
 function startBossDemo(key) {
     ['#sbAlone', '#sbGod', '#sbGodBoss', '#sbGodTorch', '#sbGodMonsters'].forEach(id => { value(id).checked = true; });
@@ -344,6 +347,8 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
         panel.querySelector('#sbFast').classList.toggle('hidden', tab !== 'fast');
         panel.querySelector('#sbScreens').classList.toggle('hidden', tab !== 'screens');
         panel.querySelector('#sbMoves').classList.toggle('hidden', tab !== 'moves');
+        panel.querySelector('#sbDialogues').classList.toggle('hidden', tab !== 'dialogues');
+        if (tab === 'dialogues') dialogues ??= mountDialogues(panel.querySelector('#sbDialogues'), { hidePanel: () => panel.classList.add('hidden'), showPanel: () => panel.classList.remove('hidden') });
         if (tab === 'moves') moves ??= mountBossMoves(panel.querySelector('#sbMoves'), {
             bosses, startDemo: startBossDemo, showPanel: () => panel.classList.remove('hidden')
         });

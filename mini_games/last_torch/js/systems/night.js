@@ -101,7 +101,7 @@ function callBoss(plan) {
         playBossIntro(plan.boss, () => announceBoss(plan));
     }), BOSS_INTRO_DELAY_MS);
 }
-const BOSS_INTRO_DELAY_MS = 800;
+const BOSS_INTRO_DELAY_MS = 300;
 
 function announceBoss(plan) {
     const boss = BOSS_MODELS[plan.boss];
@@ -219,7 +219,7 @@ export function onBossKilled(e, model) {
 }
 
 // O golpe final ainda aparece (câmera lenta, explosão) antes de a conversa congelar a tela
-const DUEL_DIALOGUE_DELAY_MS = 900;
+const DUEL_DIALOGUE_DELAY_MS = 400;
 
 function afterBoss() {
     if (state.turn === NIGHT.hours) {

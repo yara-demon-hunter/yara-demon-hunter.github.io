@@ -1,144 +1,139 @@
-// --- DIÁLOGOS DOS DUELOS ---
-// Mostrados quando o rival surge e quando ele cai (js/ui/dialogue.js): o retrato de quem fala acende e o texto vem embaixo.
-// Chave: o rival (BOSS_MODELS). first: o duelo da hora 1; final: a revanche da hora 12.
-// Cada duelo tem before (quando o rival surge, antes da luta) e after (quando ele cai).
-// byHero: falas próprias de um herói (chave = model de data_model/heroes.js) contra esse rival; sem ele, valem as de cima.
-// who: 'rival' (o boss do duelo, ou quem provoca), 'hero' (quem o jogador controla) ou 'boss' (o boss que chega nas
-// provocações, ex.: Captain Brutos; o retrato dele toma o lugar do rival enquanto fala).
+// --- DIÁLOGOS DOS DUELOS E DAS PROVOCAÇÕES ---
+// Curtos e diretos: cada cena tem 3 falas, e a última deixa no ar que a PRÓXIMA tela será impossível (para o jogador querer ir ver).
+// A história: o Demon Hunter quer parar o Azael. Azael, que não mede as palavras, foge para o castelo e faz de tudo para atrapalhar o caminho.
+// DUEL_DIALOGUES (js/ui/dialogue.js): o duelo com o rival, quando ele surge (before) e quando ele cai (after). first: onda 3; final: revanche, onda 18.
+// Chave: o rival. byHero: falas próprias de um herói (chave = model de data_model/heroes.js); sem ele, valem as de cima.
+// who: 'rival' (o boss do duelo, ou quem provoca), 'hero' (quem o jogador controla) ou 'boss' (o chefe que chega nas provocações; o retrato dele
+// toma o lugar do rival enquanto fala).
 export const DUEL_DIALOGUES = {
     // Jogando com o Demon Hunter, contra o Azael
     AZAEL: {
         first: {
             before: [
-                { who: 'rival', text: 'A hunter, guarding a little flame in the dark. How touching.' },
-                { who: 'hero', text: 'Azael. I have been waiting for you.' },
-                { who: 'rival', text: 'Then let us see if your blade is as sharp as your tongue.' }
+                { who: 'rival', text: 'A hunter. Come to die in my forest?' },
+                { who: 'hero', text: 'Your days of evil are over, Azael.' },
+                { who: 'rival', text: 'Over? I am only beginning!' }
             ],
             after: [
-                { who: 'rival', text: 'You beat me this time, hunter... but I will come back stronger.' },
-                { who: 'hero', text: 'Then come back. The torch will still be burning.' },
-                { who: 'rival', text: 'Before dawn. Count on it.' }
+                { who: 'rival', text: 'Curse you! Come to my castle... if you can reach it.' },
+                { who: 'hero', text: 'Run. I will find you.' },
+                { who: 'rival', text: 'You will never cross that river alive!' }
             ]
         },
         final: {
             before: [
-                { who: 'rival', text: 'I told you I would return, hunter. The night is almost over.' },
-                { who: 'hero', text: 'Then this is the last time we cross blades.' },
-                { who: 'rival', text: 'Yes. One of us will not see the dawn.' }
+                { who: 'rival', text: 'Impossible... You reached my throne.' },
+                { who: 'hero', text: 'No more running, Azael.' },
+                { who: 'rival', text: 'Then die here!' }
             ],
             after: [
-                { who: 'rival', text: 'Again... How does a mere human keep beating me?' },
-                { who: 'hero', text: 'I am not fighting for myself. I am fighting for the light.' },
-                { who: 'rival', text: 'Then keep your little flame, hunter. This night is yours.' }
+                { who: 'rival', text: 'How... can a mere human beat me?' },
+                { who: 'hero', text: 'I fought for the light.' },
+                { who: 'rival', text: '...Then take your dawn.' }
             ]
         },
-        // Falas próprias de outros heróis contra o Azael (byHero[model], com a mesma forma de first e final)
         byHero: {
-            // Gudran, o velho senhor do castelo: arrogante, acostumado a ser obedecido
             gudran: {
                 first: {
                     before: [
-                        { who: 'rival', text: 'An old man with a stick, tending a candle. The dark will eat you whole.' },
-                        { who: 'hero', text: 'I ruled a kingdom, boy. I have buried better demons than you.' },
-                        { who: 'rival', text: 'Then show me what a king is worth against the night.' }
+                        { who: 'rival', text: 'An old man with a stick? The dark will eat you!' },
+                        { who: 'hero', text: 'I buried better demons than you, boy.' },
+                        { who: 'rival', text: 'Then bleed like a king!' }
                     ],
                     after: [
-                        { who: 'rival', text: 'The old fool... You hit harder than any man should.' },
-                        { who: 'hero', text: 'Kneel, or come back and kneel later.' },
-                        { who: 'rival', text: 'Before dawn. Count on it.' }
+                        { who: 'rival', text: 'Damn you, old man! My castle awaits... if you survive the road.' },
+                        { who: 'hero', text: 'A king hunts what flees him.' },
+                        { who: 'rival', text: 'You will never cross that river alive!' }
                     ]
                 },
                 final: {
                     before: [
-                        { who: 'rival', text: 'Still on your feet, old lord? The night is almost over.' },
-                        { who: 'hero', text: 'This kingdom will always be mine. Even this small one.' },
-                        { who: 'rival', text: 'One of us will not see the dawn.' }
+                        { who: 'rival', text: 'You reached my castle? Old fool!' },
+                        { who: 'hero', text: 'This kingdom is mine.' },
+                        { who: 'rival', text: 'Then die in it!' }
                     ],
                     after: [
-                        { who: 'rival', text: 'Again... A king without a crown, and I still cannot break you.' },
-                        { who: 'hero', text: 'A crown is only metal. Authority is what remains.' },
-                        { who: 'rival', text: '...Keep your flame, my lord. This night is yours.' }
+                        { who: 'rival', text: 'A king without a crown... and I cannot break you.' },
+                        { who: 'hero', text: 'A crown is only metal.' },
+                        { who: 'rival', text: '...The night is yours, my lord.' }
                     ]
                 }
             },
             brutos: {
                 first: {
                     before: [
-                        { who: 'rival', text: 'A captain with an axe, guarding a little flame. Brave... or foolish.' },
+                        { who: 'rival', text: 'A captain with an axe? Brave... or stupid.' },
                         { who: 'hero', text: 'Azael. Come closer.' },
-                        { who: 'rival', text: 'Gladly. Let us see how hard that axe really hits.' }
+                        { who: 'rival', text: 'Gladly. I will carve you!' }
                     ],
                     after: [
-                        { who: 'rival', text: 'You hit like a falling wall... I will be back, Captain.' },
-                        { who: 'hero', text: 'Bring a bigger blade.' },
-                        { who: 'rival', text: 'Before dawn. Count on it.' }
+                        { who: 'rival', text: 'You hit like a falling wall! My castle awaits, Captain... if you reach it.' },
+                        { who: 'hero', text: 'Then I will knock the gate down.' },
+                        { who: 'rival', text: 'You will never cross that river alive!' }
                     ]
                 },
                 final: {
                     before: [
-                        { who: 'rival', text: 'I told you I would return, Captain. The night is almost over.' },
-                        { who: 'hero', text: 'Then I end it here.' },
-                        { who: 'rival', text: 'One of us will not see the dawn.' }
+                        { who: 'rival', text: 'You made it to my castle, Captain?!' },
+                        { who: 'hero', text: 'I end it here.' },
+                        { who: 'rival', text: 'Then die at my gate!' }
                     ],
                     after: [
-                        { who: 'rival', text: 'Again... A wall that walks. How do I break you?' },
-                        { who: 'hero', text: 'You do not. Keep to the dark.' },
-                        { who: 'rival', text: '...This night is yours, Captain.' }
+                        { who: 'rival', text: 'A wall that walks... How do I break you?' },
+                        { who: 'hero', text: 'You do not.' },
+                        { who: 'rival', text: '...The night is yours, Captain.' }
                     ]
                 }
             },
-            // Rowan, o druida: calmo e sensato, só quer a paz da floresta
             rowan: {
                 first: {
                     before: [
-                        { who: 'rival', text: 'A druid guarding a little flame in the dark. How quaint.' },
-                        { who: 'hero', text: 'Azael. I do not want a fight. Leave the forest in peace.' },
-                        { who: 'rival', text: 'Peace is for the dead, druid. Let us see what your roots can do.' }
+                        { who: 'rival', text: 'A druid? Go home and water your flowers!' },
+                        { who: 'hero', text: 'Azael. Leave the forest in peace.' },
+                        { who: 'rival', text: 'Peace is for the dead!' }
                     ],
                     after: [
-                        { who: 'rival', text: 'Roots and roses... You beat me this time, druid. I will be back.' },
-                        { who: 'hero', text: 'Then I hope you come back wiser. The forest will still be here.' },
-                        { who: 'rival', text: 'Before dawn. Count on it.' }
+                        { who: 'rival', text: 'Roots and roses... Curse you! My castle awaits, druid, if you survive the road.' },
+                        { who: 'hero', text: 'I will come. Only to stop you.' },
+                        { who: 'rival', text: 'You will never cross that river alive!' }
                     ]
                 },
                 final: {
                     before: [
-                        { who: 'rival', text: 'I told you I would return, druid. The night is almost over.' },
-                        { who: 'hero', text: 'It does not have to end in blood, Azael. Go in peace.' },
-                        { who: 'rival', text: 'No. One of us will not see the dawn.' }
+                        { who: 'rival', text: 'You reached my castle, druid?!' },
+                        { who: 'hero', text: 'It does not have to end in blood.' },
+                        { who: 'rival', text: 'It will!' }
                     ],
                     after: [
-                        { who: 'rival', text: 'Again... How does something so gentle keep beating me?' },
-                        { who: 'hero', text: 'Patience. The forest outlasts every storm. Rest now.' },
-                        { who: 'rival', text: '...Keep your flame, druid. This night is yours.' }
+                        { who: 'rival', text: 'How does something so gentle keep winning?' },
+                        { who: 'hero', text: 'Patience. Rest now.' },
+                        { who: 'rival', text: '...The night is yours, druid.' }
                     ]
                 }
             },
-            // Father Avgustino: calmo e contido, decidido a deter o demônio a qualquer custo. O Azael não o leva a sério (um padre!),
-            // mas vai se surpreendendo. Ele fala pouco e nunca diz tudo
             avgustino: {
                 first: {
                     before: [
-                        { who: 'rival', text: 'A priest? They send a priest to guard the flame? Do you plan to bore me to death with a sermon?' },
-                        { who: 'hero', text: 'Azael. I know what you are. And I know what you are for.' },
-                        { who: 'rival', text: 'Pray all you like, father. I will enjoy this.' }
+                        { who: 'rival', text: 'A priest? Save your sermon for the grave!' },
+                        { who: 'hero', text: 'I know what you are, Azael.' },
+                        { who: 'rival', text: 'Then pray, father!' }
                     ],
                     after: [
-                        { who: 'rival', text: 'Impossible... A man of the cloth, and that hits like... Who are you, priest?' },
-                        { who: 'hero', text: 'Someone who will stop you. Whatever it costs me.' },
-                        { who: 'rival', text: 'Before dawn. And this time I will not laugh.' }
+                        { who: 'rival', text: 'Impossible... A priest?! Find me at my castle, if you survive the road.' },
+                        { who: 'hero', text: 'Whatever it costs me, I will.' },
+                        { who: 'rival', text: 'You will never cross that river alive!' }
                     ]
                 },
                 final: {
                     before: [
-                        { who: 'rival', text: 'Back to preach again, father? I almost forgot how stubborn you were.' },
-                        { who: 'hero', text: 'It will not end while you still walk. I will see to it.' },
-                        { who: 'rival', text: 'At any cost? Even your soul, priest?' }
+                        { who: 'rival', text: 'You reached my castle, priest?!' },
+                        { who: 'hero', text: 'I will stop you. At any cost.' },
+                        { who: 'rival', text: 'Even your soul?' }
                     ],
                     after: [
-                        { who: 'rival', text: 'Again... I mocked you. I was wrong. What are you willing to burn to stop me?' },
-                        { who: 'hero', text: 'Everything I am. I have already paid the price.' },
-                        { who: 'rival', text: '...Keep your flame, priest. But I wonder what it cost you.' }
+                        { who: 'rival', text: 'I laughed at you... I was wrong.' },
+                        { who: 'hero', text: 'I already paid the price.' },
+                        { who: 'rival', text: '...Keep your flame, priest.' }
                     ]
                 }
             }
@@ -148,187 +143,298 @@ export const DUEL_DIALOGUES = {
     DEMON_HUNTER: {
         first: {
             before: [
-                { who: 'rival', text: 'A demon tending a torch? You will not fool me.' },
-                { who: 'hero', text: 'I hunt my own kind, hunter. Step aside.' },
-                { who: 'rival', text: 'Every demon says that. My blade will decide.' }
+                { who: 'rival', text: 'A demon with a torch? Lies!' },
+                { who: 'hero', text: 'I hunt my own kind. Move.' },
+                { who: 'rival', text: 'My blade will decide.' }
             ],
             after: [
-                { who: 'rival', text: 'You beat me this time, demon... but I will come back stronger.' },
-                { who: 'hero', text: 'Come back as often as you like. You are not the one I hunt.' },
-                { who: 'rival', text: 'A demon is a demon. Before dawn, I will prove it.' }
+                { who: 'rival', text: 'Curse you, demon...' },
+                { who: 'hero', text: 'You hunt the wrong enemy.' },
+                { who: 'rival', text: 'A demon is a demon. We are not done!' }
             ]
         },
         final: {
             before: [
-                { who: 'rival', text: 'I came back, demon. Stronger, as I promised.' },
-                { who: 'hero', text: 'You still have not learned who the real enemy is.' },
-                { who: 'rival', text: 'Then teach me. With your blade.' }
+                { who: 'rival', text: 'I came back, demon.' },
+                { who: 'hero', text: 'You still do not see the enemy.' },
+                { who: 'rival', text: 'Then show me.' }
             ],
             after: [
-                { who: 'rival', text: 'Again... A demon who guards the flame?' },
-                { who: 'hero', text: 'I told you. We hunt the same darkness.' },
-                { who: 'rival', text: '...Go, then. But I will be watching you, Azael.' }
+                { who: 'rival', text: 'A demon... guarding the flame?' },
+                { who: 'hero', text: 'We hunt the same darkness.' },
+                { who: 'rival', text: '...Go. I will be watching.' }
             ]
         }
     }
 };
 
 // Segundos por letra no efeito de máquina de escrever
-export const DIALOGUE_TYPE_SECONDS = 0.022;
+export const DIALOGUE_TYPE_SECONDS = 0.01;
 
-// --- PROVOCAÇÃO ANTES DE CADA BOSS ---
-// Nas horas de boss que não são o duelo (Demon Lord, Blood Countess, The Long Night , quando a
-// onda fecha, a caçada congela e o rival aparece provocando antes de soltar o monstro (js/ui/dialogue.js, playBossIntro).
-// Chave: quem fala (o rival do herói, RIVAL_OF em bosses.js) e depois o boss que vem. default: boss sem fala própria.
+// --- PROVOCAÇÕES ANTES DOS CHEFES ---
+// Nas horas de boss que não são o duelo, quando a onda fecha, a caçada congela e o rival provoca antes de soltar o monstro (js/ui/dialogue.js,
+// playBossIntro). Chave: quem fala (o rival do herói, RIVAL_OF em bosses.js) e depois o boss que vem. default: boss sem fala própria.
+// A última fala de cada cena aponta para a PRÓXIMA tela e a faz parecer impossível.
 export const BOSS_INTROS = {
-    // Jogando com o Demon Hunter: o Azael solta os monstros dele
+    // Jogando com o Demon Hunter: o Azael foge para o castelo e solta o que tem pelo caminho
     AZAEL: {
-        DEMON_LORD: [
-            { who: 'rival', text: 'You seem to be holding up well, hunter...' },
-            { who: 'hero', text: 'Show yourself, Azael. Stop hiding in the dark.' },
-            { who: 'rival', text: 'Not yet. First, let us see if you can destroy my beast.' }
-        ],
-        BLOOD_COUNTESS: [
-            { who: 'rival', text: 'Still standing? The night is growing tired of you.' },
-            { who: 'hero', text: 'Then send whatever you have left.' },
-            { who: 'rival', text: 'Gladly. My Countess is thirsty... try not to bleed too fast.' }
-        ],
-        // Chefes das telas do mapa: o hunter segue para o castelo do Azael, e o Azael jura que ele nunca chegará vivo
         LAKE_SPIRIT: [
-            { who: 'rival', text: 'You are heading for my castle, hunter. You will never arrive alive.' },
-            { who: 'hero', text: 'Watch me, Azael. A river will not stop me.' },
-            { who: 'rival', text: 'This one is not a river. It is the Lady of the Lake, and she drowns everyone who crosses.' },
-            { who: 'boss', text: 'Stay... in the water... with me...' }
+            { who: 'rival', text: 'The lake drowns every hunter!' },
+            { who: 'boss', text: 'Stay... with me...' },
+            { who: 'rival', text: 'And beyond it, the swamp finishes what is left!' }
         ],
         SLIZORK: [
-            { who: 'rival', text: 'The swamp swallows armies, hunter. Did you think it would spare one man?' },
-            { who: 'hero', text: 'Then it will choke on this one.' },
-            { who: 'rival', text: 'Meet Slizork, Tyrant of the Mire. My castle is still far, and you will not live to see its gates.' }
+            { who: 'rival', text: 'This swamp swallowed armies. You are a snack!' },
+            { who: 'hero', text: 'Then it will choke.' },
+            { who: 'rival', text: 'And the graveyard ahead? Nobody walks out!' }
         ],
         GRAVE_KING: [
-            { who: 'rival', text: 'Every grave on this road belongs to someone who tried to reach my castle.' },
-            { who: 'hero', text: 'Then I will not join them.' },
-            { who: 'rival', text: 'Rise, Grave King. Let him see how every road to my castle ends.' }
+            { who: 'rival', text: 'Every grave here was dug for you!' },
+            { who: 'hero', text: 'I will not lie in one.' },
+            { who: 'rival', text: 'And the village gate will crush what is left!' }
         ],
-        // Semi-boss do meio da noite: o Azael o chama e o capitão responde com uma frase curta
         BRUTOS: [
-            { who: 'rival', text: 'Enough games. Captain Brutos! This hunter is yours.' },
+            { who: 'rival', text: 'Brutos! Break him! Beyond you waits my castle, and nobody enters alive!' },
             { who: 'boss', text: 'I will break him.' },
-            { who: 'hero', text: 'Then come and try, Captain.' }
+            { who: 'hero', text: 'Come, Captain.' }
+        ],
+        DEMON_LORD: [
+            { who: 'rival', text: 'Welcome to my castle... and to your grave!' },
+            { who: 'hero', text: 'Show yourself, Azael!' },
+            { who: 'rival', text: 'First the Lord of the First Fire. Then the night itself!' }
         ],
         LONG_NIGHT: [
-            { who: 'rival', text: 'Impressive. But not even you can fight the night itself.' },
-            { who: 'hero', text: 'Dawn is close. I can feel it.' },
-            { who: 'rival', text: 'Then meet the Long Night... and pray the dawn still comes.' }
+            { who: 'rival', text: 'You cannot cut the night, hunter!' },
+            { who: 'hero', text: 'Dawn is coming.' },
+            { who: 'rival', text: 'Not for you. Never for you!' }
+        ],
+        BLOOD_COUNTESS: [
+            { who: 'rival', text: 'My Countess is thirsty!' },
+            { who: 'hero', text: 'Let her come.' },
+            { who: 'rival', text: 'Then bleed. My castle is close!' }
         ],
         default: [
-            { who: 'rival', text: 'Dawn came and went, and still you fight.' },
-            { who: 'hero', text: 'As long as the torch burns.' },
-            { who: 'rival', text: 'Then let us see how long it burns against this one.' }
+            { who: 'rival', text: 'Still on my trail? Do you ever die?' },
+            { who: 'hero', text: 'Not before you.' },
+            { who: 'rival', text: 'Then meet this one!' }
         ],
-        // Falas próprias de outros heróis (byHero[model], com a mesma forma de cima)
+        // Cada herói tem a sua voz (nunca as falas de outro): o Azael chama cada um pelo apelido que escolheu para ele
         byHero: {
-            // Rowan, o druida: calmo e sensato, só quer a paz da floresta
+            // Rowan: calmo, gentil, fala da floresta e da paz, mas não recua
             rowan: {
-                DEMON_LORD: [
-                    { who: 'rival', text: 'Still standing, druid? Then meet something far older than your trees.' },
-                    { who: 'hero', text: 'Please, Azael. Call it back. No one needs to burn.' },
-                    { who: 'rival', text: 'Not yet. First, let us see if your calm survives my beast.' }
+                LAKE_SPIRIT: [
+                    { who: 'rival', text: 'The lake drowns every druid, too!' },
+                    { who: 'hero', text: 'Water remembers kindness. Please, rest.' },
+                    { who: 'rival', text: 'And the swamp beyond rots every root you love!' }
                 ],
-                BLOOD_COUNTESS: [
-                    { who: 'rival', text: 'The night grows tired of you, druid. Let us end this.' },
-                    { who: 'hero', text: 'Then send her, if you must. I only wish to keep the forest quiet.' },
-                    { who: 'rival', text: 'Gladly. My Countess is thirsty... try not to bleed too fast.' }
+                SLIZORK: [
+                    { who: 'rival', text: 'Water your flowers in my swamp, druid!' },
+                    { who: 'hero', text: 'Even the mire is alive. I will not hate it.' },
+                    { who: 'rival', text: 'The graveyard ahead buries gentle fools!' }
+                ],
+                GRAVE_KING: [
+                    { who: 'rival', text: 'No tree grows here, druid. Only bones!' },
+                    { who: 'hero', text: 'Then I will plant one for you.' },
+                    { who: 'rival', text: 'The village gate will burn your forest down!' }
                 ],
                 BRUTOS: [
-                    { who: 'rival', text: 'Enough games. Captain Brutos! This druid is yours.' },
-                    { who: 'boss', text: 'I will break him.' },
-                    { who: 'hero', text: 'There is no need for this, Captain. Walk away and no one is hurt.' }
+                    { who: 'rival', text: 'Brutos! Snap this druid! My castle is next!' },
+                    { who: 'boss', text: 'A flower picker? I will break him.' },
+                    { who: 'hero', text: 'Please, Captain. Walk away.' }
+                ],
+                DEMON_LORD: [
+                    { who: 'rival', text: 'Welcome to my castle, druid. No forest here!' },
+                    { who: 'hero', text: 'Then I bring one with me.' },
+                    { who: 'rival', text: 'First fire, then the endless night!' }
                 ],
                 LONG_NIGHT: [
-                    { who: 'rival', text: 'Impressive. But not even you can fight the night itself.' },
-                    { who: 'hero', text: 'I do not fight the night. I wait for the dawn.' },
-                    { who: 'rival', text: 'Then meet the Long Night... and pray the dawn still comes.' }
+                    { who: 'rival', text: 'Even your forest dies in the dark!' },
+                    { who: 'hero', text: 'Every night ends, Azael.' },
+                    { who: 'rival', text: 'Not this one. Never this one!' }
+                ],
+                BLOOD_COUNTESS: [
+                    { who: 'rival', text: 'My Countess drinks druids!' },
+                    { who: 'hero', text: 'I would rather not hurt her.' },
+                    { who: 'rival', text: 'Then die gently!' }
                 ],
                 default: [
-                    { who: 'rival', text: 'Dawn came and went, and still you fight.' },
-                    { who: 'hero', text: 'Only to keep the forest quiet.' },
-                    { who: 'rival', text: 'Then let us see how quiet it stays against this one.' }
+                    { who: 'rival', text: 'Still alive, druid?!' },
+                    { who: 'hero', text: 'The forest wants me to stay.' },
+                    { who: 'rival', text: 'Then the forest dies with you!' }
                 ]
             },
-            // Father Avgustino: decidido a deter o demônio a qualquer custo. Quem o enfrenta o subestima (é um padre) e vai se
-            // surpreendendo; ele fala pouco e deixa mais perguntas do que respostas
+            // Avgustino: padre contido, fala pouco, fé e um preço que nunca explica
             avgustino: {
-                DEMON_LORD: [
-                    { who: 'rival', text: 'Still standing, father? I expected you to be on your knees by now. Then meet something older than your church.' },
-                    { who: 'hero', text: 'I have read what it is. I will not let it cross this threshold.' },
-                    { who: 'rival', text: 'Bold, for a priest. Let us see what your faith is worth against my beast.' }
+                LAKE_SPIRIT: [
+                    { who: 'rival', text: 'The lake will drown your prayers, priest!' },
+                    { who: 'hero', text: 'Then I will pray underwater.' },
+                    { who: 'rival', text: 'And the swamp will bury your God!' }
                 ],
-                BLOOD_COUNTESS: [
-                    { who: 'rival', text: 'You survived this long, priest? I am almost impressed. The night grows tired of you.' },
-                    { who: 'hero', text: 'Then send her. Whatever it takes, I will stop all of you.' },
-                    { who: 'rival', text: 'Gladly. My Countess is thirsty... try not to bleed too fast.' }
+                SLIZORK: [
+                    { who: 'rival', text: 'Say a prayer for this swamp, priest!' },
+                    { who: 'hero', text: 'I already said one. For you.' },
+                    { who: 'rival', text: 'The graveyard ahead has no priest left!' }
+                ],
+                GRAVE_KING: [
+                    { who: 'rival', text: 'Bury yourself, priest. They are waiting!' },
+                    { who: 'hero', text: 'Not yet. Not for you.' },
+                    { who: 'rival', text: 'The village gate will close on your God!' }
                 ],
                 BRUTOS: [
-                    { who: 'rival', text: 'Captain Brutos! Silence this priest. He has been preaching long enough.' },
+                    { who: 'rival', text: 'Brutos! Silence this priest! My castle is next!' },
                     { who: 'boss', text: 'A priest? I will break him.' },
-                    { who: 'hero', text: 'You may try, Captain. I do not break. I have already paid for that.' }
+                    { who: 'hero', text: 'I do not break, Captain. I paid for that.' }
+                ],
+                DEMON_LORD: [
+                    { who: 'rival', text: 'My castle, priest. God is not home!' },
+                    { who: 'hero', text: 'I did not come for Him. I came for you.' },
+                    { who: 'rival', text: 'First fire, then the endless night!' }
                 ],
                 LONG_NIGHT: [
-                    { who: 'rival', text: 'I did not think a priest would last this long. But not even you can fight the night itself.' },
-                    { who: 'hero', text: 'I do not need to win it. I only need to stop you before it ends.' },
-                    { who: 'rival', text: 'Then meet the Long Night... and pray the dawn still comes.' }
+                    { who: 'rival', text: 'No prayer reaches the Long Night!' },
+                    { who: 'hero', text: 'I do not need it to reach. Only to burn.' },
+                    { who: 'rival', text: 'Then burn alone!' }
+                ],
+                BLOOD_COUNTESS: [
+                    { who: 'rival', text: 'My Countess drinks holy blood!' },
+                    { who: 'hero', text: 'Then she will taste what it costs.' },
+                    { who: 'rival', text: 'Pay it, priest!' }
                 ],
                 default: [
-                    { who: 'rival', text: 'Dawn came and went, and the priest is still fighting. Who taught you to fight like that?' },
-                    { who: 'hero', text: 'Until the last of you is gone. At any cost.' },
-                    { who: 'rival', text: 'Then let us see how much that cost is against this one.' }
+                    { who: 'rival', text: 'Still standing, priest?!' },
+                    { who: 'hero', text: 'Until the last of you falls.' },
+                    { who: 'rival', text: 'Then fall with this one!' }
+                ]
+            },
+            // Gudran: velho senhor do castelo, arrogante, acostumado a ser obedecido
+            gudran: {
+                LAKE_SPIRIT: [
+                    { who: 'rival', text: 'The lake drowns old kings, too!' },
+                    { who: 'hero', text: 'Water bends to the crown, boy.' },
+                    { who: 'rival', text: 'And the swamp swallows your whole court!' }
+                ],
+                SLIZORK: [
+                    { who: 'rival', text: 'Kneel to the swamp, old man!' },
+                    { who: 'hero', text: 'I kneel to nothing.' },
+                    { who: 'rival', text: 'The graveyard ahead has your name!' }
+                ],
+                GRAVE_KING: [
+                    { who: 'rival', text: 'Your throne is a grave, old king!' },
+                    { who: 'hero', text: 'Then I rule it.' },
+                    { who: 'rival', text: 'The village gate will not open for you!' }
+                ],
+                BRUTOS: [
+                    { who: 'rival', text: 'Brutos! Drag this old man down! My castle is next!' },
+                    { who: 'boss', text: 'An old man? I will break him.' },
+                    { who: 'hero', text: 'Kneel, Captain. I am your king.' }
+                ],
+                DEMON_LORD: [
+                    { who: 'rival', text: 'My castle now, old man. Not yours!' },
+                    { who: 'hero', text: 'It was mine first.' },
+                    { who: 'rival', text: 'First fire, then the endless night!' }
+                ],
+                LONG_NIGHT: [
+                    { who: 'rival', text: 'Even kings die in the dark!' },
+                    { who: 'hero', text: 'Kings outlast it.' },
+                    { who: 'rival', text: 'Not this night. Never this one!' }
+                ],
+                BLOOD_COUNTESS: [
+                    { who: 'rival', text: 'My Countess drinks royal blood!' },
+                    { who: 'hero', text: 'She will choke on it.' },
+                    { who: 'rival', text: 'Then choke, old fool!' }
+                ],
+                default: [
+                    { who: 'rival', text: 'Still standing, old fool?!' },
+                    { who: 'hero', text: 'I do not fall in front of boys.' },
+                    { who: 'rival', text: 'Then fall behind this one!' }
+                ]
+            },
+            // Brutos: capitão bruto, pouco papo, vai direto ao ponto (nunca enfrenta a si mesmo: na onda 15 vem a Countess)
+            brutos: {
+                LAKE_SPIRIT: [
+                    { who: 'rival', text: 'The lake drowns captains, too!' },
+                    { who: 'hero', text: 'I do not swim. I walk.' },
+                    { who: 'rival', text: 'And the swamp swallows your whole axe!' }
+                ],
+                SLIZORK: [
+                    { who: 'rival', text: 'Swing your axe at the swamp, Captain!' },
+                    { who: 'hero', text: 'Gladly.' },
+                    { who: 'rival', text: 'The graveyard ahead has no exit!' }
+                ],
+                GRAVE_KING: [
+                    { who: 'rival', text: 'Dead men do not fear axes, Captain!' },
+                    { who: 'hero', text: 'Then I chop them twice.' },
+                    { who: 'rival', text: 'The village gate will not open for you!' }
+                ],
+                BRUTOS: [
+                    { who: 'rival', text: 'Captain, meet the Captain!' },
+                    { who: 'boss', text: 'Move.' },
+                    { who: 'hero', text: 'You move.' }
+                ],
+                DEMON_LORD: [
+                    { who: 'rival', text: 'My castle, Captain. Wall you cannot break!' },
+                    { who: 'hero', text: 'Watch me.' },
+                    { who: 'rival', text: 'First fire, then the endless night!' }
+                ],
+                LONG_NIGHT: [
+                    { who: 'rival', text: 'Your axe cannot cut the night!' },
+                    { who: 'hero', text: 'Wait and see.' },
+                    { who: 'rival', text: 'Not this one. Never this one!' }
+                ],
+                BLOOD_COUNTESS: [
+                    { who: 'rival', text: 'My Countess drinks soldiers!' },
+                    { who: 'hero', text: 'Hungry? Come eat.' },
+                    { who: 'rival', text: 'The castle is next, Captain!' }
+                ],
+                default: [
+                    { who: 'rival', text: 'Still standing, Captain?!' },
+                    { who: 'hero', text: 'Still swinging.' },
+                    { who: 'rival', text: 'Swing at this one!' }
                 ]
             }
         }
     },
     // Jogando com o Azael: o Demon Hunter assiste e desafia
     DEMON_HUNTER: {
-        DEMON_LORD: [
-            { who: 'rival', text: 'You cut down your own kind well, demon...' },
-            { who: 'hero', text: 'Watching from the shadows now, hunter?' },
-            { who: 'rival', text: 'Their lord is coming for you. Let us see whose side you are really on.' }
-        ],
-        BLOOD_COUNTESS: [
-            { who: 'rival', text: 'Something old is coming, Azael. It can smell your blood.' },
-            { who: 'hero', text: 'Then it will choke on it.' },
-            { who: 'rival', text: 'Prove it. I will be right here, blade ready.' }
-        ],
         LAKE_SPIRIT: [
-            { who: 'rival', text: 'The lake is waking, Azael. It will not let you cross.' },
-            { who: 'hero', text: 'Then I will cut my way across.' },
-            { who: 'rival', text: 'Do not expect my help.' }
+            { who: 'rival', text: 'The lake is waking, demon. It wants you.' },
+            { who: 'hero', text: 'Let it try.' },
+            { who: 'rival', text: 'And the swamp beyond will not be kinder.' }
         ],
         SLIZORK: [
-            { who: 'rival', text: 'The swamp itself is rising against you, demon.' },
+            { who: 'rival', text: 'The swamp itself is rising, demon.' },
             { who: 'hero', text: 'Let it come.' },
-            { who: 'rival', text: 'Then burn it before it swallows you.' }
+            { who: 'rival', text: 'The graveyard ahead has no exit.' }
         ],
         GRAVE_KING: [
-            { who: 'rival', text: 'The dead of this graveyard follow their king, demon.' },
-            { who: 'hero', text: 'Then they can follow him back into the ground.' },
-            { who: 'rival', text: 'We will see who stays buried.' }
+            { who: 'rival', text: 'The dead follow their king, demon.' },
+            { who: 'hero', text: 'Back into the ground, then.' },
+            { who: 'rival', text: 'And the village beyond will not open for you.' }
         ],
-        // Semi-boss do meio da noite: o Demon Hunter o chama e o capitão responde com uma frase curta
         BRUTOS: [
-            { who: 'rival', text: 'Captain Brutos! The demon is yours. Do not let him pass.' },
+            { who: 'rival', text: 'Captain Brutos! Do not let him pass!' },
             { who: 'boss', text: 'He will not.' },
-            { who: 'hero', text: 'Move, then, or be moved.' }
+            { who: 'hero', text: 'Move, or be moved.' }
+        ],
+        DEMON_LORD: [
+            { who: 'rival', text: 'You cut down your own kind well, demon.' },
+            { who: 'hero', text: 'Watching from the shadows, hunter?' },
+            { who: 'rival', text: 'Their lord is coming for you.' }
         ],
         LONG_NIGHT: [
-            { who: 'rival', text: 'The darkness itself is waking. Not even I can stop it.' },
-            { who: 'hero', text: 'Then stand back and watch, hunter.' },
-            { who: 'rival', text: 'If you fall, I will finish what is left of you both.' }
+            { who: 'rival', text: 'The darkness itself is waking.' },
+            { who: 'hero', text: 'Stand back and watch.' },
+            { who: 'rival', text: 'If you fall, I finish what is left.' }
+        ],
+        BLOOD_COUNTESS: [
+            { who: 'rival', text: 'Something old is coming. It smells your blood.' },
+            { who: 'hero', text: 'Then it will choke on it.' },
+            { who: 'rival', text: 'Prove it.' }
         ],
         default: [
-            { who: 'rival', text: 'Another one crawls out of the dark, demon.' },
-            { who: 'hero', text: 'And another one falls.' },
-            { who: 'rival', text: 'We will see. Do not expect my help.' }
+            { who: 'rival', text: 'Another one crawls out of the dark.' },
+            { who: 'hero', text: 'And another falls.' },
+            { who: 'rival', text: 'Do not expect my help.' }
         ]
     }
 };

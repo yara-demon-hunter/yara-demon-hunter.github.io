@@ -51,3 +51,7 @@ Quarta aba do painel (**🖼️ Screens**): abre uma tela do jogo na hora, com o
 - **Menus:** início, presente diário, Ranks e o Altar aberto logo depois de uma queda ("try again, but stronger").
 - **Save do sandbox:** +500 Brasas, liberar todos os heróis e **🆕 Brand new player** (apaga o save deste sandbox e recarrega, para ver a experiência de quem nunca jogou).
 - Depois de abrir uma tela, **🧪 Sandbox** (canto inferior esquerdo) volta ao painel. O save do sandbox é separado do do jogo (outra porta = outro `localStorage`).
+
+## Aba Dialogues (as conversas do jogo)
+
+Última aba do painel (**💬 Dialogues**): escolha o **herói** e veja todas as conversas dele na ordem da partida: o duelo com o rival (aparece e cai, na onda 3), a provocação antes de cada chefe (ondas 6, 9, 12, 15, 16 e 17) e a revanche da onda 18. Cada botão abre a cena na tela real do jogo (faixas de cinema, retratos, fala letra a letra; Espaço, Enter ou clique passa a fala). **▶ Play all** toca tudo em sequência, com uma pausa curta entre as cenas; **⏹ Stop dialogues** (canto superior direito) interrompe. Heróis com falas próprias (Rowan, Avgustino) mostram as deles, e o Azael mostra a conversa com o Demon Hunter. As falas ficam em `data_model/dialogues.js`.
