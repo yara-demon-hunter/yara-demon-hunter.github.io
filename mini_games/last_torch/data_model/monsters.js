@@ -1,5 +1,7 @@
 import { BONE_COLOSSUS_VISUALS } from '../library/monsters/topdown/bone_colossus/bone_colossus_visual.js';
-import { getTurnDifficulty, isMonsterUnlocked } from './difficulty.js';
+import { getTurnDifficulty } from './difficulty.js';
+import { screenOf } from './screens/index.js';
+import { CAMPAIGN, CAMPAIGN_RUNTIME, TOTAL_WAVES, waveInScreen } from './campaign.js';
 import { effectiveTurn } from './campaign.js';
 
 export const MONSTER_MODELS = {
@@ -290,8 +292,8 @@ export const MONSTER_MODELS = {
         xpRewardPerTurn: 5,
         // Raízes que prendem o herói (o mesmo efeito do Grasping Roots, do ramo Natureza): o Treant ergue os braços, raízes começam a brotar no ponto
         // onde o herói está (aviso no chão) e, se ele ainda estiver ali quando estouram, ficam `seconds` presas nele (não anda nem dá dash; ainda ataca).
-        // Sem dano direto: o perigo é ficar parado enquanto a horda chega. Para escapar, basta sair do círculo durante a preparação.
-        punch: { root: { seconds: 2.2, radius: 42 }, cooldownSeconds: 7, windupSeconds: 1.1, strikeSeconds: 0.25, recoverySeconds: 0.6, range: 320, halfAngle: 0.52, damageMultiplier: 0 }
+        // Sem dano direto: o perigo é ficar parado enquanto a horda chega. A área é grande (raio 125): para escapar é preciso correr para fora dela durante a preparação, sem dar tempo de ficar só desviando.
+        punch: { root: { seconds: 2.2, radius: 125 }, cooldownSeconds: 7, windupSeconds: 1.1, strikeSeconds: 0.25, recoverySeconds: 0.6, range: 320, halfAngle: 0.52, damageMultiplier: 0 }
     },
     // Golem de Brasa e Musgo: gigante de pedra, lento e muito resistente; o mesmo soco do Treant. Só a partir da wave 4.
     GOLEM: {
@@ -357,7 +359,6 @@ export const MONSTER_MODELS = {
 Object.assign(MONSTER_MODELS, {
     // Enguia do Rio (tela do rio): rápida, se lança em linha reta contra o herói. O dash é a resposta.
     RIVER_EEL: {
-        scenery: ['river_crossing_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
         spawnWeight: 0.4,
         hpBase: 48,
         hpPerTurn: 9,
@@ -377,7 +378,6 @@ Object.assign(MONSTER_MODELS, {
     },
     // Afogado (tela do rio): arrasta-se devagar e aguenta bastante.
     DROWNED: {
-        scenery: ['river_crossing_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
         spawnWeight: 0.4,
         hpBase: 95,
         hpPerTurn: 16,
@@ -397,8 +397,7 @@ Object.assign(MONSTER_MODELS, {
     },
     // Sapo do Pântano (tela do pântano): salta de surpresa em cima do herói.
     BOG_TOAD: {
-        scenery: ['swamp'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
-        spawnWeight: 0.4,
+        spawnWeight: 0.25,
         hpBase: 85,
         hpPerTurn: 14,
         speedMin: 40,
@@ -418,7 +417,6 @@ Object.assign(MONSTER_MODELS, {
     },
     // Lodo Vivo (tela do pântano): lento e mole, aguenta pancada.
     BOG_SLIME: {
-        scenery: ['swamp'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
         spawnWeight: 0.4,
         hpBase: 120,
         hpPerTurn: 18,
@@ -438,7 +436,6 @@ Object.assign(MONSTER_MODELS, {
     },
     // Zumbi de Armadura (cemitério): soldado morto-vivo; maior, bem mais forte e duro que o zumbi comum, e lento.
     ARMORED_ZOMBIE: {
-        scenery: ['graveyard_2'],
         spawnWeight: 0.25,
         hpBase: 270,
         hpPerTurn: 36,
@@ -457,8 +454,26 @@ Object.assign(MONSTER_MODELS, {
         xpRewardPerTurn: 4
     },
     // Zumbi (cemitério): lento, aguenta bastante e vem saindo da terra.
+    // Zumbi Rastejante (cemitério): só a metade de cima, se arrasta devagar com a coluna solta no chão. Baixo, frágil e teimoso.
+    ZOMBIE_CRAWLER: {
+        spawnWeight: 0.35,
+        hpBase: 80,
+        hpPerTurn: 14,
+        speedMin: 16,
+        speedMax: 24,
+        radius: 12,
+        color: '#86a070',
+        damage: 14,
+        knockbackResist: 0.1,
+        initialShootCooldownSeconds: 2,
+        shootCooldownSeconds: 2,
+        scoreReward: 22,
+        goldBase: 9,
+        goldVariance: 0.5,
+        xpRewardBase: 16,
+        xpRewardPerTurn: 2
+    },
     ZOMBIE: {
-        scenery: ['graveyard_2'],
         spawnWeight: 0.4,
         hpBase: 130,
         hpPerTurn: 20,
@@ -479,7 +494,6 @@ Object.assign(MONSTER_MODELS, {
     // Esqueleto Guerreiro (cemitério): com escudo e espada, mais duro que o esqueleto comum.
     SKELETON_WARRIOR: {
         melee: { kind: 'sword', range: 50, reach: 62, halfAngle: 0.8, windupSeconds: 0.42, strikeSeconds: 0.16, recoverySeconds: 0.4, cooldownSeconds: 1.5, damageMultiplier: 1.0 },
-        scenery: ['graveyard_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
         spawnWeight: 0.4,
         hpBase: 115,
         hpPerTurn: 18,
@@ -499,7 +513,6 @@ Object.assign(MONSTER_MODELS, {
     },
     // Esqueleto Arqueiro (cemitério): para a distância e atira flechas.
     SKELETON_ARCHER: {
-        scenery: ['graveyard_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
         spawnWeight: 0.4,
         hpBase: 48,
         hpPerTurn: 8,
@@ -528,7 +541,6 @@ Object.assign(MONSTER_MODELS, {
     // Miliciano da Vila (tela da vila): camponês armado, firme e curto de alcance.
     MILITIA: {
         melee: { kind: 'axe', range: 48, reach: 58, halfAngle: 0.8, windupSeconds: 0.45, strikeSeconds: 0.16, recoverySeconds: 0.45, cooldownSeconds: 1.6, damageMultiplier: 1.0 },
-        scenery: ['village_gate_3'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
         spawnWeight: 0.4,
         hpBase: 80,
         hpPerTurn: 13,
@@ -548,7 +560,6 @@ Object.assign(MONSTER_MODELS, {
     // Cavaleiro de Placas (tela da vila): lento, blindado e resistente a empurrão.
     PLATE_KNIGHT: {
         melee: { kind: 'sword', range: 56, reach: 68, halfAngle: 0.85, windupSeconds: 0.55, strikeSeconds: 0.18, recoverySeconds: 0.5, cooldownSeconds: 1.9, damageMultiplier: 1.3 },
-        scenery: ['village_gate_3'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
         spawnWeight: 0.3,
         hpBase: 190,
         hpPerTurn: 28,
@@ -569,7 +580,6 @@ Object.assign(MONSTER_MODELS, {
     // Lanceiro do Castelo (tela do castelo): estoca com a lança num avanço em linha reta.
     LANCER: {
         melee: { kind: 'spear', range: 78, reach: 96, halfAngle: 0.3, windupSeconds: 0.45, strikeSeconds: 0.16, recoverySeconds: 0.45, cooldownSeconds: 1.8, damageMultiplier: 1.2 },
-        scenery: ['castle_gate_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
         spawnWeight: 0.4,
         hpBase: 105,
         hpPerTurn: 17,
@@ -588,7 +598,6 @@ Object.assign(MONSTER_MODELS, {
     },
     // Demônio Soldado (tela do castelo): mantém distância e lança bolas de fogo.
     DEMON: {
-        scenery: ['castle_gate_2'],           // só nasce nesta tela (o sandbox deixa pôr em qualquer uma, pela lista Monsters)
         spawnWeight: 0.4,
         hpBase: 95,
         hpPerTurn: 15,
@@ -633,8 +642,6 @@ export const BUDDY_MODELS = {
     BUDDY_TREANT: { radius: 18, color: '#5b3b22' }
 };
 
-const SPAWNABLE_MONSTER_TYPES = ['BAT', 'VAMPIRE', 'WITCH', 'SKELETON', 'SKELETON_CRAWLER', 'MOTH', 'BLOATER', 'WRAITH', 'NECROMANCER', 'SHADOW_WOLF', 'ZOMBIE_WOLF', 'HEADLESS_KNIGHT', 'BONE_COLOSSUS', 'TREANT', 'GOLEM',
-    'ZOMBIE', 'ARMORED_ZOMBIE', 'RIVER_EEL', 'DROWNED', 'BOG_TOAD', 'BOG_SLIME', 'SKELETON_WARRIOR', 'SKELETON_ARCHER', 'MILITIA', 'PLATE_KNIGHT', 'LANCER', 'DEMON'];
 
 export function createMonster(type, turn, x, y, random = Math.random) {
     const model = MONSTER_MODELS[type];
@@ -679,16 +686,28 @@ export function createVampireBat(x, y, turn = 1, random = Math.random) {
 
 // Sorteia entre os monstros já liberados no turno (os pesos são reescalados entre eles)
 // sceneryId: a tela de agora. Monstros com `scenery` só nascem nas telas listadas; os sem `scenery` nascem em qualquer uma.
-export function chooseMonsterType(turn, random = Math.random, sceneryId = null) {
-    const available = SPAWNABLE_MONSTER_TYPES.filter(type => isMonsterUnlocked(type, turn) && (!MONSTER_MODELS[type].scenery || MONSTER_MODELS[type].scenery.includes(sceneryId)));
-    const total = available.reduce((sum, type) => sum + MONSTER_MODELS[type].spawnWeight, 0);
-    let roll = random() * total;
-    for (const type of available) {
-        const weight = MONSTER_MODELS[type].spawnWeight;
-        if (roll < weight) return type;
-        roll -= weight;
+// Quem nasce na tela: os tipos listados nas zonas verdes do Ateliê (zoneTypes). data_model/screens/<tela>.js só ajusta `from` (onda da tela em que
+// o monstro entra) e `weight`; tipo não listado lá entra na onda 1 (os pesados, na 3). Sem zonas com tipos, vale a lista do arquivo da tela.
+// No sandbox (campanha desligada) entram todos desde o início.
+const HEAVY_FROM = { TREANT: 3, GOLEM: 3, BONE_COLOSSUS: 3 };
+export function screenRoster(turn, sceneryId, zoneTypes = []) {
+    const screen = screenOf(sceneryId);
+    const wave = !CAMPAIGN_RUNTIME.enabled ? Infinity : turn > TOTAL_WAVES ? CAMPAIGN.wavesPerScreen : waveInScreen(turn);
+    const list = zoneTypes.length
+        ? zoneTypes.filter(type => MONSTER_MODELS[type]).map(type => ({ from: HEAVY_FROM[type] ?? 1, ...screen.monsters.find(m => m.type === type), type }))
+        : screen.monsters;
+    return list.filter(m => (m.from ?? 1) <= wave);
+}
+
+export function chooseMonsterType(turn, random = Math.random, sceneryId = null, zoneTypes = []) {
+    const roster = screenRoster(turn, sceneryId, zoneTypes);
+    const w = m => m.weight ?? MONSTER_MODELS[m.type].spawnWeight;
+    let roll = random() * roster.reduce((sum, m) => sum + w(m), 0);
+    for (const m of roster) {
+        if (roll < w(m)) return m.type;
+        roll -= w(m);
     }
-    return 'SKELETON';
+    return roster[0]?.type ?? 'SKELETON';
 }
 
 // Ouro de um monstro: o valor base sobe ou desce até goldVariance (0.5 = de metade ao dobro).

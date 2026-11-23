@@ -19,7 +19,6 @@ export function saveRun(kind) {
         hero: save.hero,
         darkness: save.darkness,
         turn: state.turn,
-        endless: state.endless,
         totalScore: state.totalScore,
         coins: state.coins,
         skillPoints: state.skillPoints,

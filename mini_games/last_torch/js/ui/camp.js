@@ -7,11 +7,9 @@ import { persist, save } from '../core/save.js';
 import { saveRun } from '../core/run_save.js';
 import { audio, player, state } from '../core/state.js';
 import { collectAllGold } from '../systems/gold.js';
-import { enterScreenForTurn, startHour } from '../systems/night.js';
+import { startHour } from '../systems/night.js';
 import { NIGHT } from '../../data_model/night.js';
-import { effectiveTurn, screenIndexOf, startsNewScreen } from '../../data_model/campaign.js';
-import { showMapHere, showMapTransition } from './map_screen.js';
-import { CAMPAIGN_RUNTIME } from '../../data_model/campaign.js';
+import { effectiveTurn } from '../../data_model/campaign.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { getHero } from '../systems/modifiers.js';
 import { feedTorch } from '../systems/torch.js';
@@ -72,8 +70,6 @@ export function setupCamp() {
     relicTree.setup();
     relicTree.onChange = renderWallet;
     document.getElementById('btnCampSkills').addEventListener('click', () => openStatus('CAMP', renderCamp));
-    // Mapa: o retrato do herói em cima da tela onde ele está (a da onda que acabou de terminar)
-    document.getElementById('btnCampMap').addEventListener('click', () => showMapHere(screenIndexOf(Math.max(1, state.turn - 1)), `WAVE ${Math.max(1, state.turn - 1)} OF ${NIGHT.hours}`));
 }
 
 // O que vem na próxima hora
@@ -92,28 +88,27 @@ function renderNext() {
 
 // Resultado do fim da onda (data_model/night.js > WAVE_SPOILS): 3 metas = 3 estrelas, ouro e (★★★) ponto de skill, e a pontuação
 // da onda, comparada com o recorde daquela onda. Devolve as estrelas, que vão para o título do acampamento; a contagem aparece por cima.
-export function grantWaveSpoils(wave) {
+export function grantWaveSpoils(wave, onClose = null) {
     const W = WAVE_SPOILS;
-    const ws = state.waveStats ?? { kills0: 0, gold0: 0, rush: 0, torchDamage: 0, heroDamage: 0 };
-    const [loose, tight] = W.damageGoals;
+    const ws = state.waveStats ?? { kills0: 0, gold0: 0, rush: 0, torchDamage: 0, heroDamage: 0, consumed: 0 };
     const torchDmg = Math.min(100, Math.round(ws.torchDamage / Math.max(1, state.coreHpMax) * 100));
     const heroDmg = Math.min(100, Math.round(ws.heroDamage / Math.max(1, player.maxHp) * 100));
-    const rushGoal = Math.round(W.rushGoalBase + W.rushGoalPerWave * effectiveTurn(wave));       // curva de 12 ondas esticada para 30
-    // Cada linha diz quantas estrelas ganhou (stars) e de quantas é capaz (goals)
-    const dmgStars = (pct) => (pct <= tight * 100 ? 2 : pct <= loose * 100 ? 1 : 0);
+    const rushGoal = Math.round(W.rushGoalBase + W.rushGoalPerWave * effectiveTurn(wave));       // curva de 12 ondas esticada para a campanha
     const kills = state.run.kills - ws.kills0;
     const gold = Math.max(0, Math.round(state.run.goldEarned - ws.gold0));
+    // Cada linha diz quantas estrelas ganhou (stars) e de quantas é capaz (goals); só as 3 regras valem estrela
     const rows = [
         { key: 'kills', label: 'Kills', value: kills, points: kills * W.score.kills },
+        { key: 'burned', label: 'Monsters burned by the torch', value: ws.consumed ?? 0, points: 0, need: '0', goals: 1, stars: (ws.consumed ?? 0) === 0 ? 1 : 0 },
+        { key: 'hero', label: 'Hero damage', value: heroDmg, suffix: '%', points: (100 - heroDmg) * W.score.hero, need: `≤${W.heroDamageGoal * 100}%`, goals: 1, stars: heroDmg <= W.heroDamageGoal * 100 ? 1 : 0 },
         { key: 'rush', label: 'Best Rush', value: ws.rush, points: ws.rush * W.score.rush, need: `${rushGoal}+`, goals: 1, stars: ws.rush >= rushGoal ? 1 : 0 },
         { key: 'gold', label: 'Gold', value: gold, points: gold * W.score.gold },
-        { key: 'torch', label: 'Torch damage', value: torchDmg, suffix: '%', points: (100 - torchDmg) * W.score.torch, need: `≤${loose * 100}/${tight * 100}%`, goals: 2, stars: dmgStars(torchDmg) },
-        { key: 'hero', label: 'Hero damage', value: heroDmg, suffix: '%', points: (100 - heroDmg) * W.score.hero, need: `≤${loose * 100}/${tight * 100}%`, goals: 2, stars: dmgStars(heroDmg) }
+        { key: 'torch', label: 'Torch damage', value: torchDmg, suffix: '%', points: (100 - torchDmg) * W.score.torch }
     ];
     const count = rows.reduce((sum, r) => sum + (r.stars ?? 0), 0);
     const score = rows.reduce((sum, r) => sum + r.points, 0);
     const spoilsGold = Math.round((W.goldBase + W.goldPerWave * wave) * W.starGold[count]);
-    const points = count === 5 ? W.perfectSkillPoints : 0;
+    const points = count === 3 ? W.perfectSkillPoints : 0;
     state.coins += spoilsGold;
     state.run.goldEarned += spoilsGold;
     state.skillPoints += points;
@@ -125,22 +120,24 @@ export function grantWaveSpoils(wave) {
     state.run.stars = (state.run.stars ?? 0) + count;
     // Estrelas de cada onda desta noite: aparecem nas marcas da barra de ondas do HUD (js/ui/hud.js)
     (state.run.waveStars ??= {})[wave] = count;
-    // Conquistas do Santuário: em quantas ondas diferentes já tirou ★★★★★
-    save.stats.fiveStarWaves = Object.values(save.waveBests).filter(b => b.stars >= 5).length;
+    // Conquistas do Santuário: em quantas ondas diferentes já tirou ★★★
+    save.stats.threeStarWaves = Object.values(save.waveBests).filter(b => b.stars >= 3).length;
     persist();
-    showWaveResults({ wave, rows, stars: count, score, best, spoilsGold, points });
-    return '★'.repeat(count) + '☆'.repeat(5 - count);
+    showWaveResults({ wave, rows, stars: count, score, best, spoilsGold, points, onClose });
+    return '★'.repeat(count) + '☆'.repeat(3 - count);
 }
 
 // resumed: voltando de um CONTINUE, o acampamento já aconteceu (ouro recolhido, tocha alimentada): não repete
-export function openCamp(resumed = false) {
+export function openCamp(resumed = false, doneStars = null) {
     state.gameState = 'CAMP';
     hideTreeHand();            // fim da onda 1: a mãozinha do medalhão não fica atrás do acampamento
     resetStreak();
     let stars = '';
     if (!resumed) {
-        collectAllGold();
-        stars = grantWaveSpoils(state.turn - 1);
+        if (doneStars === null) {
+            collectAllGold();
+            stars = grantWaveSpoils(state.turn - 1);
+        } else stars = doneStars;                       // o resultado já foi mostrado antes do mapa (fim da tela)
         feedTorch(CAMP.freeTorchHeal);
     }
     fuelUses = 0;
@@ -184,16 +181,6 @@ export function leaveCamp() {
     document.getElementById('campScreen').classList.add('hidden');
     state.knifeInput.stick.fire = false;
     persist();
-    // Matou o chefe da tela: o mapa mostra o herói indo para a tela seguinte antes de a próxima onda começar
-    if (CAMPAIGN_RUNTIME.enabled && startsNewScreen(state.turn)) {
-        enterScreenForTurn(state.turn);                       // o cenário novo se monta enquanto o mapa aparece
-        showMapTransition(screenIndexOf(state.turn - 1), screenIndexOf(state.turn), () => {
-            state.gameState = 'PLAYING';
-            saveRun('hunt');
-            startHour();
-        });
-        return;
-    }
     state.gameState = 'PLAYING';
     saveRun('hunt');
     startHour();

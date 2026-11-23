@@ -168,12 +168,10 @@
 #nightPips i.stars-0::after, #nightPips i.stars-1::after { color: #94a3b8; }
 #nightPips:has(i[data-stars]:not([data-stars=""])) { margin-bottom: 0.6rem; }
 #nightPips i.stars-0, #nightPips i.stars-1 { background: #78716c; }
-#nightPips i.stars-2, #nightPips i.stars-3 { background: #f59e0b; }
-#nightPips i.stars-2::after, #nightPips i.stars-3::after { color: #fbbf24; }
-#nightPips i.stars-4 { background: #fcd34d; }
-#nightPips i.stars-4::after { color: #fde68a; }
-#nightPips i.stars-5 { background: #fef3c7; box-shadow: 0 0 6px #fbbf24; }
-#nightPips i.stars-5::after { color: #fef3c7; text-shadow: 0 0 6px #fbbf24; }
+#nightPips i.stars-2 { background: #f59e0b; }
+#nightPips i.stars-2::after { color: #fbbf24; }
+#nightPips i.stars-3 { background: #fef3c7; box-shadow: 0 0 6px #fbbf24; }
+#nightPips i.stars-3::after { color: #fef3c7; text-shadow: 0 0 6px #fbbf24; }
 
 /* Pontuação */
 #hudScore {

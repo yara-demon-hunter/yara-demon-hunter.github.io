@@ -42,6 +42,7 @@ export function skeletonBody(S) {
 
     // --- PERNAS ---
     function drawSkeletonLeg(rig, { hip, knee, ankle, toe }) {
+        if (S.noLegs) return;                 // Zumbi Rastejante: a metade de baixo não existe
         const { C } = rig;
         bone(rig, [hip, knee, ankle], S.boneWidth, C.bone);
         joint(rig, knee, S.jointRadius, C.bone);
@@ -77,6 +78,22 @@ export function skeletonBody(S) {
             ctx.fill();
         }
 
+        // Zumbi Rastejante (S.noLegs): o corpo termina na bacia. Carne rasgada e tripa no corte, e a COLUNA segue solta para trás,
+        // arrastando no chão e balançando, até uma ponta quebrada
+        if (S.noLegs) {
+            rig.ball(add(base, u, -0.2), S.pelvisWidth * 0.62, C.wound);
+            rig.ball(add(add(base, u, -0.5), fwd, -0.4), S.pelvisWidth * 0.42, C.skinShade);
+            const gut = Math.sin(pose.t * 5) * 0.4;
+            rig.limb([add(base, u, -0.4), add(add(base, u, -1.6), side, 0.8 + gut), add(add(base, u, -2.4), side, 0.5 + gut * 1.4)], 0.7, C.wound);
+            for (let i = 1; i <= S.tailBones; i++) {
+                const k = -(i * S.tailGap) / spineLen;
+                const wob = Math.sin(pose.t * 6 - i * 0.8) * 0.5 * Math.min(1.6, i * 0.35);
+                const p = along(k).map((v, a) => (a === 1 ? v + wob : a === 2 ? Math.max(0.9, v) : v));
+                joint(rig, p, S.vertebraRadius * Math.max(0.7, 1.5 - i * 0.07), C.bone);
+                if (i % 2 === 0 && i < S.tailBones) for (const sd of [-1, 1]) bone(rig, [p, add(p, side, sd * 0.9)], 0.22, C.boneShade);
+            }
+        }
+
         // Coluna de vértebras, um pouco para trás (costas), da bacia até o pescoço
         for (let i = 0; i <= S.vertebrae; i++) {
             const k = (i / S.vertebrae) * (1 + 1.2 / spineLen);
@@ -86,17 +103,26 @@ export function skeletonBody(S) {
         // Alma: chama verde dentro do peito, pulsando
         const pulse = 0.5 + 0.5 * Math.sin(pose.t * S.soulPulseHz * Math.PI * 2);
         const soul = project(...add(along(S.soulAt), fwd, -0.2));
-        drawGlow(ctx, C.soulGlow, soul.x, soul.y, S.soulGlowRadius * (0.8 + 0.3 * pulse), 0.55 + 0.3 * pulse);
-        const size = S.soulRadius * (0.85 + 0.3 * pulse);
-        ctx.fillStyle = C.soul;
-        ctx.beginPath();
-        ctx.ellipse(soul.x, soul.y, size, size * 1.35, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = C.soulCore;
-        ctx.beginPath();
-        ctx.arc(soul.x, soul.y + size * 0.2, size * 0.45, 0, Math.PI * 2);
-        ctx.fill();
+        if (!S.noSoul) {
+            drawGlow(ctx, C.soulGlow, soul.x, soul.y, S.soulGlowRadius * (0.8 + 0.3 * pulse), 0.55 + 0.3 * pulse);
+            const size = S.soulRadius * (0.85 + 0.3 * pulse);
+            ctx.fillStyle = C.soul;
+            ctx.beginPath();
+            ctx.ellipse(soul.x, soul.y, size, size * 1.35, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = C.soulCore;
+            ctx.beginPath();
+            ctx.arc(soul.x, soul.y + size * 0.2, size * 0.45, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
+        // Carne podre grudada nas costas e nas laterais das costelas (S.fleshTorso): o zumbi ainda tem o que apodrecer
+        if (S.fleshTorso) {
+            rig.ball(add(along(0.55), fwd, -1.1), S.ribWidth * 0.62, C.skinShade);
+            rig.ball(add(add(along(0.8), fwd, -0.8), side, S.ribWidth * 0.5), S.ribWidth * 0.34, C.skin);
+            rig.ball(add(add(along(0.35), fwd, -0.6), side, -S.ribWidth * 0.45), S.ribWidth * 0.3, C.skin);
+            rig.ball(add(along(0.7), fwd, -1.7), S.ribWidth * 0.2, C.wound);
+        }
         // Costelas: arcos saindo da coluna (costas) e dando a volta até o esterno (frente), descendo um pouco
         for (let i = 0; i < S.ribPairs; i++) {
             const c = along(1 - (S.ribTop + i * S.ribGap) / spineLen);
@@ -236,6 +262,8 @@ export function skeletonBody(S) {
         const twitch = wave > 0.97 ? ((wave - 0.97) / 0.03) * S.twitchAmount : 0;
         const jawOpen = Math.max(0, Math.sin(t * S.chatterHz * Math.PI * 2)) * S.jawOpenMax;
         const R = S.skullRadius;
+        const SKULL = S.fleshHead ? C.skin : C.bone;           // Zumbi Rastejante: cabeça de pele
+        const SKULL_SHADE = S.fleshHead ? C.skinShade : C.boneShade;
         const c = [pose.headA, twitch, pose.headZ];
         const front = project(c[0] + R, c[1], c[2]);
         const center = project(...c);
@@ -270,14 +298,14 @@ export function skeletonBody(S) {
                 // Pescoço
                 bone(rig, [[pose.lean - 0.4, 0, pose.shoulderZ], [c[0] - 0.3, c[1], c[2] - R * 0.8]], 0.7, C.boneShade);
                 ball(c, R + 0.3, C.boneDark);
-                ball(c, R, C.bone);
-                ball([c[0] - R * 0.35, c[1], c[2] + R * 0.1], R * 0.62, C.boneShade);
-                ball([c[0] + R * 0.1, c[1], c[2] + R * 0.25], R * 0.7, C.bone);
+                ball(c, R, SKULL);
+                ball([c[0] - R * 0.35, c[1], c[2] + R * 0.1], R * 0.62, SKULL_SHADE);
+                ball([c[0] + R * 0.1, c[1], c[2] + R * 0.25], R * 0.7, SKULL);
                 // Maxilar: a frente do crânio desce um pouco mais estreita, com os dentes de cima
                 if (facing) {
                     const mx = [c[0] + R * 0.55, c[1], c[2] - R * 0.5];
                     ball(mx, R * 0.48 + 0.2, C.boneDark);
-                    ball(mx, R * 0.48, C.bone);
+                    ball(mx, R * 0.48, SKULL);
                     for (const b of [-0.27, -0.09, 0.09, 0.27]) {
                         limb([[mx[0] + R * 0.38, c[1] + b * R, mx[2] - R * 0.12], [mx[0] + R * 0.4, c[1] + b * R, mx[2] - R * 0.32]], R * 0.07, C.boneDark);
                     }

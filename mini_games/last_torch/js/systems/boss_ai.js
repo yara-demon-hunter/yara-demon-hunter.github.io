@@ -300,6 +300,21 @@ const ACTIONS = {
         }
         audio.playBossAttack();
     },
+    // Slizork: golpe de garra. Ele ergue as garras de espada e rasga o chão à frente: fileiras de círculos de aviso (do perto para o longe) abrindo em leque
+    // na direção do herói; quem ficar neles leva o corte. O braço do boneco anima por e.clawAt (library/monsters/25d/slizork/slizork25d.js)
+    rake(e, model) {
+        const a = aimAngle(e);
+        e.clawAt = performance.now();
+        for (let k = 0; k < 4; k++) {
+            const d = 80 + k * 62;
+            for (const off of k === 0 ? [0] : [-1, 1]) {
+                const ang = a + off * (0.14 + k * 0.07);
+                addSlam(clampX(e.x + Math.cos(ang) * d), clampY(e.y + Math.sin(ang) * d), 40 + k * 3, 0.75 + k * 0.13, e.damage * 0.95, null, 0, '#c0c6cc');
+            }
+        }
+        addShockwave(e.x, e.y, { radius: e.radius * 2.2, color: '#9ca3af', width: 5, seconds: 0.3 });
+        audio.playBossAttack();
+    },
     // Demon Lord: garra larga, um leque de fogo à frente dele
     claw(e, model) {
         const a = aimAngle(e);

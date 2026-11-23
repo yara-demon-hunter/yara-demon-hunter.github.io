@@ -1,7 +1,7 @@
 // --- TELA DE VITÓRIA (o jogador zerou a noite) ---
-// No lugar do resumo comum (HUNT AGAIN / STAY IN THE DARK): um final de verdade. O herói em destaque com os números da noite
-// (pontos, mortes, nível, skills, bosses, Brasas, tempo, estrelas), as 12 ondas com as estrelas tiradas em cada uma e um botão
-// só, MENU. Aparece depois do cartão de resultado da onda 12 (o amanhecer espera ele fechar). Estilo: css/components/victory.css.
+// No lugar do resumo comum (HUNT AGAIN): um final de verdade. O herói em destaque com os números da noite
+// (pontos, mortes, nível, skills, bosses, Brasas, tempo, estrelas), as 18 ondas com as estrelas tiradas em cada uma e um botão
+// só, MENU. Aparece depois do cartão de resultado da última onda (o amanhecer espera ele fechar). Estilo: css/components/victory.css.
 import { audio } from '../core/state.js';
 import { showToast } from './banner.js';
 
@@ -14,6 +14,7 @@ export function showVictory({ hero, darkness, waves, stats, rank, onMenu }) {
     const root = document.createElement('div');
     root.id = 'victoryScreen';
     root.className = 'victory';
+    waves = waves.map(w => Math.max(0, Math.min(3, w ?? 0)));      // nunca mais de 3 estrelas (saves antigos tinham até 5)
     const totalStars = waves.reduce((sum, w) => sum + (w ?? 0), 0);
     const tiles = [
         ['🏆', 'Score', stats.score],
@@ -40,9 +41,9 @@ export function showVictory({ hero, darkness, waves, stats, rank, onMenu }) {
             <div class="vic-stats">${tiles.map(([icon, label, value, text]) => `
               <div class="vic-stat"><span class="vic-ico">${icon}</span><b data-to="${value ?? ''}">${text ?? '0'}</b><em>${label}</em></div>`).join('')}
             </div>
-            <p class="vic-waves-title">YOUR NIGHT · ${totalStars}/${waves.length * 5} ★</p>
+            <p class="vic-waves-title">YOUR NIGHT · ${totalStars}/${waves.length * 3} ★</p>
             <div class="vic-waves">${waves.map((s, i) => `
-              <div class="vic-wave${s >= 5 ? ' is-perfect' : ''}" style="--d:${i * 0.07}s"><i>Wave ${i + 1}</i><span><b>${'★'.repeat(s ?? 0)}</b>${'★'.repeat(5 - (s ?? 0))}</span></div>`).join('')}
+              <div class="vic-wave${s >= 3 ? ' is-perfect' : ''}" style="--d:${i * 0.07}s"><i>Wave ${i + 1}</i><span><b>${'★'.repeat(s ?? 0)}</b>${'★'.repeat(3 - (s ?? 0))}</span></div>`).join('')}
             </div>
           </div>
         </div>
@@ -76,7 +77,7 @@ export function showVictory({ hero, darkness, waves, stats, rank, onMenu }) {
 }
 
 // --- IMAGEM PARA COMPARTILHAR ---
-// Desenha o card de vitória num canvas (1080×1350, formato de post) e o entrega: no celular abre o compartilhar do sistema com a imagem;
+// Desenha o card de vitória num canvas (1080×1420, formato de post) e o entrega: no celular abre o compartilhar do sistema com a imagem;
 // no computador baixa o PNG. Tudo de dentro do jogo, sem biblioteca: as fontes já estão carregadas na página.
 function loadImage(src) {
     return new Promise((resolve) => {
@@ -100,7 +101,7 @@ function roundRect(ctx, x, y, w, h, r) {
 async function drawCard({ hero, darkness, waves, stats, rank, tiles }) {
     await document.fonts?.ready;
     const W = 1080;
-    const H = 1350;
+    const H = 1420;
     const canvas = document.createElement('canvas');
     canvas.width = W;
     canvas.height = H;
@@ -185,7 +186,7 @@ async function drawCard({ hero, darkness, waves, stats, rank, tiles }) {
     ctx.font = '800 22px Inter, sans-serif';
     ctx.fillStyle = '#fbbf24';
     ctx.letterSpacing = '5px';
-    ctx.fillText(`YOUR NIGHT · ${total}/${waves.length * 5} ★`, left, 1218);
+    ctx.fillText(`YOUR NIGHT · ${total}/${waves.length * 3} ★`, left, 1218);
     const ww = (tw * 4 + gap * 3 - 5 * 14) / 6;
     waves.forEach((st, i) => {
         const wx = left + (i % 6) * (ww + 14);
@@ -194,7 +195,7 @@ async function drawCard({ hero, darkness, waves, stats, rank, tiles }) {
         ctx.fillStyle = 'rgba(8, 12, 16, 0.85)';
         ctx.fill();
         ctx.lineWidth = 2;
-        ctx.strokeStyle = (st ?? 0) >= 5 ? 'rgba(250, 204, 21, 0.85)' : 'rgba(148, 163, 184, 0.25)';
+        ctx.strokeStyle = (st ?? 0) >= 3 ? 'rgba(250, 204, 21, 0.85)' : 'rgba(148, 163, 184, 0.25)';
         ctx.stroke();
         ctx.textAlign = 'center';
         ctx.letterSpacing = '0px';

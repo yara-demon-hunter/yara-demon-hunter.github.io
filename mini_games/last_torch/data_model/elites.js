@@ -6,8 +6,7 @@ export const ELITE_MODIFIERS = {
     BLAZING: { label: 'Blazing', color: '#f97316', hp: 6, speed: 1.05, radiusScale: 1.4, damage: 1.3, knockbackResist: 0.75, flameTrail: true }
 };
 
-// Monstros que podem virar elite
-export const ELITE_TYPES = ['SKELETON', 'VAMPIRE', 'WRAITH', 'BLOATER'];
+// Quais monstros viram elite em cada tela: lista `elites` de data_model/screens/<tela>.js
 
 export function rollElite(random = Math.random) {
     const keys = Object.keys(ELITE_MODIFIERS);

@@ -177,7 +177,7 @@ export const DUEL_DIALOGUES = {
 export const DIALOGUE_TYPE_SECONDS = 0.022;
 
 // --- PROVOCAÇÃO ANTES DE CADA BOSS ---
-// Nas horas de boss que não são o duelo (Demon Lord, Blood Countess, The Long Night e os do modo sem fim), quando a
+// Nas horas de boss que não são o duelo (Demon Lord, Blood Countess, The Long Night , quando a
 // onda fecha, a caçada congela e o rival aparece provocando antes de soltar o monstro (js/ui/dialogue.js, playBossIntro).
 // Chave: quem fala (o rival do herói, RIVAL_OF em bosses.js) e depois o boss que vem. default: boss sem fala própria.
 export const BOSS_INTROS = {
@@ -192,6 +192,23 @@ export const BOSS_INTROS = {
             { who: 'rival', text: 'Still standing? The night is growing tired of you.' },
             { who: 'hero', text: 'Then send whatever you have left.' },
             { who: 'rival', text: 'Gladly. My Countess is thirsty... try not to bleed too fast.' }
+        ],
+        // Chefes das telas do mapa: o hunter segue para o castelo do Azael, e o Azael jura que ele nunca chegará vivo
+        LAKE_SPIRIT: [
+            { who: 'rival', text: 'You are heading for my castle, hunter. You will never arrive alive.' },
+            { who: 'hero', text: 'Watch me, Azael. A river will not stop me.' },
+            { who: 'rival', text: 'This one is not a river. It is the Lady of the Lake, and she drowns everyone who crosses.' },
+            { who: 'boss', text: 'Stay... in the water... with me...' }
+        ],
+        SLIZORK: [
+            { who: 'rival', text: 'The swamp swallows armies, hunter. Did you think it would spare one man?' },
+            { who: 'hero', text: 'Then it will choke on this one.' },
+            { who: 'rival', text: 'Meet Slizork, Tyrant of the Mire. My castle is still far, and you will not live to see its gates.' }
+        ],
+        GRAVE_KING: [
+            { who: 'rival', text: 'Every grave on this road belongs to someone who tried to reach my castle.' },
+            { who: 'hero', text: 'Then I will not join them.' },
+            { who: 'rival', text: 'Rise, Grave King. Let him see how every road to my castle ends.' }
         ],
         // Semi-boss do meio da noite: o Azael o chama e o capitão responde com uma frase curta
         BRUTOS: [
@@ -281,6 +298,21 @@ export const BOSS_INTROS = {
             { who: 'rival', text: 'Something old is coming, Azael. It can smell your blood.' },
             { who: 'hero', text: 'Then it will choke on it.' },
             { who: 'rival', text: 'Prove it. I will be right here, blade ready.' }
+        ],
+        LAKE_SPIRIT: [
+            { who: 'rival', text: 'The lake is waking, Azael. It will not let you cross.' },
+            { who: 'hero', text: 'Then I will cut my way across.' },
+            { who: 'rival', text: 'Do not expect my help.' }
+        ],
+        SLIZORK: [
+            { who: 'rival', text: 'The swamp itself is rising against you, demon.' },
+            { who: 'hero', text: 'Let it come.' },
+            { who: 'rival', text: 'Then burn it before it swallows you.' }
+        ],
+        GRAVE_KING: [
+            { who: 'rival', text: 'The dead of this graveyard follow their king, demon.' },
+            { who: 'hero', text: 'Then they can follow him back into the ground.' },
+            { who: 'rival', text: 'We will see who stays buried.' }
         ],
         // Semi-boss do meio da noite: o Demon Hunter o chama e o capitão responde com uma frase curta
         BRUTOS: [

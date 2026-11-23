@@ -5,7 +5,7 @@ import { registerLayout } from '../layouts.js';
 
 registerLayout('river_crossing_2', {
   profile: 'landscape',
-  savedAt: 1795356878058,
+  savedAt: 1795388245602,
   baked: [4, 8, 10, 11, 3, 6, 5, 9, 7, 12],
   placed: [
     {"prop": "stump", "x": 0.2516, "y": 0.8507, "from": 4, "attrs": {"radius": 15.006, "sides": [0.898, 0.421, 0.817]}},
@@ -181,10 +181,10 @@ registerLayout('river_crossing_2', {
   colliders: [
     {"shape": "rect", "x": 0.1726, "y": 0.5122, "w": 491, "h": 176, "rot": 0, "blocks": {"hero": true, "monsters": true, "heroShots": false, "monsterShots": false}},
     {"shape": "rect", "x": 0.8307, "y": 0.5033, "w": 484, "h": 187, "rot": 0, "blocks": {"hero": true, "monsters": true, "heroShots": false, "monsterShots": false}},
-    {"shape": "rect", "x": 0.2053, "y": 0.0787, "w": 268, "h": 78, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "VAMPIRE", "MOTH", "WITCH", "WRAITH", "SHADOW_WOLF"], "boss": false},
-    {"shape": "rect", "x": 0.1938, "y": 0.9072, "w": 268, "h": 78, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "VAMPIRE", "MOTH", "WITCH", "WRAITH", "SHADOW_WOLF"], "boss": false},
-    {"shape": "rect", "x": 0.8412, "y": 0.9072, "w": 268, "h": 78, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "VAMPIRE", "MOTH", "WITCH", "WRAITH", "SHADOW_WOLF"], "boss": false},
-    {"shape": "rect", "x": 0.8338, "y": 0.0785, "w": 268, "h": 78, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "VAMPIRE", "MOTH", "WITCH", "WRAITH", "SHADOW_WOLF"], "boss": false},
+    {"shape": "rect", "x": 0.2053, "y": 0.0787, "w": 268, "h": 78, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "VAMPIRE", "MOTH", "WITCH", "WRAITH", "SHADOW_WOLF", "RIVER_EEL", "DROWNED"], "boss": false},
+    {"shape": "rect", "x": 0.1938, "y": 0.9072, "w": 268, "h": 78, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "VAMPIRE", "MOTH", "WITCH", "WRAITH", "SHADOW_WOLF", "RIVER_EEL", "DROWNED"], "boss": false},
+    {"shape": "rect", "x": 0.8412, "y": 0.9072, "w": 268, "h": 78, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "VAMPIRE", "MOTH", "WITCH", "WRAITH", "SHADOW_WOLF", "RIVER_EEL", "DROWNED"], "boss": false},
+    {"shape": "rect", "x": 0.8338, "y": 0.0785, "w": 268, "h": 78, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "VAMPIRE", "MOTH", "WITCH", "WRAITH", "SHADOW_WOLF", "RIVER_EEL", "DROWNED"], "boss": false},
     {"shape": "circle", "x": 0.5046, "y": 0.0847, "r": 41, "kind": "spawn", "weight": 1, "types": [], "boss": true}
   ]
 });

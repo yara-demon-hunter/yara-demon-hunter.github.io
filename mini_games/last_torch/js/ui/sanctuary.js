@@ -5,6 +5,7 @@ import { save, persist } from '../core/save.js';
 import { audio } from '../core/state.js';
 import { getBossPortrait, getMonsterSprite } from '../render/monster_sprites.js';
 import { renderStartScreen } from './screens.js';
+import { TOTAL_WAVES } from '../../data_model/campaign.js';
 import { ICON_IMAGES } from '../../data_model/icon_images.js';
 import { paintIcon } from '../../data_model/tree_images.js';
 
@@ -52,21 +53,21 @@ function renderAchievements(list, group) {
 }
 
 
-// Estrelas de cada onda: o melhor resultado já tirado em cada uma das 12 (save.waveBests, gravado em js/ui/camp.js), com o recorde de
+// Estrelas de cada onda: o melhor resultado já tirado em cada uma das ondas (save.waveBests, gravado em js/ui/camp.js), com o recorde de
 // pontos. Fica na aba Ranks, no fim: é o que o jogador volta para completar.
-const WAVES = 12;
+const WAVES = TOTAL_WAVES;
 function renderWaveStars(list) {
     const bests = save.waveBests ?? {};
-    const total = Object.values(bests).reduce((sum, b) => sum + Math.min(5, b.stars ?? 0), 0);
+    const total = Object.values(bests).reduce((sum, b) => sum + Math.min(3, b.stars ?? 0), 0);
     const box = el('div', 'sanc-waves');
-    box.append(el('p', 'sanc-waves-title', `WAVE STARS · ${total}/${WAVES * 5} ★`));
+    box.append(el('p', 'sanc-waves-title', `WAVE STARS · ${total}/${WAVES * 3} ★`));
     const grid = el('div', 'sanc-waves-grid');
     for (let w = 1; w <= WAVES; w++) {
         const best = bests[w];
-        const stars = Math.min(5, best?.stars ?? 0);
-        const cell = el('div', `sanc-wave${best ? '' : ' is-unknown'}${stars === 5 ? ' is-perfect' : ''}`);
+        const stars = Math.min(3, best?.stars ?? 0);
+        const cell = el('div', `sanc-wave${best ? '' : ' is-unknown'}${stars === 3 ? ' is-perfect' : ''}`);
         const row = el('span', 'sanc-wave-stars');
-        row.innerHTML = `<b>${'★'.repeat(stars)}</b>${'★'.repeat(5 - stars)}`;
+        row.innerHTML = `<b>${'★'.repeat(stars)}</b>${'★'.repeat(3 - stars)}`;
         cell.append(el('i', '', `Wave ${w}`), row, el('em', '', best ? number(best.score) : '—'));
         grid.appendChild(cell);
     }

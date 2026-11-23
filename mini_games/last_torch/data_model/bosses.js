@@ -1,9 +1,10 @@
 import { createEnemy } from './monsters.js';
+import { CAMPAIGN, TOTAL_WAVES } from './campaign.js';
 import { RIVAL_OF, bossModelOf } from './characters/index.js';
 
 // --- BOSSES ---
-// Separados dos monstros comuns: não entram no sorteio normal, aparecem a cada `everyTurns`
-// turnos, têm nome próprio (mostrado na barra de vida do HUD) e seguram a virada do turno até morrer.
+// Separados dos monstros comuns: não entram no sorteio normal, aparecem nas ondas do
+// cronograma (BOSS_SPAWNING.schedule), têm nome próprio (mostrado na barra de vida do HUD) e seguram a virada do turno até morrer.
 // renderAs: arte reaproveitada (js/render/entities.js); palette: troca a paleta dessa arte.
 // patterns: sequência de ataques, repetida em ciclo (js/systems/boss_ai.js). Abaixo de enrageRatio de
 // vida o boss enfurece: pausas menores e mais velocidade.
@@ -163,6 +164,142 @@ export const BOSS_MODELS = {
     // frase curta. Corpo de herói (renderAs 'RIVAL'), mas sem duelo (noDuel). Tanque imparável: números e jeito de lutar em
     // data_model/characters/brutos.js (boss proporcional ao personagem). Boneco: library/characters/brutos/brutos25d.js.
     BRUTOS: { ...RIVAL_BASE, ...bossModelOf('brutos') },
+    // --- Chefes das telas do mapa (nov/2026): arte em library/monsters/25d/<id>. Os golpes são os de sempre (js/systems/boss_ai.js); a vida é um primeiro palpite, sem balancear ---
+    // River Crossing: dama d'água que some e reaparece, chove esferas e chama os afogados
+    LAKE_SPIRIT: {
+        name: 'Lake Spirit',
+        title: 'The Drowned Lady',
+        renderAs: 'LAKE_SPIRIT',
+        hpBase: 1500,
+        hpPerTurn: 0,
+        speedMin: 40,
+        speedMax: 40,
+        radius: 30,
+        color: '#38bdf8',
+        damage: 24,
+        burstCount: 4,
+        burstIntervalSeconds: 0.32,
+        initialShootCooldownSeconds: 1.5,
+        patternGapSeconds: 2.3,
+        patterns: ['blink', 'volley', 'ring', 'spiral', 'summon'],
+        phases: [
+            { at: 1, patterns: ['blink', 'volley', 'ring', 'summon'] },
+            { at: 0.6, label: 'RISING TIDE', patterns: ['blink', 'spiral', 'volley', 'ring', 'summon'] },
+            { at: 0.3, label: 'THE LAKE REMEMBERS', patterns: ['spiral', 'blink', 'ring', 'volley', 'spiral', 'summon'] }
+        ],
+        ringCount: 14,
+        spiralShots: 16,
+        spiralIntervalSeconds: 0.13,
+        summonType: 'DROWNED',
+        summonCount: 3,
+        projectileSpeed: 170,
+        projectileRadius: 7,
+        projectileDamageMultiplier: 0.75,
+        projectileTorchDamage: 6,
+        enrageRatio: 0.45,
+        enrageGapMultiplier: 0.7,
+        enrageSpeedMultiplier: 1.3,
+        walkShakeIntensity: 0,
+        walkShakeIntervalSeconds: 99,
+        scoreReward: 400,
+        goldBase: 80,
+        goldVariance: 0,
+        xpRewardBase: 260,
+        xpRewardPerTurn: 25,
+    },
+    // Swamp: gosma gigante; pesada, bate no chão e solta lodos
+    SLIZORK: {
+        name: 'Slizork',
+        title: 'Tyrant of the Mire',
+        renderAs: 'SLIZORK',
+        deathType: 'SLIZORK',
+        hpBase: 2400,
+        hpPerTurn: 0,
+        speedMin: 26,
+        speedMax: 26,
+        radius: 34,
+        color: '#4a9a2e',
+        damage: 30,
+        burstCount: 3,
+        burstIntervalSeconds: 0.5,
+        initialShootCooldownSeconds: 1.5,
+        patternGapSeconds: 2.4,
+        patterns: ['slam', 'rake', 'volley', 'ring', 'summon'],
+        phases: [
+            { at: 1, patterns: ['rake', 'slam', 'volley', 'ring', 'summon'] },
+            { at: 0.6, label: 'OOZING RAGE', patterns: ['rake', 'slam', 'rake', 'volley', 'ring', 'summon'] },
+            { at: 0.3, label: 'THE BOG RISES', patterns: ['rake', 'slam', 'ring', 'rake', 'volley', 'summon', 'slam'] }
+        ],
+        ringCount: 14,
+        slamCount: 4,
+        slamRadius: 80,
+        slamDelaySeconds: 1,
+        slamDamageMultiplier: 0.9,
+        slamTorchDamage: 8,
+        summonType: 'BOG_SLIME',
+        summonCount: 3,
+        projectileSpeed: 150,
+        projectileRadius: 8,
+        projectileDamageMultiplier: 0.8,
+        projectileTorchDamage: 6,
+        enrageRatio: 0.45,
+        enrageGapMultiplier: 0.7,
+        enrageSpeedMultiplier: 1.35,
+        walkShakeIntensity: 7,
+        walkShakeIntervalSeconds: 4.5,
+        scoreReward: 600,
+        goldBase: 100,
+        goldVariance: 0,
+        xpRewardBase: 340,
+        xpRewardPerTurn: 30,
+    },
+    // Graveyard: esqueleto zumbi de guerra; chama os mortos, golpeia o chão e lança ossos
+    GRAVE_KING: {
+        name: 'Grave King',
+        title: 'The Rotting Warlord',
+        renderAs: 'GRAVE_KING',
+        hpBase: 3200,
+        hpPerTurn: 0,
+        speedMin: 34,
+        speedMax: 34,
+        radius: 30,
+        color: '#7f996a',
+        damage: 32,
+        burstCount: 5,
+        burstIntervalSeconds: 0.3,
+        initialShootCooldownSeconds: 1.5,
+        patternGapSeconds: 2.1,
+        patterns: ['slam', 'volley', 'summon', 'ring', 'slam'],
+        phases: [
+            { at: 1, patterns: ['slam', 'volley', 'summon', 'ring'] },
+            { at: 0.6, label: 'THE DEAD RISE', patterns: ['summon', 'slam', 'volley', 'ring', 'summon'] },
+            { at: 0.3, label: 'ROT AND RUIN', patterns: ['slam', 'summon', 'ring', 'slam', 'volley', 'summon', 'spiral'] }
+        ],
+        ringCount: 16,
+        slamCount: 4,
+        slamRadius: 78,
+        slamDelaySeconds: 0.95,
+        slamDamageMultiplier: 0.9,
+        slamTorchDamage: 9,
+        spiralShots: 18,
+        spiralIntervalSeconds: 0.12,
+        summonType: 'ZOMBIE',
+        summonCount: 4,
+        projectileSpeed: 175,
+        projectileRadius: 7,
+        projectileDamageMultiplier: 0.75,
+        projectileTorchDamage: 6,
+        enrageRatio: 0.45,
+        enrageGapMultiplier: 0.65,
+        enrageSpeedMultiplier: 1.35,
+        walkShakeIntensity: 6,
+        walkShakeIntervalSeconds: 4,
+        scoreReward: 800,
+        goldBase: 120,
+        goldVariance: 0,
+        xpRewardBase: 400,
+        xpRewardPerTurn: 35,
+    },
     LONG_NIGHT: {
         name: 'The Long Night',
         title: 'The Dark Itself',
@@ -272,14 +409,14 @@ shadowOf('DEMON_HUNTER');
 export const BOSS_SPAWNING = {
     // Hora → boss da noite. RIVAL: o rival do herói (RIVAL_OF); RIVAL_FINAL: a revanche dele, que fecha a noite.
     // BRUTOS (hora 6): semi-boss do meio da noite
-    // 6 telas x 5 ondas: o chefe fecha cada tela (onda 5, 10, 15...). A 1ª tela (Dark Forest) termina com o rival (Azael, ou o Demon Hunter para quem joga de Azael).
-    // Dark Forest: rival · River Crossing: Brutos · Swamp: Demon Lord · Graveyard: Blood Countess · Village: The Long Night · Castle: a revanche do rival
-    schedule: { 5: 'RIVAL', 10: 'BRUTOS', 15: 'DEMON_LORD', 20: 'BLOOD_COUNTESS', 25: 'LONG_NIGHT', 30: 'RIVAL_FINAL' },
-    lastScheduledHour: 30,
-    // Modo sem fim (depois da hora 12): um boss a cada everyTurns horas, nesta ordem
-    everyTurns: 4,
-    spawnScreenRatio: 0.5,
-    rotation: ['DEMON_LORD', 'BLOOD_COUNTESS', 'LONG_NIGHT']
+    // 6 telas x 3 ondas (data_model/campaign.js): o chefe fecha cada tela (ondas 3, 6, 9...). A 1ª tela (Dark Forest) termina com o rival (Azael, ou o Demon Hunter para quem joga de Azael).
+    // Dark Forest: Azael (o rival) · River Crossing: Lake Spirit · Swamp: Slizork · Graveyard: Grave King · Village: Brutos
+    // Castle: os TRÊS chefes, um por onda: Demon Lord, The Long Night e a revanche do Azael (o rival)
+    schedule: {
+        [3 * 1]: 'RIVAL', [3 * 2]: 'LAKE_SPIRIT', [3 * 3]: 'SLIZORK', [3 * 4]: 'GRAVE_KING', [3 * 5]: 'BRUTOS',
+        [3 * 5 + 1]: 'DEMON_LORD', [3 * 5 + 2]: 'LONG_NIGHT', [3 * 5 + 3]: 'RIVAL_FINAL'
+    },
+    spawnScreenRatio: 0.5
 };
 
 // Boss com a conversa de duelo (rival da hora 1 e a revanche). Os que têm corpo de herói mas noDuel (Brutos) entram
@@ -290,8 +427,7 @@ export function hasDuel(model) {
 
 // heroModel: o boneco do herói escolhido; há horas que ficam sem boss para certos heróis (o Brutos não luta contra si mesmo)
 export function isBossTurn(turn, heroModel = 'hunter') {
-    const { lastScheduledHour, everyTurns } = BOSS_SPAWNING;
-    return turn <= lastScheduledHour ? !!chooseBossType(turn, heroModel) : turn % everyTurns === 0;
+    return !!chooseBossType(turn, heroModel);
 }
 
 // Rival de cada boneco de herói: o Demon Hunter (e as variações dele) e o Brutos enfrentam o Azael, e o Azael o Demon Hunter
@@ -300,17 +436,14 @@ export { RIVAL_OF };
 
 // Boss da hora (heroModel: o boneco do herói escolhido, getHero().model, que decide o rival)
 export function chooseBossType(turn, heroModel = 'hunter') {
-    const { schedule, lastScheduledHour, rotation, everyTurns } = BOSS_SPAWNING;
+    const { schedule } = BOSS_SPAWNING;
     const rival = RIVAL_OF[heroModel] ?? RIVAL_OF.hunter;
-    if (turn <= lastScheduledHour) {
-        const slot = schedule[turn];
-        // O semi-boss Brutos é o Captain Brutos: quem joga com ele não o enfrenta (a hora fica normal)
-        if (slot === 'BRUTOS' && heroModel === 'brutos') return 'DEMON_LORD';          // quem joga de Brutos não o enfrenta: a tela do rio fecha com outro chefe
-        if (slot === 'RIVAL') return rival;
-        if (slot === 'RIVAL_FINAL') return `${rival}_FINAL`;
-        return slot ?? null;
-    }
-    return rotation[(Math.floor(turn / everyTurns) - 1) % rotation.length];
+    const slot = schedule[turn];
+    // O Captain Brutos não luta contra si mesmo: quem joga com ele enfrenta a Blood Countess na Village
+    if (slot === 'BRUTOS' && heroModel === 'brutos') return 'BLOOD_COUNTESS';
+    if (slot === 'RIVAL') return rival;
+    if (slot === 'RIVAL_FINAL') return `${rival}_FINAL`;
+    return slot ?? null;
 }
 
 // Boss segura o empurrão: perde 85% dele (um monstro comum leva o empurrão inteiro). Quem tiver knockbackResist próprio usa o seu
@@ -322,7 +455,7 @@ const BOSS_KNOCKBACK_RESIST = 0.85;
 // (um jogador que desvia leva cerca do dobro). O rival da 1ª hora sobe menos: é onde o jogador novo ainda aprende.
 // +15% em todos (2026-11-18): sem monstros comuns durante o boss, a luta é o foco e pode durar mais.
 const BOSS_FOCUS_BONUS = 1.15;
-export const BOSS_HP_SCALE = { DEMON_LORD: 2.4 * BOSS_FOCUS_BONUS, BRUTOS: 2.2 * BOSS_FOCUS_BONUS, BLOOD_COUNTESS: 1.8 * BOSS_FOCUS_BONUS, LONG_NIGHT: 1.8 * BOSS_FOCUS_BONUS };
+export const BOSS_HP_SCALE = { LAKE_SPIRIT: 2.2 * BOSS_FOCUS_BONUS, SLIZORK: 2.2 * BOSS_FOCUS_BONUS, GRAVE_KING: 2.2 * BOSS_FOCUS_BONUS, DEMON_LORD: 2.4 * BOSS_FOCUS_BONUS, BRUTOS: 2.2 * BOSS_FOCUS_BONUS, BLOOD_COUNTESS: 1.8 * BOSS_FOCUS_BONUS, LONG_NIGHT: 1.8 * BOSS_FOCUS_BONUS };
 const FIRST_HOUR_BOSS_HP_SCALE = 1.7 * BOSS_FOCUS_BONUS;
 const FINAL_BOSS_HP_SCALE = 2 * BOSS_FOCUS_BONUS;
 const OTHER_BOSS_HP_SCALE = 2 * BOSS_FOCUS_BONUS;
@@ -358,6 +491,9 @@ const VARIATION_MOVES = {
     DEMON_LORD: [],
     BRUTOS: ['anchor'],
     BLOOD_COUNTESS: ['bloodfog', 'mirror'],
+    LAKE_SPIRIT: [],
+    SLIZORK: [],
+    GRAVE_KING: [],
     LONG_NIGHT: ['darkness'],
     DEMON_HUNTER: ['mirror'],               // 'holyground' (Chão Sagrado) saiu das listas; o código continua em boss_ai.js
     DEMON_HUNTER_FINAL: ['mirror'],

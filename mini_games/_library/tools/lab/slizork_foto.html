@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório · Slizork, o Tirano de Lodo</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; height: 100%; background: #05080a; color: #d6cfbf; font-family: system-ui, sans-serif; overflow: hidden; }
+        #stage { position: fixed; inset: 0; }
+        #stage canvas { display: block; width: 100%; height: 100%; }
+        #panel { position: fixed; top: 10px; right: 10px; width: 250px; padding: 12px 14px; background: rgba(10, 12, 16, .86); border: 1px solid #2a2f38; border-radius: 10px; font-size: 13px; line-height: 1.35; }
+        #panel h1 { margin: 0 0 2px; font-size: 15px; color: #a3e635; }
+        #panel .sub { margin: 0 0 8px; font-size: 11px; color: #8b93a0; }
+        #panel label { display: flex; gap: 8px; align-items: center; margin: 3px 0; cursor: pointer; }
+        #panel select, #panel button { width: 100%; margin-top: 4px; padding: 6px; background: #151a22; color: #e5ded0; border: 1px solid #2f3642; border-radius: 6px; font: inherit; cursor: pointer; }
+        #home { position: fixed; top: 10px; left: 10px; z-index: 5; padding: 6px 10px; background: rgba(10, 12, 16, .86); border: 1px solid #2a2f38; border-radius: 8px; color: #a3e635; text-decoration: none; font-size: 13px; }
+        #loading { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #05080a; color: #a39b86; font-size: 15px; text-align: center; padding: 20px; white-space: pre-line; }
+    </style>
+    <!-- Laboratório (fora dos jogos). Referência: monsters/25d/slizork/art_reference/ (descrição e images/). Abrir: na pasta mini_games, `python3 -m http.server 8010`
+         e http://localhost:8010/_library/tools/lab/slizork_foto.html -->
+    <script type="importmap">
+        { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+    </script>
+</head>
+<body>
+    <div id="stage"></div>
+    <a id="home" href="index.html">← Laboratório</a>
+    <aside id="panel">
+        <h1>Slizork, o Tirano de Lodo</h1>
+        <p class="sub">Chefe do Swamp, feito por código. Arraste para girar, role para aproximar.</p>
+        <label><input type="checkbox" id="spin" checked> Câmera girando sozinha</label>
+        <label><input type="checkbox" id="bloom" checked> Bloom <small>(olhos e joias)</small></label>
+        <label><input type="checkbox" id="swing" checked> Braços balançando</label>
+        <select id="mode"><option value="idle">Parado</option><option value="walk">Rastejando</option><option value="slash">Golpe de espada</option></select>
+        <button id="shot">📷 Salvar foto (PNG)</button>
+    </aside>
+    <div id="loading">Montando o Slizork…</div>
+    <script type="module" src="slizork_foto.js"></script>
+</body>
+</html>

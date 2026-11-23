@@ -1,6 +1,14 @@
 // GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/25d/index.js e rode o sync.
 import { SKELETON_25D_VISUALS } from './skeleton/skeleton25d_visual.js';
 import { renderSkeleton25D } from './skeleton/skeleton25d.js';
+import { ZOMBIE_CRAWLER_25D_VISUALS } from './zombie_crawler/zombie_crawler25d_visual.js';
+import { renderZombieCrawler25D } from './zombie_crawler/zombie_crawler25d.js';
+import { LAKE_SPIRIT_25D_VISUALS } from './lake_spirit/lake_spirit25d_visual.js';
+import { renderLakeSpirit25D } from './lake_spirit/lake_spirit25d.js';
+import { SLIZORK_25D_VISUALS } from './slizork/slizork25d_visual.js';
+import { renderSlizork25D } from './slizork/slizork25d.js';
+import { GRAVE_KING_25D_VISUALS } from './grave_king/grave_king25d_visual.js';
+import { renderGraveKing25D } from './grave_king/grave_king25d.js';
 import { SKELETON_CRAWLER_25D_VISUALS } from './skeleton_crawler/skeleton_crawler25d_visual.js';
 import { renderSkeletonCrawler25D } from './skeleton_crawler/skeleton_crawler25d.js';
 import { BLOATER_25D_VISUALS } from './bloater/bloater25d_visual.js';
@@ -75,6 +83,10 @@ export const MONSTERS_25D = {
     golem: { visuals: GOLEM_25D_VISUALS, render: renderGolem25D, still: golemStill },
     armored_zombie: { visuals: ARMORED_ZOMBIE_25D_VISUALS, render: renderArmoredZombie25D },
     zombie: { visuals: ZOMBIE_25D_VISUALS, render: renderZombie25D },
+    lake_spirit: { visuals: LAKE_SPIRIT_25D_VISUALS, render: renderLakeSpirit25D },
+    slizork: { visuals: SLIZORK_25D_VISUALS, render: renderSlizork25D },
+    grave_king: { visuals: GRAVE_KING_25D_VISUALS, render: renderGraveKing25D },
+    zombie_crawler: { visuals: ZOMBIE_CRAWLER_25D_VISUALS, render: renderZombieCrawler25D },
     bog_slime: { visuals: BOG_SLIME_25D_VISUALS, render: renderBogSlime25D },
     bog_toad: { visuals: BOG_TOAD_25D_VISUALS, render: renderBogToad25D },
     river_eel: { visuals: RIVER_EEL_25D_VISUALS, render: renderRiverEel25D },

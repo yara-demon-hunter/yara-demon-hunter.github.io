@@ -10,7 +10,7 @@ import { buyNode, getBuyableNodes } from '/js/systems/tree.js';
 import { leaveCamp } from '/js/ui/camp.js';
 import { startGame } from '/js/ui/screens.js';
 
-const SPEEDS = [1, 2, 4, 10, 20];           // trocáveis a qualquer momento, pela barra sobre o jogo
+const SPEEDS = [1, 2, 4, 10, 20, 50];           // trocáveis a qualquer momento, pela barra sobre o jogo
 const STEP = 1 / 60;
 
 const waves = [];                       // tempo de jogo de cada onda terminada (segundos do jogo, não do relógio)
@@ -213,3 +213,12 @@ function updateInfo() {
     info.textContent = `Wave ${state.turn} · ${mmss(state.waveTime)} · ${state.run?.kills ?? 0} kills · lvl ${state.playerLevel}${state_}`;
 }
 requestAnimationFrame(tick);
+
+// O mapa entre as telas aparece depois do chefe: com o piloto ligado, ele segue sozinho (espera a caminhada acabar e continua)
+setInterval(() => {
+    if (!run.active || !(run.auto || run.autoCamp)) return;
+    const map = document.getElementById('mapScreen');
+    if (!map || map.classList.contains('hidden')) return;
+    const go = document.getElementById('btnMapContinue');
+    if (go && !go.disabled) go.click();
+}, 400);

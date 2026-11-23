@@ -4,7 +4,7 @@ import { registerLayout } from '../layouts.js';
 
 registerLayout('village_gate_3', {
   profile: 'desktop',
-  savedAt: 1795371136847,
+  savedAt: 1795439816164,
   baked: [11, 3, 15, 16, 2, 6, 13, 5, 10, 4, 9, 14, 12, 7, 8],
   placed: [
     {"prop": "cottage", "x": 0.8862, "y": 0.2847, "from": 11, "variant": 0, "scale": 1.65, "phase": 0.085},
@@ -101,11 +101,13 @@ registerLayout('village_gate_3', {
     {"shape": "rect", "x": 0.1572, "y": 0.6371, "w": 315, "h": 15, "rot": 0, "blocks": {"hero": true, "monsters": true, "heroShots": false, "monsterShots": false}},
     {"shape": "rect", "x": 0.8881, "y": 0.2625, "w": 117, "h": 51, "rot": 0, "blocks": {"hero": true, "monsters": true, "heroShots": true, "monsterShots": true}},
     {"shape": "rect", "x": 0.8841, "y": 0.1883, "w": 149, "h": 92, "rot": 0, "kind": "behind"},
-    {"shape": "rect", "x": 0.1009, "y": 0.5081, "w": 162, "h": 149, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF", "GOLEM", "HEADLESS_KNIGHT"], "boss": false},
-    {"shape": "rect", "x": 0.9377, "y": 0.5123, "w": 162, "h": 149, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF", "GOLEM", "HEADLESS_KNIGHT"], "boss": false},
+    {"shape": "rect", "x": 0.0697, "y": 0.5035, "w": 52, "h": 112, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF", "GOLEM", "HEADLESS_KNIGHT"], "boss": false},
+    {"shape": "rect", "x": 0.9618, "y": 0.5135, "w": 80, "h": 129, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF", "GOLEM", "HEADLESS_KNIGHT"], "boss": false},
     {"shape": "rect", "x": 0.7322, "y": 0.3273, "w": 56, "h": 47, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF"], "boss": false},
     {"shape": "rect", "x": 0.4133, "y": 0.8446, "w": 56, "h": 47, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF"], "boss": false},
     {"shape": "rect", "x": 0.3995, "y": 0.2248, "w": 56, "h": 47, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF"], "boss": false},
-    {"shape": "rect", "x": 0.8963, "y": 0.326, "w": 56, "h": 47, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF"], "boss": false}
+    {"shape": "rect", "x": 0.8963, "y": 0.326, "w": 56, "h": 47, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF"], "boss": false},
+    {"shape": "rect", "x": 0.6184, "y": 0.0556, "w": 56, "h": 47, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF"], "boss": false},
+    {"shape": "rect", "x": 0.7756, "y": 0.929, "w": 56, "h": 47, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "VAMPIRE", "WITCH", "SHADOW_WOLF", "ZOMBIE_WOLF"], "boss": false}
   ]
 });

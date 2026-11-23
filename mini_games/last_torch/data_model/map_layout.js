@@ -170,12 +170,12 @@ export const MAP_LAYOUT = {
     ],
     marker: {
         size: 6,
-        border: "#fbbf24",
+        border: "#50dc04",
         borderWidth: 3
     },
     nodes: {
         size: 2.1,
-        done: "#f59f0a",
+        done: "#22c55e",
         idle: "rgba(92, 64, 36, 0.55)",
         next: "#b91c1c"
     },

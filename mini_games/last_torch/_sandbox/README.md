@@ -46,7 +46,7 @@ Terceira aba do painel (**⏩ Fast run**): escolha o **herói**, deixe ligada (o
 Quarta aba do painel (**🖼️ Screens**): abre uma tela do jogo na hora, com os números que você escolher, para ver o que acontece quando o jogador morre, passa uma onda ou zera o jogo, sem jogar uma noite inteira. Usa as funções reais do jogo (`triggerGameOver`, `openCamp`, `returnToMenu`...), então a tela é exatamente a do jogador.
 
 - **Escolhas:** herói, onda, pontuação, monstros abatidos, bosses vencidos, estrelas da onda (0 a 5) e nível de Escuridão. A caixa **Hide the "new hero unlocked" popup** (ligada) marca os troféus que liberam heróis como já ganhos, porque passar da onda 1 liberaria o Rowan e o prêmio cobriria a tela; desmarque para ver o prêmio de verdade.
-- **End of the night:** 💀 o herói caiu, 🔥 a tocha apagou, 🌅 o amanhecer (tela de vitória com STAY IN THE DARK). Dá para clicar nos botões dessas telas (HUNT AGAIN, ALTAR, MENU...) e ver o que vem depois.
+- **End of the night:** 💀 o herói caiu, 🔥 a tocha apagou, 🌅 o amanhecer (tela de vitória). Dá para clicar nos botões dessas telas (HUNT AGAIN, ALTAR, MENU...) e ver o que vem depois.
 - **Between waves:** ⭐ onda concluída (cartão de resultado com as estrelas escolhidas e depois o acampamento) e 🏕️ só o acampamento.
 - **Menus:** início, presente diário, Ranks e o Altar aberto logo depois de uma queda ("try again, but stronger").
 - **Save do sandbox:** +500 Brasas, liberar todos os heróis e **🆕 Brand new player** (apaga o save deste sandbox e recarrega, para ver a experiência de quem nunca jogou).

@@ -1,9 +1,10 @@
 import { TURN_DIFFICULTY, getTurnDifficulty } from '../../data_model/difficulty.js';
-import { ELITE_TYPES, rollElite } from '../../data_model/elites.js';
+import { screenOf } from '../../data_model/screens/index.js';
+import { rollElite } from '../../data_model/elites.js';
 import { HOUR_EVENTS, NIGHT, rollHourHordes } from '../../data_model/night.js';
 import { BOSS_MODELS, BOSS_SPAWNING, chooseBossType, createBoss, hasDuel, isBossTurn } from '../../data_model/bosses.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, chooseMonsterType, createMonster } from '../../data_model/monsters.js';
-import { isMonsterUnlocked, waveProgress, waveSpawnBoost } from '../../data_model/difficulty.js';
+import { waveProgress, waveSpawnBoost } from '../../data_model/difficulty.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner, showToast } from '../ui/banner.js';
 import { playDuelDialogue, whenHunting } from '../ui/dialogue.js';
@@ -14,24 +15,12 @@ import { clearSkillEffects } from './skills.js';
 import { getSceneryId } from '../render/scenery.js';
 import { effectiveTurn } from '../../data_model/campaign.js';
 import { spawnDefOf } from '../../library/monsters/25d/spawn.js';
-import { pickBossSpawnPoint, pickSpawnPoint } from './spawn_zones.js';
+import { pickBossSpawnPoint, pickSpawnPoint, zoneMonsterTypes } from './spawn_zones.js';
 
 const MIN_HORDE = 3;
 
 // --- SPAWNER DE INIMIGOS ---
-// Monstros nascem logo fora da tela, em qualquer ponto da borda do mundo
-function edgePoint() {
-    const { width: w, height: h } = state;
-    const m = MONSTER_SPAWNING.edgeMargin;
-    let p = Math.random() * 2 * (w + h);
-    if (p < w) return { x: p, y: -m };
-    p -= w;
-    if (p < h) return { x: w + m, y: p };
-    p -= h;
-    if (p < w) return { x: p, y: h + m };
-    p -= w;
-    return { x: -m, y: p };
-}
+// Monstros nascem SOMENTE nas zonas verdes do cenário (spawn_zones.js); não existe mais nascimento pela borda do mundo
 
 // Aplica Escuridão e presságios a um monstro recém-criado
 function applyEnemyMods(e) {
@@ -52,20 +41,29 @@ export function addMonster(type, x, y, opts = {}) {
     return e;
 }
 
-// Onde nasce um monstro deste tipo: numa zona de nascimento do cenário, se houver; senão, pela borda do mundo (o jeito de sempre)
+// Onde nasce um monstro deste tipo: SEMPRE numa zona verde do cenário (Ateliê). Sem zona nenhuma (ou todas bloqueadas), ele não nasce:
+// o jogo avisa no console (uma vez por cenário) e o cenário precisa de uma zona verde. Nunca pela borda.
+const warned = new Set();
 function spawnSpot(type) {
     const zone = pickSpawnPoint(type);
-    return zone ? { ...zone, emerge: true } : { ...edgePoint(), emerge: false };
+    if (zone) return { ...zone, emerge: true };
+    const id = getSceneryId();
+    if (!warned.has(id)) {
+        warned.add(id);
+        console.warn(`[spawner] O cenário "${id}" não tem zona verde de nascimento para ${type}: nenhum monstro nasce. Desenhe uma no Ateliê de cenários.`);
+    }
+    return null;
 }
 
 function spawnRegular() {
     if (state.enemies.length >= TURN_DIFFICULTY.maxAliveEnemies) return;
-    let type = chooseMonsterType(state.turn, Math.random, getSceneryId());
+    let type = chooseMonsterType(state.turn, Math.random, getSceneryId(), zoneMonsterTypes());
     // Alguns tipos têm limite em campo (o cavaleiro): passado dele, nasce um esqueleto
     const cap = MONSTER_MODELS[type].maxAlive;
     if (cap && state.enemies.filter(e => e.type === type).length >= cap) type = 'SKELETON';
-    const { x, y, emerge } = spawnSpot(type);
-    const e = addMonster(type, x, y, { emerge });
+    const spot = spawnSpot(type);
+    if (!spot) return;
+    const e = addMonster(type, spot.x, spot.y, { emerge: spot.emerge });
     const arrival = MONSTER_MODELS[type].arrival;
     if (arrival) {
         showBanner('', arrival.title, arrival.sub, 'danger');
@@ -77,9 +75,14 @@ function spawnRegular() {
 
 // Elite: maior, mais duro, solta um baú ao morrer
 export function spawnElite() {
-    const types = ELITE_TYPES.filter(type => isMonsterUnlocked(type, state.turn));
+    const screen = screenOf(getSceneryId());
+    const here = zoneMonsterTypes();
+    const fit = screen.elites.filter(t => !here.length || here.includes(t));
+    const types = fit.length ? fit : screen.elites;
     const type = types[Math.floor(Math.random() * types.length)];
-    const { x, y, emerge } = spawnSpot(type);
+    const spot = spawnSpot(type);
+    if (!spot) return;
+    const { x, y, emerge } = spot;
     const e = addMonster(type, x, y, { emerge });
     const elite = rollElite();
     e.elite = elite;
@@ -93,26 +96,23 @@ export function spawnElite() {
 }
 
 function spawnRing(h) {
-    const R = 430;
     for (let i = 0; i < h.count; i++) {
-        const a = (i / h.count) * Math.PI * 2;
-        addMonster(h.type, player.x + Math.cos(a) * R, player.y + Math.sin(a) * R);
+        const spot = spawnSpot(h.type);
+        if (spot) addMonster(h.type, spot.x, spot.y, { emerge: spot.emerge });
     }
 }
 
 function spawnWall(h) {
-    const { width: w, height: h2 } = state;
-    const m = MONSTER_SPAWNING.edgeMargin;
-    const horizontal = Math.random() < 0.5;
-    const far = Math.random() < 0.5;
     for (let i = 0; i < h.count; i++) {
-        const k = (i + 0.5) / h.count;
-        addMonster(h.type, horizontal ? (far ? w + m : -m) : w * k, horizontal ? h2 * k : (far ? h2 + m : -m));
+        const spot = spawnSpot(h.type);
+        if (spot) addMonster(h.type, spot.x, spot.y, { emerge: spot.emerge });
     }
 }
 
 function spawnSwarm(h) {
-    const { x, y, emerge } = spawnSpot(h.type);
+    const spot = spawnSpot(h.type);
+    if (!spot) return;
+    const { x, y, emerge } = spot;
     for (let i = 0; i < h.count; i++) {
         addMonster(h.type, x + (Math.random() - 0.5) * 90, y + (Math.random() - 0.5) * 90, { emerge });
     }
@@ -121,18 +121,27 @@ function spawnSwarm(h) {
 // Covas: círculos no chão perto do herói; o monstro levanta quando o aviso acaba
 function spawnGraves(h) {
     for (let i = 0; i < h.count; i++) {
-        const a = Math.random() * Math.PI * 2;
-        const d = 130 + Math.random() * 170;
+        const spot = spawnSpot(h.type);
+        if (!spot) continue;
         state.telegraphs.push({
             kind: 'grave',
-            x: Math.max(30, Math.min(state.width - 30, player.x + Math.cos(a) * d)),
-            y: Math.max(30, Math.min(state.height - 30, player.y + Math.sin(a) * d)),
+            x: spot.x, y: spot.y,
             radius: 20,
             age: -i * 0.06,
             seconds: 0.95,
             monsterType: h.type
         });
     }
+}
+
+// A horda usa só monstros da tela de agora: se o tipo sorteado não é daqui, troca por um da lista `hordes` da tela
+function fitHordeToScreen(h) {
+    const screen = screenOf(getSceneryId());
+    const here = zoneMonsterTypes();
+    if (here.length ? here.includes(h.type) : screen.monsters.some(m => m.type === h.type)) return h;
+    const ok = screen.hordes.filter(t => !here.length || here.includes(t));
+    const pool = ok.length ? ok : here.length ? here : screen.hordes;
+    return { ...h, type: pool[Math.floor(Math.random() * pool.length)] };
 }
 
 const HORDE_SPAWNERS = { ring: spawnRing, wall: spawnWall, swarm: spawnSwarm, grave: spawnGraves };
@@ -236,15 +245,15 @@ export function buildHourPlan(hour) {
     const curve = effectiveTurn(hour);          // hordas e elites seguem a curva de 12 ondas esticada para 30 (data_model/campaign.js)
     if (curve >= HOUR_EVENTS.firstEliteHour) elites.push({ at: HOUR_EVENTS.eliteMoment, fired: false });
     if (curve >= HOUR_EVENTS.secondEliteHour) elites.push({ at: HOUR_EVENTS.secondEliteMoment, fired: false });
-    return { boss, bossCalled: false, hordes: rollHourHordes(curve), elites };
+    return { boss, bossCalled: false, hordes: rollHourHordes(curve).map(fitHordeToScreen), elites };
 }
 
 // Monstros do início da hora, já perto: a ação começa na hora
 export function spawnOpening() {
     for (let i = 0; i < NIGHT.openingMonsters; i++) {
-        const a = Math.random() * Math.PI * 2;
-        const R = NIGHT.openingRadius + Math.random() * 120;
-        addMonster(chooseMonsterType(state.turn, Math.random, getSceneryId()), state.coreX + Math.cos(a) * R * 1.5, state.coreY + Math.sin(a) * R);
+        const type = chooseMonsterType(state.turn, Math.random, getSceneryId(), zoneMonsterTypes());
+        const spot = spawnSpot(type);
+        if (spot) addMonster(type, spot.x, spot.y, { emerge: spot.emerge });
     }
 }
 

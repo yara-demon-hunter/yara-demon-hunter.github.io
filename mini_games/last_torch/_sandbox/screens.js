@@ -12,7 +12,7 @@ import { grantWaveSpoils, openCamp } from '/js/ui/camp.js';
 import { openAltar } from '/js/ui/altar.js';
 import { openRanks } from '/js/ui/sanctuary.js';
 import { openGift, returnToMenu, startGame, triggerGameOver } from '/js/ui/screens.js';
-import { CAMPAIGN } from '/data_model/campaign.js';
+import { CAMPAIGN, TOTAL_WAVES, effectiveTurn } from '/data_model/campaign.js';
 import { showMapTransition } from '/js/ui/map_screen.js';
 
 export function mountScreens(host, { hidePanel, showPanel }) {
@@ -21,11 +21,11 @@ export function mountScreens(host, { hidePanel, showPanel }) {
       <p class="note">Open any screen right now, with the numbers below. After a screen opens, press <b>🧪 Sandbox</b> (bottom-left) to come back here.</p>
       <h3>Hero</h3><div class="sb-row" id="scHeroes"></div>
       <h3>The night so far</h3>
-      <label class="sb-field">Wave reached <input id="scWave" type="number" min="1" max="30" value="${v.wave}"></label>
+      <label class="sb-field">Wave reached <input id="scWave" type="number" min="1" max="18" value="${v.wave}"></label>
       <label class="sb-field">Score <input id="scScore" type="number" min="0" step="500" value="${v.score}"></label>
       <label class="sb-field">Monsters slain <input id="scKills" type="number" min="0" value="${v.kills}"></label>
-      <label class="sb-field">Bosses beaten <input id="scBosses" type="number" min="0" max="30" value="${v.bosses}"></label>
-      <label class="sb-field">Stars on the wave (0 to 5) <input id="scStars" type="number" min="0" max="5" value="${v.stars}"></label>
+      <label class="sb-field">Bosses beaten <input id="scBosses" type="number" min="0" max="18" value="${v.bosses}"></label>
+      <label class="sb-field">Stars on the wave (0 to 3) <input id="scStars" type="number" min="0" max="3" value="${v.stars}"></label>
       <label class="sb-field">Darkness level <input id="scDark" type="number" min="1" max="8" value="${v.darkness}"></label>
       <label class="sb-field">Hide the "new hero unlocked" popup (it would cover the screen) <input id="scNoUnlock" type="checkbox" checked></label>
       <h3>End of the night</h3>
@@ -82,22 +82,21 @@ export function mountScreens(host, { hidePanel, showPanel }) {
         save.maxDarkness = Math.max(save.maxDarkness, save.darkness);
         startGame();
         state.enemies.length = 0;
-        state.turn = num('#scWave', 1, 30);
+        state.turn = num('#scWave', 1, 18);
         state.totalScore = num('#scScore', 0, 99999999);
         state.run.kills = num('#scKills', 0, 99999);
-        state.run.bosses = num('#scBosses', 0, 30);
+        state.run.bosses = num('#scBosses', 0, 18);
         state.playerLevel = 3 + state.turn * 2;
     }
 
-    // Faz o resultado da onda render N estrelas: as metas são as do jogo (data_model/night.js > WAVE_SPOILS): tocha e herói pedem
-    // dano ≤ 75% (1 estrela) e ≤ 40% (2); o Rush pede o número da onda
+    // Faz o resultado da onda render N estrelas (0 a 3): as regras são as do jogo (data_model/night.js > WAVE_SPOILS), na ordem: nenhum monstro
+    // consumido pela tocha, herói com dano ≤ 50% e o Rush da onda
     function setWaveStars(wave, n) {
-        const [loose, tight] = WAVE_SPOILS.damageGoals;
-        const dmg = (stars) => (stars >= 2 ? tight * 100 - 15 : stars === 1 ? loose * 100 - 15 : 95);
-        const torch = n >= 5 ? 2 : n >= 4 ? 2 : n >= 1 ? 1 : 0;
-        const hero = n >= 5 ? 2 : n >= 2 ? 1 : 0;
-        const rush = n >= 3 ? WAVE_SPOILS.rushGoalBase + WAVE_SPOILS.rushGoalPerWave * wave + 2 : 6;
-        state.waveStats = { kills0: 0, gold0: 0, rush, torchDamage: state.coreHpMax * dmg(torch) / 100, heroDamage: player.maxHp * dmg(hero) / 100 };
+        const rush = n >= 3 ? Math.round(WAVE_SPOILS.rushGoalBase + WAVE_SPOILS.rushGoalPerWave * effectiveTurn(wave)) + 2 : 4;
+        state.waveStats = {
+            kills0: 0, gold0: 0, rush, consumed: n >= 1 ? 0 : 3,
+            torchDamage: state.coreHpMax * (n >= 1 ? 0.3 : 0.9), heroDamage: player.maxHp * (n >= 2 ? 0.3 : 0.9)
+        };
     }
 
     const go = (fn, what) => () => {
@@ -129,15 +128,15 @@ export function mountScreens(host, { hidePanel, showPanel }) {
         triggerGameOver('PLAYER');
         save.stats.bestScore = Math.max(oldBest, state.totalScore);
     }, 'the game over screen with every record broken'));
-    add('#scEnd', '🌅 Dawn: you finished the game', 'victory screen (STAY IN THE DARK)', go(() => {
+    add('#scEnd', '🌅 Dawn: you finished the game', 'victory screen', go(() => {
         let oldBest = 0;
         const forceRecord = false;
-        // Como no jogo: o resultado da onda 12 (com as estrelas escolhidas) aparece durante o amanhecer, e a tela de vitória vem depois
-        state.turn = 12;
+        // Como no jogo: o resultado da última onda (com as estrelas escolhidas) aparece durante o amanhecer, e a tela de vitória vem depois
+        state.turn = TOTAL_WAVES;
         state.run.victory = true;
-        // Uma noite "vivida": estrelas variadas nas ondas 1 a 11 e algumas skills compradas, para a tela de vitória ter o que mostrar
-        const pick = num('#scStars', 0, 5);
-        state.run.waveStars = Object.fromEntries(Array.from({ length: 11 }, (_, i) => [i + 1, Math.max(0, Math.min(5, pick + ((i * 7) % 5) - 2))]));
+        // Uma noite "vivida": estrelas variadas nas ondas 1 a 17 e algumas skills compradas, para a tela de vitória ter o que mostrar
+        const pick = num('#scStars', 0, 3);
+        state.run.waveStars = Object.fromEntries(Array.from({ length: TOTAL_WAVES - 1 }, (_, i) => [i + 1, Math.max(0, Math.min(3, pick + ((i * 7) % 3) - 1))]));
         state.skillPoints = 20;
         for (let i = 0; i < 10; i++) { const b = getBuyableNodes(); if (b.length) buyNode(b[i % b.length].id); }
         state.run.bestStreak = 48;
@@ -148,8 +147,8 @@ export function mountScreens(host, { hidePanel, showPanel }) {
             state.run.startBests = { hour: 1, kills: 1, stars: 1, embers: 1, streak: 1 };
             state.totalScore = Math.max(state.totalScore, 50000);
         }
-        setWaveStars(12, num('#scStars', 0, 5));
-        grantWaveSpoils(12);
+        setWaveStars(TOTAL_WAVES, num('#scStars', 0, 3));
+        grantWaveSpoils(TOTAL_WAVES);
         // O resumo da noite espera o cartão fechar (como no jogo: uma tela de cada vez)
         const t0 = performance.now();
         const wait = setInterval(() => {
@@ -163,12 +162,12 @@ export function mountScreens(host, { hidePanel, showPanel }) {
     add('#scEnd', '🏆 Dawn with a NEW RECORD', 'victory screen + record confetti', go(() => {
         let oldBest = 0;
         const forceRecord = true;
-        // Como no jogo: o resultado da onda 12 (com as estrelas escolhidas) aparece durante o amanhecer, e a tela de vitória vem depois
-        state.turn = 12;
+        // Como no jogo: o resultado da última onda (com as estrelas escolhidas) aparece durante o amanhecer, e a tela de vitória vem depois
+        state.turn = TOTAL_WAVES;
         state.run.victory = true;
-        // Uma noite "vivida": estrelas variadas nas ondas 1 a 11 e algumas skills compradas, para a tela de vitória ter o que mostrar
-        const pick = num('#scStars', 0, 5);
-        state.run.waveStars = Object.fromEntries(Array.from({ length: 11 }, (_, i) => [i + 1, Math.max(0, Math.min(5, pick + ((i * 7) % 5) - 2))]));
+        // Uma noite "vivida": estrelas variadas nas ondas 1 a 17 e algumas skills compradas, para a tela de vitória ter o que mostrar
+        const pick = num('#scStars', 0, 3);
+        state.run.waveStars = Object.fromEntries(Array.from({ length: TOTAL_WAVES - 1 }, (_, i) => [i + 1, Math.max(0, Math.min(3, pick + ((i * 7) % 3) - 1))]));
         state.skillPoints = 20;
         for (let i = 0; i < 10; i++) { const b = getBuyableNodes(); if (b.length) buyNode(b[i % b.length].id); }
         state.run.bestStreak = 48;
@@ -179,8 +178,8 @@ export function mountScreens(host, { hidePanel, showPanel }) {
             state.run.startBests = { hour: 1, kills: 1, stars: 1, embers: 1, streak: 1 };
             state.totalScore = Math.max(state.totalScore, 50000);
         }
-        setWaveStars(12, num('#scStars', 0, 5));
-        grantWaveSpoils(12);
+        setWaveStars(TOTAL_WAVES, num('#scStars', 0, 3));
+        grantWaveSpoils(TOTAL_WAVES);
         // O resumo da noite espera o cartão fechar (como no jogo: uma tela de cada vez)
         const t0 = performance.now();
         const wait = setInterval(() => {
@@ -196,7 +195,7 @@ export function mountScreens(host, { hidePanel, showPanel }) {
         const wave = state.turn;
         state.turn = wave + 1;
         state.phase = 'CLEAR';
-        setWaveStars(wave, num('#scStars', 0, 5));
+        setWaveStars(wave, num('#scStars', 0, 3));
         setTimeout(() => openCamp(), 60);
     }, 'the wave results and the camp'));
     add('#scWaveBtns', '🏕️ Camp only', 'no results card', go(() => { state.turn += 1; state.phase = 'CLEAR'; openCamp(true); }, 'the camp'));

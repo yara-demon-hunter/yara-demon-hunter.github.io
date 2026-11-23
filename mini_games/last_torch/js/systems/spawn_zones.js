@@ -4,8 +4,8 @@
 //   weight  a chance de ser sorteada entre as zonas que servem (padrão 1)
 //   types   quais monstros nascem nela (lista de tipos, como 'SKELETON'); vazia = serve para todos
 //   boss    true = zona do CHEFE: é onde o círculo de invocação dele aparece (e só ele usa)
-// Para cada monstro valem primeiro as zonas que listam o tipo dele; se não há, as zonas sem tipos; se também não há, ele nasce pela
-// borda do mundo como sempre (pickSpawnPoint devolve null e o spawner usa o caminho antigo). Cenário sem zonas = nada muda.
+// Para cada monstro valem primeiro as zonas que listam o tipo dele; se não há, as zonas sem tipos; se também não há, usa qualquer zona
+// verde. Monstro NUNCA nasce fora das zonas; cenário sem zona = ninguém nasce (pickSpawnPoint devolve null e o spawner avisa).
 import { state } from '../core/state.js';
 import { fittedSize, getSceneryColliders } from '../render/scenery.js';
 import { blockedAt } from './colliders.js';
@@ -71,13 +71,14 @@ function pickFrom(list, flag = 'monsters') {
     return null;
 }
 
-// Onde nasce um monstro comum deste tipo (null = sem zona para ele: o spawner usa a borda)
+// Onde nasce um monstro comum deste tipo (null = sem zona verde utilizável: o monstro não nasce)
 export function pickSpawnPoint(type) {
     const all = zones();
     if (all.length === 0) return null;
     const own = all.filter(z => !z.boss && z.types.includes(type));
-    const any = own.length ? own : all.filter(z => !z.boss && z.types.length === 0);
-    return pickFrom(any);
+    const untyped = all.filter(z => !z.boss && z.types.length === 0);
+    // Sem zona do tipo nem zona livre: usa qualquer zona verde (monstro nunca nasce fora delas)
+    return pickFrom(own.length ? own : untyped.length ? untyped : all.filter(z => !z.boss));
 }
 
 // Onde o chefe nasce (null = sem zona de chefe)
@@ -85,4 +86,9 @@ export function pickBossSpawnPoint() {
     const all = zones();
     if (all.length === 0) return null;
     return pickFrom(all.filter(z => z.boss));
+}
+
+// Tipos de monstro que as zonas verdes da tela listam (a lista de quem nasce na tela mora no Ateliê); [] = nenhuma zona com tipos
+export function zoneMonsterTypes() {
+    return [...new Set(zones().filter(z => !z.boss).flatMap(z => z.types))];
 }

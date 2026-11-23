@@ -17,7 +17,7 @@ const ease = (k) => 1 - (1 - k) ** 3;
 // O cartão está na tela? (o amanhecer espera ele fechar antes de mostrar o resumo da noite: uma tela de cada vez)
 export const isWaveResultsOpen = () => !!document.querySelector('.wave-results');
 
-export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, points }) {
+export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, points, onClose }) {
     document.querySelector('.wave-results')?.remove();
     const root = document.createElement('div');
     root.className = 'wave-results';
@@ -33,7 +33,7 @@ export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, po
         </div>
         <div class="wr-total"><span>SCORE</span><b class="wr-score">0</b></div>
         <p class="wr-best">${best ? `Best on this wave: ${fmt(best.score)}` : 'First time on this wave'}</p>
-        <div class="wr-stars">${[0, 1, 2, 3, 4].map(() => '<span class="wr-star">★</span>').join('')}</div>
+        <div class="wr-stars">${[0, 1, 2].map(() => '<span class="wr-star">★</span>').join('')}</div>
         <p class="wr-spoils"></p>
         <p class="wr-hint">tap to continue</p>
       </div>`;
@@ -46,7 +46,7 @@ export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, po
     // Linha do tempo: as linhas, o total, as estrelas (só as ganhas acendem), o prêmio
     const rowsEnd = rows.length * ROW_SECONDS;
     const scoreEnd = rowsEnd + SCORE_SECONDS;
-    const starsEnd = scoreEnd + 5 * STAR_SECONDS;
+    const starsEnd = scoreEnd + 3 * STAR_SECONDS;
     const newBest = !!best && score > best.score;
     let start = performance.now();
     let lastTick = -1;
@@ -64,7 +64,7 @@ export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, po
         });
         const ks = Math.max(0, Math.min(1, (t - rowsEnd) / SCORE_SECONDS));
         scoreEl.textContent = fmt(rows.reduce((sum, r) => sum + r.points, 0) * (t < rowsEnd ? 0 : ease(ks)));
-        const due = Math.max(0, Math.min(5, Math.floor((t - scoreEnd) / STAR_SECONDS) + 1));
+        const due = Math.max(0, Math.min(3, Math.floor((t - scoreEnd) / STAR_SECONDS) + 1));
         while (stamped < due) {
             const lit = stamped < stars;
             starEls[stamped].classList.add(lit ? 'is-lit' : 'is-off');
@@ -105,6 +105,7 @@ export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, po
         document.removeEventListener('keydown', onKey, true);
         root.classList.remove('is-in');
         setTimeout(() => root.remove(), 250);
+        onClose?.();                       // o fim da onda de uma tela segue para o mapa depois do resultado
     }
     // Primeiro toque: pula para o resultado; o segundo fecha
     const advance = () => (finished ? close() : finish());

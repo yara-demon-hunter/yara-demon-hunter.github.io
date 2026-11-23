@@ -167,7 +167,7 @@ function updateDangerFx() {
 function updateNightPips() {
     if (pipsHour === state.turn) return;
     pipsHour = state.turn;
-    const total = Math.max(NIGHT.hours, state.endless ? state.turn : 0);
+    const total = NIGHT.hours;
     if (ui.pips.childElementCount !== total) {
         ui.pips.textContent = '';
         for (let h = 1; h <= total; h++) {

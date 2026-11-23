@@ -5,7 +5,7 @@ import { inPortal, enterFullscreen, showIosHint } from './orientation.js';
 import { choosePick, isPicking, setupQuickPick } from './quick_pick.js';
 import { closeSanctuary, openRanks, openSanctuary, setSanctuaryTab } from './sanctuary.js';
 import { closeAltar, openAltar, setupAltar } from './altar.js';
-import { changeDarkness, keepHunting, quitToMenu, returnToMenu, shareResult, startGame, continueRun } from './screens.js';
+import { changeDarkness, quitToMenu, returnToMenu, shareResult, startGame, continueRun } from './screens.js';
 import { openSettings, toggleSetting } from './settings.js';
 import { setupTouchLayout } from './touch_layout.js';
 import { openStatus, resumeGame, setStatusTab, showBuildNote } from './status.js';
@@ -54,10 +54,6 @@ export function setupButtons() {
     on('btnCloseSettings', resume);
     on('btnResumeSettings', resume);
     on('btnResume', resume);
-    on('btnEndless', () => {
-        enterFullscreen();
-        keepHunting();
-    });
     // Sair para o menu pede confirmação: um toque sem querer não pode jogar a noite fora
     const confirmBox = document.getElementById('confirmScreen');
     const closeConfirm = () => confirmBox.classList.add('hidden');

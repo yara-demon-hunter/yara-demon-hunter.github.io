@@ -89,6 +89,7 @@ permalink: /mini_games/last_torch/last_torch.html
         <!-- Medalhão de status (pausa e mostra a build) e, ao lado, o botão de controles -->
         <button id="btnPause" class="status-btn" title="Skill tree and status (P)" aria-label="Skill tree and hero status"><span id="statusBadge" class="hud-badge"></span></button>
         <div id="hudButtons">
+            <button id="btnMap" class="map-btn" title="Map (M)" aria-label="Map: where you are"></button>
             <button id="btnSettings" class="hud-btn" title="Settings" aria-label="Settings">🎮</button>
         </div>
 
@@ -228,15 +229,33 @@ permalink: /mini_games/last_torch/last_torch.html
 
 <!-- MAPA entre as telas (depois do chefe de cada tela). Styles in css/components/map.css, lógica em js/ui/map_screen.js -->
 <div id="mapScreen" class="game-screen hidden" role="dialog" aria-label="Map">
-    <p id="mapSub" class="screen-eyebrow"></p>
-    <h2 id="mapTitle" class="screen-title"></h2>
-    <div id="mapFrame" class="map-frame">
-        <img id="mapImg" class="map-img" alt="" draggable="false">
-        <div id="mapNodes" class="map-nodes"></div>
-        <div id="mapLabels" class="map-labels"></div>
-        <div id="mapMarker" class="map-marker"><img id="mapHero" alt="" draggable="false"></div>
+    <div class="map-panel">
+        <header class="map-head">
+            <div class="map-hero"><img id="mapHeroCard" alt="" draggable="false"><div><b id="mapHeroName"></b><span id="mapHeroLevel"></span></div></div>
+            <div class="map-head-text">
+                <p id="mapSub" class="screen-eyebrow"></p>
+                <h2 id="mapTitle" class="screen-title"></h2>
+            </div>
+            <div class="map-chips">
+                <div class="map-chip" title="Stars earned this night">★ <b id="mapStars">0</b></div>
+                <div class="map-chip" title="Gold">🪙 <b id="mapGold">0</b></div>
+            </div>
+        </header>
+        <div id="mapFrame" class="map-frame">
+            <img id="mapImg" class="map-img" alt="" draggable="false">
+            <div id="mapNodes" class="map-nodes"></div>
+            <div id="mapLabels" class="map-labels"></div>
+            <div id="mapMarker" class="map-marker"><img id="mapHero" alt="" draggable="false"></div>
+        </div>
+        <div id="mapRail" class="map-rail" aria-hidden="true"></div>
+        <footer class="map-foot">
+            <div class="map-legend" aria-hidden="true">
+                <span><i class="lg lg-won"></i>Won</span><span><i class="lg lg-now"></i>Now</span><span><i class="lg lg-boss"></i>Boss</span>
+            </div>
+            <div id="mapNext" class="map-next"></div>
+            <button id="btnMapContinue" class="start-btn" disabled>CONTINUE ▶</button>
+        </footer>
     </div>
-    <button id="btnMapContinue" class="start-btn" disabled>CONTINUE ▶</button>
 </div>
 
 <!-- ACAMPAMENTO (fim de cada hora). Styles in css/components/camp.css -->
@@ -249,7 +268,7 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
             <div class="camp-wallet">
                 <button id="btnCampSkills" class="points-chip hidden" title="Skill tree">⚡ <b id="campPoints">0</b> SKILLS</button>
-                <button id="btnCampMap" class="points-chip" title="Where you are on the map">🗺️ MAP</button>
+                <button id="btnCampMap" class="map-btn is-camp" title="Map: where you are" aria-label="Map: where you are"></button>
                 <div class="camp-gold">🪙 <b id="campCoins">0</b></div>
             </div>
         </header>
@@ -488,7 +507,6 @@ permalink: /mini_games/last_torch/last_torch.html
         </div>
         <div class="summary-actions">
             <button id="btnRestart" class="start-btn">▶ HUNT AGAIN</button>
-            <button id="btnEndless" class="start-btn start-btn-dark hidden">STAY IN THE DARK</button>
             <button id="btnMenu" class="start-btn start-btn-dark">MENU</button>
         </div>
     </div>

@@ -83,6 +83,7 @@
     import { MAP_LAYOUT } from '/last_torch/data_model/map_layout.js';
 
     const $ = (id) => document.getElementById(id);
+    const WAVES_PER_SCREEN = 3;            // igual a CAMPAIGN.wavesPerScreen (last_torch/data_model/campaign.js)
     const MAP_W = 1375;
     const MAP_H = 767;
     const FONTS = { cinzel: "'Cinzel', serif", inter: "'Inter', sans-serif" };
@@ -125,6 +126,19 @@
             n.style.setProperty('--done', L.nodes.done); n.style.setProperty('--idle', L.nodes.idle); n.style.setProperty('--next', L.nodes.next);
             n.title = `${i + 1}. ${s.name}`;
             nodes.appendChild(n);
+            // as ondas da tela (3 por tela, a última é a do chefe), como no jogo: ★★★ por onda, exemplo de vencidas até a passagem escolhida
+            const waves = document.createElement('div');
+            waves.className = 'map-waves';
+            [waves.style.left, waves.style.top] = pct(s.node);
+            const sample = [3, 2, 3];
+            for (let j = 1; j <= WAVES_PER_SCREEN; j++) {
+                const won = i <= here;
+                const slot = document.createElement('span');
+                slot.className = 'mw-slot' + (j === WAVES_PER_SCREEN ? ' is-boss' : '') + (won ? ' is-won' : i === here + 1 && j === 1 ? ' is-now' : '');
+                slot.innerHTML = [0, 1, 2].map(k => `<i class="mw-star${won && k < (sample[j - 1] ?? 3) ? ' is-on' : ''}">★</i>`).join('');
+                waves.appendChild(slot);
+            }
+            nodes.appendChild(waves);
         });
         // textos
         const labels = $('labels');

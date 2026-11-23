@@ -263,7 +263,7 @@ function updateTreantPunch(e, P, dist, angle, dt) {
     e.punchCooldown -= dt;
     if (dist > P.range || e.punchCooldown > 0) return false;
     e.punchAngle = angle;
-    if (P.root) { e.rootX = player.x; e.rootY = player.y; e.rootWarn = true; e.rootWindup = P.windupSeconds; }       // o ponto das raízes fica marcado no começo: dá tempo de sair
+    if (P.root) { e.rootX = player.x; e.rootY = player.y; e.rootWarn = true; e.rootWindup = P.windupSeconds; e.rootR = P.root.radius; }       // o ponto das raízes fica marcado no começo: dá tempo de sair
     e.punchState = 1;
     e.punchTimer = P.windupSeconds;
     e.punchCooldown = P.cooldownSeconds;
@@ -420,8 +420,9 @@ function deathEffects(e, model) {
         return;
     }
     if (e.isBoss) {
-        addGibs('BOSS', e.x, e.y);
-        addStain('BOSS', e.x, e.y, e.radius * 1.6);
+        const dt = model.deathType ?? 'BOSS';          // chefes com morte própria (Slizork explode em bolhas)
+        addGibs(dt, e.x, e.y, dt === 'BOSS' ? 1 : 1.6);
+        addStain(dt, e.x, e.y, e.radius * 1.6);
         return;
     }
     addGibs(e.type, e.x, e.y, scale);
@@ -686,6 +687,7 @@ export function updateEnemies(dt) {
             if (model.explosion) burst(e, model);
             createExplosion(e.x, e.y, e.color, 8);
             removeEnemy(i, e);
+            state.waveStats.consumed++;                    // para a estrela "nenhum monstro consumido pela tocha"
             hurtTorch(damage, e.x, e.y);
             if (state.phase !== 'HUNT') return;
             continue;

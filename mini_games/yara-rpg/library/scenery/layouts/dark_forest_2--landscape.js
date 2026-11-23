@@ -5,7 +5,7 @@ import { registerLayout } from '../layouts.js';
 
 registerLayout('dark_forest_2', {
   profile: 'landscape',
-  savedAt: 1795367852159,
+  savedAt: 1795390007916,
   baked: [4, 5, 6, 7, 3, 9, 8],
   placed: [
     {"prop": "stump", "x": 0.317, "y": 0.3046, "from": 4, "attrs": {"radius": 11.702, "sides": [0.606, 0.557, 0.577]}},

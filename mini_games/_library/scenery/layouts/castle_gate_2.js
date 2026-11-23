@@ -4,7 +4,7 @@ import { registerLayout } from '../layouts.js';
 
 registerLayout('castle_gate_2', {
   profile: 'desktop',
-  savedAt: 1795371781462,
+  savedAt: 1795440078704,
   baked: [4, 0],
   placed: [
     {"prop": "brazier", "x": 0.5633, "y": 0.2708, "from": 4, "variant": 1, "scale": 0.991, "phase": 0.001},
@@ -71,9 +71,12 @@ registerLayout('castle_gate_2', {
   ],
   // Áreas de contato: ninguém passa (x, y = centro em fração do mundo; w, h, r em unidades; rot em graus)
   colliders: [
-    {"shape": "rect", "x": 0.0693, "y": 0.9137, "w": 168, "h": 117, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "TREANT", "GOLEM"], "boss": false},
-    {"shape": "rect", "x": 0.9369, "y": 0.9144, "w": 168, "h": 117, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "TREANT", "GOLEM"], "boss": false},
-    {"shape": "rect", "x": 0.0626, "y": 0.0855, "w": 168, "h": 117, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "TREANT", "GOLEM"], "boss": false},
-    {"shape": "rect", "x": 0.9316, "y": 0.0789, "w": 168, "h": 117, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "TREANT", "GOLEM"], "boss": false}
+    {"shape": "rect", "x": 0.0731, "y": 0.9137, "w": 168, "h": 117, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "GOLEM", "LANCER", "PLATE_KNIGHT", "DEMON"], "boss": false},
+    {"shape": "rect", "x": 0.9353, "y": 0.9144, "w": 168, "h": 117, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "GOLEM", "LANCER", "DEMON", "PLATE_KNIGHT"], "boss": false},
+    {"shape": "rect", "x": 0.0652, "y": 0.0844, "w": 168, "h": 117, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "GOLEM", "PLATE_KNIGHT", "LANCER", "DEMON"], "boss": false},
+    {"shape": "rect", "x": 0.9322, "y": 0.0803, "w": 168, "h": 117, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "GOLEM", "LANCER", "DEMON", "PLATE_KNIGHT"], "boss": false},
+    {"shape": "circle", "x": 0.5021, "y": 0.0801, "r": 54, "kind": "spawn", "weight": 1, "types": [], "boss": true},
+    {"shape": "rect", "x": 0.0453, "y": 0.5076, "w": 28, "h": 94, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "PLATE_KNIGHT", "LANCER", "DEMON", "ARMORED_ZOMBIE", "SKELETON_ARCHER", "MILITIA", "SKELETON_WARRIOR"], "boss": false},
+    {"shape": "rect", "x": 0.9807, "y": 0.4833, "w": 28, "h": 94, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "PLATE_KNIGHT", "LANCER", "DEMON", "ARMORED_ZOMBIE", "SKELETON_ARCHER", "MILITIA", "SKELETON_WARRIOR"], "boss": false}
   ]
 });

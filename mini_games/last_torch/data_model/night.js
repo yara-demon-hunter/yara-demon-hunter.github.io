@@ -3,22 +3,21 @@ import { CAMPAIGN, TOTAL_WAVES, screenOfTurn } from './campaign.js';
 // Uma partida é uma noite de `hours` horas. Cada hora fecha ao somar os pontos da hora (ou ao matar
 // o boss dela) e termina no acampamento. Sobreviver à última hora traz o amanhecer (vitória).
 // Resultado e prêmio do fim da onda (js/ui/camp.js mostra a contagem em js/ui/wave_results.js).
-// ESTRELAS = 5 metas, uma estrela cada. O dano SOFRIDO na onda conta (curar depois não apaga): soma do dano levado ÷ vida máxima.
-//   ★ tocha levou no máximo `damageGoals[0]` · ★ tocha no máximo `damageGoals[1]` (as duas estrelas da tocha)
-//   ★ herói levou no máximo `damageGoals[0]` · ★ herói no máximo `damageGoals[1]`
-//   ★ sequência de mortes (Rush) de pelo menos rushGoalBase + rushGoalPerWave x onda
-// Mais de damageGoals[1] de dano na tocha OU no herói = sem 5 estrelas. Ouro = (goldBase + goldPerWave x onda) x starGold[estrelas];
-// ★★★★★ também dá perfectSkillPoints.
+// ESTRELAS: no máximo 3, uma por regra (todas fáceis de entender e de fazer):
+//   ★ NENHUM monstro foi consumido pela tocha (nenhum chegou na chama e se apagou nela)
+//   ★ o herói levou no máximo `heroDamageGoal` da vida máxima em dano na onda (o dano sofrido conta; curar depois não apaga)
+//   ★ sequência de mortes (Rush) de pelo menos rushGoalBase + rushGoalPerWave x onda (a onda pela curva de dificuldade, data_model/campaign.js)
+// Ouro = (goldBase + goldPerWave x onda) x starGold[estrelas]; ★★★ também dá perfectSkillPoints.
 // PONTUAÇÃO DA ONDA (recorde de cada onda em save.waveBests): kills x 10, maior Rush x 25, ouro pego x 1,
 // (100 - % de dano da tocha) x 10, (100 - % de dano do herói) x 5.
 export const WAVE_SPOILS = {
-    damageGoals: [0.85, 0.5],   // estrelas de dano (tocha e herói): sofrer no máximo 85% e 50% da vida na onda (já foi 50% e 20%, depois 75% e 40%: 5 estrelas ainda eram difíceis)
-    rushGoalBase: 15,           // onda 1: 18 mortes seguidas; onda 12: 51 (antes 24 e 68)
-    rushGoalPerWave: 3,
+    heroDamageGoal: 0.5,        // estrela do herói: sofrer no máximo 50% da vida na onda
+    rushGoalBase: 12,           // estrela do Rush, onda 1: 14 mortes seguidas; a última onda: ~36
+    rushGoalPerWave: 2,
     score: { kills: 10, rush: 25, gold: 1, torch: 10, hero: 5 },
     goldBase: 60,
     goldPerWave: 30,
-    starGold: [0.5, 0.8, 1.1, 1.5, 2, 2.6],
+    starGold: [0.6, 1, 1.5, 2],  // 0, 1, 2 e 3 estrelas
     perfectSkillPoints: 1
 };
 
@@ -41,7 +40,7 @@ export const HOUR_NAMES = [
 
 // O nome da onda é o da TELA onde ela acontece (Dark Forest, River Crossing...). HOUR_NAMES ficou só de reserva.
 export function getHourName(hour) {
-    return hour > TOTAL_WAVES ? 'Endless Dark' : screenOfTurn(hour).name;
+    return screenOfTurn(hour).name;
 }
 
 // --- HORDAS ---

@@ -12,11 +12,13 @@ import { addGibs, addShockwave, createExplosion, hitStop, screenFlash, shakeScre
 import { purgeEnemy } from './enemies.js';
 import { refreshModifiers } from './modifiers.js';
 import { collectAllPickups } from './pickups.js';
+import { collectAllGold } from './gold.js';
 import { bumpStat } from './sanctuary.js';
 import { resetStreak } from './streak.js';
 import { resetFury } from './fury.js';
 import { hasBossIntro, playBossIntro, playDuelDialogue, whenHunting } from '../ui/dialogue.js';
-import { CAMPAIGN_RUNTIME, screenOfTurn } from '../../data_model/campaign.js';
+import { CAMPAIGN_RUNTIME, screenIndexOf, screenOfTurn, startsNewScreen } from '../../data_model/campaign.js';
+import { showMapTransition } from '../ui/map_screen.js';
 import { getSceneryId, prepareScenery, setScenery } from '../render/scenery.js';
 import { warmSceneryMonsters } from '../render/monster_sprites.js';
 import { buildHourPlan, prepareBossSummon, resetFieldForNewTurn, spawnOpening } from './spawner.js';
@@ -53,7 +55,7 @@ export function startHour() {
     state.goldVacuum = false;
     state.lastStand = false;
     state.hourHit = false;
-    state.waveStats = { kills0: state.run.kills, gold0: state.run.goldEarned, rush: 0, torchDamage: 0, heroDamage: 0 };
+    state.waveStats = { kills0: state.run.kills, gold0: state.run.goldEarned, rush: 0, torchDamage: 0, heroDamage: 0, consumed: 0 };
     state.clearWaveRadius = 0;
     state.phoenixSpent = false;
     resetFieldForNewTurn();
@@ -170,6 +172,17 @@ function finishHour() {
     save.stats.bestHour = Math.max(save.stats.bestHour, state.turn);
     persist();
     state.nextOmen = rollOmen(state.turn);
+    // Terminou as 5 ondas da tela (o chefe caiu): o mapa aparece e o herói anda até a tela seguinte; depois vem o resultado e o acampamento, já lá
+    if (CAMPAIGN_RUNTIME.enabled && startsNewScreen(state.turn)) {
+        state.gameState = 'MAP';                              // a partida espera (sem isto o fim da onda rodaria de novo a cada quadro)
+        enterScreenForTurn(state.turn);                       // o cenário novo se monta enquanto o resultado e o mapa aparecem
+        // Primeiro o resultado da onda (as estrelas), depois o mapa (que mostra as estrelas de cada onda), depois o acampamento já na tela nova
+        collectAllGold();
+        const stars = grantWaveSpoils(state.turn - 1, () => {
+            showMapTransition(screenIndexOf(state.turn - 1), screenIndexOf(state.turn), () => openCamp(false, stars));
+        });
+        return;
+    }
     openCamp();
 }
 
@@ -209,7 +222,7 @@ export function onBossKilled(e, model) {
 const DUEL_DIALOGUE_DELAY_MS = 900;
 
 function afterBoss() {
-    if (state.turn === NIGHT.hours && !state.endless) {
+    if (state.turn === NIGHT.hours) {
         beginDawn();
         return;
     }
@@ -268,16 +281,6 @@ function updateDawn(dt) {
         collectAllPickups();
         triggerGameOver('DAWN');
     }
-}
-
-// Continua na noite sem fim depois da tela de vitória
-export function continueEndless() {
-    state.endless = true;
-    state.dawn = 0;
-    state.turn++;
-    state.nextOmen = rollOmen(state.turn);
-    state.gameState = 'PLAYING';
-    startHour();
 }
 
 // --- MORTE ---

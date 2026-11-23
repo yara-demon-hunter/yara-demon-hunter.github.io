@@ -20,7 +20,7 @@ function createSave() {
             runs: 0, kills: 0, bestHour: 0, bestScore: 0, bestStreak: 0, victories: 0,
             elites: 0, evolutions: 0, bestDarknessWon: 0, bosses: 0, chests: 0,
             bestMultiKill: 0, perfectDodges: 0, flawlessHours: 0,
-            fiveStarWaves: 0,           // ondas diferentes com ★★★★★ no resultado (conquistas)
+            threeStarWaves: 0,          // ondas diferentes com ★★★ no resultado (conquistas)
             bestNightKills: 0, bestNightStars: 0, bestNightEmbers: 0   // recordes de uma noite (tela final)
         },
         // quickPickChosen: o jogador já ligou ou desligou a escolha ao subir de nível em Settings; sem isso vale o padrão (data_model/start.js)

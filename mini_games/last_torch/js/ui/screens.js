@@ -1,4 +1,5 @@
 import { CHARACTER_MODEL, getXpToNextLevel } from '../../data_model/character.js';
+import { TOTAL_WAVES } from '../../data_model/campaign.js';
 import { ACHIEVEMENTS, achievementValue } from '../../data_model/sanctuary.js';
 import { EVOLUTIONS } from '../../data_model/powers.js';
 import { preloadTreeImages, treeImageFor, paintIcon } from '../../data_model/tree_images.js';
@@ -27,7 +28,7 @@ import { resetDruid } from '../systems/druid.js';
 import { resetConversion } from '../systems/conversion.js';
 import { resetArcane } from '../systems/arcane.js';
 import { getHero, mod, refreshModifiers } from '../systems/modifiers.js';
-import { continueEndless, enterScreenForTurn, startHour } from '../systems/night.js';
+import { enterScreenForTurn, startHour } from '../systems/night.js';
 import { platform } from '../platform/platform.js';
 import { getMaxPlayerHp } from '../systems/stats.js';
 import { resetTorch } from '../systems/torch.js';
@@ -70,7 +71,6 @@ export function startGame() {
     state.scoreTurn = 0;
     state.totalScore = 0;
     state.coins = 0;
-    state.endless = false;
     state.dawn = 0;
     state.omen = null;
     state.nextOmen = null;
@@ -203,7 +203,6 @@ export function continueRun() {
     startGame();                   // zera tudo e já começa a hora 1: o que vem a seguir sobrescreve
     resetFieldForNewTurn();
     state.turn = snap.turn;
-    state.endless = snap.endless;
     state.totalScore = snap.totalScore;
     state.coins = snap.coins;
     state.skillPoints = snap.skillPoints;
@@ -549,14 +548,13 @@ export function triggerGameOver(reason) {
     renderDaily();
     renderGoal();
     openAltarAfterDeath(reason);
-    document.getElementById('btnEndless').classList.toggle('hidden', reason !== 'DAWN');
-    // Zerou a noite: um final de verdade (o herói, os números e as 12 ondas com as estrelas) no lugar do resumo, só com MENU
+    // Zerou a noite: um final de verdade (o herói, os números e as 18 ondas com as estrelas) no lugar do resumo, só com MENU
     if (reason === 'DAWN') {
         const learned = getOwnedPowers().length + Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0).length;
         showVictory({
             hero: getHero(),
             darkness: save.darkness,
-            waves: Array.from({ length: 12 }, (_, i) => run.waveStars?.[i + 1] ?? 0),
+            waves: Array.from({ length: TOTAL_WAVES }, (_, i) => run.waveStars?.[i + 1] ?? 0),
             stats: { score: state.totalScore, kills: run.kills, level: state.playerLevel, skills: learned, bosses: run.bosses, embers: embersEarned, streak: run.bestStreak, seconds: state.runTime },
             rank: nightRank,
             // MENU depois do amanhecer: anúncio entre partidas, depois o menu
@@ -576,7 +574,7 @@ export function triggerGameOver(reason) {
 export async function shareResult() {
     const text = state.run.victory
         ? `I kept the last torch alive until dawn on Last Torch: ${state.totalScore.toLocaleString('en-US')} points. Can you survive the night?`
-        : `I reached Wave ${state.turn} of 12 on Last Torch: ${state.totalScore.toLocaleString('en-US')} points. Can you survive the night?`;
+        : `I reached Wave ${state.turn} of ${TOTAL_WAVES} on Last Torch: ${state.totalScore.toLocaleString('en-US')} points. Can you survive the night?`;
     const url = location.href.split('?')[0];
     try {
         if (navigator.share) await navigator.share({ title: 'Last Torch', text, url });
@@ -587,12 +585,6 @@ export async function shareResult() {
     } catch {
         // Jogador cancelou o compartilhamento
     }
-}
-
-export function keepHunting() {
-    platform.gameplayStart();
-    document.getElementById('gameOverScreen').classList.add('hidden');
-    continueEndless();
 }
 
 // --- TELA INICIAL ---

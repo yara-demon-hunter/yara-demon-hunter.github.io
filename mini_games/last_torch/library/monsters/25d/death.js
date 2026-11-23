@@ -4,7 +4,7 @@
 //
 //   groups  os pedaços que voam. Cada grupo: { count, colors, shape } e, se quiser, multiplicadores: size (tamanho), speed
 //           (velocidade lateral), lift (impulso para cima), life (quanto tempo ficam), gravity (1 = cai normal; folhas caem leve)
-//           shape: 'drop' (gota: água e lodo), 'ember' (brasa), 'plate' (placa de armadura), 'cloth' (trapo), 'bone' (osso), 'rock' (pedra), 'log' (tora de madeira, com a face cortada), 'wood' (casca), 'leaf' (folha que balança),
+//           shape: 'drop' (gota: água e lodo), 'bubble' (bolha de gosma), 'ember' (brasa), 'plate' (placa de armadura), 'cloth' (trapo), 'bone' (osso), 'rock' (pedra), 'log' (tora de madeira, com a face cortada), 'wood' (casca), 'leaf' (folha que balança),
 //           'shard' e 'blob' (lasca)
 //   stain   a mancha que fica no chão
 //   fall    (opcional) o corpo não some: ele TOMBA. { seconds (duração total), tiltSeconds (tempo até cair), tilt (ângulo, rad),
@@ -71,6 +71,23 @@ export const MONSTER_DEATH = {
         stain: 'rgba(24, 34, 14, 0.62)',
         fall: { seconds: 1.5, tiltSeconds: 0.6, tilt: 1.4, shake: 0.07, sink: 0.3, pivot: 0.55, squash: 0.8, fade: 0.4 },
         dust: { radius: 2.4, seconds: 0.5, width: 5, color: '#a8a29e' }
+    },
+    // Slizork: explode soltando bolhas grandes de gosma que sobem devagar e estouram, mais respingos verdes
+    slizork: {
+        groups: [
+            { count: 24, colors: ['rgba(150, 240, 90, 0.5)', 'rgba(100, 210, 70, 0.5)', 'rgba(220, 255, 190, 0.55)'], shape: 'bubble', size: 2.4, speed: 1.1, lift: 1.8, gravity: 0.3, life: 1.9 },
+            { count: 14, colors: ['#3f9a2c', '#7cc050', '#23491a'], shape: 'drop', size: 1.6, speed: 1.3, lift: 1.2 },
+            { count: 3, colors: ['#c79a2c', '#e0b73a'], shape: 'shard', size: 1.4, lift: 1.3 }
+        ],
+        stain: 'rgba(30, 90, 20, 0.6)'
+    },
+    // Zumbi Rastejante: ossos da coluna e carne verde
+    zombie_crawler: {
+        groups: [
+            { count: 9, colors: ['#e7e0cf', '#b9b09a', '#8f8772'], shape: 'bone', size: 1.05, lift: 1.1 },
+            { count: 5, colors: ['#86a070', '#55704a', '#5a1f2a'], shape: 'blob', size: 1.1, speed: 0.9 }
+        ],
+        stain: 'rgba(24, 34, 14, 0.62)'
     },
     // Zumbi: os mesmos ossos dos esqueletos, mais pedaços de carne verde e trapo
     zombie: {
@@ -287,6 +304,18 @@ export function drawGib(ctx, g) {
         ctx.lineTo(s * 1.1, 0);
         ctx.lineTo(0, s * 0.55);
         ctx.closePath();
+        ctx.fill();
+    } else if (g.shape === 'bubble') {
+        // Bolha: círculo translúcido com aro e dois brilhos
+        ctx.beginPath();
+        ctx.arc(0, 0, s * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(235, 255, 215, 0.8)';
+        ctx.lineWidth = Math.max(0.8, s * 0.12);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.beginPath();
+        ctx.arc(-s * 0.3, -s * 0.32, s * 0.2, 0, Math.PI * 2);
         ctx.fill();
     } else if (g.shape === 'drop') {
         // Gota (água, lodo): bolinha com um brilho no alto

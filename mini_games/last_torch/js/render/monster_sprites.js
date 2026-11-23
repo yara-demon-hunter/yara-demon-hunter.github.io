@@ -1,4 +1,5 @@
 import { BOSS_MODELS } from '../../data_model/bosses.js';
+import { SCREEN_MONSTERS, screenOf } from '../../data_model/screens/index.js';
 import { BUDDY_MODELS, MONSTER_MODELS } from '../../data_model/monsters.js';
 import { DEMON_LORD_VISUALS } from '../../library/monsters/topdown/demon_lord/demon_lord_visual.js';
 import { BAT_VISUALS } from '../../library/monsters/topdown/bat/bat_visual.js';
@@ -90,7 +91,7 @@ const FOLDER_25D = {
     NECROMANCER: 'witch', MOTH: 'moth', BLOATER: 'bloater', WRAITH: 'wraith', SHADOW_WOLF: 'shadow_wolf',
     ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight', BONE_COLOSSUS: 'bone_colossus',
     // Telas novas
-    ZOMBIE: 'zombie', ARMORED_ZOMBIE: 'armored_zombie', RIVER_EEL: 'river_eel', DROWNED: 'drowned', BOG_TOAD: 'bog_toad', BOG_SLIME: 'bog_slime', SKELETON_WARRIOR: 'skeleton_warrior', SKELETON_ARCHER: 'skeleton_archer',
+    ZOMBIE: 'zombie', ZOMBIE_CRAWLER: 'zombie_crawler', ARMORED_ZOMBIE: 'armored_zombie', RIVER_EEL: 'river_eel', DROWNED: 'drowned', BOG_TOAD: 'bog_toad', BOG_SLIME: 'bog_slime', SKELETON_WARRIOR: 'skeleton_warrior', SKELETON_ARCHER: 'skeleton_archer',
     MILITIA: 'militia', PLATE_KNIGHT: 'plate_knight', LANCER: 'lancer', DEMON: 'demon'
 };
 // Buddies (library/buddies): os lobos do Rowan. Mesmo caminho dos monstros, mas a pasta é a de buddies
@@ -109,7 +110,7 @@ const SPECS = USE_25D ? MONSTER_SPRITES_25D : MONSTER_SPRITES;
 
 // Buddies (BUDDY_MODELS) não entram na fila da abertura: o sprite sai na primeira vez que alguém pede (getMonsterSprite)
 // Os monstros das telas novas (os que têm `scenery`) também: só valem na tela deles, então não pesam na abertura (warmSceneryMonsters grava os da tela antes da partida)
-const ON_DEMAND = new Set([...Object.keys(BUDDY_MODELS), ...Object.keys(MONSTER_MODELS).filter(type => MONSTER_MODELS[type].scenery)].filter(type => ART[type]));
+const ON_DEMAND = new Set([...Object.keys(BUDDY_MODELS), ...Object.values(SCREEN_MONSTERS).flatMap(sc => sc.monsters.map(m => m.type))].filter(type => ART[type]));
 const modelOf = (type) => MONSTER_MODELS[type] ?? BUDDY_MODELS[type];
 
 const sprites = {};
@@ -316,9 +317,7 @@ export function ensureMonsterSprites() {
 
 // Grava, antes da partida, os monstros que nascem nesta tela (assim ninguém trava na primeira vez que um deles aparece)
 export function warmSceneryMonsters(sceneryId) {
-    for (const type of Object.keys(MONSTER_MODELS)) {
-        if (MONSTER_MODELS[type].scenery?.includes(sceneryId)) getMonsterSprite(type);
-    }
+    for (const m of screenOf(sceneryId).monsters) getMonsterSprite(m.type);
 }
 
 export function getMonsterSprite(type) {
@@ -341,8 +340,8 @@ const BOSS_PORTRAITS = {
 const portraits = {};
 
 // Os bosses 2.5D (Demon Lord e Vampiro; o Rival continua o boneco do herói): extent em unidades do boneco
-const BOSS_FOLDER_25D = { DEMON_LORD: 'demon_lord', VAMPIRE: 'vampire' };
-const BOSS_EXTENT_25D = { DEMON_LORD: 34, VAMPIRE: 20 };
+const BOSS_FOLDER_25D = { DEMON_LORD: 'demon_lord', VAMPIRE: 'vampire', LAKE_SPIRIT: 'lake_spirit', SLIZORK: 'slizork', GRAVE_KING: 'grave_king' };
+const BOSS_EXTENT_25D = { DEMON_LORD: 34, VAMPIRE: 20, LAKE_SPIRIT: 20, SLIZORK: 24, GRAVE_KING: 22 };
 
 // Quem desenha um boss 2.5D ao vivo: o boneco com a paleta do boss (a paleta troca só as cores que ela traz)
 const bossPaletteCache = {};

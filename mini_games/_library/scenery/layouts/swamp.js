@@ -4,7 +4,7 @@ import { registerLayout } from '../layouts.js';
 
 registerLayout('swamp', {
   profile: 'desktop',
-  savedAt: 1795363310390,
+  savedAt: 1795387900980,
   baked: [4, 5, 7, 2, 3, 9, 10, 8, 6],
   placed: [
     {"prop": "stump", "x": 0.6877, "y": 0.1431, "from": 4, "attrs": {"radius": 14.229, "sides": [0.039, 0.197, 0.163]}},
@@ -129,6 +129,16 @@ registerLayout('swamp', {
     {"shape": "circle", "x": 0.4926, "y": 0.7252, "r": 107, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 58},
     {"shape": "circle", "x": 0.3705, "y": 0.3728, "r": 87, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 46},
     {"shape": "circle", "x": 0.5752, "y": 0.3103, "r": 72, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 44},
-    {"shape": "circle", "x": 0.6437, "y": 0.4131, "r": 90, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 48}
+    {"shape": "circle", "x": 0.6437, "y": 0.4131, "r": 90, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 48},
+    {"shape": "rect", "x": 0.9156, "y": 0.1219, "w": 174, "h": 136, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "WITCH", "BLOATER", "BOG_SLIME", "BOG_TOAD", "TREANT"], "boss": false},
+    {"shape": "rect", "x": 0.9357, "y": 0.896, "w": 174, "h": 136, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "WITCH", "BLOATER", "BOG_SLIME", "BOG_TOAD", "TREANT"], "boss": false},
+    {"shape": "rect", "x": 0.0869, "y": 0.8922, "w": 174, "h": 136, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "WITCH", "BLOATER", "BOG_SLIME", "BOG_TOAD", "TREANT"], "boss": false},
+    {"shape": "rect", "x": 0.078, "y": 0.1083, "w": 174, "h": 136, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "WITCH", "BLOATER", "BOG_SLIME", "BOG_TOAD", "TREANT"], "boss": false},
+    {"shape": "rect", "x": 0.0709, "y": 0.4768, "w": 174, "h": 136, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "WITCH", "BLOATER", "BOG_SLIME", "BOG_TOAD", "TREANT"], "boss": false},
+    {"shape": "rect", "x": 0.9284, "y": 0.4514, "w": 174, "h": 136, "rot": 0, "kind": "spawn", "weight": 1, "types": ["MOTH", "WITCH", "BLOATER", "BOG_SLIME", "BOG_TOAD", "TREANT"], "boss": false},
+    {"shape": "rect", "x": 0.7195, "y": 0.3939, "w": 90, "h": 45, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BOG_SLIME"], "boss": false},
+    {"shape": "rect", "x": 0.4981, "y": 0.8046, "w": 90, "h": 45, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BOG_SLIME"], "boss": false},
+    {"shape": "rect", "x": 0.3454, "y": 0.3014, "w": 90, "h": 45, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BOG_SLIME"], "boss": false},
+    {"shape": "circle", "x": 0.4979, "y": 0.0907, "r": 53, "kind": "spawn", "weight": 1, "types": [], "boss": true}
   ]
 });

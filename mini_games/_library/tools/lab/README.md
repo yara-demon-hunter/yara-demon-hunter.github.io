@@ -5,6 +5,7 @@ afeta o Last Torch nem o yara-rpg.
 
 | Arquivo | O que é |
 |---|---|
+| `slizork_foto.html` e `.js` | **Slizork, o Tirano de Lodo** (chefe do Swamp) em 3D: gosma verde-ácida translúcida deformada por ruído, bolhas e detritos por dentro, coroa de ouro afundada, olhos vermelhos que surgem e somem, braços com garras de espada e rastro corrosivo. Modos Parado, Rastejando e Golpe. Primeira versão, ainda não está no jogo (o jogo usa o 2.5D provisório). Descrição e imagem de referência em `monsters/25d/slizork/art_reference/` |
 | `demon_hunter3_foto.html` e `.js` | O **Demon Hunter 3**, 2,5D para a câmera do jogo (de cima, ~56°): mesma técnica do Golem (PBR por ruído, capa que ondula, luz de noite, bloom), com proporções de silhueta (capuz e ombros grandes, pernas curtas). A prévia no canto mostra o tamanho real no jogo (64, 96, 128 px). Parado, correndo e golpe. Grava o atlas |
 | `bake_demon_hunter3.py` | Grava o atlas do Demon Hunter 3 em `exemplos/demon_hunter3_atlas.webp` (8 direções x parado + andar + golpe); servidor na porta 18900 |
 | `demon_hunter2_foto.html` e `.js` | O **Demon Hunter 2**: 3D de corpo inteiro, 100% procedural na técnica do Golem (texturas PBR por ruído, relevo, capa que ondula, luz de noite, AO, bloom). Parado, correndo e golpe de espada. Primeira versão, ainda em ajuste. Referência: `characters/hunter/art_reference/` |

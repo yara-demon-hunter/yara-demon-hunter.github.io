@@ -20,9 +20,9 @@ export const ACHIEVEMENTS = [
     { id: 'chests10', group: 'trophy', icon: '🗝️', name: 'Treasure Hunter', desc: 'Open 10 chests.', stat: 'chests', target: 10 },
     { id: 'hour6', group: 'trophy', icon: '🕯️', name: 'Deep Dark', desc: 'Reach Wave 6.', stat: 'bestHour', target: 6 },
     { id: 'elites10', group: 'trophy', icon: '🎯', name: 'Trophy Hunter', desc: 'Slay 10 elites.', stat: 'elites', target: 10 },
-    { id: 'stars5x3', group: 'trophy', icon: '🌟', name: 'Starlit', desc: 'Earn 5 stars on 3 different waves.', stat: 'fiveStarWaves', target: 3 },
-    { id: 'stars3all', group: 'trophy', icon: '⭐', name: 'Rising Star', desc: 'Earn 3 stars or more on all 12 waves.', stat: 'threeStarWaves', target: 12 },
-    { id: 'stars5all', group: 'trophy', icon: '🌠', name: 'Constellation', desc: 'Earn 5 stars on all 12 waves.', stat: 'fiveStarWaves', target: 12 },
+    { id: 'stars5x3', group: 'trophy', icon: '🌟', name: 'Starlit', desc: 'Earn 3 stars on 3 different waves.', stat: 'threeStarWaves', target: 3 },
+    { id: 'stars3all', group: 'trophy', icon: '⭐', name: 'Rising Star', desc: 'Earn 2 stars or more on all 18 waves.', stat: 'twoStarWaves', target: 18 },
+    { id: 'stars5all', group: 'trophy', icon: '🌠', name: 'Constellation', desc: 'Earn 3 stars on all 18 waves.', stat: 'threeStarWaves', target: 18 },
     { id: 'kills2000', group: 'trophy', icon: '🪦', name: 'Harvester', desc: 'Slay 1,200 monsters.', stat: 'kills', target: 1200 },
     { id: 'countess', group: 'trophy', icon: '🌞', name: 'Sunlight', desc: 'Slay the Blood Countess.', stat: 'boss_BLOOD_COUNTESS', target: 1, hero: 'warden' },
     { id: 'dawn', group: 'trophy', icon: '🌅', name: 'Dawn', desc: 'Survive until dawn.', stat: 'victories', target: 1, hero: 'azael' },
@@ -34,7 +34,6 @@ export const ACHIEVEMENTS = [
     { id: 'sworn3', group: 'trophy', icon: '🏮', name: 'The Flame Will Not Die', desc: 'Reach Wave 8 under the Oath of the Hearth.', stat: 'oath_oathHearth', target: 8 },
     { id: 'sworn4', group: 'trophy', icon: '📕', name: 'The Dark Pays in Kind', desc: 'Reach Wave 8 under the Oath of Ruin.', stat: 'oath_oathRuin', target: 8 },
     { id: 'sworn5', group: 'trophy', icon: '🦌', name: 'The Forest Remembers', desc: 'Reach Wave 8 under the Oath of the Wild.', stat: 'oath_oathWild', target: 8 },
-    { id: 'hour20', group: 'trophy', icon: '♾️', name: 'Endless Dark', desc: 'Reach Wave 20 in the endless night.', stat: 'bestHour', target: 20 },
     { id: 'darkness8', group: 'trophy', icon: '👑', name: 'Lightbringer', desc: 'Win a night on Darkness 8.', stat: 'bestDarknessWon', target: 8 },
 
     // --- FAÇANHAS ---
@@ -74,17 +73,17 @@ export const ACHIEVEMENTS = [
 export const ACHIEVEMENT_EMBERS = {
     firstNight: 10, hour3: 10, hour4: 10, kills300: 15, kills1000: 25, demon: 25, evolve: 15, chests10: 15, hour6: 20, elites10: 15,
     stars3all: 40, stars5x3: 30, stars5all: 80, kills2000: 40, countess: 30, darkness3: 30,
-    sworn1: 20, sworn2: 20, sworn3: 20, sworn4: 20, sworn5: 20, hour20: 50, darkness8: 80,
+    sworn1: 20, sworn2: 20, sworn3: 20, sworn4: 20, sworn5: 20, darkness8: 80,
     beast_SKELETON: 15, beast_SKELETON_CRAWLER: 10, beast_BAT: 20, beast_SHADOW_WOLF: 15, beast_VAMPIRE: 15, beast_WITCH: 10, beast_MOTH: 10, beast_BLOATER: 10, beast_ZOMBIE_WOLF: 10, beast_WRAITH: 15, beast_HEADLESS_KNIGHT: 20, beast_BONE_COLOSSUS: 25, beast_GOLEM: 20, beast_TREANT: 20, beast_NECROMANCER: 20,
     multi3: 5, dodge5: 5, multi4: 10, flawless1: 10, streak30: 15, multi6: 15, streak40: 20, dodge25: 20, flawless5: 25, streak100: 30, multi10: 30
 };
 
 // Quanto o jogador já tem para esta conquista: um número do save.stats, o abate de um tipo de monstro (beast, do bestiário) ou o
-// número de ondas com 3 ou 5 estrelas (calculado dos recordes por onda, então vale também para quem já tinha jogado)
+// número de ondas com 2 ou 3 estrelas (calculado dos recordes por onda, então vale também para quem já tinha jogado)
 export function achievementValue(a, save) {
     if (a.beast) return save.bestiary?.[a.beast]?.kills ?? 0;
-    if (a.stat === 'threeStarWaves' || a.stat === 'fiveStarWaves') {
-        const min = a.stat === 'fiveStarWaves' ? 5 : 3;
+    if (a.stat === 'twoStarWaves' || a.stat === 'threeStarWaves') {
+        const min = a.stat === 'twoStarWaves' ? 2 : 3;
         return Object.values(save.waveBests ?? {}).filter(b => (b.stars ?? 0) >= min).length;
     }
     return save.stats[a.stat] ?? 0;
@@ -126,7 +125,7 @@ const MONSTER_ENTRIES = [
     { key: 'GOLEM', name: 'Ember Golem', icon: '🪨' },
     { key: 'NECROMANCER', name: 'Necromancer', icon: '☠️' }
 ];
-const BOSS_ICONS = { DEMON_LORD: '😈', BLOOD_COUNTESS: '🩸', LONG_NIGHT: '🌑', AZAEL: '⚔️', DEMON_HUNTER: '🗡️', BRUTOS: '🪓' };
+const BOSS_ICONS = { DEMON_LORD: '😈', BLOOD_COUNTESS: '🩸', LONG_NIGHT: '🌑', AZAEL: '⚔️', DEMON_HUNTER: '🗡️', BRUTOS: '🪓', LAKE_SPIRIT: '🌊', SLIZORK: '🟢', GRAVE_KING: '💀' };
 
 // Primeira hora (de 1 até o fim da noite) em que o boss aparece, com qualquer um dos heróis (o rival muda com ele)
 function firstBossHour(key) {

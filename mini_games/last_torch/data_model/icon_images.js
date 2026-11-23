@@ -10,7 +10,7 @@ export const ICON_IMAGES = Object.fromEntries([
     'hour3', 'hour4', 'kills300', 'kills1000', 'demon', 'evolve',
     'chests10', 'hour6', 'elites10', 'stars5x3', 'stars5all', 'kills2000',
     'countess', 'dawn', 'brutos', 'darkness3', 'sworn1', 'sworn2',
-    'sworn3', 'sworn4', 'sworn5', 'hour20', 'darkness8', 'multi3',
+    'sworn3', 'sworn4', 'sworn5', 'darkness8', 'multi3',
     'dodge5', 'multi4', 'flawless1', 'streak30', 'multi6', 'streak40',
     'dodge25', 'flawless5', 'streak100', 'multi10', 'altar_vitality', 'altar_swiftness',
     'altar_might', 'altar_arcane', 'altar_reach', 'altar_furyPower', 'altar_longDash', 'altar_insight',

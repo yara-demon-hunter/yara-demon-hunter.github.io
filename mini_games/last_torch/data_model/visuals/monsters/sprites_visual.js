@@ -73,6 +73,7 @@ export const MONSTER_SPRITES_25D = {
     // attackLive: anda como sprite e, SÓ enquanto ataca ou mira (e.atk / e.aim / e.release), é desenhado ao vivo (golpe de arma, corda do arco)
     // Monstros das telas novas: gravados sob demanda (ON_DEMAND, em monster_sprites.js) e aquecidos ao entrar na tela deles. Os laços da arte têm 1 s.
     ARMORED_ZOMBIE: { extent: 22, bakeSeconds: 1, playSeconds: 1.5, speed: 22 },
+    ZOMBIE_CRAWLER: { extent: 18, bakeSeconds: 1, playSeconds: 1.1, speed: 18 },
     ZOMBIE: { extent: 19, bakeSeconds: 1, playSeconds: 1.3, speed: 24 },
     RIVER_EEL: { extent: 24, bakeSeconds: 1, playSeconds: 0.8, speed: 80 },
     DROWNED: { extent: 18, bakeSeconds: 1, playSeconds: 1.1, speed: 36 },

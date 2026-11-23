@@ -232,6 +232,7 @@ export function renderRoots() {
         if (!e.rootWarn || e.punchState !== 1) continue;
         const p = Math.max(0, Math.min(1, 1 - e.punchTimer / (e.rootWindup ?? 1)));
         sprite ??= getRoots();
+        const R = e.rootR ?? 42;
         const w = 40 * (0.25 + p * 0.75);
         const h = w * (ROOT_H / ROOT_W);
         ctx.save();
@@ -239,9 +240,18 @@ export function renderRoots() {
         ctx.strokeStyle = '#4ade80';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([5, 4]);
-        ctx.beginPath(); ctx.ellipse(e.rootX, e.rootY + 8, 42, 17, 0, 0, TAU); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(e.rootX, e.rootY + 8, R, R * 0.4, 0, 0, TAU); ctx.stroke();
         ctx.setLineDash([]);
         ctx.drawImage(sprite, e.rootX - w / 2, e.rootY + 10 - h * 0.62, w, h);
+        // Área grande: raízes brotando por todo o círculo (posições fixas por treant, nascem em ondas)
+        const n = Math.round(R / 14);
+        for (let i = 0; i < n; i++) {
+            const a = i * 2.399 + (e.phase ?? 0), d = Math.sqrt((i + 0.5) / n) * R * 0.92;
+            const k = Math.max(0, Math.min(1, p * 1.6 - (i / n) * 0.6));
+            if (k <= 0) continue;
+            const rw = 34 * (0.25 + k * 0.75), rh = rw * (ROOT_H / ROOT_W);
+            ctx.drawImage(sprite, e.rootX + Math.cos(a) * d - rw / 2, e.rootY + 10 + Math.sin(a) * d * 0.4 - rh * 0.62, rw, rh);
+        }
         ctx.restore();
     }
     if (player.rootedTimer > 0) {

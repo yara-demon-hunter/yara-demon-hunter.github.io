@@ -83,7 +83,6 @@ export const state = {
     nextOmen: null,
     bossPending: 0,             // segundos até o boss surgir (0 = nenhum a caminho)
     bossSpawnAt: null,          // onde o boss vai surgir (o círculo de invocação já está lá)
-    endless: false,             // jogador escolheu continuar depois do amanhecer
     dawn: 0,                    // 0 a 1: a noite clareando
 
     // Números da partida (tela final, conquistas)
@@ -125,7 +124,7 @@ export const state = {
     currentBoss: null,
     multiKill: 0,               // mortes dentro da janela atual (matar vários de uma vez)
     multiTimer: 0,
-    waveStats: { kills0: 0, gold0: 0, rush: 0, torchDamage: 0, heroDamage: 0 },   // resultado da onda: mortes e ouro no começo dela, maior sequência e dano sofrido nela
+    waveStats: { kills0: 0, gold0: 0, rush: 0, torchDamage: 0, heroDamage: 0, consumed: 0 },   // resultado da onda: mortes e ouro no começo dela, maior sequência e dano sofrido nela
     hourHit: false,             // o herói levou dano nesta hora
     goldVacuum: false,          // fim da hora: todas as moedas voam até o herói
     lastStand: false,           // cota da hora fechada: não nasce mais nada, falta matar o que sobrou

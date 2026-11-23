@@ -42,6 +42,7 @@ export const MONSTER_SPAWN = {
     bog_toad: ooze(0.9, 'rgba(120, 170, 70, 0.9)'),
     bog_slime: ooze(1, 'rgba(110, 190, 70, 0.9)', { size: 1.9 }),
     armored_zombie: grave(1.4, 'rgba(120, 100, 70, 0.9)', { size: 2.4, rise: 1.6 }),
+    zombie_crawler: grave(1.3, 'rgba(120, 100, 70, 0.9)', { size: 1.8, rise: 1.2 }),
     zombie: grave(1.2, 'rgba(120, 100, 70, 0.9)', { size: 2, rise: 1.5 }),
     skeleton_warrior: grave(1, 'rgba(150, 140, 120, 0.9)'),
     skeleton_archer: grave(1, 'rgba(150, 140, 120, 0.9)'),

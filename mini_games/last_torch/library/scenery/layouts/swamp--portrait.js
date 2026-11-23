@@ -5,7 +5,7 @@ import { registerLayout } from '../layouts.js';
 
 registerLayout('swamp', {
   profile: 'portrait',
-  savedAt: 1795363864586,
+  savedAt: 1795389889693,
   baked: [4, 5, 7, 2, 3, 9, 10, 8, 6],
   placed: [
     {"prop": "stump", "x": 0.8156, "y": 0.1431, "from": 4, "attrs": {"radius": 14.229, "sides": [0.039, 0.197, 0.163]}},
@@ -128,6 +128,12 @@ registerLayout('swamp', {
     {"shape": "circle", "x": 0.5219, "y": 0.7133, "r": 107, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 58},
     {"shape": "circle", "x": 0.3173, "y": 0.3858, "r": 87, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 46},
     {"shape": "circle", "x": 0.8476, "y": 0.4957, "r": 72, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 44},
-    {"shape": "circle", "x": 0.6437, "y": 0.4131, "r": 90, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 48}
+    {"shape": "circle", "x": 0.6437, "y": 0.4131, "r": 90, "kind": "slow", "slow": 0.35, "rot": -1, "ry": 48},
+    {"shape": "rect", "x": 0.8741, "y": 0.061, "w": 112, "h": 99, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "MOTH", "BLOATER", "TREANT", "BOG_SLIME", "BOG_TOAD", "WITCH"], "boss": false},
+    {"shape": "rect", "x": 0.1301, "y": 0.0675, "w": 112, "h": 99, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "MOTH", "BLOATER", "TREANT", "BOG_SLIME", "BOG_TOAD", "WITCH"], "boss": false},
+    {"shape": "rect", "x": 0.1286, "y": 0.9353, "w": 112, "h": 99, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "MOTH", "BLOATER", "TREANT", "BOG_SLIME", "BOG_TOAD", "WITCH"], "boss": false},
+    {"shape": "rect", "x": 0.8871, "y": 0.9484, "w": 112, "h": 99, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BAT", "MOTH", "BLOATER", "TREANT", "BOG_SLIME", "BOG_TOAD", "WITCH"], "boss": false},
+    {"shape": "rect", "x": 0.5182, "y": 0.7828, "w": 80, "h": 51, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BOG_SLIME"], "boss": false},
+    {"shape": "rect", "x": 0.4933, "y": 0.2397, "w": 80, "h": 51, "rot": 0, "kind": "spawn", "weight": 1, "types": ["BOG_SLIME"], "boss": false}
   ]
 });

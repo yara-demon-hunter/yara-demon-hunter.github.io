@@ -4,7 +4,7 @@ import { registerLayout } from '../layouts.js';
 
 registerLayout('castle_gate_2', {
   profile: 'landscape',
-  savedAt: 1795371817216,
+  savedAt: 1795440094037,
   baked: [4, 0],
   placed: [
     {"prop": "brazier", "x": 0.5633, "y": 0.2708, "from": 4, "variant": 1, "scale": 0.991, "phase": 0.001},
@@ -71,9 +71,12 @@ registerLayout('castle_gate_2', {
   ],
   // Áreas de contato: ninguém passa (x, y = centro em fração do mundo; w, h, r em unidades; rot em graus)
   colliders: [
-    {"shape": "rect", "x": 0.0545, "y": 0.908, "w": 79, "h": 79, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "TREANT", "GOLEM"], "boss": false},
-    {"shape": "rect", "x": 0.9536, "y": 0.9059, "w": 93, "h": 95, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "TREANT", "GOLEM"], "boss": false},
-    {"shape": "rect", "x": 0.0432, "y": 0.1017, "w": 59, "h": 80, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "TREANT", "GOLEM"], "boss": false},
-    {"shape": "rect", "x": 0.9363, "y": 0.1078, "w": 110, "h": 87, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "TREANT", "GOLEM"], "boss": false}
+    {"shape": "rect", "x": 0.0545, "y": 0.908, "w": 79, "h": 79, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "GOLEM", "LANCER", "PLATE_KNIGHT", "DEMON"], "boss": false},
+    {"shape": "rect", "x": 0.9536, "y": 0.9059, "w": 93, "h": 95, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "GOLEM", "LANCER", "DEMON", "PLATE_KNIGHT"], "boss": false},
+    {"shape": "rect", "x": 0.0438, "y": 0.1017, "w": 59, "h": 80, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "GOLEM", "LANCER", "DEMON", "PLATE_KNIGHT"], "boss": false},
+    {"shape": "rect", "x": 0.9363, "y": 0.1078, "w": 110, "h": 87, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "BONE_COLOSSUS", "GOLEM", "LANCER", "DEMON", "PLATE_KNIGHT"], "boss": false},
+    {"shape": "circle", "x": 0.4965, "y": 0.0995, "r": 45, "kind": "spawn", "weight": 1, "types": [], "boss": true},
+    {"shape": "rect", "x": 0.0289, "y": 0.5242, "w": 31, "h": 82, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "LANCER", "DEMON", "PLATE_KNIGHT", "ARMORED_ZOMBIE", "SKELETON_WARRIOR", "SKELETON_ARCHER", "MILITIA"], "boss": false},
+    {"shape": "rect", "x": 0.9759, "y": 0.4954, "w": 31, "h": 82, "rot": 0, "kind": "spawn", "weight": 1, "types": ["SKELETON", "SKELETON_CRAWLER", "BAT", "MOTH", "VAMPIRE", "WITCH", "WRAITH", "BLOATER", "NECROMANCER", "SHADOW_WOLF", "ZOMBIE_WOLF", "HEADLESS_KNIGHT", "LANCER", "DEMON", "PLATE_KNIGHT", "ARMORED_ZOMBIE", "SKELETON_WARRIOR", "SKELETON_ARCHER", "MILITIA"], "boss": false}
   ]
 });
