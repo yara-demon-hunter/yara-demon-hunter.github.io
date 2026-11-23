@@ -55,3 +55,7 @@ Quarta aba do painel (**🖼️ Screens**): abre uma tela do jogo na hora, com o
 ## Aba Dialogues (as conversas do jogo)
 
 Última aba do painel (**💬 Dialogues**): escolha o **herói** e veja todas as conversas dele na ordem da partida: o duelo com o rival (aparece e cai, na onda 3), a provocação antes de cada chefe (ondas 6, 9, 12, 15, 16 e 17) e a revanche da onda 18. Cada botão abre a cena na tela real do jogo (faixas de cinema, retratos, fala letra a letra; Espaço, Enter ou clique passa a fala). **▶ Play all** toca tudo em sequência, com uma pausa curta entre as cenas; **⏹ Stop dialogues** (canto superior direito) interrompe. Heróis com falas próprias (Rowan, Avgustino) mostram as deles, e o Azael mostra a conversa com o Demon Hunter. As falas ficam em `data_model/dialogues.js`.
+
+### 💾 SAVE TO THE GAME FILE (HUD tuner)
+
+O botão **💾 SAVE TO THE GAME FILE** grava os ajustes direto em `data_model/fluid_layout.js` (precisa abrir o sandbox por `serve.py`): cada tela ajustada vira (ou atualiza) um ponto de referência da tabela, e os ajustes saem do tuner, porque agora fazem parte do jogo. Só as peças que você mexeu mudam; o resto da tabela fica igual. Não grava: peça escondida ("Hide it") e a dica do mouse (não existem na tabela). O botão **Map** e o botão **Controls (🎮)** são peças independentes. 📋 Copy continua existindo para colar na conversa.

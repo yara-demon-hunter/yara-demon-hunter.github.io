@@ -8,6 +8,7 @@ Jekyll, com o painel de testes (sandbox.js) injetado. Nada daqui entra no jogo: 
 e build-standalone.rb só copia js, css, data_model e images.
 Outra porta = outro localStorage: o save da arena não toca o do jogo.
 """
+import json
 import re
 import sys
 from functools import partial
@@ -80,6 +81,50 @@ def sandbox_page(frame_prefix: str | None = None, embed: bool = False) -> bytes:
     return html.encode("utf-8")
 
 
+FLUID_FILE = GAME / "data_model" / "fluid_layout.js"
+FLUID_AXIS = {"portrait": "height", "tablet": "width", "landscape": "width", "desktop": "width"}
+
+
+def js_to_json(text: str):
+    """O objeto de FLUID_LAYOUT é JS simples (chaves sem aspas, aspas simples): vira JSON para mexer e volta a ser escrito no mesmo formato."""
+    body = text.split("export const FLUID_LAYOUT =", 1)[1].strip().rstrip(";")
+    body = re.sub(r"([{,]\s*)([A-Za-z_]\w*)\s*:", r'\1"\2":', body).replace("'", '"')
+    return json.loads(body)
+
+
+def fluid_text(head: str, layout: dict) -> str:
+    inline = lambda o: json.dumps(o, ensure_ascii=False, separators=(", ", ": "))
+    out = [head.rstrip("\n") + "\nexport const FLUID_LAYOUT = {"]
+    groups = list(layout.items())
+    for n, (name, group) in enumerate(groups):
+        out.append(f"    {name}: {{ axis: '{group['axis']}', anchors: [")
+        anchors = group["anchors"]
+        for i, a in enumerate(anchors):
+            out.append(f"        {{ at: {a['at']}, screen: '{a['screen']}',")
+            out.append("          hud: {" + ", ".join(f"{k}: {inline(v)}" for k, v in a["hud"].items()) + "},")
+            out.append("          ctl: {" + ", ".join(f"{k}: {inline(v)}" for k, v in a["ctl"].items()) + "} }" + ("," if i < len(anchors) - 1 else ""))
+        out.append("    ] }" + ("," if n < len(groups) - 1 else ""))
+    out.append("};")
+    return "\n".join(out) + "\n"
+
+
+def save_hud(entries: list) -> int:
+    text = FLUID_FILE.read_text(encoding="utf-8")
+    head = text.split("export const FLUID_LAYOUT", 1)[0]
+    layout = js_to_json(text)
+    for e in entries:
+        group = layout.setdefault(e["profile"], {"axis": FLUID_AXIS[e["profile"]], "anchors": []})
+        anchor = next((a for a in group["anchors"] if a["screen"] == e["screen"]), None)
+        if anchor is None:
+            anchor = {"at": e["at"], "screen": e["screen"], "hud": {}, "ctl": {}}
+            group["anchors"].append(anchor)
+        anchor["hud"].update(e.get("hud", {}))
+        anchor["ctl"].update(e.get("ctl", {}))
+        group["anchors"].sort(key=lambda a: a["at"])
+    FLUID_FILE.write_text(fluid_text(head, layout), encoding="utf-8")
+    return len(entries)
+
+
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")
@@ -137,6 +182,26 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_page(css.encode("utf-8"), "text/css; charset=utf-8")
             return
         super().do_GET()
+
+    # --- Gravar o HUD tuner no arquivo do jogo (POST /__save_hud) ---
+    # Recebe pontos de referência { profile, at, screen, hud, ctl } e os mistura na tabela data_model/fluid_layout.js (um ponto já existente da mesma
+    # tela só tem as peças enviadas trocadas; as outras ficam como estavam). O resto do arquivo (comentários e demais pontos) não muda.
+    def do_POST(self):
+        if self.path.split("?")[0] != "/__save_hud":
+            self.send_error(404)
+            return
+        try:
+            body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
+            n = save_hud(body["entries"])
+            out, code = {"ok": True, "saved": n}, 200
+        except Exception as err:  # noqa: BLE001 - devolve o motivo para o tuner mostrar
+            out, code = {"ok": False, "error": str(err)}, 500
+        data = json.dumps(out).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
 
     def log_message(self, *args):
         pass

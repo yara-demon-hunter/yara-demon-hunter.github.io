@@ -13,7 +13,8 @@ import { save } from '../core/save.js';
 // Controles de toque: variáveis CSS de tamanho e afastamento (o CSS de joystick.css as lê; o layout que o jogador arrastou em
 // Settings continua mandando na posição). `?fluid=0` na URL desliga tudo (usado para medir o layout base) e `?fluid=debug`
 // mostra no topo da tela qual perfil está valendo e se há um layout de controles salvo em Settings (que ganha do fluido).
-const HUD_IDS = ['heroCard', 'btnPause', 'hudButtons', 'bossHpContainer', 'hudBottom', 'hudScore', 'hudStreak'];
+// btnMap e btnSettings são peças INDEPENDENTES (cada uma se ajusta sozinha); hudButtons é só o grupo que as carrega e guarda os valores antigos
+const HUD_IDS = ['heroCard', 'btnPause', 'hudButtons', 'btnMap', 'btnSettings', 'bossHpContainer', 'hudBottom', 'hudScore', 'hudStreak'];
 const MIN_FACTOR = 0.8;
 const MAX_FACTOR = 1.35;
 
@@ -102,6 +103,17 @@ export function applyFluidLayout() {
     current.knifeButton = knife ? knife.v.map(n => n * knife.factor) : null;
     current.dashButton = dash ? dash.v.map(n => n * dash.factor) : null;
 }
+
+// Valores do layout para um tamanho de tela QUALQUER (o tuner usa para gravar telas que não são a aberta agora):
+// peça do HUD -> [dx, dy, escala]; controle -> [tamanho, lateral, baixo]; null se a tabela não tem a peça
+export function fluidAt(width, height, id) {
+    const [name, at] = profileOf(width, height);
+    const kind = HUD_IDS.includes(id) ? 'hud' : 'ctl';
+    const found = valuesAt(FLUID_LAYOUT[name].anchors, kind, id, at);
+    if (!found) return kind === 'hud' ? [0, 0, 1] : null;
+    return kind === 'hud' ? [found.v[0] * found.factor, found.v[1] * found.factor, found.v[2]] : found.v.map(n => n * found.factor);
+}
+export const fluidProfileOf = profileOf;
 
 let queued = 0;
 function schedule() {

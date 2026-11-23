@@ -32,7 +32,8 @@ async function cssFingerprint() {
 const ELEMENTS = [
     { id: 'heroCard', label: 'Hero card' },
     { id: 'btnPause', label: 'Skill medal' },
-    { id: 'hudButtons', label: 'Settings button' },
+    { id: 'btnMap', label: 'Map button' },
+    { id: 'btnSettings', label: 'Controls button (🎮)' },
     { id: 'bossHpContainer', label: 'Boss bar' },
     { id: 'hudBottom', label: 'Wave bar (bottom)' },
     { id: 'hudScore', label: 'Score' },
@@ -115,7 +116,8 @@ export function mountTuner(root) {
             <button id="tnResetScreen">Reset this screen</button>
           </div>
           <button id="tnResetAll" class="tn-copy-one" title="Use this after the AI applied your changes to the game CSS, so they are not applied twice">Reset ALL screens (after the AI applied them)</button>
-          <button id="tnCopy" class="tn-copy">📋 COPY ALL CHANGES</button>
+          <button id="tnSave" class="tn-copy" title="Writes your adjustments into data_model/fluid_layout.js (needs serve.py) and clears them here">💾 SAVE TO THE GAME FILE</button>
+          <button id="tnCopy" class="tn-copy-one">📋 Copy all changes (to paste in the chat)</button>
           <button id="tnCopyOne" class="tn-copy-one">Copy this screen only</button>
           <p id="tnStatus" class="tn-status"></p>
           <div id="tnCssNotice" class="tn-notice" hidden>
@@ -422,6 +424,58 @@ export function mountTuner(root) {
         }
     }
 
+    // ---------- Gravar no arquivo do jogo ----------
+    // Cada tela ajustada vira um ponto de referência da tabela data_model/fluid_layout.js (o servidor do sandbox grava). Peças do HUD: o valor
+    // novo é o do layout fluido naquela tela + o ajuste do tuner (deslocamentos somam, tamanhos multiplicam). Controles de toque: tamanho e
+    // afastamentos recalculados a partir do deslocamento e do tamanho (o ajuste é em torno do centro do controle).
+    async function saveToFile() {
+        const entries = [];
+        const skipped = [];
+        const { fluidAt, fluidProfileOf } = await import('/js/ui/fluid_layout.js');
+        Object.keys(data).sort().forEach(k => {
+            const m = /^(\d+)x(\d+)([td])$/.exec(k);
+            if (!m) return;
+            const [w, h] = [+m[1], +m[2]];
+            const [profile, at] = fluidProfileOf(w, h);
+            const hud = {}, ctl = {};
+            ELEMENTS.forEach(e => {
+                const c = data[k][e.id];
+                if (!isChanged(c)) return;
+                if (c.hide) skipped.push(`${e.label} (hidden)`);
+                if (['joystick', 'knifeButton', 'dashButton'].includes(e.id)) {
+                    const base = fluidAt(w, h, e.id);
+                    if (!base) { skipped.push(`${e.label} (no base value)`); return; }
+                    const [size, lateral, bottom] = base;
+                    const grow = size * (c.s - 1) / 2;
+                    ctl[e.id] = [round(size * c.s), round(lateral + (e.id === 'joystick' ? c.dx : -c.dx) - grow), round(bottom - c.dy - grow)];
+                } else if (e.id === 'mouseHint') {
+                    skipped.push(`${e.label} (not in the layout table)`);
+                } else {
+                    const [fx, fy, fs] = fluidAt(w, h, e.id);
+                    hud[e.id] = [round(fx + c.dx), round(fy + c.dy), Math.round(fs * c.s * 10000) / 10000];
+                }
+            });
+            if (Object.keys(hud).length || Object.keys(ctl).length) entries.push({ profile, at, screen: `${w}x${h}`, hud, ctl, key: k });
+        });
+        if (!entries.length) { $('tnStatus').textContent = 'Nothing changed yet: nothing to save.'; return; }
+        $('tnStatus').textContent = 'Saving…';
+        let result;
+        try {
+            const res = await fetch('/__save_hud', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entries }) });
+            result = await res.json();
+            if (!res.ok || !result.ok) throw new Error(result.error ?? res.statusText);
+        } catch (err) {
+            $('tnStatus').textContent = `Could not save (${err.message}). Open the sandbox with: python3 mini_games/last_torch/_sandbox/serve.py`;
+            return;
+        }
+        // Gravado: os ajustes agora fazem parte do jogo, então saem daqui (senão contariam duas vezes)
+        entries.forEach(en => delete data[en.key]);
+        currentCss = await cssFingerprint();
+        writeStore(data);
+        setView(view.w, view.h, view.touch);
+        $('tnStatus').textContent = `Saved ${entries.length} screen${entries.length === 1 ? '' : 's'} in data_model/fluid_layout.js.${skipped.length ? ` Not saved: ${skipped.join(', ')}.` : ''}`;
+    }
+
     // ---------- Ligações ----------
     PRESETS.forEach((p, i) => { const o = el('option', '', p[0]); o.value = String(i); $('tnPreset').appendChild(o); });
     $('tnPreset').appendChild(Object.assign(el('option', '', 'Custom size'), { value: 'custom' }));
@@ -448,6 +502,7 @@ export function mountTuner(root) {
         $('tnCssNotice').hidden = true;
         applyAll(); renderList(); renderFields(); renderStatus();
     };
+    $('tnSave').onclick = saveToFile;
     $('tnCopy').onclick = () => copy(null);
     $('tnCopyOne').onclick = () => copy(key());
 

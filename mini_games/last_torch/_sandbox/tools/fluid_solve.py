@@ -13,7 +13,7 @@ S = HERE + '/'                                                            # onde
 OUT = os.path.abspath(HERE + '/../../data_model/fluid_layout.js')         # a tabela que o jogo lê
 BASE_URL = sys.argv[3] if len(sys.argv) > 3 else 'https://127.0.0.1:18766/?fluid=0'
 base = json.load(open(S + sys.argv[1])); tuned = json.load(open(S + sys.argv[2]))
-HUD = ['heroCard','btnPause','hudButtons','bossHpContainer','hudBottom','hudScore','hudStreak']
+HUD = ['heroCard','btnPause','hudButtons','btnMap','btnSettings','bossHpContainer','hudBottom','hudScore','hudStreak']
 CENTER = "(id) => { const b = document.getElementById(id).getBoundingClientRect(); return [b.left + b.width/2, b.top + b.height/2]; }"
 profile = lambda W, H: ('portrait' if W < 600 else 'tablet') if H >= W else ('landscape' if H <= 520 else 'desktop')
 axis = lambda W, H: (H if W < 600 else W) if H >= W else W

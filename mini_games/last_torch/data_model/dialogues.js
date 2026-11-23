@@ -198,20 +198,15 @@ export const BOSS_INTROS = {
             { who: 'boss', text: 'I will break him.' },
             { who: 'hero', text: 'Come, Captain.' }
         ],
-        DEMON_LORD: [
-            { who: 'rival', text: 'Welcome to my castle... and to your grave!' },
-            { who: 'hero', text: 'Show yourself, Azael!' },
-            { who: 'rival', text: 'First the Lord of the First Fire. Then the night itself!' }
-        ],
         LONG_NIGHT: [
             { who: 'rival', text: 'You cannot cut the night, hunter!' },
             { who: 'hero', text: 'Dawn is coming.' },
             { who: 'rival', text: 'Not for you. Never for you!' }
         ],
         BLOOD_COUNTESS: [
-            { who: 'rival', text: 'My Countess is thirsty!' },
-            { who: 'hero', text: 'Let her come.' },
-            { who: 'rival', text: 'Then bleed. My castle is close!' }
+            { who: 'rival', text: 'Welcome to my castle... and to your grave!' },
+            { who: 'hero', text: 'Show yourself, Azael!' },
+            { who: 'rival', text: 'First my Countess. Then the night itself!' }
         ],
         default: [
             { who: 'rival', text: 'Still on my trail? Do you ever die?' },
@@ -242,20 +237,15 @@ export const BOSS_INTROS = {
                     { who: 'boss', text: 'A flower picker? I will break him.' },
                     { who: 'hero', text: 'Please, Captain. Walk away.' }
                 ],
-                DEMON_LORD: [
-                    { who: 'rival', text: 'Welcome to my castle, druid. No forest here!' },
-                    { who: 'hero', text: 'Then I bring one with me.' },
-                    { who: 'rival', text: 'First fire, then the endless night!' }
-                ],
                 LONG_NIGHT: [
                     { who: 'rival', text: 'Even your forest dies in the dark!' },
                     { who: 'hero', text: 'Every night ends, Azael.' },
                     { who: 'rival', text: 'Not this one. Never this one!' }
                 ],
                 BLOOD_COUNTESS: [
-                    { who: 'rival', text: 'My Countess drinks druids!' },
-                    { who: 'hero', text: 'I would rather not hurt her.' },
-                    { who: 'rival', text: 'Then die gently!' }
+                    { who: 'rival', text: 'My castle, druid. No forest here! Meet my Countess!' },
+                    { who: 'hero', text: 'Then I bring one with me.' },
+                    { who: 'rival', text: 'And then the endless night!' }
                 ],
                 default: [
                     { who: 'rival', text: 'Still alive, druid?!' },
@@ -285,20 +275,15 @@ export const BOSS_INTROS = {
                     { who: 'boss', text: 'A priest? I will break him.' },
                     { who: 'hero', text: 'I do not break, Captain. I paid for that.' }
                 ],
-                DEMON_LORD: [
-                    { who: 'rival', text: 'My castle, priest. God is not home!' },
-                    { who: 'hero', text: 'I did not come for Him. I came for you.' },
-                    { who: 'rival', text: 'First fire, then the endless night!' }
-                ],
                 LONG_NIGHT: [
                     { who: 'rival', text: 'No prayer reaches the Long Night!' },
                     { who: 'hero', text: 'I do not need it to reach. Only to burn.' },
                     { who: 'rival', text: 'Then burn alone!' }
                 ],
                 BLOOD_COUNTESS: [
-                    { who: 'rival', text: 'My Countess drinks holy blood!' },
-                    { who: 'hero', text: 'Then she will taste what it costs.' },
-                    { who: 'rival', text: 'Pay it, priest!' }
+                    { who: 'rival', text: 'My castle, priest. God is not home! Meet my Countess!' },
+                    { who: 'hero', text: 'I did not come for Him. I came for you.' },
+                    { who: 'rival', text: 'And then the endless night!' }
                 ],
                 default: [
                     { who: 'rival', text: 'Still standing, priest?!' },
@@ -328,20 +313,15 @@ export const BOSS_INTROS = {
                     { who: 'boss', text: 'An old man? I will break him.' },
                     { who: 'hero', text: 'Kneel, Captain. I am your king.' }
                 ],
-                DEMON_LORD: [
-                    { who: 'rival', text: 'My castle now, old man. Not yours!' },
-                    { who: 'hero', text: 'It was mine first.' },
-                    { who: 'rival', text: 'First fire, then the endless night!' }
-                ],
                 LONG_NIGHT: [
                     { who: 'rival', text: 'Even kings die in the dark!' },
                     { who: 'hero', text: 'Kings outlast it.' },
                     { who: 'rival', text: 'Not this night. Never this one!' }
                 ],
                 BLOOD_COUNTESS: [
-                    { who: 'rival', text: 'My Countess drinks royal blood!' },
-                    { who: 'hero', text: 'She will choke on it.' },
-                    { who: 'rival', text: 'Then choke, old fool!' }
+                    { who: 'rival', text: 'My castle now, old man. Meet my Countess!' },
+                    { who: 'hero', text: 'It was mine first.' },
+                    { who: 'rival', text: 'And then the endless night!' }
                 ],
                 default: [
                     { who: 'rival', text: 'Still standing, old fool?!' },
@@ -371,20 +351,20 @@ export const BOSS_INTROS = {
                     { who: 'boss', text: 'Move.' },
                     { who: 'hero', text: 'You move.' }
                 ],
-                DEMON_LORD: [
-                    { who: 'rival', text: 'My castle, Captain. Wall you cannot break!' },
-                    { who: 'hero', text: 'Watch me.' },
-                    { who: 'rival', text: 'First fire, then the endless night!' }
-                ],
                 LONG_NIGHT: [
                     { who: 'rival', text: 'Your axe cannot cut the night!' },
                     { who: 'hero', text: 'Wait and see.' },
                     { who: 'rival', text: 'Not this one. Never this one!' }
                 ],
                 BLOOD_COUNTESS: [
-                    { who: 'rival', text: 'My Countess drinks soldiers!' },
+                    { who: 'rival', text: 'My castle, Captain. Meet my Countess!' },
                     { who: 'hero', text: 'Hungry? Come eat.' },
-                    { who: 'rival', text: 'The castle is next, Captain!' }
+                    { who: 'rival', text: 'And then the endless night!' }
+                ],
+                DEMON_LORD: [
+                    { who: 'rival', text: 'The village gate is yours, Captain. Meet the Lord of the First Fire!' },
+                    { who: 'hero', text: 'Watch me.' },
+                    { who: 'rival', text: 'Beyond him, my castle. Nobody enters alive!' }
                 ],
                 default: [
                     { who: 'rival', text: 'Still standing, Captain?!' },
@@ -416,19 +396,14 @@ export const BOSS_INTROS = {
             { who: 'boss', text: 'He will not.' },
             { who: 'hero', text: 'Move, or be moved.' }
         ],
-        DEMON_LORD: [
-            { who: 'rival', text: 'You cut down your own kind well, demon.' },
-            { who: 'hero', text: 'Watching from the shadows, hunter?' },
-            { who: 'rival', text: 'Their lord is coming for you.' }
-        ],
         LONG_NIGHT: [
             { who: 'rival', text: 'The darkness itself is waking.' },
             { who: 'hero', text: 'Stand back and watch.' },
             { who: 'rival', text: 'If you fall, I finish what is left.' }
         ],
         BLOOD_COUNTESS: [
-            { who: 'rival', text: 'Something old is coming. It smells your blood.' },
-            { who: 'hero', text: 'Then it will choke on it.' },
+            { who: 'rival', text: 'The castle is ahead, demon. Its Countess is thirsty.' },
+            { who: 'hero', text: 'Then she will choke on it.' },
             { who: 'rival', text: 'Prove it.' }
         ],
         default: [

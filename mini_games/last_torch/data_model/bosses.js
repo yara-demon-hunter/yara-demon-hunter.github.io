@@ -411,10 +411,10 @@ export const BOSS_SPAWNING = {
     // BRUTOS (hora 6): semi-boss do meio da noite
     // 6 telas x 3 ondas (data_model/campaign.js): o chefe fecha cada tela (ondas 3, 6, 9...). A 1ª tela (Dark Forest) termina com o rival (Azael, ou o Demon Hunter para quem joga de Azael).
     // Dark Forest: Azael (o rival) · River Crossing: Lake Spirit · Swamp: Slizork · Graveyard: Grave King · Village: Brutos
-    // Castle: os TRÊS chefes, um por onda: Demon Lord, The Long Night e a revanche do Azael (o rival)
+    // Castle: os TRÊS chefes, um por onda: Blood Countess, The Long Night e a revanche do Azael (o rival). O Demon Lord só vem para quem joga de Brutos, no lugar dele na Village
     schedule: {
         [3 * 1]: 'RIVAL', [3 * 2]: 'LAKE_SPIRIT', [3 * 3]: 'SLIZORK', [3 * 4]: 'GRAVE_KING', [3 * 5]: 'BRUTOS',
-        [3 * 5 + 1]: 'DEMON_LORD', [3 * 5 + 2]: 'LONG_NIGHT', [3 * 5 + 3]: 'RIVAL_FINAL'
+        [3 * 5 + 1]: 'BLOOD_COUNTESS', [3 * 5 + 2]: 'LONG_NIGHT', [3 * 5 + 3]: 'RIVAL_FINAL'
     },
     spawnScreenRatio: 0.5
 };
@@ -439,8 +439,8 @@ export function chooseBossType(turn, heroModel = 'hunter') {
     const { schedule } = BOSS_SPAWNING;
     const rival = RIVAL_OF[heroModel] ?? RIVAL_OF.hunter;
     const slot = schedule[turn];
-    // O Captain Brutos não luta contra si mesmo: quem joga com ele enfrenta a Blood Countess na Village
-    if (slot === 'BRUTOS' && heroModel === 'brutos') return 'BLOOD_COUNTESS';
+    // O Captain Brutos não luta contra si mesmo: quem joga com ele enfrenta o Demon Lord na Village (o Demon Lord só aparece assim)
+    if (slot === 'BRUTOS' && heroModel === 'brutos') return 'DEMON_LORD';
     if (slot === 'RIVAL') return rival;
     if (slot === 'RIVAL_FINAL') return `${rival}_FINAL`;
     return slot ?? null;

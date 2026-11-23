@@ -8,7 +8,7 @@ import json, sys
 from playwright.sync_api import sync_playwright
 # Telas de referência (largura, altura, toque). Acrescente aqui a tela nova de um envio do tuner.
 SCREENS = [(360,640,1),(360,740,1),(390,844,1),(412,915,1),(768,1024,1),(640,360,1),(740,360,1),(844,390,1),(915,412,1),(1024,768,1),(1280,720,0),(1920,1080,0)]
-IDS = ['heroCard','btnPause','hudButtons','bossHpContainer','hudBottom','hudScore','hudStreak','joystick','knifeButton','dashButton']
+IDS = ['heroCard','btnPause','hudButtons','btnMap','btnSettings','bossHpContainer','hudBottom','hudScore','hudStreak','joystick','knifeButton','dashButton']
 SETUP = """async () => {
   const st = await import(location.origin+'/js/core/state.js'); const hud = await import(location.origin+'/js/ui/hud.js'); const bs = await import(location.origin+'/data_model/bosses.js');
   const boss = bs.createBoss('AZAEL', 1, st.state.coreX + 220, st.state.coreY - 160);
