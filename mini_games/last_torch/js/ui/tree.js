@@ -185,7 +185,7 @@ function createTreeView(cfg) {
         }
         const st = getNodeState(node);
         const info = getNodeInfo(node);
-        const furyUpgrade = node.key === 'frenzyNova' && !st.maxed && !st.restricted;
+        const furyUpgrade = node.key === 'furySkill' && !st.maxed && !st.restricted;
         const upgradeRows = st.maxed || st.restricted || furyUpgrade ? [] : getNodeUpgradeRows(node);
         setIcon(detail('Icon'), node, info);
         detail('Name').textContent = info.name;

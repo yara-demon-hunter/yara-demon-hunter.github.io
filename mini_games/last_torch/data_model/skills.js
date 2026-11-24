@@ -13,7 +13,7 @@ export const UPGRADE_MODELS = {
     },
     atkSpeed: { name: 'Attack Speed', icon: '⏱️', lvl: 1, maxLvl: 99, desc: 'Reduces the cooldown between hits.' },
     moveSpeed: { name: 'Move Speed', icon: '🥾', lvl: 1, maxLvl: 99, desc: 'Makes the character move faster.' },
-    frenzyNova: { name: 'Fury (Skill)', icon: '😡', lvl: 1, maxLvl: 99, desc: 'Improves Fury duration and damage, and increases Fury charge.' },
+    furySkill: { name: 'Fury (Skill)', icon: '😡', lvl: 1, maxLvl: 99, desc: 'Improves Fury duration and damage, and increases Fury charge.' },
     playerHp: { name: 'Hero Health', icon: '❤️', lvl: 1, maxLvl: 99, desc: 'Increases max health and heals the character. Blows land softer, and monsters leave the torch to come for you from farther away.' },
     knockback: { name: 'Knockback', icon: '👊', lvl: 1, maxLvl: 99, desc: 'Increases the push when hitting targets.' }
 };

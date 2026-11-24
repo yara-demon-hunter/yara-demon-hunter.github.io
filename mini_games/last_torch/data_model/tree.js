@@ -75,9 +75,9 @@ export const TREE_NODES = [
     // --- LÂMINA: o guerreiro. Força bruta, matar tudo, ser cercado de propósito ---
     { id: 'damage', branch: 'blade', kind: 'stat', key: 'damage', cost: 2, x: 0, y: 1.5, requires: [] },
     // Linha da Fúria: matar alimenta matar
-    { id: 'frenzyNova', branch: 'blade', kind: 'stat', key: 'frenzyNova', x: 1, y: 0, requires: [req('damage')],
+    { id: 'furySkill', branch: 'blade', kind: 'stat', key: 'furySkill', cost: 2, x: 1, y: 0, requires: [req('damage')],
       levelText: (mods) => `Fury charge: +${Math.round(mods.furyCharge * 100)}%`, mods: { furyCharge: 0.06 } },
-    { id: 'bloodlust', branch: 'blade', kind: 'power', key: 'bloodlust', x: 2, y: 0, requires: [req('frenzyNova', 2)] },
+    { id: 'bloodlust', branch: 'blade', kind: 'power', key: 'bloodlust', x: 2, y: 0, requires: [req('furySkill', 2)] },
     { id: 'bloodlustEvolve', branch: 'blade', kind: 'evolve', key: 'bloodlust', x: 3, y: 0, requires: [req('bloodlust', 5)] },
     // Linha do aço: o golpe cada vez mais largo e mortal
     { id: 'atkSpeed', branch: 'blade', kind: 'stat', key: 'atkSpeed', cost: 2, x: 1, y: 1, requires: [req('damage')] },

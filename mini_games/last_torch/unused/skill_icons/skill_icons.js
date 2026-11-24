@@ -195,7 +195,7 @@ const ICONS = {
     fleetFoot: (g) => { shape(g, [[8, 30], [24, 30], [36, 18], [43, 22], [30, 38], [8, 38]], ICE); shape(g, [[14, 30], [26, 12], [34, 18], [24, 30]], '#e0f2fe'); },
     fanOfKnives: (g) => { dagger(g, 24, 42, -0.62, 1.2); dagger(g, 24, 42, 0, 1.3); dagger(g, 24, 42, 0.62, 1.2); },
     // --- Chama ---
-    frenzyNova: (g) => { star(g, 24, 24, 21, 11, 10, BLOOD); flame(g, 24, 25, 0.72); },
+    furySkill: (g) => { star(g, 24, 24, 21, 11, 10, BLOOD); flame(g, 24, 25, 0.72); },
     playerHp: (g) => heart(g, 24, 24, 1.3, BLOOD),
     torchBolts: (g) => { line(g, [[17, 44], [20, 26]], '#7c4a21', 5); flame(g, 21, 17, 0.78); line(g, [[31, 14], [44, 8]], FIRE, 3); dot(g, 44, 8, 3, FIRE_CORE); },
     torchKeeper: (g) => { line(g, [[24, 44], [24, 28]], '#7c4a21', 6); shape(g, [[13, 28], [35, 28], [31, 34], [17, 34]], STEEL_DARK); flame(g, 24, 17, 0.95); },

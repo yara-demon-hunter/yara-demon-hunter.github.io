@@ -261,11 +261,11 @@ export function isRestricted(node) {
 }
 
 // Ramos e skills que o personagem não pode seguir (sealedBranches / sealedSkills no arquivo dele: o Rowan não tem lâmina).
-// A skill Fury (frenzyNova) fica fora do selo: é a Fúria, de todos, mesmo morando no ramo Blade.
+// A skill Fury (furySkill) fica fora do selo: é a Fúria, de todos, mesmo morando no ramo Blade.
 function isSealedForHero(node) {
     const hero = getHero();
     if (hero.sealedSkills?.includes(node.id)) return true;
-    return !!hero.sealedBranches?.includes(node.branch) && node.id !== 'frenzyNova';
+    return !!hero.sealedBranches?.includes(node.branch) && node.id !== 'furySkill';
 }
 
 // Skills que causam dano de MAGIA (dependem do `magicDamage` do personagem): os poderes, passivas e evoluções dos ramos de
@@ -287,7 +287,7 @@ export function getRestrictionText(node) {
     if (node?.hero && getHero().id !== node.hero) return `Only ${node.hero[0].toUpperCase()}${node.hero.slice(1)} can learn this skill.`;
     if (node?.notFor?.includes(getHero().id)) return `${getHero().name} cannot use this skill: his roses do not burn.`;
     const hero = getHero();
-    if (hero.sealedBranches?.includes(node.branch) && node.branch !== 'blade' && node.id !== 'frenzyNova') return `${hero.name} cannot walk the ${TREE_BRANCHES[node.branch].path.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase())}.`;
+    if (hero.sealedBranches?.includes(node.branch) && node.branch !== 'blade' && node.id !== 'furySkill') return `${hero.name} cannot walk the ${TREE_BRANCHES[node.branch].path.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase())}.`;
     if (isSealedForHero(node)) return node.branch === 'blade' ? `${hero.name} carries no blade: the Blade Path is not for him.` : `${hero.name} cannot use this skill: his weapon does not cut.`;
     if (isMagicNode(node) && characterMagic() <= 0) return `${hero.name} has no magic: this skill is not for him.`;
     return (hero.mods?.noKnives ?? 0) > 0

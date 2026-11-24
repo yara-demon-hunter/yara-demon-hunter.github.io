@@ -210,6 +210,8 @@ export function continueRun() {
     state.playerLevel = snap.playerLevel;
     state.playerXp = snap.playerXp;
     state.playerMaxXp = snap.playerMaxXp;
+    // Partida guardada antes do renome frenzyNova -> furySkill (a skill Fury): leva o nível para o nome novo
+    for (const bag of [snap.attributes, snap.tree]) if (bag && bag.frenzyNova !== undefined) { bag.furySkill ??= bag.frenzyNova; delete bag.frenzyNova; }
     state.tree = { ...snap.tree };
     for (const [key, lvl] of Object.entries(snap.attributes)) if (attributes[key]) attributes[key].lvl = lvl;
     for (const [key, p] of Object.entries(snap.passives)) if (passives[key]) Object.assign(passives[key], p);

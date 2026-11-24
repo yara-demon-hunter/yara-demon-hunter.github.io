@@ -147,13 +147,13 @@ export function getWarmthHeal() {
     const multiplier = Math.min(WARMTH_HEAL_MAX_MULTIPLIER, 1 + mod('warmth') * WARMTH_HEAL_SHARE);
     return characterStat('warmthHeal') * multiplier;
 }
-// Tudo da Fúria vem do `fury` do personagem escolhido (data_model/characters/<id>.js); o nível da skill Fury (frenzyNova) sobe por cima
+// Tudo da Fúria vem do `fury` do personagem escolhido (data_model/characters/<id>.js); o nível da skill Fury (furySkill) sobe por cima
 export function getFrenzyDamageBonus() {
-    return attributes.frenzyNova.lvl * getFury().damageBonusPerLevel + mod('furyPower');
+    return attributes.furySkill.lvl * getFury().damageBonusPerLevel + mod('furyPower');
 }
 export function getFrenzyDuration() {
     const fury = getFury();
-    return fury.durationSeconds + Math.max(0, attributes.frenzyNova.lvl - 1) * fury.durationPerLevel + mod('furyDuration');
+    return fury.durationSeconds + Math.max(0, attributes.furySkill.lvl - 1) * fury.durationPerLevel + mod('furyDuration');
 }
 // Carga da barra por monstro atingido e por morte na sequência, já com o bônus de Fury Charge
 export function getFuryChargePerHit() {
