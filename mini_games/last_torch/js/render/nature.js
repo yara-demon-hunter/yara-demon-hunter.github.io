@@ -375,9 +375,12 @@ function renderLeechVines(t) {
     ctx.lineJoin = 'round';
     const curves = [];
     for (const oak of N.oaks) {
-        if (!oak.vines?.length) continue;
+        // As raízes que prendem o monstro mais forte (grip) desenham o mesmo cipó até ele, enquanto ele estiver preso
+        const gripped = oak.gripTarget && oak.gripTarget.rooted > 0 && oak.gripTarget.hp > 0 && state.enemies.includes(oak.gripTarget) ? [oak.gripTarget] : [];
+        const linked = [...(oak.vines ?? []), ...gripped];
+        if (!linked.length) continue;
         const sy = oak.y - 20;         // da base da copa
-        oak.vines.forEach((e, i) => curves.push({
+        linked.forEach((e, i) => curves.push({
             e,
             x0: oak.x,
             y0: sy,

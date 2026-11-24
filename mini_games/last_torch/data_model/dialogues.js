@@ -413,7 +413,9 @@ export const BOSS_INTROS = {
                 ],
                 DEMON_LORD: [
                     { who: 'rival', text: 'The village gate is yours, Captain. Meet the Lord of the First Fire!' },
+                    { who: 'boss', text: 'I am the first fire. Kneel, or burn.' },
                     { who: 'hero', text: 'Watch me.' },
+                    { who: 'boss', text: 'Then burn slowly.' },
                     { who: 'rival', text: 'Beyond him, my castle. Nobody enters alive!' }
                 ],
                 default: [

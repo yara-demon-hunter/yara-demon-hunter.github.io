@@ -7,7 +7,7 @@ lang: pt
 translation_id: last-torch-guide
 mini_games_hub: true
 hide_recent_updates: true
-last_updated: 2026-11-13
+last_updated: 2026-11-24
 image: /assets/images/common/mini-game/last_torch_cover.jpeg
 permalink: /pt/mini-games/last-torch/
 ---
@@ -70,12 +70,13 @@ permalink: /pt/mini-games/last-torch/
     <section id="noite" class="game-guide__section">
         <h2>Como funciona uma noite</h2>
         <ol class="game-guide__steps game-guide__steps--cards">
-            <li><strong>Caçada</strong> Mate monstros por XP, ouro e a cota da hora.</li>
-            <li><strong>Últimos monstros</strong> Cota fechada? Limpe a tela para encerrar a hora.</li>
+            <li><strong>Caçada</strong> Mate monstros por XP, ouro e a cota da onda.</li>
+            <li><strong>Últimos monstros</strong> Cota fechada? Limpe a tela para encerrar a onda.</li>
             <li><strong>Acampamento</strong> Compre relíquias, alimente a tocha ou descanse.</li>
-            <li><strong>Sobreviva</strong> Há chefes nas horas 4, 8 e 12. Depois, o amanhecer.</li>
+            <li><strong>Sobreviva</strong> Um chefe fecha cada tela, e três esperam no Castle. Depois, o amanhecer.</li>
         </ol>
         <p>Você perde se o caçador <em>ou</em> a tocha morrer, então nunca dá para simplesmente fugir.</p>
+        <p>A noite tem <strong>18 ondas em seis telas</strong>: Dark Forest, River Crossing, Swamp, Graveyard, Village e Castle. Cada tela tem três ondas, monstros próprios e um chefe no fim (o Castle tem um chefe em cada onda). O mapa mostra seu progresso e suas estrelas, e não dá para voltar a uma tela anterior.</p>
     </section>
 
     <section id="cacador" class="game-guide__section">
@@ -93,40 +94,31 @@ permalink: /pt/mini-games/last-torch/
     <section id="monstros" class="game-guide__section">
         <h2>Monstros da floresta</h2>
         <div class="game-guide__bestiary">
-            <article class="bestiary-card"><img src="{{ art }}skeleton.webp" alt="Esqueleto andando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 1</p><h3>Esqueleto</h3><p>Comum, e pode brotar do chão.</p></article>
-            <article class="bestiary-card"><img src="{{ art }}bat.webp" alt="Morcego voando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 1</p><h3>Morcego</h3><p>Rápido, frágil e mortal em círculos.</p></article>
-            <article class="bestiary-card"><img src="{{ art }}vampire.webp" alt="Vampiro andando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 2</p><h3>Vampiro</h3><p>Vira dois morcegos ao morrer.</p></article>
-            <article class="bestiary-card"><img src="{{ art }}witch.webp" alt="Bruxa lançando feitiço" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 3</p><h3>Bruxa</h3><p>Ataca de longe. Use a adaga.</p></article>
-            <article class="bestiary-card"><img src="{{ art }}zombie-wolf.webp" alt="Lobo Zumbi correndo" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 4</p><h3>Lobo Zumbi</h3><p>Matilhas que avançam em linha reta.</p></article>
-            <article class="bestiary-card"><img src="{{ art }}moth.webp" alt="Mariposa voando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 5</p><h3>Mariposa</h3><p>Ignora você e voa para a chama.</p></article>
-            <article class="bestiary-card"><img src="{{ art }}bloater.webp" alt="Inchado andando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 6</p><h3>Inchado</h3><p>Explode. Estoure no meio da multidão.</p></article>
-            <article class="bestiary-card"><img src="{{ art }}wraith.webp" alt="Espectro flutuando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 7</p><h3>Espectro</h3><p>Mira e dispara para a frente. Dash!</p></article>
-            <article class="bestiary-card"><img src="{{ art }}headless-knight.webp" alt="Cavaleiro Sem Cabeça marchando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 8</p><h3>Cavaleiro Sem Cabeça</h3><p>Tanque cuja cabeça flutuante atira.</p></article>
-            <article class="bestiary-card"><img src="{{ art }}necromancer.webp" alt="Necromante lançando feitiço" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Hora 9</p><h3>Necromante</h3><p>Levanta esqueletos até você alcançá-lo.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}skeleton.webp" alt="Esqueleto andando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Dark Forest</p><h3>Esqueleto</h3><p>Comum, e pode brotar do chão.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}bat.webp" alt="Morcego voando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Dark Forest</p><h3>Morcego</h3><p>Rápido, frágil e mortal em círculos.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}vampire.webp" alt="Vampiro andando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">River Crossing</p><h3>Vampiro</h3><p>Vira dois morcegos ao morrer.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}witch.webp" alt="Bruxa lançando feitiço" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">River Crossing</p><h3>Bruxa</h3><p>Ataca de longe. Use a adaga.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}zombie-wolf.webp" alt="Lobo Zumbi correndo" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Graveyard</p><h3>Lobo Zumbi</h3><p>Matilhas que avançam em linha reta.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}moth.webp" alt="Mariposa voando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">River Crossing</p><h3>Mariposa</h3><p>Ignora você e voa para a chama.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}bloater.webp" alt="Inchado andando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Swamp</p><h3>Inchado</h3><p>Explode. Estoure no meio da multidão.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}wraith.webp" alt="Espectro flutuando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">River Crossing</p><h3>Espectro</h3><p>Mira e dispara para a frente. Dash!</p></article>
+            <article class="bestiary-card"><img src="{{ art }}headless-knight.webp" alt="Cavaleiro Sem Cabeça marchando" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Village</p><h3>Cavaleiro Sem Cabeça</h3><p>Tanque cuja cabeça flutuante atira.</p></article>
+            <article class="bestiary-card"><img src="{{ art }}necromancer.webp" alt="Necromante lançando feitiço" width="180" height="180" loading="lazy"><p class="bestiary-card__hour">Graveyard</p><h3>Necromante</h3><p>Levanta esqueletos até você alcançá-lo.</p></article>
         </div>
-        <p><strong>Elites:</strong> a partir da Hora 2, monstros Brute, Swift e Blazing chegam com aura colorida e soltam baús cheios de pontos de habilidade.</p>
+        <p><strong>Elites:</strong> a partir da onda 3, monstros Brute, Swift e Blazing chegam com aura colorida e soltam baús cheios de pontos de habilidade.</p>
     </section>
 
     <section id="chefes" class="game-guide__section">
         <h2>Chefes</h2>
-        <div class="game-guide__clips">
-            <figure class="game-clip">
-                <video autoplay muted loop playsinline preload="metadata" poster="{{ art }}demon-lord-fight.webp" aria-label="Luta contra o Demon Lord">
-                    <source src="{{ art }}demon-lord-fight.mp4" type="video/mp4">
-                </video>
-                <figcaption>Demon Lord: bolas de fogo e chão marcado.</figcaption>
-            </figure>
-            <figure class="game-clip">
-                <video autoplay muted loop playsinline preload="metadata" poster="{{ art }}blood-countess-fight.webp" aria-label="Luta contra a Blood Countess">
-                    <source src="{{ art }}blood-countess-fight.mp4" type="video/mp4">
-                </video>
-                <figcaption>Blood Countess: teleportes e espirais de sangue.</figcaption>
-            </figure>
-        </div>
         <div class="game-guide__bosses">
-            <article class="boss-card"><img src="{{ art }}demon-lord.webp" alt="Demon Lord" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Hora 4</p><h3>Demon Lord</h3><p class="boss-card__title">Lord of the First Fire</p></div></article>
-            <article class="boss-card"><img src="{{ art }}blood-countess.webp" alt="Blood Countess" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Hora 8</p><h3>Blood Countess</h3><p class="boss-card__title">She Who Drinks the Light</p></div></article>
-            <article class="boss-card"><img src="{{ art }}long-night.webp" alt="The Long Night" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Hora 12</p><h3>The Long Night</h3><p class="boss-card__title">The Dark Itself</p></div></article>
+            <article class="boss-card"><img src="{{ art }}azael.webp" alt="Azael" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Onda 3 · Dark Forest</p><h3>Azael</h3><p class="boss-card__title">The Demon Who Hunts His Kind</p></div></article>
+            <article class="boss-card"><img src="{{ art }}river-spirit.webp" alt="River Spirit" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Onda 6 · River Crossing</p><h3>River Spirit</h3><p class="boss-card__title">The Drowned Lady</p></div></article>
+            <article class="boss-card"><img src="{{ art }}slizork.webp" alt="Slizork" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Onda 9 · Swamp</p><h3>Slizork</h3><p class="boss-card__title">Tyrant of the Mire</p></div></article>
+            <article class="boss-card"><img src="{{ art }}grave-king.webp" alt="Grave King" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Onda 12 · Graveyard</p><h3>Grave King</h3><p class="boss-card__title">The Rotting Warlord</p></div></article>
+            <article class="boss-card"><img src="{{ art }}brutos.webp" alt="Captain Brutos" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Onda 15 · Village</p><h3>Captain Brutos</h3><p class="boss-card__title">Captain of the Black Guard</p></div></article>
+            <article class="boss-card"><img src="{{ art }}blood-countess.webp" alt="Blood Countess" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Onda 16 · Castle</p><h3>Blood Countess</h3><p class="boss-card__title">She Who Drinks the Light</p></div></article>
+            <article class="boss-card"><img src="{{ art }}long-night.webp" alt="The Long Night" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Onda 17 · Castle</p><h3>The Long Night</h3><p class="boss-card__title">The Dark Itself</p></div></article>
+            <article class="boss-card"><img src="{{ art }}azael.webp" alt="Azael, de novo" width="180" height="180" loading="lazy"><div><p class="bestiary-card__hour">Onda 18 · Castle</p><h3>Azael, de novo</h3><p class="boss-card__title">Stronger Than Before</p></div></article>
         </div>
     </section>
 
@@ -149,7 +141,7 @@ permalink: /pt/mini-games/last-torch/
         <p>
             A árvore de habilidades recomeça a cada noite. Poderes no máximo podem evoluir, como Earthbreaker em
             <strong>Cataclysm</strong> ou Void Rift em <strong>Event Horizon</strong>. No acampamento, o ouro compra 27 relíquias,
-            e a partir da Hora 3 presságios como <strong>Blood Moon</strong> trocam mais perigo por mais recompensa.
+            e a partir da onda 3 presságios como <strong>Blood Moon</strong> trocam mais perigo por mais recompensa.
         </p>
     </section>
 
@@ -165,14 +157,16 @@ permalink: /pt/mini-games/last-torch/
     </section>
 
     <section id="herois" class="game-guide__section">
-        <h2>Quatro caçadores para liberar</h2>
-        <div class="game-guide__gallery game-guide__gallery--four">
+        <h2>Seis caçadores</h2>
+        <div class="game-guide__gallery game-guide__gallery--six">
             <figure><img src="{{ art }}hero-hunter.webp" alt="Demon Hunter" width="200" height="200" loading="lazy"><figcaption><strong>Demon Hunter</strong> Equilibrado, desde o início</figcaption></figure>
-            <figure><img src="{{ art }}hero-reaver.webp" alt="Ash Reaver" width="200" height="200" loading="lazy"><figcaption><strong>Ash Reaver</strong> Mate o Demon Lord</figcaption></figure>
-            <figure><img src="{{ art }}hero-warden.webp" alt="Torch Warden" width="200" height="200" loading="lazy"><figcaption><strong>Torch Warden</strong> Mate a Blood Countess</figcaption></figure>
-            <figure><img src="{{ art }}hero-shade.webp" alt="The Shade" width="200" height="200" loading="lazy"><figcaption><strong>The Shade</strong> Faça 70 mortes em sequência</figcaption></figure>
+            <figure><img src="{{ art }}hero-rowan.webp" alt="Rowan" width="200" height="200" loading="lazy"><figcaption><strong>Rowan</strong> Sobreviva à onda 1</figcaption></figure>
+            <figure><img src="{{ art }}hero-brutos.webp" alt="Captain Brutos" width="200" height="200" loading="lazy"><figcaption><strong>Captain Brutos</strong> Derrote o Captain Brutos</figcaption></figure>
+            <figure><img src="{{ art }}hero-azael.webp" alt="Azael" width="200" height="200" loading="lazy"><figcaption><strong>Azael</strong> Zere o jogo</figcaption></figure>
+            <figure><img src="{{ art }}hero-avgustino.webp" alt="Padre Avgustino" width="200" height="200" loading="lazy"><figcaption><strong>Padre Avgustino</strong> Desbloqueie com brasas</figcaption></figure>
+            <figure><img src="{{ art }}hero-gudran.webp" alt="Gudran" width="200" height="200" loading="lazy"><figcaption><strong>Gudran</strong> Desbloqueie com brasas</figcaption></figure>
         </div>
-        <p>Vencer abre a noite sem fim e oito níveis de Escuridão. Troféus, façanhas e bestiário ficam guardados no Santuário.</p>
+        <p>Vencer abre oito níveis de Escuridão. Troféus, façanhas e bestiário ficam guardados no Santuário.</p>
     </section>
 
     <section id="controles" class="game-guide__section game-guide__section--last">

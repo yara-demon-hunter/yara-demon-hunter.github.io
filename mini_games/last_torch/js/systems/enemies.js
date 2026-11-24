@@ -4,6 +4,7 @@ import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, createVampireBat, rollMonsterGold } from '../../data_model/monsters.js';
 import { MIRROR_WARD } from '../../data_model/passives.js';
+import { POWER_MODELS } from '../../data_model/powers.js';
 import { audio, passives, player, shadowClones, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { addSlam, updateBossAI, updateShadowAI } from './boss_ai.js';
@@ -16,6 +17,7 @@ import { checkHourEnd, onBossKilled } from './night.js';
 import { dropChest, maybeDropPickup } from './pickups.js';
 import { hurtPlayer, knockbackPlayer } from './player.js';
 import { damageShadowClone } from './shadow_clone.js';
+import { hurtOaks } from './skills_nature.js';
 import { addHostileFire, onEnemyKilled } from './powers.js';
 import { spreadBurn, wardSpendForShot, wardTorch } from './skills_flame.js';
 import { gainXp } from './progression.js';
@@ -115,6 +117,8 @@ function updateMelee(e, M, dist, angle, dt) {
             for (const clone of shadowClones) {
                 if (clone.active && inArc(clone.x, clone.y, CHARACTER_MODEL.collisionRadius)) damageShadowClone(clone, e.damage * M.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
             }
+            // A árvore do druida também leva o corte: o tronco dentro do leque é ferido
+            for (const oak of state.nature.oaks) if (inArc(oak.x, oak.y, POWER_MODELS.shelterOak.trunkRadius)) { oak.hp -= e.damage * M.damageMultiplier; oak.shake = 0.18; }
             audio.playSlice();
         }
         return true;
@@ -834,6 +838,7 @@ function updateBubble(p, i, dt) {
         if (Math.hypot(player.x - p.x, player.y - p.y) < p.burstRadius + CHARACTER_MODEL.collisionRadius) {
             hurtPlayer(p.damage, p.x, p.y, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
         }
+        hurtOaks(p.x, p.y, p.burstRadius, p.damage);
     }
 }
 
@@ -863,6 +868,16 @@ export function updateEnemyProjectiles(dt) {
                 enemyProjectiles.splice(i, 1);
                 continue;
             }
+        }
+
+        // A árvore do druida (carvalho) também leva o tiro: a magia da bruxa passava reto por ela. O tronco absorve o tiro e perde vida
+        const oak = state.nature.oaks.find(o => Math.hypot(o.x - p.x, o.y - p.y) < POWER_MODELS.shelterOak.trunkRadius + p.radius);
+        if (oak) {
+            oak.hp -= p.damage;
+            oak.shake = 0.18;
+            createExplosion(p.x, p.y, p.color ?? '#a16207', 6);
+            enemyProjectiles.splice(i, 1);
+            continue;
         }
 
         if (passives.mirrorWard.lvl > 0 && player.reflectTimer <= 0

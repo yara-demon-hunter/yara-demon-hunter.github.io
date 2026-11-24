@@ -86,12 +86,12 @@ export const MONSTER_MODELS = {
         damage: 12,
         initialShootCooldownSeconds: 4,
         shootCooldownSeconds: 6.5,       // segundos entre um tiro e outro
-        shootRange: 300,                 // só atira daqui para perto: não acerta a tocha de muito longe (tem que ser maior que keepDistance)
+        shootRange: 390,                 // só atira daqui para perto: não acerta a tocha de muito longe (tem que ser maior que keepDistance)
         projectileSpeed: 160,
         projectileRadius: 5,
         projectileDamageMultiplier: 0.8,
         projectileTorchDamage: 5,
-        keepDistance: 165,               // para de andar a esta distância do alvo e atira
+        keepDistance: 215,               // para de andar a esta distância do alvo e atira
         scoreReward: 30,
         goldBase: 10,
         goldVariance: 0.5,
@@ -338,8 +338,8 @@ export const MONSTER_MODELS = {
         radius: 13,
         color: '#86efac',
         damage: 12,
-        keepDistance: 290,
-        shootRange: 370,                 // só levanta esqueletos daqui para perto (maior que keepDistance, senão ele para fora do alcance)
+        keepDistance: 335,
+        shootRange: 430,                 // só levanta esqueletos daqui para perto (maior que keepDistance, senão ele para fora do alcance)
         summon: { type: 'SKELETON', count: 2, spread: 46 },
         projectileSpeed: 150,            // além de levantar mortos, atira uma alma
         projectileRadius: 5,

@@ -22,6 +22,26 @@ const COLOR = '#4ade80';
 
 // --- RAÍZES ---
 // Prende um monstro. Boss fica só uma fração do tempo; o Captain Brutos (imparável) não fica.
+// Qualquer ataque inimigo pode ferir a árvore do druida, como fere o herói: círculo (x, y, raio) ou risco (x1, y1, x2, y2, largura)
+export function hurtOaks(x, y, radius, amount) {
+    for (const oak of N.oaks) {
+        if (Math.hypot(oak.x - x, oak.y - y) > radius + POWER_MODELS.shelterOak.trunkRadius) continue;
+        oak.hp -= amount;
+        oak.shake = 0.18;
+        createExplosion(oak.x, oak.y - 14, '#a16207', 4);
+    }
+}
+export function hurtOaksOnSegment(x1, y1, x2, y2, width, amount) {
+    const dx = x2 - x1, dy = y2 - y1, len2 = dx * dx + dy * dy || 1;
+    for (const oak of N.oaks) {
+        const k = Math.max(0, Math.min(1, ((oak.x - x1) * dx + (oak.y - y1) * dy) / len2));
+        if (Math.hypot(oak.x - (x1 + dx * k), oak.y - (y1 + dy * k)) > width / 2 + POWER_MODELS.shelterOak.trunkRadius) continue;
+        oak.hp -= amount;
+        oak.shake = 0.18;
+        createExplosion(oak.x, oak.y - 14, '#a16207', 4);
+    }
+}
+
 export function rootEnemy(e, seconds, dps = 0) {
     if (e.unstoppable || e.hp <= 0) return false;
     const M = POWER_MODELS.graspingRoots;
@@ -252,6 +272,23 @@ function updateShelterOak(dt) {
         }
         const grown = oak.stage === 'adult' || oak.stage === 'elder';
         if (grown) {
+            // Raízes que prendem o monstro mais forte da tela (por mais tempo que as raízes comuns)
+            oak.gripCd = (oak.gripCd ?? M.grip.firstDelay) - dt;
+            if (oak.gripCd <= 0 && state.phase === 'HUNT') {
+                let strongest = null;
+                for (const e of state.enemies) {
+                    if (e.hp <= 0 || e.unstoppable || e.emerge || e.x < 0 || e.x > state.width || e.y < 0 || e.y > state.height) continue;
+                    if (!strongest || e.maxHp > strongest.maxHp) strongest = e;
+                }
+                if (strongest && rootEnemy(strongest, M.grip.seconds)) {
+                    oak.gripTarget = strongest;
+                    oak.gripCd = M.grip.cooldownSeconds;
+                    oak.shake = 0.3;
+                    addShockwave(strongest.x, strongest.y, { radius: strongest.radius * 2.2, color: COLOR, width: 5, seconds: 0.4 });
+                    createExplosion(strongest.x, strongest.y, '#4ade80', 12);
+                    audio.playSummon();
+                } else oak.gripCd = 1.5;        // nada para agarrar agora: tenta de novo logo
+            }
             oak.age += dt;
             // Quarto estágio: o carvalho adulto continua crescendo (tempo + mortes) até ficar furioso de vez
             oak.growthAge += dt * (1 + mod('oakGrowth'));

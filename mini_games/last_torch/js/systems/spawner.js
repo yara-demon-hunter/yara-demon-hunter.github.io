@@ -1,7 +1,8 @@
 import { TURN_DIFFICULTY, getTurnDifficulty } from '../../data_model/difficulty.js';
 import { screenOf } from '../../data_model/screens/index.js';
 import { rollElite } from '../../data_model/elites.js';
-import { HOUR_EVENTS, NIGHT, rollHourHordes } from '../../data_model/night.js';
+import { DARKNESS, HOUR_EVENTS, NIGHT, rollHourHordes } from '../../data_model/night.js';
+import { save } from '../core/save.js';
 import { BOSS_MODELS, BOSS_SPAWNING, chooseBossType, createBoss, hasDuel, isBossTurn } from '../../data_model/bosses.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, chooseMonsterType, createMonster } from '../../data_model/monsters.js';
 import { waveProgress, waveSpawnBoost } from '../../data_model/difficulty.js';
@@ -23,6 +24,16 @@ const MIN_HORDE = 3;
 // Monstros nascem SOMENTE nas zonas verdes do cenário (spawn_zones.js); não existe mais nascimento pela borda do mundo
 
 // Aplica Escuridão e presságios a um monstro recém-criado
+// Chefe: a Escuridão já entrou em createBoss (BOSS_DARKNESS, em bosses.js); aqui só os outros modificadores (presságios, juramentos), sem contar a Escuridão duas vezes
+function applyBossMods(e) {
+    const dark = Math.max(0, save.darkness - 1);
+    const factor = (key, perLevel) => Math.max(0.1, 1 + mod(key) - perLevel * dark);
+    e.hp = e.maxHp = Math.max(1, Math.round(e.hp * factor('enemyHp', DARKNESS.enemyHpPerLevel)));
+    e.damage *= factor('enemyDamage', DARKNESS.enemyDamagePerLevel);
+    e.speed *= factor('enemySpeed', DARKNESS.enemySpeedPerLevel);
+    return e;
+}
+
 function applyEnemyMods(e) {
     e.hp = e.maxHp = Math.max(1, Math.round(e.hp * (1 + mod('enemyHp'))));
     e.damage *= 1 + mod('enemyDamage');
@@ -179,7 +190,7 @@ export function spawnBoss() {
     const { x, y } = state.bossSpawnAt ?? bossSpawnPoint();
     state.bossSpawnAt = null;
 
-    state.currentBoss = applyEnemyMods(createBoss(type, state.turn, x, y));
+    state.currentBoss = applyBossMods(createBoss(type, state.turn, x, y, Math.random, save.darkness));
     state.enemies.push(state.currentBoss);
     updateHUD();
     shakeScreen(16);

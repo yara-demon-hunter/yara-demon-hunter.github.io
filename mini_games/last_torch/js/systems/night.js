@@ -17,6 +17,7 @@ import { bumpStat } from './sanctuary.js';
 import { resetStreak } from './streak.js';
 import { resetFury } from './fury.js';
 import { clearSkillEffects } from './skills.js';
+import { clearNatureSkills } from './skills_nature.js';
 import { hasBossIntro, playBossIntro, playDuelDialogue, whenHunting } from '../ui/dialogue.js';
 import { CAMPAIGN_RUNTIME, screenIndexOf, screenOfTurn, startsNewScreen } from '../../data_model/campaign.js';
 import { showMapTransition } from '../ui/map_screen.js';
@@ -36,6 +37,7 @@ export function enterScreenForTurn(turn) {
     if (!CAMPAIGN_RUNTIME.enabled) return;
     const screen = screenOfTurn(turn);
     if (getSceneryId() === screen.id) return;
+    clearNatureSkills(true);                       // a árvore do druida recomeça como muda a cada tela (de 3 em 3 ondas); entre ondas da mesma tela ela fica
     clearBattleEffects();                          // nada da tela anterior (mancha do chefe, respingos, pedaços) fica na nova
     setScenery(screen.id);
     prepareScenery();

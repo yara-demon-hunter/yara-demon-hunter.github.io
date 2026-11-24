@@ -674,6 +674,12 @@
     grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
+.game-guide__gallery--six img {
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: center 20%;
+}
+
 .game-guide__gallery img,
 .game-guide__shots img {
     display: block;

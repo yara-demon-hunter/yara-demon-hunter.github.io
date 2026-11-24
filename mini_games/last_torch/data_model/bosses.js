@@ -8,10 +8,32 @@ import { RIVAL_OF, bossModelOf } from './characters/index.js';
 // renderAs: arte reaproveitada (js/render/entities.js); palette: troca a paleta dessa arte.
 // patterns: sequência de ataques, repetida em ciclo (js/systems/boss_ai.js). Abaixo de enrageRatio de
 // vida o boss enfurece: pausas menores e mais velocidade.
-// Vida: o boss já sobe com o multiplicador de dificuldade da hora (0.65 + 0.17 por hora), então hpPerTurn fica em 0
-// e o hpBase é a vida da primeira aparição dividida por esse multiplicador. Duração alvo da luta com o dano que o
-// herói faz de fato (já descontando o tempo desviando): Demon Lord ~1 min (35/s), Blood Countess ~2 min (70/s),
-// The Long Night ~5 min (100/s). Mudou o ritmo do herói? Ajuste o hpBase na mesma proporção.
+// ============================================================================================================================
+// AJUSTE DOS CHEFES: tudo o que se mexe com frequência fica aqui, no topo.
+//   1. BOSS_STATS: a vida, o dano e a velocidade FINAIS de cada chefe (Escuridão 1). O número escrito aqui é o que vale em jogo, sem curva por
+//      onda nem multiplicador escondido. Cada chefe aparece numa onda fixa da campanha, então o número é de uma onda só.
+//   2. BOSS_DARKNESS: quanto a Escuridão aumenta TODOS os chefes, por nível acima do 1 (vida, dano e velocidade). Um valor muda todos.
+//   3. BOSS_GLOBAL: botões gerais (multiplicam todos os chefes, em qualquer Escuridão): ex.: vida 0.8 deixa todos 20% mais fracos.
+// Os golpes de cada chefe (patterns, phases e os números de cada golpe) ficam logo abaixo, no BOSS_MODELS.
+// ============================================================================================================================
+export const BOSS_STATS = {
+    //                    vida    dano  velocidade   (onda em que aparece)
+    AZAEL:               { hp: 6000,  damage: 12.7, speed: 110 },     // 3  · Dark Forest   (o rival de quem joga de Demon Hunter, Rowan, Brutos...)
+    DEMON_HUNTER:        { hp: 6000,  damage: 10.9, speed: 58 },      // 3  · quando você joga de Azael, o rival é o Demon Hunter
+    RIVER_SPIRIT:        { hp: 12000,  damage: 21.2, speed: 33 },      // 6  · River Crossing
+    SLIZORK:             { hp: 30000,  damage: 32.5, speed: 23 },      // 9  · Swamp
+    GRAVE_KING:          { hp: 50000, damage: 41.1, speed: 32 },      // 12 · Graveyard
+    BRUTOS:              { hp: 100000, damage: 53.4, speed: 37 },      // 15 · Village
+    DEMON_LORD:          { hp: 100000, damage: 44.5, speed: 27 },      // 15 · Village, só para quem joga de Brutos (no lugar dele)
+    BLOOD_COUNTESS:      { hp: 200000, damage: 40.3, speed: 46 },      // 16 · Castle
+    LONG_NIGHT:          { hp: 300000, damage: 55.0, speed: 32 },      // 17 · Castle
+    AZAEL_FINAL:         { hp: 500000, damage: 44.7, speed: 144 },     // 18 · Castle (a revanche do Azael)
+    DEMON_HUNTER_FINAL:  { hp: 500000, damage: 38.3, speed: 76 }       // 18 · Castle (a revanche, quando você joga de Azael)
+};
+// Escuridão: por nível acima de 1 (Escuridão 1 = valores de BOSS_STATS). Ex.: hpPerLevel 0.3 = +30% de vida a cada nível (nível 8 = +210%).
+export const BOSS_DARKNESS = { hpPerLevel: 0.3, damagePerLevel: 0.12, speedPerLevel: 0.03 };
+// Botões gerais: 1 = como está
+export const BOSS_GLOBAL = { hp: 1, damage: 1, speed: 1 };
 
 // Golpes tirados de campo (ajuste de nov/2026): bloom (Condessa, Long Night), mark (Azael) e traps (Demon Hunter) saíram das listas de
 // patterns. O código deles continua em js/systems/boss_ai.js; para devolver, é só pôr o nome de volta na lista.
@@ -70,6 +92,7 @@ export const BOSS_MODELS = {
         name: 'Demon Lord',
         title: 'Lord of the First Fire',
         renderAs: 'DEMON_LORD',
+        portraitImage: 'images/characters/demon-lord-small.webp',      // retrato do diálogo (cópia de monsters/25d/demon_lord/art_reference/images/demon-lord.webp)
         hpBase: 1810,
         hpPerTurn: 0,
         speedMin: 28,
@@ -417,6 +440,9 @@ function shadowOf(key) {
 shadowOf('AZAEL');
 shadowOf('DEMON_HUNTER');
 
+// Os números finais de BOSS_STATS entram nos modelos (a revanche e as sombras já foram montadas acima)
+for (const [type, stats] of Object.entries(BOSS_STATS)) Object.assign(BOSS_MODELS[type], stats);
+
 export const BOSS_SPAWNING = {
     // Hora → boss da noite. RIVAL: o rival do herói (RIVAL_OF); RIVAL_FINAL: a revanche dele, que fecha a noite.
     // BRUTOS (hora 6): semi-boss do meio da noite
@@ -460,31 +486,19 @@ export function chooseBossType(turn, heroModel = 'hunter') {
 // Boss segura o empurrão: perde 85% dele (um monstro comum leva o empurrão inteiro). Quem tiver knockbackResist próprio usa o seu
 const BOSS_KNOCKBACK_RESIST = 0.85;
 
-// Bosses vivem mais (2026-11-18): medido com o piloto do sandbox (Fast Run, herói que só ataca), as lutas duravam 15 a 35 s
-// (The Long Night ~80 s): o boss morria antes de mostrar os ataques. A vida de cada um é multiplicada por isto. Alvo com o piloto:
-// rival da 1ª hora ~30 s, Demon Lord ~45 s, Brutos ~50 s, Blood Countess ~65 s, The Long Night ~2 min, revanche final ~75 s
-// (um jogador que desvia leva cerca do dobro). O rival da 1ª hora sobe menos: é onde o jogador novo ainda aprende.
-// +15% em todos (2026-11-18): sem monstros comuns durante o boss, a luta é o foco e pode durar mais.
-const BOSS_FOCUS_BONUS = 1.15;
-export const BOSS_HP_SCALE = { RIVER_SPIRIT: 2.2 * BOSS_FOCUS_BONUS, SLIZORK: 2.2 * BOSS_FOCUS_BONUS, GRAVE_KING: 2.2 * BOSS_FOCUS_BONUS, DEMON_LORD: 2.4 * BOSS_FOCUS_BONUS, BRUTOS: 2.2 * BOSS_FOCUS_BONUS, BLOOD_COUNTESS: 1.8 * BOSS_FOCUS_BONUS, LONG_NIGHT: 1.8 * BOSS_FOCUS_BONUS };
-const FIRST_HOUR_BOSS_HP_SCALE = 1.7 * BOSS_FOCUS_BONUS;
-const FINAL_BOSS_HP_SCALE = 2 * BOSS_FOCUS_BONUS;
-const OTHER_BOSS_HP_SCALE = 2 * BOSS_FOCUS_BONUS;
-function bossHpScale(type, turn) {
-    if (BOSS_HP_SCALE[type]) return BOSS_HP_SCALE[type];
-    if (type.endsWith('_FINAL')) return FINAL_BOSS_HP_SCALE;
-    return turn <= 1 ? FIRST_HOUR_BOSS_HP_SCALE : OTHER_BOSS_HP_SCALE;
-}
-
-export function createBoss(type, turn, x, y, random = Math.random) {
+// Cria o chefe com os números de BOSS_STATS, BOSS_GLOBAL e a Escuridão (darkness: o nível escolhido, 1 = normal). Sem curva por onda.
+export function createBoss(type, turn, x, y, random = Math.random, darkness = 1) {
     const model = BOSS_MODELS[type];
     if (!model) throw new Error(`Unknown boss type: ${type}`);
-    const enemy = createEnemy(model, type, turn, x, y, random);
-    const scale = bossHpScale(type, turn);
-    enemy.hp = Math.round(enemy.hp * scale);
-    enemy.maxHp = Math.round(enemy.maxHp * scale);
+    const enemy = createEnemy(model, type, turn, x, y, random);          // posição, relógios e fase da animação
+    const level = Math.max(0, darkness - 1);
+    const hp = Math.round(model.hp * BOSS_GLOBAL.hp * (1 + BOSS_DARKNESS.hpPerLevel * level));
     return {
         ...enemy,
+        hp,
+        maxHp: hp,
+        damage: model.damage * BOSS_GLOBAL.damage * (1 + BOSS_DARKNESS.damagePerLevel * level),
+        speed: model.speed * BOSS_GLOBAL.speed * (1 + BOSS_DARKNESS.speedPerLevel * level),
         knockbackResist: model.knockbackResist ?? BOSS_KNOCKBACK_RESIST,
         unstoppable: !!model.unstoppable,     // não é atrasado, preso nem empurrado (Captain Brutos)
         isBoss: true,

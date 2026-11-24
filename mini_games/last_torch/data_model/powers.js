@@ -590,7 +590,10 @@ export const POWER_MODELS = {
         elder: { seconds: 220, scale: 1.25, reach: 1.15, damage: 1.25, walk: 1.2 },
         // A árvore adulta anda, bem devagar: até o monstro mais perto (dentro de reach x seekRatio) que ainda não está ao alcance
         // dos galhos; sem monstros, volta para perto do herói (se estiver a mais de heroDistance)
-        walk: { speed: 9, seekRatio: 3, heroDistance: 160 }
+        walk: { speed: 9, seekRatio: 3, heroDistance: 160 },
+        // Raízes que prendem: a árvore adulta agarra o monstro MAIS FORTE da tela (maior vida) e o segura no chão por bem mais tempo que as raízes comuns,
+        // como o Shadow Shackle. O bônus de raízes do druida (ROOTS +20%, mod rootSeconds) vale aqui também; chefe segura menos (bossRatio das raízes)
+        grip: { cooldownSeconds: 15, seconds: 6.5, firstDelay: 5 }
     },
     sporePods: {
         name: 'Spore Pods', icon: '🍄', maxLvl: 5,
