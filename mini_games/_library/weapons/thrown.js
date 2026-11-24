@@ -4,6 +4,8 @@ import { ROSE_VISUALS } from './rose/rose_visual.js';
 import { drawRose } from './rose/rose.js';
 import { CROSS_VISUALS } from './cross/cross_visual.js';
 import { drawCross } from './cross/cross.js';
+import { SHURIKEN_VISUALS, drawShuriken } from './shuriken/shuriken.js';
+import { KUNAI_VISUALS, drawKunai } from './kunai/kunai.js';
 import { ARCANE_ORB_VISUALS, drawArcaneOrb } from './arcane_orb/arcane_orb.js';
 
 // --- ARMAS DE ARREMESSO ---
@@ -22,6 +24,10 @@ export const THROWN_WEAPONS = {
     // Crucifixo de prata do Avgustino: gira em voo, um pouco mais devagar que a adaga
     // Esfera arcana do Gudran: um pouco mais lenta que a adaga e maior, sem giro (a esfera brilha, não gira)
     arcane: { draw: drawArcaneOrb, centerX: ARCANE_ORB_VISUALS.shape.centerX, colors: ARCANE_ORB_VISUALS.colors, speed: 0.75, scale: 1.7, spin: 0 },
+    // Shuriken do Kuro (ninja): pequena e rápida, gira muito em voo
+    shuriken: { draw: drawShuriken, centerX: SHURIKEN_VISUALS.shape.centerX, colors: SHURIKEN_VISUALS.colors, speed: 1.15, scale: 1.5, spin: 0.35 },
+    // Kunai do Kurama: voa reto e quase sem giro
+    kunai: { draw: drawKunai, centerX: KUNAI_VISUALS.shape.centerX, colors: KUNAI_VISUALS.colors, speed: 1, scale: 1.6, spin: 0.05 },
     cross: { draw: drawCross, centerX: CROSS_VISUALS.shape.centerX, colors: CROSS_VISUALS.colors, speed: 0.8, scale: 1.6, spin: 0.03 }
 };
 

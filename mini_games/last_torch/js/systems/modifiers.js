@@ -57,6 +57,11 @@ export function refreshModifiers() {
         TREE_NODES.forEach(n => { if (n.branch === affinity && (n.kind === 'power' || n.kind === 'evolve')) POWER_BOOST[n.key] = AFFINITY_BONUS; });
         if (affinity === 'blade') addAll({ bladeDamage: AFFINITY_BONUS });
     }
+    // Ramos extras com o mesmo +5% (extraAffinities no arquivo do herói; o Kuro: Shadow e Blade)
+    for (const branch of getHero().extraAffinities ?? []) {
+        TREE_NODES.forEach(n => { if (n.branch === branch && (n.kind === 'power' || n.kind === 'evolve')) POWER_BOOST[n.key] = AFFINITY_BONUS; });
+        if (branch === 'blade') addAll({ bladeDamage: AFFINITY_BONUS });
+    }
     Object.values(passives).forEach(p => { if (p.lvl > 0) addAll(p.mods); });
     Object.entries(state.tree).forEach(([id, lvl]) => addAll(TREE_BY_ID[id]?.mods, lvl));
     TREE_NODES.forEach(n => { if (n.kind === 'stat' && n.mods) addAll(n.mods, attributes[n.key].lvl - 1); });

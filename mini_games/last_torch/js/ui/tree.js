@@ -1,4 +1,4 @@
-import { TREE_BRANCHES, TREE_LAYOUT, TREE_NODES, affinityLabel } from '../../data_model/tree.js';
+import { AFFINITY_BONUS, TREE_BRANCHES, TREE_LAYOUT, TREE_NODES, affinityLabel } from '../../data_model/tree.js';
 import { BRANCH_IMAGES, TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { getFuryUpgradeRows } from './stat_sheet.js';
@@ -252,8 +252,8 @@ function createTreeView(cfg) {
             const hero = getHero();
             const sealed = !!hero.sealedBranches?.includes(key);
             const tag = block.querySelector('.tree-band-tag');
-            tag.textContent = sealed ? '⛔ LOCKED' : hero.affinity === key ? (hero.affinityMods ? affinityLabel(hero) : `${affinityLabel(hero)} DMG`) : '';
-            tag.className = `tree-band-tag${sealed ? ' is-no' : hero.affinity === key ? ' is-plus' : ''}`;
+            tag.textContent = sealed ? '⛔ LOCKED' : hero.extraAffinities?.includes(key) ? `+${Math.round(AFFINITY_BONUS * 100)}% DMG` : hero.affinity === key ? (hero.affinityMods ? affinityLabel(hero) : `${affinityLabel(hero)} DMG`) : '';
+            tag.className = `tree-band-tag${sealed ? ' is-no' : hero.affinity === key || hero.extraAffinities?.includes(key) ? ' is-plus' : ''}`;
             block.classList.toggle('is-forbidden', sealed);
         });
         const hero = getHero();
@@ -262,7 +262,7 @@ function createTreeView(cfg) {
             const sealed = !!hero.sealedBranches?.includes(key);
             tab.classList.toggle('is-on', key === activeBranch);
             // Afinidade do herói: o ramo dele ganha a estrela dourada no canto (CSS); o proibido fica apagado com ⛔ na bolinha
-            tab.classList.toggle('is-affinity', hero.affinity === key);
+            tab.classList.toggle('is-affinity', hero.affinity === key || !!hero.extraAffinities?.includes(key));
             tab.classList.toggle('is-forbidden', sealed);
             tab.querySelector('i').textContent = sealed ? '⛔' : ready || '';
             tab.title = sealed ? 'Locked for this hero' : hero.affinity === key ? `Affinity: ${affinityLabel(hero)}` : '';

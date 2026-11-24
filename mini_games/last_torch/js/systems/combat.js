@@ -1,4 +1,4 @@
-import { BLESSED_BLADE, FLAME_BLADE } from '../../data_model/passives.js';
+import { BLESSED_BLADE, FLAME_BLADE, WHIRLWIND } from '../../data_model/passives.js';
 import { BLADE_SKILL } from '../../data_model/skills.js';
 import { SLASH_VISUALS } from '../../data_model/visuals/effects/slash_visual.js';
 import { audio, maxUltEnergy, passives, player, state } from '../core/state.js';
@@ -110,7 +110,7 @@ export function chargeUlt(amount) {
 
 // Ativação automática da Fúria. A barra e a duração são iguais para todos; o especial é de cada personagem (js/systems/fury.js).
 // O especial de cada herói (inclusive a Chuva de Espadas do Demon Hunter) roda em fury.js; aqui só o disparo e o anúncio.
-const FURY_COLORS = { swordRain: '#f0abfc', bloodWaltz: '#f87171', stomp: '#cbd5e1', forestGuardian: '#4ade80', consecration: '#fde68a', beam: '#93c5fd' };
+const FURY_COLORS = { swordRain: '#f0abfc', bloodWaltz: '#f87171', groundRend: '#dc2626', stomp: '#cbd5e1', forestGuardian: '#4ade80', consecration: '#fde68a', beam: '#93c5fd' };
 export function triggerFrenzyUlt() {
     if (state.phase !== 'HUNT') return;          // a Fúria só dispara com a onda rolando (nunca no fim dela, no acampamento ou na limpeza)
     state.ultEnergy = 0;
@@ -166,13 +166,14 @@ export function updateAutoAttack(dt) {
 
     // Skill passiva Giro Sombrio: o 3º golpe vira um giro de 360°
     const whirl = player.comboStep === 3 && passives.shadowWhirl.lvl > 0;
-    executeBladeSlash(player.x, player.y, atkAngle, attackRad, player.comboStep, whirl);
+    const slashRad = whirl ? attackRad * WHIRLWIND.radiusRatio : attackRad;   // Whirlwind: mini-furacão roxo, bem mais longo que o golpe normal
+    executeBladeSlash(player.x, player.y, atkAngle, slashRad, player.comboStep, whirl);
 
     const dmg = getBladeDamage() * (player.comboStep === 3 ? characterStat('comboDamage') : 1.0);
     const kbForce = getKnockback() * (player.comboStep === 3 ? characterStat('comboKnockback') : 1.0);
 
     // Colisão de dano no arco do golpe
-    const hits = hitEnemiesInArc(player.x, player.y, atkAngle, attackRad, currentArcHalf, dmg, kbForce, whirl,
+    const hits = hitEnemiesInArc(player.x, player.y, atkAngle, slashRad, currentArcHalf, dmg, kbForce, whirl,
         (e) => {
             chargeUlt(getFuryChargePerHit());
             // Em pleno dash a marca espera: é o dash que vai detoná-la, com o bônus

@@ -125,7 +125,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 | Cataclysm | Evolução | Abalos saem do impacto e lava brota das rachaduras | Rachaduras em lava |
 | Provoke (dentro do Hero Health) | Efeito | A cada nível de Hero Health, aumenta a distância em que os monstros largam a tocha e vêm atrás do herói: é assim que o guerreiro a protege | - |
 | War Cry | Passiva | Cercado, ruge: joga os monstros para longe, atordoa e fortalece temporariamente a lâmina | Braços abertos, cabeça para trás |
-| Executioner | Passiva | A lâmina termina monstros enfraquecidos em um golpe (bosses são imunes) | X vermelho |
+| Executioner | Passiva | Evolui a Crimson Tide: cada golpe solta 3 meias-luas de sangue em leque (vale 5 pontos) | X vermelho |
 | Death Mark | Poder | A adaga marca. A lâmina detona; o dash detona mais forte e devolve a carga. Toda detonação recarrega a adaga | Mira girando, X violeta |
 | Shadow Clone | Passiva | Uma sombra guarda uma área em volta da tocha e não sai dela. Espera no posto; quando um monstro chega perto, anda em linha reta até ele, golpeia com o combo do herói e volta. Os monstros não correm atrás dela, mas quem esbarra ou acerta um tiro a machuca; ela tem vida e volta depois de um tempo | Sombra violeta, barra de vida e área tracejada no chão |
 | Shadow Legion | Evolução | Abre com Umbral Bond no nível máximo. Mais sombras guardam a tocha, cada uma cuidando de um monstro | Sombras no anel |

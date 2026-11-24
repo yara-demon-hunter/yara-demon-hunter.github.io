@@ -10,7 +10,7 @@ import {
     renderParticles,
     renderGoldDrops
 } from './entities.js';
-import { renderFuryTrails, renderFurySwords } from './fury.js';
+import { renderFuryRend, renderFuryTrails, renderFurySwords } from './fury.js';
 import { renderArcane, renderFuryBeam, renderRuneShield } from './arcane.js';
 import { renderSceneryAmbient, renderSceneryGround, renderSceneryOccluders, renderSceneryOverlay, renderScenerySway } from './scenery.js';
 import { renderLevelUpBack, renderLevelUpFront } from './level_up.js';
@@ -228,6 +228,7 @@ export function render() {
     renderDashGhosts();
     renderShadowClone();
     renderLevelUpBack();
+    renderFuryRend();
     renderFuryTrails();
     renderFurySwords();
     renderGuardianWard();

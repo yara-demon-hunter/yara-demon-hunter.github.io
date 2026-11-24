@@ -6,5 +6,6 @@ import '../../library/characters/azael/azael25d.js';
 import '../../library/characters/brutos/brutos25d.js';
 import '../../library/characters/gudran/gudran25d.js';
 import '../../library/characters/rowan/rowan25d.js';
+import '../../library/characters/kuro-ninja/ninja25d.js';
 
 export { BODIES } from '../../library/characters/hunter/body_registry.js';

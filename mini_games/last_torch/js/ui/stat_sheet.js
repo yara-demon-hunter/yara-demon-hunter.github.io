@@ -145,6 +145,13 @@ export function getFuryGroup() {
             row('📏', 'Reach', 'How far he looks for the next monster.', `${fury.cutRange}px`),
             row('⚡', 'Speed', 'Time between one cut and the next.', secondsShort(fury.cutSeconds))
         ],
+        groundRend: () => [
+            row('🗡️', 'Rend Damage', 'Damage of the cut = your blade damage times this. Each monster in its path is hit once.', times(dmg(fury.damage))),
+            row('⚔️', 'Second Cut', 'Right after, a wider horizontal cut runs the same path. Damage = your blade damage times this.', times(dmg(fury.secondDamage))),
+            row('📏', 'Length', 'How far the crimson cut tears the ground.', `${fury.length}px`),
+            row('↔️', 'Width', 'How wide the strip that hurts is.', `${fury.width}px`),
+            row('😈', 'Demon Bonus', 'Extra damage on elites and bosses.', `+${Math.round(fury.demonBonus * 100)}%`)
+        ],
         stomp: () => [
             row('🦶', 'Stomp', 'Time between one stomp and the next.', secondsShort(fury.stepSeconds)),
             row('💥', 'Stomp Damage', 'Damage of each stomp around him = your blade damage times this.', times(dmg(fury.damage))),
@@ -182,6 +189,7 @@ export function getFuryGroup() {
     const summary = {
         swordRain: 'swords fall from the sky on the monsters around him, and a giant one ends it',
         bloodWaltz: 'a chain of fast cuts, leaping from monster to monster',
+        groundRend: 'raises his sword with both hands and brings it straight down: a standing crimson blade of air tears the ground ahead, followed by a wide horizontal one',
         stomp: 'stomps the ground around him, stunning monsters',
         consecration: 'a circle of holy light that burns and slows monsters, heals him and the torch, and ends in a cross of light',
         beam: 'a blue beam that crosses the whole screen: he stands still and turns it with your aim, burning everything in its path',

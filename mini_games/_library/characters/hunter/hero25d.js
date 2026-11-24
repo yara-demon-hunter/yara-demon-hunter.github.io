@@ -256,7 +256,7 @@ function staffCastStance(stance, k) {
     stance.rise += 0.3 * w;
 }
 
-const STANCES = { staffCast: staffCastStance, slam: slamStance, quake: quakeStance, roar: roarStance, oath: oathStance, guard: guardStance, drink: drinkStance, fall: fallStance };
+const STANCES = { staffCast: staffCastStance, slam: slamStance, quake: quakeStance, overhead: quakeStance, roar: roarStance, oath: oathStance, guard: guardStance, drink: drinkStance, fall: fallStance };
 
 function applyStance(stance, body, blend) {
     if (anim.dash > 0.01) {

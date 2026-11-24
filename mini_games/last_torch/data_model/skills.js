@@ -20,6 +20,8 @@ export const UPGRADE_MODELS = {
 
 // Dano de cada golpe, tempo entre golpes e alcance da lâmina e da adaga NÃO ficam aqui: são de cada personagem
 // (data_model/characters/). Aqui só o que sobe por nível de skill e as regras gerais.
+// Slash Width, do nível 2 em diante: cada golpe também solta uma ONDA DE AR curta à frente, que atravessa os inimigos (dano = dano da lâmina x damagePerLevel x níveis acima do 1)
+
 export const BLADE_SKILL = {
     damagePerUpgrade: 5,
     radiusPerUpgrade: 7,

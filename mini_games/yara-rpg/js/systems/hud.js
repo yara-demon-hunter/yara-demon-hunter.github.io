@@ -1,6 +1,8 @@
 // Character/game interface rendering and the scrolling event log.
 // Classic browser script; state is initialized by game.js before user actions run.
 
+// Falas em balões sobre os personagens: ligadas. Mude para false para desligar.
+const CHARACTER_BUBBLES_ENABLED = true;
 let characterDialogueTimeout = null;
 let characterBubbleTimeout = null;
 let lastDialogueSpeaker = null;
@@ -83,6 +85,7 @@ function scheduleCharacterDialogue() {
 function startCharacterDialogues(initialDelay = DIALOGUE_RULES.exploration.initialDelayMs) {
     window.clearTimeout(characterDialogueTimeout);
     hideCharacterDialogueBubbles();
+    if (!CHARACTER_BUBBLES_ENABLED) return;
     lastDialogueSpeaker = null;
     lastDialogueContext = null;
     characterDialogueTimeout = window.setTimeout(scheduleCharacterDialogue, initialDelay);

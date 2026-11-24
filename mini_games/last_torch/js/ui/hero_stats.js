@@ -2,7 +2,7 @@ import { getCharacterBase } from '../../data_model/characters/index.js';
 import { ACTIVE_HEROES, HEROES } from '../../data_model/heroes.js';
 import { save } from '../core/save.js';
 import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
-import { TREE_BRANCHES, affinityLabel } from '../../data_model/tree.js';
+import { AFFINITY_BONUS, TREE_BRANCHES, affinityLabel } from '../../data_model/tree.js';
 
 // Herói bloqueado que o jogador tocou: o painel mostra como desbloqueá-lo em vez das barras (js/ui/heroes.js liga e desliga)
 let preview = null;
@@ -114,6 +114,9 @@ function furyEstimate(h, b) {
         case 'bloodWaltz':
             damage = blade * F.cuts * F.cutDamage;
             break;
+        case 'groundRend':
+            damage = blade * (F.damage + F.secondDamage);
+            break;
         case 'stomp':
             damage = blade * F.damage * Math.ceil(seconds / F.stepSeconds);
             break;
@@ -167,7 +170,7 @@ export function renderHeroStats() {
     const pathName = (k) => TREE_BRANCHES[k].name;
     const sealed = (hero.sealedBranches ?? []);
     const paths = hero.affinity || sealed.length
-        ? `${hero.affinity ? `<span class="hs-path is-plus" style="--tone:${TREE_BRANCHES[hero.affinity].color}">${TREE_BRANCHES[hero.affinity].icon} ${pathName(hero.affinity)} ${hero.affinityMods ? affinityLabel(hero) : `${affinityLabel(hero)} DMG`}</span>` : ''}${sealed.map(k => `<span class="hs-path is-no">⛔ ${pathName(k)}</span>`).join('')}`
+        ? `${hero.affinity ? `<span class="hs-path is-plus" style="--tone:${TREE_BRANCHES[hero.affinity].color}">${TREE_BRANCHES[hero.affinity].icon} ${pathName(hero.affinity)} ${hero.affinityMods ? affinityLabel(hero) : `${affinityLabel(hero)} DMG`}</span>` : ''}${(hero.extraAffinities ?? []).map(k => `<span class="hs-path is-plus" style="--tone:${TREE_BRANCHES[k].color}">${TREE_BRANCHES[k].icon} ${pathName(k)} +${Math.round(AFFINITY_BONUS * 100)}% DMG</span>`).join('')}${sealed.map(k => `<span class="hs-path is-no">⛔ ${pathName(k)}</span>`).join('')}`
         : '<span class="hs-path is-all">✦ ALL PATHS OPEN</span>';
     // O nome do herói fica aqui (os cartões viraram só retratos)
     panel.innerHTML = `<div class="hs-bars">${rows}</div><div class="hs-paths">${paths}</div>`

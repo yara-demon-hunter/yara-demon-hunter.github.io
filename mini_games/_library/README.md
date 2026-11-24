@@ -44,6 +44,8 @@ characters/
   azael/                   azael25d.js (o boneco) e azael_visual.js; exporta a orelha e a bandagem que a Yara usa
   brutos/                  brutos25d.js (o boneco) e brutos_visual.js
   yara/, zeph/, oskar/     os heróis do yara-rpg, no mesmo esquema (<id>25d.js e <id>_visual.js)
+  kurama-ninja/            Kurama, o ninja de armadura do Last Torch (preto, ombreiras, panos); ficha em art_reference/character.md
+  kuro-ninja/              Kuro, o ninja do Last Torch (boneco copiado do Azael, com capuz e máscara); ficha em art_reference/character.md
   rowan/                   o druida do Last Torch (molde do Zeph com galhada, folhas e cajado); ficha em art_reference/character.md
 buddies/                   quem anda e luta ao lado do herói (fênix, corvo, caveira voadora, lobo sombrio, lobo branco): um por pasta (desenho, cores e art_reference/ com buddy.md e images/). O que o buddy FAZ fica no jogo
 weapons/                   as armas dos personagens, separadas deles: espada, katana, machados, adaga, espada curta, cajado e a rosa de arremesso; um por pasta (<id>.js e art_reference/weapon.md). thrown.js: as armas de arremesso (adaga, rosa, rosa negra)

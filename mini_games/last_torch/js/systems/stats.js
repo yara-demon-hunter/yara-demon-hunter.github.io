@@ -90,7 +90,7 @@ export function getPlayerMaxSpeed() {
         + (attributes.moveSpeed.lvl - 1) * CHARACTER_MODEL.moveSpeedPerUpgrade) * (1 + mod('moveSpeed'))
         * (1 + rushTier(state.streak) * STREAK.rush.moveSpeedPerTier);
     // Axe Quake em andamento (Captain Brutos): quase parado enquanto o machado sobe e desce
-    const base = player.move?.kind === 'quake' ? speed * getAxeQuake().moveSpeed : speed;
+    const base = player.move?.kind === 'quake' ? speed * getAxeQuake().moveSpeed : player.move?.kind === 'overhead' ? speed * 0.05 : speed;
     // Névoa de Sangue (Condessa): o herói anda 35% mais devagar enquanto ela dura
     return state.bossFx?.kind === 'fog' ? base * 0.65 : base;
 }

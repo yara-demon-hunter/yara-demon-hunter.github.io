@@ -83,8 +83,8 @@ AUDIT = """async () => {
   for (const a of S.ACHIEVEMENTS) {
     if (a.hero && !H.HEROES[a.hero]) issues.push(['FAIL', 'achievement ' + a.id + ': herói inexistente ' + a.hero]);
     if (a.beast && !MO.MONSTER_MODELS[a.beast]) issues.push(['FAIL', 'achievement ' + a.id + ': monstro inexistente ' + a.beast]);
-    if ((a.stat === 'fiveStarWaves' || a.stat === 'threeStarWaves') && a.target > 12) issues.push(['FAIL', 'achievement ' + a.id + ': pede estrelas em ' + a.target + ' ondas, só existem 12']);
-    if (a.stat && !(a.stat in stats) && !/^(boss_|oath_)/.test(a.stat) && !['fiveStarWaves', 'threeStarWaves'].includes(a.stat)) issues.push(['WARN', 'achievement ' + a.id + ': stat "' + a.stat + '" não existe no save']);
+    if ((a.stat === 'fiveStarWaves' || a.stat === 'threeStarWaves') && a.target > 18) issues.push(['FAIL', 'achievement ' + a.id + ': pede estrelas em ' + a.target + ' ondas, só existem 18']);
+    if (a.stat && !(a.stat in stats) && !/^(boss_|oath_)/.test(a.stat) && !['fiveStarWaves', 'twoStarWaves', 'threeStarWaves'].includes(a.stat)) issues.push(['WARN', 'achievement ' + a.id + ': stat "' + a.stat + '" não existe no save']);
     if (!I.ICON_IMAGES[a.id]) issues.push(['WARN', 'achievement ' + a.id + ': sem ícone (usa emoji)']);
     if (!(a.id in S.ACHIEVEMENT_EMBERS) && !(a.hero && H.HEROES[a.hero] && !H.HEROES[a.hero].shelved)) issues.push(['WARN', 'achievement ' + a.id + ': não paga Brasas']);
   }

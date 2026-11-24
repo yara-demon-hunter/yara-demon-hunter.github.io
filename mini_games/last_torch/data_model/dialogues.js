@@ -85,6 +85,33 @@ export const DUEL_DIALOGUES = {
                     ]
                 }
             },
+            // Kuro, o ninja: poucas palavras, frio, sempre um passo à frente
+            ninja: {
+                first: {
+                    before: [
+                        { who: 'rival', text: 'A shadow with a sword. Who sent you?' },
+                        { who: 'hero', text: 'No one. I came for the demon.' },
+                        { who: 'rival', text: 'Then come and find me, little shadow!' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'Too fast... Fine. The castle awaits, ninja.' },
+                        { who: 'hero', text: 'I will be there before you.' },
+                        { who: 'rival', text: 'You will never cross that river alive!' }
+                    ]
+                },
+                final: {
+                    before: [
+                        { who: 'rival', text: 'You followed me all the way, ninja?' },
+                        { who: 'hero', text: 'You never saw me. That was the plan.' },
+                        { who: 'rival', text: 'I see you now!' }
+                    ],
+                    after: [
+                        { who: 'rival', text: 'Even the dark... fears you.' },
+                        { who: 'hero', text: 'Silence is enough. Rest.' },
+                        { who: 'rival', text: '...The night is yours, ninja.' }
+                    ]
+                }
+            },
             rowan: {
                 first: {
                     before: [
@@ -225,6 +252,54 @@ export const BOSS_INTROS = {
         ],
         // Cada herói tem a sua voz (nunca as falas de outro): o Azael chama cada um pelo apelido que escolheu para ele
         byHero: {
+            // Kuro, o ninja: frases curtas e frias; fala do alvo, nunca grita
+            ninja: {
+                RIVER_SPIRIT: [
+                    { who: 'rival', text: 'Even a shadow drowns in the river!' },
+                    { who: 'boss', text: 'I am the River. Everyone who crosses me... stays.' },
+                    { who: 'hero', text: 'Water cannot hold what it cannot see.' },
+                    { who: 'boss', text: 'Stay... with me...' },
+                    { who: 'rival', text: 'And the swamp beyond swallows ninjas whole!' }
+                ],
+                SLIZORK: [
+                    { who: 'rival', text: 'Slip through my swamp, shadow, if you can!' },
+                    { who: 'boss', text: 'Grrrk... Hungry... Bow to the Tyrant.' },
+                    { who: 'hero', text: 'Too loud. Too slow.' },
+                    { who: 'boss', text: 'Then I will swallow you.' },
+                    { who: 'rival', text: 'The graves ahead will quiet that tongue!' }
+                ],
+                GRAVE_KING: [
+                    { who: 'rival', text: 'Dead men feel no blade, ninja!' },
+                    { who: 'boss', text: 'Kneel. This ground is my kingdom.' },
+                    { who: 'hero', text: 'Then I will cut the strings.' },
+                    { who: 'boss', text: 'Then lie down with my subjects.' },
+                    { who: 'rival', text: 'The village gate will burn you down!' }
+                ],
+                BRUTOS: [
+                    { who: 'rival', text: 'Brutos! Catch this shadow! My castle is next!' },
+                    { who: 'boss', text: 'Too small to hit? I will hit anyway.' },
+                    { who: 'hero', text: 'You will have to find me first.' }
+                ],
+                LONG_NIGHT: [
+                    { who: 'rival', text: 'Hide in the dark all you want, ninja!' },
+                    { who: 'boss', text: 'I am the dark... and I have no end.' },
+                    { who: 'hero', text: 'The dark is where I live.' },
+                    { who: 'boss', text: 'Then die at home.' },
+                    { who: 'rival', text: 'Not him! Never him!' }
+                ],
+                BLOOD_COUNTESS: [
+                    { who: 'rival', text: 'My castle, ninja. Meet my Countess!' },
+                    { who: 'boss', text: 'Welcome... Dinner is served.' },
+                    { who: 'hero', text: 'I do not eat with strangers.' },
+                    { who: 'boss', text: 'Come closer. Bleed for me.' },
+                    { who: 'rival', text: 'And then the endless night!' }
+                ],
+                default: [
+                    { who: 'rival', text: 'Still alive, ninja?!' },
+                    { who: 'hero', text: 'I was never here.' },
+                    { who: 'rival', text: 'Then die where I cannot see you!' }
+                ]
+            },
             // Rowan: calmo, gentil, fala da floresta e da paz, mas não recua
             rowan: {
                 RIVER_SPIRIT: [

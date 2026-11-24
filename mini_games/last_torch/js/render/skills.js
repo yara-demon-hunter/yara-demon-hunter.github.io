@@ -259,7 +259,7 @@ export function renderCrescents() {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     for (const w of state.crescents) {
-        const r = C.radius * Math.min(1, 0.5 + w.age * 7);
+        const r = (w.radius ?? C.radius) * Math.min(1, 0.5 + w.age * 7);
         drawGlow(ctx, C.glow, w.x + Math.cos(w.angle) * r * 0.5, w.y + Math.sin(w.angle) * r * 0.5, r * 0.95, 0.3);
         ctx.translate(w.x, w.y);
         ctx.rotate(w.angle);

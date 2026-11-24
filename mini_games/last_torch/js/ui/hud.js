@@ -74,8 +74,12 @@ export function updateKnifeButton() {
     const kind = runeHero ? 'runes' : snareHero ? 'snare' : quakeHero ? 'quake' : roseHero ? 'rose' : 'knife';
     if (knifeShown.quake !== kind) {
         knifeShown.quake = kind;
-        ui.knifeButton.setAttribute('aria-label', runeHero ? 'Rune Shield' : snareHero ? 'Root Snare' : quakeHero ? 'Axe Quake' : roseHero ? 'Throw rose' : 'Throw dagger');
-        document.getElementById('knifeButtonKnob').textContent = runeHero ? '🔷' : snareHero ? '🌿' : quakeHero ? '🪓' : roseHero ? '🌹' : '🗡️';
+        const thrown = getHero().thrown;
+        const label = runeHero ? 'Rune Shield' : snareHero ? 'Root Snare' : quakeHero ? 'Axe Quake' : roseHero ? 'Throw rose' : thrown === 'shuriken' ? 'Throw shuriken' : thrown === 'cross' ? 'Throw cross' : 'Throw dagger';
+        ui.knifeButton.setAttribute('aria-label', label);
+        const hint = document.querySelector('.mouse-left-text');       // a dica do mouse acompanha o herói
+        if (hint) hint.textContent = label;
+        document.getElementById('knifeButtonKnob').textContent = runeHero ? '🔷' : snareHero ? '🌿' : quakeHero ? '🪓' : roseHero ? '🌹' : thrown === 'shuriken' ? '✴️' : thrown === 'cross' ? '✝️' : '🗡️';
     }
     const abilitySeconds = runeHero ? getRuneShield().cooldownSeconds : snareHero ? getRootSnare().cooldownSeconds : getAxeQuake()?.cooldownSeconds ?? 1;
     const ratio = quakeHero ? Math.min(1, state.quake.timer / abilitySeconds) : Math.min(1, state.knifeTimer / getKnifeCooldown());

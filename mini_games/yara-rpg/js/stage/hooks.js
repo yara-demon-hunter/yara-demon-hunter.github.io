@@ -5,7 +5,10 @@
 //   monta o relatório do turno (acertou? quanto? o monstro revidou? aparado? esquivado?) e pede a cena ao palco.
 //   Os efeitos sonoros tocados durante a ação dizem o que só o som sabe (crítico, atordoar, aparar, esquivar).
 // Carregar depois de todos os sistemas do jogo e antes de js/game.js.
+// Palco 2.5D desligado: só o chat/log. Mude para true para religar (e remova o display:none em css/interface.css).
+const ACTION_STAGE_ENABLED = false;
 (() => {
+    if (!ACTION_STAGE_ENABLED) return;
     const NS = window.YaraStage25D;
 
     function install() {

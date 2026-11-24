@@ -16,6 +16,7 @@ export const HEROES = {
     rowan: HERO_ENTRIES.rowan,
     avgustino: HERO_ENTRIES.avgustino,
     gudran: HERO_ENTRIES.gudran,
+    ninja: HERO_ENTRIES.ninja,
     reaver: {
         name: 'Ash Reaver',
         shelved: true,

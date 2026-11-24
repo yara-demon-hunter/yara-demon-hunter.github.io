@@ -124,6 +124,39 @@ function strokeWaveTrail(startRadius, frontRadius, half, color, alpha) {
     }
 }
 
+// Whirlwind: um único corte afiado que gira 360° em volta do herói enquanto abre para fora (cabeça brilhante + rastro afinando)
+function drawTornado(R, progress, fade, color) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.lineCap = 'round';
+    const open = 1 - Math.pow(1 - Math.min(1, progress * 1.6), 3);
+    const r = R * (0.55 + 0.45 * open);                       // o círculo se expande enquanto gira
+    const head = -Math.PI * 0.5 + progress * Math.PI * 2;      // ponta do corte
+    const trail = Math.PI * 1.35;                              // comprimento do rastro
+    const steps = 28;
+    let px = 0, py = 0;
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;                                   // 0 = cauda, 1 = cabeça
+        const ang = head - trail * (1 - t);
+        const x = Math.cos(ang) * r, y = Math.sin(ang) * r;
+        if (i > 0) {
+            const w = 1 + 9 * Math.pow(t, 1.6);                // fino na cauda, grosso perto da cabeça
+            const a = fade * Math.pow(t, 1.2);
+            ctx.globalAlpha = a * 0.3; ctx.strokeStyle = color; ctx.lineWidth = w * 2.4;
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x, y); ctx.stroke();
+            ctx.globalAlpha = a; ctx.lineWidth = w;
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x, y); ctx.stroke();
+            ctx.strokeStyle = '#f5e8ff'; ctx.lineWidth = Math.max(1, w * 0.3);
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x, y); ctx.stroke();
+        }
+        px = x; py = y;
+    }
+    // Anel fraco marcando a área atingida
+    ctx.globalAlpha = fade * 0.25 * (1 - progress); ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+}
+
 export function renderBladeSlashes() {
     const frenzyActive = state.frenzyActiveTimer > 0;
     // Sob um Juramento o corte tem a cor dele
@@ -166,7 +199,8 @@ export function renderBladeSlashes() {
             fillAirWave(travel, half, width * W.thicknessScale, color, waveAlpha);
         }
 
-        for (let l = 0; l < look.lines; l++) {
+        if (look.spin) drawTornado(s.radius, progress, fadeOut, color);
+        else for (let l = 0; l < look.lines; l++) {
             const r = s.radius * (0.88 + progress * 0.12) - l * SLASH_VISUALS.doubleLineGap;
             // Brilho: um traço largo e translúcido por baixo (bem mais barato que shadowBlur)
             ctx.globalAlpha = fadeOut * 0.26;

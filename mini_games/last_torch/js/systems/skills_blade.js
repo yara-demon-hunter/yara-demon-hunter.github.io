@@ -59,14 +59,14 @@ function updateCrescents(dt) {
         w.x += w.vx * dt;
         w.y += w.vy * dt;
         w.age += dt;
-        w.travelled += C.speed * dt;
+        w.travelled += (w.speed ?? C.speed) * dt;
         for (const e of state.enemies) {
-            if (w.struck.has(e) || Math.hypot(e.x - w.x, e.y - w.y) > e.radius + C.radius) continue;
+            if (w.struck.has(e) || Math.hypot(e.x - w.x, e.y - w.y) > e.radius + (w.radius ?? C.radius)) continue;
             w.struck.add(e);
             dealDamage(e, w.damage, { kbX: Math.cos(w.angle) * 160, kbY: Math.sin(w.angle) * 160 });
             createExplosion(e.x, e.y, '#ef4444', 4);
         }
-        if (w.travelled >= C.range) crescents.splice(i, 1);
+        if (w.travelled >= (w.range ?? C.range)) crescents.splice(i, 1);
     }
 }
 

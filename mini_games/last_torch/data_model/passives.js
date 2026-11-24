@@ -14,7 +14,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 80,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'Your final combo hit becomes a full spin that strikes every enemy in range.'
+        desc: 'Your final combo hit becomes a whirlwind: a long, sharp purple cut that spins around you like a small tornado, striking every enemy in a much wider circle.'
     },
     mirrorWard: {
         name: 'Return Fire',
@@ -502,6 +502,9 @@ export const WAR_CRY = {
     bladeBonus: 0.2,            // dano extra da lâmina depois do rugido
     bonusSeconds: 3.5
 };
+
+// Whirlwind: o giro puxa os monstros comuns até `pullRadiusRatio` x o alcance do golpe, `pullFraction` do caminho até o herói (parando a `minDistance` px do centro), antes de bater
+export const WHIRLWIND = { radiusRatio: 1.6 };
 
 // Executioner: evolução do golpe da Crimson Tide: a meia-lua de sangue vira `crescents` em leque, abertas `spread` radianos uma da outra
 export const EXECUTIONER = {

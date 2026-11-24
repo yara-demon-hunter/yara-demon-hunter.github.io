@@ -6,6 +6,7 @@ import { AZAEL_VISUALS } from '../../../library/characters/azael/azael_visual.js
 import { BRUTOS_VISUALS } from '../../../library/characters/brutos/brutos_visual.js';
 import { AVGUSTINO_VISUALS } from '../../../library/characters/avgustino/avgustino_visual.js';
 import { GUDRAN_VISUALS } from '../../../library/characters/gudran/gudran_visual.js';
+import { NINJA_VISUALS } from '../../../library/characters/kuro-ninja/ninja_visual.js';
 import { ROWAN_VISUALS } from '../../../library/characters/rowan/rowan_visual.js';
 
 // Tons de sombra que o clone do Azael usa nas peças só dele (pele, cabelo, faixas, bainha)
@@ -98,6 +99,15 @@ SHADOW_CLONE_VISUALS.colorsByModel = {
     },
     azael: SHADOW_CLONE_VISUALS.azaelColors,
     brutos: { ...BRUTOS_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors, ...BRUTOS_SHADOW },
+    // Clone do Kuro: o ninja em tons de sombra violeta; olhos e testeira ficam acesos
+    ninja: {
+        ...NINJA_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors,
+        skin: '#2a1846', skinShade: '#170c2a', skinLight: '#3b2363', outline: '#000000', mouth: '#0d0719',
+        hair: '#160d29', hairShade: '#2a1846', mask: '#0d0719', maskShade: '#05030b',
+        body: '#140a24', sleeve: '#1e1035', glove: '#0d0719', boots: '#0d0719', sash: '#6d28d9',
+        bandana: '#7c3aed', bandanaShade: '#4c1d95', eye: '#ddd6fe', eyeGlow: 'rgba(196, 181, 253, 0.6)',
+        scabbard: '#0d0719', scabbardShine: '#1e1035', tsuba: '#6d4cc0'
+    },
     // Clone do Rowan: o boneco dele com pele, cabelo, túnica, folhas e madeira em tons de sombra; a semente fica violeta
     rowan: {
         ...ROWAN_VISUALS.colors, ...SHADOW_CLONE_VISUALS.colors,

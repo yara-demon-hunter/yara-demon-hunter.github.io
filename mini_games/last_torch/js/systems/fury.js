@@ -1,3 +1,5 @@
+import { executeBladeSlash } from './combat.js';
+import { startMove } from './moves.js';
 import { audio, joystick, player, state } from '../core/state.js';
 import { dealDamage } from './damage.js';
 import { addNumber, addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
@@ -12,6 +14,8 @@ import { showCallout } from '../ui/banner.js';
 //               últimos instantes uma espada gigante cai onde há mais monstros juntos (o desenho: js/render/fury.js)
 //   bloodWaltz  Azael: até 6 cortes seguidos, saltando para o monstro mais perto que não seja o do corte anterior e
 //               deixando um risco vermelho no caminho (com 2 monstros, vai e volta 3 vezes); cada corte cura
+//   groundRend  Kuro (ninja): ergue a espada e desce na vertical; um corte vermelho rasga o chão à frente, abrindo uma fenda que
+//               machuca tudo no caminho (js/render/fury.js desenha a fenda)
 //   consecration Avgustino: abre um círculo de luz no chão onde ele está; dentro dele os monstros queimam e andam mais
 //               devagar (demônios sofrem mais), e ele e a tocha se curam. No fim, uma cruz de luz estoura (js/render/fury.js)
 //   stomp       Brutos: enquanto a Fúria dura, cada pisada bate no chão em volta dele e a tela treme
@@ -31,6 +35,11 @@ export const CONSECRATION_FINALE_SECONDS = 0.9;     // a cruz de luz do fim: des
 // Raio do Gudran (Lord's Decree): o cajado aponta e o raio cruza a tela; js/render/arcane.js desenha
 export const furyBeam = { on: false, angle: 0, age: 0, pulse: 0 };
 
+// Fenda do Corte Carmesim (Kuro): uma só, reaproveitada. pts = zigue-zague da fenda, fixo na hora do golpe (js/render/fury.js desenha)
+export const furyRend = { on: false, x: 0, y: 0, angle: 0, age: 0, windup: 0.3, travel: 0.3, linger: 1, length: 500, width: 70, front: 0, struck: false, pts: [], second: 1, front2: 0, struck2: false, secondWidth: 1.6 };
+const rendHit = new Set();
+const rendHit2 = new Set();
+
 const run = { kind: null, fury: null, left: 0, timer: 0, side: 1, last: null };
 
 // Espadas da Chuva de Espadas: um conjunto fixo, reaproveitado em círculo (js/render/fury.js desenha)
@@ -46,6 +55,7 @@ export function resetFury() {
     for (const s of furySwords) s.on = false;
     consecration.on = false;
     furyBeam.on = false;
+    furyRend.on = false;
     run.kind = null;
     run.fury = null;
     run.left = 0;
@@ -68,6 +78,28 @@ export function startFury(fury) {
         addShockwave(player.x, player.y, { radius: 70, color: '#f0abfc', width: 8, seconds: 0.5 });
         createExplosion(player.x, player.y, '#f0abfc', 14);
         audio.playBlast();
+    }
+    if (fury.kind === 'groundRend') {
+        // Mira no monstro mais perto (ou para onde ele já olha) e ergue a espada
+        let aim = player.angle, best = 900;
+        for (const e of state.enemies) {
+            if (e.hp <= 0) continue;
+            const d = Math.hypot(e.x - player.x, e.y - player.y);
+            if (d < best) { best = d; aim = Math.atan2(e.y - player.y, e.x - player.x); }
+        }
+        rendHit.clear();
+        rendHit2.clear();
+        const pts = [];
+        for (let d = 0; d <= fury.length; d += 14) pts.push(d, (Math.random() - 0.5) * 9 * Math.min(1, d / 60));
+        Object.assign(furyRend, { on: true, x: player.x, y: player.y, angle: aim, age: 0, windup: fury.windup, travel: fury.travelSeconds, linger: fury.lingerSeconds,
+            length: fury.length, width: fury.width, front: 0, struck: false, pts,
+            second: fury.windup + fury.travelSeconds + fury.secondGap, front2: 0, struck2: false, secondWidth: fury.secondWidth });
+        player.angle = aim;
+        run.timer = 0;
+        startMove('overhead');              // ergue a espada nas duas mãos e desce (a pose do Axe Quake, sem a habilidade do Brutos)
+        screenFlash('#7f1d1d', 0.25);
+        zoomPunch(0.03);
+        addShockwave(player.x, player.y, { radius: 50, color: '#dc2626', width: 6, seconds: 0.4 });
     }
     if (fury.kind === 'bloodWaltz') {
         run.left = fury.cuts;
@@ -327,6 +359,10 @@ export function updateFury(dt) {
         updateSwordRain(dt);
         return;
     }
+    if (run.kind === 'groundRend') {
+        updateRend(dt);
+        return;
+    }
     if (run.kind === 'bloodWaltz') {
         run.timer -= dt;
         if (run.timer <= 0) {
@@ -422,6 +458,67 @@ export function updateFury(dt) {
             }
         }
         if (run.timer <= 0) run.timer = F.tickSeconds;
+    }
+}
+
+// --- CORTE CARMESIM (Kuro) ---
+// Ergue a espada (windup), desce na vertical e a fenda corre à frente até `length`, rasgando o chão: cada monstro no caminho
+// leva o golpe uma vez, e a fenda fica aberta um pouco antes de sumir.
+function updateRend(dt) {
+    const F = run.fury, R = furyRend;
+    if (player.hp <= 0) { resetFury(); return; }
+    R.age += dt;
+    player.angle = R.angle;
+    player.iFrames = Math.max(player.iFrames, 0.15);
+    if (R.age < R.windup) return;
+    const dx = Math.cos(R.angle), dy = Math.sin(R.angle);
+    // 1º corte: vertical (a lâmina de ar em pé)
+    if (!R.struck) {
+        R.struck = true;
+        executeBladeSlash(player.x, player.y, R.angle, 90, 2, false);     // o golpe vertical do boneco
+        shakeScreen(12);
+        hitStop(0.06);
+        zoomPunch(0.05);
+        screenFlash('#dc2626', 0.3);
+        addShockwave(player.x, player.y, { radius: 80, color: '#dc2626', width: 10, seconds: 0.4 });
+        audio.playBlast();
+    }
+    const prev = R.front;
+    R.front = Math.min(R.length, ((R.age - R.windup) / R.travel) * R.length);
+    rendSweep(F, R, R.front, R.width, F.damage, rendHit, dx, dy);
+    if (R.front > prev) createExplosion(R.x + dx * R.front, R.y + dy * R.front, '#ef4444', 3);
+    // 2º corte: horizontal, logo em seguida, deitado e bem mais largo
+    const t2 = R.age - R.second;
+    if (t2 >= 0) {
+        if (!R.struck2) {
+            R.struck2 = true;
+            executeBladeSlash(player.x, player.y, R.angle, 100, 1, false);
+            shakeScreen(10);
+            hitStop(0.05);
+            screenFlash('#dc2626', 0.25);
+            audio.playSlice();
+        }
+        const prev2 = R.front2;
+        R.front2 = Math.min(R.length, (t2 / R.travel) * R.length);
+        rendSweep(F, R, R.front2, R.width * F.secondWidth, F.secondDamage, rendHit2, dx, dy);
+        if (R.front2 > prev2) createExplosion(R.x + dx * R.front2, R.y + dy * R.front2, '#ef4444', 3);
+    }
+    if (R.age > R.second + R.travel + R.linger) resetFury();
+}
+
+// Machuca, uma vez por corte, quem a lâmina já alcançou na faixa de largura `width`
+function rendSweep(F, R, front, width, mult, hitSet, dx, dy) {
+    const damage = furyDamage(getBladeDamage() * mult);
+    for (const e of state.enemies) {
+        if (e.hp <= 0 || hitSet.has(e)) continue;
+        const along = (e.x - R.x) * dx + (e.y - R.y) * dy;
+        if (along < -e.radius || along > front + e.radius) continue;
+        const across = (e.x - R.x) * -dy + (e.y - R.y) * dx;
+        if (Math.abs(across) > width / 2 + e.radius) continue;
+        hitSet.add(e);
+        const side = across >= 0 ? 1 : -1;
+        dealDamage(e, damage * (isDemon(e) ? 1 + F.demonBonus : 1), { kbX: -dy * side * F.knockback + dx * 80, kbY: dx * side * F.knockback + dy * 80 });
+        createExplosion(e.x, e.y, '#dc2626', 8);
     }
 }
 

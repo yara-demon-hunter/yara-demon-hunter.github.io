@@ -20,7 +20,7 @@ import { beamActive } from './fury.js';
 export function getThrownStyle() {
     const thrown = getHero().thrown;
     if (thrown === 'rose') return passives.darkRoses.lvl > 0 ? 'darkRose' : 'rose';
-    return thrown === 'cross' || thrown === 'arcane' ? thrown : 'dagger';
+    return thrown === 'cross' || thrown === 'arcane' || thrown === 'shuriken' || thrown === 'kunai' ? thrown : 'dagger';
 }
 
 const KNIFE_RELEASE_SECONDS = K.throwSeconds * K.letGoFraction;

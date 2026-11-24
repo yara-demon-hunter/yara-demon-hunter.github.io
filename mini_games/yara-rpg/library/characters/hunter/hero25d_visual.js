@@ -83,6 +83,8 @@ export const HERO_25D_VISUALS = {
         slam: { seconds: 0.68, impactAt: 0.64, crouchEnd: 0.2, riseEnd: 0.46, height: 30, crouch: 4, recoverAt: 0.84 },
         // Axe Quake (Captain Brutos): ergue o machado, desce no chão sem sair do lugar
         quake: { seconds: 0.75, impactAt: 0.62, raiseEnd: 0.5, crouch: 3, recoverAt: 0.84 },
+        // Golpe erguido (Kuro, Crimson Rend): a mesma pose do quake, ergue a espada nas duas mãos e desce, mas sem a habilidade do Brutos
+        overhead: { seconds: 0.75, impactAt: 0.62, raiseEnd: 0.5, crouch: 3, recoverAt: 0.84 },
         // War Cry: peito aberto, cabeça para trás, braços abertos
         roar: { seconds: 0.72, impactAt: 0.2, leanBack: 3.4, armReach: 10.5 },
         // Juramento: ajoelha e ergue a espada
