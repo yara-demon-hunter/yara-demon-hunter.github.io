@@ -63,7 +63,8 @@ function build(rivalHero, playerHero, intro) {
         advance();
     });
     document.body.appendChild(root);
-    requestAnimationFrame(() => root.classList.add('is-open'));
+    const node = root;                                       // fechada antes do primeiro quadro (dois toques seguidos), `root` já é null aqui
+    requestAnimationFrame(() => node.classList.add('is-open'));
 }
 
 // Troca o retrato do lado do rival: o do rival, ou o do boss que chegou quando ele fala
@@ -96,6 +97,7 @@ function showLine() {
 function completeLine() {
     clearInterval(typeTimer);
     typeTimer = null;
+    if (!root) return;
     root.querySelector('.dlg-text').textContent = lines[index].text;
     root.classList.add('is-done');
 }

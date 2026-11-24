@@ -378,3 +378,100 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
 value('#sbAreas').onchange = (e) => showColliders(e.target.checked);
 value('#sbGo').onclick = fight;
 toggle.onclick = () => panel.classList.toggle('hidden');
+if (location.hash.startsWith('#bug')) {
+    const [, q] = location.hash.split('=');
+    const [heroIdx, god, maxMin] = (q ?? '0,1,40').split(',').map(Number);
+    const errs = [];
+    const add = (t) => { if (errs.length < 60 && !errs.includes(t)) errs.push(t); };
+    window.addEventListener('error', (e) => add(`ERR ${e.message} @${(e.filename ?? '').split('/').slice(-2).join('/')}:${e.lineno}`));
+    window.addEventListener('unhandledrejection', (e) => add(`REJ ${e.reason?.message ?? e.reason}`));
+    const ce = console.error.bind(console); console.error = (...a) => { add('CONSOLE.ERROR ' + a.map(String).join(' ').slice(0, 200)); ce(...a); };
+    const pre = document.createElement('pre'); pre.id = 'bugrep'; document.body.appendChild(pre);
+    const { state, player, joystick } = await import('/js/core/state.js');
+    const { ACTIVE_HEROES, HEROES } = await import('/data_model/heroes.js');
+    const { save } = await import('/js/core/save.js');
+    const { update } = await import('/js/game.js');
+    const { startGame } = await import('/js/ui/screens.js');
+    const { leaveCamp } = await import('/js/ui/camp.js');
+    const { buyNode, getBuyableNodes } = await import('/js/systems/tree.js');
+    let renderFn = null;
+    try { const R = await import('/js/render/renderer.js'); renderFn = R.render ?? R.renderGame ?? Object.values(R).find(f => typeof f === 'function' && /^render$/i.test(f.name)); } catch (e) { add('no renderer import ' + e.message); }
+    const heroKey = ACTIVE_HEROES[heroIdx % ACTIVE_HEROES.length];
+    if (!save.unlockedHeroes.includes(heroKey)) save.unlockedHeroes.push(heroKey);
+    save.hero = heroKey;
+    if (god) HEROES[heroKey].mods = { ...HEROES[heroKey].mods, damageTaken: -0.9 };
+    startGame();
+    const STEP = 1 / 60;
+    const trail = []; window.__tl = [];
+    let t = 0, lastKey = '', stuck = 0, frames = 0, kills0 = 0;
+    const seenBosses = new Set(), seenScenery = new Set();
+    const spend = (n) => { for (let i = 0; i < n && state.skillPoints > 0; i++) { const o = getBuyableNodes(); if (!o.length) return; buyNode(o[Math.floor(Math.random() * o.length)].id); } };
+    const pilot = () => {
+        if (document.getElementById('dialogue') || state.gameState === 'DIALOGUE') { document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true, cancelable: true })); document.getElementById('dialogue')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); return; }
+        if (state.gameState === 'CAMP') { ui(); if (document.querySelector('.wave-results, .hero-unlock')) return; spend(40); try { leaveCamp(); } catch (e) { add('leaveCamp ' + e.message); } return; }
+        if (state.gameState !== 'PLAYING') return;
+        let best = null, bd = 1e9;
+        for (const e of state.enemies) { const d = Math.hypot(e.x - state.coreX, e.y - state.coreY); if (e.hp > 0 && d < bd) { bd = d; best = e; } }
+        const tx = best && bd < 260 ? best.x : state.coreX, ty = best && bd < 260 ? best.y : state.coreY;
+        const dx = tx - player.x, dy = ty - player.y, d = Math.hypot(dx, dy) || 1, near = best && bd < 260;
+        joystick.x = d > (near ? 70 : 60) ? dx / d : 0; joystick.y = d > (near ? 70 : 60) ? dy / d : 0;
+    };
+    var ui = () => {
+        // fecha o que bloqueia: cartão de resultado, mapa, prêmio de herói, banners
+        document.querySelectorAll('.wave-results button, .hu-later, .vic-btn').forEach(b => { if (b.offsetParent !== null) b.click(); });
+        const wr = document.querySelector('.wave-results'); if (wr) { for (let k = 0; k < 2; k++) document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true, cancelable: true })); }
+        const map = document.getElementById('mapScreen');
+        if (map && !map.classList.contains('hidden')) { const go = document.getElementById('btnMapContinue'); if (go && !go.disabled) go.click(); }
+    };
+    const finish = (why) => {
+        pre.textContent = `DONE ${why}\nhero=${heroKey} god=${god} gameSec=${Math.round(t)} turn=${state.turn} gs=${state.gameState} bosses=[${[...seenBosses]}] sceneries=[${[...seenScenery]}]\nrun.kills=${state.run?.kills} stars=${JSON.stringify(state.run?.waveStars)}\ntrail: ${trail.join(' | ')}\ntimeline: ${window.__tl.join(' | ')}\nerrors(${errs.length}):\n${errs.join('\n')}`;
+        document.title = 'FINISHED';
+    };
+    const chunk = async () => {
+        for (let i = 0; i < 12; i++) {
+            if (state.gameState === 'GAMEOVER') return finish('gameover');
+            pilot();
+            if (god && state.gameState === 'PLAYING') { player.hp = player.maxHp; state.coreHp = state.coreHpMax; }
+            try { update(STEP); } catch (e) { add('update: ' + e.message + ' @' + (e.stack ?? '').split('\n')[1]?.trim().slice(-60)); }
+            t += STEP;
+            { const k2 = `${state.turn}/${state.gameState}/${state.phase}${document.getElementById('dialogue') ? '+DLG' : ''}${document.querySelector('.wave-results') ? '+WR' : ''}`; if (k2 !== window.__k2) { window.__k2 = k2; if (window.__tl.length < 70) window.__tl.push(Math.round(t) + 's:' + k2); } }
+            if (renderFn && frames++ % 12 === 0) { try { renderFn(); } catch (e) { add('render: ' + e.message + ' @' + (e.stack ?? '').split('\n')[1]?.trim().slice(-60)); } }
+            if (state.currentBoss) seenBosses.add(state.currentBoss.type);
+            if (frames % 30 === 0) ui();
+        }
+        const key = `${state.turn}/${state.gameState}${document.getElementById('dialogue') ? '+DLG' : ''}`;
+        if (key !== lastKey) { trail.push(`${Math.round(t)}s:${key}`); lastKey = key; stuck = 0; } else stuck += 0.2;
+        if (stuck >= 900) return finish(`STUCK at ${key} for ${stuck}s boss=${state.currentBoss?.type} hp=${Math.round(state.currentBoss?.hp ?? 0)}/${Math.round(state.currentBoss?.maxHp ?? 0)} bossXY=${Math.round(state.currentBoss?.x ?? 0)},${Math.round(state.currentBoss?.y ?? 0)} player=${Math.round(player.x)},${Math.round(player.y)} enemies=${state.enemies.length} phase=${state.phase} pending=${state.bossPending}`);
+        if (t > maxMin * 60) return finish('timeout');
+        if (state.turn > 18 && state.gameState !== 'PLAYING') return finish('post-final');
+        setTimeout(chunk, 200);
+    };
+    chunk();
+}
+if (location.hash === '#bestiary') {
+    const out = [];
+    const pre = document.createElement('pre'); pre.id = 'bestrep'; document.body.appendChild(pre);
+    window.addEventListener('error', (e) => out.push(`ERR ${e.message} @${(e.filename ?? '').split('/').pop()}:${e.lineno}`));
+    try {
+        const M = await import('/js/render/monster_sprites.js');
+        const { BOSS_MODELS } = await import('/data_model/bosses.js');
+        const { MONSTER_MODELS } = await import('/data_model/monsters.js');
+        const { state } = await import('/js/core/state.js');
+        for (const k of Object.keys(BOSS_MODELS)) {
+            if (BOSS_MODELS[k].isShadow) continue;
+            try { const p = M.getBossPortrait(k); if (!p) out.push(`boss portrait missing ${k}`); } catch (e) { out.push(`boss portrait ${k}: ${e.message}`); }
+        }
+        for (const k of Object.keys(MONSTER_MODELS)) {
+            try { const s = M.getMonsterSprite(k); if (!s) out.push(`monster sprite missing ${k}`); } catch (e) { out.push(`monster sprite ${k}: ${e.message}`); }
+        }
+        const { setScenery, prepareScenery } = await import('/js/render/scenery.js');
+        const { sceneryIds } = await import('/library/scenery/index.js');
+        for (const id of sceneryIds()) { try { setScenery(id); prepareScenery(); } catch (e) { out.push(`scenery ${id}: ${e.message}`); } }
+        const S = await import('/js/ui/sanctuary.js');
+        for (const tab of ['achievements', 'bestiary']) {
+            try { S.openSanctuary(); S.setSanctuaryTab(tab); const n = document.querySelectorAll('#sanctuaryList > *').length; out.push(`sanctuary ${tab}: ${n} entries`); } catch (e) { out.push(`sanctuary ${tab}: ${e.message}`); }
+        }
+        out.push('checked ' + Object.keys(BOSS_MODELS).length + ' bosses, ' + Object.keys(MONSTER_MODELS).length + ' monsters');
+    } catch (e) { out.push('ERR ' + e.stack.split('\n').slice(0, 3).join(' | ')); }
+    pre.textContent = out.join('\n');
+}

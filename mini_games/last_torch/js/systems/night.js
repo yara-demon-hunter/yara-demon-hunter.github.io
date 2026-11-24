@@ -16,12 +16,13 @@ import { collectAllGold } from './gold.js';
 import { bumpStat } from './sanctuary.js';
 import { resetStreak } from './streak.js';
 import { resetFury } from './fury.js';
+import { clearSkillEffects } from './skills.js';
 import { hasBossIntro, playBossIntro, playDuelDialogue, whenHunting } from '../ui/dialogue.js';
 import { CAMPAIGN_RUNTIME, screenIndexOf, screenOfTurn, startsNewScreen } from '../../data_model/campaign.js';
 import { showMapTransition } from '../ui/map_screen.js';
 import { getSceneryId, prepareScenery, setScenery } from '../render/scenery.js';
 import { warmSceneryMonsters } from '../render/monster_sprites.js';
-import { buildHourPlan, prepareBossSummon, resetFieldForNewTurn, spawnOpening } from './spawner.js';
+import { buildHourPlan, clearBattleEffects, prepareBossSummon, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
 // --- A NOITE ---
 // Fases de uma hora: HUNT (caçada) -> CLEAR (onda de fogo, ouro vem todo, tempo para pegar os itens) ->
@@ -35,6 +36,7 @@ export function enterScreenForTurn(turn) {
     if (!CAMPAIGN_RUNTIME.enabled) return;
     const screen = screenOfTurn(turn);
     if (getSceneryId() === screen.id) return;
+    clearBattleEffects();                          // nada da tela anterior (mancha do chefe, respingos, pedaços) fica na nova
     setScenery(screen.id);
     prepareScenery();
     warmSceneryMonsters(screen.id);                // os monstros dessa tela já ficam prontos (sem travar quando o primeiro nascer)
@@ -58,6 +60,8 @@ export function startHour() {
     state.waveStats = { kills0: state.run.kills, gold0: state.run.goldEarned, rush: 0, torchDamage: 0, heroDamage: 0, consumed: 0 };
     state.clearWaveRadius = 0;
     state.phoenixSpent = false;
+    state.frenzyActiveTimer = 0;       // segurança: a Fúria nunca atravessa a virada de onda
+    resetFury();
     resetFieldForNewTurn();
 
     // Hora de boss também começa com a onda normal: o boss só chega quando a cota fecha (callBoss)
@@ -134,6 +138,7 @@ function beginClear() {
     // A Fúria acaba junto com a onda: não passa para a onda seguinte (nem fica parada no acampamento)
     state.frenzyActiveTimer = 0;
     resetFury();
+    clearSkillEffects();               // e os golpes longos dos especiais (tornado, fênix, lâminas, lobos no ar...) também: nada continua na onda seguinte
     state.phase = 'CLEAR';
     state.lastStand = false;
     state.phaseTimer = NIGHT.clearSeconds;

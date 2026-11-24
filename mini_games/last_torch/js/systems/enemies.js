@@ -551,6 +551,7 @@ export function updateEnemies(dt) {
 
     for (let i = enemies.length - 1; i >= 0; i--) {
         const e = enemies[i];
+        if (!e) continue;                 // algo removeu monstros no meio do laço (a morte de um chefe leva as sombras dele): o índice pode ter passado do fim
         const model = getEnemyModel(e.type);
 
         // Nascendo (zona de nascimento do cenário): fica parado e não ataca até o efeito acabar (library/monsters/25d/spawn.js)

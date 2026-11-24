@@ -259,6 +259,20 @@ export function spawnOpening() {
 
 // Novo turno: a tela é limpa (monstros, tiros, efeitos e moedas) e os monstros voltam a aparecer
 // depois de uma pequena pausa, já com a dificuldade do turno novo.
+// Efeitos da onda que acabou (morte do chefe explodindo, pedaços, respingos, MANCHAS, corpos, anéis, números, avisos no chão) não atravessam para o
+// acampamento nem para a próxima tela: a mancha verde do Slizork aparecia no Graveyard. Chamado ao abrir o acampamento, ao trocar de tela e ao começar a onda
+export function clearBattleEffects() {
+    state.gibs.length = 0;
+    state.corpses.length = 0;
+    state.stains.length = 0;
+    state.shockwaves.length = 0;
+    state.floaters.length = 0;
+    state.telegraphs.length = 0;
+    state.enemyProjectiles.length = 0;
+    player.rootGoo = false;
+    player.reflectTimer = 0;
+}
+
 export function resetFieldForNewTurn() {
     state.enemies.length = 0;
     state.enemyProjectiles.length = 0;
@@ -273,6 +287,7 @@ export function resetFieldForNewTurn() {
     state.bossFx = state.bossZone = state.bossShackle = null;
     player.shackledTimer = 0;
     player.rootedTimer = 0;
+    clearBattleEffects();
     state.groundFires.length = 0;
     state.lightning.length = 0;
     state.bolts.length = 0;

@@ -112,6 +112,7 @@ export function chargeUlt(amount) {
 // O especial de cada herói (inclusive a Chuva de Espadas do Demon Hunter) roda em fury.js; aqui só o disparo e o anúncio.
 const FURY_COLORS = { swordRain: '#f0abfc', bloodWaltz: '#f87171', stomp: '#cbd5e1', forestGuardian: '#4ade80', consecration: '#fde68a', beam: '#93c5fd' };
 export function triggerFrenzyUlt() {
+    if (state.phase !== 'HUNT') return;          // a Fúria só dispara com a onda rolando (nunca no fim dela, no acampamento ou na limpeza)
     state.ultEnergy = 0;
     const fury = getFury();
     // Cada personagem pode durar um pouco mais (o Brutos: as pisadas são o show dele)
@@ -119,8 +120,13 @@ export function triggerFrenzyUlt() {
     state.frenzyActiveTimer = state.frenzyDuration;
     audio.playUltSound();
     const startedAt = state.runTime;      // se uma partida nova começar durante o anúncio, o golpe não sai nela
-    // Anúncio: a faixa com a foto do herói aparece e some com a caçada parada; só então o golpe sai (a tela livre)
-    showFuryCutIn(getHero(), fury.name, fury.color ?? FURY_COLORS[fury.kind] ?? '#f0abfc', () => { if (state.runTime >= startedAt) releaseFury(fury); });
+    const turn = state.turn;
+    // Anúncio: a faixa com a foto do herói aparece e some com a caçada parada; só então o golpe sai (a tela livre).
+    // Se a onda acabou durante o anúncio (o último monstro caiu), a Fúria NÃO começa: antes ela saía no acampamento ou na onda seguinte
+    showFuryCutIn(getHero(), fury.name, fury.color ?? FURY_COLORS[fury.kind] ?? '#f0abfc', () => {
+        if (state.runTime >= startedAt && state.turn === turn && state.phase === 'HUNT') releaseFury(fury);
+        else state.frenzyActiveTimer = 0;
+    });
 }
 
 function releaseFury(fury) {

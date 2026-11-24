@@ -1,4 +1,5 @@
 import { hideTreeHand } from './hints.js';
+import { clearBattleEffects } from '../systems/spawner.js';
 import { CAMP } from '../../data_model/passives.js';
 import { BOSS_MODELS, chooseBossType, isBossTurn } from '../../data_model/bosses.js';
 import { WAVE_SPOILS, getHourName } from '../../data_model/night.js';
@@ -130,6 +131,7 @@ export function grantWaveSpoils(wave, onClose = null) {
 // resumed: voltando de um CONTINUE, o acampamento já aconteceu (ouro recolhido, tocha alimentada): não repete
 export function openCamp(resumed = false, doneStars = null) {
     state.gameState = 'CAMP';
+    clearBattleEffects();                  // o acampamento começa limpo: sem manchas, respingos nem pedaços da onda que acabou
     hideTreeHand();            // fim da onda 1: a mãozinha do medalhão não fica atrás do acampamento
     resetStreak();
     let stars = '';
