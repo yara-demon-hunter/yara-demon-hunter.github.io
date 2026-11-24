@@ -422,3 +422,34 @@ value('#sbReset').onclick = () => {
     saveArena();
 };
 toggle.onclick = () => panel.classList.toggle('hidden');
+if (location.hash === '#clonehit2') {
+    const out = [];
+    const pre = document.createElement('pre'); pre.id = 'ch'; document.body.appendChild(pre);
+    try {
+        const { forceBossAction, updateBossAI, updateTelegraphs } = await import('/js/systems/boss_ai.js');
+        const { updateEnemyProjectiles } = await import('/js/systems/enemies.js');
+        const { createBoss, BOSS_MODELS } = await import('/data_model/bosses.js');
+        const { state, player, shadowClones } = await import('/js/core/state.js');
+        state.phase = 'HUNT'; state.gameState = 'PLAYING';
+        const types = ['RIVER_SPIRIT', 'AZAEL', 'DEMON_HUNTER', 'SLIZORK', 'GRAVE_KING', 'BLOOD_COUNTESS', 'LONG_NIGHT', 'DEMON_LORD', 'BRUTOS'];
+        for (const type of types) {
+            const m = BOSS_MODELS[type];
+            const actions = [...new Set([...(m.patterns ?? []), ...(m.phases ?? []).flatMap(p => p.patterns)])].filter(a => a !== 'rest');
+            const hit = [], miss = [];
+            for (const action of actions) {
+                state.enemies.length = 0; state.enemyProjectiles.length = 0; state.telegraphs.length = 0; shadowClones.length = 0;
+                const e = createBoss(type, 9, 300, 300); e.hp = e.maxHp = 1e9; e.damage = 40; state.enemies.push(e); state.currentBoss = e;
+                const c = { active: true, hp: 1e6, maxHp: 1e6, x: 430, y: 300, iFrames: 0, respawnTimer: 0, hitDirX: 0, hitDirY: 0 }; shadowClones.push(c);
+                player.x = 900; player.y = 300;
+                forceBossAction(e, m, action);
+                for (let i = 0; i < 350; i++) {
+                    c.iFrames = 0; player.iFrames = 0; player.hp = player.maxHp;
+                    updateBossAI(e, m, 0.02); updateEnemyProjectiles(0.02); updateTelegraphs(0.02);
+                }
+                (c.hp < 1e6 ? hit : miss).push(action);
+            }
+            out.push(`${type}: FERE=[${hit.join(',')}]  NÃO=[${miss.join(',')}]`);
+        }
+    } catch (e) { out.push('ERR ' + e.stack.split('\n').slice(0, 4).join(' | ')); }
+    pre.textContent = out.join('\n');
+}

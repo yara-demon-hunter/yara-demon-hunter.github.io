@@ -897,10 +897,12 @@ export function updateEnemyProjectiles(dt) {
             continue;
         }
 
-        const hitClone = shadowClones.find(c => c.active && c.iFrames <= 0
-            && Math.hypot(c.x - p.x, c.y - p.y) < p.radius + CHARACTER_MODEL.collisionRadius);
+        // A sombra ABSORVE o tiro mesmo enquanto está invulnerável (logo depois de levar um): antes os tiros seguintes de uma rajada passavam reto por ela e
+        // iam no herói; agora só o primeiro causa dano, e os outros somem na sombra sem feri-la
+        const hitClone = shadowClones.find(c => c.active && Math.hypot(c.x - p.x, c.y - p.y) < p.radius + CHARACTER_MODEL.collisionRadius);
         if (hitClone) {
-            damageShadowClone(hitClone, p.damage, p.x - p.vx * 0.05, p.y - p.vy * 0.05, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
+            if (hitClone.iFrames <= 0) damageShadowClone(hitClone, p.damage, p.x - p.vx * 0.05, p.y - p.vy * 0.05, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
+            else createExplosion(p.x, p.y, '#a78bfa', 4);
             enemyProjectiles.splice(i, 1);
             continue;
         }
