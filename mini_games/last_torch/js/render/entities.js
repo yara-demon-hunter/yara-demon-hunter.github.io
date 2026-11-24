@@ -194,6 +194,29 @@ export function renderBladeSlashes() {
 export function renderEnemyProjectiles() {
     if (state.enemyProjectiles.length === 0) return;
     for (const p of state.enemyProjectiles) {
+        // Meia-lua de sangue do Azael (Maré Carmesim): a mesma da skill do herói, vermelha, apontando para onde voa
+        if (p.crescent) {
+            resetWorldView();
+            const a = Math.atan2(p.vy, p.vx), r = p.radius * 1.5;
+            ctx.save();
+            ctx.globalCompositeOperation = 'lighter';
+            drawGlow(ctx, p.glow ?? 'rgba(239, 68, 68, 0.55)', p.x + Math.cos(a) * r * 0.4, p.y + Math.sin(a) * r * 0.4, r * 1.3, 0.5);
+            ctx.translate(p.x, p.y);
+            ctx.rotate(a);
+            ctx.fillStyle = p.fill ?? 'rgba(220, 38, 38, 0.9)';
+            ctx.beginPath();
+            ctx.arc(-r * 0.3, 0, r, -1.15, 1.15);
+            ctx.arc(-r * 0.95, 0, r * 1.35, 0.8, -0.8, true);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = p.core ?? '#fecaca';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(-r * 0.3, 0, r, -1, 1);
+            ctx.stroke();
+            ctx.restore();
+            continue;
+        }
         // Caveira do Grave King: crânio de osso com olhos vermelhos e a MANDÍBULA batendo (rindo); nos últimos instantes os olhos piscam e ela incha
         if (p.skull) {
             resetWorldView();

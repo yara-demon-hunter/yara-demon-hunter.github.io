@@ -7,7 +7,7 @@ import { MIRROR_WARD } from '../../data_model/passives.js';
 import { POWER_MODELS } from '../../data_model/powers.js';
 import { audio, passives, player, shadowClones, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
-import { addSlam, updateBossAI, updateShadowAI } from './boss_ai.js';
+import { addSlam, bossTarget, updateBossAI, updateShadowAI } from './boss_ai.js';
 import { dealDamage } from './damage.js';
 import { addCorpse, addGibs, addShockwave, addStain, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
 import { dropGold } from './gold.js';
@@ -585,8 +585,10 @@ export function updateEnemies(dt) {
         const huntsPlayer = !model.ignoresPlayer && (e.isBoss || distToPlayer < provoked);
         // Convertido do Avgustino por perto (Conversion): provoca o monstro comum, que vai bater nele. Boss não se deixa provocar
         const ally = !lured && !e.isBoss && !e.shadowOwner && !model.ignoresPlayer ? provokingConvert(e) : null;
-        const targetX = lured ? lure.x : ally ? ally.x : huntsPlayer ? player.x : state.coreX;
-        const targetY = lured ? lure.y : ally ? ally.y : huntsPlayer ? player.y : state.coreY;
+        // Chefe: vira para a sombra que o provoca (perto dele e mais perto que o herói); senão, o herói
+        const bossT = e.isBoss && huntsPlayer ? bossTarget(e) : null;
+        const targetX = lured ? lure.x : ally ? ally.x : bossT ? bossT.x : huntsPlayer ? player.x : state.coreX;
+        const targetY = lured ? lure.y : ally ? ally.y : bossT ? bossT.y : huntsPlayer ? player.y : state.coreY;
         const distToTarget = Math.hypot(targetX - e.x, targetY - e.y);
         const distCore = Math.hypot(state.coreX - e.x, state.coreY - e.y);
 
@@ -712,7 +714,7 @@ export function updateEnemies(dt) {
 
         // Quem está caçando o herói contorna a chama: atrair monstros é o que protege a tocha
         const touchesCore = distCore < e.radius + CORE_MODEL.collisionRadius;
-        if (touchesCore && huntsPlayer) {
+        if (touchesCore && huntsPlayer && !(e.dashTimer > 0)) {          // no meio do avanço o chefe atravessa a tocha (e a fere, em boss_ai.js)
             const a = Math.atan2(e.y - state.coreY, e.x - state.coreX);
             e.x = state.coreX + Math.cos(a) * (e.radius + CORE_MODEL.collisionRadius);
             e.y = state.coreY + Math.sin(a) * (e.radius + CORE_MODEL.collisionRadius);
@@ -839,6 +841,7 @@ function updateBubble(p, i, dt) {
             hurtPlayer(p.damage, p.x, p.y, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
         }
         hurtOaks(p.x, p.y, p.burstRadius, p.damage);
+        for (const c of shadowClones) if (c.active && Math.hypot(c.x - p.x, c.y - p.y) < p.burstRadius + 12) damageShadowClone(c, p.damage, p.x, p.y, 0.5);
     }
 }
 

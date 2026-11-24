@@ -1,7 +1,7 @@
-import { BOSS_MODELS } from '../../data_model/bosses.js';
+import { BOSS_MODELS, BOSS_TARGETING } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { createEnemy } from '../../data_model/monsters.js';
-import { audio, player, state } from '../core/state.js';
+import { audio, player, shadowClones, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { addShockwave, createExplosion, hitStop, screenFlash, shakeScreen } from './effects.js';
 import { hurtPlayer } from './player.js';
@@ -9,6 +9,7 @@ import { addMonster } from './spawner.js';
 import { clipSegment } from './colliders.js';
 import { hurtTorch } from './torch.js';
 import { hurtOaks, hurtOaksOnSegment } from './skills_nature.js';
+import { damageShadowClone } from './shadow_clone.js';
 
 // --- ATAQUES DOS BOSSES ---
 // Cada boss repete em ciclo a lista model.patterns. Entre um ataque e outro, e.shootTimer conta a
@@ -52,8 +53,28 @@ function openWindow(e, model) {
 // Golpes que deixam o boss aberto (o tempo é o do aviso no chão)
 const OPENS_AFTER = { slam: 1.5, quake: 1.4, stomp: 1.6, meteors: 2.2, bloom: 2.0, eclipse: 2.2, traps: 2.4, columns: 1.6, mark: 1.7 };
 
+// Em quem o chefe mira: o herói, ou a SOMBRA mais perto quando ela está dentro do raio de provocação dela (BOSS_TARGETING) e mais perto que o herói
+export function bossTarget(e) {
+    const heroD = Math.hypot(player.x - e.x, player.y - e.y);
+    let best = null, bd = BOSS_TARGETING.cloneProvokeRadius + e.radius;
+    for (const c of shadowClones) {
+        if (!c.active || c.hp <= 0) continue;
+        const d = Math.hypot(c.x - e.x, c.y - e.y);
+        if (d < bd && d < heroD) { bd = d; best = c; }
+    }
+    return best ? { x: best.x, y: best.y, dist: bd, clone: best } : { x: player.x, y: player.y, dist: heroD, clone: null };
+}
 function aimAngle(e) {
-    return Math.atan2(player.y - e.y, player.x - e.x);
+    const t = bossTarget(e);
+    return Math.atan2(t.y - e.y, t.x - e.x);
+}
+
+// Os golpes do chefe também ferem as sombras (como o herói): em círculo ou em risco
+function hurtClonesCircle(x, y, radius, amount, fromX = x, fromY = y) {
+    for (const c of shadowClones) if (c.active && Math.hypot(c.x - x, c.y - y) < radius + 12) damageShadowClone(c, amount * BOSS_TARGETING.cloneDamageRatio, fromX, fromY, 0.5);
+}
+function hurtClonesSegment(x1, y1, x2, y2, width, amount) {
+    for (const c of shadowClones) if (c.active && distanceToSegment(c.x, c.y, x1, y1, x2, y2) < width / 2 + 12) damageShadowClone(c, amount * BOSS_TARGETING.cloneDamageRatio, x1, y1, 0.5);
 }
 
 // Círculo no chão que estoura depois de delay segundos
@@ -67,7 +88,7 @@ export function addSlam(x, y, radius, delay, damage, color = null, torchDamage =
 const TELL_SECONDS = 0.55;
 const LUNGE_WINDUP_SCALE = 1.5;     // aviso da investida 50% mais longo
 const LUNGE_TIME_SCALE = 1.5;       // e a corrida em si 50% mais lenta
-const TELLED = new Set(['skulls', 'frenzy', 'claws', 'bubbles', 'goo', 'volley', 'ring', 'spiral', 'shackle', 'fireshield', 'bloodfog', 'darkness', 'holyground', 'mirror']);
+const TELLED = new Set(['crescent', 'skulls', 'frenzy', 'claws', 'bubbles', 'goo', 'volley', 'ring', 'spiral', 'shackle', 'fireshield', 'bloodfog', 'darkness', 'holyground', 'mirror']);
 // Correntes do Demon Hunter (a skill Shadow Shackle virada contra o herói): voam a 700 px/s e prendem por 1,5 s.
 // Quem estiver em dash (ou invulnerável) na hora em que a ponta chega escapa: a corrente erra e se desfaz.
 export const BOSS_SHACKLE = { speed: 700, holdSeconds: 1.5 };
@@ -349,6 +370,29 @@ const ACTIONS = {
         audio.playBossRoar();
         later(ai, secs, () => { e.speed /= m; e.frenzy = false; if (e.hp > e.maxHp * model.enrageRatio) e.enraged = false; });
     },
+    // Azael (vermelha) e Demon Hunter-chefe (azul), Maré Carmesim: ele corta o ar com a espada e solta meias-luas de sangue em leque na direção do herói (uma onda; crescentWaves > 1 solta mais, 0,55 s uma da outra).
+    // Cada meia-lua voa reta até o alcance e fere quem tocar (herói, árvore do druida, tocha). Desenho em js/render/entities.js (p.crescent)
+    crescent(e, model, ai) {
+        const n = model.crescentCount ?? 3;
+        e.comboStep = ((e.comboStep ?? 1) % 3) + 1;               // o boneco faz o golpe de espada quando este número troca
+        addShockwave(e.x, e.y, { radius: 70, color: model.color, width: 4, seconds: 0.25 });
+        const wave = () => {
+            const base = aimAngle(e);
+            e.angle = base;
+            for (let i = 0; i < n; i++) {
+                const a = base + (i - (n - 1) / 2) * 0.32;
+                state.enemyProjectiles.push({
+                    owner: e.type, crescent: true, color: model.crescentColor ?? '#ef4444', fill: model.crescentFill ?? 'rgba(220, 38, 38, 0.9)', glow: model.crescentGlow ?? 'rgba(239, 68, 68, 0.55)', core: model.crescentCore ?? '#fecaca', range: model.crescentRange ?? 560, travelled: 0,
+                    x: e.x + Math.cos(a) * e.radius, y: e.y + Math.sin(a) * e.radius,
+                    vx: Math.cos(a) * (model.crescentSpeed ?? 420), vy: Math.sin(a) * (model.crescentSpeed ?? 420),
+                    radius: model.crescentRadius ?? 22, damage: e.damage * (model.crescentDamageMultiplier ?? 1), torchDamage: 4
+                });
+            }
+            audio.playBossAttack();
+        };
+        wave();
+        for (let k = 1; k < (model.crescentWaves ?? 1); k++) later(ai, 0.55 * k, wave);         // ondas extras só se o chefe pedir (crescentWaves > 1)
+    },
     // Grave King, avanço: um DASH curto e rápido até perto do herói (para logo antes dele), para emendar o corte de espada. Usa a investida dos rivais
     // (aviso + corrida, updateLunge) com o comprimento cortado na distância até o herói
     dash(e, model, ai) {
@@ -509,7 +553,14 @@ function updateLunge(e, model, ai, dt) {
     }
     if (L.t >= 1) {
         // O corte vermelho que ficou no chão por onde ele passou
-        state.telegraphs.push({ kind: 'scar', x: L.fromX, y: L.fromY, toX: L.toX, toY: L.toY, age: 0, seconds: 0.7 });
+        state.telegraphs.push({ kind: 'scar', x: L.fromX, y: L.fromY, toX: e.x, toY: e.y, age: 0, seconds: 0.7 });      // até onde ele chegou de verdade
+        // O avanço COMPLETA mesmo com a tocha no caminho e fere o que estiver na frente: a tocha (se o trecho passou por ela) e a árvore do druida
+        if (distanceToSegment(state.coreX, state.coreY, L.fromX, L.fromY, e.x, e.y) < CORE_MODEL.collisionRadius + model.lungeHitRadius) {
+            hurtTorch(model.lungeTorchDamage ?? 10, state.coreX, state.coreY);
+            addShockwave(state.coreX, state.coreY, { radius: 60, color: model.color, width: 5, seconds: 0.3 });
+        }
+        hurtOaksOnSegment(L.fromX, L.fromY, e.x, e.y, model.lungeHitRadius * 2, e.damage * model.lungeDamageMultiplier);
+        hurtClonesSegment(L.fromX, L.fromY, e.x, e.y, model.lungeHitRadius * 2, e.damage * model.lungeDamageMultiplier);
         e.dashTimer = 0;
         e.invulnerable = false;
         ai.lunge = null;
@@ -641,10 +692,11 @@ function updateBossMelee(e, model, dt) {
     const M = model.melee;
     e.meleeCooldown = Math.max(0, (e.meleeCooldown ?? M.firstDelay ?? 0.6) - dt);
     if (e.atkT === undefined || e.atkT === null) {
-        const dist = Math.hypot(player.x - e.x, player.y - e.y);
+        const target = bossTarget(e);                       // o herói, ou a sombra que provocou o chefe
+        const dist = target.dist;
         if (e.meleeCooldown > 0 || dist > M.range + e.radius || state.phase !== 'HUNT') return false;
         e.atkT = 0;
-        e.atkAngle = aimAngle(e);
+        e.atkAngle = Math.atan2(target.y - e.y, target.x - e.x);
         e.atkHit = false;
         e.holdAim = true;                                    // fica parado enquanto corta
     }
@@ -667,6 +719,14 @@ function updateBossMelee(e, model, dt) {
         while (diff < -Math.PI) diff += Math.PI * 2;
         if (Math.hypot(dx, dy) < M.range + e.radius + 14 && Math.abs(diff) < M.arc / 2) hurtPlayer(e.damage * M.damageMultiplier, e.x, e.y, 0.6);
         hurtOaks(e.x + Math.cos(e.atkAngle) * (M.range * 0.6), e.y + Math.sin(e.atkAngle) * (M.range * 0.6), M.range * 0.5, e.damage * M.damageMultiplier);
+        for (const c of shadowClones) {                      // as sombras dentro do leque também levam o corte
+            if (!c.active) continue;
+            const cx = c.x - e.x, cy = c.y - e.y;
+            let cd = Math.atan2(cy, cx) - e.atkAngle;
+            while (cd > Math.PI) cd -= Math.PI * 2;
+            while (cd < -Math.PI) cd += Math.PI * 2;
+            if (Math.hypot(cx, cy) < M.range + e.radius + 14 && Math.abs(cd) < M.arc / 2) damageShadowClone(c, e.damage * M.damageMultiplier * BOSS_TARGETING.cloneDamageRatio, e.x, e.y, 0.5);
+        }
     }
     if (p >= 1) {
         e.atkT = null;
@@ -870,7 +930,7 @@ export function updateTelegraphs(dt) {
             shakeScreen(7);
             audio.playBlast();
             if (hit) hurtPlayer(t.damage, t.lines[1].x1, t.lines[1].y1, 0.5);
-            for (const L of t.lines) hurtOaksOnSegment(L.x1, L.y1, L.x2, L.y2, t.width, t.damage);
+            for (const L of t.lines) { hurtOaksOnSegment(L.x1, L.y1, L.x2, L.y2, t.width, t.damage); hurtClonesSegment(L.x1, L.y1, L.x2, L.y2, t.width, t.damage); }
         } else if (t.kind === 'circle') {
             addShockwave(t.x, t.y, { radius: t.radius, color: t.shockColor ?? '#f87171', width: 7, seconds: 0.3 });
             createExplosion(t.x, t.y, t.goo ? '#4ade80' : t.bone ? '#e7e0cf' : t.drop ? '#7dd3fc' : t.shockColor ? '#a8a29e' : '#f97316', 16);
@@ -878,6 +938,7 @@ export function updateTelegraphs(dt) {
             audio.playBlast();
             if (Math.hypot(player.x - t.x, player.y - t.y) < t.radius) hurtPlayer(t.damage, t.x, t.y, 0.5);
             hurtOaks(t.x, t.y, t.radius, t.damage);          // a árvore do druida também leva o golpe
+            hurtClonesCircle(t.x, t.y, t.radius, t.damage);  // e as sombras
             // Gosma: os pés ficam presos (não anda nem dá dash; ainda ataca), como as raízes do Treant
             if (t.root && Math.hypot(player.x - t.x, player.y - t.y) < t.radius) {
                 player.rootedTimer = Math.max(player.rootedTimer ?? 0, t.root);

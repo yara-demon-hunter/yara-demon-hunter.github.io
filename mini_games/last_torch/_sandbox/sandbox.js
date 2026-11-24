@@ -64,6 +64,7 @@ panel.innerHTML = `
     <div class="sb-format"><label>Screen format (all tabs): <select id="sbFormat"><option value="desktop">Desktop (full window)</option><option value="landscape">Phone · landscape 844×390</option><option value="portrait">Phone · portrait 390×844</option></select></label></div>
     <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button><button data-tab="screens">🖼️ Screens</button><button data-tab="moves">🗡️ Boss moves</button><button data-tab="dialogues">💬 Dialogues</button></div>
     <div id="sbArena">
+    <button id="sbReset" class="sb-opt" title="Put every Arena setting back to how it starts (hero, boss, monsters, buddies, numbers, boxes and scenery)">↺ Reset Arena to defaults</button>
     <h3>Scenery <small>(applies right away, even mid-fight)</small></h3><div class="sb-row" id="sbScenery"></div>
     <h3>Hero</h3><div class="sb-row" id="sbHeroes"></div>
     <h3>Boss <small>(click again to unselect: monsters only)</small></h3><div class="sb-row" id="sbBosses"></div>
@@ -130,6 +131,35 @@ function fillScenery() {
         host.appendChild(b);
     });
 }
+// --- A Arena lembra a última configuração (herói, chefe, monstros, buddies, árvore, números e caixas) e tem um botão para voltar ao padrão ---
+const ARENA_KEY = 'sbArenaSettings';
+const ARENA_FIELDS = ['#sbCount', '#sbHour', '#sbPoints', '#sbAlone', '#sbAreas', '#sbGod', '#sbGodBoss', '#sbGodTorch', '#sbGodMonsters', '#sbFreezeOak', '#sbUnlockCamp'];
+const fieldDefaults = Object.fromEntries(ARENA_FIELDS.map(id => { const el = panel.querySelector(id); return [id, el.type === 'checkbox' ? el.checked : el.value]; }));
+const arenaDefaults = () => ({ hero: ACTIVE_HEROES[0], boss: 'AZAEL', picked: [], buddies: [], oak: '', scenery: WORLD.scenery, fields: { ...fieldDefaults } });
+function applyArena(s) {
+    if (ACTIVE_HEROES.includes(s.hero)) choice.hero = s.hero;
+    if (s.boss === '' || BOSS_MODELS[s.boss]) choice.boss = s.boss;
+    picked.clear(); (s.picked ?? []).forEach(k => { if (MONSTER_MODELS[k]) picked.add(k); });
+    buddyPicked.clear(); (s.buddies ?? []).forEach(k => { if (BUDDIES.some(b => b.key === k)) buddyPicked.add(k); });
+    oakChoice.stage = OAK_STAGES.some(o => o.key === s.oak) ? s.oak : '';
+    for (const [id, v] of Object.entries(s.fields ?? {})) {
+        const el = panel.querySelector(id);
+        if (!el) continue;
+        if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
+    }
+}
+function saveArena() {
+    try {
+        const fields = Object.fromEntries(ARENA_FIELDS.map(id => { const el = panel.querySelector(id); return [id, el.type === 'checkbox' ? el.checked : el.value]; }));
+        localStorage.setItem(ARENA_KEY, JSON.stringify({ hero: choice.hero, boss: choice.boss, picked: [...picked], buddies: [...buddyPicked], oak: oakChoice.stage, fields }));
+    } catch { /* sem armazenamento: só não lembra */ }
+}
+try { const saved = JSON.parse(localStorage.getItem(ARENA_KEY)); if (saved) { applyArena(saved); showColliders(panel.querySelector('#sbAreas').checked); } } catch { /* nada guardado */ }
+// Qualquer clique ou mudança no painel grava a configuração (os botões trocam o estado antes do clique terminar)
+panel.addEventListener('click', () => setTimeout(saveArena, 0));
+panel.addEventListener('change', saveArena);
+panel.addEventListener('input', saveArena);
+
 setScenery(sceneryChoice.scenery);
 fillScenery();
 fill('#sbHeroes', ACTIVE_HEROES.map(k => ({ key: k, label: HEROES[k].name, sub: HEROES[k].tagline })), 'hero');
@@ -377,4 +407,18 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
 
 value('#sbAreas').onchange = (e) => showColliders(e.target.checked);
 value('#sbGo').onclick = fight;
+value('#sbReset').onclick = () => {
+    const d = arenaDefaults();
+    applyArena(d);
+    sceneryChoice.scenery = d.scenery;
+    try { localStorage.setItem('sbScenery', d.scenery); } catch { /* sem armazenamento */ }
+    setScenery(d.scenery);
+    fillScenery();
+    fill('#sbHeroes', ACTIVE_HEROES.map(k => ({ key: k, label: HEROES[k].name, sub: HEROES[k].tagline })), 'hero');
+    fill('#sbBosses', bosses.map(b => ({ key: b.key, label: b.label, sub: b.sub })), 'boss');
+    fillMonsters();
+    fillBuddies();
+    showColliders(value('#sbAreas').checked);
+    saveArena();
+};
 toggle.onclick = () => panel.classList.toggle('hidden');

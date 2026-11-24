@@ -8,7 +8,6 @@ import { audio, passives, player, state } from '../core/state.js';
 import { dealDamage } from './damage.js';
 import { addShockwave, createExplosion } from './effects.js';
 import { chargeUlt } from './combat.js';
-import { tryExecute } from './skills_blade.js';
 import { characterStat, getAtkRadius, getFuryChargePerHit, getRuneShield, getSpellDamage } from './stats.js';
 import { mod } from './modifiers.js';
 import { startCast } from './moves.js';
@@ -69,7 +68,6 @@ export function updateArcane(dt) {
         if (hit) {
             dealDamage(hit, b.damage, { style: 'spell', kbX: Math.cos(b.angle) * b.knockback, kbY: Math.sin(b.angle) * b.knockback });
             chargeUlt(getFuryChargePerHit());
-            tryExecute(hit);
             createExplosion(b.x, b.y, '#93c5fd', b.big ? 8 : 5);
             audio.playHit?.(1);
             if (b.pierces > 0) {

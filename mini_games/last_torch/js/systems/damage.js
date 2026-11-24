@@ -40,11 +40,15 @@ export function dealDamage(e, amount, o = {}) {
         return 0;
     }
     const crit = o.crit || (!o.noCrit && (Math.random() < getCritChance() || (inSmoke(e) && Math.random() < SMOKE_BOMB.critChance)));
-    const dmg = amount * (crit ? getCritMultiplier() : 1) * (e.ravenMark > 0 ? 1 + SHADOW_RAVEN.markDamage : 1)
+    const dmgRaw = amount * (crit ? getCritMultiplier() : 1) * (e.ravenMark > 0 ? 1 + SHADOW_RAVEN.markDamage : 1)
         * (e.rooted > 0 ? 1 + rootedBonus() : 1)
         * (e.openTimer > 0 ? 1.3 : 1)                                           // boss aberto depois de um golpe pesado: +30%
         * (e.blessed > 0 ? 1 + POWER_MODELS.holyWater.blessBonus : 1)       // Holy Water: abençoado leva mais de tudo
         * (e.chilled > 0 && o.torchFire ? 1 + BLUE_TORCH.brittle : 1);       // Blue Torch: gelado leva mais só dos golpes de fogo da tocha
+
+    // Defesa do chefe (BOSS_STATS em data_model/bosses.js): magia (número azul e fogo da tocha) usa a defesa mágica; o resto (lâmina, adaga, sombras) a física
+    const defense = e.isBoss ? ((o.style === 'spell' || o.torchFire) ? e.magicDefense : e.physicalDefense) ?? 0 : 0;
+    const dmg = dmgRaw * (1 - Math.min(0.9, defense));
 
     e.hp -= dmg;
     // Dano contínuo (quiet: veneno, videira, espinhos, queimadura...) não pisca nem faz o monstro "levar um golpe": a cada tique

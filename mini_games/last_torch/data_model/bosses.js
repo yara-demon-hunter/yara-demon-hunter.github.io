@@ -10,28 +10,33 @@ import { RIVAL_OF, bossModelOf } from './characters/index.js';
 // vida o boss enfurece: pausas menores e mais velocidade.
 // ============================================================================================================================
 // AJUSTE DOS CHEFES: tudo o que se mexe com frequência fica aqui, no topo.
-//   1. BOSS_STATS: a vida, o dano e a velocidade FINAIS de cada chefe (Escuridão 1). O número escrito aqui é o que vale em jogo, sem curva por
+//   1. BOSS_STATS: a vida, o dano, a velocidade e as DEFESAS (física e mágica) FINAIS de cada chefe (Escuridão 1). O número escrito aqui é o que vale em jogo, sem curva por
 //      onda nem multiplicador escondido. Cada chefe aparece numa onda fixa da campanha, então o número é de uma onda só.
 //   2. BOSS_DARKNESS: quanto a Escuridão aumenta TODOS os chefes, por nível acima do 1 (vida, dano e velocidade). Um valor muda todos.
 //   3. BOSS_GLOBAL: botões gerais (multiplicam todos os chefes, em qualquer Escuridão): ex.: vida 0.8 deixa todos 20% mais fracos.
 // Os golpes de cada chefe (patterns, phases e os números de cada golpe) ficam logo abaixo, no BOSS_MODELS.
 // ============================================================================================================================
 export const BOSS_STATS = {
-    //                    vida    dano  velocidade   (onda em que aparece)
-    AZAEL:               { hp: 6000,  damage: 12.7, speed: 110 },     // 3  · Dark Forest   (o rival de quem joga de Demon Hunter, Rowan, Brutos...)
-    DEMON_HUNTER:        { hp: 6000,  damage: 10.9, speed: 58 },      // 3  · quando você joga de Azael, o rival é o Demon Hunter
-    RIVER_SPIRIT:        { hp: 12000,  damage: 21.2, speed: 33 },      // 6  · River Crossing
-    SLIZORK:             { hp: 30000,  damage: 32.5, speed: 23 },      // 9  · Swamp
-    GRAVE_KING:          { hp: 50000, damage: 41.1, speed: 32 },      // 12 · Graveyard
-    BRUTOS:              { hp: 100000, damage: 53.4, speed: 37 },      // 15 · Village
-    DEMON_LORD:          { hp: 100000, damage: 44.5, speed: 27 },      // 15 · Village, só para quem joga de Brutos (no lugar dele)
-    BLOOD_COUNTESS:      { hp: 200000, damage: 40.3, speed: 46 },      // 16 · Castle
-    LONG_NIGHT:          { hp: 300000, damage: 55.0, speed: 32 },      // 17 · Castle
-    AZAEL_FINAL:         { hp: 500000, damage: 44.7, speed: 144 },     // 18 · Castle (a revanche do Azael)
-    DEMON_HUNTER_FINAL:  { hp: 500000, damage: 38.3, speed: 76 }       // 18 · Castle (a revanche, quando você joga de Azael)
+    // physicalDef: defesa contra golpes físicos (lâmina, adaga, tudo o que mostra número branco); magicDef: defesa contra magia (número azul e fogo da tocha).
+    // As defesas são em fração do dano que NÃO passa: 0.25 = o chefe leva 25% menos dano desse tipo; 0 = leva tudo. (Número roxo, das sombras, conta como físico.)
+    //                    vida    dano  velocidade  physicalDef  magicDef      (onda em que aparece)
+    AZAEL:               { hp: 3000,  damage: 12.7, speed: 110, physicalDef: 0.25, magicDef: 0.10 },   // 3  · Dark Forest   (o rival de quem joga de Demon Hunter, Rowan, Brutos...)
+    DEMON_HUNTER:        { hp: 3000,  damage: 10.9, speed: 58,  physicalDef: 0.20, magicDef: 0.15 },   // 3  · quando você joga de Azael, o rival é o Demon Hunter
+    RIVER_SPIRIT:        { hp: 7000,  damage: 21.2, speed: 33,  physicalDef: 0.10, magicDef: 0.15 },   // 6  · River Crossing
+    SLIZORK:             { hp: 10000,  damage: 32.5, speed: 23,  physicalDef: 0.20, magicDef: 0.00},   // 9  · Swamp
+    GRAVE_KING:          { hp: 15000, damage: 41.1, speed: 32,  physicalDef: 0.25, magicDef: 0.00 },   // 12 · Graveyard
+    BRUTOS:              { hp: 20000, damage: 53.4, speed: 37,  physicalDef: 0.25, magicDef: 0.00 },   // 15 · Village
+    DEMON_LORD:          { hp: 20000, damage: 44.5, speed: 27,  physicalDef: 0.10, magicDef: 0.10 },   // 15 · Village, só para quem joga de Brutos (no lugar dele)
+    BLOOD_COUNTESS:      { hp: 30000, damage: 40.3, speed: 46,  physicalDef: 0.10, magicDef: 0.15 },   // 16 · Castle
+    LONG_NIGHT:          { hp: 50000, damage: 55.0, speed: 32,  physicalDef: 0.10, magicDef: 0.15 },   // 17 · Castle
+    AZAEL_FINAL:         { hp: 60000, damage: 44.7, speed: 144, physicalDef: 0.25, magicDef: 0.10 },   // 18 · Castle (a revanche do Azael)
+    DEMON_HUNTER_FINAL:  { hp: 60000, damage: 38.3, speed: 76,  physicalDef: 0.20, magicDef: 0.15 }    // 18 · Castle (a revanche, quando você joga de Azael)
 };
 // Escuridão: por nível acima de 1 (Escuridão 1 = valores de BOSS_STATS). Ex.: hpPerLevel 0.3 = +30% de vida a cada nível (nível 8 = +210%).
 export const BOSS_DARKNESS = { hpPerLevel: 0.3, damagePerLevel: 0.12, speedPerLevel: 0.03 };
+// Provocação das sombras (Shadow Clone): o chefe só vira para uma sombra quando ela está a menos de cloneProvokeRadius px dele E mais perto que o herói.
+// O herói provoca de qualquer distância (os chefes sempre o caçam); a sombra provoca bem menos. 0 desliga (o chefe ignora as sombras como antes).
+export const BOSS_TARGETING = { cloneProvokeRadius: 110, cloneDamageRatio: 1 };     // cloneDamageRatio: o dano dos golpes dele nas sombras, em fração do dano no herói
 // Botões gerais: 1 = como está
 export const BOSS_GLOBAL = { hp: 1, damage: 1, speed: 1 };
 
@@ -392,12 +397,13 @@ function rematch(key, changes) {
 rematch('AZAEL', {
     hpBase: 6000, patternGapSeconds: 1.4, burstCount: 5, ringCount: 16, meleeCooldownSeconds: 0.6,
     // Revanche: já começa com o kit completo e ainda ganha fases
-    patterns: ['lunge', 'combo', 'volley', 'blink'],
+    patterns: ['lunge', 'combo', 'crescent', 'volley', 'blink'],
     phases: [
-        { at: 1, patterns: ['lunge', 'combo', 'volley', 'blink'] },
-        { at: 0.66, label: 'SHADOW LEGION', patterns: ['lunge', 'combo', 'shadows', 'blink', 'ring'] },
-        { at: 0.33, label: 'FULL POWER', patterns: ['combo', 'shadows', 'blink', 'ring', 'combo', 'volley', 'lunge'] }
+        { at: 1, patterns: ['lunge', 'combo', 'crescent', 'volley', 'blink'] },
+        { at: 0.66, label: 'SHADOW LEGION', patterns: ['lunge', 'combo', 'crescent', 'shadows', 'blink', 'ring'] },
+        { at: 0.33, label: 'FULL POWER', patterns: ['combo', 'crescent', 'shadows', 'blink', 'ring', 'crescent', 'combo', 'volley', 'lunge'] }
     ],
+    crescentCount: 5,          // a revanche solta mais meias-luas por onda
     scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
 });
 rematch('DEMON_HUNTER', {
@@ -405,8 +411,8 @@ rematch('DEMON_HUNTER', {
     patterns: ['volley', 'lunge', 'columns', 'slam'],
     phases: [
         { at: 1, patterns: ['volley', 'lunge', 'columns', 'slam'] },
-        { at: 0.66, label: 'HOLY WRATH', patterns: ['volley', 'lunge', 'shackle', 'columns', 'shadows', 'slam', 'ring'] },
-        { at: 0.33, label: 'FULL POWER', patterns: ['columns', 'shackle', 'shadows', 'lunge', 'slam', 'ring', 'volley'] }
+        { at: 0.66, label: 'HOLY WRATH', patterns: ['volley', 'lunge', 'shackle', 'columns', 'shadows', 'slam', 'ring', 'crescent'] },
+        { at: 0.33, label: 'FULL POWER', patterns: ['columns', 'shackle', 'shadows', 'lunge', 'slam', 'ring', 'crescent', 'volley'] }
     ],
     scoreReward: 1500, goldBase: 180, xpRewardBase: 500, xpRewardPerTurn: 0
 });
@@ -499,6 +505,8 @@ export function createBoss(type, turn, x, y, random = Math.random, darkness = 1)
         maxHp: hp,
         damage: model.damage * BOSS_GLOBAL.damage * (1 + BOSS_DARKNESS.damagePerLevel * level),
         speed: model.speed * BOSS_GLOBAL.speed * (1 + BOSS_DARKNESS.speedPerLevel * level),
+        physicalDefense: model.physicalDef ?? 0,    // fração do dano físico / mágico que o chefe não leva (BOSS_STATS); js/systems/damage.js aplica
+        magicDefense: model.magicDef ?? 0,
         knockbackResist: model.knockbackResist ?? BOSS_KNOCKBACK_RESIST,
         unstoppable: !!model.unstoppable,     // não é atrasado, preso nem empurrado (Captain Brutos)
         isBoss: true,

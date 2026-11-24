@@ -116,10 +116,12 @@ export const AZAEL = {
         // Kit curto na hora 1; cada fase abaixo libera golpes novos (mark = marca e reaparece; combo = 3 investidas)
         patterns: ['lunge', 'volley'],
         phases: [
-            { at: 1, patterns: ['lunge', 'volley', 'lunge'] },
-            { at: 0.66, label: 'SHADOW STEP', patterns: ['lunge', 'combo', 'blink', 'volley'] },
-            { at: 0.33, label: 'FULL POWER', patterns: ['combo', 'shadows', 'blink', 'ring', 'lunge', 'volley'] }
+            { at: 1, patterns: ['lunge', 'volley', 'crescent', 'lunge'] },
+            { at: 0.66, label: 'SHADOW STEP', patterns: ['lunge', 'combo', 'crescent', 'blink', 'volley'] },
+            { at: 0.33, label: 'FULL POWER', patterns: ['combo', 'shadows', 'crescent', 'blink', 'ring', 'lunge', 'crescent', 'volley'] }
         ],
+        // Maré Carmesim (crescent): ele corta o ar e solta meias-luas de sangue na direção do herói: quantas por onda, quantas ondas em seguida, alcance, tamanho e dano
+        crescentCount: 3, crescentWaves: 1, crescentSpeed: 420, crescentRange: 560, crescentRadius: 22, crescentDamageMultiplier: 1.0,
         ringCount: 12,
         projectileSpeed: 300,
         enrageSpeedMultiplier: 1.35

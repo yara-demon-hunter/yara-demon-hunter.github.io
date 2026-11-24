@@ -114,9 +114,12 @@ export const HUNTER = {
         patterns: ['volley', 'slam', 'columns'],
         phases: [
             { at: 1, patterns: ['volley', 'slam', 'columns', 'volley'] },
-            { at: 0.66, label: 'HOLY GROUND', patterns: ['volley', 'lunge', 'shackle', 'slam', 'columns'] },
-            { at: 0.33, label: 'FULL POWER', patterns: ['columns', 'shackle', 'shadows', 'lunge', 'slam', 'ring', 'volley'] }
+            { at: 0.66, label: 'HOLY GROUND', patterns: ['volley', 'lunge', 'shackle', 'slam', 'columns', 'crescent'] },
+            { at: 0.33, label: 'FULL POWER', patterns: ['columns', 'shackle', 'shadows', 'lunge', 'slam', 'ring', 'crescent', 'volley'] }
         ],
+        // Maré Carmesim azul (crescent): um corte só (ele já tem muitas skills): meia-lua azul na direção do herói
+        crescentCount: 1, crescentWaves: 1, crescentSpeed: 400, crescentRange: 560, crescentRadius: 24, crescentDamageMultiplier: 1.0,
+        crescentColor: '#38bdf8', crescentFill: 'rgba(37, 99, 235, 0.9)', crescentGlow: 'rgba(96, 165, 250, 0.55)', crescentCore: '#dbeafe',
         ringCount: 14,
         slamCount: 3,
         slamRadius: 70,

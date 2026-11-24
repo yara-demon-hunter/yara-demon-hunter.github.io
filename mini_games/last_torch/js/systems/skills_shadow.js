@@ -275,6 +275,7 @@ function bindShackle(s) {
     const e = s.target;
     s.held = true;
     s.age = 0;
+    s.hold = SHADOW_SHACKLE.holdSeconds * (e.isBoss ? SHADOW_SHACKLE.bossRatio : 1);      // chefe: metade do tempo
     e.chained = true;
     e.chainX = e.x;
     e.chainY = e.y;
@@ -294,7 +295,7 @@ export function updateShackle(dt) {
             releaseShackle();
         } else if (s.held) {
             s.age += dt;
-            if (s.age >= SHADOW_SHACKLE.holdSeconds) {
+            if (s.age >= (s.hold ?? SHADOW_SHACKLE.holdSeconds)) {
                 createExplosion(e.x, e.y, '#a78bfa', 8);
                 releaseShackle();
             }

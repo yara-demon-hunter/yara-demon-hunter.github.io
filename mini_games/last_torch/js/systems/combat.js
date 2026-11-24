@@ -7,7 +7,7 @@ import { dealDamage, ignite } from './damage.js';
 import { createExplosion, hitStop, shakeScreen } from './effects.js';
 import { isFireCasting } from './knives.js';
 import { fireArcaneBolt } from './arcane.js';
-import { launchCrescent, tryExecute } from './skills_blade.js';
+import { feedBloodlust, launchCrescent } from './skills_blade.js';
 import { detonateMark } from './skills_shadow.js';
 import { beamActive, startFury } from './fury.js';
 import { startMove } from './moves.js';
@@ -177,10 +177,10 @@ export function updateAutoAttack(dt) {
             chargeUlt(getFuryChargePerHit());
             // Em pleno dash a marca espera: é o dash que vai detoná-la, com o bônus
             if (e.marked > 0 && player.dashTimer <= 0) detonateMark(e, false);
-            tryExecute(e);
         },
         // Blessed Blade (Avgustino): a lâmina benta soma uma parte pequena da magia a cada golpe (um número só, azul)
         passives.blessedBlade.lvl > 0 ? getSpellDamage() * BLESSED_BLADE.magicRatio : 0);
+    if (hits > 0) feedBloodlust();         // Bloodlust: cada golpe que acerta alguém soma um stack (não precisa matar: com só um chefe em campo ela também sobe)
     launchCrescent(atkAngle);
     if (hits > 0) {
         audio.playHit(hits);

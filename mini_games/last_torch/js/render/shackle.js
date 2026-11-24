@@ -179,7 +179,7 @@ export function renderShackle() {
     if (!s) return;
     const e = s.target;
     if (s.held) {
-        drawHold(e, s.age);
+        drawHold(e, s.age, s.hold);
         return;
     }
     // Em voo: a corrente sai da mão do herói e a ponta brilha

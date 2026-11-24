@@ -181,11 +181,11 @@ export function updateShadowClone(dt) {
         c.maxHp = getCloneMaxHp();
         c.hp = Math.min(c.hp, c.maxHp);
 
-        // O monstro mais perto da tocha que ainda não tem sombra e que a lâmina alcança a partir da área
+        // O monstro mais perto da tocha que ainda não tem sombra (o chefe aceita todas) e que a lâmina alcança a partir da área
         let target = null;
         let best = getCloneArea() + reach * 0.8;
         for (const e of state.enemies) {
-            if (e.hp <= 0 || claimed.has(e)) continue;
+            if (e.hp <= 0 || (claimed.has(e) && !e.isBoss)) continue;      // uma sombra por monstro comum, mas o CHEFE pode ter todas atacando junto
             const d = Math.hypot(e.x - state.coreX, e.y - state.coreY) - e.radius;
             if (d < best) {
                 best = d;

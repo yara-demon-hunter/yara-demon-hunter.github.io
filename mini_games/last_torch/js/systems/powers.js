@@ -4,7 +4,6 @@ import { blast, dealDamage } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen } from './effects.js';
 import { startCast } from './moves.js';
 import { hurtPlayer } from './player.js';
-import { feedBloodlust } from './skills_blade.js';
 import { spreadHex } from './skills_curse.js';
 import { onNatureKill } from './skills_nature.js';
 import { onLightKill } from './skills_light.js';
@@ -316,7 +315,6 @@ function updateTorchBolts(dt) {
 export function onEnemyKilled(e) {
     const heal = getKillHeal();
     if (heal > 0) player.hp = Math.min(player.maxHp, player.hp + heal);
-    feedBloodlust();
     spreadHex(e);
     onNatureKill(e);
     onLightKill(e);

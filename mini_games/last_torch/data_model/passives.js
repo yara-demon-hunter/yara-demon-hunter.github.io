@@ -33,7 +33,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         get desc() {
-            return `Every ${SHADOW_SHACKLE.cooldownSeconds}s you hurl a chain at the strongest monster within dagger range. It stays nailed to that spot for ${SHADOW_SHACKLE.holdSeconds}s, bosses included. A chained monster can still attack, and a boss can still teleport, but neither can walk.`;
+            return `Every ${SHADOW_SHACKLE.cooldownSeconds}s you hurl a chain at the strongest monster within dagger range. It stays nailed to that spot for ${SHADOW_SHACKLE.holdSeconds}s, but only ${Math.round(SHADOW_SHACKLE.holdSeconds * SHADOW_SHACKLE.bossRatio)}s on a boss. A chained monster can still attack, and a boss can still teleport, but neither can walk.`;
         }
     },
     fanOfKnives: {
@@ -73,7 +73,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
         get desc() {
-            return `Your blade finishes off monsters under ${formatPercent(EXECUTIONER.threshold)} health in one brutal cut. Elites under ${formatPercent(EXECUTIONER.eliteThreshold)}. Bosses are immune.`;
+            return `Crimson Tide evolves: every swing throws ${EXECUTIONER.crescents} blood crescents in a fan instead of one, each hitting as hard as the original.`;
         }
     },
     smokeBomb: {
@@ -503,10 +503,10 @@ export const WAR_CRY = {
     bonusSeconds: 3.5
 };
 
-// Executioner: fração da vida abaixo da qual a lâmina termina o serviço
+// Executioner: evolução do golpe da Crimson Tide: a meia-lua de sangue vira `crescents` em leque, abertas `spread` radianos uma da outra
 export const EXECUTIONER = {
-    threshold: 0.12,
-    eliteThreshold: 0.06
+    crescents: 3,
+    spread: 0.3
 };
 
 // Smoke Bomb: o dash deixa um rasto de fumaça. Quem está nela anda devagar e cada golpe que recebe tem uma chance extra de ser crítico
@@ -643,6 +643,7 @@ export const PHOENIX_PACT = {
 export const SHADOW_SHACKLE = {
     cooldownSeconds: 15,        // conta a partir do lançamento
     holdSeconds: 10,
+    bossRatio: 0.5,             // num chefe a corrente segura só esta parte do tempo (50%: 5 s)
     speed: 800                  // velocidade da ponta da corrente
 };
 

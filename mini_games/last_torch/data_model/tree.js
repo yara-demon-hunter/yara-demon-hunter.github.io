@@ -41,7 +41,7 @@ export const TREE_POINTS = {
 // basic = stats e efeitos simples; power = poderes; special = passivas e evoluções
 export const TREE_COSTS = {
     shadow: { basic: 1, power: 1, special: 1 },
-    blade: { basic: 1, power: 2, special: 3 },
+    blade: { basic: 1, power: 3, special: 4 },     // 2026-11-24: era 1/2/3; os stats de dano, ataque e raio ficam em 2 (cost no nó)
     flame: { basic: 1, power: 3, special: 4 },
     curse: { basic: 1, power: 3, special: 4 },
     nature: { basic: 1, power: 2, special: 3 },
@@ -73,20 +73,20 @@ export const req = (id, lvl = 1) => ({ id, lvl });
 
 export const TREE_NODES = [
     // --- LÂMINA: o guerreiro. Força bruta, matar tudo, ser cercado de propósito ---
-    { id: 'damage', branch: 'blade', kind: 'stat', key: 'damage', x: 0, y: 1.5, requires: [] },
+    { id: 'damage', branch: 'blade', kind: 'stat', key: 'damage', cost: 2, x: 0, y: 1.5, requires: [] },
     // Linha da Fúria: matar alimenta matar
     { id: 'frenzyNova', branch: 'blade', kind: 'stat', key: 'frenzyNova', x: 1, y: 0, requires: [req('damage')],
       levelText: (mods) => `Fury charge: +${Math.round(mods.furyCharge * 100)}%`, mods: { furyCharge: 0.06 } },
     { id: 'bloodlust', branch: 'blade', kind: 'power', key: 'bloodlust', x: 2, y: 0, requires: [req('frenzyNova', 2)] },
     { id: 'bloodlustEvolve', branch: 'blade', kind: 'evolve', key: 'bloodlust', x: 3, y: 0, requires: [req('bloodlust', 5)] },
     // Linha do aço: o golpe cada vez mais largo e mortal
-    { id: 'atkSpeed', branch: 'blade', kind: 'stat', key: 'atkSpeed', x: 1, y: 1, requires: [req('damage')] },
+    { id: 'atkSpeed', branch: 'blade', kind: 'stat', key: 'atkSpeed', cost: 2, x: 1, y: 1, requires: [req('damage')] },
     { id: 'slashArc', branch: 'blade', kind: 'stat', key: 'slashArc', x: 2, y: 1, requires: [req('atkSpeed', 2)] },
     { id: 'shadowWhirl', branch: 'blade', kind: 'passive', key: 'shadowWhirl', x: 3, y: 1, requires: [req('slashArc', 2)] },
     { id: 'keenEye', branch: 'blade', kind: 'power', key: 'keenEye', x: 4, y: 1, requires: [req('shadowWhirl')] },
-    { id: 'executioner', branch: 'blade', kind: 'passive', key: 'executioner', x: 4, y: 0, requires: [req('bloodlustEvolve')] },
+    { id: 'executioner', branch: 'blade', kind: 'passive', key: 'executioner', cost: 5, x: 4, y: 0, requires: [req('bloodlustEvolve')] },
     // Linha da força: quebrar o chão
-    { id: 'radius', branch: 'blade', kind: 'stat', key: 'radius', x: 1, y: 2, requires: [req('damage')] },
+    { id: 'radius', branch: 'blade', kind: 'stat', key: 'radius', cost: 2, x: 1, y: 2, requires: [req('damage')] },
     { id: 'knockback', branch: 'blade', kind: 'stat', key: 'knockback', x: 2, y: 2, requires: [req('radius')] },
     { id: 'earthbreaker', branch: 'blade', kind: 'power', key: 'earthbreaker', x: 3, y: 2, requires: [req('knockback', 2)] },
     { id: 'earthbreakerEvolve', branch: 'blade', kind: 'evolve', key: 'earthbreaker', x: 4, y: 2, requires: [req('earthbreaker', 5)] },

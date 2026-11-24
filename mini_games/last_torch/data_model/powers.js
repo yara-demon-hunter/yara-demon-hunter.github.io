@@ -295,7 +295,7 @@ export const POWER_MODELS = {
         name: 'Bloodlust', icon: '🐺', maxLvl: 5,
         get desc() {
             const strongest = this.levels[this.levels.length - 1];
-            return `Every kill adds a stack, up to ${strongest.stacks}. At max level, each stack grants ${formatPercent(strongest.damage)} blade damage and ${formatPercent(strongest.speed)} attack speed. Stacks decay every ${formatNumber(this.decaySeconds)}s after the last kill.`;
+            return `Every swing that hits adds a stack, up to ${strongest.stacks}. At max level, each stack grants ${formatPercent(strongest.damage)} blade damage and ${formatPercent(strongest.speed)} attack speed. Stacks decay every ${formatNumber(this.decaySeconds)}s after the last hit.`;
         },
         get upgrades() {
             return this.levels.map(level =>
@@ -794,7 +794,7 @@ export const EVOLUTIONS = {
             return `At ${minStacks} or more stacks, every swing throws a blood crescent through the horde. At max level, each crescent deals ${formatMultiplier(damage)} blade damage; each stack grants ${formatPercent(stackDamage)} damage and ${formatPercent(stackSpeed)} attack speed, up to ${stacks} stacks. Range: ${range}.`;
         },
         levels: { stacks: 10, damage: 0.03, speed: 0.015, seconds: 3 },
-        crescent: { minStacks: 5, damage: 0.55, speed: 560, range: 340, radius: 26 }
+        crescent: { minStacks: 5, damage: 0.2, speed: 560, range: 340, radius: 26 }
     },
     earthbreaker: {
         name: 'Cataclysm', icon: '🌋',

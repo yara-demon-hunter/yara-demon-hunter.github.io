@@ -37,13 +37,18 @@ export function launchCrescent(angle) {
     if (!powers.bloodlust.evolved) return;
     const C = EVOLUTIONS.bloodlust.crescent;
     if (state.bloodlust.stacks < C.minStacks) return;
-    state.crescents.push({
-        x: player.x, y: player.y, angle,
-        vx: Math.cos(angle) * C.speed, vy: Math.sin(angle) * C.speed,
-        travelled: 0, age: 0,
-        damage: getBladeDamage() * C.damage,
-        struck: new Set()
-    });
+    // Executioner: a meia-lua vira TRÊS em leque (mesmo dano em cada uma) em vez de uma
+    const fan = passives.executioner.lvl > 0 ? EXECUTIONER.crescents : 1;
+    for (let i = 0; i < fan; i++) {
+        const a = angle + (i - (fan - 1) / 2) * EXECUTIONER.spread;
+        state.crescents.push({
+            x: player.x, y: player.y, angle: a,
+            vx: Math.cos(a) * C.speed, vy: Math.sin(a) * C.speed,
+            travelled: 0, age: 0,
+            damage: getBladeDamage() * C.damage,
+            struck: new Set()
+        });
+    }
 }
 
 function updateCrescents(dt) {
@@ -190,20 +195,6 @@ function updateWarCry(dt) {
     if (around < WAR_CRY.monsters) return;
     timers.warCry = WAR_CRY.cooldownSeconds;
     startMove('roar', warCryImpact);
-}
-
-// --- EXECUTIONER ---
-// Chamado a cada monstro atingido pela lâmina do herói
-export function tryExecute(e) {
-    if (passives.executioner.lvl <= 0 || e.isBoss || e.hp <= 0) return;
-    if (e.hp > e.maxHp * (e.elite ? EXECUTIONER.eliteThreshold : EXECUTIONER.threshold)) return;
-    state.run.damage += e.hp;
-    e.hp = 0;
-    state.executions.push({ x: e.x, y: e.y, angle: Math.random() * TAU, age: 0, seconds: 0.26, radius: e.radius });
-    createExplosion(e.x, e.y, '#dc2626', 10);
-    hitStop(0.035);
-    shakeScreen(3);
-    audio.playExecute();
 }
 
 export function updateBladeSkills(dt) {
