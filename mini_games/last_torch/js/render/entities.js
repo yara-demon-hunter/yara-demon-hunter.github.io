@@ -194,6 +194,38 @@ export function renderBladeSlashes() {
 export function renderEnemyProjectiles() {
     if (state.enemyProjectiles.length === 0) return;
     for (const p of state.enemyProjectiles) {
+        // Caveira do Grave King: crânio de osso com olhos vermelhos e a MANDÍBULA batendo (rindo); nos últimos instantes os olhos piscam e ela incha
+        if (p.skull) {
+            resetWorldView();
+            const left = p.life - p.age;
+            const swell = 1 + (left < 0.9 ? (0.9 - left) * 0.35 : 0);
+            const r = p.radius * swell;
+            const jaw = Math.abs(Math.sin(p.age * 14)) * r * 0.35;            // abre e fecha depressa: a risada
+            const face = Math.atan2(p.vy, p.vx) > -Math.PI / 2 && Math.atan2(p.vy, p.vx) < Math.PI / 2 ? 1 : -1;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.scale(face, 1);
+            drawGlow(ctx, 'rgba(239, 68, 68, 0.45)', 0, 0, r * 2.2, 0.5);
+            ctx.fillStyle = '#e8e0c8';
+            ctx.strokeStyle = '#3a3226';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath(); ctx.ellipse(0, -r * 0.15, r, r * 0.9, 0, 0, TAU); ctx.fill(); ctx.stroke();          // crânio
+            ctx.beginPath(); ctx.roundRect(-r * 0.55, r * 0.45 + jaw, r * 1.1, r * 0.45, r * 0.15); ctx.fill(); ctx.stroke();   // mandíbula
+            ctx.fillStyle = '#1a1412';
+            for (let k = -2; k <= 2; k++) ctx.fillRect(k * r * 0.2 - r * 0.05, r * 0.45 + jaw, r * 0.1, r * 0.16);              // dentes de baixo
+            for (let k = -2; k <= 2; k++) ctx.fillRect(k * r * 0.2 - r * 0.05, r * 0.38, r * 0.1, r * 0.14);                    // dentes de cima
+            const blink = left < 0.9 && Math.floor(p.age * 12) % 2 ? '#fde68a' : '#ef4444';
+            for (const sx of [-0.38, 0.38]) {
+                ctx.fillStyle = '#1a1412';
+                ctx.beginPath(); ctx.ellipse(sx * r, -r * 0.12, r * 0.26, r * 0.3, 0, 0, TAU); ctx.fill();
+                ctx.fillStyle = blink;
+                ctx.beginPath(); ctx.arc(sx * r, -r * 0.1, r * 0.11, 0, TAU); ctx.fill();
+            }
+            ctx.fillStyle = '#1a1412';
+            ctx.beginPath(); ctx.moveTo(0, r * 0.08); ctx.lineTo(-r * 0.1, r * 0.28); ctx.lineTo(r * 0.1, r * 0.28); ctx.closePath(); ctx.fill();    // nariz
+            ctx.restore();
+            continue;
+        }
         // Bolha do Slizork: translúcida, pulsa e, nos últimos instantes, pisca em vermelho avisando que vai estourar
         if (p.bubble) {
             resetWorldView();

@@ -576,7 +576,8 @@ export function updateEnemies(dt) {
         // Arbusto da emboscada: com o herói escondido, o monstro comum não o vê e segue para a tocha. Carvalho acordado: o
         // monstro por perto vai bater nele. Boss não se deixa enganar
         const lured = lure && !e.isBoss && !model.ignoresPlayer && Math.hypot(lure.x - e.x, lure.y - e.y) < lure.lures;
-        const huntsPlayer = !model.ignoresPlayer && distToPlayer < provoked;
+        // O chefe SEMPRE caça o herói (de qualquer distância): antes ele só vinha dentro do raio de provocação dos monstros comuns e, fora dele, ia para a tocha
+        const huntsPlayer = !model.ignoresPlayer && (e.isBoss || distToPlayer < provoked);
         // Convertido do Avgustino por perto (Conversion): provoca o monstro comum, que vai bater nele. Boss não se deixa provocar
         const ally = !lured && !e.isBoss && !e.shadowOwner && !model.ignoresPlayer ? provokingConvert(e) : null;
         const targetX = lured ? lure.x : ally ? ally.x : huntsPlayer ? player.x : state.coreX;
@@ -825,8 +826,9 @@ function updateBubble(p, i, dt) {
     p.y += p.vy * dt;
     if (p.age >= p.life || d < p.radius + CHARACTER_MODEL.collisionRadius) {
         enemyProjectiles.splice(i, 1);
-        addShockwave(p.x, p.y, { radius: p.burstRadius, color: '#86efac', width: 5, seconds: 0.3 });
-        createExplosion(p.x, p.y, '#86efac', 16);
+        addShockwave(p.x, p.y, { radius: p.burstRadius, color: p.burstColor ?? '#86efac', width: 5, seconds: 0.3 });
+        createExplosion(p.x, p.y, p.burstColor ?? '#86efac', 16);
+        if (p.skull) shakeScreen(5);
         audio.playBlast();
         if (Math.hypot(player.x - p.x, player.y - p.y) < p.burstRadius + CHARACTER_MODEL.collisionRadius) {
             hurtPlayer(p.damage, p.x, p.y, CHARACTER_MODEL.projectileInvulnerabilitySeconds);

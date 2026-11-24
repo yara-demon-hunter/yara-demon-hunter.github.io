@@ -195,6 +195,52 @@ export function renderTelegraphs() {
             ctx.globalAlpha = 1;
             return;
         }
+        if (t.drop) {
+            // Gota d'água grande caindo do céu: sombra azulada crescendo e a gota descendo (formato de lágrima, ponta para cima)
+            ctx.fillStyle = `rgba(14, 90, 150, ${0.15 + 0.35 * p})`;
+            ctx.beginPath(); ctx.ellipse(t.x, t.y, t.radius * (0.4 + 0.6 * p), t.radius * 0.45 * (0.4 + 0.6 * p), 0, 0, TAU); ctx.fill();
+            ctx.strokeStyle = `rgba(125, 211, 252, ${0.35 + 0.45 * p})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.ellipse(t.x, t.y, t.radius, t.radius * 0.45, 0, 0, TAU); ctx.stroke();
+            const h = (1 - p) * 280;
+            const r = 9;
+            ctx.save();
+            ctx.translate(t.x, t.y - h - r);
+            ctx.globalAlpha = Math.min(1, p * 3);
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.85)';
+            ctx.strokeStyle = '#0c4a6e';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, -r * 2.2);
+            ctx.quadraticCurveTo(r * 1.1, -r * 0.4, r, r * 0.2);
+            ctx.arc(0, r * 0.2, r, 0, Math.PI);
+            ctx.quadraticCurveTo(-r * 1.1, -r * 0.4, 0, -r * 2.2);
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+            ctx.beginPath(); ctx.ellipse(-r * 0.35, -r * 0.1, r * 0.22, r * 0.4, 0, 0, TAU); ctx.fill();
+            ctx.restore();
+            return;
+        }
+        if (t.bone) {
+            // Osso caindo do céu: a sombra cresce no chão e o osso desce girando até bater
+            ctx.fillStyle = `rgba(0, 0, 0, ${0.15 + 0.35 * p})`;
+            ctx.beginPath(); ctx.ellipse(t.x, t.y, t.radius * (0.4 + 0.6 * p), t.radius * 0.45 * (0.4 + 0.6 * p), 0, 0, TAU); ctx.fill();
+            ctx.strokeStyle = `rgba(231, 224, 207, ${0.35 + 0.4 * p})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.ellipse(t.x, t.y, t.radius, t.radius * 0.45, 0, 0, TAU); ctx.stroke();
+            const h = (1 - easeOutCubic(p) * 0.15 - p * 0.85) * 260;
+            ctx.save();
+            ctx.translate(t.x, t.y - h);
+            ctx.rotate(t.spin + t.age * 9);
+            ctx.globalAlpha = Math.min(1, p * 3);
+            ctx.fillStyle = '#e7e0cf';
+            ctx.strokeStyle = '#4a4232';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.roundRect(-13, -3, 26, 6, 3); ctx.fill(); ctx.stroke();
+            for (const sx of [-13, 13]) for (const sy of [-3.5, 3.5]) { ctx.beginPath(); ctx.arc(sx, sy, 4, 0, TAU); ctx.fill(); ctx.stroke(); }
+            ctx.restore();
+            return;
+        }
         ctx.fillStyle = t.goo ? `rgba(74, 222, 128, ${0.16 + 0.1 * p})` : T.fill;
         ctx.strokeStyle = t.goo ? '#86efac' : T.color;
         ctx.lineWidth = 2.5;

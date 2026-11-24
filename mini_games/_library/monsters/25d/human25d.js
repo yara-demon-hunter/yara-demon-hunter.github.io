@@ -21,7 +21,7 @@ import { meleePose, meleeState } from './melee25d.js';
 //   tail / wings / cape   true = rabo, asas pequenas, capa
 //   claws     true = garras nas mãos
 //   (Rei do Cemitério) helmet 'skull' = elmo aberto de espinhos com a CAVEIRA à mostra e rabo de crina no topo; spikes = espinhos nas ombreiras;
-//   boneHands = mãos de esqueleto saindo da manga de placas; mail = saia de cota de malha; skullBuckle = fivela de caveira; weapon 'greatsword' = espadão que ARRASTA
+//   boneHands = mãos de esqueleto saindo da manga de placas; mail = saia de cota de malha; sabatons = botas de metal em placas; skullBuckle = fivela de caveira; weapon 'greatsword' = espadão que ARRASTA
 //   boneArms / boneLegs / ribs / dragLeg  (zumbi) true = braços de osso / pernas de osso / costelas aparecendo no peito rasgado / uma perna que arrasta (S.dragSide: 1 direita, -1 esquerda)
 //   armsForward true = braços esticados à frente (zumbi), balançando com a passada; armsBare true = braços sem manga (pele)
 // Coordenadas locais: a = frente, b = direita, z = altura. Uso: registerHuman(id, S) e depois renderMonster25D(e, id, S).
@@ -54,6 +54,24 @@ export function registerHuman(id, S) {
         olimb(rig, [hip, knee], S.legWidth, greaves ? C.armorDark : color);
         olimb(rig, [knee, ankle], S.legWidth + 0.2, color);
         if (greaves) oball(rig, knee, S.legWidth * 0.62, C.armorLight);
+        if (L.sabatons) {
+            // Bota medieval de metal (sabatão): punho do tornozelo com friso de bronze, pé em placas sobrepostas que afinam até a ponta, sola escura
+            const { limb } = rig;
+            const toeTip = [toe[0] + 1.6, toe[1], Math.max(0.35, toe[2] - 0.15)];
+            oball(rig, [ankle[0], ankle[1], ankle[2] + 0.5], S.legWidth * 0.72, C.armorDark);
+            limb([[ankle[0] - S.legWidth * 0.55, ankle[1], ankle[2] + 0.9], [ankle[0] + S.legWidth * 0.6, ankle[1], ankle[2] + 0.9]], 0.5, C.trim ?? C.armorLight);
+            for (let q = 0; q < 3; q++) {                                                                       // placas do pé
+                const k = q / 3;
+                const p0 = mix([ankle[0] + 0.2, ankle[1], ankle[2] * 0.9 + 0.3], toeTip, k);
+                const p1 = mix([ankle[0] + 0.2, ankle[1], ankle[2] * 0.9 + 0.3], toeTip, k + 0.4);
+                const w = S.legWidth * (1.05 - k * 0.55);
+                olimb(rig, [p0, p1], w, q % 2 ? C.armor : C.armorDark);
+            }
+            ball([toeTip[0] - 0.1, toeTip[1], toeTip[2] + 0.1], 0.35, C.armorLight);
+            // Joelheira com um espinho curto
+            limb([[knee[0] + 0.4, knee[1], knee[2] + 0.2], [knee[0] + 1.5, knee[1], knee[2] + 0.5]], 0.5, C.armorLight);
+            return;
+        }
         olimb(rig, [ankle, [toe[0] + 0.6, toe[1], toe[2]]], S.legWidth + 0.5, greaves ? C.armorDark : C.boot);
         if (L.legs === 'cloth' && L.torso !== 'bare') ball([knee[0], knee[1], knee[2]], 0.2, color);
     }
@@ -170,7 +188,7 @@ export function registerHuman(id, S) {
             const d = norm(sub(hand, elbow));
             const sd = norm([-d[1], d[0], 0]);
             oball(rig, hand, S.handRadius * 0.7, C.bone);
-            for (const k of [-1.1, -0.4, 0.35, 1.05]) {
+            for (const k of (L.weapon === 'greatsword' && side > 0 ? [] : [-1.1, -0.4, 0.35, 1.05])) {        // a mão da espada já fecha os dedos no cabo
                 const knuckle = add(add(hand, d, 0.6), sd, k * 0.45);
                 const tip = add(add(add(knuckle, d, 1.1), sd, k * 0.15), [0, 0, 1], -0.7);
                 limb([knuckle, tip], 0.42, C.boneDark);
@@ -216,16 +234,26 @@ export function registerHuman(id, S) {
         const flat = Math.hypot(dir[0], dir[1]);
         const side = flat > 0.05 ? [-dir[1] / flat, dir[0] / flat, 0] : [0, 1, 0];
         if (L.weapon === 'greatsword') {
-            // Espadão largo e gasto: cabo com pomo, guarda comprida de pontas curvas, lâmina larga com o sulco no meio
+            // Espadão largo e gasto: a MÃO fica no meio do cabo (pomo acima dela, guarda logo abaixo), guarda comprida de pontas curvas, lâmina larga com sulco
             const len = S.weaponLength;
-            limb([at(hand, dir, -2.2), at(hand, dir, 0.6)], 1.0, C.grip);
-            ball(at(hand, dir, -2.5), 0.75, C.metalDark);
-            const g = at(hand, dir, 0.9);
-            limb([add(add(g, side, -2.4), dir, 0.6), add(g, side, -1.2), add(g, side, 1.2), add(add(g, side, 2.4), dir, 0.6)], 1.0, C.outline);
-            limb([add(add(g, side, -2.4), dir, 0.6), add(g, side, -1.2), add(g, side, 1.2), add(add(g, side, 2.4), dir, 0.6)], 0.7, C.metalDark);
-            poly(rig, [add(at(hand, dir, 1.1), side, -1.0), add(at(hand, dir, len - 1.6), side, -0.85), at(hand, dir, len), add(at(hand, dir, len - 1.6), side, 0.85), add(at(hand, dir, 1.1), side, 1.0)], C.metal, C.outline, 0.4);
-            limb([at(hand, dir, 1.6), at(hand, dir, len - 2.2)], 0.36, C.metalDark);
-            limb([add(at(hand, dir, 1.5), side, 0.55), add(at(hand, dir, len - 1.8), side, 0.45)], 0.18, C.metalLight);
+            const bw = S.bladeHalfWidth ?? 1.3;
+            limb([at(hand, dir, -1.3), at(hand, dir, 1.3)], 1.1, C.grip);
+            ball(at(hand, dir, -1.6), 0.8, C.metalDark);
+            const g = at(hand, dir, 1.6);
+            limb([add(add(g, side, -2.8), dir, 0.7), add(g, side, -1.3), add(g, side, 1.3), add(add(g, side, 2.8), dir, 0.7)], 1.15, C.outline);
+            limb([add(add(g, side, -2.8), dir, 0.7), add(g, side, -1.3), add(g, side, 1.3), add(add(g, side, 2.8), dir, 0.7)], 0.8, C.metalDark);
+            poly(rig, [add(at(hand, dir, 1.8), side, -bw), add(at(hand, dir, len - 2), side, -bw * 0.85), at(hand, dir, len), add(at(hand, dir, len - 2), side, bw * 0.85), add(at(hand, dir, 1.8), side, bw)], C.metal, C.outline, 0.45);
+            limb([at(hand, dir, 2.3), at(hand, dir, len - 2.6)], 0.45, C.metalDark);
+            limb([add(at(hand, dir, 2.2), side, bw * 0.55), add(at(hand, dir, len - 2.2), side, bw * 0.45)], 0.2, C.metalLight);
+            if (L.boneHands) {
+                // Dedos de osso FECHADOS em volta do cabo (desenhados por cima dele): é o que mostra que ele segura a espada
+                for (const k of [-0.7, -0.15, 0.4, 0.95]) {
+                    const f = add(at(hand, dir, k), [0, 0, 1], 0.45);
+                    ball(f, 0.5, C.boneDark);
+                    ball(f, 0.38, C.bone);
+                }
+                ball(add(at(hand, dir, -0.2), side, -0.7), 0.45, C.bone);       // polegar
+            }
         } else if (L.weapon === 'sword') {
             const len = S.weaponLength;
             limb([at(hand, dir, -1.6), at(hand, dir, 0.5)], 0.9, C.grip);

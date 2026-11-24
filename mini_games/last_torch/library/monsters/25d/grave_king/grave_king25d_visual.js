@@ -5,12 +5,12 @@ import { HUMAN_DEFAULTS, HUMAN_COLORS } from '../human25d_visual.js';
 // Chefe do Graveyard (onda 12), pela imagem de referência art_reference/images/grave-king.webp: cavaleiro morto-vivo em armadura NEGRA de placas com
 // frisos de BRONZE escuro e rebites, elmo de espinhos aberto na frente mostrando a CAVEIRA de olhos vermelhos, pino no topo com rabo de crina vermelha,
 // ombreiras grandes com espinhos e medalhões de caveira, mãos de ESQUELETO saindo das manoplas, saia de cota de malha, fivela de caveira, capa comprida
-// e RASGADA e um espadão largo que ele arrasta pelo chão. Montado por human25d.js (as escolhas ficam em `look`).
+// e RASGADA, botas de metal negras em placas e um espadão largo que ele arrasta pelo chão. Montado por human25d.js (as escolhas ficam em `look`).
 export const GRAVE_KING_25D_VISUALS = {
     ...HUMAN_DEFAULTS,
     look: {
         legs: 'greaves', torso: 'plate', pauldrons: true, spikes: true, tabard: null, helmet: 'skull', plume: true, weapon: 'greatsword', shield: false,
-        tail: false, wings: false, cape: true, claws: false, boneHands: true, mail: true, skullBuckle: true
+        tail: false, wings: false, cape: true, claws: false, boneHands: true, mail: true, skullBuckle: true, sabatons: true
     },
     colors: {
         ...HUMAN_COLORS,
@@ -29,8 +29,9 @@ export const GRAVE_KING_25D_VISUALS = {
     // Capa comprida (a padrão do boneco já tem a barra dentada, que vira o pano rasgado)
     capeSpread: 1.25, capeHemSpread: 1.35, capeLength: 1.05,
     strideSpeed: 4.6,
-    weaponLength: 14,
-    bodyScale: 1.28,
+    weaponLength: 16.5,
+    bladeHalfWidth: 1.35,     // espadão mais grosso
+    bodyScale: 1.12,
     chestWiden: 1.2,
     shoulderScale: 1.18,
     pauldronRadius: 3.0,
@@ -38,6 +39,6 @@ export const GRAVE_KING_25D_VISUALS = {
     armWidth: 2.3,
     handRadius: 1.0,
     headRadius: 2.45,
-    plumeLength: 6.5,
+    plumeLength: 9.658,
     center: 12.5
 };

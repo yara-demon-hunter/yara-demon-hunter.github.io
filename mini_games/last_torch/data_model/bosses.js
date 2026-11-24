@@ -184,12 +184,14 @@ export const BOSS_MODELS = {
         burstIntervalSeconds: 0.32,
         initialShootCooldownSeconds: 1.5,
         patternGapSeconds: 2.3,
-        patterns: ['blink', 'volley', 'ring', 'spiral', 'summon'],
+        patterns: ['blink', 'volley', 'rainfall', 'spiral', 'summon'],
         phases: [
-            { at: 1, patterns: ['blink', 'volley', 'ring', 'summon'] },
-            { at: 0.6, label: 'RISING TIDE', patterns: ['blink', 'spiral', 'volley', 'ring', 'summon'] },
-            { at: 0.3, label: 'THE RIVER REMEMBERS', patterns: ['spiral', 'blink', 'ring', 'volley', 'spiral', 'summon'] }
+            { at: 1, patterns: ['blink', 'volley', 'rainfall', 'summon'] },
+            { at: 0.6, label: 'RISING TIDE', patterns: ['blink', 'spiral', 'volley', 'rainfall', 'summon'] },
+            { at: 0.3, label: 'THE RIVER REMEMBERS', patterns: ['spiral', 'blink', 'rainfall', 'volley', 'spiral', 'summon'] }
         ],
+        // Chuva: quantas gotas, espalhadas até quantos px do herói, raio de cada uma e tempo de queda (s)
+        dropCount: 10, dropSpread: 200, dropRadius: 36, dropFallSeconds: 1.0,
         ringCount: 14,
         spiralShots: 16,
         spiralIntervalSeconds: 0.13,
@@ -264,27 +266,33 @@ export const BOSS_MODELS = {
         hpPerTurn: 0,
         speedMin: 34,
         speedMax: 34,
-        radius: 30,
+        radius: 26,
         color: '#7f996a',
         damage: 32,
         burstCount: 5,
         burstIntervalSeconds: 0.3,
         initialShootCooldownSeconds: 1.5,
         patternGapSeconds: 2.1,
-        patterns: ['slam', 'volley', 'summon', 'ring', 'slam'],
+        // Sem tiros: ele vem andando e CORTA com o espadão quando o herói chega perto (melee); de longe só bate no chão (slam) e chama os mortos (summon)
+        patterns: ['dash', 'skulls', 'bonerain', 'summon'],
         phases: [
-            { at: 1, patterns: ['slam', 'volley', 'summon', 'ring'] },
-            { at: 0.6, label: 'THE DEAD RISE', patterns: ['summon', 'slam', 'volley', 'ring', 'summon'] },
-            { at: 0.3, label: 'ROT AND RUIN', patterns: ['slam', 'summon', 'ring', 'slam', 'volley', 'summon', 'spiral'] }
+            { at: 1, patterns: ['dash', 'skulls', 'bonerain', 'summon'] },
+            { at: 0.6, label: 'THE DEAD RISE', patterns: ['summon', 'skulls', 'dash', 'bonerain', 'skulls'] },
+            { at: 0.3, label: 'ROT AND RUIN', patterns: ['skulls', 'dash', 'bonerain', 'summon', 'dash', 'bonerain'] }
         ],
-        ringCount: 16,
+        // Chuva de ossos: quantos caem, espalhados até quantos px do herói, raio de cada um e tempo de queda (s)
+        boneCount: 9, boneSpread: 190, boneRadius: 34, boneFallSeconds: 1.0,
+        // Avanço (dash): até quantos px corre, aviso (s), duração da corrida (s), largura da área que acerta e dano de quem for atropelado
+        dashLength: 300, lungeWindupSeconds: 0.35, lungeSeconds: 0.22, lungeHitRadius: 40, lungeDamageMultiplier: 0.8,
+        // Caveiras que perseguem rindo e explodem: quantas, vida (s), velocidade e raio da explosão
+        skullCount: 2, skullLife: 4.5, skullSpeed: 115, skullBurstRadius: 70,
+        // Corte de espada de perto: alcance (px além do corpo), duração da animação (s), momento do corte (0 a 1), abertura do leque (rad), dano e intervalo
+        melee: { range: 95, seconds: 0.95, strikeAt: 0.5, arc: 2.1, damageMultiplier: 1.25, cooldown: 1.4, firstDelay: 0.6 },
         slamCount: 4,
         slamRadius: 78,
         slamDelaySeconds: 0.95,
         slamDamageMultiplier: 0.9,
         slamTorchDamage: 9,
-        spiralShots: 18,
-        spiralIntervalSeconds: 0.12,
         summonType: 'ZOMBIE',
         summonCount: 4,
         projectileSpeed: 175,

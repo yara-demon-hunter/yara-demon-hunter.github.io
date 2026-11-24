@@ -66,7 +66,7 @@ export function addSlam(x, y, radius, delay, damage, color = null, torchDamage =
 const TELL_SECONDS = 0.55;
 const LUNGE_WINDUP_SCALE = 1.5;     // aviso da investida 50% mais longo
 const LUNGE_TIME_SCALE = 1.5;       // e a corrida em si 50% mais lenta
-const TELLED = new Set(['frenzy', 'claws', 'bubbles', 'goo', 'volley', 'ring', 'spiral', 'shackle', 'fireshield', 'bloodfog', 'darkness', 'holyground', 'mirror']);
+const TELLED = new Set(['skulls', 'frenzy', 'claws', 'bubbles', 'goo', 'volley', 'ring', 'spiral', 'shackle', 'fireshield', 'bloodfog', 'darkness', 'holyground', 'mirror']);
 // Correntes do Demon Hunter (a skill Shadow Shackle virada contra o herói): voam a 700 px/s e prendem por 1,5 s.
 // Quem estiver em dash (ou invulnerável) na hora em que a ponta chega escapa: a corrente erra e se desfaz.
 export const BOSS_SHACKLE = { speed: 700, holdSeconds: 1.5 };
@@ -348,6 +348,55 @@ const ACTIONS = {
         audio.playBossRoar();
         later(ai, secs, () => { e.speed /= m; e.frenzy = false; if (e.hp > e.maxHp * model.enrageRatio) e.enraged = false; });
     },
+    // Grave King, avanço: um DASH curto e rápido até perto do herói (para logo antes dele), para emendar o corte de espada. Usa a investida dos rivais
+    // (aviso + corrida, updateLunge) com o comprimento cortado na distância até o herói
+    dash(e, model, ai) {
+        const dist = Math.hypot(player.x - e.x, player.y - e.y);
+        const length = Math.max(60, Math.min(model.dashLength ?? 300, dist - e.radius - 24));
+        ACTIONS.lunge(e, { ...model, lungeLength: length }, ai);
+    },
+    // Grave King, chuva de ossos: ossos caem do céu em volta do herói, um depois do outro. A sombra no chão cresce mostrando onde cada um vai cair
+    // (dá para fugir das sombras); o primeiro mira o lugar onde o herói está
+    bonerain(e, model) {
+        const n = model.boneCount ?? 9;
+        for (let i = 0; i < n; i++) {
+            const a = Math.random() * TAU, d = i === 0 ? 0 : 50 + Math.random() * (model.boneSpread ?? 190);
+            state.telegraphs.push({
+                kind: 'circle', bone: true, x: clampX(player.x + Math.cos(a) * d), y: clampY(player.y + Math.sin(a) * d), radius: model.boneRadius ?? 34,
+                age: -i * 0.12, seconds: model.boneFallSeconds ?? 1.0, damage: e.damage * 0.6, color: null, torchDamage: 4, shockColor: '#e7e0cf', spin: Math.random() * TAU
+            });
+        }
+        audio.playBossAttack();
+    },
+    // River Spirit, chuva: o mesmo golpe da chuva de ossos, mas caem GOTAS DE ÁGUA grandes (sombra azul no chão, gota descendo, respingo ao bater)
+    rainfall(e, model) {
+        const n = model.dropCount ?? 10;
+        for (let i = 0; i < n; i++) {
+            const a = Math.random() * TAU, d = i === 0 ? 0 : 50 + Math.random() * (model.dropSpread ?? 200);
+            state.telegraphs.push({
+                kind: 'circle', drop: true, x: clampX(player.x + Math.cos(a) * d), y: clampY(player.y + Math.sin(a) * d), radius: model.dropRadius ?? 36,
+                age: -i * 0.11, seconds: model.dropFallSeconds ?? 1.0, damage: e.damage * 0.6, color: null, torchDamage: 4, shockColor: '#7dd3fc'
+            });
+        }
+        audio.playBossAttack();
+    },
+    // Grave King, caveira: solta caveiras que SEGUEM o herói por alguns segundos, batendo a mandíbula como se rissem, e depois explodem
+    // (mesmo voo das bolhas do Slizork: js/systems/enemies.js, updateBubble; desenho em js/render/entities.js)
+    skulls(e, model) {
+        const n = model.skullCount ?? 2;
+        const base = aimAngle(e);
+        for (let i = 0; i < n; i++) {
+            const a = base + (i - (n - 1) / 2) * 0.9;
+            state.enemyProjectiles.push({
+                owner: e.type, bubble: true, skull: true, age: 0, life: model.skullLife ?? 4.5, color: '#e5e0cf', range: 0, travelled: 0,
+                x: e.x + Math.cos(a) * e.radius, y: e.y + Math.sin(a) * e.radius,
+                vx: Math.cos(a) * 120, vy: Math.sin(a) * 120, radius: 14, speed: model.skullSpeed ?? 115,
+                burstRadius: model.skullBurstRadius ?? 70, burstColor: '#f87171', damage: e.damage * 0.95, torchDamage: 0
+            });
+        }
+        createExplosion(e.x, e.y, '#a8a29e', 14);
+        audio.playBossAttack();
+    },
     // Slizork, gosma: uma poça de gosma verde é marcada no chão onde o herói está; se ele ainda estiver nela quando estoura, os pés ficam presos por alguns segundos
     goo(e, model) {
         state.telegraphs.push({
@@ -585,8 +634,51 @@ export function forceBossAction(e, model, action) {
     return true;
 }
 
+// Golpe de espada de perto (model.melee, o Grave King): quando o herói chega perto ele para, ergue a espada e corta à frente. A animação é a mesma do
+// Ateliê (o boneco lê e.atk de 0 a 1: prepara, golpeia, recolhe). Enquanto corta, nenhum outro golpe começa. Devolve true enquanto o golpe dura.
+function updateBossMelee(e, model, dt) {
+    const M = model.melee;
+    e.meleeCooldown = Math.max(0, (e.meleeCooldown ?? M.firstDelay ?? 0.6) - dt);
+    if (e.atkT === undefined || e.atkT === null) {
+        const dist = Math.hypot(player.x - e.x, player.y - e.y);
+        if (e.meleeCooldown > 0 || dist > M.range + e.radius || state.phase !== 'HUNT') return false;
+        e.atkT = 0;
+        e.atkAngle = aimAngle(e);
+        e.atkHit = false;
+        e.holdAim = true;                                    // fica parado enquanto corta
+    }
+    e.atkT += dt;
+    const p = Math.min(1, e.atkT / M.seconds);
+    e.atk = p;
+    e.angle = e.atkAngle;
+    if (!e.atkHit && p >= M.strikeAt) {
+        e.atkHit = true;
+        // O corte: um leque à frente dele, do tamanho do alcance da espada
+        const tipX = e.x + Math.cos(e.atkAngle) * (M.range * 0.7 + e.radius), tipY = e.y + Math.sin(e.atkAngle) * (M.range * 0.7 + e.radius);
+        state.telegraphs.push({ kind: 'scar', x: e.x + Math.cos(e.atkAngle - 0.9) * (M.range * 0.8 + e.radius), y: e.y + Math.sin(e.atkAngle - 0.9) * (M.range * 0.8 + e.radius),
+            toX: e.x + Math.cos(e.atkAngle + 0.9) * (M.range * 0.8 + e.radius), toY: e.y + Math.sin(e.atkAngle + 0.9) * (M.range * 0.8 + e.radius), age: 0, seconds: 0.35 });
+        addShockwave(tipX, tipY, { radius: 46, color: '#e5e7eb', width: 4, seconds: 0.25 });
+        shakeScreen(6);
+        audio.playBossAttack();
+        const dx = player.x - e.x, dy = player.y - e.y;
+        let diff = Math.atan2(dy, dx) - e.atkAngle;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        if (Math.hypot(dx, dy) < M.range + e.radius + 14 && Math.abs(diff) < M.arc / 2) hurtPlayer(e.damage * M.damageMultiplier, e.x, e.y, 0.6);
+    }
+    if (p >= 1) {
+        e.atkT = null;
+        e.atk = 0;
+        e.holdAim = false;
+        e.meleeCooldown = M.cooldown * (e.enraged ? 0.75 : 1);
+        return false;
+    }
+    return true;
+}
+
 export function updateBossAI(e, model, dt) {
     const ai = e.ai ?? (e.ai = { step: 0, shots: 0, interval: 0, wait: 0, fire: null });
+    if (model.melee && !ai.lunge && updateBossMelee(e, model, dt)) return;
 
     if (!e.enraged && e.hp < e.maxHp * model.enrageRatio) enrage(e, model);
 
@@ -778,7 +870,7 @@ export function updateTelegraphs(dt) {
             if (hit) hurtPlayer(t.damage, t.lines[1].x1, t.lines[1].y1, 0.5);
         } else if (t.kind === 'circle') {
             addShockwave(t.x, t.y, { radius: t.radius, color: t.shockColor ?? '#f87171', width: 7, seconds: 0.3 });
-            createExplosion(t.x, t.y, t.goo ? '#4ade80' : t.shockColor ? '#a8a29e' : '#f97316', 16);
+            createExplosion(t.x, t.y, t.goo ? '#4ade80' : t.bone ? '#e7e0cf' : t.drop ? '#7dd3fc' : t.shockColor ? '#a8a29e' : '#f97316', 16);
             shakeScreen(5);
             audio.playBlast();
             if (Math.hypot(player.x - t.x, player.y - t.y) < t.radius) hurtPlayer(t.damage, t.x, t.y, 0.5);
