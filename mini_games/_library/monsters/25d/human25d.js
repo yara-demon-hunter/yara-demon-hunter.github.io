@@ -20,6 +20,8 @@ import { meleePose, meleeState } from './melee25d.js';
 //   shield    true = escudo redondo na mão livre
 //   tail / wings / cape   true = rabo, asas pequenas, capa
 //   claws     true = garras nas mãos
+//   (Rei do Cemitério) helmet 'skull' = elmo aberto de espinhos com a CAVEIRA à mostra e rabo de crina no topo; spikes = espinhos nas ombreiras;
+//   boneHands = mãos de esqueleto saindo da manga de placas; mail = saia de cota de malha; skullBuckle = fivela de caveira; weapon 'greatsword' = espadão que ARRASTA
 //   boneArms / boneLegs / ribs / dragLeg  (zumbi) true = braços de osso / pernas de osso / costelas aparecendo no peito rasgado / uma perna que arrasta (S.dragSide: 1 direita, -1 esquerda)
 //   armsForward true = braços esticados à frente (zumbi), balançando com a passada; armsBare true = braços sem manga (pele)
 // Coordenadas locais: a = frente, b = direita, z = altura. Uso: registerHuman(id, S) e depois renderMonster25D(e, id, S).
@@ -63,8 +65,19 @@ export function registerHuman(id, S) {
         trunk(rig, bottom, top, wb, wt, body, C.outline, S.chestWiden ?? 1, L.torso === 'plate' ? C.armorLight : L.torso === 'bare' ? C.skin : C.clothLight);
         const beltZ = bottom.z + 1.4;
         frontArc(rig, bottom.a, beltZ, bottom.A * 1.08, bottom.B * 1.08, 1.3, C.belt);
+        if (L.mail) {
+            // Saia de cota de malha: faixas de anéis do cinto para baixo, na frente e dos lados
+            for (let i = 0; i < 4; i++) frontArc(rig, bottom.a, beltZ - 1.1 - i * 1.05, bottom.A * (1.06 - i * 0.02), bottom.B * (1.12 - i * 0.03), 1.05, i % 2 ? C.mailDark : C.mail);
+        }
         if (rig.sinF < -0.25) return;
-        ball([bottom.a + bottom.A * 1.1, 0, beltZ], 0.65, C.buckle);
+        if (L.skullBuckle) {
+            // Fivela redonda de bronze com uma caveira
+            const bk = [bottom.a + bottom.A * 1.12, 0, beltZ];
+            ball(bk, 1.15, C.trimDark);
+            ball(bk, 0.95, C.trim);
+            ball([bk[0] + 0.2, 0, bk[2] + 0.12], 0.55, C.bone);
+            for (const sd of [-1, 1]) ball([bk[0] + 0.45, sd * 0.2, bk[2] + 0.18], 0.13, C.ink);
+        } else ball([bottom.a + bottom.A * 1.1, 0, beltZ], 0.65, C.buckle);
         if (L.tabard) {
             const f = (z, w) => [bottom.a + bottom.A * 1.02, w, z];
             poly(rig, [f(top.z - 0.4, -wt * 0.72), f(top.z - 0.4, wt * 0.72), f(bottom.z - 2.6, wt * 0.6), f(bottom.z - 3.6, 0), f(bottom.z - 2.6, -wt * 0.6)], L.tabard, C.outline, 0.35);
@@ -78,6 +91,12 @@ export function registerHuman(id, S) {
             limb([[top.a + top.A * 0.98, 0, top.z - 0.8], [bottom.a + bottom.A * 1.05, 0, beltZ + 0.8]], 0.5, C.armorLight);
             frontArc(rig, mix([bottom.a], [top.a], 0.5)[0], bottom.z + (top.z - bottom.z) * 0.5, bottom.A * 1.1, bottom.B * 1.12, 0.4, C.armorDark);
             if (C.rust) ball([bottom.a + bottom.A, -bottom.B * 0.5, bottom.z + 3.4], 0.7, C.rust);
+            if (C.trim) {
+                // Frisos de bronze escuro: a gola do peitoral e uma faixa diagonal com rebites
+                frontArc(rig, top.a, top.z - 0.5, top.A * 1.02, top.B * 0.62, 0.55, C.trim);
+                limb([[top.a + top.A * 0.95, -wt * 0.7, top.z - 1.2], [bottom.a + bottom.A * 1.04, wb * 0.55, beltZ + 0.9]], 0.6, C.trimDark);
+                limb([[top.a + top.A * 0.97, -wt * 0.7, top.z - 1.2], [bottom.a + bottom.A * 1.06, wb * 0.55, beltZ + 0.9]], 0.38, C.trim);
+            }
         }
         if (L.ribs) {
             // Camisa rasgada no peito: buraco escuro com as costelas de osso aparecendo e o esterno
@@ -123,8 +142,41 @@ export function registerHuman(id, S) {
             oball(rig, p, S.pauldronRadius ?? 2.4, C.armorDark);
             ball([p[0], p[1], p[2] + 0.5], (S.pauldronRadius ?? 2.4) * 0.84, C.armor);
             ball([p[0] + 0.2, p[1] - side * 0.2, p[2] + (S.pauldronRadius ?? 2.4) * 0.4], (S.pauldronRadius ?? 2.4) * 0.4, C.armorLight);
+            const PR = S.pauldronRadius ?? 2.4;
+            if (C.trim) {
+                // Borda de bronze e o medalhão de caveira na ombreira
+                const ring = [];
+                for (let q = 0; q <= 6; q++) { const a = -0.3 + (q / 6) * Math.PI * 1.2; ring.push([p[0] + Math.cos(a) * PR * 0.95, p[1] + side * Math.sin(a) * PR * 0.35, p[2] + 0.2 - Math.sin(a) * PR * 0.15]); }
+                limb(ring, 0.42, C.trim);
+                ball([p[0] + PR * 0.75, p[1] + side * 0.1, p[2] - 0.2], 0.75, C.trim);
+                ball([p[0] + PR * 0.85, p[1] + side * 0.1, p[2] - 0.15], 0.45, C.bone);
+            }
+            if (L.spikes) {
+                // Espinhos: três cones saindo do alto da ombreira, para cima e para fora
+                for (const [da, db, h] of [[-0.9, 0.35, 3.0], [0.4, 0.75, 3.6], [1.4, 0.4, 2.6]]) {
+                    const base = [p[0] + da, p[1] + side * db * PR * 0.6, p[2] + PR * 0.55];
+                    const tip = [base[0] - 0.2, base[1] + side * h * 0.35, base[2] + h];
+                    const mid = mix(base, tip, 0.5);
+                    limb([base, mid], 1.25, C.outline);
+                    limb([base, mid], 0.95, C.armorLight);
+                    limb([mid, tip], 0.6, C.outline);
+                    limb([mid, tip], 0.38, C.armorLight);
+                }
+            }
         }
-        oball(rig, hand, S.handRadius, L.torso === 'plate' ? C.armorDark : C.skin);
+        if (L.boneHands) {
+            // Mão de esqueleto saindo da manopla: palma de osso e quatro dedos finos dobrados
+            oball(rig, mix(elbow, hand, 0.86), S.armWidth * 0.75, C.trim ?? C.armorDark);
+            const d = norm(sub(hand, elbow));
+            const sd = norm([-d[1], d[0], 0]);
+            oball(rig, hand, S.handRadius * 0.7, C.bone);
+            for (const k of [-1.1, -0.4, 0.35, 1.05]) {
+                const knuckle = add(add(hand, d, 0.6), sd, k * 0.45);
+                const tip = add(add(add(knuckle, d, 1.1), sd, k * 0.15), [0, 0, 1], -0.7);
+                limb([knuckle, tip], 0.42, C.boneDark);
+                limb([knuckle, tip], 0.28, C.bone);
+            }
+        } else oball(rig, hand, S.handRadius, L.torso === 'plate' ? C.armorDark : C.skin);
         if (L.claws) {
             const d = norm(sub(hand, elbow));
             const sd = norm([-d[1], d[0], 0]);
@@ -154,6 +206,8 @@ export function registerHuman(id, S) {
         sword: (pose, k) => ({ hand: [pose.lean * 0.5 + 2.4, V.chest.B + 1.2, 7.2 - pose.crouch], dir: norm([0.9, 0.18, -0.28 * k]) }),
         spear: (pose) => ({ hand: [pose.lean + 2.8, V.chest.B + 1.4, 7.6 - pose.crouch], dir: norm([0.88, 0.04, 0.42]) }),
         axe: (pose) => ({ hand: [pose.lean * 0.5 + 2, V.chest.B + 1.3, 8 - pose.crouch], dir: norm([0.45, 0.1, 0.88]) }),
+        // Espadão que ARRASTA: a mão baixa ao lado do corpo e a lâmina vai para trás e para baixo até a ponta raspar o chão
+        greatsword: (pose) => ({ hand: [pose.lean * 0.4 + 1.2, V.chest.B + 1.6, 6.4 - pose.crouch], dir: norm([-0.72, 0.22, -0.48]) }),
         pitchfork: (pose) => ({ hand: [pose.lean + 2.6, V.chest.B + 1.3, 7.4 - pose.crouch], dir: norm([0.8, 0.04, 0.55]) })
     };
     const at = (hand, dir, d) => [hand[0] + dir[0] * d, hand[1] + dir[1] * d, hand[2] + dir[2] * d];
@@ -161,7 +215,18 @@ export function registerHuman(id, S) {
         const { C, limb, ball } = rig;
         const flat = Math.hypot(dir[0], dir[1]);
         const side = flat > 0.05 ? [-dir[1] / flat, dir[0] / flat, 0] : [0, 1, 0];
-        if (L.weapon === 'sword') {
+        if (L.weapon === 'greatsword') {
+            // Espadão largo e gasto: cabo com pomo, guarda comprida de pontas curvas, lâmina larga com o sulco no meio
+            const len = S.weaponLength;
+            limb([at(hand, dir, -2.2), at(hand, dir, 0.6)], 1.0, C.grip);
+            ball(at(hand, dir, -2.5), 0.75, C.metalDark);
+            const g = at(hand, dir, 0.9);
+            limb([add(add(g, side, -2.4), dir, 0.6), add(g, side, -1.2), add(g, side, 1.2), add(add(g, side, 2.4), dir, 0.6)], 1.0, C.outline);
+            limb([add(add(g, side, -2.4), dir, 0.6), add(g, side, -1.2), add(g, side, 1.2), add(add(g, side, 2.4), dir, 0.6)], 0.7, C.metalDark);
+            poly(rig, [add(at(hand, dir, 1.1), side, -1.0), add(at(hand, dir, len - 1.6), side, -0.85), at(hand, dir, len), add(at(hand, dir, len - 1.6), side, 0.85), add(at(hand, dir, 1.1), side, 1.0)], C.metal, C.outline, 0.4);
+            limb([at(hand, dir, 1.6), at(hand, dir, len - 2.2)], 0.36, C.metalDark);
+            limb([add(at(hand, dir, 1.5), side, 0.55), add(at(hand, dir, len - 1.8), side, 0.45)], 0.18, C.metalLight);
+        } else if (L.weapon === 'sword') {
             const len = S.weaponLength;
             limb([at(hand, dir, -1.6), at(hand, dir, 0.5)], 0.9, C.grip);
             limb([add(at(hand, dir, 0.8), side, -1.5), add(at(hand, dir, 0.8), side, 1.5)], 0.8, C.metalDark);
@@ -209,6 +274,55 @@ export function registerHuman(id, S) {
             draw() {
                 limb([[neck[0], 0, neck[2]], [c[0] - 0.2, 0, c[2] - R * 0.7]], 1.6, C.skinShade);
                 const covered = L.helmet === 'great';
+                if (L.helmet === 'skull') {
+                    // Elmo de espinhos aberto na frente, com a CAVEIRA à mostra, olhos vermelhos, faixa de bronze com caveira e o rabo de crina vermelha no topo
+                    const back = !facesCamera(rig, [c[0] + R, 0, c[2]], c);
+                    const tail = () => {
+                        for (let i = 0; i < 4; i++) {
+                            const chain = flowChain([c[0] - R * 0.15, (i - 1.5) * 0.3, c[2] + R * 1.25], pose, rig.anim, {
+                                hang: [-0.8, 0, 0.2], stream: [-1, 0, -0.2], len: S.plumeLength * (1 - Math.abs(i - 1.5) * 0.12), segs: 5,
+                                amp: 0.35, ampRun: 0.6, speed: 3, speedRun: 6, waveLength: 1.6, phase: i * 1.1, lag: 0.25
+                            });
+                            drawRibbon(rig, chain, 0.8, 0.15, i % 2 ? C.plume : C.plumeLight ?? C.plume, C.outline, true);
+                        }
+                    };
+                    if (back) tail();
+                    // Caveira: crânio, maçãs, nariz e a fileira de dentes
+                    oball(rig, c, R * 0.92, C.bone);
+                    ball([c[0] + R * 0.45, 0, c[2] - R * 0.5], R * 0.55, C.bone);
+                    // Elmo: cúpula escura por cima e atrás, com faixa de bronze na testa
+                    ball([c[0] - R * 0.25, 0, c[2] + R * 0.35], R * 1.02, C.armorDark);
+                    ball([c[0] - R * 0.3, -R * 0.2, c[2] + R * 0.62], R * 0.72, C.armor);
+                    const band = [];
+                    for (let q = 0; q <= 8; q++) { const a = -Math.PI * 0.55 + (q / 8) * Math.PI * 1.1; band.push([c[0] + Math.cos(a) * R * 0.98, Math.sin(a) * R * 1.0, c[2] + R * 0.42]); }
+                    limb(band, 0.55, C.trimDark);
+                    limb(band, 0.38, C.trim);
+                    // Espinhos em volta da cúpula e o pino do topo
+                    for (let q = 0; q < 7; q++) {
+                        const a = (q / 7) * Math.PI * 2;
+                        const base = [c[0] - R * 0.25 + Math.cos(a) * R * 0.75, Math.sin(a) * R * 0.75, c[2] + R * 0.9];
+                        const tip = [base[0] + Math.cos(a) * 0.5, base[1] + Math.sin(a) * 0.5, base[2] + 2.0 + (q % 2) * 0.6];
+                        limb([base, tip], 0.75, C.outline);
+                        limb([base, tip], 0.5, C.armorLight);
+                    }
+                    limb([[c[0] - R * 0.2, 0, c[2] + R * 1.1], [c[0] - R * 0.2, 0, c[2] + R * 1.45]], 0.55, C.armorLight);
+                    ball([c[0] - R * 0.2, 0, c[2] + R * 1.5], 0.45, C.armorLight);
+                    if (back) return;
+                    tail();
+                    // Rosto da caveira: órbitas escuras com brilho vermelho, nariz triangular e dentes
+                    for (const sd of [-1, 1]) {
+                        const eye = [c[0] + R * 0.8, sd * R * 0.36, c[2] + R * 0.02];
+                        ball(eye, R * 0.26, C.ink);
+                        glowAt(rig, eye, C.glow, 1.6 * (0.85 + 0.2 * Math.sin(t * Math.PI * 2 + sd)), 0.9);
+                        ball([eye[0] + 0.1, eye[1], eye[2]], 0.26, C.eye);
+                    }
+                    ball([c[0] + R * 0.92, 0, c[2] - R * 0.25], R * 0.12, C.ink);
+                    limb([[c[0] + R * 0.88, -R * 0.36, c[2] - R * 0.56], [c[0] + R * 0.94, R * 0.36, c[2] - R * 0.56]], 0.5, C.boneDark);
+                    for (let q = -3; q <= 3; q++) limb([[c[0] + R * 0.94, q * R * 0.1, c[2] - R * 0.46], [c[0] + R * 0.95, q * R * 0.1, c[2] - R * 0.66]], 0.14, C.ink);
+                    // Caveirinha de bronze no meio da faixa
+                    ball([c[0] + R * 0.98, 0, c[2] + R * 0.44], 0.5, C.trim);
+                    return;
+                }
                 if (L.helmet === 'weeds') {
                     // Cabelo de algas: tiras compridas e pesadas que pingam
                     for (let i = 0; i < 6; i++) {

@@ -1,12 +1,12 @@
-import { LAKE_SPIRIT_25D_VISUALS as S } from './lake_spirit25d_visual.js';
+import { RIVER_SPIRIT_25D_VISUALS as S } from './river_spirit25d_visual.js';
 import { registerCreature, glowAt } from '../creature25d.js';
 import { renderMonster25D } from '../monster25d.js';
 
 const TAU = Math.PI * 2;
 
-// --- ESPÍRITO DO LAGO 2.5D (chefe) ---
+// --- ESPÍRITO DO RIO 2.5D (chefe) ---
 // Dama d'água: redemoinho no chão com anéis de ondas, vestido de bolas de água em camadas que balançam, tronco e cabeça claros, cabelo que flui para trás,
-// coroa de juncos com lírios, braços abertos com esferas d'água em órbita. Medidas e cores: lake_spirit25d_visual.js.
+// coroa de juncos com lírios, braços abertos com esferas d'água em órbita. Medidas e cores: river_spirit25d_visual.js.
 function parts(pose, rig) {
     const { C, project, ball, limb } = rig;
     const t = pose.t;
@@ -72,18 +72,26 @@ function parts(pose, rig) {
         draw() {
             // Cabelo: fitas de água que descem e fluem para trás
             for (let i = 0; i < S.hairStrands; i++) {
-                const a = (i / (S.hairStrands - 1) - 0.5) * 2.4;
+                const a = (i / (S.hairStrands - 1) - 0.5) * 3.2;
                 const pts = [];
                 for (let j = 0; j <= 5; j++) {
                     const k = j / 5;
-                    pts.push([head[0] - 1 - k * 5.5, head[1] + a * (1.2 + k * 1.8) + Math.sin(t * S.swayHz * TAU - k * 3 + i) * 0.8 * k, head[2] + 0.6 - k * 7.5]);
+                    pts.push([head[0] - 0.8 - k * 3.2, head[1] + a * (1.6 + k * 3.4) + Math.sin(t * S.swayHz * TAU - k * 3 + i) * 1.2 * k, head[2] + 0.4 - k * 4.8]);
                 }
                 limb(pts, 1.5, C.outline);
                 limb(pts, 1.1, i % 2 ? C.hair : C.hairLight);
             }
             ball(head, 2.1 + 0.3, C.outline);
             ball(head, 2.1, C.skin);
-            ball([head[0] - 0.4, head[1], head[2] + 0.5], 1.6, C.skinShade);
+            // Cabelo loiro na cabeça toda: calota no alto e atrás, madeixas caindo dos dois lados do rosto e franja na testa (o rosto fica à mostra)
+            ball([head[0] - 0.35, head[1], head[2] + 0.55], 2.35 + 0.3, C.outline);
+            ball([head[0] - 0.35, head[1], head[2] + 0.55], 2.35, C.hair);
+            ball([head[0] - 0.1, head[1], head[2] + 1.15], 1.7, C.hairLight);
+            for (const sd of [-1, 1]) {
+                ball([head[0] - 0.3, head[1] + sd * 1.75, head[2] - 0.1], 1.1, C.hair);
+                limb([[head[0] - 0.1, head[1] + sd * 1.7, head[2] + 0.4], [head[0] + 0.3, head[1] + sd * 1.95, head[2] - 1.4], [head[0] - 0.4, head[1] + sd * 2.1, head[2] - 3.2 + Math.sin(t * S.swayHz * TAU + sd) * 0.4]], 0.9, C.hair);
+            }
+            for (let b = -2; b <= 2; b++) limb([[head[0] + 0.1, head[1] + b * 0.55, head[2] + 1.75], [head[0] + 1.55, head[1] + b * 0.8, head[2] + 1.05 - Math.abs(b) * 0.15]], 0.6, b % 2 ? C.hairLight : C.hair);
             // Rosto: olhos brancos brilhantes e uma boca fina
             for (const sd of [-1, 1]) {
                 const e = [head[0] + 1.75, head[1] + sd * 0.8, head[2] + 0.25];
@@ -124,8 +132,8 @@ function parts(pose, rig) {
     return items;
 }
 
-registerCreature('lake_spirit', S, parts);
+registerCreature('river_spirit', S, parts);
 
-export function renderLakeSpirit25D(e) {
-    renderMonster25D(e, 'lake_spirit', S);
+export function renderRiverSpirit25D(e) {
+    renderMonster25D(e, 'river_spirit', S);
 }

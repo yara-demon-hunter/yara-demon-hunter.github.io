@@ -66,7 +66,7 @@ export function addSlam(x, y, radius, delay, damage, color = null, torchDamage =
 const TELL_SECONDS = 0.55;
 const LUNGE_WINDUP_SCALE = 1.5;     // aviso da investida 50% mais longo
 const LUNGE_TIME_SCALE = 1.5;       // e a corrida em si 50% mais lenta
-const TELLED = new Set(['volley', 'ring', 'spiral', 'shackle', 'fireshield', 'bloodfog', 'darkness', 'holyground', 'mirror']);
+const TELLED = new Set(['frenzy', 'claws', 'bubbles', 'goo', 'volley', 'ring', 'spiral', 'shackle', 'fireshield', 'bloodfog', 'darkness', 'holyground', 'mirror']);
 // Correntes do Demon Hunter (a skill Shadow Shackle virada contra o herói): voam a 700 px/s e prendem por 1,5 s.
 // Quem estiver em dash (ou invulnerável) na hora em que a ponta chega escapa: a corrente erra e se desfaz.
 export const BOSS_SHACKLE = { speed: 700, holdSeconds: 1.5 };
@@ -300,19 +300,61 @@ const ACTIONS = {
         }
         audio.playBossAttack();
     },
-    // Slizork: golpe de garra. Ele ergue as garras de espada e rasga o chão à frente: fileiras de círculos de aviso (do perto para o longe) abrindo em leque
-    // na direção do herói; quem ficar neles leva o corte. O braço do boneco anima por e.clawAt (library/monsters/25d/slizork/slizork25d.js)
-    rake(e, model) {
+    // Slizork, golpe de garra: de perto ou a meia distância ele corta o ar com as garras e deixa TRÊS RISCOS vermelhos à frente, na direção do herói. Os riscos
+    // aparecem como aviso e, passado o tempo, cortam: quem estiver em cima de um deles leva o dano (dá para ficar entre eles ou sair). Longe demais, ele solta bolhas
+    claws(e, model, ai) {
+        const range = model.clawRange ?? 340;
+        if (Math.hypot(player.x - e.x, player.y - e.y) > range + 140) { ACTIONS.bubbles(e, model, ai); return; }
         const a = aimAngle(e);
         e.clawAt = performance.now();
-        for (let k = 0; k < 4; k++) {
-            const d = 80 + k * 62;
-            for (const off of k === 0 ? [0] : [-1, 1]) {
-                const ang = a + off * (0.14 + k * 0.07);
-                addSlam(clampX(e.x + Math.cos(ang) * d), clampY(e.y + Math.sin(ang) * d), 40 + k * 3, 0.75 + k * 0.13, e.damage * 0.95, null, 0, '#c0c6cc');
-            }
+        e.clawSide = e.clawSide === 1 ? -1 : 1;           // alterna a mão que corta (library/monsters/25d/slizork/slizork25d.js)
+        const gap = model.clawGap ?? 44;
+        const nx = -Math.sin(a), ny = Math.cos(a);
+        const lines = [-1, 0, 1].map(k => {
+            const x1 = e.x + nx * k * gap, y1 = e.y + ny * k * gap;
+            return { x1, y1, x2: x1 + Math.cos(a) * range, y2: y1 + Math.sin(a) * range };
+        });
+        state.telegraphs.push({ kind: 'claws', age: 0, seconds: model.clawDelay ?? 0.85, lines, width: model.clawWidth ?? 26, damage: e.damage * 1.05 });
+        audio.playBossAttack();
+    },
+    // Slizork, bolhas: solta bolhas de gosma que SEGUEM o herói devagar por alguns segundos e então estouram (também estouram ao encostar)
+    bubbles(e, model) {
+        const n = model.bubbleCount ?? 4;
+        const base = aimAngle(e);
+        for (let i = 0; i < n; i++) {
+            const a = base + (i - (n - 1) / 2) * 0.7;
+            state.enemyProjectiles.push({
+                owner: e.type, bubble: true, age: 0, life: model.bubbleLife ?? 4.2, color: '#86efac', range: 0, travelled: 0,
+                x: e.x + Math.cos(a) * e.radius * 0.8, y: e.y + Math.sin(a) * e.radius * 0.8,
+                vx: Math.cos(a) * 110, vy: Math.sin(a) * 110, radius: 15, speed: model.bubbleSpeed ?? 95,
+                burstRadius: model.bubbleBurstRadius ?? 64, damage: e.damage * 0.9, torchDamage: 0
+            });
         }
-        addShockwave(e.x, e.y, { radius: e.radius * 2.2, color: '#9ca3af', width: 5, seconds: 0.3 });
+        createExplosion(e.x, e.y, '#86efac', 14);
+        audio.playBossAttack();
+    },
+    // Slizork, fúria: ele ruge, fica enfurecido e CORRE atrás do herói bem mais depressa por alguns segundos (e não solta outro golpe até acabar)
+    frenzy(e, model, ai) {
+        const secs = model.frenzySeconds ?? 3.5;
+        const m = model.frenzySpeedMultiplier ?? 2.4;
+        if (e.frenzy) return;
+        e.frenzy = true;
+        e.speed *= m;
+        e.shootTimer = Math.max(e.shootTimer, secs);
+        e.enraged = true;                                      // a arte e o brilho de fúria já existem
+        addShockwave(e.x, e.y, { radius: e.radius * 3.2, color: '#ef4444', width: 8, seconds: 0.5 });
+        screenFlash('#ef4444', 0.18);
+        shakeScreen(8);
+        audio.playBossRoar();
+        later(ai, secs, () => { e.speed /= m; e.frenzy = false; if (e.hp > e.maxHp * model.enrageRatio) e.enraged = false; });
+    },
+    // Slizork, gosma: uma poça de gosma verde é marcada no chão onde o herói está; se ele ainda estiver nela quando estoura, os pés ficam presos por alguns segundos
+    goo(e, model) {
+        state.telegraphs.push({
+            kind: 'circle', goo: true, x: player.x, y: player.y, radius: model.gooRadius ?? 80, age: 0, seconds: model.gooDelay ?? 1.0,
+            damage: e.damage * 0.35, color: null, torchDamage: 0, shockColor: '#4ade80', root: model.gooRootSeconds ?? 2.6
+        });
+        createExplosion(e.x, e.y, '#4ade80', 12);
         audio.playBossAttack();
     },
     // Demon Lord: garra larga, um leque de fogo à frente dele
@@ -722,12 +764,30 @@ export function updateTelegraphs(dt) {
         if (t.age < t.seconds) continue;
         telegraphs.splice(i, 1);
 
-        if (t.kind === 'circle') {
+        if (t.kind === 'claws') {
+            // Os três cortes: cada risco fica no chão por um instante; quem estiver em cima de algum leva o dano (uma vez)
+            let hit = false;
+            for (const L of t.lines) {
+                state.telegraphs.push({ kind: 'scar', x: L.x1, y: L.y1, toX: L.x2, toY: L.y2, age: 0, seconds: 0.6 });
+                const dx = L.x2 - L.x1, dy = L.y2 - L.y1;
+                const k = Math.max(0, Math.min(1, ((player.x - L.x1) * dx + (player.y - L.y1) * dy) / (dx * dx + dy * dy)));
+                if (Math.hypot(player.x - (L.x1 + dx * k), player.y - (L.y1 + dy * k)) < t.width / 2 + 12) hit = true;
+            }
+            shakeScreen(7);
+            audio.playBlast();
+            if (hit) hurtPlayer(t.damage, t.lines[1].x1, t.lines[1].y1, 0.5);
+        } else if (t.kind === 'circle') {
             addShockwave(t.x, t.y, { radius: t.radius, color: t.shockColor ?? '#f87171', width: 7, seconds: 0.3 });
-            createExplosion(t.x, t.y, t.shockColor ? '#a8a29e' : '#f97316', 16);
+            createExplosion(t.x, t.y, t.goo ? '#4ade80' : t.shockColor ? '#a8a29e' : '#f97316', 16);
             shakeScreen(5);
             audio.playBlast();
             if (Math.hypot(player.x - t.x, player.y - t.y) < t.radius) hurtPlayer(t.damage, t.x, t.y, 0.5);
+            // Gosma: os pés ficam presos (não anda nem dá dash; ainda ataca), como as raízes do Treant
+            if (t.root && Math.hypot(player.x - t.x, player.y - t.y) < t.radius) {
+                player.rootedTimer = Math.max(player.rootedTimer ?? 0, t.root);
+                player.rootedMax = player.rootedTimer;
+                player.rootGoo = true;
+            }
             // Boss lutando perto da tocha: o círculo que pega a chama também a fere
             if (t.torchDamage && Math.hypot(state.coreX - t.x, state.coreY - t.y) < t.radius + CORE_MODEL.collisionRadius) {
                 hurtTorch(t.torchDamage, state.coreX, state.coreY);

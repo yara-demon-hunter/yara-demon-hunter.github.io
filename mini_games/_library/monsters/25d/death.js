@@ -71,6 +71,24 @@ export const MONSTER_DEATH = {
         fall: { seconds: 1.5, tiltSeconds: 0.6, tilt: 1.4, shake: 0.07, sink: 0.3, pivot: 0.55, squash: 0.8, fade: 0.4 },
         dust: { radius: 2.4, seconds: 0.5, width: 5, color: '#a8a29e' }
     },
+    // River Spirit (chefe): a dama d'água vira água de uma vez: bolhas e gotas azuis grandes, espuma branca e uns fios loiros do cabelo
+    river_spirit: {
+        groups: [
+            { count: 20, colors: ['rgba(56, 189, 248, 0.6)', 'rgba(125, 211, 252, 0.6)', 'rgba(224, 242, 254, 0.7)'], shape: 'bubble', size: 2.6, speed: 1.2, lift: 1.9, gravity: 0.35, life: 1.9 },
+            { count: 22, colors: ['#38bdf8', '#7dd3fc', '#0ea5e9'], shape: 'drop', size: 1.7, speed: 1.4, lift: 1.5 },
+            { count: 14, colors: ['#e0f2fe', '#ffffff'], shape: 'drop', size: 0.8, speed: 1.6, lift: 1.8 },
+            { count: 5, colors: ['#d9ad45', '#f6d980'], shape: 'cloth', size: 1.1, lift: 1.3 }
+        ],
+        stain: 'rgba(14, 90, 150, 0.55)'
+    },
+    // Jatos de gotas do chão molhado estourando (um por ponto, ver riverSpiritBurst em enemies.js)
+    river_spirit_splash: {
+        groups: [
+            { count: 8, colors: ['#38bdf8', '#7dd3fc', '#e0f2fe'], shape: 'drop', size: 1.2, speed: 1.1, lift: 1.9, life: 1.1 },
+            { count: 3, colors: ['rgba(186, 230, 253, 0.6)'], shape: 'bubble', size: 1.6, lift: 1.4, gravity: 0.4, life: 1.3 }
+        ],
+        stain: 'rgba(14, 90, 150, 0.4)'
+    },
     // Slizork: explode soltando bolhas grandes de gosma que sobem devagar e estouram, mais respingos verdes
     slizork: {
         groups: [

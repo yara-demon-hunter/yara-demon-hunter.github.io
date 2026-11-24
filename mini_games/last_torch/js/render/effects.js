@@ -146,6 +146,23 @@ export function renderTelegraphs() {
             ctx.restore();
             return;
         }
+        if (t.kind === 'claws') {
+            // Aviso dos três riscos do Slizork: linhas vermelhas que acendem e engrossam até o corte
+            ctx.save();
+            ctx.lineCap = 'round';
+            for (const L of t.lines) {
+                ctx.globalAlpha = 0.25 + p * 0.5;
+                ctx.strokeStyle = 'rgba(239, 68, 68, 0.55)';
+                ctx.lineWidth = t.width * (0.5 + p * 0.5);
+                ctx.beginPath(); ctx.moveTo(L.x1, L.y1); ctx.lineTo(L.x2, L.y2); ctx.stroke();
+                ctx.globalAlpha = 0.4 + p * 0.6;
+                ctx.strokeStyle = '#fecaca';
+                ctx.lineWidth = 2 + p * 2;
+                ctx.beginPath(); ctx.moveTo(L.x1, L.y1); ctx.lineTo(L.x1 + (L.x2 - L.x1) * easeOutCubic(p), L.y1 + (L.y2 - L.y1) * easeOutCubic(p)); ctx.stroke();
+            }
+            ctx.restore();
+            return;
+        }
         if (t.kind === 'scar') {
             // Corte deixado pela investida: risco vermelho fino e brilhante que some depressa
             const fade = 1 - p;
@@ -178,8 +195,8 @@ export function renderTelegraphs() {
             ctx.globalAlpha = 1;
             return;
         }
-        ctx.fillStyle = T.fill;
-        ctx.strokeStyle = T.color;
+        ctx.fillStyle = t.goo ? `rgba(74, 222, 128, ${0.16 + 0.1 * p})` : T.fill;
+        ctx.strokeStyle = t.goo ? '#86efac' : T.color;
         ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.arc(t.x, t.y, t.radius, 0, TAU);

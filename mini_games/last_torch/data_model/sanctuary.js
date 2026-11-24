@@ -125,7 +125,7 @@ const MONSTER_ENTRIES = [
     { key: 'GOLEM', name: 'Ember Golem', icon: '🪨' },
     { key: 'NECROMANCER', name: 'Necromancer', icon: '☠️' }
 ];
-const BOSS_ICONS = { DEMON_LORD: '😈', BLOOD_COUNTESS: '🩸', LONG_NIGHT: '🌑', AZAEL: '⚔️', DEMON_HUNTER: '🗡️', BRUTOS: '🪓', LAKE_SPIRIT: '🌊', SLIZORK: '🟢', GRAVE_KING: '💀' };
+const BOSS_ICONS = { DEMON_LORD: '😈', BLOOD_COUNTESS: '🩸', LONG_NIGHT: '🌑', AZAEL: '⚔️', DEMON_HUNTER: '🗡️', BRUTOS: '🪓', RIVER_SPIRIT: '🌊', SLIZORK: '🟢', GRAVE_KING: '💀' };
 
 // Primeira hora (de 1 até o fim da noite) em que o boss aparece, com qualquer um dos heróis (o rival muda com ele)
 function firstBossHour(key) {

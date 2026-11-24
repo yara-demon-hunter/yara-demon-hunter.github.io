@@ -194,8 +194,10 @@
         import '../monsters/25d/headless_knight/headless_knight25d.js';
         import { ZOMBIE_CRAWLER_25D_VISUALS } from '../monsters/25d/zombie_crawler/zombie_crawler25d_visual.js';
         import '../monsters/25d/zombie_crawler/zombie_crawler25d.js';
-        import { LAKE_SPIRIT_25D_VISUALS } from '../monsters/25d/lake_spirit/lake_spirit25d_visual.js';
-        import '../monsters/25d/lake_spirit/lake_spirit25d.js';
+        import { BLOOD_COUNTESS_25D_VISUALS } from '../monsters/25d/blood_countess/blood_countess25d_visual.js';
+        import '../monsters/25d/blood_countess/blood_countess25d.js';
+        import { RIVER_SPIRIT_25D_VISUALS } from '../monsters/25d/river_spirit/river_spirit25d_visual.js';
+        import '../monsters/25d/river_spirit/river_spirit25d.js';
         import { SLIZORK_25D_VISUALS } from '../monsters/25d/slizork/slizork25d_visual.js';
         import '../monsters/25d/slizork/slizork25d.js';
         import { GRAVE_KING_25D_VISUALS } from '../monsters/25d/grave_king/grave_king25d_visual.js';
@@ -307,7 +309,8 @@
             demon_lord: 'monsters/25d/demon_lord/demon_lord25d_visual.js',
             armored_zombie: 'monsters/25d/armored_zombie/armored_zombie25d_visual.js',
             zombie_crawler: 'monsters/25d/zombie_crawler/zombie_crawler25d_visual.js',
-            lake_spirit: 'monsters/25d/lake_spirit/lake_spirit25d_visual.js',
+            river_spirit: 'monsters/25d/river_spirit/river_spirit25d_visual.js',
+            blood_countess: 'monsters/25d/blood_countess/blood_countess25d_visual.js',
             slizork: 'monsters/25d/slizork/slizork25d_visual.js',
             grave_king: 'monsters/25d/grave_king/grave_king25d_visual.js',
             zombie: 'monsters/25d/zombie/zombie25d_visual.js',
@@ -361,7 +364,7 @@
         RADIUS.demon_lord = 32;
         RADIUS.armored_zombie = 18;
         RADIUS.zombie_crawler = 13;
-        RADIUS.lake_spirit = 30; RADIUS.slizork = 34; RADIUS.grave_king = 30;
+        RADIUS.river_spirit = 30; RADIUS.blood_countess = 20; RADIUS.slizork = 34; RADIUS.grave_king = 30;
         RADIUS.zombie = 14;
         RADIUS.bog_slime = 13;
         RADIUS.bog_toad = 15;
@@ -417,11 +420,12 @@
             ['headless_knight', 'Cavaleiro Sem Cabeça', HEADLESS_KNIGHT_25D_VISUALS, 'rig'],
             ['bone_colossus', 'Colosso de Ossos', BONE_COLOSSUS_25D_VISUALS, 'rig'],
             ['golem', 'Golem de Brasa e Musgo', GOLEM_25D_VISUALS, 'rig'],
-            ['vampire', 'Vampiro (e Blood Countess)', VAMPIRE_25D_VISUALS, 'rig'],
+            ['vampire', 'Vampiro', VAMPIRE_25D_VISUALS, 'rig'],
             ['demon_lord', 'Demon Lord (boss)', DEMON_LORD_25D_VISUALS, 'rig'],
             ['armored_zombie', 'Zumbi de Armadura', ARMORED_ZOMBIE_25D_VISUALS, 'rig'],
             ['zombie_crawler', 'Zumbi Rastejante', ZOMBIE_CRAWLER_25D_VISUALS, 'rig'],
-            ['lake_spirit', 'Chefe: Espírito do Lago', LAKE_SPIRIT_25D_VISUALS, 'rig'],
+            ['river_spirit', 'Chefe: Espírito do Rio', RIVER_SPIRIT_25D_VISUALS, 'rig'],
+            ['blood_countess', 'Chefe: Blood Countess', BLOOD_COUNTESS_25D_VISUALS, 'rig'],
             ['slizork', 'Chefe: Slizork', SLIZORK_25D_VISUALS, 'rig'],
             ['grave_king', 'Chefe: Rei do Cemitério', GRAVE_KING_25D_VISUALS, 'rig'],
             ['zombie', 'Zumbi', ZOMBIE_25D_VISUALS, 'rig'],
@@ -451,8 +455,8 @@
         Object.entries(TOPDOWN).forEach(([key, td]) => { FILES[key] = `monsters/topdown/${td.folder}/${td.folder}_visual.js`; });
         // tipo: 'hero', 'rig' (monstro 2.5D) ou 'topdown' (monstro 2D de cima)
         const typeOf = (key) => MODELS.find(([k]) => k === key)?.[3] ?? 'hero';
-        // Chefes do Last Torch com arte 2.5D (os rivais Azael/Hunter/Brutos são heróis e ficam na lista de Heróis). Vampiro = Blood Countess (paleta)
-        const BOSS_KEYS = new Set(['demon_lord', 'vampire', 'lake_spirit', 'slizork', 'grave_king']);
+        // Chefes do Last Torch com arte 2.5D (os rivais Azael/Hunter/Brutos são heróis e ficam na lista de Heróis). O Vampiro comum é monstro.
+        const BOSS_KEYS = new Set(['demon_lord', 'blood_countess', 'river_spirit', 'slizork', 'grave_king']);
         const kindOf = (key) => (typeOf(key) === 'hero' ? 'hero' : BOSS_KEYS.has(key) ? 'boss' : 'monster');
         // Câmera: mudam por vista, não são do personagem (ficam fora dos controles)
         const CAMERA_KEYS = new Set(['scale', 'heightScale', 'groundSquash', 'depthHeightWeight']);

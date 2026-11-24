@@ -254,7 +254,22 @@ export function renderRoots() {
         }
         ctx.restore();
     }
-    if (player.rootedTimer > 0) {
+    if (player.rootedTimer > 0 && player.rootGoo) {
+        // Gosma do Slizork: uma poça verde brilhante presa aos pés, com bolhas
+        const max = player.rootedMax ?? player.rootedTimer;
+        const grow = Math.min(1, (max - player.rootedTimer) / 0.15 + 0.35) * Math.min(1, player.rootedTimer / 0.3);
+        ctx.save();
+        ctx.fillStyle = `rgba(74, 222, 128, ${0.55 * grow})`;
+        ctx.strokeStyle = `rgba(220, 255, 230, ${0.8 * grow})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(player.x, player.y + 12, 26 * grow, 11 * grow, 0, 0, TAU); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = `rgba(190, 255, 170, ${0.7 * grow})`;
+        for (let b = 0; b < 4; b++) {
+            const a = state.runTime * 2 + b * 1.6;
+            ctx.beginPath(); ctx.arc(player.x + Math.cos(a) * 14 * grow, player.y + 11 + Math.sin(a) * 5 * grow - ((state.runTime * 10 + b * 4) % 9), 2.4 * grow, 0, TAU); ctx.fill();
+        }
+        ctx.restore();
+    } else if (player.rootedTimer > 0) {
         sprite ??= getRoots();
         const max = player.rootedMax ?? player.rootedTimer;
         const grow = Math.min(1, (max - player.rootedTimer) / 0.15 + 0.35) * Math.min(1, player.rootedTimer / 0.2);

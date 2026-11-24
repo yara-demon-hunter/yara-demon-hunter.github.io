@@ -116,8 +116,8 @@ export const BOSS_MODELS = {
     BLOOD_COUNTESS: {
         name: 'Blood Countess',
         title: 'She Who Drinks the Light',
-        renderAs: 'VAMPIRE',
-        palette: 'countess',
+        renderAs: 'BLOOD_COUNTESS',
+        portraitImage: 'images/characters/blood-countess-small.webp',      // retrato do diálogo (cópia de monsters/25d/blood_countess/art_reference/images/blood-countess.webp)
         hpBase: 4565,
         hpPerTurn: 0,
         speedMin: 46,
@@ -166,10 +166,13 @@ export const BOSS_MODELS = {
     BRUTOS: { ...RIVAL_BASE, ...bossModelOf('brutos') },
     // --- Chefes das telas do mapa (nov/2026): arte em library/monsters/25d/<id>. Os golpes são os de sempre (js/systems/boss_ai.js); a vida é um primeiro palpite, sem balancear ---
     // River Crossing: dama d'água que some e reaparece, chove esferas e chama os afogados
-    LAKE_SPIRIT: {
-        name: 'Lake Spirit',
+    RIVER_SPIRIT: {
+        name: 'River Spirit',
         title: 'The Drowned Lady',
-        renderAs: 'LAKE_SPIRIT',
+        renderAs: 'RIVER_SPIRIT',
+        deathType: 'RIVER_SPIRIT',
+        deathFx: 'water',            // a morte rebenta o chão molhado (js/systems/enemies.js, riverSpiritBurst)
+        portraitImage: 'images/characters/river-spirit-small.webp',      // retrato do diálogo (cópia de monsters/25d/river_spirit/art_reference/images/river-spirit.webp)
         hpBase: 1500,
         hpPerTurn: 0,
         speedMin: 40,
@@ -185,7 +188,7 @@ export const BOSS_MODELS = {
         phases: [
             { at: 1, patterns: ['blink', 'volley', 'ring', 'summon'] },
             { at: 0.6, label: 'RISING TIDE', patterns: ['blink', 'spiral', 'volley', 'ring', 'summon'] },
-            { at: 0.3, label: 'THE LAKE REMEMBERS', patterns: ['spiral', 'blink', 'ring', 'volley', 'spiral', 'summon'] }
+            { at: 0.3, label: 'THE RIVER REMEMBERS', patterns: ['spiral', 'blink', 'ring', 'volley', 'spiral', 'summon'] }
         ],
         ringCount: 14,
         spiralShots: 16,
@@ -212,6 +215,7 @@ export const BOSS_MODELS = {
         name: 'Slizork',
         title: 'Tyrant of the Mire',
         renderAs: 'SLIZORK',
+        portraitImage: 'images/characters/slizork-small.webp',      // retrato do diálogo (cópia de monsters/25d/slizork/art_reference/images/slizork.webp)
         deathType: 'SLIZORK',
         hpBase: 2400,
         hpPerTurn: 0,
@@ -224,20 +228,17 @@ export const BOSS_MODELS = {
         burstIntervalSeconds: 0.5,
         initialShootCooldownSeconds: 1.5,
         patternGapSeconds: 2.4,
-        patterns: ['slam', 'rake', 'volley', 'ring', 'summon'],
+        // Quatro golpes: garras (3 riscos vermelhos), bolhas que perseguem e estouram, gosma que prende os pés e a fúria (corre mais depressa por uns segundos)
+        patterns: ['claws', 'bubbles', 'goo', 'frenzy'],
         phases: [
-            { at: 1, patterns: ['rake', 'slam', 'volley', 'ring', 'summon'] },
-            { at: 0.6, label: 'OOZING RAGE', patterns: ['rake', 'slam', 'rake', 'volley', 'ring', 'summon'] },
-            { at: 0.3, label: 'THE BOG RISES', patterns: ['rake', 'slam', 'ring', 'rake', 'volley', 'summon', 'slam'] }
+            { at: 1, patterns: ['claws', 'bubbles', 'goo', 'frenzy'] },
+            { at: 0.6, label: 'OOZING RAGE', patterns: ['claws', 'bubbles', 'goo', 'frenzy', 'claws'] },
+            { at: 0.3, label: 'THE BOG RISES', patterns: ['claws', 'bubbles', 'frenzy', 'goo', 'claws', 'frenzy'] }
         ],
-        ringCount: 14,
-        slamCount: 4,
-        slamRadius: 80,
-        slamDelaySeconds: 1,
-        slamDamageMultiplier: 0.9,
-        slamTorchDamage: 8,
-        summonType: 'BOG_SLIME',
-        summonCount: 3,
+        clawRange: 340, clawGap: 44, clawWidth: 26, clawDelay: 0.85,       // garras: comprimento e distância dos riscos, largura de cada um, aviso (s)
+        bubbleCount: 4, bubbleLife: 4.2, bubbleSpeed: 95, bubbleBurstRadius: 64,   // bolhas: quantas, vida (s), velocidade e raio do estouro
+        gooRadius: 80, gooDelay: 1, gooRootSeconds: 2.6,                  // gosma: raio da poça, aviso (s) e tempo preso (s)
+        frenzySeconds: 3.5, frenzySpeedMultiplier: 2.4,                   // fúria: quanto tempo corre e quantas vezes mais rápido
         projectileSpeed: 150,
         projectileRadius: 8,
         projectileDamageMultiplier: 0.8,
@@ -258,6 +259,7 @@ export const BOSS_MODELS = {
         name: 'Grave King',
         title: 'The Rotting Warlord',
         renderAs: 'GRAVE_KING',
+        portraitImage: 'images/characters/grave-king-small.webp',      // retrato do diálogo (cópia de monsters/25d/grave_king/art_reference/images/grave-king.webp)
         hpBase: 3200,
         hpPerTurn: 0,
         speedMin: 34,
@@ -304,6 +306,7 @@ export const BOSS_MODELS = {
         name: 'The Long Night',
         title: 'The Dark Itself',
         renderAs: 'DEMON_LORD',
+        portraitImage: 'images/characters/the-long-night-small.webp',      // retrato do diálogo (cópia de monsters/25d/demon_lord/art_reference/images/the-long-night.webp)
         palette: 'longNight',
         hpBase: 11900,
         hpPerTurn: 0,
@@ -410,10 +413,10 @@ export const BOSS_SPAWNING = {
     // Hora → boss da noite. RIVAL: o rival do herói (RIVAL_OF); RIVAL_FINAL: a revanche dele, que fecha a noite.
     // BRUTOS (hora 6): semi-boss do meio da noite
     // 6 telas x 3 ondas (data_model/campaign.js): o chefe fecha cada tela (ondas 3, 6, 9...). A 1ª tela (Dark Forest) termina com o rival (Azael, ou o Demon Hunter para quem joga de Azael).
-    // Dark Forest: Azael (o rival) · River Crossing: Lake Spirit · Swamp: Slizork · Graveyard: Grave King · Village: Brutos
+    // Dark Forest: Azael (o rival) · River Crossing: River Spirit · Swamp: Slizork · Graveyard: Grave King · Village: Brutos
     // Castle: os TRÊS chefes, um por onda: Blood Countess, The Long Night e a revanche do Azael (o rival). O Demon Lord só vem para quem joga de Brutos, no lugar dele na Village
     schedule: {
-        [3 * 1]: 'RIVAL', [3 * 2]: 'LAKE_SPIRIT', [3 * 3]: 'SLIZORK', [3 * 4]: 'GRAVE_KING', [3 * 5]: 'BRUTOS',
+        [3 * 1]: 'RIVAL', [3 * 2]: 'RIVER_SPIRIT', [3 * 3]: 'SLIZORK', [3 * 4]: 'GRAVE_KING', [3 * 5]: 'BRUTOS',
         [3 * 5 + 1]: 'BLOOD_COUNTESS', [3 * 5 + 2]: 'LONG_NIGHT', [3 * 5 + 3]: 'RIVAL_FINAL'
     },
     spawnScreenRatio: 0.5
@@ -455,7 +458,7 @@ const BOSS_KNOCKBACK_RESIST = 0.85;
 // (um jogador que desvia leva cerca do dobro). O rival da 1ª hora sobe menos: é onde o jogador novo ainda aprende.
 // +15% em todos (2026-11-18): sem monstros comuns durante o boss, a luta é o foco e pode durar mais.
 const BOSS_FOCUS_BONUS = 1.15;
-export const BOSS_HP_SCALE = { LAKE_SPIRIT: 2.2 * BOSS_FOCUS_BONUS, SLIZORK: 2.2 * BOSS_FOCUS_BONUS, GRAVE_KING: 2.2 * BOSS_FOCUS_BONUS, DEMON_LORD: 2.4 * BOSS_FOCUS_BONUS, BRUTOS: 2.2 * BOSS_FOCUS_BONUS, BLOOD_COUNTESS: 1.8 * BOSS_FOCUS_BONUS, LONG_NIGHT: 1.8 * BOSS_FOCUS_BONUS };
+export const BOSS_HP_SCALE = { RIVER_SPIRIT: 2.2 * BOSS_FOCUS_BONUS, SLIZORK: 2.2 * BOSS_FOCUS_BONUS, GRAVE_KING: 2.2 * BOSS_FOCUS_BONUS, DEMON_LORD: 2.4 * BOSS_FOCUS_BONUS, BRUTOS: 2.2 * BOSS_FOCUS_BONUS, BLOOD_COUNTESS: 1.8 * BOSS_FOCUS_BONUS, LONG_NIGHT: 1.8 * BOSS_FOCUS_BONUS };
 const FIRST_HOUR_BOSS_HP_SCALE = 1.7 * BOSS_FOCUS_BONUS;
 const FINAL_BOSS_HP_SCALE = 2 * BOSS_FOCUS_BONUS;
 const OTHER_BOSS_HP_SCALE = 2 * BOSS_FOCUS_BONUS;
@@ -491,7 +494,7 @@ const VARIATION_MOVES = {
     DEMON_LORD: [],
     BRUTOS: ['anchor'],
     BLOOD_COUNTESS: ['bloodfog', 'mirror'],
-    LAKE_SPIRIT: [],
+    RIVER_SPIRIT: [],
     SLIZORK: [],
     GRAVE_KING: [],
     LONG_NIGHT: ['darkness'],

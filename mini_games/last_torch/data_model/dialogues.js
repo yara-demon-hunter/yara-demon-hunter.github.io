@@ -178,19 +178,25 @@ export const DIALOGUE_TYPE_SECONDS = 0.01;
 export const BOSS_INTROS = {
     // Jogando com o Demon Hunter: o Azael foge para o castelo e solta o que tem pelo caminho
     AZAEL: {
-        LAKE_SPIRIT: [
-            { who: 'rival', text: 'The lake drowns every hunter!' },
+        RIVER_SPIRIT: [
+            { who: 'rival', text: 'The river drowns every hunter!' },
+            { who: 'boss', text: 'I am the River. Everyone who crosses me... stays.' },
+            { who: 'hero', text: 'Not today.' },
             { who: 'boss', text: 'Stay... with me...' },
             { who: 'rival', text: 'And beyond it, the swamp finishes what is left!' }
         ],
         SLIZORK: [
             { who: 'rival', text: 'This swamp swallowed armies. You are a snack!' },
+            { who: 'boss', text: 'Grrrk... Hungry... Bow to the Tyrant.' },
             { who: 'hero', text: 'Then it will choke.' },
+            { who: 'boss', text: 'Then I will swallow you.' },
             { who: 'rival', text: 'And the graveyard ahead? Nobody walks out!' }
         ],
         GRAVE_KING: [
             { who: 'rival', text: 'Every grave here was dug for you!' },
+            { who: 'boss', text: 'Kneel. This ground is my kingdom.' },
             { who: 'hero', text: 'I will not lie in one.' },
+            { who: 'boss', text: 'Then lie down with my subjects.' },
             { who: 'rival', text: 'And the village gate will crush what is left!' }
         ],
         BRUTOS: [
@@ -200,12 +206,16 @@ export const BOSS_INTROS = {
         ],
         LONG_NIGHT: [
             { who: 'rival', text: 'You cannot cut the night, hunter!' },
+            { who: 'boss', text: 'I am the dark... and I have no end.' },
             { who: 'hero', text: 'Dawn is coming.' },
+            { who: 'boss', text: 'The sun has forgotten you.' },
             { who: 'rival', text: 'Not for you. Never for you!' }
         ],
         BLOOD_COUNTESS: [
             { who: 'rival', text: 'Welcome to my castle... and to your grave!' },
+            { who: 'boss', text: 'Welcome... Dinner is served.' },
             { who: 'hero', text: 'Show yourself, Azael!' },
+            { who: 'boss', text: 'Come closer. Bleed for me.' },
             { who: 'rival', text: 'First my Countess. Then the night itself!' }
         ],
         default: [
@@ -217,19 +227,25 @@ export const BOSS_INTROS = {
         byHero: {
             // Rowan: calmo, gentil, fala da floresta e da paz, mas não recua
             rowan: {
-                LAKE_SPIRIT: [
-                    { who: 'rival', text: 'The lake drowns every druid, too!' },
+                RIVER_SPIRIT: [
+                    { who: 'rival', text: 'The river drowns every druid, too!' },
+                    { who: 'boss', text: 'I am the River. Everyone who crosses me... stays.' },
                     { who: 'hero', text: 'Water remembers kindness. Please, rest.' },
+                    { who: 'boss', text: 'Stay... with me...' },
                     { who: 'rival', text: 'And the swamp beyond rots every root you love!' }
                 ],
                 SLIZORK: [
                     { who: 'rival', text: 'Water your flowers in my swamp, druid!' },
+                    { who: 'boss', text: 'Grrrk... Hungry... Bow to the Tyrant.' },
                     { who: 'hero', text: 'Even the mire is alive. I will not hate it.' },
+                    { who: 'boss', text: 'Then I will swallow you.' },
                     { who: 'rival', text: 'The graveyard ahead buries gentle fools!' }
                 ],
                 GRAVE_KING: [
                     { who: 'rival', text: 'No tree grows here, druid. Only bones!' },
+                    { who: 'boss', text: 'Kneel. This ground is my kingdom.' },
                     { who: 'hero', text: 'Then I will plant one for you.' },
+                    { who: 'boss', text: 'Then lie down with my subjects.' },
                     { who: 'rival', text: 'The village gate will burn your forest down!' }
                 ],
                 BRUTOS: [
@@ -239,12 +255,16 @@ export const BOSS_INTROS = {
                 ],
                 LONG_NIGHT: [
                     { who: 'rival', text: 'Even your forest dies in the dark!' },
+                    { who: 'boss', text: 'I am the dark... and I have no end.' },
                     { who: 'hero', text: 'Every night ends, Azael.' },
+                    { who: 'boss', text: 'The sun has forgotten you.' },
                     { who: 'rival', text: 'Not this one. Never this one!' }
                 ],
                 BLOOD_COUNTESS: [
                     { who: 'rival', text: 'My castle, druid. No forest here! Meet my Countess!' },
+                    { who: 'boss', text: 'Welcome... Dinner is served.' },
                     { who: 'hero', text: 'Then I bring one with me.' },
+                    { who: 'boss', text: 'Come closer. Bleed for me.' },
                     { who: 'rival', text: 'And then the endless night!' }
                 ],
                 default: [
@@ -255,19 +275,25 @@ export const BOSS_INTROS = {
             },
             // Avgustino: padre contido, fala pouco, fé e um preço que nunca explica
             avgustino: {
-                LAKE_SPIRIT: [
-                    { who: 'rival', text: 'The lake will drown your prayers, priest!' },
+                RIVER_SPIRIT: [
+                    { who: 'rival', text: 'The river will drown your prayers, priest!' },
+                    { who: 'boss', text: 'I am the River. Everyone who crosses me... stays.' },
                     { who: 'hero', text: 'Then I will pray underwater.' },
+                    { who: 'boss', text: 'Stay... with me...' },
                     { who: 'rival', text: 'And the swamp will bury your God!' }
                 ],
                 SLIZORK: [
                     { who: 'rival', text: 'Say a prayer for this swamp, priest!' },
+                    { who: 'boss', text: 'Grrrk... Hungry... Bow to the Tyrant.' },
                     { who: 'hero', text: 'I already said one. For you.' },
+                    { who: 'boss', text: 'Then I will swallow you.' },
                     { who: 'rival', text: 'The graveyard ahead has no priest left!' }
                 ],
                 GRAVE_KING: [
                     { who: 'rival', text: 'Bury yourself, priest. They are waiting!' },
+                    { who: 'boss', text: 'Kneel. This ground is my kingdom.' },
                     { who: 'hero', text: 'Not yet. Not for you.' },
+                    { who: 'boss', text: 'Then lie down with my subjects.' },
                     { who: 'rival', text: 'The village gate will close on your God!' }
                 ],
                 BRUTOS: [
@@ -277,12 +303,16 @@ export const BOSS_INTROS = {
                 ],
                 LONG_NIGHT: [
                     { who: 'rival', text: 'No prayer reaches the Long Night!' },
+                    { who: 'boss', text: 'I am the dark... and I have no end.' },
                     { who: 'hero', text: 'I do not need it to reach. Only to burn.' },
+                    { who: 'boss', text: 'The sun has forgotten you.' },
                     { who: 'rival', text: 'Then burn alone!' }
                 ],
                 BLOOD_COUNTESS: [
                     { who: 'rival', text: 'My castle, priest. God is not home! Meet my Countess!' },
+                    { who: 'boss', text: 'Welcome... Dinner is served.' },
                     { who: 'hero', text: 'I did not come for Him. I came for you.' },
+                    { who: 'boss', text: 'Come closer. Bleed for me.' },
                     { who: 'rival', text: 'And then the endless night!' }
                 ],
                 default: [
@@ -293,19 +323,25 @@ export const BOSS_INTROS = {
             },
             // Gudran: velho senhor do castelo, arrogante, acostumado a ser obedecido
             gudran: {
-                LAKE_SPIRIT: [
-                    { who: 'rival', text: 'The lake drowns old kings, too!' },
+                RIVER_SPIRIT: [
+                    { who: 'rival', text: 'The river drowns old kings, too!' },
+                    { who: 'boss', text: 'I am the River. Everyone who crosses me... stays.' },
                     { who: 'hero', text: 'Water bends to the crown, boy.' },
+                    { who: 'boss', text: 'Stay... with me...' },
                     { who: 'rival', text: 'And the swamp swallows your whole court!' }
                 ],
                 SLIZORK: [
                     { who: 'rival', text: 'Kneel to the swamp, old man!' },
+                    { who: 'boss', text: 'Grrrk... Hungry... Bow to the Tyrant.' },
                     { who: 'hero', text: 'I kneel to nothing.' },
+                    { who: 'boss', text: 'Then I will swallow you.' },
                     { who: 'rival', text: 'The graveyard ahead has your name!' }
                 ],
                 GRAVE_KING: [
                     { who: 'rival', text: 'Your throne is a grave, old king!' },
+                    { who: 'boss', text: 'Kneel. This ground is my kingdom.' },
                     { who: 'hero', text: 'Then I rule it.' },
+                    { who: 'boss', text: 'Then lie down with my subjects.' },
                     { who: 'rival', text: 'The village gate will not open for you!' }
                 ],
                 BRUTOS: [
@@ -315,12 +351,16 @@ export const BOSS_INTROS = {
                 ],
                 LONG_NIGHT: [
                     { who: 'rival', text: 'Even kings die in the dark!' },
+                    { who: 'boss', text: 'I am the dark... and I have no end.' },
                     { who: 'hero', text: 'Kings outlast it.' },
+                    { who: 'boss', text: 'The sun has forgotten you.' },
                     { who: 'rival', text: 'Not this night. Never this one!' }
                 ],
                 BLOOD_COUNTESS: [
                     { who: 'rival', text: 'My castle now, old man. Meet my Countess!' },
+                    { who: 'boss', text: 'Welcome... Dinner is served.' },
                     { who: 'hero', text: 'It was mine first.' },
+                    { who: 'boss', text: 'Come closer. Bleed for me.' },
                     { who: 'rival', text: 'And then the endless night!' }
                 ],
                 default: [
@@ -331,19 +371,25 @@ export const BOSS_INTROS = {
             },
             // Brutos: capitão bruto, pouco papo, vai direto ao ponto (nunca enfrenta a si mesmo: na onda 15 vem a Countess)
             brutos: {
-                LAKE_SPIRIT: [
-                    { who: 'rival', text: 'The lake drowns captains, too!' },
+                RIVER_SPIRIT: [
+                    { who: 'rival', text: 'The river drowns captains, too!' },
+                    { who: 'boss', text: 'I am the River. Everyone who crosses me... stays.' },
                     { who: 'hero', text: 'I do not swim. I walk.' },
+                    { who: 'boss', text: 'Stay... with me...' },
                     { who: 'rival', text: 'And the swamp swallows your whole axe!' }
                 ],
                 SLIZORK: [
                     { who: 'rival', text: 'Swing your axe at the swamp, Captain!' },
+                    { who: 'boss', text: 'Grrrk... Hungry... Bow to the Tyrant.' },
                     { who: 'hero', text: 'Gladly.' },
+                    { who: 'boss', text: 'Then I will swallow you.' },
                     { who: 'rival', text: 'The graveyard ahead has no exit!' }
                 ],
                 GRAVE_KING: [
                     { who: 'rival', text: 'Dead men do not fear axes, Captain!' },
+                    { who: 'boss', text: 'Kneel. This ground is my kingdom.' },
                     { who: 'hero', text: 'Then I chop them twice.' },
+                    { who: 'boss', text: 'Then lie down with my subjects.' },
                     { who: 'rival', text: 'The village gate will not open for you!' }
                 ],
                 BRUTOS: [
@@ -353,12 +399,16 @@ export const BOSS_INTROS = {
                 ],
                 LONG_NIGHT: [
                     { who: 'rival', text: 'Your axe cannot cut the night!' },
+                    { who: 'boss', text: 'I am the dark... and I have no end.' },
                     { who: 'hero', text: 'Wait and see.' },
+                    { who: 'boss', text: 'The sun has forgotten you.' },
                     { who: 'rival', text: 'Not this one. Never this one!' }
                 ],
                 BLOOD_COUNTESS: [
                     { who: 'rival', text: 'My castle, Captain. Meet my Countess!' },
+                    { who: 'boss', text: 'Welcome... Dinner is served.' },
                     { who: 'hero', text: 'Hungry? Come eat.' },
+                    { who: 'boss', text: 'Come closer. Bleed for me.' },
                     { who: 'rival', text: 'And then the endless night!' }
                 ],
                 DEMON_LORD: [
@@ -376,19 +426,25 @@ export const BOSS_INTROS = {
     },
     // Jogando com o Azael: o Demon Hunter assiste e desafia
     DEMON_HUNTER: {
-        LAKE_SPIRIT: [
-            { who: 'rival', text: 'The lake is waking, demon. It wants you.' },
+        RIVER_SPIRIT: [
+            { who: 'rival', text: 'The river is waking, demon. It wants you.' },
+            { who: 'boss', text: 'I am the River. Everyone who crosses me... stays.' },
             { who: 'hero', text: 'Let it try.' },
+            { who: 'boss', text: 'Stay... with me...' },
             { who: 'rival', text: 'And the swamp beyond will not be kinder.' }
         ],
         SLIZORK: [
             { who: 'rival', text: 'The swamp itself is rising, demon.' },
+            { who: 'boss', text: 'Grrrk... Hungry... Bow to the Tyrant.' },
             { who: 'hero', text: 'Let it come.' },
+            { who: 'boss', text: 'Then I will swallow you.' },
             { who: 'rival', text: 'The graveyard ahead has no exit.' }
         ],
         GRAVE_KING: [
             { who: 'rival', text: 'The dead follow their king, demon.' },
+            { who: 'boss', text: 'Kneel. This ground is my kingdom.' },
             { who: 'hero', text: 'Back into the ground, then.' },
+            { who: 'boss', text: 'Then lie down with my subjects.' },
             { who: 'rival', text: 'And the village beyond will not open for you.' }
         ],
         BRUTOS: [
@@ -398,12 +454,16 @@ export const BOSS_INTROS = {
         ],
         LONG_NIGHT: [
             { who: 'rival', text: 'The darkness itself is waking.' },
+            { who: 'boss', text: 'I am the dark... and I have no end.' },
             { who: 'hero', text: 'Stand back and watch.' },
+            { who: 'boss', text: 'The sun has forgotten you.' },
             { who: 'rival', text: 'If you fall, I finish what is left.' }
         ],
         BLOOD_COUNTESS: [
             { who: 'rival', text: 'The castle is ahead, demon. Its Countess is thirsty.' },
+            { who: 'boss', text: 'Welcome... Dinner is served.' },
             { who: 'hero', text: 'Then she will choke on it.' },
+            { who: 'boss', text: 'Come closer. Bleed for me.' },
             { who: 'rival', text: 'Prove it.' }
         ],
         default: [

@@ -2,12 +2,14 @@ import { SKELETON_25D_VISUALS } from './skeleton/skeleton25d_visual.js';
 import { renderSkeleton25D } from './skeleton/skeleton25d.js';
 import { ZOMBIE_CRAWLER_25D_VISUALS } from './zombie_crawler/zombie_crawler25d_visual.js';
 import { renderZombieCrawler25D } from './zombie_crawler/zombie_crawler25d.js';
-import { LAKE_SPIRIT_25D_VISUALS } from './lake_spirit/lake_spirit25d_visual.js';
-import { renderLakeSpirit25D } from './lake_spirit/lake_spirit25d.js';
+import { RIVER_SPIRIT_25D_VISUALS } from './river_spirit/river_spirit25d_visual.js';
+import { renderRiverSpirit25D } from './river_spirit/river_spirit25d.js';
 import { SLIZORK_25D_VISUALS } from './slizork/slizork25d_visual.js';
 import { renderSlizork25D } from './slizork/slizork25d.js';
 import { GRAVE_KING_25D_VISUALS } from './grave_king/grave_king25d_visual.js';
 import { renderGraveKing25D } from './grave_king/grave_king25d.js';
+import { BLOOD_COUNTESS_25D_VISUALS } from './blood_countess/blood_countess25d_visual.js';
+import { renderBloodCountess25D } from './blood_countess/blood_countess25d.js';
 import { SKELETON_CRAWLER_25D_VISUALS } from './skeleton_crawler/skeleton_crawler25d_visual.js';
 import { renderSkeletonCrawler25D } from './skeleton_crawler/skeleton_crawler25d.js';
 import { BLOATER_25D_VISUALS } from './bloater/bloater25d_visual.js';
@@ -82,7 +84,8 @@ export const MONSTERS_25D = {
     golem: { visuals: GOLEM_25D_VISUALS, render: renderGolem25D, still: golemStill },
     armored_zombie: { visuals: ARMORED_ZOMBIE_25D_VISUALS, render: renderArmoredZombie25D },
     zombie: { visuals: ZOMBIE_25D_VISUALS, render: renderZombie25D },
-    lake_spirit: { visuals: LAKE_SPIRIT_25D_VISUALS, render: renderLakeSpirit25D },
+    blood_countess: { visuals: BLOOD_COUNTESS_25D_VISUALS, render: renderBloodCountess25D },
+    river_spirit: { visuals: RIVER_SPIRIT_25D_VISUALS, render: renderRiverSpirit25D },
     slizork: { visuals: SLIZORK_25D_VISUALS, render: renderSlizork25D },
     grave_king: { visuals: GRAVE_KING_25D_VISUALS, render: renderGraveKing25D },
     zombie_crawler: { visuals: ZOMBIE_CRAWLER_25D_VISUALS, render: renderZombieCrawler25D },

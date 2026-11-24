@@ -194,6 +194,22 @@ export function renderBladeSlashes() {
 export function renderEnemyProjectiles() {
     if (state.enemyProjectiles.length === 0) return;
     for (const p of state.enemyProjectiles) {
+        // Bolha do Slizork: translúcida, pulsa e, nos últimos instantes, pisca em vermelho avisando que vai estourar
+        if (p.bubble) {
+            resetWorldView();
+            const left = p.life - p.age;
+            const pulse = 1 + 0.08 * Math.sin(p.age * 9) + (left < 0.9 ? (0.9 - left) * 0.25 : 0);
+            const r = p.radius * pulse;
+            ctx.save();
+            ctx.fillStyle = 'rgba(134, 239, 172, 0.38)';
+            ctx.strokeStyle = left < 0.9 && Math.floor(p.age * 12) % 2 ? 'rgba(248, 113, 113, 0.95)' : 'rgba(220, 255, 230, 0.9)';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, TAU); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath(); ctx.arc(p.x - r * 0.35, p.y - r * 0.38, r * 0.2, 0, TAU); ctx.fill();
+            ctx.restore();
+            continue;
+        }
         if (p.reflected && !p.allyShot) {
             resetWorldView();
             renderReflectedBolt(p);

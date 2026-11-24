@@ -1,5 +1,5 @@
 // GERADO por mini_games/_library/sync.rb. NÃO EDITE: altere mini_games/_library/monsters/25d/vampire/vampire25d.js e rode o sync.
-import { VAMPIRE_25D_VISUALS as S } from './vampire25d_visual.js';
+import { VAMPIRE_25D_VISUALS as S0 } from './vampire25d_visual.js';
 import { registerBody } from '../../../characters/hunter/body_registry.js';
 import { HERO_25D_VISUALS as V } from '../../../characters/hunter/hero25d_visual.js';
 import { mix, add, norm, sub, olimb, oball } from '../../../characters/hunter/kit25d.js';
@@ -14,6 +14,10 @@ import { host } from '../../../core/host.js';
 // Desliza com as mãos juntas na frente do corpo e estica os braços, de unhas abertas, ao chegar perto do alvo.
 // Medidas: vampire25d_visual.js (cores do topdown). Uso: renderVampire25D(e), ou o modelo 'vampire' em renderHero25D.
 
+// S: as medidas do vampiro em uso. O Blood Countess (chefe) usa este mesmo corpo com outras medidas e cores (registerVampireVariant): enquanto uma peça dele
+// é desenhada, S aponta para as medidas dele
+let S = S0;
+
 // Quanto ele está agarrando (0 a 1): o jogo informa por renderVampire25D; sem ele, previewGrab
 let grab = null;
 const grabNow = () => grab ?? S.previewGrab;
@@ -25,7 +29,14 @@ function drawTorso(rig, pose, bottom, top, wb, wt) {
     if (rig.sinF < -0.25) return;
     // Frisos prateados em V e o medalhão vermelho pulsando
     const chest = [top.a + top.A * 0.95, 0, top.z - 1.6];
-    for (const side of [-1, 1]) limb([[top.a + top.A * 0.6, side * top.B * 0.7, top.z - 0.4], [bottom.a + bottom.A, 0, bottom.z + 2.5]], 0.3, C.trim);
+    for (const side of [-1, 1]) limb([[top.a + top.A * 0.6, side * top.B * 0.7, top.z - 0.4], [bottom.a + bottom.A, 0, bottom.z + 2.5]], S.armor ? 0.5 : 0.3, C.trim);
+    if (S.armor) {
+        // Filigrana prateada em espiral no peito e o colar de gola alta
+        for (const side of [-1, 1]) {
+            limb([[top.a + top.A * 0.9, side * top.B * 0.35, top.z - 0.3], [top.a + top.A * 1.0, side * top.B * 0.8, top.z - 1.4], [top.a + top.A * 1.0, side * top.B * 0.45, top.z - 2.6]], 0.3, C.trim);
+            limb([[top.a + top.A * 0.95, side * top.B * 0.6, top.z - 3.2], [top.a + top.A * 1.0, side * top.B * 0.2, top.z - 4.2]], 0.26, C.trim);
+        }
+    }
     const pulse = 0.5 + 0.5 * Math.sin(pose.t * 2.4);
     glowAt(rig, chest, C.eyeGlow, S.medallionRadius * (1.8 + pulse), 0.4 + 0.3 * pulse);
     ball(chest, S.medallionRadius + 0.25, C.medallionRim);
@@ -49,6 +60,12 @@ function drawArm(rig, shoulder, elbow, hand) {
     const { C, limb } = rig;
     const g = grabNow();
     oball(rig, shoulder, S.sleeveWidth * 0.6, C.suit);
+    if (S.armor) {
+        // Ombreira ornamentada (Blood Countess): placa escura com filigrana prateada
+        oball(rig, [shoulder[0], shoulder[1] + Math.sign(shoulder[1]) * 0.5, shoulder[2] + 0.5], S.sleeveWidth * 1.45, C.armor);
+        oball(rig, [shoulder[0] + 0.2, shoulder[1] + Math.sign(shoulder[1]) * 0.5, shoulder[2] + 0.95], S.sleeveWidth * 1.0, C.armorLight);
+        limb([[shoulder[0] - 1.1, shoulder[1], shoulder[2] + 1.6], [shoulder[0] + 0.2, shoulder[1] + Math.sign(shoulder[1]) * 1.2, shoulder[2] + 1.9], [shoulder[0] + 1.3, shoulder[1], shoulder[2] + 1.4]], 0.26, C.trim);
+    }
     olimb(rig, [shoulder, elbow, mix(elbow, hand, 0.82)], S.sleeveWidth, C.suit);
     limb([mix(elbow, hand, 0.74), mix(elbow, hand, 0.84)], S.sleeveWidth + 0.3, C.trim);
     oball(rig, hand, S.handRadius, C.skin);
@@ -111,8 +128,8 @@ function headParts(pose, rig) {
     }];
 }
 
-registerBody('vampire', {
-    vis: S,
+const BODY = {
+    vis: S0,
     // Desliza flutuando: o corpo sobe e desce devagar
     poseTweak: (pose) => {
         const bob = Math.sin(pose.t * S.floatHz * Math.PI * 2) * S.floatAmount;
@@ -136,17 +153,33 @@ registerBody('vampire', {
     },
     drawn: () => 0,
     headParts
-});
+};
+registerBody('vampire', BODY);
+
+// Uma variante do vampiro com outras medidas e cores (o chefe Blood Countess): o mesmo corpo, com S trocado enquanto cada peça é montada e desenhada
+export function registerVampireVariant(id, Sx) {
+    const run = (fn, args) => { const prev = S; S = Sx; try { return fn(...args); } finally { S = prev; } };
+    const wrapPart = (part) => (part && typeof part.draw === 'function' ? { ...part, draw: (...a) => run(part.draw, a) } : part);
+    const wrapped = { vis: Sx };
+    for (const [key, value] of Object.entries(BODY)) {
+        if (typeof value !== 'function') continue;
+        wrapped[key] = (...args) => {
+            const out = run(value, args);
+            return Array.isArray(out) ? out.map(wrapPart) : wrapPart(out);
+        };
+    }
+    registerBody(id, wrapped);
+}
 
 // --- NO JOGO (câmera do Last Torch) ---
 // Estica os braços quando o alvo (o herói, informado pelo jogo em core/host.js) chega perto
 const grabByVampire = new WeakMap();
-export function renderVampire25D(e) {
+export function renderVampire25D(e, model = 'vampire', Sx = S0) {
     const target = host.target();
-    const near = target && Math.hypot(target.x - e.x, target.y - e.y) < S.grabDistance + e.radius ? 1 : 0;
+    const near = target && Math.hypot(target.x - e.x, target.y - e.y) < Sx.grabDistance + e.radius ? 1 : 0;
     const g = (grabByVampire.get(e) ?? 0) + (near - (grabByVampire.get(e) ?? 0)) * 0.1;
     grabByVampire.set(e, g);
     grab = g;
-    renderMonster25D(e, 'vampire', S);
+    renderMonster25D(e, model, Sx);
     grab = null;
 }

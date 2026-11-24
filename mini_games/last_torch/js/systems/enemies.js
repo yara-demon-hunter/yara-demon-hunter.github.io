@@ -8,7 +8,7 @@ import { audio, passives, player, shadowClones, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
 import { addSlam, updateBossAI, updateShadowAI } from './boss_ai.js';
 import { dealDamage } from './damage.js';
-import { addCorpse, addGibs, addShockwave, addStain, createExplosion, hitStop, shakeScreen, zoomPunch } from './effects.js';
+import { addCorpse, addGibs, addShockwave, addStain, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
 import { dropGold } from './gold.js';
 import { GOLD_ECONOMY } from '../../data_model/gold.js';
 import { mod } from './modifiers.js';
@@ -212,6 +212,7 @@ function updateTreantPunch(e, P, dist, angle, dt) {
             e.rootWarn = false;
             if (Math.hypot(player.x - e.rootX, player.y - e.rootY) <= P.root.radius + CHARACTER_MODEL.collisionRadius) {
                 player.rootedTimer = Math.max(player.rootedTimer ?? 0, P.root.seconds);
+                player.rootGoo = false;
                 player.rootedMax = player.rootedTimer;
                 player.dashTimer = 0;
                 audio.playShackle(true);
@@ -423,6 +424,7 @@ function deathEffects(e, model) {
         const dt = model.deathType ?? 'BOSS';          // chefes com morte própria (Slizork explode em bolhas)
         addGibs(dt, e.x, e.y, dt === 'BOSS' ? 1 : 1.6);
         addStain(dt, e.x, e.y, e.radius * 1.6);
+        if (model.deathFx === 'water') riverSpiritBurst(e);
         return;
     }
     addGibs(e.type, e.x, e.y, scale);
@@ -441,6 +443,37 @@ function removeEnemy(i, e) {
 }
 
 // Morte com recompensa: pontos, XP, ouro, itens e os gatilhos dos poderes
+// Morte do River Spirit: o chão molhado ESTOURA. Anéis de água se abrem em sequência, jatos de gotas sobem em volta dela um depois do outro
+// (cada ponto estoura em respingos), clarão azul, tremor e uma poça enorme. As peças e as gotas: library/monsters/25d/death.js (river_spirit e river_spirit_splash)
+function riverSpiritBurst(e) {
+    const turn = state.turn;
+    const later = (ms, fn) => setTimeout(() => { if (state.turn === turn && state.gameState !== 'START') fn(); }, ms);
+    hitStop(0.16);
+    shakeScreen(18);
+    zoomPunch(0.04);
+    screenFlash('#7dd3fc', 0.4);
+    [0, 110, 230, 370].forEach((ms, i) => later(ms, () => {
+        addShockwave(e.x, e.y, { radius: 100 + i * 75, color: i % 2 ? '#e0f2fe' : '#38bdf8', width: 10 - i * 2, seconds: 0.5 + i * 0.1 });
+        shakeScreen(10 - i * 2);
+    }));
+    // Jatos em círculo: o chão rebenta ao redor, do perto para o longe
+    for (let ring = 0; ring < 2; ring++) {
+        const n = 8 + ring * 4;
+        for (let k = 0; k < n; k++) {
+            const a = (k / n) * Math.PI * 2 + ring * 0.4;
+            const d = e.radius * (1.5 + ring * 1.6);
+            later(90 + ring * 180 + k * 30, () => {
+                const x = e.x + Math.cos(a) * d, y = e.y + Math.sin(a) * d;
+                addGibs('RIVER_SPIRIT_SPLASH', x, y, 0.9);
+                createExplosion(x, y, '#7dd3fc', 8);
+                addShockwave(x, y, { radius: 38, color: '#bae6fd', width: 3, seconds: 0.3 });
+            });
+        }
+    }
+    later(200, () => addGibs('RIVER_SPIRIT', e.x, e.y, 1.2));       // segunda onda de bolhas
+    addStain('RIVER_SPIRIT', e.x, e.y, e.radius * 3.2);
+}
+
 function killEnemy(i, e, model) {
     spreadBurn(e);
     deathEffects(e, model);
@@ -780,6 +813,27 @@ function updateReflectedProjectile(p, i, dt) {
     if (p.x < 0 || p.x > state.width || p.y < 0 || p.y > state.height) enemyProjectiles.splice(i, 1);
 }
 
+// Bolha do Slizork: persegue o herói devagar (vira suavemente) e estoura ao fim da vida ou ao encostar nele
+function updateBubble(p, i, dt) {
+    const { enemyProjectiles } = state;
+    p.age += dt;
+    const dx = player.x - p.x, dy = player.y - p.y, d = Math.hypot(dx, dy) || 1;
+    const k = Math.min(1, dt * 2.2);
+    p.vx += ((dx / d) * p.speed - p.vx) * k;
+    p.vy += ((dy / d) * p.speed - p.vy) * k;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    if (p.age >= p.life || d < p.radius + CHARACTER_MODEL.collisionRadius) {
+        enemyProjectiles.splice(i, 1);
+        addShockwave(p.x, p.y, { radius: p.burstRadius, color: '#86efac', width: 5, seconds: 0.3 });
+        createExplosion(p.x, p.y, '#86efac', 16);
+        audio.playBlast();
+        if (Math.hypot(player.x - p.x, player.y - p.y) < p.burstRadius + CHARACTER_MODEL.collisionRadius) {
+            hurtPlayer(p.damage, p.x, p.y, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
+        }
+    }
+}
+
 export function updateEnemyProjectiles(dt) {
     const { enemyProjectiles } = state;
     player.reflectTimer = Math.max(0, player.reflectTimer - dt);
@@ -787,6 +841,11 @@ export function updateEnemyProjectiles(dt) {
 
     for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
         const p = enemyProjectiles[i];
+        if (p.bubble) {
+            updateBubble(p, i, dt);
+            if (state.phase !== 'HUNT') return;
+            continue;
+        }
         if (p.reflected) {
             updateReflectedProjectile(p, i, dt);
             continue;

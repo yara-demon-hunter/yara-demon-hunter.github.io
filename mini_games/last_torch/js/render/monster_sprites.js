@@ -340,8 +340,8 @@ const BOSS_PORTRAITS = {
 const portraits = {};
 
 // Os bosses 2.5D (Demon Lord e Vampiro; o Rival continua o boneco do herói): extent em unidades do boneco
-const BOSS_FOLDER_25D = { DEMON_LORD: 'demon_lord', VAMPIRE: 'vampire', LAKE_SPIRIT: 'lake_spirit', SLIZORK: 'slizork', GRAVE_KING: 'grave_king' };
-const BOSS_EXTENT_25D = { DEMON_LORD: 34, VAMPIRE: 20, LAKE_SPIRIT: 20, SLIZORK: 24, GRAVE_KING: 22 };
+const BOSS_FOLDER_25D = { DEMON_LORD: 'demon_lord', VAMPIRE: 'vampire', BLOOD_COUNTESS: 'blood_countess', RIVER_SPIRIT: 'river_spirit', SLIZORK: 'slizork', GRAVE_KING: 'grave_king' };
+const BOSS_EXTENT_25D = { DEMON_LORD: 34, VAMPIRE: 20, BLOOD_COUNTESS: 22, RIVER_SPIRIT: 20, SLIZORK: 24, GRAVE_KING: 22 };
 
 // Quem desenha um boss 2.5D ao vivo: o boneco com a paleta do boss (a paleta troca só as cores que ela traz)
 const bossPaletteCache = {};
