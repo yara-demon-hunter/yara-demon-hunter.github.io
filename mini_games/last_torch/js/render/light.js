@@ -1,8 +1,14 @@
-import { EVOLUTIONS } from '../../data_model/powers.js';
+import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
+import { getAngelPost } from '../systems/skills_light.js';
 import { ctx, player, powers, state } from '../core/state.js';
 import { CONSECRATION_FINALE_SECONDS, consecration } from '../systems/fury.js';
 import { PASSIVE_SKILL_MODELS } from '../../data_model/passives.js';
 import { drawGlow } from '../../library/core/glow.js';
+import { GUARDIAN_ANGEL_VISUALS, drawGuardianOrb } from '../../library/buddies/index.js';
+import { updateHeroAnim } from '../../library/characters/hunter/hero_anim.js';
+import { renderPlayer25D } from './player25d.js';
+import { heroAnim } from './player.js';
+import { HERO_25D_VISUALS } from '../../library/characters/hunter/hero25d_visual.js';
 
 // --- DESENHO DAS SKILLS DA LUZ (js/systems/skills_light.js) e de Divine Sanctuary (js/systems/fury.js) ---
 // Só linhas e brilhos prontos: um círculo é um brilho, dois anéis, alguns traços e uma cruz. Nada cobre a ação: o
@@ -11,6 +17,8 @@ const L = state.light;
 const TAU = Math.PI * 2;
 const SQUASH = 0.72;                // achatamento do chão (mesma perspectiva do resto do jogo)
 const GOLD = '#fde68a';
+const ANGEL_COLORS = GUARDIAN_ANGEL_VISUALS.colors;
+const ANGEL_BEAM_LENGTH = EVOLUTIONS.guardianAngel.levels.beamLength;       // cruza a tela toda, como o raio do Gudran (BEAM_LENGTH em fury.js)
 const WHITE = '#fef9e7';
 
 // Cruz plana no chão (centro x, y; tamanho s)
@@ -301,6 +309,8 @@ export function renderLightFront() {
     renderRain(state.runTime);
     renderGroundSkillsFront(state.runTime);
     renderChurchBell();
+    renderPendant();
+    renderAngel();
     renderFaithShields();
     if (!L.flasks.length && !L.grounds.length && !L.drops.length && !L.bolts.length && !L.bursts.length && !consecration.on && consecration.finale <= 0) {
         ctx.globalAlpha = 1;
@@ -593,6 +603,186 @@ function renderChurchBell() {
     ctx.beginPath();
     ctx.arc(-swing * 6, 22.5, 2.2, 0, TAU);
     ctx.fill();
+    ctx.restore();
+    ctx.globalAlpha = 1;
+}
+
+// --- SACRED PENDANT: o colar no peito do herói e a onda branca ---
+// Um pingente de cruz dourado no peito, com um brilho que pulsa de leve. Ao acender, anéis brancos abrem do herói até o alcance e
+// um clarão sobe do pingente.
+function renderPendant() {
+    if (powers.sacredPendant.lvl <= 0) return;
+    const P = L.pendant;
+    const t = performance.now() / 1000;
+    for (const ring of L.pendantRings) {
+        const k = ring.age / ring.seconds;
+        const r = ring.radius * easeOut(Math.min(1, k * 1.4));
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        drawGlow(ctx, 'rgba(255, 255, 255, 0.9)', player.x, player.y, r * 0.9, 0.5 * (1 - k));
+        ctx.restore();
+        ctx.strokeStyle = '#ffffff';
+        ctx.globalAlpha = 0.95 * (1 - k);
+        ctx.lineWidth = 5 * (1 - k) + 1;
+        ctx.beginPath();
+        ctx.ellipse(player.x, player.y, r, r * SQUASH, 0, 0, TAU);
+        ctx.stroke();
+        ctx.globalAlpha = 0.45 * (1 - k);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(player.x, player.y, r * 0.78, r * 0.78 * SQUASH, 0, 0, TAU);
+        ctx.stroke();
+    }
+    // O colar fica no peito, então só aparece com o herói de frente (ou de lado); de costas, some. Mesma câmera do boneco 2.5D:
+    // o peito é um ponto à frente do corpo (a), na altura do peito (z), projetado na direção para onde ele olha
+    const f = heroAnim.facing;
+    const vis = Math.max(0, Math.min(1, (Math.sin(f) + 0.45) / 0.5));
+    if (vis <= 0) {
+        ctx.globalAlpha = 1;
+        return;
+    }
+    const C = HERO_25D_VISUALS;
+    // Andando, o tronco se inclina para a frente (runLean) e desce um pouco, e a cabeça vem junto: o colar acompanha o peito, para não subir
+    // até a boca. Parado fica no meio do peito (z 11,6), bem abaixo da gola; andando, mantém a mesma distância abaixo da boca
+    const run = heroAnim.run;
+    const reach = 2.9 + C.runLean * run;
+    const chestZ = 11.6 - run * 1.4;
+    const x = player.x + Math.cos(f) * reach * C.scale;
+    const y = player.y + (Math.sin(f) * reach * C.groundSquash - chestZ * C.heightScale) * C.scale;
+    const pulse = 0.5 + 0.5 * Math.sin(t * 2.4);
+    drawGlow(ctx, 'rgba(255, 255, 255, 0.9)', x, y, 6 + 14 * P.flash, Math.min(1, (0.35 + 0.25 * pulse + 0.4 * P.flash) * vis));
+    ctx.globalAlpha = vis;
+    ctx.strokeStyle = '#fde68a';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 2.8);
+    ctx.lineTo(x, y + 2.8);
+    ctx.moveTo(x - 2.1, y - 0.9);
+    ctx.lineTo(x + 2.1, y - 0.9);
+    ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.globalAlpha = vis * (0.6 + 0.4 * pulse);
+    ctx.fillRect(x - 0.5, y - 1.4, 1, 1);
+    ctx.globalAlpha = 1;
+}
+
+// --- GUARDIAN ANGEL: o anjo do cajado e as bolas de luz ---
+// O anjo é um boneco 2.5D do motor do herói (library/buddies/guardian_angel/angel25d.js), com a própria animação como as sombras
+// do Shadow Clone: anda (voa), vira para onde vai, bate as asas e mexe as pernas. Aqui só se escolhe quando desenhar.
+// Barra de vida em cima da cabeça (como a das sombras) e, caído, o anel dourado no posto que enche até ele voltar
+function renderAngelHp(A) {
+    const w = 30;
+    const x = A.x - w / 2;
+    const y = A.y - 70;
+    const max = Math.max(1, A.maxHp);
+    const ratio = Math.max(0, Math.min(1, A.hp / max));
+    const low = ratio < 0.35;
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+    ctx.fillRect(x, y, w, 4);
+    // O pedaço que acabou de se perder fica vermelho e some devagar: mostra o tamanho do golpe
+    ctx.fillStyle = '#f43f5e';
+    ctx.fillRect(x, y, w * Math.max(ratio, Math.min(1, A.ghost / max)), 4);
+    // Vida baixa: a barra fica vermelha e pisca
+    ctx.fillStyle = low ? (Math.sin(performance.now() / 110) > 0 ? '#fb7185' : '#fecdd3') : '#fde68a';
+    ctx.fillRect(x, y, w * ratio, 4);
+    ctx.strokeStyle = 'rgba(255, 251, 235, 0.9)';
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(x, y, w, 4);
+}
+
+function renderAngelRespawn(A) {
+    const M = POWER_MODELS.guardianAngel;
+    const post = getAngelPost();
+    const progress = 1 - A.respawn / M.respawnSeconds;
+    ctx.save();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(253, 230, 138, 0.25)';
+    ctx.beginPath();
+    ctx.ellipse(post.x, post.y, 16, 16 * SQUASH, 0, 0, TAU);
+    ctx.stroke();
+    ctx.strokeStyle = '#fde68a';
+    ctx.beginPath();
+    ctx.ellipse(post.x, post.y, 16, 16 * SQUASH, 0, -Math.PI / 2, -Math.PI / 2 + progress * TAU);
+    ctx.stroke();
+    ctx.restore();
+}
+
+// Raio do Archangel: o MESMO desenho do raio do Gudran (js/render/arcane.js, renderFuryBeam), em branco. Sai da ponta do cajado e cruza a
+// tela toda na direção em que o anjo olha: camadas aditivas (largas e fracas por fora, fina e branca no meio), pulso de largura a cada
+// tique de dano, faíscas correndo pela linha e clarão na origem.
+function renderAngelBeams() {
+    if (!L.angelBeams.length) return;
+    const t = state.runTime;
+    for (const b of L.angelBeams) {
+        const grow = Math.min(1, b.age / 0.18) * (1 - Math.max(0, (b.age - (b.seconds - 0.3)) / 0.3));
+        const pulse = 1 + 0.12 * Math.sin(t * 38) + b.pulse * 0.25;
+        b.pulse = Math.max(0, b.pulse - 0.1);
+        const w = b.width * grow;
+        const ex = b.sx + b.dx * ANGEL_BEAM_LENGTH;
+        const ey = b.sy + b.dy * ANGEL_BEAM_LENGTH;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.lineCap = 'round';
+        for (const [mul, color, alpha] of [[2.1, '#cbd5e1', 0.14], [1.5, '#e2e8f0', 0.22], [1.0, '#f1f5f9', 0.4], [0.5, '#f8fafc', 0.75], [0.2, '#ffffff', 1]]) {
+            ctx.strokeStyle = color;
+            ctx.globalAlpha = alpha;
+            ctx.lineWidth = Math.max(1, w * mul * pulse);
+            ctx.beginPath();
+            ctx.moveTo(b.sx, b.sy);
+            ctx.lineTo(ex, ey);
+            ctx.stroke();
+        }
+        // Faíscas correndo pela linha
+        ctx.globalAlpha = 0.9 * grow;
+        ctx.fillStyle = '#ffffff';
+        for (let i = 0; i < 16; i++) {
+            const k = ((t * 1.6 + i / 16) % 1);
+            const d = k * 900;
+            const side = Math.sin(i * 12.9 + Math.floor(t * 8) * 1.7) * w * 0.6;
+            ctx.beginPath();
+            ctx.arc(b.sx + b.dx * d - b.dy * side, b.sy + b.dy * d + b.dx * side, 1.6 + (1 - k) * 1.8, 0, TAU);
+            ctx.fill();
+        }
+        // Clarão na origem
+        ctx.globalAlpha = 1;
+        drawGlow(ctx, '#e2e8f0', b.sx, b.sy, w * 1.6 * pulse, 0.9);
+        drawGlow(ctx, '#ffffff', b.sx, b.sy, w * 0.7 * pulse, 0.9);
+        ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+}
+
+function renderAngel() {
+    const A = L.angel;
+    if (A.respawn > 0 && powers.guardianAngel.lvl > 0) renderAngelRespawn(A);
+    if (!A.on || !A.anim) return;
+    updateHeroAnim(A.anim, A);
+    // Levando golpe: o corpo pisca e fica vermelho (todo branco, o anel de dano do motor quase não aparece)
+    ctx.save();
+    if (A.hurtFx > 0) ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(performance.now() / 40));
+    renderPlayer25D(A, A.anim, ANGEL_COLORS, null, 'angel');
+    ctx.restore();
+    if (A.hurtFx > 0) drawGlow(ctx, 'rgba(255, 45, 70, 0.95)', A.x, A.y - 26, 24 + 8 * A.hurtFx, 0.6 * A.hurtFx);
+    // Vida baixa: brilho vermelho pulsando em volta, pedindo socorro
+    if (A.hp / Math.max(1, A.maxHp) < 0.35) drawGlow(ctx, 'rgba(255, 60, 70, 0.9)', A.x, A.y - 26, 26, 0.1 + 0.1 * Math.sin(performance.now() / 160));
+    renderAngelHp(A);
+    renderAngelBeams();
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (const shot of L.angelShots) {
+        if (shot.age < 0) continue;
+        const k = Math.min(1, shot.age / shot.seconds);
+        const at = (kk) => [shot.x0 + (shot.tx - shot.x0) * kk, shot.y0 + (shot.ty - 10 - shot.y0) * kk - Math.sin(Math.PI * kk) * 16];
+        drawGuardianOrb(ctx, ...at(k));
+        // Rastro curto
+        for (let i = 1; i <= 3; i++) {
+            const [rx, ry] = at(Math.max(0, k - i * 0.07));
+            ctx.globalAlpha = 0.35 / i;
+            ctx.beginPath();
+            ctx.arc(rx, ry, 2.4 - i * 0.4, 0, TAU);
+            ctx.fill();
+        }
+    }
     ctx.restore();
     ctx.globalAlpha = 1;
 }

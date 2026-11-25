@@ -23,6 +23,59 @@ export const skillsSfx = {
         this.burst({ filter: 'bandpass', freq: 500, to: 1400, q: 0.8, attack: 0.06, decay: 0.42, gain: 0.3 });
     },
 
+    // Parry: aço batendo em aço. Estalo metálico agudo, anel que fica no ar e um baque grave de quem foi desviado
+    playParry() {
+        if (!this.ctx || this.throttled('parry', 0.08)) return;
+        this.burst({ filter: 'highpass', freq: 3800, to: 6500, attack: 0.001, decay: 0.05, gain: 0.34 });
+        this.tone({ type: 'square', freq: 1480, to: 1180, attack: 0.001, decay: 0.07, gain: 0.1 });
+        this.tone({ type: 'triangle', freq: 2217, to: 2100, at: 0.004, decay: 0.34, gain: 0.13 });
+        this.tone({ type: 'sine', freq: 3322, at: 0.01, decay: 0.42, gain: 0.07 });
+        this.sub({ freq: 150, to: 70, decay: 0.16, gain: 0.3 });
+    },
+
+    // Sacred Pendant: pancada branca que empurra tudo. Baque grave, estouro de ar e um brilho de sinos que sobe
+    playPendant() {
+        if (!this.ctx || this.throttled('pendant', 0.15)) return;
+        this.sub({ freq: 110, to: 42, decay: 0.45, gain: 0.5 });
+        this.burst({ filter: 'bandpass', freq: 700, to: 2600, q: 0.7, attack: 0.01, decay: 0.34, gain: 0.34 });
+        this.tone({ type: 'sine', freq: 1568, to: 2093, at: 0.03, decay: 0.5, gain: 0.1 });
+        this.tone({ type: 'sine', freq: 2349, to: 3136, at: 0.08, decay: 0.55, gain: 0.07 });
+    },
+
+    // Guardian Angel: o cajado solta uma bolinha de luz. Chiado curto que sobe, depois um "ting" macio quando estoura
+    playAngelBolt() {
+        if (!this.ctx || this.throttled('angelBolt', 0.07)) return;
+        this.tone({ type: 'sine', freq: 880, to: 1760, decay: 0.16, gain: 0.09 });
+        this.tone({ type: 'triangle', freq: 1320, to: 2640, at: 0.02, decay: 0.12, gain: 0.05 });
+    },
+    playAngelHit() {
+        if (!this.ctx || this.throttled('angelHit', 0.06)) return;
+        this.tone({ type: 'sine', freq: 1976, to: 1480, decay: 0.22, gain: 0.1 });
+        this.burst({ filter: 'highpass', freq: 3500, decay: 0.05, gain: 0.12 });
+    },
+
+    // Archangel: o raio de luz sagrada. Um acorde que sobe e abre (coro de seno), um zumbido grave e o estalo de luz no começo
+    playAngelBeam() {
+        if (!this.ctx || this.throttled('angelBeam', 0.4)) return;
+        this.sub({ freq: 98, to: 64, attack: 0.02, decay: 0.9, gain: 0.34 });
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => this.tone({ type: 'sine', freq, to: freq * 1.5, at: i * 0.04, attack: 0.06, decay: 0.9, gain: 0.09 }));
+        this.burst({ filter: 'bandpass', freq: 1800, to: 5200, q: 0.8, attack: 0.02, decay: 0.7, gain: 0.2 });
+        this.burst({ filter: 'highpass', freq: 4200, decay: 0.08, gain: 0.26 });
+    },
+
+    // Rose Whip: o estalo do chicote (hit = false: sai da mão; true: pega no monstro, com o baque e o brilho de pétalas)
+    playRoseWhip(hit = false) {
+        if (!this.ctx || this.throttled(hit ? 'roseWhipHit' : 'roseWhip', 0.1)) return;
+        if (!hit) {
+            this.burst({ filter: 'highpass', freq: 3200, to: 9000, attack: 0.002, decay: 0.07, gain: 0.3 });
+            this.tone({ type: 'sawtooth', freq: 900, to: 240, decay: 0.09, gain: 0.07 });
+            return;
+        }
+        this.burst({ filter: 'bandpass', freq: 2600, to: 900, q: 1, attack: 0.001, decay: 0.12, gain: 0.34 });
+        this.sub({ freq: 120, to: 60, decay: 0.2, gain: 0.3 });
+        this.tone({ type: 'sine', freq: 1568, to: 2093, at: 0.04, decay: 0.3, gain: 0.07 });
+    },
+
     // Executioner: corte seco
     playExecute() {
         if (!this.ctx || this.throttled('execute', 0.06)) return;

@@ -1,11 +1,12 @@
 // --- PASSIVAS ---
-// type 'skill': aprendidas na árvore de skills, com pontos (data_model/tree.js).
+// type 'skill': aprendidas na árvore de skills, com pontos (data_model/skill_tree).
 // Sem type (relíquias): compradas com ouro na árvore de relíquias do acampamento (data_model/relics.js),
 // onde cost é o preço base em moedas.
 // mods: efeitos simples, somados por js/systems/modifiers.js. As skills têm mecânica própria.
 
 const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
 const formatMultiplier = (value) => `${Number(value.toFixed(2))}×`;
+const formatNumber = (value) => String(Number(value.toFixed(2)));
 
 export const PASSIVE_SKILL_MODELS = {
     shadowWhirl: {
@@ -13,7 +14,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🌀',
         cost: 80,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         desc: 'Your final combo hit becomes a whirlwind: a long, sharp purple cut that spins around you like a small tornado, striking every enemy in a much wider circle.'
     },
     mirrorWard: {
@@ -21,7 +22,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🪞',
         cost: 60,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Bats an incoming enemy shot back at the nearest monster. Recharges in ${MIRROR_WARD.cooldownSeconds}s.`;
         }
@@ -31,7 +32,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '⛓️',
         cost: 120,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Every ${SHADOW_SHACKLE.cooldownSeconds}s you hurl a chain at the strongest monster within dagger range. It stays nailed to that spot for ${SHADOW_SHACKLE.holdSeconds}s, but only ${Math.round(SHADOW_SHACKLE.holdSeconds * SHADOW_SHACKLE.bossRatio)}s on a boss. A chained monster can still attack, and a boss can still teleport, but neither can walk.`;
         }
@@ -41,7 +42,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🔱',
         cost: 110,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Throws ${FAN_OF_KNIVES.count} daggers at once in a fan.`;
         }
@@ -51,9 +52,19 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '👥',
         cost: 150,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `A shadow keeps watch near the torch and walks out to cut down whatever comes close. Monsters ignore it, but a stray hit can still bring it down. It returns after ${SHADOW_CLONE.respawnSeconds}s.`;
+        }
+    },
+    parry: {
+        name: 'Parry',
+        icon: '🤺',
+        cost: 90,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        get desc() {
+            return `When a monster strikes you in melee, your sword turns the blow aside: you take no damage, the attacker is stunned for ${formatNumber(PARRY.stun)}s and riposted for ${formatMultiplier(PARRY.damage)} weapon damage, and neighbours within ${PARRY.radius} are stunned too. Ready every ${formatNumber(PARRY.cooldown)}s. Bosses are stunned only briefly.`;
         }
     },
     warCry: {
@@ -61,9 +72,19 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '📣',
         cost: 90,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `When surrounded by ${WAR_CRY.monsters} monsters, you roar: they are thrown back and stunned, and your blade hits ${formatPercent(WAR_CRY.bladeBonus)} harder for ${WAR_CRY.bonusSeconds}s.`;
+        }
+    },
+    roseWhip: {
+        name: 'Rose Whip',
+        icon: '🌹',
+        cost: 130,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        get desc() {
+            return `Every ${ROSE_WHIP.cooldownSeconds}s you crack a whip of thorns, a rose at its tip, at the strongest monster within ${ROSE_WHIP.range} reach. It lashes for ${formatMultiplier(ROSE_WHIP.lashDamage)} spell damage and stays wrapped around it for ${ROSE_WHIP.holdSeconds}s (${Math.round(ROSE_WHIP.holdSeconds * ROSE_WHIP.bossRatio)}s on a boss): the monster is pinned to the spot and the thorns bite for ${formatMultiplier(ROSE_WHIP.thornDps)} spell damage per second.`;
         }
     },
     executioner: {
@@ -71,7 +92,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🪓',
         cost: 90,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Crimson Tide evolves: every swing throws ${EXECUTIONER.crescents} blood crescents in a fan instead of one, each hitting as hard as the original.`;
         }
@@ -81,7 +102,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🌫️',
         cost: 70,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Every dash leaves a trail of smoke that lingers for ${SMOKE_BOMB.seconds}s. Monsters inside it slow down, and every hit they take, from blade or dagger, has a ${formatPercent(SMOKE_BOMB.critChance)} chance to be a critical hit.`;
         }
@@ -91,7 +112,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '⚔️',
         cost: 90,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Your sword catches fire. Every cut burns monsters for ${formatPercent(FLAME_BLADE.burnRatio)} of the hit's damage per second for ${FLAME_BLADE.burnSeconds}s. A burning monster that dies passes the fire to others within ${FLAME_BLADE.spreadRadius} range. Under the Oath of the Hearth, burn damage is multiplied by ${FLAME_BLADE.oathMultiplier}.`;
         }
@@ -101,7 +122,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '☄️',
         cost: 90,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby, setting it ablaze and leaving the ground burning. Everything that improves your daggers still counts, and your magic damage multiplies the fireball on top (its hits show in blue). The price: you stand still for a moment, unable to do anything, while the fire grows in your hand. Hold the dagger button to charge it into a huge fireball that deals up to 4x damage and bursts over a wide area.',
         warning: 'Charged fireballs do not ricochet, and Ricochet is lost while you hold the fire.'
     },
@@ -110,7 +131,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🌪️',
         cost: 130,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Every ${FIRE_TORNADO.cooldownSeconds}s a tornado of fire forms over the torch and rages for ${FIRE_TORNADO.durationSeconds}s, scorching everything within ${FIRE_TORNADO.radius} range of the torch (as far as a maxed Hearth Ring reaches) for ${formatMultiplier(FIRE_TORNADO.damage)} torch fire damage every ${FIRE_TORNADO.tickSeconds}s and setting it ablaze. It counts as the torch's fire.`;
         }
@@ -120,7 +141,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🐦‍🔥',
         cost: 130,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `A fire phoenix rises from the torch and circles it, hurling fireballs every ${HEARTH_PHOENIX.cooldownSeconds}s at monsters near the flame for ${formatMultiplier(HEARTH_PHOENIX.boltDamage)} spell damage, and every ${HEARTH_PHOENIX.breathCooldown}s it breathes a ${HEARTH_PHOENIX.breathSeconds}s torrent of fire that scorches everything in its path. They count as the torch's fire.`;
         }
@@ -130,7 +151,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🔵',
         cost: 90,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `The torch burns blue, and so does everything it does: its bolts, rings and light. Its light and warmth reach ${formatPercent(BLUE_TORCH.light)} and ${formatPercent(BLUE_TORCH.warmth)} farther, the torch's fire hits ${formatPercent(BLUE_TORCH.fireDamage)} harder, and the cold flame slows every monster inside its warmth by ${formatPercent(BLUE_TORCH.chill)}. Monsters slowed this way take ${formatPercent(BLUE_TORCH.brittle)} more damage from the torch's fire hits only.`;
         }
@@ -140,8 +161,16 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🦅',
         cost: 130,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
-        desc: 'A phoenix flies at your shoulder and hurls fireballs. When you fall, it gives its life to raise you in a storm of fire. If the torch goes out, it dives into the flame and relights it at half health, shielding you both. Either way, it is reborn the next wave.'
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        desc: 'A phoenix flies at your shoulder and hurls fireballs at the monsters near you. Learn Phoenix Reborn to let it give its life for you.'
+    },
+    phoenixReborn: {
+        name: 'Phoenix Reborn',
+        icon: '🔥',
+        cost: 130,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        desc: 'The phoenix gives its life for you. When you fall, it raises you in a storm of fire. If the torch goes out, it dives into the flame and relights it at half health, shielding you both. Either way, it is reborn the next wave.'
     },
 
     shadowRaven: {
@@ -149,7 +178,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🐦‍⬛',
         cost: 90,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `A small raven circles at your shoulder. Every ${SHADOW_RAVEN.cooldownSeconds}s it dives at the nearest monster within ${SHADOW_RAVEN.range} range, pecks it for ${formatMultiplier(SHADOW_RAVEN.damage)} blade damage and flies back. The pecked monster is marked for ${SHADOW_RAVEN.markSeconds}s: every hit it takes deals ${formatPercent(SHADOW_RAVEN.markDamage)} more damage.`;
         }
@@ -161,9 +190,9 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🌵',
         cost: 120,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
-            return `A monster that dies while pinned by roots bursts into thorns: ${formatMultiplier(THORN_BURST.damage)} spell damage to everything within ${THORN_BURST.radius} range.`;
+            return `A monster killed by any Nature skill sprouts into a Cactling (up to ${THORN_BURST.maxCacti} at a time). When a monster, or you, touches it, it bursts and shoots ${THORN_BURST.needles} thorns in every direction, each hitting for ${formatMultiplier(THORN_BURST.needleDamage)} spell damage (a single monster takes at most ${THORN_BURST.maxPerMonster} of them).`;
         }
     },
     // Só o Rowan (hero: 'rowan' no nó da árvore): as rosas escurecem e ferem mais. Vale como mod de dano da adaga (knifeDamage),
@@ -173,7 +202,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🥀',
         cost: 140,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Your roses wither and turn black: +${formatPercent(this.mods.knifeDamage)} dagger damage, and a monster they hit is marked with a black rose for ${THORN_ROSES.markSeconds}s. If it dies marked, thorn roses burst from the ground where it fell and hurt everything that crosses them for ${THORN_ROSES.patchSeconds}s. Only Rowan can learn this. Every skill that improves daggers works on roses.`;
         },
@@ -184,7 +213,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🦌',
         cost: 200,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'wild', tagline: 'The forest remembers',
         get desc() {
             const mods = this.mods;
@@ -199,7 +228,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🗡️',
         cost: 0,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `You anoint your blade with holy water. Every blade hit also burns for ${Math.round(this.magicRatio * 100)}% of your magic damage (a blue number next to the white one): physical and holy at once.`;
         },
@@ -213,7 +242,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🙏',
         cost: 0,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Every ${this.cooldownSeconds}s you pray over a common monster near you and it joins your side for the rest of the night, with its normal health (full, even if it was wounded). It never heals. Converts stack up to ${this.maxAllies}: they fight the monsters near them and provoke them, so the horde attacks them instead of you. Bosses and elites cannot be converted. Only Avgustino can learn this.`;
         },
@@ -235,7 +264,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🔷',
         cost: 0,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
             return `Your arcane bolts pierce ${this.pierce} extra monster${this.pierce === 1 ? '' : 's'} and burst in blue light where they end, hurting everything within ${this.burstRadius} range for ${formatPercent(this.burstDamage)} of the bolt's damage. Only Gudran can learn this.`;
         },
@@ -248,7 +277,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🕯️',
         cost: 200,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'faith', tagline: 'Light answers the dark',
         get desc() {
             const mods = this.mods;
@@ -268,7 +297,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '☠️',
         cost: 200,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'slaughter', tagline: 'Blood answers blood',
         get desc() {
             const { bladeDamage, attackSpeed, furyCharge, killHeal } = this.mods;
@@ -281,7 +310,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🤫',
         cost: 300,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'whispers', tagline: 'Never where they strike',
         get desc() {
             const mods = this.mods;
@@ -294,7 +323,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '🛡️',
         cost: 200,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'hearth', tagline: 'The flame will not die',
         get desc() {
             const mods = this.mods;
@@ -307,7 +336,7 @@ export const PASSIVE_SKILL_MODELS = {
         icon: '📕',
         cost: 200,
         maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/tree.js)
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'ruin', tagline: 'The dark pays in kind',
         get desc() {
             const mods = this.mods;
@@ -458,7 +487,12 @@ export const PASSIVE_SKILL_MODELS = {
 };
 
 // Natureza: o estouro de espinhos e a casca do carvalho (js/systems/skills_nature.js)
-export const THORN_BURST = { radius: 80, damage: 1.2, knockback: 90 };
+// Thorn Burst: quem morre por um golpe do Nature Path vira um Caquito (cacto pequeno, no máximo maxCacti de uma vez); quando um monstro ou o herói encosta
+// nele (depois de armSeconds), ele explode e solta `needles` espinhos em todas as direções (cada um fere o primeiro monstro que acerta).
+export const THORN_BURST = {
+    maxCacti: 3, lifeSeconds: 25, growSeconds: 0.3, armSeconds: 0.7, touchRadius: 15,
+    needles: 12, maxPerMonster: 3, needleDamage: 0.7, needleSpeed: 430, needleLife: 0.5, needleRadius: 5, knockback: 70
+};
 // Dark Roses (só o Rowan): o monstro atingido por uma rosa negra fica marcado por markSeconds; se morrer marcado, brotam rosas de
 // espinho no lugar (patchSeconds) que ferem quem passa (damage = dano da adaga x isto, a cada tickSeconds) e desaceleram
 export const THORN_ROSES = { markSeconds: 10, patchSeconds: 6, radius: 34, damage: 0.35, tickSeconds: 0.5, slow: 0.35, growSeconds: 0.25 };
@@ -501,6 +535,19 @@ export const WAR_CRY = {
     damage: 1.2,
     bladeBonus: 0.2,            // dano extra da lâmina depois do rugido
     bonusSeconds: 3.5
+};
+
+// Parry (js/systems/skills_blade.js, tryParry): o golpe corpo a corpo que ia acertar o herói é desviado com a espada. Sem dano para ele;
+// o monstro leva um contragolpe e fica atordoado, e os vizinhos (radius) também, pela metade do tempo. Chefe só perde bossStunRatio do
+// atordoamento. Passiva única (antes era um poder de 5 níveis): os números são os do antigo nível 3.
+export const PARRY = {
+    cooldown: 5.5,              // segundos até poder aparar de novo
+    stun: 1.4,                  // atordoamento de quem bateu
+    damage: 1.5,                // contragolpe, x dano de arma
+    radius: 60,                 // vizinhos do atacante também ficam atordoados (metade do tempo)
+    knockback: 260,
+    bossStunRatio: 0.35,
+    invulnerableSeconds: 0.5    // o herói fica invulnerável depois do aparo
 };
 
 // Whirlwind: o giro puxa os monstros comuns até `pullRadiusRatio` x o alcance do golpe, `pullFraction` do caminho até o herói (parando a `minDistance` px do centro), antes de bater
@@ -618,12 +665,17 @@ export const HEARTH_PHOENIX = {
 
 // Phoenix Pact: a fênix voa no ombro do herói e atira bolas de fogo. Quando ele cai, ela morre para levantá-lo
 // (uma vez por hora) e renasce na hora seguinte.
-export const PHOENIX_PACT = {
-    healRatio: 0.45,
+// Phoenix Reborn: a fênix se sacrifica (uma vez por hora): levanta o herói caído ou reacende a tocha apagada (js/systems/skills_flame.js,
+// tryPhoenix e tryPhoenixTorch). Antes isso era parte do Phoenix Pact, que agora é só a ave que voa e atira.
+export const PHOENIX_REBORN = {
+    healRatio: 0.45,            // vida com que o herói levanta
     invulnerableSeconds: 2.5,
-    radius: 300,
-    damage: 3,
-    knockback: 760,
+    radius: 300,                // o pulso de fogo em volta de quem foi salvo
+    damage: 3,                  // x dano de feitiço
+    knockback: 760
+};
+
+export const PHOENIX_PACT = {
     // Voo
     shoulderX: 28,              // ao lado do herói, sempre do lado de trás de quem anda
     shoulderY: -42,
@@ -648,6 +700,19 @@ export const SHADOW_SHACKLE = {
     holdSeconds: 10,
     bossRatio: 0.5,             // num chefe a corrente segura só esta parte do tempo (50%: 5 s)
     speed: 800                  // velocidade da ponta da corrente
+};
+
+// Rose Whip (Nature; js/systems/skills_nature.js, updateRoseWhip; desenho em js/render/rose_whip.js): irmã do Shadow Shackle. O chicote voa até o
+// monstro de mais vida ao alcance, açoita (lashDamage) e fica enrolado nele: prende no lugar (e.chained) e os espinhos mordem a cada tique.
+export const ROSE_WHIP = {
+    cooldownSeconds: 12,        // conta a partir do lançamento
+    range: 300,                 // alcance do chicote, a partir do herói
+    holdSeconds: 6,             // quanto tempo fica enrolado
+    bossRatio: 0.5,             // num chefe segura só esta parte do tempo
+    speed: 900,                 // velocidade da ponta do chicote
+    lashDamage: 3.2,            // o açoite, x dano de feitiço
+    thornDps: 0.7,              // os espinhos, x dano de feitiço por segundo enquanto está enrolado
+    tickSeconds: 0.5
 };
 
 // Companheiros em voo (fênix, Grave Wisp, Shadow Raven): rodeiam devagar o ponto onde ficam e demoram mais para

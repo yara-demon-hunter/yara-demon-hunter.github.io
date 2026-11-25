@@ -1,4 +1,4 @@
-import { EXECUTIONER, WAR_CRY } from '../../data_model/passives.js';
+import { EXECUTIONER, PARRY, WAR_CRY } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { isFireCasting } from './knives.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
@@ -109,11 +109,11 @@ function slamImpact() {
     const M = POWER_MODELS.earthbreaker;
     const { x, y } = player;
     const evolved = powers.earthbreaker.evolved;
-    quake(x, y, level.radius, getBladeDamage() * level.damage, M.knockback, M.stunSeconds);
-    addCracks(x, y, level.radius * 1.1, evolved);
-    addShockwave(x, y, { radius: level.radius, color: '#e7e0cf', width: 12, seconds: 0.4 });
-    addShockwave(x, y, { radius: level.radius * 0.6, color: '#fb923c', width: 6, seconds: 0.3 });
-    addGibs('ROCK', x, y, 1 + level.radius / 120);
+    quake(x, y, P.radius, getBladeDamage() * P.damage, M.knockback, M.stunSeconds);
+    addCracks(x, y, P.radius * 1.1, evolved);
+    addShockwave(x, y, { radius: P.radius, color: '#e7e0cf', width: 12, seconds: 0.4 });
+    addShockwave(x, y, { radius: P.radius * 0.6, color: '#fb923c', width: 6, seconds: 0.3 });
+    addGibs('ROCK', x, y, 1 + P.radius / 120);
     createExplosion(x, y, '#a8a29e', 14);
     shakeScreen(14);
     hitStop(0.08);
@@ -123,11 +123,11 @@ function slamImpact() {
     if (!evolved) return;
     const E = EVOLUTIONS.earthbreaker;
     for (let i = 1; i <= E.aftershocks; i++) {
-        state.aftershocks.push({ x, y, delay: i * E.aftershockSeconds, radius: level.radius + i * E.aftershockStep, damage: level.damage * E.aftershockDamage });
+        state.aftershocks.push({ x, y, delay: i * E.aftershockSeconds, radius: P.radius + i * E.aftershockStep, damage: P.damage * E.aftershockDamage });
     }
     for (let i = 0; i < E.lava.count; i++) {
         const a = (i / E.lava.count) * TAU + Math.random() * 0.5;
-        const r = level.radius * (0.45 + Math.random() * 0.5);
+        const r = P.radius * (0.45 + Math.random() * 0.5);
         addGroundFire(x + Math.cos(a) * r, y + Math.sin(a) * r * 0.82, { life: E.lava.life, radius: E.lava.radius, dps: E.lava.dps, evolved: true });
     }
 }
@@ -153,12 +153,52 @@ function updateEarthbreaker(dt) {
     timers.earthbreaker = (timers.earthbreaker ?? level.cooldown * 0.4) - dt;
     // Pronto, espera ter alguém perto: o golpe nunca é gasto no vazio
     if (timers.earthbreaker > 0 || player.move || player.dashTimer > 0 || isFireCasting()) return;
-    const near = state.enemies.some(e => Math.hypot(e.x - player.x, e.y - player.y) < level.radius * 0.8 + e.radius);
+    const near = state.enemies.some(e => Math.hypot(e.x - player.x, e.y - player.y) < P.radius * 0.8 + e.radius);
     if (!near) return;
     timers.earthbreaker = level.cooldown;
     startMove('slam', slamImpact);
     // No ar nada encosta nele: o salto também é uma esquiva
     player.iFrames = Math.max(player.iFrames, player.move.seconds * player.move.impactAt);
+}
+
+// --- PARRY ---
+// O golpe corpo a corpo que ia acertar o herói é desviado com a espada (hurtPlayer chama aqui antes de tirar vida). Quem bateu
+// leva o contragolpe e fica atordoado, e os vizinhos também (PARRY, em data_model/passives.js). Devolve true se o golpe foi desviado.
+export function tryParry(attacker) {
+    const P = PARRY;
+    if (passives.parry.lvl <= 0 || !attacker || attacker.hp <= 0 || (state.powerTimers.parry ?? 0) > 0) return false;
+    // Salto, rugido ou dash em andamento têm a própria defesa; o aparo não os interrompe
+    if (player.move || player.dashTimer > 0) return false;
+    state.powerTimers.parry = P.cooldown;
+    startMove('parry');
+    player.iFrames = Math.max(player.iFrames, P.invulnerableSeconds);
+
+    const a = Math.atan2(attacker.y - player.y, attacker.x - player.x);
+    const mx = player.x + Math.cos(a) * (attacker.radius + 6) * 0.7;
+    const my = player.y + Math.sin(a) * (attacker.radius + 6) * 0.7 - 8;
+    const stun = (e) => { e.stunned = Math.max(e.stunned ?? 0, e.isBoss ? P.stun * P.bossStunRatio : P.stun); };
+    dealDamage(attacker, getAtkDamage() * P.damage, { kbX: Math.cos(a) * P.knockback, kbY: Math.sin(a) * P.knockback, noCrit: true });
+    stun(attacker);
+    if (P.radius > 0) {
+        for (const e of state.enemies) {
+            if (e === attacker || e.hp <= 0 || Math.hypot(e.x - attacker.x, e.y - attacker.y) > P.radius + e.radius) continue;
+            e.stunned = Math.max(e.stunned ?? 0, (e.isBoss ? P.bossStunRatio : 1) * P.stun * 0.5);
+        }
+        addShockwave(attacker.x, attacker.y, { radius: P.radius, color: '#bae6fd', width: 4, seconds: 0.3 });
+    }
+    // O "clang": faíscas de aço e um anel curto onde as lâminas se cruzam
+    createExplosion(mx, my, '#e0f2fe', 14);
+    createExplosion(mx, my, '#fde68a', 8);
+    addShockwave(mx, my, { radius: 44, color: '#f8fafc', width: 5, seconds: 0.22 });
+    screenFlash('#e0f2fe', 0.12);
+    shakeScreen(5);
+    hitStop(0.07);
+    audio.playParry?.();
+    return true;
+}
+
+function updateParry(dt) {
+    if ((state.powerTimers.parry ?? 0) > 0) state.powerTimers.parry -= dt;
 }
 
 // --- WAR CRY ---
@@ -203,6 +243,7 @@ export function updateBladeSkills(dt) {
     updateEarthbreaker(dt);
     updateAftershocks(dt);
     updateWarCry(dt);
+    updateParry(dt);
     for (let i = state.executions.length - 1; i >= 0; i--) {
         state.executions[i].age += dt;
         if (state.executions[i].age >= state.executions[i].seconds) state.executions.splice(i, 1);

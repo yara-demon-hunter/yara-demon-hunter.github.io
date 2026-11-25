@@ -1,4 +1,4 @@
-import { TREE_NODES } from './tree.js';
+import { TREE_NODES } from './skill_tree/index.js';
 import { RELIC_NODES } from './relics.js';
 import { ICON_IMAGES } from './icon_images.js';
 
@@ -12,6 +12,7 @@ export const TREE_IMAGES = {
     furySkill: img('fury'),
     atkSpeed: img('attack-speed'),
     keenEye: img('keen-eye'),
+    parry: img('parry'),
     bloodlust: img('bloodlust'),
     bloodlustEvolve: img('crimson-tide'),
     executioner: img('executioner'),
@@ -42,6 +43,7 @@ export const TREE_IMAGES = {
     warmHearth: img('warm-hearth'),
     undyingFlame: img('undying-flame'),
     phoenixPact: img('phoenix-pact'),
+    phoenixReborn: img('phoenix-reborn'),
     shadowRaven: img('shadow-raven'),
     mirrorWard: img('return-fire'),
     shadowShackle: img('shadow-shackle'),
@@ -66,6 +68,9 @@ export const TREE_IMAGES = {
     // Light Path
     silentVigil: img('silent-vigil'),
     holyGround: img('sacred-ground'),
+    sacredPendant: img('sacred-pendant'),
+    divineGrace: img('divine-grace'),
+    sanctifiedMantle: img('sanctified-mantle'),
     groundEvolve: img('consecrated-earth'),
     holyWater: img('holy-water'),
     waterEvolve: img('blessed-rain'),

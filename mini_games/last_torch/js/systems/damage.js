@@ -44,6 +44,7 @@ export function dealDamage(e, amount, o = {}) {
         * (e.rooted > 0 ? 1 + rootedBonus() : 1)
         * (e.openTimer > 0 ? 1.3 : 1)                                           // boss aberto depois de um golpe pesado: +30%
         * (e.blessed > 0 ? 1 + POWER_MODELS.holyWater.blessBonus : 1)       // Holy Water: abençoado leva mais de tudo
+        * ((e.elite || e.isBoss) && state.dmgSource === 'light' ? 1 + mod('demonDamage') : 1)   // Judgment (Light): elites e chefes levam mais SÓ do dano das skills do Light Path
         * (e.chilled > 0 && o.torchFire ? 1 + BLUE_TORCH.brittle : 1);       // Blue Torch: gelado leva mais só dos golpes de fogo da tocha
 
     // Defesa do chefe (BOSS_STATS em data_model/bosses.js): magia (número azul e fogo da tocha) usa a defesa mágica; o resto (lâmina, adaga, sombras) a física
@@ -51,6 +52,7 @@ export function dealDamage(e, amount, o = {}) {
     const dmg = dmgRaw * (1 - Math.min(0.9, defense));
 
     e.hp -= dmg;
+    e.lastHitNature = state.dmgSource === 'nature';           // o último golpe veio de uma skill do Nature Path? (Thorn Burst: quem morre assim vira Caquito)
     // Dano contínuo (quiet: veneno, videira, espinhos, queimadura...) não pisca nem faz o monstro "levar um golpe": a cada tique
     // isso reiniciaria o tranco sem parar (o rival, com corpo de herói, ficava se contorcendo)
     if (!o.quiet) e.hitFlash = J.hitFlashSeconds;

@@ -1,6 +1,6 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
-import { BLUE_TORCH, FIREBALLS, FIRE_TORNADO, HEARTH_PHOENIX, FLAME_BLADE, PHOENIX_PACT } from '../../data_model/passives.js';
+import { BLUE_TORCH, FIREBALLS, FIRE_TORNADO, HEARTH_PHOENIX, FLAME_BLADE, PHOENIX_PACT, PHOENIX_REBORN } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
@@ -213,7 +213,7 @@ function burstPhoenixFire(b, hit) {
 
 // Devolve true se a fênix morreu para o herói levantar
 export function tryPhoenix() {
-    if (passives.phoenixPact.lvl <= 0 || state.phoenixSpent) return false;
+    if (passives.phoenixReborn.lvl <= 0 || state.phoenixSpent) return false;
     const bird = state.phoenix;
     state.phoenixSpent = true;
     // A ave mergulha no herói e vira as asas de fogo em volta dele (js/render/skills.js)
@@ -223,12 +223,12 @@ export function tryPhoenix() {
         createExplosion(bird.x, bird.y, '#fde047', 16);
     }
     bird.placed = false;
-    player.hp = player.maxHp * PHOENIX_PACT.healRatio;
-    player.iFrames = PHOENIX_PACT.invulnerableSeconds;
+    player.hp = player.maxHp * PHOENIX_REBORN.healRatio;
+    player.iFrames = PHOENIX_REBORN.invulnerableSeconds;
     state.enemyProjectiles.length = 0;
     state.blastBudget++;
-    blast(player.x, player.y, PHOENIX_PACT.radius, getSpellDamage() * PHOENIX_PACT.damage, PHOENIX_PACT.knockback, '#fb923c', 'spell');
-    addShockwave(player.x, player.y, { radius: PHOENIX_PACT.radius * 1.3, color: '#fde047', width: 12, seconds: 0.7 });
+    blast(player.x, player.y, PHOENIX_REBORN.radius, getSpellDamage() * PHOENIX_REBORN.damage, PHOENIX_REBORN.knockback, '#fb923c', 'spell');
+    addShockwave(player.x, player.y, { radius: PHOENIX_REBORN.radius * 1.3, color: '#fde047', width: 12, seconds: 0.7 });
     createExplosion(player.x, player.y, '#fb923c', 30);
     slowMotion(0.3, 0.7);
     screenFlash('#fb923c', 0.6);
@@ -242,7 +242,7 @@ export function tryPhoenix() {
 // A tocha apagou: a fênix se joga na chama e a reacende com metade da vida (uma vez por hora, a mesma vida da fênix que levanta o herói).
 // Devolve true se a tocha foi salva
 export function tryPhoenixTorch() {
-    if (passives.phoenixPact.lvl <= 0 || state.phoenixSpent) return false;
+    if (passives.phoenixReborn.lvl <= 0 || state.phoenixSpent) return false;
     const bird = state.phoenix;
     state.phoenixSpent = true;
     state.phoenixFx = { x: state.coreX, y: state.coreY - 20, age: 0, seconds: 1.3 };
@@ -253,11 +253,11 @@ export function tryPhoenixTorch() {
     bird.placed = false;
     state.coreHp = state.coreHpMax * 0.5;
     // Protege o herói também: o pulso de fogo sai da tocha e os tiros voam longe
-    player.iFrames = Math.max(player.iFrames, PHOENIX_PACT.invulnerableSeconds);
+    player.iFrames = Math.max(player.iFrames, PHOENIX_REBORN.invulnerableSeconds);
     state.enemyProjectiles.length = 0;
     state.blastBudget++;
-    blast(state.coreX, state.coreY, PHOENIX_PACT.radius, getSpellDamage() * PHOENIX_PACT.damage, PHOENIX_PACT.knockback, '#fb923c', 'spell');
-    addShockwave(state.coreX, state.coreY, { radius: PHOENIX_PACT.radius * 1.3, color: '#fde047', width: 12, seconds: 0.7 });
+    blast(state.coreX, state.coreY, PHOENIX_REBORN.radius, getSpellDamage() * PHOENIX_REBORN.damage, PHOENIX_REBORN.knockback, '#fb923c', 'spell');
+    addShockwave(state.coreX, state.coreY, { radius: PHOENIX_REBORN.radius * 1.3, color: '#fde047', width: 12, seconds: 0.7 });
     createExplosion(state.coreX, state.coreY - 20, '#fb923c', 30);
     slowMotion(0.3, 0.7);
     screenFlash('#fb923c', 0.6);

@@ -2,7 +2,7 @@ import { getCharacterBase } from '../../data_model/characters/index.js';
 import { ACTIVE_HEROES, HEROES } from '../../data_model/heroes.js';
 import { save } from '../core/save.js';
 import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
-import { AFFINITY_BONUS, TREE_BRANCHES, affinityLabel } from '../../data_model/tree.js';
+import { AFFINITY_BONUS, TREE_BRANCHES, affinityLabel } from '../../data_model/skill_tree/index.js';
 
 // Herói bloqueado que o jogador tocou: o painel mostra como desbloqueá-lo em vez das barras (js/ui/heroes.js liga e desliga)
 let preview = null;

@@ -3,7 +3,7 @@
 // (preço base em passives.js, corrigido pela hora em data_model/passives.js > CAMP). Os pré-requisitos
 // seguram as relíquias mais fortes para depois das mais simples. Mesmas coordenadas e mesmo formato de
 // requisitos da árvore de skills.
-import { req } from './tree.js';
+import { req } from './skill_tree/index.js';
 
 export const RELIC_LAYOUT = {
     labelWidth: 1.5,

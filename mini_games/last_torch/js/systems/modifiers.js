@@ -1,5 +1,5 @@
 import { HEROES } from '../../data_model/heroes.js';
-import { AFFINITY_BONUS, TREE_BY_ID, TREE_NODES } from '../../data_model/tree.js';
+import { AFFINITY_BONUS, TREE_BY_ID, TREE_NODES } from '../../data_model/skill_tree/index.js';
 import { DARKNESS } from '../../data_model/night.js';
 import { POWER_BOOST, getPowerLevel } from '../../data_model/powers.js';
 import { altarMods } from '../../data_model/embers.js';
@@ -22,6 +22,7 @@ import { attributes, passives, powers, state } from '../core/state.js';
 //   tocha: torchHp (pontos), torchRegen (pontos por segundo), torchGuard, warmthBurn (x dano de feitiço por segundo)
 //   pontos de skill: levelPoints (por nível, fração acumula), chestPoints (por baú)
 //   vida extra: revives
+//   demonDamage (dano extra contra elites e chefes, SÓ das skills do Light Path: Judgment; state.dmgSource === 'light' em damage.js)
 //   monstros: enemyHp, enemyDamage, enemySpeed, spawnRate; itens: pickupRate
 const totals = {};
 

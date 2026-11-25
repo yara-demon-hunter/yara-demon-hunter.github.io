@@ -29,6 +29,7 @@ import { renderHearthBird, renderPhoenixBird } from './phoenix.js';
 import { renderFireTornado } from './fire_tornado.js';
 import { renderPickups } from './pickups.js';
 import { renderShackle } from './shackle.js';
+import { renderRoseWhip } from './rose_whip.js';
 import { heroAnim } from './player.js';
 import {
     renderBolts, renderChillAura, renderDashGhosts, renderGroundFires, renderLightning,
@@ -216,6 +217,7 @@ export function render() {
     renderSpiritWolves();
     renderMonsterCurses();
     renderShackle();
+    renderRoseWhip();
     renderSmokes();
     renderGibs();
     renderKnifeAim();

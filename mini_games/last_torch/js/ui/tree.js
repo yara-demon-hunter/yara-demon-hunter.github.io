@@ -1,4 +1,4 @@
-import { AFFINITY_BONUS, TREE_BRANCHES, TREE_LAYOUT, TREE_NODES, affinityLabel } from '../../data_model/tree.js';
+import { AFFINITY_BONUS, TREE_BRANCHES, TREE_LAYOUT, TREE_NODES, affinityLabel } from '../../data_model/skill_tree/index.js';
 import { BRANCH_IMAGES, TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { getFuryUpgradeRows } from './stat_sheet.js';

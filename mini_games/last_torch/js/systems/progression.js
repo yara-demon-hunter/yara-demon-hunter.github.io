@@ -4,7 +4,7 @@ import { showToast } from '../ui/banner.js';
 import { pulseLevel, updateHUD } from '../ui/hud.js';
 import { mod } from './modifiers.js';
 import { save, persist } from '../core/save.js';
-import { TREE_POINTS } from '../../data_model/tree.js';
+import { TREE_POINTS } from '../../data_model/skill_tree/index.js';
 import { addShockwave } from './effects.js';
 import { requestQuickPick } from '../ui/quick_pick.js';
 

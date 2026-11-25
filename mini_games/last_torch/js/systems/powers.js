@@ -6,7 +6,7 @@ import { startCast } from './moves.js';
 import { hurtPlayer } from './player.js';
 import { spreadHex } from './skills_curse.js';
 import { onNatureKill } from './skills_nature.js';
-import { onLightKill } from './skills_light.js';
+import { damageAngel, liveAngel, onLightKill } from './skills_light.js';
 import { getKillHeal, getSpellCooldown, getSpellDamage, getTorchFireDamage } from './stats.js';
 
 // --- PODERES ---
@@ -108,6 +108,8 @@ function updateGroundFires(dt) {
         f.tick = tickSeconds;
         if (f.hostile) {
             if (Math.hypot(player.x - f.x, player.y - f.y) < f.radius + 10) hurtPlayer(8, f.x, f.y, 0.5);
+            const angelF = liveAngel();
+            if (angelF && Math.hypot(angelF.x - f.x, angelF.y - f.y) < f.radius + angelF.radius) damageAngel(8, 0.5);
             continue;
         }
         const damage = getSpellDamage() * f.dps * tickSeconds;

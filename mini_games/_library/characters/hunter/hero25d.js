@@ -210,6 +210,20 @@ function guardStance(stance, k) {
     stance.free = { hand: [5.4, -1.2, 16.4], w: w * 0.9 };
 }
 
+// Parry: a espada começa alta e armada ao lado, varre rápido para o outro lado na frente do corpo (o desvio) e volta
+const PARRY_FROM = { hand: [4.4, 3.2, 17], dir: norm3([0.35, 0.7, 0.62]) };
+const PARRY_TO = { hand: [5.6, -3.4, 12.6], dir: norm3([0.5, -0.82, 0.1]) };
+function parryStance(stance, k) {
+    const M = MOVES.parry;
+    const sweep = easeOutCubic(clamp01(k / M.sweepEnd));
+    const w = hold(k, 0.06, M.recoverAt);
+    const mix = (a, b) => a + (b - a) * sweep;
+    stance.crouch += M.crouch * w;
+    stance.lean -= M.lean * w * (1 - sweep * 0.5);
+    stance.sword = { hand: PARRY_FROM.hand.map((v, i) => mix(v, PARRY_TO.hand[i])), dir: norm3(PARRY_FROM.dir.map((v, i) => mix(v, PARRY_TO.dir[i]))), w };
+    stance.free = { hand: [3.4, -3.6, 15.4], w: w * 0.7 };
+}
+
 // Poção: a mão livre leva o frasco à boca e a cabeça vai para trás
 function drinkStance(stance, k) {
     const lift = hold(k, 0.25, 0.75);
@@ -256,7 +270,7 @@ function staffCastStance(stance, k) {
     stance.rise += 0.3 * w;
 }
 
-const STANCES = { staffCast: staffCastStance, slam: slamStance, quake: quakeStance, overhead: quakeStance, roar: roarStance, oath: oathStance, guard: guardStance, drink: drinkStance, fall: fallStance };
+const STANCES = { staffCast: staffCastStance, slam: slamStance, quake: quakeStance, overhead: quakeStance, roar: roarStance, oath: oathStance, guard: guardStance, parry: parryStance, drink: drinkStance, fall: fallStance };
 
 function applyStance(stance, body, blend) {
     if (anim.dash > 0.01) {

@@ -10,6 +10,7 @@ import { clipSegment } from './colliders.js';
 import { hurtTorch } from './torch.js';
 import { hurtOaks, hurtOaksOnSegment } from './skills_nature.js';
 import { damageShadowClone } from './shadow_clone.js';
+import { damageAngel, liveAngel } from './skills_light.js';
 
 // --- ATAQUES DOS BOSSES ---
 // Cada boss repete em ciclo a lista model.patterns. Entre um ataque e outro, e.shootTimer conta a
@@ -72,9 +73,13 @@ function aimAngle(e) {
 // Os golpes do chefe também ferem as sombras (como o herói): em círculo ou em risco
 function hurtClonesCircle(x, y, radius, amount, fromX = x, fromY = y) {
     for (const c of shadowClones) if (c.active && Math.hypot(c.x - x, c.y - y) < radius + 12) damageShadowClone(c, amount * BOSS_TARGETING.cloneDamageRatio, fromX, fromY, 0.5);
+    const an = liveAngel();
+    if (an && Math.hypot(an.x - x, an.y - y) < radius + an.radius) damageAngel(amount * BOSS_TARGETING.cloneDamageRatio, 0.5);
 }
 function hurtClonesSegment(x1, y1, x2, y2, width, amount) {
     for (const c of shadowClones) if (c.active && distanceToSegment(c.x, c.y, x1, y1, x2, y2) < width / 2 + 12) damageShadowClone(c, amount * BOSS_TARGETING.cloneDamageRatio, x1, y1, 0.5);
+    const an = liveAngel();
+    if (an && distanceToSegment(an.x, an.y, x1, y1, x2, y2) < width / 2 + an.radius) damageAngel(amount * BOSS_TARGETING.cloneDamageRatio, 0.5);
 }
 
 // Círculo no chão que estoura depois de delay segundos
@@ -549,7 +554,7 @@ function updateLunge(e, model, ai, dt) {
     e.dashTimer = model.lungeSeconds * LUNGE_TIME_SCALE * (1 - L.t);
     // O avanço é tão rápido que num quadro ele passa por cima do herói: confere o trecho percorrido, não só o ponto final
     if (!L.hit && distanceToSegment(player.x, player.y, prevX, prevY, e.x, e.y) < e.radius + model.lungeHitRadius) {
-        L.hit = hurtPlayer(e.damage * model.lungeDamageMultiplier, e.x, e.y, 0.6);
+        L.hit = hurtPlayer(e.damage * model.lungeDamageMultiplier, e.x, e.y, 0.6, e);
     }
     if (L.t >= 1) {
         // O corte vermelho que ficou no chão por onde ele passou
@@ -592,7 +597,7 @@ function updateRivalMelee(e, model, ai, dt) {
             while (diff > Math.PI) diff -= TAU;
             while (diff < -Math.PI) diff += TAU;
             if (Math.hypot(dx, dy) < model.meleeRange + 18 && Math.abs(diff) < model.meleeArc / 2) {
-                hurtPlayer(e.damage * model.meleeDamageMultiplier, e.x, e.y, 0.5);
+                hurtPlayer(e.damage * model.meleeDamageMultiplier, e.x, e.y, 0.5, e);
             }
         }
     }
@@ -717,7 +722,7 @@ function updateBossMelee(e, model, dt) {
         let diff = Math.atan2(dy, dx) - e.atkAngle;
         while (diff > Math.PI) diff -= Math.PI * 2;
         while (diff < -Math.PI) diff += Math.PI * 2;
-        if (Math.hypot(dx, dy) < M.range + e.radius + 14 && Math.abs(diff) < M.arc / 2) hurtPlayer(e.damage * M.damageMultiplier, e.x, e.y, 0.6);
+        if (Math.hypot(dx, dy) < M.range + e.radius + 14 && Math.abs(diff) < M.arc / 2) hurtPlayer(e.damage * M.damageMultiplier, e.x, e.y, 0.6, e);
         hurtOaks(e.x + Math.cos(e.atkAngle) * (M.range * 0.6), e.y + Math.sin(e.atkAngle) * (M.range * 0.6), M.range * 0.5, e.damage * M.damageMultiplier);
         for (const c of shadowClones) {                      // as sombras dentro do leque também levam o corte
             if (!c.active) continue;
@@ -726,6 +731,14 @@ function updateBossMelee(e, model, dt) {
             while (cd > Math.PI) cd -= Math.PI * 2;
             while (cd < -Math.PI) cd += Math.PI * 2;
             if (Math.hypot(cx, cy) < M.range + e.radius + 14 && Math.abs(cd) < M.arc / 2) damageShadowClone(c, e.damage * M.damageMultiplier * BOSS_TARGETING.cloneDamageRatio, e.x, e.y, 0.5);
+        }
+        const an = liveAngel();                              // e o anjo guardião também
+        if (an) {
+            const ax = an.x - e.x, ay = an.y - e.y;
+            let ad = Math.atan2(ay, ax) - e.atkAngle;
+            while (ad > Math.PI) ad -= Math.PI * 2;
+            while (ad < -Math.PI) ad += Math.PI * 2;
+            if (Math.hypot(ax, ay) < M.range + e.radius + 14 && Math.abs(ad) < M.arc / 2) damageAngel(e.damage * M.damageMultiplier * BOSS_TARGETING.cloneDamageRatio, 0.5);
         }
     }
     if (p >= 1) {

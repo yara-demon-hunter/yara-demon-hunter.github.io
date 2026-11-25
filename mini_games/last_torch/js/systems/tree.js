@@ -1,7 +1,7 @@
 import { CAMP } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
 import { RELIC_BY_ID } from '../../data_model/relics.js';
-import { ACTIVE_SKILLS, TREE_BRANCHES, TREE_BY_ID, TREE_COSTS, TREE_NODES } from '../../data_model/tree.js';
+import { TREE_BRANCHES, TREE_BY_ID, TREE_NODES } from '../../data_model/skill_tree/index.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, powers, state } from '../core/state.js';
 import { prepareRaven } from '../render/raven.js';
@@ -16,7 +16,7 @@ import { celebrateEvolution } from './powers.js';
 import { syncMaxHp, syncTorchMax } from './torch.js';
 
 // --- ÁRVORES (regras) ---
-// Duas árvores com as mesmas regras: skills (pontos, tela de status, data_model/tree.js) e relíquias
+// Duas árvores com as mesmas regras: skills (pontos, tela de status, data_model/skill_tree) e relíquias
 // (ouro, acampamento, data_model/relics.js). O desenho fica em js/ui/tree.js. Um nó guarda o nível no
 // próprio sistema que ele muda (atributo, poder, passiva) ou em state.tree (efeitos simples), então o
 // resto do jogo continua lendo `attributes`, `powers` e `passives` como antes.
@@ -62,12 +62,7 @@ export function getRelicPrice(node) {
 
 export function getNodeCost(node) {
     if (node.kind === 'relic') return getRelicPrice(node);
-    if (node.cost) return node.cost;
-    const costs = TREE_COSTS[node.branch];
-    // Skills que agem sozinhas em campo custam mais (data_model/tree.js > ACTIVE_SKILLS)
-    const extra = isActiveSkill(node) ? ACTIVE_SKILLS.extraCost : 0;
-    if (node.kind === 'power') return costs.power + extra;
-    return (node.kind === 'passive' || node.kind === 'evolve' ? costs.special : costs.basic) + extra;
+    return node.cost;       // o preço mora no próprio nó (data_model/skill_tree/nodes/<ramo>.js)
 }
 
 // Nome, ícone e descrição de um nó, vindos de onde ele mora
@@ -96,7 +91,8 @@ export function getNextText(node) {
     if (node.kind === 'passive' || node.kind === 'relic') return '';
     if (node.kind === 'power') return POWER_MODELS[node.key].upgrades[powers[node.key].lvl] ?? '';
     if (node.kind === 'evolve') return `${evolvable(node).name} evolves`;
-    if (node.kind === 'mod') return typeof node.levelText === 'function' ? node.levelText(node.mods) : node.levelText;
+    // levelText(mods, nível depois da compra): quem quiser mostra o total acumulado (1 nível +10%, 2 níveis +20%) em vez do valor de um nível
+    if (node.kind === 'mod') return typeof node.levelText === 'function' ? node.levelText(node.mods, getNodeLevel(node) + 1) : node.levelText;
     const attr = attributes[node.key];
     const before = getStatText(node.key);
     attr.lvl++;
@@ -184,14 +180,16 @@ const TREE_MOD_FIELDS = {
     xp: ['📖', 'XP Bonus', n => `+${Math.round(n * 100)}%`],
     spellHaste: ['⏳', 'Spell Recharge', n => `-${Math.round(n * 100)}%`],
     spellDamage: ['🔮', 'Magic Damage', n => `+${Math.round(n * 100)}%`],
-    hpRegen: ['❤️', 'Heal per Second', n => `+${Number(n.toFixed(1))}/s`],
+    demonDamage: ['⚖️', 'Light Damage vs Elites & Bosses', n => `+${Math.round(n * 100)}%`],
+    hpRegen: ['❤️', 'Heal per Second', n => `+${Number(n.toFixed(2))}/s`],
     blessedKillHeal: ['💛', 'Heal per Blessed Kill', n => `+${Number(n.toFixed(1))}`]
 };
 
-function modifierRows(mods = {}) {
+// times: quantos níveis somar (nós com showTotal mostram o TOTAL que o jogador terá depois da compra: 10%, 20%, 30%...)
+function modifierRows(mods = {}, times = 1) {
     return Object.entries(mods).map(([field, value]) => {
         const [icon, name, format] = TREE_MOD_FIELDS[field] ?? ['⬆️', field, String];
-        return { icon, name, value: format(value) };
+        return { icon, name, value: format(value * times) };
     });
 }
 
@@ -226,7 +224,7 @@ export function getPowerUpgradeRows(key) {
 
 export function getNodeUpgradeRows(node) {
     if (node.kind === 'power') return getPowerUpgradeRows(node.key);
-    if (node.kind === 'mod') return modifierRows(node.mods);
+    if (node.kind === 'mod') return modifierRows(node.mods, node.showTotal ? getNodeLevel(node) + 1 : 1);
     if (node.kind !== 'stat') return [];
     const attr = attributes[node.key];
     attr.lvl++;
@@ -243,7 +241,7 @@ const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || n
 // Skill que só funciona com adaga (needs: 'knives') e o jogador não lança adaga (mod noKnives): o nó fica selado.
 // Não se compra, e conta como cumprido para quem o pede (passe livre). Vale para o herói que não tem adaga (Captain
 // Brutos) e para quem jurou o Oath of Slaughter; níveis já comprados ficam, só não sobem mais.
-// Grupo exclusivo (exclusive em data_model/tree.js): quem já aprendeu uma skill do grupo não pode aprender as outras
+// Grupo exclusivo (exclusive em data_model/skill_tree): quem já aprendeu uma skill do grupo não pode aprender as outras
 export function excludedBy(node) {
     if (!node.exclusive || getNodeLevel(node) > 0) return null;
     return TREE_NODES.find(other => other !== node && other.exclusive === node.exclusive && getNodeLevel(other) > 0) ?? null;
@@ -270,7 +268,7 @@ function isSealedForHero(node) {
 
 // Skills que causam dano de MAGIA (dependem do `magicDamage` do personagem): os poderes, passivas e evoluções dos ramos de
 // feitiço (Maldição, Natureza, Luz) e as da Chama que usam magia. Quem tem magicDamage 0 (Captain Brutos) as tem seladas.
-const MAGIC_FLAME_KEYS = new Set(['torchBolts', 'fireRing', 'emberTrail', 'phoenixPact', 'hearthPhoenix', 'fireTornado', 'fireballs']);
+const MAGIC_FLAME_KEYS = new Set(['torchBolts', 'fireRing', 'emberTrail', 'phoenixPact', 'phoenixReborn', 'hearthPhoenix', 'fireTornado', 'fireballs']);
 function isMagicNode(node) {
     if (node.kind === 'mod' || node.kind === 'stat' || node.oath) return false;
     if (node.branch === 'curse' || node.branch === 'nature' || node.branch === 'light') return true;
@@ -293,11 +291,6 @@ export function getRestrictionText(node) {
     return (hero.mods?.noKnives ?? 0) > 0
         ? `${hero.name} fights without daggers: this skill is not for him.`
         : 'The Oath of Slaughter sealed your daggers: this skill can no longer be used.';
-}
-
-function isActiveSkill(node) {
-    if (node.kind === 'power') return ACTIVE_SKILLS.powers.includes(node.key);
-    return node.kind === 'passive' && ACTIVE_SKILLS.passives.includes(node.key);
 }
 
 // Lista completa do que um nó pede, com o que o jogador já tem: { label, have, need, met }.

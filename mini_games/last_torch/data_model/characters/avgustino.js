@@ -7,9 +7,9 @@ import { AVGUSTINO_VISUALS } from '../../library/characters/avgustino/avgustino_
 
 export const AVGUSTINO = {
     id: 'avgustino',
-    // Caminhos (árvore): +5% de dano nas skills do Light Path; o Curse Path é proibido para ele
+    // Caminhos (árvore): +5% de dano nas skills do Light Path; o Curse Path e o Shadow Path são proibidos para ele
     affinity: 'light',
-    sealedBranches: ['curse'],
+    sealedBranches: ['curse', 'shadow'],
     model: 'avgustino',             // boneco 2.5D (js/render/bodies.js)
     thrown: 'cross',                // o que lança com a mão livre: um crucifixo de prata no lugar da adaga (_library/weapons/cross)
     order: 2.5,                     // posição na tela de escolha: depois do Rowan, antes do Azael

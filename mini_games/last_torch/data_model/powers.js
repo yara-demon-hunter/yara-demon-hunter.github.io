@@ -1,7 +1,7 @@
 // --- PODERES ---
-// Aprendidos na árvore de skills (data_model/tree.js). Cada um tem 5 níveis.
+// Aprendidos na árvore de skills (data_model/skill_tree). Cada um tem 5 níveis.
 // damage = fração do dano da lâmina. Os dados de cada nível ficam em `levels`.
-// O ramo de cada poder está em data_model/tree.js; o conceito, em SKILLS.md.
+// O ramo de cada poder está em data_model/skill_tree; o conceito, em SKILLS.md.
 const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
 const formatNumber = (value) => String(Number(value.toFixed(2)));
 const formatMultiplier = (value) => `${formatNumber(value)}×`;
@@ -482,6 +482,70 @@ export const POWER_MODELS = {
         radius: 34,
         bossStunRatio: 0.3
     },
+    // Sacred Pendant (js/systems/skills_light.js, updatePendant): o colar sagrado no peito do herói. Quando há monstros em cima dele,
+    // solta uma onda de luz branca que os joga para longe e os atordoa. Chefe: empurrão e atordoamento bem menores.
+    sacredPendant: {
+        name: 'Sacred Pendant', icon: '⚜️', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `Every ${formatNumber(level.cooldown)}s, when monsters crowd you, your holy pendant flares: a white wave of light flings them away from you, stuns them for ${formatNumber(level.stun)}s and hurts for ${formatMultiplier(level.damage)} spell damage. Bosses barely budge.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.radius} range · ${level.knockback} push · stun ${formatNumber(level.stun)}s · ${formatMultiplier(level.damage)} spell damage · every ${formatNumber(level.cooldown)}s`
+            );
+        },
+        levels: [
+            { cooldown: 11, radius: 105, knockback: 430, stun: 0.8, damage: 0.5 },
+            { cooldown: 10, radius: 112, knockback: 480, stun: 0.9, damage: 0.65 },
+            { cooldown: 9.5, radius: 120, knockback: 530, stun: 1, damage: 0.8 },
+            { cooldown: 9, radius: 128, knockback: 580, stun: 1.15, damage: 1 },
+            { cooldown: 8, radius: 140, knockback: 650, stun: 1.3, damage: 1.2 }
+        ],
+        wakeRatio: 0.85,        // acorda quando há monstro a esta fração do alcance
+        bossStunRatio: 0.3,
+        bossKnockbackRatio: 0.25
+    },
+    // Guardian Angel (js/systems/skills_light.js, updateGuardianAngel): um anjo guarda a tocha como as sombras do Shadow Clone: espera
+    // no posto e, quando um monstro se aproxima, voa até ficar entre ele e a chama, a `castDistance` do monstro, e lança bolas de luz
+    // com o cajado. Depois volta ao posto. Provoca: os monstros comuns por perto (provokeRadius) vão bater nele em vez de ir ao herói ou à
+    // tocha (como o convertido do Avgustino), e podem derrubá-lo; cai e volta ao posto depois de respawnSeconds. A vida é uma fração da
+    // vida máxima do herói (hpRatio, por nível). Cada bola estoura em área (burst) com dano de magia.
+    guardianAngel: {
+        name: 'Guardian Angel', icon: '👼', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `An angel guards the torch. When monsters close in, it flies out to meet them and, every ${formatNumber(level.cooldown)}s, hurls ${level.count} orb${level.count > 1 ? 's' : ''} of light from its staff at the ones closest to the flame, each bursting for ${formatMultiplier(level.damage)} spell damage. Monsters nearby go for the angel instead of you, and it can fall: it returns to its post after ${this.respawnSeconds}s.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.count} orb${level.count > 1 ? 's' : ''} · ${formatMultiplier(level.damage)} spell damage · ${level.burst} burst · ${formatPercent(level.hpRatio)} of your health · every ${formatNumber(level.cooldown)}s`
+            );
+        },
+        levels: [
+            { cooldown: 4.4, count: 1, damage: 1.2, burst: 34, hpRatio: 0.6 },
+            { cooldown: 4.1, count: 1, damage: 1.5, burst: 38, hpRatio: 0.7 },
+            { cooldown: 3.8, count: 2, damage: 1.5, burst: 40, hpRatio: 0.8 },
+            { cooldown: 3.5, count: 2, damage: 1.8, burst: 44, hpRatio: 0.9 },
+            { cooldown: 3.2, count: 3, damage: 2, burst: 48, hpRatio: 1 }
+        ],
+        range: 330,             // alcance do cajado, contado a partir do anjo
+        shotSeconds: 0.3,       // tempo da bola no ar
+        castSeconds: 0.95,      // o gesto do cajado (a bola sai em 58% dele): mais lento, mais solene
+        provokeRadius: 190,     // monstros comuns a esta distância do anjo vão bater nele
+        radius: 12,             // corpo do anjo (para o contato dos monstros)
+        respawnSeconds: 12,     // volta ao posto depois de cair
+        guard: {
+            radius: 250,        // área em volta da tocha de onde o anjo não sai
+            minRadius: 62,      // nunca fica mais perto da tocha que isto: voa num raio em volta dela, não em cima
+            engage: 130,        // enfrenta monstros até esta distância além da área
+            post: { angle: -2.55, distance: 78 },   // o posto: em cima e à esquerda da tocha (radianos, px)
+            castDistance: 150,  // fica a esta distância do monstro, do lado da tocha
+            moveSpeed: 200,     // px/s: voando até o monstro
+            returnSpeed: 130,   // px/s: voltando ao posto
+            height: 34          // altura do voo acima do chão, px
+        }
+    },
     churchBell: {
         name: 'Church Bell', icon: '🔔', maxLvl: 5,
         get desc() {
@@ -676,7 +740,7 @@ export const POWER_MODELS = {
 };
 
 // --- EVOLUÇÕES ---
-// Poder no nível máximo + requisitos do nó de evolução (data_model/tree.js) = transforma o poder.
+// Poder no nível máximo + requisitos do nó de evolução (data_model/skill_tree) = transforma o poder.
 export const EVOLUTIONS = {
     holyGround: {
         name: 'Consecrated Earth', icon: '⛪',
@@ -720,6 +784,20 @@ export const EVOLUTIONS = {
         tolls: 3,
         blessedMultiplier: 2,
         torchHeal: 4
+    },
+    // Archangel (evolução do Guardian Angel; js/systems/skills_light.js, fireAngelBeam): de tempos em tempos o anjo ergue o cajado e solta
+    // um raio de luz branca na direção em que ele olha (vira para a maior fila de monstros antes de disparar), que cruza a tela toda, como o
+    // Lord's Decree do Gudran (mesmo desenho, em branco), ferindo e atordoando tudo no caminho em pulsos. Bem mais fraco que o do Gudran:
+    // só alguns pulsos, direção travada e recarga longa.
+    guardianAngel: {
+        name: 'Archangel', icon: '🌟',
+        get desc() {
+            const L = this.levels;
+            return `The angel is sturdier, and every ${formatNumber(L.beamEvery)}s it raises its staff and looses a white beam of holy light across the whole screen, in the direction it faces: ${L.beamPulses} pulses of ${formatMultiplier(L.beamDamage)} spell damage that stun everything in its path.`;
+        },
+        levels: { hpRatio: 1.25, beamEvery: 15, beamDamage: 0.8, beamPulses: 5, beamPulseSeconds: 0.25, beamWidth: 30, beamLength: 2400, beamStun: 0.5 },
+        bossStunRatio: 0.3,
+        beamCastSeconds: 1.1    // o gesto longo do cajado antes do raio (sai no meio dele)
     },
     graspingRoots: {
         name: 'Strangling Grove', icon: '🪴',

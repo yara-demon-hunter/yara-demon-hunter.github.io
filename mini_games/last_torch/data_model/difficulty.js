@@ -29,13 +29,13 @@ export const TURN_DIFFICULTY = {
     bossSpawnIntervalMultiplier: 3.6,   // com o boss em campo nascem menos monstros
 
     // Pontos para fechar a hora: base + porTurno x n + porTurnoQuadrado x n², com n = turno - 1
-    targetScoreFirstTurn: 442,   // 15% menos (era 520, 125 e 3): a onda fecha mais cedo
-    targetScorePerTurn: 106,
-    targetScorePerTurnSquared: 2.55,
+    targetScoreFirstTurn: 398,   // 2026-11-25: 10% menos (era 442; antes 520, 125 e 3), junto com o tempo mínimo da onda
+    targetScorePerTurn: 95,
+    targetScorePerTurnSquared: 2.3,
 
     // Duração mínima da onda: ela só fecha (e chama o boss) depois deste tempo E de a cota de pontos ser atingida.
     // Dentro dela os monstros vão ficando mais frequentes: o intervalo entre eles encolhe até 1 / (1 + spawnGrowth) no fim do tempo mínimo.
-    waveMinSeconds: 122,              // era 180 (3 min), depois 144; agora 15% mais curto que 144
+    waveMinSeconds: 110,              // era 180 (3 min), depois 144, depois 122; 2026-11-25: mais 10% curto
     spawnGrowth: 0.9,
 
     // Limite de monstros vivos ao mesmo tempo (desempenho e leitura da tela)

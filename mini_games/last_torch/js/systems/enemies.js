@@ -17,6 +17,7 @@ import { checkHourEnd, onBossKilled } from './night.js';
 import { dropChest, maybeDropPickup } from './pickups.js';
 import { hurtPlayer, knockbackPlayer } from './player.js';
 import { damageShadowClone } from './shadow_clone.js';
+import { damageAngel, hitAngelWithShot, liveAngel, provokingAngel } from './skills_light.js';
 import { hurtOaks } from './skills_nature.js';
 import { addHostileFire, onEnemyKilled } from './powers.js';
 import { spreadBurn, wardSpendForShot, wardTorch } from './skills_flame.js';
@@ -113,10 +114,12 @@ function updateMelee(e, M, dist, angle, dt) {
                 const diff = Math.atan2(Math.sin(Math.atan2(dy, dx) - e.atkAngle), Math.cos(Math.atan2(dy, dx) - e.atkAngle));
                 return Math.hypot(dx, dy) <= M.reach + r && Math.abs(diff) <= M.halfAngle;
             };
-            if (inArc(player.x, player.y, CHARACTER_MODEL.collisionRadius)) hurtPlayer(e.damage * M.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            if (inArc(player.x, player.y, CHARACTER_MODEL.collisionRadius)) hurtPlayer(e.damage * M.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds, e);
             for (const clone of shadowClones) {
                 if (clone.active && inArc(clone.x, clone.y, CHARACTER_MODEL.collisionRadius)) damageShadowClone(clone, e.damage * M.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
             }
+            const angelA = liveAngel();
+            if (angelA && inArc(angelA.x, angelA.y, angelA.radius)) damageAngel(e.damage * M.damageMultiplier);
             // A árvore do druida também leva o corte: o tronco dentro do leque é ferido
             for (const oak of state.nature.oaks) if (inArc(oak.x, oak.y, POWER_MODELS.shelterOak.trunkRadius)) { oak.hp -= e.damage * M.damageMultiplier; oak.shake = 0.18; }
             audio.playSlice();
@@ -162,10 +165,12 @@ function updateTongue(e, T, dist, angle, dt) {
                 const side = Math.abs(-dx * cy + dy * cx);
                 return along > 0 && along <= T.range + r && side <= T.width / 2 + r;
             };
-            if (near(player.x, player.y, CHARACTER_MODEL.collisionRadius)) hurtPlayer(e.damage * T.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            if (near(player.x, player.y, CHARACTER_MODEL.collisionRadius)) hurtPlayer(e.damage * T.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds, e);
             for (const clone of shadowClones) {
                 if (clone.active && near(clone.x, clone.y, CHARACTER_MODEL.collisionRadius)) damageShadowClone(clone, e.damage * T.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
             }
+            const angelT = liveAngel();
+            if (angelT && near(angelT.x, angelT.y, angelT.radius)) damageAngel(e.damage * T.damageMultiplier);
             audio.playSlice();
         }
         return true;
@@ -207,6 +212,8 @@ function updateTreantPunch(e, P, dist, angle, dt) {
                     damageShadowClone(clone, e.damage * P.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
                 }
             }
+            const angelG = liveAngel();
+            if (angelG && Math.hypot(angelG.x - e.x, angelG.y - e.y) < P.areaRadius + angelG.radius) damageAngel(e.damage * P.damageMultiplier);
             shakeScreen(7);
             audio.playSlam(0.9);
         } else if (e.punchTimer <= 0 && P.root) {
@@ -234,13 +241,15 @@ function updateTreantPunch(e, P, dist, angle, dt) {
                 return d <= P.range + radius && Math.abs(diff) <= P.halfAngle;
             };
             if (hits(player.x, player.y, CHARACTER_MODEL.collisionRadius)) {
-                hurtPlayer(e.damage * P.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+                hurtPlayer(e.damage * P.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds, e);
             }
             for (const clone of shadowClones) {
                 if (clone.active && hits(clone.x, clone.y, CHARACTER_MODEL.collisionRadius)) {
                     damageShadowClone(clone, e.damage * P.damageMultiplier, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
                 }
             }
+            const angelP = liveAngel();
+            if (angelP && hits(angelP.x, angelP.y, angelP.radius)) damageAngel(e.damage * P.damageMultiplier);
             createExplosion(e.x + Math.cos(e.punchAngle) * 28, e.y + Math.sin(e.punchAngle) * 28, e.color, 10);
             addShockwave(e.x + Math.cos(e.punchAngle) * 26, e.y + Math.sin(e.punchAngle) * 26, { radius: 28, color: '#a3e635', width: 5, seconds: 0.3 });
             shakeScreen(4);
@@ -311,6 +320,10 @@ function updateTorchSlam(e, S, distCore, dt) {
         if (inSlamSweep(e, S.sweep, player.x, player.y)) hurtPlayer(e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
         for (const c of shadowClones) {
             if (c.active && inSlamSweep(e, S.sweep, c.x, c.y)) damageShadowClone(c, e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+        }
+        {
+            const angelS = liveAngel();
+            if (angelS && inSlamSweep(e, S.sweep, angelS.x, angelS.y)) damageAngel(e.damage);
         }
         hurtTorch(state.coreHpMax * ratio, state.coreX, state.coreY);
         return true;
@@ -584,7 +597,7 @@ export function updateEnemies(dt) {
         // O chefe SEMPRE caça o herói (de qualquer distância): antes ele só vinha dentro do raio de provocação dos monstros comuns e, fora dele, ia para a tocha
         const huntsPlayer = !model.ignoresPlayer && (e.isBoss || distToPlayer < provoked);
         // Convertido do Avgustino por perto (Conversion): provoca o monstro comum, que vai bater nele. Boss não se deixa provocar
-        const ally = !lured && !e.isBoss && !e.shadowOwner && !model.ignoresPlayer ? provokingConvert(e) : null;
+        const ally = !lured && !e.isBoss && !e.shadowOwner && !model.ignoresPlayer ? (provokingConvert(e) ?? provokingAngel(e)) : null;
         // Chefe: vira para a sombra que o provoca (perto dele e mais perto que o herói); senão, o herói
         const bossT = e.isBoss && huntsPlayer ? bossTarget(e) : null;
         const targetX = lured ? lure.x : ally ? ally.x : bossT ? bossT.x : huntsPlayer ? player.x : state.coreX;
@@ -682,7 +695,7 @@ export function updateEnemies(dt) {
 
         // Colisão com Herói
         if (hunting && distToPlayer < e.radius + CHARACTER_MODEL.collisionRadius && player.iFrames <= 0) {
-            const hit = hurtPlayer(e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds);
+            const hit = hurtPlayer(e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds, e);
             if (state.phase !== 'HUNT') return;
 
             const pushAngle = Math.atan2(e.y - player.y, e.x - player.x);
@@ -842,6 +855,8 @@ function updateBubble(p, i, dt) {
         }
         hurtOaks(p.x, p.y, p.burstRadius, p.damage);
         for (const c of shadowClones) if (c.active && Math.hypot(c.x - p.x, c.y - p.y) < p.burstRadius + 12) damageShadowClone(c, p.damage, p.x, p.y, 0.5);
+        const angelB = liveAngel();
+        if (angelB && Math.hypot(angelB.x - p.x, angelB.y - p.y) < p.burstRadius + angelB.radius) damageAngel(p.damage, 0.5);
     }
 }
 
@@ -894,6 +909,13 @@ export function updateEnemyProjectiles(dt) {
             hurtPlayer(p.damage, p.x - p.vx * 0.05, p.y - p.vy * 0.05, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
             // Morreu, ou reviveu (o revive limpa os tiros da tela)
             if (state.phase !== 'HUNT' || enemyProjectiles.length === 0) return;
+            continue;
+        }
+
+        // O anjo guardião também absorve o tiro (e leva o dano)
+        if (hitAngelWithShot(p)) {
+            createExplosion(p.x, p.y, '#fef9c3', 5);
+            enemyProjectiles.splice(i, 1);
             continue;
         }
 

@@ -1,4 +1,4 @@
-import { THORN_ROSES } from '../../data_model/passives.js';
+import { THORN_BURST, THORN_ROSES } from '../../data_model/passives.js';
 import { POWER_MODELS } from '../../data_model/powers.js';
 import { ctx, player, powers, state } from '../core/state.js';
 import { drawGlow } from '../../library/core/glow.js';
@@ -187,8 +187,140 @@ function renderRoseMarks() {
     ctx.globalAlpha = 1;
 }
 
+// --- THORN BURST: o Caquito e os espinhos (js/systems/skills_nature.js) ---
+// Um cacto pequeno com braços, estrias, espinhos claros e uma florzinha rosa no topo. Brota do chão (cresce em growSeconds), balança de leve e,
+// armado, pisca um brilho verde-limão avisando que explode ao toque. Murcha (some) nos últimos segundos. Só traços e elipses.
+function drawCactus(x, y, grow, t, fade, armed) {
+    const s = (0.4 + 0.6 * grow) * (2 - grow);         // sobe com um leve estouro
+    const sway = Math.sin(t * 2.2 + x * 0.3) * 0.04;
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 1, 9 * s, 3.2 * s, 0, 0, TAU);
+    ctx.fill();
+    if (armed) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        drawGlow(ctx, 'rgba(190, 242, 100, 0.9)', x, y - 8, 15 + 3 * Math.sin(t * 7), 0.22 + 0.12 * Math.sin(t * 7));
+        ctx.restore();
+    }
+    ctx.translate(x, y);
+    ctx.rotate(sway);
+    ctx.scale(s, s);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    const body = (w, color) => {
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#14532d';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(-w / 2, -19, w, 19, w / 2);
+        ctx.fill();
+        ctx.stroke();
+    };
+    // Braços (dois, um de cada lado, subindo)
+    ctx.strokeStyle = '#14532d';
+    ctx.lineWidth = 5.2;
+    for (const side of [-1, 1]) {
+        ctx.beginPath();
+        ctx.moveTo(side * 3, -7 - (side > 0 ? 0 : 2));
+        ctx.lineTo(side * 7.6, -8 - (side > 0 ? 0 : 2));
+        ctx.lineTo(side * 7.6, -14 - (side > 0 ? 0 : 3));
+        ctx.stroke();
+    }
+    ctx.strokeStyle = '#4d9d3f';
+    ctx.lineWidth = 3.6;
+    for (const side of [-1, 1]) {
+        ctx.beginPath();
+        ctx.moveTo(side * 3, -7 - (side > 0 ? 0 : 2));
+        ctx.lineTo(side * 7.6, -8 - (side > 0 ? 0 : 2));
+        ctx.lineTo(side * 7.6, -14 - (side > 0 ? 0 : 3));
+        ctx.stroke();
+    }
+    body(8.4, '#4d9d3f');
+    // Estrias e brilho do corpo
+    ctx.strokeStyle = '#2f7a2f';
+    ctx.lineWidth = 0.8;
+    for (const dx of [-1.8, 1.8]) {
+        ctx.beginPath();
+        ctx.moveTo(dx, -17);
+        ctx.lineTo(dx, -2);
+        ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(190, 242, 100, 0.7)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-2.9, -16);
+    ctx.lineTo(-2.9, -4);
+    ctx.stroke();
+    // Espinhos claros
+    ctx.strokeStyle = '#fef3c7';
+    ctx.lineWidth = 0.9;
+    for (const [px, py, dx] of [[-4, -15, -1.8], [4, -12, 1.8], [-4, -8, -1.8], [4, -5, 1.8], [0, -18, 0], [-7.6, -13, -1.6], [7.6, -13, 1.6], [7.6, -10, 1.6], [-7.6, -10, -1.6]]) {
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px + dx, py - 1.6);
+        ctx.stroke();
+    }
+    // A florzinha no topo
+    ctx.fillStyle = '#fb7185';
+    ctx.strokeStyle = '#9f1239';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.arc(0, -20.2, 2.3, 0, TAU);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#fde68a';
+    ctx.beginPath();
+    ctx.arc(0, -20.2, 0.8, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+}
+
+function renderCacti() {
+    if (!N.cacti.length && !N.needles.length) return;
+    const t = performance.now() / 1000;
+    const B = THORN_BURST;
+    for (const c of N.cacti) {
+        const grow = Math.min(1, c.age / B.growSeconds);
+        const fade = Math.min(1, (B.lifeSeconds - c.age) / 1.5);
+        drawCactus(c.x, c.y, grow, t, fade, c.age >= B.armSeconds);
+    }
+    // Espinhos em voo: um traço claro com a ponta escura e um rastro curto
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (const n of N.needles) {
+        const len = 9;
+        const ux = Math.cos(n.ang);
+        const uy = Math.sin(n.ang);
+        ctx.globalAlpha = Math.min(1, n.life / 0.15);
+        ctx.strokeStyle = 'rgba(254, 243, 199, 0.5)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(n.x - ux * len * 1.8, n.y - uy * len * 1.8);
+        ctx.lineTo(n.x - ux * len * 0.2, n.y - uy * len * 0.2);
+        ctx.stroke();
+        ctx.strokeStyle = '#fef3c7';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(n.x - ux * len, n.y - uy * len);
+        ctx.lineTo(n.x, n.y);
+        ctx.stroke();
+        ctx.strokeStyle = '#4d7c0f';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(n.x - ux * 1.5, n.y - uy * 1.5);
+        ctx.lineTo(n.x + ux * 1.5, n.y + uy * 1.5);
+        ctx.stroke();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+}
+
 export function renderNatureGround() {
     renderThornPatches();
+    renderCacti();
     if (N.oaks.length === 0 && N.pods.length === 0 && N.clouds.length === 0) return;
     const t = performance.now() / 1000;
     for (const oak of N.oaks) {

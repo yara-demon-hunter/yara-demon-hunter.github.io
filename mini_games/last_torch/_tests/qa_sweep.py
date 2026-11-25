@@ -77,7 +77,7 @@ MEASURE = """() => {
 # Auditoria dos dados do jogo, dentro da própria página (usa os mesmos módulos do jogo)
 AUDIT = """async () => {
   const O = location.origin; const M = (p) => import(O + p); const issues = [];
-  const [S, H, T, R, I, TI, MO, AL, SV, PW] = await Promise.all([M('/data_model/sanctuary.js'), M('/data_model/heroes.js'), M('/data_model/tree.js'), M('/data_model/relics.js'), M('/data_model/icon_images.js'), M('/data_model/tree_images.js'), M('/data_model/monsters.js'), M('/data_model/embers.js'), M('/js/core/save.js'), M('/data_model/passives.js')]);
+  const [S, H, T, R, I, TI, MO, AL, SV, PW] = await Promise.all([M('/data_model/sanctuary.js'), M('/data_model/heroes.js'), M('/data_model/skill_tree/index.js'), M('/data_model/relics.js'), M('/data_model/icon_images.js'), M('/data_model/tree_images.js'), M('/data_model/monsters.js'), M('/data_model/embers.js'), M('/js/core/save.js'), M('/data_model/passives.js')]);
   const stats = SV.save.stats;
   // Conquistas: alcançáveis e ligadas a coisas que existem
   for (const a of S.ACHIEVEMENTS) {

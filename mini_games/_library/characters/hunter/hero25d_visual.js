@@ -93,6 +93,8 @@ export const HERO_25D_VISUALS = {
         // Cajado erguido (Gudran): sobe o cajado devagar com a esfera acima da cabeça, no alto ele aponta para a frente e o poder
         // sai da ponta (impactAt), segura um instante e abaixa. Sem varredura: não é golpe de espada
         staffCast: { seconds: 0.85, impactAt: 0.58, holdEnd: 0.76, lean: 0.8 },
+        // Parry (Last Torch): a espada varre da guarda alta para o outro lado do corpo, desviando o golpe, e volta
+        parry: { seconds: 0.42, sweepEnd: 0.34, recoverAt: 0.62, crouch: 1.6, lean: 1.2 },
         // Aparo: espada atravessada na frente do corpo, nas duas mãos (yara-rpg)
         guard: { seconds: 1.1, crouch: 2.2 },
         // Poção: a mão livre leva o frasco à boca e a cabeça vai para trás (yara-rpg)

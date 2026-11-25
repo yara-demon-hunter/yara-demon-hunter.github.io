@@ -1,4 +1,4 @@
-import { TREE_BRANCHES } from '../../data_model/tree.js';
+import { TREE_BRANCHES } from '../../data_model/skill_tree/index.js';
 import { TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
 import { save } from '../core/save.js';
 import { audio, state } from '../core/state.js';

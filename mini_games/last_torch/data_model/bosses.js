@@ -258,13 +258,15 @@ export const BOSS_MODELS = {
         burstIntervalSeconds: 0.5,
         initialShootCooldownSeconds: 1.5,
         patternGapSeconds: 2.4,
-        // Quatro golpes: garras (3 riscos vermelhos), bolhas que perseguem e estouram, gosma que prende os pés e a fúria (corre mais depressa por uns segundos)
-        patterns: ['claws', 'bubbles', 'goo', 'frenzy'],
+        // Cinco golpes: garras (3 riscos vermelhos), bolhas que perseguem e estouram, gosma que prende os pés, a fúria (corre mais depressa por uns segundos)
+        // e a invocação: ele chama os Bog Slimes do pântano em volta de si
+        patterns: ['claws', 'bubbles', 'summon', 'goo', 'frenzy'],
         phases: [
-            { at: 1, patterns: ['claws', 'bubbles', 'goo', 'frenzy'] },
-            { at: 0.6, label: 'OOZING RAGE', patterns: ['claws', 'bubbles', 'goo', 'frenzy', 'claws'] },
-            { at: 0.3, label: 'THE BOG RISES', patterns: ['claws', 'bubbles', 'frenzy', 'goo', 'claws', 'frenzy'] }
+            { at: 1, patterns: ['claws', 'bubbles', 'summon', 'goo', 'frenzy'] },
+            { at: 0.6, label: 'OOZING RAGE', patterns: ['claws', 'bubbles', 'summon', 'goo', 'frenzy', 'claws'] },
+            { at: 0.3, label: 'THE BOG RISES', patterns: ['claws', 'summon', 'bubbles', 'frenzy', 'goo', 'summon', 'claws', 'frenzy'] }
         ],
+        summonType: 'BOG_SLIME', summonCount: 3,                          // invocação: o que chama e quantos de uma vez
         clawRange: 340, clawGap: 44, clawWidth: 26, clawDelay: 0.85,       // garras: comprimento e distância dos riscos, largura de cada um, aviso (s)
         bubbleCount: 4, bubbleLife: 4.2, bubbleSpeed: 95, bubbleBurstRadius: 64,   // bolhas: quantas, vida (s), velocidade e raio do estouro
         gooRadius: 80, gooDelay: 1, gooRootSeconds: 2.6,                  // gosma: raio da poça, aviso (s) e tempo preso (s)

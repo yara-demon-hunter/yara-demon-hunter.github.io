@@ -1,7 +1,7 @@
 # Skills: conceito da árvore
 
 Guia para decidir onde cada skill mora, quanto custa e como aparece. Toda skill nova deve seguir estas regras.
-Os dados ficam em `data_model/tree.js`, `data_model/powers.js` e `data_model/passives.js`.
+Os dados ficam em `data_model/skill_tree/` (nós, preços e pontos), `data_model/powers.js` e `data_model/passives.js`.
 
 ## Os 6 ramos (o quinto, Natureza, e o sexto, Luz, estão descritos no README do jogo)
 
@@ -47,25 +47,19 @@ fica com as adagas, as sombras e a esquiva.
 
 ## Custos
 
-O custo vem do ramo e do tipo do nó, nunca só do fato de ser evolução. A regra é
-**Shadow < Blade < Flame = Curse**: quanto mais habilidade o ramo exige, mais barato ele é.
+**O preço de cada skill mora no próprio nó**: campo `cost` em `data_model/skill_tree/nodes/<ramo>.js` (pontos por nível; obrigatório,
+o jogo não abre se faltar). Não há tabela por ramo nem acréscimo automático: para mudar um preço, edite o número no nó.
+Os pontos que o herói ganha ficam em `data_model/skill_tree/points.js`. Guia completo: `data_model/skill_tree/README.md`.
 
-| Pontos por nível | Shadow | Blade | Flame | Curse |
-|---|---|---|---|---|
-| Básico (stats e efeitos simples) | 1 | 1 | 1 | 1 |
-| Poder | 1 | 2 | 3 | 3 |
-| Especial (passiva, evolução, Juramento) | 1 (Juramento: 5) | 3 | 4 | 4 |
+Convenção usada ao definir os números (não é regra do código): **Shadow < Blade < Flame = Curse**, porque quanto mais habilidade
+o ramo exige, mais barato ele deve ser.
 
-- A linha Básico é igual em todos os ramos porque 1 é o menor custo possível, e assim o primeiro ponto
-  pode ser gasto em qualquer ramo.
+- Stats e efeitos simples custam 1 (ou 2 nos que movem o jogo: dano, ataque, raio, vida).
+- Poderes custam de 1 (Shadow) a 3 (Blade, Flame, Curse); passivas e evoluções, de 1 a 5. Juramentos: 5 em Shadow.
 - Cada nível do herói dá **2 pontos** (`TREE_POINTS`). Uma noite completa rende cerca de 70 pontos, contando os baús.
-  Com 1 ponto por nível, o primeiro feitiço de Flame ou Curse só viria na hora 2 ou 3.
 - O preço mais alto de Flame e Curse paga uma força maior: feitiços batem 10% acima da lâmina (`SPELL_SKILL`).
-- Em Shadow quase tudo custa 1: o ramo é o mais barato porque exige habilidade. As decisões caras, via `cost` no nó, são
-  o Juramento (5), a Smoke Bomb (4) e o Shadow Shackle (3).
-- Os valores ficam em `TREE_COSTS` (`data_model/tree.js`).
-- `cost` no próprio nó sobrescreve a tabela. Use só para uma exceção justificada.
-  Exceções atuais: Oath of Whispers (5), Smoke Bomb (4), Shadow Shackle (3), Hero Health (2 por nível) e, no Flame, Ember Steps (2) e Hellwalker (3), por serem mais simples que os outros poderes do ramo.
+- Skills que agem sozinhas em campo (atiram, explodem, invocam) ficam 1 ponto acima das de efeito passivo do mesmo ramo, para
+  que empilhar várias seja quase impossível numa noite (~86 pontos numa partida inteira).
 
 ## Formatos
 
@@ -78,9 +72,12 @@ O formato diz o tipo do nó, em qualquer árvore:
 | Losango | evolução | Transforma um poder no nível máximo |
 | Hexágono | Juramento | Um por noite, muda o jeito de jogar |
 
-## Skills ativas custam mais
+## Skills ativas
 
-Não há limite de quantas skills o jogador leva, mas as **skills ativas** (as que agem sozinhas em campo: atiram, explodem, invocam, como Flame Sentinel, Hearth Ring, Grave Wisp, Holy Water, Flaming Phoenix, Fire Tornado, Phoenix Pact, Shadow Raven; lista em `ACTIVE_SKILLS` de `data_model/tree.js`) custam **1 ponto a mais por nível** que o padrão do ramo. Com ~86 pontos numa partida inteira, dá para levar umas 3 ou 4 ativas fortes; empilhar várias fica quase impossível. Status, adaga e golpe mantêm o preço do ramo.
+Não há limite de quantas skills o jogador leva. As **skills ativas** (as que agem sozinhas em campo: atiram, explodem, invocam,
+como Flame Sentinel, Hearth Ring, Grave Wisp, Holy Water, Guardian Angel, Flaming Phoenix, Fire Tornado, Phoenix Pact, Shadow Raven)
+custam 1 ponto a mais que as passivas do mesmo ramo, e isso já está no `cost` de cada nó. Com ~86 pontos numa noite dá para levar
+umas 3 ou 4 ativas no máximo; o resto vira escolha.
 
 As evoluções mais fortes custam 1 ponto a mais que o padrão do ramo: Sun Spire, Solar Wall e Event Horizon (5) e Cathedral Toll evoluído (4).
 
@@ -154,7 +151,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 
 ## Skills seladas (sem adaga)
 
-Algumas skills só funcionam com adaga: Ricochet, Death Mark, Dagger Mastery, Fan of Knives e Fireballs (as adagas viram bolas de fogo). Elas levam `needs: 'knives'` em `data_model/tree.js`. Quando o jogador não lança adaga (mod `noKnives`: o **Captain Brutos**, ou quem jurou o **Oath of Slaughter**), esses nós ficam **selados**:
+Algumas skills só funcionam com adaga: Ricochet, Death Mark, Dagger Mastery, Fan of Knives e Fireballs (as adagas viram bolas de fogo). Elas levam `needs: 'knives'` em `data_model/skill_tree/nodes`. Quando o jogador não lança adaga (mod `noKnives`: o **Captain Brutos**, ou quem jurou o **Oath of Slaughter**), esses nós ficam **selados**:
 
 - **Não é o cadeado.** O cadeado diz "ainda não" (falta o nó anterior). O selo diz "não é para este personagem": borda sólida cor de ferrugem, ícone apagado e um risco diagonal laranja, sem corrente. O painel de detalhe mostra a etiqueta `NO DAGGERS`, o motivo e o passe livre.
 - **Passe livre.** Um nó selado conta como cumprido para os nós que o pedem, e a ligação que sai dele fica acesa. Assim a cadeia não trava: com o Brutos, Return Fire (que pede Ricochet) e Shadow Raven (que pede Death Mark) abrem normalmente, e o Oath of the Hearth não fica preso por Fireballs.
@@ -170,9 +167,9 @@ Algumas skills só funcionam com adaga: Ricochet, Death Mark, Dagger Mastery, Fa
 3. Mecânica própria: em `js/systems/skills_blade.js`, `skills_shadow.js`, `skills_flame.js` ou `skills_curse.js`.
    Golpe do herói com impacto: `startMove` em `js/systems/moves.js`, com a pose em `js/render/player25d.js`.
    Efeito na tela: `js/render/skills.js`, com as medidas em `data_model/visuals/effects/skills_visual.js`.
-4. Adicione o nó em `TREE_NODES`. O pré-requisito vem sempre do nó anterior na linha. Evolução fica logo depois do
+4. Adicione o nó em `data_model/skill_tree/nodes/<ramo>.js`. O pré-requisito vem sempre do nó anterior na linha. Evolução fica logo depois do
    poder; o que continua a linha depois dela sai do poder em diagonal, para a ligação não passar por cima do losango.
-5. Não defina `cost`: deixe a tabela decidir.
+5. Defina o `cost` do nó (obrigatório): olhe skills parecidas do ramo e siga a convenção da seção Custos.
 6. Mostre a skill em `previews/characters_preview.html` e atualize o mapa acima.
 
 

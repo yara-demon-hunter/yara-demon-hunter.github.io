@@ -1,5 +1,5 @@
 import { CHARACTER_BASES } from '../../data_model/characters/index.js';
-import { TREE_POINTS } from '../../data_model/tree.js';
+import { TREE_POINTS } from '../../data_model/skill_tree/index.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { save } from '../core/save.js';
 import { state } from '../core/state.js';

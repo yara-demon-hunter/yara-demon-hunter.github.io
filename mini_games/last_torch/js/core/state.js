@@ -94,7 +94,7 @@ export const state = {
     secondWind: false,          // a segunda chance da tocha ainda está disponível nesta noite (js/systems/player.js)
     skillPoints: 0,             // pontos para gastar na árvore (medalhão de status)
     levelPointsCarry: 0,        // fração de ponto acumulada (relíquias que dão pontos extras)
-    tree: {},                   // níveis dos nós de efeito simples (data_model/tree.js, kind 'mod')
+    tree: {},                   // níveis dos nós de efeito simples (data_model/skill_tree, kind 'mod')
     pickupPity: 0,
 
     // Level & XP
@@ -164,6 +164,7 @@ export const state = {
     hearthBird: { x: 0, y: 0, placed: false, facing: 1, look: 0, tilt: 0, flash: 0, rise: 1, dirX: 1, dirY: 0, view: 0, breath: 0, hold: 0, beakX: undefined, beakY: undefined, breathAng: 0, breathCd: 4, breathTick: 0 },
     fireTornado: { wait: null, left: 0, age: 0, tick: 0 },   // Fire Tornado: espera até o próximo, tempo restante do furacão, idade (para o visual) e tempo até o próximo pulso
     torchWard: { charges: 0, timer: 0, flash: 0 },   // Torch Ward: escudos guardados, tempo para o próximo e clarão da última defesa
+    dmgSource: null,            // quem está causando dano agora ('nature' durante js/systems/skills_nature.js, 'light' durante js/systems/skills_light.js): o monstro guarda o do último golpe (e.lastHitNature)
     phoenixSpent: false,        // a fênix já morreu nesta hora
     phoenixFx: null,
     // Fênix em campo. side: de que lado do herói ela voa; look: tempo olhando para o alvo; rise: 0 a 1 ao renascer
@@ -188,8 +189,8 @@ export const state = {
     // Natureza (js/systems/skills_nature.js): carvalhos, cogumelos, nuvens de esporos, monstros na videira e o lobo
     // lure: o carvalho acordado que os monstros próximos vão atacar; claws: marcas de garra das mordidas
     // Luz (js/systems/skills_light.js): círculos sagrados, frascos de água benta, raios e explosões de luz
-    light: { grounds: [], flasks: [], bolts: [], bursts: [], puddles: [], drops: [], bell: { swing: 0, flash: 0, queue: 0, gap: 0, index: 0, level: null }, bellRings: [], rain: 0, rainDrop: 0, rainTick: 0, rainTimer: 12 },
-    nature: { oaks: [], seeds: [], pods: [], clouds: [], thorns: [], wolves: [], claws: [], lure: null },
+    light: { grounds: [], flasks: [], bolts: [], bursts: [], puddles: [], drops: [], bell: { swing: 0, flash: 0, queue: 0, gap: 0, index: 0, level: null }, bellRings: [], pendant: { flash: 0 }, pendantRings: [], angel: { on: false, placed: false, x: 0, y: 0, hp: 0, maxHp: 0, lastHp: 0, ghost: 0, hurtFx: 0, radius: 12, hitFlash: 0, respawn: 0, angle: 0, anim: null, move: null, comboStep: 1, dashTimer: 0, vigilStance: false, castAge: -1, iFrames: 0, hitTime: -100000, hitDirX: 0, hitDirY: 0 }, angelShots: [], angelBeams: [], rain: 0, rainDrop: 0, rainTick: 0, rainTimer: 12 },
+    nature: { oaks: [], seeds: [], pods: [], clouds: [], thorns: [], wolves: [], claws: [], lure: null, whip: null, cacti: [], needles: [] },
 
     // Animação de level up em andamento: { age, label } ou null
     levelUpFx: null,

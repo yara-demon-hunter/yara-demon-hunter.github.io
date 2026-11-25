@@ -47,7 +47,7 @@ characters/
   kurama-ninja/            Kurama, o ninja de armadura do Last Torch (preto, ombreiras, panos); ficha em art_reference/character.md
   kuro-ninja/              Kuro, o ninja do Last Torch (boneco copiado do Azael, com capuz e máscara); ficha em art_reference/character.md
   rowan/                   o druida do Last Torch (molde do Zeph com galhada, folhas e cajado); ficha em art_reference/character.md
-buddies/                   quem anda e luta ao lado do herói (fênix, corvo, caveira voadora, lobo sombrio, lobo branco): um por pasta (desenho, cores e art_reference/ com buddy.md e images/). O que o buddy FAZ fica no jogo
+buddies/                   quem anda e luta ao lado do herói (fênix, corvo, caveira voadora, anjo guardião, lobo sombrio, lobo branco): um por pasta (desenho, cores e art_reference/ com buddy.md e images/). O que o buddy FAZ fica no jogo
 weapons/                   as armas dos personagens, separadas deles: espada, katana, machados, adaga, espada curta, cajado e a rosa de arremesso; um por pasta (<id>.js e art_reference/weapon.md). thrown.js: as armas de arremesso (adaga, rosa, rosa negra)
 objects/                   objetos do jogo que não são personagem nem cenário (a tocha 2,5D); um por pasta: <id>.js, <id>_visual.js e art_reference/object.md
   torch/                   a tocha 2,5D: poste e gaiola em dois sprites (atrás e na frente do fogo), fogo num atlas de poucos quadros (createTorch25D); a regra da vida fica no jogo

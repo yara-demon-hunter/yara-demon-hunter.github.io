@@ -147,6 +147,12 @@ function fillHud(here, target) {
     }
 }
 
+// O X de fechar só existe no mapa parado (o de ver onde você está); na caminhada entre telas o botão é o CONTINUE
+function setCloseButton(visible) {
+    document.getElementById('btnMapClose').hidden = !visible;
+    document.querySelector('.map-head').classList.toggle('has-close', visible);
+}
+
 function finish() {
     if (!arrived) return;
     window.removeEventListener('keydown', onKey);
@@ -173,6 +179,7 @@ export function showMapTransition(from, to, callback) {
     cancelAnimationFrame(raf);
     onDone = callback;
     arrived = false;
+    setCloseButton(false);
     document.getElementById('mapImg').src = CAMPAIGN.map.src;
     document.getElementById('mapHero').src = HEROES[save.hero]?.portraitImage ?? HERO_FALLBACK;
     document.getElementById('mapTitle').textContent = fillText(MAP_LAYOUT.texts.title, from, to);
@@ -220,6 +227,7 @@ export function showMapHere(index, subtitle, callback) {
     cancelAnimationFrame(raf);
     onDone = callback;
     arrived = true;
+    setCloseButton(true);
     document.getElementById('mapImg').src = CAMPAIGN.map.src;
     document.getElementById('mapHero').src = HEROES[save.hero]?.portraitImage ?? HERO_FALLBACK;
     document.getElementById('mapTitle').textContent = `YOU ARE IN THE ${CAMPAIGN.screens[index].name}`;
@@ -265,6 +273,7 @@ export function setupMapScreen() {
     document.getElementById('btnCampMap').addEventListener('click', openMapView);
     window.addEventListener('keydown', (e) => { if (e.code === 'KeyM' && !e.repeat && !e.ctrlKey && !e.metaKey && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) openMapView(); });
     document.getElementById('btnMapContinue').addEventListener('click', () => { if (arrived) finish(); });
+    document.getElementById('btnMapClose').addEventListener('click', () => { if (arrived) finish(); });
     // Tocar no mapa pula a caminhada, e depois continua
     document.getElementById('mapFrame').addEventListener('click', () => { if (!arrived) arriveNow(); });
 }

@@ -1,5 +1,5 @@
 // --- STATS DO HERÓI ---
-// Melhorados na árvore de skills (data_model/tree.js): cada ponto gasto sobe um nível.
+// Melhorados na árvore de skills (data_model/skill_tree): cada ponto gasto sobe um nível.
 const SLASH_ARC_MAX_LEVEL = 6;
 
 export const UPGRADE_MODELS = {

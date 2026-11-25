@@ -40,7 +40,7 @@ import { resetSkills } from '../systems/skills.js';
 import { hideTreeHand, startHints } from './hints.js';
 import { heroOffer, isOwned, renderHeroPicker } from './heroes.js';
 import { previewHero, renderHeroStats, unlockProgressLabel } from './hero_stats.js';
-import { TREE_BRANCHES } from '../../data_model/tree.js';
+import { TREE_BRANCHES } from '../../data_model/skill_tree/index.js';
 import { dailyStatus } from '../../data_model/daily.js';
 import { resetQuickPick } from './quick_pick.js';
 import { updateHUD } from './hud.js';

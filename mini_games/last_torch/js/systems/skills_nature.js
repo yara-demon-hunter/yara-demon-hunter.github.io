@@ -1,4 +1,4 @@
-import { THORN_BURST, THORN_ROSES } from '../../data_model/passives.js';
+import { ROSE_WHIP, THORN_BURST, THORN_ROSES } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
@@ -19,6 +19,7 @@ import { noteAmbientHeal } from './torch.js';
 //   state.nature.lure     o carvalho ACORDADO: os monstros comuns por perto vão bater nele em vez de no herói (enemies.js)
 const N = state.nature;
 const COLOR = '#4ade80';
+const TAU = Math.PI * 2;
 
 // --- RAÍZES ---
 // Prende um monstro. Boss fica só uma fração do tempo; o Captain Brutos (imparável) não fica.
@@ -689,6 +690,71 @@ function updateRoseThorns(dt) {
     }
 }
 
+// --- THORN BURST: o Caquito ---
+// Brota onde caiu um monstro morto por um golpe do Nature Path (no máximo THORN_BURST.maxCacti vivos: com todos de pé, o monstro morre sem deixar um).
+// Depois de armSeconds explode quando um monstro (ou o herói) encosta, soltando espinhos em todas as direções; um espinho que mata também
+// deixa um Caquito. Murcha sozinho depois de lifeSeconds. Desenho em js/render/nature.js.
+function sproutCactus(x, y) {
+    if (N.cacti.length >= THORN_BURST.maxCacti) return;
+    N.cacti.push({ x, y, age: 0, spin: Math.random() * TAU });
+    createExplosion(x, y, '#4ade80', 8);
+    audio.playSummon?.();
+}
+
+let needleBurstId = 0;
+
+function burstCactus(c) {
+    const B = THORN_BURST;
+    const turn = c.spin;
+    const burst = ++needleBurstId;
+    for (let i = 0; i < B.needles; i++) {
+        const a = turn + (i / B.needles) * TAU;
+        N.needles.push({ x: c.x, y: c.y - 6, vx: Math.cos(a) * B.needleSpeed, vy: Math.sin(a) * B.needleSpeed, life: B.needleLife, ang: a, burst });
+    }
+    createExplosion(c.x, c.y - 6, '#fef3c7', 10);
+    createExplosion(c.x, c.y - 6, '#4ade80', 6);
+    addShockwave(c.x, c.y, { radius: 46, color: '#bef264', width: 4, seconds: 0.3 });
+    shakeScreen(3);
+    audio.playBlast?.();
+}
+
+function updateCacti(dt) {
+    const B = THORN_BURST;
+    for (let i = N.cacti.length - 1; i >= 0; i--) {
+        const c = N.cacti[i];
+        c.age += dt;
+        if (c.age >= B.lifeSeconds) {
+            createExplosion(c.x, c.y - 4, '#65a30d', 4);
+            N.cacti.splice(i, 1);
+            continue;
+        }
+        if (c.age < B.armSeconds) continue;
+        const touched = Math.hypot(player.x - c.x, player.y - c.y) < B.touchRadius + 8
+            || state.enemies.some(e => e.hp > 0 && Math.hypot(e.x - c.x, e.y - c.y) < B.touchRadius + e.radius * 0.5);
+        if (!touched) continue;
+        N.cacti.splice(i, 1);
+        burstCactus(c);
+    }
+    for (let i = N.needles.length - 1; i >= 0; i--) {
+        const n = N.needles[i];
+        n.x += n.vx * dt;
+        n.y += n.vy * dt;
+        n.life -= dt;
+        // Cada monstro leva no máximo maxPerMonster espinhos de uma explosão (quem está colado no Caquito não come todos: o resto atravessa e segue)
+        const hit = state.enemies.find(e => e.hp > 0 && Math.hypot(e.x - n.x, e.y - n.y) < e.radius + B.needleRadius && !(e.needleBurst === n.burst && e.needleCount >= B.maxPerMonster));
+        if (hit) {
+            if (hit.needleBurst !== n.burst) {
+                hit.needleBurst = n.burst;
+                hit.needleCount = 0;
+            }
+            hit.needleCount++;
+            dealDamage(hit, getSpellDamage() * B.needleDamage, { noCrit: true, style: 'spell', kbX: Math.cos(n.ang) * B.knockback, kbY: Math.sin(n.ang) * B.knockback });
+            createExplosion(n.x, n.y, '#fef3c7', 3);
+        }
+        if (hit || n.life <= 0) N.needles.splice(i, 1);
+    }
+}
+
 // --- MORTE DE UM MONSTRO (chamado por js/systems/powers.js, onEnemyKilled) ---
 export function onNatureKill(e) {
     // Cada monstro morto (de qualquer jeito) adianta o crescimento das mudas e das árvores pequenas (a anterior à semente nova)
@@ -705,10 +771,9 @@ export function onNatureKill(e) {
         N.seeds.splice(seeded, 1);
         if (level) growOak(e.x, e.y, level);
     }
+    // Thorn Burst: quem morreu por um golpe do Nature Path vira um Caquito
+    if (e.lastHitNature && passives.thornBurst.lvl > 0) sproutCactus(e.x, e.y);
     if (e.rooted > 0) {
-        if (passives.thornBurst.lvl > 0) {
-            blast(e.x, e.y, THORN_BURST.radius, getSpellDamage() * THORN_BURST.damage, THORN_BURST.knockback, COLOR, 'spell');
-        }
         // Strangling Grove: as raízes do morto pulam para o monstro mais perto
         const level = getPowerLevel(powers.graspingRoots);
         if (level && powers.graspingRoots.evolved) {
@@ -730,10 +795,96 @@ export function onNatureKill(e) {
     if (pods && powers.sporePods.evolved && e.poisonedUntil > state.runTime && N.pods.length < podLimit(pods)) addPod(e.x, e.y);
 }
 
+// --- ROSE WHIP ---
+// Sozinho, a cada recarga: o chicote sai da mão do herói, voa até o monstro de MAIS VIDA ao alcance, açoita e se enrola nele. Enrolado, o monstro fica
+// preso no lugar (e.chained, o mesmo trava do Shadow Shackle: js/systems/enemies.js) e os espinhos mordem a cada tique. Desenho em js/render/rose_whip.js.
+function whipTarget() {
+    let best = null;
+    for (const e of state.enemies) {
+        if (e.hp <= 0 || e.chained || e.unstoppable || Math.hypot(e.x - player.x, e.y - player.y) > ROSE_WHIP.range) continue;
+        if (!best || e.maxHp > best.maxHp) best = e;
+    }
+    return best;
+}
+
+function releaseWhip() {
+    const w = N.whip;
+    N.whip = null;
+    if (w?.held) w.target.chained = false;
+}
+
+function bindWhip(w) {
+    const e = w.target;
+    w.held = true;
+    w.age = 0;
+    w.tick = ROSE_WHIP.tickSeconds;
+    w.hold = ROSE_WHIP.holdSeconds * (e.isBoss ? ROSE_WHIP.bossRatio : 1);
+    e.chained = true;
+    e.chainX = e.x;
+    e.chainY = e.y;
+    dealDamage(e, getSpellDamage() * ROSE_WHIP.lashDamage, { noCrit: true, style: 'spell', number: true });
+    createExplosion(e.x, e.y - e.radius * 0.4, '#e11d48', 10);
+    createExplosion(e.x, e.y - e.radius * 0.4, '#fda4af', 5);
+    addShockwave(e.x, e.y, { radius: e.radius + 30, color: '#fb7185', width: 4, seconds: 0.3 });
+    shakeScreen(3);
+    audio.playRoseWhip?.(true);
+}
+
+export function updateRoseWhip(dt) {
+    if (passives.roseWhip.lvl <= 0) {
+        if (N.whip) releaseWhip();
+        return;
+    }
+    const timers = state.powerTimers;
+    if ((timers.roseWhip ?? 0) > 0) timers.roseWhip -= dt;
+    const w = N.whip;
+    if (w) {
+        const e = w.target;
+        if (e.hp <= 0 || !state.enemies.includes(e)) {
+            releaseWhip();
+        } else if (w.held) {
+            w.age += dt;
+            w.tick -= dt;
+            if (w.tick <= 0) {
+                w.tick += ROSE_WHIP.tickSeconds;
+                dealDamage(e, getSpellDamage() * ROSE_WHIP.thornDps * ROSE_WHIP.tickSeconds, { noCrit: true, quiet: true, style: 'spell', number: true });
+                createExplosion(e.x, e.y - e.radius * 0.4, '#be123c', 2);
+            }
+            if (w.age >= w.hold) {
+                createExplosion(e.x, e.y - e.radius * 0.4, '#fda4af', 6);
+                releaseWhip();
+            }
+        } else {
+            w.reach += ROSE_WHIP.speed * dt;
+            if (w.reach >= Math.hypot(e.x - player.x, e.y - player.y)) bindWhip(w);
+        }
+        return;
+    }
+    if ((timers.roseWhip ?? 0) > 0) return;
+    const target = whipTarget();
+    if (!target) return;
+    timers.roseWhip = ROSE_WHIP.cooldownSeconds;
+    N.whip = { target, reach: 0, held: false, age: 0 };
+    startCast();
+    audio.playRoseWhip?.(false);
+}
+
+// Tudo o que este arquivo causa de dano leva a marca 'nature' (state.dmgSource): é assim que o Thorn Burst sabe se o monstro morreu por um golpe do Nature Path
 export function updateNatureSkills(dt) {
+    state.dmgSource = 'nature';
+    try {
+        updateNatureInner(dt);
+    } finally {
+        state.dmgSource = null;
+    }
+}
+
+function updateNatureInner(dt) {
     // Wild Heart e Oath of the Wild: a floresta fecha as feridas aos poucos
     const regen = mod('hpRegen');
     if (regen > 0 && player.hp > 0 && player.hp < player.maxHp) player.hp = Math.min(player.maxHp, player.hp + regen * dt);
+    updateRoseWhip(dt);
+    updateCacti(dt);
     updateGraspingRoots(dt);
     updateLeechVine(dt);
     updateShelterOak(dt);
@@ -745,6 +896,7 @@ export function updateNatureSkills(dt) {
 // Virada da hora: o campo fica limpo
 // all: começo de noite ou fim de jogo (a árvore NÃO sobrevive à noite); sem all (virada de onda) a árvore fica e recupera parte da vida
 export function clearNatureSkills(all = false) {
+    releaseWhip();
     if (all) N.oaks.length = 0;
     else for (const oak of N.oaks) oak.hp = Math.min(oak.maxHp, oak.hp + oak.maxHp * POWER_MODELS.shelterOak.waveHealRatio);
     N.seeds.length = 0;
@@ -752,6 +904,8 @@ export function clearNatureSkills(all = false) {
     N.clouds.length = 0;
     N.claws.length = 0;
     N.thorns.length = 0;
+    N.cacti.length = 0;
+    N.needles.length = 0;
     N.lure = null;
     // Na virada da hora a matilha se refaz: quem caiu volta com a vida cheia
     for (const w of N.wolves) {
