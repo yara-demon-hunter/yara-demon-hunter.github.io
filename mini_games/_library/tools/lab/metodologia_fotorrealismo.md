@@ -100,6 +100,50 @@ Imagens de comparação em `exemplos/`: `golem_tudo_desligado.png` (só a forma,
 - O que não valeu o custo (a confirmar em GPU real): profundidade de campo e FXAA/granulação, efeito sutil perto do preço.
 - Dá para levar para os jogos 2D? Não direto: os jogos são Canvas 2D. O caminho realista é usar o laboratório para gerar imagens/sprites de referência, e imitar no 2D só o que é barato (sombra de contato, brilho do núcleo, gradação de cor).
 
+### Personagens de longe: LOD, mipmap e perspectiva aérea
+
+**Origem (estudo de 25/11/2026):** a técnica que usa **ASCII 3D** em jogos se chama *ASCII 3D rendering* ou *ASCII post-processing shader*
+(*3D ASCII raymarching/raycasting* quando a cena é traçada por raios). A técnica de reduzir detalhe conforme o objeto se afasta é o **LOD**
+(Level of Detail). Quando cor e textura se misturam pela distância, entram também o **mipmapping** e a **perspectiva aérea / fog**.
+
+**Ideia central:** de longe, o olho não quer mais detalhe, quer **leitura**: silhueta clara, contraste certo e cor atmosférica. Detalhe
+fino demais de longe vira ruído (cintilação) e parece *menos* real. A lista abaixo é o que dá para somar ao Golem e aos monstros 2D.
+
+| # | Técnica | O que faz de longe | Custo | Serve no 2D? |
+|---|---|---|---|---|
+| 8 | **LOD de malha** (3 níveis: perto, médio, longe) | Troca por uma malha com menos triângulos; some pele, dedos, dobras. | baixo | Sim, como 3 sprites por monstro |
+| 9 | **LOD de shader** | Desliga o que não se vê: normal map fino, parallax, subsurface e rachaduras pequenas somem pela distância. | baixo | Parcial |
+| 10 | **Mipmapping + filtro anisotrópico** | Textura se reduz sozinha pela distância (sem serrilhado nem cintilação); o anisotrópico mantém o chão e a pele nítidos em ângulo. | grátis | Sim, ao reduzir sprites |
+| 11 | **Perspectiva aérea por personagem** | Cor se aproxima da cor da névoa, contraste e saturação caem, tom puxa para o azul. Já existe na cena; falta aplicar **no próprio monstro** pela distância. | baixo | Sim, é só um filtro de cor |
+| 12 | **Specular antialiasing** | Quando o normal map fica pequeno demais, a rugosidade sobe junto. Evita os brilhos piscando e dá o aspecto fosco de longe. | baixo | Não |
+| 13 | **Impostor / billboard** | Renderiza o monstro em imagem (atlas com vários ângulos) e desenha só um quadrado. Para multidões e horda distante. | muito baixo | **Sim, é o que o jogo já faz** |
+| 14 | **Dithered LOD crossfade** | A troca entre níveis é feita com padrão pontilhado, sem "pulo" visível. | baixo | Sim (mistura de 2 sprites) |
+| 15 | **Luz de borda (rim light) mantida** | O contorno iluminado é a última coisa a sumir; segura a silhueta contra a névoa. | baixo | Sim, contorno fino claro |
+| 16 | **Sombra de contato e AO de baixo custo** | Elipse escura sob os pés mantém o personagem "pisando" no chão mesmo sem detalhe. | muito baixo | Sim, a melhor relação custo/efeito |
+| 17 | **Reforço de silhueta** | Contorno sutil que escurece com a distância, para o monstro não se perder no fundo. | baixo | Sim |
+| 18 | **ASCII / pós-processamento estilizado** | Luminância vira caractere (rampa tipo ` .:-=+*#%@`) em blocos de tela. É **estilo**, não realismo: por isso ganhou metodologia própria, [metodologia_ascii.md](metodologia_ascii.md). | médio | Sim, em Canvas 2D |
+
+**Como combinar (receita para distância):**
+
+1. Três distâncias: **perto** (tudo ligado), **médio** (sem parallax, normal map fraco, sem SSS), **longe** (impostor + cor atmosférica + sombra de contato).
+2. A cor atmosférica é uma única fórmula: `cor = mistura(cor, corDaNévoa, 1 - exp(-densidade * distância))`, igual à névoa da cena.
+3. Troque de nível com *crossfade* curto, nunca de uma vez; o salto de detalhe é o que denuncia o LOD.
+4. Meça com horda: o ganho de LOD só aparece com muitos monstros ao mesmo tempo.
+
+**Para os jogos 2D (Canvas):** gerar cada monstro do laboratório em **3 tamanhos já filtrados** (mipmap feito na mão, reduzindo com
+filtro bom em vez de deixar o navegador encolher um sprite grande), aplicar o filtro de cor atmosférica pela posição na tela, manter a
+sombra de contato e a luz de borda. É barato e entrega o que mais pesa na leitura de longe. ASCII fica como efeito opcional.
+
+**Teste em 25/11/2026:** o [Cavaleiro Ossário](cavaleiro_foto.html) (`cavaleiro_foto.js`) implementa 8 (3 níveis de LOD, escolhidos pela distância da
+câmera), 10 (mipmap + anisotrópico, com caixa), 11 (a névoa da cena aplicada no personagem, com caixa), 12 (relevo some e rugosidade sobe),
+15 (luz de borda que cresce com a distância) e 16 (sombra de contato mais forte de longe). Uma fileira de cavaleiros a 14, 24, 36, 52 e 72 m mostra
+tudo numa imagem, com rótulo de distância, nível e triângulos. Número medido (WebGL por software, sem GPU real): os 3 níveis têm 17.692, 4.832 e 2.076
+triângulos; a cena de 6 cavaleiros tem 33.584 triângulos com LOD automático e 106.152 com tudo no nível 0.
+
+Ainda **não** feitos: 9 (LOD de shader além do relevo/rugosidade), 13 (impostor), 14 (troca de nível com pontilhado: hoje a troca é seca) e 17
+(contorno que escurece). O ASCII (18) saiu desta lista e virou [metodologia_ascii.md](metodologia_ascii.md). Sem medida em GPU de verdade nem em celular, e ninguém comparou ainda "ligado x desligado"
+a olho com calma: o botão "Desligar as 5 técnicas" existe para isso.
+
 ### Limites e cuidados antes de adotar
 
 - O projeto hoje é **Canvas 2D** (monstros desenhados em sprites, leves para celular fraco). Esta técnica é **WebGL 3D** com pós-processamento: pesa

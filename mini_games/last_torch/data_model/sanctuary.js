@@ -15,7 +15,6 @@ export const ACHIEVEMENTS = [
     { id: 'hour4', group: 'trophy', icon: '🌕', name: 'Blood Moon', desc: 'Reach Wave 4.', stat: 'bestHour', target: 4 },
     { id: 'kills300', group: 'trophy', icon: '⚰️', name: 'Reaper', desc: 'Slay 200 monsters.', stat: 'kills', target: 200 },
     { id: 'kills1000', group: 'trophy', icon: '🔱', name: 'Thousand Souls', desc: 'Slay 1,000 monsters across all your nights.', stat: 'kills', target: 1000 },
-    { id: 'demon', group: 'trophy', icon: '😈', name: 'Demon Slayer', desc: 'Slay the Demon Lord.', stat: 'boss_DEMON_LORD', target: 1, hero: 'reaver' },
     { id: 'evolve', group: 'trophy', icon: '✨', name: 'Transcendence', desc: 'Evolve a power.', stat: 'evolutions', target: 1 },
     { id: 'chests10', group: 'trophy', icon: '🗝️', name: 'Treasure Hunter', desc: 'Open 10 chests.', stat: 'chests', target: 10 },
     { id: 'hour6', group: 'trophy', icon: '🕯️', name: 'Deep Dark', desc: 'Reach Wave 6.', stat: 'bestHour', target: 6 },
@@ -24,7 +23,6 @@ export const ACHIEVEMENTS = [
     { id: 'stars3all', group: 'trophy', icon: '⭐', name: 'Rising Star', desc: 'Earn 2 stars or more on all 18 waves.', stat: 'twoStarWaves', target: 18 },
     { id: 'stars5all', group: 'trophy', icon: '🌠', name: 'Constellation', desc: 'Earn 3 stars on all 18 waves.', stat: 'threeStarWaves', target: 18 },
     { id: 'kills2000', group: 'trophy', icon: '🪦', name: 'Harvester', desc: 'Slay 1,200 monsters.', stat: 'kills', target: 1200 },
-    { id: 'countess', group: 'trophy', icon: '🌞', name: 'Sunlight', desc: 'Slay the Blood Countess.', stat: 'boss_BLOOD_COUNTESS', target: 1, hero: 'warden' },
     { id: 'dawn', group: 'trophy', icon: '🌅', name: 'Dawn', desc: 'Survive until dawn.', stat: 'victories', target: 1, hero: 'azael' },
     { id: 'brutos', group: 'trophy', icon: '🪓', name: 'Iron Captain', desc: 'Defeat Captain Brutos.', stat: 'boss_BRUTOS', target: 1, hero: 'brutos' },
     { id: 'darkness3', group: 'trophy', icon: '🌑', name: 'Deeper Still', desc: 'Win a night on Darkness 3.', stat: 'bestDarknessWon', target: 3 },
@@ -46,7 +44,6 @@ export const ACHIEVEMENTS = [
     { id: 'streak40', group: 'feat', icon: '🌋', name: 'Rampage', desc: 'Reach a 40 kill streak.', stat: 'bestStreak', target: 40 },
     { id: 'dodge25', group: 'feat', icon: '🧵', name: 'Needle and Thread', desc: 'Dodge 25 attacks at the last moment.', stat: 'perfectDodges', target: 25 },
     { id: 'flawless5', group: 'feat', icon: '🌫️', name: 'Ghost', desc: 'Finish 5 waves without taking a hit.', stat: 'flawlessHours', target: 5 },
-    { id: 'streak100', group: 'feat', icon: '💫', name: 'Unstoppable', desc: 'Reach a 70 kill streak.', stat: 'bestStreak', target: 70, hero: 'shade' },
     { id: 'multi10', group: 'feat', icon: '☄️', name: 'Annihilation', desc: 'Slay 10 monsters at once.', stat: 'bestMultiKill', target: 10 },
 
     // --- MONSTROS (bestiário: quantos de cada tipo você já abateu; save.bestiary[tipo].kills) ---
@@ -71,11 +68,11 @@ export const ACHIEVEMENTS = [
 // Altar): é um motivo a mais para conseguir o troféu, não um atalho. Quem libera um herói paga 0 (o prêmio já é o herói); troféu
 // que libera um herói guardado (shelved) paga normal.
 export const ACHIEVEMENT_EMBERS = {
-    firstNight: 10, hour3: 10, hour4: 10, kills300: 15, kills1000: 25, demon: 25, evolve: 15, chests10: 15, hour6: 20, elites10: 15,
-    stars3all: 40, stars5x3: 30, stars5all: 80, kills2000: 40, countess: 30, darkness3: 30,
+    firstNight: 10, hour3: 10, hour4: 10, kills300: 15, kills1000: 25, evolve: 15, chests10: 15, hour6: 20, elites10: 15,
+    stars3all: 40, stars5x3: 30, stars5all: 80, kills2000: 40, darkness3: 30,
     sworn1: 20, sworn2: 20, sworn3: 20, sworn4: 20, sworn5: 20, darkness8: 80,
     beast_SKELETON: 15, beast_SKELETON_CRAWLER: 10, beast_BAT: 20, beast_SHADOW_WOLF: 15, beast_VAMPIRE: 15, beast_WITCH: 10, beast_MOTH: 10, beast_BLOATER: 10, beast_ZOMBIE_WOLF: 10, beast_WRAITH: 15, beast_HEADLESS_KNIGHT: 20, beast_BONE_COLOSSUS: 25, beast_GOLEM: 20, beast_TREANT: 20, beast_NECROMANCER: 20,
-    multi3: 5, dodge5: 5, multi4: 10, flawless1: 10, streak30: 15, multi6: 15, streak40: 20, dodge25: 20, flawless5: 25, streak100: 30, multi10: 30
+    multi3: 5, dodge5: 5, multi4: 10, flawless1: 10, streak30: 15, multi6: 15, streak40: 20, dodge25: 20, flawless5: 25, multi10: 30
 };
 
 // Quanto o jogador já tem para esta conquista: um número do save.stats, o abate de um tipo de monstro (beast, do bestiário) ou o

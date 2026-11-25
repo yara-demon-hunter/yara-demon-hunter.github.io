@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório · Cavaleiro Ossário (técnicas de distância)</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; height: 100%; background: #060a10; color: #d6dbe6; font-family: system-ui, sans-serif; overflow: hidden; }
+        #stage { position: fixed; inset: 0; }
+        #stage canvas { display: block; width: 100%; height: 100%; }
+        #labels { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+        #labels div { position: absolute; transform: translate(-50%, -100%); padding: 2px 6px; font-size: 11px; line-height: 1.25; white-space: nowrap; text-align: center; color: #cfe6ff; background: rgba(6, 10, 16, .72); border: 1px solid #28405a; border-radius: 6px; }
+        #labels div b { color: #7fe8ff; }
+        #panel { position: fixed; top: 10px; right: 10px; width: 270px; max-height: calc(100% - 20px); overflow: auto; padding: 12px 14px; background: rgba(8, 12, 18, .88); border: 1px solid #25303f; border-radius: 10px; font-size: 13px; line-height: 1.35; }
+        #panel h1 { margin: 0 0 2px; font-size: 15px; color: #7fe8ff; }
+        #panel h2 { margin: 10px 0 3px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #8b98ad; }
+        #panel .sub { margin: 0 0 6px; font-size: 11px; color: #8b98ad; }
+        #panel label { display: flex; gap: 8px; align-items: center; margin: 3px 0; cursor: pointer; }
+        #panel label small { color: #8b98ad; }
+        #panel .row { display: grid; gap: 2px; margin: 4px 0; }
+        #panel select, #panel button, #panel input[type=range] { width: 100%; margin-top: 2px; }
+        #panel select, #panel button { padding: 6px; background: #141b26; color: #e5e9f2; border: 1px solid #2b3647; border-radius: 6px; font: inherit; cursor: pointer; }
+        #read { margin-top: 8px; padding: 8px; font-size: 12px; background: #0b1119; border: 1px solid #25303f; border-radius: 8px; color: #b8c6dc; }
+        #read b { color: #7fe8ff; }
+        #home { position: fixed; top: 10px; left: 10px; z-index: 5; padding: 6px 10px; background: rgba(8, 12, 18, .88); border: 1px solid #25303f; border-radius: 8px; color: #7fe8ff; text-decoration: none; font-size: 13px; }
+        #loading { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #060a10; color: #8b98ad; font-size: 15px; text-align: center; padding: 20px; white-space: pre-line; }
+        @media (max-width: 640px) { #panel { width: 220px; font-size: 12px; } }
+    </style>
+    <!-- Laboratório (fora dos jogos). Mostra as técnicas de distância da metodologia_fotorrealismo.md (LOD, mipmap, perspectiva aérea, luz de borda,
+         sombra de contato, specular AA). Abrir: na pasta mini_games, `python3 -m http.server 8010` e
+         http://localhost:8010/_library/tools/lab/cavaleiro_foto.html -->
+    <script type="importmap">
+        { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+    </script>
+</head>
+<body>
+    <div id="stage"></div>
+    <div id="labels"></div>
+    <a id="home" href="index.html">← Laboratório</a>
+    <aside id="panel">
+        <h1>Cavaleiro Ossário</h1>
+        <p class="sub">Esqueleto de armadura enferrujada, feito por código. Mostra como um personagem fica de perto e de longe. Arraste para girar, role para aproximar.</p>
+        <div class="row">
+            <select id="mode"><option value="idle">Parado</option><option value="walk">Andando</option><option value="slash">Golpe de espada</option></select>
+        </div>
+        <div class="row"><span>Distância do cavaleiro da frente: <b id="distTxt">11</b></span><input type="range" id="dist" min="3" max="80" step="0.5" value="11"></div>
+        <label><input type="checkbox" id="line" checked> Fileira de cavaleiros a 14, 24, 36, 52 e 72</label>
+        <label><input type="checkbox" id="labs" checked> Rótulos (distância, LOD, triângulos)</label>
+
+        <h2>LOD (nível de detalhe)</h2>
+        <div class="row"><select id="lod"><option value="auto">Automático pela distância</option><option value="0">Forçar 0 · perto (tudo)</option><option value="1">Forçar 1 · médio</option><option value="2">Forçar 2 · longe</option></select></div>
+
+        <h2>Técnicas de distância</h2>
+        <label><input type="checkbox" id="t_fog" checked> Cor atmosférica <small>(névoa no personagem)</small></label>
+        <label><input type="checkbox" id="t_rim" checked> Luz de borda que cresce com a distância</label>
+        <label><input type="checkbox" id="t_contact" checked> Sombra de contato</label>
+        <label><input type="checkbox" id="t_spec" checked> Specular AA <small>(relevo some, rugosidade sobe)</small></label>
+        <label><input type="checkbox" id="t_mip" checked> Mipmap + anisotrópico</label>
+        <div class="row"><span>Densidade da névoa</span><input type="range" id="fogd" min="0" max="0.035" step="0.001" value="0.014"></div>
+        <button id="alloff">Desligar as 5 técnicas (para comparar)</button>
+        <button id="allon">Ligar as 5 técnicas</button>
+
+        <h2>Cena</h2>
+        <label><input type="checkbox" id="bloom" checked> Bloom <small>(olhos, alma, runas)</small></label>
+        <label><input type="checkbox" id="spin"> Câmera girando sozinha</label>
+        <button id="shot">📷 Salvar foto (PNG)</button>
+        <div id="read">…</div>
+    </aside>
+    <div id="loading">Montando o Cavaleiro Ossário…</div>
+    <script type="module" src="cavaleiro_foto.js"></script>
+</body>
+</html>

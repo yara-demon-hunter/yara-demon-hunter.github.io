@@ -1,5 +1,8 @@
 /* --- CONFIRMAÇÃO DE SAÍDA: caixa curta por cima de tudo, com o botão seguro em destaque --- */
-#confirmScreen { z-index: 60; background: rgba(2, 4, 8, 0.82); }
+#confirmScreen, #continueScreen, #newRunScreen { z-index: 60; background: rgba(2, 4, 8, 0.82); }
+.confirm-stack { display: grid; gap: 0.5rem; width: 100%; }
+.confirm-stack .start-btn { padding: 0.7rem 0.6rem; font-size: 0.8rem; letter-spacing: 0.12em; text-indent: 0; }
+.confirm-stack .start-btn em { display: block; font-style: normal; font-size: 0.62rem; letter-spacing: 0.06em; opacity: 0.7; margin-top: 0.15rem; }
 .confirm-box {
     display: flex;
     flex-direction: column;

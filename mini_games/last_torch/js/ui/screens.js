@@ -7,7 +7,7 @@ import { DARKNESS, getHourName, startingSkillPoints } from '../../data_model/nig
 import { START } from '../../data_model/start.js';
 import { ALTAR, ALTAR_KEYS, affordableCount, altarCost, altarLevel, altarStartPoints, emberBreakdown, emberTotal } from '../../data_model/embers.js';
 import { save, persist } from '../core/save.js';
-import { clearRun, loadRun, saveRun } from '../core/run_save.js';
+import { clearRun, loadRun, runPlace, saveRun, syncRunAccounting } from '../core/run_save.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { OMENS } from '../../data_model/night.js';
 import { openCamp } from './camp.js';
@@ -20,7 +20,7 @@ import { attributes, audio, passives, player, powers, state } from '../core/stat
 import { checkAchievements, pushStats, recordNight, rewardText } from '../systems/sanctuary.js';
 import { celebrateRecord } from './record_celebration.js';
 import { flushHeroUnlocks } from './hero_unlock.js';
-import { getOwnedPowers, hasBuyableNode } from '../systems/tree.js';
+import { getOwnedPowers, hasBuyableNode, respecSkills } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
 import { resetQuake } from '../systems/quake.js';
 import { resetFury } from '../systems/fury.js';
@@ -57,9 +57,9 @@ export function paintHeroPortrait(node, hero) {
 }
 
 // --- INÍCIO DE PARTIDA ---
-export function startGame() {
+export function startGame(keepSavedRun = false) {
     platform.gameplayStart();
-    clearRun();                    // outra partida: o registro de CONTINUAR da anterior não vale mais
+    if (!keepSavedRun) clearRun();          // outra partida com este herói: o registro de CONTINUAR dele não vale mais (o CONTINUE passa true)
     audio.init();
     state.turn = 1;
     enterScreenForTurn(1);                  // a partida começa na primeira tela do mapa (a anterior pode ter acabado no Castle)
@@ -184,6 +184,8 @@ export function startGame() {
         document.getElementById(id).classList.add('hidden');
     });
     startHour();
+    // A partida já nasce guardada (onda 1): sair no meio da primeira onda também deixa um CONTINUE
+    if (!keepSavedRun) saveRun('hunt');
     updateHUD();
     startHints();
 }
@@ -191,7 +193,7 @@ export function startGame() {
 // --- CONTINUAR ---
 // Recomeça do registro mais recente (js/core/run_save.js): começa uma partida normal, joga por cima tudo o que estava
 // guardado e abre o acampamento (se parou nele) ou o começo da hora.
-export function continueRun() {
+export function continueRun(respec = false) {
     const snap = loadRun();
     if (!snap) return false;
     if (!HEROES[snap.hero] || HEROES[snap.hero].shelved) {
@@ -200,7 +202,7 @@ export function continueRun() {
     }
     save.hero = snap.hero;
     save.darkness = Math.min(save.maxDarkness, snap.darkness);
-    startGame();                   // zera tudo e já começa a hora 1: o que vem a seguir sobrescreve
+    startGame(true);               // zera tudo e já começa a hora 1: o que vem a seguir sobrescreve (e o registro do herói fica)
     resetFieldForNewTurn();
     state.turn = snap.turn;
     state.totalScore = snap.totalScore;
@@ -224,6 +226,8 @@ export function continueRun() {
     state.nextOmen = snap.omen ? Object.values(OMENS).find(o => o.name === snap.omen) ?? null : null;
     refreshModifiers();
     state.revives = snap.revives;
+    // Recomeçar com outra build: a árvore é zerada e todos os pontos gastos voltam (js/systems/tree.js > respecSkills)
+    if (respec) respecSkills();
     state.coreHpMax = getTorchMaxHp();
     state.coreHp = Math.min(state.coreHpMax, snap.coreHp);
     player.maxHp = getMaxPlayerHp();
@@ -233,7 +237,8 @@ export function continueRun() {
     if (passives.phoenixPact.lvl > 0) preparePhoenix();
     if (passives.shadowRaven.lvl > 0) prepareRaven();
     if (passives.shadowShackle.lvl > 0) prepareShackle();
-    if (snap.kind === 'camp') openCamp(true);
+    // Com a árvore zerada, ele volta ao acampamento da onda: um lugar calmo para montar a build antes de caçar (na onda 1 não há acampamento)
+    if (snap.kind === 'camp' || (respec && snap.turn > 1)) openCamp(true);
     else {
         startHour();
         saveRun('hunt');
@@ -490,7 +495,9 @@ export function triggerGameOver(reason) {
     const embersEarned = bankRun();
     // Ranks: a noite entra no top 10 e no recorde do herói (a posição aparece na tela final)
     nightRank = recordNight({ score: state.totalScore, wave: state.turn, hero: save.hero, kills: run.kills, victory: reason === 'DAWN', darkness: save.darkness });
-    clearRun();                    // a noite acabou: nada para continuar (a noite sem fim guarda de novo no próximo acampamento)
+    // Amanheceu: nada para continuar. Morreu: o registro do herói fica (CONTINUE recomeça a onda), com a contabilidade em dia
+    if (reason === 'DAWN') clearRun();
+    else syncRunAccounting();
     if (reason === 'DAWN') {
         save.stats.victories++;
         save.stats.bestDarknessWon = Math.max(save.stats.bestDarknessWon, save.darkness);
@@ -500,6 +507,12 @@ export function triggerGameOver(reason) {
 
     const unlocked = checkAchievements({ toast: false, announce: true, flush: false });
     persist();
+
+    // CONTINUE depois de morrer: o mesmo herói recomeça a onda em que caiu (quem amanheceu não tem o que continuar)
+    const saved = loadRun();
+    const deathContinue = document.getElementById('btnDeathContinue');
+    deathContinue.classList.toggle('hidden', !saved);
+    if (saved) deathContinue.innerHTML = `▶ CONTINUE<em>${runPlace(saved)}</em>`;
 
     // Tela final
     const text = END_TEXTS[reason];
@@ -607,7 +620,7 @@ export function renderStartScreen() {
     const resumable = run && HEROES[run.hero] && !HEROES[run.hero].shelved;
     const btnContinue = document.getElementById('btnContinue');
     btnContinue.classList.toggle('hidden', !resumable);
-    if (resumable) btnContinue.innerHTML = `▶ CONTINUE<em>${HEROES[run.hero].name} · Wave ${run.turn}${run.kind === 'camp' ? ' · camp' : ''}</em>`;
+    if (resumable) btnContinue.innerHTML = `▶ CONTINUE<em>${HEROES[run.hero].name} · ${runPlace(run)}</em>`;
     document.getElementById('darknessValue').innerText = save.darkness;
     const startPoints = startingSkillPoints(save.darkness) + altarStartPoints(save);
     dark.title = `Start with ${startPoints} skill point${startPoints === 1 ? '' : 's'}`;

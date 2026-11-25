@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório · Espectro Encapuzado (ASCII)</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; height: 100%; background: #020605; color: #c9e8d4; font-family: system-ui, sans-serif; overflow: hidden; }
+        #stage { position: fixed; inset: 0; background: #020605; }
+        #stage canvas { position: absolute; left: 0; top: 0; image-rendering: pixelated; }
+        #glow { pointer-events: none; filter: blur(5px) brightness(1.4); mix-blend-mode: screen; opacity: .85; }
+        #scan { position: absolute; inset: 0; pointer-events: none; display: none; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,.28) 3px); }
+        #panel { position: fixed; top: 10px; right: 10px; width: 280px; max-height: calc(100% - 20px); overflow: auto; padding: 12px 14px; background: rgba(2, 10, 6, .9); border: 1px solid #1f3a2b; border-radius: 10px; font-size: 13px; line-height: 1.35; }
+        #panel h1 { margin: 0 0 2px; font-size: 15px; color: #5dff9a; }
+        #panel h2 { margin: 10px 0 3px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #7da58e; }
+        #panel .sub { margin: 0 0 6px; font-size: 11px; color: #7da58e; }
+        #panel label { display: flex; gap: 8px; align-items: center; margin: 3px 0; cursor: pointer; }
+        #panel label small { color: #7da58e; }
+        #panel .row { display: grid; gap: 2px; margin: 4px 0; }
+        #panel select, #panel button, #panel input[type=range] { width: 100%; margin-top: 2px; }
+        #panel select, #panel button { padding: 6px; background: #0c1a12; color: #dff5e6; border: 1px solid #25402f; border-radius: 6px; font: inherit; cursor: pointer; }
+        #read { margin-top: 8px; padding: 8px; font-size: 12px; background: #04100a; border: 1px solid #1f3a2b; border-radius: 8px; color: #a9d3b8; word-break: break-all; }
+        #read b { color: #5dff9a; }
+        #read code { font-family: ui-monospace, "DejaVu Sans Mono", monospace; color: #e8fff0; }
+        #home { position: fixed; top: 10px; left: 10px; z-index: 5; padding: 6px 10px; background: rgba(2, 10, 6, .9); border: 1px solid #1f3a2b; border-radius: 8px; color: #5dff9a; text-decoration: none; font-size: 13px; }
+        #loading { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #020605; color: #7da58e; font-size: 15px; text-align: center; padding: 20px; }
+        @media (max-width: 640px) { #panel { width: 230px; font-size: 12px; } }
+    </style>
+    <!-- Laboratório (fora dos jogos). Aplica metodologia_ascii.md (A1 a A12). Abrir: na pasta mini_games, `python3 -m http.server 8010` e
+         http://localhost:8010/_library/tools/lab/ascii_foto.html -->
+    <script type="importmap">
+        { "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+    </script>
+</head>
+<body>
+    <div id="stage"><div id="scan"></div></div>
+    <a id="home" href="index.html">← Laboratório</a>
+    <aside id="panel">
+        <h1>Espectro Encapuzado</h1>
+        <p class="sub">Figura 3D desenhada só com caracteres. Arraste para girar, role para aproximar.</p>
+        <div class="row"><select id="anim"><option value="idle">Flutuando</option><option value="cast">Conjurando</option></select></div>
+        <div class="row"><span>Distância: <b id="distTxt">13</b> m</span><input type="range" id="dist" min="4" max="55" step="0.5" value="13"></div>
+        <div class="row"><span>Tamanho da célula: <b id="cellTxt">6</b> px</span><input type="range" id="cell" min="5" max="16" step="1" value="6"></div>
+
+        <h2>Base (A1, A2, A10, A11)</h2>
+        <div class="row"><select id="ramp"><option value="med">A1 · rampa medida na fonte</option><option value="txt"> rampa pronta: ` .:-=+*#%@`</option></select></div>
+        <div class="row"><span>Exposição</span><input type="range" id="expo" min="0.5" max="3.5" step="0.05" value="1.7"></div>
+        <div class="row"><span>Contraste (gama)</span><input type="range" id="gam" min="0.4" max="1.8" step="0.05" value="0.85"></div>
+
+        <h2>Leitura (A3 a A7)</h2>
+        <label><input type="checkbox" id="a3" checked> A3 Célula maior de longe <small>(LOD)</small></label>
+        <label><input type="checkbox" id="a4" checked> A4 Bordas <small>(Sobel: / \ | -)</small></label>
+        <div class="row"><span>Limiar das bordas</span><input type="range" id="edge" min="0.05" max="0.8" step="0.01" value="0.3"></div>
+        <label><input type="checkbox" id="a5" checked> A5 Dithering <small>(Bayer)</small></label>
+        <label><input type="checkbox" id="a6" checked> A6 Profundidade esvazia os caracteres</label>
+        <label><input type="checkbox" id="a7" checked> A7 Glifos por material</label>
+
+        <h2>Cor e brilho (A8, A9)</h2>
+        <div class="row"><select id="color"><option value="pal">A8 · paleta por material</option><option value="mono">A8 · verde de terminal</option><option value="cel">A8 · cor da célula</option></select></div>
+        <label><input type="checkbox" id="a9" checked> A9 Brilho de texto <small>(olhos, orbe, runas)</small></label>
+
+        <h2>Animação (A12)</h2>
+        <div class="row"><span>Instabilidade dos glifos</span><input type="range" id="flick" min="0" max="1" step="0.02" value="0.15"></div>
+        <div class="row"><span>Chuva de código</span><input type="range" id="rain" min="0" max="1" step="0.02" value="0"></div>
+        <label><input type="checkbox" id="scanl"> Linhas de CRT</label>
+        <button id="die">☠ Dissolver em chuva</button>
+        <button id="raw">Só a rampa (desliga A3 a A9 e A12)</button>
+        <button id="all">Ligar tudo</button>
+        <button id="shot">📷 Salvar foto (PNG)</button>
+        <div id="read">…</div>
+    </aside>
+    <div id="loading">Medindo os glifos…</div>
+    <script type="module" src="ascii_foto.js"></script>
+</body>
+</html>

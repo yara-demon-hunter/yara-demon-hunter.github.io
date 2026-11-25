@@ -1,4 +1,6 @@
 import { audio, state } from '../core/state.js';
+import { loadRun, runPlace } from '../core/run_save.js';
+import { HEROES } from '../../data_model/heroes.js';
 import { buyFuel, buyRest, leaveCamp, setupCamp } from './camp.js';
 import { buyHero, chooseHero, closeHeroes, pickHeroOnStart } from './heroes.js';
 import { inPortal, enterFullscreen, showIosHint } from './orientation.js';
@@ -40,11 +42,37 @@ export function setupButtons() {
         enterFullscreen();
         resumeGame();
     };
-    on('btnStart', start);
-    on('btnContinue', () => {
-        enterFullscreen();
-        continueRun();
+    // Começar por cima de um registro do mesmo herói pede confirmação
+    const newRunBox = document.getElementById('newRunScreen');
+    on('btnStart', () => {
+        const saved = loadRun();
+        if (!saved) return start();
+        document.getElementById('newRunText').textContent = `${HEROES[saved.hero].name} has a saved hunt (${runPlace(saved)}). Starting a new one replaces it.`;
+        newRunBox.classList.remove('hidden');
     });
+    on('btnNewRunStay', () => newRunBox.classList.add('hidden'));
+    on('btnNewRunGo', () => {
+        newRunBox.classList.add('hidden');
+        start();
+    });
+    // CONTINUE (do menu ou da tela de derrota): manter a build ou zerar as skills para montar outra
+    const continueBox = document.getElementById('continueScreen');
+    const openContinue = () => {
+        const saved = loadRun();
+        if (!saved) return;
+        document.getElementById('continueText').textContent = `${HEROES[saved.hero].name} · ${runPlace(saved)}. The wave starts over; everything else stays.`;
+        continueBox.classList.remove('hidden');
+    };
+    const goContinue = (respec) => {
+        continueBox.classList.add('hidden');
+        enterFullscreen();
+        continueRun(respec);
+    };
+    on('btnContinue', openContinue);
+    on('btnDeathContinue', openContinue);
+    on('btnContinueKeep', () => goContinue(false));
+    on('btnContinueReset', () => goContinue(true));
+    on('btnContinueCancel', () => continueBox.classList.add('hidden'));
     on('btnRestart', startAfterNight);
     on('btnPause', (e) => {
         e.currentTarget.blur();

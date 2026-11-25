@@ -396,3 +396,39 @@ export function buyNode(id) {
     else audio.playCardPick(node.kind === 'evolve' ? 'evolution' : node.kind === 'power' || node.kind === 'passive' ? 'rare' : 'common');
     return true;
 }
+
+// Zera a árvore de skills e devolve os pontos gastos (usado ao CONTINUAR uma noite para montar outra build). Só a árvore de skills:
+// relíquias (ouro) e o que o herói já traz de graça (startPower) ficam como estão. Devolve quantos pontos voltaram.
+export function respecSkills() {
+    const hero = getHero();
+    let refund = 0;
+    for (const node of TREE_NODES) {
+        let lvl = getNodeLevel(node);
+        if (node.kind === 'power' && node.key === hero.startPower) lvl = Math.max(0, lvl - 1);      // o poder de graça do herói não custou nada
+        if (lvl <= 0) continue;
+        refund += lvl * getNodeCost(node);
+        if (node.kind === 'passive') refund -= lvl * (passives[node.key].grantPoints ?? 0);          // pontos que a própria skill deu voltam a não existir
+    }
+    for (const node of TREE_NODES) {
+        if (node.kind === 'passive') {
+            state.revives -= (passives[node.key].mods?.revives ?? 0) * passives[node.key].lvl;
+            passives[node.key].lvl = 0;
+            passives[node.key].evolved = false;
+        } else if (node.kind === 'stat') attributes[node.key].lvl = 1;
+        else if (node.kind === 'power') {
+            powers[node.key].lvl = node.key === hero.startPower ? 1 : 0;
+            powers[node.key].evolved = false;
+        } else if (node.kind === 'evolve') evolvable(node).evolved = false;
+        else if (node.kind === 'mod') state.tree[node.id] = 0;
+    }
+    state.tree = {};
+    state.oath = null;
+    state.oathAnnounced = false;
+    state.oathCeremony = null;
+    state.revives = Math.max(0, state.revives);
+    state.skillPoints += Math.max(0, refund);
+    refreshModifiers();
+    syncMaxHp();
+    syncTorchMax();
+    return Math.max(0, refund);
+}

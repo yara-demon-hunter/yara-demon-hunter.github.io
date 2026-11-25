@@ -6,10 +6,10 @@ import { NINJA_VISUALS } from '../../library/characters/kuro-ninja/ninja_visual.
 export const NINJA = {
     id: 'ninja',
     // Caminhos (árvore): +5% de dano nas skills do Shadow Path e do Blade Path (no Blade, também no golpe da lâmina);
-    // nenhum ramo é proibido para ele
+    // os caminhos Light, Curse e Nature são proibidos para ele (só Blade, Shadow e Flame)
     affinity: 'shadow',
     extraAffinities: ['blade'],
-    sealedBranches: [],
+    sealedBranches: ['light', 'curse', 'nature'],
     model: 'ninja',                 // boneco 2.5D (js/render/bodies.js)
     thrown: 'shuriken',             // lança shurikens no lugar da adaga (_library/weapons/thrown.js); as skills de adaga valem para elas
     order: 3.7,                     // posição na tela de escolha

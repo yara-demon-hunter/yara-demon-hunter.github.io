@@ -481,6 +481,31 @@ permalink: /mini_games/last_torch/last_torch.html
     </div>
 </div>
 
+<!-- CONTINUAR: escolhe manter a build ou zerar as skills (cada herói tem o seu registro; js/core/run_save.js). Styles in css/components/confirm.css -->
+<div id="continueScreen" class="game-screen hidden" role="alertdialog" aria-labelledby="continueTitle">
+    <div class="confirm-box">
+        <h2 id="continueTitle" class="screen-title">CONTINUE</h2>
+        <p id="continueText">Pick up where you stopped.</p>
+        <div class="confirm-stack">
+            <button id="btnContinueKeep" class="start-btn">KEEP MY BUILD</button>
+            <button id="btnContinueReset" class="start-btn start-btn-dark">RESET SKILLS &amp; REBUILD<em>all skill points are refunded</em></button>
+            <button id="btnContinueCancel" class="start-btn start-btn-dark">BACK</button>
+        </div>
+    </div>
+</div>
+
+<!-- NOVA PARTIDA POR CIMA DE UM REGISTRO: pede confirmação. Styles in css/components/confirm.css -->
+<div id="newRunScreen" class="game-screen hidden" role="alertdialog" aria-labelledby="newRunTitle">
+    <div class="confirm-box">
+        <h2 id="newRunTitle" class="screen-title">START A NEW HUNT?</h2>
+        <p id="newRunText">Your saved hunt will be replaced.</p>
+        <div class="confirm-actions">
+            <button id="btnNewRunStay" class="start-btn">KEEP SAVED HUNT</button>
+            <button id="btnNewRunGo" class="start-btn start-btn-dark">START NEW</button>
+        </div>
+    </div>
+</div>
+
 <!-- FIM DA NOITE. Styles in css/components/summary.css -->
 <div id="gameOverScreen" class="game-screen hidden">
     <div class="summary">
@@ -506,6 +531,7 @@ permalink: /mini_games/last_torch/last_torch.html
             </div>
         </div>
         <div class="summary-actions">
+            <button id="btnDeathContinue" class="start-btn start-btn-continue hidden">▶ CONTINUE</button>
             <button id="btnRestart" class="start-btn">▶ HUNT AGAIN</button>
             <button id="btnMenu" class="start-btn start-btn-dark">MENU</button>
         </div>
