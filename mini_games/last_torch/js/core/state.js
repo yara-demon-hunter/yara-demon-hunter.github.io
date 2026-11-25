@@ -190,7 +190,7 @@ export const state = {
     // lure: o carvalho acordado que os monstros próximos vão atacar; claws: marcas de garra das mordidas
     // Luz (js/systems/skills_light.js): círculos sagrados, frascos de água benta, raios e explosões de luz
     light: { grounds: [], flasks: [], bolts: [], bursts: [], puddles: [], drops: [], bell: { swing: 0, flash: 0, queue: 0, gap: 0, index: 0, level: null }, bellRings: [], pendant: { flash: 0 }, pendantRings: [], angel: { on: false, placed: false, x: 0, y: 0, hp: 0, maxHp: 0, lastHp: 0, ghost: 0, hurtFx: 0, radius: 12, hitFlash: 0, respawn: 0, angle: 0, anim: null, move: null, comboStep: 1, dashTimer: 0, vigilStance: false, castAge: -1, iFrames: 0, hitTime: -100000, hitDirX: 0, hitDirY: 0 }, angelShots: [], angelBeams: [], rain: 0, rainDrop: 0, rainTick: 0, rainTimer: 12 },
-    nature: { oaks: [], seeds: [], pods: [], clouds: [], thorns: [], wolves: [], claws: [], lure: null, whip: null, cacti: [], needles: [] },
+    nature: { oaks: [], seeds: [], pods: [], clouds: [], thorns: [], wolves: [], claws: [], lure: null, whips: [], cacti: [], needles: [], storm: null },
 
     // Animação de level up em andamento: { age, label } ou null
     levelUpFx: null,

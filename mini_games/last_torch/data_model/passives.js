@@ -87,6 +87,16 @@ export const PASSIVE_SKILL_MODELS = {
             return `Every ${ROSE_WHIP.cooldownSeconds}s you crack a whip of thorns, a rose at its tip, at the strongest monster within ${ROSE_WHIP.range} reach. It lashes for ${formatMultiplier(ROSE_WHIP.lashDamage)} spell damage and stays wrapped around it for ${ROSE_WHIP.holdSeconds}s (${Math.round(ROSE_WHIP.holdSeconds * ROSE_WHIP.bossRatio)}s on a boss): the monster is pinned to the spot and the thorns bite for ${formatMultiplier(ROSE_WHIP.thornDps)} spell damage per second.`;
         }
     },
+    rosePetals: {
+        name: 'Rose Petals',
+        icon: '🌷',
+        cost: 130,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        get desc() {
+            return `Every ${ROSE_PETALS.cooldownSeconds}s, when monsters are near, a hurricane of roses and loose petals spins around you for ${ROSE_PETALS.durationSeconds}s, hitting everything within ${ROSE_PETALS.radius} range for ${formatMultiplier(ROSE_PETALS.damage)} spell damage every ${formatNumber(ROSE_PETALS.tickSeconds)}s, pushing them back and slowing them.`;
+        }
+    },
     executioner: {
         name: 'Executioner',
         icon: '🪓',
@@ -204,9 +214,9 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
-            return `Your roses wither and turn black: +${formatPercent(this.mods.knifeDamage)} dagger damage, and a monster they hit is marked with a black rose for ${THORN_ROSES.markSeconds}s. If it dies marked, thorn roses burst from the ground where it fell and hurt everything that crosses them for ${THORN_ROSES.patchSeconds}s. Only Rowan can learn this. Every skill that improves daggers works on roses.`;
+            return `Your roses wither and turn black, in every skill that uses them (thrown roses, Rose Whip, Rose Petals). All your Nature Path skills deal +${formatPercent(this.mods.natureDamage)} damage, daggers deal +${formatPercent(this.mods.knifeDamage)}, and a monster they hit is marked with a black rose for ${THORN_ROSES.markSeconds}s. If it dies marked, thorn roses burst from the ground where it fell and hurt everything that crosses them for ${THORN_ROSES.patchSeconds}s. Only Rowan can learn this. Every skill that improves daggers works on roses.`;
         },
-        mods: { knifeDamage: 0.6 }
+        mods: { knifeDamage: 0.6, natureDamage: 0.2 }
     },
     oathWild: {
         name: 'Oath of the Wild',
@@ -702,10 +712,25 @@ export const SHADOW_SHACKLE = {
     speed: 800                  // velocidade da ponta da corrente
 };
 
+// (o bônus rootSeconds de quem o tem, como o Rowan, também estica o tempo que o chicote segura)
+// Rose Petals (Nature; js/systems/skills_nature.js, updateRosePetals; desenho em js/render/rose_petals.js): um furacão de rosas e pétalas gira em volta do
+// herói (e o acompanha) por durationSeconds, ferindo em pulsos tudo no raio grande.
+export const ROSE_PETALS = {
+    cooldownSeconds: 17,
+    durationSeconds: 5,
+    radius: 170,                // raio grande, em volta do herói
+    tickSeconds: 0.4,
+    damage: 0.9,                // x dano de feitiço, por pulso, em cada monstro dentro do raio
+    knockback: 28,              // empurrão para fora a cada pulso
+    slow: 0.25,                 // e a lentidão enquanto o furacão dura
+    firstDelaySeconds: 6        // a primeira vez que se forma, depois de aprender
+};
+
 // Rose Whip (Nature; js/systems/skills_nature.js, updateRoseWhip; desenho em js/render/rose_whip.js): irmã do Shadow Shackle. O chicote voa até o
 // monstro de mais vida ao alcance, açoita (lashDamage) e fica enrolado nele: prende no lugar (e.chained) e os espinhos mordem a cada tique.
+// (evoluído, Crimson Surge: os números de EVOLUTIONS.roseWhip.levels trocam holdSeconds e somam o pulso de energia vermelha: pulseSeconds, pulseDamage, travelSeconds)
 export const ROSE_WHIP = {
-    cooldownSeconds: 12,        // conta a partir do lançamento
+    cooldownSeconds: 20,        // conta a partir do lançamento
     range: 300,                 // alcance do chicote, a partir do herói
     holdSeconds: 6,             // quanto tempo fica enrolado
     bossRatio: 0.5,             // num chefe segura só esta parte do tempo

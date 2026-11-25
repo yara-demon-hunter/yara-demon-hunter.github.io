@@ -44,6 +44,7 @@ export function dealDamage(e, amount, o = {}) {
         * (e.rooted > 0 ? 1 + rootedBonus() : 1)
         * (e.openTimer > 0 ? 1.3 : 1)                                           // boss aberto depois de um golpe pesado: +30%
         * (e.blessed > 0 ? 1 + POWER_MODELS.holyWater.blessBonus : 1)       // Holy Water: abençoado leva mais de tudo
+        * (state.dmgSource === 'nature' ? 1 + mod('natureDamage') : 1)                  // Dark Roses (Rowan): +20% em todas as skills do Nature Path
         * ((e.elite || e.isBoss) && state.dmgSource === 'light' ? 1 + mod('demonDamage') : 1)   // Judgment (Light): elites e chefes levam mais SÓ do dano das skills do Light Path
         * (e.chilled > 0 && o.torchFire ? 1 + BLUE_TORCH.brittle : 1);       // Blue Torch: gelado leva mais só dos golpes de fogo da tocha
 

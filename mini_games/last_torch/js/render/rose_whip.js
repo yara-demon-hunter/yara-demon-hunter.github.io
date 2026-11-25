@@ -1,5 +1,5 @@
 import { ROSE_WHIP } from '../../data_model/passives.js';
-import { ctx, player, state } from '../core/state.js';
+import { ctx, passives, player, state } from '../core/state.js';
 import { drawRose } from '../../library/weapons/rose/rose.js';
 import { drawGlow } from '../../library/core/glow.js';
 
@@ -69,16 +69,64 @@ function strokeVine(pts, thick = 1) {
 }
 
 // A rosa na ponta, virada para onde o chicote aponta (ang) e um brilho suave
+const TIP_ROSE_SIZE = 1.3;        // a rosa da ponta é 30% maior (em voo e enrolado)
 function drawTipRose(x, y, ang, scale = 1.4, glow = 0.35) {
+    scale *= TIP_ROSE_SIZE;
+    const dark = passives.darkRoses.lvl > 0;          // Dark Roses (Rowan): as rosas de todos os golpes ficam negras
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    drawGlow(ctx, 'rgba(251, 113, 133, 0.9)', x, y, 11 * scale, glow);
+    drawGlow(ctx, dark ? 'rgba(139, 92, 246, 0.9)' : 'rgba(251, 113, 133, 0.9)', x, y, 11 * scale, glow);
     ctx.restore();
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(ang);
     ctx.scale(scale, scale);
-    drawRose(ctx, state.runTime, false);
+    drawRose(ctx, state.runTime, dark);
+    ctx.restore();
+}
+
+// Crimson Surge: a energia vermelha que corre da mão até o monstro POR DENTRO do chicote (path = o caminho todo, da mão ao topo da espiral). Cada pulso é uma
+// bola de energia com um rastro brilhante que acende o chicote por onde passou; ao chegar, o jogo faz a explosão (js/systems/skills_nature.js).
+function pointAt(path, lens, total, frac) {
+    const target = Math.max(0, Math.min(1, frac)) * total;
+    for (let i = 1; i < lens.length; i++) {
+        if (lens[i] >= target) {
+            const span = lens[i] - lens[i - 1] || 1;
+            const k = (target - lens[i - 1]) / span;
+            return { x: path[i - 1].x + (path[i].x - path[i - 1].x) * k, y: path[i - 1].y + (path[i].y - path[i - 1].y) * k };
+        }
+    }
+    return path[path.length - 1];
+}
+
+function drawEnergy(w, path) {
+    if (!w.orbs?.length) return;
+    const lens = [0];
+    for (let i = 1; i < path.length; i++) lens.push(lens[i - 1] + Math.hypot(path[i].x - path[i - 1].x, path[i].y - path[i - 1].y));
+    const total = lens[lens.length - 1] || 1;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (const orb of w.orbs) {
+        const k = Math.min(1, orb.age / orb.seconds);
+        const head = pointAt(path, lens, total, k);
+        // Rastro: o trecho de chicote que a energia acabou de atravessar fica aceso
+        const from = Math.max(0, k - 0.4);
+        const trail = [pointAt(path, lens, total, from)];
+        for (let i = 1; i < path.length; i++) if (lens[i] / total > from && lens[i] / total < k) trail.push(path[i]);
+        trail.push(head);
+        for (const [width, color, alpha] of [[9, 'rgba(239, 68, 68, 0.35)', 1], [4.5, 'rgba(248, 113, 113, 0.8)', 1], [1.6, 'rgba(254, 226, 226, 1)', 1]]) {
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath();
+            trail.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+            ctx.stroke();
+        }
+        drawGlow(ctx, 'rgba(239, 68, 68, 0.95)', head.x, head.y, 15, 0.9);
+        drawGlow(ctx, 'rgba(254, 226, 226, 1)', head.x, head.y, 6, 1);
+    }
     ctx.restore();
 }
 
@@ -107,14 +155,13 @@ function drawWrapped(w) {
     if (left < 0.7) ctx.globalAlpha = 0.55 + 0.45 * Math.abs(Math.sin(t * 22));
     strokeVine(slack, 1);
     strokeVine(spiral, squeeze);
+    drawEnergy(w, slack.concat(spiral));
     const tip = spiral[spiral.length - 1];
     drawTipRose(tip.x, tip.y - 2, -Math.PI / 2 + Math.sin(t * 2) * 0.2, 1.5, 0.3);
     ctx.restore();
 }
 
-export function renderRoseWhip() {
-    const w = state.nature.whip;
-    if (!w) return;
+function renderOne(w) {
     if (w.held) {
         drawWrapped(w);
         return;
@@ -134,4 +181,8 @@ export function renderRoseWhip() {
     const prev = pts[pts.length - 3] ?? pts[0];
     drawTipRose(last.x, last.y, Math.atan2(last.y - prev.y, last.x - prev.x), 1.4, 0.4);
     ctx.restore();
+}
+
+export function renderRoseWhip() {
+    for (const w of state.nature.whips) renderOne(w);
 }

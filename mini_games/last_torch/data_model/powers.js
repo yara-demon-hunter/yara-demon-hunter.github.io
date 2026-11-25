@@ -799,6 +799,37 @@ export const EVOLUTIONS = {
         bossStunRatio: 0.3,
         beamCastSeconds: 1.1    // o gesto longo do cajado antes do raio (sai no meio dele)
     },
+    // Crimson Surge (evolução do Rose Whip, que é passiva: passives.roseWhip.evolved; js/systems/skills_nature.js, updateRoseWhip): com o monstro enrolado,
+    // uma energia vermelha corre do herói por DENTRO do chicote e explode nele (pulseDamage, bastante). Repete a cada pulseSeconds enquanto ele
+    // estiver preso; se sobreviver, continua preso. O chicote também segura mais tempo.
+    roseWhip: {
+        name: 'Crimson Surge', icon: '⚡',
+        get desc() {
+            const L = this.levels;
+            return `Red energy flows from you through the whip and bursts on the wrapped monster for ${formatMultiplier(L.pulseDamage)} spell damage, again every ${formatNumber(L.pulseSeconds)}s. If it survives, it stays pinned. The whip holds for ${L.holdSeconds}s.`;
+        },
+        levels: { pulseSeconds: 1.6, pulseDamage: 3.5, travelSeconds: 0.4, holdSeconds: 7 }
+    },
+    // Bloodrose Vine (evolução do Leech Vine; js/systems/skills_nature.js, updateLeechVine): cada carvalho solta 3 videiras mais famintas, parte do que
+    // drenam cura TAMBÉM o herói (heroHeal) e elas escolhem primeiro o monstro enrolado no Rose Whip (combo com o chicote).
+    leechVine: {
+        name: 'Bloodrose Vine', icon: '🌺',
+        get desc() {
+            const L = this.levels;
+            return `Each oak grows ${L.targets} hungrier vines (${formatMultiplier(L.dps)} spell damage per second) that go first for any monster wrapped by your Rose Whip. ${formatPercent(L.heroHeal)} of what they drain also heals you.`;
+        },
+        levels: { targets: 3, dps: 1.15, heal: 0.55, heroHeal: 0.2 }
+    },
+    // Briar Garden (evolução do Thorn Burst, que é passiva: passives.thornBurst.evolved; js/systems/skills_nature.js, thornBurstConfig): mais Caquitos, espinhos
+    // mais numerosos e mais fortes, e quem leva espinho fica lento por um tempo (assim o chicote e os cactos se completam).
+    thornBurst: {
+        name: 'Briar Garden', icon: '🌸',
+        get desc() {
+            const L = this.levels;
+            return `Up to ${L.maxCacti} Cactlings at a time, each bursting into ${L.needles} thorns of ${formatMultiplier(L.needleDamage)} spell damage that also slow every monster they hit for ${formatNumber(L.slowSeconds)}s.`;
+        },
+        levels: { maxCacti: 5, needles: 16, needleDamage: 0.9, slowSeconds: 2 }
+    },
     graspingRoots: {
         name: 'Strangling Grove', icon: '🪴',
         get desc() {

@@ -88,6 +88,7 @@
         <select id="kind" aria-label="Heróis ou monstros"><option value="hero">Heróis</option><option value="monster">Monstros</option><option value="boss">Chefes</option></select>
         <label class="check" id="topdownBox" hidden><input id="topdown" type="checkbox"> Topdown (desenho de cima)</label>
         <select id="model" aria-label="Personagem"></select>
+        <select id="oath" aria-label="Juramento (Oath)" title="Veste o herói com um Juramento do Last Torch (o primeiro é o padrão, sem nada)" hidden></select>
         <span class="turn" title="Gira o monstro nas vistas do Last Torch (0° = direita, 90° = de frente para a câmera, 180° = esquerda, 270° = de costas)">
             <label class="check"><input id="faceManual" type="checkbox"> Girar</label>
             <input id="faceAngle" type="range" min="0" max="360" step="5" value="90">
@@ -156,7 +157,8 @@
         import { setHost } from '../core/host.js';
         import { HERO_VISUALS } from '../characters/hunter/hero_visual.js';
         import { HERO_25D_VISUALS as V } from '../characters/hunter/hero25d_visual.js';
-        import { renderHero25D } from '../characters/hunter/hero25d.js';
+        import { renderHero25D, setHeroHooks } from '../characters/hunter/hero25d.js';
+        import { OATH_LIST, getOathPalette, oathGearHooks } from '../characters/hunter/hero_gear.js';
         import { createHeroAnim, updateHeroAnim } from '../characters/hunter/hero_anim.js';
         import { AZAEL_VISUALS } from '../characters/azael/azael_visual.js';
         import { BRUTOS_VISUALS } from '../characters/brutos/brutos_visual.js';
@@ -478,6 +480,7 @@
         function fillModels(pick) {
             const type = wantedType();
             $('topdownBox').hidden = $('kind').value === 'hero' || $('kind').value === 'boss';
+            $('oath').hidden = $('kind').value !== 'hero';
             $('model').innerHTML = '';
             const kind = $('kind').value;
             // Chefes e monstros dividem o tipo 'rig': a lista mostra só os de cada categoria (nos topdown, tudo é monstro)
@@ -485,6 +488,18 @@
             MODELS.filter(fits).forEach(([key, name]) => $('model').add(new Option(name, key)));
             $('model').value = MODELS.some(m => m[0] === pick && fits(m)) ? pick : (MODELS.find(fits) ?? MODELS.find(m => m[3] === type))[0];
         }
+        // --- JURAMENTO (Oath): veste o herói escolhido com o equipamento de um Juramento do Last Torch. O primeiro item é o padrão, sem nada ---
+        setHeroHooks(oathGearHooks);
+        $('oath').add(new Option('Oath: nenhum (padrão)', ''));
+        OATH_LIST.forEach(([gear, name]) => $('oath').add(new Option(name, gear)));
+        $('oath').value = OATH_LIST.some(([g]) => g === params.get('oath')) ? params.get('oath') : '';
+        const oathGear = () => ($('kind').value === 'hero' && $('oath').value ? $('oath').value : null);
+        const heroColors = (key) => getOathPalette(oathGear(), blockOf(key).colors);
+        $('oath').addEventListener('change', () => {
+            const url = new URL(location.href);
+            if ($('oath').value) url.searchParams.set('oath', $('oath').value); else url.searchParams.delete('oath');
+            history.replaceState(null, '', url);
+        });
         const startModel = MODELS.some(([k]) => k === params.get('model')) ? params.get('model') : MODELS[0][0];
         $('kind').value = kindOf(startModel);
         $('topdown').checked = typeOf(startModel) === 'topdown';
@@ -970,7 +985,7 @@
                 const footX = o.face ? w / 2 - headA * Math.cos(face) * k : w / 2;
                 const footY = o.face ? h * 0.5 + headZ * RPG().heightScale * k - headA * Math.sin(face) * RPG().groundSquash * k : h * (o.footY ?? 0.8);
                 const body = { ...v.body, x: footX, y: footY };
-                renderHero25D(body, v.anim, blockOf(key).colors, null, key,
+                renderHero25D(body, v.anim, heroColors(key), oathGear(), key,
                     { camera: RPG(), scale, time: window.__clock, moves: RPG_MOVES(), body: RPG_BODY, frenzyGlow: 1.4 });
                 return;
             }
@@ -980,7 +995,7 @@
             const before = V.scale;
             V.scale = scale;
             try {
-                renderHero25D(v.body, v.anim, blockOf(key).colors, null, key);
+                renderHero25D(v.body, v.anim, heroColors(key), oathGear(), key);
             } finally {
                 V.scale = before;
                 g.restore();
@@ -1034,7 +1049,7 @@
                 g.translate(ox - v.body.x, oy - v.body.y);
                 const before = V.scale;
                 V.scale = scale;
-                try { renderHero25D(v.body, v.anim, blockOf(key).colors, null, key); } finally { V.scale = before; g.restore(); }
+                try { renderHero25D(v.body, v.anim, heroColors(key), oathGear(), key); } finally { V.scale = before; g.restore(); }
             }
         }
         window.__spawn = () => views.find(x => x.o.spawn)?.s;      // (gancho de teste)
@@ -1177,7 +1192,7 @@
                 g.translate(ox - v.body.x, oy - v.body.y);
                 const before = V.scale;
                 V.scale = scale;
-                try { renderHero25D(v.body, v.anim, blockOf(key).colors, null, key); } finally { V.scale = before; g.restore(); }
+                try { renderHero25D(v.body, v.anim, heroColors(key), oathGear(), key); } finally { V.scale = before; g.restore(); }
             }
             if (d?.dust >= 0 && def.dust && d.dust < def.dust.seconds) {
                 const p = d.dust / def.dust.seconds;

@@ -22,6 +22,7 @@ import { attributes, passives, powers, state } from '../core/state.js';
 //   tocha: torchHp (pontos), torchRegen (pontos por segundo), torchGuard, warmthBurn (x dano de feitiço por segundo)
 //   pontos de skill: levelPoints (por nível, fração acumula), chestPoints (por baú)
 //   vida extra: revives
+//   natureDamage (dano extra de todas as skills do Nature Path, state.dmgSource === 'nature' em damage.js: Dark Roses, do Rowan)
 //   demonDamage (dano extra contra elites e chefes, SÓ das skills do Light Path: Judgment; state.dmgSource === 'light' em damage.js)
 //   monstros: enemyHp, enemyDamage, enemySpeed, spawnRate; itens: pickupRate
 const totals = {};

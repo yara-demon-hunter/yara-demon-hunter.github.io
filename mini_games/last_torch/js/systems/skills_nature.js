@@ -1,4 +1,4 @@
-import { ROSE_WHIP, THORN_BURST, THORN_ROSES } from '../../data_model/passives.js';
+import { ROSE_PETALS, ROSE_WHIP, THORN_BURST, THORN_ROSES } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
@@ -109,6 +109,12 @@ function updateLeechVine(dt) {
         while (oak.vines.length > level.targets) oak.vines.pop();
         if (oak.vines.length < level.targets) {
             const skip = new Set(oak.vines);
+            // Evoluído (Bloodrose Vine): o monstro enrolado no Rose Whip, se estiver ao alcance, é o primeiro
+            const whipped = powers.leechVine.evolved ? N.whips.find(w => w.held && w.target.hp > 0 && !skip.has(w.target) && Math.hypot(w.target.x - oak.x, w.target.y - oak.y) <= M.range)?.target : null;
+            if (whipped) {
+                oak.vines.push(whipped);
+                skip.add(whipped);
+            }
             while (oak.vines.length < level.targets) {
                 const target = nearestEnemy(oak.x, oak.y, M.range, skip);
                 if (!target) break;
@@ -120,6 +126,8 @@ function updateLeechVine(dt) {
         let drained = 0;
         for (const e of oak.vines) drained += dealDamage(e, amount, { noCrit: true, quiet: true });
         const heal = drained * level.heal;
+        // Bloodrose Vine: parte do dreno cura também o herói
+        if (level.heroHeal && player.hp > 0) player.hp = Math.min(player.maxHp, player.hp + drained * level.heroHeal);
         if (oak.hp < oak.maxHp) {
             oak.hp = Math.min(oak.maxHp, oak.hp + heal);
             oak.healFloat = (oak.healFloat ?? 0) + heal;
@@ -694,8 +702,13 @@ function updateRoseThorns(dt) {
 // Brota onde caiu um monstro morto por um golpe do Nature Path (no máximo THORN_BURST.maxCacti vivos: com todos de pé, o monstro morre sem deixar um).
 // Depois de armSeconds explode quando um monstro (ou o herói) encosta, soltando espinhos em todas as direções; um espinho que mata também
 // deixa um Caquito. Murcha sozinho depois de lifeSeconds. Desenho em js/render/nature.js.
+// Os números do Thorn Burst; evoluído (Briar Garden) trocam pelos de EVOLUTIONS.thornBurst
+function thornBurstConfig() {
+    return passives.thornBurst.evolved ? { ...THORN_BURST, ...EVOLUTIONS.thornBurst.levels } : THORN_BURST;
+}
+
 function sproutCactus(x, y) {
-    if (N.cacti.length >= THORN_BURST.maxCacti) return;
+    if (N.cacti.length >= thornBurstConfig().maxCacti) return;
     N.cacti.push({ x, y, age: 0, spin: Math.random() * TAU });
     createExplosion(x, y, '#4ade80', 8);
     audio.playSummon?.();
@@ -704,7 +717,7 @@ function sproutCactus(x, y) {
 let needleBurstId = 0;
 
 function burstCactus(c) {
-    const B = THORN_BURST;
+    const B = thornBurstConfig();
     const turn = c.spin;
     const burst = ++needleBurstId;
     for (let i = 0; i < B.needles; i++) {
@@ -719,7 +732,7 @@ function burstCactus(c) {
 }
 
 function updateCacti(dt) {
-    const B = THORN_BURST;
+    const B = thornBurstConfig();
     for (let i = N.cacti.length - 1; i >= 0; i--) {
         const c = N.cacti[i];
         c.age += dt;
@@ -750,6 +763,7 @@ function updateCacti(dt) {
             hit.needleCount++;
             dealDamage(hit, getSpellDamage() * B.needleDamage, { noCrit: true, style: 'spell', kbX: Math.cos(n.ang) * B.knockback, kbY: Math.sin(n.ang) * B.knockback });
             createExplosion(n.x, n.y, '#fef3c7', 3);
+            if (B.slowSeconds) hit.roseSlowTimer = Math.max(hit.roseSlowTimer ?? 0, B.slowSeconds * (1 + mod('rootSeconds')));       // Briar Garden: quem leva espinho fica lento
         }
         if (hit || n.life <= 0) N.needles.splice(i, 1);
     }
@@ -798,31 +812,47 @@ export function onNatureKill(e) {
 // --- ROSE WHIP ---
 // Sozinho, a cada recarga: o chicote sai da mão do herói, voa até o monstro de MAIS VIDA ao alcance, açoita e se enrola nele. Enrolado, o monstro fica
 // preso no lugar (e.chained, o mesmo trava do Shadow Shackle: js/systems/enemies.js) e os espinhos mordem a cada tique. Desenho em js/render/rose_whip.js.
-function whipTarget() {
+// Evoluído (Crimson Surge): enquanto está enrolado, uma energia vermelha corre do herói por dentro do chicote e explode no monstro (N.whips guarda o chicote ativo).
+function roseWhipConfig() {
+    return passives.roseWhip.evolved ? { ...ROSE_WHIP, ...EVOLUTIONS.roseWhip.levels } : ROSE_WHIP;
+}
+
+// O monstro de mais vida ao alcance que ainda não está preso nem enrolado
+function whipTarget(fromX, fromY, range) {
     let best = null;
     for (const e of state.enemies) {
-        if (e.hp <= 0 || e.chained || e.unstoppable || Math.hypot(e.x - player.x, e.y - player.y) > ROSE_WHIP.range) continue;
+        if (e.hp <= 0 || e.chained || e.unstoppable || Math.hypot(e.x - fromX, e.y - fromY) > range) continue;
         if (!best || e.maxHp > best.maxHp) best = e;
     }
     return best;
 }
 
-function releaseWhip() {
-    const w = N.whip;
-    N.whip = null;
-    if (w?.held) w.target.chained = false;
+function unbindWhip(w) {
+    if (w.held) {
+        w.target.chained = false;
+        w.target.whipped = false;
+    }
 }
 
-function bindWhip(w) {
+function releaseWhips() {
+    for (const w of N.whips) unbindWhip(w);
+    N.whips.length = 0;
+}
+
+function bindWhip(w, cfg) {
     const e = w.target;
     w.held = true;
     w.age = 0;
-    w.tick = ROSE_WHIP.tickSeconds;
-    w.hold = ROSE_WHIP.holdSeconds * (e.isBoss ? ROSE_WHIP.bossRatio : 1);
+    w.tick = cfg.tickSeconds;
+    w.orbs = [];
+    w.pulse = cfg.pulseSeconds ? cfg.pulseSeconds * 0.5 : 0;           // Crimson Surge: o primeiro pulso sai logo depois do açoite
+    // O bônus de tempo das raízes (rootSeconds: o Rowan tem +50% no Nature Path) vale para tudo do Nature que segura, o chicote também
+    w.hold = cfg.holdSeconds * (1 + mod('rootSeconds')) * (e.isBoss ? cfg.bossRatio : 1);
     e.chained = true;
+    e.whipped = true;                       // o Bloodrose Vine (evolução do Leech Vine) vai primeiro nele
     e.chainX = e.x;
     e.chainY = e.y;
-    dealDamage(e, getSpellDamage() * ROSE_WHIP.lashDamage, { noCrit: true, style: 'spell', number: true });
+    dealDamage(e, getSpellDamage() * cfg.lashDamage, { noCrit: true, style: 'spell', number: true });
     createExplosion(e.x, e.y - e.radius * 0.4, '#e11d48', 10);
     createExplosion(e.x, e.y - e.radius * 0.4, '#fda4af', 5);
     addShockwave(e.x, e.y, { radius: e.radius + 30, color: '#fb7185', width: 4, seconds: 0.3 });
@@ -832,41 +862,108 @@ function bindWhip(w) {
 
 export function updateRoseWhip(dt) {
     if (passives.roseWhip.lvl <= 0) {
-        if (N.whip) releaseWhip();
+        if (N.whips.length) releaseWhips();
         return;
     }
+    const cfg = roseWhipConfig();
     const timers = state.powerTimers;
     if ((timers.roseWhip ?? 0) > 0) timers.roseWhip -= dt;
-    const w = N.whip;
-    if (w) {
+    for (let i = N.whips.length - 1; i >= 0; i--) {
+        const w = N.whips[i];
         const e = w.target;
         if (e.hp <= 0 || !state.enemies.includes(e)) {
-            releaseWhip();
-        } else if (w.held) {
+            unbindWhip(w);
+            N.whips.splice(i, 1);
+            continue;
+        }
+        if (w.held) {
             w.age += dt;
             w.tick -= dt;
             if (w.tick <= 0) {
-                w.tick += ROSE_WHIP.tickSeconds;
-                dealDamage(e, getSpellDamage() * ROSE_WHIP.thornDps * ROSE_WHIP.tickSeconds, { noCrit: true, quiet: true, style: 'spell', number: true });
+                w.tick += cfg.tickSeconds;
+                dealDamage(e, getSpellDamage() * cfg.thornDps * cfg.tickSeconds, { noCrit: true, quiet: true, style: 'spell', number: true });
                 createExplosion(e.x, e.y - e.radius * 0.4, '#be123c', 2);
+            }
+            // Crimson Surge: a energia vermelha sai da mão, corre por dentro do chicote e explode no monstro. Sobreviveu, continua preso
+            if (cfg.pulseSeconds) {
+                w.pulse -= dt;
+                if (w.pulse <= 0 && w.hold - w.age > cfg.travelSeconds) {
+                    w.pulse = cfg.pulseSeconds;
+                    w.orbs.push({ age: 0, seconds: cfg.travelSeconds });
+                    audio.playBriarPulse?.(false);
+                }
+                for (let k = w.orbs.length - 1; k >= 0; k--) {
+                    const orb = w.orbs[k];
+                    orb.age += dt;
+                    if (orb.age < orb.seconds) continue;
+                    w.orbs.splice(k, 1);
+                    dealDamage(e, getSpellDamage() * cfg.pulseDamage, { noCrit: true, style: 'spell', number: true });
+                    createExplosion(e.x, e.y - e.radius * 0.4, '#ef4444', 14);
+                    createExplosion(e.x, e.y - e.radius * 0.4, '#fecaca', 6);
+                    addShockwave(e.x, e.y, { radius: e.radius + 46, color: '#ef4444', width: 6, seconds: 0.4 });
+                    screenFlash('#ef4444', 0.08);
+                    shakeScreen(4);
+                    audio.playBriarPulse?.(true);
+                }
             }
             if (w.age >= w.hold) {
                 createExplosion(e.x, e.y - e.radius * 0.4, '#fda4af', 6);
-                releaseWhip();
+                unbindWhip(w);
+                N.whips.splice(i, 1);
             }
         } else {
-            w.reach += ROSE_WHIP.speed * dt;
-            if (w.reach >= Math.hypot(e.x - player.x, e.y - player.y)) bindWhip(w);
+            w.reach += cfg.speed * dt;
+            if (w.reach >= Math.hypot(e.x - player.x, e.y - player.y)) bindWhip(w, cfg);
         }
-        return;
     }
-    if ((timers.roseWhip ?? 0) > 0) return;
-    const target = whipTarget();
+    if (N.whips.length || (timers.roseWhip ?? 0) > 0) return;
+    const target = whipTarget(player.x, player.y, cfg.range);
     if (!target) return;
-    timers.roseWhip = ROSE_WHIP.cooldownSeconds;
-    N.whip = { target, reach: 0, held: false, age: 0 };
+    timers.roseWhip = cfg.cooldownSeconds;
+    N.whips.push({ target, reach: 0, held: false, age: 0 });
     startCast();
     audio.playRoseWhip?.(false);
+}
+
+// --- ROSE PETALS ---
+// Com monstros por perto e a recarga pronta, um furacão de rosas e pétalas se forma em volta do herói, o acompanha por durationSeconds e fere em pulsos tudo
+// no raio grande (empurra para fora e deixa lento). Desenho em js/render/rose_petals.js.
+export function updateRosePetals(dt) {
+    if (passives.rosePetals.lvl <= 0) {
+        N.storm = null;
+        return;
+    }
+    const P = ROSE_PETALS;
+    const timers = state.powerTimers;
+    if ((timers.rosePetals ?? P.firstDelaySeconds) > 0) timers.rosePetals = (timers.rosePetals ?? P.firstDelaySeconds) - dt;
+    const s = N.storm;
+    if (s) {
+        s.age += dt;
+        s.tick -= dt;
+        const tick = s.tick <= 0;
+        if (tick) s.tick += P.tickSeconds;
+        const damage = getSpellDamage() * P.damage;
+        for (const e of state.enemies) {
+            if (e.hp <= 0) continue;
+            const dx = e.x - player.x;
+            const dy = e.y - player.y;
+            const d = Math.hypot(dx, dy);
+            if (d > P.radius + e.radius * 0.5) continue;
+            e.slow = Math.max(e.slow ?? 0, P.slow);
+            if (!tick) continue;
+            dealDamage(e, damage, { noCrit: true, style: 'spell', quiet: true, number: true, kbX: (dx / (d || 1)) * P.knockback, kbY: (dy / (d || 1)) * P.knockback });
+        }
+        if (s.age >= P.durationSeconds) N.storm = null;
+        return;
+    }
+    if (timers.rosePetals > 0) return;
+    if (!state.enemies.some(e => e.hp > 0 && Math.hypot(e.x - player.x, e.y - player.y) < P.radius * 1.1 + e.radius)) return;
+    timers.rosePetals = P.cooldownSeconds;
+    N.storm = { age: 0, tick: 0.15 };
+    addShockwave(player.x, player.y, { radius: P.radius, color: '#fb7185', width: 6, seconds: 0.5 });
+    createExplosion(player.x, player.y - 12, '#fda4af', 14);
+    startCast();
+    audio.playRosePetals?.();
 }
 
 // Tudo o que este arquivo causa de dano leva a marca 'nature' (state.dmgSource): é assim que o Thorn Burst sabe se o monstro morreu por um golpe do Nature Path
@@ -884,6 +981,7 @@ function updateNatureInner(dt) {
     const regen = mod('hpRegen');
     if (regen > 0 && player.hp > 0 && player.hp < player.maxHp) player.hp = Math.min(player.maxHp, player.hp + regen * dt);
     updateRoseWhip(dt);
+    updateRosePetals(dt);
     updateCacti(dt);
     updateGraspingRoots(dt);
     updateLeechVine(dt);
@@ -896,7 +994,8 @@ function updateNatureInner(dt) {
 // Virada da hora: o campo fica limpo
 // all: começo de noite ou fim de jogo (a árvore NÃO sobrevive à noite); sem all (virada de onda) a árvore fica e recupera parte da vida
 export function clearNatureSkills(all = false) {
-    releaseWhip();
+    releaseWhips();
+    N.storm = null;
     if (all) N.oaks.length = 0;
     else for (const oak of N.oaks) oak.hp = Math.min(oak.maxHp, oak.hp + oak.maxHp * POWER_MODELS.shelterOak.waveHealRatio);
     N.seeds.length = 0;

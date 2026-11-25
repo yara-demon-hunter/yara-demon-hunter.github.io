@@ -76,6 +76,27 @@ export const skillsSfx = {
         this.tone({ type: 'sine', freq: 1568, to: 2093, at: 0.04, decay: 0.3, gain: 0.07 });
     },
 
+    // Briar Coil: a energia vermelha. Sai da mão (hit = false): zumbido que sobe, rápido; chega (true): estouro grave com brilho
+    playBriarPulse(hit = false) {
+        if (!this.ctx || this.throttled(hit ? 'briarHit' : 'briar', 0.12)) return;
+        if (!hit) {
+            this.tone({ type: 'sawtooth', freq: 180, to: 760, attack: 0.02, decay: 0.34, gain: 0.1 });
+            this.burst({ filter: 'bandpass', freq: 900, to: 3200, q: 1.2, attack: 0.03, decay: 0.34, gain: 0.14 });
+            return;
+        }
+        this.sub({ freq: 150, to: 52, decay: 0.34, gain: 0.5 });
+        this.burst({ filter: 'lowpass', freq: 1600, to: 220, attack: 0.002, decay: 0.3, gain: 0.45 });
+        this.tone({ type: 'sine', freq: 1046, to: 523, decay: 0.3, gain: 0.08 });
+    },
+
+    // Rose Petals: o furacão de pétalas se forma. Um vento que sobe e gira (ruído em varredura) com um acorde suave de sinos por cima
+    playRosePetals() {
+        if (!this.ctx || this.throttled('rosePetals', 0.3)) return;
+        this.burst({ filter: 'bandpass', freq: 500, to: 2600, q: 0.7, attack: 0.12, decay: 0.9, gain: 0.3 });
+        this.burst({ filter: 'highpass', freq: 3000, to: 6500, attack: 0.2, decay: 0.7, gain: 0.1 });
+        [659.25, 830.61, 987.77].forEach((freq, i) => this.tone({ type: 'sine', freq, at: 0.08 + i * 0.07, attack: 0.01, decay: 0.8, gain: 0.06 }));
+    },
+
     // Executioner: corte seco
     playExecute() {
         if (!this.ctx || this.throttled('execute', 0.06)) return;

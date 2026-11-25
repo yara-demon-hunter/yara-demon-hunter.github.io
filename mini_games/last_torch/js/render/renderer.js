@@ -30,6 +30,7 @@ import { renderFireTornado } from './fire_tornado.js';
 import { renderPickups } from './pickups.js';
 import { renderShackle } from './shackle.js';
 import { renderRoseWhip } from './rose_whip.js';
+import { renderRosePetals } from './rose_petals.js';
 import { heroAnim } from './player.js';
 import {
     renderBolts, renderChillAura, renderDashGhosts, renderGroundFires, renderLightning,
@@ -218,6 +219,7 @@ export function render() {
     renderMonsterCurses();
     renderShackle();
     renderRoseWhip();
+    renderRosePetals();
     renderSmokes();
     renderGibs();
     renderKnifeAim();
