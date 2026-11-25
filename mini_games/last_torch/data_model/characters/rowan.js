@@ -7,11 +7,12 @@ import { ROWAN_VISUALS } from '../../library/characters/rowan/rowan_visual.js';
 
 export const ROWAN = {
     id: 'rowan',
-    // Caminhos (árvore): no Nature Path, em vez de +5% de dano, as raízes seguram 50% mais tempo (affinityMods); o Flame Path é
-    // proibido (e o Blade, porque o cajado não corta)
+    // Caminhos (árvore): no Nature Path, em vez de +5% de dano, tudo o que segura dura 50% mais (rootSeconds) e os carvalhos crescem 20% mais
+    // depressa (oakGrowth), em affinityMods; o Flame Path é proibido (e o Blade, porque o cajado não corta)
     affinity: 'nature',
-    affinityMods: { rootSeconds: 0.5 },
-    affinityLabel: 'ROOTS +50%',
+    affinityMods: { rootSeconds: 0.5, oakGrowth: 0.2 },
+    affinityLabel: 'HOLD +50% · OAK GROW +20%',                        // o resumo na árvore de skills
+    affinityText: 'hold 50% and oak grow 20% faster',                  // a frase completa na ficha do herói: "NATURE PATH: ..." 
     sealedBranches: ['blade', 'flame'],
     model: 'rowan',                 // boneco 2.5D (js/render/bodies.js)
     // Árvore de skills: o cajado não corta. O ramo Blade fica selado (menos a skill Fury, que é da Fúria de todos) e também a Flaming Sword

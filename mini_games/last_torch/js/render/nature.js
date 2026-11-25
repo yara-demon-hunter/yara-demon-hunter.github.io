@@ -502,6 +502,43 @@ export function renderSpiritWolves() {
 // garras de espinho.
 const THORN_FILL = '#d9f99d';
 const THORN_EDGE = '#14532d';
+// Bloodbud Vine: o botão de sangue que cresce no cipó (um bulbo vermelho brilhante que pinga e pulsa quando está quase maduro)
+function renderBloodBuds(curves, t) {
+    for (const c of curves) {
+        if (!(c.bud > 0)) continue;
+        const u = 0.55;
+        const v = 1 - u;
+        const px = v * v * c.x0 + 2 * v * u * c.mx + u * u * c.x1;
+        const py = v * v * c.y0 + 2 * v * u * c.my + u * u * c.y1 - 2;
+        const ripe = c.bud > 0.8 ? 0.5 + 0.5 * Math.sin(t * 16) : 0;
+        const r = 2 + 4.5 * c.bud + ripe * 1.2;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        drawGlow(ctx, 'rgba(239, 68, 68, 0.9)', px, py, r * 2.6, 0.3 + 0.4 * c.bud);
+        ctx.restore();
+        ctx.fillStyle = '#7f1d1d';
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.arc(px, py, r * 0.62, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fecaca';
+        ctx.beginPath();
+        ctx.arc(px - r * 0.25, py - r * 0.25, r * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+        if (c.bud > 0.5) {                                  // pinga
+            ctx.strokeStyle = '#b91c1c';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(px, py + r);
+            ctx.lineTo(px, py + r + 2 + 3 * ((t * 1.5) % 1));
+            ctx.stroke();
+        }
+    }
+}
+
 function renderLeechVines(t) {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -509,11 +546,14 @@ function renderLeechVines(t) {
     for (const oak of N.oaks) {
         // As raízes que prendem o monstro mais forte (grip) desenham o mesmo cipó até ele, enquanto ele estiver preso
         const gripped = oak.gripTarget && oak.gripTarget.rooted > 0 && oak.gripTarget.hp > 0 && state.enemies.includes(oak.gripTarget) ? [oak.gripTarget] : [];
-        const linked = [...(oak.vines ?? []), ...gripped];
+        // Só um cipó de cada vez: o do Leech Vine tem prioridade; o das raízes (grip) só aparece quando não há outro
+        const linked = oak.vines?.length ? oak.vines : gripped;
         if (!linked.length) continue;
         const sy = oak.y - 20;         // da base da copa
         linked.forEach((e, i) => curves.push({
             e,
+            drain: !!oak.vines?.length,
+            bud: i < (oak.vines?.length ?? 0) ? oak.budRatio ?? 0 : 0,       // Bloodbud Vine: quanto o botão de sangue já cresceu (0 a 1)
             x0: oak.x,
             y0: sy,
             mx: (oak.x + e.x) / 2 + Math.sin(t * 3 + i * 2.1 + oak.x) * 12,
@@ -523,6 +563,11 @@ function renderLeechVines(t) {
         }));
     }
     if (curves.length === 0) return;
+    // Com mais de um carvalho, ainda só um cipó: o do Leech Vine (bud > 0 ou drenando) antes do das raízes
+    if (curves.length > 1) {
+        curves.sort((p, q) => (q.drain ? 1 : 0) - (p.drain ? 1 : 0));
+        curves.length = 1;
+    }
     // O caule: três traços (sombra, folha, brilho) para todas as videiras de uma vez
     for (const [color, width] of VINE_STROKES) {
         ctx.strokeStyle = color;
@@ -587,6 +632,7 @@ function renderLeechVines(t) {
         }
         drawGlow(ctx, 'rgba(74, 222, 128, 0.7)', c.x1, c.y1, 10, 0.55);
     });
+    renderBloodBuds(curves, t);
 }
 
 

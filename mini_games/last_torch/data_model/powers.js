@@ -583,11 +583,11 @@ export const POWER_MODELS = {
             );
         },
         levels: [
-            { cooldown: 6, count: 2, seconds: 1.8, dps: 0.5 },
-            { cooldown: 6, count: 3, seconds: 1.8, dps: 0.6 },
-            { cooldown: 5.5, count: 3, seconds: 2.2, dps: 0.7 },
-            { cooldown: 5, count: 4, seconds: 2.2, dps: 0.8 },
-            { cooldown: 4.5, count: 5, seconds: 2.6, dps: 0.9 }
+            { cooldown: 13, count: 2, seconds: 1.0, dps: 0.5 },
+            { cooldown: 12, count: 3, seconds: 1.25, dps: 0.6 },
+            { cooldown: 11, count: 3, seconds: 1.50, dps: 0.7 },
+            { cooldown: 10, count: 4, seconds: 1.75, dps: 0.8 },
+            { cooldown: 9, count: 5, seconds: 2.0, dps: 0.9 }
         ],
         range: 300,             // até onde as raízes alcançam, a partir do herói
         tickSeconds: 0.5,
@@ -810,15 +810,16 @@ export const EVOLUTIONS = {
         },
         levels: { pulseSeconds: 1.6, pulseDamage: 3.5, travelSeconds: 0.4, holdSeconds: 7 }
     },
-    // Bloodrose Vine (evolução do Leech Vine; js/systems/skills_nature.js, updateLeechVine): cada carvalho solta 3 videiras mais famintas, parte do que
-    // drenam cura TAMBÉM o herói (heroHeal) e elas escolhem primeiro o monstro enrolado no Rose Whip (combo com o chicote).
+    // Bloodbud Vine (evolução do Leech Vine; js/systems/skills_nature.js, updateLeechVine): cada carvalho solta UM cipó, no monstro MAIS FORTE ao alcance (ou no
+    // enrolado no Rose Whip), que o espreme e drena. Enquanto drena, um botão de sangue cresce no cipó; a cada budSeconds ele amadurece e estoura: dano em área
+    // em volta da vítima e uma cura fixa e pequena para o herói (budHeroHeal, fração da vida máxima). Limitado pelo tempo, não pelo número de cipós.
     leechVine: {
-        name: 'Bloodrose Vine', icon: '🌺',
+        name: 'Bloodbud Vine', icon: '🌺',
         get desc() {
             const L = this.levels;
-            return `Each oak grows ${L.targets} hungrier vines (${formatMultiplier(L.dps)} spell damage per second) that go first for any monster wrapped by your Rose Whip. ${formatPercent(L.heroHeal)} of what they drain also heals you.`;
+            return `Each oak sends one vine after the strongest monster in reach (the one wrapped in your Rose Whip first), squeezing it for ${formatMultiplier(L.dps)} spell damage per second. A blood bud swells on the vine and, every ${L.budSeconds}s, bursts for ${formatMultiplier(L.budDamage)} spell damage around the victim and heals you for ${formatPercent(L.budHeroHeal)} of your health.`;
         },
-        levels: { targets: 3, dps: 1.15, heal: 0.55, heroHeal: 0.2 }
+        levels: { targets: 1, dps: 1.2, heal: 0.5, budSeconds: 5, budDamage: 2, budRadius: 60, budHeroHeal: 0.03 }
     },
     // Briar Garden (evolução do Thorn Burst, que é passiva: passives.thornBurst.evolved; js/systems/skills_nature.js, thornBurstConfig): mais Caquitos, espinhos
     // mais numerosos e mais fortes, e quem leva espinho fica lento por um tempo (assim o chicote e os cactos se completam).
@@ -836,7 +837,7 @@ export const EVOLUTIONS = {
             const { count, seconds, dps } = this.levels;
             return `Roots pin ${count} monsters for ${formatNumber(seconds)}s and crush for ${formatMultiplier(dps)} spell damage per second. Barbed: a pinned monster takes +${formatPercent(this.rootedDamage)} damage from every hit. When a pinned monster dies, its roots leap to the nearest monster.`;
         },
-        levels: { cooldown: 4, count: 7, seconds: 3.2, dps: 1.2 },
+        levels: { cooldown: 8, count: 7, seconds: 2.5, dps: 1.2 },
         rootedDamage: 0.3,      // o que era a Barbed Roots: preso por raízes leva mais de tudo
         spreadRange: 160
     },

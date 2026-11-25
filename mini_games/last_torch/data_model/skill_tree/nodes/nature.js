@@ -14,7 +14,7 @@ export const NATURE_NODES = [
     { id: 'rootsEvolve', cost: 3, branch: 'nature', kind: 'evolve', key: 'graspingRoots', x: 2, y: 0, requires: [req('graspingRoots', 5)] },
     { id: 'thornBurst', cost: 3, branch: 'nature', kind: 'passive', key: 'thornBurst', x: 3, y: 0, requires: [req('rootsEvolve')] },
     { id: 'thornEvolve', cost: 4, branch: 'nature', kind: 'evolve', key: 'thornBurst', x: 4, y: 0, requires: [req('thornBurst')] },
-    // Linha 2, o carvalho: Wicked Oak -> Ancient Grove -> Leech Vine (as videiras saem do carvalho) -> Bloodrose Vine -> Oath
+    // Linha 2, o carvalho: Wicked Oak -> Ancient Grove -> Leech Vine (as videiras saem do carvalho) -> Bloodbud Vine -> Oath
     { id: 'shelterOak', cost: 3, branch: 'nature', kind: 'power', key: 'shelterOak', x: 1, y: 1, requires: [req('wildHeart')] },
     { id: 'oakEvolve', cost: 3, branch: 'nature', kind: 'evolve', key: 'shelterOak', x: 2, y: 1, requires: [req('shelterOak', 5)] },
     { id: 'leechVine', cost: 3, branch: 'nature', kind: 'power', key: 'leechVine', x: 3, y: 1, requires: [req('oakEvolve')] },

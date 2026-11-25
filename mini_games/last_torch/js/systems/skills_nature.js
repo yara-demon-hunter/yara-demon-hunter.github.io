@@ -87,6 +87,37 @@ function updateGraspingRoots(dt) {
 // As videiras nascem de cada carvalho (muda não: só a árvore pequena ou a grande), agarram os monstros mais perto DELE e drenam
 // a vida deles; o que drenam volta como vida para o próprio carvalho (não para o herói). Sem carvalho, a skill não faz nada.
 // Cada carvalho guarda os monstros que está drenando em oak.vines (o desenho: js/render/nature.js).
+// O monstro de mais vida ao alcance (que não está em skip)
+function strongestEnemy(x, y, range, skip) {
+    let best = null;
+    for (const e of state.enemies) {
+        if (e.hp <= 0 || skip.has(e) || Math.hypot(e.x - x, e.y - y) > range) continue;
+        if (!best || e.maxHp > best.maxHp) best = e;
+    }
+    return best;
+}
+
+// Bloodbud Vine: o botão amadurece e estoura em volta da vítima (dano em área) e cura um pouco o herói
+function burstBud(oak, level) {
+    const victim = oak.vines[0];
+    if (!victim) return;
+    const damage = getSpellDamage() * level.budDamage;
+    for (const e of state.enemies) {
+        if (e.hp <= 0 || Math.hypot(e.x - victim.x, e.y - victim.y) > level.budRadius + e.radius) continue;
+        const a = Math.atan2(e.y - victim.y, e.x - victim.x);
+        dealDamage(e, damage, { noCrit: true, style: 'spell', number: true, kbX: Math.cos(a) * 60, kbY: Math.sin(a) * 60 });
+    }
+    createExplosion(victim.x, victim.y - victim.radius * 0.4, '#ef4444', 14);
+    createExplosion(victim.x, victim.y - victim.radius * 0.4, '#fecaca', 6);
+    addShockwave(victim.x, victim.y, { radius: level.budRadius, color: '#ef4444', width: 5, seconds: 0.35 });
+    if (player.hp > 0) {
+        const heal = Math.min(player.maxHp - player.hp, player.maxHp * level.budHeroHeal);
+        player.hp += heal;
+        if (heal > 0) addNumber(player.x, player.y - 40, heal, 1, 'heal');
+    }
+    audio.playBlast?.();
+}
+
 function updateLeechVine(dt) {
     const level = getPowerLevel(powers.leechVine);
     const M = POWER_MODELS.leechVine;
@@ -94,6 +125,7 @@ function updateLeechVine(dt) {
         oak.vines ??= [];
         if (!level || oak.stage === 'sapling') {
             oak.vines.length = 0;
+            oak.budRatio = 0;
             continue;
         }
         // Solta quem morreu ou saiu do alcance do carvalho
@@ -104,30 +136,43 @@ function updateLeechVine(dt) {
     }
     if (!level || !ready('leechVine', dt, M.tickSeconds)) return;
     const amount = getSpellDamage() * level.dps * M.tickSeconds;
+    // level.targets é o TOTAL de videiras no jogo (não por carvalho): só uma de cada vez, venha de qual carvalho vier
+    let total = 0;
     for (const oak of N.oaks) {
         if (oak.stage === 'sapling') continue;
-        while (oak.vines.length > level.targets) oak.vines.pop();
-        if (oak.vines.length < level.targets) {
+        while (oak.vines.length > 0 && total + oak.vines.length > level.targets) oak.vines.pop();
+        total += oak.vines.length;
+        if (oak.vines.length === 0 && total < level.targets) {
             const skip = new Set(oak.vines);
-            // Evoluído (Bloodrose Vine): o monstro enrolado no Rose Whip, se estiver ao alcance, é o primeiro
+            // Evoluído (Bloodbud Vine): o monstro enrolado no Rose Whip, se estiver ao alcance, é o primeiro
             const whipped = powers.leechVine.evolved ? N.whips.find(w => w.held && w.target.hp > 0 && !skip.has(w.target) && Math.hypot(w.target.x - oak.x, w.target.y - oak.y) <= M.range)?.target : null;
             if (whipped) {
                 oak.vines.push(whipped);
                 skip.add(whipped);
             }
-            while (oak.vines.length < level.targets) {
-                const target = nearestEnemy(oak.x, oak.y, M.range, skip);
+            const room = level.targets - total;
+            while (oak.vines.length < room) {
+                // Evoluído (Bloodbud Vine): o cipó vai no monstro mais FORTE ao alcance, não no mais perto
+                const target = level.budSeconds ? strongestEnemy(oak.x, oak.y, M.range, skip) : nearestEnemy(oak.x, oak.y, M.range, skip);
                 if (!target) break;
                 skip.add(target);
                 oak.vines.push(target);
             }
+            total += oak.vines.length;
         }
         if (oak.vines.length === 0) continue;
         let drained = 0;
         for (const e of oak.vines) drained += dealDamage(e, amount, { noCrit: true, quiet: true });
         const heal = drained * level.heal;
-        // Bloodrose Vine: parte do dreno cura também o herói
-        if (level.heroHeal && player.hp > 0) player.hp = Math.min(player.maxHp, player.hp + drained * level.heroHeal);
+        // Bloodbud Vine: o botão de sangue cresce enquanto o cipó drena e estoura quando amadurece
+        if (level.budSeconds) {
+            oak.budT = oak.vines.length ? (oak.budT ?? 0) + M.tickSeconds : 0;
+            if (oak.budT >= level.budSeconds) {
+                burstBud(oak, level);
+                oak.budT = 0;
+            }
+            oak.budRatio = oak.budT / level.budSeconds;
+        }
         if (oak.hp < oak.maxHp) {
             oak.hp = Math.min(oak.maxHp, oak.hp + heal);
             oak.healFloat = (oak.healFloat ?? 0) + heal;
@@ -849,7 +894,7 @@ function bindWhip(w, cfg) {
     // O bônus de tempo das raízes (rootSeconds: o Rowan tem +50% no Nature Path) vale para tudo do Nature que segura, o chicote também
     w.hold = cfg.holdSeconds * (1 + mod('rootSeconds')) * (e.isBoss ? cfg.bossRatio : 1);
     e.chained = true;
-    e.whipped = true;                       // o Bloodrose Vine (evolução do Leech Vine) vai primeiro nele
+    e.whipped = true;                       // o Bloodbud Vine (evolução do Leech Vine) vai primeiro nele
     e.chainX = e.x;
     e.chainY = e.y;
     dealDamage(e, getSpellDamage() * cfg.lashDamage, { noCrit: true, style: 'spell', number: true });

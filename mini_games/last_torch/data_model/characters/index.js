@@ -186,7 +186,7 @@ export const HERO_ENTRIES = Object.fromEntries(CHARACTER_LIST.map(character => {
         colors: character.colors,
         portrait: character.portrait
     };
-    for (const key of ['model', 'perk', 'portraitImage', 'unlockHint', 'emberPrice', 'thrown', 'basicAttack', 'affinity', 'extraAffinities', 'affinityMods', 'affinityLabel', 'sealedBranches', 'sealedSkills']) if (character[key] !== undefined) entry[key] = character[key];
+    for (const key of ['model', 'perk', 'portraitImage', 'unlockHint', 'emberPrice', 'thrown', 'basicAttack', 'affinity', 'extraAffinities', 'affinityMods', 'affinityLabel', 'affinityText', 'sealedBranches', 'sealedSkills']) if (character[key] !== undefined) entry[key] = character[key];
     return [character.id, entry];
 }));
 

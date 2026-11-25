@@ -170,7 +170,7 @@ export function renderHeroStats() {
     const pathName = (k) => TREE_BRANCHES[k].name;
     const sealed = (hero.sealedBranches ?? []);
     const paths = hero.affinity || sealed.length
-        ? `${hero.affinity ? `<span class="hs-path is-plus" style="--tone:${TREE_BRANCHES[hero.affinity].color}">${TREE_BRANCHES[hero.affinity].icon} ${pathName(hero.affinity)} ${hero.affinityMods ? affinityLabel(hero) : `${affinityLabel(hero)} DMG`}</span>` : ''}${(hero.extraAffinities ?? []).map(k => `<span class="hs-path is-plus" style="--tone:${TREE_BRANCHES[k].color}">${TREE_BRANCHES[k].icon} ${pathName(k)} +${Math.round(AFFINITY_BONUS * 100)}% DMG</span>`).join('')}${sealed.map(k => `<span class="hs-path is-no">⛔ ${pathName(k)}</span>`).join('')}`
+        ? `${hero.affinity ? `<span class="hs-path is-plus" style="--tone:${TREE_BRANCHES[hero.affinity].color}">${TREE_BRANCHES[hero.affinity].icon} ${hero.affinityText ? `${TREE_BRANCHES[hero.affinity].path}: ${hero.affinityText}` : `${pathName(hero.affinity)} ${hero.affinityMods ? affinityLabel(hero) : `${affinityLabel(hero)} DMG`}`}</span>` : ''}${(hero.extraAffinities ?? []).map(k => `<span class="hs-path is-plus" style="--tone:${TREE_BRANCHES[k].color}">${TREE_BRANCHES[k].icon} ${pathName(k)} +${Math.round(AFFINITY_BONUS * 100)}% DMG</span>`).join('')}${sealed.map(k => `<span class="hs-path is-no">⛔ ${pathName(k)}</span>`).join('')}`
         : '<span class="hs-path is-all">✦ ALL PATHS OPEN</span>';
     // O nome do herói fica aqui (os cartões viraram só retratos)
     panel.innerHTML = `<div class="hs-bars">${rows}</div><div class="hs-paths">${paths}</div>`

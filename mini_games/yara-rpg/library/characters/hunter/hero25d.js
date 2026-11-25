@@ -498,9 +498,11 @@ function capePart(pose) {
     }
 
     const depth = project(pose.lean - 3.5, 0, 9).depth;
+    // De costas, a capa (ou as costas próprias do boneco: sobretudo, manto) vem sempre por cima do tronco, e cobre o cinto e as alças; de frente fica atrás.
+    // É a regra de todos os heróis; backDepth deixa um boneco trocar por outra
+    const aboveTorso = sinF < 0 ? Math.max(depth, project(pose.lean * 0.6, 0, 13.5).depth + 0.05) : depth;
     return {
-        // backDepth: o boneco pode mudar a ordem de desenho das costas (ex.: capa por cima do tronco, vista de costas)
-        depth: B?.backDepth ? B.backDepth(rig, pose, depth) : depth,
+        depth: B?.backDepth ? B.backDepth(rig, pose, aboveTorso) : aboveTorso,
         draw() {
             // Quem tem as costas próprias (drawBack) desenha no lugar da capa
             if (B?.drawBack) {
