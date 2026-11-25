@@ -103,7 +103,7 @@ export function spawnElite() {
     e.damage *= elite.damage;
     e.knockbackResist = Math.max(e.knockbackResist ?? 0, elite.knockbackResist);   // nunca menos do que o monstro já tinha
     showToast('💀', `${elite.label} monster in the fog`, 'It carries treasure');
-    audio.playHorn();
+    audio.playElite();
 }
 
 function spawnRing(h) {

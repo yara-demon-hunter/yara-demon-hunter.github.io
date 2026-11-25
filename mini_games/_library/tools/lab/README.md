@@ -5,6 +5,8 @@ afeta o Last Torch nem o yara-rpg.
 
 | Arquivo | O que é |
 |---|---|
+| `dragon_ascii.html` e `.js` | O **Dragão em ASCII**: recria `dragon.png` só com caracteres, por cima da imagem (sem 3D). Divisor para comparar com o original, imagem por baixo ajustável, nota de semelhança, salva PNG e `.txt`. Usa a técnica A13 (casamento de forma) |
+| `dragon.png` | A imagem de referência do dragão vermelho usada pelo `dragon_ascii.html` |
 | `ascii_foto.html` e `.js` | O **Espectro Encapuzado em ASCII**: figura 3D (manto que balança, cajado com orbe, cristais em órbita) renderizada numa grade minúscula em 3 passes (cor, profundidade, material) e convertida em caracteres num canvas 2D, pelo caminho que serviria para os jogos. Implementa A1 a A12 da metodologia ASCII, cada uma com caixa; botões de dissolução em chuva e "só a rampa" |
 | `cavaleiro_foto.html` e `.js` | O **Cavaleiro Ossário**: esqueleto de armadura enferrujada (elmo de chifres, capa rasgada, espada rúnica, alma azul), 100% procedural. Testa as técnicas de distância da metodologia: 3 níveis de LOD (17,7 mil, 4,8 mil e 2,1 mil triângulos), fileira de cavaleiros a 14, 24, 36, 52 e 72 m, e caixas para cor atmosférica, luz de borda, sombra de contato, specular AA e mipmap. Primeira versão, ainda não está no jogo |
 | `slizork_foto.html` e `.js` | **Slizork, o Tirano de Lodo** (chefe do Swamp) em 3D: gosma verde-ácida translúcida deformada por ruído, bolhas e detritos por dentro, coroa de ouro afundada, olhos vermelhos que surgem e somem, braços com garras de espada e rastro corrosivo. Modos Parado, Rastejando e Golpe. Primeira versão, ainda não está no jogo (o jogo usa o 2.5D provisório). Descrição e imagem de referência em `monsters/25d/slizork/art_reference/` |

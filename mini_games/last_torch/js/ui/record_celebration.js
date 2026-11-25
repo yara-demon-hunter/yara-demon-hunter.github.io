@@ -31,8 +31,7 @@ export function celebrateRecord({ score, rank }) {
         badge.querySelector('.record-rank').textContent = rank ? `Best night #${rank}` : '';
         root.append(confetti, badge);
         document.body.appendChild(root);
-        audio.playLevelUp();
-        setTimeout(() => audio.playChest?.(), 300);
+        audio.playRecord();
         requestAnimationFrame(() => root?.classList.add('is-in'));
         const gone = root;
         const end = () => { gone.classList.add('is-out'); setTimeout(() => { gone.remove(); if (root === gone) root = null; }, 400); };

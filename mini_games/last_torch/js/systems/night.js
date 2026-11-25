@@ -75,6 +75,7 @@ export function startHour() {
     else showBanner(`WAVE ${hour} OF ${NIGHT.hours}`, getHourName(hour).toUpperCase(), bossNote || (state.omen ? `${state.omen.icon} ${state.omen.name}` : ''), 'hour');
     audio.setMood('hunt');
     audio.setIntensity(Math.min(1, (hour - 1) / (NIGHT.hours - 1)));
+    if (hour > 1) audio.playWaveStart((hour - 1) / (NIGHT.hours - 1));     // a primeira onda já tem o som de início de partida
     updateHUD();
 }
 

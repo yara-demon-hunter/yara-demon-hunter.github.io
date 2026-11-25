@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório · Dragão em ASCII</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; height: 100%; background: #020605; color: #d9ead9; font-family: system-ui, sans-serif; overflow: hidden; }
+        #stage { position: fixed; inset: 0 300px 0 0; display: grid; place-items: center; padding: 10px; }
+        #frame { position: relative; background: #020605; border: 1px solid #1f3a2b; max-width: 100%; max-height: 100%; }
+        #frame img, #frame canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+        #frame .sizer { position: relative; visibility: hidden; display: block; width: 100%; height: auto; }
+        #under { opacity: 0; }
+        #glow { pointer-events: none; filter: blur(4px) brightness(1.5); mix-blend-mode: screen; opacity: .8; }
+        #ascii { mix-blend-mode: screen; }
+        #right { }
+        #divider { position: absolute; top: 0; bottom: 0; width: 2px; background: #5dff9a; box-shadow: 0 0 8px #5dff9a; pointer-events: none; display: none; }
+        #panel { position: fixed; top: 10px; right: 10px; bottom: 10px; width: 280px; overflow: auto; padding: 12px 14px; background: rgba(2, 10, 6, .92); border: 1px solid #1f3a2b; border-radius: 10px; font-size: 13px; line-height: 1.35; }
+        #panel h1 { margin: 0 0 2px; font-size: 15px; color: #ff9f5a; }
+        #panel h2 { margin: 10px 0 3px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #7da58e; }
+        #panel .sub { margin: 0 0 6px; font-size: 11px; color: #7da58e; }
+        #panel label { display: flex; gap: 8px; align-items: center; margin: 3px 0; cursor: pointer; }
+        #panel label small { color: #7da58e; }
+        #panel .row { display: grid; gap: 2px; margin: 4px 0; }
+        #panel select, #panel button, #panel input[type=range] { width: 100%; margin-top: 2px; }
+        #panel select, #panel button { padding: 6px; background: #0c1a12; color: #dff5e6; border: 1px solid #25402f; border-radius: 6px; font: inherit; cursor: pointer; }
+        #read { margin-top: 8px; padding: 8px; font-size: 12px; background: #04100a; border: 1px solid #1f3a2b; border-radius: 8px; color: #a9d3b8; }
+        #read b { color: #ffb36b; }
+        #home { position: fixed; top: 10px; left: 10px; z-index: 5; padding: 6px 10px; background: rgba(2, 10, 6, .9); border: 1px solid #1f3a2b; border-radius: 8px; color: #5dff9a; text-decoration: none; font-size: 13px; }
+        #loading { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #020605; color: #7da58e; font-size: 15px; text-align: center; padding: 20px; }
+        @media (max-width: 760px) { #stage { inset: 0 0 46% 0; } #panel { top: auto; left: 10px; width: auto; height: 44%; } }
+    </style>
+    <!-- Laboratório (fora dos jogos). Recria a imagem dragon.png (desta pasta) em ASCII, por cima dela. Técnicas de metodologia_ascii.md:
+         A1 rampa medida, A2 célula 1:2, A5 dithering, A8 cor da célula, A9 brilho, A11 desempenho (desenha uma vez) e a nova A13 (casamento de forma).
+         Abrir: na pasta mini_games, `python3 -m http.server 8010` e http://localhost:8010/_library/tools/lab/dragon_ascii.html -->
+</head>
+<body>
+    <div id="stage">
+        <div id="frame">
+            <img class="sizer" id="sizer" src="dragon.png" alt="">
+            <img id="under" src="dragon.png" alt="">
+            <canvas id="glow"></canvas>
+            <canvas id="ascii"></canvas>
+            <img id="right" src="dragon.png" alt="" style="display:none">
+            <div id="divider"></div>
+        </div>
+    </div>
+    <a id="home" href="index.html">← Laboratório</a>
+    <aside id="panel">
+        <h1>Dragão em ASCII</h1>
+        <p class="sub">A imagem <b>dragon.png</b> refeita só com caracteres, por cima dela. Cada célula testa os caracteres e fica com o que mais se parece com o pedaço da imagem.</p>
+        <div class="row"><span>Colunas: <b id="colsTxt">240</b></span><input type="range" id="cols" min="70" max="260" step="2" value="240"></div>
+        <div class="row"><span>Imagem original por baixo: <b id="underTxt">0</b>%</span><input type="range" id="underR" min="0" max="100" step="1" value="0"></div>
+        <div class="row"><span>Comparar com o original (divisor): <b id="wipeTxt">100</b>%</span><input type="range" id="wipe" min="0" max="100" step="1" value="100"></div>
+
+        <h2>Casamento de forma (A13)</h2>
+        <label><input type="checkbox" id="a13" checked> Escolher o caractere pela forma</label>
+        <div class="row"><select id="set"><option value="sym">Só símbolos (sem letras e números)</option><option value="all">Todos os caracteres</option></select></div>
+        <div class="row"><span>Limiar de textura: <b id="thrTxt">0.20</b></span><input type="range" id="thr" min="0.05" max="0.6" step="0.01" value="0.2"></div>
+
+        <h2>Fundo e cor (A8)</h2>
+        <div class="row"><span>Remover o papel (claridade): <b id="paperTxt">0.74</b></span><input type="range" id="paper" min="0.55" max="0.95" step="0.01" value="0.74"></div>
+        <label><input type="checkbox" id="holes" checked> Tirar também o papel preso <small>(entre as pernas)</small></label>
+        <label><input type="checkbox" id="cellbg" checked> Fundo colorido em cada célula <small>(mais fiel)</small></label>
+        <div class="row"><span>Saturação</span><input type="range" id="sat" min="0.8" max="2" step="0.05" value="1.35"></div>
+        <div class="row"><span>Brilho</span><input type="range" id="bri" min="0.6" max="1.8" step="0.05" value="1.2"></div>
+        <label><input type="checkbox" id="a5" checked> A5 Dithering <small>(células lisas)</small></label>
+        <label><input type="checkbox" id="a9" checked> A9 Brilho de texto</label>
+
+        <button id="save">📷 Salvar PNG</button>
+        <button id="txt">📄 Salvar só o texto (.txt)</button>
+        <div id="read">…</div>
+    </aside>
+    <div id="loading">Medindo os glifos…</div>
+    <script type="module" src="dragon_ascii.js"></script>
+</body>
+</html>

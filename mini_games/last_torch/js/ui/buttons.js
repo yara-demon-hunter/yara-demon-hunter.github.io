@@ -16,6 +16,9 @@ import { platform } from '../platform/platform.js';
 
 // --- EVENTOS DA INTERFACE (BOTOES) ---
 export function setupButtons() {
+    // Clique de interface em qualquer botão (curto e discreto)
+    document.addEventListener('pointerdown', (e) => { if (e.target.closest?.('button')) audio.playClick(); }, true);
+
     const on = (id, handler) => document.getElementById(id).addEventListener('click', handler);
 
     on('btnSettings', (e) => {

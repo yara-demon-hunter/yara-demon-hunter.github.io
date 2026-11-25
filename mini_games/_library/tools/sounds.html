@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sons · Ateliê</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0c0a06; color: #d6cfbf; font-family: system-ui, sans-serif; }
+        .wrap { max-width: 1040px; margin: 0 auto; padding: 20px 16px 80px; }
+        a.back { color: #a39b86; font-size: 13px; text-decoration: none; }
+        h1 { margin: 6px 0 4px; font-size: 26px; color: #fde68a; }
+        .lead { margin: 0 0 14px; color: #a39b86; font-size: 14px; line-height: 1.5; }
+        h2 { margin: 26px 0 8px; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: #fbbf24; }
+        h2 small { text-transform: none; letter-spacing: 0; color: #7a725f; font-size: 12px; margin-left: 6px; }
+        .bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding: 10px 12px; margin: 0 -12px 8px; background: #120f09ee; border-bottom: 1px solid #2a2418; backdrop-filter: blur(6px); }
+        .bar label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #c9c0aa; }
+        .meter { margin-left: auto; font-size: 13px; color: #a39b86; font-variant-numeric: tabular-nums; }
+        .meter b { color: #fde68a; }
+        .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0; }
+        .row .hint { flex-basis: 100%; font-size: 12px; color: #7a725f; margin: -2px 0 2px; line-height: 1.45; }
+        button { font: inherit; font-size: 13px; padding: 8px 12px; color: #fde68a; background: #17140d; border: 1px solid #3a3322; border-radius: 8px; cursor: pointer; min-height: 38px; }
+        button:hover, button:focus-visible { border-color: #fbbf24; outline: none; }
+        button:active { transform: translateY(1px); }
+        button.big { background: #3b2a08; border-color: #fbbf24; }
+        button.on { background: #fbbf24; color: #1a1306; }
+        select, input[type=range] { accent-color: #fbbf24; }
+        select { font: inherit; font-size: 13px; padding: 7px; background: #17140d; color: #e7dfcc; border: 1px solid #3a3322; border-radius: 8px; }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .chips button { padding: 5px 10px; min-height: 32px; font-size: 12px; color: #e7dfcc; border-radius: 999px; }
+        .note { margin-top: 24px; padding: 12px 14px; font-size: 13px; line-height: 1.6; color: #a39b86; background: #120f09; border: 1px solid #2a2418; border-radius: 10px; }
+        code { color: #c9c0aa; }
+        #error { display: none; padding: 16px; color: #fbbf24; line-height: 1.6; }
+        @media (max-width: 560px) { .meter { margin-left: 0; flex-basis: 100%; } }
+    </style>
+</head>
+<body>
+    <!-- Setor de sons do Ateliê: ouve cada som da biblioteca (mini_games/_library/sounds) e testa as regras de retenção
+         (variação de tom, limite de vozes, ducking, abafar na morte). Para editar um som: arquivo em _library/sounds/sfx/, depois ruby _library/sync.rb.
+         As músicas vêm do Last Torch (last_torch/js/audio/music.js): é só dado, e o motor delas é o da biblioteca. -->
+    <div class="wrap">
+        <a class="back" href="index.html">← Ateliê</a>
+        <h1>Sons</h1>
+        <p class="lead">Aperte <b>Ligar o som</b> (o navegador só libera áudio depois de um clique) e teste. Tudo é sintetizado na hora, sem arquivo. Para sons de hit e kill,
+            aperte várias vezes: o tom varia um pouco a cada vez, de propósito.</p>
+
+        <div class="bar">
+            <button id="power" class="big">🔊 Ligar o som</button>
+            <label>Volume <input id="vol" type="range" min="0" max="1" step="0.05" value="0.8"></label>
+            <label><input id="optSfx" type="checkbox" checked> Efeitos</label>
+            <label><input id="optMusic" type="checkbox" checked> Música</label>
+            <span class="meter">vozes tocando: <b id="voices">0</b> · limite dos curtos: 40</span>
+        </div>
+
+        <h2>Momentos do jogo <small>a tabela da metodologia, um som por momento</small></h2>
+        <div id="moments"></div>
+
+        <h2>Testes de estresse <small>o que acontece quando tudo toca ao mesmo tempo</small></h2>
+        <div class="row">
+            <button data-stress="swarm">Enxame: 30 mortes e hits por segundo (3 s)</button>
+            <button data-stress="coins">Moedas em sequência (12 seguidas)</button>
+            <button data-stress="repeat">Mesmo hit 8 vezes (ouça a variação)</button>
+            <button data-stress="night">Noite resumida (início → onda → boss → morte)</button>
+            <span class="hint">No enxame, o contador de vozes sobe e para no limite: sons curtos novos são descartados em vez de embolar. Os longos (boss, morte) sempre passam.</span>
+        </div>
+
+        <h2>Música e mixagem</h2>
+        <div class="row">
+            <label>Clima <select id="mood"></select></label>
+            <label>Intensidade <input id="intensity" type="range" min="0" max="1" step="0.05" value="0"> <span id="intensityValue">0</span></label>
+            <button id="btnPause">Abafar (pausa)</button>
+        </div>
+        <div class="row">
+            <button id="btnDuck">Ducking: música abaixa e volta</button>
+            <button id="btnMuffle">Abafar o mundo (corte da morte)</button>
+            <span class="hint">Ducking: com a música tocando, aperte e ouça ela ceder lugar. Abafar o mundo: o corte seco que a morte usa, antes do silêncio.</span>
+        </div>
+
+        <h2>Todos os sons <small>cada método da biblioteca, por grupo</small></h2>
+        <div id="all"></div>
+
+        <div class="note">
+            <b>Onde editar:</b> os sons ficam em <code>mini_games/_library/sounds/sfx/&lt;grupo&gt;.js</code> e o motor em <code>core/</code>. Depois rode
+            <code>ruby mini_games/_library/sync.rb</code>: cada jogo carrega a própria cópia (<code>last_torch/library/sounds</code>).<br>
+            <b>Regras de mix e metodologia:</b> <code>_library/sounds/README.md</code>.
+        </div>
+        <div id="error"></div>
+    </div>
+
+    <script type="module">
+        import { SoundEngine, SFX_GROUPS } from '../sounds/index.js';
+
+        const settings = { muted: false, sfx: true, music: true };
+        let moods = {};
+        try { moods = (await import('../../last_torch/js/audio/music.js')).MOODS; } catch { /* sem músicas: só os efeitos */ }
+        const audio = new SoundEngine({ moods, getSettings: () => settings });
+        const $ = (id) => document.getElementById(id);
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        const ready = () => { if (!audio.ctx) powerOn(); };
+
+        function powerOn() {
+            audio.init();
+            $('power').textContent = '🔊 Som ligado';
+            $('power').classList.add('on');
+            applyVolume();
+        }
+        function applyVolume() {
+            audio.applySettings();
+            if (audio.ctx) audio.master.gain.setTargetAtTime(settings.muted ? 0 : +$('vol').value, audio.ctx.currentTime, 0.02);
+        }
+        $('power').onclick = powerOn;
+        $('vol').oninput = applyVolume;
+        $('optSfx').onchange = (e) => { settings.sfx = e.target.checked; applyVolume(); };
+        $('optMusic').onchange = (e) => { settings.music = e.target.checked; applyVolume(); };
+        setInterval(() => { $('voices').textContent = audio.voices; }, 100);
+
+        // --- Momentos ---
+        // [rótulo, dica, controles, ação]. Controle: { name, min, max, step, value }
+        const MOMENTS = [
+            ['Início de partida', 'Impacto grave + riser + "clack" metálico.', [], () => audio.playRunStart()],
+            ['Início de onda', 'Grave curto + sweep + dois pulsos; mais tenso quanto mais avançada a noite.', [{ name: 'progresso da noite', min: 0, max: 1, step: 0.1, value: 0 }], (p) => audio.playWaveStart(p)],
+            ['Morte do jogador', 'O mundo abafa, silêncio curto, grave seco; depois a brasa que convida a tentar de novo (Game over).', [], () => audio.playDeath(), ['Morte + Game over', async () => { audio.playDeath(); await wait(900); audio.playGameOver(); }]],
+            ['Monstro morrendo', 'Nota que sobe com a sequência (streak): quem mantém a sequência viva ouve a escada.', [{ name: 'sequência', min: 0, max: 39, step: 1, value: 0 }], (s) => audio.playKill(s), ['Escada: 0 a 39', async () => { for (let s = 0; s < 40; s += 3) { audio.playKill(s); await wait(110); } }]],
+            ['Hit / dano causado', 'Tick curto com variação de tom a cada acerto.', [{ name: 'alvos', min: 1, max: 8, step: 1, value: 1 }], (n) => audio.playHit(n), ['Crítico', () => audio.playCrit()]],
+            ['Aparição de boss', 'Aviso grave pulsando + rugido; a música abaixa (ducking).', [], () => audio.playBossWarning(), ['Rugido', () => audio.playBossRoar()], ['Ataque (aperte várias vezes: 3 timbres)', () => { audio.last = {}; audio.playBossAttack(); }], ['Elite', () => audio.playElite()], ['Horda', () => audio.playHorn()], ['Morte do boss', () => audio.playBossDeath()]],
+            ['Level up', 'Arpejo ascendente limpo, com a música cedendo.', [], () => audio.playLevelUp()],
+            ['Coleta de moeda', 'Cada moeda em sequência rápida sobe um degrau.', [], () => audio.playCoin(), ['Pegar 10', async () => { for (let i = 0; i < 10; i++) { audio.playCoin(); await wait(70); } }]],
+            ['Vitória da onda', 'Resolução maior com grave de alívio.', [], () => audio.playHourClear(), ['Sino', () => audio.playBell()], ['Reviver', () => audio.playRevive()], ['Troca de clima', () => audio.playMoodChange('hunt')]],
+            ['Recorde batido', 'Arpejo brilhante com cintilar.', [], () => audio.playRecord()],
+            ['Interface', 'Clique curto e discreto; e o coração quando a vida está baixa.', [], () => audio.playClick(), ['Coração', () => audio.playHeartbeat()], ['Alarme da tocha', () => audio.playAlarm()]]
+        ];
+        for (const [label, hint, controls, action, ...extras] of MOMENTS) {
+            const row = document.createElement('div');
+            row.className = 'row';
+            const values = controls.map(c => {
+                const input = Object.assign(document.createElement('input'), { type: 'range', min: c.min, max: c.max, step: c.step, value: c.value });
+                const read = document.createElement('span');
+                read.textContent = `${c.name}: ${c.value}`;
+                input.oninput = () => { read.textContent = `${c.name}: ${input.value}`; };
+                return { input, read };
+            });
+            const play = Object.assign(document.createElement('button'), { textContent: `▶ ${label}` });
+            play.className = 'big';
+            play.onclick = () => { ready(); action(...values.map(v => +v.input.value)); };
+            row.append(play);
+            values.forEach(v => row.append(v.input, v.read));
+            extras.forEach(([name, fn]) => {
+                const button = Object.assign(document.createElement('button'), { textContent: name });
+                button.onclick = () => { ready(); fn(); };
+                row.append(button);
+            });
+            const note = Object.assign(document.createElement('span'), { className: 'hint', textContent: hint });
+            row.append(note);
+            $('moments').append(row);
+        }
+
+        // --- Estresse ---
+        const STRESS = {
+            async swarm() { const end = performance.now() + 3000; let i = 0; while (performance.now() < end) { audio.playKill(i++ % 30); audio.playHit(3); audio.playCoin(); await wait(33); } },
+            async coins() { for (let i = 0; i < 12; i++) { audio.playCoin(); await wait(70); } },
+            async repeat() { for (let i = 0; i < 8; i++) { audio.last.hit = -1; audio.playHit(1); await wait(160); } },
+            async night() {
+                audio.setMood('hunt'); audio.setIntensity(0.5);
+                audio.playRunStart(); await wait(1500);
+                audio.playWaveStart(0.5); await wait(2200);
+                for (let i = 0; i < 12; i++) { audio.playKill(i * 3); audio.playHit(2); await wait(140); }
+                audio.playBossWarning(); await wait(2300);
+                audio.playBossRoar(); await wait(2500);
+                audio.playDeath(); await wait(900); audio.playGameOver();
+            }
+        };
+        document.querySelectorAll('[data-stress]').forEach(b => { b.onclick = () => { ready(); STRESS[b.dataset.stress](); }; });
+
+        // --- Música e mixagem ---
+        const select = $('mood');
+        ['silent', ...Object.keys(moods).filter(m => m !== 'silent')].forEach(name => select.append(new Option(name, name)));
+        select.onchange = () => { ready(); audio.setMood(select.value); };
+        $('intensity').oninput = (e) => { $('intensityValue').textContent = e.target.value; audio.setIntensity(+e.target.value); };
+        let paused = false;
+        $('btnPause').onclick = () => { ready(); paused = !paused; audio.setPaused(paused); $('btnPause').classList.toggle('on', paused); };
+        $('btnDuck').onclick = () => { ready(); audio.duck({ depth: 0.2, hold: 1, release: 1 }); audio.playBossRoar(); };
+        $('btnMuffle').onclick = () => { ready(); audio.muffle({ freq: 380, hold: 1.2, release: 0.9 }); audio.playBlast(); };
+
+        // --- Todos ---
+        for (const [name, group] of Object.entries(SFX_GROUPS)) {
+            const title = Object.assign(document.createElement('h2'), { textContent: name });
+            title.style.fontSize = '12px'; title.style.margin = '14px 0 6px'; title.style.color = '#a39b86';
+            const chips = document.createElement('div');
+            chips.className = 'chips';
+            for (const method of Object.keys(group)) {
+                const b = Object.assign(document.createElement('button'), { textContent: method.replace(/^play/, '') });
+                b.onclick = () => { ready(); audio.last = {}; audio[method](); };
+                chips.append(b);
+            }
+            $('all').append(title, chips);
+        }
+    </script>
+</body>
+</html>

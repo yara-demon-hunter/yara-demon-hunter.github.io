@@ -133,6 +133,7 @@ function trySecondWind() {
 export function updatePlayer(dt) {
     // Timers
     if (player.iFrames > 0) player.iFrames -= dt;
+    if (state.phase === 'HUNT' && player.hp > 0 && player.hp < player.maxHp * 0.25) audio.playHeartbeat();     // vida baixa: coração (o som se limita sozinho)
     const fromX = player.x;
     const fromY = player.y;
 

@@ -61,6 +61,7 @@ export function startGame(keepSavedRun = false) {
     platform.gameplayStart();
     if (!keepSavedRun) clearRun();          // outra partida com este herói: o registro de CONTINUAR dele não vale mais (o CONTINUE passa true)
     audio.init();
+    audio.playRunStart();
     state.turn = 1;
     enterScreenForTurn(1);                  // a partida começa na primeira tela do mapa (a anterior pode ter acabado no Castle)
     prepareScenery();

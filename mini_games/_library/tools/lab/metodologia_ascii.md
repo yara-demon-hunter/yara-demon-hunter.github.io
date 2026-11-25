@@ -17,7 +17,7 @@ Para que serve no projeto (nada disso é o visual normal dos jogos):
 - efeito de dano, portal ou corrupção (a imagem vira texto por um instante);
 - modo especial desbloqueável, tipo "terminal".
 
-## As técnicas (A1 a A12)
+## As técnicas (A1 a A13)
 
 Legenda de custo: **baixo** = barato em celular fraco; **médio** = precisa de cuidado; **alto** = só em GPU boa.
 
@@ -35,6 +35,7 @@ Legenda de custo: **baixo** = barato em celular fraco; **médio** = precisa de c
 | A10 | **Tone mapping e contraste antes da rampa** | Aplicar ACES e um ajuste de contraste local antes de converter. Sem isso, cenas escuras viram um mar de espaços. | baixo | ACES, gradação |
 | A11 | **Atlas de glifos (desempenho)** | Desenhar cada caractere uma vez num atlas e copiar pedaços (`drawImage` no Canvas 2D, ou textura no shader). `fillText` por célula a cada quadro é lento. | baixo | os jogos Canvas 2D |
 | A12 | **Animação do texto** | Piscar de glifos, rastro vertical tipo "chuva de código" na morte, tremor de linha (CRT), troca de caractere por ruído temporal. | baixo | estilo |
+| A13 | **Casamento de forma** | Em vez de só a luminância, cada célula é comparada (erro quadrático, mini-quadro 4x8) com o desenho de cada caractere da fonte, e fica com o mais parecido. Cor do caractere = pixels claros; fundo da célula = pixels escuros. É o que faz contorno, asas e escamas ficarem fiéis a uma imagem. Células lisas continuam na rampa (A1). | médio (≈0,4 s para 24 mil células, desenhando uma vez) | A1, A5, A8; **serve para recriar imagens prontas** |
 
 ## Como combinar (receitas)
 
@@ -82,3 +83,15 @@ o JS lê os pixels, converte e copia glifos de um atlas por cor para um canvas. 
 - A12 (chuva e dissolução) lê bem como efeito de morte.
 - Fraquezas: o manto, que é cor uniforme, fica pouco distinto no meio da imagem (pouco contraste entre rampa e fundo); cenas mais escuras pedem mais exposição.
 - Não testado: celular, ASCII só em telas paradas com `getImageData` de um jogo Canvas 2D real, e as técnicas de raymarching direto.
+
+## Teste com uma imagem pronta: o dragão (25/11/2026)
+
+`dragon_ascii.html` aplica ASCII a uma imagem 2D (`dragon.png`), sem 3D. Papel de fundo removido por inundação a partir das bordas (e manchas grandes de papel presas
+entre as pernas), A13 em cada célula e cor da imagem em cada caractere. Há um divisor para comparar com o original e um controle de imagem por baixo.
+
+- Nota de semelhança (cor média por célula, só onde há dragão; medida minha, não é padrão): **55%** só com caracteres sobre fundo preto, **82%** com fundo colorido na célula.
+  Com 45% da imagem original por baixo, a leitura visual é a melhor das três, mesmo com a mesma nota de 55%.
+- 240 colunas (célula 7x14 px) fecham asas, patas, cauda e degradê de cor; o rosto fica borrado, porque a cabeça cabe em poucas células. Mais colunas melhorariam
+  (limite atual 260, a imagem tem só 486 px de largura).
+- Desenhar leva ~0,4 s por mudança de parâmetro (feito uma vez, não por quadro).
+- Não testado: imagem de maior resolução, outras imagens, celular.
