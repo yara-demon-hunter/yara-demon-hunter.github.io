@@ -75,12 +75,78 @@
     overflow: hidden;
 }
 .goal-row u { display: block; height: 100%; background: linear-gradient(90deg, #ea580c, #fde68a); }
+/* Uma fileira compacta e centralizada: CONTINUE e HUNT AGAIN, ALTAR e MENU. Botões do tamanho do texto, não da tela */
 .summary-actions {
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);       /* HUNT AGAIN e MENU lado a lado */
-    gap: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.45rem;
 }
-.summary-actions .start-btn { grid-column: auto; margin: 0; }
+.summary-actions .start-btn {
+    width: auto;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-indent: 0;
+    white-space: nowrap;
+}
+/* Cores: CONTINUE verde, HUNT AGAIN e ALTAR laranja (o padrão do botão), MENU roxo */
+.summary-actions .start-btn, .summary-actions .start-btn-dark {
+    background: linear-gradient(180deg, #7c2d12, #431407);
+    border: 1px solid rgba(251, 146, 60, 0.55);
+    box-shadow: 0 0 22px rgba(194, 65, 12, 0.35), inset 0 1px 0 rgba(253, 186, 116, 0.25);
+    color: #fde4c8;
+}
+.summary-actions .start-btn em { color: #fdba74; font-family: inherit; }
+.summary-actions .start-btn-continue {
+    background: linear-gradient(180deg, #14532d, #052e16);
+    border-color: rgba(74, 222, 128, 0.55);
+    box-shadow: 0 0 22px rgba(22, 163, 74, 0.35), inset 0 1px 0 rgba(187, 247, 208, 0.25);
+    color: #dcfce7;
+}
+.summary-actions .start-btn-continue em { color: #86efac; }
+.summary-actions #btnMenu {
+    background: linear-gradient(180deg, #581c87, #2e1065);
+    border-color: rgba(192, 132, 252, 0.55);
+    box-shadow: 0 0 22px rgba(126, 34, 206, 0.35), inset 0 1px 0 rgba(233, 213, 255, 0.25);
+    color: #f3e8ff;
+}
+.summary-actions .start-btn em { display: block; font-size: 0.58rem; letter-spacing: 0.06em; margin-top: 0.1rem; }
+/* Bolinha de notificação no canto superior direito do botão ALTAR: mesma cor e contorno do botão, número branco, brilhando e piscando de leve */
+.altar-badge {
+    position: absolute;
+    top: -0.55rem;
+    right: -0.5rem;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    padding: 0 0.32rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #7c2d12, #431407);
+    border: 1px solid rgba(251, 146, 60, 0.95);
+    box-shadow: 0 0 0 2px #14090a, 0 0 8px rgba(251, 146, 60, 0.7), inset 0 1px 0 rgba(253, 186, 116, 0.35);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    line-height: calc(1.35rem - 2px);
+    text-align: center;
+    text-shadow: 0 0 6px rgba(253, 186, 116, 0.95);
+    pointer-events: none;
+    animation: altar-badge-glow 1.3s ease-in-out infinite;
+}
+@keyframes altar-badge-glow {
+    0%, 100% { box-shadow: 0 0 0 2px #9b6569, 0 0 6px rgba(251, 146, 60, 0.45), inset 0 1px 0 rgba(253, 186, 116, 0.35); filter: brightness(0.92); }
+    50% { box-shadow: 0 0 0 2px #db8d93, 0 0 16px rgba(251, 146, 60, 1), inset 0 1px 0 rgba(253, 186, 116, 0.5); filter: brightness(1.3); }
+}
+@media (prefers-reduced-motion: reduce) { .altar-badge { animation: none; } }
+.altar-badge:empty { display: none; }
+.summary-actions .summary-altar { position: relative; overflow: visible; }
+.summary-altar.is-ready { animation: altar-ready-pulse 1.6s ease-in-out infinite; }
+/* @keyframes altar-ready-pulse { 50% { box-shadow: 0 0 18px rgba(251, 146, 60, 0.6); } } */
+@media (prefers-reduced-motion: reduce) { .summary-altar.is-ready { animation: none; } }
 
 @media (max-width: 600px) and (orientation: portrait) {
     .summary-grid { grid-template-columns: minmax(0, 1fr); }
@@ -109,7 +175,7 @@
     .goal-row b { font-size: 0.58rem; }
     .summary-actions .start-btn { padding: 0.45rem 1rem; font-size: 0.85rem; }
     .summary-actions .start-btn-small { padding: 0.3rem 0.6rem; font-size: 0.66rem; }
-    .summary-actions { grid-template-columns: 1.4fr 1fr; position: sticky; bottom: 0; z-index: 2; padding: 0.3rem 0 0.2rem; background: linear-gradient(to top, rgba(3, 3, 6, 0.97) 75%, rgba(3, 3, 6, 0)); }
+    .summary-actions { position: sticky; bottom: 0; z-index: 2; padding: 0.3rem 0 0.2rem; background: linear-gradient(to top, rgba(3, 3, 6, 0.97) 75%, rgba(3, 3, 6, 0)); }
 }
 .unlock-more { text-align: center; color: #94a3b8; font-size: 0.64rem; border-color: rgba(148, 163, 184, 0.25); background: rgba(8, 12, 16, 0.5); animation: none; }
 

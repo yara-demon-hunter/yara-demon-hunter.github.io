@@ -66,9 +66,12 @@ export function setupButtons() {
         document.getElementById('continueText').textContent = `${HEROES[saved.hero].name} · ${runPlace(saved)}. The wave starts over; everything else stays.`;
         continueBox.classList.remove('hidden');
     };
-    const goContinue = (respec) => {
+    // Na tela de derrota o CONTINUE ocupa o lugar do HUNT AGAIN, então o anúncio entre noites também entra aqui (depois da escolha do jogador,
+    // com o mesmo intervalo mínimo). Do menu inicial não tem anúncio, como sempre foi.
+    const goContinue = async (respec) => {
         continueBox.classList.add('hidden');
         enterFullscreen();
+        if (state.gameState === 'GAMEOVER') await platform.showInterstitial();
         continueRun(respec);
     };
     on('btnContinue', openContinue);
@@ -107,6 +110,7 @@ export function setupButtons() {
     on('btnSanctuary', openSanctuary);
     on('btnCloseSanctuary', closeSanctuary);
     on('btnAltar', openAltar);
+    on('btnSummaryAltar', () => openAltar({ retry: true }));      // do fim da noite: o Altar traz HUNT AGAIN e MENU para voltar
     on('btnRanks', openRanks);
     on('btnCloseAltar', closeAltar);
     setupAltar();

@@ -292,7 +292,7 @@ function renderEmbers(earned) {
     persist();
     box.innerHTML = `<div class="embers-gain"><span>🔥 EMBERS</span><b>+0</b></div>
         <div class="embers-rows">${rows.map(r => `<div class="embers-row"><span>${r.label}</span><em>${r.detail}</em><b>+0</b></div>`).join('')}</div>
-        <p class="embers-records"></p><p class="embers-total"></p><p class="embers-buy"></p>`;
+        <p class="embers-records"></p><p class="embers-total"></p>`;
     const rowEls = [...box.querySelectorAll('.embers-row')];
     const totalEl = box.querySelector('.embers-gain b');
     const start = performance.now();
@@ -328,35 +328,26 @@ function renderEmbers(earned) {
     renderEmberWallet();
 }
 
-// "You have N" e "You can buy" da tela final: refeitos também quando o baú diário é aberto ali
+// "You have N" da tela final: refeito também quando o baú diário é aberto ali (e a bolinha do Altar acompanha)
 function renderEmberWallet() {
     const box = document.getElementById('summaryEmbers');
     if (!box.querySelector('.embers-total')) return;
     const buyable = ALTAR_KEYS.filter(key => altarCost(save, key) !== null && altarCost(save, key) <= save.embers);
     box.querySelector('.embers-total').textContent = `You have ${save.embers}`;
-    box.querySelector('.embers-buy').textContent = buyable.length
-        ? `You can buy: ${buyable.map(key => ALTAR[key].name).join(', ')}`
-        : 'Keep hunting: embers buy permanent upgrades at the Altar';
     box.classList.toggle('can-buy', buyable.length > 0);
+    renderSummaryActions(state.gameOverReason);
 }
 
-// Morreu: depois de um instante no resumo, o Altar abre sozinho ("tente de novo, mais forte") se há Brasas para gastar.
-// Não abre na vitória. Se o prêmio de um herói liberado está na tela, espera o jogador fechá-lo (até ~1 minuto); e só abre
-// enquanto o jogador ainda está na tela do fim da noite (quem já apertou HUNT AGAIN não é interrompido).
-// Espera a conta das Brasas terminar e dá tempo de ler o que ganhou antes de o Altar cobrir a tela (o botão ALTAR abre na hora)
-const ALTAR_AFTER_DEATH_MS = 7500;
-function openAltarAfterDeath(reason) {
-    if (reason === 'DAWN' || affordableCount(save) === 0) return;
-    let tries = 0;
-    const attempt = () => {
-        if (state.gameState !== 'GAMEOVER' || ++tries > 150) return;
-        if (document.querySelector('.hero-unlock')) {
-            setTimeout(attempt, 400);
-            return;
-        }
-        import('./altar.js').then(m => m.openAltar({ retry: true }));
-    };
-    setTimeout(attempt, ALTAR_AFTER_DEATH_MS);
+// Botões do fim da noite: CONTINUE (verde, só quando há noite salva), HUNT AGAIN (laranja), ALTAR (laranja) e MENU (roxo).
+// O Altar nunca abre sozinho: o botão ALTAR pulsa e diz quantas melhorias dá para comprar com as Brasas.
+function renderSummaryActions(reason) {
+    // Com CONTINUE na tela, HUNT AGAIN some (quem quer recomeçar usa o Altar > HUNT AGAIN ou o menu); sem noite salva ele é o botão principal
+    const hasContinue = !document.getElementById('btnDeathContinue').classList.contains('hidden');
+    document.getElementById('btnRestart').classList.toggle('hidden', hasContinue);
+    const altar = document.getElementById('btnSummaryAltar');
+    const ready = reason === 'DAWN' ? 0 : affordableCount(save);
+    altar.classList.toggle('is-ready', ready > 0);
+    document.getElementById('summaryAltarHint').textContent = ready > 0 ? String(ready) : '';
 }
 
 // Brasas no topo e as bolinhas da barra de navegação (presente pronto, compra no Altar, troféu novo no Santuário)
@@ -563,7 +554,7 @@ export function triggerGameOver(reason) {
     renderEmbers(embersEarned);
     renderDaily();
     renderGoal();
-    openAltarAfterDeath(reason);
+    renderSummaryActions(reason);
     // Zerou a noite: um final de verdade (o herói, os números e as 18 ondas com as estrelas) no lugar do resumo, só com MENU
     if (reason === 'DAWN') {
         const learned = getOwnedPowers().length + Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0).length;
