@@ -6,8 +6,8 @@ import { formatPercent, req } from '../helpers.js';
 export const FLAME_NODES = [
 
     { id: 'torchKeeper', cost: 1, branch: 'flame', kind: 'mod', x: 0, y: 1.5, requires: [],
-      name: 'Torch Keeper', icon: '🏮', desc: 'The torch holds more flame.',
-      levelText: (mods) => `+${mods.torchHp} torch health`, mods: { torchHp: 15 } },
+      name: 'Torch Keeper', icon: '🏮', desc: 'The torch holds more flame and slowly mends itself.',
+      levelText: (mods) => `+${mods.torchHp} torch health, heals ${mods.torchRegen} health/s`, mods: { torchHp: 15, torchRegen: 0.04 } },
     // Linha do calor: a tocha não morre
     { id: 'warmHearth', cost: 1, branch: 'flame', kind: 'mod', x: 1, y: 0, requires: [req('torchKeeper')],
       name: 'Warm Hearth', icon: '♨️', desc: 'The fire warms you and mends itself.',
@@ -25,7 +25,7 @@ export const FLAME_NODES = [
     { id: 'hearthPhoenix', cost: 5, branch: 'flame', kind: 'passive', key: 'hearthPhoenix', x: 3, y: 1, requires: [req('fireTornado')] },
     { id: 'blueTorch', cost: 4, branch: 'flame', kind: 'passive', key: 'blueTorch', x: 4, y: 1, requires: [req('hearthPhoenix')] },
     // Linha da muralha
-    { id: 'torchBolts', cost: 4, branch: 'flame', kind: 'power', key: 'torchBolts', x: 1, y: 2, requires: [req('torchKeeper')] },
+    { id: 'torchBolts', cost: 3, branch: 'flame', kind: 'power', key: 'torchBolts', x: 1, y: 2, requires: [req('torchKeeper')] },
     { id: 'sunEvolve', cost: 5, branch: 'flame', kind: 'evolve', key: 'torchBolts', x: 2, y: 2, requires: [req('torchBolts', 5)], },
     { id: 'fireRing', cost: 4, branch: 'flame', kind: 'power', key: 'fireRing', x: 3, y: 2, requires: [req('sunEvolve')] },
     { id: 'fireRingEvolve', cost: 5, branch: 'flame', kind: 'evolve', key: 'fireRing', x: 4, y: 2, requires: [req('fireRing', 5)], },

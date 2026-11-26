@@ -97,6 +97,56 @@ export const PASSIVE_SKILL_MODELS = {
             return `Every ${ROSE_PETALS.cooldownSeconds}s, when monsters are near, a hurricane of roses and loose petals spins around you for ${ROSE_PETALS.durationSeconds}s, hitting everything within ${ROSE_PETALS.radius} range for ${formatMultiplier(ROSE_PETALS.damage)} spell damage every ${formatNumber(ROSE_PETALS.tickSeconds)}s, pushing them back and slowing them.`;
         }
     },
+    featherDodge: {
+        name: 'Feather Dodge',
+        icon: '🪶',
+        cost: 130,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        get desc() {
+            return `When a blow would hit you, you burst into a storm of raven feathers and slip through it: the blow misses and you are untouchable for ${formatNumber(FEATHER_DODGE.immuneSeconds)}s. Recharges in ${FEATHER_DODGE.cooldownSeconds}s.`;
+        }
+    },
+    featherRain: {
+        name: 'Feather Rain',
+        icon: '🪶',
+        cost: 120,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        get desc() {
+            return `Every ${formatNumber(FEATHER_RAIN.cooldownSeconds)}s you shed a rain of raven quills that falls from above on the monsters your raven has marked (up to ${FEATHER_RAIN.targets}): ${FEATHER_RAIN.quills} quills each, ${formatMultiplier(FEATHER_RAIN.damage)} blade damage per quill.`;
+        }
+    },
+    ravenDecoy: {
+        name: 'Raven Decoy',
+        icon: '🪶',
+        cost: 140,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        get desc() {
+            return `Feather Dodge leaves a giant raven feather where you stood. Monsters nearby rush it for ${formatNumber(RAVEN_DECOY.seconds)}s, then it bursts into feathers for ${formatMultiplier(RAVEN_DECOY.damage)} blade damage around it.`;
+        }
+    },
+    finalBlow: {
+        name: 'Final Blow',
+        icon: '☄️',
+        cost: 120,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        get desc() {
+            return `The 3rd strike of your combo deals ${formatMultiplier(FINAL_BLOW.damageMultiplier)} damage (on top of the combo's own bonus). With Whirlwind, that finishing blow hits everyone around you.`;
+        }
+    },
+    shatterStrike: {
+        name: 'Shatter Strike',
+        icon: '💢',
+        cost: 120,
+        maxLvl: 1,
+        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
+        get desc() {
+            return `A monster you knock back that crashes into another one hurts both: ${formatMultiplier(SHATTER_STRIKE.damage)} blade damage to the one it hits and half of that to itself. Light blows that barely push do not count.`;
+        }
+    },
     executioner: {
         name: 'Executioner',
         icon: '🪓',
@@ -707,7 +757,7 @@ export const PHOENIX_PACT = {
 // ele continua atacando, e o boss que se teleporta leva a corrente junto e fica preso no ponto novo.
 export const SHADOW_SHACKLE = {
     cooldownSeconds: 15,        // conta a partir do lançamento
-    holdSeconds: 10,
+    holdSeconds: 6,
     bossRatio: 0.5,             // num chefe a corrente segura só esta parte do tempo (50%: 5 s)
     speed: 800                  // velocidade da ponta da corrente
 };
@@ -738,6 +788,45 @@ export const ROSE_WHIP = {
     lashDamage: 3.2,            // o açoite, x dano de feitiço
     thornDps: 0.7,              // os espinhos, x dano de feitiço por segundo enquanto está enrolado
     tickSeconds: 0.5
+};
+
+// Feather Dodge (Shadow; js/systems/skills_shadow.js, tryFeatherDodge, chamado por hurtPlayer em js/systems/player.js): o golpe que ia acertar o herói erra,
+// uma tempestade de penas de corvo aparece e ele fica intocável por immuneSeconds. Carrion Feast: quem morre marcado pelo corvo cura o herói e adianta a recarga.
+export const FEATHER_DODGE = {
+    cooldownSeconds: 8,
+    immuneSeconds: 1.5,           // intocável depois de escapar (o herói pisca como em qualquer invulnerabilidade)
+    feathers: 30                // quantas penas voam
+};
+// Feather Rain (Shadow; js/systems/skills_shadow.js, updateFeatherRain): a cada cooldownSeconds uma chuva de penas cai de cima nos monstros marcados pelo corvo.
+export const FEATHER_RAIN = {
+    cooldownSeconds: 5.5,
+    targets: 2,                 // quantos marcados recebem a chuva de cada vez
+    quills: 15,                  // penas por alvo
+    damage: 0.35,                // dano de lâmina de cada pena
+    stuckSeconds: 1.4,          // quanto tempo a pena fica fincada no chão antes de sumir
+    fallSeconds: 0.45           // quanto uma pena demora para cair
+};
+
+// Raven Decoy (Shadow; js/systems/skills_shadow.js, tryFeatherDodge / updateFeathers; a isca atrai como o carvalho acordado, em js/systems/enemies.js):
+// o Feather Dodge deixa uma pena gigante onde o herói estava; os monstros comuns correm para ela e, no fim, ela explode em penas.
+export const RAVEN_DECOY = {
+    seconds: 2,                 // quanto tempo a isca fica de pé
+    lures: 320,                 // de que distância os monstros comuns a veem
+    radius: 90,                 // área da explosão
+    damage: 2,                  // dano de lâmina da explosão
+    feathers: 24                // penas da explosão
+};
+
+// Final Blow (Blade; js/systems/skills_blade.js, getFinalBlowMultiplier; o multiplicador entra em js/systems/combat.js): o 3º golpe do combo causa o dobro de dano.
+export const FINAL_BLOW = {
+    damageMultiplier: 2
+};
+// Shatter Strike (Blade; js/systems/skills_blade.js, updateShatter): o monstro empurrado que bate em outro causa dano baixo nos dois.
+export const SHATTER_STRIKE = {
+    damage: 0.35,               // x dano da lâmina no monstro atingido; o que foi empurrado leva metade
+    windowSeconds: 0.55,        // quanto tempo depois do golpe o empurrão ainda conta
+    minSpeed: 140,              // abaixo desta velocidade o empurrão é fraco demais e não conta
+    knockback: 60
 };
 
 // Companheiros em voo (fênix, Grave Wisp, Shadow Raven): rodeiam devagar o ponto onde ficam e demoram mais para

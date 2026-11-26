@@ -1,4 +1,4 @@
-import { EXECUTIONER, PARRY, WAR_CRY } from '../../data_model/passives.js';
+import { EXECUTIONER, FINAL_BLOW, PARRY, SHATTER_STRIKE, WAR_CRY } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { isFireCasting } from './knives.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
@@ -48,6 +48,35 @@ export function launchCrescent(angle) {
             damage: getBladeDamage() * C.damage,
             struck: new Set()
         });
+    }
+}
+
+// Final Blow: o 3º golpe do combo causa o dobro de dano (o multiplicador entra no dano do golpe, em combat.js)
+export function getFinalBlowMultiplier() {
+    return passives.finalBlow.lvl > 0 ? FINAL_BLOW.damageMultiplier : 1;
+}
+
+// Shatter Strike: o monstro atingido pelo golpe fica "em voo" por windowSeconds; se bater num outro enquanto é empurrado, os dois levam dano baixo
+export function markShatter(e) {
+    if (passives.shatterStrike.lvl <= 0) return;
+    e.shatterUntil = state.runTime + SHATTER_STRIKE.windowSeconds;
+    e.shatterHit = new Set();
+}
+
+function updateShatter() {
+    if (passives.shatterStrike.lvl <= 0) return;
+    const S = SHATTER_STRIKE;
+    for (const e of state.enemies) {
+        if (!(e.shatterUntil > state.runTime) || e.hp <= 0 || Math.hypot(e.vx ?? 0, e.vy ?? 0) < S.minSpeed) continue;
+        for (const o of state.enemies) {
+            if (o === e || o.hp <= 0 || e.shatterHit.has(o) || Math.hypot(o.x - e.x, o.y - e.y) > e.radius + o.radius) continue;
+            e.shatterHit.add(o);
+            const a = Math.atan2(o.y - e.y, o.x - e.x);
+            const damage = getAtkDamage() * S.damage;
+            dealDamage(o, damage, { noCrit: true, kbX: Math.cos(a) * S.knockback, kbY: Math.sin(a) * S.knockback });
+            dealDamage(e, damage * 0.5, { noCrit: true, quiet: true });
+            createExplosion((e.x + o.x) / 2, (e.y + o.y) / 2 - 4, '#fde68a', 5);
+        }
     }
 }
 
@@ -238,6 +267,7 @@ function updateWarCry(dt) {
 }
 
 export function updateBladeSkills(dt) {
+    updateShatter();
     updateBloodlust(dt);
     updateCrescents(dt);
     updateEarthbreaker(dt);

@@ -97,6 +97,14 @@ export const skillsSfx = {
         [659.25, 830.61, 987.77].forEach((freq, i) => this.tone({ type: 'sine', freq, at: 0.08 + i * 0.07, attack: 0.01, decay: 0.8, gain: 0.06 }));
     },
 
+    // Feather Dodge: o golpe erra e o herói vira penas. Farfalhar agudo e rápido com um assobio que sobe e some
+    playFeatherDodge() {
+        if (!this.ctx || this.throttled('featherDodge', 0.2)) return;
+        this.burst({ filter: 'bandpass', freq: 2600, to: 6800, q: 0.7, attack: 0.005, decay: 0.32, gain: 0.3 });
+        this.burst({ filter: 'highpass', freq: 5000, decay: 0.12, gain: 0.14 });
+        this.tone({ type: 'sine', freq: 700, to: 1900, attack: 0.01, decay: 0.28, gain: 0.07 });
+    },
+
     // Executioner: corte seco
     playExecute() {
         if (!this.ctx || this.throttled('execute', 0.06)) return;

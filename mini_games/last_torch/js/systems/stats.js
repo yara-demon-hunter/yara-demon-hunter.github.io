@@ -1,4 +1,5 @@
 import { CHARACTER_MODEL } from '../../data_model/character.js';
+import { CORE_MODEL } from '../../data_model/core.js';
 import { getCharacterBase } from '../../data_model/characters/index.js';
 import { BLADE_SKILL } from '../../data_model/skills.js';
 import { BLUE_TORCH, WAR_CRY } from '../../data_model/passives.js';
@@ -145,7 +146,7 @@ const WARMTH_HEAL_MAX_MULTIPLIER = 1.5;
 export function getWarmthHeal() {
     if (mod('noWarmthHeal') > 0) return 0;
     const multiplier = Math.min(WARMTH_HEAL_MAX_MULTIPLIER, 1 + mod('warmth') * WARMTH_HEAL_SHARE);
-    return characterStat('warmthHeal') * multiplier;
+    return characterStat('warmthHeal') * multiplier * CORE_MODEL.warmthHealMultiplier;
 }
 // Tudo da Fúria vem do `fury` do personagem escolhido (data_model/characters/<id>.js); o nível da skill Fury (furySkill) sobe por cima
 export function getFrenzyDamageBonus() {

@@ -173,6 +173,10 @@ export const state = {
     raven: { x: 0, y: 0, placed: false, side: 1, facing: -1, tilt: 0, mode: 'home', target: null, timer: 1, diveTime: 0, dive: 0, rise: 1 },
     // Corrente do Shadow Shackle: recarga e a corrente em campo { target, reach, held, age }. Só existe uma: a recarga é maior que o tempo preso
     shackleTimer: 0,
+    featherDodge: null,         // o Feather Dodge em andamento: { age, seconds } (js/systems/skills_shadow.js; desenho em js/render/feathers.js)
+    quills: [],                 // penas do Raven Quills em queda: { x, y, delay, age, fall, hit } (js/systems/skills_shadow.js)
+    decoy: null,                // a isca do Raven Decoy: { x, y, age, seconds, lures } (js/systems/skills_shadow.js; os monstros a perseguem em enemies.js)
+    feathers: [],               // as penas de corvo no ar
     shackle: null,
     bossFx: null,                 // névoa/escuridão de um boss: { kind: 'fog' | 'dark', boss, age, seconds }
     bossZone: null,               // chão sagrado do Demon Hunter: { boss, x, y, radius, age, seconds }

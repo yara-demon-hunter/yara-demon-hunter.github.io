@@ -1,6 +1,7 @@
 export const CORE_MODEL = {
     name: 'Torch',
-    initialHp: 100,
+    initialHp: 150,             // 2026-11-26: era 100 (+50%)
+    warmthHealMultiplier: 1.5,  // 2026-11-26: a cura do calor da tocha (warmthHeal de cada personagem) vale 50% a mais, para todos
     collisionRadius: 22,
     playerBlockRadius: 40,    // o herói não entra neste raio em volta da tocha
     damageTakenPerMonster: 8,   // monstros sem torchDamage próprio

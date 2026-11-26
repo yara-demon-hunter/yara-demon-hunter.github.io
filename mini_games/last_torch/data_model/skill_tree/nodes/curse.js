@@ -9,9 +9,11 @@ export const CURSE_NODES = [
       name: 'Arcane Study', icon: '🧿', desc: 'You learn from every kill.',
       levelText: (mods) => `+${formatPercent(mods.xp)} XP`, mods: { xp: 0.05 } },
     // Linha do gelo e da força
-    { id: 'chillAura', cost: 4, branch: 'curse', kind: 'power', key: 'chillAura', x: 1, y: 0, requires: [req('arcaneStudy')] },
+    { id: 'chillAura', cost: 2, branch: 'curse', kind: 'power', key: 'chillAura', x: 1, y: 0, requires: [req('arcaneStudy')] },
     // Soul Nova (e a evolução que congela) DESLIGADA em 19/11/2026. No lugar dela entra o Absolute Zero, skill própria que congela. Para voltar a Soul Nova, tire os //
-    { id: 'absoluteZero', cost: 4, branch: 'curse', kind: 'power', key: 'absoluteZero', x: 2, y: 0, requires: [req('chillAura', 2)] },
+    { id: 'absoluteZero', cost: 2, branch: 'curse', kind: 'power', key: 'absoluteZero', x: 2, y: 0, requires: [req('chillAura', 2)] },
+    // A Runa Soberana, só do Gudran (selada para os outros, com passe livre), vem depois do Absolute Zero: dá furo e explosão aos raios do cajado
+    { id: 'sovereignRune', cost: 4, hero: 'gudran', branch: 'curse', kind: 'passive', key: 'sovereignRune', x: 3, y: 0, requires: [req('absoluteZero')] },
     // { id: 'soulNova', branch: 'curse', kind: 'power', key: 'soulNova', x: 2, y: 0, requires: [req('chillAura', 2)] },
     // { id: 'novaEvolve', branch: 'curse', kind: 'evolve', key: 'soulNova', x: 3, y: 0, requires: [req('soulNova', 5)] },
     { id: 'starfall', cost: 4, branch: 'curse', kind: 'power', key: 'starfall', x: 4, y: 0, requires: [req('chainLightning', 2)] },
@@ -34,7 +36,5 @@ export const CURSE_NODES = [
     { id: 'corpseEvolve', cost: 4, branch: 'curse', kind: 'evolve', key: 'corpseBurst', x: 2, y: 3, requires: [req('corpseBurst', 5)] },
     { id: 'orbitBlades', cost: 4, branch: 'curse', kind: 'power', key: 'orbitBlades', x: 3, y: 3, requires: [req('darkKnowledge', 2)] },
     { id: 'orbitEvolve', cost: 4, branch: 'curse', kind: 'evolve', key: 'orbitBlades', x: 4, y: 3, requires: [req('orbitBlades', 5)] },
-    // Linha 5, só do Gudran (selada para os outros): a Runa Soberana, que dá furo e explosão aos raios do cajado
-    { id: 'sovereignRune', cost: 4, hero: 'gudran', branch: 'curse', kind: 'passive', key: 'sovereignRune', x: 1, y: 4, requires: [req('arcaneStudy')] },
     { id: 'oathRuin', cost: 4, branch: 'curse', kind: 'passive', key: 'oathRuin', oath: true, x: 6, y: 1.5, requires: [req('wrathEvolve'), req('voidRiftEvolve')] }
 ];

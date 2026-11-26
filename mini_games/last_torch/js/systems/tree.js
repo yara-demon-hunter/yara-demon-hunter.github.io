@@ -104,7 +104,17 @@ export function getNextText(node) {
     const change = beforeLines.length > 1 && afterLines.length === beforeLines.length
         ? beforeLines.map((line, index) => `${line} → ${afterLines[index]}`).join('\n')
         : `${before} → ${after}`;
-    return levelText ? `${change}; ${levelText}` : change;
+    // Os outros atributos que o mesmo ponto sobe (`also`): "Slash Width: 52° → 75°"
+    const also = (node.also ?? []).filter(k => attributes[k].lvl < attributes[k].maxLvl).map(k => {
+        const a = attributes[k];
+        const was = getStatText(k);
+        a.lvl++;
+        const now = getStatText(k);
+        a.lvl--;
+        return `${a.name}: ${was} → ${now}`;
+    });
+    const withAlso = [change, ...also].join('; ');
+    return levelText ? `${withAlso}; ${levelText}` : withAlso;
 }
 
 // Linhas da prévia verde da árvore. Poderes guardam os números de cada nível em
@@ -222,6 +232,17 @@ export function getPowerUpgradeRows(key) {
     return rows;
 }
 
+// Os atributos que o mesmo ponto também sobe (`also` no nó): o valor que terão com o próximo nível
+function alsoRows(node) {
+    return (node.also ?? []).filter(k => attributes[k].lvl < attributes[k].maxLvl).map(k => {
+        const a = attributes[k];
+        a.lvl++;
+        const value = getStatText(k);
+        a.lvl--;
+        return { icon: a.icon, name: a.name, value };
+    });
+}
+
 export function getNodeUpgradeRows(node) {
     if (node.kind === 'power') return getPowerUpgradeRows(node.key);
     if (node.kind === 'mod') return modifierRows(node.mods, node.showTotal ? getNodeLevel(node) + 1 : 1);
@@ -232,6 +253,7 @@ export function getNodeUpgradeRows(node) {
     attr.lvl--;
     return [
         { icon: attr.icon, name: attr.name, value, image: true },
+        ...alsoRows(node),
         ...modifierRows(node.mods)
     ];
 }
@@ -369,8 +391,10 @@ export function buyNode(id) {
             state.oath = node.key;
             state.oathCeremony = node.key;
         }
-    } else if (node.kind === 'stat') attributes[node.key].lvl++;
-    else if (node.kind === 'power') powers[node.key].lvl++;
+    } else if (node.kind === 'stat') {
+        attributes[node.key].lvl++;
+        for (const k of node.also ?? []) if (attributes[k].lvl < attributes[k].maxLvl) attributes[k].lvl++;       // `also`: o mesmo ponto sobe outros atributos (Blade Rhythm: largura; Heavy Reach: empurrão)
+    } else if (node.kind === 'power') powers[node.key].lvl++;
     else if (node.kind === 'mod') state.tree[node.id] = st.level + 1;
     else {
         evolvable(node).evolved = true;
@@ -407,7 +431,10 @@ export function respecSkills() {
             state.revives -= (passives[node.key].mods?.revives ?? 0) * passives[node.key].lvl;
             passives[node.key].lvl = 0;
             passives[node.key].evolved = false;
-        } else if (node.kind === 'stat') attributes[node.key].lvl = 1;
+        } else if (node.kind === 'stat') {
+            attributes[node.key].lvl = 1;
+            for (const k of node.also ?? []) attributes[k].lvl = 1;
+        }
         else if (node.kind === 'power') {
             powers[node.key].lvl = node.key === hero.startPower ? 1 : 0;
             powers[node.key].evolved = false;

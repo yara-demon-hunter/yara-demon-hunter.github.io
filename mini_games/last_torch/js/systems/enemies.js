@@ -564,7 +564,7 @@ export function updateEnemies(dt) {
     const hunting = state.phase === 'HUNT';
     // Provoke e Oath of Slaughter: o herói chama a horda de mais longe
     const provoked = MONSTER_SPAWNING.targetPlayerDistance * (1 + mod('provoke'));
-    const lure = state.nature.lure;
+    const lure = state.nature.lure ?? state.decoy;
 
     for (let i = enemies.length - 1; i >= 0; i--) {
         const e = enemies[i];

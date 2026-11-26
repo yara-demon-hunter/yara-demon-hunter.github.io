@@ -4,14 +4,16 @@ const SLASH_ARC_MAX_LEVEL = 6;
 
 export const UPGRADE_MODELS = {
     damage: { name: 'Blade Damage', icon: '⚔️', lvl: 1, maxLvl: 99, desc: 'Increases the base damage of each hit.' },
-    radius: { name: 'Attack Range', icon: '🎯', lvl: 1, maxLvl: 99, desc: 'Increases the radius that detects targets.' },
+    // Heavy Reach: cada ponto sobe o alcance E o empurrão (o nó da árvore tem `also: ['knockback']`; o atributo knockback segue existindo para as contas e a ficha de status)
+    radius: { name: 'Heavy Reach', icon: '🎯', lvl: 1, maxLvl: 99, desc: 'Increases the attack range and the push when hitting targets.' },
     slashArc: {
         name: 'Slash Width', icon: '🌙', lvl: 1, maxLvl: SLASH_ARC_MAX_LEVEL,
         get desc() {
             return `Widens the slash (${BLADE_SKILL.minimumSlashArcDegrees}° at level 1 up to ${BLADE_SKILL.maximumSlashArcDegrees}° at max level).`;
         }
     },
-    atkSpeed: { name: 'Attack Speed', icon: '⏱️', lvl: 1, maxLvl: 99, desc: 'Reduces the cooldown between hits.' },
+    // Blade Rhythm: cada ponto encurta o tempo entre golpes E alarga o golpe (o nó da árvore tem `also: ['slashArc']`; a largura para nos 6 níveis)
+    atkSpeed: { name: 'Blade Rhythm', icon: '⏱️', lvl: 1, maxLvl: 99, desc: 'Shortens the time between hits and widens the slash.' },
     moveSpeed: { name: 'Move Speed', icon: '🥾', lvl: 1, maxLvl: 99, desc: 'Makes the character move faster.' },
     furySkill: { name: 'Fury (Skill)', icon: '😡', lvl: 1, maxLvl: 99, desc: 'Improves Fury duration and damage, and increases Fury charge.' },
     playerHp: { name: 'Hero Health', icon: '❤️', lvl: 1, maxLvl: 99, desc: 'Increases max health and heals the character. Blows land softer, and monsters leave the torch to come for you from farther away.' },
@@ -23,7 +25,7 @@ export const UPGRADE_MODELS = {
 // Slash Width, do nível 2 em diante: cada golpe também solta uma ONDA DE AR curta à frente, que atravessa os inimigos (dano = dano da lâmina x damagePerLevel x níveis acima do 1)
 
 export const BLADE_SKILL = {
-    damagePerUpgrade: 5,
+    damagePerUpgrade: 10,           // 2026-11-26: era 5 (cada ponto em Blade Damage soma 10 ao dano de cada golpe)
     radiusPerUpgrade: 7,
     maxRadiusScreenRatio: 0.38,
     minimumSlashArcDegrees: 40,

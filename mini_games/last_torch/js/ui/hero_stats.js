@@ -1,4 +1,5 @@
 import { getCharacterBase } from '../../data_model/characters/index.js';
+import { CORE_MODEL } from '../../data_model/core.js';
 import { ACTIVE_HEROES, HEROES } from '../../data_model/heroes.js';
 import { save } from '../core/save.js';
 import { ACHIEVEMENTS } from '../../data_model/sanctuary.js';
@@ -83,7 +84,7 @@ const STATS = [
     // lâmina por segundo. É o que ele se cura sem comprar nada.
     { label: 'REGEN', value: (h, b) => {
         const dps = b.player.attackDamage * (1 + (h.mods.bladeDamage ?? 0)) / b.player.attackCooldown;
-        return b.player.stats.warmthHeal * (b.player.stats.warmthRadius / 92) + (h.mods.lifeSteal ?? 0) * dps;
+        return b.player.stats.warmthHeal * CORE_MODEL.warmthHealMultiplier * (b.player.stats.warmthRadius / 92) + (h.mods.lifeSteal ?? 0) * dps;
     } },
     // SPEED junta a velocidade de movimento com o alcance do dash: dá a velocidade real de jogo
     { label: 'SPEED', value: (h, b) => b.player.moveSpeed * (1 + b.player.dash.distance / 600) },

@@ -7,7 +7,7 @@ import { dealDamage, ignite } from './damage.js';
 import { createExplosion, hitStop, shakeScreen } from './effects.js';
 import { isFireCasting } from './knives.js';
 import { fireArcaneBolt } from './arcane.js';
-import { feedBloodlust, launchCrescent } from './skills_blade.js';
+import { feedBloodlust, getFinalBlowMultiplier, launchCrescent, markShatter } from './skills_blade.js';
 import { detonateMark } from './skills_shadow.js';
 import { beamActive, startFury } from './fury.js';
 import { startMove } from './moves.js';
@@ -169,13 +169,15 @@ export function updateAutoAttack(dt) {
     const slashRad = whirl ? attackRad * WHIRLWIND.radiusRatio : attackRad;   // Whirlwind: mini-furacão roxo, bem mais longo que o golpe normal
     executeBladeSlash(player.x, player.y, atkAngle, slashRad, player.comboStep, whirl);
 
-    const dmg = getBladeDamage() * (player.comboStep === 3 ? characterStat('comboDamage') : 1.0);
+    // Final Blow: o 3º golpe causa o dobro de dano (e o Whirlwind já faz esse 3º golpe acertar todos em volta)
+    const dmg = getBladeDamage() * (player.comboStep === 3 ? characterStat('comboDamage') * getFinalBlowMultiplier() : 1.0);
     const kbForce = getKnockback() * (player.comboStep === 3 ? characterStat('comboKnockback') : 1.0);
 
     // Colisão de dano no arco do golpe
     const hits = hitEnemiesInArc(player.x, player.y, atkAngle, slashRad, currentArcHalf, dmg, kbForce, whirl,
         (e) => {
             chargeUlt(getFuryChargePerHit());
+            markShatter(e);                 // Shatter Strike: o empurrado que bater em outro causa dano baixo nos dois
             // Em pleno dash a marca espera: é o dash que vai detoná-la, com o bônus
             if (e.marked > 0 && player.dashTimer <= 0) detonateMark(e, false);
         },

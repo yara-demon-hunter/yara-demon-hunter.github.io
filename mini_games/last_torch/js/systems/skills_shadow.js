@@ -1,4 +1,4 @@
-import { MASTER_THIEF, SHADOW_RAVEN, SHADOW_SHACKLE, SMOKE_BOMB } from '../../data_model/passives.js';
+import { FEATHER_DODGE, MASTER_THIEF, FEATHER_RAIN, RAVEN_DECOY, SHADOW_RAVEN, SHADOW_SHACKLE, SMOKE_BOMB } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
@@ -252,6 +252,112 @@ function peck(e, dirX, dirY) {
     audio.playCaw();
 }
 
+const TAU = Math.PI * 2;
+
+// --- FEATHER DODGE ---
+// Chamado por hurtPlayer (js/systems/player.js) quando um golpe ia acertar o herói: o golpe erra, as penas de corvo explodem em volta dele e ele fica
+// intocável por immuneSeconds (o resto do tempo em que o herói pisca é a invulnerabilidade comum). Uma vez por recarga. Devolve true se escapou.
+export function tryFeatherDodge() {
+    const D = FEATHER_DODGE;
+    if (passives.featherDodge.lvl <= 0 || (state.powerTimers.featherDodge ?? 0) > 0 || state.phase !== 'HUNT' || player.hp <= 0) return false;
+    state.powerTimers.featherDodge = D.cooldownSeconds;
+    player.iFrames = Math.max(player.iFrames, D.immuneSeconds);
+    state.featherDodge = { age: 0, seconds: D.immuneSeconds };
+    for (let i = 0; i < D.feathers; i++) {
+        const a = Math.random() * TAU;
+        const speed = 90 + Math.random() * 230;
+        state.feathers.push({
+            x: player.x + Math.cos(a) * 6, y: player.y - 16 + Math.sin(a) * 4,
+            vx: Math.cos(a) * speed, vy: Math.sin(a) * speed * 0.7 - 30,
+            rot: Math.random() * TAU, spin: (Math.random() - 0.5) * 9,
+            age: 0, life: 0.7 + Math.random() * 0.7, size: 5 + Math.random() * 3.5, tone: i % 3
+        });
+    }
+    if (passives.ravenDecoy.lvl > 0) state.decoy = { x: player.x, y: player.y, age: 0, seconds: RAVEN_DECOY.seconds, lures: RAVEN_DECOY.lures };
+    createExplosion(player.x, player.y - 14, '#a78bfa', 10);
+    addShockwave(player.x, player.y, { radius: 54, color: '#a78bfa', width: 4, seconds: 0.35 });
+    shakeScreen(3);
+    audio.playFeatherDodge?.();
+    audio.playCaw?.();
+    return true;
+}
+
+function updateFeathers(dt) {
+    const timers = state.powerTimers;
+    if ((timers.featherDodge ?? 0) > 0) timers.featherDodge -= dt;
+    const dodge = state.featherDodge;
+    if (dodge) {
+        dodge.age += dt;
+        if (dodge.age >= dodge.seconds) state.featherDodge = null;
+    }
+    const decoy = state.decoy;
+    if (decoy) {
+        decoy.age += dt;
+        if (decoy.age >= decoy.seconds) {
+            const R = RAVEN_DECOY;
+            state.decoy = null;
+            blast(decoy.x, decoy.y, R.radius, getAtkDamage() * R.damage, 160, '#a78bfa', 'shadow');
+            for (let i = 0; i < R.feathers; i++) {
+                const a = Math.random() * TAU, speed = 80 + Math.random() * 200;
+                state.feathers.push({ x: decoy.x, y: decoy.y - 10, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed * 0.7 - 40, rot: Math.random() * TAU,
+                    spin: (Math.random() - 0.5) * 9, age: 0, life: 0.6 + Math.random() * 0.6, size: 5 + Math.random() * 3.5, tone: i % 3 });
+            }
+            createExplosion(decoy.x, decoy.y - 8, '#a78bfa', 10);
+            addShockwave(decoy.x, decoy.y, { radius: R.radius, color: '#a78bfa', width: 4, seconds: 0.35 });
+            shakeScreen(3);
+            audio.playFeatherDodge?.();
+        }
+    }
+    const { feathers } = state;
+    for (let i = feathers.length - 1; i >= 0; i--) {
+        const f = feathers[i];
+        f.age += dt;
+        f.x += f.vx * dt;
+        f.y += f.vy * dt;
+        f.vx *= 0.94;
+        f.vy = f.vy * 0.94 + 55 * dt;                 // cai devagar, planando
+        f.rot += f.spin * dt;
+        if (f.age >= f.life) feathers.splice(i, 1);
+    }
+}
+
+// Feather Rain: a cada cooldownSeconds, os marcados pelo corvo (os mais perto do herói) recebem uma chuva de penas que cai de cima. Cada pena machuca ao pousar.
+function updateFeatherRain(dt) {
+    const Q = FEATHER_RAIN;
+    const timers = state.powerTimers;
+    if (passives.featherRain.lvl > 0 && state.phase === 'HUNT') {
+        timers.featherRain = (timers.featherRain ?? Q.cooldownSeconds) - dt;
+        if (timers.featherRain <= 0) {
+            const marked = state.enemies.filter((e) => e.ravenMark > 0 && e.hp > 0)
+                .sort((a, b) => Math.hypot(a.x - player.x, a.y - player.y) - Math.hypot(b.x - player.x, b.y - player.y)).slice(0, Q.targets);
+            if (marked.length) {
+                timers.featherRain = Q.cooldownSeconds;
+                for (const e of marked) {
+                    for (let i = 0; i < Q.quills; i++) {
+                        state.quills.push({ target: e, ox: (Math.random() - 0.5) * 26, oy: (Math.random() - 0.5) * 14, delay: i * 0.07, age: 0, fall: Q.fallSeconds, hit: false });
+                    }
+                }
+                audio.playFeatherDodge?.();
+            } else timers.featherRain = 0.3;
+        }
+    }
+    const quills = state.quills;
+    for (let i = quills.length - 1; i >= 0; i--) {
+        const q = quills[i];
+        q.age += dt;
+        const e = q.target;
+        if (!q.hit && q.age >= q.delay + q.fall) {
+            q.hit = true;
+            q.x = e.x + q.ox; q.y = e.y + q.oy;
+            if (e.hp > 0) {
+                dealDamage(e, getAtkDamage() * Q.damage, { style: 'shadow' });
+                createExplosion(q.x, q.y, '#a78bfa', 2);
+            }
+        }
+        if (q.age >= q.delay + q.fall + Q.stuckSeconds) quills.splice(i, 1);
+    }
+}
+
 // --- SHADOW SHACKLE ---
 // Sozinha, a cada recarga: a corrente sai do herói, voa até o monstro mais forte ao alcance da adaga e o prende ao
 // chão. Quem trava a posição é js/systems/enemies.js, pelo e.chained. Desenho em js/render/shackle.js.
@@ -316,6 +422,8 @@ export function updateShackle(dt) {
 
 export function updateShadowSkills(dt) {
     updateRaven(dt);
+    updateFeathers(dt);
+    updateFeatherRain(dt);
     updateShackle(dt);
     updateSmokes(dt);
     updateEchoes(dt);
@@ -327,6 +435,10 @@ export function updateShadowSkills(dt) {
 
 export function clearShadowSkills() {
     releaseShackle();
+    state.featherDodge = null;
+    state.feathers.length = 0;
+    state.decoy = null;
+    state.quills.length = 0;
     state.smokes.length = 0;
     state.echoes.length = 0;
     state.markBursts.length = 0;

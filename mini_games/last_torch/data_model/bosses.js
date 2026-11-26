@@ -20,17 +20,17 @@ export const BOSS_STATS = {
     // physicalDef: defesa contra golpes físicos (lâmina, adaga, tudo o que mostra número branco); magicDef: defesa contra magia (número azul e fogo da tocha).
     // As defesas são em fração do dano que NÃO passa: 0.25 = o chefe leva 25% menos dano desse tipo; 0 = leva tudo. (Número roxo, das sombras, conta como físico.)
     //                    vida    dano  velocidade  physicalDef  magicDef      (onda em que aparece)
-    AZAEL:               { hp: 3000,  damage: 12.7, speed: 110, physicalDef: 0.25, magicDef: 0.10 },   // 3  · Dark Forest   (o rival de quem joga de Demon Hunter, Rowan, Brutos...)
-    DEMON_HUNTER:        { hp: 3000,  damage: 10.9, speed: 58,  physicalDef: 0.20, magicDef: 0.15 },   // 3  · quando você joga de Azael, o rival é o Demon Hunter
-    RIVER_SPIRIT:        { hp: 7000,  damage: 21.2, speed: 33,  physicalDef: 0.10, magicDef: 0.15 },   // 6  · River Crossing
-    SLIZORK:             { hp: 10000,  damage: 32.5, speed: 23,  physicalDef: 0.20, magicDef: 0.00},   // 9  · Swamp
-    GRAVE_KING:          { hp: 15000, damage: 41.1, speed: 32,  physicalDef: 0.25, magicDef: 0.00 },   // 12 · Graveyard
-    BRUTOS:              { hp: 20000, damage: 53.4, speed: 37,  physicalDef: 0.25, magicDef: 0.00 },   // 15 · Village
-    DEMON_LORD:          { hp: 20000, damage: 44.5, speed: 27,  physicalDef: 0.10, magicDef: 0.10 },   // 15 · Village, só para quem joga de Brutos (no lugar dele)
-    BLOOD_COUNTESS:      { hp: 30000, damage: 40.3, speed: 46,  physicalDef: 0.10, magicDef: 0.15 },   // 16 · Castle
-    LONG_NIGHT:          { hp: 50000, damage: 55.0, speed: 32,  physicalDef: 0.10, magicDef: 0.15 },   // 17 · Castle
-    AZAEL_FINAL:         { hp: 60000, damage: 44.7, speed: 144, physicalDef: 0.25, magicDef: 0.10 },   // 18 · Castle (a revanche do Azael)
-    DEMON_HUNTER_FINAL:  { hp: 60000, damage: 38.3, speed: 76,  physicalDef: 0.20, magicDef: 0.15 }    // 18 · Castle (a revanche, quando você joga de Azael)
+    AZAEL:               { hp: 2000,  damage: 12.7, speed: 110, physicalDef: 0.25, magicDef: 0.10 },   // 3  · Dark Forest   (o rival de quem joga de Demon Hunter, Rowan, Brutos...)
+    DEMON_HUNTER:        { hp: 2000,  damage: 10.9, speed: 58,  physicalDef: 0.20, magicDef: 0.15 },   // 3  · quando você joga de Azael, o rival é o Demon Hunter
+    RIVER_SPIRIT:        { hp: 5000,  damage: 21.2, speed: 33,  physicalDef: 0.10, magicDef: 0.15 },   // 6  · River Crossing
+    SLIZORK:             { hp: 7000,  damage: 32.5, speed: 23,  physicalDef: 0.20, magicDef: 0.00},   // 9  · Swamp
+    GRAVE_KING:          { hp: 10000, damage: 41.1, speed: 32,  physicalDef: 0.25, magicDef: 0.00 },   // 12 · Graveyard
+    BRUTOS:              { hp: 12000, damage: 53.4, speed: 37,  physicalDef: 0.25, magicDef: 0.00 },   // 15 · Village
+    DEMON_LORD:          { hp: 15000, damage: 44.5, speed: 27,  physicalDef: 0.10, magicDef: 0.10 },   // 15 · Village, só para quem joga de Brutos (no lugar dele)
+    BLOOD_COUNTESS:      { hp: 20000, damage: 40.3, speed: 46,  physicalDef: 0.10, magicDef: 0.15 },   // 16 · Castle
+    LONG_NIGHT:          { hp: 25000, damage: 55.0, speed: 32,  physicalDef: 0.10, magicDef: 0.15 },   // 17 · Castle
+    AZAEL_FINAL:         { hp: 30000, damage: 44.7, speed: 144, physicalDef: 0.25, magicDef: 0.10 },   // 18 · Castle (a revanche do Azael)
+    DEMON_HUNTER_FINAL:  { hp: 30000, damage: 38.3, speed: 76,  physicalDef: 0.20, magicDef: 0.15 }    // 18 · Castle (a revanche, quando você joga de Azael)
 };
 // Escuridão: por nível acima de 1 (Escuridão 1 = valores de BOSS_STATS). Ex.: hpPerLevel 0.3 = +30% de vida a cada nível (nível 8 = +210%).
 export const BOSS_DARKNESS = { hpPerLevel: 0.3, damagePerLevel: 0.12, speedPerLevel: 0.03 };
