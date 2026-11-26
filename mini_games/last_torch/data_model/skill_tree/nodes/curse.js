@@ -36,5 +36,5 @@ export const CURSE_NODES = [
     { id: 'corpseEvolve', cost: 4, branch: 'curse', kind: 'evolve', key: 'corpseBurst', x: 2, y: 3, requires: [req('corpseBurst', 5)] },
     { id: 'orbitBlades', cost: 4, branch: 'curse', kind: 'power', key: 'orbitBlades', x: 3, y: 3, requires: [req('darkKnowledge', 2)] },
     { id: 'orbitEvolve', cost: 4, branch: 'curse', kind: 'evolve', key: 'orbitBlades', x: 4, y: 3, requires: [req('orbitBlades', 5)] },
-    { id: 'oathRuin', cost: 4, branch: 'curse', kind: 'passive', key: 'oathRuin', oath: true, x: 6, y: 1.5, requires: [req('wrathEvolve'), req('voidRiftEvolve')] }
+    { id: 'oathRuin', cost: 4, branch: 'curse', kind: 'passive', key: 'oathRuin', oath: true, x: 5, y: 1.5, requires: [req('wrathEvolve'), req('voidRiftEvolve')] }
 ];

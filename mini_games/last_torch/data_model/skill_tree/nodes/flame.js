@@ -36,5 +36,5 @@ export const FLAME_NODES = [
     { id: 'flameBlade', cost: 4, exclusive: 'bladeEnchant', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
     // As bolas de fogo vêm depois da espada em chamas: nada mais depende delas (heróis sem adaga as têm seladas e a cadeia segue)
     { id: 'fireballs', cost: 4, needs: 'knives', notFor: ['rowan'], branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
-    { id: 'oathHearth', cost: 4, branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 6, y: 1.5, requires: [req('phoenixReborn'), req('fireRingEvolve')] }
+    { id: 'oathHearth', cost: 4, branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 5, y: 1.5, requires: [req('phoenixReborn'), req('fireRingEvolve')] }
 ];

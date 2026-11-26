@@ -12,13 +12,13 @@ export const SHADOW_NODES = [
     { id: 'featherRain', cost: 2, branch: 'shadow', kind: 'passive', key: 'featherRain', x: 3, y: 0, requires: [req('featherDodge')] },
     { id: 'ravenDecoy', cost: 3, branch: 'shadow', kind: 'passive', key: 'ravenDecoy', x: 4, y: 0, requires: [req('featherRain')] },
     // Linha das adagas, tudo numa linha só: Ricochet -> Death Mark -> Dagger Mastery -> Fan of Knives
-    { id: 'ricochet', cost: 1, needs: 'knives', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 1, requires: [req('moveSpeed')] },
-    { id: 'deathMark', cost: 1, needs: 'knives', branch: 'shadow', kind: 'power', key: 'deathMark', x: 2, y: 1, requires: [req('ricochet', 2)] },
-    { id: 'daggerMastery', cost: 1, needs: 'knives', branch: 'shadow', kind: 'mod', x: 3, y: 1, requires: [req('deathMark', 2)],
+    { id: 'ricochet', cost: 2, needs: 'knives', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 1, requires: [req('moveSpeed')] },
+    { id: 'deathMark', cost: 2, needs: 'knives', branch: 'shadow', kind: 'power', key: 'deathMark', x: 2, y: 1, requires: [req('ricochet', 2)] },
+    { id: 'daggerMastery', cost: 2, needs: 'knives', branch: 'shadow', kind: 'mod', x: 3, y: 1, requires: [req('deathMark', 2)],
       name: 'Dagger Mastery', icon: '🔪', desc: 'Your daggers cut deeper, fly farther and faster, and recharge sooner.',
       levelText: (mods) => `+${formatPercent(mods.knifeDamage)} dagger damage, +${formatPercent(mods.knifeRange)} range, +${formatPercent(mods.knifeSpeed)} speed, ${formatPercent(mods.knifeCooldown)} shorter recharge`,
       mods: { knifeDamage: 0.15, knifeRange: 0.12, knifeSpeed: 0.05, knifeCooldown: 0.06 } },
-    { id: 'fanOfKnives', cost: 1, needs: 'knives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 4, y: 1, requires: [req('daggerMastery', 2)] },
+    { id: 'fanOfKnives', cost: 5, needs: 'knives', branch: 'shadow', kind: 'passive', key: 'fanOfKnives', x: 4, y: 1, requires: [req('daggerMastery', 2)] },
     // Caminho das sombras: Move Speed -> Return Fire -> Shadow Clone -> Umbral Bond (5/5) -> Shadow Legion -> Juramento
     { id: 'mirrorWard', cost: 1, branch: 'shadow', kind: 'passive', key: 'mirrorWard', x: 1, y: 2, requires: [req('moveSpeed')] },
     { id: 'shadowClone', cost: 1, branch: 'shadow', kind: 'passive', key: 'shadowClone', x: 2, y: 2, requires: [req('mirrorWard')] },
@@ -29,5 +29,5 @@ export const SHADOW_NODES = [
     { id: 'phantomEvolve', cost: 1, branch: 'shadow', kind: 'evolve', key: 'phantomDash', x: 2, y: 3, requires: [req('phantomDash', 5)] },
     { id: 'shadowShackle', cost: 3, branch: 'shadow', kind: 'passive', key: 'shadowShackle', x: 3, y: 3, requires: [req('phantomEvolve')] },
     { id: 'smokeBomb', cost: 4, branch: 'shadow', kind: 'passive', key: 'smokeBomb', x: 4, y: 3, requires: [req('shadowShackle')] },
-    { id: 'oathWhispers', cost: 5, branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, x: 6, y: 1.5, requires: [req('shadowCloneEvolve'), req('smokeBomb')] }
+    { id: 'oathWhispers', cost: 5, branch: 'shadow', kind: 'passive', key: 'oathWhispers', oath: true, x: 5, y: 1.5, requires: [req('shadowCloneEvolve'), req('smokeBomb')] }
 ];

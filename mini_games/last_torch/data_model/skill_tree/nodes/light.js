@@ -37,5 +37,5 @@ export const LIGHT_NODES = [
       levelText: (mods, lvl = 1) => `${stacked(lvl, mods.demonDamage)} Light Path damage against elites and bosses`, mods: { demonDamage: 0.1 } },
     { id: 'conversion', cost: 4, hero: 'avgustino', branch: 'light', kind: 'passive', key: 'conversion', x: 3, y: 3, requires: [req('sanctifiedMantle')], },
     { id: 'blessedBlade', cost: 3, exclusive: 'bladeEnchant', hero: 'avgustino', branch: 'light', kind: 'passive', key: 'blessedBlade', x: 4, y: 3, requires: [req('conversion')] },
-    { id: 'oathFaith', cost: 3, branch: 'light', kind: 'passive', key: 'oathFaith', oath: true, x: 6, y: 1.5, requires: [req('angelEvolve'), req('divineGrace')] }
+    { id: 'oathFaith', cost: 3, branch: 'light', kind: 'passive', key: 'oathFaith', oath: true, x: 5, y: 1.5, requires: [req('angelEvolve'), req('divineGrace')] }
 ];

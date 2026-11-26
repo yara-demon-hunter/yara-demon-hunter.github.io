@@ -70,7 +70,7 @@ export const ROWAN = {
         // ===== DAGGER: a adaga (dano x alcance) =====
         knifeRange: 250,            // alcance da rosa, px
         knifeDamage: 0,             // dano da rosa, bônus em %
-        knifeCooldown: 0.9,         // segundos entre adagas
+        knifeCooldown: 1.8,         // segundos entre adagas
         knifeSpeed: 520,            // velocidade da adaga em voo, px/s
         knifeDamageRatio: 0.8,      // dano da adaga = dano de cada golpe x este número
         knifeKnockbackRatio: 0.8,   // empurrão da adaga = empurrão do golpe x este número

@@ -1,7 +1,7 @@
 // --- RAMOS (caminhos) DA ÁRVORE: nome, cor, ícone, layout da tela e afinidade dos heróis ---
 export const TREE_LAYOUT = {
     labelWidth: 1.5,            // coluna do nome do ramo, em células
-    tiers: 7,
+    tiers: 6,
     branchGap: 0.3
 };
 

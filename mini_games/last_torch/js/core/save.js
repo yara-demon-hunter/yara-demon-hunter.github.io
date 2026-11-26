@@ -24,7 +24,7 @@ function createSave() {
             bestNightKills: 0, bestNightStars: 0, bestNightEmbers: 0   // recordes de uma noite (tela final)
         },
         // quickPickChosen: o jogador já ligou ou desligou a escolha ao subir de nível em Settings; sem isso vale o padrão (data_model/start.js)
-        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, moveKeys: false, quickPick: START.quickPickDefault, quickPickChosen: false, touch: { scale: 1, positions: {} } },
+        settings: { muted: false, music: true, sfx: true, shake: true, numbers: true, moveKeys: false, autoShoot: true, quickPick: START.quickPickDefault, quickPickChosen: false, touch: { scale: 1, positions: {} } },
         seenTutorial: false,
         seenTreeHint: false,
         embers: 0,                  // Brasas: a moeda que fica entre as noites (data_model/embers.js)

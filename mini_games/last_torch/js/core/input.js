@@ -1,6 +1,7 @@
 import { tryDash } from '../systems/dash.js';
 import { screenToWorld } from './resize.js';
 import { mod } from '../systems/modifiers.js';
+import { autoShootOn } from '../systems/knives.js';
 import { save } from './save.js';
 import { audio, canvas, joystick, keys, player, state } from './state.js';
 
@@ -173,22 +174,66 @@ function aimKnife(clientX, clientY) {
     state.knifeInput.y = y;
 }
 
+// Mira do mouse como o botão da adaga: perto de onde clicou, mira automática (0, 0); afastando o mouse mais que a zona morta, aponta do herói ao cursor
+let mouseAim = null;
+const MOUSE_DEAD_ZONE = 40;
+function dragMouseAim(clientX, clientY) {
+    const { stick } = state.knifeInput;
+    if (Math.hypot(clientX - mouseAim.x, clientY - mouseAim.y) < MOUSE_DEAD_ZONE) {
+        stick.x = 0;
+        stick.y = 0;
+        return;
+    }
+    const w = screenToWorld(clientX, clientY);
+    const dx = w.x - player.x, dy = w.y - player.y, len = Math.hypot(dx, dy) || 1;
+    stick.x = dx / len;
+    stick.y = dy / len;
+}
+function releaseMouseAim(fire) {
+    if (!mouseAim) return;
+    mouseAim = null;
+    const { stick } = state.knifeInput;
+    stick.active = false;
+    if (fire) {
+        stick.fire = true;
+    } else {
+        stick.x = 0;
+        stick.y = 0;
+        stick.fire = false;
+        state.knifeCharge = 0;
+    }
+}
+
 export function setupInput() {
     window.addEventListener('mousemove', (e) => {
         if (state.gameState !== 'PLAYING') return;
         setTarget(e.clientX, e.clientY);
         aimKnife(e.clientX, e.clientY);
+        if (mouseAim) dragMouseAim(e.clientX, e.clientY);
     });
 
     // Faca: botão esquerdo no canvas arremessa na direção do cursor; segurar repete na recarga
     canvas.addEventListener('mousedown', (e) => {
         if (e.button !== 0 || state.gameState !== 'PLAYING') return;
         aimKnife(e.clientX, e.clientY);
+        // Mira automática (padrão): o clique funciona como o botão da adaga do celular (monstro mais perto; arrastar mira; o tiro sai ao soltar)
+        if (autoShootOn()) {
+            mouseAim = { x: e.clientX, y: e.clientY };
+            state.knifeInput.stick.active = true;
+            state.knifeInput.stick.fire = false;
+            state.knifeInput.stick.x = 0;
+            state.knifeInput.stick.y = 0;
+            return;
+        }
         state.knifeInput.held = true;
     });
     window.addEventListener('mouseup', (e) => {
-        if (e.button === 0) state.knifeInput.held = false;
+        if (e.button !== 0) return;
+        state.knifeInput.held = false;
+        releaseMouseAim(state.gameState === 'PLAYING');
     });
+    window.addEventListener('blur', () => releaseMouseAim(false));
+    touchReleases.push(() => releaseMouseAim(false));
 
     // Botão direito: dash na direção do cursor
     window.addEventListener('contextmenu', (e) => e.preventDefault());

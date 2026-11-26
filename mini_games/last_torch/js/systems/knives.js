@@ -14,6 +14,7 @@ import { markWithRose } from './skills_nature.js';
 import { characterStat, getKnifeBaseRange, isMagicKnife, getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
 import { getHero } from './modifiers.js';
 import { beamActive } from './fury.js';
+import { save } from '../core/save.js';
 
 // O que o herói lança: adaga, ou a rosa do Rowan (a Rosa Negra, com a skill Dark Roses). Só muda o desenho: dano, alcance e
 // todas as skills de adaga valem igual para a rosa
@@ -158,6 +159,15 @@ function getFireCharge() {
 export function getKnifeChargeRatio() {
     const charge = getFireCharge();
     return charge ? Math.min(1, state.knifeCharge / charge.seconds) : 0;
+}
+
+// --- MIRA AUTOMÁTICA (PC) ---
+// Padrão no PC, igual ao botão da adaga do celular (core/input.js liga o mouse ao mesmo "stick"): clicar e soltar atira no monstro mais perto;
+// segurar mostra o riscado tracejado e, se o mouse se afastar de onde clicou, mira na direção do cursor; o tiro sai ao soltar. Settings >
+// autoShoot desliga e volta ao modo antigo (clicar atira no cursor, segurar repete). Heróis de habilidade segurada (machado, raízes, runas) não usam.
+const COARSE = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+export function autoShootOn() {
+    return save.settings.autoShoot && !COARSE && mod('noKnives') <= 0 && mod('axeQuake') <= 0 && mod('rootSnare') <= 0 && mod('runeShield') <= 0;
 }
 
 // Botão da adaga (toque): arrastando mira na direção do arraste. Num toque rápido a mira é automática:

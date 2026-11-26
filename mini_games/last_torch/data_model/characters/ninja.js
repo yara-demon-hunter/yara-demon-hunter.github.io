@@ -65,7 +65,7 @@ export const NINJA = {
         // ===== DAGGER: a adaga (dano x alcance) =====
         knifeRange: 310,            // alcance da adaga, px (valor absoluto)
         knifeDamage: 0,             // dano da adaga, bônus em % (soma ao attackDamage)
-        knifeCooldown: 0.55,         // segundos entre adagas
+        knifeCooldown: 1.0,         // segundos entre adagas
         knifeSpeed: 640,            // velocidade da adaga em voo, px/s
         knifeDamageRatio: 0.7,      // dano da adaga = dano de cada golpe x este número
         knifeKnockbackRatio: 0.8,   // empurrão da adaga = empurrão do golpe x este número

@@ -30,5 +30,5 @@ export const NATURE_NODES = [
     { id: 'rosePetals', cost: 4, branch: 'nature', kind: 'passive', key: 'rosePetals', x: 3, y: 3, requires: [req('whipEvolve')] },
     { id: 'darkRoses', cost: 3, hero: 'rowan', branch: 'nature', kind: 'passive', key: 'darkRoses', x: 4, y: 3, requires: [req('rosePetals')] },
 
-    { id: 'oathWild', cost: 3, branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 6, y: 1.5, requires: [req('thornEvolve'), req('leechEvolve')] }
+    { id: 'oathWild', cost: 3, branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 5, y: 1.5, requires: [req('thornEvolve'), req('leechEvolve')] }
 ];

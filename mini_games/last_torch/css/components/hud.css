@@ -420,7 +420,7 @@
     #hudStreak i { width: 3.4rem; height: 0.14rem; }
 }
 
-/* Lembrete do mouse no começo da hora 1: entra, pulsa para chamar atenção e some aos poucos */
+/* Lembrete do mouse no começo da hora 1 (15 s): entra, pulsa para chamar atenção e some aos poucos */
 #mouseHint {
     display: none;
     position: fixed;
@@ -437,13 +437,15 @@
     white-space: nowrap;
     pointer-events: none;
 }
-#mouseHint.is-showing { display: flex; animation: mouse-hint 11s ease-out forwards; }
+#mouseHint.is-showing { display: flex; animation: mouse-hint 15s ease-out forwards; }
 #mouseHint .mouse-figure { width: 1.7rem; }
-#mouseHint .mouse-left { animation: mouse-click 1.6s ease-in-out 0.6s 4; }
-#mouseHint .mouse-right { animation: mouse-click 1.6s ease-in-out 1.4s 4; }
+#mouseHint .mouse-left { animation: mouse-click 1.6s ease-in-out 0.6s 6; }
+#mouseHint .mouse-right { animation: mouse-click 1.6s ease-in-out 1.4s 6; }
+.mh-left { color: #67e8f9; text-align: right; line-height: 1.35; }
+.mh-left b { color: #67e8f9; }
 @keyframes mouse-hint {
     0% { opacity: 0; }
-    6%, 60% { opacity: 1; }
+    5%, 70% { opacity: 1; }
     100% { opacity: 0; }
 }
 @keyframes mouse-click {

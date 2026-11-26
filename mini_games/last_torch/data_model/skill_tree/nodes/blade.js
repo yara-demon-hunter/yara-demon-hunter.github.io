@@ -28,5 +28,5 @@ export const BLADE_NODES = [
       mods: { damageTaken: -0.04, provoke: 0.25 } },
     { id: 'bloodEdge', cost: 3, branch: 'blade', kind: 'power', key: 'bloodEdge', x: 3, y: 3, requires: [req('playerHp', 2)] },
     { id: 'warCry', cost: 4, branch: 'blade', kind: 'passive', key: 'warCry', x: 4, y: 3, requires: [req('bloodEdge')] },
-    { id: 'oathSlaughter', cost: 4, branch: 'blade', kind: 'passive', key: 'oathSlaughter', oath: true, x: 6, y: 1.5, requires: [req('executioner'), req('earthbreakerEvolve')] }
+    { id: 'oathSlaughter', cost: 4, branch: 'blade', kind: 'passive', key: 'oathSlaughter', oath: true, x: 5, y: 1.5, requires: [req('executioner'), req('earthbreakerEvolve')] }
 ];
