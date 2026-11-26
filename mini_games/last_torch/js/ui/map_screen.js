@@ -311,7 +311,10 @@ export function openMapView() {
             state.gameState = 'PLAYING';
             audio.setPaused(false);
         }
-    }, { canReplay: state.turn > 1 && !state.replay && (from === 'CAMP' || state.phase === 'HUNT'), duringHunt: from === 'PLAYING' });
+    // TREINO DESLIGADO (nov/2026): jogar uma onda de novo deixava o herói forte demais tirar ★★★ nas ondas fáceis (troféu Constellation). Para voltar, troque
+    // `canReplay: false` pela linha comentada e apague o `return false` do começo de startWaveReplay (js/systems/night.js).
+    // }, { canReplay: state.turn > 1 && !state.replay && (from === 'CAMP' || state.phase === 'HUNT'), duringHunt: from === 'PLAYING' });
+    }, { canReplay: false, duringHunt: from === 'PLAYING' });
 }
 
 export function setupMapScreen() {

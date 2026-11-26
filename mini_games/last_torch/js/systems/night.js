@@ -204,6 +204,7 @@ function finishHour() {
 // Perder também volta ao acampamento, sem perder a noite.
 const BACK_KEYS = ['turn', 'nextOmen', 'coins', 'skillPoints', 'playerXp', 'playerMaxXp', 'playerLevel', 'levelPointsCarry', 'totalScore', 'revives', 'secondWind', 'rushPaid'];
 export function startWaveReplay(wave) {
+    return false;       // TREINO DESLIGADO (nov/2026, ver canReplay em js/ui/map_screen.js): apague esta linha para voltar. O resto do código do treino segue aqui, intacto
     // No acampamento, ou no meio da caçada (o mapa também abre na batalha): neste caso a onda em andamento recomeça quando o treino acaba
     const fromHunt = state.gameState === 'PLAYING' && state.phase === 'HUNT';
     if ((state.gameState !== 'CAMP' && !fromHunt) || state.replay || !(wave >= 1 && wave < state.turn)) return false;

@@ -24,7 +24,7 @@ export const BOSS_STATS = {
     DEMON_HUNTER:        { hp: 4000,  damage: 4.7, speed: 70,  physicalDef: 0.20, magicDef: 0.15 },   // 3  · quando você joga de Azael, o rival é o Demon Hunter
     RIVER_SPIRIT:        { hp: 10000,  damage: 4, speed: 50,  physicalDef: 0.15, magicDef: 0.15 },   // 6  · River Crossing
     SLIZORK:             { hp: 17000,  damage: 10, speed: 23,  physicalDef: 0.3, magicDef: 0.00},   // 9  · Swamp
-    GRAVE_KING:          { hp: 25000, damage: 35, speed: 60,  physicalDef: 0.25, magicDef: 0.00 },   // 12 · Graveyard
+    GRAVE_KING:          { hp: 35000, damage: 45, speed: 60,  physicalDef: 0.25, magicDef: 0.10 },   // 12 · Graveyard
     BRUTOS:              { hp: 34000, damage: 53.4, speed: 37,  physicalDef: 0.25, magicDef: 0.00 },   // 15 · Village
     DEMON_LORD:          { hp: 34000, damage: 44.5, speed: 27,  physicalDef: 0.10, magicDef: 0.10 },   // 15 · Village, só para quem joga de Brutos (no lugar dele)
     BLOOD_COUNTESS:      { hp: 45000, damage: 40.3, speed: 75,  physicalDef: 0.2, magicDef: 0.2 },   // 16 · Castle

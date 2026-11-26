@@ -15,10 +15,12 @@ export const WORLD = {
     //   1.3 = 30% mais área visível; herói, monstros e cenário ficam ~23% menores na tela
     //   0.8 = mais "perto": menos área, tudo maior na tela
     //   Os objetos mantêm suas proporções entre si; só o espaço ao redor muda.
-    // minAspect/maxAspect: limites da proporção lado maior / lado menor; fora deles sobram faixas
+    // minAspect/maxAspect: limites da proporção lado maior / lado menor; fora deles sobram faixas.
+    //   O DESKTOP TRAVA em 16:9 (mundo sempre 1664x936, o do Ateliê): as áreas de contato dos cenários (o rio, a ponte...) são desenhadas nesse mundo; com a largura
+    //   variando, a água e a ponte (que não esticam igual) saíam do lugar e o herói entrava na água. Outras proporções ganham faixas escuras nas laterais ou em cima/embaixo.
     // maxPixelRatio / maxCanvasPixels: teto da resolução interna do canvas. A tela estica a imagem e o
     // HUD continua nítido; pintar menos pixels é o que mais alivia celulares e notebooks.
-    desktop: { shortSide: 720, areaScale: 1.3, minAspect: 1.3, maxAspect: 1.9, maxPixelRatio: 1.25, maxCanvasPixels: 1100000 },
+    desktop: { shortSide: 720, areaScale: 1.3, minAspect: 16 / 9, maxAspect: 16 / 9, maxPixelRatio: 1.25, maxCanvasPixels: 1100000 },
     // No celular o mundo é menor: o herói e os monstros ficam maiores na tela
     mobile: { shortSide: 480, areaScale: 1.3, minAspect: 1.3, maxAspect: 2.3, maxPixelRatio: 1, maxCanvasPixels: 420000 },
 
