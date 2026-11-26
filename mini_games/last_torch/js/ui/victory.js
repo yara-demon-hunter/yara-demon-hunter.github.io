@@ -1,6 +1,6 @@
 // --- TELA DE VITÓRIA (o jogador zerou a noite) ---
 // No lugar do resumo comum (HUNT AGAIN): um final de verdade. O herói em destaque com os números da noite
-// (pontos, mortes, nível, skills, bosses, Brasas, tempo, estrelas), as 18 ondas com as estrelas tiradas em cada uma e um botão
+// (pontos, mortes, nível, pontos de skill ganhos, bosses, Brasas, tempo, estrelas), as 18 ondas com as estrelas tiradas em cada uma e um botão
 // só, MENU. Aparece depois do cartão de resultado da última onda (o amanhecer espera ele fechar). Estilo: css/components/victory.css.
 import { audio } from '../core/state.js';
 import { showToast } from './banner.js';
@@ -20,7 +20,7 @@ export function showVictory({ hero, darkness, waves, stats, rank, onMenu }) {
         ['🏆', 'Score', stats.score],
         ['💀', 'Kills', stats.kills],
         ['⭐', 'Max level', stats.level],
-        ['✨', 'Skills learned', stats.skills],
+        ['✨', 'Skill points', stats.skillPoints],
         ['👑', 'Bosses', stats.bosses],
         ['🔥', 'Embers', stats.embers],
         ['⚡', 'Best streak', stats.streak],

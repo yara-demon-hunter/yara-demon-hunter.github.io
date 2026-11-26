@@ -6,10 +6,11 @@ import { ACTIVE_HEROES, HEROES } from '/data_model/heroes.js';
 import { save } from '/js/core/save.js';
 import { audio, joystick, player, state } from '/js/core/state.js';
 import { update } from '/js/game.js';
-import { buyNode, getBuyableNodes } from '/js/systems/tree.js';
+import { buyNode, getBuyableNodes, getSpentSkillPoints } from '/js/systems/tree.js';
 import { leaveCamp } from '/js/ui/camp.js';
 import { continueRun, startGame } from '/js/ui/screens.js';
 import { loadRun, runPlace } from '/js/core/run_save.js';
+import { refreshModifiers } from '/js/systems/modifiers.js';
 
 const SPEEDS = [1, 2, 4, 10, 20, 50];           // trocáveis a qualquer momento, pela barra sobre o jogo
 const STEP = 1 / 60;
@@ -40,6 +41,7 @@ export function mountFastRun(host, { hidePanel, showPanel, onStart }) {
         try { localStorage.setItem(FAST_KEY, JSON.stringify({ hero: choice.hero, god: q('#sbFastGod').checked, speed: run.speed, auto: run.auto })); } catch { /* sem armazenamento: só não lembra */ }
     }
     run.saveFast = saveFast;
+    run.onGod = (on) => { q('#sbFastGod').checked = on; saveFast(); };        // a caixa da barra também muda a do painel (e fica lembrada)
     function applyFast(d) {
         choice.hero = ACTIVE_HEROES.includes(d.hero) ? d.hero : ACTIVE_HEROES[0];
         q('#sbFastGod').checked = d.god !== false;
@@ -88,14 +90,8 @@ export function mountFastRun(host, { hidePanel, showPanel, onStart }) {
         // Herói: só na memória desta página (o save não é gravado)
         if (!save.unlockedHeroes.includes(choice.hero)) save.unlockedHeroes.push(choice.hero);
         save.hero = choice.hero;
-        if (run.heroMods) { HEROES[run.heroMods.key].mods = run.heroMods.mods; run.heroMods = null; }
-        if (q('#sbFastGod').checked) {
-            const h = HEROES[choice.hero];
-            run.heroMods = { key: choice.hero, mods: h.mods };
-            h.mods = { ...h.mods, damageTaken: -0.9 };
-        }
-        run.god = q('#sbFastGod').checked;
-        run.godTorch = run.god;
+        setGod(q('#sbFastGod').checked, choice.hero);
+        bar.querySelector('#sbBarGod').checked = run.god;
         run.over = null;
         waves.length = 0;
         run.autoCamp = false;
@@ -134,6 +130,7 @@ bar.innerHTML = `
   <div class="sb-speed-info">
     <label><input type="checkbox" id="sbBarAuto" checked> autopilot</label>
     <label title="The autopilot also leaves the camp by itself"><input type="checkbox" id="sbBarCamp"> auto camp</label>
+    <label title="Hero and torch cannot die (can be changed during the run)"><input type="checkbox" id="sbBarGod"> never die</label>
     <button id="sbBarStop" title="Stop the fast run bar">✕</button></div>`;
 document.body.appendChild(bar);
 const barSpeeds = bar.querySelector('#sbBarSpeeds');
@@ -146,6 +143,20 @@ SPEEDS.forEach((s) => {
 });
 bar.querySelector('#sbBarAuto').onchange = (e) => { run.auto = e.target.checked; run.saveFast?.(); };
 bar.querySelector('#sbBarCamp').onchange = (e) => { run.autoCamp = e.target.checked; };
+bar.querySelector('#sbBarGod').onchange = (e) => { setGod(e.target.checked, save.hero); run.onGod?.(e.target.checked); };
+
+// Never die: vida e tocha sempre cheias (o tick abaixo) e o herói quase não leva dano. Trocável no meio da partida: desligar devolve os modificadores do herói
+function setGod(on, heroKey) {
+    if (run.heroMods) { HEROES[run.heroMods.key].mods = run.heroMods.mods; run.heroMods = null; }
+    if (on) {
+        const h = HEROES[heroKey];
+        run.heroMods = { key: heroKey, mods: h.mods };
+        h.mods = { ...h.mods, damageTaken: -0.9 };
+    }
+    run.god = on;
+    run.godTorch = on;
+    refreshModifiers();
+}
 bar.querySelector('#sbBarStop').onclick = () => { run.active = false; setSpeed(1); bar.classList.add('hidden'); };
 
 function setSpeed(s) {
@@ -165,7 +176,7 @@ let dialogueTimer = 0;
 function autopilot() {
     if (state.gameState === 'GAMEOVER') {
         if (!run.over) {
-            run.over = { wave: state.turn, kills: state.run?.kills ?? 0, seconds: Math.round((performance.now() - run.startedAt) / 1000) };
+            run.over = { wave: state.turn, kills: state.run?.kills ?? 0, seconds: Math.round((performance.now() - run.startedAt) / 1000), skillPoints: getSpentSkillPoints() + state.skillPoints };
             setSpeed(1);
         }
         return;
@@ -246,11 +257,11 @@ function updateInfo() {
     times.textContent = waves.length ? waves.map((w) => `W${w.wave} ${mmss(w.seconds)}`).join(' · ') + `  (total ${mmss(waves.reduce((a, w) => a + w.seconds, 0))})` : 'Finished waves: (none yet)';
     const info = bar.querySelector('#sbBarInfo');
     if (run.over) {
-        info.textContent = `☠ Run over: wave ${run.over.wave}, ${run.over.kills} kills, ${run.over.seconds}s real time`;
+        info.textContent = `☠ Run over: wave ${run.over.wave}, ${run.over.kills} kills, ${run.over.seconds}s real time · ⚡ ${run.over.skillPoints ?? 0} skill points`;
         return;
     }
     const state_ = state.gameState === 'PLAYING' ? '' : ` (${state.gameState.toLowerCase()})`;
-    info.textContent = `Wave ${state.turn} · ${mmss(state.waveTime)} · ${state.run?.kills ?? 0} kills · lvl ${state.playerLevel}${state_}`;
+    info.textContent = `Wave ${state.turn} · ${mmss(state.waveTime)} · ${state.run?.kills ?? 0} kills · lvl ${state.playerLevel} · ⚡ ${getSpentSkillPoints() + state.skillPoints} skill points (${state.skillPoints} unspent)${state_}`;
 }
 requestAnimationFrame(tick);
 

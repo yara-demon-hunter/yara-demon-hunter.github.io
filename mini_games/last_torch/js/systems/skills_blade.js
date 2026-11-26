@@ -138,11 +138,11 @@ function slamImpact() {
     const M = POWER_MODELS.earthbreaker;
     const { x, y } = player;
     const evolved = powers.earthbreaker.evolved;
-    quake(x, y, P.radius, getBladeDamage() * P.damage, M.knockback, M.stunSeconds);
-    addCracks(x, y, P.radius * 1.1, evolved);
-    addShockwave(x, y, { radius: P.radius, color: '#e7e0cf', width: 12, seconds: 0.4 });
-    addShockwave(x, y, { radius: P.radius * 0.6, color: '#fb923c', width: 6, seconds: 0.3 });
-    addGibs('ROCK', x, y, 1 + P.radius / 120);
+    quake(x, y, level.radius, getBladeDamage() * level.damage, M.knockback, M.stunSeconds);
+    addCracks(x, y, level.radius * 1.1, evolved);
+    addShockwave(x, y, { radius: level.radius, color: '#e7e0cf', width: 12, seconds: 0.4 });
+    addShockwave(x, y, { radius: level.radius * 0.6, color: '#fb923c', width: 6, seconds: 0.3 });
+    addGibs('ROCK', x, y, 1 + level.radius / 120);
     createExplosion(x, y, '#a8a29e', 14);
     shakeScreen(14);
     hitStop(0.08);
@@ -152,11 +152,11 @@ function slamImpact() {
     if (!evolved) return;
     const E = EVOLUTIONS.earthbreaker;
     for (let i = 1; i <= E.aftershocks; i++) {
-        state.aftershocks.push({ x, y, delay: i * E.aftershockSeconds, radius: P.radius + i * E.aftershockStep, damage: P.damage * E.aftershockDamage });
+        state.aftershocks.push({ x, y, delay: i * E.aftershockSeconds, radius: level.radius + i * E.aftershockStep, damage: level.damage * E.aftershockDamage });
     }
     for (let i = 0; i < E.lava.count; i++) {
         const a = (i / E.lava.count) * TAU + Math.random() * 0.5;
-        const r = P.radius * (0.45 + Math.random() * 0.5);
+        const r = level.radius * (0.45 + Math.random() * 0.5);
         addGroundFire(x + Math.cos(a) * r, y + Math.sin(a) * r * 0.82, { life: E.lava.life, radius: E.lava.radius, dps: E.lava.dps, evolved: true });
     }
 }
@@ -182,7 +182,7 @@ function updateEarthbreaker(dt) {
     timers.earthbreaker = (timers.earthbreaker ?? level.cooldown * 0.4) - dt;
     // Pronto, espera ter alguém perto: o golpe nunca é gasto no vazio
     if (timers.earthbreaker > 0 || player.move || player.dashTimer > 0 || isFireCasting()) return;
-    const near = state.enemies.some(e => Math.hypot(e.x - player.x, e.y - player.y) < P.radius * 0.8 + e.radius);
+    const near = state.enemies.some(e => Math.hypot(e.x - player.x, e.y - player.y) < level.radius * 0.8 + e.radius);
     if (!near) return;
     timers.earthbreaker = level.cooldown;
     startMove('slam', slamImpact);

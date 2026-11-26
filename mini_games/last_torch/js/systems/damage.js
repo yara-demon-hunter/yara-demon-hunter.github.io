@@ -1,6 +1,7 @@
 import { BLUE_TORCH, SHADOW_RAVEN, SMOKE_BOMB } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
 import { JUICE_VISUALS as J } from '../../data_model/visuals/effects/juice_visual.js';
+import { BOSS_KNOCKBACK } from '../../data_model/bosses.js';
 import { audio, player, powers, state } from '../core/state.js';
 import { syncBossBar } from '../ui/hud.js';
 import { addDamageNumber, addShockwave, createExplosion, hitStop, shakeScreen } from './effects.js';
@@ -27,16 +28,24 @@ function inSmoke(e) {
     return false;
 }
 
+// Empurrão de um golpe (o.kbX, o.kbY): o monstro perde a fração knockbackResist dele. O chefe tem ainda um teto para o empurrão acumulado
+// (BOSS_KNOCKBACK.maxSpeedRatio, em bosses.js): vários golpes seguidos não o fazem andar para trás mais rápido do que ele anda para a frente
+function pushMonster(e, o) {
+    const resist = 1 - (e.knockbackResist ?? 0);
+    e.vx += (o.kbX ?? 0) * resist;
+    e.vy += (o.kbY ?? 0) * resist;
+    if (e.isBoss) {
+        const cap = (e.speed ?? 0) * BOSS_KNOCKBACK.maxSpeedRatio, v = Math.hypot(e.vx, e.vy);
+        if (v > cap) { e.vx *= cap / v; e.vy *= cap / v; }
+    }
+}
+
 export function dealDamage(e, amount, o = {}) {
     // Imune enquanto investe (lungeState 2 = o dash do Wraith e do Zombie Wolf): a resposta ao golpe é desviar, não trocar tiro
     if (e.hp <= 0 || e.invulnerable || e.lungeState === 2) return 0;
     // Golpe sem dano (a Fúria sob o Oath of the Wild): só empurra, sem piscar nem número
     if (amount <= 0) {
-        if (o.kbX || o.kbY) {
-            const resist = 1 - (e.knockbackResist ?? 0);
-            e.vx += (o.kbX ?? 0) * resist;
-            e.vy += (o.kbY ?? 0) * resist;
-        }
+        pushMonster(e, o);
         return 0;
     }
     const crit = o.crit || (!o.noCrit && (Math.random() < getCritChance() || (inSmoke(e) && Math.random() < SMOKE_BOMB.critChance)));
@@ -62,9 +71,7 @@ export function dealDamage(e, amount, o = {}) {
     if (!o.quiet && player.hp > 0 && mod('lifeSteal') > 0) player.hp = Math.min(player.maxHp, player.hp + dmg * mod('lifeSteal'));
 
     if (o.kbX || o.kbY) {
-        const resist = 1 - (e.knockbackResist ?? 0);
-        e.vx += (o.kbX ?? 0) * resist;
-        e.vy += (o.kbY ?? 0) * resist;
+        pushMonster(e, o);
         e.recoilX = Math.sign(o.kbX ?? 0);
         e.recoilY = Math.sign(o.kbY ?? 0);
     }

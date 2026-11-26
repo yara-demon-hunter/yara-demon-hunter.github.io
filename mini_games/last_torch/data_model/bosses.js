@@ -20,11 +20,11 @@ export const BOSS_STATS = {
     // physicalDef: defesa contra golpes físicos (lâmina, adaga, tudo o que mostra número branco); magicDef: defesa contra magia (número azul e fogo da tocha).
     // As defesas são em fração do dano que NÃO passa: 0.25 = o chefe leva 25% menos dano desse tipo; 0 = leva tudo. (Número roxo, das sombras, conta como físico.)
     //                    vida    dano  velocidade  physicalDef  magicDef      (onda em que aparece)
-    AZAEL:               { hp: 4000,  damage: 5.7, speed: 100, physicalDef: 0.25, magicDef: 0.10 },   // 3  · Dark Forest   (o rival de quem joga de Demon Hunter, Rowan, Brutos...)
-    DEMON_HUNTER:        { hp: 4000,  damage: 5.7, speed: 70,  physicalDef: 0.20, magicDef: 0.15 },   // 3  · quando você joga de Azael, o rival é o Demon Hunter
-    RIVER_SPIRIT:        { hp: 10000,  damage: 5.2, speed: 50,  physicalDef: 0.10, magicDef: 0.15 },   // 6  · River Crossing
-    SLIZORK:             { hp: 7000,  damage: 32.5, speed: 23,  physicalDef: 0.20, magicDef: 0.00},   // 9  · Swamp
-    GRAVE_KING:          { hp: 10000, damage: 41.1, speed: 32,  physicalDef: 0.25, magicDef: 0.00 },   // 12 · Graveyard
+    AZAEL:               { hp: 4000,  damage: 4.7, speed: 100, physicalDef: 0.25, magicDef: 0.10 },   // 3  · Dark Forest   (o rival de quem joga de Demon Hunter, Rowan, Brutos...)
+    DEMON_HUNTER:        { hp: 4000,  damage: 4.7, speed: 70,  physicalDef: 0.20, magicDef: 0.15 },   // 3  · quando você joga de Azael, o rival é o Demon Hunter
+    RIVER_SPIRIT:        { hp: 10000,  damage: 4, speed: 50,  physicalDef: 0.15, magicDef: 0.15 },   // 6  · River Crossing
+    SLIZORK:             { hp: 17000,  damage: 10, speed: 23,  physicalDef: 0.3, magicDef: 0.00},   // 9  · Swamp
+    GRAVE_KING:          { hp: 25000, damage: 35, speed: 60,  physicalDef: 0.25, magicDef: 0.00 },   // 12 · Graveyard
     BRUTOS:              { hp: 12000, damage: 53.4, speed: 37,  physicalDef: 0.25, magicDef: 0.00 },   // 15 · Village
     DEMON_LORD:          { hp: 15000, damage: 44.5, speed: 27,  physicalDef: 0.10, magicDef: 0.10 },   // 15 · Village, só para quem joga de Brutos (no lugar dele)
     BLOOD_COUNTESS:      { hp: 20000, damage: 40.3, speed: 46,  physicalDef: 0.10, magicDef: 0.15 },   // 16 · Castle
@@ -491,8 +491,10 @@ export function chooseBossType(turn, heroModel = 'hunter') {
     return slot ?? null;
 }
 
-// Boss segura o empurrão: perde 85% dele (um monstro comum leva o empurrão inteiro). Quem tiver knockbackResist próprio usa o seu
-const BOSS_KNOCKBACK_RESIST = 0.85;
+// Empurrão no chefe (js/systems/damage.js, pushMonster). resist: ele perde essa fração de cada empurrão (um monstro comum leva inteiro; quem tiver
+// knockbackResist próprio usa o seu). maxSpeedRatio: o teto da velocidade de empurrão acumulada, em fração da velocidade de andar dele. Sem o teto, tiros
+// seguidos somavam empurrões e o chefe andava para trás mais rápido do que avançava (nunca chegava no herói); com 0.5 ele sempre avança pelo menos metade da sua velocidade.
+export const BOSS_KNOCKBACK = { resist: 0.85, maxSpeedRatio: 0.5 };
 
 // Cria o chefe com os números de BOSS_STATS, BOSS_GLOBAL e a Escuridão (darkness: o nível escolhido, 1 = normal). Sem curva por onda.
 export function createBoss(type, turn, x, y, random = Math.random, darkness = 1) {
@@ -509,7 +511,7 @@ export function createBoss(type, turn, x, y, random = Math.random, darkness = 1)
         speed: model.speed * BOSS_GLOBAL.speed * (1 + BOSS_DARKNESS.speedPerLevel * level),
         physicalDefense: model.physicalDef ?? 0,    // fração do dano físico / mágico que o chefe não leva (BOSS_STATS); js/systems/damage.js aplica
         magicDefense: model.magicDef ?? 0,
-        knockbackResist: model.knockbackResist ?? BOSS_KNOCKBACK_RESIST,
+        knockbackResist: model.knockbackResist ?? BOSS_KNOCKBACK.resist,
         unstoppable: !!model.unstoppable,     // não é atrasado, preso nem empurrado (Captain Brutos)
         isBoss: true,
         name: model.name

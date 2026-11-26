@@ -59,3 +59,14 @@ Quarta aba do painel (**🖼️ Screens**): abre uma tela do jogo na hora, com o
 ### 💾 SAVE TO THE GAME FILE (HUD tuner)
 
 O botão **💾 SAVE TO THE GAME FILE** grava os ajustes direto em `data_model/fluid_layout.js` (precisa abrir o sandbox por `serve.py`): cada tela ajustada vira (ou atualiza) um ponto de referência da tabela, e os ajustes saem do tuner, porque agora fazem parte do jogo. Só as peças que você mexeu mudam; o resto da tabela fica igual. Não grava: peça escondida ("Hide it") e a dica do mouse (não existem na tabela). O botão **Map** e o botão **Controls (🎮)** são peças independentes. 📋 Copy continua existindo para colar na conversa.
+
+## Aba Boss balance (balancear chefes com um bot)
+
+Última aba do painel (**⚖️ Boss balance**): um bot sem inteligência (fica perto da tocha, ataca o mais próximo, nunca desvia) luta contra o chefe e a barra sobre o jogo mostra quanto da vida dele foi tirada. Regra de bolso: se o bot tira **metade** da vida no automático, um jogador que desvia passa (a marca amarela na barra e o campo "Passes if…" são esse limite; muda-se à vontade).
+
+- Escolha **herói**, **chefe**, os **caminhos de skill** que o bot sorteia (marcados = só compra nesses ramos, ao acaso) e os **pontos de skill** (o padrão é a medição feita à mão, por onda do chefe: 30, 58, 84, 123, 167, 182, 194 e 208 nas ondas 3, 6, 9, 12, 15, 16, 17 e 18; mudou o número, ele fica guardado por chefe).
+- **Boss numbers:** vida, dano, velocidade, defesa física e mágica. Valem só nesta página (o jogo não é alterado); campos mudados ficam com borda laranja, **↺ Back to file values** volta ao `bosses.js` e **📋 Copy BOSS_STATS line** copia a linha pronta para colar em `BOSS_STATS`.
+- **BATTLE** começa a luta; a barra tem **×1, ×5 e ×10**, **↻ Fight again** e **☰ Panel**. Termina quando o chefe cai, o herói cai (se "can die" estiver ligado) ou acaba o tempo limite (em segundos de jogo); mostra ✅ PASS ou ❌ TOO HARD.
+- A tocha fica imortal e o chefe é o único monstro. As caixas da aba Arena são trocadas só durante a luta e voltam ao abrir o painel.
+- **💾 Save changes to bosses.js:** grava em `BOSS_STATS` (data_model/bosses.js) os cinco números de todo chefe que você editou na aba, e só eles: comentários, espaçamento e o resto do arquivo não mudam (pede confirmação). Depois de gravar, os valores do arquivo passam a ser os novos. Precisa do `serve.py` (rota `POST /__save_bosses`): reinicie o servidor se ele já estava aberto.
+- **⟲ Reset everything to default:** zera a aba toda (números editados de todos os chefes, pontos de skill por onda, caminhos, limite de tempo, % de aprovação, velocidade). **↺ Back to file values** continua voltando só o chefe aberto.

@@ -628,7 +628,8 @@ export function updateEnemies(dt) {
             const holdsDistance = model.keepDistance && inField && !state.lastStand && distToTarget < model.keepDistance;
             const slamming = model.torchSlam && hunting && updateTorchSlam(e, model.torchSlam, distCore, dt);
             const punching = model.punch && hunting && updateTreantPunch(e, model.punch, distToTarget, toTargetAngle, dt);
-            const meleeing = model.melee && hunting && !e.chained && !(e.rooted > 0) && updateMelee(e, model.melee, distToTarget, toTargetAngle, dt);
+            // Chefe com melee (Grave King): o corte é o de boss_ai.js (updateBossMelee, outras chaves). Este é o dos monstros comuns: num chefe o temporizador virava NaN e ele parava de andar para sempre
+            const meleeing = model.melee && !e.isBoss && hunting && !e.chained && !(e.rooted > 0) && updateMelee(e, model.melee, distToTarget, toTargetAngle, dt);
             const tonguing = model.tongue && hunting && !(e.rooted > 0) && updateTongue(e, model.tongue, distToTarget, toTargetAngle, dt);
             if (state.phase !== 'HUNT' && hunting) return;
             const blockedByTorch = e.isBoss && distCore < CORE_MODEL.bossStopDistance + e.radius;
@@ -844,7 +845,10 @@ function updateBubble(p, i, dt) {
     p.vy += ((dy / d) * p.speed - p.vy) * k;
     p.x += p.vx * dt;
     p.y += p.vy * dt;
-    if (p.age >= p.life || d < p.radius + CHARACTER_MODEL.collisionRadius) {
+    // Encostar só estoura com o herói vulnerável (como os outros tiros): no dash (ou logo depois de levar um golpe) ela o atravessa e segue perseguindo,
+    // em vez de estourar de graça e sumir. O fim da vida dela continua estourando.
+    const touching = d < p.radius + CHARACTER_MODEL.collisionRadius && player.iFrames <= 0;
+    if (p.age >= p.life || touching) {
         enemyProjectiles.splice(i, 1);
         addShockwave(p.x, p.y, { radius: p.burstRadius, color: p.burstColor ?? '#86efac', width: 5, seconds: 0.3 });
         createExplosion(p.x, p.y, p.burstColor ?? '#86efac', 16);

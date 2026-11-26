@@ -559,12 +559,11 @@ export function triggerGameOver(reason) {
     renderSummaryActions(reason);
     // Zerou a noite: um final de verdade (o herói, os números e as 18 ondas com as estrelas) no lugar do resumo, só com MENU
     if (reason === 'DAWN') {
-        const learned = getOwnedPowers().length + Object.values(passives).filter(p => p.type === 'skill' && p.lvl > 0).length;
         showVictory({
             hero: getHero(),
             darkness: save.darkness,
             waves: Array.from({ length: TOTAL_WAVES }, (_, i) => run.waveStars?.[i + 1] ?? 0),
-            stats: { score: state.totalScore, kills: run.kills, level: state.playerLevel, skills: learned, bosses: run.bosses, embers: embersEarned, streak: run.bestStreak, seconds: state.runTime },
+            stats: { score: state.totalScore, kills: run.kills, level: state.playerLevel, skillPoints: getSpentSkillPoints() + state.skillPoints, bosses: run.bosses, embers: embersEarned, streak: run.bestStreak, seconds: state.runTime },
             rank: nightRank,
             // MENU depois do amanhecer: anúncio entre partidas, depois o menu
             onMenu: () => platform.showInterstitial().finally(returnToMenu)

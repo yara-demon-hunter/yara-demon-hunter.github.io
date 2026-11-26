@@ -125,6 +125,37 @@ def save_hud(entries: list) -> int:
     return len(entries)
 
 
+BOSS_FIELDS = ("hp", "damage", "speed", "physicalDef", "magicDef")
+
+
+def save_bosses(stats):
+    """Grava em data_model/bosses.js SÓ os números de BOSS_STATS (vida, dano, velocidade e as duas defesas) dos chefes enviados.
+    Comentários, espaçamento e o resto do arquivo não mudam. Devolve quantos chefes foram alterados."""
+    path = GAME / "data_model" / "bosses.js"
+    text = path.read_text(encoding="utf-8")
+    start = text.index("export const BOSS_STATS")
+    end = text.index("};", start)
+    block = text[start:end]
+    for key, values in stats.items():
+        if not re.fullmatch(r"[A-Z_]+", key):
+            raise ValueError(f"chefe inválido: {key}")
+        m = re.search(rf"^(\s*{key}:\s*\{{)([^}}]*)(\}})", block, re.M)
+        if not m:
+            raise ValueError(f"{key} não está em BOSS_STATS")
+        inner = m.group(2)
+        for field, v in values.items():
+            if field not in BOSS_FIELDS or not isinstance(v, (int, float)) or isinstance(v, bool) or v < 0:
+                raise ValueError(f"valor inválido: {key}.{field}")
+            inner, n = re.subn(rf"\b{field}:\s*-?[\d.]+", f"{field}: {v:g}" if field != "hp" else f"{field}: {int(round(v))}", inner, count=1)
+            if n != 1:
+                raise ValueError(f"{key}.{field} não achado")
+        block = block[:m.start(2)] + inner + block[m.end(2):]
+    tmp = path.with_suffix(".js.tmp")
+    tmp.write_text(text[:start] + block + text[end:], encoding="utf-8")
+    tmp.replace(path)
+    return len(stats)
+
+
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")
@@ -187,12 +218,13 @@ class Handler(SimpleHTTPRequestHandler):
     # Recebe pontos de referência { profile, at, screen, hud, ctl } e os mistura na tabela data_model/fluid_layout.js (um ponto já existente da mesma
     # tela só tem as peças enviadas trocadas; as outras ficam como estavam). O resto do arquivo (comentários e demais pontos) não muda.
     def do_POST(self):
-        if self.path.split("?")[0] != "/__save_hud":
+        route = self.path.split("?")[0]
+        if route not in ("/__save_hud", "/__save_bosses"):
             self.send_error(404)
             return
         try:
             body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
-            n = save_hud(body["entries"])
+            n = save_hud(body["entries"]) if route == "/__save_hud" else save_bosses(body["stats"])
             out, code = {"ok": True, "saved": n}, 200
         except Exception as err:  # noqa: BLE001 - devolve o motivo para o tuner mostrar
             out, code = {"ok": False, "error": str(err)}, 500
