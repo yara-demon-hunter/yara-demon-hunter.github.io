@@ -17,13 +17,13 @@ const ease = (k) => 1 - (1 - k) ** 3;
 // O cartão está na tela? (o amanhecer espera ele fechar antes de mostrar o resumo da noite: uma tela de cada vez)
 export const isWaveResultsOpen = () => !!document.querySelector('.wave-results');
 
-export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, points, onClose }) {
+export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, points, onClose, practice = false }) {
     document.querySelector('.wave-results')?.remove();
     const root = document.createElement('div');
     root.className = 'wave-results';
     root.innerHTML = `
       <div class="wr-card" role="dialog" aria-label="Wave results">
-        <p class="wr-eyebrow">WAVE ${wave} RESULTS</p>
+        <p class="wr-eyebrow">WAVE ${wave} ${practice ? 'PRACTICE' : 'RESULTS'}</p>
         <div class="wr-rows">${rows.map((r, i) => `
           <div class="wr-row" data-i="${i}">
             <span class="wr-label">${r.goals ? `<i class="wr-goal">${'<b class="is-met">★</b>'.repeat(r.stars)}${'★'.repeat(r.goals - r.stars)}</i>` : ''}${r.label}${r.need ? `<small class="wr-need">${r.need}</small>` : ''}</span>
@@ -77,7 +77,7 @@ export function showWaveResults({ wave, rows, stars, score, best, spoilsGold, po
         if (finished) return;
         finished = true;
         paint(starsEnd + 1);
-        root.querySelector('.wr-spoils').innerHTML = `+${fmt(spoilsGold)} 🪙${points ? ` &nbsp; +${points} ⚡ skill point` : ''}`;
+        root.querySelector('.wr-spoils').innerHTML = practice ? (spoilsGold || points ? `Record beaten! +${fmt(spoilsGold)} 🪙${points ? ` &nbsp; +${points} ⚡ skill point` : ''}` : 'Practice: no gold or XP') : `+${fmt(spoilsGold)} 🪙${points ? ` &nbsp; +${points} ⚡ skill point` : ''}`;
         root.querySelector('.wr-spoils').classList.add('is-on');
         if (newBest) {
             root.querySelector('.wr-best').innerHTML = `<span class="wr-new">NEW BEST!</span> was ${fmt(best.score)}`;

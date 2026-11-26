@@ -143,6 +143,7 @@ permalink: /mini_games/last_torch/last_torch.html
 <div id="callout" aria-hidden="true"></div>
 <div id="toasts" aria-live="polite"></div>
 <!-- Dica em cima da tocha ("a tocha cura"): aparece e some sozinha (js/ui/hints.js; estilo em css/components/banner.css) -->
+<div id="practiceBadge" class="practice-badge hidden" aria-live="polite">🎯 PRACTICE · no gold or XP<small>beat your best stars for a bonus</small></div>
 <div id="torchHint" class="torch-hint" aria-live="polite"><b></b><span></span></div>
 <div id="treeHand" class="tree-hand" aria-hidden="true"><i></i><span>👆</span><b>Upgrade your skills</b></div>
 
@@ -256,6 +257,8 @@ permalink: /mini_games/last_torch/last_torch.html
             <div id="mapNext" class="map-next"></div>
             <button id="btnMapContinue" class="start-btn" disabled>CONTINUE ▶</button>
         </footer>
+        <!-- Escolher uma onda já vencida para jogar de novo (treino: sem ouro nem XP, só o recorde de ★★★). Só no acampamento (js/ui/map_screen.js) -->
+        <div id="mapReplay" class="map-replay hidden" role="dialog" aria-label="Play a wave again"></div>
     </div>
 </div>
 
@@ -490,7 +493,7 @@ permalink: /mini_games/last_torch/last_torch.html
         <p id="continueText">Pick up where you stopped.</p>
         <div class="confirm-stack">
             <button id="btnContinueKeep" class="start-btn">KEEP MY BUILD</button>
-            <button id="btnContinueReset" class="start-btn start-btn-dark">RESET SKILLS &amp; REBUILD<em>all skill points are refunded</em></button>
+            <button id="btnContinueReset" class="start-btn start-btn-dark">RESET SKILLS, RELICS &amp; REBUILD<em>skill points and the gold spent on relics are refunded</em></button>
             <button id="btnContinueCancel" class="start-btn start-btn-dark">BACK</button>
         </div>
     </div>
@@ -523,6 +526,7 @@ permalink: /mini_games/last_torch/last_torch.html
                     <div class="summary-stat"><span>Kills</span><b id="finalKills">0</b><em id="finalKillsTotal"></em></div>
                     <div class="summary-stat"><span>Best streak</span><b id="finalStreak">0</b></div>
                     <div class="summary-stat"><span>Level</span><b id="finalLevel">1</b></div>
+                    <div class="summary-stat"><span>Skill points</span><b id="finalSkills">0</b></div>
                 </div>
                 <div id="finalBuild"></div>
             </div>
@@ -576,8 +580,9 @@ permalink: /mini_games/last_torch/last_torch.html
         </header>
         <p id="altarSub" class="altar-sub">Every night earns embers, even the ones you lose. Spend them on upgrades that last.</p>
         <div id="altarList" class="custom-scroll"></div>
-        <!-- Só aparece quando o Altar abre depois da morte (js/ui/altar.js): joga de novo na hora -->
+        <!-- Só aparece quando o Altar abre depois da morte (js/ui/altar.js): CONTINUE no lugar de HUNT AGAIN quando há noite salva (como na tela de derrota), senão joga de novo na hora -->
         <div id="altarRetryRow" class="altar-retry-row hidden">
+            <button id="btnAltarContinue" class="start-btn start-btn-continue altar-retry hidden">▶ CONTINUE</button>
             <button id="btnAltarRetry" class="start-btn altar-retry">▶ HUNT AGAIN</button>
             <button id="btnAltarMenu" class="start-btn start-btn-dark altar-retry">MENU</button>
         </div>

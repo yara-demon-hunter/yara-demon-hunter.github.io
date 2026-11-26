@@ -3,8 +3,9 @@ import { MAP_LAYOUT } from '../../data_model/map_layout.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { save } from '../core/save.js';
 import { audio, state } from '../core/state.js';
+import { startWaveReplay } from '../systems/night.js';
 import { NIGHT } from '../../data_model/night.js';
-import { CAMPAIGN as CAMP, screenIndexOf } from '../../data_model/campaign.js';
+import { CAMPAIGN as CAMP, screenIndexOf, startsNewScreen } from '../../data_model/campaign.js';
 import { BOSS_MODELS, chooseBossType } from '../../data_model/bosses.js';
 
 // --- O MAPA ENTRE AS TELAS ---
@@ -84,6 +85,7 @@ function buildNodes(from, to) {
         waves.className = 'map-waves';
         [waves.style.left, waves.style.top] = pct(s.node);
         let total = 0;
+        let skulls = 0;
         for (let j = 1; j <= CAMP.wavesPerScreen; j++) {
             const wave = i * CAMP.wavesPerScreen + j;
             const won = wave < state.turn;
@@ -91,8 +93,11 @@ function buildNodes(from, to) {
             total += earned;
             const slot = document.createElement('span');
             const isBossWave = !!chooseBossType(wave, HEROES[save.hero]?.model ?? 'hunter');
+            if (isBossWave) skulls++;
             slot.className = 'mw-slot' + (isBossWave ? ' is-boss' : '') + (won ? ' is-won' : wave === state.turn ? ' is-now' : '');
-            slot.title = `Wave ${wave}${isBossWave ? ' (boss)' : ''}${won ? `: ${earned} of 3 stars` : ''}`;
+            const replayable = replayEnabled && wave < state.turn;
+            if (replayable) { slot.classList.add('is-replayable'); slot.dataset.wave = wave; }
+            slot.title = `Wave ${wave}${isBossWave ? ' (boss)' : ''}${won ? `: ${earned} of 3 stars` : ''}${replayable ? ' · click to play it again (practice)' : ''}`;
             slot.innerHTML = [0, 1, 2].map(k => `<i class="mw-star${k < earned ? ' is-on' : ''}">★</i>`).join('');
             waves.appendChild(slot);
         }
@@ -100,8 +105,9 @@ function buildNodes(from, to) {
         // Resumo para telas pequenas (no celular os 9 ★ não cabem): ★ ganhas / possíveis nesta tela
         const sum = document.createElement('div');
         sum.className = 'map-sum' + (total === CAMP.wavesPerScreen * 3 ? ' is-full' : '');
+        if (replayEnabled && i * CAMP.wavesPerScreen + 1 < state.turn) { sum.classList.add('is-replayable'); sum.dataset.screen = i; }
         [sum.style.left, sum.style.top] = pct(s.node);
-        sum.textContent = `★ ${total}/${CAMP.wavesPerScreen * 3}`;
+        sum.textContent = `★ ${total}/${CAMP.wavesPerScreen * 3}${skulls ? ` ${'💀'.repeat(skulls)}` : ''}`;
         host.appendChild(sum);
     });
 }
@@ -147,6 +153,40 @@ function fillHud(here, target) {
     }
 }
 
+// Jogar uma onda já vencida de novo (só no acampamento): clicar na onda no mapa abre este aviso. É treino: o aviso diz o que vale e o que não vale
+let replayEnabled = false;
+let replayDuringHunt = false;               // o mapa foi aberto no meio da batalha: treinar faz a onda em andamento recomeçar depois
+const replayBox = () => document.getElementById('mapReplay');
+function confirmReplay(wave) {
+    const hm = HEROES[save.hero]?.model ?? 'hunter';
+    const boss = chooseBossType(wave, hm);
+    const stars = Math.min(3, save.waveBests?.[wave]?.stars ?? 0);
+    const screenName = CAMPAIGN.screens[screenIndexOf(wave)].name;
+    replayBox().innerHTML = `<div class="mr-card">
+        <h3>PLAY WAVE ${wave} AGAIN?</h3>
+        <p class="mr-where">${screenName}${boss && BOSS_MODELS[boss] ? ` · 💀 ${BOSS_MODELS[boss].name} at the end` : ''} · your best: <b class="mr-best">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</b></p>
+        <div class="mr-rules">
+            <div class="mr-rule is-no"><i>🚫</i><span><b>No gold and no XP</b> from this wave. Nothing you earn here is kept.</span></div>
+            <div class="mr-rule is-yes"><i>★</i><span><b>Beat your best stars</b> and you win the extra gold and, with ★★★, a skill point.</span></div>
+            <div class="mr-rule"><i>🛡️</i><span>Full health, and losing costs nothing. ${replayDuringHunt ? 'Then the wave you were fighting starts over.' : 'You come back to camp.'}</span></div>
+            ${replayDuringHunt ? '<div class="mr-rule is-warn"><i>⚠️</i><span><b>The wave in progress restarts</b> when you come back (its kills and quota are lost).</span></div>' : ''}
+        </div>
+        <div class="mr-actions"><button class="start-btn mr-go" type="button" data-wave="${wave}">▶ PLAY</button><button class="start-btn start-btn-dark mr-back" type="button">CANCEL</button></div>
+    </div>`;
+    replayBox().classList.remove('hidden');
+}
+// Telas pequenas (as ondas não cabem no mapa): tocar no resumo da tela lista as ondas dela
+function chooseReplay(screenIndex) {
+    const hm = HEROES[save.hero]?.model ?? 'hunter';
+    const waves = Array.from({ length: CAMP.wavesPerScreen }, (_, j) => screenIndex * CAMP.wavesPerScreen + j + 1).filter(w => w < state.turn);
+    const buttons = waves.map((w) => {
+        const stars = Math.min(3, save.waveBests?.[w]?.stars ?? 0);
+        return `<button class="mr-wave${chooseBossType(w, hm) ? ' is-boss' : ''}${stars === 3 ? ' is-perfect' : ''}" type="button" data-wave="${w}">${chooseBossType(w, hm) ? '💀 ' : ''}Wave ${w}<span class="mr-stars">${[0, 1, 2].map(k => `<i class="${k < stars ? 'is-on' : ''}">★</i>`).join('')}</span></button>`;
+    }).join('');
+    replayBox().innerHTML = `<div class="mr-card"><h3>${CAMPAIGN.screens[screenIndex].name}</h3><p>Pick a wave to play again (practice)</p><div class="mr-waves">${buttons}</div><button class="start-btn start-btn-dark mr-back" type="button">CANCEL</button></div>`;
+    replayBox().classList.remove('hidden');
+}
+
 // O X de fechar só existe no mapa parado (o de ver onde você está); na caminhada entre telas o botão é o CONTINUE
 function setCloseButton(visible) {
     document.getElementById('btnMapClose').hidden = !visible;
@@ -187,6 +227,8 @@ export function showMapTransition(from, to, callback) {
     const btn = document.getElementById('btnMapContinue');
     btn.disabled = true;
     btn.textContent = MAP_LAYOUT.texts.button;
+    replayEnabled = false;
+    document.getElementById('mapReplay').classList.add('hidden');
     buildNodes(from, to);
     buildLabels();
     fillHud(from, to);
@@ -221,7 +263,7 @@ export function showMapTransition(from, to, callback) {
 }
 
 // O mapa parado: o retrato do herói fica em cima da tela onde ele está agora (só olhar; o botão volta). subtitle: o texto de cima (ex.: "WAVE 8 OF 30")
-export function showMapHere(index, subtitle, callback) {
+export function showMapHere(index, subtitle, callback, { canReplay = false, duringHunt = false } = {}) {
     const root = screen();
     if (!root) { callback?.(); return; }
     cancelAnimationFrame(raf);
@@ -235,6 +277,9 @@ export function showMapHere(index, subtitle, callback) {
     const btn = document.getElementById('btnMapContinue');
     btn.disabled = false;
     btn.textContent = 'BACK ◀';
+    replayEnabled = canReplay;
+    replayDuringHunt = duringHunt;
+    document.getElementById('mapReplay').classList.add('hidden');
     buildNodes(index, -1);
     buildLabels();
     fillHud(index, -1);
@@ -254,7 +299,8 @@ export function openMapView() {
     const from = state.gameState;
     if (from !== 'PLAYING' && from !== 'CAMP') return;
     if (!screen().classList.contains('hidden')) return;
-    const wave = from === 'CAMP' ? Math.max(1, state.turn - 1) : state.turn;           // no acampamento, o herói ainda está na tela da onda que acabou
+    // No acampamento, o herói está na tela da onda que acabou; mas se essa foi a última da tela, ele já chegou na tela nova (o mapa andou até lá antes do acampamento)
+    const wave = from === 'CAMP' ? (startsNewScreen(state.turn) ? state.turn : Math.max(1, state.turn - 1)) : state.turn;
     if (from === 'PLAYING') {
         state.gameState = 'MAP';
         audio.setPaused(true);
@@ -265,7 +311,7 @@ export function openMapView() {
             state.gameState = 'PLAYING';
             audio.setPaused(false);
         }
-    });
+    }, { canReplay: state.turn > 1 && !state.replay && (from === 'CAMP' || state.phase === 'HUNT'), duringHunt: from === 'PLAYING' });
 }
 
 export function setupMapScreen() {
@@ -273,6 +319,24 @@ export function setupMapScreen() {
     document.getElementById('btnCampMap').addEventListener('click', openMapView);
     window.addEventListener('keydown', (e) => { if (e.code === 'KeyM' && !e.repeat && !e.ctrlKey && !e.metaKey && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) openMapView(); });
     document.getElementById('btnMapContinue').addEventListener('click', () => { if (arrived) finish(); });
+    // Clicar numa onda já vencida no mapa (no acampamento) abre o aviso do treino
+    document.getElementById('mapNodes').addEventListener('click', (e) => {
+        const slot = e.target.closest('.mw-slot.is-replayable');
+        const sum = e.target.closest('.map-sum.is-replayable');
+        if (slot) confirmReplay(Number(slot.dataset.wave));
+        else if (sum) chooseReplay(Number(sum.dataset.screen));
+    });
+    replayBox().addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (e.target.closest('.mr-back') || e.target === replayBox()) { replayBox().classList.add('hidden'); return; }
+        const wave = e.target.closest('.mr-wave');
+        if (wave) { confirmReplay(Number(wave.dataset.wave)); return; }
+        const go = e.target.closest('.mr-go');
+        if (!go || !arrived) return;
+        replayBox().classList.add('hidden');
+        finish();                                                    // fecha o mapa (volta ao acampamento) e começa o treino
+        startWaveReplay(Number(go.dataset.wave));
+    });
     document.getElementById('btnMapClose').addEventListener('click', () => { if (arrived) finish(); });
     // Tocar no mapa pula a caminhada, e depois continua
     document.getElementById('mapFrame').addEventListener('click', () => { if (!arrived) arriveNow(); });

@@ -72,6 +72,7 @@ export function setupButtons() {
         continueBox.classList.add('hidden');
         enterFullscreen();
         if (state.gameState === 'GAMEOVER') await platform.showInterstitial();
+        document.getElementById('altarScreen').classList.add('hidden');       // veio do Altar da tela de derrota
         continueRun(respec);
     };
     on('btnContinue', openContinue);

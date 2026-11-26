@@ -1,6 +1,6 @@
 import { CAMP } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
-import { RELIC_BY_ID } from '../../data_model/relics.js';
+import { RELIC_BY_ID, RELIC_NODES } from '../../data_model/relics.js';
 import { TREE_BRANCHES, TREE_BY_ID, TREE_NODES } from '../../data_model/skill_tree/index.js';
 import { save, persist } from '../core/save.js';
 import { attributes, audio, passives, powers, state } from '../core/state.js';
@@ -416,15 +416,31 @@ export function buyNode(id) {
 
 // Zera a árvore de skills e devolve os pontos gastos (usado ao CONTINUAR uma noite para montar outra build). Só a árvore de skills:
 // relíquias (ouro) e o que o herói já traz de graça (startPower) ficam como estão. Devolve quantos pontos voltaram.
-export function respecSkills() {
+// Pontos de skill já gastos na árvore (o que o respec devolve): nível x preço de cada nó, menos o poder de graça do herói e os pontos que as próprias skills deram
+export function getSpentSkillPoints() {
     const hero = getHero();
-    let refund = 0;
+    let spent = 0;
     for (const node of TREE_NODES) {
         let lvl = getNodeLevel(node);
         if (node.kind === 'power' && node.key === hero.startPower) lvl = Math.max(0, lvl - 1);      // o poder de graça do herói não custou nada
         if (lvl <= 0) continue;
-        refund += lvl * getNodeCost(node);
-        if (node.kind === 'passive') refund -= lvl * (passives[node.key].grantPoints ?? 0);          // pontos que a própria skill deu voltam a não existir
+        spent += lvl * getNodeCost(node);
+        if (node.kind === 'passive') spent -= lvl * (passives[node.key].grantPoints ?? 0);          // pontos que a própria skill deu voltam a não existir
+    }
+    return Math.max(0, spent);
+}
+
+export function respecSkills() {
+    const hero = getHero();
+    const refund = getSpentSkillPoints();
+    let goldRefund = 0;
+    // Relíquias (árvore do acampamento, comprada com ouro): o ouro volta e elas somem, para montar outra build
+    for (const node of RELIC_NODES) {
+        const lvl = passives[node.key].lvl;
+        if (lvl <= 0) continue;
+        goldRefund += lvl * getNodeCost(node);
+        state.revives -= (passives[node.key].mods?.revives ?? 0) * lvl;
+        passives[node.key].lvl = 0;
     }
     for (const node of TREE_NODES) {
         if (node.kind === 'passive') {
@@ -447,6 +463,7 @@ export function respecSkills() {
     state.oathCeremony = null;
     state.revives = Math.max(0, state.revives);
     state.skillPoints += Math.max(0, refund);
+    state.coins += goldRefund;
     refreshModifiers();
     syncMaxHp();
     syncTorchMax();

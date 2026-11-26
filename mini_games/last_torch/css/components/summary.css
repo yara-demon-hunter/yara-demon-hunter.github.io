@@ -18,7 +18,7 @@
 .summary-col { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
 .summary-stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.4rem;
 }
 .summary-stat {
@@ -28,7 +28,7 @@
     background: rgba(8, 12, 16, 0.7);
     text-align: center;
 }
-.summary-stat-main { grid-column: span 3; }
+.summary-stat-main { grid-column: span 4; }
 .summary-stat span {
     display: block;
     color: #8b98a8;
@@ -166,7 +166,7 @@
     .summary-grid { gap: 0.4rem; }
     .summary-col { gap: 0.25rem; }
     .summary-stat { padding: 0.15rem 0.3rem; }
-    .summary-stat-main { grid-column: span 3; }
+    .summary-stat-main { grid-column: span 4; }
     .summary-stat span { font-size: 0.56rem; }
     .summary-stat b { font-size: 0.8rem; }
     .summary-stat-main b { font-size: 0.95rem; }

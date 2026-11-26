@@ -89,7 +89,8 @@ function renderNext() {
 
 // Resultado do fim da onda (data_model/night.js > WAVE_SPOILS): 3 metas = 3 estrelas, ouro e (★★★) ponto de skill, e a pontuação
 // da onda, comparada com o recorde daquela onda. Devolve as estrelas, que vão para o título do acampamento; a contagem aparece por cima.
-export function grantWaveSpoils(wave, onClose = null) {
+export const practiceBonus = { gold: 0, points: 0 };        // o extra do treino da última onda (grantWaveSpoils com practice)
+export function grantWaveSpoils(wave, onClose = null, practice = false) {
     const W = WAVE_SPOILS;
     const ws = state.waveStats ?? { kills0: 0, gold0: 0, rush: 0, torchDamage: 0, heroDamage: 0, consumed: 0 };
     const torchDmg = Math.min(100, Math.round(ws.torchDamage / Math.max(1, state.coreHpMax) * 100));
@@ -108,23 +109,30 @@ export function grantWaveSpoils(wave, onClose = null) {
     ];
     const count = rows.reduce((sum, r) => sum + (r.stars ?? 0), 0);
     const score = rows.reduce((sum, r) => sum + r.points, 0);
-    const spoilsGold = Math.round((W.goldBase + W.goldPerWave * wave) * W.starGold[count]);
-    const points = count === 3 ? W.perfectSkillPoints : 0;
-    state.coins += spoilsGold;
-    state.run.goldEarned += spoilsGold;
-    state.skillPoints += points;
+    // Treino (jogar a onda de novo pelo mapa): sem ouro nem XP. Só quem BATE o recorde de estrelas da onda ganha o extra das estrelas novas
+    // (ouro e o ponto de skill do ★★★); esse extra é entregue por js/systems/night.js (endWaveReplay), depois de a partida voltar ao que era
+    const bestBefore = save.waveBests?.[wave]?.stars ?? 0;
+    const full = (n) => Math.round((W.goldBase + W.goldPerWave * wave) * W.starGold[n]);
+    const spoilsGold = practice ? Math.max(0, count > bestBefore ? full(count) - full(bestBefore) : 0) : full(count);
+    const points = (practice ? count === 3 && bestBefore < 3 : count === 3) ? W.perfectSkillPoints : 0;
+    if (practice) practiceBonus.gold = spoilsGold, practiceBonus.points = points;
+    else {
+        state.coins += spoilsGold;
+        state.run.goldEarned += spoilsGold;
+        state.skillPoints += points;
+    }
     // Recorde da onda: guardado no save (vale entre partidas)
     save.waveBests ??= {};
     const best = save.waveBests[wave] ?? null;
     const record = { score: Math.max(score, best?.score ?? 0), stars: Math.max(count, best?.stars ?? 0) };
     save.waveBests[wave] = record;
-    state.run.stars = (state.run.stars ?? 0) + count;
+    if (!practice) state.run.stars = (state.run.stars ?? 0) + count;
     // Estrelas de cada onda desta noite: aparecem nas marcas da barra de ondas do HUD (js/ui/hud.js)
-    (state.run.waveStars ??= {})[wave] = count;
+    if (!practice) (state.run.waveStars ??= {})[wave] = count;
     // Conquistas do Santuário: em quantas ondas diferentes já tirou ★★★
     save.stats.threeStarWaves = Object.values(save.waveBests).filter(b => b.stars >= 3).length;
     persist();
-    showWaveResults({ wave, rows, stars: count, score, best, spoilsGold, points, onClose });
+    showWaveResults({ wave, rows, stars: count, score, best, spoilsGold, points, onClose, practice });
     return '★'.repeat(count) + '☆'.repeat(3 - count);
 }
 

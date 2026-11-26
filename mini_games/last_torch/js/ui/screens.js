@@ -20,7 +20,7 @@ import { attributes, audio, passives, player, powers, state } from '../core/stat
 import { checkAchievements, pushStats, recordNight, rewardText } from '../systems/sanctuary.js';
 import { celebrateRecord } from './record_celebration.js';
 import { flushHeroUnlocks } from './hero_unlock.js';
-import { getOwnedPowers, hasBuyableNode, respecSkills } from '../systems/tree.js';
+import { getOwnedPowers, getSpentSkillPoints, hasBuyableNode, respecSkills } from '../systems/tree.js';
 import { resetDash } from '../systems/dash.js';
 import { resetQuake } from '../systems/quake.js';
 import { resetFury } from '../systems/fury.js';
@@ -526,7 +526,9 @@ export function triggerGameOver(reason) {
 
     const build = document.getElementById('finalBuild');
     build.innerHTML = '';
-    [...getOwnedPowers(), ...Object.values(passives).filter(p => p.lvl > 0)].forEach(p => {
+    const owned = [...getOwnedPowers(), ...Object.values(passives).filter(p => p.lvl > 0)];
+    document.getElementById('finalSkills').innerText = getSpentSkillPoints() + state.skillPoints;       // total de pontos de skill ganhos na noite (gastos + os que sobraram)
+    owned.forEach(p => {
         const item = document.createElement('span');
         paintIcon(item, treeImageFor(p.key, p.evolved), p.evolved && EVOLUTIONS[p.key] ? EVOLUTIONS[p.key].icon : p.icon);
         build.appendChild(item);

@@ -31,6 +31,7 @@ export function announcePoints(points) {
 // --- LEVEL & XP ---
 // Cada nível dá pontos de skill (gastos na árvore, js/ui/tree.js) e uma cura parcial.
 export function gainXp(amount) {
+    if (state.replay) return;           // treino (onda jogada de novo pelo mapa): sem experiência
     state.playerXp += amount;
     let gained = 0;
     while (state.playerXp >= state.playerMaxXp) {

@@ -61,7 +61,8 @@ panel.innerHTML = `
   <div class="card">
     <h2>🧪 Last Torch Sandbox</h2>
     <p class="note">Test arena: nothing here touches the game or its save.</p>
-    <div class="sb-format"><label>Screen format (all tabs): <select id="sbFormat"><option value="desktop">Desktop (full window)</option><option value="landscape">Phone · landscape 844×390</option><option value="portrait">Phone · portrait 390×844</option></select></label></div>
+    <div class="sb-format"><label>Screen format (all tabs): <select id="sbFormat"><option value="desktop">Desktop (full window)</option><option value="landscape">Phone · landscape 844×390</option><option value="portrait">Phone · portrait 390×844</option></select></label>
+    <button id="sbWipeSave" class="sb-opt" title="Wipes the game save of this sandbox (embers, Altar upgrades, trophies, unlocked heroes, saved hunts) and reloads. Your sandbox settings (Arena, Fast run, format) stay.">🗑️ Reset game save</button></div>
     <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button><button data-tab="screens">🖼️ Screens</button><button data-tab="moves">🗡️ Boss moves</button><button data-tab="dialogues">💬 Dialogues</button></div>
     <div id="sbArena">
     <button id="sbReset" class="sb-opt" title="Put every Arena setting back to how it starts (hero, boss, monsters, buddies, numbers, boxes and scenery)">↺ Reset Arena to defaults</button>
@@ -399,6 +400,12 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
     const current = document.cookie.split(';').map(s => s.trim()).find(s => s.startsWith('sbx_format='))?.split('=')[1] ?? 'desktop';
     const select = value('#sbFormat');
     select.value = ['landscape', 'portrait'].includes(current) ? current : 'desktop';
+    // Vale para todas as abas: apaga só o save do JOGO (brasas, Altar, troféus, heróis, noites guardadas); as configurações do sandbox ficam
+    value('#sbWipeSave').onclick = () => {
+        if (!confirm('Reset the game save (embers, Altar, trophies, unlocked heroes, saved hunts) and reload?\nYour sandbox settings stay.')) return;
+        try { Object.keys(localStorage).filter(k => k.startsWith('last_torch_')).forEach(k => localStorage.removeItem(k)); } catch { /* sem armazenamento */ }
+        window.top.location.reload();
+    };
     select.onchange = () => {
         document.cookie = `sbx_format=${select.value}; path=/; max-age=31536000; SameSite=Lax`;
         window.top.location.href = '/';

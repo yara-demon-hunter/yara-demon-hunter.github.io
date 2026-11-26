@@ -69,6 +69,10 @@ export function openAltar({ retry: afterNight = false } = {}) {
         ? 'Spend your embers on upgrades that last, then hunt again.'
         : 'Every night earns embers, even the ones you lose. Spend them on upgrades that last.';
     $('altarRetryRow').classList.toggle('hidden', !afterNight);
+    // Como na tela de derrota: com noite salva, CONTINUE ocupa o lugar do HUNT AGAIN (que recomeçaria do zero sem querer)
+    const canContinue = afterNight && !$('btnDeathContinue').classList.contains('hidden');
+    $('btnAltarContinue').classList.toggle('hidden', !canContinue);
+    $('btnAltarRetry').classList.toggle('hidden', canContinue);
     $('altarScreen').classList.remove('hidden');
     renderAltar();
     audio.init();
@@ -102,6 +106,8 @@ function backToMenu() {
 export function setupAltar() {
     $('btnAltarMenu').addEventListener('click', backToMenu);
     $('btnAltarRetry').addEventListener('click', huntAgain);
+    // O mesmo CONTINUE da tela de derrota (confirma manter a build, e o anúncio entre noites entra lá); o Altar fecha quando a partida recomeça (buttons.js)
+    $('btnAltarContinue').addEventListener('click', () => $('btnDeathContinue').click());
     document.getElementById('altarList').addEventListener('click', (e) => {
         const button = e.target.closest('button[data-key]');
         if (button && !button.disabled) buyUpgrade(button.dataset.key);

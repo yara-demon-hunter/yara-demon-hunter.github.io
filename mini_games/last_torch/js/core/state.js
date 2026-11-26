@@ -86,6 +86,7 @@ export const state = {
     dawn: 0,                    // 0 a 1: a noite clareando
 
     // Números da partida (tela final, conquistas)
+    replay: null,               // "jogar a onda de novo" (treino do mapa, sem ouro nem XP): { wave, back } com o que volta ao fim (js/systems/night.js)
     run: { kills: 0, damage: 0, bestStreak: 0, bosses: 0, elites: 0, goldEarned: 0, evolutions: 0, victory: false, revivesUsed: 0 },
     streak: 0,
     streakTimer: 0,

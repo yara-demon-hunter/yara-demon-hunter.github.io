@@ -4,7 +4,7 @@ import { NIGHT, getHourName, rollOmen } from '../../data_model/night.js';
 import { save, persist } from '../core/save.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
-import { grantWaveSpoils, openCamp } from '../ui/camp.js';
+import { grantWaveSpoils, openCamp, practiceBonus } from '../ui/camp.js';
 import { isWaveResultsOpen } from '../ui/wave_results.js';
 import { updateHUD } from '../ui/hud.js';
 import { triggerGameOver } from '../ui/screens.js';
@@ -174,6 +174,7 @@ function updateClear(dt) {
 }
 
 function finishHour() {
+    if (state.replay) { endWaveReplay(true); return; }
     state.goldVacuum = false;
     collectAllPickups();
     state.turn++;
@@ -194,6 +195,58 @@ function finishHour() {
     openCamp();
 }
 
+// --- JOGAR A ONDA DE NOVO (treino) ---
+// Pelo mapa, no acampamento: joga de novo uma onda já vencida só para tentar as 3 estrelas. Não dá ouro, experiência nem pontos de skill
+// (gold.js e progression.js ignoram state.replay), e ao fim tudo volta ao que era antes: só o recorde de estrelas da onda pode subir.
+// Perder também volta ao acampamento, sem perder a noite.
+const BACK_KEYS = ['turn', 'nextOmen', 'coins', 'skillPoints', 'playerXp', 'playerMaxXp', 'playerLevel', 'levelPointsCarry', 'totalScore', 'revives', 'secondWind', 'rushPaid'];
+export function startWaveReplay(wave) {
+    // No acampamento, ou no meio da caçada (o mapa também abre na batalha): neste caso a onda em andamento recomeça quando o treino acaba
+    const fromHunt = state.gameState === 'PLAYING' && state.phase === 'HUNT';
+    if ((state.gameState !== 'CAMP' && !fromHunt) || state.replay || !(wave >= 1 && wave < state.turn)) return false;
+    const back = { hp: player.hp, coreHp: state.coreHp, restart: fromHunt, omen: state.omen, run: { ...state.run, waveStars: { ...state.run.waveStars } } };
+    for (const key of BACK_KEYS) back[key] = state[key] && typeof state[key] === 'object' ? { ...state[key] } : state[key];
+    state.replay = { wave, back };
+    document.getElementById('campScreen').classList.add('hidden');
+    state.knifeInput.stick.fire = false;
+    state.turn = wave;
+    state.gameState = 'PLAYING';
+    startHour();
+    player.hp = player.maxHp;                                   // treino justo: vida e tocha cheias (voltam ao que eram no fim)
+    state.coreHp = state.coreHpMax;
+    document.getElementById('practiceBadge')?.classList.remove('hidden');
+    updateHUD();
+    return true;
+}
+
+function endWaveReplay(won) {
+    const { wave, back } = state.replay;
+    if (won) grantWaveSpoils(wave, null, true);                 // antes de restaurar: conta as mortes e o dano desta onda e grava o recorde de estrelas
+    state.replay = null;
+    document.getElementById('practiceBadge')?.classList.add('hidden');
+    for (const key of BACK_KEYS) state[key] = back[key];
+    state.run = back.run;
+    if (won) {                                                  // só bater o recorde de estrelas rende o extra (ouro e ponto de skill)
+        state.coins += practiceBonus.gold;
+        state.run.goldEarned += practiceBonus.gold;
+        state.skillPoints += practiceBonus.points;
+    }
+    player.hp = back.hp;
+    player.hidden = false;
+    state.coreHp = back.coreHp;
+    resetFieldForNewTurn();
+    state.phase = 'CLEAR';
+    state.lastStand = false;
+    if (back.restart) {                                         // veio da batalha: a onda interrompida começa de novo, com o mesmo presságio
+        state.nextOmen = back.omen;
+        state.gameState = 'PLAYING';
+        startHour();
+        return;
+    }
+    openCamp(true);
+    if (!won) showBanner('PRACTICE OVER', `WAVE ${wave}`, 'Nothing lost. Try again from the map', 'hour');
+}
+
 // --- BOSS MORTO ---
 export function onBossKilled(e, model) {
     hitStop(0.14);
@@ -206,9 +259,11 @@ export function onBossKilled(e, model) {
     createExplosion(e.x, e.y, model.color, 40);
     audio.playBossDeath();
 
-    const key = `boss_${e.type}`;
-    save.stats[key] = (save.stats[key] ?? 0) + 1;
-    bumpStat('bosses');
+    if (!state.replay) {                       // treino: o boss de novo não conta de novo
+        const key = `boss_${e.type}`;
+        save.stats[key] = (save.stats[key] ?? 0) + 1;
+        bumpStat('bosses');
+    }
 
     // Rival: os ataques dele somem já, e a conversa entre os dois vem antes de a noite seguir
     if (hasDuel(model)) {
@@ -230,7 +285,7 @@ export function onBossKilled(e, model) {
 const DUEL_DIALOGUE_DELAY_MS = 400;
 
 function afterBoss() {
-    if (state.turn === NIGHT.hours) {
+    if (state.turn === NIGHT.hours && !state.replay) {
         beginDawn();
         return;
     }
@@ -317,7 +372,10 @@ export function beginDeath(reason) {
 
 function updateDeath(dt) {
     state.phaseTimer -= dt;
-    if (state.phaseTimer <= 0) triggerGameOver(state.gameOverReason);
+    if (state.phaseTimer <= 0) {
+        if (state.replay) endWaveReplay(false);          // caiu no treino: volta ao acampamento, nada se perde
+        else triggerGameOver(state.gameOverReason);
+    }
 }
 
 export function updateNight(dt) {

@@ -9,6 +9,7 @@ import { getMagnetRadius } from './stats.js';
 // Moeda: pula para o lado (pop), fica um tempo no chão e some. Perto do herói é atraída com aceleração crescente
 // (a que já voa até ele não some mais); com o ímã ou no fim da hora, todas vêm juntas.
 export function dropGold(x, y, amount) {
+    if (state.replay) return;           // treino: sem ouro
     const coinCount = Math.max(1, Math.min(D.maxCoinsPerKill, amount));
     // Muitas moedas na tela: entra direto para não pesar
     if (state.goldDrops.length + coinCount > D.maxActiveCoins) {
@@ -34,6 +35,7 @@ export function dropGold(x, y, amount) {
 }
 
 function collectGold(value) {
+    if (state.replay) return;
     state.coins += value;
     state.run.goldEarned += value;
     // Coin Rush: cada moeda adianta o dash e a adaga
@@ -48,6 +50,7 @@ function collectGold(value) {
 
 // Ao abrir a loja, o ouro que ainda está voando entra de uma vez (nada se perde)
 export function collectAllGold() {
+    if (state.replay) { state.goldDrops = []; return; }
     const total = state.goldDrops.reduce((sum, c) => sum + c.value, 0);
     state.goldDrops = [];
     if (total > 0) {
