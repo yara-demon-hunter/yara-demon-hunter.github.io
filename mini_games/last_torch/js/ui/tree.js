@@ -2,7 +2,7 @@ import { AFFINITY_BONUS, TREE_BRANCHES, TREE_LAYOUT, TREE_NODES, affinityLabel }
 import { BRANCH_IMAGES, TREE_IMAGES, paintIcon } from '../../data_model/tree_images.js';
 import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/relics.js';
 import { getFuryUpgradeRows } from './stat_sheet.js';
-import { state } from '../core/state.js';
+import { passives, state } from '../core/state.js';
 import { getHero } from '../systems/modifiers.js';
 import { buyNode, excludedBy, getNodeInfo, getNodeState, getNodeUpgradeRows, getRestrictionText } from '../systems/tree.js';
 
@@ -132,7 +132,7 @@ function createTreeView(cfg) {
         if (rail) branchKeys.forEach(buildTab);
     }
 
-    const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic';
+    const isSingle = (node) => (node.kind === 'passive' && passives[node.key].maxLvl === 1) || node.kind === 'relic';        // passiva com níveis (maxLvl > 1) mostra Lv. x/y
 
     function levelText(node, st) {
         // Selado (sem adaga): não é cadeado, é "não é para este personagem"
@@ -141,6 +141,7 @@ function createTreeView(cfg) {
         if (node.kind === 'evolve') return st.maxed ? 'EVOLVED' : 'EVOLUTION';
         if (node.kind === 'relic') return st.maxed ? 'OWNED' : 'RELIC';
         if (node.oath) return st.maxed ? 'SWORN' : 'OATH';
+        if (node.kind === 'passive' && st.max > 1) return `Lv. ${st.level}/${st.max}`;
         if (node.kind === 'passive') return st.maxed ? 'LEARNED' : 'PASSIVE SKILL';
         return `Lv. ${st.level}/${st.max}`;
     }

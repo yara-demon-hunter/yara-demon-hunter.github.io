@@ -25,10 +25,10 @@ export const NATURE_NODES = [
     { id: 'spiritWolves', cost: 3, branch: 'nature', kind: 'power', key: 'spiritWolves', x: 3, y: 2, requires: [req('sporeEvolve')] },
     { id: 'wolvesEvolve', cost: 3, branch: 'nature', kind: 'evolve', key: 'spiritWolves', x: 4, y: 2, requires: [req('spiritWolves', 5)] },
     // Linha 4, o chicote: Rose Whip -> Crimson Surge (evolução: energia vermelha que corre pelo chicote e explode no preso) -> Rose Petals (furacão de pétalas em volta do herói) -> Dark Roses (só do Rowan: o nó fica selado para os outros e conta como cumprido)
-    { id: 'roseWhip', cost: 4, branch: 'nature', kind: 'passive', key: 'roseWhip', x: 1, y: 3, requires: [req('wildHeart')] },
-    { id: 'whipEvolve', cost: 4, branch: 'nature', kind: 'evolve', key: 'roseWhip', x: 2, y: 3, requires: [req('roseWhip')] },
-    { id: 'rosePetals', cost: 4, branch: 'nature', kind: 'passive', key: 'rosePetals', x: 3, y: 3, requires: [req('whipEvolve')] },
-    { id: 'darkRoses', cost: 3, hero: 'rowan', branch: 'nature', kind: 'passive', key: 'darkRoses', x: 4, y: 3, requires: [req('rosePetals')] },
+    { id: 'roseWhip', cost: 2, branch: 'nature', kind: 'passive', key: 'roseWhip', x: 1, y: 3, requires: [req('wildHeart')] },
+    { id: 'whipEvolve', cost: 4, branch: 'nature', kind: 'evolve', key: 'roseWhip', x: 2, y: 3, requires: [req('roseWhip', 3)] },
+    { id: 'rosePetals', cost: 2, branch: 'nature', kind: 'passive', key: 'rosePetals', x: 3, y: 3, requires: [req('whipEvolve')] },
+    { id: 'darkRoses', cost: 3, hero: 'rowan', branch: 'nature', kind: 'passive', key: 'darkRoses', x: 4, y: 3, requires: [req('rosePetals', 3)] },
 
     { id: 'oathWild', cost: 3, branch: 'nature', kind: 'passive', key: 'oathWild', oath: true, x: 5, y: 1.5, requires: [req('thornEvolve'), req('leechEvolve')] }
 ];

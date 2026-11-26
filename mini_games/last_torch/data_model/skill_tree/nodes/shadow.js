@@ -7,10 +7,10 @@ export const SHADOW_NODES = [
 
     { id: 'moveSpeed', cost: 1, branch: 'shadow', kind: 'stat', key: 'moveSpeed', x: 0, y: 1.5, requires: [] },
     // Linha de cima, só do corvo: Move Speed -> Shadow Raven -> Feather Dodge (o golpe erra, penas de corvo e um instante intocável) -> Feather Rain (uma chuva de penas cai de cima nos marcados pelo corvo) -> Raven Decoy (o Feather Dodge deixa uma pena-isca que atrai e explode)
-        { id: 'shadowRaven', cost: 4, branch: 'shadow', kind: 'passive', key: 'shadowRaven', x: 1, y: 0, requires: [req('moveSpeed')] },
-    { id: 'featherDodge', cost: 4, branch: 'shadow', kind: 'passive', key: 'featherDodge', x: 2, y: 0, requires: [req('shadowRaven')] },
-    { id: 'featherRain', cost: 4, branch: 'shadow', kind: 'passive', key: 'featherRain', x: 3, y: 0, requires: [req('featherDodge')] },
-    { id: 'ravenDecoy', cost: 4, branch: 'shadow', kind: 'passive', key: 'ravenDecoy', x: 4, y: 0, requires: [req('featherRain')] },
+        { id: 'shadowRaven', cost: 2, branch: 'shadow', kind: 'passive', key: 'shadowRaven', x: 1, y: 0, requires: [req('moveSpeed')] },
+    { id: 'featherDodge', cost: 2, branch: 'shadow', kind: 'passive', key: 'featherDodge', x: 2, y: 0, requires: [req('shadowRaven', 2)] },
+    { id: 'featherRain', cost: 2, branch: 'shadow', kind: 'passive', key: 'featherRain', x: 3, y: 0, requires: [req('featherDodge', 2)] },
+    { id: 'ravenDecoy', cost: 2, branch: 'shadow', kind: 'passive', key: 'ravenDecoy', x: 4, y: 0, requires: [req('featherRain', 3)] },
     // Linha das adagas, tudo numa linha só: Ricochet -> Death Mark -> Dagger Mastery -> Fan of Knives
     { id: 'ricochet', cost: 2, needs: 'knives', branch: 'shadow', kind: 'power', key: 'ricochet', x: 1, y: 1, requires: [req('moveSpeed')] },
     { id: 'deathMark', cost: 2, needs: 'knives', branch: 'shadow', kind: 'power', key: 'deathMark', x: 2, y: 1, requires: [req('ricochet', 2)] },

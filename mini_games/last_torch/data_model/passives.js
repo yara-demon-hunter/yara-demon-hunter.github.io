@@ -8,6 +8,27 @@ const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
 const formatMultiplier = (value) => `${Number(value.toFixed(2))}×`;
 const formatNumber = (value) => String(Number(value.toFixed(2)));
 
+// --- SKILLS PASSIVAS COM NÍVEIS ---
+// Algumas passivas têm 3 níveis (maxLvl 3): o ÚLTIMO nível é o valor equilibrado da skill; os de antes são mais fracos, na ordem. As tabelas
+// ficam aqui, o campo da constante (ex.: FEATHER_DODGE.cooldownSeconds) passa a valer o nível atual (scaleByLevel, no fim do arquivo) e a
+// árvore trava o nó seguinte até certo nível (data_model/skill_tree/nodes). Antes de aprender, vale o nível 1.
+export const levelSource = { of: () => 1 };          // js/core/state.js liga isto ao nível de cada passiva
+export const LEVELS = {
+    shadowRaven: { cooldownSeconds: [3.6, 3, 2.4], range: [220, 260, 300], damage: [0.7, 0.9, 1.1], markSeconds: [1.2, 1.6, 2], markDamage: [0.1, 0.18, 0.25] },
+    featherDodge: { cooldownSeconds: [12, 10, 8], immuneSeconds: [1, 1.25, 1.5], feathers: [18, 24, 30] },
+    featherRain: { cooldownSeconds: [8, 6.5, 5.5], targets: [1, 2, 2], quills: [8, 12, 15], damage: [0.25, 0.3, 0.35] },
+    roseWhip: { cooldownSeconds: [26, 23, 20], holdSeconds: [4, 5, 6], lashDamage: [2.2, 2.7, 3.2], thornDps: [0.45, 0.55, 0.7] },
+    rosePetals: { cooldownSeconds: [24, 20, 17], durationSeconds: [3.5, 4.2, 5], radius: [120, 145, 170], damage: [0.6, 0.75, 0.9] }
+};
+const atLevel = (key, values) => values[Math.max(1, Math.min(values.length, levelSource.of(key) || 1)) - 1];
+const byLevel = (values, format = formatNumber) => values.map(format).join(' / ');       // "12 / 10 / 8": o texto mostra os três níveis
+function scaleByLevel(model, key) {
+    for (const [field, values] of Object.entries(LEVELS[key])) {
+        Object.defineProperty(model, field, { get: () => atLevel(key, values), enumerable: true, configurable: true });
+    }
+    return model;
+}
+
 export const PASSIVE_SKILL_MODELS = {
     shadowWhirl: {
         name: 'Whirlwind',
@@ -81,40 +102,40 @@ export const PASSIVE_SKILL_MODELS = {
         name: 'Rose Whip',
         icon: '🌹',
         cost: 130,
-        maxLvl: 1,
+        maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
-            return `Every ${ROSE_WHIP.cooldownSeconds}s you crack a whip of thorns, a rose at its tip, at the strongest monster within ${ROSE_WHIP.range} reach. It lashes for ${formatMultiplier(ROSE_WHIP.lashDamage)} spell damage and stays wrapped around it for ${ROSE_WHIP.holdSeconds}s (${Math.round(ROSE_WHIP.holdSeconds * ROSE_WHIP.bossRatio)}s on a boss): the monster is pinned to the spot and the thorns bite for ${formatMultiplier(ROSE_WHIP.thornDps)} spell damage per second.`;
+            return `Three levels (the numbers below go from level 1 to 3). Every ${byLevel(LEVELS.roseWhip.cooldownSeconds)}s you crack a whip of thorns, a rose at its tip, at the strongest monster within ${ROSE_WHIP.range} reach. It lashes for ${byLevel(LEVELS.roseWhip.lashDamage, formatMultiplier)} spell damage and stays wrapped around it for ${byLevel(LEVELS.roseWhip.holdSeconds)}s (half of that on a boss): the monster is pinned to the spot and the thorns bite for ${byLevel(LEVELS.roseWhip.thornDps, formatMultiplier)} spell damage per second.`;
         }
     },
     rosePetals: {
         name: 'Rose Petals',
         icon: '🌷',
         cost: 130,
-        maxLvl: 1,
+        maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
-            return `Every ${ROSE_PETALS.cooldownSeconds}s, when monsters are near, a hurricane of roses and loose petals spins around you for ${ROSE_PETALS.durationSeconds}s, hitting everything within ${ROSE_PETALS.radius} range for ${formatMultiplier(ROSE_PETALS.damage)} spell damage every ${formatNumber(ROSE_PETALS.tickSeconds)}s, pushing them back and slowing them.`;
+            return `Three levels (the numbers below go from level 1 to 3). Every ${byLevel(LEVELS.rosePetals.cooldownSeconds)}s, when monsters are near, a hurricane of roses and loose petals spins around you for ${byLevel(LEVELS.rosePetals.durationSeconds)}s, hitting everything within ${byLevel(LEVELS.rosePetals.radius)} range for ${byLevel(LEVELS.rosePetals.damage, formatMultiplier)} spell damage every ${formatNumber(ROSE_PETALS.tickSeconds)}s, pushing them back and slowing them.`;
         }
     },
     featherDodge: {
         name: 'Feather Dodge',
         icon: '🪶',
         cost: 130,
-        maxLvl: 1,
+        maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
-            return `When a blow would hit you, you burst into a storm of raven feathers and slip through it: the blow misses and you are untouchable for ${formatNumber(FEATHER_DODGE.immuneSeconds)}s. Recharges in ${FEATHER_DODGE.cooldownSeconds}s.`;
+            return `Three levels (the numbers below go from level 1 to 3). When a blow would hit you, you burst into a storm of raven feathers and slip through it: the blow misses and you are untouchable for ${byLevel(LEVELS.featherDodge.immuneSeconds)}s. Recharges in ${byLevel(LEVELS.featherDodge.cooldownSeconds)}s.`;
         }
     },
     featherRain: {
         name: 'Feather Rain',
         icon: '🪶',
         cost: 120,
-        maxLvl: 1,
+        maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
-            return `Every ${formatNumber(FEATHER_RAIN.cooldownSeconds)}s you shed a rain of raven quills that falls from above on the monsters your raven has marked (up to ${FEATHER_RAIN.targets}): ${FEATHER_RAIN.quills} quills each, ${formatMultiplier(FEATHER_RAIN.damage)} blade damage per quill.`;
+            return `Three levels (the numbers below go from level 1 to 3). Every ${byLevel(LEVELS.featherRain.cooldownSeconds)}s you shed a rain of raven quills that falls from above on the monsters your raven has marked (up to ${byLevel(LEVELS.featherRain.targets)}): ${byLevel(LEVELS.featherRain.quills)} quills each, ${byLevel(LEVELS.featherRain.damage, formatMultiplier)} blade damage per quill.`;
         }
     },
     ravenDecoy: {
@@ -237,10 +258,10 @@ export const PASSIVE_SKILL_MODELS = {
         name: 'Shadow Raven',
         icon: '🐦‍⬛',
         cost: 90,
-        maxLvl: 1,
+        maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
-            return `A small raven circles at your shoulder. Every ${SHADOW_RAVEN.cooldownSeconds}s it dives at the nearest monster within ${SHADOW_RAVEN.range} range, pecks it for ${formatMultiplier(SHADOW_RAVEN.damage)} blade damage and flies back. The pecked monster is marked for ${SHADOW_RAVEN.markSeconds}s: every hit it takes deals ${formatPercent(SHADOW_RAVEN.markDamage)} more damage.`;
+            return `Three levels (the numbers below go from level 1 to 3). A small raven circles at your shoulder. Every ${byLevel(LEVELS.shadowRaven.cooldownSeconds)}s it dives at the nearest monster within ${byLevel(LEVELS.shadowRaven.range)} range, pecks it for ${byLevel(LEVELS.shadowRaven.damage, formatMultiplier)} blade damage and flies back. The pecked monster is marked for ${byLevel(LEVELS.shadowRaven.markSeconds)}s: every hit it takes deals ${byLevel(LEVELS.shadowRaven.markDamage, formatPercent)} more damage.`;
         }
     },
 
@@ -861,6 +882,12 @@ export const SHADOW_RAVEN = {
     markSeconds: 2,             // o monstro bicado fica em mira vermelha
     markDamage: 0.25            // e leva este bônus em todo golpe (lâmina, adaga, feitiço, sombras) enquanto a mira durar
 };
+
+scaleByLevel(SHADOW_RAVEN, 'shadowRaven');
+scaleByLevel(FEATHER_DODGE, 'featherDodge');
+scaleByLevel(FEATHER_RAIN, 'featherRain');
+scaleByLevel(ROSE_WHIP, 'roseWhip');
+scaleByLevel(ROSE_PETALS, 'rosePetals');
 
 export function createPassives() {
     return Object.fromEntries(

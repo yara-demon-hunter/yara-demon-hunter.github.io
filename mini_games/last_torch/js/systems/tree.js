@@ -258,7 +258,7 @@ export function getNodeUpgradeRows(node) {
     ];
 }
 
-const isSingle = (node) => node.kind === 'passive' || node.kind === 'relic' || node.kind === 'evolve';
+const isSingle = (node) => (node.kind === 'passive' && passives[node.key].maxLvl === 1) || node.kind === 'relic' || node.kind === 'evolve';
 
 // Skill que só funciona com adaga (needs: 'knives') e o jogador não lança adaga (mod noKnives): o nó fica selado.
 // Não se compra, e conta como cumprido para quem o pede (passe livre). Vale para o herói que não tem adaga (Captain

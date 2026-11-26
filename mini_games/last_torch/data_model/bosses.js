@@ -25,12 +25,12 @@ export const BOSS_STATS = {
     RIVER_SPIRIT:        { hp: 10000,  damage: 4, speed: 50,  physicalDef: 0.15, magicDef: 0.15 },   // 6  · River Crossing
     SLIZORK:             { hp: 17000,  damage: 10, speed: 23,  physicalDef: 0.3, magicDef: 0.00},   // 9  · Swamp
     GRAVE_KING:          { hp: 25000, damage: 35, speed: 60,  physicalDef: 0.25, magicDef: 0.00 },   // 12 · Graveyard
-    BRUTOS:              { hp: 12000, damage: 53.4, speed: 37,  physicalDef: 0.25, magicDef: 0.00 },   // 15 · Village
-    DEMON_LORD:          { hp: 15000, damage: 44.5, speed: 27,  physicalDef: 0.10, magicDef: 0.10 },   // 15 · Village, só para quem joga de Brutos (no lugar dele)
-    BLOOD_COUNTESS:      { hp: 20000, damage: 40.3, speed: 46,  physicalDef: 0.10, magicDef: 0.15 },   // 16 · Castle
-    LONG_NIGHT:          { hp: 25000, damage: 55.0, speed: 32,  physicalDef: 0.10, magicDef: 0.15 },   // 17 · Castle
-    AZAEL_FINAL:         { hp: 30000, damage: 44.7, speed: 144, physicalDef: 0.25, magicDef: 0.10 },   // 18 · Castle (a revanche do Azael)
-    DEMON_HUNTER_FINAL:  { hp: 30000, damage: 38.3, speed: 76,  physicalDef: 0.20, magicDef: 0.15 }    // 18 · Castle (a revanche, quando você joga de Azael)
+    BRUTOS:              { hp: 34000, damage: 53.4, speed: 37,  physicalDef: 0.25, magicDef: 0.00 },   // 15 · Village
+    DEMON_LORD:          { hp: 34000, damage: 44.5, speed: 27,  physicalDef: 0.10, magicDef: 0.10 },   // 15 · Village, só para quem joga de Brutos (no lugar dele)
+    BLOOD_COUNTESS:      { hp: 45000, damage: 40.3, speed: 75,  physicalDef: 0.2, magicDef: 0.2 },   // 16 · Castle
+    LONG_NIGHT:          { hp: 65000, damage: 55.0, speed: 60,  physicalDef: 0.25, magicDef: 0.25 },   // 17 · Castle
+    AZAEL_FINAL:         { hp: 80000, damage: 35, speed: 166, physicalDef: 0.25, magicDef: 0.2 },   // 18 · Castle (a revanche do Azael)
+    DEMON_HUNTER_FINAL:  { hp: 80000, damage: 35, speed: 120,  physicalDef: 0.20, magicDef: 0.25 }    // 18 · Castle (a revanche, quando você joga de Azael)
 };
 // Escuridão: por nível acima de 1 (Escuridão 1 = valores de BOSS_STATS). Ex.: hpPerLevel 0.3 = +30% de vida a cada nível (nível 8 = +210%).
 export const BOSS_DARKNESS = { hpPerLevel: 0.3, damagePerLevel: 0.12, speedPerLevel: 0.03 };

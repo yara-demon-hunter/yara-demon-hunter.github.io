@@ -184,11 +184,14 @@ function finishHour() {
     // Terminou as 5 ondas da tela (o chefe caiu): o mapa aparece e o herói anda até a tela seguinte; depois vem o resultado e o acampamento, já lá
     if (CAMPAIGN_RUNTIME.enabled && startsNewScreen(state.turn)) {
         state.gameState = 'MAP';                              // a partida espera (sem isto o fim da onda rodaria de novo a cada quadro)
-        enterScreenForTurn(state.turn);                       // o cenário novo se monta enquanto o resultado e o mapa aparecem
-        // Primeiro o resultado da onda (as estrelas), depois o mapa (que mostra as estrelas de cada onda), depois o acampamento já na tela nova
+        // Primeiro o resultado da onda (as estrelas), depois o mapa (que mostra as estrelas de cada onda), depois o acampamento já na tela nova.
+        // O cenário novo só entra com o mapa já cobrindo a tela: antes, o fundo do cartão de estrelas já mostrava a tela seguinte (adiantava o capítulo)
         collectAllGold();
+        let entered = false;
+        const enterNewScreen = () => { if (!entered) { entered = true; enterScreenForTurn(state.turn); } };
         const stars = grantWaveSpoils(state.turn - 1, () => {
-            showMapTransition(screenIndexOf(state.turn - 1), screenIndexOf(state.turn), () => openCamp(false, stars));
+            showMapTransition(screenIndexOf(state.turn - 1), screenIndexOf(state.turn), () => { enterNewScreen(); openCamp(false, stars); });
+            enterNewScreen();                                 // o mapa já está na tela (showMapTransition o mostra na hora): o cenário novo se monta por trás dele
         });
         return;
     }

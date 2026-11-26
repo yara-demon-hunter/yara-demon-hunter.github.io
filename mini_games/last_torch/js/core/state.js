@@ -1,6 +1,6 @@
 import { createPlayerState } from '../../data_model/character.js';
 import { CORE_MODEL } from '../../data_model/core.js';
-import { createPassives } from '../../data_model/passives.js';
+import { createPassives, levelSource } from '../../data_model/passives.js';
 import { createPowers } from '../../data_model/powers.js';
 import { FURY_BAR, createAttributes } from '../../data_model/skills.js';
 import { SoundEngine } from '../audio/sound-engine.js';
@@ -22,6 +22,7 @@ export function setDrawTarget(target) {
 export const audio = new SoundEngine();
 export const attributes = createAttributes();
 export const passives = createPassives();
+levelSource.of = (key) => passives[key]?.lvl;          // as constantes das passivas com níveis (LEVELS) leem o nível daqui
 export const powers = createPowers();
 
 // Heroi & Light Trail
