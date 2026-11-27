@@ -1,31 +1,31 @@
 /* --- BAÚ DIÁRIO (js/ui/daily.js) ---
-   Uma faixa: na tela inicial acima do PLAY, na tela final abaixo das Brasas. Fechado brilha; aberto mostra o de amanhã. */
+   Um cartão: título + botão/relógio em cima e os 7 dias embaixo, cada um com o valor em Brasas. Na tela inicial fica acima do PLAY.
+   Fechado (pronto para abrir): o cartão inteiro é um botão que brilha. Aberto: mostra o de amanhã e as horas que faltam. */
 .daily { width: 100%; }
 .daily.hidden { display: none; }
-.daily-open, .daily-done {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas: "icon text reward" "icon pips pips";
-    align-items: center;
-    column-gap: 0.55rem;
-    row-gap: 0.2rem;
+.daily-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
     width: 100%;
-    padding: 0.4rem 0.65rem;
+    padding: 0.5rem 0.6rem 0.55rem;
     border: 1px solid rgba(251, 191, 36, 0.35);
-    border-radius: 0.7rem;
-    background: rgba(40, 24, 8, 0.6);
+    border-radius: 0.8rem;
+    background: linear-gradient(180deg, rgba(58, 34, 10, 0.78), rgba(24, 14, 6, 0.82));
     color: #fde4c8;
     font: inherit;
     text-align: left;
+    box-shadow: inset 0 1px 0 rgba(253, 230, 138, 0.12);
 }
-.daily-done { grid-template-areas: "icon text" "icon pips"; grid-template-columns: auto minmax(0, 1fr); }
-.daily-open { cursor: pointer; border-color: rgba(251, 191, 36, 0.85); animation: dailyReady 1.4s ease-in-out infinite; }
-.daily-open:hover { background: rgba(66, 36, 8, 0.75); }
+.daily-open { cursor: pointer; border-color: rgba(251, 191, 36, 0.9); animation: dailyReady 1.4s ease-in-out infinite; }
+.daily-open:hover { background: linear-gradient(180deg, rgba(80, 46, 12, 0.85), rgba(32, 18, 8, 0.9)); }
+.daily-open:active { transform: scale(0.985); }
 @keyframes dailyReady {
-    0%, 100% { box-shadow: 0 0 0 rgba(251, 191, 36, 0); }
-    50% { box-shadow: 0 0 16px rgba(251, 191, 36, 0.55); }
+    0%, 100% { box-shadow: 0 0 0 rgba(251, 191, 36, 0), inset 0 1px 0 rgba(253, 230, 138, 0.12); }
+    50% { box-shadow: 0 0 18px rgba(251, 191, 36, 0.55), inset 0 1px 0 rgba(253, 230, 138, 0.12); }
 }
-.daily-icon { grid-area: icon; font-size: 1.5rem; line-height: 1; }
+.daily-head { display: flex; align-items: center; gap: 0.5rem; }
+.daily-icon { font-size: 1.5rem; line-height: 1; }
 .daily-open .daily-icon { animation: dailyShake 1.4s ease-in-out infinite; }
 @keyframes dailyShake {
     0%, 80%, 100% { transform: rotate(0); }
@@ -33,25 +33,58 @@
     90% { transform: rotate(10deg); }
     95% { transform: rotate(-6deg); }
 }
-.daily-text { grid-area: text; display: flex; flex-direction: column; min-width: 0; }
-.daily-text b { color: #fde68a; font-size: 0.74rem; letter-spacing: 0.12em; }
+.daily-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.daily-text b { color: #fde68a; font-size: 0.78rem; letter-spacing: 0.14em; }
 .daily-text em { color: #d6cdb8; font-size: 0.66rem; font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.daily-reward { grid-area: reward; padding: 0.25rem 0.55rem; border-radius: 0.5rem; background: #b45309; color: #fff7ed; font-size: 0.74rem; font-weight: 800; white-space: nowrap; }
-.daily-pips { grid-area: pips; display: flex; gap: 0.25rem; }
-.daily-pips i { flex: 1; height: 0.3rem; border-radius: 999px; background: rgba(148, 163, 184, 0.25); }
-.daily-pips i.is-big { flex: 1.6; }
-.daily-pips i.is-done { background: linear-gradient(90deg, #ea580c, #fbbf24); }
-.daily-pips i.is-today { background: rgba(251, 191, 36, 0.55); }
+.daily-reward { padding: 0.3rem 0.6rem; border-radius: 0.55rem; background: linear-gradient(180deg, #f59e0b, #b45309); color: #fff7ed; font-size: 0.74rem; font-weight: 800; white-space: nowrap; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4); }
+.daily-timer { padding: 0.25rem 0.5rem; border-radius: 999px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.3); color: #cbd5e1; font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
 
-/* Tela inicial: espaço entre a faixa e o PLAY/CONTINUE */
+/* Os 7 dias: rótulo, ícone e o valor em Brasas embaixo */
+.daily-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.28rem; }
+.daily-day {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.05rem;
+    padding: 0.28rem 0.1rem 0.3rem;
+    border-radius: 0.5rem;
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    min-width: 0;
+}
+.daily-day small { max-width: 100%; overflow: hidden; text-overflow: clip; font-size: 0.5rem; font-weight: 800; letter-spacing: 0.06em; color: #94a3b8; white-space: nowrap; }
+.daily-day-icon { font-size: 0.95rem; line-height: 1.1; }
+.daily-day b { font-size: 0.72rem; color: #fcd9a8; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.daily-day.is-done { background: rgba(234, 88, 12, 0.18); border-color: rgba(251, 146, 60, 0.4); }
+.daily-day.is-done small, .daily-day.is-done b { color: #fdba74; opacity: 0.8; }
+.daily-day.is-done .daily-day-icon { color: #4ade80; }
+.daily-day.is-today, .daily-day.is-next {
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.3), rgba(234, 88, 12, 0.2));
+    border-color: #fbbf24;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.35);
+}
+.daily-day.is-today small, .daily-day.is-next small { color: #fde68a; }
+.daily-day.is-today b, .daily-day.is-next b { color: #fff7ed; }
+.daily-day.is-today { animation: dailyToday 1.4s ease-in-out infinite; }
+@keyframes dailyToday { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+/* O dia 7 (o prêmio grande) tem o mesmo tamanho dos outros: só a moldura e o valor são dourados */
+.daily-day.is-big { border-color: rgba(251, 191, 36, 0.65); background: linear-gradient(180deg, rgba(251, 191, 36, 0.22), rgba(120, 53, 15, 0.3)); }
+.daily-day.is-big b { color: #fde68a; }
+.daily-day.is-big.is-done { opacity: 0.85; }
+
+/* Tela inicial: espaço entre o cartão e o PLAY/CONTINUE */
 #startDaily { margin-bottom: 0.5rem; }
 #summaryDaily { margin-top: 0.45rem; }
 
-/* Celular em pé ou tela baixa: faixa mais fina */
+/* Celular em pé ou tela baixa: cartão mais fino (sem os rótulos DAY n, só ícone e valor) */
 @media (max-height: 520px), (max-width: 420px) {
-    .daily-open, .daily-done { padding: 0.3rem 0.55rem; }
+    .daily-card { padding: 0.35rem 0.45rem 0.4rem; gap: 0.3rem; }
     .daily-icon { font-size: 1.2rem; }
-    .daily-text b { font-size: 0.66rem; }
-    .daily-reward { font-size: 0.68rem; padding: 0.2rem 0.45rem; }
+    .daily-text b { font-size: 0.68rem; }
+    .daily-reward { font-size: 0.68rem; padding: 0.22rem 0.45rem; }
+    .daily-days { gap: 0.2rem; }
+    .daily-day { padding: 0.2rem 0.05rem 0.22rem; }
+    .daily-day small { font-size: 0.44rem; letter-spacing: 0.03em; }
+    .daily-day b { font-size: 0.64rem; }
     #startDaily { margin-bottom: 0.35rem; }
+}
+@media (max-height: 420px) {
+    .daily-day small { display: none; }
 }

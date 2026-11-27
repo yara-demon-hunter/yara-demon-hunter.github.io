@@ -7,7 +7,7 @@ import { hurtPlayer } from './player.js';
 import { spreadHex } from './skills_curse.js';
 import { onNatureKill } from './skills_nature.js';
 import { damageAngel, liveAngel, onLightKill } from './skills_light.js';
-import { getKillHeal, getSpellCooldown, getSpellDamage, getTorchFireDamage } from './stats.js';
+import { getBladeDamage, getKillHeal, getSpellCooldown, getSpellDamage, getTorchFireDamage } from './stats.js';
 
 // --- PODERES ---
 // Cada poder lê os dados do nível atual com getPowerLevel (data_model/powers.js).
@@ -37,26 +37,111 @@ export function nearestEnemy(x, y, maxDist, skip = null) {
     return best;
 }
 
-// --- LÂMINAS ORBITANDO ---
-function updateOrbitBlades(dt) {
-    const level = getPowerLevel(powers.orbitBlades);
-    if (!level) return;
-    const M = POWER_MODELS.orbitBlades;
-    state.orbitAngle += M.spin * dt;
-    const damage = getSpellDamage() * level.damage;
-
+// --- SPECTRAL BLADE (Blade Path) ---
+// Quando monstros chegam perto, `count` lâminas fantasmas APARECEM em volta do herói (crescendo), giram por `duration` s fazendo dano de LÂMINA em quem toca, SOMEM
+// (encolhendo) e só então a recarga corre. Números: POWER_MODELS.spectralBlade. Desenho: renderSpectralBlade (js/render/powers.js).
+function updateSpectralBlade(dt) {
+    const level = getPowerLevel(powers.spectralBlade);
+    const R = state.spectralBlade;
+    if (!level) { R.left = 0; return; }
+    const M = POWER_MODELS.spectralBlade.base;
+    if (R.left <= 0) {
+        if (state.phase !== 'HUNT' || player.hp <= 0 || !ready('spectralBlade', dt, getSpellCooldown(level.cooldown))) return;
+        const near = state.enemies.some(e => e.hp > 0 && !e.emerge && Math.hypot(e.x - player.x, e.y - player.y) <= level.radius + 130 + e.radius);
+        if (!near) { state.powerTimers.spectralBlade = 0.3; return; }          // ninguém perto: não gasta a recarga
+        R.left = level.duration;
+        R.age = 0;
+        R.count = level.count;
+        createExplosion(player.x, player.y, '#c4b5fd', 8);
+        addShockwave(player.x, player.y, { radius: level.radius, color: '#a78bfa', width: 4, seconds: 0.35 });
+        audio.playSwordSlash?.(2);
+    } else state.powerTimers.spectralBlade = getSpellCooldown(level.cooldown);      // a recarga só corre depois que as lâminas somem
+    R.left -= dt;
+    R.age += dt;
+    R.angle += M.spin * dt;
+    const grow = Math.min(1, R.age / M.appearSeconds, R.left / M.vanishSeconds);     // aparecem crescendo e somem encolhendo: só fere com as lâminas "cheias"
+    if (grow < 0.5) return;
+    const damage = getBladeDamage() * level.damage;
     for (let i = 0; i < level.count; i++) {
-        const a = state.orbitAngle + (i / level.count) * TAU;
+        const a = R.angle + (i / level.count) * TAU;
         const x = player.x + Math.cos(a) * level.radius;
         const y = player.y + Math.sin(a) * level.radius;
         for (const e of state.enemies) {
-            if (e.orbitCd > 0 || Math.hypot(e.x - x, e.y - y) > e.radius + M.bladeRadius) continue;
-            e.orbitCd = M.hitCooldown;
-            dealDamage(e, damage, { kbX: Math.cos(a) * M.knockback, kbY: Math.sin(a) * M.knockback, style: 'spell' });
-            createExplosion(x, y, '#a5f3fc', 3);
+            if (e.hp <= 0 || e.bladeCd > 0 || Math.hypot(e.x - x, e.y - y) > e.radius + M.bladeRadius) continue;
+            e.bladeCd = M.hitCooldown;
+            dealDamage(e, damage, { kbX: Math.cos(a) * M.knockback, kbY: Math.sin(a) * M.knockback });
+            createExplosion(x, y, '#c4b5fd', 3);
             audio.playHit(1);
         }
     }
+    for (const e of state.enemies) if (e.bladeCd > 0) e.bladeCd -= dt;
+}
+
+// --- GOLDEN TORNADO (Curse Path) ---
+// Quando monstros chegam perto, um tornado dourado de luz nasce ao lado do herói e CAÇA os monstros (anda até o mais perto) por `duration` s: fere tudo dentro dele
+// (dano de feitiço por segundo) e arrasta quem está em volta para o centro. Some e só então a recarga corre. Números: POWER_MODELS.goldenTornado. Desenho: renderGoldenTornado.
+function updateGoldenTornado(dt) {
+    const level = getPowerLevel(powers.goldenTornado);
+    if (!level) { if (state.goldenTornado) endGoldenTornado(); return; }
+    const M = POWER_MODELS.goldenTornado.base;
+    let T = state.goldenTornado;
+    if (!T) {
+        if (state.phase !== 'HUNT' || player.hp <= 0 || !ready('goldenTornado', dt, getSpellCooldown(level.cooldown))) return;
+        const near = state.enemies.some(e => e.hp > 0 && !e.emerge && Math.hypot(e.x - player.x, e.y - player.y) <= 260 + e.radius);
+        if (!near) { state.powerTimers.goldenTornado = 0.3; return; }
+        const a = player.angle ?? 0;
+        T = state.goldenTornado = { x: player.x + Math.cos(a) * 50, y: player.y + Math.sin(a) * 50, age: 0, seconds: level.duration, tick: 0, radius: level.radius, hits: new Set() };
+        createExplosion(T.x, T.y, '#fde68a', 10);
+        addShockwave(T.x, T.y, { radius: level.radius * 1.4, color: '#fbbf24', width: 5, seconds: 0.4 });
+        audio.playNova?.();
+    }
+    state.powerTimers.goldenTornado = getSpellCooldown(level.cooldown);        // a recarga só corre depois que o tornado some
+    T.age += dt;
+    if (T.age >= T.seconds || state.phase !== 'HUNT') { endGoldenTornado(); return; }
+    // Caça: trava num monstro e anda até ele; quando ele morre, vai para o mais perto (sem monstro, volta para perto do herói)
+    if (!T.target || T.target.hp <= 0 || !state.enemies.includes(T.target) || Math.hypot(T.target.x - T.x, T.target.y - T.y) > 650) {
+        T.target = null;
+        let best = 520;
+        for (const e of state.enemies) {
+            if (e.hp <= 0 || e.emerge) continue;
+            const d = Math.hypot(e.x - T.x, e.y - T.y);
+            if (d < best) { best = d; T.target = e; }
+        }
+    }
+    const tx = T.target ? T.target.x : player.x, ty = T.target ? T.target.y : player.y;
+    const dx = tx - T.x, dy = ty - T.y, d = Math.hypot(dx, dy) || 1;
+    if (d > 8) {
+        const step = Math.min(d, M.speed * dt);
+        T.x += (dx / d) * step;
+        T.y += (dy / d) * step;
+    }
+    T.x = Math.max(20, Math.min(state.width - 20, T.x));
+    T.y = Math.max(160, Math.min(state.height - 20, T.y));
+    // Engole: quem está em volta é puxado em ESPIRAL para o centro (gira em volta dele enquanto se aproxima) e fere a cada instante. e.swallow (0 a 1) diz o quanto
+    // o monstro já está "dentro" do tornado; o desenho (js/render/entities.js e renderGoldenTornado) o encolhe, o faz girar e o cobre de ouro. Chefe e pesados quase não se mexem
+    const reach = T.radius * M.pullRatio;
+    const tick = (T.tick -= dt) <= 0;
+    if (tick) T.tick += M.tickSeconds;
+    const damage = getSpellDamage() * level.dps * M.tickSeconds;
+    const rise = Math.min(1, T.age / M.riseSeconds, (T.seconds - T.age) / M.fadeSeconds);
+    for (const e of state.enemies) {
+        const ex = T.x - e.x, ey = T.y - e.y, ed = Math.hypot(ex, ey) || 1;
+        if (e.hp <= 0 || e.emerge || ed > reach + e.radius) { e.swallow = 0; continue; }
+        e.swallow = Math.max(0, Math.min(1, (1 - ed / (T.radius * 1.15)) * 1.2)) * Math.max(0, rise);
+        if (!e.isBoss && !e.immovable && ed > 6) {
+            const resist = 1 - (e.knockbackResist ?? 0);
+            const pull = M.pull * resist * dt, swirl = M.swirl * resist * dt;
+            e.x += (ex / ed) * Math.min(pull, ed) + (-ey / ed) * swirl;        // para o centro + de lado: gira em volta dele
+            e.y += (ey / ed) * Math.min(pull, ed) + (ex / ed) * swirl;
+        }
+        if (tick && ed <= T.radius + e.radius) dealDamage(e, damage, { noCrit: true, style: 'spell', quiet: true });
+    }
+}
+
+// O tornado some: ninguém fica "engolido" (e.swallow volta a 0)
+function endGoldenTornado() {
+    state.goldenTornado = null;
+    for (const e of state.enemies) e.swallow = 0;
 }
 
 // --- FOGO NOS PASSOS ---
@@ -198,24 +283,69 @@ function updateSoulNova(dt) {
     audio.playNova();
 }
 
-// --- ABSOLUTE ZERO ---
-// Pulso de frio: fere e congela (e.frozen: o bloco de gelo de js/render/entities.js) todo monstro em volta; boss só leva o dano
+// --- FREEZING BREATH (chave absoluteZero) ---
+// Quando um monstro chega perto, o herói solta um sopro gelado em CONE pela boca que DURA M.breathSeconds (3 s) e GIRA com o herói (segue player.angle). A cada tickSeconds fere
+// e congela (e.frozen: o bloco de gelo de js/render/entities.js) quem está dentro: o primeiro contato congela por `freeze`, e cada instante seguinte renova o gelo enquanto o monstro
+// está no cone. Chefe também congela, mas por METADE do tempo (M.bossFreezeRatio). A recarga só corre depois que o sopro acaba; sem monstro ao alcance ele espera. O desenho: renderFrostBreaths (js/render/powers.js).
+const inCone = (e, ox, oy, angle, range, half) => {
+    const dx = e.x - ox, dy = e.y - oy;
+    const d = Math.hypot(dx, dy);
+    if (d > range + e.radius) return false;
+    if (d < e.radius) return true;                                   // colado no herói
+    let diff = Math.atan2(dy, dx) - angle;
+    diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+    return Math.abs(diff) <= half + Math.asin(Math.min(1, e.radius / d));      // o corpo do monstro alarga o cone
+};
+function breathTick(b, level, M) {
+    const damage = getSpellDamage() * level.dps * M.tickSeconds;
+    for (const e of state.enemies) {
+        if (e.hp <= 0 || e.emerge || !inCone(e, player.x, player.y, b.angle, level.range, level.halfAngle)) continue;
+        dealDamage(e, damage, { kbX: Math.cos(b.angle) * M.knockback, kbY: Math.sin(b.angle) * M.knockback, noCrit: true, style: 'spell', quiet: true });
+        const k = e.isBoss ? M.bossFreezeRatio : 1;                 // chefe congela por metade do tempo
+        if (!b.touched.has(e)) { b.touched.add(e); e.frozen = Math.max(e.frozen ?? 0, (level.freeze + M.holdFreeze) * k); }
+        else e.frozen = Math.max(e.frozen ?? 0, (M.holdFreeze + 0.15) * k);
+    }
+}
 function updateAbsoluteZero(dt) {
-    const level = getPowerLevel(powers.absoluteZero);
-    if (!level || !ready('absoluteZero', dt, getSpellCooldown(level.cooldown))) return;
     const M = POWER_MODELS.absoluteZero;
-    const damage = getSpellDamage() * level.damage;
-    state.enemies.forEach(e => {
-        if (Math.hypot(e.x - player.x, e.y - player.y) > level.radius + e.radius) return;
-        const a = Math.atan2(e.y - player.y, e.x - player.x);
-        dealDamage(e, damage, { kbX: Math.cos(a) * M.knockback, kbY: Math.sin(a) * M.knockback, noCrit: true, style: 'spell' });
-        if (!e.isBoss) e.frozen = Math.max(e.frozen ?? 0, level.freeze);
-    });
-    addShockwave(player.x, player.y, { radius: level.radius, color: '#a5f3fc', width: 9, seconds: 0.45 });
-    addShockwave(player.x, player.y, { radius: level.radius * 0.6, color: '#ffffff', width: 3, seconds: 0.3 });
-    shakeScreen(4);
+    const level = getPowerLevel(powers.absoluteZero);
+    const breaths = state.frostBreaths;
+    // Durante a Fúria (o especial: o Lord's Decree do Gudran, etc.) o sopro não sai, e um que estivesse soprando é cortado: o gesto da Fúria e o do sopro brigavam na animação
+    if (state.frenzyActiveTimer > 0) {
+        if (breaths.length > 0 && level) state.powerTimers.absoluteZero = getSpellCooldown(level.cooldown);      // o sopro cortado conta como usado
+        breaths.length = 0;
+        return;
+    }
+    for (let i = breaths.length - 1; i >= 0; i--) {
+        const b = breaths[i];
+        if (!level || state.phase !== 'HUNT' || player.hp <= 0) { breaths.splice(i, 1); continue; }
+        b.age += dt;
+        // O cone vira com o herói (suave: acompanha o rumo para onde ele olha)
+        let diff = player.angle - b.angle;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        b.angle += Math.max(-M.turnSpeed * dt, Math.min(M.turnSpeed * dt, diff));
+        b.tick -= dt;
+        if (b.tick <= 0) { b.tick += M.tickSeconds; breathTick(b, level, M); }
+        b.sound -= dt;
+        if (b.sound <= 0) { b.sound = 0.7; audio.playIceBreath?.(); }
+        state.powerTimers.absoluteZero = getSpellCooldown(level.cooldown);       // a recarga só começa a correr quando o sopro acaba
+        if (b.age >= M.breathSeconds) breaths.splice(i, 1);
+    }
+    if (!level || breaths.length > 0 || state.phase !== 'HUNT' || !ready('absoluteZero', dt, getSpellCooldown(level.cooldown))) return;
+    // O melhor rumo para começar: a direção de cada monstro ao alcance, ficando com a que pega mais monstros
+    const near = state.enemies.filter(e => e.hp > 0 && !e.emerge && Math.hypot(e.x - player.x, e.y - player.y) <= level.range + e.radius);
+    if (near.length === 0) { state.powerTimers.absoluteZero = 0.3; return; }       // ninguém perto: não gasta a recarga
+    let best = null, bestCount = -1, bestDist = Infinity;
+    for (const t of near) {
+        const angle = Math.atan2(t.y - player.y, t.x - player.x);
+        const count = near.filter(e => inCone(e, player.x, player.y, angle, level.range, level.halfAngle)).length;
+        const dist = Math.hypot(t.x - player.x, t.y - player.y);
+        if (count > bestCount || (count === bestCount && dist < bestDist)) { best = angle; bestCount = count; bestDist = dist; }
+    }
+    player.angle = best;
+    breaths.push({ x: player.x, y: player.y, angle: best, age: 0, tick: 0, sound: 0, touched: new Set(), range: level.range, half: level.halfAngle });
     startCast();
-    audio.playNova();
+    shakeScreen(2);
 }
 
 // --- LUA FRIA ---
@@ -320,17 +450,12 @@ export function onEnemyKilled(e) {
     spreadHex(e);
     onNatureKill(e);
     onLightKill(e);
-
-    const burst = getPowerLevel(powers.corpseBurst);
-    if (burst && Math.random() < burst.chance) {
-        blast(e.x, e.y, burst.radius, getSpellDamage() * burst.damage, POWER_MODELS.corpseBurst.knockback, '#fb7185', 'spell');
-        if (powers.corpseBurst.evolved) player.hp = Math.min(player.maxHp, player.hp + 1);
-    }
 }
 
 export function updatePowers(dt) {
     if (state.powerTimers.wrath > 0) state.powerTimers.wrath -= dt;
-    updateOrbitBlades(dt);
+    updateSpectralBlade(dt);
+    updateGoldenTornado(dt);
     updateEmberTrail();
     updateGroundFires(dt);
     updateChainLightning(dt);

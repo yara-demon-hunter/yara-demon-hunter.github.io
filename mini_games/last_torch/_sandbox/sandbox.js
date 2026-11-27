@@ -22,6 +22,7 @@ import { mountScreens } from '/_sandbox/screens.js';
 import { mountBossMoves } from '/_sandbox/bossmoves.js';
 import { mountDialogues } from '/_sandbox/dialogues.js';
 import { mountBalance } from '/_sandbox/balance.js';
+import { mountLevels } from '/_sandbox/levels.js';
 
 CAMPAIGN_RUNTIME.enabled = false;           // o sandbox escolhe o cenário à mão: a troca automática por tela da campanha fica desligada
 const choice = { hero: ACTIVE_HEROES[0], boss: 'AZAEL' };
@@ -64,7 +65,7 @@ panel.innerHTML = `
     <p class="note">Test arena: nothing here touches the game or its save.</p>
     <div class="sb-format"><label>Screen format (all tabs): <select id="sbFormat"><option value="desktop">Desktop (full window)</option><option value="landscape">Phone · landscape 844×390</option><option value="portrait">Phone · portrait 390×844</option></select></label>
     <button id="sbWipeSave" class="sb-opt" title="Wipes the game save of this sandbox (embers, Altar upgrades, trophies, unlocked heroes, saved hunts) and reloads. Your sandbox settings (Arena, Fast run, format) stay.">🗑️ Reset game save</button></div>
-    <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button><button data-tab="screens">🖼️ Screens</button><button data-tab="moves">🗡️ Boss moves</button><button data-tab="dialogues">💬 Dialogues</button><button data-tab="balance">⚖️ Boss balance</button></div>
+    <div class="sb-tabs"><button data-tab="arena" class="on">⚔️ Arena</button><button data-tab="tuner">📐 HUD tuner</button><button data-tab="fast">⏩ Fast run</button><button data-tab="screens">🖼️ Screens</button><button data-tab="moves">🗡️ Boss moves</button><button data-tab="dialogues">💬 Dialogues</button><button data-tab="balance">⚖️ Boss balance</button><button data-tab="levels">📈 Levels</button></div>
     <div id="sbArena">
     <button id="sbReset" class="sb-opt" title="Put every Arena setting back to how it starts (hero, boss, monsters, buddies, numbers, boxes and scenery)">↺ Reset Arena to defaults</button>
     <h3>Scenery <small>(applies right away, even mid-fight)</small></h3><div class="sb-row" id="sbScenery"></div>
@@ -95,6 +96,7 @@ panel.innerHTML = `
     <div id="sbMoves" class="hidden"></div>
     <div id="sbDialogues" class="hidden"></div>
     <div id="sbBalance" class="hidden"></div>
+    <div id="sbLevels" class="hidden"></div>
   </div>`;
 document.body.appendChild(panel);
 
@@ -363,6 +365,7 @@ let screens = null;
 let moves = null;
 let dialogues = null;
 let balance = null;
+let levels = null;
 // Demonstração de golpes: só o boss escolhido, sem monstros, com todos os modos deus ligados (o painel esconde na hora)
 function startBossDemo(key) {
     ['#sbAlone', '#sbGod', '#sbGodBoss', '#sbGodTorch', '#sbGodMonsters'].forEach(id => { value(id).checked = true; });
@@ -404,6 +407,8 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
         panel.querySelector('#sbMoves').classList.toggle('hidden', tab !== 'moves');
         panel.querySelector('#sbDialogues').classList.toggle('hidden', tab !== 'dialogues');
         panel.querySelector('#sbBalance').classList.toggle('hidden', tab !== 'balance');
+        panel.querySelector('#sbLevels').classList.toggle('hidden', tab !== 'levels');
+        if (tab === 'levels') levels ??= mountLevels(panel.querySelector('#sbLevels'));
         if (tab === 'balance') balance ??= mountBalance(panel.querySelector('#sbBalance'), {
             bosses, startFight: (o) => { const r = startBalanceFight(o); panel.classList.add('hidden'); return r; },
             restoreFight: restoreBalanceFight, showPanel: () => panel.classList.remove('hidden')
@@ -413,7 +418,7 @@ panel.querySelectorAll('.sb-tabs button').forEach(button => {
             bosses, startDemo: startBossDemo, showPanel: () => panel.classList.remove('hidden')
         });
         if (tab === 'screens') screens ??= mountScreens(panel.querySelector('#sbScreens'), { hidePanel: () => panel.classList.add('hidden'), showPanel: () => panel.classList.remove('hidden') });
-        panel.querySelector('.card').classList.toggle('is-wide', tab === 'tuner');
+        panel.querySelector('.card').classList.toggle('is-wide', tab === 'tuner' || tab === 'levels');
         if (tab === 'fast') fast ??= mountFastRun(panel.querySelector('#sbFast'), {
             hidePanel: () => panel.classList.add('hidden'),
             showPanel: () => panel.classList.remove('hidden'),

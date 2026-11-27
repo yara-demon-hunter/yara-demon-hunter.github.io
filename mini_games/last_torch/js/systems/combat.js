@@ -7,7 +7,7 @@ import { dealDamage, ignite } from './damage.js';
 import { createExplosion, hitStop, shakeScreen } from './effects.js';
 import { isFireCasting } from './knives.js';
 import { fireArcaneBolt } from './arcane.js';
-import { feedBloodlust, getFinalBlowMultiplier, launchCrescent, markShatter } from './skills_blade.js';
+import { feedBloodlust, getFinalBlowMultiplier, launchCrescent, launchShatter } from './skills_blade.js';
 import { detonateMark } from './skills_shadow.js';
 import { beamActive, startFury } from './fury.js';
 import { startMove } from './moves.js';
@@ -175,10 +175,11 @@ export function updateAutoAttack(dt) {
     const kbForce = getKnockback() * (player.comboStep === 3 ? characterStat('comboKnockback') : 1.0);
 
     // Colisão de dano no arco do golpe
+    let thrown = false;                                    // Shatter Strike: no máximo um monstro lançado por golpe
     const hits = hitEnemiesInArc(player.x, player.y, atkAngle, slashRad, currentArcHalf, dmg, kbForce, whirl,
         (e) => {
             chargeUlt(getFuryChargePerHit());
-            markShatter(e);                 // Shatter Strike: o empurrado que bater em outro causa dano baixo nos dois
+            if (!thrown) thrown = launchShatter(e, atkAngle);      // Shatter Strike (recarga de 15 s): lança este monstro, que bate no que encontrar
             // Em pleno dash a marca espera: é o dash que vai detoná-la, com o bônus
             if (e.marked > 0 && player.dashTimer <= 0) detonateMark(e, false);
         },

@@ -3,6 +3,7 @@ import { MAP_LAYOUT } from '../../data_model/map_layout.js';
 import { HEROES } from '../../data_model/heroes.js';
 import { save } from '../core/save.js';
 import { audio, state } from '../core/state.js';
+import { resetQuickPick } from './quick_pick.js';
 import { startWaveReplay } from '../systems/night.js';
 import { NIGHT } from '../../data_model/night.js';
 import { CAMPAIGN as CAMP, screenIndexOf, startsNewScreen } from '../../data_model/campaign.js';
@@ -197,6 +198,7 @@ function finish() {
     if (!arrived) return;
     window.removeEventListener('keydown', onKey);
     screen().classList.add('hidden');
+    markMap(false);
     const done = onDone;
     onDone = null;
     done?.();
@@ -205,13 +207,24 @@ function finish() {
 function onKey(e) {
     if (e.code === 'Enter' || e.code === 'Space') {
         e.preventDefault();
-        if (!arrived) arriveNow(); else finish();
+        if (arrived) finish();                       // a caminhada depois do chefe NÃO se pula: só dá para continuar quando o herói chega
     }
 }
 
 let arriveNow = () => {};
 
 // from, to: índices das telas (CAMPAIGN.screens). callback: roda quando o jogador continua.
+// O mapa está na tela? (a caminhada entre telas ou o mapa aberto pelo ícone). Enquanto está, ninguém gasta pontos de skill: a escolha rápida, a tela de status e a compra
+// de nós ficam bloqueadas (quick_pick.js, status.js, tree.js) e o HUD de pontos some (body.is-map-open em css/components/map.css)
+export function isMapOpen() {
+    const root = document.getElementById('mapScreen');
+    return state.gameState === 'MAP' || (!!root && !root.classList.contains('hidden'));
+}
+function markMap(open) {
+    document.body.classList.toggle('is-map-open', open);
+    if (open) resetQuickPick();                       // uma escolha de skill que estava para abrir não abre por cima do mapa
+}
+
 export function showMapTransition(from, to, callback) {
     const root = screen();
     const leg = CAMPAIGN.screens[from].leg;
@@ -239,6 +252,7 @@ export function showMapTransition(from, to, callback) {
     const place = (p) => { [marker.style.left, marker.style.top] = pct(p); };
     place(leg[0]);
     root.classList.remove('hidden');
+    markMap(true);
     window.addEventListener('keydown', onKey);
 
     const arrive = () => {
@@ -291,6 +305,7 @@ export function showMapHere(index, subtitle, callback, { canReplay = false, duri
     marker.classList.add('is-arrived');
     arriveNow = () => {};
     root.classList.remove('hidden');
+    markMap(true);
     window.addEventListener('keydown', onKey);
 }
 
@@ -341,6 +356,5 @@ export function setupMapScreen() {
         startWaveReplay(Number(go.dataset.wave));
     });
     document.getElementById('btnMapClose').addEventListener('click', () => { if (arrived) finish(); });
-    // Tocar no mapa pula a caminhada, e depois continua
-    document.getElementById('mapFrame').addEventListener('click', () => { if (!arrived) arriveNow(); });
+    // (Tocar no mapa não pula mais a caminhada: ela toca inteira antes de o botão de continuar acender)
 }

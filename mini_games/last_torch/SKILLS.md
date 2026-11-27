@@ -33,7 +33,7 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 | Oath of Ruin | Curse | Reforça e acelera os feitiços | Reduz o dano da lâmina | Capuz alto, grimório flutuando, runas no chão |
 
 Regras: abre ao aprender **as duas skills que chegam nele** (as ligações do mapa) e fica na coluna 6, sempre na mesma posição.
-Slaughter pede Cataclysm e Executioner; Whispers, Shadow Legion e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Phoenix Pact e Solar Wall;
+Slaughter pede Spectral Blade e Executioner (o Cataclysm saiu em 27/11/2026); Whispers, Shadow Legion e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Phoenix Pact e Solar Wall;
 Ruin, Wrath of Heaven e Event Horizon. Os dados ficam em `data_model/passives.js`, e a arte
 em `data_model/visuals/characters/oath_visual.js` e `js/render/hero_gear.js`.
 
@@ -56,7 +56,7 @@ o ramo exige, mais barato ele deve ser.
 
 - Stats e efeitos simples custam 1 (ou 2 nos que movem o jogo: dano, ataque, raio, vida).
 - Poderes custam de 1 (Shadow) a 3 (Blade, Flame, Curse); passivas e evoluções, de 1 a 5. Juramentos: 5 em Shadow.
-- Cada nível do herói dá **1 ponto** (`TREE_POINTS`; eram 2 até 27/11/2026, quando a árvore passou a ser cara de verdade: antes o jogador comprava quase tudo, 127 pontos no nível 34). Os baús seguem dando 1 a 2 (o do Goblin do Baú, 2).
+- Cada nível do herói dá **2 pontos** (`TREE_POINTS`), mas o XP por nível é **exponencial** (`xpCurve` em `character.js`: base 200, cada nível custa 37% mais). Começo rápido (nível 5 na onda 1), fim lento (~18 na onda 18). Medido em 27/11/2026: antes dava nível 37 e 127 pontos no total. Os baús (1 a 2; o do Goblin do Baú, 2), o Rush e as estrelas também pagam pontos.
 - O preço mais alto de Flame e Curse paga uma força maior: feitiços batem 10% acima da lâmina (`SPELL_SKILL`).
 - Skills que agem sozinhas em campo (atiram, explodem, invocam) ficam 1 ponto acima das de efeito passivo do mesmo ramo, para
   que empilhar várias seja quase impossível numa noite (~86 pontos numa partida inteira).
@@ -89,7 +89,7 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
 - **Blade** (raiz: Blade Damage)
   - Fúria: Fury (duração, dano e carga da barra), Bloodlust*, Crimson Tide*, Executioner*
   - Aço: Attack Speed, Slash Width, Whirlwind, Keen Eye
-  - Força: Attack Range, Knockback, Earthbreaker*, Cataclysm*
+  - Força: Attack Range, Knockback, Earthbreaker*, Spectral Blade (no lugar do Cataclysm: lâminas fantasmas que aparecem, giram por um tempo, somem e entram em recarga)
   - Corpo: Hero Health (vida, -4% de dano recebido e provocar de mais longe; 2 pontos por nível), Blood Edge, War Cry*
   - Oath of Slaughter*
 - **Shadow** (raiz: Move Speed)
@@ -106,10 +106,10 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Armas: Flaming Sword* (sai do Hellwalker), Fireballs* (vem depois da Flaming Sword; nada mais depende dela)
   - Oath of the Hearth*
 - **Curse** (raiz: Arcane Study)
-  - Gelo e força: Cold Moon, Soul Nova, Absolute Zero, Starfall
+  - Gelo e força: Cold Moon, Soul Nova, Freezing Breath (antes Absolute Zero; a chave interna continua absoluteZero), Starfall
   - Distância: Grave Wisp*, Occult Focus*, Storm Sigil, Wrath of Heaven
   - Vazio: Creeping Hex*, Dark Knowledge*, Void Rift*, Event Horizon*
-  - Morte: Corpse Burst, Red Harvest, Spectral Blades, Blade Tempest
+  - Morte: Golden Tornado (um tornado dourado de luz que caça os monstros). Saíram em 27/11/2026: Corpse Burst, Red Harvest, Spectral Blades (agora é a Spectral Blade do Blade Path) e Blade Tempest. Arcane Study: +1% de dano por nível (até 5%) só nas skills do Curse Path
   - Oath of Ruin*
 
 ## O que cada skill nova faz

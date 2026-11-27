@@ -425,6 +425,39 @@ function stampMonster(e, t) {
         ctx.globalAlpha = 1;
         return;
     }
+    if (e.shatterFly) {
+        // Lançado pelo Shatter Strike: o corpo GIRA no ar (cambalhota), se estica no sentido do voo e deixa imagens para trás e um risco de velocidade
+        const flown = state.runTime - (e.shatterStart ?? state.runTime);
+        const speed = Math.hypot(e.vx, e.vy) || 1;
+        const tumble = flown * 16 * (e.vx >= 0 ? 1 : -1);
+        const dirX = e.vx / speed, dirY = e.vy / speed;
+        const lift = Math.sin(Math.min(1, flown / 0.6) * Math.PI) * e.radius * 0.9;        // sobe no ar e volta
+        ctx.globalAlpha = 0.28;
+        for (let g = 3; g >= 1; g--) stamp(atlas, frame.sx, frame.sy, cell, cell, x - dirX * g * 11, y - dirY * g * 11 - lift * 0.7, frame.rotation + tumble - g * 0.35, width * 1.1, height * 1.1);
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = 'rgba(253, 230, 138, 0.75)';
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(x - dirX * (e.radius + 4), y - dirY * (e.radius + 4) - lift * 0.5);
+        ctx.lineTo(x - dirX * (e.radius + 34), y - dirY * (e.radius + 34) - lift * 0.5);
+        ctx.stroke();
+        stamp(atlas, frame.sx, frame.sy, cell, cell, x, y - lift, frame.rotation + tumble, width * 1.25, height * 1.25);
+        // sombra no chão fica onde ele está de verdade
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.beginPath();
+        ctx.ellipse(x, y + e.radius * 0.6, e.radius * (1 - 0.3 * (lift / (e.radius * 0.9 + 0.01))), e.radius * 0.35, 0, 0, TAU);
+        ctx.fill();
+        return;
+    }
+    if (e.swallow > 0.05) {
+        // Engolido pelo Golden Tornado (js/systems/powers.js): encolhe, balança e perde opacidade conforme entra no tornado (a luz dourada é desenhada por cima, em renderGoldenTornado)
+        const k = e.swallow;
+        ctx.globalAlpha = 1 - 0.35 * k;
+        stamp(atlas, frame.sx, frame.sy, cell, cell, x + Math.sin(t * 11 + e.phase) * 2 * k, y, frame.rotation + Math.sin(t * 7 + e.phase) * 0.45 * k, width * (1 - 0.3 * k), height * (1 - 0.3 * k));
+        ctx.globalAlpha = 1;
+        return;
+    }
     stamp(atlas, frame.sx, frame.sy, cell, cell, x, y, frame.rotation, width, height);
 }
 

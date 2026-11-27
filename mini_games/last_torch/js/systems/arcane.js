@@ -1,16 +1,18 @@
-// --- ATAQUE ARCANO (Gudran) ---
-// O herói sem lâmina: no lugar do golpe de espada, ele ergue o cajado e solta um raio de energia azul no monstro mais perto
-// (js/systems/combat.js chama fireArcaneBolt). Dano de MAGIA (número azul). Cada 3º raio do combo é maior e empurra mais.
-// Com a Runa Soberana (Curse Path) o raio fura monstros e estoura em luz azul onde acaba. Números: ARCANE_BOLT e SOVEREIGN_RUNE
+// --- RAIO ARCANO E ESCUDO DE RUNAS (Gudran) ---
+// 27/11/2026: o ataque básico do Gudran é uma cajadada (o golpe normal, físico). O CLIQUE é o arremesso de adaga do jogo com uma bola de energia azul (burstArcaneKnife aqui;
+// o arremesso em js/systems/knives.js, com o gesto staffCast do boneco). O código do raio antigo (fireArcaneBolt, state.arcaneBolts) fica para quem tiver basicAttack: 'arcane'.
+// O ESCUDO DE RUNAS deixou de ser o clique: é um poder da árvore (Curse Path, só dele) que dispara sozinho quando monstros chegam perto (updateRuneShield).
+// Com a Runa Soberana (Curse Path) o raio EXPLODE em luz azul no primeiro monstro que acerta (não atravessa) e a explosão fere os outros em volta. Números: ARCANE_BOLT e SOVEREIGN_RUNE
 // em data_model/passives.js. Desenho: js/render/arcane.js.
 import { ARCANE_BOLT as B, SOVEREIGN_RUNE as RUNE } from '../../data_model/passives.js';
 import { audio, passives, player, state } from '../core/state.js';
+import { ready } from './powers.js';
 import { dealDamage } from './damage.js';
-import { addShockwave, createExplosion } from './effects.js';
+import { addShockwave, createExplosion, shakeScreen } from './effects.js';
 import { chargeUlt } from './combat.js';
-import { characterStat, getAtkRadius, getFuryChargePerHit, getRuneShield, getSpellDamage } from './stats.js';
+import { characterStat, getAtkRadius, getFuryChargePerHit, getRuneShield, getSpellCooldown, getSpellDamage } from './stats.js';
 import { mod } from './modifiers.js';
-import { startCast } from './moves.js';
+import { startCast, startMove } from './moves.js';
 import { beamActive } from './fury.js';
 
 export function resetArcane() {
@@ -23,7 +25,7 @@ export function fireArcaneBolt(target, comboStep) {
     const angle = Math.atan2(target.y - player.y, target.x - player.x);
     player.angle = angle;
     const big = comboStep === 3;
-    const pierce = passives.sovereignRune.lvl > 0 ? RUNE.pierce : 0;
+    const pierce = passives.sovereignRune.lvl > 0 ? RUNE.pierce : 0;       // 0: com a Runa o raio explode no primeiro, não atravessa
     state.arcaneBolts.push({
         x: player.x + Math.cos(angle) * B.spawnForward,
         y: player.y + Math.sin(angle) * B.spawnForward,
@@ -33,7 +35,7 @@ export function fireArcaneBolt(target, comboStep) {
         radius: big ? B.comboRadius : B.radius,
         damage: getSpellDamage() * B.damageRatio * (big ? B.comboRatio : 1),
         knockback: B.knockback * (big ? characterStat('comboKnockback') : 1),
-        range: getAtkRadius() + 70,           // um pouco além do alvo: o raio erra e segue se o monstro se mexer
+        range: B.range,                       // voa até B.range: erra e segue se o monstro se mexer
         travelled: 0,
         pierces: pierce,
         struck: null
@@ -42,17 +44,22 @@ export function fireArcaneBolt(target, comboStep) {
     audio.playSwordSlash?.(big ? 3 : 1);
 }
 
-// O raio acaba (batendo, ou chegando ao fim do alcance): com a Runa Soberana, estoura em área
-function endBolt(b) {
+// O raio acaba (batendo, ou chegando ao fim do alcance): com a Runa Soberana, estoura em área. `primary` é o monstro que o raio já acertou em cheio
+// (ele não leva a explosão de novo: a explosão é para os outros em volta)
+function endBolt(b, primary = null) {
     if (passives.sovereignRune.lvl <= 0) return;
     const radius = RUNE.burstRadius * (b.big ? 1.25 : 1);
     for (const e of state.enemies) {
-        if (e.hp <= 0 || Math.hypot(e.x - b.x, e.y - b.y) > radius + e.radius) continue;
+        if (e === primary || e.hp <= 0 || Math.hypot(e.x - b.x, e.y - b.y) > radius + e.radius) continue;
         const a = Math.atan2(e.y - b.y, e.x - b.x);
         dealDamage(e, b.damage * RUNE.burstDamage, { style: 'spell', kbX: Math.cos(a) * 90, kbY: Math.sin(a) * 90 });
     }
-    addShockwave(b.x, b.y, { radius, color: '#60a5fa', width: 4, seconds: 0.3 });
-    createExplosion(b.x, b.y, '#93c5fd', 8);
+    addShockwave(b.x, b.y, { radius, color: '#60a5fa', width: 5, seconds: 0.35 });
+    addShockwave(b.x, b.y, { radius: radius * 0.55, color: '#dbeafe', width: 3, seconds: 0.22 });
+    createExplosion(b.x, b.y, '#93c5fd', b.big ? 16 : 11);
+    createExplosion(b.x, b.y, '#dbeafe', 5);
+    shakeScreen(b.big ? 4 : 2);
+    audio.playBlast?.();
 }
 
 export function updateArcane(dt) {
@@ -74,7 +81,7 @@ export function updateArcane(dt) {
                 b.pierces--;
                 (b.struck ??= new Set()).add(hit);
             } else {
-                endBolt(b);
+                endBolt(b, hit);
                 arcaneBolts.splice(i, 1);
             }
             continue;
@@ -87,24 +94,43 @@ export function updateArcane(dt) {
     }
 }
 
-// --- ESCUDO DE RUNAS (o clique do Gudran, no lugar da adaga) ---
-// Runas azuis giram em volta dele por `seconds`. Um monstro que encosta numa runa leva dano de magia e é jogado para fora; o mesmo
-// monstro só leva outro toque depois de hitSeconds. Usa o mesmo relógio de recarga das habilidades do botão (state.quake.timer),
-// como o Axe Quake e o Root Snare, e não sai durante o raio da Fúria. Números: abilities.runeShield no data_model/characters/gudran.js.
+// --- BOLA DE ENERGIA (o clique do Gudran) ---
+// O clique é o arremesso de adaga do jogo (js/systems/knives.js): a bola de energia azul voa com os números da adaga (alcance, velocidade, recarga, dano de magia). Com a Runa
+// Soberana ela EXPLODE no primeiro monstro (ou no fim do alcance) e fere os outros em volta: é esta função, chamada por knives.js.
+export function burstArcaneKnife(k, primary = null) {
+    if (passives.sovereignRune.lvl <= 0 || k.style !== 'arcane') return;
+    for (const e of state.enemies) {
+        if (e === primary || e.hp <= 0 || Math.hypot(e.x - k.x, e.y - k.y) > RUNE.burstRadius + e.radius) continue;
+        const a = Math.atan2(e.y - k.y, e.x - k.x);
+        dealDamage(e, k.damage * RUNE.burstDamage, { style: 'spell', kbX: Math.cos(a) * 90, kbY: Math.sin(a) * 90 });
+    }
+    addShockwave(k.x, k.y, { radius: RUNE.burstRadius, color: '#60a5fa', width: 5, seconds: 0.35 });
+    addShockwave(k.x, k.y, { radius: RUNE.burstRadius * 0.55, color: '#dbeafe', width: 3, seconds: 0.22 });
+    createExplosion(k.x, k.y, '#93c5fd', 11);
+    createExplosion(k.x, k.y, '#dbeafe', 5);
+    shakeScreen(2);
+    audio.playBlast?.();
+}
+
+// --- ESCUDO DE RUNAS (poder da árvore, Curse Path, só do Gudran) ---
+// Quando monstros chegam perto, runas azuis giram em volta dele por `seconds`. Um monstro que encosta numa runa leva dano de magia e é jogado para fora; o mesmo
+// monstro só leva outro toque depois de hitSeconds. A recarga só corre depois que as runas somem. Números: POWER_MODELS.runeShield em data_model/powers.js.
 function updateRuneShield(dt) {
     const R = state.runeShield;
-    if (mod('runeShield') <= 0) return;
     const S = getRuneShield();
-    const wants = state.knifeInput.held || state.quake.touch || state.knifeInput.stick.fire;
-    if (wants && state.quake.timer <= 0 && R.left <= 0 && !beamActive() && player.dashTimer <= 0 && state.phase === 'HUNT') {
-        state.quake.timer = S.cooldownSeconds;
-        state.knifeInput.stick.fire = false;
+    if (!S) { R.left = 0; return; }
+    if (R.left <= 0) {
+        if (state.phase !== 'HUNT' || beamActive() || player.hp <= 0 || !ready('runeShield', dt, getSpellCooldown(S.cooldown))) return;
+        const near = state.enemies.some(e => e.hp > 0 && !e.emerge && Math.hypot(e.x - player.x, e.y - player.y) <= S.radius + 120 + e.radius);
+        if (!near) { state.powerTimers.runeShield = 0.3; return; }       // ninguém perto: não gasta a recarga
         R.left = S.seconds;
         R.age = 0;
         startCast();
         addShockwave(player.x, player.y, { radius: S.radius, color: '#60a5fa', width: 6, seconds: 0.4 });
         createExplosion(player.x, player.y, '#93c5fd', 10);
         audio.playReflect?.();
+    } else {
+        state.powerTimers.runeShield = getSpellCooldown(S.cooldown);     // a recarga só começa quando as runas somem
     }
     if (R.left <= 0) return;
     R.left -= dt;

@@ -102,3 +102,13 @@
 .sb-bal-hp #sbBalPct { position: absolute; inset: 0; display: grid; place-items: center; text-shadow: 0 1px 2px #000; }
 #sbBalVerdict.ok { color: #4ade80; }
 #sbBalVerdict.bad { color: #f87171; }
+
+/* Aba Levels: tabela de níveis por onda */
+.sb-lv { border-collapse: collapse; font-size: 12px; width: 100%; margin-top: 8px; }
+.sb-lv th, .sb-lv td { padding: 3px 7px; text-align: right; border-bottom: 1px solid #1e293b; white-space: nowrap; }
+.sb-lv th:nth-child(2), .sb-lv td:nth-child(2) { text-align: left; }
+.sb-lv th { color: #94a3b8; position: sticky; top: 0; background: #0f172a; }
+.sb-lv-boss td { background: rgba(251, 191, 36, 0.07); }
+.sb-lv-zero { color: #64748b; }
+.sb-lv td:nth-child(9) { color: #fbbf24; }
+.sb-lv td:nth-child(10), .sb-lv td:nth-child(11) { color: #64748b; }

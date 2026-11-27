@@ -20,7 +20,8 @@ export const BLADE_NODES = [
     { id: 'radius', cost: 1, also: ['knockback'], branch: 'blade', kind: 'stat', key: 'radius', x: 1, y: 2, requires: [req('damage')] },
     { id: 'shatterStrike', cost: 3, branch: 'blade', kind: 'passive', key: 'shatterStrike', x: 2, y: 2, requires: [req('radius')] },
     { id: 'earthbreaker', cost: 4, branch: 'blade', kind: 'power', key: 'earthbreaker', x: 3, y: 2, requires: [req('shatterStrike')] },
-    { id: 'earthbreakerEvolve', cost: 4, branch: 'blade', kind: 'evolve', key: 'earthbreaker', x: 4, y: 2, requires: [req('earthbreaker', 5)] },
+    // 27/11/2026: o Cataclysm (a evolução do Earthbreaker) saiu; no lugar dele entra a Spectral Blade: lâminas fantasmas que aparecem, giram por um tempo, somem e entram em recarga
+    { id: 'spectralBlade', cost: 4, branch: 'blade', kind: 'power', key: 'spectralBlade', x: 4, y: 2, requires: [req('earthbreaker', 5)] },
     // Linha do corpo: aguentar o cerco (Parry -> Hero Health -> Blood Edge -> War Cry)
     { id: 'parry', cost: 2, branch: 'blade', kind: 'passive', key: 'parry', x: 1, y: 3, requires: [req('damage')] },
     { id: 'playerHp', cost: 2, branch: 'blade', kind: 'stat', key: 'playerHp', x: 2, y: 3, requires: [req('parry')],
@@ -28,5 +29,5 @@ export const BLADE_NODES = [
       mods: { damageTaken: -0.04, provoke: 0.25 } },
     { id: 'bloodEdge', cost: 3, branch: 'blade', kind: 'power', key: 'bloodEdge', x: 3, y: 3, requires: [req('playerHp', 2)] },
     { id: 'warCry', cost: 4, branch: 'blade', kind: 'passive', key: 'warCry', x: 4, y: 3, requires: [req('bloodEdge')] },
-    { id: 'oathSlaughter', cost: 4, branch: 'blade', kind: 'passive', key: 'oathSlaughter', oath: true, x: 5, y: 1.5, requires: [req('executioner'), req('earthbreakerEvolve')] }
+    { id: 'oathSlaughter', cost: 4, branch: 'blade', kind: 'passive', key: 'oathSlaughter', oath: true, x: 5, y: 1.5, requires: [req('executioner'), req('spectralBlade')] }
 ];

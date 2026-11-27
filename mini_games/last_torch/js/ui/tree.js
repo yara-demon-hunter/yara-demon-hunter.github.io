@@ -286,6 +286,8 @@ function createTreeView(cfg) {
             button.classList.toggle('is-chained', !st.reached && !st.maxed);
             // Selado para este personagem (sem adaga): visual próprio, diferente do cadeado
             button.classList.toggle('is-sealed', st.restricted);
+            // A exceção à regra: Fury mora no ramo Blade, que está selado para o herói (Gudran, Rowan), mas ela se compra. O ramo fica apagado e ela, acesa
+            button.classList.toggle('is-exception', node.id === 'furySkill' && !st.restricted && !!getHero().sealedBranches?.includes(node.branch));
             button.querySelector('.tnode-level').textContent = node.kind !== 'evolve' && !isSingle(node) && !(st.restricted && st.level === 0) ? `${st.level}/${st.max}` : '';
         });
         lines.forEach(({ line, from, to, need }) => {

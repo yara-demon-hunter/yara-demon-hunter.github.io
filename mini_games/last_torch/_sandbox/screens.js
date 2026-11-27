@@ -12,8 +12,13 @@ import { grantWaveSpoils, openCamp } from '/js/ui/camp.js';
 import { openAltar } from '/js/ui/altar.js';
 import { openRanks } from '/js/ui/sanctuary.js';
 import { openGift, returnToMenu, startGame, triggerGameOver } from '/js/ui/screens.js';
-import { CAMPAIGN, TOTAL_WAVES, effectiveTurn } from '/data_model/campaign.js';
-import { showMapTransition } from '/js/ui/map_screen.js';
+import { CAMPAIGN, TOTAL_WAVES, effectiveTurn, screenIndexOf } from '/data_model/campaign.js';
+import { showMapHere, showMapTransition } from '/js/ui/map_screen.js';
+import { WAVE_EVENTS } from '/data_model/wave_events.js';
+import { startHour } from '/js/systems/night.js';
+import { dealDamage } from '/js/systems/damage.js';
+import { openStatus } from '/js/ui/status.js';
+import { requestQuickPick, updateQuickPick } from '/js/ui/quick_pick.js';
 
 export function mountScreens(host, { hidePanel, showPanel }) {
     const v = { hero: ACTIVE_HEROES[0], wave: 4, score: 12400, kills: 260, bosses: 1, stars: 3, darkness: 1 };
@@ -32,6 +37,10 @@ export function mountScreens(host, { hidePanel, showPanel }) {
       <div class="sb-row" id="scEnd"></div>
       <h3>Between waves</h3>
       <div class="sb-row" id="scWaveBtns"></div>
+      <h3>Skills <small>(level-up and the tree)</small></h3>
+      <div class="sb-row" id="scSkills"></div>
+      <h3>Wave events <small>(starts the wave at the chosen number and triggers the event right away; the hero starts under the torch)</small></h3>
+      <div class="sb-row" id="scEvents"></div>
       <h3>World map (between screens)</h3>
       <div class="sb-row" id="scMap"></div>
       <h3>Menus</h3>
@@ -200,6 +209,36 @@ export function mountScreens(host, { hidePanel, showPanel }) {
     }, 'the wave results and the camp'));
     add('#scWaveBtns', '🏕️ Camp only', 'no results card', go(() => { state.turn += 1; state.phase = 'CLEAR'; openCamp(true); }, 'the camp'));
 
+    // Skills: a escolha rápida que abre ao subir de nível e a árvore (tela de status), com pontos para gastar
+    add('#scSkills', '⚡ Level-up pick', '3 cards, as when you level up', go(() => {
+        const was = save.settings.quickPick;
+        save.settings.quickPick = true;
+        state.skillPoints = 6;
+        state.phase = 'HUNT';
+        requestQuickPick();
+        state.runTime += 5;
+        updateQuickPick();
+        save.settings.quickPick = was;
+    }, 'the level-up pick'));
+    add('#scSkills', '🌳 Skill tree', 'the status screen with 20 points', go(() => { state.skillPoints = 20; state.phase = 'HUNT'; openStatus('PLAYING'); }, 'the skill tree'));
+
+    // Eventos de onda: começa a onda escolhida e dispara o evento na hora (o progresso da onda é posto no ponto em que ele começa)
+    const startEvent = (key) => {
+        startHour();
+        state.hourPlan.event = { key, started: false, timer: 0, goblin: null };
+        state.waveTime = 70 * WAVE_EVENTS[key].at + 2;
+        state.scoreTurn = state.targetScore * (WAVE_EVENTS[key].at + 0.03);
+    };
+    const EVENT_LABELS = { goblin: ['🧌 Catch the Goblin', 'chest goblin, blink around the torch'], flank: ['🌊 Flank', 'a wave from one side, for the torch'], dark: ['🌑 The light fails', 'only the torch lights'], meteors: ['☄️ Starfall', 'red circles, then impact'] };
+    Object.keys(WAVE_EVENTS).filter(k => EVENT_LABELS[k]).forEach(key => add('#scEvents', EVENT_LABELS[key][0], EVENT_LABELS[key][1], go(() => startEvent(key), WAVE_EVENTS[key].name)));
+    add('#scEvents', '💰 Goblin treasure drop', 'the goblin dies: chest + coin shower', go(() => {
+        startEvent('goblin');
+        setTimeout(() => {
+            const g = state.enemies.find(e => e.type === 'CHEST_GOBLIN');
+            if (g) { g.invulnerable = false; g.untargetable = false; dealDamage(g, 1e9, {}); }
+        }, 1600);
+    }, 'the goblin treasure'));
+
     // Mapa entre as telas: o retrato do herói escolhido anda pelo caminho até a tela seguinte (a mesma animação que toca depois de cada chefe)
     CAMPAIGN.screens.slice(0, -1).forEach((s, i) => {
         const to = CAMPAIGN.screens[i + 1];
@@ -208,6 +247,12 @@ export function mountScreens(host, { hidePanel, showPanel }) {
             hidePanel();
             showMapTransition(i, i + 1, () => { showPanel?.(); note(`Played: ${s.name} to ${to.name}.`); });
         });
+    });
+    add('#scMap', '📍 Map: you are here', 'the map from the HUD icon, for the wave above', () => {
+        save.hero = v.hero;
+        const wave = num('#scWave', 1, 18);
+        hidePanel();
+        showMapHere(screenIndexOf(wave), `WAVE ${wave} OF ${TOTAL_WAVES}`, () => { showPanel?.(); note('Closed the map.'); }, { duringHunt: false });
     });
     // Menus
     add('#scMenus', '🏠 Start menu', 'with this save', () => { hidePanel(); returnToMenu(); note('Opened: the start menu.'); });

@@ -98,14 +98,6 @@ function buildPlayer(character) {
         }
         mods.rootSnare = 1;
     }
-    // Habilidade do Gudran: Escudo de Runas no botão da adaga (js/systems/arcane.js)
-    const runeShield = character.abilities?.runeShield ?? null;
-    if (runeShield) {
-        for (const key of ['cooldownSeconds', 'seconds', 'runes', 'radius', 'runeRadius', 'spin', 'damage', 'hitSeconds', 'knockback']) {
-            if (typeof runeShield[key] !== 'number') throw new Error(`Personagem ${character.id}: falta "${key}" em abilities.runeShield`);
-        }
-        mods.runeShield = 1;
-    }
     // Fúria do personagem (character.fury): o tipo e os números dela (js/systems/fury.js)
     const FURY_KEYS = {
         swordRain: ['name', 'stepSeconds', 'fallSeconds', 'radius', 'damage', 'range', 'giantFallSeconds', 'giantRadius', 'giantDamage', 'giantKnockback'],
@@ -132,7 +124,6 @@ function buildPlayer(character) {
         knifeRange: stats.knifeRange,
         axeQuake,
         rootSnare,
-        runeShield,
         fury,
         moveSpeed: stats.speed,
         dash: { distance: stats.dashDistance, seconds: stats.dashSeconds }

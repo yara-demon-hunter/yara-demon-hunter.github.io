@@ -75,14 +75,14 @@ function openPick() {
 // Chamado no fim do quadro da partida. Só abre na caçada: o fim da hora não pode ser interrompido.
 export function updateQuickPick() {
     if (openAt === null || state.runTime < openAt) return;
-    if (state.gameState !== 'PLAYING' || state.phase !== 'HUNT') return;
+    if (state.gameState !== 'PLAYING' || state.phase !== 'HUNT' || document.body.classList.contains('is-map-open')) return;
     openAt = null;
     openPick();
 }
 
 export function choosePick(index) {
     const node = cards[index];
-    if (!node || performance.now() - openedTime < CLICK_GUARD_MS) return;
+    if (!node || performance.now() - openedTime < CLICK_GUARD_MS || document.body.classList.contains('is-map-open')) return;
     for (let levels = levelsFor(node); levels > 0; levels--) buyNode(node.id);
     updateHUD();
     resumeGame();

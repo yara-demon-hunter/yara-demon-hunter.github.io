@@ -3,7 +3,7 @@ import { CHARACTER_MODEL } from '../../data_model/character.js';
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { CORE_MODEL } from '../../data_model/core.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, createVampireBat, rollMonsterGold } from '../../data_model/monsters.js';
-import { MIRROR_WARD } from '../../data_model/passives.js';
+import { MIRROR_WARD, SHATTER_STRIKE } from '../../data_model/passives.js';
 import { POWER_MODELS } from '../../data_model/powers.js';
 import { audio, passives, player, shadowClones, state } from '../core/state.js';
 import { updateHUD } from '../ui/hud.js';
@@ -600,8 +600,9 @@ export function updateEnemies(dt) {
 
         e.x += e.vx * dt;
         e.y += e.vy * dt;
-        e.vx *= damping;
-        e.vy *= damping;
+        const drag = e.shatterFly ? Math.pow(SHATTER_STRIKE.flightDamping, dt * 60) : damping;      // lançado pelo Shatter Strike: voa mais longe
+        e.vx *= drag;
+        e.vy *= drag;
 
         const distToPlayer = Math.hypot(player.x - e.x, player.y - e.y);
         // Arbusto da emboscada: com o herói escondido, o monstro comum não o vê e segue para a tocha. Carvalho acordado: o

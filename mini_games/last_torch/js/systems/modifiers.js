@@ -22,6 +22,7 @@ import { attributes, passives, powers, state } from '../core/state.js';
 //   tocha: torchHp (pontos), torchRegen (pontos por segundo), torchGuard, warmthBurn (x dano de feitiço por segundo)
 //   pontos de skill: levelPoints (por nível, fração acumula), chestPoints (por baú)
 //   vida extra: revives
+//   curseDamage (dano extra SÓ das skills do Curse Path, por nível do Arcane Study; vira POWER_BOOST dos poderes do ramo)
 //   natureDamage (dano extra de todas as skills do Nature Path, state.dmgSource === 'nature' em damage.js: Dark Roses, do Rowan)
 //   demonDamage (dano extra contra elites e chefes, SÓ das skills do Light Path: Judgment; state.dmgSource === 'light' em damage.js)
 //   monstros: enemyHp, enemyDamage, enemySpeed, spawnRate; itens: pickupRate
@@ -72,6 +73,10 @@ export function refreshModifiers() {
         addAll(p.mods, p.lvl);
         addAll(getPowerLevel(p)?.mods);
     });
+    // Arcane Study (Curse Path): +1% por nível de dano SÓ nas skills do Curse Path (os poderes e evoluções desse ramo; mesma via do bônus de afinidade, POWER_BOOST)
+    if ((totals.curseDamage ?? 0) > 0) {
+        TREE_NODES.forEach(n => { if (n.branch === 'curse' && (n.kind === 'power' || n.kind === 'evolve')) POWER_BOOST[n.key] = (POWER_BOOST[n.key] ?? 0) + totals.curseDamage; });
+    }
     addAll(state.omen?.mods);
 
     const dark = save.darkness - 1;

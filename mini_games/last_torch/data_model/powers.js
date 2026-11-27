@@ -7,26 +7,6 @@ const formatNumber = (value) => String(Number(value.toFixed(2)));
 const formatMultiplier = (value) => `${formatNumber(value)}×`;
 
 export const POWER_MODELS = {
-    orbitBlades: {
-        name: 'Spectral Blades', icon: '🗡️', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `${level.count} ghost daggers circle you, dealing ${formatMultiplier(level.damage)} blade damage within ${level.radius} range.`;
-        },
-        get upgrades() {
-            return this.levels.map(level =>
-                `${level.count} blades · ${formatMultiplier(level.damage)} blade damage · ${level.radius} orbit range`
-            );
-        },
-        levels: [
-            { count: 2, damage: 0.55, radius: 66 },
-            { count: 3, damage: 0.55, radius: 66 },
-            { count: 3, damage: 0.75, radius: 72 },
-            { count: 4, damage: 0.75, radius: 72 },
-            { count: 5, damage: 0.85, radius: 86 }
-        ],
-        spin: 3.4, hitCooldown: 0.42, bladeRadius: 12, knockback: 70
-    },
     emberTrail: {
         name: 'Ember Steps', icon: '👣', maxLvl: 5,
         get desc() {
@@ -190,47 +170,103 @@ export const POWER_MODELS = {
         ],
         knockback: 520
     },
-    // Absolute Zero (era a evolução da Soul Nova, agora uma skill própria no lugar dela): um pulso de frio que fere e CONGELA tudo em volta
-    // (bosses só levam o dano). Cada nível encurta a recarga, alarga o pulso e congela por mais tempo.
+    // Freezing Breath (a chave interna continua absoluteZero: era o Absolute Zero, um pulso de frio em área; 27/11/2026 virou uma baforada): quando um monstro chega perto o
+    // bastante, o herói solta pela boca um sopro gelado em CONE que DURA `breathSeconds` e ACOMPANHA para onde ele vira (o cone gira com o herói). Quem está dentro leva dano
+    // de feitiço a cada instante e fica congelado enquanto o sopro o pega; ao sair do cone ainda fica congelado por `freeze` segundos. Chefe também congela, mas por metade do tempo.
+    // A recarga conta depois que o sopro acaba. Cada nível encurta a recarga, alonga e alarga o cone, e congela por mais tempo.
     absoluteZero: {
-        name: 'Absolute Zero', icon: '🧊', maxLvl: 5,
+        name: 'Freezing Breath', icon: '🌬️', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `A pulse of absolute cold bursts from you every ${formatNumber(level.cooldown)}s, dealing ${formatMultiplier(level.damage)} spell damage within ${level.radius} range and freezing monsters solid for ${formatNumber(level.freeze)}s. Bosses take the damage but do not freeze.`;
+            return `When a monster gets close, you exhale a freezing breath for ${formatNumber(this.breathSeconds)}s in a cone ${level.range} long and ${Math.round(level.halfAngle * 2 * 180 / Math.PI)}° wide. Turn and the breath follows you. Monsters in it take ${formatMultiplier(level.dps)} spell damage per second and stay frozen solid, then ${formatNumber(level.freeze)}s more after they leave the cone. Bosses freeze too, but for half as long. Ready again ${formatNumber(level.cooldown)}s after it ends.`;
         },
         get upgrades() {
             return this.levels.map(level =>
-                `Pulse every ${formatNumber(level.cooldown)}s · ${level.radius} radius · ${formatMultiplier(level.damage)} spell damage · frozen ${formatNumber(level.freeze)}s`
+                `Cone ${level.range} long, ${Math.round(level.halfAngle * 2 * 180 / Math.PI)}° wide · ${formatMultiplier(level.dps)} spell damage/s · +${formatNumber(level.freeze)}s frozen · ready ${formatNumber(level.cooldown)}s after`
             );
         },
+        // range: o comprimento do cone (e a distância em que o sopro dispara); halfAngle: metade da abertura (radianos); dps: dano de feitiço por segundo
         levels: [
-            { cooldown: 14, radius: 170, damage: 1.4, freeze: 1.5 },
-            { cooldown: 13, radius: 190, damage: 1.6, freeze: 1.8 },
-            { cooldown: 12, radius: 210, damage: 1.8, freeze: 2.1 },
-            { cooldown: 11, radius: 230, damage: 2.0, freeze: 2.3 },
-            { cooldown: 10, radius: 250, damage: 2.2, freeze: 2.5 }
+            { cooldown: 8, range: 150, halfAngle: 0.52, dps: 0.5, freeze: 1.0 },
+            { cooldown: 7.5, range: 165, halfAngle: 0.58, dps: 0.55, freeze: 1.3 },
+            { cooldown: 7, range: 180, halfAngle: 0.64, dps: 0.6, freeze: 1.6 },
+            { cooldown: 6.5, range: 195, halfAngle: 0.7, dps: 0.7, freeze: 1.9 },
+            { cooldown: 6, range: 210, halfAngle: 0.78, dps: 0.8, freeze: 2.2 }
         ],
-        knockback: 140
+        knockback: 25,
+        breathSeconds: 3,        // quanto dura o sopro
+        tickSeconds: 0.25,       // de quanto em quanto tempo ele fere e renova o gelo
+        turnSpeed: 7,            // o cone vira para onde o herói olha (radianos por segundo)
+        holdFreeze: 0.5,         // o gelo que cada instante do sopro renova em quem está dentro
+        bossFreezeRatio: 0.5     // chefe congela por esta fração do tempo (metade)
     },
-    corpseBurst: {
-        name: 'Corpse Burst', icon: '💥', maxLvl: 5,
+    // Rune Shield (só o Gudran, Curse Path): era o clique dele até 27/11/2026, agora uma skill. Sozinho, quando um monstro chega perto, runas azuis giram em volta do herói por
+    // `seconds` s: quem encosta numa runa leva dano de magia e é jogado para fora. Cada nível encurta a recarga, dura mais, ganha runas e bate mais forte.
+    runeShield: {
+        name: 'Rune Shield', icon: '🔷', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `Slain monsters have a ${formatPercent(level.chance)} chance to explode, dealing ${formatMultiplier(level.damage)} spell damage within ${level.radius} range. Explosions can chain.`;
+            return `When monsters come close, ${level.runes} blue runes spin around you for ${formatNumber(level.seconds)}s. Every monster that touches one takes ${formatMultiplier(level.damage)} spell damage and is thrown away. Ready again ${formatNumber(level.cooldown)}s after it ends. Only Gudran can learn this.`;
         },
         get upgrades() {
             return this.levels.map(level =>
-                `${formatPercent(level.chance)} chance · ${level.radius} blast radius · ${formatMultiplier(level.damage)} spell damage`
+                `${level.runes} runes · ${formatNumber(level.seconds)}s · ${formatMultiplier(level.damage)} spell damage per touch · every ${formatNumber(level.cooldown)}s`
             );
         },
         levels: [
-            { chance: 0.2, radius: 62, damage: 1.3 },
-            { chance: 0.3, radius: 62, damage: 1.3 },
-            { chance: 0.3, radius: 80, damage: 1.6 },
-            { chance: 0.4, radius: 80, damage: 1.6 },
-            { chance: 0.5, radius: 96, damage: 2 }
+            { cooldown: 15, seconds: 4, runes: 3, damage: 0.5 },
+            { cooldown: 13, seconds: 6, runes: 4, damage: 0.6 },
+            { cooldown: 12, seconds: 8, runes: 4, damage: 0.8 },
+            { cooldown: 11, seconds: 10, runes: 5, damage: 1.0 },
+            { cooldown: 10, seconds: 12, runes: 6, damage: 1.5 }
         ],
-        knockback: 240
+        // O que não muda de nível (o desenho das runas e o toque)
+        base: { radius: 62, runeRadius: 9, spin: 3.2, hitSeconds: 0.45, knockback: 280 }
+    },
+    // Spectral Blade (Blade Path, no lugar do Cataclysm; 27/11/2026): sozinha, quando monstros chegam perto, lâminas fantasmas APARECEM em volta do herói, giram por `duration` s
+    // (dano de LÂMINA em quem toca), SOMEM, e só então a recarga corre. Cada nível: mais lâminas, mais tempo, mais dano e menos recarga.
+    spectralBlade: {
+        name: 'Spectral Blade', icon: '🗡️', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `When monsters come close, ${level.count} ghost blades appear around you and spin for ${formatNumber(level.duration)}s, dealing ${formatMultiplier(level.damage)} blade damage to every monster they touch within ${level.radius} range. Then they vanish, and the skill recharges for ${formatNumber(level.cooldown)}s.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.count} blades · ${formatNumber(level.duration)}s · ${formatMultiplier(level.damage)} blade damage · ${level.radius} range · recharge ${formatNumber(level.cooldown)}s`
+            );
+        },
+        levels: [
+            { cooldown: 14, duration: 4, count: 3, damage: 0.8, radius: 70 },
+            { cooldown: 13, duration: 4.5, count: 4, damage: 0.9, radius: 75 },
+            { cooldown: 12, duration: 5, count: 4, damage: 1.0, radius: 80 },
+            { cooldown: 11, duration: 5.5, count: 5, damage: 1.1, radius: 85 },
+            { cooldown: 10, duration: 6, count: 6, damage: 1.3, radius: 92 }
+        ],
+        base: { spin: 4.2, hitCooldown: 0.35, bladeRadius: 13, knockback: 80, appearSeconds: 0.3, vanishSeconds: 0.4 }
+    },
+    // Golden Tornado (Curse Path, no lugar do Blade Tempest; 27/11/2026): sozinho, quando monstros chegam perto, um TORNADO DOURADO de luz nasce junto do herói e CAÇA os monstros
+    // por `duration` s: fere (dano de feitiço por segundo) tudo dentro dele e arrasta quem está em volta para o centro. Some e só então a recarga corre.
+    goldenTornado: {
+        name: 'Golden Tornado', icon: '🌪️', maxLvl: 5,
+        get desc() {
+            const level = this.levels[this.levels.length - 1];
+            return `When monsters come close, a tornado of golden light rises beside you and hunts them for ${formatNumber(level.duration)}s, dealing ${formatMultiplier(level.dps)} spell damage per second to everything inside (${level.radius} range) and dragging nearby monsters into its core. Then it fades, and the skill recharges for ${formatNumber(level.cooldown)}s.`;
+        },
+        get upgrades() {
+            return this.levels.map(level =>
+                `${formatNumber(level.duration)}s · ${formatMultiplier(level.dps)} spell damage/s · ${level.radius} range · recharge ${formatNumber(level.cooldown)}s`
+            );
+        },
+        levels: [
+            { cooldown: 14, duration: 4, dps: 0.8, radius: 55 },
+            { cooldown: 13, duration: 4.5, dps: 0.9, radius: 60 },
+            { cooldown: 12, duration: 5, dps: 1.0, radius: 65 },
+            { cooldown: 11, duration: 5.5, dps: 1.2, radius: 72 },
+            { cooldown: 10, duration: 6, dps: 1.4, radius: 80 }
+        ],
+        // speed: quanto o tornado anda atrás dos monstros (px/s); pull: o quanto arrasta os monstros em volta para o centro, px/s; swirl: o quanto os faz girar em volta dele, px/s; pullRatio: até quantas vezes o raio ele puxa
+        base: { speed: 95, pull: 70, swirl: 90, pullRatio: 1.9, tickSeconds: 0.25, knockback: 20, riseSeconds: 0.4, fadeSeconds: 0.5 }
     },
     chainLightning: {
         name: 'Storm Sigil', icon: '⚡', maxLvl: 5,
@@ -880,14 +916,6 @@ export const EVOLUTIONS = {
         },
         levels: { count: 3 }
     },
-    orbitBlades: {
-        name: 'Blade Tempest', icon: '🌪️',
-        get desc() {
-            const { count, damage, radius } = this.levels;
-            return `${count} blades circle you, each dealing ${formatMultiplier(damage)} blade damage within ${radius} range.`;
-        },
-        levels: { count: 8, damage: 1.1, radius: 104 }
-    },
     emberTrail: {
         name: 'Hellwalker', icon: '☄️',
         get desc() {
@@ -941,14 +969,6 @@ export const EVOLUTIONS = {
         },
         levels: { damage: 3 },
         echo: { delaySeconds: 0.28, seconds: 0.16, damage: 0.8, hitRadius: 26 }
-    },
-    corpseBurst: {
-        name: 'Red Harvest', icon: '🥀',
-        get desc() {
-            const { chance, radius, damage } = this.levels;
-            return `Every kill has a ${formatPercent(chance)} chance to trigger an explosion, dealing ${formatMultiplier(damage)} spell damage within ${radius} range.`;
-        },
-        levels: { chance: 1, radius: 110, damage: 1.7 }
     },
     chainLightning: {
         name: 'Wrath of Heaven', icon: '🌩️',

@@ -147,12 +147,14 @@ export const state = {
     clearWaveRadius: 0,
 
     // Poderes (js/systems/powers.js, desenhados em js/render/powers.js)
-    orbitAngle: 0,
+    spectralBlade: { left: 0, angle: 0, age: 0 },      // Spectral Blade (Blade Path): tempo restante, giro e idade das lâminas
+    goldenTornado: null,                               // Golden Tornado (Curse Path): { x, y, age, seconds, tick, ... } enquanto existe
     trailDistance: 0,
     groundFires: [],
     lightning: [],
     bolts: [],
     stars: [],
+    frostBreaths: [],           // Freezing Breath: os sopros gelados na tela { x, y, angle, range, half, age }
     powerTimers: {},
     blastBudget: 0,
 

@@ -15,6 +15,8 @@ import { characterStat, getKnifeBaseRange, isMagicKnife, getKnifeCooldown, getKn
 import { getHero } from './modifiers.js';
 import { beamActive } from './fury.js';
 import { save } from '../core/save.js';
+import { startMove } from './moves.js';
+import { burstArcaneKnife } from './arcane.js';
 
 // O que o herói lança: adaga, ou a rosa do Rowan (a Rosa Negra, com a skill Dark Roses). Só muda o desenho: dano, alcance e
 // todas as skills de adaga valem igual para a rosa
@@ -46,6 +48,16 @@ export function throwKnife(aimX, aimY) {
     if (Math.hypot(aimX - player.x, aimY - player.y) < 1) angle = player.angle;
 
     state.knifeTimer = getKnifeCooldown();
+    // Gudran: a "adaga" é a bola de energia, e o arremesso é o gesto de erguer o cajado (staffCast): a bola sai no instante de impacto do gesto
+    if (getHero().thrown === 'arcane') {
+        state.knifeThrowAngle = angle;
+        state.knifeThrowPower = 0;
+        state.knifeCharge = 0;
+        player.angle = angle;                                // o boneco vira para onde a bola vai (durante o staffCast ele segue player.angle), como em todo arremesso
+        if (player.move) releaseKnife();                     // ocupado em outro movimento (a cajadada): solta direto
+        else startMove('staffCast', () => releaseKnife());
+        return;
+    }
     // Fireballs: antes do arremesso a bola cresce na mão (getFireCastRatio); a animação só começa depois disso
     const hold = passives.fireballs.lvl > 0 ? getFireCastSeconds() : 0;
     state.knifeThrowTime = performance.now() + hold * 1000;
@@ -101,7 +113,7 @@ function releaseKnife(thrower = player) {
             angle, speed, maxRange, damage, knockback,
             travelled: 0,
             bounces: power > 0 ? 0 : ricochet?.bounces ?? 0,      // a bola carregada não ricocheteia
-            pierces: getThrownStyle() === 'arcane' ? 1 : 0,       // a esfera arcana atravessa o primeiro monstro
+            pierces: 0,                                           // (a bola de energia não atravessa: explode com a Runa Soberana)
             scale: 1 + power * ((charge?.maxScale ?? 1) - 1),
             fire: passives.fireballs.lvl > 0,
             magic: isMagicKnife(),
@@ -167,7 +179,7 @@ export function getKnifeChargeRatio() {
 // autoShoot desliga e volta ao modo antigo (clicar atira no cursor, segurar repete). Heróis de habilidade segurada (machado, raízes, runas) não usam.
 const COARSE = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 export function autoShootOn() {
-    return save.settings.autoShoot && !COARSE && mod('noKnives') <= 0 && mod('axeQuake') <= 0 && mod('rootSnare') <= 0 && mod('runeShield') <= 0;
+    return save.settings.autoShoot && !COARSE && mod('noKnives') <= 0 && mod('axeQuake') <= 0 && mod('rootSnare') <= 0;
 }
 
 // Botão da adaga (toque): arrastando mira na direção do arraste. Num toque rápido a mira é automática:
@@ -301,6 +313,7 @@ export function updateKnives(dt) {
             if (k.fire) burstFireball(k, hit);
             createExplosion(k.x, k.y, hit.color, 6);
             audio.playHit(1);
+            burstArcaneKnife(k, hit);                                 // Gudran com a Runa Soberana: a bola explode e fere os outros em volta
             if (k.pierces > 0) {
                 k.pierces--;
                 (k.struck ??= new Set()).add(hit);
@@ -311,6 +324,9 @@ export function updateKnives(dt) {
         }
 
         const outside = k.x < 0 || k.x > state.width || k.y < 0 || k.y > state.height;
-        if (outside || k.travelled >= k.maxRange) knives.splice(i, 1);
+        if (outside || k.travelled >= k.maxRange) {
+            if (!outside) burstArcaneKnife(k);                        // acabou o alcance: com a Runa Soberana a bola estoura onde parou
+            knives.splice(i, 1);
+        }
     }
 }

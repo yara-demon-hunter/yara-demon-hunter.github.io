@@ -4,8 +4,10 @@
 // É o "motivo marcado no relógio" do plano de retenção (report/improvement_2026_11_16/05_retencao_d1_d7.md, 5.4):
 // quem joga hoje vê na tela final quanto o baú de amanhã vale.
 
-// Brasas de cada dia da sequência. O dia 1 já paga a 1ª melhoria do Altar (15); o dia 7 paga o Torch's Call (160).
-export const DAILY_REWARDS = [20, 30, 40, 55, 70, 90, 200];
+// Brasas de cada dia da sequência: 100, 200, 300... até 700 no dia 7 (27/11/2026; antes 20, 30, 40, 55, 70, 90 e 200). Uma semana inteira rende 2.800.
+// Junto com os preços dos heróis (Avgustino 1.000, Gudran 2.000, Kuro 5.000: data_model/characters/) a conta é: Avgustino no dia 4 (100+200+300+400),
+// Gudran no dia 6 (2.100) e o Kuro na 2ª semana. As Brasas das noites jogadas somam por cima. Pular um dia volta ao dia 1 (dailyStatus).
+export const DAILY_REWARDS = [100, 200, 300, 400, 500, 600, 700];
 
 // Dia local como número (dias desde 1970), para comparar "hoje", "ontem" e "pulou"
 export function dayNumber(date = new Date()) {

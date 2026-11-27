@@ -1,3 +1,4 @@
+import { placeHeroAtSpawn } from '../systems/player.js';
 import { CHARACTER_MODEL, getXpToNextLevel } from '../../data_model/character.js';
 import { TOTAL_WAVES } from '../../data_model/campaign.js';
 import { ACHIEVEMENTS, achievementValue } from '../../data_model/sanctuary.js';
@@ -145,7 +146,8 @@ export function startGame(keepSavedRun = false) {
     state.bolts = [];
     state.stars = [];
     state.powerTimers = {};
-    state.orbitAngle = 0;
+    state.spectralBlade = { left: 0, angle: 0, age: 0 };
+    state.goldenTornado = null;
     state.trailDistance = 0;
     state.magnetTimer = 0;
     state.goldVacuum = false;
@@ -171,10 +173,7 @@ export function startGame(keepSavedRun = false) {
     player.mouseFollow = true;
     resetDash();
 
-    player.x = state.coreX;
-    player.y = state.coreY + CHARACTER_MODEL.initialPositionOffsetY;
-    player.targetX = player.x;
-    player.targetY = player.y;
+    placeHeroAtSpawn();                 // o ponto fixo logo abaixo da tocha (CHARACTER_MODEL.heroSpawn)
     player.comboStep = 1;
 
     document.querySelector('#heroName span').innerText = hero.name.toUpperCase();

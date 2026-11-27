@@ -6,8 +6,8 @@ import { req } from '../helpers.js';
 export const NATURE_NODES = [
 
     { id: 'wildHeart', cost: 1, branch: 'nature', kind: 'mod', x: 0, y: 1.5, requires: [],
-      name: 'Wild Heart', icon: '🌱', desc: 'The forest mends your wounds, slowly and always.',
-      levelText: (mods) => `Heal ${mods.hpRegen} health per second`, mods: { hpRegen: 0.3 } },
+      name: 'Wild Heart', icon: '🌱', desc: 'The forest mends your wounds, slowly and always, and makes your trees grow faster.',
+      levelText: (mods) => `Heal ${mods.hpRegen} health per second, and seeds, saplings and oaks grow ${Math.round(mods.oakGrowth * 100)}% faster`, mods: { hpRegen: 0.3, oakGrowth: 0.05 } },
     // Quatro linhas. Duas delas terminam no Oath of the Wild (raízes e carvalho); a rosa negra fica sozinha na última.
     // Linha 1, as raízes: Grasping Roots -> Strangling Grove -> Thorn Burst -> Briar Garden -> Oath
     { id: 'graspingRoots', cost: 3, branch: 'nature', kind: 'power', key: 'graspingRoots', x: 1, y: 0, requires: [req('wildHeart')] },

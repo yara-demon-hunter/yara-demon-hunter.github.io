@@ -22,9 +22,9 @@ export const AVGUSTINO = {
     colors: AVGUSTINO_VISUALS.colors,
     portrait: '',
     portraitImage: 'images/characters/avgustino-small.webp',
-    // Liberado só com Brasas (desde 18/11/2026; antes era a conquista Blood Moon): o cartão bloqueado mostra "🔥 x/350" e,
+    // Liberado só com Brasas (desde 18/11/2026; antes era a conquista Blood Moon): o cartão bloqueado mostra "🔥 x/1000" e,
     // com Brasas suficientes, um toque compra (js/ui/heroes.js). Quem já o tinha continua com ele.
-    emberPrice: 350,
+    emberPrice: 1000,                 // 27/11/2026: era 350
     unlockHint: 'Unlock with embers',
 
     // --- NÚMEROS: todos os parâmetros do personagem, nenhum escondido (0 / false = não tem) ---

@@ -3,7 +3,7 @@ import { CORE_MODEL } from '../../data_model/core.js';
 import { getCharacterBase } from '../../data_model/characters/index.js';
 import { BLADE_SKILL } from '../../data_model/skills.js';
 import { BLUE_TORCH, WAR_CRY } from '../../data_model/passives.js';
-import { getPowerLevel } from '../../data_model/powers.js';
+import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { attributes, passives, player, powers, state } from '../core/state.js';
 import { getHero, mod } from './modifiers.js';
 import { STREAK, rushTier } from '../../data_model/streak.js';
@@ -114,8 +114,10 @@ export function getFury() {
 export function getRootSnare() {
     return getCurrentCharacterBase().player.rootSnare;
 }
+// O Escudo de Runas (poder da árvore, Curse Path, só do Gudran): os números do nível de agora + os fixos; null se ainda não aprendeu
 export function getRuneShield() {
-    return getCurrentCharacterBase().player.runeShield;
+    const level = getPowerLevel(powers.runeShield);
+    return level ? { ...POWER_MODELS.runeShield.base, ...level } : null;
 }
 
 export function getAxeQuake() {

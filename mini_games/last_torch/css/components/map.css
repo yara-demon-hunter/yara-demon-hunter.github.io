@@ -259,3 +259,6 @@
 .practice-badge small { display: block; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.02em; color: #fde68a; }
 .practice-badge.hidden { display: none; }
 .mr-rule.is-warn { background: rgba(120, 80, 10, 0.3); border: 1px solid rgba(251, 146, 60, 0.6); }
+
+/* Com o mapa na tela, o HUD de pontos de skill (medalhão, pontos) e os avisos somem: nada de gastar skill durante a caminhada */
+body.is-map-open #toasts, body.is-map-open #treeHand { display: none !important; }

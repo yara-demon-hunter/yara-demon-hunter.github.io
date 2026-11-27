@@ -375,6 +375,7 @@ export function buyNode(id) {
     const node = NODE_BY_ID[id];
     const st = node ? getNodeState(node) : null;
     if (!st?.canBuy) return false;
+    if (document.body.classList.contains('is-map-open')) return false;       // enquanto o mapa está na tela (animação ou aberto) não se compra skill
 
     if (st.currency === 'gold') state.coins -= st.cost;
     else state.skillPoints -= st.cost;

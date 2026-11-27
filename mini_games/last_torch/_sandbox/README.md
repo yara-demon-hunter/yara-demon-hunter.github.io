@@ -18,6 +18,23 @@ python3 mini_games/last_torch/_sandbox/serve.py        # http://localhost:8800/
 - Lista **Buddies**: clique em um ou mais (Phoenix Pact, Flaming Phoenix, Blue Torch, Shadow Raven, Grave Wisp, Shadow Wolf, White Wolf); cada um liga a skill que o faz existir, no nível máximo. **Druid tree**: a árvore do druida já nasce no estágio escolhido (muda, árvore jovem, Wicked Oak adulto ou Ancient Grove evoluída), perto do herói; a caixa **Keep the tree at that stage** impede que ela cresça (para ver cada fase com calma).
 - **Preview: hero unlocked:** botões com cada herói mostram a tela de prêmio de personagem liberado (a mesma do jogo). A caixa "mid-run" mostra a versão do acampamento. Clique em LATER, PLAY AS ou Esc/Enter para fechar e voltar ao painel.
 
+## Aba Screens: telas novas (27/11/2026)
+
+Além do fim de noite, do entre ondas, do mapa e dos menus, a aba Screens agora abre:
+- **Skills:** **⚡ Level-up pick** (as 3 cartas da escolha rápida, com 6 pontos) e **🌳 Skill tree** (a tela de status com 20 pontos).
+- **Wave events:** **🧌 Catch the Goblin**, **🌊 Flank**, **🌑 The light fails**, **☄️ Starfall** (começam a onda escolhida e disparam o evento na hora, com o herói já abaixo da tocha) e **💰 Goblin treasure drop** (o goblin morre depois de 1,6 s: baú com 2 pontos e a chuva de moedas).
+- **Mapa:** **📍 Map: you are here** (o mapa aberto pelo ícone, na tela da onda escolhida), ao lado das caminhadas entre telas.
+
+Depois de abrir qualquer uma, aperte **🧪 Sandbox** (canto inferior esquerdo) para voltar. O número da onda, o herói e a Escuridão escolhidos no topo da aba valem para todas.
+
+## Aba Levels (calculadora de níveis e pontos de skill)
+
+Aba **📈 Levels**: ajuste a curva de XP e os pontos por nível e veja, **da onda 1 à 18**, o nível do herói, quantos níveis ganhou na onda, o XP que falta e o **total de pontos de skill** (níveis + baús/Rush/estrelas + iniciais), com um gráfico e a curva antiga (antes de 27/11/2026) ao lado para comparar. Não joga nada: é uma conta rápida.
+
+- **Campos:** XP do nível 1→2, crescimento por nível (1,37 = cada nível custa 37% mais), pontos por nível, outros pontos por onda (estimado em 3), pontos iniciais (Escuridão e Insight) e **Player pace** (% do XP do autopiloto; 100 = o que foi medido, 150 = quem joga bem).
+- **O XP de cada onda** foi medido com o autopiloto da Fast run (herói imortal, ~1.900 abates na noite); não muda com a curva de níveis. Chefe aparece com 💀. "+Lv" mostra · quando a onda não rendeu nenhum nível.
+- **Botões:** 💾 **Save to game files** (grava `xpCurve` em `data_model/character.js` e `perLevel` em `data_model/skill_tree/points.js`; só essas duas linhas mudam; precisa do `serve.py` rodando; recarregue o jogo depois), ↺ File values (volta aos números do jogo), ▶ Use in this sandbox (aplica na Arena e na Fast run daqui até recarregar, para conferir com o autopiloto), 📋 Copy lines for the game (as linhas para colar em `data_model/character.js` e `data_model/skill_tree/points.js`) e 📋 Copy table.
+
 ## Aba HUD tuner (ajustar a tela de jogo)
 
 Segunda aba do painel (**📐 HUD tuner**). Mostra o jogo de verdade num iframe do tamanho de qualquer celular, tablet ou monitor.

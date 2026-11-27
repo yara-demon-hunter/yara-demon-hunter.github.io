@@ -7,7 +7,7 @@ import { audio, joystick, keys, player, state } from '../core/state.js';
 import { showBanner } from '../ui/banner.js';
 import { updateHUD } from '../ui/hud.js';
 import { moveDash } from './dash.js';
-import { heroSpeedFactorAt } from './colliders.js';
+import { blockedAt, heroSpeedFactorAt } from './colliders.js';
 import { isFireCasting } from './knives.js';
 import { beamActive } from './fury.js';
 import { addNumber, addShockwave, createExplosion, registerPlayerHit, screenFlash, shakeScreen, slowMotion, spawnDust } from './effects.js';
@@ -99,6 +99,19 @@ function heroDown() {
     addShockwave(player.x, player.y, { radius: 420, color: '#fde68a', width: 10, seconds: 0.7 });
     showBanner('', 'NOT YET', 'The prayer is answered', 'gold');
     audio.playRevive();
+}
+
+// O herói começa cada onda (e a partida) no mesmo ponto, logo abaixo da tocha (CHARACTER_MODEL.heroSpawn); se for área bloqueada do cenário, o primeiro ponto livre da lista
+export function placeHeroAtSpawn() {
+    const S = CHARACTER_MODEL.heroSpawn;
+    const candidates = [[S.offsetX, S.offsetY], ...S.fallback];
+    const r = CHARACTER_MODEL.collisionRadius;
+    const [dx, dy] = candidates.find(([x, y]) => !blockedAt(state.coreX + x, state.coreY + y, r, 'hero')) ?? candidates[0];
+    player.x = state.coreX + dx;
+    player.y = state.coreY + dy;
+    player.targetX = player.x;
+    player.targetY = player.y;
+    player.trail = [];
 }
 
 // Segunda chance da tocha (CORE_MODEL.secondWind): uma vez por noite ela gasta parte da chama e puxa o herói de volta

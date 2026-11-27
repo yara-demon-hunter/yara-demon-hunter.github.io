@@ -156,6 +156,32 @@ def save_bosses(stats):
     return len(stats)
 
 
+def save_levels(v):
+    """Grava a curva de XP (data_model/character.js, xpCurve: base e growth) e os pontos por nível (data_model/skill_tree/points.js, perLevel).
+    Só essas duas linhas mudam; comentários e o resto dos arquivos ficam como estão. Devolve os valores gravados."""
+    base, growth, per = v["base"], v["growth"], v["perLevel"]
+    for name, x, lo, hi in (("base", base, 20, 5000), ("growth", growth, 1.0, 3.0), ("perLevel", per, 0, 20)):
+        if not isinstance(x, (int, float)) or isinstance(x, bool) or not (lo <= x <= hi):
+            raise ValueError(f"valor inválido: {name}={x!r}")
+    if int(per) != per:
+        raise ValueError("perLevel precisa ser inteiro")
+    char = GAME / "data_model" / "character.js"
+    text = char.read_text(encoding="utf-8")
+    text, n = re.subn(r"xpCurve:\s*\{[^}]*\}", f"xpCurve: {{ base: {base:g}, growth: {growth:g} }}", text, count=1)
+    if n != 1:
+        raise ValueError("xpCurve não encontrado em character.js")
+    pts = GAME / "data_model" / "skill_tree" / "points.js"
+    ptext = pts.read_text(encoding="utf-8")
+    ptext, m = re.subn(r"perLevel:\s*\d+", f"perLevel: {int(per)}", ptext, count=1)
+    if m != 1:
+        raise ValueError("perLevel não encontrado em points.js")
+    for path, content in ((char, text), (pts, ptext)):
+        tmp = path.with_suffix(".js.tmp")
+        tmp.write_text(content, encoding="utf-8")
+        tmp.replace(path)
+    return {"base": base, "growth": growth, "perLevel": int(per)}
+
+
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")
@@ -219,12 +245,12 @@ class Handler(SimpleHTTPRequestHandler):
     # tela só tem as peças enviadas trocadas; as outras ficam como estavam). O resto do arquivo (comentários e demais pontos) não muda.
     def do_POST(self):
         route = self.path.split("?")[0]
-        if route not in ("/__save_hud", "/__save_bosses"):
+        if route not in ("/__save_hud", "/__save_bosses", "/__save_levels"):
             self.send_error(404)
             return
         try:
             body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
-            n = save_hud(body["entries"]) if route == "/__save_hud" else save_bosses(body["stats"])
+            n = save_hud(body["entries"]) if route == "/__save_hud" else save_bosses(body["stats"]) if route == "/__save_bosses" else save_levels(body)
             out, code = {"ok": True, "saved": n}, 200
         except Exception as err:  # noqa: BLE001 - devolve o motivo para o tuner mostrar
             out, code = {"ok": False, "error": str(err)}, 500

@@ -154,7 +154,7 @@ let returnState = 'PLAYING';
 let afterReturn = null;
 
 export function openStatus(from = 'PLAYING', onBack = null) {
-    if (state.gameState !== from) return;
+    if (state.gameState !== from || document.body.classList.contains('is-map-open')) return;     // com o mapa na tela ninguém gasta pontos
     returnState = from;
     afterReturn = onBack;
     state.gameState = 'PAUSED';

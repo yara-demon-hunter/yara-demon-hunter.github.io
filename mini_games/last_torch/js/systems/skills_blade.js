@@ -3,10 +3,12 @@ import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers
 import { isFireCasting } from './knives.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
-import { addGibs, addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
+import { addGibs, addShockwave, createExplosion, hitStop, screenFlash, shakeScreen, spawnDust, zoomPunch } from './effects.js';
 import { addGroundFire } from './powers.js';
 import { startMove } from './moves.js';
 import { getAtkDamage, getBladeDamage } from './stats.js';
+import { CHARACTER_MODEL } from '../../data_model/character.js';
+import { blockedAt } from './colliders.js';
 
 // --- SKILLS DA LÂMINA ---
 // O guerreiro quer estar no meio da horda: matar acelera, ser cercado rende um rugido, quem sobra morre de um golpe.
@@ -56,26 +58,78 @@ export function getFinalBlowMultiplier() {
     return passives.finalBlow.lvl > 0 ? FINAL_BLOW.damageMultiplier : 1;
 }
 
-// Shatter Strike: o monstro atingido pelo golpe fica "em voo" por windowSeconds; se bater num outro enquanto é empurrado, os dois levam dano baixo
-export function markShatter(e) {
-    if (passives.shatterStrike.lvl <= 0) return;
-    e.shatterUntil = state.runTime + SHATTER_STRIKE.windowSeconds;
+// --- SHATTER STRIKE ---
+// A cada SHATTER_STRIKE.cooldownSeconds o golpe LANÇA um monstro (um só por golpe) muito mais longe do que o empurrão comum. Em voo ele bate no que encontrar:
+// outro monstro (os dois levam dano), ou parede, obstáculo do cenário e borda da tela (só ele leva dano, maior, e fica tonto). Não funciona em monstros pesados.
+const HEAVY = new Set(SHATTER_STRIKE.immune);
+const canBeThrown = (e) => !e.isBoss && !e.elite && !HEAVY.has(e.type) && !e.unstoppable && !e.immovable && !e.shadowOwner && !e.emerge && !(e.rooted > 0) && !e.chained && !e.shatterFly;
+
+// Chamado para cada monstro que o golpe acerta; devolve true se lançou este (então o golpe não lança outro)
+export function launchShatter(e, angle) {
+    if (passives.shatterStrike.lvl <= 0 || !canBeThrown(e)) return false;
+    const S = SHATTER_STRIKE;
+    if (state.shatterReadyAt > state.runTime + S.cooldownSeconds) state.shatterReadyAt = 0;       // sobra de uma partida anterior
+    if (state.runTime < (state.shatterReadyAt ?? 0)) return false;
+    state.shatterReadyAt = state.runTime + S.cooldownSeconds;
+    e.vx = Math.cos(angle) * S.launchSpeed;
+    e.vy = Math.sin(angle) * S.launchSpeed;
+    e.shatterFly = true;
+    e.shatterUntil = state.runTime + S.flightSeconds;
     e.shatterHit = new Set();
+    e.stunned = Math.max(e.stunned ?? 0, S.flightSeconds);          // em voo ele não anda
+    createExplosion(e.x, e.y, '#fde68a', 6);
+    addShockwave(e.x, e.y, { radius: 46, color: '#fde68a', width: 4, seconds: 0.25 });
+    e.shatterStart = state.runTime;
+    audio.playShatterLaunch?.();
+    return true;
+}
+
+// Para a bater: ele deixa de voar, fica tonto um instante e perde a velocidade
+function endFlight(e) {
+    e.shatterFly = false;
+    e.shatterUntil = 0;
+    e.vx = e.vy = 0;
+    e.stunned = Math.max(e.stunned ?? 0, SHATTER_STRIKE.dazeSeconds);
 }
 
 function updateShatter() {
     if (passives.shatterStrike.lvl <= 0) return;
     const S = SHATTER_STRIKE;
     for (const e of state.enemies) {
-        if (!(e.shatterUntil > state.runTime) || e.hp <= 0 || Math.hypot(e.vx ?? 0, e.vy ?? 0) < S.minSpeed) continue;
+        if (!e.shatterFly) continue;
+        const speed = Math.hypot(e.vx ?? 0, e.vy ?? 0);
+        if (e.hp <= 0 || state.runTime > e.shatterUntil || speed < S.minSpeed) { e.shatterFly = false; continue; }
+        const dx = e.vx / speed, dy = e.vy / speed;
+        if (state.quality < 2 && Math.random() < 0.7) spawnDust(e.x - dx * e.radius, e.y + e.radius * 0.5, 2, 1.6, '#e7d9b8');      // poeira da corrida pelo chão
+        // 1) bateu em outro monstro: os dois levam dano
+        let crashed = false, crashedMonster = false;
         for (const o of state.enemies) {
-            if (o === e || o.hp <= 0 || e.shatterHit.has(o) || Math.hypot(o.x - e.x, o.y - e.y) > e.radius + o.radius) continue;
-            e.shatterHit.add(o);
+            if (o === e || o.hp <= 0 || o.emerge || Math.hypot(o.x - e.x, o.y - e.y) > e.radius + o.radius) continue;
             const a = Math.atan2(o.y - e.y, o.x - e.x);
-            const damage = getAtkDamage() * S.damage;
-            dealDamage(o, damage, { noCrit: true, kbX: Math.cos(a) * S.knockback, kbY: Math.sin(a) * S.knockback });
-            dealDamage(e, damage * 0.5, { noCrit: true, quiet: true });
-            createExplosion((e.x + o.x) / 2, (e.y + o.y) / 2 - 4, '#fde68a', 5);
+            dealDamage(o, getAtkDamage() * S.hitDamage, { noCrit: true, kbX: Math.cos(a) * S.knockback, kbY: Math.sin(a) * S.knockback });
+            dealDamage(e, getAtkDamage() * S.selfDamage, { noCrit: true, quiet: true });
+            createExplosion((e.x + o.x) / 2, (e.y + o.y) / 2 - 4, '#fde68a', 9);
+            addShockwave((e.x + o.x) / 2, (e.y + o.y) / 2, { radius: 60, color: '#fbbf24', width: 5, seconds: 0.3 });
+            crashed = true;
+            crashedMonster = true;
+            break;
+        }
+        // 2) bateu em parede, obstáculo do cenário ou na borda da tela: só ele leva dano, maior
+        if (!crashed) {
+            const px = e.x + dx * (e.radius + 6), py = e.y + dy * (e.radius + 6);
+            const edge = px < e.radius || px > state.width - e.radius || py < CHARACTER_MODEL.topMargin || py > state.height - e.radius;
+            if (edge || blockedAt(px, py, 3, 'monsters')) {
+                dealDamage(e, getAtkDamage() * S.wallDamage, { noCrit: true });
+                createExplosion(e.x + dx * e.radius, e.y + dy * e.radius, '#fbbf24', 10);
+                addShockwave(e.x + dx * e.radius, e.y + dy * e.radius, { radius: 54, color: '#fbbf24', width: 5, seconds: 0.3 });
+                crashed = true;
+            }
+        }
+        if (crashed) {
+            hitStop(0.05);
+            shakeScreen(4);
+            audio.playShatterImpact?.(!crashedMonster);
+            if (e.hp > 0) endFlight(e);
         }
     }
 }

@@ -15,7 +15,7 @@ export const NINJA = {
     order: 3.7,                     // posição na tela de escolha
 
     // --- QUEM É ---
-    name: 'Kuro',
+    name: 'Ninja Kuro',               // 27/11/2026: era 'Kuro' (o adjetivo Ninja chama mais a atenção)
     tagline: 'Ninja. Nobody sees him coming; nobody sees him leave.',
     trait: 'Fast sword, two dashes and a stream of shurikens, but little health.',
     perk: { name: 'SILENT STEP', text: 'Two dashes and fast shurikens. Fragile if caught.' },
@@ -23,7 +23,7 @@ export const NINJA = {
     portrait: '',
     portraitImage: 'images/characters/ninja-small.webp',
     // À venda por Brasas na tela de escolha (emberPrice): sem conquista que o libere
-    emberPrice: 1000,
+    emberPrice: 3000,                 // 27/11/2026: era 1000
     unlockHint: 'Unlock with embers',
 
     // --- NÚMEROS: todos os parâmetros do personagem, nenhum escondido (0 / false = não tem) ---

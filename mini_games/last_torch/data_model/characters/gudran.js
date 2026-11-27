@@ -12,9 +12,10 @@ export const GUDRAN = {
     affinity: 'curse',
     sealedBranches: ['blade', 'light', 'shadow'],
     model: 'gudran',             // boneco 2.5D (js/render/bodies.js)
-    // Não tem lâmina: o ataque básico é um raio de energia azul do cajado (js/systems/arcane.js). No lugar da adaga, o clique (ou o
-    // botão do canto) ergue o Escudo de Runas (abilities.runeShield). A esfera azul (thrown) só aparece na mão livre. Árvore: o ramo Blade e a Flaming Sword ficam selados (como no Rowan); o dele é o Curse Path.
-    basicAttack: 'arcane',
+    // 27/11/2026: o ataque básico é uma CAJADADA (golpe físico com o cajado, o golpe normal do jogo, sem lâmina de verdade). O CLIQUE (ou o botão do canto) é o ARREMESSO de adaga do
+    // jogo, só que a "adaga" é uma bola de energia azul (thrown: 'arcane') e o dano é de MAGIA (magicKnife): vale tudo da adaga (knifeRange, knifeSpeed, knifeCooldown, knifeDamage...
+    // abaixo, os mods de adaga, a mira automática e o arrastar para mirar), com o gesto de erguer o cajado. O Escudo de Runas deixou de ser o clique e virou uma skill da árvore
+    // (poder Rune Shield, no Curse Path; data_model/powers.js). Árvore: o ramo Blade e a Flaming Sword ficam selados (como no Rowan); o dele é o Curse Path
     thrown: 'arcane',
     sealedSkills: ['flameBlade'],
     order: 3.5,                     // posição na tela de escolha: depois do Avgustino, antes do Azael
@@ -22,13 +23,13 @@ export const GUDRAN = {
     // --- QUEM É ---
     name: 'Gudran',
     tagline: 'Lord of the Castle. He ruled a kingdom; now his staff guards the last flame.',
-    trait: 'The strongest magic of all heroes, a long reach and a Rune Shield instead of daggers, but little health and slow steps.',
-    perk: { name: 'LORD OF THE CASTLE', text: 'His staff fires bolts of blue energy, and a click raises a shield of spinning runes.' },
+    trait: 'The strongest magic of all heroes: a staff that strikes, and a click that hurls a ball of blue energy in place of a dagger. Little health and slow steps.',
+    perk: { name: 'LORD OF THE CASTLE', text: 'His staff strikes with real weight, and a click raises it to hurl a ball of blue energy.' },
     colors: GUDRAN_VISUALS.colors,
     portrait: '',
     portraitImage: 'images/characters/gudran-small.webp',
-    // Liberado só com Brasas: o cartão bloqueado mostra "🔥 x/500" e, com Brasas suficientes, o painel de requisitos tem o botão de comprar (js/ui/heroes.js)
-    emberPrice: 500,
+    // Liberado só com Brasas: o cartão bloqueado mostra "🔥 x/2000" e, com Brasas suficientes, o painel de requisitos tem o botão de comprar (js/ui/heroes.js)
+    emberPrice: 2000,                 // 27/11/2026: era 500
     unlockHint: 'Unlock with embers',
 
     // --- NÚMEROS: todos os parâmetros do personagem, nenhum escondido (0 / false = não tem) ---
@@ -65,17 +66,18 @@ export const GUDRAN = {
         dashInvulnerable: 0.3,      // segundos invulnerável durante o dash
 
         // ===== RANGE: o alcance do ataque (aqui, o raio do cajado) =====
-        bladeRange: 230,            // ALCANCE do raio do cajado, px (é o círculo vermelho em volta dele)
+        bladeRange: 55,             // ALCANCE da cajadada, px (é o círculo vermelho em volta dele): um pouco mais que o cajado do Rowan (65) e o Demon Hunter (55). Era 230 quando o ataque básico era o raio; o raio arcano (clique) agora voa até ARCANE_BOLT.range
 
         // ===== DAGGER: a adaga (dano x alcance) =====
-        knifeRange: 340,            // alcance da adaga, px (valor absoluto)
-        knifeDamage: 25,            // dano da adaga, bônus em % (soma ao attackDamage)
-        knifeCooldown: 2.0,         // segundos entre adagas
-        knifeSpeed: 520,            // velocidade da adaga em voo, px/s
-        knifeDamageRatio: 0.8,      // dano da adaga = dano de cada golpe x este número
+        // This is our "ireArcaneBolt"
+        knifeRange: 450,            // alcance da adaga, px (valor absoluto)
+        knifeDamage: 0,             // bônus em % no dano da bola (soma ao dano de magia x knifeDamageRatio)
+        knifeCooldown: 1.0,         // segundos entre uma bola e a próxima
+        knifeSpeed: 700,            // velocidade da bola em voo, px/s (a esfera arcana voa a 75% disto: ~525 na tela)
+        knifeDamageRatio: 1.0,      // dano da bola = dano de MAGIA x este número (magicKnife)
         knifeKnockbackRatio: 0.8,   // empurrão da adaga = empurrão do golpe x este número
-        noKnives: true,             // não lança adaga (o clique é o Escudo de Runas); as skills de adaga ficam seladas na árvore
-        magicKnife: true,           // o arremesso usa o dano de MAGIA (número azul) em vez do dano de lâmina: a rosa e a adaga benta são magia
+        noKnives: false,            // lança (a bola de energia): o clique é o arremesso de adaga do jogo
+        magicKnife: true,           // o arremesso usa o dano de MAGIA (número azul) em vez do dano de lâmina: a bola de energia, a rosa e a adaga benta são magia
 
         // ===== MAGIC: o dano da magia (feitiços, tocha, fênix, bolas de fogo, luz...); 0 = não usa magia =====
         magicDamage: 52             // dano base da MAGIA (feitiços, tocha, fênix, bolas de fogo, luz...): independente do dano da lâmina. 0 = não usa magia
@@ -101,23 +103,6 @@ export const GUDRAN = {
         turnSpeed: 2.6,             // quão rápido o raio gira para onde você mira, rad/s
         demonBonus: 0.25,           // elites e bosses levam 25% mais
         knockback: 40               // empurrão de cada pulso, no sentido do raio
-    },
-
-    // ===== HABILIDADE: o clique (ou o botão do canto, no celular) no lugar da adaga =====
-    // ESCUDO DE RUNAS: runas azuis giram em volta dele por alguns segundos; quem encosta numa runa leva dano de magia e é jogado longe.
-    // Lógica em js/systems/arcane.js (updateRuneShield), desenho em js/render/arcane.js.
-    abilities: {
-        runeShield: {
-            cooldownSeconds: 8,     // recarga, s
-            seconds: 4,             // quanto tempo as runas giram
-            runes: 6,               // quantas runas
-            radius: 62,             // distância das runas ao corpo, px
-            runeRadius: 9,          // tamanho de cada runa (para acertar), px
-            spin: 3.2,              // giro, rad/s
-            damage: 0.6,            // dano de cada toque = dano de magia x isto
-            hitSeconds: 0.45,       // o mesmo monstro só leva outro toque depois disto
-            knockback: 280          // empurrão para fora, px/s
-        }
     },
 
     rival: 'AZAEL'                  // quem o enfrenta quando o jogador é ele

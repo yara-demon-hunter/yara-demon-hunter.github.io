@@ -1,8 +1,6 @@
-import { SHADOW_CLONE } from '../../data_model/passives.js';
 import { HERO_HUD_VISUALS } from '../../data_model/visuals/characters/hero_hud_visual.js';
-import { SHADOW_CLONE_VISUALS } from '../../data_model/visuals/characters/shadow_clone_visual.js';
 import { TORCH_VISUALS as T } from '../../data_model/visuals/scenery/torch_visual.js';
-import { ctx, maxUltEnergy, passives, player, shadowClones, state } from '../core/state.js';
+import { ctx, maxUltEnergy, passives, player, state } from '../core/state.js';
 import { getAtkRadius } from '../systems/stats.js';
 import { createTorch25D } from '../../library/objects/torch/torch25d.js';
 import { TORCH25D_VISUALS } from '../../library/objects/torch/torch25d_visual.js';
@@ -85,12 +83,8 @@ function drawRangeCircle(x, y, radius, alpha = 1) {
     ctx.globalAlpha = 1;
 }
 
-// Raio de Alcance do herói e do Shadow Clone (o do clone um pouco mais apagado)
+// Raio de Alcance do herói. O das sombras (Shadow Clone) NÃO é mais desenhado (27/11/2026: com várias sombras eram vários círculos tracejados poluindo o mapa);
+// o alcance delas continua o do herói (SHADOW_CLONE.radiusMultiplier), só não aparece
 export function renderAttackRange() {
-    for (const c of shadowClones) {
-        if (!c.active) continue;
-        const appear = Math.min(1, (performance.now() - c.spawnTime) / 1000 / SHADOW_CLONE_VISUALS.spawnSeconds);
-        drawRangeCircle(c.x, c.y, getAtkRadius() * SHADOW_CLONE.radiusMultiplier, SHADOW_CLONE_VISUALS.rangeAlpha * appear);
-    }
     if (!player.hidden) drawRangeCircle(player.x, player.y, getAtkRadius());
 }

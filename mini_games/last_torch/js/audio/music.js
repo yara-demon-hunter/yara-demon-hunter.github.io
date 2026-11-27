@@ -1,6 +1,6 @@
 // --- AS MÚSICAS DO LAST TORCH ---
 // O motor (sequenciador) fica na biblioteca: library/sounds/core/music.js. Aqui só o tom do jogo: compassos e climas.
-// Climas: menu, hunt, boss, camp, dawn, silent. Tudo em ré menor, tirando o boss (mi frígio).
+// Climas: menu, hunt, boss, camp, adventure (o mapa entre as telas), dawn, silent. Tudo em ré menor, tirando o boss (mi frígio).
 // Baixo por compasso e notas do arpejo: Dm - Bb - Gm - A
 const HUNT_BARS = [
     { bass: 38, chord: [62, 65, 69, 74] },
@@ -28,11 +28,20 @@ const DAWN_BARS = [
     { bass: 45, chord: [61, 64, 69, 73] }
 ];
 
+// Aventura (a viagem pelo mapa depois de um chefe): maior e luminosa, em ré maior: D - A - Bm - G
+const ADVENTURE_BARS = [
+    { bass: 38, chord: [62, 66, 69, 74] },
+    { bass: 33, chord: [61, 64, 69, 73] },
+    { bass: 35, chord: [62, 66, 71, 74] },
+    { bass: 31, chord: [62, 67, 71, 74] }
+];
+
 export const MOODS = {
     silent: null,
     menu: { bpm: 54, bars: CAMP_BARS, pad: 0.05, bass: 0, kick: 0, snare: 0, hat: 0, arp: 0.05, arpEvery: 4, bell: 0.05 },
     hunt: { bpm: 104, bars: HUNT_BARS, pad: 0.035, bass: 0.16, kick: 0.5, snare: 0.1, hat: 0.03, arp: 0.045, arpEvery: 2, bell: 0 },
     boss: { boss: true, bpm: 142, bars: BOSS_BARS, pad: 0.05, bass: 0.2, kick: 0.62, snare: 0.18, hat: 0.05, arp: 0.055, arpEvery: 1, bell: 0 },
     camp: { bpm: 66, bars: CAMP_BARS, pad: 0.05, bass: 0.05, kick: 0, snare: 0, hat: 0, arp: 0.08, arpEvery: 2, bell: 0 },
+    adventure: { bpm: 108, bars: ADVENTURE_BARS, pad: 0.05, bass: 0.1, kick: 0.2, snare: 0.05, hat: 0.03, arp: 0.075, arpEvery: 1, bell: 0.07 },
     dawn: { bpm: 72, bars: DAWN_BARS, pad: 0.08, bass: 0.06, kick: 0, snare: 0, hat: 0, arp: 0.08, arpEvery: 2, bell: 0.05 }
 };

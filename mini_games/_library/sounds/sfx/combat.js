@@ -17,6 +17,31 @@ export const combatSfx = {
         if (targets > 1) this.tone({ type: 'sine', freq: 190, to: 110, vary: 0.05, decay: 0.04, gain: Math.min(0.12, 0.03 * targets) });
     },
 
+    // Shatter Strike (Blade): o monstro é LANÇADO. Um estalo seco do golpe e o sopro grave que passa voando (do grave para o agudo, como algo que corta o ar)
+    playShatterLaunch() {
+        if (!this.ctx || this.throttled('shatterLaunch', 0.4)) return;
+        this.tone({ type: 'square', freq: 220, to: 70, attack: 0.002, decay: 0.12, gain: 0.1 });
+        this.burst({ filter: 'bandpass', freq: 350, to: 2600, q: 0.9, attack: 0.02, decay: 0.45, gain: 0.16 });
+        this.tone({ type: 'sine', freq: 90, to: 50, attack: 0.002, decay: 0.2, gain: 0.14 });
+    },
+
+    // Shatter Strike: a pancada (o monstro lançado bate em algo). Impacto pesado com o craque de ossos e madeira
+    playShatterImpact(wall = false) {
+        if (!this.ctx || this.throttled('shatterImpact', 0.12)) return;
+        this.tone({ type: 'sine', freq: wall ? 120 : 150, to: 38, attack: 0.001, decay: 0.28, gain: 0.22 });
+        this.tone({ type: 'square', freq: 320, to: 90, attack: 0.001, decay: 0.08, gain: 0.08 });
+        this.burst({ filter: 'bandpass', freq: wall ? 900 : 1500, q: 1.3, attack: 0.001, decay: 0.16, gain: 0.2 });
+        this.burst({ filter: 'highpass', freq: 3200, attack: 0.001, decay: 0.05, gain: 0.1 });
+    },
+
+    // Freezing Breath: o sopro gelado. Um "fffuuu" longo e agudo (ruído filtrado que sobe e desce) com cintilar de gelo no fim
+    playIceBreath() {
+        if (!this.ctx || this.throttled('iceBreath', 0.5)) return;
+        this.burst({ filter: 'bandpass', freq: 1800, to: 5200, q: 0.8, attack: 0.04, decay: 0.55, gain: 0.16 });
+        this.burst({ filter: 'highpass', freq: 3500, attack: 0.08, decay: 0.4, gain: 0.07 });
+        [2637, 3136, 3951].forEach((freq, i) => this.tone({ type: 'sine', freq, at: 0.12 + i * 0.08, attack: 0.003, decay: 0.18, gain: 0.04 }));
+    },
+
     playCrit() {
         if (!this.ctx || this.throttled('crit', 0.05)) return;
         this.tone({ type: 'square', freq: 1760, to: 880, decay: 0.09, gain: 0.05 });

@@ -411,4 +411,5 @@
 .tree-band-tag:empty { display: none; }
 .tree-band-tag.is-plus { color: #1c1917; background: #fde68a; }
 .tree-band-tag.is-no { color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.5); }
-.tree-branch.is-forbidden .tree-grid { opacity: 0.45; }
+.tree-branch.is-forbidden .tnode:not(.is-exception), .tree-branch.is-forbidden .tree-lines { opacity: 0.45; }       /* o ramo proibido apagado... */
+.tree-branch.is-forbidden .tnode.is-exception { opacity: 1; z-index: 2; }                                          /* ...menos a exceção (Fury): clara, como qualquer skill que se compra */

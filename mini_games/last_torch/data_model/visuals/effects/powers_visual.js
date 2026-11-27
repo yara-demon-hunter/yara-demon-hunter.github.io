@@ -1,7 +1,6 @@
 // --- DADOS VISUAIS: Poderes e itens. ---
 // Lidos por js/render/powers.js e js/render/pickups.js. Só afeta o desenho.
 export const POWERS_VISUALS = {
-    orbit: { glow: 'rgba(103, 232, 249, 0.75)', evolvedGlow: 'rgba(253, 224, 71, 0.85)', scale: 0.72, glowRadius: 17 },
     fire: {
         colors: ['rgba(234, 88, 12, 0.8)', 'rgba(251, 146, 60, 0.8)', 'rgba(253, 224, 71, 0.85)'],
         glow: 'rgba(249, 115, 22, 0.75)',

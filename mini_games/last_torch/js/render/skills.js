@@ -1,3 +1,4 @@
+import { getDashedRing } from './fx/rings.js';
 import { getPowerLevel, POWER_MODELS } from '../../data_model/powers.js';
 import { WAR_CRY } from '../../data_model/passives.js';
 import { SKILLS_VISUALS as V } from '../../data_model/visuals/effects/skills_visual.js';
@@ -7,7 +8,6 @@ import { drawFlameTongue, fireLook } from './fire.js';
 import { drawGlow } from '../../library/core/glow.js';
 import { drawPhoenixSprite } from './phoenix.js';
 import { drawGraveWisp } from '../../library/buddies/grave_wisp/grave_wisp.js';
-import { getDashedRing } from './fx/rings.js';
 
 // --- SKILLS DOS RAMOS (desenho) ---
 // Efeitos de js/systems/skills_*.js. Quem tem muitos por quadro usa brilhos em cache e anéis prontos.

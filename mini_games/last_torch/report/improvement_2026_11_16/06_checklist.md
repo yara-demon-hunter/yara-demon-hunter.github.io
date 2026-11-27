@@ -189,6 +189,7 @@ Origem: o dono achou o jogo fácil, monótono até o chefe e visualmente poluíd
 
 **B. Menos skills, mais escolha** (primeiro pacote)
 - Eu decidi fazer com que em vez de ganhar duas skills por level up, ganhamos apenas 1, assim eu dificulto muito pegarem varios poderes.
+- [x] **Atualização 27/11:** voltou para 2 pontos por nível, mas o **XP é exponencial** (`xpCurve` em `character.js`: base 200, cada nível custa 37% mais). Começo rápido (nível 5 no fim da onda 1, 10 na onda 5) e fim lento (nível 18 na onda 18, antes 37). Pontos de nível por noite: ~34 (antes ~72). Ainda entram ~55 pontos por baús, Rush e estrelas: se a árvore continuar cheia, é daí que cortar
 - ~~[ ] limite de 4 poderes ativos por noite (passivas livres)~~
 - ~~[ ] menos pontos por noite; evolução de poder como grande momento~~
 - ~~[ ] checar que duas noites seguidas terminam com builds diferentes~~

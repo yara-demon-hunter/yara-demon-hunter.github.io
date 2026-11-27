@@ -37,9 +37,8 @@ export const TREE_IMAGES = {
     oathHearth: img('oath-of-the-hearth'),
     oathRuin: img('oath-of-ruin'),
     emberTrail: img('ember-steps'),
-    corpseBurst: img('corpse-burst'),
-    orbitBlades: img('spectral-blades'),
-    orbitEvolve: img('balde-tempest'),
+    goldenTornado: img('golden-tornado'),        // a arte da antiga evolução Blade Tempest (balde-tempest), renomeada: agora é a do Golden Tornado (Curse Path)
+    spectralBlade: img('spectral-blades'),       // a arte da antiga Spectral Blades (Curse) agora é da Spectral Blade do Blade Path
     warmHearth: img('warm-hearth'),
     undyingFlame: img('undying-flame'),
     phoenixPact: img('phoenix-pact'),

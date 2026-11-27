@@ -165,7 +165,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
-            return `A monster you knock back that crashes into another one hurts both: ${formatMultiplier(SHATTER_STRIKE.damage)} blade damage to the one it hits and half of that to itself. Light blows that barely push do not count.`;
+            return `Every ${SHATTER_STRIKE.cooldownSeconds}s your blow hurls one monster far away. If it crashes into another monster, it deals ${formatMultiplier(SHATTER_STRIKE.hitDamage)} blade damage to it and takes ${formatMultiplier(SHATTER_STRIKE.selfDamage)} itself. If it slams into a wall or an obstacle, it takes ${formatMultiplier(SHATTER_STRIKE.wallDamage)} and is dazed. Too heavy to throw: bosses, elites, Bone Colossi, Golems and Treants.`;
         }
     },
     executioner: {
@@ -339,7 +339,7 @@ export const PASSIVE_SKILL_MODELS = {
         followDistance: 90,     // sem inimigo por perto, fica a esta distância do herói
         enemyHitSeconds: 0.7    // tempo entre golpes de um monstro no convertido
     },
-    // Runa Soberana (só o Gudran, no Curse Path): os raios arcanos do cajado furam o primeiro monstro e estouram onde acabam
+    // Runa Soberana (só o Gudran, no Curse Path): os raios arcanos do cajado EXPLODEM no primeiro monstro que acertam (não atravessam mais: 27/11/2026) e a explosão fere os outros em volta
     sovereignRune: {
         name: 'Sovereign Rune',
         icon: '🔷',
@@ -347,11 +347,11 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         get desc() {
-            return `Your arcane bolts pierce ${this.pierce} extra monster${this.pierce === 1 ? '' : 's'} and burst in blue light where they end, hurting everything within ${this.burstRadius} range for ${formatPercent(this.burstDamage)} of the bolt's damage. Only Gudran can learn this.`;
+            return `Your arcane bolts no longer fly through monsters: they explode in blue light on the first one they hit, hurting every other monster within ${this.burstRadius} range for ${formatPercent(this.burstDamage)} of the bolt's damage. The 3rd bolt of the combo explodes bigger. Only Gudran can learn this.`;
         },
-        pierce: 1,
-        burstRadius: 70,
-        burstDamage: 0.6
+        pierce: 0,              // (não atravessa: explode no primeiro)
+        burstRadius: 85,
+        burstDamage: 0.75
     },
     oathFaith: {
         name: 'Oath of Faith',
@@ -672,6 +672,7 @@ export const ARCANE_BOLT = {
     radius: 5,              // tamanho do raio
     comboRadius: 8,
     knockback: 70,
+    range: 380,             // até onde o raio voa, px (27/11/2026: o raio é o clique do Gudran; antes o alcance era o do ataque básico)
     flightHeight: 30,       // altura do voo na tela (px): sai da esfera do cajado erguido, acima da cabeça
     spawnForward: 22
 };
@@ -842,12 +843,21 @@ export const RAVEN_DECOY = {
 export const FINAL_BLOW = {
     damageMultiplier: 2
 };
-// Shatter Strike (Blade; js/systems/skills_blade.js, updateShatter): o monstro empurrado que bate em outro causa dano baixo nos dois.
+// Shatter Strike (Blade; js/systems/skills_blade.js, launchShatter e updateShatter): a cada `cooldownSeconds`, o golpe LANÇA um monstro muito mais longe do que um empurrão comum.
+// Se ele bater em outro monstro, os dois levam dano; se bater numa parede, num obstáculo do cenário ou na borda da tela, ele leva um dano maior e fica tonto.
+// Não funciona em monstros pesados: chefes, elites, Bone Colossus, Golem e Treant (`immune`). Dano em x do dano da lâmina.
 export const SHATTER_STRIKE = {
-    damage: 0.35,               // x dano da lâmina no monstro atingido; o que foi empurrado leva metade
-    windowSeconds: 0.55,        // quanto tempo depois do golpe o empurrão ainda conta
-    minSpeed: 140,              // abaixo desta velocidade o empurrão é fraco demais e não conta
-    knockback: 60
+    cooldownSeconds: 15,        // recarga
+    launchSpeed: 900,           // velocidade do lançamento (px/s): voa ~350 px (um empurrão comum anda ~30)
+    flightDamping: 0.965,       // freio por quadro durante o voo (o normal dos monstros é 0.88)
+    flightSeconds: 0.75,        // o voo acaba depois disto, ou ao bater, ou ao ficar lento demais
+    minSpeed: 170,              // abaixo desta velocidade o voo acabou
+    hitDamage: 1.2,             // dano no monstro que ele atinge
+    selfDamage: 0.8,            // dano no monstro lançado ao bater em outro monstro
+    wallDamage: 1.5,            // dano no monstro lançado ao bater em parede, obstáculo ou borda
+    knockback: 120,             // empurrão extra no monstro atingido
+    dazeSeconds: 0.7,           // tontura depois da pancada
+    immune: ['BONE_COLOSSUS', 'GOLEM', 'TREANT']       // além de chefes e elites
 };
 
 // Companheiros em voo (fênix, Grave Wisp, Shadow Raven): rodeiam devagar o ponto onde ficam e demoram mais para

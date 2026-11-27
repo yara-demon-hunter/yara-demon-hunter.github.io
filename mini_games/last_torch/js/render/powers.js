@@ -1,4 +1,4 @@
-import { getPowerLevel } from '../../data_model/powers.js';
+import { getPowerLevel, POWER_MODELS } from '../../data_model/powers.js';
 import { POWERS_VISUALS as V } from '../../data_model/visuals/effects/powers_visual.js';
 import { SKILLS_VISUALS } from '../../data_model/visuals/effects/skills_visual.js';
 import { ctx, passives, player, powers, state } from '../core/state.js';
@@ -42,23 +42,116 @@ export function renderGroundFires() {
     ctx.restore();
 }
 
-// Lâminas orbitando: a mesma adaga do arremesso, girando em volta do herói
-export function renderOrbitBlades() {
-    const level = getPowerLevel(powers.orbitBlades);
+// Spectral Blade (Blade Path): as lâminas fantasmas aparecem crescendo, giram e somem encolhendo (state.spectralBlade; js/systems/powers.js). Mesma adaga do arremesso, em roxo
+export function renderSpectralBlade() {
+    const R = state.spectralBlade;
+    if (R.left <= 0) return;
+    const level = getPowerLevel(powers.spectralBlade);
     if (!level) return;
-    const O = V.orbit;
-    const glow = powers.orbitBlades.evolved ? O.evolvedGlow : O.glow;
+    const M = POWER_MODELS.spectralBlade.base;
+    const grow = Math.max(0, Math.min(1, R.age / M.appearSeconds, R.left / M.vanishSeconds));
     const dagger = getDaggerSprite();
-    const width = DAGGER_LENGTH * O.scale;
-    const height = DAGGER_WIDTH * O.scale;
+    const width = DAGGER_LENGTH * 0.8 * (0.4 + 0.6 * grow);
+    const height = DAGGER_WIDTH * 0.8 * (0.4 + 0.6 * grow);
+    const radius = level.radius * (0.55 + 0.45 * grow);
+    ctx.save();
+    ctx.globalAlpha = grow;
     for (let i = 0; i < level.count; i++) {
-        const a = state.orbitAngle + (i / level.count) * TAU;
-        const x = player.x + Math.cos(a) * level.radius;
-        const y = player.y + Math.sin(a) * level.radius;
-        drawGlow(ctx, glow, x, y, O.glowRadius, 0.5);
+        const a = R.angle + (i / level.count) * TAU;
+        const x = player.x + Math.cos(a) * radius;
+        const y = player.y + Math.sin(a) * radius;
+        drawGlow(ctx, 'rgba(167, 139, 250, 0.85)', x, y, 18, 0.55 * grow);
         stamp(dagger, 0, 0, dagger.width, dagger.height, x, y, a + Math.PI / 2, width, height);
         resetWorldView();
     }
+    ctx.restore();
+}
+
+// Golden Tornado (Curse Path): um funil dourado de luz que gira (state.goldenTornado; js/systems/powers.js). Desenhado POR CIMA dos monstros (depois deles na ordem do quadro):
+// corpo translúcido com volume, anéis que sobem alargando, núcleo brilhante, cacos de ouro e poeira girando, e uma luz dourada com arcos em volta de cada monstro engolido (e.swallow)
+// para parecer que ele está dentro do tornado. Tudo em função do relógio e do estado (nada guardado; poucos desenhos de brilho em cache).
+export function renderGoldenTornado() {
+    const T = state.goldenTornado;
+    if (!T) return;
+    const M = POWER_MODELS.goldenTornado.base;
+    const rise = Math.min(1, T.age / M.riseSeconds, (T.seconds - T.age) / M.fadeSeconds);
+    if (rise <= 0) return;
+    const t = performance.now() / 1000;
+    const low = state.quality >= 2;
+    const height = (80 + T.radius * 0.8) * rise;
+    const layers = low ? 7 : 12;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.lineCap = 'round';
+    // Chão: brilho largo e arcos de vento girando em volta da base
+    drawGlow(ctx, 'rgba(251, 191, 36, 0.95)', T.x, T.y, T.radius * 1.9, 0.28 * rise);
+    for (let k = 0; k < 4; k++) {
+        const rr = T.radius * (1.05 + 0.28 * k);
+        const a = t * (3.2 - k * 0.5) + k * 1.7;
+        ctx.globalAlpha = (0.55 - k * 0.1) * rise;
+        ctx.strokeStyle = k % 2 ? '#fde68a' : '#f59e0b';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.ellipse(T.x, T.y, rr, rr * 0.34, 0, a, a + 1.5);
+        ctx.stroke();
+    }
+    // Corpo: camadas translúcidas empilhadas (dão volume ao funil) + o anel de cada camada em dois arcos opostos
+    for (let k = 0; k < layers; k++) {
+        const u = k / (layers - 1);                                  // 0 = base, 1 = topo
+        const rr = T.radius * (0.32 + 0.98 * u) * (0.88 + 0.12 * Math.sin(t * 5 + k));
+        const y = T.y - u * height;
+        const spin = t * (8 - u * 3.5) + k * 1.9;
+        ctx.globalAlpha = (0.14 + 0.06 * (1 - u)) * rise;
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.ellipse(T.x, y, rr, rr * 0.32, 0, 0, TAU);
+        ctx.fill();
+        ctx.lineWidth = 3.4 - u * 1.5;
+        ctx.strokeStyle = k % 2 ? '#fde68a' : '#f59e0b';
+        for (const off of [0, Math.PI]) {
+            ctx.globalAlpha = (0.9 - 0.4 * u) * rise;
+            ctx.beginPath();
+            ctx.ellipse(T.x, y, rr, rr * 0.32, 0, spin + off, spin + off + 1.25);
+            ctx.stroke();
+        }
+    }
+    // Núcleo: uma coluna de luz branca-dourada no eixo
+    for (let k = 0; k < 6; k++) {
+        const u = k / 5;
+        drawGlow(ctx, 'rgba(255, 251, 235, 0.95)', T.x + Math.sin(t * 9 + k) * 2, T.y - (0.15 + u * 0.85) * height * 0.9, 8 + (1 - u) * 6, 0.3 * rise);
+    }
+    // Cacos de ouro e poeira girando em alturas e raios diferentes
+    ctx.fillStyle = '#fffbeb';
+    const bits = low ? 8 : 20;
+    for (let i = 0; i < bits; i++) {
+        const u = (t * 0.55 + i / bits + (i % 3) * 0.13) % 1;
+        const a = t * (5 + (i % 4)) + i * 2.4;
+        const rr = T.radius * (0.4 + 1.0 * u);
+        ctx.globalAlpha = Math.min(1, (1 - u) * 1.4) * rise;
+        ctx.save();
+        ctx.translate(T.x + Math.cos(a) * rr, T.y - u * height + Math.sin(a) * rr * 0.32);
+        ctx.rotate(a * 2);
+        ctx.fillRect(-1.6, -1.1, 3.2 + (i % 3), 2.2);
+        ctx.restore();
+    }
+    // Monstros engolidos: luz dourada por cima deles e arcos girando em volta, para parecer que estão dentro do tornado
+    let shown = 0;
+    for (const e of state.enemies) {
+        if (!(e.swallow > 0.12) || e.hp <= 0 || shown >= 14) continue;
+        shown++;
+        const k = e.swallow * rise;
+        drawGlow(ctx, 'rgba(253, 224, 71, 0.9)', e.x, e.y - e.radius * 0.3, e.radius * 2.1, 0.2 * k);
+        const a = t * 9 + e.phase;
+        ctx.strokeStyle = '#fde68a';
+        for (let r = 0; r < 2; r++) {
+            ctx.globalAlpha = (0.85 - r * 0.25) * k;
+            ctx.lineWidth = 2.6 - r * 0.8;
+            ctx.beginPath();
+            ctx.ellipse(e.x, e.y - e.radius * (0.1 + r * 0.55), e.radius * (1.45 - r * 0.3), e.radius * 0.55, 0, a + r * 2.4, a + r * 2.4 + 2.1);
+            ctx.stroke();
+        }
+    }
+    ctx.restore();
 }
 
 export function renderChillAura() {
@@ -139,6 +232,64 @@ export function renderBolts() {
     for (const b of state.bolts) {
         if (b.fire) drawFireOrb(b.x, b.y, SKILLS_VISUALS.fire.orbRadius, t, Math.atan2(b.vy, b.vx), 1);
     }
+}
+
+const POWER_MODELS_ABS = POWER_MODELS.absoluteZero;
+// Freezing Breath: o sopro gelado sai da boca do herói e abre em cone por 3 s, girando com ele: nuvem de gelo que corre da boca até a ponta do cone (cada puff nasce na boca,
+// viaja e some), cacos que voam e névoa. Tudo em função da idade e do rumo de agora (nada guardado); b.range/b.half vêm do nível.
+const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+export function renderFrostBreaths() {
+    if (state.frostBreaths.length === 0) return;
+    const SECONDS = POWER_MODELS_ABS.breathSeconds;
+    const puffs = state.quality >= 2 ? 12 : 26;
+    ctx.save();
+    for (const b of state.frostBreaths) {
+        const fade = Math.min(1, b.age / 0.15, (SECONDS - b.age) / 0.35);            // entra e sai de leve
+        if (fade <= 0) continue;
+        const ox = player.x + Math.cos(b.angle) * 10, oy = player.y - 16 + Math.sin(b.angle) * 4;      // a boca: um pouco acima do centro
+        const nx = -Math.sin(b.angle), ny = Math.cos(b.angle);
+        const spreadK = Math.tan(b.half);
+        // Névoa do cone: brilhos largos ao longo dele
+        for (let k = 0; k < 5; k++) {
+            const t = (k + 1) / 5;
+            drawGlow(ctx, 'rgba(125, 211, 252, 0.9)', ox + Math.cos(b.angle) * b.range * t, oy + Math.sin(b.angle) * b.range * t, 14 + spreadK * b.range * t * 0.9, 0.2 * fade);
+        }
+        // Nuvem: cada puff nasce na boca e corre até a ponta, abrindo e esmaecendo
+        for (let k = 0; k < puffs; k++) {
+            const phase = (b.age * 1.7 + hash(k) + k / puffs) % 1;
+            const dist = b.range * phase;
+            const spread = (hash(k + 7) - 0.5) * 2 * spreadK * dist * 0.85;
+            const wob = Math.sin(b.age * 12 + k) * 2;
+            drawGlow(ctx, k % 3 === 0 ? 'rgba(255, 255, 255, 0.95)' : 'rgba(165, 243, 252, 0.95)',
+                ox + Math.cos(b.angle) * dist + nx * (spread + wob), oy + Math.sin(b.angle) * dist + ny * (spread + wob),
+                5 + 9 * phase + hash(k + 90) * 4, (0.85 - 0.6 * phase) * fade);
+        }
+        // Cacos de gelo que voam no sopro
+        ctx.fillStyle = '#e0f2fe';
+        for (let k = 0; k < 10; k++) {
+            const phase = (b.age * 1.3 + hash(k + 200)) % 1;
+            const dist = b.range * phase;
+            const spread = (hash(k + 220) - 0.5) * 2 * spreadK * dist * 0.9;
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, (1 - phase) * fade);
+            ctx.translate(ox + Math.cos(b.angle) * dist + nx * spread, oy + Math.sin(b.angle) * dist + ny * spread);
+            ctx.rotate(b.age * 8 + k);
+            ctx.fillRect(-1.6, -1.6, 3.2, 3.2);
+            ctx.restore();
+        }
+        // O contorno do cone aparece de leve no começo (mostra a área que o sopro pega)
+        if (b.age < 0.4) {
+            ctx.globalAlpha = (0.4 - b.age) * 1.2;
+            ctx.strokeStyle = '#bae6fd';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(ox, oy);
+            ctx.arc(ox, oy, b.range, b.angle - b.half, b.angle + b.half);
+            ctx.closePath();
+            ctx.stroke();
+        }
+    }
+    ctx.restore();
 }
 
 export function renderStars() {

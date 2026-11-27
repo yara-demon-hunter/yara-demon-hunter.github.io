@@ -24,6 +24,7 @@ import { showMapTransition } from '../ui/map_screen.js';
 import { getSceneryId, prepareScenery, setScenery } from '../render/scenery.js';
 import { warmSceneryMonsters } from '../render/monster_sprites.js';
 import { rollWaveEvent } from './wave_events.js';
+import { placeHeroAtSpawn } from './player.js';
 import { buildHourPlan, clearBattleEffects, prepareBossSummon, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
 // --- A NOITE ---
@@ -67,6 +68,7 @@ export function startHour() {
     state.frenzyActiveTimer = 0;       // segurança: a Fúria nunca atravessa a virada de onda
     resetFury();
     resetFieldForNewTurn();
+    placeHeroAtSpawn();                               // todo começo de onda: o herói no mesmo ponto, logo abaixo da tocha
 
     // Hora de boss também começa com a onda normal: o boss só chega quando a cota fecha (callBoss)
     const plan = state.hourPlan;
@@ -186,6 +188,8 @@ function finishHour() {
     // Terminou as 5 ondas da tela (o chefe caiu): o mapa aparece e o herói anda até a tela seguinte; depois vem o resultado e o acampamento, já lá
     if (CAMPAIGN_RUNTIME.enabled && startsNewScreen(state.turn)) {
         state.gameState = 'MAP';                              // a partida espera (sem isto o fim da onda rodaria de novo a cada quadro)
+        audio.setMood('adventure');                           // o chefe caiu: a música da luta sai e entra a da viagem (aventura), do resultado até o acampamento
+        audio.setIntensity(0.35);
         // Primeiro o resultado da onda (as estrelas), depois o mapa (que mostra as estrelas de cada onda), depois o acampamento já na tela nova.
         // O cenário novo só entra com o mapa já cobrindo a tela: antes, o fundo do cartão de estrelas já mostrava a tela seguinte (adiantava o capítulo)
         collectAllGold();
