@@ -301,6 +301,7 @@
 .tdetail-preview .shop-row { min-height: 1.55rem; }
 .tdetail-preview .shop-row-value { color: #d6cdb8; }                      /* o número que NÃO muda agora: neutro */
 .tdetail-preview .is-up .shop-row-value { color: #6ee7b7; }
+.tdetail-preview .is-bad .shop-row-value { color: #f87171; }                /* o que o juramento tira (Disabled / None): vermelho, nunca verde */
 .tdetail-preview .is-later { opacity: 0.42; }                              /* o que ainda não temos (chega em um nível à frente): meio apagado */
 .tdetail-preview .is-later .shop-row-value { color: #9ca3af; }                /* o que sobe com a próxima compra: verde */
 .tdetail-preview.hidden { display: none; }

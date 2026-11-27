@@ -230,9 +230,9 @@ function createTreeView(cfg) {
                     preview.appendChild(row);
                 });
             } else {
-                upgradeRows.forEach(({ icon, name, value, image, up, later }) => {
+                upgradeRows.forEach(({ icon, name, value, image, up, later, bad }) => {
                     const row = document.createElement('div');
-                    row.className = `shop-row tree-preview-row${up ? ' is-up' : ''}${later ? ' is-later' : ''}`;       // verde: sobe agora; apagado: só chega em outro nível
+                    row.className = `shop-row tree-preview-row${up ? ' is-up' : ''}${later ? ' is-later' : ''}${bad ? ' is-bad' : ''}`;       // verde: sobe agora; apagado: só chega em outro nível
                     row.innerHTML = '<span class="shop-row-name"><span class="stat-icon"></span><span></span></span><b class="shop-row-value"></b>';
                     paintIcon(row.querySelector('.stat-icon'), image ? TREE_IMAGES[node.key] : null, icon);
                     row.querySelector('.shop-row-name > span:last-child').textContent = name;

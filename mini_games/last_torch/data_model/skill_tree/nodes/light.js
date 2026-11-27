@@ -16,7 +16,7 @@ export const LIGHT_NODES = [
     { id: 'guardianAngel', cost: 3, branch: 'light', kind: 'power', key: 'guardianAngel', x: 3, y: 0, requires: [req('groundEvolve')] },
     { id: 'angelEvolve', cost: 4, branch: 'light', kind: 'evolve', key: 'guardianAngel', x: 4, y: 0, requires: [req('guardianAngel', 5)] },
     { id: 'sanctifiedMantle', showTotal: true, cost: 1, branch: 'light', kind: 'mod', x: 2, y: 3, requires: [req('judgment')],
-      name: 'Sanctified Mantle', icon: '🛡️', desc: 'A holy mantle turns blows aside (3% less damage taken per level), strengthens your spells (+3% spell damage per level) and keeps the torch burning (+10 torch health per level). Levels stack.',
+      name: 'Sanctified Mantle', icon: '🛡️', desc: 'A holy mantle turns blows aside, strengthens your spells and keeps the torch burning. Levels stack.',
       levelText: (mods, lvl = 1) => `${stacked(lvl, -mods.damageTaken)} less damage taken · ${stacked(lvl, mods.spellDamage)} spell damage · ${stacked(lvl, mods.torchHp, num)} torch health`, mods: { damageTaken: -0.03, spellDamage: 0.03, torchHp: 10 } },
     // Linha 2, a água benta e o sino: Holy Water -> Blessed Rain -> Church Bell -> Cathedral Toll
     { id: 'holyWater', cost: 3, branch: 'light', kind: 'power', key: 'holyWater', x: 1, y: 1, requires: [req('silentVigil')] },
@@ -28,12 +28,12 @@ export const LIGHT_NODES = [
     { id: 'smiteEvolve', cost: 3, branch: 'light', kind: 'evolve', key: 'smite', x: 2, y: 2, requires: [req('smite', 5)] },
     { id: 'sacredPendant', cost: 3, branch: 'light', kind: 'power', key: 'sacredPendant', x: 3, y: 2, requires: [req('smiteEvolve')] },
     { id: 'divineGrace', showTotal: true, cost: 1, branch: 'light', kind: 'mod', x: 4, y: 2, requires: [req('sacredPendant', 2)],
-      name: 'Divine Grace', icon: '✨', desc: 'Grace speeds your spells (4% shorter recharge per level) and mends your wounds over time (+0.25 health per second per level). Levels stack.',
+      name: 'Divine Grace', icon: '✨', desc: 'Grace speeds your spells and mends your wounds over time. Levels stack.',
       levelText: (mods, lvl = 1) => `${stacked(lvl, mods.spellHaste)} shorter spell recharge · ${stacked(lvl, mods.hpRegen, num)} health per second`, mods: { spellHaste: 0.04, hpRegen: 0.25 } },
     // Linha 4, o julgamento e a Conversão: Judgment -> Sanctified Mantle -> Conversão -> Blessed Blade. A Conversão e a lâmina benta são só do Avgustino (seladas
     // para os outros, com passe livre); o Judgment é de todos
     { id: 'judgment', cost: 2, showTotal: true, branch: 'light', kind: 'mod', x: 1, y: 3, requires: [req('silentVigil')],
-      name: 'Judgment', icon: '⚖️', desc: 'The light judges the mighty: every level adds 10% damage to elites and bosses, but ONLY from your Light Path skills (holy ground, holy water, smite, bell, pendant, angel...). Damage from other paths is not affected. Levels stack.',
+      name: 'Judgment', icon: '⚖️', desc: 'The light judges the mighty: more damage to elites and bosses, but only from your Light Path skills. Levels stack.',
       levelText: (mods, lvl = 1) => `${stacked(lvl, mods.demonDamage)} Light Path damage against elites and bosses`, mods: { demonDamage: 0.1 } },
     { id: 'conversion', cost: 4, hero: 'avgustino', branch: 'light', kind: 'passive', key: 'conversion', x: 3, y: 3, requires: [req('sanctifiedMantle')], },
     { id: 'blessedBlade', cost: 3, exclusive: 'bladeEnchant', hero: 'avgustino', branch: 'light', kind: 'passive', key: 'blessedBlade', x: 4, y: 3, requires: [req('conversion')] },

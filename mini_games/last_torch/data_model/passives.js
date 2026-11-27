@@ -36,7 +36,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 80,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        desc: 'Your final combo hit becomes a whirlwind: a long, sharp purple cut that spins around you like a small tornado, striking every enemy in a much wider circle.'
+        desc: "Your final combo hit becomes a whirlwind that spins around you, striking every enemy in a wider circle.",
     },
     mirrorWard: {
         name: 'Return Fire',
@@ -44,9 +44,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 60,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Bats an incoming enemy shot back at the nearest monster. Recharges in ${MIRROR_WARD.cooldownSeconds}s.`;
-        }
+        desc: "Bats an incoming enemy shot back at the nearest monster.",
     },
     shadowShackle: {
         name: 'Shadow Shackle',
@@ -54,9 +52,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 120,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Every ${SHADOW_SHACKLE.cooldownSeconds}s you hurl a chain at the strongest monster within dagger range. It stays nailed to that spot for ${SHADOW_SHACKLE.holdSeconds}s, but only ${Math.round(SHADOW_SHACKLE.holdSeconds * SHADOW_SHACKLE.bossRatio)}s on a boss. A chained monster can still attack, and a boss can still teleport, but neither can walk.`;
-        }
+        desc: "You hurl a chain at the strongest monster within dagger range and nail it to the spot (half as long on a boss). It can still attack, and a boss can still teleport, but neither can walk.",
     },
     fanOfKnives: {
         name: 'Fan of Knives',
@@ -64,9 +60,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 110,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Throws ${FAN_OF_KNIVES.count} daggers at once in a fan.`;
-        }
+        desc: "Throws several daggers at once in a fan.",
     },
     shadowClone: {
         name: 'Shadow Clone',
@@ -74,9 +68,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 150,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `A shadow keeps watch near the torch and walks out to cut down whatever comes close. Monsters ignore it, but a stray hit can still bring it down. It returns after ${SHADOW_CLONE.respawnSeconds}s.`;
-        }
+        desc: "A shadow keeps watch near the torch and cuts down whatever comes close. Monsters ignore it, but a stray hit can bring it down. It returns after a while.",
     },
     parry: {
         name: 'Parry',
@@ -84,9 +76,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `When a monster strikes you in melee, your sword turns the blow aside: you take no damage, the attacker is stunned for ${formatNumber(PARRY.stun)}s and riposted for ${formatMultiplier(PARRY.damage)} weapon damage, and neighbours within ${PARRY.radius} are stunned too. Ready every ${formatNumber(PARRY.cooldown)}s. Bosses are stunned only briefly.`;
-        }
+        desc: "When a monster strikes you in melee, your sword turns the blow aside: no damage, the attacker is stunned and hit back, and its neighbours are stunned too. Bosses are stunned only briefly.",
     },
     warCry: {
         name: 'War Cry',
@@ -94,9 +84,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `When surrounded by ${WAR_CRY.monsters} monsters, you roar: they are thrown back and stunned, and your blade hits ${formatPercent(WAR_CRY.bladeBonus)} harder for ${WAR_CRY.bonusSeconds}s.`;
-        }
+        desc: "When surrounded, you roar: monsters are thrown back and stunned, and your blade hits harder for a moment.",
     },
     roseWhip: {
         name: 'Rose Whip',
@@ -104,9 +92,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Three levels (the numbers below go from level 1 to 3). Every ${byLevel(LEVELS.roseWhip.cooldownSeconds)}s you crack a whip of thorns, a rose at its tip, at the strongest monster within ${ROSE_WHIP.range} reach. It lashes for ${byLevel(LEVELS.roseWhip.lashDamage, formatMultiplier)} spell damage and stays wrapped around it for ${byLevel(LEVELS.roseWhip.holdSeconds)}s (half of that on a boss): the monster is pinned to the spot and the thorns bite for ${byLevel(LEVELS.roseWhip.thornDps, formatMultiplier)} spell damage per second.`;
-        }
+        desc: "A whip of thorns, a rose at its tip, cracks at the strongest monster in reach. It lashes, then stays wrapped around it (half as long on a boss): the monster is pinned and the thorns keep biting.",
     },
     rosePetals: {
         name: 'Rose Petals',
@@ -114,9 +100,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Three levels (the numbers below go from level 1 to 3). Every ${byLevel(LEVELS.rosePetals.cooldownSeconds)}s, when monsters are near, a hurricane of roses and loose petals spins around you for ${byLevel(LEVELS.rosePetals.durationSeconds)}s, hitting everything within ${byLevel(LEVELS.rosePetals.radius)} range for ${byLevel(LEVELS.rosePetals.damage, formatMultiplier)} spell damage every ${formatNumber(ROSE_PETALS.tickSeconds)}s, pushing them back and slowing them.`;
-        }
+        desc: "When monsters are near, a hurricane of roses and petals spins around you, hitting everything in range, pushing monsters back and slowing them.",
     },
     featherDodge: {
         name: 'Feather Dodge',
@@ -124,9 +108,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Three levels (the numbers below go from level 1 to 3). When a blow would hit you, you burst into a storm of raven feathers and slip through it: the blow misses and you are untouchable for ${byLevel(LEVELS.featherDodge.immuneSeconds)}s. Recharges in ${byLevel(LEVELS.featherDodge.cooldownSeconds)}s.`;
-        }
+        desc: "When a blow would hit you, you burst into raven feathers and slip through it: the blow misses and you are untouchable for a moment.",
     },
     featherRain: {
         name: 'Feather Rain',
@@ -134,9 +116,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 120,
         maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Three levels (the numbers below go from level 1 to 3). Every ${byLevel(LEVELS.featherRain.cooldownSeconds)}s you shed a rain of raven quills that falls from above on the monsters your raven has marked (up to ${byLevel(LEVELS.featherRain.targets)}): ${byLevel(LEVELS.featherRain.quills)} quills each, ${byLevel(LEVELS.featherRain.damage, formatMultiplier)} blade damage per quill.`;
-        }
+        desc: "A rain of raven quills falls on the monsters your raven has marked.",
     },
     ravenDecoy: {
         name: 'Raven Decoy',
@@ -144,9 +124,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 140,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Feather Dodge leaves a giant raven feather where you stood. Monsters nearby rush it for ${formatNumber(RAVEN_DECOY.seconds)}s, then it bursts into feathers for ${formatMultiplier(RAVEN_DECOY.damage)} blade damage around it.`;
-        }
+        desc: "Feather Dodge leaves a giant feather where you stood. Monsters nearby rush it, then it bursts into feathers that hurt them.",
     },
     finalBlow: {
         name: 'Final Blow',
@@ -154,9 +132,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 120,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `The 3rd strike of your combo deals ${formatMultiplier(FINAL_BLOW.damageMultiplier)} damage (on top of the combo's own bonus). With Whirlwind, that finishing blow hits everyone around you.`;
-        }
+        desc: "The 3rd strike of your combo deals extra damage. With Whirlwind, it hits everyone around you.",
     },
     shatterStrike: {
         name: 'Shatter Strike',
@@ -164,9 +140,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 120,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Every ${SHATTER_STRIKE.cooldownSeconds}s your blow hurls one monster far away. If it crashes into another monster, it deals ${formatMultiplier(SHATTER_STRIKE.hitDamage)} blade damage to it and takes ${formatMultiplier(SHATTER_STRIKE.selfDamage)} itself. If it slams into a wall or an obstacle, it takes ${formatMultiplier(SHATTER_STRIKE.wallDamage)} and is dazed. Too heavy to throw: bosses, elites, Bone Colossi, Golems and Treants.`;
-        }
+        desc: "Your blow hurls one monster far away. If it crashes into another monster, both take damage; if it slams into a wall or obstacle, it takes more and is dazed. Too heavy to throw: bosses, elites, Bone Colossi, Golems and Treants.",
     },
     executioner: {
         name: 'Executioner',
@@ -174,9 +148,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Crimson Tide evolves: every swing throws ${EXECUTIONER.crescents} blood crescents in a fan instead of one, each hitting as hard as the original.`;
-        }
+        desc: "Crimson Tide evolves: every swing throws several blood crescents in a fan instead of one.",
     },
     smokeBomb: {
         name: 'Smoke Bomb',
@@ -184,9 +156,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 70,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Every dash leaves a trail of smoke that lingers for ${SMOKE_BOMB.seconds}s. Monsters inside it slow down, and every hit they take, from blade or dagger, has a ${formatPercent(SMOKE_BOMB.critChance)} chance to be a critical hit.`;
-        }
+        desc: "Every dash leaves a trail of smoke. Monsters inside it slow down, and the hits they take have a chance to be critical.",
     },
     flameBlade: {
         name: 'Flaming Sword',
@@ -194,9 +164,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Your sword catches fire. Every cut burns monsters for ${formatPercent(FLAME_BLADE.burnRatio)} of the hit's damage per second for ${FLAME_BLADE.burnSeconds}s. A burning monster that dies passes the fire to others within ${FLAME_BLADE.spreadRadius} range. Under the Oath of the Hearth, burn damage is multiplied by ${FLAME_BLADE.oathMultiplier}.`;
-        }
+        desc: "Your sword catches fire. Every cut burns monsters, and a burning monster that dies passes the fire to others nearby. Under the Oath of the Hearth, burn damage doubles.",
     },
     fireballs: {
         name: 'Fireballs',
@@ -204,7 +172,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        desc: 'Your daggers become fireballs. They burst on impact, scorching everything nearby, setting it ablaze and leaving the ground burning. Everything that improves your daggers still counts, and your magic damage multiplies the fireball on top (its hits show in blue). The price: you stand still for a moment, unable to do anything, while the fire grows in your hand. Hold the dagger button to charge it into a huge fireball that deals up to 4x damage and bursts over a wide area.',
+        desc: "Your daggers become fireballs: they burst on impact, ignite everything nearby and leave the ground burning. Your magic damage multiplies them. The price: you stand still while the fire grows in your hand. Hold the dagger button to charge a huge fireball.",
         warning: 'Charged fireballs do not ricochet, and Ricochet is lost while you hold the fire.'
     },
     fireTornado: {
@@ -213,9 +181,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Every ${FIRE_TORNADO.cooldownSeconds}s a tornado of fire forms over the torch and rages for ${FIRE_TORNADO.durationSeconds}s, scorching everything within ${FIRE_TORNADO.radius} range of the torch (as far as a maxed Hearth Ring reaches) for ${formatMultiplier(FIRE_TORNADO.damage)} torch fire damage every ${FIRE_TORNADO.tickSeconds}s and setting it ablaze. It counts as the torch's fire.`;
-        }
+        desc: "A tornado of fire forms over the torch now and then, scorching and igniting everything inside the torch's circle. It counts as the torch's fire.",
     },
     hearthPhoenix: {
         name: 'Flaming Phoenix',
@@ -223,9 +189,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `A fire phoenix rises from the torch and circles it, hurling fireballs every ${HEARTH_PHOENIX.cooldownSeconds}s at monsters near the flame for ${formatMultiplier(HEARTH_PHOENIX.boltDamage)} spell damage, and every ${HEARTH_PHOENIX.breathCooldown}s it breathes a ${HEARTH_PHOENIX.breathSeconds}s torrent of fire that scorches everything in its path. They count as the torch's fire.`;
-        }
+        desc: "A fire phoenix circles the torch, hurling fireballs at nearby monsters and now and then breathing a torrent of fire. It counts as the torch's fire.",
     },
     blueTorch: {
         name: 'Blue Torch',
@@ -233,9 +197,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `The torch burns blue, and so does everything it does: its bolts, rings and light. Its light and warmth reach ${formatPercent(BLUE_TORCH.light)} and ${formatPercent(BLUE_TORCH.warmth)} farther, the torch's fire hits ${formatPercent(BLUE_TORCH.fireDamage)} harder, and the cold flame slows every monster inside its warmth by ${formatPercent(BLUE_TORCH.chill)}. Monsters slowed this way take ${formatPercent(BLUE_TORCH.brittle)} more damage from the torch's fire hits only.`;
-        }
+        desc: "The torch burns blue: more light and warmth, stronger fire, and a cold flame that slows monsters inside its warmth. Slowed monsters take extra damage from the torch's fire hits only.",
     },
     phoenixPact: {
         name: 'Phoenix Pact',
@@ -243,7 +205,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        desc: 'A phoenix flies at your shoulder and hurls fireballs at the monsters near you. Learn Phoenix Reborn to let it give its life for you.'
+        desc: "A phoenix flies at your shoulder and hurls fireballs at nearby monsters. Learn Phoenix Reborn to let it give its life for you.",
     },
     phoenixReborn: {
         name: 'Phoenix Reborn',
@@ -251,7 +213,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 130,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        desc: 'The phoenix gives its life for you. When you fall, it raises you in a storm of fire. If the torch goes out, it dives into the flame and relights it at half health, shielding you both. Either way, it is reborn the next wave.'
+        desc: "The phoenix gives its life for you. When you fall, it raises you in a storm of fire; if the torch goes out, it relights it at half health, shielding you both. It is reborn the next wave.",
     },
 
     shadowRaven: {
@@ -260,9 +222,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 90,
         maxLvl: 3,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Three levels (the numbers below go from level 1 to 3). A small raven circles at your shoulder. Every ${byLevel(LEVELS.shadowRaven.cooldownSeconds)}s it dives at the nearest monster within ${byLevel(LEVELS.shadowRaven.range)} range, pecks it for ${byLevel(LEVELS.shadowRaven.damage, formatMultiplier)} blade damage and flies back. The pecked monster is marked for ${byLevel(LEVELS.shadowRaven.markSeconds)}s: every hit it takes deals ${byLevel(LEVELS.shadowRaven.markDamage, formatPercent)} more damage.`;
-        }
+        desc: "A small raven circles at your shoulder and dives at the nearest monster, pecks it and flies back. A pecked monster is marked: it takes extra damage from every hit.",
     },
 
     // --- NATUREZA ---
@@ -272,9 +232,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 120,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `A monster killed by any Nature skill sprouts into a Cactling (up to ${THORN_BURST.maxCacti} at a time). When a monster, or you, touches it, it bursts and shoots ${THORN_BURST.needles} thorns in every direction, each hitting for ${formatMultiplier(THORN_BURST.needleDamage)} spell damage (a single monster takes at most ${THORN_BURST.maxPerMonster} of them).`;
-        }
+        desc: "A monster killed by a Nature skill sprouts into a Cactling. When a monster, or you, touches it, it bursts into thorns in every direction.",
     },
     // Só o Rowan (hero: 'rowan' no nó da árvore): as rosas escurecem e ferem mais. Vale como mod de dano da adaga (knifeDamage),
     // então soma com o Dagger Mastery e tudo o mais que melhora a adaga
@@ -284,9 +242,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 140,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Your roses wither and turn black, in every skill that uses them (thrown roses, Rose Whip, Rose Petals). All your Nature Path skills deal +${formatPercent(this.mods.natureDamage)} damage, daggers deal +${formatPercent(this.mods.knifeDamage)}, and a monster they hit is marked with a black rose for ${THORN_ROSES.markSeconds}s. If it dies marked, thorn roses burst from the ground where it fell and hurt everything that crosses them for ${THORN_ROSES.patchSeconds}s. Only Rowan can learn this. Every skill that improves daggers works on roses.`;
-        },
+        desc: "Your roses wither and turn black in every skill that uses them. Nature Path skills and daggers deal more damage, and a monster they hit is marked: if it dies marked, thorn roses burst where it fell and hurt whatever crosses them. Only Rowan can learn this.",
         mods: { knifeDamage: 0.6, natureDamage: 0.2 }
     },
     oathWild: {
@@ -296,10 +252,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'wild', tagline: 'The forest remembers',
-        get desc() {
-            const mods = this.mods;
-            return `You heal ${mods.hpRegen} health per second, gain ${formatPercent(mods.maxHp)} max health, roots hold ${formatPercent(mods.rootSeconds)} longer and spells deal ${formatPercent(mods.spellDamage)} more damage. The price: your Fury deals no damage. It still shields you and slows monsters, but the wild gives life, not rage.`;
-        },
+        desc: "You heal over time, gain max health, roots hold longer and spells hit harder. The price: your Fury deals no damage (it still shields you and slows monsters).",
         mods: { hpRegen: 1.2, maxHp: 0.15, rootSeconds: 0.5, spellDamage: 0.15, furyNoDamage: 1 }
     },
 
@@ -310,9 +263,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 0,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `You anoint your blade with holy water. Every blade hit also burns for ${Math.round(this.magicRatio * 100)}% of your magic damage (a blue number next to the white one): physical and holy at once.`;
-        },
+        desc: "You anoint your blade with holy water: every blade hit also burns with a part of your magic damage (a blue number beside the white one).",
         magicRatio: 0.2     // parte do dano de magia que cada golpe da lâmina soma (baixa: é um tempero, não o total da magia)
     },
     // Conversão (só o Avgustino): de tempos em tempos ele reza por um monstro comum perto dele, que passa para o lado dele
@@ -324,9 +275,7 @@ export const PASSIVE_SKILL_MODELS = {
         cost: 0,
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Every ${this.cooldownSeconds}s you pray over a common monster near you and it joins your side for the rest of the night, with its normal health (full, even if it was wounded). It never heals. Converts stack up to ${this.maxAllies}: they fight the monsters near them and provoke them, so the horde attacks them instead of you. Bosses and elites cannot be converted. Only Avgustino can learn this.`;
-        },
+        desc: "You pray over a common monster near you and it joins your side for the rest of the night, at full health (it never heals). Converts stack: they fight nearby monsters and provoke them, so the horde attacks them instead of you. Bosses and elites cannot be converted. Only Avgustino can learn this.",
         cooldownSeconds: 20,     // entre uma reza e outra (a primeira vem logo: firstDelaySeconds)
         firstDelaySeconds: 3,
         range: 260,             // distância do herói até o monstro que ele converte
@@ -346,11 +295,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'faith', tagline: 'Light answers the dark',
-        get desc() {
-            const mods = this.mods;
-            const S = this.shields;
-            return `${S.count} shields of light circle you, striking every monster that comes close for ${Math.round(S.damage * 100)}% of your magic damage and pushing it back. Spells deal ${formatPercent(mods.spellDamage)} more damage, you heal ${mods.hpRegen} health per second, the torch gains ${mods.torchHp} health and holds ${formatPercent(mods.torchGuard)} more against hits. The price: the faithful do not flee. You can no longer dash.`;
-        },
+        desc: "Shields of light circle you, striking monsters that come close and pushing them back. Spells hit harder, you heal over time, and the torch gains health and holds against hits. The price: you can no longer dash.",
         // Os escudos de luz que giram em volta do herói (js/systems/skills_light.js; desenho em js/render/light.js)
         shields: { count: 3, orbit: 46, spin: 2.2, size: 11, damage: 0.55, hitSeconds: 0.6, knockback: 160 },
         mods: { spellDamage: 0.2, hpRegen: 1, torchHp: 40, torchGuard: 0.15, noDash: 1 }
@@ -366,10 +311,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'slaughter', tagline: 'Blood answers blood',
-        get desc() {
-            const { bladeDamage, attackSpeed, furyCharge, killHeal } = this.mods;
-            return `+${formatPercent(bladeDamage)} blade damage, +${formatPercent(attackSpeed)} attack speed, +${formatPercent(furyCharge)} Fury charge, and each kill heals ${killHeal}. Monsters are drawn to you from farther away. The price: the warmth of the torch no longer heals you, and you can no longer throw daggers.`;
-        },
+        desc: "More blade damage, attack speed and Fury charge, and kills heal you. Monsters are drawn to you from farther away. The price: the torch's warmth no longer heals you, and you can no longer throw daggers.",
         mods: { bladeDamage: 0.25, attackSpeed: 0.05, furyCharge: 0.4, killHeal: 1, provoke: 0.5, noWarmthHeal: 1, noKnives: 1 }
     },
     oathWhispers: {
@@ -379,10 +321,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'whispers', tagline: 'Never where they strike',
-        get desc() {
-            const mods = this.mods;
-            return `+${mods.dashCharges} dash charge, ${formatPercent(mods.dashCooldown)} shorter dash cooldown, +${formatPercent(mods.moveSpeed)} move speed, +${formatPercent(mods.critChance)} critical chance and +${formatPercent(mods.knifeDamage)} dagger damage. Every ${SHADOW_CLONE.whispers.killsPerShadow} kills a shadow joins the torch (up to ${SHADOW_CLONE.whispers.maxShadows}). The price: ${formatPercent(Math.abs(mods.maxHp))} less max health.`;
-        },
+        desc: "More dash charges, faster dash recharge, move speed, crit chance and dagger damage. Every few kills a shadow joins the torch. The price: less max health.",
         mods: { dashCharges: 1, dashCooldown: 0.2, moveSpeed: 0.15, critChance: 0.1, knifeDamage: 0.5, maxHp: -0.25 }
     },
     oathHearth: {
@@ -392,10 +331,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'hearth', tagline: 'The flame will not die',
-        get desc() {
-            const mods = this.mods;
-            return `The torch takes ${formatPercent(mods.torchGuard)} less damage, you gain ${formatPercent(mods.maxHp)} max health, and its warmth reaches ${formatMultiplier(1 + mods.warmth)} as far and burns monsters inside it. The price: ${formatPercent(Math.abs(mods.moveSpeed))} less move speed.`;
-        },
+        desc: "The torch takes less damage, you gain max health, and its warmth reaches farther and burns monsters inside it. The price: less move speed.",
         mods: { torchGuard: 0.25, maxHp: 0.3, warmth: 1, warmthBurn: 0.4, moveSpeed: -0.25 }
     },
     oathRuin: {
@@ -405,10 +341,7 @@ export const PASSIVE_SKILL_MODELS = {
         maxLvl: 1,
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'ruin', tagline: 'The dark pays in kind',
-        get desc() {
-            const mods = this.mods;
-            return `Spells deal ${formatPercent(mods.spellDamage)} more damage and recharge ${formatPercent(mods.spellHaste)} faster. The price: your blade deals ${formatPercent(Math.abs(mods.bladeDamage))} less damage.`;
-        },
+        desc: "Spells deal more damage and recharge faster. The price: your blade deals much less damage.",
         mods: { spellDamage: 0.2, spellHaste: 0.12, bladeDamage: -0.4 }
     },
 

@@ -1,3 +1,4 @@
+import { evolutionStatRows, passiveStatRows } from '../../data_model/skill_stats.js';
 import { CAMP } from '../../data_model/passives.js';
 import { EVOLUTIONS, POWER_MODELS } from '../../data_model/powers.js';
 import { RELIC_BY_ID, RELIC_NODES } from '../../data_model/relics.js';
@@ -202,7 +203,10 @@ const TREE_MOD_FIELDS = {
     spellDamage: ['🔮', 'Magic Damage', n => `+${Math.round(n * 100)}%`],
     demonDamage: ['⚖️', 'Light Damage vs Elites & Bosses', n => `+${Math.round(n * 100)}%`],
     hpRegen: ['❤️', 'Heal per Second', n => `+${Number(n.toFixed(2))}/s`],
-    blessedKillHeal: ['💛', 'Heal per Blessed Kill', n => `+${Number(n.toFixed(1))}`]
+    blessedKillHeal: ['💛', 'Heal per Blessed Kill', n => `+${Number(n.toFixed(1))}`],
+    curseDamage: ['🔮', 'Curse Path Damage', n => `+${Math.round(n * 100)}%`],
+    iceDamage: ['🧊', 'Ice Skill Damage', n => `+${Math.round(n * 100)}%`],
+    oakGrowth: ['🌳', 'Oak Growth Speed', n => `+${Math.round(n * 100)}%`]
 };
 
 // times: quantos níveis somar (nós com showTotal mostram o TOTAL que o jogador terá depois da compra: 10%, 20%, 30%...)
@@ -269,6 +273,8 @@ function alsoRows(node) {
 export function getNodeTotalRows(node) {
     const level = getNodeLevel(node);
     if (level <= 0) return [];
+    if (node.kind === 'passive') return passiveStatRows(node.key, level).map(r => ({ ...r, up: false }));       // passivas e evoluções: data_model/skill_stats.js
+    if (node.kind === 'evolve') return evolutionStatRows(node.key, true).map(r => ({ ...r, up: false }));
     if (node.kind === 'power') {
         const model = POWER_MODELS[node.key];
         const key = node.key;
@@ -301,6 +307,8 @@ export function getNodeTotalRows(node) {
 }
 
 export function getNodeUpgradeRows(node) {
+    if (node.kind === 'passive') return passiveStatRows(node.key, getNodeLevel(node));
+    if (node.kind === 'evolve') return evolutionStatRows(node.key, getNodeLevel(node) > 0);
     if (node.kind === 'power') return getPowerUpgradeRows(node.key);
     if (node.kind === 'mod') return modifierRows(node.mods, node.showTotal ? getNodeLevel(node) + 1 : 1);
     if (node.kind !== 'stat') return [];

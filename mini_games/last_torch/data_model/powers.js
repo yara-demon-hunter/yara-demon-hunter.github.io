@@ -12,10 +12,7 @@ export const ICE_POWERS = ['chillAura', 'absoluteZero'];
 export const POWER_MODELS = {
     emberTrail: {
         name: 'Ember Steps', icon: '👣', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Your footsteps leave fire that burns monsters for ${formatMultiplier(level.dps)} blade damage per second for ${formatNumber(level.life)}s. Inside the torch's warmth, your blade deals ${formatPercent(level.warmthDamage)} more damage.`;
-        },
+        desc: "Your footsteps leave fire that burns monsters. Inside the torch's warmth, your blade deals extra damage.",
         get upgrades() {
             return this.levels.map(level =>
                 `${formatMultiplier(level.dps)} burn damage for ${formatNumber(level.life)}s · +${formatPercent(level.warmthDamage)} blade damage in the warmth · ${level.radius} fire radius`
@@ -33,9 +30,7 @@ export const POWER_MODELS = {
     },
     bloodEdge: {
         name: 'Blood Edge', icon: '🩸', maxLvl: 5,
-        get desc() {
-            return `Each kill restores ${formatNumber(this.levels[this.levels.length - 1].heal)} health at max level.`;
-        },
+        desc: "Every kill restores a little health.",
         get upgrades() {
             return this.levels.map(level => `Restore ${formatNumber(level.heal)} health per kill`);
         },
@@ -43,9 +38,7 @@ export const POWER_MODELS = {
     },
     keenEye: {
         name: 'Keen Eye', icon: '👁️', maxLvl: 5,
-        get desc() {
-            return `Each level adds ${formatPercent(this.mods.critChance)} critical chance and ${formatPercent(this.mods.critDamage)} critical damage.`;
-        },
+        desc: "Raises your critical chance and critical damage.",
         get upgrades() {
             return this.levels.map(() =>
                 `+${formatPercent(this.mods.critChance)} critical chance · +${formatPercent(this.mods.critDamage)} critical damage`
@@ -56,10 +49,7 @@ export const POWER_MODELS = {
     },
     ricochet: {
         name: 'Ricochet', icon: '🎯', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Your daggers bounce between up to ${level.bounces} monsters. At max level, they also deal ${formatPercent(level.damage)} more damage.`;
-        },
+        desc: "Your daggers bounce between several monsters. At max level they also deal more damage.",
         get upgrades() {
             return this.levels.map(level =>
                 `Up to ${level.bounces} bounces · +${formatPercent(level.damage)} dagger damage`
@@ -76,10 +66,7 @@ export const POWER_MODELS = {
     },
     deathMark: {
         name: 'Death Mark', icon: '❌', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Daggers mark monsters for ${formatNumber(level.seconds)}s. Your blade detonates the mark for ${formatMultiplier(level.damage)} blade damage; dashing through deals ${formatMultiplier(this.dashMultiplier)} damage and restores the dash. At max level, the blast reaches ${level.splash}.`;
-        },
+        desc: "Daggers mark monsters. Hitting a marked monster with your blade detonates the mark; dashing through it deals damage and restores your dash. At max level the blast is wider.",
         get upgrades() {
             return this.levels.map(level =>
                 `${formatMultiplier(level.damage)} blade damage · ${formatNumber(level.seconds)}s mark · ${level.splash ? `${level.splash} blast radius` : 'no splash'}`
@@ -96,10 +83,7 @@ export const POWER_MODELS = {
     },
     shadowBond: {
         name: 'Umbral Bond', icon: '🖤', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `At max level, shadows gain ${formatPercent(level.hp)} health, ${formatPercent(level.damage)} damage, and ${level.area} more guard area around the torch.`;
-        },
+        desc: "Your shadows gain health, damage and a wider guard area around the torch.",
         get upgrades() {
             return this.levels.map(level =>
                 `+${formatPercent(level.hp)} shadow health · +${formatPercent(level.damage)} damage · +${level.area} guard area`
@@ -116,10 +100,7 @@ export const POWER_MODELS = {
     },
     torchBolts: {
         name: 'Flame Sentinel', icon: '🔥', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `The torch fires ${level.count} bolts every ${formatNumber(level.cooldown)}s, each dealing ${formatMultiplier(level.damage)} spell damage.`;
-        },
+        desc: "The torch fires bolts of spell damage at the monsters around it.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.count} bolts · every ${formatNumber(level.cooldown)}s · ${formatMultiplier(level.damage)} spell damage`
@@ -136,10 +117,7 @@ export const POWER_MODELS = {
     },
     torchWard: {
         name: 'Torch Ward', icon: '🛡️', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `A shield of flame guards the torch and renews every ${level.cooldown}s (up to ${level.charges} stored). It absorbs a hit meant for the torch, throwing back and stunning every monster within ${level.radius} range. Each shield also sends one enemy projectile flying back at the monsters.`;
-        },
+        desc: "A shield of flame guards the torch and renews over time, storing charges. It absorbs a hit meant for the torch, stunning and throwing back nearby monsters, and sends one enemy projectile back at the monsters.",
         get upgrades() {
             return this.levels.map(level =>
                 `Shield every ${level.cooldown}s · holds ${level.charges} · ${level.radius} repel range · ${formatNumber(level.stun)}s stun`
@@ -179,10 +157,7 @@ export const POWER_MODELS = {
     // A recarga conta depois que o sopro acaba. Cada nível encurta a recarga, alonga e alarga o cone, e congela por mais tempo.
     absoluteZero: {
         name: 'Freezing Breath', icon: '🌬️', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `When a monster gets close, you exhale a freezing breath for ${formatNumber(this.breathSeconds)}s in a cone ${level.range} long and ${Math.round(level.halfAngle * 2 * 180 / Math.PI)}° wide. The breath turns toward the nearest monster, and so do you. Monsters in it take ${formatMultiplier(level.dps)} spell damage per second and stay frozen solid, then ${formatNumber(level.freeze)}s more after they leave the cone. Bosses freeze too, but for half as long. It leaves a layer of ice on the ground behind it. Ready again ${formatNumber(level.cooldown)}s after it ends.`;
-        },
+        desc: "When a monster gets close, you breathe freezing air in a cone that follows the nearest monster. Monsters in it take damage and stay frozen, even after they leave the cone. Bosses freeze for half as long. The breath leaves ice on the ground.",
         get upgrades() {
             return this.levels.map(level =>
                 `Cone ${level.range} long, ${Math.round(level.halfAngle * 2 * 180 / Math.PI)}° wide · ${formatMultiplier(level.dps)} spell damage/s · +${formatNumber(level.freeze)}s frozen · ready ${formatNumber(level.cooldown)}s after`
@@ -209,10 +184,7 @@ export const POWER_MODELS = {
     // `seconds` s: quem encosta numa runa leva dano de magia e é jogado para fora. Cada nível encurta a recarga, dura mais, ganha runas e bate mais forte.
     runeShield: {
         name: 'Rune Shield', icon: '🔷', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `When monsters come close, ${level.runes} blue runes spin around you for ${formatNumber(level.seconds)}s. Every monster that touches one takes ${formatMultiplier(level.damage)} spell damage and is thrown away. Ready again ${formatNumber(level.cooldown)}s after it ends.`;
-        },
+        desc: "When monsters come close, blue runes spin around you for a while. Monsters that touch one take damage and are thrown away.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.runes} runes · ${formatNumber(level.seconds)}s · ${formatMultiplier(level.damage)} spell damage per touch · every ${formatNumber(level.cooldown)}s`
@@ -232,10 +204,7 @@ export const POWER_MODELS = {
     // (dano de LÂMINA em quem toca), SOMEM, e só então a recarga corre. Cada nível: mais lâminas, mais tempo, mais dano e menos recarga.
     spectralBlade: {
         name: 'Spectral Blade', icon: '🗡️', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `When monsters come close, ${level.count} ghost blades appear around you and spin for ${formatNumber(level.duration)}s, dealing ${formatMultiplier(level.damage)} blade damage to every monster they touch within ${level.radius} range. Then they vanish, and the skill recharges for ${formatNumber(level.cooldown)}s.`;
-        },
+        desc: "When monsters come close, ghost blades appear and spin around you for a while, hurting every monster they touch. Then they vanish and the skill recharges.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.count} blades · ${formatNumber(level.duration)}s · ${formatMultiplier(level.damage)} blade damage · ${level.radius} range · recharge ${formatNumber(level.cooldown)}s`
@@ -254,10 +223,7 @@ export const POWER_MODELS = {
     // convertidos do Avgustino (js/systems/conversion.js): vão no monstro mais perto, batem nele e PROVOCAM os monstros comuns (eles vão atrás dos esqueletos). Cada mordida = dano de feitiço x damage.
     summonSkeletons: {
         name: 'Summon Skeletons', icon: '💀', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `When monsters come close, 2 skeletons (each a skeleton, a crawler or an archer, at random) rise from the ground beside you and fight for you until they fall, biting for ${formatMultiplier(level.damage)} spell damage. Keep summoning until ${this.base.maxAlive} stand at once. Monsters chase them instead of you; they take damage from shots and explosions (boss attacks hurt them ${this.base.bossDamageMultiplier}× more, and every hit takes at least half of a skeleton's health). Their health and strength grow with your Magic. Ready again ${formatNumber(level.cooldown)}s after the cast.`;
-        },
+        desc: "When monsters come close, 2 random skeletons (skeleton, crawler or archer) rise and fight for you until they fall, drawing monsters away from you. Keep summoning up to 6 at once. Their health and bite damage grow with your Magic. Monster shots and explosions can kill them, and bosses kill them fast.",
         get upgrades() {
             return this.levels.map(level =>
                 `${formatMultiplier(level.damage)} spell damage per bite · ${formatNumber(level.hpPerMagic)} health per point of spell damage · every ${formatNumber(level.cooldown)}s`
@@ -291,10 +257,7 @@ export const POWER_MODELS = {
     },
     chainLightning: {
         name: 'Storm Sigil', icon: '⚡', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Lightning strikes every ${formatNumber(level.cooldown)}s, leaping to ${level.jumps} targets and dealing ${formatMultiplier(level.damage)} spell damage.`;
-        },
+        desc: "Lightning strikes and leaps between monsters.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.jumps} targets · every ${formatNumber(level.cooldown)}s · ${formatMultiplier(level.damage)} spell damage`
@@ -311,10 +274,7 @@ export const POWER_MODELS = {
     },
     chillAura: {
         name: 'Cold Moon', icon: '❄️', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Monsters within ${level.radius} range are slowed by ${formatPercent(level.slow)} and take ${formatMultiplier(level.dps)} spell damage per second.`;
-        },
+        desc: "A cold aura around you slows monsters and damages them over time.",
         get upgrades() {
             return this.levels.map(level =>
                 `${formatPercent(level.slow)} slow · ${level.radius} radius · ${formatMultiplier(level.dps)} spell damage per second`
@@ -330,10 +290,7 @@ export const POWER_MODELS = {
     },
     starfall: {
         name: 'Starfall', icon: '🌠', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `${level.count} stars fall every ${formatNumber(level.cooldown)}s, each crushing enemies within ${level.radius} range for ${formatMultiplier(level.damage)} spell damage.`;
-        },
+        desc: "Stars fall on the monsters around you, crushing everything in their area.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.count} stars · every ${formatNumber(level.cooldown)}s · ${level.radius} impact radius · ${formatMultiplier(level.damage)} spell damage`
@@ -350,10 +307,7 @@ export const POWER_MODELS = {
     },
     bloodlust: {
         name: 'Bloodlust', icon: '🐺', maxLvl: 5,
-        get desc() {
-            const strongest = this.levels[this.levels.length - 1];
-            return `Every swing that hits adds a stack, up to ${strongest.stacks}. At max level, each stack grants ${formatPercent(strongest.damage)} blade damage and ${formatPercent(strongest.speed)} attack speed. Stacks decay every ${formatNumber(this.decaySeconds)}s after the last hit.`;
-        },
+        desc: "Each swing that hits adds a stack of blade damage and attack speed. Stacks fade shortly after you stop hitting.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.stacks} stacks max · +${formatPercent(level.damage)} blade damage and +${formatPercent(level.speed)} attack speed per stack`
@@ -370,10 +324,7 @@ export const POWER_MODELS = {
     },
     earthbreaker: {
         name: 'Earthbreaker', icon: '🔨', maxLvl: 5,
-        get desc() {
-            const strongest = this.levels[this.levels.length - 1];
-            return `When monsters get close, you leap and smash the ground, dealing up to ${formatMultiplier(strongest.damage)} your blade damage within ${strongest.radius} range and stunning enemies for ${formatNumber(this.stunSeconds)}s.`;
-        },
+        desc: "When monsters get close, you leap and smash the ground, damaging and stunning everything around the impact.",
         get upgrades() {
             return this.levels.map(level =>
                 `Slam every ${formatNumber(level.cooldown)}s · ${formatMultiplier(level.damage)} blade damage · ${level.radius} range`
@@ -390,10 +341,7 @@ export const POWER_MODELS = {
     },
     fireRing: {
         name: 'Hearth Ring', icon: '🔆', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `A ring of fire protects the torch, burning enemies within ${level.radius} range for ${formatMultiplier(level.dps)} spell damage per second and slowing them by ${formatPercent(level.slow)}.`;
-        },
+        desc: "A ring of fire protects the torch, burning and slowing the enemies inside it.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.radius} radius · ${formatMultiplier(level.dps)} spell damage per second · ${formatPercent(level.slow)} slow`
@@ -410,10 +358,7 @@ export const POWER_MODELS = {
     },
     graveWisp: {
         name: 'Grave Wisp', icon: '💀', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `A burning skull fires ${level.count} bolts every ${formatNumber(level.cooldown)}s from up to ${this.range} range, each dealing ${formatMultiplier(level.damage)} spell damage.`;
-        },
+        desc: "A burning skull follows you and fires bolts of spell damage at nearby monsters.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.count} bolts · every ${formatNumber(level.cooldown)}s · ${formatMultiplier(level.damage)} spell damage`
@@ -430,10 +375,7 @@ export const POWER_MODELS = {
     },
     creepingHex: {
         name: 'Creeping Hex', icon: '🕸️', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `A curse deals ${formatMultiplier(level.dps)} spell damage per second for ${formatNumber(level.seconds)}s. When its target dies, it spreads to ${level.spread} nearby monsters. Casts every ${formatNumber(level.cooldown)}s.`;
-        },
+        desc: "A curse deals damage over time. When its target dies, it spreads to nearby monsters.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.spread} spreads · ${formatMultiplier(level.dps)} spell damage per second · ${formatNumber(level.seconds)}s duration · every ${formatNumber(level.cooldown)}s`
@@ -450,10 +392,7 @@ export const POWER_MODELS = {
     },
     voidRift: {
         name: 'Void Rift', icon: '🕳️', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `A rift opens every ${formatNumber(level.cooldown)}s, pulling enemies within ${level.radius} range with force ${level.pull} before collapsing for ${formatMultiplier(level.damage)} spell damage.`;
-        },
+        desc: "A rift opens, pulling monsters in before collapsing for heavy damage.",
         get upgrades() {
             return this.levels.map(level =>
                 `Every ${formatNumber(level.cooldown)}s · ${level.radius} radius · ${level.pull} pull · ${formatMultiplier(level.damage)} spell damage · ${formatNumber(level.seconds)}s duration`
@@ -472,10 +411,7 @@ export const POWER_MODELS = {
     // --- LUZ (js/systems/skills_light.js). O dano é de feitiço: o que fortalece feitiços fortalece a luz ---
     holyGround: {
         name: 'Sacred Ground', icon: '✝️', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Every ${formatNumber(level.cooldown)}s a circle of holy light opens where the most monsters stand. For ${formatNumber(level.seconds)}s it burns everything inside for ${formatMultiplier(level.dps)} spell damage per second and slows it by ${formatPercent(level.slow)}.`;
-        },
+        desc: "A circle of holy light opens where the most monsters stand, burning and slowing everything inside.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.radius} radius · ${formatMultiplier(level.dps)} spell damage per second · ${formatPercent(level.slow)} slow · lasts ${formatNumber(level.seconds)}s · every ${formatNumber(level.cooldown)}s`
@@ -493,10 +429,7 @@ export const POWER_MODELS = {
     },
     holyWater: {
         name: 'Holy Water', icon: '💧', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Every ${formatNumber(level.cooldown)}s you hurl a vial of holy water at the nearest monster. It bursts for ${formatMultiplier(level.damage)} spell damage and leaves the ground soaked for ${formatNumber(level.puddleSeconds)}s: monsters walking through it burn for ${formatMultiplier(level.puddleDps)} spell damage per second. It blesses everything it touches: for ${formatNumber(level.seconds)}s a blessed monster takes ${formatPercent(this.blessBonus)} more damage from everything.`;
-        },
+        desc: "You hurl a vial of holy water at the nearest monster. It bursts, soaks the ground (monsters walking through it burn) and blesses what it touches: blessed monsters take extra damage from everything.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.count} vial${level.count > 1 ? 's' : ''} · ${formatMultiplier(level.damage)} spell damage · ${level.radius} burst · blessed ${formatNumber(level.seconds)}s · every ${formatNumber(level.cooldown)}s`
@@ -519,10 +452,7 @@ export const POWER_MODELS = {
     },
     smite: {
         name: 'Holy Smite', icon: '⚡', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Every ${formatNumber(level.cooldown)}s a bolt of divine light strikes the strongest monster in reach for ${formatMultiplier(level.damage)} spell damage and stuns it for ${formatNumber(level.stun)}s. Bosses are only staggered.`;
-        },
+        desc: "A bolt of divine light strikes the strongest monster in reach, damaging and stunning it. Bosses are only staggered.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.count} bolt${level.count > 1 ? 's' : ''} · ${formatMultiplier(level.damage)} spell damage · stun ${formatNumber(level.stun)}s · every ${formatNumber(level.cooldown)}s`
@@ -543,10 +473,7 @@ export const POWER_MODELS = {
     // solta uma onda de luz branca que os joga para longe e os atordoa. Chefe: empurrão e atordoamento bem menores.
     sacredPendant: {
         name: 'Sacred Pendant', icon: '⚜️', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Every ${formatNumber(level.cooldown)}s, when monsters crowd you, your holy pendant flares: a white wave of light flings them away from you, stuns them for ${formatNumber(level.stun)}s and hurts for ${formatMultiplier(level.damage)} spell damage. Bosses barely budge.`;
-        },
+        desc: "When monsters crowd you, your holy pendant flares: a wave of light flings them away, stuns and hurts them. Bosses barely budge.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.radius} range · ${level.knockback} push · stun ${formatNumber(level.stun)}s · ${formatMultiplier(level.damage)} spell damage · every ${formatNumber(level.cooldown)}s`
@@ -570,10 +497,7 @@ export const POWER_MODELS = {
     // vida máxima do herói (hpRatio, por nível). Cada bola estoura em área (burst) com dano de magia.
     guardianAngel: {
         name: 'Guardian Angel', icon: '👼', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `An angel guards the torch. When monsters close in, it flies out to meet them and, every ${formatNumber(level.cooldown)}s, hurls ${level.count} orb${level.count > 1 ? 's' : ''} of light from its staff at the ones closest to the flame, each bursting for ${formatMultiplier(level.damage)} spell damage. Monsters nearby go for the angel instead of you, and it can fall: it returns to its post after ${this.respawnSeconds}s.`;
-        },
+        desc: "An angel guards the torch. When monsters close in, it flies out and hurls orbs of light at the ones nearest the flame. Monsters go for the angel instead of you; if it falls, it returns to its post after a while.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.count} orb${level.count > 1 ? 's' : ''} · ${formatMultiplier(level.damage)} spell damage · ${level.burst} burst · ${formatPercent(level.hpRatio)} of your health · every ${formatNumber(level.cooldown)}s`
@@ -605,10 +529,7 @@ export const POWER_MODELS = {
     },
     churchBell: {
         name: 'Church Bell', icon: '🔔', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `A holy bell hangs over the torch. Every ${formatNumber(level.cooldown)}s it tolls: a ring of sound bursts from the torch, pushing monsters away from it, dealing ${formatMultiplier(level.damage)} spell damage within ${level.radius} range and stunning them for ${formatNumber(level.stun)}s. Bosses are only staggered.`;
-        },
+        desc: "A holy bell tolls over the torch: a ring of sound pushes monsters away, damages and stuns them. Bosses are only staggered.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.radius} range · ${formatMultiplier(level.damage)} spell damage · stun ${formatNumber(level.stun)}s · every ${formatNumber(level.cooldown)}s`
@@ -630,10 +551,7 @@ export const POWER_MODELS = {
     // --- NATUREZA (js/systems/skills_nature.js). O dano é de feitiço: o que fortalece feitiços fortalece a floresta ---
     graspingRoots: {
         name: 'Grasping Roots', icon: '🌿', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Every ${formatNumber(level.cooldown)}s roots burst under the ${level.count} nearest monsters and pin them to the ground for ${formatNumber(level.seconds)}s, crushing them for ${formatMultiplier(level.dps)} spell damage per second. Bosses are only held for a moment.`;
-        },
+        desc: "Roots burst under the nearest monsters and pin them to the ground, crushing them over time. Bosses are held only briefly.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.count} monsters · pinned ${formatNumber(level.seconds)}s · ${formatMultiplier(level.dps)} spell damage per second · every ${formatNumber(level.cooldown)}s`
@@ -652,10 +570,7 @@ export const POWER_MODELS = {
     },
     leechVine: {
         name: 'Leech Vine', icon: '🩸', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Thorned vines grow from your oaks (the small tree and the full oak) and latch onto the ${level.targets} monster${level.targets > 1 ? 's' : ''} nearest to each one, draining ${formatMultiplier(level.dps)} spell damage per second from each. What they drain returns to the oak as health: ${formatPercent(level.heal)} of it. It needs an oak to do anything.`;
-        },
+        desc: "Vines grow from your oaks, latch onto the nearest monsters and drain them. Part of what they drain heals the oak. Needs an oak.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.targets} vine${level.targets > 1 ? 's' : ''} per oak · ${formatMultiplier(level.dps)} spell damage per second · ${formatPercent(level.heal)} heals the oak`
@@ -674,10 +589,7 @@ export const POWER_MODELS = {
     },
     shelterOak: {
         name: 'Wicked Oak', icon: '🌳', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree and then a full oak that walks: after ${this.levels[0].grow.adult}s at level 1, only ${level.grow.adult}s at max level; every monster you kill speeds its growth up a little (more at higher levels). Evolve the skill and the full oak becomes the Ancient Grove: a huge ancient tree, bigger and stronger, that hits harder and reaches farther. There is only ever one tree, and it stays with you through every wave of the night, regaining some health between waves. The grown oak walks, very slowly, toward the fight and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; if it falls, a new seed can be planted. A full-grown oak also grips the strongest monster on screen: a thorned root crawls to it and coils around it for ${this.grip.seconds}s, pinning it and crushing it for ${formatMultiplier(this.grip.dps)} spell damage per second.`;
-        },
+        desc: "A seed is thrown at the nearby monster with the most health, draining it. If it dies, a sapling grows there and heals you while you stand near it. It grows into a walking oak that lashes nearby monsters and grips the strongest monster on screen; kills speed up its growth. You have only one tree: it stays all night and can be destroyed (plant a new seed if it falls).",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.hp} oak health · ${level.reach} reach · ${formatMultiplier(level.damage)} lash every ${formatNumber(level.lashSeconds)}s · new seed ${formatNumber(level.cooldown)}s after it falls`
@@ -718,10 +630,7 @@ export const POWER_MODELS = {
     },
     sporePods: {
         name: 'Spore Pods', icon: '🍄', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Mushrooms sprout behind you (up to ${level.max}). Only the druid can eat them, and only when injured: Rowan walking over one bursts it into a healing puff that restores ${formatNumber(level.heal)} health (up to 10 at max level). The first monster to step on one bursts it into a cloud that poisons for ${formatMultiplier(level.dps)} spell damage per second and slows by ${formatPercent(level.slow)} for ${formatNumber(level.seconds)}s.`;
-        },
+        desc: "Mushrooms sprout behind you. Only the druid eats them, and only when injured: Rowan walking over one heals. The first monster to step on one is poisoned and slowed.",
         get upgrades() {
             return this.levels.map(level =>
                 `${level.max} mushrooms · Rowan heals ${formatNumber(level.heal)} on one · ${formatMultiplier(level.dps)} poison per second · ${formatPercent(level.slow)} slow · ${level.radius} cloud · one every ${formatNumber(level.cooldown)}s`
@@ -741,10 +650,7 @@ export const POWER_MODELS = {
     },
     spiritWolves: {
         name: 'Shadow Wolf', icon: '🐺', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `A shadow wolf roams free and hunts on its own: it runs at the nearest monster, stays on it and bites for ${formatMultiplier(level.damage)} spell damage (${formatMultiplier(this.rootedBonus)} on a monster pinned by roots). It has ${level.hp} health: monsters that reach it hit back, and if it falls it returns after ${this.respawnSeconds}s.`;
-        },
+        desc: "A shadow wolf hunts on its own, running at the nearest monster and biting it (harder on monsters pinned by roots). Monsters that reach it hit back; if it falls, it returns after a while.",
         get upgrades() {
             return this.levels.map(level =>
                 `${formatMultiplier(level.damage)} spell damage per bite · a bite every ${formatNumber(level.biteSeconds)}s · ${level.hp} health`
@@ -773,10 +679,7 @@ export const POWER_MODELS = {
     },
     phantomDash: {
         name: 'Phantom Rush', icon: '👻', maxLvl: 5,
-        get desc() {
-            const level = this.levels[this.levels.length - 1];
-            return `Your dash deals ${formatMultiplier(level.damage)} blade damage to enemies in its path.`;
-        },
+        desc: "Your dash damages the enemies in its path.",
         get upgrades() {
             return this.levels.map(level => {
                 const mods = level.mods ?? {};
@@ -803,28 +706,20 @@ export const EVOLUTIONS = {
     // para fora, em várias direções (a direção de cada runa a partir do herói). Dano de feitiço x boltDamage por bola.
     runeShield: {
         name: 'Sovereign Rune', icon: '🔷',
-        get desc() {
-            const { boltEvery, boltDamage, boltRange } = this.levels;
-            return `Your runes now hurl balls of blue energy outward in every direction: every ${formatNumber(boltEvery)}s each rune fires one, dealing ${formatMultiplier(boltDamage)} spell damage up to ${boltRange} away, on top of their spinning touch.`;
-        },
+        desc: "Your runes also hurl balls of blue energy outward in every direction.",
         levels: { boltEvery: 0.9, boltDamage: 0.7, boltRange: 280, boltSpeed: 520 }
     },
     // Permafrost (a evolução do Freezing Breath, chave absoluteZero; 27/11/2026): o gelo no chão (que o sopro já deixa, só visual) passa a valer: os monstros nele ficam MAIS LENTOS (iceSlow) e as
     // skills de gelo (ICE_POWERS) dão mais dano (iceDamage). O desenho do gelo é do próprio sopro (POWER_MODELS.absoluteZero.frost)
     absoluteZero: {
         name: 'Permafrost', icon: '🧊',
-        get desc() {
-            return `The ice your breath leaves on the ground turns solid: monsters standing on it move ${formatPercent(this.levels.iceSlow)} slower. Also, your ice skills (${ICE_POWERS.map(key => POWER_MODELS[key].name).join(' and ')}) deal ${formatPercent(this.iceDamage)} more damage.`;
-        },
+        desc: "The ice your breath leaves turns solid and slows monsters standing on it. Your ice skills deal more damage.",
         levels: { iceSlow: 0.5 },
         iceDamage: 0.2          // bônus de dano em TODAS as skills de gelo (ICE_POWERS) enquanto o Permafrost está evoluído (somado em js/systems/modifiers.js)
     },
     holyGround: {
         name: 'Consecrated Earth', icon: '⛪',
-        get desc() {
-            const { radius, dps, seconds } = this.levels;
-            return `A wide circle (${radius} radius) burns for ${formatMultiplier(dps)} spell damage per second for ${formatNumber(seconds)}s. Demons (elites and bosses) take ${formatPercent(this.demonBonus)} more. You heal ${this.healPerSecond} health per second standing in it, and when it fades a cross of light bursts for ${formatMultiplier(this.finale.damage)} spell damage.`;
-        },
+        desc: "A wider circle that burns harder. Elites and bosses take extra damage, you heal while standing in it, and when it fades a cross of light bursts.",
         levels: { cooldown: 6, radius: 120, dps: 1.5, slow: 0.4, seconds: 7 },
         demonBonus: 0.35,
         healPerSecond: 2,
@@ -832,10 +727,7 @@ export const EVOLUTIONS = {
     },
     holyWater: {
         name: 'Blessed Rain', icon: '🌧️',
-        get desc() {
-            const R = this.rain;
-            return `Your vials keep flying, and every ${formatNumber(R.every)}s a holy rain falls over the whole field for ${formatNumber(R.seconds)}s. Every monster on screen burns for ${formatMultiplier(R.dps)} spell damage per second and stays blessed (takes more damage from everything), and big drops splash where monsters stand for ${formatMultiplier(R.damage)} spell damage, soaking the ground. Baptism: a blessed monster that dies explodes in a burst of light for ${formatMultiplier(this.baptism.damage)} spell damage.`;
-        },
+        desc: "Your vials keep flying, and a holy rain now falls over the whole field: every monster burns and stays blessed, and big drops soak the ground. Baptism: a blessed monster that dies explodes in light.",
         // Os frascos continuam na evolução (com os números do nível comprado); a chuva vem por cima. levels: o que a chuva usa das poças e da bênção
         levels: { cooldown: 16, count: 0, radius: 70, damage: 1.7, seconds: 3, puddleSeconds: 4, puddleDps: 0.5 },
         // A chuva: a cada `every` segundos, por `seconds`. Todo monstro na tela leva `dps` (dano de magia por segundo, de
@@ -845,18 +737,13 @@ export const EVOLUTIONS = {
     },
     smite: {
         name: 'Divine Wrath', icon: '☀️',
-        get desc() {
-            const { count, damage } = this.levels;
-            return `${count} bolts strike for ${formatMultiplier(damage)} spell damage. Judgment: a monster struck below ${formatPercent(this.judgment)} health is banished on the spot (bosses are not).`;
-        },
+        desc: "More bolts, hitting harder. Judgment: a monster struck below a low health threshold is banished on the spot (bosses are not).",
         levels: { cooldown: 4.5, count: 4, damage: 4, stun: 1.4 },
         judgment: 0.25
     },
     churchBell: {
         name: 'Cathedral Toll', icon: '⛪',
-        get desc() {
-            return `The bell tolls ${this.tolls} times in a row, each ring wider than the last. Blessed monsters take double damage from it, and every toll mends the torch for ${this.torchHeal} health.`;
-        },
+        desc: "The bell tolls several times in a row, each ring wider than the last. Blessed monsters take double damage from it, and every toll mends the torch.",
         levels: { cooldown: 8, radius: 160, damage: 1.5, stun: 0.8, knockback: 340 },
         tolls: 3,
         blessedMultiplier: 2,
@@ -868,10 +755,7 @@ export const EVOLUTIONS = {
     // só alguns pulsos, direção travada e recarga longa.
     guardianAngel: {
         name: 'Archangel', icon: '🌟',
-        get desc() {
-            const L = this.levels;
-            return `The angel is sturdier, and every ${formatNumber(L.beamEvery)}s it raises its staff and looses a white beam of holy light across the whole screen, in the direction it faces: ${L.beamPulses} pulses of ${formatMultiplier(L.beamDamage)} spell damage that stun everything in its path.`;
-        },
+        desc: "The angel is sturdier and now looses a white beam of holy light across the whole screen, in the direction it faces, stunning everything in its path.",
         levels: { hpRatio: 1.25, beamEvery: 15, beamDamage: 0.8, beamPulses: 5, beamPulseSeconds: 0.25, beamWidth: 30, beamLength: 2400, beamStun: 0.5 },
         bossStunRatio: 0.3,
         beamCastSeconds: 1.1    // o gesto longo do cajado antes do raio (sai no meio dele)
@@ -881,10 +765,7 @@ export const EVOLUTIONS = {
     // estiver preso; se sobreviver, continua preso. O chicote também segura mais tempo.
     roseWhip: {
         name: 'Crimson Surge', icon: '⚡',
-        get desc() {
-            const L = this.levels;
-            return `Red energy flows from you through the whip and bursts on the wrapped monster for ${formatMultiplier(L.pulseDamage)} spell damage, again every ${formatNumber(L.pulseSeconds)}s. If it survives, it stays pinned. The whip holds for ${L.holdSeconds}s.`;
-        },
+        desc: "Red energy flows through the whip and bursts on the wrapped monster again and again while it is pinned. The whip holds longer.",
         levels: { pulseSeconds: 1.6, pulseDamage: 3.5, travelSeconds: 0.4, holdSeconds: 7 }
     },
     // Bloodbud Vine (evolução do Leech Vine; js/systems/skills_nature.js, updateLeechVine): cada carvalho solta UM cipó, no monstro MAIS FORTE ao alcance (ou no
@@ -892,48 +773,33 @@ export const EVOLUTIONS = {
     // em volta da vítima e uma cura fixa e pequena para o herói (budHeroHeal, fração da vida máxima). Limitado pelo tempo, não pelo número de cipós.
     leechVine: {
         name: 'Bloodbud Vine', icon: '🌺',
-        get desc() {
-            const L = this.levels;
-            return `Each oak sends one vine after the strongest monster in reach (the one wrapped in your Rose Whip first), squeezing it for ${formatMultiplier(L.dps)} spell damage per second. A blood bud swells on the vine and, every ${L.budSeconds}s, bursts for ${formatMultiplier(L.budDamage)} spell damage around the victim and heals you for ${formatPercent(L.budHeroHeal)} of your health.`;
-        },
+        desc: "Each oak sends one vine after the strongest monster in reach (the one wrapped in your Rose Whip first), squeezing it. A blood bud swells on the vine and bursts now and then, hurting everything around the victim and healing you.",
         levels: { targets: 1, dps: 1.2, heal: 0.5, budSeconds: 5, budDamage: 2, budRadius: 60, budHeroHeal: 0.03 }
     },
     // Briar Garden (evolução do Thorn Burst, que é passiva: passives.thornBurst.evolved; js/systems/skills_nature.js, thornBurstConfig): mais Caquitos, espinhos
     // mais numerosos e mais fortes, e quem leva espinho fica lento por um tempo (assim o chicote e os cactos se completam).
     thornBurst: {
         name: 'Briar Garden', icon: '🌸',
-        get desc() {
-            const L = this.levels;
-            return `Up to ${L.maxCacti} Cactlings at a time, each bursting into ${L.needles} thorns of ${formatMultiplier(L.needleDamage)} spell damage that also slow every monster they hit for ${formatNumber(L.slowSeconds)}s.`;
-        },
+        desc: "More Cactlings, each bursting into more thorns that also slow what they hit.",
         levels: { maxCacti: 5, needles: 16, needleDamage: 0.9, slowSeconds: 2 }
     },
     graspingRoots: {
         name: 'Strangling Grove', icon: '🪴',
-        get desc() {
-            const { count, seconds, dps } = this.levels;
-            return `Roots pin ${count} monsters for ${formatNumber(seconds)}s and crush for ${formatMultiplier(dps)} spell damage per second. Barbed: a pinned monster takes +${formatPercent(this.rootedDamage)} damage from every hit. When a pinned monster dies, its roots leap to the nearest monster.`;
-        },
+        desc: "Roots pin more monsters, for longer, and crush harder. Pinned monsters take extra damage from every hit; when one dies, its roots leap to the nearest monster.",
         levels: { cooldown: 8, count: 7, seconds: 2.5, dps: 1.2 },
         rootedDamage: 0.3,      // o que era a Barbed Roots: preso por raízes leva mais de tudo
         spreadRange: 160
     },
     shelterOak: {
         name: 'Ancient Grove', icon: '🌲',
-        get desc() {
-            const { hp, reach } = this.levels;
-            return `A huge oak with ${hp} health and ${reach} reach that never withers with time: it only falls if monsters destroy it. When it falls, its roots tear out of the ground: every monster around it is pinned for ${formatNumber(this.burst.seconds)}s and takes ${formatMultiplier(this.burst.damage)} spell damage. Thorn bark: a monster that strikes the oak takes ${formatMultiplier(this.thornBark.damage)} spell damage and is pinned by roots for ${this.thornBark.rootSeconds}s.`;
-        },
+        desc: "A huge oak that never withers with time: it only falls if monsters destroy it. When it falls, its roots pin every monster around it and hurt them. Thorn bark: a monster that strikes the oak takes damage and is pinned for a moment.",
         levels: { count: 1, cooldown: 11, seconds: 18, hp: 400, reach: 110, damage: 1.5, lashSeconds: 0.85 },
         burst: { radiusRatio: 1.6, seconds: 3, damage: 2 },
         thornBark: { damage: 0.6, rootSeconds: 1 }      // o que era o nó Thorn Bark: quem bate na árvore leva dano e fica preso
     },
     spiritWolves: {
         name: 'The White Wolf', icon: '🌕',
-        get desc() {
-            const { damage, hp } = this.levels;
-            return `The wolf turns white: ${formatMultiplier(damage)} spell damage per bite (+${formatPercent(this.damageBonus)} more), ${Math.round(hp * (1 + this.healthBonus))} health, ${formatPercent(this.speedBonus)} faster, and it returns after ${this.respawnSeconds}s. Every bite hamstrings: the monster is pinned for ${formatNumber(this.hamstringSeconds)}s.`;
-        },
+        desc: "The wolf turns white: stronger, tougher and faster, and it returns sooner. Every bite hamstrings: the monster is pinned for a moment.",
         levels: { damage: 2.4, biteSeconds: 0.75, hp: 200 },
         damageBonus: 0.12,      // o que era o Pack Instinct, agora do lobo branco
         speedBonus: 0.06,
@@ -943,35 +809,23 @@ export const EVOLUTIONS = {
     },
     sporePods: {
         name: 'Plague Garden', icon: '☣️',
-        get desc() {
-            const { max, dps } = this.levels;
-            return `Up to ${max} mushrooms, thicker spores: ${formatMultiplier(dps)} poison per second. A monster that dies inside a cloud leaves a new mushroom where it fell.`;
-        },
+        desc: "More mushrooms and thicker spores. A monster that dies inside a cloud leaves a new mushroom.",
         levels: { max: 7, dps: 1.8 }       // dps com o que era o Toxic Bloom (+30% de veneno)
     },
     // Passiva que evolui (passives.shadowClone.evolved): count = sombras em guarda
     shadowClone: {
         name: 'Shadow Legion', icon: '🥷',
-        get desc() {
-            return `${this.levels.count} shadows guard the torch, each watching a different monster.`;
-        },
+        desc: "Three shadows guard the torch, each watching a different monster.",
         levels: { count: 3 }
     },
     emberTrail: {
         name: 'Hellwalker', icon: '☄️',
-        get desc() {
-            const { dps, life, radius } = this.levels;
-            return `Pillars of fire rise from your steps, burning enemies for ${formatMultiplier(dps)} blade damage per second for ${formatNumber(life)}s within ${radius} range.`;
-        },
+        desc: "Pillars of fire rise from your steps and burn the enemies around them.",
         levels: { dps: 0.7, life: 4, radius: 42 }
     },
     bloodlust: {
         name: 'Crimson Tide', icon: '🌊',
-        get desc() {
-            const { minStacks, damage, speed, range } = this.crescent;
-            const { stacks, damage: stackDamage, speed: stackSpeed } = this.levels;
-            return `At ${minStacks} or more stacks, every swing throws a blood crescent through the horde. At max level, each crescent deals ${formatMultiplier(damage)} blade damage; each stack grants ${formatPercent(stackDamage)} damage and ${formatPercent(stackSpeed)} attack speed, up to ${stacks} stacks. Range: ${range}.`;
-        },
+        desc: "With enough stacks, every swing throws a blood crescent through the horde. Stacks also grow stronger.",
         levels: { stacks: 10, damage: 0.03, speed: 0.015, seconds: 3 },
         crescent: { minStacks: 5, damage: 0.2, speed: 560, range: 340, radius: 26 }
     },
@@ -987,10 +841,7 @@ export const EVOLUTIONS = {
     },
     fireRing: {
         name: 'Solar Wall', icon: '🌅',
-        get desc() {
-            const { radius, dps, slow } = this.levels;
-            return `The ring becomes a wall of white fire, burning for ${formatMultiplier(dps)} spell damage per second and slowing by ${formatPercent(slow)}. Every ${formatNumber(this.flare.seconds)}s it flares for ${formatMultiplier(this.flare.damage)} spell damage and knocks monsters back. Range: ${radius}.`;
-        },
+        desc: "The ring becomes a wall of white fire that burns and slows harder, and flares now and then to knock monsters back.",
         levels: { radius: 200, dps: 1.1, slow: 0.55 },
         flare: { seconds: 4.5, damage: 1.5, knockback: 520, reach: 46 }
     },
@@ -1005,18 +856,13 @@ export const EVOLUTIONS = {
     },
     phantomDash: {
         name: 'Night Reaper', icon: '🌘',
-        get desc() {
-            return `After each dash, your shadow repeats the path after ${formatNumber(this.echo.delaySeconds)}s, dealing ${formatMultiplier(this.echo.damage)} blade damage to enemies within ${this.echo.hitRadius} range.`;
-        },
+        desc: "After each dash, your shadow repeats the path and damages the enemies along it.",
         levels: { damage: 3 },
         echo: { delaySeconds: 0.28, seconds: 0.16, damage: 0.8, hitRadius: 26 }
     },
     chainLightning: {
         name: 'Wrath of Heaven', icon: '🌩️',
-        get desc() {
-            const { cooldown, jumps, damage } = this.levels;
-            return `Lightning strikes every ${formatNumber(cooldown)}s, leaping to ${jumps} targets for ${formatMultiplier(damage)} spell damage.`;
-        },
+        desc: "Lightning leaps to more monsters and hits harder.",
         levels: { cooldown: 2.6, jumps: 8, damage: 1.7 }
     },
     soulNova: {
@@ -1030,10 +876,7 @@ export const EVOLUTIONS = {
     },
     torchBolts: {
         name: 'Sun Spire', icon: '☀️',
-        get desc() {
-            const { cooldown, count, damage } = this.levels;
-            return `The torch rains ${count} bolts every ${formatNumber(cooldown)}s, each dealing ${formatMultiplier(damage)} spell damage.`;
-        },
+        desc: "The torch rains more bolts, much faster and harder.",
         levels: { cooldown: 3, count: 5, damage: 4.6 }
     }
 };

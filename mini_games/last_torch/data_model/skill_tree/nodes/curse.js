@@ -20,7 +20,7 @@ export const CURSE_NODES = [
     { id: 'permafrost', cost: 4, branch: 'curse', kind: 'evolve', key: 'absoluteZero', x: 3, y: 0, requires: [req('absoluteZero', 5)] },
     // 27/11/2026: skill de nível (como o Arcane Study): cada nível soma dano nas skills de GELO. Nível 5 = 5x o dano (+400%)
     { id: 'blizzard', cost: 3, branch: 'curse', kind: 'mod', x: 4, y: 0, requires: [req('permafrost')],
-      name: 'Blizzard', icon: '🌨️', desc: `Your ice skills hit harder: ${ICE_NAMES}. Only ice skills get this bonus. At max level they deal five times the damage.`,
+      name: 'Blizzard', icon: '🌨️', desc: `Your ice skills (${ICE_NAMES}) hit much harder: five times the damage at max level.`,
       levelText: (mods) => `+${formatPercent(mods.iceDamage)} damage on ice skills (${ICE_NAMES})`, mods: { iceDamage: 0.8 } },
     // { id: 'soulNova', branch: 'curse', kind: 'power', key: 'soulNova', x: 2, y: 0, requires: [req('chillAura', 2)] },
     // { id: 'novaEvolve', branch: 'curse', kind: 'evolve', key: 'soulNova', x: 3, y: 0, requires: [req('soulNova', 5)] },
