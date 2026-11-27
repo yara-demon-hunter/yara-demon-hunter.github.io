@@ -10,7 +10,10 @@ import { updateHUD } from '../ui/hud.js';
 import { addSlam, bossTarget, updateBossAI, updateShadowAI } from './boss_ai.js';
 import { dealDamage } from './damage.js';
 import { addCorpse, addGibs, addShockwave, addStain, createExplosion, hitStop, screenFlash, shakeScreen, zoomPunch } from './effects.js';
-import { dropGold } from './gold.js';
+import { dropGold, dropTreasureGold } from './gold.js';
+import { WAVE_EVENTS } from '../../data_model/wave_events.js';
+import { effectiveTurn } from '../../data_model/campaign.js';
+import { showToast } from '../ui/banner.js';
 import { GOLD_ECONOMY } from '../../data_model/gold.js';
 import { mod } from './modifiers.js';
 import { checkHourEnd, onBossKilled } from './night.js';
@@ -92,7 +95,8 @@ function updateLunge(e, L, dist, angle, dt) {
         e.lungeTimer = L.aimSeconds;
         e.lungeX = Math.cos(angle);
         e.lungeY = Math.sin(angle);
-        // Sem linha de aviso no chão: só a pose de mira do monstro (aimSeconds, curto) anuncia o dash
+        // Aviso no chão: uma risca vermelha na direção do dash durante a mira (dá para sair da frente)
+        state.telegraphs.push({ kind: 'line', owner: e, x: e.x, y: e.y, angle, length: L.speed * L.seconds, age: 0, seconds: L.aimSeconds, red: true, dashed: true });
         return true;
     }
     return false;
@@ -526,6 +530,15 @@ function killEnemy(i, e, model) {
         hitStop(0.09);
         shakeScreen(9);
         zoomPunch(0.02);
+    } else if (e.dropsChest) {
+        // Goblin do Baú: o baú das costas cai no chão (2 pontos de skill garantidos) e uma chuva de moedas voa para todo lado
+        const T = WAVE_EVENTS.goblin.treasure;
+        dropChest(e.x, e.y, T.skillPoints);
+        dropTreasureGold(e.x, e.y, Math.round(T.goldBase + T.goldPerCurveTurn * effectiveTurn(state.turn)), T.coins, T.scatterSpeed);
+        showToast('💰', 'THE GOBLIN DROPPED HIS TREASURE', 'Grab the chest and the coins!');
+        addShockwave(e.x, e.y, { radius: 130, color: '#fbbf24', width: 7, seconds: 0.45 });
+        audio.playGiggle?.();
+        hitStop(0.06);
     } else {
         maybeDropPickup(e.x, e.y);
     }
@@ -595,7 +608,7 @@ export function updateEnemies(dt) {
         // monstro por perto vai bater nele. Boss não se deixa enganar
         const lured = lure && !e.isBoss && !model.ignoresPlayer && Math.hypot(lure.x - e.x, lure.y - e.y) < lure.lures;
         // O chefe SEMPRE caça o herói (de qualquer distância): antes ele só vinha dentro do raio de provocação dos monstros comuns e, fora dele, ia para a tocha
-        const huntsPlayer = !model.ignoresPlayer && (e.isBoss || distToPlayer < provoked);
+        const huntsPlayer = !model.ignoresPlayer && !e.torchOnly && (e.isBoss || distToPlayer < provoked);
         // Convertido do Avgustino por perto (Conversion): provoca o monstro comum, que vai bater nele. Boss não se deixa provocar
         const ally = !lured && !e.isBoss && !e.shadowOwner && !model.ignoresPlayer ? (provokingConvert(e) ?? provokingAngel(e)) : null;
         // Chefe: vira para a sombra que o provoca (perto dele e mais perto que o herói); senão, o herói

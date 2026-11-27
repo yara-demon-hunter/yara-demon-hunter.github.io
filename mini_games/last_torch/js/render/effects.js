@@ -135,6 +135,18 @@ export function renderTelegraphs() {
         const p = Math.min(1, t.age / t.seconds);
         if (t.kind === 'line') {
             if (t.owner.hp <= 0) return;
+            if (t.red && t.dashed) {
+                // Aviso discreto da investida dos monstros comuns: traços finos e curtos (sem setLineDash: são só ~15 fillRect e duram ~0,3 s)
+                const reach = t.length * easeOutCubic(p);
+                ctx.save();
+                ctx.translate(t.x, t.y);
+                ctx.rotate(t.angle);
+                ctx.fillStyle = '#f87171';
+                ctx.globalAlpha = 0.3 + p * 0.45;
+                for (let x = 14; x < reach; x += 20) ctx.fillRect(x, -1, 9, 2);
+                ctx.restore();
+                return;
+            }
             ctx.save();
             ctx.translate(t.x, t.y);
             ctx.rotate(t.angle);

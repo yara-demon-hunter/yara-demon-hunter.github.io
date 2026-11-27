@@ -7,9 +7,10 @@ import { mod } from '../systems/modifiers.js';
 // Dicas curtas e espaçadas, só na primeira partida do jogador.
 const touch = () => window.matchMedia('(pointer: coarse)').matches;
 
-// No computador os dois cliques ficam no lembrete do mouse: estas duas dicas são só do toque
+// No computador o lembrete do mouse (mover, clicar, segurar, dash) já ensina tudo: estas dicas são só do toque.
+// (A primeira também aparecia no PC como "Move with the mouse", repetindo o lembrete e cobrindo a barra de ondas.)
 const HINTS = [
-    { at: 1.8, icon: '🕹️', title: () => (touch() ? 'Left thumb moves' : 'Move with the mouse'), sub: 'Your blade strikes on its own' },
+    { at: 1.8, icon: '🕹️', title: () => 'Left thumb moves', sub: 'Your blade strikes on its own', touchOnly: true },
     { at: 8, icon: '🗡️', title: () => 'Right button throws a dagger', sub: '', touchOnly: true },
     { at: 15, icon: '💨', title: () => 'Small button dashes', sub: '', touchOnly: true }
 ];

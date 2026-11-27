@@ -5,7 +5,7 @@ import { DARKNESS, HOUR_EVENTS, NIGHT, rollHourHordes } from '../../data_model/n
 import { save } from '../core/save.js';
 import { BOSS_MODELS, BOSS_SPAWNING, chooseBossType, createBoss, hasDuel, isBossTurn } from '../../data_model/bosses.js';
 import { MONSTER_MODELS, MONSTER_SPAWNING, chooseMonsterType, createMonster } from '../../data_model/monsters.js';
-import { waveProgress, waveSpawnBoost } from '../../data_model/difficulty.js';
+import { TENSION_CURVE, waveProgress, waveTension } from '../../data_model/difficulty.js';
 import { audio, player, state } from '../core/state.js';
 import { showBanner, showToast } from '../ui/banner.js';
 import { playDuelDialogue, whenHunting } from '../ui/dialogue.js';
@@ -55,6 +55,7 @@ export function addMonster(type, x, y, opts = {}) {
 // Onde nasce um monstro deste tipo: SEMPRE numa zona verde do cenário (Ateliê). Sem zona nenhuma (ou todas bloqueadas), ele não nasce:
 // o jogo avisa no console (uma vez por cenário) e o cenário precisa de uma zona verde. Nunca pela borda.
 const warned = new Set();
+export function spawnSpotFor(type) { return spawnSpot(type); }
 function spawnSpot(type) {
     const zone = pickSpawnPoint(type);
     if (zone) return { ...zone, emerge: true };
@@ -209,11 +210,26 @@ export function spawnBoss() {
 }
 const RIVAL_INTRO_DELAY_MS = 700;
 
+// A música acompanha a curva de tensão da onda: o andamento e o brilho (library/sounds/core/music.js, intensity) sobem aos poucos no aperto, caem no
+// respiro e sobem de novo até o pico. Suavizado (~2 s) para o andamento não dar tranco. Chefe e acampamento têm a música própria (mood).
+const MUSIC_TENSION = { floor: 0.08, wave: 0.25, tension: 0.67, followPerSecond: 0.5 };
+function updateTensionMusic(dt) {
+    if (state.currentBoss || state.bossPending > 0 || state.hourPlan?.bossCalled) return;
+    const lo = TENSION_CURVE[0][1], hi = Math.max(...TENSION_CURVE.map(p => p[1]));
+    const base = (state.turn - 1) / Math.max(1, NIGHT.hours - 1);
+    const progress = waveProgress(state.scoreTurn, state.targetScore, state.waveTime);
+    const felt = state.lastStand ? 0 : (waveTension(progress) - lo) / (hi - lo);       // sobrou só limpar: a música desce
+    const target = Math.min(1, MUSIC_TENSION.floor + MUSIC_TENSION.wave * base + MUSIC_TENSION.tension * felt);
+    const now = audio.music?.intensity ?? target;
+    if (Math.abs(target - now) > 0.004) audio.setIntensity(now + (target - now) * Math.min(1, dt * MUSIC_TENSION.followPerSecond));
+}
+
 export function updateSpawner(dt) {
     // Relógio da onda: conta toda a caçada, até o último monstro (não o acampamento)
     if (state.phase === 'HUNT') {
         state.waveTime += dt;
         updateWaveEta(dt);
+        updateTensionMusic(dt);
     }
     if (state.phase !== 'HUNT' || state.lastStand || state.bossSlain) return;
 
@@ -231,6 +247,7 @@ export function updateSpawner(dt) {
         if (!h.fired && progress >= h.at) {
             h.fired = true;
             spawnHorde(h);
+            state.spawnTimer = Math.max(state.spawnTimer, TURN_DIFFICULTY.hordeLullSeconds);     // a horda é o pico; depois dela, um respiro
         }
     });
     plan.elites.forEach(moment => {
@@ -244,7 +261,7 @@ export function updateSpawner(dt) {
     if (state.spawnTimer <= 0) {
         spawnRegular();
         const difficulty = getTurnDifficulty(state.turn);
-        const interval = difficulty.spawnIntervalSeconds / (1 + mod('spawnRate')) / waveSpawnBoost(state.waveTime);
+        const interval = difficulty.spawnIntervalSeconds / (1 + mod('spawnRate')) / waveTension(progress);
         state.spawnTimer = state.currentBoss ? interval * TURN_DIFFICULTY.bossSpawnIntervalMultiplier : interval;
     }
 }

@@ -11,7 +11,7 @@ import { getAtkDamage } from './stats.js';
 import { feedTorch } from './torch.js';
 
 // --- ITENS NO CHÃO ---
-function addPickup(type, x, y) {
+function addPickup(type, x, y, extra = null) {
     // Nasce dentro do mundo, longe da borda, para dar para pegar
     state.pickups.push({
         type,
@@ -20,7 +20,8 @@ function addPickup(type, x, y) {
         age: 0,
         phase: Math.random() * Math.PI * 2,
         attracted: false,
-        speed: 0
+        speed: 0,
+        ...extra
     });
 }
 
@@ -33,8 +34,9 @@ export function maybeDropPickup(x, y) {
     addPickup(rollPickupType(), x, y);
 }
 
-export function dropChest(x, y) {
-    addPickup('CHEST', x, y);
+// points: baú com quantidade fixa de pontos de skill (o do Goblin do Baú); sem isso, sorteia (rollChestPoints)
+export function dropChest(x, y, points = null) {
+    addPickup('CHEST', x, y, points ? { points } : null);
 }
 
 function collect(p) {
@@ -56,7 +58,7 @@ function collect(p) {
         screenFlash('#fef9c3', 0.55);
         shakeScreen(12);
     } else if (p.type === 'CHEST') {
-        const points = rollChestPoints() + mod('chestPoints');
+        const points = (p.points ?? rollChestPoints()) + mod('chestPoints');
         state.skillPoints += points;
         bumpStat('chests');
         showToast('⚡', `+${points} skill points`, 'Spend them in the skill tree');

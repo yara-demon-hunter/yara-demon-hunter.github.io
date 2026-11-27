@@ -45,6 +45,7 @@ export const MONSTER_SPAWN = {
     zombie: grave(1.2, 'rgba(120, 100, 70, 0.9)', { size: 2, rise: 1.5 }),
     skeleton_warrior: grave(1, 'rgba(150, 140, 120, 0.9)'),
     skeleton_archer: grave(1, 'rgba(150, 140, 120, 0.9)'),
+    chest_goblin: smoke(0.55, 'rgba(250, 204, 21, 0.85)', { size: 1.4 }),     // aparece numa nuvem de fumaça dourada (também usada a cada blink)
     militia: smoke(0.9, 'rgba(170, 150, 110, 0.85)'),
     plate_knight: smoke(1.1, 'rgba(148, 163, 184, 0.9)', { size: 2 }),
     lancer: portal(1, 'rgba(139, 92, 246, 0.9)'),

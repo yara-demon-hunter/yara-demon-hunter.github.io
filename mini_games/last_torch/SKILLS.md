@@ -56,7 +56,7 @@ o ramo exige, mais barato ele deve ser.
 
 - Stats e efeitos simples custam 1 (ou 2 nos que movem o jogo: dano, ataque, raio, vida).
 - Poderes custam de 1 (Shadow) a 3 (Blade, Flame, Curse); passivas e evoluções, de 1 a 5. Juramentos: 5 em Shadow.
-- Cada nível do herói dá **2 pontos** (`TREE_POINTS`). Uma noite completa rende cerca de 70 pontos, contando os baús.
+- Cada nível do herói dá **1 ponto** (`TREE_POINTS`; eram 2 até 27/11/2026, quando a árvore passou a ser cara de verdade: antes o jogador comprava quase tudo, 127 pontos no nível 34). Os baús seguem dando 1 a 2 (o do Goblin do Baú, 2).
 - O preço mais alto de Flame e Curse paga uma força maior: feitiços batem 10% acima da lâmina (`SPELL_SKILL`).
 - Skills que agem sozinhas em campo (atiram, explodem, invocam) ficam 1 ponto acima das de efeito passivo do mesmo ramo, para
   que empilhar várias seja quase impossível numa noite (~86 pontos numa partida inteira).

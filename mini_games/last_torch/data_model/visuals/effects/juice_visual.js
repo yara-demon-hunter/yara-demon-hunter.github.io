@@ -10,7 +10,7 @@ const DEATH_OF_TYPE = {
     BONE_COLOSSUS: 'bone_colossus', TREANT: 'treant', GOLEM: 'golem',
     // Telas novas
     SLIZORK: 'slizork', RIVER_SPIRIT: 'river_spirit', RIVER_SPIRIT_SPLASH: 'river_spirit_splash', ZOMBIE: 'zombie', ZOMBIE_CRAWLER: 'zombie_crawler', ARMORED_ZOMBIE: 'armored_zombie', RIVER_EEL: 'river_eel', DROWNED: 'drowned', BOG_TOAD: 'bog_toad', BOG_SLIME: 'bog_slime',
-    SKELETON_WARRIOR: 'skeleton_warrior', SKELETON_ARCHER: 'skeleton_archer', MILITIA: 'militia', PLATE_KNIGHT: 'plate_knight', LANCER: 'lancer', DEMON: 'demon'
+    SKELETON_WARRIOR: 'skeleton_warrior', SKELETON_ARCHER: 'skeleton_archer', CHEST_GOBLIN: 'chest_goblin', MILITIA: 'militia', PLATE_KNIGHT: 'plate_knight', LANCER: 'lancer', DEMON: 'demon'
 };
 const MONSTER_DEATH_BY_TYPE = Object.fromEntries(Object.entries(DEATH_OF_TYPE).map(([type, id]) => [type, MONSTER_DEATH[id]]));
 

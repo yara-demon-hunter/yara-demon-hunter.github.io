@@ -185,6 +185,7 @@ export const MONSTER_MODELS = {
         radius: 12,
         color: '#8ea3bf',
         damage: 12,
+        lunge: { cooldownSeconds: 3.4, aimSeconds: 0.4, seconds: 0.32, speed: 480, triggerDistance: 260 },      // 2026-11-26: o lobo avisa (risca vermelha) e se lança
         initialShootCooldownSeconds: 2,
         shootCooldownSeconds: 2,
         scoreReward: 20,
@@ -556,6 +557,26 @@ Object.assign(MONSTER_MODELS, {
         goldVariance: 0.5,
         xpRewardBase: 22,
         xpRewardPerTurn: 3
+    },
+    // Goblin do Baú (evento de onda, data_model/wave_events.js): nunca nasce sozinho (spawnWeight 0). Não ataca; roda em volta da tocha com o baú nas costas,
+    // dá risada e some e reaparece. Muita vida: dá tempo de correr atrás dele. Morto, solta o baú (js/systems/wave_events.js)
+    CHEST_GOBLIN: {
+        spawnWeight: 0,
+        hpBase: 250,
+        hpPerTurn: 45,
+        speedMin: 150,
+        speedMax: 150,
+        radius: 15,
+        color: '#7fb04a',
+        damage: 0,
+        knockbackResist: 0.9,
+        initialShootCooldownSeconds: 99,
+        shootCooldownSeconds: 99,
+        scoreReward: 40,
+        goldBase: 30,
+        goldVariance: 0.3,
+        xpRewardBase: 40,
+        xpRewardPerTurn: 4
     },
     // Cavaleiro de Placas (tela da vila): lento, blindado e resistente a empurrão.
     PLATE_KNIGHT: {

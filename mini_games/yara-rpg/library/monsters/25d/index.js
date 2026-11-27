@@ -35,6 +35,8 @@ import { VAMPIRE_25D_VISUALS } from './vampire/vampire25d_visual.js';
 import { renderVampire25D } from './vampire/vampire25d.js';
 import { DEMON_LORD_25D_VISUALS } from './demon_lord/demon_lord25d_visual.js';
 import { renderDemonLord25D } from './demon_lord/demon_lord25d.js';
+import { CHEST_GOBLIN_25D_VISUALS } from './chest_goblin/chest_goblin25d_visual.js';
+import { renderChestGoblin25D } from './chest_goblin/chest_goblin25d.js';
 import { MILITIA_25D_VISUALS } from './militia/militia25d_visual.js';
 import { renderMilitia25D } from './militia/militia25d.js';
 import { PLATE_KNIGHT_25D_VISUALS } from './plate_knight/plate_knight25d_visual.js';
@@ -99,7 +101,8 @@ export const MONSTERS_25D = {
     drowned: { visuals: DROWNED_25D_VISUALS, render: renderDrowned25D },
     lancer: { visuals: LANCER_25D_VISUALS, render: renderLancer25D },
     plate_knight: { visuals: PLATE_KNIGHT_25D_VISUALS, render: renderPlateKnight25D },
-    militia: { visuals: MILITIA_25D_VISUALS, render: renderMilitia25D }
+    militia: { visuals: MILITIA_25D_VISUALS, render: renderMilitia25D },
+    chest_goblin: { visuals: CHEST_GOBLIN_25D_VISUALS, render: renderChestGoblin25D }
 };
 
 export { knightHeadPosition25D };

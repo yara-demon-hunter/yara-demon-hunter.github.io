@@ -27,7 +27,7 @@ export function nearestEnemy(x, y, maxDist, skip = null) {
     let best = null;
     let min = maxDist;
     for (const e of state.enemies) {
-        if (e.hp <= 0 || skip?.has(e)) continue;
+        if (e.hp <= 0 || e.untargetable || skip?.has(e)) continue;
         const d = Math.hypot(e.x - x, e.y - y);
         if (d < min) {
             min = d;

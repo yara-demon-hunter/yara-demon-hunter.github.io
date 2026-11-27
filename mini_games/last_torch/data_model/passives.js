@@ -427,21 +427,21 @@ export const PASSIVE_SKILL_MODELS = {
     },
 
     // Mãos de ladrão (ramo Fortune da árvore de relíquias)
-    lightFingers: { name: 'Light Fingers', icon: '🧤', cost: 300, maxLvl: 1, desc: 'Coins and loot leap into your hands: your pickup range doubles.', mods: { magnet: 1 } },
-    pickpocket: { name: 'Pickpocket', icon: '👛', cost: 900, maxLvl: 1, desc: 'Every monster you kill drops 2 extra gold.', mods: { killGold: 2 } },
-    coinRush: { name: 'Coin Rush', icon: '💰', cost: 2000, maxLvl: 1, desc: 'Every coin you grab shaves 0.05s off your dagger and dash recharge. Gold buys speed.', mods: { coinHaste: 0.05 } },
-    thiefNose: { name: "Thief's Nose", icon: '👃', cost: 3800, maxLvl: 1, desc: 'You smell what others miss: monsters drop items 60% more often.', mods: { pickupRate: 0.6 } },
+    lightFingers: { name: 'Light Fingers', icon: '🧤', cost: 150, maxLvl: 1, desc: 'Coins and loot leap into your hands: your pickup range doubles.', mods: { magnet: 1 } },
+    pickpocket: { name: 'Pickpocket', icon: '👛', cost: 200, maxLvl: 1, desc: 'Every monster you kill drops 2 extra gold.', mods: { killGold: 2 } },
+    coinRush: { name: 'Coin Rush', icon: '💰', cost: 300, maxLvl: 1, desc: 'Every coin you grab shaves 0.05s off your dagger and dash recharge. Gold buys speed.', mods: { coinHaste: 0.05 } },
+    thiefNose: { name: "Thief's Nose", icon: '👃', cost: 350, maxLvl: 1, desc: 'You smell what others miss: monsters drop items 60% more often.', mods: { pickupRate: 0.6 } },
     masterThief: {
         name: 'Master Thief',
         icon: '🦝',
-        cost: 6500,
+        cost: 400,
         maxLvl: 1,
         desc: 'Dash through monsters to pick their pockets. A Perfect Dodge steals a fistful of gold.'
     },
     greedyIdol: {
         name: 'Greedy Idol',
         icon: '🗿',
-        cost: 300,
+        cost: 200,
         maxLvl: 1,
         desc: '+35% gold, but -12% max health.',
         mods: { gold: 0.35, maxHp: -0.12 }

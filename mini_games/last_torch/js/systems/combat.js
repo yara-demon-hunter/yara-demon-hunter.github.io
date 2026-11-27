@@ -58,6 +58,7 @@ export function findNearestEnemy(x, y, maxDist) {
     let target = null;
     let minDist = maxDist;
     state.enemies.forEach(e => {
+        if (e.untargetable) return;           // o Goblin do Baú invisível (blink)
         const d = Math.hypot(e.x - x, e.y - y) - e.radius;
         if (d < minDist) {
             minDist = d;

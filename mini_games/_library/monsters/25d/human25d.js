@@ -23,6 +23,7 @@ import { meleePose, meleeState } from './melee25d.js';
 //   (Rei do Cemitério) helmet 'skull' = elmo aberto de espinhos com a CAVEIRA à mostra e rabo de crina no topo; spikes = espinhos nas ombreiras;
 //   boneHands = mãos de esqueleto saindo da manga de placas; mail = saia de cota de malha; sabatons = botas de metal em placas; skullBuckle = fivela de caveira; weapon 'greatsword' = espadão que ARRASTA
 //   boneArms / boneLegs / ribs / dragLeg  (zumbi) true = braços de osso / pernas de osso / costelas aparecendo no peito rasgado / uma perna que arrasta (S.dragSide: 1 direita, -1 esquerda)
+//   (Goblin do Baú) helmet 'cap' = chapeuzinho de cone caído para trás (C.hat); ears = orelhas grandes e pontudas; grin = sorrisão largo com dentes; backChest = o BAÚ do jogo (o mesmo do item Treasure) amarrado nas costas, com correias nos ombros
 //   armsForward true = braços esticados à frente (zumbi), balançando com a passada; armsBare true = braços sem manga (pele)
 // Coordenadas locais: a = frente, b = direita, z = altura. Uso: registerHuman(id, S) e depois renderMonster25D(e, id, S).
 export function registerHuman(id, S) {
@@ -363,6 +364,16 @@ export function registerHuman(id, S) {
                     }
                 }
                 if (!covered) oball(rig, c, R, C.skin);
+                if (L.ears) {
+                    // Orelhas de goblin: grandes, pontudas, para trás e para cima, com o miolo mais escuro
+                    for (const side of [-1, 1]) {
+                        const base = [c[0] - R * 0.1, side * R * 0.9, c[2] + R * 0.1];
+                        const tip = [c[0] - R * 0.9, side * (R + S.earLength), c[2] + R * 0.9 + S.earLength * 0.25];
+                        limb([base, tip], 1.5, C.outline);
+                        limb([base, tip], 1.1, C.skin);
+                        limb([mix(base, tip, 0.18), mix(base, tip, 0.78)], 0.45, C.skinShade);
+                    }
+                }
                 if (L.helmet === 'weeds') ball([c[0] - R * 0.3, 0, c[2] + R * 0.5], R * 0.8, C.hair);
                 if (L.helmet === 'horned') {
                     ball([c[0] - R * 0.5, 0, c[2] + R * 0.45], R * 0.8, C.hair);
@@ -373,6 +384,22 @@ export function registerHuman(id, S) {
                         limb([base, mid, tip], 1.5, C.outline);
                         limb([base, mid, tip], 1.0, C.horn);
                     }
+                }
+                if (L.helmet === 'cap') {
+                    // Chapeuzinho de goblin: aba redonda, copa em cone que cai para trás e uma pena na faixa (cores C.hat, C.hatDark, C.hatLight)
+                    rig.disk([c[0], 0, c[2] + R * 0.5], [R * 1.15, 0, 0], [0, R * 1.15, 0]);
+                    ctx.fillStyle = C.hatDark;
+                    ctx.fill();
+                    ctx.strokeStyle = C.outline;
+                    ctx.lineWidth = 0.4;
+                    ctx.stroke();
+                    ball([c[0], 0, c[2] + R * 0.78], R * 0.82, C.hat);
+                    const tip = [c[0] - R * 1.5, 0, c[2] + R * 1.35];
+                    limb([[c[0] - R * 0.1, 0, c[2] + R * 1.0], [c[0] - R * 0.7, 0, c[2] + R * 1.5], tip], R * 1.05, C.outline);
+                    limb([[c[0] - R * 0.1, 0, c[2] + R * 1.0], [c[0] - R * 0.7, 0, c[2] + R * 1.5], tip], R * 0.85, C.hat);
+                    ball([tip[0] - 0.2, 0, tip[2] - 0.2], R * 0.28, C.hatLight);
+                    ball([c[0] - R * 0.1, -R * 0.3, c[2] + R * 1.15], R * 0.28, C.hatLight);
+                    limb([[c[0] + R * 0.3, R * 0.55, c[2] + R * 0.62], [c[0] - R * 0.3, R * 0.95, c[2] + R * 0.5]], 0.55, C.hatBand ?? C.chestBand ?? C.hatLight);
                 }
                 if (L.helmet === 'kettle') {
                     // Chapéu de ferro: cúpula e a aba larga em volta
@@ -420,7 +447,16 @@ export function registerHuman(id, S) {
                     if (!S.eyeGlow) limb([[eye[0], sd * R * 0.6, eye[2] + 0.6], [eye[0] + 0.1, sd * R * 0.16, eye[2] + 0.38]], 0.2, C.hair ?? C.ink);
                 }
                 ball([c[0] + R * 0.98, 0, c[2] - R * 0.1], R * 0.14, C.skinShade);
-                if (S.openMouth) {
+                if (L.grin) {
+                    // Sorrisão: boca larga e curva até quase as orelhas, com a fileira de dentes de cima
+                    const mouth = [];
+                    for (let q = 0; q <= 8; q++) {
+                        const u = q / 4 - 1;
+                        mouth.push([c[0] + R * 0.86, u * R * 0.62, c[2] - R * 0.66 + u * u * R * 0.3]);
+                    }
+                    limb(mouth, 0.55, C.ink);
+                    for (let q = 1; q <= 7; q += 2) limb([[mouth[q][0] + 0.03, mouth[q][1], mouth[q][2] + 0.05], [mouth[q][0] + 0.03, mouth[q][1], mouth[q][2] - 0.42]], 0.34, C.fang);
+                } else if (S.openMouth) {
                     ball([c[0] + R * 0.86, 0, c[2] - R * 0.46], R * 0.2, C.ink);
                 } else {
                     limb([[c[0] + R * 0.9, -R * 0.22, c[2] - R * 0.5], [c[0] + R * 0.92, R * 0.22, c[2] - R * 0.5]], 0.18, C.skinShade);
@@ -428,6 +464,46 @@ export function registerHuman(id, S) {
                 if (S.fangs) for (const sd of [-1, 1]) limb([[c[0] + R * 0.88, sd * R * 0.14, c[2] - R * 0.5], [c[0] + R * 0.88, sd * R * 0.14, c[2] - R * 0.5 - 0.7]], 0.2, C.fang);
             }
         }];
+    }
+
+    // --- O BAÚ NAS COSTAS ---
+    // É o baú do item Treasure do Last Torch (caixa de madeira, tampa arredondada mais clara, cintas e fecho dourados): as cores vêm de S.colors (chest*),
+    // copiadas de powers_visual.js do jogo. Só as faces voltadas para a câmera são desenhadas; duas correias passam pelos ombros.
+    function drawBackChest(rig, pose) {
+        const { C, limb, ball } = rig;
+        const K = S.chest;
+        const ca = pose.lean * 0.4 - K.behind, cz = pose.shoulderZ - K.drop;
+        const hw = K.halfWidth, hd = K.halfDepth, hh = K.halfHeight;
+        const center = [ca, 0, cz];
+        // Correias (por trás do baú, até os ombros)
+        for (const sd of [-1, 1]) {
+            limb([[ca + hd * 0.3, sd * hw * 0.62, cz + hh * 0.7], [pose.lean + 0.2, sd * V.chest.B * 0.9, pose.shoulderZ - 0.2]], 0.55, C.outline);
+            limb([[ca + hd * 0.3, sd * hw * 0.62, cz + hh * 0.7], [pose.lean + 0.2, sd * V.chest.B * 0.9, pose.shoulderZ - 0.2]], 0.36, C.belt);
+        }
+        const P = (da, db, dz) => [ca + da, db, cz + dz];
+        const faces = [
+            { n: [-1, 0, 0], pts: [P(-hd, -hw, -hh), P(-hd, hw, -hh), P(-hd, hw, hh), P(-hd, -hw, hh)], color: C.chest },       // de trás (a que se vê quando ele foge)
+            { n: [1, 0, 0], pts: [P(hd, -hw, -hh), P(hd, hw, -hh), P(hd, hw, hh), P(hd, -hw, hh)], color: C.chest },
+            { n: [0, -1, 0], pts: [P(-hd, -hw, -hh), P(hd, -hw, -hh), P(hd, -hw, hh), P(-hd, -hw, hh)], color: C.chestDark },
+            { n: [0, 1, 0], pts: [P(-hd, hw, -hh), P(hd, hw, -hh), P(hd, hw, hh), P(-hd, hw, hh)], color: C.chestDark }
+        ];
+        for (const f of faces) {
+            const mid = [ca + f.n[0] * hd, f.n[1] * hw, cz + f.n[2] * hh];
+            if (!facesCamera(rig, mid, center)) continue;
+            poly(rig, f.pts, f.color, C.outline, 0.4);
+            if (f.n[0] === -1) {
+                // Cintas douradas verticais e o fecho, na face de trás
+                for (const k of [-0.62, 0.62]) limb([P(-hd - 0.05, k * hw, -hh), P(-hd - 0.05, k * hw, hh)], 0.55, C.chestBand);
+                poly(rig, [P(-hd - 0.08, -0.22 * hw, hh * 0.45), P(-hd - 0.08, 0.22 * hw, hh * 0.45), P(-hd - 0.08, 0.22 * hw, -hh * 0.3), P(-hd - 0.08, -0.22 * hw, -hh * 0.3)], C.chestLock, C.outline, 0.25);
+            }
+        }
+        // Tampa arredondada, mais clara, com a cinta de ouro na beirada
+        limb([P(0, -hw, hh), P(0, hw, hh)], hd * 2 + 0.25, C.chestLight);
+        limb([P(-hd * 0.9, -hw, hh + 0.05), P(-hd * 0.9, hw, hh + 0.05)], 0.5, C.chestBand);
+        limb([P(hd * 0.9, -hw, hh + 0.05), P(hd * 0.9, hw, hh + 0.05)], 0.5, C.chestBand);
+        for (const k of [-0.62, 0.62]) limb([P(-hd, k * hw, hh + 0.1), P(hd, k * hw, hh + 0.1)], 0.5, C.chestBand);
+        // Um brilho de ouro escapando pela tampa
+        glowAt(rig, P(0, 0, hh + 0.9), C.chestBand, 2.2, 0.45);
     }
 
     // --- COSTAS: capa, rabo e asas ---
@@ -455,6 +531,7 @@ export function registerHuman(id, S) {
             const tip = chain[chain.length - 1];
             poly(rig, [[tip[0] - 0.4, tip[1] - 1.1, tip[2]], [tip[0] - 2.2, tip[1], tip[2] - 0.3], [tip[0] - 0.4, tip[1] + 1.1, tip[2]]], C.horn, C.outline, 0.3);
         }
+        if (L.backChest) drawBackChest(rig, pose);
         if (L.cape) {
             // Capa curta e estreita (S.capeSpread / S.capeHemSpread / S.capeLength): sem isso a padrão do boneco fica enorme e dentada
             const spread = S.capeSpread ?? 1;

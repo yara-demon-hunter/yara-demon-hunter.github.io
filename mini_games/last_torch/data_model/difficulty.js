@@ -29,14 +29,16 @@ export const TURN_DIFFICULTY = {
     bossSpawnIntervalMultiplier: 3.6,   // com o boss em campo nascem menos monstros
 
     // Pontos para fechar a hora: base + porTurno x n + porTurnoQuadrado x n², com n = turno - 1
-    targetScoreFirstTurn: 398,   // 2026-11-25: 10% menos (era 442; antes 520, 125 e 3), junto com o tempo mínimo da onda
-    targetScorePerTurn: 95,
-    targetScorePerTurnSquared: 2.3,
+    // 2026-11-26: ondas de ~70 s (eram 2-3 min): cota a ~50% do que era (398 / 95 / 2.3); medido com o autopiloto: ondas comuns 70-90 s
+    targetScoreFirstTurn: 200,
+    targetScorePerTurn: 48,
+    targetScorePerTurnSquared: 1.2,
 
     // Duração mínima da onda: ela só fecha (e chama o boss) depois deste tempo E de a cota de pontos ser atingida.
     // Dentro dela os monstros vão ficando mais frequentes: o intervalo entre eles encolhe até 1 / (1 + spawnGrowth) no fim do tempo mínimo.
-    waveMinSeconds: 110,              // era 180 (3 min), depois 144, depois 122; 2026-11-25: mais 10% curto
-    spawnGrowth: 0.9,
+    waveMinSeconds: 70,               // era 180 (3 min), 144, 122, 110; 2026-11-26: 70 s (ondas curtas, cada uma com mais variação)
+    spawnGrowth: 0.9,                 // (só a função waveSpawnBoost antiga usa; o spawner agora segue waveTension)
+    hordeLullSeconds: 3.5,            // depois que uma horda chega, nada comum nasce por este tempo (respiro depois do pico)
 
     // Limite de monstros vivos ao mesmo tempo (desempenho e leitura da tela)
     maxAliveEnemies: 42,
@@ -69,6 +71,21 @@ export const TURN_DIFFICULTY = {
 // Quanto da onda já passou (0 a 1): o menor entre a cota de pontos e o tempo mínimo. Hordas, elites, a barra do HUD e o fim da onda usam isto.
 export function waveProgress(score, target, waveTime) {
     return Math.min(score / Math.max(1, target), waveTime / TURN_DIFFICULTY.waveMinSeconds);
+}
+
+// CURVA DE TENSÃO DA ONDA: multiplica a taxa de nascimento conforme a onda avança (progresso 0 a 1). Calmo no começo (dá para respirar e
+// juntar o que caiu), aperta no meio, alivia um instante depois do elite (0,6) e sobe até o pico no fim. Pontos [progresso, multiplicador].
+export const TENSION_CURVE = [[0, 0.55], [0.15, 0.7], [0.45, 1.5], [0.62, 1.05], [0.82, 1.95], [1, 2.1]];
+export function waveTension(progress) {
+    const c = TENSION_CURVE;
+    const p = Math.max(0, Math.min(1, progress));
+    for (let i = 1; i < c.length; i++) {
+        if (p <= c[i][0]) {
+            const [x0, y0] = c[i - 1], [x1, y1] = c[i];
+            return y0 + (y1 - y0) * ((p - x0) / (x1 - x0));
+        }
+    }
+    return c[c.length - 1][1];
 }
 
 // Quanto mais a onda avança, mais depressa nascem monstros (multiplica a taxa de spawn)

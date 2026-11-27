@@ -619,7 +619,7 @@ export const POWER_MODELS = {
         name: 'Wicked Oak', icon: '🌳', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree and then a full oak that walks: after ${this.levels[0].grow.adult}s at level 1, only ${level.grow.adult}s at max level; every monster you kill speeds its growth up a little (more at higher levels). Evolve the skill and the full oak becomes the Ancient Grove: a huge ancient tree, bigger and stronger, that hits harder and reaches farther. There is only ever one tree, and it stays with you through every wave of the night, regaining some health between waves. The grown oak walks, very slowly, toward the fight and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; if it falls, a new seed can be planted.`;
+            return `A seed is thrown at the nearby monster with the most health, slowly draining it. If that monster dies, a sapling grows at its death spot. Stand within its green healing circle to recover 1 health per second. It grows into a small tree and then a full oak that walks: after ${this.levels[0].grow.adult}s at level 1, only ${level.grow.adult}s at max level; every monster you kill speeds its growth up a little (more at higher levels). Evolve the skill and the full oak becomes the Ancient Grove: a huge ancient tree, bigger and stronger, that hits harder and reaches farther. There is only ever one tree, and it stays with you through every wave of the night, regaining some health between waves. The grown oak walks, very slowly, toward the fight and lashes everything within ${level.reach} range for ${formatMultiplier(level.damage)} spell damage every ${formatNumber(level.lashSeconds)}s. It has health and can be destroyed; if it falls, a new seed can be planted. A full-grown oak also grips the strongest monster on screen: a thorned root crawls to it and coils around it for ${this.grip.seconds}s, pinning it and crushing it for ${formatMultiplier(this.grip.dps)} spell damage per second.`;
         },
         get upgrades() {
             return this.levels.map(level =>
@@ -657,7 +657,7 @@ export const POWER_MODELS = {
         walk: { speed: 9, seekRatio: 3, heroDistance: 160 },
         // Raízes que prendem: a árvore adulta agarra o monstro MAIS FORTE da tela (maior vida) e o segura no chão por bem mais tempo que as raízes comuns,
         // como o Shadow Shackle. O bônus de raízes do druida (ROOTS +50%, mod rootSeconds) vale aqui também; chefe segura menos (bossRatio das raízes)
-        grip: { cooldownSeconds: 15, seconds: 6.5, firstDelay: 5 }
+        grip: { cooldownSeconds: 15, seconds: 6.5, firstDelay: 5, dps: 0.6 }
     },
     sporePods: {
         name: 'Spore Pods', icon: '🍄', maxLvl: 5,

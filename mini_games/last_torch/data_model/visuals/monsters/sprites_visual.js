@@ -82,6 +82,7 @@ export const MONSTER_SPRITES_25D = {
     SKELETON_WARRIOR: { extent: 20, bakeSeconds: 1 / 1.8, playSeconds: 0.7, speed: 50, attackLive: true },
     SKELETON_ARCHER: { extent: 19, bakeSeconds: 1 / 1.8, playSeconds: 0.9, speed: 32, attackLive: true },
     MILITIA: { extent: 19, bakeSeconds: 1, playSeconds: 0.8, speed: 50, attackLive: true },
+    CHEST_GOBLIN: { extent: 18, bakeSeconds: 1, playSeconds: 0.55, speed: 90 },
     PLATE_KNIGHT: { extent: 22, bakeSeconds: 1, playSeconds: 1.1, speed: 27, attackLive: true },
     LANCER: { extent: 27, bakeSeconds: 1, playSeconds: 0.8, speed: 52, attackLive: true },
     DEMON: { extent: 21, bakeSeconds: 1, playSeconds: 0.7, speed: 62 },

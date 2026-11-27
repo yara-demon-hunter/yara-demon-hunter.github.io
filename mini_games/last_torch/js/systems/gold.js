@@ -34,6 +34,26 @@ export function dropGold(x, y, amount) {
     }
 }
 
+// Chuva de moedas (tesouro do Goblin do Baú): muitas moedas visuais de uma vez, espalhadas num círculo largo. Passa do limite de moedas
+// em campo de propósito (é raro e dura poucos segundos); o valor total é dividido exato entre elas.
+export function dropTreasureGold(x, y, amount, count, speed = [120, 330]) {
+    if (state.replay) return;
+    const base = Math.floor(amount / count);
+    let extra = amount - base * count;
+    for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+        const v = speed[0] + Math.random() * (speed[1] - speed[0]);
+        state.goldDrops.push({
+            x, y, vx: Math.cos(angle) * v, vy: Math.sin(angle) * v,
+            value: base + (extra-- > 0 ? 1 : 0),
+            age: -Math.random() * 0.12,            // saem escalonadas: chove, não explode de uma vez
+            homingSpeed: 0,
+            phase: Math.random() * Math.PI * 2,
+            treasure: true
+        });
+    }
+}
+
 function collectGold(value) {
     if (state.replay) return;
     state.coins += value;
@@ -80,7 +100,7 @@ export function updateGold(dt) {
             const dx = player.x - c.x;
             const dy = player.y - c.y;
             const dist = Math.hypot(dx, dy) || 1;
-            if (vacuum || dist < magnet) c.attracted = true;
+            if (vacuum || c.treasure || dist < magnet) c.attracted = true;       // as moedas do tesouro vão sozinhas até o herói (o jingle toca em sequência)
             if (c.attracted) {
                 // Atraída pelo herói, cada vez mais rápido
                 c.homingSpeed = Math.min(maxSpeed, c.homingSpeed + acceleration * dt);

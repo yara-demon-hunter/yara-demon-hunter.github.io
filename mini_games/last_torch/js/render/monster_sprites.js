@@ -92,7 +92,7 @@ const FOLDER_25D = {
     ZOMBIE_WOLF: 'zombie_wolf', HEADLESS_KNIGHT: 'headless_knight', BONE_COLOSSUS: 'bone_colossus',
     // Telas novas
     ZOMBIE: 'zombie', ZOMBIE_CRAWLER: 'zombie_crawler', ARMORED_ZOMBIE: 'armored_zombie', RIVER_EEL: 'river_eel', DROWNED: 'drowned', BOG_TOAD: 'bog_toad', BOG_SLIME: 'bog_slime', SKELETON_WARRIOR: 'skeleton_warrior', SKELETON_ARCHER: 'skeleton_archer',
-    MILITIA: 'militia', PLATE_KNIGHT: 'plate_knight', LANCER: 'lancer', DEMON: 'demon'
+    CHEST_GOBLIN: 'chest_goblin', MILITIA: 'militia', PLATE_KNIGHT: 'plate_knight', LANCER: 'lancer', DEMON: 'demon'
 };
 // Buddies (library/buddies): os lobos do Rowan. Mesmo caminho dos monstros, mas a pasta é a de buddies
 const BUDDY_FOLDER_25D = { BUDDY_SHADOW_WOLF: 'shadow_wolf', BUDDY_WHITE_WOLF: 'white_wolf', BUDDY_TREANT: 'treant' };

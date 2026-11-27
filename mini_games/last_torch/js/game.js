@@ -25,6 +25,7 @@ import { updatePowers } from './systems/powers.js';
 import { updateShadowClone } from './systems/shadow_clone.js';
 import { updateSkills } from './systems/skills.js';
 import { updateSpawner } from './systems/spawner.js';
+import { updateWaveEvents } from './systems/wave_events.js';
 import { updateStreak } from './systems/streak.js';
 import { updateTorch } from './systems/torch.js';
 import { setupButtons } from './ui/buttons.js';
@@ -97,6 +98,7 @@ export function update(dt) {
     updatePowers(dt);
     updateSkills(dt);
     updateSpawner(dt);
+    updateWaveEvents(dt);
 
     updateEnemies(dt);
     if (state.gameState !== 'PLAYING') return;

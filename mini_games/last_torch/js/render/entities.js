@@ -679,7 +679,7 @@ function renderEnemyOverlays(t) {
         }
 
         // Barra de vida simples acima do inimigo (o boss tem a dele no HUD)
-        if (e.hp < e.maxHp && !e.isBoss) {
+        if (e.hp < e.maxHp && !e.isBoss && !(e.blinkAlpha < 1)) {
             const bw = e.radius * 2;
             const barY = e.shadowOwner ? 50 : e.radius + (HEALTH_BAR_OFFSETS[e.type] ?? 8);
             ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
@@ -705,7 +705,7 @@ export function renderEnemies(pass = null, splitY = 0, renderActor = null, actor
     const t = performance.now() / 1000;
     // Desenha de trás para frente: o ator mais abaixo na tela deve cobrir o que está mais acima.
     // Os convertidos do Avgustino (Conversion) entram na mesma ordem de profundidade: são monstros, só que do lado do herói
-    const ordered = (state.converts.length ? state.enemies.concat(state.converts) : state.enemies).filter(inPass).sort((a, b) => a.y - b.y);
+    const ordered = (state.converts.length ? state.enemies.concat(state.converts) : state.enemies).filter(e => inPass(e) && e.blinkAlpha !== 0).sort((a, b) => a.y - b.y);
     renderUnderlays();
     renderConvertRings(t);
     for (const e of ordered) if (e.emerge) drawSpawnFx(ctx, e.emerge.def, e.emerge.age, e.x, e.y + e.radius * 0.5, e.radius);      // o efeito de nascer, no chão
@@ -714,7 +714,11 @@ export function renderEnemies(pass = null, splitY = 0, renderActor = null, actor
         if (e.elite) renderEliteMark(e);
     }
     for (const e of ordered) {
-        if (!e.isBoss && !e.shadowOwner && !liveNow(e, getMonsterSprite(e.type).spec)) stampMonster(e, t);
+        if (!e.isBoss && !e.shadowOwner && !liveNow(e, getMonsterSprite(e.type).spec)) {
+            if (e.blinkAlpha < 1) ctx.globalAlpha = e.blinkAlpha;       // blink do Goblin do Baú: some e aparece
+            stampMonster(e, t);
+            ctx.globalAlpha = 1;
+        }
     }
     resetWorldView();
 

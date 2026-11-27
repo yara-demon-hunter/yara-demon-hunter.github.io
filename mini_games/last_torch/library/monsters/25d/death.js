@@ -154,6 +154,15 @@ export const MONSTER_DEATH = {
         ],
         stain: 'rgba(14, 34, 10, 0.68)'
     },
+    // Goblin do Baú: estoura num punhado de moedas e farpas de madeira (o baú de verdade cai no chão, pelo jogo)
+    chest_goblin: {
+        groups: [
+            { count: 9, colors: ['#fbbf24', '#fde68a', '#f59e0b'], shape: 'drop', size: 0.9, speed: 1.3, lift: 1.6 },
+            { count: 4, colors: ['#78350f', '#b45309'], shape: 'wood', size: 1 },
+            { count: 4, colors: ['#7fb04a', '#4f7a2c'], shape: 'cloth', size: 0.9 }
+        ],
+        stain: 'rgba(40, 52, 14, 0.5)'
+    },
     // Miliciano: cai de lado, com lascas de madeira (machado e escudo) e trapos
     militia: {
         groups: [

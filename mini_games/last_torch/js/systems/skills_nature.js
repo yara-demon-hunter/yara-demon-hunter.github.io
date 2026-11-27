@@ -328,14 +328,16 @@ function updateShelterOak(dt) {
         if (grown) {
             // Raízes que prendem o monstro mais forte da tela (por mais tempo que as raízes comuns)
             oak.gripCd = (oak.gripCd ?? M.grip.firstDelay) - dt;
+            if (oak.gripTarget) oak.gripAge = (oak.gripAge ?? 0) + dt;       // desde o agarrão (a animação do enrolar, js/render/nature.js)
             if (oak.gripCd <= 0 && state.phase === 'HUNT') {
                 let strongest = null;
                 for (const e of state.enemies) {
                     if (e.hp <= 0 || e.unstoppable || e.emerge || e.x < 0 || e.x > state.width || e.y < 0 || e.y > state.height) continue;
                     if (!strongest || e.maxHp > strongest.maxHp) strongest = e;
                 }
-                if (strongest && rootEnemy(strongest, M.grip.seconds)) {
+                if (strongest && rootEnemy(strongest, M.grip.seconds, M.grip.dps)) {
                     oak.gripTarget = strongest;
+                    oak.gripAge = 0;
                     oak.gripCd = M.grip.cooldownSeconds;
                     oak.shake = 0.3;
                     addShockwave(strongest.x, strongest.y, { radius: strongest.radius * 2.2, color: COLOR, width: 5, seconds: 0.4 });

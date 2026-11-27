@@ -23,6 +23,7 @@ import { CAMPAIGN_RUNTIME, screenIndexOf, screenOfTurn, startsNewScreen } from '
 import { showMapTransition } from '../ui/map_screen.js';
 import { getSceneryId, prepareScenery, setScenery } from '../render/scenery.js';
 import { warmSceneryMonsters } from '../render/monster_sprites.js';
+import { rollWaveEvent } from './wave_events.js';
 import { buildHourPlan, clearBattleEffects, prepareBossSummon, resetFieldForNewTurn, spawnOpening } from './spawner.js';
 
 // --- A NOITE ---
@@ -56,6 +57,7 @@ export function startHour() {
     state.nextOmen = null;
     refreshModifiers();
     state.hourPlan = buildHourPlan(hour);
+    state.hourPlan.event = rollWaveEvent(hour);       // 2ª onda de cada tela: um evento que muda a regra (data_model/wave_events.js)
     state.goldVacuum = false;
     state.lastStand = false;
     state.hourHit = false;

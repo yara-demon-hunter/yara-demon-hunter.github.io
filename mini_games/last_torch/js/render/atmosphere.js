@@ -155,9 +155,9 @@ export function renderBossFx() {
         return;
     }
     // Escuridão: só um círculo em volta da tocha continua claro (a luz encolhida)
-    const grad = ctx.createRadialGradient(state.coreX, state.coreY, 70, state.coreX, state.coreY, 210);
+    const grad = ctx.createRadialGradient(state.coreX, state.coreY, fx.r0 ?? 70, state.coreX, state.coreY, fx.r1 ?? 210);
     grad.addColorStop(0, 'rgba(3, 0, 12, 0)');
-    grad.addColorStop(1, `rgba(3, 0, 12, ${0.88 * k})`);
+    grad.addColorStop(1, `rgba(3, 0, 12, ${0.88 * (fx.strength ?? 1) * k})`);
     ctx.fillStyle = grad;
     ctx.fillRect(-big, -big, big * 2, big * 2);
     ctx.restore();

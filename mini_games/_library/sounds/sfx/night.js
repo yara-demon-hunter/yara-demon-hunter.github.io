@@ -58,6 +58,19 @@ export const nightSfx = {
         this.tone({ type: 'sine', freq: 2349, at: 0.24, decay: 0.4, gain: 0.05 });
     },
 
+    // Risadinha do Goblin do Baú: "hi-hi-hi-hi" (quatro bipes agudos que sobem e descem rápido)
+    playGiggle() {
+        if (!this.ctx || this.throttled('giggle', 0.9)) return;
+        [880, 1175, 988, 1319].forEach((freq, i) => this.tone({ type: 'triangle', freq, at: i * 0.075, attack: 0.005, decay: 0.07, gain: 0.07, vary: 0.04 }));
+    },
+
+    // Blink (some ou aparece): um estalo agudo com um sopro rápido
+    playBlink() {
+        if (!this.ctx || this.throttled('blink', 0.15)) return;
+        this.tone({ type: 'sine', freq: 1400, to: 380, attack: 0.005, decay: 0.16, gain: 0.07 });
+        this.burst({ filter: 'bandpass', freq: 2200, to: 700, q: 1.4, attack: 0.01, decay: 0.14, gain: 0.07 });
+    },
+
     // Sino de igreja: parciais desafinadas como um sino de bronze (hum, prima, terça, quinta, nominal), com cauda longa
     playBell(echo = false) {
         if (!this.ctx) return;

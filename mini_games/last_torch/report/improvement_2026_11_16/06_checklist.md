@@ -171,6 +171,45 @@ Objetivo: o revisor e o jogador perceberem uma versão nova logo nos primeiros m
 
 **Recomendação:** desafio diário (Fase 4) + bioma novo com boss + metas por noite; idiomas em quarto.
 
+## Fase 8 — Ritmo, clareza e identidade (análise de 26/11/2026)
+
+Origem: o dono achou o jogo fácil, monótono até o chefe e visualmente poluído. Rodei o jogo real (bot + herói imortal até a onda 18, prints em 1280×800). O que vi:
+- Bot que só anda em volta da tocha não caiu abaixo de 67% da vida nas ondas 1 e 2; morreu no Azael (onda 3). A dificuldade é uma reta com um pico só no chefe.
+- Ondas de 2 a 3 min (W1 1:59 · W2 1:58 · W3 3:00 · W4 2:10 · W5 2:06 · W6 2:49), todas com a mesma estrutura. Noite inteira ≈ 40 min; a média da plataforma é ~9 min.
+- Onda 14: nível 34 e 127 pontos de skill, 108 nós abertos desde o início → no fim tudo ligado, toda noite parecida.
+- Onda 10: 4 círculos tracejados em volta do herói/tocha + números + brilhos; o cenário (ossos, lápides) tem mais contraste que os monstros.
+
+**A. Ritmo** (primeiro pacote)
+- [x] ondas curtas: `waveMinSeconds` 110 → 70 e cota de pontos a ~50% (`difficulty.js`). Medido com o autopiloto (x50): ondas comuns **1:23–1:43** (antes 1:58–2:49); chefes 2:04–2:40 com a luta. Os ~83 s são os 70 s do piso + o tempo de limpar a tela; a cota deixou de ser o limite
+- [x] onda 2 de cada tela com um evento que muda a regra: **Goblin do Baú** (monstro novo, `chest_goblin` na biblioteca: pequeno, verde, com o baú do item Treasure amarrado nas costas; não ataca, roda em volta da tocha dando risada e some/reaparece com blink; muita vida; fica ~20 s; morto, solta o baú com 2 pontos de skill e uma chuva de ~28 moedas), **Flanco** (bando de um lado, vai direto à tocha), **Escuridão** (só a luz da tocha enxerga, 14 s) e **Chuva de meteoros** (círculos vermelhos com aviso). Dados em `data_model/wave_events.js`, lógica em `js/systems/wave_events.js`; a 1ª tela sempre abre com o Goblin do Baú e depois nunca repete o anterior. Testado cada um no jogo real (prints), 0 erros
+- [x] curva de tensão: `waveTension` em `difficulty.js` (calmo 0,55× → aperto 1,5× → alívio depois do elite → pico 2,1×) e respiro de 3,5 s depois de cada horda (`hordeLullSeconds`)
+- [x] a música acompanha a curva de tensão (`updateTensionMusic` em `spawner.js`): andamento e brilho sobem no aperto, caem no respiro, sobem ao pico e descem na limpeza (valores em `MUSIC_TENSION`). Medido na onda 8: 0,21 → 0,56 → 0,43 → 0,84. **Não ouvido ainda**
+- [~] ataques avisados: toda investida (Wraith, Lobo Zumbi, Enguia) agora mostra uma risca vermelha no chão durante a mira, e o Lobo Sombrio ganhou investida. **Falta:** esqueleto, zumbi, morcego e mariposa ainda só andam até o herói (ideia: pancada de área no chão para o zumbi, mergulho para o morcego)
+- [~] medir com bot: o autopiloto não desvia de nada, então a vida mínima não é conclusiva (ondas 1–2: 0,59–0,76 contra 0,67–0,84 antes). Precisa de um bot que desvie dos círculos ou de um teste com gente
+
+**B. Menos skills, mais escolha** (primeiro pacote)
+- Eu decidi fazer com que em vez de ganhar duas skills por level up, ganhamos apenas 1, assim eu dificulto muito pegarem varios poderes.
+- ~~[ ] limite de 4 poderes ativos por noite (passivas livres)~~
+- ~~[ ] menos pontos por noite; evolução de poder como grande momento~~
+- ~~[ ] checar que duas noites seguidas terminam com builds diferentes~~
+
+**C. Clareza visual** (primeiro pacote)
+- [ ] ordem de destaque: monstros e ataques inimigos > herói > efeitos do jogador > cenário
+- [ ] círculos de alcance só quando importam; vermelho só para o que machuca o jogador
+- [ ] efeitos do jogador mais transparentes + opacidade ajustável em Settings
+- [ ] cenário mais escuro/menos saturado; contorno ou luz de borda nos monstros
+- [ ] números de dano só em críticos e golpes grandes
+- [ ] medir ms por quadro antes/depois (regra de desempenho do jogo) e conferir no celular
+
+**D. A tocha como identidade**
+- [ ] luz como recurso: tocha fraca ilumina menos; monstro fora da luz vira sombra com olhos
+- [ ] eventos que apagam a luz; skills que gastam ou devolvem chama
+
+**E. Motivo para voltar**
+- [ ] tela vencida fica liberada: começar a próxima noite direto dela (sessões de 6–8 min)
+- [ ] 3 missões diárias que pagam Brasas
+- [ ] noite semanal com a mesma semente para todos
+
 ## Antes de relançar
 - [ ] conferir o mínimo de pontos das regras novas (4 métricas)
 - [ ] build novo gerado e testado

@@ -544,10 +544,8 @@ function renderLeechVines(t) {
     ctx.lineJoin = 'round';
     const curves = [];
     for (const oak of N.oaks) {
-        // As raízes que prendem o monstro mais forte (grip) desenham o mesmo cipó até ele, enquanto ele estiver preso
-        const gripped = oak.gripTarget && oak.gripTarget.rooted > 0 && oak.gripTarget.hp > 0 && state.enemies.includes(oak.gripTarget) ? [oak.gripTarget] : [];
-        // Só um cipó de cada vez: o do Leech Vine tem prioridade; o das raízes (grip) só aparece quando não há outro
-        const linked = oak.vines?.length ? oak.vines : gripped;
+        // Só o cipó do Leech Vine é desenhado aqui. O agarrão do carvalho tem desenho próprio (renderOakGrip: a raiz que enrola o monstro)
+        const linked = oak.vines ?? [];
         if (!linked.length) continue;
         const sy = oak.y - 20;         // da base da copa
         linked.forEach((e, i) => curves.push({
@@ -636,10 +634,94 @@ function renderLeechVines(t) {
 }
 
 
+// --- O AGARRÃO DO CARVALHO ---
+// A árvore adulta prende o monstro mais forte da tela (grip em powers.js). O desenho é PRÓPRIO, para não se confundir com o Leech Vine (cipó verde que
+// drena): uma raiz de casca marrom sai do pé da árvore, rasteja pelo chão até o monstro e ENROLA nele em espiral, apertando (com espinhos), enquanto ele
+// estiver preso e levando dano. No fim, solta. oak.gripAge (segundos desde o agarrão) é contado em js/systems/skills_nature.js.
+const GRIP_STROKES = [['rgba(24, 14, 5, 0.92)', 6.2], ['#6b4a24', 3.8], ['#b88a4a', 1.3]];
+const GRIP_THORN = '#d9bd84';
+function renderOakGrip(t) {
+    for (const oak of N.oaks) {
+        const e = oak.gripTarget;
+        if (!e || !(e.rooted > 0) || e.hp <= 0 || !state.enemies.includes(e)) continue;
+        const age = oak.gripAge ?? 0;
+        const reach = Math.min(1, age / 0.35);                         // a raiz rasteja até o monstro
+        const wrap = Math.min(1, Math.max(0, (age - 0.25) / 0.6));     // e então enrola, subindo pelo corpo
+        const fade = Math.min(1, e.rooted / 0.45);                     // no fim, solta e some
+        const squeeze = Math.max(0, 1 - ((t * 2) % 1) / 0.28);        // aperto a cada meio segundo (o ritmo do dano)
+        const r = e.radius;
+        const x0 = oak.x, y0 = oak.y + 6, x1 = e.x, y1 = e.y + r * 0.45;
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.globalAlpha = fade;
+        // A raiz pelo chão: curva com ondulação, desenhada só até onde já chegou
+        const path = [];
+        const steps = 18;
+        for (let k = 0; k <= steps * reach; k++) {
+            const u = k / steps;
+            const bend = Math.sin(u * Math.PI) * 18 + Math.sin(u * 9 + t * 4 + oak.x) * 3 * Math.sin(u * Math.PI);
+            const dx = x1 - x0, dy = y1 - y0, n = Math.hypot(dx, dy) || 1;
+            path.push([x0 + dx * u - (dy / n) * bend, y0 + dy * u + (dx / n) * bend]);
+        }
+        // O enrolar: espiral em volta do corpo, de baixo para cima, apertando com o tempo
+        const coil = [];
+        const loops = 3, samples = 30;
+        for (let k = 0; k <= samples * wrap; k++) {
+            const u = k / samples;
+            const a = u * loops * TAU + 0.8 + t * 0.5;
+            const rr = r * (1.3 - 0.3 * wrap - 0.07 * squeeze);
+            coil.push([e.x + Math.cos(a) * rr, e.y + r * 0.55 - u * r * 1.7 + Math.sin(a) * rr * 0.42]);
+        }
+        for (const [color, width] of GRIP_STROKES) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            for (const line of [path, coil]) {
+                if (line.length < 2) continue;
+                ctx.beginPath();
+                ctx.moveTo(line[0][0], line[0][1]);
+                for (let k = 1; k < line.length; k++) ctx.lineTo(line[k][0], line[k][1]);
+                ctx.stroke();
+            }
+        }
+        // Espinhos claros ao longo do enrolar e na raiz
+        ctx.fillStyle = GRIP_THORN;
+        ctx.strokeStyle = 'rgba(24, 14, 5, 0.9)';
+        ctx.lineWidth = 0.6;
+        const thorns = (line, every, size) => {
+            for (let k = 2; k < line.length - 1; k += every) {
+                const [px, py] = line[k], [qx, qy] = line[k + 1];
+                const tx = qx - px, ty = qy - py, n = Math.hypot(tx, ty) || 1;
+                const nx = -ty / n, ny = tx / n, side = (k / every) % 2 ? 1 : -1;
+                ctx.beginPath();
+                ctx.moveTo(px - tx / n * 1.6, py - ty / n * 1.6);
+                ctx.lineTo(px + nx * side * size, py + ny * side * size);
+                ctx.lineTo(px + tx / n * 1.6, py + ty / n * 1.6);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+        };
+        thorns(path, 3, 4.5);
+        thorns(coil, 2, 5 + 1.5 * squeeze);
+        // Pontinha da raiz no alto do enrolar e um clarão discreto a cada aperto
+        const tip = coil[coil.length - 1];
+        if (tip && wrap > 0.2) {
+            ctx.fillStyle = '#b88a4a';
+            ctx.beginPath();
+            ctx.arc(tip[0], tip[1], 2.2, 0, TAU);
+            ctx.fill();
+        }
+        ctx.restore();
+        if (squeeze > 0 && wrap > 0.5) drawGlow(ctx, 'rgba(217, 189, 132, 0.8)', e.x, e.y - r * 0.2, r * 1.5, 0.28 * squeeze * fade);
+    }
+}
+
 // --- VIDEIRAS E CARVALHO (depois do herói) ---
 export function renderNatureFront() {
     renderRoseMarks();
     renderLeechVines(performance.now() / 1000);
+    renderOakGrip(performance.now() / 1000);
     for (const seed of N.seeds) {
         const target = seed.target;
         if (!(target.hp > 0)) continue;
