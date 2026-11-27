@@ -76,6 +76,8 @@ function lastSlashOf(shadow) {
 }
 
 setHeroHooks({
+    // Freezing Breath: enquanto o sopro dura o herói olha para onde ele sopra (o monstro mais perto), mesmo andando para trás
+    lockFacing: (body) => (body === player && state.frostBreaths.length > 0 ? state.frostBreaths[0].angle : null),
     // Arremesso da adaga (mão esquerda). O Shadow Clone arremessa junto com o herói
     throwVisual: KNIFE_VISUALS,
     throwProgress() {

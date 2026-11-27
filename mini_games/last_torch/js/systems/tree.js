@@ -144,7 +144,17 @@ const POWER_UPGRADE_FIELDS = {
     chance: ['🎲', 'Chance', n => `${Math.round(n * 100)}%`],
     heal: ['❤️', 'Healing', n => n <= 1 ? `${Math.round(n * 100)}%` : String(Number(n.toFixed(1)))],
     pull: ['🌀', 'Pull', n => String(Math.round(n))],
-    knockback: ['💨', 'Knockback', n => String(Math.round(n))]
+    knockback: ['💨', 'Knockback', n => String(Math.round(n))],
+    charges: ['🛡️', 'Charges', n => String(n)],
+    range: ['📏', 'Range', n => `${Math.round(n)}px`],
+    halfAngle: ['📐', 'Cone Width', n => `${Math.round(n * 2 * 180 / Math.PI)}°`],
+    freeze: ['🧊', 'Freeze', n => `${Number(n.toFixed(2))}s`],
+    runes: ['🔷', 'Runes', n => String(n)],
+    duration: ['⌛', 'Duration', n => `${Number(n.toFixed(2))}s`],
+    hpPerMagic: ['❤️', 'Health per Magic', n => String(Number(n.toFixed(1)))],
+    burst: ['💥', 'Burst Radius', n => `${Math.round(n)}px`],
+    hpRatio: ['❤️', 'Health', n => `${Math.round(n * 100)}% of yours`],
+    grow: ['🌱', 'Growth', n => `${n.sapling}s sapling · ${n.adult}s grown`]
 };
 
 const POWER_FIELD_OVERRIDES = {
@@ -199,36 +209,47 @@ const TREE_MOD_FIELDS = {
 function modifierRows(mods = {}, times = 1) {
     return Object.entries(mods).map(([field, value]) => {
         const [icon, name, format] = TREE_MOD_FIELDS[field] ?? ['⬆️', field, String];
-        return { icon, name, value: format(value * times) };
+        return { icon, name, value: format(value * times), up: true };
     });
 }
 
+// `up`: este número SOBE com a próxima compra (a tela o pinta de verde); os que ficam iguais aparecem em cor neutra. Sem nada comprado, tudo sobe.
 export function getPowerUpgradeRows(key) {
     const model = POWER_MODELS[key];
     const level = powers[key]?.lvl ?? 0;
     const target = model?.levels?.[level];
     if (!model || !target) return [];
     const previous = level > 0 ? model.levels[level - 1] : {};
-    const rows = Object.entries(target)
-        .filter(([field, value]) => field !== 'mods' && value !== previous[field] && !(typeof value === 'number' && value === 0))
-        .map(([field, value]) => {
-            const [icon, name, format] = POWER_FIELD_OVERRIDES[key]?.[field] ?? POWER_UPGRADE_FIELDS[field] ?? ['⬆️', field, String];
-            return { icon, name, value: format(value) };
-        });
-    // Keen Eye não tem valores por nível: cada compra aplica estes dois bônus fixos.
+    // Keen Eye não tem valores por nível: cada compra soma estes dois bônus fixos (o total depois da compra).
     if (key === 'keenEye') {
         return Object.entries(model.mods).map(([field, value]) => {
             const [icon, name, format] = POWER_MOD_FIELDS[field];
-            return { icon, name, value: format(value) };
+            return { icon, name, value: format(value * (level + 1)), up: true };
         });
     }
-    const targetMods = target.mods ?? {};
+    // Todos os números que a skill vai dar até o último nível (a união dos níveis). Verde (`up`): sobe com a próxima compra. Neutro: já tem e não muda agora.
+    // Apagado (`later`): só aparece num nível mais à frente (ex.: +10% de vida no nível 1 e +5% de ataque só no nível 2): mostra o valor e em que nível chega.
+    const fields = [...new Set(model.levels.flatMap(l => Object.keys(l)))].filter(f => f !== 'mods');
+    const rows = [];
+    for (const field of fields) {
+        const [icon, name, format] = POWER_FIELD_OVERRIDES[key]?.[field] ?? POWER_UPGRADE_FIELDS[field] ?? ['⬆️', field, String];
+        const has = (v) => v !== undefined && !(typeof v === 'number' && v === 0);
+        if (has(target[field])) {
+            rows.push({ icon, name, value: format(target[field]), up: JSON.stringify(target[field]) !== JSON.stringify(previous[field]) });
+            continue;
+        }
+        const at = model.levels.findIndex((l, i) => i > level && has(l[field]));
+        if (at >= 0) rows.push({ icon, name, value: format(model.levels[at][field]), later: at + 1 });
+    }
+    const modFields = [...new Set(model.levels.flatMap(l => Object.keys(l.mods ?? {})))];
     const previousMods = previous.mods ?? {};
-    Object.entries(targetMods).forEach(([field, value]) => {
-        if (value === previousMods[field]) return;
+    for (const field of modFields) {
         const [icon, name, format] = POWER_MOD_FIELDS[field] ?? ['⬆️', field, String];
-        rows.push({ icon, name, value: format(value) });
-    });
+        const now = target.mods?.[field];
+        if (now !== undefined && now !== 0) { rows.push({ icon, name, value: format(now), up: now !== previousMods[field] }); continue; }
+        const at = model.levels.findIndex((l, i) => i > level && l.mods?.[field]);
+        if (at >= 0) rows.push({ icon, name, value: format(model.levels[at].mods[field]), later: at + 1 });
+    }
     return rows;
 }
 
@@ -239,8 +260,44 @@ function alsoRows(node) {
         a.lvl++;
         const value = getStatText(k);
         a.lvl--;
-        return { icon: a.icon, name: a.name, value };
+        return { icon: a.icon, name: a.name, value, up: true };
     });
+}
+
+// O que a skill dá NO TOTAL com o nível que o jogador tem agora (a referência de quem já completou a skill: sem isso as linhas verdes sumiam no nível máximo).
+// Poder: os valores do nível atual; Keen Eye: o bônus fixo x níveis; nó de bônus: o total acumulado; atributo: o valor de agora. Passivas e evoluções não têm números (valem a descrição)
+export function getNodeTotalRows(node) {
+    const level = getNodeLevel(node);
+    if (level <= 0) return [];
+    if (node.kind === 'power') {
+        const model = POWER_MODELS[node.key];
+        const key = node.key;
+        if (key === 'keenEye') {
+            return Object.entries(model.mods).map(([field, value]) => {
+                const [icon, name, format] = POWER_MOD_FIELDS[field];
+                return { icon, name, value: format(value * level) };
+            });
+        }
+        const current = model?.levels?.[level - 1];
+        if (!current) return [];
+        const rows = Object.entries(current)
+            .filter(([field, value]) => field !== 'mods' && !(typeof value === 'number' && value === 0))
+            .map(([field, value]) => {
+                const [icon, name, format] = POWER_FIELD_OVERRIDES[key]?.[field] ?? POWER_UPGRADE_FIELDS[field] ?? ['⬆️', field, String];
+                return { icon, name, value: format(value) };
+            });
+        Object.entries(current.mods ?? {}).forEach(([field, value]) => {
+            const [icon, name, format] = POWER_MOD_FIELDS[field] ?? ['⬆️', field, String];
+            rows.push({ icon, name, value: format(value) });
+        });
+        return rows;
+    }
+    if (node.kind === 'mod') return modifierRows(node.mods, level);
+    if (node.kind === 'stat') {
+        const attr = attributes[node.key];
+        return [{ icon: attr.icon, name: attr.name, value: getStatText(node.key), image: true }, ...modifierRows(node.mods, level)];
+    }
+    return [];
 }
 
 export function getNodeUpgradeRows(node) {
@@ -252,7 +309,7 @@ export function getNodeUpgradeRows(node) {
     const value = getStatText(node.key);
     attr.lvl--;
     return [
-        { icon: attr.icon, name: attr.name, value, image: true },
+        { icon: attr.icon, name: attr.name, value, image: true, up: true },
         ...alsoRows(node),
         ...modifierRows(node.mods)
     ];

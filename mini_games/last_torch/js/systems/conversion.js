@@ -6,6 +6,7 @@
 // Números em data_model/passives.js (CONVERSION); desenho em js/render/entities.js (renderConverts...).
 import { CONVERSION } from '../../data_model/passives.js';
 import { MONSTER_MODELS } from '../../data_model/monsters.js';
+import { POWER_MODELS } from '../../data_model/powers.js';
 import { audio, passives, player, state } from '../core/state.js';
 import { dealDamage } from './damage.js';
 import { addFloater, addShockwave, createExplosion } from './effects.js';
@@ -77,6 +78,51 @@ export function hurtConvert(a, amount) {
 
 }
 
+// --- DANO NOS ESQUELETOS INVOCADOS (Summon Skeletons): tiros, explosões e golpes em área dos monstros os atingem; o chefe fere BOSS_MULT x mais ---
+const bossMult = () => POWER_MODELS.summonSkeletons.base.bossDamageMultiplier;
+// O dano de um golpe de chefe num esqueleto: o dano x bossDamageMultiplier, mas NUNCA menos que bossMinHitRatio da vida máxima dele (o chefe os derruba em poucos golpes, mesmo os mais resistentes: eles não atrapalham a luta)
+const bossHit = (a, amount) => Math.max(amount * bossMult(), a.maxHp * POWER_MODELS.summonSkeletons.base.bossMinHitRatio);
+const hitAmount = (a, amount, fromBoss) => (fromBoss ? bossHit(a, amount) : amount);
+export function summonedHit(x, y, radius) {
+    for (const a of state.converts) if (a.summoned && a.hp > 0 && Math.hypot(a.x - x, a.y - y) < radius + a.radius) return a;
+    return null;
+}
+export function hurtSummonsCircle(x, y, radius, amount, fromBoss = false) {
+    for (const a of state.converts) {
+        if (!a.summoned || a.hp <= 0 || Math.hypot(a.x - x, a.y - y) >= radius + a.radius) continue;
+        hurtConvert(a, hitAmount(a, amount, fromBoss));
+    }
+}
+// Golpe em leque (a espada do chefe): quem está dentro do alcance e do ângulo (arc, em radianos) leva o dano
+export function hurtSummonsArc(x, y, angle, range, arc, amount, fromBoss = false) {
+    for (const a of state.converts) {
+        if (!a.summoned || a.hp <= 0) continue;
+        const dx = a.x - x, dy = a.y - y;
+        if (Math.hypot(dx, dy) >= range + a.radius) continue;
+        let diff = Math.atan2(dy, dx) - angle;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        if (Math.abs(diff) < arc / 2) hurtConvert(a, hitAmount(a, amount, fromBoss));
+    }
+}
+// A investida do chefe (dash): fere cada esqueleto UMA vez ao passar por ele (hit = o Set de quem já levou)
+export function hurtSummonsDash(x1, y1, x2, y2, reach, amount, hit) {
+    for (const a of state.converts) {
+        if (!a.summoned || a.hp <= 0 || hit.has(a)) continue;
+        const dx = x2 - x1, dy = y2 - y1, len2 = dx * dx + dy * dy || 1;
+        const k = Math.max(0, Math.min(1, ((a.x - x1) * dx + (a.y - y1) * dy) / len2));
+        if (Math.hypot(a.x - (x1 + dx * k), a.y - (y1 + dy * k)) < reach + a.radius) { hit.add(a); hurtConvert(a, bossHit(a, amount)); }
+    }
+}
+export function hurtSummonsSegment(x1, y1, x2, y2, width, amount, fromBoss = false) {
+    const dx = x2 - x1, dy = y2 - y1, len2 = dx * dx + dy * dy || 1;
+    for (const a of state.converts) {
+        if (!a.summoned || a.hp <= 0) continue;
+        const k = Math.max(0, Math.min(1, ((a.x - x1) * dx + (a.y - y1) * dy) / len2));
+        if (Math.hypot(a.x - (x1 + dx * k), a.y - (y1 + dy * k)) < width / 2 + a.radius) hurtConvert(a, hitAmount(a, amount, fromBoss));
+    }
+}
+
 function nearestEnemy(a) {
     let best = null;
     let bestD = C.seekRange;
@@ -88,6 +134,20 @@ function nearestEnemy(a) {
     return best;
 }
 
+// O alvo de um esqueleto invocado: o que ele já escolheu (se ainda vive); senão o monstro mais perto que NENHUM outro esqueleto invocado escolheu; sem livre, o mais perto de todos
+function stickyTarget(a, claimed) {
+    if (a.target && a.target.hp > 0 && state.enemies.includes(a.target)) return a.target;
+    let best = null, bestD = C.seekRange;
+    for (const e of state.enemies) {
+        if (e.hp <= 0 || claimed.has(e)) continue;
+        const d = Math.hypot(e.x - a.x, e.y - a.y);
+        if (d < bestD) { bestD = d; best = e; }
+    }
+    a.target = best ?? nearestEnemy(a);
+    if (best) claimed.add(best);
+    return a.target;
+}
+
 function moveToward(a, x, y, stopAt, dt) {
     const dx = x - a.x;
     const dy = y - a.y;
@@ -95,6 +155,7 @@ function moveToward(a, x, y, stopAt, dt) {
     const angle = Math.atan2(dy, dx);
     a.angle = angle;
     a.facing = lerpAngle(a.facing ?? angle, angle, Math.min(1, dt * 8));
+    a.idle = d <= stopAt;                 // parado: o desenho não mexe os pés (js/render/entities.js, liveNow)
     if (d <= stopAt) return d;
     const step = Math.min(d - stopAt, a.speed * C.speedScale * dt);
     a.x += Math.cos(angle) * step;
@@ -113,7 +174,8 @@ function allyShot(a, model, target) {
     const angle = Math.atan2(target.y - a.y, target.x - a.x);
     const speed = (model.projectileSpeed ?? 170) * 1.25;
     state.enemyProjectiles.push({
-        owner: a.type, color: model.projectileColor ?? model.color, allyShot: true, reflected: true, target,
+        owner: a.type, color: model.projectileColor ?? model.color, allyShot: true, reflected: true,
+        target: a.summoned ? null : target,          // os esqueletos invocados NÃO miram a flecha: ela sai reta; se errar, passa reto (e pode acertar outro monstro). Os convertidos do Avgustino continuam com o tiro que persegue
         x: a.x, y: a.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
         radius: model.projectileRadius ?? 6,
         damage: a.damage * (model.projectileDamageMultiplier ?? 1) * C.damageScale,
@@ -241,14 +303,18 @@ function fight(a, target, dt) {
     if (ranged && !(model.punch && d <= model.punch.range)) {
         const range = model.shootRange ?? 300;
         const hold = Math.min(range * 0.8, model.keepDistance ?? range * 0.7);
-        if (d > hold) moveToward(a, target.x, target.y, hold, dt);
+        // Arqueiro: nos últimos aimSeconds PARA e puxa a corda (a.aim, 0 a 1); depois do tiro a corda vibra por releaseSeconds (a.release): a mesma animação do arqueiro inimigo
+        const aiming = model.aimSeconds && d <= range && (a.shotTimer ?? 0.4) < model.aimSeconds;
+        moveToward(a, target.x, target.y, aiming ? Infinity : hold, dt);        // puxando a corda: fica parado (olhando o alvo)
         const cooldown = (model.shootCooldownSeconds ?? 2.5) * 0.8;
         a.shotTimer = (a.shotTimer ?? 0.4) - dt;           // o primeiro tiro sai logo
         // Golem: a mão sobe nos últimos instantes antes da pedra
         if (model.throwWindup) a.throwArm = a.shotTimer < model.throwWindup ? 1 - Math.max(0, a.shotTimer) / model.throwWindup : 0;
+        if (model.aimSeconds) a.aim = d <= range && a.shotTimer < model.aimSeconds ? 1 - Math.max(0, a.shotTimer) / model.aimSeconds : 0;
         if (d <= range && a.shotTimer <= 0) {
             a.shotTimer = cooldown;
             a.throwArm = 0;
+            if (model.aimSeconds) { a.aim = 0; a.release = model.releaseSeconds; }
             allyShot(a, model, target);
         }
         return;
@@ -299,14 +365,18 @@ export function updateConversion(dt) {
         if (S.timer <= 0 && allies.length < C.maxAllies) S.timer = convertNearest() ? C.cooldownSeconds : 0.5;
     }
 
+    // Esqueletos invocados (Summon Skeletons): cada um fica com um monstro DIFERENTE (o alvo é guardado em a.target até ele morrer); só quando não sobra nenhum livre eles dividem
+    const claimed = new Set();
+    for (const a of allies) if (a.summoned && a.target && a.target.hp > 0 && state.enemies.includes(a.target)) claimed.add(a.target);
     for (let i = allies.length - 1; i >= 0; i--) {
         const a = allies[i];
         if (a.hitFlash > 0) a.hitFlash -= dt;
         a.allyCd = Math.max(0, (a.allyCd ?? 0) - dt);
-        const target = a.hp > 0 ? nearestEnemy(a) : null;
+        if (a.release > 0) a.release -= dt;
+        const target = a.hp > 0 ? (a.summoned ? stickyTarget(a, claimed) : nearestEnemy(a)) : null;
         if (target) fight(a, target, dt);
         else if (a.hp > 0) {
-            a.punchState = 0; a.lungeState = 0; a.swing = 0;
+            a.punchState = 0; a.lungeState = 0; a.swing = 0; a.aim = 0;
             moveToward(a, player.x, player.y, C.followDistance, dt);
         }
         if (a.hp <= 0) {

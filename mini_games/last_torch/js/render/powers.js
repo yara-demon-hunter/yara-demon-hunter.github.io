@@ -67,93 +67,6 @@ export function renderSpectralBlade() {
     ctx.restore();
 }
 
-// Golden Tornado (Curse Path): um funil dourado de luz que gira (state.goldenTornado; js/systems/powers.js). Desenhado POR CIMA dos monstros (depois deles na ordem do quadro):
-// corpo translúcido com volume, anéis que sobem alargando, núcleo brilhante, cacos de ouro e poeira girando, e uma luz dourada com arcos em volta de cada monstro engolido (e.swallow)
-// para parecer que ele está dentro do tornado. Tudo em função do relógio e do estado (nada guardado; poucos desenhos de brilho em cache).
-export function renderGoldenTornado() {
-    const T = state.goldenTornado;
-    if (!T) return;
-    const M = POWER_MODELS.goldenTornado.base;
-    const rise = Math.min(1, T.age / M.riseSeconds, (T.seconds - T.age) / M.fadeSeconds);
-    if (rise <= 0) return;
-    const t = performance.now() / 1000;
-    const low = state.quality >= 2;
-    const height = (80 + T.radius * 0.8) * rise;
-    const layers = low ? 7 : 12;
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.lineCap = 'round';
-    // Chão: brilho largo e arcos de vento girando em volta da base
-    drawGlow(ctx, 'rgba(251, 191, 36, 0.95)', T.x, T.y, T.radius * 1.9, 0.28 * rise);
-    for (let k = 0; k < 4; k++) {
-        const rr = T.radius * (1.05 + 0.28 * k);
-        const a = t * (3.2 - k * 0.5) + k * 1.7;
-        ctx.globalAlpha = (0.55 - k * 0.1) * rise;
-        ctx.strokeStyle = k % 2 ? '#fde68a' : '#f59e0b';
-        ctx.lineWidth = 2.4;
-        ctx.beginPath();
-        ctx.ellipse(T.x, T.y, rr, rr * 0.34, 0, a, a + 1.5);
-        ctx.stroke();
-    }
-    // Corpo: camadas translúcidas empilhadas (dão volume ao funil) + o anel de cada camada em dois arcos opostos
-    for (let k = 0; k < layers; k++) {
-        const u = k / (layers - 1);                                  // 0 = base, 1 = topo
-        const rr = T.radius * (0.32 + 0.98 * u) * (0.88 + 0.12 * Math.sin(t * 5 + k));
-        const y = T.y - u * height;
-        const spin = t * (8 - u * 3.5) + k * 1.9;
-        ctx.globalAlpha = (0.14 + 0.06 * (1 - u)) * rise;
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath();
-        ctx.ellipse(T.x, y, rr, rr * 0.32, 0, 0, TAU);
-        ctx.fill();
-        ctx.lineWidth = 3.4 - u * 1.5;
-        ctx.strokeStyle = k % 2 ? '#fde68a' : '#f59e0b';
-        for (const off of [0, Math.PI]) {
-            ctx.globalAlpha = (0.9 - 0.4 * u) * rise;
-            ctx.beginPath();
-            ctx.ellipse(T.x, y, rr, rr * 0.32, 0, spin + off, spin + off + 1.25);
-            ctx.stroke();
-        }
-    }
-    // Núcleo: uma coluna de luz branca-dourada no eixo
-    for (let k = 0; k < 6; k++) {
-        const u = k / 5;
-        drawGlow(ctx, 'rgba(255, 251, 235, 0.95)', T.x + Math.sin(t * 9 + k) * 2, T.y - (0.15 + u * 0.85) * height * 0.9, 8 + (1 - u) * 6, 0.3 * rise);
-    }
-    // Cacos de ouro e poeira girando em alturas e raios diferentes
-    ctx.fillStyle = '#fffbeb';
-    const bits = low ? 8 : 20;
-    for (let i = 0; i < bits; i++) {
-        const u = (t * 0.55 + i / bits + (i % 3) * 0.13) % 1;
-        const a = t * (5 + (i % 4)) + i * 2.4;
-        const rr = T.radius * (0.4 + 1.0 * u);
-        ctx.globalAlpha = Math.min(1, (1 - u) * 1.4) * rise;
-        ctx.save();
-        ctx.translate(T.x + Math.cos(a) * rr, T.y - u * height + Math.sin(a) * rr * 0.32);
-        ctx.rotate(a * 2);
-        ctx.fillRect(-1.6, -1.1, 3.2 + (i % 3), 2.2);
-        ctx.restore();
-    }
-    // Monstros engolidos: luz dourada por cima deles e arcos girando em volta, para parecer que estão dentro do tornado
-    let shown = 0;
-    for (const e of state.enemies) {
-        if (!(e.swallow > 0.12) || e.hp <= 0 || shown >= 14) continue;
-        shown++;
-        const k = e.swallow * rise;
-        drawGlow(ctx, 'rgba(253, 224, 71, 0.9)', e.x, e.y - e.radius * 0.3, e.radius * 2.1, 0.2 * k);
-        const a = t * 9 + e.phase;
-        ctx.strokeStyle = '#fde68a';
-        for (let r = 0; r < 2; r++) {
-            ctx.globalAlpha = (0.85 - r * 0.25) * k;
-            ctx.lineWidth = 2.6 - r * 0.8;
-            ctx.beginPath();
-            ctx.ellipse(e.x, e.y - e.radius * (0.1 + r * 0.55), e.radius * (1.45 - r * 0.3), e.radius * 0.55, 0, a + r * 2.4, a + r * 2.4 + 2.1);
-            ctx.stroke();
-        }
-    }
-    ctx.restore();
-}
-
 export function renderChillAura() {
     const level = getPowerLevel(powers.chillAura);
     if (!level) return;
@@ -235,6 +148,88 @@ export function renderBolts() {
 }
 
 const POWER_MODELS_ABS = POWER_MODELS.absoluteZero;
+// Permafrost: o GELO no chão. Em vez do setor liso do sopro, cada camada é uma crosta irregular de placas de gelo (polígonos tortos que se sobrepõem), com rachaduras claras, bordas
+// brilhantes e cristais; nasce se espalhando e some derretendo. As placas são sorteadas UMA vez por camada (p.plates) dentro da área onde o sopro passou, e cada camada é desenhada
+// com poucos traços (um caminho para todas as placas, um para as bordas e um para as rachaduras). Camada de CHÃO (desenhada antes dos personagens).
+function makeIcePlates(p) {
+    const plates = [];
+    const count = state.quality >= 2 ? 6 : 10;
+    for (let i = 0; i < count; i++) {
+        const d = p.range * (0.12 + 0.88 * Math.sqrt(Math.random()));
+        const a = p.angle + (Math.random() * 2 - 1) * p.half * 1.05;
+        const cx = Math.cos(a) * d, cy = Math.sin(a) * d;
+        const size = 9 + Math.random() * 12;
+        const sides = 5 + Math.floor(Math.random() * 3);
+        const rot = Math.random() * TAU;
+        const pts = [];
+        for (let k = 0; k < sides; k++) {
+            const ang = rot + (k / sides) * TAU + (Math.random() - 0.5) * 0.5;
+            const r = size * (0.55 + Math.random() * 0.6);
+            pts.push(Math.cos(ang) * r, Math.sin(ang) * r * 0.62);       // achatado: gelo deitado no chão
+        }
+        plates.push({ cx, cy, pts, delay: (d / p.range) * 0.25 });
+    }
+    p.plates = plates;
+    // Rachaduras curtas: do centro de algumas placas até um canto delas, passando um pouco além (cada uma tem seu desvio)
+    p.cracks = [];
+    for (let i = 0; i < plates.length; i += 2) {
+        const q = plates[i], v = (Math.floor(Math.random() * (q.pts.length / 2))) * 2;
+        const ex = q.cx + q.pts[v] * 1.25, ey = q.cy + q.pts[v + 1] * 1.25;
+        p.cracks.push(q.cx, q.cy, (q.cx + ex) / 2 + (Math.random() - 0.5) * 6, (q.cy + ey) / 2 + (Math.random() - 0.5) * 4, ex, ey);
+    }
+}
+export function renderIcePatches() {
+    const patches = state.icePatches;
+    if (patches.length === 0) return;
+    const t = performance.now() / 1000;
+    ctx.save();
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    for (const p of patches) {
+        if (!p.plates) makeIcePlates(p);
+        const age = p.maxLife - p.life;
+        const fade = Math.max(0, Math.min(1, p.life / 1.4));                    // derrete nos últimos 1,4 s
+        const melt = 0.75 + 0.25 * fade;                                        // e as placas encolhem um pouco
+        // Placas (um caminho só): crescem do centro para fora no começo
+        ctx.beginPath();
+        for (const pl of p.plates) {
+            const g = Math.max(0, Math.min(1, (age - pl.delay) / 0.2)) * melt;
+            if (g <= 0) continue;
+            const n = pl.pts.length;
+            ctx.moveTo(p.x + pl.cx + pl.pts[0] * g, p.y + pl.cy + pl.pts[1] * g);
+            for (let k = 2; k < n; k += 2) ctx.lineTo(p.x + pl.cx + pl.pts[k] * g, p.y + pl.cy + pl.pts[k + 1] * g);
+            ctx.closePath();
+        }
+        ctx.globalAlpha = 0.26 * fade;
+        ctx.fillStyle = '#9fdcf8';
+        ctx.fill();
+        ctx.globalAlpha = 0.75 * fade;
+        ctx.strokeStyle = '#e8f7ff';
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+        // Rachaduras: traços claros ligando as placas
+        ctx.beginPath();
+        for (let i = 0; i < p.cracks.length; i += 6) {
+            ctx.moveTo(p.x + p.cracks[i], p.y + p.cracks[i + 1]);
+            ctx.quadraticCurveTo(p.x + p.cracks[i + 2], p.y + p.cracks[i + 3], p.x + p.cracks[i + 4], p.y + p.cracks[i + 5]);
+        }
+        ctx.globalAlpha = 0.5 * fade;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 0.9;
+        ctx.stroke();
+        // Brilhos: um cristal piscando no meio de algumas placas
+        if (state.quality < 2) {
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < p.plates.length; i += 3) {
+                const pl = p.plates[i];
+                ctx.globalAlpha = Math.max(0, Math.sin(t * 2.6 + i * 1.7)) * 0.85 * fade;
+                ctx.fillRect(p.x + pl.cx - 1.5, p.y + pl.cy - 1.5, 3, 3);
+            }
+        }
+    }
+    ctx.restore();
+}
+
 // Freezing Breath: o sopro gelado sai da boca do herói e abre em cone por 3 s, girando com ele: nuvem de gelo que corre da boca até a ponta do cone (cada puff nasce na boca,
 // viaja e some), cacos que voam e névoa. Tudo em função da idade e do rumo de agora (nada guardado); b.range/b.half vêm do nível.
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };

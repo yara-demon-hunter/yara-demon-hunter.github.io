@@ -450,14 +450,6 @@ function stampMonster(e, t) {
         ctx.fill();
         return;
     }
-    if (e.swallow > 0.05) {
-        // Engolido pelo Golden Tornado (js/systems/powers.js): encolhe, balança e perde opacidade conforme entra no tornado (a luz dourada é desenhada por cima, em renderGoldenTornado)
-        const k = e.swallow;
-        ctx.globalAlpha = 1 - 0.35 * k;
-        stamp(atlas, frame.sx, frame.sy, cell, cell, x + Math.sin(t * 11 + e.phase) * 2 * k, y, frame.rotation + Math.sin(t * 7 + e.phase) * 0.45 * k, width * (1 - 0.3 * k), height * (1 - 0.3 * k));
-        ctx.globalAlpha = 1;
-        return;
-    }
     stamp(atlas, frame.sx, frame.sy, cell, cell, x, y, frame.rotation, width, height);
 }
 
@@ -730,7 +722,7 @@ let depthSplit = 0;
 const inPass = (e) => depthPass === null || (depthPass === 'behind' ? e.y < depthSplit : e.y >= depthSplit);
 
 // Desenhado ao vivo? Os `live` sempre; os `attackLive` só enquanto atacam ou miram (o resto do tempo é sprite: barato)
-const liveNow = (e, spec) => spec.live || (spec.attackLive && (e.atk > 0 || e.aim > 0 || e.release > 0));
+const liveNow = (e, spec) => spec.live || (spec.attackLive && (e.atk > 0 || e.aim > 0 || e.release > 0 || (e.ally && e.idle)));      // aliado parado também: o desenho ao vivo não mexe os pés
 
 export function renderEnemies(pass = null, splitY = 0, renderActor = null, actorY = 0) {
     depthPass = pass;
@@ -827,6 +819,7 @@ function renderConvertRings(t) {
     ctx.lineWidth = 2;
     for (const a of state.converts) {
         if (!inPass(a)) continue;
+        ctx.strokeStyle = a.summoned ? '#7c3aed' : CONVERT_GOLD;                 // esqueletos invocados (Curse Path): anel roxo escuro; convertidos (Avgustino, Light Path): dourado
         ctx.globalAlpha = 0.45 + Math.sin(t * 3 + a.x * 0.01) * 0.15;
         ctx.beginPath();
         ctx.ellipse(a.x, a.y + a.radius * 0.35, a.radius * 1.15, a.radius * 0.5, 0, 0, TAU);
@@ -842,12 +835,29 @@ function renderConvertMarks(t) {
     for (const a of state.converts) {
         if (!inPass(a)) continue;
         const top = a.y - a.radius * 1.9 + Math.sin(t * 2.4 + a.x * 0.02) * 2;
-        ctx.globalAlpha = 0.9;
-        ctx.strokeStyle = CONVERT_GOLD;
-        ctx.lineWidth = 2.2;
-        ctx.beginPath();
-        ctx.ellipse(a.x, top, a.radius * 0.6, a.radius * 0.2, 0, 0, TAU);
-        ctx.stroke();
+        if (a.summoned) {
+            // Esqueleto invocado (Curse Path): ENERGIA NEGRA em volta dele (nada de auréola, que é do Light Path): uma névoa escura com brilho roxo e fiapos subindo
+            const r = a.radius;
+            ctx.globalAlpha = 1;
+            drawGlow(ctx, 'rgba(8, 0, 22, 0.95)', a.x, a.y - r * 0.2, r * 2.1, 0.6);                       // a sombra negra (por cima do corpo, escurecendo-o)
+            ctx.globalCompositeOperation = 'lighter';
+            drawGlow(ctx, 'rgba(124, 58, 237, 0.9)', a.x, a.y - r * 0.3, r * 1.7, 0.3);                    // o brilho roxo
+            ctx.fillStyle = '#a78bfa';
+            for (let i = 0; i < 4; i++) {
+                const u = (t * 0.9 + i / 4 + (a.x % 7) * 0.05) % 1;
+                ctx.globalAlpha = (1 - u) * 0.8;
+                ctx.fillRect(a.x + Math.sin(t * 3.2 + i * 1.9 + a.y * 0.05) * r * 0.75 - 1.2, a.y + r * 0.5 - u * r * 2.3 - 1.2, 2.4, 3.4);
+            }
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1;
+        } else {
+            ctx.globalAlpha = 0.9;
+            ctx.strokeStyle = CONVERT_GOLD;
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            ctx.ellipse(a.x, top, a.radius * 0.6, a.radius * 0.2, 0, 0, TAU);
+            ctx.stroke();
+        }
         if (a.hitFlash > 0) {
             ctx.globalCompositeOperation = 'lighter';
             drawGlow(ctx, '#ffffff', a.x, a.y, a.radius * 1.4, 0.6);
@@ -859,7 +869,7 @@ function renderConvertMarks(t) {
             ctx.globalAlpha = 0.85;
             ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
             ctx.fillRect(a.x - w / 2, top + a.radius * 0.35, w, 3);
-            ctx.fillStyle = CONVERT_GOLD;
+            ctx.fillStyle = a.summoned ? '#a78bfa' : CONVERT_GOLD;
             ctx.fillRect(a.x - w / 2, top + a.radius * 0.35, w * Math.max(0, a.hp / a.maxHp), 3);
         }
     }

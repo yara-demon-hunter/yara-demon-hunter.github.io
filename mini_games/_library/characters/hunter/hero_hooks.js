@@ -18,6 +18,10 @@ export const heroHooks = {
     // Desenha o que está na mão livre durante o arremesso ou a carga: (rig, { shoulder, hand, pose, charge, fireHold })
     drawHeldItem: null,
 
+    // --- DIREÇÃO TRAVADA ---
+    // O jogo pode travar para onde o boneco olha (ex.: um sopro que ele solta andando para trás): (body) => ângulo em radianos, ou null para o boneco decidir sozinho
+    lockFacing: (body) => null,
+
     // --- LÂMINA ---
     // Golpe novo: o corte que o jogo acabou de fazer por este corpo ({ arcWidth, spin }), ou null
     lastSlash: (body) => null,

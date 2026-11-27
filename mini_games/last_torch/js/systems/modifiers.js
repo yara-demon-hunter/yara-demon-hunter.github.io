@@ -1,7 +1,7 @@
 import { HEROES } from '../../data_model/heroes.js';
 import { AFFINITY_BONUS, TREE_BY_ID, TREE_NODES } from '../../data_model/skill_tree/index.js';
 import { DARKNESS } from '../../data_model/night.js';
-import { POWER_BOOST, getPowerLevel } from '../../data_model/powers.js';
+import { EVOLUTIONS, ICE_POWERS, POWER_BOOST, getPowerLevel } from '../../data_model/powers.js';
 import { altarMods } from '../../data_model/embers.js';
 import { save } from '../core/save.js';
 import { attributes, passives, powers, state } from '../core/state.js';
@@ -22,6 +22,7 @@ import { attributes, passives, powers, state } from '../core/state.js';
 //   tocha: torchHp (pontos), torchRegen (pontos por segundo), torchGuard, warmthBurn (x dano de feitiço por segundo)
 //   pontos de skill: levelPoints (por nível, fração acumula), chestPoints (por baú)
 //   vida extra: revives
+//   iceDamage (dano extra SÓ das skills de gelo, ICE_POWERS; por nível do Blizzard: 0.8 x 5 = 5x o dano)
 //   curseDamage (dano extra SÓ das skills do Curse Path, por nível do Arcane Study; vira POWER_BOOST dos poderes do ramo)
 //   natureDamage (dano extra de todas as skills do Nature Path, state.dmgSource === 'nature' em damage.js: Dark Roses, do Rowan)
 //   demonDamage (dano extra contra elites e chefes, SÓ das skills do Light Path: Judgment; state.dmgSource === 'light' em damage.js)
@@ -77,6 +78,10 @@ export function refreshModifiers() {
     if ((totals.curseDamage ?? 0) > 0) {
         TREE_NODES.forEach(n => { if (n.branch === 'curse' && (n.kind === 'power' || n.kind === 'evolve')) POWER_BOOST[n.key] = (POWER_BOOST[n.key] ?? 0) + totals.curseDamage; });
     }
+    // Blizzard (Curse Path): +80% por nível (até +400%, 5x o dano) SÓ nas skills de gelo (ICE_POWERS em powers.js), pela mesma via do bônus de afinidade
+    // Permafrost (a evolução do Freezing Breath) também soma +20% (EVOLUTIONS.absoluteZero.iceDamage) nas mesmas skills de gelo
+    const iceBonus = (totals.iceDamage ?? 0) + (powers.absoluteZero.evolved ? EVOLUTIONS.absoluteZero.iceDamage : 0);
+    if (iceBonus > 0) ICE_POWERS.forEach(key => { POWER_BOOST[key] = (POWER_BOOST[key] ?? 0) + iceBonus; });
     addAll(state.omen?.mods);
 
     const dark = save.darkness - 1;

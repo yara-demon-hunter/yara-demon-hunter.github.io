@@ -36,7 +36,7 @@ export const BOSS_STATS = {
 export const BOSS_DARKNESS = { hpPerLevel: 0.3, damagePerLevel: 0.12, speedPerLevel: 0.03 };
 // Provocação das sombras (Shadow Clone): o chefe só vira para uma sombra quando ela está a menos de cloneProvokeRadius px dele E mais perto que o herói.
 // O herói provoca de qualquer distância (os chefes sempre o caçam); a sombra provoca bem menos. 0 desliga (o chefe ignora as sombras como antes).
-export const BOSS_TARGETING = { cloneProvokeRadius: 110, cloneDamageRatio: 1 };     // cloneDamageRatio: o dano dos golpes dele nas sombras, em fração do dano no herói
+export const BOSS_TARGETING = { cloneProvokeRadius: 110, cloneDamageRatio: 1, summonProvokeRadius: 380 };       // summonProvokeRadius: o raio em que um esqueleto invocado (Summon Skeletons) provoca o chefe (ele o mira e o mata)     // cloneDamageRatio: o dano dos golpes dele nas sombras, em fração do dano no herói
 // Botões gerais: 1 = como está
 export const BOSS_GLOBAL = { hp: 1, damage: 1, speed: 1 };
 
@@ -304,11 +304,11 @@ export const BOSS_MODELS = {
         initialShootCooldownSeconds: 1.5,
         patternGapSeconds: 2.1,
         // Sem tiros: ele vem andando e CORTA com o espadão quando o herói chega perto (melee); de longe só bate no chão (slam) e chama os mortos (summon)
-        patterns: ['dash', 'skulls', 'bonerain', 'summon'],
+        patterns: ['dash', 'skulls', 'bonerain', 'summon', 'frenzy'],         // frenzy (27/11/2026): a fúria do Slizork: ele ruge e corre bem mais depressa por uns segundos
         phases: [
-            { at: 1, patterns: ['dash', 'skulls', 'bonerain', 'summon'] },
-            { at: 0.6, label: 'THE DEAD RISE', patterns: ['summon', 'skulls', 'dash', 'bonerain', 'skulls'] },
-            { at: 0.3, label: 'ROT AND RUIN', patterns: ['skulls', 'dash', 'bonerain', 'summon', 'dash', 'bonerain'] }
+            { at: 1, patterns: ['dash', 'skulls', 'bonerain', 'summon', 'frenzy'] },
+            { at: 0.6, label: 'THE DEAD RISE', patterns: ['summon', 'skulls', 'dash', 'bonerain', 'frenzy', 'skulls'] },
+            { at: 0.3, label: 'ROT AND RUIN', patterns: ['skulls', 'dash', 'frenzy', 'bonerain', 'summon', 'dash', 'frenzy', 'bonerain'] }
         ],
         // Chuva de ossos: quantos caem, espalhados até quantos px do herói, raio de cada um e tempo de queda (s)
         boneCount: 9, boneSpread: 190, boneRadius: 34, boneFallSeconds: 1.0,
@@ -318,6 +318,7 @@ export const BOSS_MODELS = {
         skullCount: 2, skullLife: 4.5, skullSpeed: 115, skullBurstRadius: 70,
         // Corte de espada de perto: alcance (px além do corpo), duração da animação (s), momento do corte (0 a 1), abertura do leque (rad), dano e intervalo
         melee: { range: 95, seconds: 0.95, strikeAt: 0.5, arc: 2.1, damageMultiplier: 1.25, cooldown: 1.4, firstDelay: 0.6 },
+        frenzySeconds: 3, frenzySpeedMultiplier: 2.2,                     // fúria: quanto tempo corre (s) e quantas vezes mais rápido
         slamCount: 4,
         slamRadius: 78,
         slamDelaySeconds: 0.95,
@@ -357,18 +358,13 @@ export const BOSS_MODELS = {
         burstIntervalSeconds: 0.24,
         initialShootCooldownSeconds: 1.5,
         patternGapSeconds: 1.9,
-        patterns: ['ring', 'slam', 'spiral', 'volley', 'summon', 'slam', 'ring', 'blink'],
+        patterns: ['ring', 'spiral', 'volley', 'summon', 'ring', 'blink'],       // sem 'slam': o golpe no chão saiu dele (27/11/2026, apelão demais)
         phases: [
-            { at: 1, patterns: ['ring', 'slam', 'spiral', 'volley', 'summon', 'blink'] },
-            { at: 0.66, label: 'ECLIPSE', patterns: ['eclipse', 'slam', 'spiral', 'summon', 'blink', 'ring'] },
-            { at: 0.33, label: 'THE DARK ITSELF', patterns: ['eclipse', 'spiral', 'eclipse', 'slam', 'summon', 'ring', 'blink'] }
+            { at: 1, patterns: ['ring', 'spiral', 'volley', 'summon', 'blink'] },
+            { at: 0.66, label: 'ECLIPSE', patterns: ['eclipse', 'spiral', 'summon', 'blink', 'ring'] },
+            { at: 0.33, label: 'THE DARK ITSELF', patterns: ['eclipse', 'spiral', 'eclipse', 'summon', 'ring', 'blink'] }
         ],
         ringCount: 18,
-        slamCount: 5,
-        slamRadius: 84,
-        slamDelaySeconds: 0.95,
-        slamDamageMultiplier: 0.8,
-        slamTorchDamage: 10,
         spiralShots: 24,
         spiralIntervalSeconds: 0.1,
         summonType: 'WRAITH',

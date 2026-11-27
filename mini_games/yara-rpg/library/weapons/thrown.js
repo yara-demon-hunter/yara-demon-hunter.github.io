@@ -24,7 +24,7 @@ export const THROWN_WEAPONS = {
     darkRose: { draw: (ctx, t) => drawRose(ctx, t, true), centerX: ROSE_VISUALS.shape.centerX, colors: ROSE_VISUALS.dark.colors, speed: 0.55, scale: 1.95, spin: 0 },
     // Crucifixo de prata do Avgustino: gira em voo, um pouco mais devagar que a adaga
     // Esfera arcana do Gudran: um pouco mais lenta que a adaga e maior, sem giro (a esfera brilha, não gira)
-    arcane: { draw: drawArcaneOrb, centerX: ARCANE_ORB_VISUALS.shape.centerX, colors: ARCANE_ORB_VISUALS.colors, speed: 0.75, scale: 1.7, spin: 0 },
+    arcane: { draw: drawArcaneOrb, centerX: ARCANE_ORB_VISUALS.shape.centerX, colors: ARCANE_ORB_VISUALS.colors, speed: 0.75, scale: 2.04, spin: 0 },       // scale 1.7 -> 2.04 (27/11/2026: a bola de energia do Gudran 20% maior)
     // Shuriken do Kuro (ninja): pequena e rápida, gira muito em voo
     shuriken: { draw: drawShuriken, centerX: SHURIKEN_VISUALS.shape.centerX, colors: SHURIKEN_VISUALS.colors, speed: 1.15, scale: 1.5, spin: 0.35 },
     // Kunai do Kurama: voa reto e quase sem giro

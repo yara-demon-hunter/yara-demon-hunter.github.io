@@ -5,7 +5,7 @@ import { whenHunting } from './dialogue.js';
 // Quando a barra enche, a caçada congela um instante e aparece a MESMA faixa escura das ondas (css/components/banner.css)
 // com a foto do herói e o nome do especial. A faixa some e SÓ ENTÃO o golpe sai, com a tela livre para o jogador ver o que
 // acontece. É DOM com animação de CSS (css/components/cutin.css): nada no canvas.
-const FREEZE_SECONDS = 0.85;        // a pausa e a duração da faixa (a animação do CSS tem o mesmo tempo)
+const FREEZE_SECONDS = 1.5;        // a pausa e a duração da faixa (a animação do CSS tem o mesmo tempo)
 const HUNTER_IMAGE = 'images/characters/demon-hunter-small.webp';
 let box = null;
 

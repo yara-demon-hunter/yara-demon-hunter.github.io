@@ -322,7 +322,7 @@ export function resetFieldForNewTurn() {
     state.stars.length = 0;
     state.frostBreaths.length = 0;
     state.spectralBlade.left = 0;
-    state.goldenTornado = null;
+    state.icePatches.length = 0;
     clearSkillEffects();
     state.currentBoss = null;
     state.spawnTimer = TURN_DIFFICULTY.turnStartGraceSeconds;

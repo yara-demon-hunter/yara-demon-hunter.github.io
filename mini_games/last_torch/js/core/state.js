@@ -148,7 +148,7 @@ export const state = {
 
     // Poderes (js/systems/powers.js, desenhados em js/render/powers.js)
     spectralBlade: { left: 0, angle: 0, age: 0 },      // Spectral Blade (Blade Path): tempo restante, giro e idade das lâminas
-    goldenTornado: null,                               // Golden Tornado (Curse Path): { x, y, age, seconds, tick, ... } enquanto existe
+    icePatches: [],                                    // Permafrost: camadas de gelo no chão { x, y, angle, range, half, life, maxLife }
     trailDistance: 0,
     groundFires: [],
     lightning: [],

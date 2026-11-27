@@ -150,11 +150,13 @@ export const BRUTOS = {
         // no meio tempo as lâminas acertam normalmente, então dá para vencer o escudo com ritmo ou golpes de perto
         reflect: { cooldownSeconds: 1.6, damageMultiplier: 0.8, speedMultiplier: 1.1 },
         patternGapSeconds: 2.4,
-        patterns: ['quake', 'lunge', 'quake', 'stomp'],
+        // frenzy (27/11/2026): a fúria do Slizork: ele ruge e CORRE bem mais depressa por uns segundos, para se aproximar do herói e fechar a distância (ele é lento e sem tiros)
+        frenzySeconds: 3.5, frenzySpeedMultiplier: 2.4,
+        patterns: ['quake', 'frenzy', 'lunge', 'quake', 'stomp'],
         phases: [
-            { at: 1, patterns: ['quake', 'lunge', 'quake', 'stomp'] },
-            { at: 0.66, label: 'STAMPEDE', patterns: ['quake', 'stomp', 'lunge', 'stomp'] },
-            { at: 0.33, label: 'RAMPAGE', patterns: ['stomp', 'quake', 'lunge', 'stomp', 'quake', 'lunge'] }
+            { at: 1, patterns: ['quake', 'frenzy', 'lunge', 'quake', 'stomp'] },
+            { at: 0.66, label: 'STAMPEDE', patterns: ['quake', 'stomp', 'frenzy', 'lunge', 'stomp'] },
+            { at: 0.33, label: 'RAMPAGE', patterns: ['stomp', 'quake', 'frenzy', 'lunge', 'stomp', 'frenzy', 'quake', 'lunge'] }
         ],
         enrageRatio: 0.4,
         enrageGapMultiplier: 0.75,

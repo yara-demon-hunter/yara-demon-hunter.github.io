@@ -106,7 +106,10 @@ export function updateHeroAnim(a, body) {
         const throwing = a.throwsKnives && heroHooks.throwing(now);
         // Cajado erguido (staffCast, Gudran): vira rápido para o alvo, como no golpe, mesmo andando para o outro lado
         const casting = body.move?.kind === 'staffCast';
-        if (throwing) {
+        const locked = heroHooks.lockFacing(body);          // o jogo trava para onde ele olha (null = livre)
+        if (locked !== null && locked !== undefined) {
+            a.facing = lerpAngle(a.facing, locked, Math.min(1, dt * 18));
+        } else if (throwing) {
             a.facing = lerpAngle(a.facing, heroHooks.throwAngle(), Math.min(1, dt * 25));
         } else if (casting) {
             a.facing = lerpAngle(a.facing, body.angle, Math.min(1, dt * 18));

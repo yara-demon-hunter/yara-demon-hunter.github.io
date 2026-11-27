@@ -339,20 +339,6 @@ export const PASSIVE_SKILL_MODELS = {
         followDistance: 90,     // sem inimigo por perto, fica a esta distância do herói
         enemyHitSeconds: 0.7    // tempo entre golpes de um monstro no convertido
     },
-    // Runa Soberana (só o Gudran, no Curse Path): os raios arcanos do cajado EXPLODEM no primeiro monstro que acertam (não atravessam mais: 27/11/2026) e a explosão fere os outros em volta
-    sovereignRune: {
-        name: 'Sovereign Rune',
-        icon: '🔷',
-        cost: 0,
-        maxLvl: 1,
-        type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
-        get desc() {
-            return `Your arcane bolts no longer fly through monsters: they explode in blue light on the first one they hit, hurting every other monster within ${this.burstRadius} range for ${formatPercent(this.burstDamage)} of the bolt's damage. The 3rd bolt of the combo explodes bigger. Only Gudran can learn this.`;
-        },
-        pierce: 0,              // (não atravessa: explode no primeiro)
-        burstRadius: 85,
-        burstDamage: 0.75
-    },
     oathFaith: {
         name: 'Oath of Faith',
         icon: '🕯️',
@@ -661,7 +647,6 @@ export const MASTER_THIEF = {
 // Blessed Blade (Avgustino): a parte da magia que cada golpe da lâmina soma (js/systems/combat.js)
 export const BLESSED_BLADE = PASSIVE_SKILL_MODELS.blessedBlade;
 export const CONVERSION = PASSIVE_SKILL_MODELS.conversion;
-export const SOVEREIGN_RUNE = PASSIVE_SKILL_MODELS.sovereignRune;
 
 // Ataque básico arcano (Gudran e qualquer herói com basicAttack: 'arcane'): no lugar do golpe de lâmina, ele ergue o cajado e solta
 // um raio de energia azul no monstro mais perto. Dano de MAGIA (número azul). Cada 3º raio é maior e empurra mais.

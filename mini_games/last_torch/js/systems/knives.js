@@ -16,7 +16,6 @@ import { getHero } from './modifiers.js';
 import { beamActive } from './fury.js';
 import { save } from '../core/save.js';
 import { startMove } from './moves.js';
-import { burstArcaneKnife } from './arcane.js';
 
 // O que o herói lança: adaga, ou a rosa do Rowan (a Rosa Negra, com a skill Dark Roses). Só muda o desenho: dano, alcance e
 // todas as skills de adaga valem igual para a rosa
@@ -313,7 +312,6 @@ export function updateKnives(dt) {
             if (k.fire) burstFireball(k, hit);
             createExplosion(k.x, k.y, hit.color, 6);
             audio.playHit(1);
-            burstArcaneKnife(k, hit);                                 // Gudran com a Runa Soberana: a bola explode e fere os outros em volta
             if (k.pierces > 0) {
                 k.pierces--;
                 (k.struck ??= new Set()).add(hit);
@@ -324,9 +322,6 @@ export function updateKnives(dt) {
         }
 
         const outside = k.x < 0 || k.x > state.width || k.y < 0 || k.y > state.height;
-        if (outside || k.travelled >= k.maxRange) {
-            if (!outside) burstArcaneKnife(k);                        // acabou o alcance: com a Runa Soberana a bola estoura onde parou
-            knives.splice(i, 1);
-        }
+        if (outside || k.travelled >= k.maxRange) knives.splice(i, 1);
     }
 }

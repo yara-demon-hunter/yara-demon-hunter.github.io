@@ -218,7 +218,7 @@ function updateMeteors(ev, def, dt) {
         const d = i === 0 ? 0 : 70 + Math.random() * 190;
         const x = Math.max(40, Math.min(state.width - 40, player.x + Math.cos(a) * d));
         const y = Math.max(170, Math.min(state.height - 40, player.y + Math.sin(a) * d));
-        addSlam(x, y, def.radius, def.warnSeconds + i * 0.12, damage, null, 0, '#fb923c');
+        addSlam(x, y, def.radius, def.warnSeconds + i * 0.12, damage, null, 0, '#fb923c').boss = false;       // meteoro do evento, não é golpe de chefe
     }
     shakeScreen(2);
 }

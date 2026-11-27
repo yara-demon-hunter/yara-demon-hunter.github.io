@@ -4,7 +4,7 @@ import { RELIC_BRANCHES, RELIC_LAYOUT, RELIC_NODES } from '../../data_model/reli
 import { getFuryUpgradeRows } from './stat_sheet.js';
 import { passives, state } from '../core/state.js';
 import { getHero } from '../systems/modifiers.js';
-import { buyNode, excludedBy, getNodeInfo, getNodeState, getNodeUpgradeRows, getRestrictionText } from '../systems/tree.js';
+import { buyNode, excludedBy, getNodeInfo, getNodeState, getNodeTotalRows, getNodeUpgradeRows, getRestrictionText } from '../systems/tree.js';
 
 // --- ÁRVORES (tela) ---
 // Uma fábrica monta cada árvore: skills (tela de status) e relíquias (acampamento). O mapa é montado uma
@@ -187,7 +187,9 @@ function createTreeView(cfg) {
         const st = getNodeState(node);
         const info = getNodeInfo(node);
         const furyUpgrade = node.key === 'furySkill' && !st.maxed && !st.restricted;
-        const upgradeRows = st.maxed || st.restricted || furyUpgrade ? [] : getNodeUpgradeRows(node);
+        // Completa: as linhas verdes (o que ela dá) não somem; viram o TOTAL acumulado, como referência. Antes de completar mostram o que o próximo nível dá
+        const totalRows = st.maxed && !st.restricted ? getNodeTotalRows(node) : [];
+        const upgradeRows = st.restricted || furyUpgrade ? [] : st.maxed ? totalRows : getNodeUpgradeRows(node);
         setIcon(detail('Icon'), node, info);
         detail('Name').textContent = info.name;
         detail('Level').textContent = levelText(node, st);
@@ -211,10 +213,16 @@ function createTreeView(cfg) {
         if (preview) {
             preview.replaceChildren();
             preview.classList.toggle('hidden', !(furyUpgrade || upgradeRows.length));
+            if (st.maxed && totalRows.length) {
+                const head = document.createElement('div');
+                head.className = 'tree-preview-title';
+                head.textContent = 'TOTAL BONUS · MAXED';
+                preview.appendChild(head);
+            }
             if (furyUpgrade) {
                 getFuryUpgradeRows(node.mods?.furyCharge ?? 0).forEach(({ icon, name, value }) => {
                     const row = document.createElement('div');
-                    row.className = 'shop-row tree-preview-row tree-preview-fury';
+                    row.className = 'shop-row tree-preview-row tree-preview-fury is-up';
                     row.innerHTML = '<span class="shop-row-name"><span class="stat-icon"></span><span></span></span><b class="shop-row-value"></b>';
                     paintIcon(row.querySelector('.stat-icon'), null, icon);
                     row.querySelector('.shop-row-name > span:last-child').textContent = name;
@@ -222,14 +230,14 @@ function createTreeView(cfg) {
                     preview.appendChild(row);
                 });
             } else {
-                upgradeRows.forEach(({ icon, name, value, image }) => {
+                upgradeRows.forEach(({ icon, name, value, image, up, later }) => {
                     const row = document.createElement('div');
-                    row.className = 'shop-row tree-preview-row';
+                    row.className = `shop-row tree-preview-row${up ? ' is-up' : ''}${later ? ' is-later' : ''}`;       // verde: sobe agora; apagado: só chega em outro nível
                     row.innerHTML = '<span class="shop-row-name"><span class="stat-icon"></span><span></span></span><b class="shop-row-value"></b>';
                     paintIcon(row.querySelector('.stat-icon'), image ? TREE_IMAGES[node.key] : null, icon);
                     row.querySelector('.shop-row-name > span:last-child').textContent = name;
                     row.querySelector('.shop-row-value').textContent = value;
-                    row.title = `${info.name}: ${info.desc}`;
+                    row.title = later ? `Unlocks at level ${later}` : `${info.name}: ${info.desc}`;
                     preview.appendChild(row);
                 });
             }

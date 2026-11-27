@@ -18,7 +18,7 @@ export const CHARACTER_MODEL = {
     // XP para o próximo nível: EXPONENCIAL, base x growth^n, com n = nível - 1 (2026-11-27; antes era base + linear x n + quadratic x n², 260/110/5, que dava nível 37 na onda 18).
     // Cada nível custa 37% mais que o anterior: o começo é rápido (nível 5 no fim da onda 1, 10 na onda 5: o jogador sente os golpes novos chegando) e depois sobe
     // devagar (~nível 18 na onda 18), para a tela não se encher de skills. Medido com o autopiloto (ver report/improvement_2026_11_16/06_checklist.md, Fase 8)
-    xpCurve: { base: 100, growth: 1.19 },
+    xpCurve: { base: 100, growth: 2.07 },
     levelUpHealRatio: 0.12,
     // Calor da tocha: perto dela o herói se recupera aos poucos
     // Ouro no chão só vem até o herói dentro deste raio (no fim da hora vem tudo)

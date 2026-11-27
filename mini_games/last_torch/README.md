@@ -137,7 +137,7 @@ js/
   systems/skills_blade.js         Bloodlust, Crimson Tide, Earthbreaker, War Cry, Executioner
   systems/skills_shadow.js        Death Mark, caminho do dash, Master Thief, Smoke Bomb, Night Reaper
   systems/skills_flame.js         Hearth Ring, Solar Wall, Torch Ward, Blue Torch, Flaming Phoenix, Phoenix Pact (levanta o herói ou reacende a tocha)
-  systems/skills_curse.js         Grave Wisp, Creeping Hex, Void Rift, Event Horizon
+  systems/skills_curse.js         Grave Wisp, Creeping Hex, Void Rift
   systems/moves.js                golpes especiais do herói (salto, rugido, juramento) e gesto de feitiço
   systems/tree.js                 regras das duas árvores: nível, custo (pontos ou ouro), pré-requisitos, travas, compra
   systems/player.js               movimentação e dano no herói

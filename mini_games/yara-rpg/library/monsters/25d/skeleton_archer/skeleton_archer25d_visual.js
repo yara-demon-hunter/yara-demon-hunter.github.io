@@ -8,6 +8,7 @@ export const SKELETON_ARCHER_25D_VISUALS = {
     ...SKELETON_25D_VISUALS,
     hold: 'bow',
     previewAim: 0.6,       // tuner: o quanto a corda está puxada (0 a 1)
+    bowScale: 1.45,        // o arco é 45% maior que o padrão (27/11/2026)
     hood: true,
     quiver: true,
     strideSpeed: 7,

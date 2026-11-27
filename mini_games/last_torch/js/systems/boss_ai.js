@@ -11,6 +11,7 @@ import { hurtTorch } from './torch.js';
 import { hurtOaks, hurtOaksOnSegment } from './skills_nature.js';
 import { damageShadowClone } from './shadow_clone.js';
 import { damageAngel, liveAngel } from './skills_light.js';
+import { hurtSummonsArc, hurtSummonsCircle, hurtSummonsDash, hurtSummonsSegment } from './conversion.js';
 
 // --- ATAQUES DOS BOSSES ---
 // Cada boss repete em ciclo a lista model.patterns. Entre um ataque e outro, e.shootTimer conta a
@@ -63,6 +64,14 @@ export function bossTarget(e) {
         const d = Math.hypot(c.x - e.x, c.y - e.y);
         if (d < bd && d < heroD) { bd = d; best = c; }
     }
+    // Os esqueletos invocados (Summon Skeletons) provocam o chefe também: ele os mira (e os mata) em vez de passar por cima deles atrás do herói
+    let summon = null, sd = BOSS_TARGETING.summonProvokeRadius + e.radius;
+    for (const a of state.converts) {
+        if (!a.summoned || a.hp <= 0) continue;
+        const d = Math.hypot(a.x - e.x, a.y - e.y);
+        if (d < sd && d < heroD && (!best || d < bd)) { sd = d; summon = a; }
+    }
+    if (summon) return { x: summon.x, y: summon.y, dist: sd, clone: null, summon };
     return best ? { x: best.x, y: best.y, dist: bd, clone: best } : { x: player.x, y: player.y, dist: heroD, clone: null };
 }
 function aimAngle(e) {
@@ -553,6 +562,9 @@ function updateLunge(e, model, ai, dt) {
     e.chainY = e.y;
     e.dashTimer = model.lungeSeconds * LUNGE_TIME_SCALE * (1 - L.t);
     // O avanço é tão rápido que num quadro ele passa por cima do herói: confere o trecho percorrido, não só o ponto final
+    // Os esqueletos invocados no caminho também levam o corte (cada um uma vez, 10x mais)
+    L.skeletons ??= new Set();
+    hurtSummonsDash(prevX, prevY, e.x, e.y, e.radius + model.lungeHitRadius, e.damage * model.lungeDamageMultiplier, L.skeletons);
     if (!L.hit && distanceToSegment(player.x, player.y, prevX, prevY, e.x, e.y) < e.radius + model.lungeHitRadius) {
         L.hit = hurtPlayer(e.damage * model.lungeDamageMultiplier, e.x, e.y, 0.6, e);
     }
@@ -599,6 +611,7 @@ function updateRivalMelee(e, model, ai, dt) {
             if (Math.hypot(dx, dy) < model.meleeRange + 18 && Math.abs(diff) < model.meleeArc / 2) {
                 hurtPlayer(e.damage * model.meleeDamageMultiplier, e.x, e.y, 0.5, e);
             }
+            hurtSummonsArc(e.x, e.y, ai.meleeAngle, model.meleeRange + 18, model.meleeArc, e.damage * model.meleeDamageMultiplier, true);       // e os esqueletos invocados
         }
     }
     if (ai.meleeTimer > 0 || Math.hypot(player.x - e.x, player.y - e.y) > model.meleeRange) return;
@@ -724,6 +737,7 @@ function updateBossMelee(e, model, dt) {
         while (diff < -Math.PI) diff += Math.PI * 2;
         if (Math.hypot(dx, dy) < M.range + e.radius + 14 && Math.abs(diff) < M.arc / 2) hurtPlayer(e.damage * M.damageMultiplier, e.x, e.y, 0.6, e);
         hurtOaks(e.x + Math.cos(e.atkAngle) * (M.range * 0.6), e.y + Math.sin(e.atkAngle) * (M.range * 0.6), M.range * 0.5, e.damage * M.damageMultiplier);
+        hurtSummonsArc(e.x, e.y, e.atkAngle, M.range + e.radius + 14, M.arc, e.damage * M.damageMultiplier, true);     // os esqueletos invocados no leque também
         for (const c of shadowClones) {                      // as sombras dentro do leque também levam o corte
             if (!c.active) continue;
             const cx = c.x - e.x, cy = c.y - e.y;
@@ -943,7 +957,7 @@ export function updateTelegraphs(dt) {
             shakeScreen(7);
             audio.playBlast();
             if (hit) hurtPlayer(t.damage, t.lines[1].x1, t.lines[1].y1, 0.5);
-            for (const L of t.lines) { hurtOaksOnSegment(L.x1, L.y1, L.x2, L.y2, t.width, t.damage); hurtClonesSegment(L.x1, L.y1, L.x2, L.y2, t.width, t.damage); }
+            for (const L of t.lines) { hurtSummonsSegment(L.x1, L.y1, L.x2, L.y2, t.width, t.damage, true); hurtOaksOnSegment(L.x1, L.y1, L.x2, L.y2, t.width, t.damage); hurtClonesSegment(L.x1, L.y1, L.x2, L.y2, t.width, t.damage); }
         } else if (t.kind === 'circle') {
             addShockwave(t.x, t.y, { radius: t.radius, color: t.shockColor ?? '#f87171', width: 7, seconds: 0.3 });
             createExplosion(t.x, t.y, t.goo ? '#4ade80' : t.bone ? '#e7e0cf' : t.drop ? '#7dd3fc' : t.shockColor ? '#a8a29e' : '#f97316', 16);
@@ -952,6 +966,7 @@ export function updateTelegraphs(dt) {
             if (Math.hypot(player.x - t.x, player.y - t.y) < t.radius) hurtPlayer(t.damage, t.x, t.y, 0.5);
             hurtOaks(t.x, t.y, t.radius, t.damage);          // a árvore do druida também leva o golpe
             hurtClonesCircle(t.x, t.y, t.radius, t.damage);  // e as sombras
+            hurtSummonsCircle(t.x, t.y, t.radius, t.damage, t.boss !== false);       // e os esqueletos invocados (3x mais se for golpe de chefe)
             // Gosma: os pés ficam presos (não anda nem dá dash; ainda ataca), como as raízes do Treant
             if (t.root && Math.hypot(player.x - t.x, player.y - t.y) < t.radius) {
                 player.rootedTimer = Math.max(player.rootedTimer ?? 0, t.root);
@@ -963,7 +978,8 @@ export function updateTelegraphs(dt) {
                 hurtTorch(t.torchDamage, state.coreX, state.coreY);
             }
         } else if (t.kind === 'grave') {
-            if (state.phase === 'HUNT') addMonster(t.monsterType, t.x, t.y);
+            if (t.onSpawn) t.onSpawn();                      // esqueleto aliado do Summon Skeletons (js/systems/powers.js)
+            else if (state.phase === 'HUNT') addMonster(t.monsterType, t.x, t.y);
             createExplosion(t.x, t.y, '#a8a29e', 10);
         }
     }

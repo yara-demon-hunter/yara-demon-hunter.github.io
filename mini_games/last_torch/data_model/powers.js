@@ -6,6 +6,9 @@ const formatPercent = (value) => `${Number((value * 100).toFixed(1))}%`;
 const formatNumber = (value) => String(Number(value.toFixed(2)));
 const formatMultiplier = (value) => `${formatNumber(value)}×`;
 
+// As skills de GELO do Curse Path (o que a skill Blizzard aumenta: dano até 5x). Chave interna -> nome mostrado nas descrições
+export const ICE_POWERS = ['chillAura', 'absoluteZero'];
+
 export const POWER_MODELS = {
     emberTrail: {
         name: 'Ember Steps', icon: '👣', maxLvl: 5,
@@ -178,7 +181,7 @@ export const POWER_MODELS = {
         name: 'Freezing Breath', icon: '🌬️', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `When a monster gets close, you exhale a freezing breath for ${formatNumber(this.breathSeconds)}s in a cone ${level.range} long and ${Math.round(level.halfAngle * 2 * 180 / Math.PI)}° wide. Turn and the breath follows you. Monsters in it take ${formatMultiplier(level.dps)} spell damage per second and stay frozen solid, then ${formatNumber(level.freeze)}s more after they leave the cone. Bosses freeze too, but for half as long. Ready again ${formatNumber(level.cooldown)}s after it ends.`;
+            return `When a monster gets close, you exhale a freezing breath for ${formatNumber(this.breathSeconds)}s in a cone ${level.range} long and ${Math.round(level.halfAngle * 2 * 180 / Math.PI)}° wide. The breath turns toward the nearest monster, and so do you. Monsters in it take ${formatMultiplier(level.dps)} spell damage per second and stay frozen solid, then ${formatNumber(level.freeze)}s more after they leave the cone. Bosses freeze too, but for half as long. It leaves a layer of ice on the ground behind it. Ready again ${formatNumber(level.cooldown)}s after it ends.`;
         },
         get upgrades() {
             return this.levels.map(level =>
@@ -198,15 +201,17 @@ export const POWER_MODELS = {
         tickSeconds: 0.25,       // de quanto em quanto tempo ele fere e renova o gelo
         turnSpeed: 7,            // o cone vira para onde o herói olha (radianos por segundo)
         holdFreeze: 0.5,         // o gelo que cada instante do sopro renova em quem está dentro
-        bossFreezeRatio: 0.5     // chefe congela por esta fração do tempo (metade)
+        bossFreezeRatio: 0.5,    // chefe congela por esta fração do tempo (metade)
+        // O gelo no chão que o sopro deixa por onde passa (só o VISUAL, desde o começo; o Permafrost acrescenta a lentidão e o dano): quanto dura, quantas camadas ao mesmo tempo e de quanto em quanto tempo nasce uma
+        frost: { seconds: 8, maxPatches: 8, patchEvery: 0.5 }
     },
-    // Rune Shield (só o Gudran, Curse Path): era o clique dele até 27/11/2026, agora uma skill. Sozinho, quando um monstro chega perto, runas azuis giram em volta do herói por
+    // Rune Shield (Curse Path, qualquer herói): era o clique do Gudran até 27/11/2026, agora uma skill. Sozinho, quando um monstro chega perto, runas azuis giram em volta do herói por
     // `seconds` s: quem encosta numa runa leva dano de magia e é jogado para fora. Cada nível encurta a recarga, dura mais, ganha runas e bate mais forte.
     runeShield: {
         name: 'Rune Shield', icon: '🔷', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `When monsters come close, ${level.runes} blue runes spin around you for ${formatNumber(level.seconds)}s. Every monster that touches one takes ${formatMultiplier(level.damage)} spell damage and is thrown away. Ready again ${formatNumber(level.cooldown)}s after it ends. Only Gudran can learn this.`;
+            return `When monsters come close, ${level.runes} blue runes spin around you for ${formatNumber(level.seconds)}s. Every monster that touches one takes ${formatMultiplier(level.damage)} spell damage and is thrown away. Ready again ${formatNumber(level.cooldown)}s after it ends.`;
         },
         get upgrades() {
             return this.levels.map(level =>
@@ -245,28 +250,44 @@ export const POWER_MODELS = {
         ],
         base: { spin: 4.2, hitCooldown: 0.35, bladeRadius: 13, knockback: 80, appearSeconds: 0.3, vanishSeconds: 0.4 }
     },
-    // Golden Tornado (Curse Path, no lugar do Blade Tempest; 27/11/2026): sozinho, quando monstros chegam perto, um TORNADO DOURADO de luz nasce junto do herói e CAÇA os monstros
-    // por `duration` s: fere (dano de feitiço por segundo) tudo dentro dele e arrasta quem está em volta para o centro. Some e só então a recarga corre.
-    goldenTornado: {
-        name: 'Golden Tornado', icon: '🌪️', maxLvl: 5,
+    // Summon Skeletons (Curse Path; 27/11/2026): sozinho, quando monstros chegam perto, esqueletos ALIADOS levantam do chão em volta do herói, lutam por `life` s e desmoronam. Usam a mesma IA dos
+    // convertidos do Avgustino (js/systems/conversion.js): vão no monstro mais perto, batem nele e PROVOCAM os monstros comuns (eles vão atrás dos esqueletos). Cada mordida = dano de feitiço x damage.
+    summonSkeletons: {
+        name: 'Summon Skeletons', icon: '💀', maxLvl: 5,
         get desc() {
             const level = this.levels[this.levels.length - 1];
-            return `When monsters come close, a tornado of golden light rises beside you and hunts them for ${formatNumber(level.duration)}s, dealing ${formatMultiplier(level.dps)} spell damage per second to everything inside (${level.radius} range) and dragging nearby monsters into its core. Then it fades, and the skill recharges for ${formatNumber(level.cooldown)}s.`;
+            return `When monsters come close, 2 skeletons (each a skeleton, a crawler or an archer, at random) rise from the ground beside you and fight for you until they fall, biting for ${formatMultiplier(level.damage)} spell damage. Keep summoning until ${this.base.maxAlive} stand at once. Monsters chase them instead of you; they take damage from shots and explosions (boss attacks hurt them ${this.base.bossDamageMultiplier}× more, and every hit takes at least half of a skeleton's health). Their health and strength grow with your Magic. Ready again ${formatNumber(level.cooldown)}s after the cast.`;
         },
         get upgrades() {
             return this.levels.map(level =>
-                `${formatNumber(level.duration)}s · ${formatMultiplier(level.dps)} spell damage/s · ${level.radius} range · recharge ${formatNumber(level.cooldown)}s`
+                `${formatMultiplier(level.damage)} spell damage per bite · ${formatNumber(level.hpPerMagic)} health per point of spell damage · every ${formatNumber(level.cooldown)}s`
             );
         },
+        // damage: dano da mordida = dano de MAGIA x isto. hpPerMagic: vida do esqueleto = dano de MAGIA do herói (getSpellDamage: magicDamage do herói x bônus de feitiço) x isto x o `hp` do tipo.
+        // Os dois crescem com a magia do herói: quem não tem magia (magicDamage 0) invoca esqueletos que não aguentam nada, e o Gudran (magia 52) os faz ~2,6x mais firmes que o Caçador (20).
+        // Eles NÃO somem pelo tempo: ficam até morrer.
         levels: [
-            { cooldown: 14, duration: 4, dps: 0.8, radius: 55 },
-            { cooldown: 13, duration: 4.5, dps: 0.9, radius: 60 },
-            { cooldown: 12, duration: 5, dps: 1.0, radius: 65 },
-            { cooldown: 11, duration: 5.5, dps: 1.2, radius: 72 },
-            { cooldown: 10, duration: 6, dps: 1.4, radius: 80 }
+            { cooldown: 18, damage: 0.5, hpPerMagic: 8 },
+            { cooldown: 17, damage: 0.6, hpPerMagic: 10 },
+            { cooldown: 16, damage: 0.7, hpPerMagic: 12.5 },
+            { cooldown: 15, damage: 0.8, hpPerMagic: 15.5 },
+            { cooldown: 14, damage: 1.0, hpPerMagic: 19 }
         ],
-        // speed: quanto o tornado anda atrás dos monstros (px/s); pull: o quanto arrasta os monstros em volta para o centro, px/s; swirl: o quanto os faz girar em volta dele, px/s; pullRatio: até quantas vezes o raio ele puxa
-        base: { speed: 95, pull: 70, swirl: 90, pullRatio: 1.9, tickSeconds: 0.25, knockback: 20, riseSeconds: 0.4, fadeSeconds: 0.5 }
+        // Cada invocação levanta base.perCast esqueletos, cada um de um tipo sorteado (base.types). O arqueiro é frágil, o rastejante um pouco mais firme.
+        // Cada esqueleto escolhe um monstro DIFERENTE para enfrentar (js/systems/conversion.js, stickyTarget)
+        base: {
+            triggerRange: 420, spawnDistance: 60,
+            maxAlive: 6,                  // quantos vivos ao mesmo tempo (a skill continua invocando até chegar neste número)
+            bossDamageMultiplier: 10,
+            bossMinHitRatio: 0.5,         // e um golpe de chefe tira no mínimo esta fração da vida MÁXIMA do esqueleto (2 golpes derrubam qualquer um): eles não podem atrapalhar a luta
+                 // o chefe fere os esqueletos 3x mais (tiros, explosões e golpes em área dele)
+            perCast: 2,                   // quantos levantam por invocação: sorteados entre os tipos abaixo (weight = chance relativa; hp = multiplicador da vida do tipo)
+            types: [
+                { type: 'SKELETON', weight: 1, hp: 1 },
+                { type: 'SKELETON_CRAWLER', weight: 1, hp: 1.1 },
+                { type: 'SKELETON_ARCHER', weight: 1, hp: 0.7 }
+            ]
+        }
     },
     chainLightning: {
         name: 'Storm Sigil', icon: '⚡', maxLvl: 5,
@@ -778,6 +799,26 @@ export const POWER_MODELS = {
 // --- EVOLUÇÕES ---
 // Poder no nível máximo + requisitos do nó de evolução (data_model/skill_tree) = transforma o poder.
 export const EVOLUTIONS = {
+    // Sovereign Rune (a evolução do Rune Shield, chave runeShield; 27/11/2026): as runas giram como antes e, a cada boltEvery s, CADA runa lança uma bola de energia (a mesma do clique do Gudran)
+    // para fora, em várias direções (a direção de cada runa a partir do herói). Dano de feitiço x boltDamage por bola.
+    runeShield: {
+        name: 'Sovereign Rune', icon: '🔷',
+        get desc() {
+            const { boltEvery, boltDamage, boltRange } = this.levels;
+            return `Your runes now hurl balls of blue energy outward in every direction: every ${formatNumber(boltEvery)}s each rune fires one, dealing ${formatMultiplier(boltDamage)} spell damage up to ${boltRange} away, on top of their spinning touch.`;
+        },
+        levels: { boltEvery: 0.9, boltDamage: 0.7, boltRange: 280, boltSpeed: 520 }
+    },
+    // Permafrost (a evolução do Freezing Breath, chave absoluteZero; 27/11/2026): o gelo no chão (que o sopro já deixa, só visual) passa a valer: os monstros nele ficam MAIS LENTOS (iceSlow) e as
+    // skills de gelo (ICE_POWERS) dão mais dano (iceDamage). O desenho do gelo é do próprio sopro (POWER_MODELS.absoluteZero.frost)
+    absoluteZero: {
+        name: 'Permafrost', icon: '🧊',
+        get desc() {
+            return `The ice your breath leaves on the ground turns solid: monsters standing on it move ${formatPercent(this.levels.iceSlow)} slower. Also, your ice skills (${ICE_POWERS.map(key => POWER_MODELS[key].name).join(' and ')}) deal ${formatPercent(this.iceDamage)} more damage.`;
+        },
+        levels: { iceSlow: 0.5 },
+        iceDamage: 0.2          // bônus de dano em TODAS as skills de gelo (ICE_POWERS) enquanto o Permafrost está evoluído (somado em js/systems/modifiers.js)
+    },
     holyGround: {
         name: 'Consecrated Earth', icon: '⛪',
         get desc() {

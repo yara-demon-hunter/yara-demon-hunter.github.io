@@ -2,6 +2,10 @@
 // Cada nó leva o próprio `cost` (pontos de skill por nível). Para mudar um preço, edite o número aqui, no nó.
 // Campos e regras dos nós: skill_tree/README.md.
 import { formatPercent, req } from '../helpers.js';
+import { ICE_POWERS, POWER_MODELS } from '../../powers.js';
+
+// Os nomes das skills de gelo, para a descrição do Blizzard (lidos dos poderes: mudou o nome lá, muda aqui)
+const ICE_NAMES = ICE_POWERS.map(key => POWER_MODELS[key].name).join(' and ');
 
 export const CURSE_NODES = [
 
@@ -12,16 +16,16 @@ export const CURSE_NODES = [
     { id: 'chillAura', cost: 2, branch: 'curse', kind: 'power', key: 'chillAura', x: 1, y: 0, requires: [req('arcaneStudy')] },
     // Soul Nova (e a evolução que congela) DESLIGADA em 19/11/2026. No lugar dela entra o Absolute Zero, skill própria que congela. Para voltar a Soul Nova, tire os //
     { id: 'absoluteZero', cost: 2, branch: 'curse', kind: 'power', key: 'absoluteZero', x: 2, y: 0, requires: [req('chillAura', 2)] },
-    // A Runa Soberana, só do Gudran (selada para os outros, com passe livre), vem depois do Absolute Zero: dá furo e explosão aos raios do cajado
-    { id: 'sovereignRune', cost: 4, hero: 'gudran', branch: 'curse', kind: 'passive', key: 'sovereignRune', x: 3, y: 0, requires: [req('absoluteZero')] },
-    // O Escudo de Runas, só do Gudran (selado para os outros, com passe livre): era o clique dele, agora uma skill
-    { id: 'runeShield', cost: 3, hero: 'gudran', branch: 'curse', kind: 'power', key: 'runeShield', x: 0, y: 3, requires: [req('arcaneStudy')] },
+    // Depois do Freezing Breath (a chave interna continua absoluteZero): Permafrost (a evolução dele: camada de gelo no chão) e Ice Ring (o anel de gelo que prende o monstro com mais vida). 27/11/2026
+    { id: 'permafrost', cost: 4, branch: 'curse', kind: 'evolve', key: 'absoluteZero', x: 3, y: 0, requires: [req('absoluteZero', 5)] },
+    // 27/11/2026: skill de nível (como o Arcane Study): cada nível soma dano nas skills de GELO. Nível 5 = 5x o dano (+400%)
+    { id: 'blizzard', cost: 3, branch: 'curse', kind: 'mod', x: 4, y: 0, requires: [req('permafrost')],
+      name: 'Blizzard', icon: '🌨️', desc: `Your ice skills hit harder: ${ICE_NAMES}. Only ice skills get this bonus. At max level they deal five times the damage.`,
+      levelText: (mods) => `+${formatPercent(mods.iceDamage)} damage on ice skills (${ICE_NAMES})`, mods: { iceDamage: 0.8 } },
     // { id: 'soulNova', branch: 'curse', kind: 'power', key: 'soulNova', x: 2, y: 0, requires: [req('chillAura', 2)] },
     // { id: 'novaEvolve', branch: 'curse', kind: 'evolve', key: 'soulNova', x: 3, y: 0, requires: [req('soulNova', 5)] },
-    { id: 'starfall', cost: 4, branch: 'curse', kind: 'power', key: 'starfall', x: 4, y: 0, requires: [req('chainLightning', 2)] },
-    // Linha da tempestade: à distância
-    { id: 'graveWisp', cost: 4, branch: 'curse', kind: 'power', key: 'graveWisp', x: 1, y: 1, requires: [req('arcaneStudy')] },
-    { id: 'occultFocus', cost: 1, branch: 'curse', kind: 'mod', x: 2, y: 1, requires: [req('graveWisp')],
+    // Linha da tempestade: à distância (o Grave Wisp saiu daqui em 27/11/2026: foi para a linha de baixo, depois do Summon Skeletons)
+    { id: 'occultFocus', cost: 1, branch: 'curse', kind: 'mod', x: 2, y: 1, requires: [req('arcaneStudy')],
       name: 'Occult Focus', icon: '🔮', desc: 'Your spells return to your hand faster.',
       levelText: (mods) => `${formatPercent(mods.spellHaste)} shorter spell recharge`, mods: { spellHaste: 0.06 } },
     { id: 'chainLightning', cost: 4, branch: 'curse', kind: 'power', key: 'chainLightning', x: 3, y: 1, requires: [req('occultFocus', 2)] },
@@ -32,8 +36,13 @@ export const CURSE_NODES = [
       name: 'Dark Knowledge', icon: '📚', desc: 'Forbidden words hit harder.',
       levelText: (mods) => `+${formatPercent(mods.spellDamage)} spell damage`, mods: { spellDamage: 0.1 } },
     { id: 'voidRift', cost: 4, branch: 'curse', kind: 'power', key: 'voidRift', x: 3, y: 2, requires: [req('darkKnowledge', 2)] },
-    { id: 'voidRiftEvolve', cost: 5, branch: 'curse', kind: 'evolve', key: 'voidRift', x: 4, y: 2, requires: [req('voidRift', 5)], },
-    // Linha da morte. 27/11/2026: Corpse Burst, Red Harvest, Spectral Blades e Blade Tempest saíram do Curse Path (a Spectral Blade foi para o Blade Path). Fica o Golden Tornado, uma skill de mago
-    { id: 'goldenTornado', cost: 4, branch: 'curse', kind: 'power', key: 'goldenTornado', x: 1, y: 3, requires: [req('arcaneStudy')] },
-    { id: 'oathRuin', cost: 4, branch: 'curse', kind: 'passive', key: 'oathRuin', oath: true, x: 5, y: 1.5, requires: [req('wrathEvolve'), req('voidRiftEvolve')] }
+    // 27/11/2026 (nerf do Void Rift): o Event Horizon (a evolução dele) saiu e o Starfall entrou no lugar, no fim da linha do vazio
+    { id: 'starfall', cost: 4, branch: 'curse', kind: 'power', key: 'starfall', x: 4, y: 2, requires: [req('voidRift', 5)] },
+    // Linha de baixo (27/11/2026): Summon Skeletons > Grave Wisp (veio da linha da tempestade) > Rune Shield > Sovereign Rune. O Golden Tornado saiu. Rune Shield era o clique do Gudran, agora uma
+    // skill de qualquer herói; Sovereign Rune é a evolução dela: as runas lançam bolas de energia em várias direções
+    { id: 'summonSkeletons', cost: 4, branch: 'curse', kind: 'power', key: 'summonSkeletons', x: 1, y: 3, requires: [req('arcaneStudy')] },
+    { id: 'graveWisp', cost: 4, branch: 'curse', kind: 'power', key: 'graveWisp', x: 2, y: 3, requires: [req('summonSkeletons')] },
+    { id: 'runeShield', cost: 3, branch: 'curse', kind: 'power', key: 'runeShield', x: 3, y: 3, requires: [req('graveWisp')] },
+    { id: 'sovereignRune', cost: 4, branch: 'curse', kind: 'evolve', key: 'runeShield', x: 4, y: 3, requires: [req('runeShield', 5)] },
+    { id: 'oathRuin', cost: 4, branch: 'curse', kind: 'passive', key: 'oathRuin', oath: true, x: 5, y: 1.5, requires: [req('wrathEvolve'), req('starfall')] }
 ];

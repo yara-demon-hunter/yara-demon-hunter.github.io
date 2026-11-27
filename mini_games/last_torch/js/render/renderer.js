@@ -35,7 +35,7 @@ import { renderFeathers } from './feathers.js';
 import { heroAnim } from './player.js';
 import {
     renderBolts, renderChillAura, renderDashGhosts, renderGroundFires, renderLightning,
-    renderFrostBreaths, renderGoldenTornado, renderSpectralBlade, renderStars
+    renderFrostBreaths, renderIcePatches, renderSpectralBlade, renderStars
 } from './powers.js';
 import { renderReflectWard } from './reflect.js';
 import { renderGuardianWard, renderSnares } from './druid.js';
@@ -189,6 +189,7 @@ export function render() {
     renderCracks();
     renderWarmth();
     renderGroundFires();
+    renderIcePatches();
     renderFireRing();
     renderTorchAlarm();
     renderAttackRange();
@@ -213,7 +214,6 @@ export function render() {
     renderFireTornado();
     renderHearthBird();
     renderEnemies('front', state.coreY, heroBehind ? null : renderHeroBlock, player.y);
-    renderGoldenTornado();               // por cima de todos os monstros: o tornado dourado engole o que está dentro dele
     renderSceneryOccluders();            // o herói atrás de um prédio: o prédio cobre e o herói aparece translúcido por cima
     renderTorchLight();
     renderRoots();

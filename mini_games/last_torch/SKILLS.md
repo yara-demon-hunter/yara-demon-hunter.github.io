@@ -34,7 +34,7 @@ troféu no Santuário ao alcançar a hora 8 sob ele.
 
 Regras: abre ao aprender **as duas skills que chegam nele** (as ligações do mapa) e fica na coluna 6, sempre na mesma posição.
 Slaughter pede Spectral Blade e Executioner (o Cataclysm saiu em 27/11/2026); Whispers, Shadow Legion e Smoke Bomb (os fins dos dois caminhos de Shadow; Fan of Knives e o ouro ficam de fora); Hearth, Phoenix Pact e Solar Wall;
-Ruin, Wrath of Heaven e Event Horizon. Os dados ficam em `data_model/passives.js`, e a arte
+Ruin, Wrath of Heaven e Starfall (o Event Horizon saiu em 27/11/2026). Os dados ficam em `data_model/passives.js`, e a arte
 em `data_model/visuals/characters/oath_visual.js` e `js/render/hero_gear.js`.
 
 ## O ladrão e as relíquias
@@ -79,7 +79,7 @@ como Flame Sentinel, Hearth Ring, Grave Wisp, Holy Water, Guardian Angel, Flamin
 custam 1 ponto a mais que as passivas do mesmo ramo, e isso já está no `cost` de cada nó. Com ~86 pontos numa noite dá para levar
 umas 3 ou 4 ativas no máximo; o resto vira escolha.
 
-As evoluções mais fortes custam 1 ponto a mais que o padrão do ramo: Sun Spire, Solar Wall e Event Horizon (5) e Cathedral Toll evoluído (4).
+As evoluções mais fortes custam 1 ponto a mais que o padrão do ramo: Sun Spire, Solar Wall e Cathedral Toll evoluído (4).
 
 ## Mapa atual
 
@@ -106,10 +106,10 @@ Cada ramo tem 4 linhas temáticas e termina no Juramento (coluna 6). Uma skill n
   - Armas: Flaming Sword* (sai do Hellwalker), Fireballs* (vem depois da Flaming Sword; nada mais depende dela)
   - Oath of the Hearth*
 - **Curse** (raiz: Arcane Study)
-  - Gelo e força: Cold Moon, Soul Nova, Freezing Breath (antes Absolute Zero; a chave interna continua absoluteZero), Starfall
+  - Gelo e força: Cold Moon, Soul Nova, Freezing Breath (antes Absolute Zero; a chave interna continua absoluteZero), Permafrost (evolução do sopro: crosta de gelo no chão que deixa os monstros 50% mais lentos e +20% de dano nas skills de gelo), Blizzard (skill de nível: +80% por nível, até 5x o dano, só nas skills de gelo: Chill Aura e Freezing Breath)
   - Distância: Grave Wisp*, Occult Focus*, Storm Sigil, Wrath of Heaven
-  - Vazio: Creeping Hex*, Dark Knowledge*, Void Rift*, Event Horizon*
-  - Morte: Golden Tornado (um tornado dourado de luz que caça os monstros). Saíram em 27/11/2026: Corpse Burst, Red Harvest, Spectral Blades (agora é a Spectral Blade do Blade Path) e Blade Tempest. Arcane Study: +1% de dano por nível (até 5%) só nas skills do Curse Path
+  - Vazio: Creeping Hex*, Dark Knowledge*, Void Rift*, Starfall (no lugar do Event Horizon)
+  - Morte: Summon Skeletons (esqueletos aliados de vários tipos que levantam do chão, cada um pega um monstro, lutam por um tempo e provocam os monstros), Grave Wisp, Rune Shield (runas que giram em volta do herói) e a evolução Sovereign Rune (as runas lançam bolas de energia em várias direções). O Golden Tornado saiu em 27/11/2026. Arcane Study: +1% de dano por nível (até 5%) só nas skills do Curse Path
   - Oath of Ruin*
 
 ## O que cada skill nova faz

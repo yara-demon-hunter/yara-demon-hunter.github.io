@@ -192,16 +192,17 @@ export function skeletonBody(S) {
             limb([[c[0] + 0.4, c[1] - R * 0.7, c[2] + R * 0.5], [c[0] + 0.4, c[1] + R * 0.5, c[2] - R * 0.7]], 0.5, C.boneDark);
             ball([c[0] + 0.6, c[1], c[2]], R * 0.24, C.steel);
         } else if (S.hold === 'bow' && side < 0) {
-            const top = [hand[0] - 0.6, hand[1], hand[2] + 5.6];
-            const mid = [hand[0] + 1.5, hand[1], hand[2]];
-            const bot = [hand[0] - 0.6, hand[1], hand[2] - 5.6];
+            const K = S.bowScale ?? 1;                                       // o tamanho do arco (o Esqueleto Arqueiro usa mais que 1)
+            const top = [hand[0] - 0.6 * K, hand[1], hand[2] + 5.6 * K];
+            const mid = [hand[0] + 1.5 * K, hand[1], hand[2]];
+            const bot = [hand[0] - 0.6 * K, hand[1], hand[2] - 5.6 * K];
             // O arco curva mais quando a corda está puxada
             const pull = aimNow(S);
-            const bend = 0.4 * pull;
+            const bend = 0.4 * pull * K;
             const bowTop = [top[0] + bend, top[1], top[2] - bend * 1.2];
             const bowBot = [bot[0] + bend, bot[1], bot[2] + bend * 1.2];
-            limb([bowTop, mid, bowBot], 1.1, C.boneDark);
-            limb([bowTop, mid, bowBot], 0.7, C.wood);
+            limb([bowTop, mid, bowBot], 1.1 * Math.sqrt(K), C.boneDark);
+            limb([bowTop, mid, bowBot], 0.7 * Math.sqrt(K), C.wood);
             const rel = releaseNow();
             // Corda: em V até a mão que puxa; ao soltar ela vibra reta e a flecha já foi
             const stringPoint = [hand[0] - 2.6 - pull * 2.3 + (rel > 0 ? 2.3 * pull + Math.sin(rel * 90) * 0.4 : 0), hand[1], hand[2]];

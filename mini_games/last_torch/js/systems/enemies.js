@@ -32,7 +32,7 @@ import { lerpAngle } from '../../library/core/easing.js';
 import { knightHeadOf } from '../core/monster_art.js';
 import { getAtkDamage } from './stats.js';
 import { hurtTorch } from './torch.js';
-import { hurtConvert, provokingConvert } from './conversion.js';
+import { hurtConvert, hurtSummonsCircle, provokingConvert, summonedHit } from './conversion.js';
 import { CONVERSION } from '../../data_model/passives.js';
 
 // Modelo de dados do inimigo (monstro comum ou boss)
@@ -287,7 +287,10 @@ function updateTreantPunch(e, P, dist, angle, dt) {
     e.punchCooldown = P.cooldownSeconds;
     e.swing = 0;
     // Golpe em área: o círculo no chão avisa onde vai pegar e estoura quando as mãos batem (junto do fim da preparação)
-    if (P.area) e.slamTele = addSlam(e.x, e.y, P.areaRadius, P.windupSeconds, e.damage * P.damageMultiplier, null, P.torchDamage ?? 0, '#a8a29e');
+    if (P.area) {
+        e.slamTele = addSlam(e.x, e.y, P.areaRadius, P.windupSeconds, e.damage * P.damageMultiplier, null, P.torchDamage ?? 0, '#a8a29e');
+        e.slamTele.boss = false;             // pancada de monstro comum (o golem): não é de chefe
+    }
     return true;
 }
 
@@ -426,6 +429,7 @@ function burst(e, model) {
             dealDamage(o, o.maxHp * X.monsterDamageRatio, { kbX: Math.cos(a) * 320, kbY: Math.sin(a) * 320, noCrit: true });
         }
     });
+    hurtSummonsCircle(e.x, e.y, radius, X.damage * (e.damage / model.damage));        // os esqueletos invocados também levam o estouro
     addShockwave(e.x, e.y, { radius, color: model.color, width: 7, seconds: 0.35 });
     createExplosion(e.x, e.y, model.color, 20);
     shakeScreen(7);
@@ -708,6 +712,12 @@ export function updateEnemies(dt) {
             hurtConvert(ally, e.damage);
         }
 
+        // Chefe provocado por um esqueleto invocado (bossTarget): no contato ele o fere (3x, ver hurtSummonsCircle) com o intervalo dos outros golpes em convertidos
+        if (hunting && bossT?.summon && !(e.allyHitCd > 0) && Math.hypot(bossT.summon.x - e.x, bossT.summon.y - e.y) < bossT.summon.radius + e.radius + 4) {
+            e.allyHitCd = CONVERSION.enemyHitSeconds;
+            hurtSummonsCircle(bossT.summon.x, bossT.summon.y, 0, e.damage, true);
+        }
+
         // Colisão com Herói
         if (hunting && distToPlayer < e.radius + CHARACTER_MODEL.collisionRadius && player.iFrames <= 0) {
             const hit = hurtPlayer(e.damage, e.x, e.y, CHARACTER_MODEL.invulnerabilitySeconds, e);
@@ -872,6 +882,7 @@ function updateBubble(p, i, dt) {
             hurtPlayer(p.damage, p.x, p.y, CHARACTER_MODEL.projectileInvulnerabilitySeconds);
         }
         hurtOaks(p.x, p.y, p.burstRadius, p.damage);
+        hurtSummonsCircle(p.x, p.y, p.burstRadius, p.damage, true);       // a bolha é do Slizork (chefe)
         for (const c of shadowClones) if (c.active && Math.hypot(c.x - p.x, c.y - p.y) < p.burstRadius + 12) damageShadowClone(c, p.damage, p.x, p.y, 0.5);
         const angelB = liveAngel();
         if (angelB && Math.hypot(angelB.x - p.x, angelB.y - p.y) < p.burstRadius + angelB.radius) damageAngel(p.damage, 0.5);
@@ -919,6 +930,15 @@ export function updateEnemyProjectiles(dt) {
         if (passives.mirrorWard.lvl > 0 && player.reflectTimer <= 0
             && Math.hypot(player.x - p.x, player.y - p.y) < p.radius + MIRROR_WARD.catchRadius
             && tryReflect(p)) {
+            continue;
+        }
+
+        // Os esqueletos invocados (Summon Skeletons) também levam o tiro; o do chefe dói mais (ver hurtSummonsCircle)
+        const skeleton = summonedHit(p.x, p.y, p.radius);
+        if (skeleton) {
+            hurtSummonsCircle(skeleton.x, skeleton.y, 0, p.damage, !!BOSS_MODELS[p.owner]);
+            createExplosion(p.x, p.y, p.color ?? '#a8a29e', 5);
+            enemyProjectiles.splice(i, 1);
             continue;
         }
 

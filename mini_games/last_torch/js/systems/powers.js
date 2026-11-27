@@ -1,4 +1,5 @@
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
+import { createMonster } from '../../data_model/monsters.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
 import { blast, dealDamage } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen } from './effects.js';
@@ -75,73 +76,6 @@ function updateSpectralBlade(dt) {
         }
     }
     for (const e of state.enemies) if (e.bladeCd > 0) e.bladeCd -= dt;
-}
-
-// --- GOLDEN TORNADO (Curse Path) ---
-// Quando monstros chegam perto, um tornado dourado de luz nasce ao lado do herói e CAÇA os monstros (anda até o mais perto) por `duration` s: fere tudo dentro dele
-// (dano de feitiço por segundo) e arrasta quem está em volta para o centro. Some e só então a recarga corre. Números: POWER_MODELS.goldenTornado. Desenho: renderGoldenTornado.
-function updateGoldenTornado(dt) {
-    const level = getPowerLevel(powers.goldenTornado);
-    if (!level) { if (state.goldenTornado) endGoldenTornado(); return; }
-    const M = POWER_MODELS.goldenTornado.base;
-    let T = state.goldenTornado;
-    if (!T) {
-        if (state.phase !== 'HUNT' || player.hp <= 0 || !ready('goldenTornado', dt, getSpellCooldown(level.cooldown))) return;
-        const near = state.enemies.some(e => e.hp > 0 && !e.emerge && Math.hypot(e.x - player.x, e.y - player.y) <= 260 + e.radius);
-        if (!near) { state.powerTimers.goldenTornado = 0.3; return; }
-        const a = player.angle ?? 0;
-        T = state.goldenTornado = { x: player.x + Math.cos(a) * 50, y: player.y + Math.sin(a) * 50, age: 0, seconds: level.duration, tick: 0, radius: level.radius, hits: new Set() };
-        createExplosion(T.x, T.y, '#fde68a', 10);
-        addShockwave(T.x, T.y, { radius: level.radius * 1.4, color: '#fbbf24', width: 5, seconds: 0.4 });
-        audio.playNova?.();
-    }
-    state.powerTimers.goldenTornado = getSpellCooldown(level.cooldown);        // a recarga só corre depois que o tornado some
-    T.age += dt;
-    if (T.age >= T.seconds || state.phase !== 'HUNT') { endGoldenTornado(); return; }
-    // Caça: trava num monstro e anda até ele; quando ele morre, vai para o mais perto (sem monstro, volta para perto do herói)
-    if (!T.target || T.target.hp <= 0 || !state.enemies.includes(T.target) || Math.hypot(T.target.x - T.x, T.target.y - T.y) > 650) {
-        T.target = null;
-        let best = 520;
-        for (const e of state.enemies) {
-            if (e.hp <= 0 || e.emerge) continue;
-            const d = Math.hypot(e.x - T.x, e.y - T.y);
-            if (d < best) { best = d; T.target = e; }
-        }
-    }
-    const tx = T.target ? T.target.x : player.x, ty = T.target ? T.target.y : player.y;
-    const dx = tx - T.x, dy = ty - T.y, d = Math.hypot(dx, dy) || 1;
-    if (d > 8) {
-        const step = Math.min(d, M.speed * dt);
-        T.x += (dx / d) * step;
-        T.y += (dy / d) * step;
-    }
-    T.x = Math.max(20, Math.min(state.width - 20, T.x));
-    T.y = Math.max(160, Math.min(state.height - 20, T.y));
-    // Engole: quem está em volta é puxado em ESPIRAL para o centro (gira em volta dele enquanto se aproxima) e fere a cada instante. e.swallow (0 a 1) diz o quanto
-    // o monstro já está "dentro" do tornado; o desenho (js/render/entities.js e renderGoldenTornado) o encolhe, o faz girar e o cobre de ouro. Chefe e pesados quase não se mexem
-    const reach = T.radius * M.pullRatio;
-    const tick = (T.tick -= dt) <= 0;
-    if (tick) T.tick += M.tickSeconds;
-    const damage = getSpellDamage() * level.dps * M.tickSeconds;
-    const rise = Math.min(1, T.age / M.riseSeconds, (T.seconds - T.age) / M.fadeSeconds);
-    for (const e of state.enemies) {
-        const ex = T.x - e.x, ey = T.y - e.y, ed = Math.hypot(ex, ey) || 1;
-        if (e.hp <= 0 || e.emerge || ed > reach + e.radius) { e.swallow = 0; continue; }
-        e.swallow = Math.max(0, Math.min(1, (1 - ed / (T.radius * 1.15)) * 1.2)) * Math.max(0, rise);
-        if (!e.isBoss && !e.immovable && ed > 6) {
-            const resist = 1 - (e.knockbackResist ?? 0);
-            const pull = M.pull * resist * dt, swirl = M.swirl * resist * dt;
-            e.x += (ex / ed) * Math.min(pull, ed) + (-ey / ed) * swirl;        // para o centro + de lado: gira em volta dele
-            e.y += (ey / ed) * Math.min(pull, ed) + (ex / ed) * swirl;
-        }
-        if (tick && ed <= T.radius + e.radius) dealDamage(e, damage, { noCrit: true, style: 'spell', quiet: true });
-    }
-}
-
-// O tornado some: ninguém fica "engolido" (e.swallow volta a 0)
-function endGoldenTornado() {
-    state.goldenTornado = null;
-    for (const e of state.enemies) e.swallow = 0;
 }
 
 // --- FOGO NOS PASSOS ---
@@ -320,32 +254,104 @@ function updateAbsoluteZero(dt) {
         const b = breaths[i];
         if (!level || state.phase !== 'HUNT' || player.hp <= 0) { breaths.splice(i, 1); continue; }
         b.age += dt;
-        // O cone vira com o herói (suave: acompanha o rumo para onde ele olha)
-        let diff = player.angle - b.angle;
+        // O cone gira para o monstro MAIS PERTO (e o herói vira junto: o corpo trava nessa direção em js/render/player25d.js, lockFacing). Dá para andar recuando enquanto ele sopra
+        // para trás; e um arremesso (adaga, bola de energia) vai pelo mesmo rumo, que é o da mira automática. Sem monstro perto, o cone fica onde está
+        const aimed = nearestEnemy(player.x, player.y, level.range + 120);
+        if (aimed) b.aim = Math.atan2(aimed.y - player.y, aimed.x - player.x);
+        let diff = (b.aim ?? b.angle) - b.angle;
         diff = Math.atan2(Math.sin(diff), Math.cos(diff));
         b.angle += Math.max(-M.turnSpeed * dt, Math.min(M.turnSpeed * dt, diff));
+        player.angle = b.angle;                         // o rumo do herói é o do sopro
         b.tick -= dt;
         if (b.tick <= 0) { b.tick += M.tickSeconds; breathTick(b, level, M); }
+        // O gelo no chão: por onde o sopro passa fica uma camada de gelo (só o visual, desde o começo; o Permafrost é que a torna lenta). Uma nova a cada frost.patchEvery s; o cone gira, então cada uma aponta para um lado
+        {
+            const F = M.frost;
+            b.iceCd = (b.iceCd ?? 0) - dt;
+            if (b.iceCd <= 0) {
+                b.iceCd += F.patchEvery;
+                if (state.icePatches.length >= F.maxPatches) state.icePatches.shift();
+                state.icePatches.push({ x: player.x, y: player.y, angle: b.angle, range: level.range, half: level.halfAngle, life: F.seconds, maxLife: F.seconds });
+            }
+        }
         b.sound -= dt;
         if (b.sound <= 0) { b.sound = 0.7; audio.playIceBreath?.(); }
         state.powerTimers.absoluteZero = getSpellCooldown(level.cooldown);       // a recarga só começa a correr quando o sopro acaba
         if (b.age >= M.breathSeconds) breaths.splice(i, 1);
     }
     if (!level || breaths.length > 0 || state.phase !== 'HUNT' || !ready('absoluteZero', dt, getSpellCooldown(level.cooldown))) return;
-    // O melhor rumo para começar: a direção de cada monstro ao alcance, ficando com a que pega mais monstros
-    const near = state.enemies.filter(e => e.hp > 0 && !e.emerge && Math.hypot(e.x - player.x, e.y - player.y) <= level.range + e.radius);
-    if (near.length === 0) { state.powerTimers.absoluteZero = 0.3; return; }       // ninguém perto: não gasta a recarga
-    let best = null, bestCount = -1, bestDist = Infinity;
-    for (const t of near) {
-        const angle = Math.atan2(t.y - player.y, t.x - player.x);
-        const count = near.filter(e => inCone(e, player.x, player.y, angle, level.range, level.halfAngle)).length;
-        const dist = Math.hypot(t.x - player.x, t.y - player.y);
-        if (count > bestCount || (count === bestCount && dist < bestDist)) { best = angle; bestCount = count; bestDist = dist; }
-    }
+    // O sopro começa quando um monstro chega ao alcance do cone, virado para o mais perto
+    const nearest = nearestEnemy(player.x, player.y, level.range);
+    if (!nearest) { state.powerTimers.absoluteZero = 0.3; return; }       // ninguém perto: não gasta a recarga
+    const best = Math.atan2(nearest.y - player.y, nearest.x - player.x);
     player.angle = best;
     breaths.push({ x: player.x, y: player.y, angle: best, age: 0, tick: 0, sound: 0, touched: new Set(), range: level.range, half: level.halfAngle });
     startCast();
     shakeScreen(2);
+}
+
+// Gelo no chão: as camadas duram frost.seconds. Só com o PERMAFROST (a evolução) deixam mais lento quem está em cima (e.slow, o mesmo da Chill Aura, refeito a cada quadro)
+function updateIcePatches(dt) {
+    const patches = state.icePatches;
+    if (patches.length === 0) return;
+    const level = getPowerLevel(powers.absoluteZero);
+    const slow = powers.absoluteZero.evolved ? (level?.iceSlow ?? 0.5) : 0;
+    for (let i = patches.length - 1; i >= 0; i--) {
+        patches[i].life -= dt;
+        if (patches[i].life <= 0) patches.splice(i, 1);
+    }
+    if (slow <= 0) return;
+    for (const e of state.enemies) {
+        if (e.hp <= 0 || e.emerge) continue;
+        for (const p of patches) {
+            if (inCone(e, p.x, p.y, p.angle, p.range, p.half)) { e.slow = Math.max(e.slow ?? 0, slow); break; }
+        }
+    }
+}
+
+// --- SUMMON SKELETONS (Curse Path) ---
+// Quando monstros chegam perto, `count` esqueletos ALIADOS levantam do chão em volta do herói (até `maxAlive` vivos) e lutam até cair: entram em state.converts, a lista dos aliados
+// (a IA, o dano deles e o desenho vêm de js/systems/conversion.js e js/render/entities.js). Não somem pelo tempo: ficam até morrer (tiros, explosões e golpes em área; o chefe fere 3x mais: ver hurtSummons em conversion.js).
+const SKELETON_ALLY_FIELDS = { ally: true, vx: 0, vy: 0, lungeState: 0, rooted: 0, frozen: 0, stunned: 0, marked: 0, blessed: 0, chilled: 0, burning: 0, ravenMark: 0, slow: 0, hitFlash: 0, allyCd: 0, punchState: 0, punchCooldown: 0.4, swing: 0, throwArm: 0, slamHit: false, shotTimer: undefined, lungeTimer: 0.4 };
+// Sorteia o tipo do esqueleto pelo peso de cada um
+function pickSkeletonType(types) {
+    let roll = Math.random() * types.reduce((sum, t) => sum + t.weight, 0);
+    for (const t of types) { roll -= t.weight; if (roll < 0) return t; }
+    return types[0];
+}
+function updateSummonSkeletons(dt) {
+    const level = getPowerLevel(powers.summonSkeletons);
+    if (!level || state.phase !== 'HUNT' || player.hp <= 0 || !ready('summonSkeletons', dt, getSpellCooldown(level.cooldown))) return;
+    const B = POWER_MODELS.summonSkeletons.base;
+    const target = nearestEnemy(player.x, player.y, B.triggerRange);
+    const alive = state.converts.filter(a => a.summoned && a.hp > 0).length;
+    if (!target || alive >= B.maxAlive) { state.powerTimers.summonSkeletons = 0.5; return; }       // ninguém perto (ou já tem todos): não gasta a recarga
+    const toward = Math.atan2(target.y - player.y, target.x - player.x);
+    const count = Math.min(B.perCast, B.maxAlive - alive);
+    const hp = getSpellDamage() * level.hpPerMagic;           // a vida cresce com a MAGIA do herói (getSpellDamage)
+    for (let i = 0; i < count; i++) {
+        const a = toward + (i - (count - 1) / 2) * 0.9;
+        const x = Math.max(20, Math.min(state.width - 20, player.x + Math.cos(a) * B.spawnDistance));
+        const y = Math.max(160, Math.min(state.height - 20, player.y + Math.sin(a) * B.spawnDistance));
+        const kind = pickSkeletonType(B.types);
+        // Nasce como no Necromante: uma cova escura se abre no chão (telegraph 'grave', 0.7s) e, quando ela fecha, a terra voa e o esqueleto surge (boss_ai.js chama onSpawn)
+        const damage = getSpellDamage() * level.damage / 1.4;        // 1.4 = CONVERSION.damageScale: cada mordida = dano de feitiço x level.damage
+        const maxHp = Math.max(10, hp * kind.hp);
+        state.telegraphs.push({
+            kind: 'grave', radius: 18, age: 0, seconds: 0.7, monsterType: kind.type, x, y,
+            onSpawn: () => {
+                if (state.phase !== 'HUNT') return;
+                const sk = createMonster(kind.type, state.turn, x, y);
+                Object.assign(sk, SKELETON_ALLY_FIELDS, { summoned: true, emerge: null });
+                sk.hp = sk.maxHp = maxHp;
+                sk.damage = damage;
+                state.converts.push(sk);
+                createExplosion(x, y, '#4c1d95', 6);                 // e a energia negra do Curse Path
+            }
+        });
+    }
+    startCast();
+    audio.playSummon?.();
 }
 
 // --- LUA FRIA ---
@@ -455,7 +461,8 @@ export function onEnemyKilled(e) {
 export function updatePowers(dt) {
     if (state.powerTimers.wrath > 0) state.powerTimers.wrath -= dt;
     updateSpectralBlade(dt);
-    updateGoldenTornado(dt);
+    updateSummonSkeletons(dt);
+    updateIcePatches(dt);
     updateEmberTrail();
     updateGroundFires(dt);
     updateChainLightning(dt);
