@@ -5,7 +5,7 @@ seo_title: "Last Torch: Guia de Sobrevivência"
 description: "Aprenda a proteger a tocha, escolher habilidades, gastar ouro no acampamento e se preparar para os chefes de Last Torch: Demon Hunter."
 lang: pt
 translation_id: last-torch-survival-guide
-last_updated: 2026-11-10
+last_updated: 2026-11-26
 hide_recent_updates: true
 image: /assets/images/common/mini-game/last_torch_cover.jpeg
 ---

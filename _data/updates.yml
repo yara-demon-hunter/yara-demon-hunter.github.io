@@ -1,3 +1,14 @@
+- date: "2026-11-28"
+  title:
+    en: "New guides: Last Torch heroes, map and bosses"
+    pt: "Guias novos: heróis, mapa e chefes de Last Torch"
+  summary:
+    en: "Two new guides: who each hero is and how to unlock them, and a tour of the six screens with the boss at the end of each one."
+    pt: "Dois guias novos: quem é cada herói e como liberá-lo, e um passeio pelas seis telas com o chefe no fim de cada uma."
+  url:
+    en: "/en/guides/last-torch-heroes/"
+    pt: "/pt/guias/herois-last-torch/"
+
 - date: "2026-11-24"
   title:
     en: "Last Torch: six screens, a world map and eight bosses"

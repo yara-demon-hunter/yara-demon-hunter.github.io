@@ -4,7 +4,7 @@ title: "Last Torch Beginner's Guide: Survive the Night"
 description: "Learn how to protect the torch, build your skills, spend gold at camp, and prepare for the bosses in Last Torch: Demon Hunter."
 lang: en
 translation_id: last-torch-survival-guide
-last_updated: 2026-11-10
+last_updated: 2026-11-26
 hide_recent_updates: true
 image: /assets/images/common/mini-game/last_torch_cover.jpeg
 ---
