@@ -1,0 +1,27 @@
+{%- assign mail = "yarademonhunter@gmail.com" -%}
+{%- if page.lang == "pt" -%}
+    {%- assign subject = "Sobre: " | append: page.title -%}
+    {%- assign body = "Oi! Estou escrevendo sobre esta página.
+
+O que mais gostei:
+O que você mudaria ou quer ver a seguir:
+" | url_encode | replace: "+", "%20" -%}
+{%- else -%}
+    {%- assign subject = "About: " | append: page.title -%}
+    {%- assign body = "Hi! I'm writing about this page.
+
+What I liked most:
+What you should change or add next:
+" | url_encode | replace: "+", "%20" -%}
+{%- endif -%}
+<aside class="contact-cta" aria-labelledby="contact-cta-title">
+    {% if page.lang == "pt" %}
+        <h2 id="contact-cta-title">Fala comigo</h2>
+        <p>Sou uma pessoa só fazendo a história e os jogos, e leio e respondo todos os e-mails. Qual personagem você quer ver mais? Achou um bug? Tem uma ideia? As melhores sugestões podem virar conteúdo do projeto.</p>
+        <a class="contact-cta__button" href="mailto:{{ mail }}?subject={{ subject | url_encode | replace: "+", "%20" }}&body={{ body }}">✉ Enviar uma mensagem</a>
+    {% else %}
+        <h2 id="contact-cta-title">Talk to me</h2>
+        <p>It's just one person making the story and the games, and I read and answer every email. Which character do you want to see more? Found a bug? Got an idea? The best suggestions may end up in the project.</p>
+        <a class="contact-cta__button" href="mailto:{{ mail }}?subject={{ subject | url_encode | replace: "+", "%20" }}&body={{ body }}">✉ Send a message</a>
+    {% endif %}
+</aside>

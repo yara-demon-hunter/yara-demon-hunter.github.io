@@ -50,6 +50,13 @@
                     {% include chapter-navigation.html %}
                 {% endif %}
 
+                {% assign cta_url = page.url %}
+                {% if page.hide_contact_cta != true and page.layout != "legal" and page.layout != "copyright" and cta_url contains "/" and cta_url != "/en/" and cta_url != "/pt/" and cta_url != "/" %}
+                    {% if cta_url contains "/guides/" or cta_url contains "/guias/" or cta_url contains "/books/" or cta_url contains "/characters/" or cta_url contains "/mini-games/" or cta_url contains "/updates/" or cta_url contains "/world/" %}
+                        {% include contact-cta.html %}
+                    {% endif %}
+                {% endif %}
+
             </main>
 
             {% unless page.hide_recent_updates %}

@@ -23,6 +23,17 @@ Se você quiser falar com o projeto, envie um e-mail para:
     <a href="mailto:yarademonhunter@gmail.com">yarademonhunter@gmail.com</a>
 </p>
 
+<h2 id="rapido">Mensagens rápidas</h2>
+
+Um clique abre um e-mail com o assunto já preenchido:
+
+<ul>
+    <li><a href="mailto:yarademonhunter@gmail.com?subject=D%C3%BAvida%20sobre%20a%20hist%C3%B3ria">Perguntar sobre a história ou os personagens</a></li>
+    <li><a href="mailto:yarademonhunter@gmail.com?subject=Bug%20ou%20feedback%20do%20jogo">Avisar de um bug ou dar feedback do jogo</a></li>
+    <li><a href="mailto:yarademonhunter@gmail.com?subject=Ideia%20para%20o%20projeto">Mandar uma ideia</a></li>
+    <li><a href="mailto:yarademonhunter@gmail.com?subject=Colabora%C3%A7%C3%A3o">Propor uma colaboração</a></li>
+</ul>
+
 <h2 id="topics">2. Assuntos comuns</h2>
 
 O projeto pode ser contatado para:
