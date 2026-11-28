@@ -35,7 +35,7 @@ import { renderFeathers } from './feathers.js';
 import { heroAnim } from './player.js';
 import {
     renderBolts, renderChillAura, renderDashGhosts, renderGroundFires, renderLightning,
-    renderFrostBreaths, renderIcePatches, renderSpectralBlade, renderStars
+    renderFireBreaths, renderFrostBreaths, renderIcePatches, renderLaughingSkulls, renderSpectralBlade, renderStars
 } from './powers.js';
 import { renderReflectWard } from './reflect.js';
 import { renderGuardianWard, renderSnares } from './druid.js';
@@ -247,7 +247,9 @@ export function render() {
     renderPhoenix();
     renderParticles();
     renderLightning();
+    renderLaughingSkulls();
     renderFrostBreaths();
+    renderFireBreaths();
     renderStars();
     renderShockwaves();
     renderSceneryAmbient();

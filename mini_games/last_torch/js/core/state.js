@@ -135,7 +135,7 @@ export const state = {
     // Efeitos (js/systems/effects.js, desenhados em js/render/effects.js)
     gibs: [],
     arcaneBolts: [],
-    runeShield: { left: 0, angle: 0, age: 0 },   // Escudo de Runas do Gudran: tempo restante, giro e idade (para o desenho)           // raios de energia do cajado do Gudran (js/systems/arcane.js)
+    runeShield: { count: 0, angle: 0, age: 0 },   // Escudo de Runas do Gudran: tempo restante, giro e idade (para o desenho)           // raios de energia do cajado do Gudran (js/systems/arcane.js)
     converts: [],              // monstros convertidos pelo Avgustino (Conversion): lutam do lado do herói (js/systems/conversion.js)
     conversion: { timer: 0, fx: [] },   // tempo até a próxima reza e os clarões das rezas
     corpses: [],               // corpos que tombam ao morrer (Treant)
@@ -152,8 +152,10 @@ export const state = {
     trailDistance: 0,
     groundFires: [],
     lightning: [],
+    skulls: [],                 // Laughing Skull: as caveiras em voo { x, y, angle, target, age, damage, radius, burst }
     bolts: [],
     stars: [],
+    fireBreaths: [],            // Chili Breath: os sopros de fogo na tela { x, y, angle, range, half, age }
     frostBreaths: [],           // Freezing Breath: os sopros gelados na tela { x, y, angle, range, half, age }
     powerTimers: {},
     blastBudget: 0,

@@ -43,6 +43,7 @@ tudo o que falta de uma vez. Só a ligação com o nó anterior abre um nó: nã
 O custo é o `cost` de cada nó (obrigatório). maxLvl padrão 5.
 notFor: ['rowan'] sela a skill para esses heróis, como o hero (a Fireballs, que mexeria nas rosas dele): selada, não se compra.
 exclusive: 'grupo' põe a skill num grupo em que só uma pode ser aprendida (a lâmina só aceita um encantamento: Flaming Sword ou Blessed Blade); a outra fica selada, com passe livre.
+noFreePass: true no nó faz o pedido de um pai selado NÃO ser dispensado: sem o pai de verdade, o nó fica trancado (Fireballs só abre com o Flaming Sword).
 needs: 'knives' marca a skill que só funciona com adaga. Quem não lança adaga (mod noKnives: o Captain Brutos, ou o
 Oath of Slaughter jurado) tem esses nós SELADOS (não é o cadeado: o cadeado é "ainda não", o selo é "não é para
 este personagem"): não se compram e valem como cumpridos para os nós que vêm depois (passe livre), então a cadeia

@@ -99,19 +99,68 @@ export function renderLightning() {
     ctx.lineJoin = 'round';
     state.lightning.forEach(bolt => {
         const look = bolt.hex ? SKILLS_VISUALS.hex.beam : L;
-        ctx.globalAlpha = Math.min(1, (bolt.life / bolt.maxLife) * 1.6);
+        const fade = Math.min(1, (bolt.life / bolt.maxLife) * 1.6);
+        ctx.globalAlpha = fade;
+        // Wrath of Heaven: o trovão é bem mais grosso e brilhante (e pisca no começo), com ramificações finas e um clarão onde fere cada alvo
+        const k = bolt.heaven ? 1.8 : 1;
+        const flicker = bolt.heaven && bolt.life > bolt.maxLife * 0.8 ? 1.15 : 1;
         ctx.beginPath();
         bolt.points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
-        ctx.strokeStyle = look.glow;
-        ctx.lineWidth = L.glowWidth;
+        ctx.strokeStyle = bolt.heaven ? 'rgba(147, 197, 253, 0.28)' : look.glow;
+        ctx.lineWidth = L.glowWidth * (bolt.heaven ? 1.8 : 1) * flicker;
         ctx.stroke();
-        ctx.strokeStyle = look.color;
-        ctx.lineWidth = L.width;
+        ctx.strokeStyle = bolt.heaven ? '#c4b5fd' : look.color;
+        ctx.lineWidth = L.width * k;
         ctx.stroke();
-        ctx.strokeStyle = look.core;
-        ctx.lineWidth = L.coreWidth;
+        ctx.strokeStyle = bolt.heaven ? '#dbeafe' : look.core;       // o miolo do raio forte é azul clarinho, não branco puro (cansava o olho)
+        ctx.lineWidth = L.coreWidth * k;
         ctx.stroke();
+        if (bolt.heaven) {
+            ctx.strokeStyle = '#e0f2fe';
+            ctx.lineWidth = 1.6;
+            for (const fork of bolt.forks ?? []) {
+                ctx.beginPath();
+                fork.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+                ctx.stroke();
+            }
+            for (const hit of bolt.hits ?? []) drawGlow(ctx, 'rgba(147, 197, 253, 0.8)', hit.x, hit.y, 28 * fade + 10, 0.45 * fade);
+        }
     });
+    ctx.restore();
+}
+
+// Laughing Skull: o crânio de osso do Grave King, com a mandíbula batendo (rindo), olhos roxos do Curse Path e um rastro de energia
+export function renderLaughingSkulls() {
+    if (!state.skulls.length) return;
+    ctx.save();
+    for (const s of state.skulls) {
+        const r = 14 * (1 + (s.age > 4 ? (s.age - 4) * 0.3 : 0));
+        const jaw = Math.abs(Math.sin(s.age * 14)) * r * 0.35;
+        const face = Math.cos(s.angle) >= 0 ? 1 : -1;
+        ctx.globalCompositeOperation = 'lighter';
+        drawGlow(ctx, 'rgba(124, 58, 237, 0.55)', s.x, s.y, r * 2.6, 0.6);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.scale(face, 1);
+        ctx.fillStyle = '#e8e0c8';
+        ctx.strokeStyle = '#3a3226';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.ellipse(0, -r * 0.15, r, r * 0.9, 0, 0, TAU); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.roundRect(-r * 0.55, r * 0.45 + jaw, r * 1.1, r * 0.45, r * 0.15); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#1a1412';
+        for (let k = -2; k <= 2; k++) ctx.fillRect(k * r * 0.2 - r * 0.05, r * 0.45 + jaw, r * 0.1, r * 0.16);
+        for (let k = -2; k <= 2; k++) ctx.fillRect(k * r * 0.2 - r * 0.05, r * 0.38, r * 0.1, r * 0.14);
+        for (const sx of [-0.38, 0.38]) {
+            ctx.fillStyle = '#1a1412';
+            ctx.beginPath(); ctx.ellipse(sx * r, -r * 0.12, r * 0.26, r * 0.3, 0, 0, TAU); ctx.fill();
+            ctx.fillStyle = '#a78bfa';
+            ctx.beginPath(); ctx.arc(sx * r, -r * 0.1, r * 0.12, 0, TAU); ctx.fill();
+        }
+        ctx.fillStyle = '#1a1412';
+        ctx.beginPath(); ctx.moveTo(0, r * 0.08); ctx.lineTo(-r * 0.1, r * 0.28); ctx.lineTo(r * 0.1, r * 0.28); ctx.closePath(); ctx.fill();
+        ctx.restore();
+    }
     ctx.restore();
 }
 
@@ -276,6 +325,55 @@ export function renderFrostBreaths() {
         if (b.age < 0.4) {
             ctx.globalAlpha = (0.4 - b.age) * 1.2;
             ctx.strokeStyle = '#bae6fd';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(ox, oy);
+            ctx.arc(ox, oy, b.range, b.angle - b.half, b.angle + b.half);
+            ctx.closePath();
+            ctx.stroke();
+        }
+    }
+    ctx.restore();
+}
+
+// Chili Breath: o lança-chamas. Língua de fogo que corre da boca até a ponta do cone (puffs laranja, amarelos e vermelhos), brasas que voam e um brilho quente. Cone estreito e comprido.
+export function renderFireBreaths() {
+    if (state.fireBreaths.length === 0) return;
+    const SECONDS = POWER_MODELS.chiliBreath.breathSeconds;
+    const puffs = state.quality >= 2 ? 14 : 30;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (const b of state.fireBreaths) {
+        const fade = Math.min(1, b.age / 0.12, (SECONDS - b.age) / 0.3);
+        if (fade <= 0) continue;
+        const ox = player.x + Math.cos(b.angle) * 10, oy = player.y - 16 + Math.sin(b.angle) * 4;
+        const nx = -Math.sin(b.angle), ny = Math.cos(b.angle);
+        const spreadK = Math.tan(b.half);
+        for (let k = 0; k < 6; k++) {
+            const t = (k + 1) / 6;
+            drawGlow(ctx, 'rgba(249, 115, 22, 0.9)', ox + Math.cos(b.angle) * b.range * t, oy + Math.sin(b.angle) * b.range * t, 12 + spreadK * b.range * t * 1.1, 0.22 * fade);
+        }
+        for (let k = 0; k < puffs; k++) {
+            const phase = (b.age * 2.2 + hash(k) + k / puffs) % 1;
+            const dist = b.range * phase;
+            const spread = (hash(k + 7) - 0.5) * 2 * spreadK * dist * 0.85;
+            const wob = Math.sin(b.age * 16 + k) * 2.2;
+            const color = k % 3 === 0 ? 'rgba(254, 240, 138, 0.95)' : k % 3 === 1 ? 'rgba(251, 146, 60, 0.95)' : 'rgba(239, 68, 68, 0.9)';
+            drawGlow(ctx, color, ox + Math.cos(b.angle) * dist + nx * (spread + wob), oy + Math.sin(b.angle) * dist + ny * (spread + wob),
+                5 + 8 * phase + hash(k + 90) * 4, (0.9 - 0.55 * phase) * fade);
+        }
+        ctx.fillStyle = '#fde68a';
+        for (let k = 0; k < 12; k++) {
+            const phase = (b.age * 1.6 + hash(k + 200)) % 1;
+            const dist = b.range * phase;
+            const spread = (hash(k + 220) - 0.5) * 2 * spreadK * dist * 1.1;
+            ctx.globalAlpha = Math.max(0, (1 - phase) * fade);
+            ctx.fillRect(ox + Math.cos(b.angle) * dist + nx * spread - 1.2, oy + Math.sin(b.angle) * dist + ny * spread - 1.2 - phase * 10, 2.4, 2.4);
+        }
+        ctx.globalAlpha = 1;
+        if (b.age < 0.4) {
+            ctx.globalAlpha = (0.4 - b.age) * 1.2;
+            ctx.strokeStyle = '#fdba74';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(ox, oy);

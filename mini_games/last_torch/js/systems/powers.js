@@ -1,11 +1,11 @@
 import { EVOLUTIONS, POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { createMonster } from '../../data_model/monsters.js';
 import { audio, passives, player, powers, state } from '../core/state.js';
-import { blast, dealDamage } from './damage.js';
+import { blast, dealDamage, ignite } from './damage.js';
 import { addShockwave, createExplosion, screenFlash, shakeScreen } from './effects.js';
 import { startCast } from './moves.js';
 import { hurtPlayer } from './player.js';
-import { spreadHex } from './skills_curse.js';
+import { spreadHex, updateLaughingSkull } from './skills_curse.js';
 import { onNatureKill } from './skills_nature.js';
 import { damageAngel, liveAngel, onLightKill } from './skills_light.js';
 import { getBladeDamage, getKillHeal, getSpellCooldown, getSpellDamage, getTorchFireDamage } from './stats.js';
@@ -146,38 +146,61 @@ function strikeChain(startX, startY, level, first = null) {
     let current = first ?? nearestEnemy(startX, startY, M.range);
     if (!current) return false;
 
-    const points = [{ x: startX, y: startY }];
+    // Wrath of Heaven (evoluído): o raio CAI DO CÉU no primeiro alvo (um trovão grosso, com clarão e tremor) e dali salta pelos outros
+    const heaven = !!powers.chainLightning.evolved;
+    const points = heaven ? [{ x: current.x + (Math.random() - 0.5) * 70, y: current.y - 520 }] : [{ x: startX, y: startY }];
     let jumps = level.jumps;
     while (current && jumps > 0) {
         struck.add(current);
         points.push({ x: current.x, y: current.y });
         dealDamage(current, damage, { noCrit: true, style: 'spell' });
-        createExplosion(current.x, current.y, '#7dd3fc', 4);
+        createExplosion(current.x, current.y, '#7dd3fc', heaven ? 8 : 4);
+        if (heaven) addShockwave(current.x, current.y, { radius: 34 + (level.jumps - jumps) * 2, color: '#e0f2fe', width: 4, seconds: 0.25 });
         jumps--;
         current = nearestEnemy(current.x, current.y, M.jumpRange, struck);
     }
-    state.lightning.push({ points: jaggedPath(points), life: 0.2, maxLife: 0.2 });
+    if (heaven) {
+        const path = jaggedPath(points, 38, 34);
+        state.lightning.push({ points: path, life: 0.34, maxLife: 0.34, heaven: true, forks: lightningForks(path), hits: points.slice(1) });
+        shakeScreen(2);                                        // sem clarão na tela inteira (cansava o olho): só um tremor leve
+    } else state.lightning.push({ points: jaggedPath(points), life: 0.2, maxLife: 0.2 });
     audio.playZap();
     return true;
 }
 
 // Quebra cada trecho em pontos deslocados, para parecer um raio
-function jaggedPath(points) {
+function jaggedPath(points, stepLength = 26, wobble = 22) {
     const path = [points[0]];
     for (let i = 1; i < points.length; i++) {
         const a = points[i - 1];
         const b = points[i];
-        const steps = Math.max(2, Math.floor(Math.hypot(b.x - a.x, b.y - a.y) / 26));
+        const steps = Math.max(2, Math.floor(Math.hypot(b.x - a.x, b.y - a.y) / stepLength));
         for (let s = 1; s < steps; s++) {
             const k = s / steps;
             path.push({
-                x: a.x + (b.x - a.x) * k + (Math.random() - 0.5) * 22,
-                y: a.y + (b.y - a.y) * k + (Math.random() - 0.5) * 22
+                x: a.x + (b.x - a.x) * k + (Math.random() - 0.5) * wobble,
+                y: a.y + (b.y - a.y) * k + (Math.random() - 0.5) * wobble
             });
         }
         path.push(b);
     }
     return path;
+}
+
+// Ramificações finas que saem do raio forte (Wrath of Heaven): cada uma é um pequeno traço em zigue-zague para o lado
+function lightningForks(path) {
+    const forks = [];
+    for (let i = 2; i < path.length - 1; i += 2) {
+        if (Math.random() < 0.45) continue;
+        const p = path[i];
+        const side = Math.random() < 0.5 ? -1 : 1;
+        const pts = [p];
+        let x = p.x, y = p.y;
+        const n = 2 + Math.floor(Math.random() * 3);
+        for (let k = 0; k < n; k++) { x += side * (14 + Math.random() * 22); y += 6 + Math.random() * 20; pts.push({ x, y }); }
+        forks.push(pts);
+    }
+    return forks;
 }
 
 function updateChainLightning(dt) {
@@ -279,13 +302,63 @@ function updateAbsoluteZero(dt) {
         state.powerTimers.absoluteZero = getSpellCooldown(level.cooldown);       // a recarga só começa a correr quando o sopro acaba
         if (b.age >= M.breathSeconds) breaths.splice(i, 1);
     }
-    if (!level || breaths.length > 0 || state.phase !== 'HUNT' || !ready('absoluteZero', dt, getSpellCooldown(level.cooldown))) return;
+    // Enquanto o Chili Breath sopra, este espera (sem gastar a recarga)
+    if (!level || breaths.length > 0 || state.fireBreaths.length > 0 || state.phase !== 'HUNT' || !ready('absoluteZero', dt, getSpellCooldown(level.cooldown))) return;
     // O sopro começa quando um monstro chega ao alcance do cone, virado para o mais perto
     const nearest = nearestEnemy(player.x, player.y, level.range);
     if (!nearest) { state.powerTimers.absoluteZero = 0.3; return; }       // ninguém perto: não gasta a recarga
     const best = Math.atan2(nearest.y - player.y, nearest.x - player.x);
     player.angle = best;
     breaths.push({ x: player.x, y: player.y, angle: best, age: 0, tick: 0, sound: 0, touched: new Set(), range: level.range, half: level.halfAngle });
+    startCast();
+    shakeScreen(2);
+}
+
+// --- CHILI BREATH ("bafo de pimenta": o Freezing Breath do fogo) ---
+// A mesma lógica do sopro gelado: quando um monstro chega ao alcance, o lança-chamas sai da boca e dura M.breathSeconds, o cone GIRA para o monstro mais perto (o herói vira junto: lockFacing) e a cada
+// tickSeconds fere e ACENDE (burn) quem está dentro. Cone mais estreito e mais comprido. Nunca durante a Fúria (o especial) e nunca junto com o Freezing Breath: enquanto um dos dois sopra, o outro espera.
+function updateChiliBreath(dt) {
+    const M = POWER_MODELS.chiliBreath;
+    const level = getPowerLevel(powers.chiliBreath);
+    const breaths = state.fireBreaths;
+    if (state.frenzyActiveTimer > 0) {
+        if (breaths.length > 0 && level) state.powerTimers.chiliBreath = getSpellCooldown(level.cooldown);      // o sopro cortado conta como usado
+        breaths.length = 0;
+        return;
+    }
+    for (let i = breaths.length - 1; i >= 0; i--) {
+        const b = breaths[i];
+        if (!level || state.phase !== 'HUNT' || player.hp <= 0) { breaths.splice(i, 1); continue; }
+        b.age += dt;
+        const aimed = nearestEnemy(player.x, player.y, level.range + 120);
+        if (aimed) b.aim = Math.atan2(aimed.y - player.y, aimed.x - player.x);
+        let diff = (b.aim ?? b.angle) - b.angle;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        b.angle += Math.max(-M.turnSpeed * dt, Math.min(M.turnSpeed * dt, diff));
+        player.angle = b.angle;
+        b.tick -= dt;
+        if (b.tick <= 0) {
+            b.tick += M.tickSeconds;
+            const damage = getSpellDamage() * level.dps * M.tickSeconds;
+            const burn = getSpellDamage() * level.burnDps;
+            for (const e of state.enemies) {
+                if (e.hp <= 0 || e.emerge || !inCone(e, player.x, player.y, b.angle, level.range, level.halfAngle)) continue;
+                dealDamage(e, damage, { kbX: Math.cos(b.angle) * M.knockback, kbY: Math.sin(b.angle) * M.knockback, noCrit: true, style: 'spell', quiet: true });
+                ignite(e, burn, level.burnSeconds);
+            }
+        }
+        b.sound -= dt;
+        if (b.sound <= 0) { b.sound = 0.5; audio.playFlame?.(); }
+        state.powerTimers.chiliBreath = getSpellCooldown(level.cooldown);       // a recarga só começa a correr quando o sopro acaba
+        if (b.age >= M.breathSeconds) breaths.splice(i, 1);
+    }
+    // Enquanto o Freezing Breath sopra, este espera (sem gastar a recarga)
+    if (!level || breaths.length > 0 || state.frostBreaths.length > 0 || state.phase !== 'HUNT' || !ready('chiliBreath', dt, getSpellCooldown(level.cooldown))) return;
+    const nearest = nearestEnemy(player.x, player.y, level.range);
+    if (!nearest) { state.powerTimers.chiliBreath = 0.3; return; }       // ninguém perto: não gasta a recarga
+    const best = Math.atan2(nearest.y - player.y, nearest.x - player.x);
+    player.angle = best;
+    breaths.push({ x: player.x, y: player.y, angle: best, age: 0, tick: 0, sound: 0, range: level.range, half: level.halfAngle });
     startCast();
     shakeScreen(2);
 }
@@ -462,12 +535,14 @@ export function updatePowers(dt) {
     if (state.powerTimers.wrath > 0) state.powerTimers.wrath -= dt;
     updateSpectralBlade(dt);
     updateSummonSkeletons(dt);
+    updateLaughingSkull(dt);
     updateIcePatches(dt);
     updateEmberTrail();
     updateGroundFires(dt);
     updateChainLightning(dt);
     updateSoulNova(dt);
     updateAbsoluteZero(dt);
+    updateChiliBreath(dt);
     updateChillAura(dt);
     updateStarfall(dt);
     updateTorchBolts(dt);

@@ -26,11 +26,6 @@ export const WAVE_EVENTS = {
     dark: {
         name: 'THE LIGHT FAILS', sub: 'Stay in the torchlight', at: 0.4,
         seconds: 14, strength: 0.8, innerRadius: 90, outerRadius: 260
-    },
-    meteors: {
-        name: 'STARFALL', sub: 'Watch the red circles', at: 0.25, until: 0.85,
-        everySeconds: 6.5, baseCount: 3, perCurveTurn: 0.25, maxCount: 6,
-        radius: 56, warnSeconds: 1.35, damage: 22          // damage x multiplicador de dano da onda
     }
 };
 

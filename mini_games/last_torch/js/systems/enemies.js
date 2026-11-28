@@ -225,7 +225,7 @@ function updateTreantPunch(e, P, dist, angle, dt) {
             e.punchState = 2;
             e.punchTimer = P.strikeSeconds;
             e.rootWarn = false;
-            if (Math.hypot(player.x - e.rootX, player.y - e.rootY) <= P.root.radius + CHARACTER_MODEL.collisionRadius) {
+            if (Math.hypot(player.x - e.rootX, player.y - e.rootY) <= P.root.radius) {       // o centro do herói dentro do círculo desenhado (antes valia +12px e o desenho era achatado)
                 player.rootedTimer = Math.max(player.rootedTimer ?? 0, P.root.seconds);
                 player.rootGoo = false;
                 player.rootedMax = player.rootedTimer;

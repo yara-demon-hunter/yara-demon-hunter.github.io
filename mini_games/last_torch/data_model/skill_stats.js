@@ -66,7 +66,7 @@ const MOD_LABELS = {
 const BAD_MODS = new Set(['furyNoDamage', 'noDash', 'noWarmthHeal', 'noKnives']);      // o que o juramento TIRA (Disabled / None): a linha aparece em vermelho
 const modRows = (mods) => Object.entries(mods).map(([field, v]) => {
     const [icon, name, format] = MOD_LABELS[field] ?? ['⬆️', field, String];
-    return { ...row(icon, name, format(v)), bad: BAD_MODS.has(field) };
+    return { ...row(icon, name, format(v)), bad: BAD_MODS.has(field) || v < 0 };       // o preço do juramento (tirar algo, ou um número negativo: −30% de velocidade) aparece em vermelho
 });
 
 // --- PASSIVAS DE NÍVEL ÚNICO ---
@@ -85,13 +85,13 @@ const PASSIVE_ROWS = {
     fanOfKnives: () => [row('🔱', 'Daggers', String(FAN_OF_KNIVES.count)), row('📐', 'Spread', `${FAN_OF_KNIVES.spreadDegrees}°`)],
     mirrorWard: () => [row('⏳', 'Recharge', sec(MIRROR_WARD.cooldownSeconds)), row('💥', 'Returned Damage', mult(MIRROR_WARD.damageMultiplier)), row('📏', 'Catch Range', px(MIRROR_WARD.catchRadius))],
     shadowClone: () => [row('⏳', 'Returns After', sec(SHADOW_CLONE.respawnSeconds)), row('❤️', 'Health', `${pct(SHADOW_CLONE.hpRatio)} of yours`),
-        row('⚔️', 'Damage', pct(SHADOW_CLONE.damageMultiplier)), row('📏', 'Guard Area', px(SHADOW_CLONE.areaRadius))],
+        row('⚔️', 'Damage', `${pct(SHADOW_CLONE.damageMultiplier)} of your blade`), row('📏', 'Guard Area', px(SHADOW_CLONE.areaRadius))],
     shadowShackle: () => [row('⏳', 'Recharge', sec(SHADOW_SHACKLE.cooldownSeconds)), row('⛓️', 'Holds For', sec(SHADOW_SHACKLE.holdSeconds)),
         row('👑', 'Holds a Boss For', sec(SHADOW_SHACKLE.holdSeconds * SHADOW_SHACKLE.bossRatio))],
     smokeBomb: () => [row('⌛', 'Cloud Lasts', sec(SMOKE_BOMB.seconds)), row('📏', 'Cloud Range', px(SMOKE_BOMB.radius)), row('🐌', 'Slow', pct(SMOKE_BOMB.slow)),
         row('🎲', 'Crit Chance Inside', plus(SMOKE_BOMB.critChance))],
-    flameBlade: () => [row('🔥', 'Burn per Second', pct(FLAME_BLADE.burnRatio)), row('⌛', 'Burns For', sec(FLAME_BLADE.burnSeconds)), row('📏', 'Fire Spreads', px(FLAME_BLADE.spreadRadius))],
-    fireballs: () => [row('📏', 'Burst Range', px(FIREBALLS.splashRadius)), row('💥', 'Burst Damage', pct(FIREBALLS.splashRatio)), row('🔥', 'Burn per Second', pct(FIREBALLS.burnRatio)),
+    flameBlade: () => [row('🔥', 'Burn per Second', `${pct(FLAME_BLADE.burnRatio)} of the hit`), row('⌛', 'Burns For', sec(FLAME_BLADE.burnSeconds)), row('📏', 'Fire Spreads', px(FLAME_BLADE.spreadRadius))],
+    fireballs: () => [row('📏', 'Burst Range', px(FIREBALLS.splashRadius)), row('💥', 'Burst Damage', `${pct(FIREBALLS.splashRatio)} of dagger`), row('🔥', 'Burn per Second', `${pct(FIREBALLS.burnRatio)} of dagger`),
         row('⌛', 'Burns For', sec(FIREBALLS.burnSeconds)), row('🌋', 'Ground Fire', sec(FIREBALLS.patchSeconds)), row('🔥', 'Full Charge', sec(FIREBALLS.charge.seconds))],
     fireTornado: () => [row('⏳', 'Recharge', sec(FIRE_TORNADO.cooldownSeconds)), row('⌛', 'Lasts', sec(FIRE_TORNADO.durationSeconds)), row('📏', 'Range', px(FIRE_TORNADO.radius)),
         row('💥', 'Damage per Pulse', mult(FIRE_TORNADO.damage)), row('🔥', 'Burns For', sec(FIRE_TORNADO.burnSeconds))],
@@ -100,13 +100,13 @@ const PASSIVE_ROWS = {
     blueTorch: () => [row('💡', 'Light Reach', plus(BLUE_TORCH.light)), row('🌡️', 'Warmth Reach', plus(BLUE_TORCH.warmth)), row('🔥', 'Torch Fire Damage', plus(BLUE_TORCH.fireDamage)),
         row('🐌', 'Slow Inside Warmth', pct(BLUE_TORCH.chill)), row('🧊', 'Slowed Take (fire hits)', plus(BLUE_TORCH.brittle))],
     phoenixPact: () => [row('⏳', 'Fireball Every', sec(PHOENIX_PACT.cooldownSeconds)), row('💥', 'Fireball Damage', mult(PHOENIX_PACT.boltDamage)), row('📏', 'Range', px(PHOENIX_PACT.range)),
-        row('💥', 'Burst Range', px(PHOENIX_PACT.splashRadius)), row('🔥', 'Burn per Second', pct(PHOENIX_PACT.burnRatio))],
+        row('💥', 'Burst Range', px(PHOENIX_PACT.splashRadius)), row('🔥', 'Burn per Second', `${pct(PHOENIX_PACT.burnRatio)} of the hit`)],
     phoenixReborn: () => [row('❤️', 'Rise With', pct(PHOENIX_REBORN.healRatio)), row('🛡️', 'Untouchable For', sec(PHOENIX_REBORN.invulnerableSeconds)),
         row('📏', 'Fire Pulse Range', px(PHOENIX_REBORN.radius)), row('💥', 'Fire Pulse Damage', mult(PHOENIX_REBORN.damage))],
     thornBurst: () => [row('🌵', 'Cactlings at Once', String(THORN_BURST.maxCacti)), row('✨', 'Thorns', String(THORN_BURST.needles)), row('💥', 'Thorn Damage', mult(THORN_BURST.needleDamage)),
         row('🎯', 'Max Thorns per Monster', String(THORN_BURST.maxPerMonster))],
     darkRoses: () => [...modRows(PASSIVE_SKILL_MODELS.darkRoses.mods), row('🖤', 'Black Rose Mark', sec(THORN_ROSES.markSeconds)), row('🌹', 'Thorn Roses Last', sec(THORN_ROSES.patchSeconds)),
-        row('💥', 'Thorn Roses Damage', pct(THORN_ROSES.damage))],
+        row('💥', 'Thorn Roses Damage', `${pct(THORN_ROSES.damage)} of dagger`)],
     blessedBlade: () => [row('✨', 'Magic Added to Each Hit', pct(PASSIVE_SKILL_MODELS.blessedBlade.magicRatio))],
     conversion: () => [row('⏳', 'Recharge', sec(CONVERSION.cooldownSeconds)), row('📏', 'Range', px(CONVERSION.range)), row('👥', 'Converts at Once', String(CONVERSION.maxAllies))],
     oathSlaughter: () => modRows(PASSIVE_SKILL_MODELS.oathSlaughter.mods),

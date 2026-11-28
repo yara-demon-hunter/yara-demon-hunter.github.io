@@ -11,6 +11,59 @@ import { getSpellCooldown, getSpellDamage } from './stats.js';
 // O feiticeiro fica longe e deixa a horda morrer em cadeia: bolas à distância, pragas que pulam, fendas no chão.
 // Desenho em js/render/skills.js.
 
+// --- LAUGHING SKULL ---
+// A cada recarga, com monstros perto, solta `count` caveiras. Cada uma persegue o monstro de MAIS VIDA que nenhuma outra caveira já caça e explode nele (ou em qualquer
+// monstro que ela toque no caminho). Se o alvo morrer, procura outro; sem ninguém ao alcance, voa reta e explode no fim da vida. Números: POWER_MODELS.laughingSkull. Desenho: renderLaughingSkulls.
+const strongest = (x, y, range, taken) => {
+    let best = null;
+    for (const e of state.enemies) {
+        if (e.hp <= 0 || e.untargetable || e.emerge || taken?.has(e) || Math.hypot(e.x - x, e.y - y) > range) continue;
+        if (!best || e.hp > best.hp) best = e;
+    }
+    return best;
+};
+function explodeSkull(s) {
+    blast(s.x, s.y, s.burst, s.damage, POWER_MODELS.laughingSkull.base.knockback, '#a78bfa', 'spell');
+    createExplosion(s.x, s.y, '#e8e0c8', 10);
+    addShockwave(s.x, s.y, { radius: s.burst * 0.7, color: '#7c3aed', width: 3, seconds: 0.25 });
+}
+function updateLaughingSkull(dt) {
+    const M = POWER_MODELS.laughingSkull.base;
+    const skulls = state.skulls;
+    for (let i = skulls.length - 1; i >= 0; i--) {
+        const s = skulls[i];
+        s.age += dt;
+        if (!s.target || s.target.hp <= 0 || !state.enemies.includes(s.target)) s.target = strongest(s.x, s.y, M.triggerRange, new Set(skulls.filter(o => o !== s).map(o => o.target)));
+        if (s.target) {
+            let diff = Math.atan2(s.target.y - s.y, s.target.x - s.x) - s.angle;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            s.angle += Math.max(-1, Math.min(1, diff)) * Math.min(Math.abs(diff), M.turnRate * dt);
+        }
+        s.x += Math.cos(s.angle) * M.speed * dt;
+        s.y += Math.sin(s.angle) * M.speed * dt;
+        const touched = state.enemies.some(e => e.hp > 0 && !e.untargetable && !e.emerge && Math.hypot(e.x - s.x, e.y - s.y) < e.radius + M.hitRadius);
+        if (touched || s.age >= M.life || state.phase !== 'HUNT') {
+            skulls.splice(i, 1);
+            if (state.phase === 'HUNT') explodeSkull(s);
+        }
+    }
+    const level = getPowerLevel(powers.laughingSkull);
+    if (!level || state.phase !== 'HUNT' || player.hp <= 0 || !ready('laughingSkull', dt, getSpellCooldown(level.cooldown))) return;
+    if (!strongest(player.x, player.y, M.triggerRange)) { state.powerTimers.laughingSkull = 0.4; return; }       // ninguém perto: não gasta a recarga
+    const taken = new Set();
+    for (let k = 0; k < level.count; k++) {
+        const target = strongest(player.x, player.y, M.triggerRange, taken) ?? strongest(player.x, player.y, M.triggerRange);
+        if (!target) break;
+        taken.add(target);
+        const angle = Math.atan2(target.y - player.y, target.x - player.x) + (k - (level.count - 1) / 2) * 0.7;
+        state.skulls.push({ x: player.x + Math.cos(angle) * 20, y: player.y - 24 + Math.sin(angle) * 10, angle, target, age: 0, damage: getSpellDamage() * level.damage, burst: level.radius });
+    }
+    startCast();
+    audio.playSummon?.();
+}
+export { updateLaughingSkull };
+
 // --- GRAVE WISP ---
 // Caveira em chamas que flutua perto do ombro e atira no que está longe
 function updateGraveWisp(dt) {

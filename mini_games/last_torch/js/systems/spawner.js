@@ -318,9 +318,11 @@ export function resetFieldForNewTurn() {
     clearBattleEffects();
     state.groundFires.length = 0;
     state.lightning.length = 0;
+    state.skulls.length = 0;
     state.bolts.length = 0;
     state.stars.length = 0;
     state.frostBreaths.length = 0;
+    state.fireBreaths.length = 0;
     state.spectralBlade.left = 0;
     state.icePatches.length = 0;
     clearSkillEffects();

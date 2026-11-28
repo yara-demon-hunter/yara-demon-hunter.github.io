@@ -114,8 +114,9 @@ export const BOSS_MODELS = {
         patterns: ['volley', 'ring', 'volley', 'slam', 'summon'],
         phases: [
             { at: 1, patterns: ['volley', 'ring', 'volley', 'slam', 'summon'] },
-            { at: 0.66, label: 'FIRE RAIN', patterns: ['volley', 'meteors', 'claw', 'slam', 'summon'] },
-            { at: 0.33, label: 'INFERNO', patterns: ['meteors', 'claw', 'ring', 'meteors', 'slam', 'summon', 'volley'] }
+            // 28/11/2026: sem 'meteors' (a chuva de meteoros caindo do nada saiu; o código do golpe continua em boss_ai.js, é só pôr o nome de volta na lista)
+            { at: 0.66, label: 'HELLFIRE', patterns: ['volley', 'claw', 'slam', 'summon'] },
+            { at: 0.33, label: 'INFERNO', patterns: ['claw', 'ring', 'volley', 'slam', 'summon', 'ring', 'volley'] }
         ],
         ringCount: 14,
         slamCount: 3,

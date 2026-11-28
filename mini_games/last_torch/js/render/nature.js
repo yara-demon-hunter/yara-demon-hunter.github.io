@@ -372,7 +372,7 @@ export function renderRoots() {
         ctx.strokeStyle = '#4ade80';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([5, 4]);
-        ctx.beginPath(); ctx.ellipse(e.rootX, e.rootY + 8, R, R * 0.4, 0, 0, TAU); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(e.rootX, e.rootY + 8, R, R * 0.92, 0, 0, TAU); ctx.stroke();      // 0,92 como os outros avisos no chão: o que se vê é a área que prende (era 0,4: a área real era bem mais alta que o desenho)
         ctx.setLineDash([]);
         ctx.drawImage(sprite, e.rootX - w / 2, e.rootY + 10 - h * 0.62, w, h);
         // Área grande: raízes brotando por todo o círculo (posições fixas por treant, nascem em ondas)
@@ -382,7 +382,7 @@ export function renderRoots() {
             const k = Math.max(0, Math.min(1, p * 1.6 - (i / n) * 0.6));
             if (k <= 0) continue;
             const rw = 34 * (0.25 + k * 0.75), rh = rw * (ROOT_H / ROOT_W);
-            ctx.drawImage(sprite, e.rootX + Math.cos(a) * d - rw / 2, e.rootY + 10 + Math.sin(a) * d * 0.4 - rh * 0.62, rw, rh);
+            ctx.drawImage(sprite, e.rootX + Math.cos(a) * d - rw / 2, e.rootY + 10 + Math.sin(a) * d * 0.92 - rh * 0.62, rw, rh);
         }
         ctx.restore();
     }

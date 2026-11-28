@@ -115,6 +115,30 @@ export const POWER_MODELS = {
         ],
         range: 360, speed: 420, turnRate: 7, radius: 6
     },
+    // Chili Breath (Flame Path, no lugar do Sun Spire; 27/11/2026): o Freezing Breath do fogo ("bafo de pimenta"). Mesma lógica (js/systems/powers.js, updateChiliBreath): quando um monstro chega perto,
+    // um lança-chamas sai da boca por breathSeconds, o cone GIRA para o monstro mais perto (e o herói vira junto) e fere + QUEIMA quem está dentro. Cone mais ESTREITO e mais COMPRIDO que o do gelo.
+    // Não sai durante a Fúria, e NUNCA junto com o Freezing Breath: enquanto um sopra, o outro espera.
+    chiliBreath: {
+        name: 'Chili Breath', icon: '🌶️', maxLvl: 5,
+        desc: "When a monster gets close, you breathe a jet of fire in a long, narrow cone that follows the nearest monster. Monsters in it take damage and burn. It cannot be used while Freezing Breath is active, nor during your special.",
+        get upgrades() {
+            return this.levels.map(level =>
+                `Cone ${level.range} long, ${Math.round(level.halfAngle * 2 * 180 / Math.PI)}° wide · ${formatMultiplier(level.dps)} spell damage/s · burns ${formatMultiplier(level.burnDps)}/s for ${formatNumber(level.burnSeconds)}s · ready ${formatNumber(level.cooldown)}s after`
+            );
+        },
+        // range: o comprimento do cone (e a distância em que o sopro dispara); halfAngle: metade da abertura (radianos); dps: dano de feitiço por segundo; burnDps/burnSeconds: a queimadura que fica
+        levels: [
+            { cooldown: 8, range: 250, halfAngle: 0.22, dps: 0.45, burnDps: 0.3, burnSeconds: 2 },
+            { cooldown: 7.5, range: 270, halfAngle: 0.24, dps: 0.55, burnDps: 0.38, burnSeconds: 2.5 },
+            { cooldown: 7, range: 295, halfAngle: 0.26, dps: 0.65, burnDps: 0.46, burnSeconds: 3 },
+            { cooldown: 6.5, range: 320, halfAngle: 0.28, dps: 0.78, burnDps: 0.54, burnSeconds: 3.3 },
+            { cooldown: 6, range: 345, halfAngle: 0.3, dps: 0.9, burnDps: 0.62, burnSeconds: 3.6 }
+        ],
+        knockback: 12,
+        breathSeconds: 3,        // quanto dura o sopro
+        tickSeconds: 0.25,       // de quanto em quanto tempo ele fere e acende
+        turnSpeed: 7             // o cone vira para o monstro mais perto (radianos por segundo)
+    },
     torchWard: {
         name: 'Torch Ward', icon: '🛡️', maxLvl: 5,
         desc: "A shield of flame guards the torch and renews over time, storing charges. It absorbs a hit meant for the torch, stunning and throwing back nearby monsters, and sends one enemy projectile back at the monsters.",
@@ -157,7 +181,7 @@ export const POWER_MODELS = {
     // A recarga conta depois que o sopro acaba. Cada nível encurta a recarga, alonga e alarga o cone, e congela por mais tempo.
     absoluteZero: {
         name: 'Freezing Breath', icon: '🌬️', maxLvl: 5,
-        desc: "When a monster gets close, you breathe freezing air in a cone that follows the nearest monster. Monsters in it take damage and stay frozen, even after they leave the cone. Bosses freeze for half as long. The breath leaves ice on the ground.",
+        desc: "When a monster gets close, you breathe freezing air in a cone that follows the nearest monster. Monsters in it take damage and stay frozen, even after they leave the cone. Bosses freeze for half as long. The breath leaves ice on the ground. It cannot be used while Chili Breath is active, nor during your special.",
         get upgrades() {
             return this.levels.map(level =>
                 `Cone ${level.range} long, ${Math.round(level.halfAngle * 2 * 180 / Math.PI)}° wide · ${formatMultiplier(level.dps)} spell damage/s · +${formatNumber(level.freeze)}s frozen · ready ${formatNumber(level.cooldown)}s after`
@@ -180,22 +204,23 @@ export const POWER_MODELS = {
         // O gelo no chão que o sopro deixa por onde passa (só o VISUAL, desde o começo; o Permafrost acrescenta a lentidão e o dano): quanto dura, quantas camadas ao mesmo tempo e de quanto em quanto tempo nasce uma
         frost: { seconds: 8, maxPatches: 8, patchEvery: 0.5 }
     },
-    // Rune Shield (Curse Path, qualquer herói): era o clique do Gudran até 27/11/2026, agora uma skill. Sozinho, quando um monstro chega perto, runas azuis giram em volta do herói por
-    // `seconds` s: quem encosta numa runa leva dano de magia e é jogado para fora. Cada nível encurta a recarga, dura mais, ganha runas e bate mais forte.
+    // Rune Shield (Curse Path, qualquer herói): era o clique do Gudran até 27/11/2026, agora uma skill DEFENSIVA (28/11/2026): até 3 runas azuis giram em volta do herói; cada uma segura UM golpe e se
+    // quebra (js/systems/arcane.js, tryRuneShield); quem encosta numa runa leva dano de magia e é jogado para fora. Quando a última se quebra, a recarga corre e vem um conjunto novo.
     runeShield: {
         name: 'Rune Shield', icon: '🔷', maxLvl: 5,
-        desc: "When monsters come close, blue runes spin around you for a while. Monsters that touch one take damage and are thrown away.",
+        desc: "Up to 3 blue runes spin around you. Each one absorbs a hit meant for you and breaks. Monsters that touch a rune take damage and are thrown away. When the last rune breaks, the skill recharges and a new set appears.",
         get upgrades() {
             return this.levels.map(level =>
-                `${level.runes} runes · ${formatNumber(level.seconds)}s · ${formatMultiplier(level.damage)} spell damage per touch · every ${formatNumber(level.cooldown)}s`
+                `${level.runes} rune${level.runes > 1 ? 's' : ''} (one hit each) · ${formatMultiplier(level.damage)} spell damage per touch · new set ${formatNumber(level.cooldown)}s after the last breaks`
             );
         },
+        // runes: quantas runas de uma vez (no máximo 3), cada uma segura UM golpe; cooldown: a recarga depois que a última se quebra; damage: o dano de feitiço de quem encosta numa runa
         levels: [
-            { cooldown: 15, seconds: 4, runes: 3, damage: 0.5 },
-            { cooldown: 13, seconds: 6, runes: 4, damage: 0.6 },
-            { cooldown: 12, seconds: 8, runes: 4, damage: 0.8 },
-            { cooldown: 11, seconds: 10, runes: 5, damage: 1.0 },
-            { cooldown: 10, seconds: 12, runes: 6, damage: 1.5 }
+            { cooldown: 15, runes: 1, damage: 0.5 },
+            { cooldown: 13, runes: 2, damage: 0.6 },
+            { cooldown: 12, runes: 2, damage: 0.8 },
+            { cooldown: 11, runes: 3, damage: 1.0 },
+            { cooldown: 10, runes: 3, damage: 1.5 }
         ],
         // O que não muda de nível (o desenho das runas e o toque)
         base: { radius: 62, runeRadius: 9, spin: 3.2, hitSeconds: 0.45, knockback: 280 }
@@ -254,6 +279,27 @@ export const POWER_MODELS = {
                 { type: 'SKELETON_ARCHER', weight: 1, hp: 0.7 }
             ]
         }
+    },
+    // Laughing Skull (Curse Path; 27/11/2026): a caveira rindo do Grave King, agora sua. Sozinha, quando monstros chegam perto, solta `count` caveiras que PERSEGUEM o monstro mais forte
+    // (o de mais vida) e EXPLODEM nele (dano de feitiço em área). Cada caveira escolhe um alvo diferente. Se o alvo morre antes, ela procura outro. Se ninguém ficar ao alcance, explode no fim da vida.
+    laughingSkull: {
+        name: 'Laughing Skull', icon: '☠️', maxLvl: 5,
+        desc: "When monsters come close, skulls fly out, chase the strongest monsters and burst on them.",
+        get upgrades() {
+            return this.levels.map(level =>
+                `${level.count} skull${level.count > 1 ? 's' : ''} · ${formatMultiplier(level.damage)} spell damage · ${level.radius} burst · every ${formatNumber(level.cooldown)}s`
+            );
+        },
+        // count: caveiras por vez (cada uma caça um alvo diferente); radius: o raio da explosão
+        levels: [
+            { cooldown: 9, count: 1, damage: 2.5, radius: 70 },
+            { cooldown: 8.5, count: 1, damage: 3, radius: 78 },
+            { cooldown: 8, count: 2, damage: 3, radius: 84 },
+            { cooldown: 7, count: 2, damage: 3.6, radius: 92 },
+            { cooldown: 6, count: 3, damage: 4.2, radius: 100 }
+        ],
+        // speed: px/s; turnRate: rad/s (quanto ela curva atrás do alvo); life: segundos até explodir sozinha; hitRadius: tamanho dela
+        base: { triggerRange: 460, speed: 150, turnRate: 3.4, life: 5, hitRadius: 14, knockback: 140 }
     },
     chainLightning: {
         name: 'Storm Sigil', icon: '⚡', maxLvl: 5,
@@ -702,11 +748,11 @@ export const POWER_MODELS = {
 // --- EVOLUÇÕES ---
 // Poder no nível máximo + requisitos do nó de evolução (data_model/skill_tree) = transforma o poder.
 export const EVOLUTIONS = {
-    // Sovereign Rune (a evolução do Rune Shield, chave runeShield; 27/11/2026): as runas giram como antes e, a cada boltEvery s, CADA runa lança uma bola de energia (a mesma do clique do Gudran)
-    // para fora, em várias direções (a direção de cada runa a partir do herói). Dano de feitiço x boltDamage por bola.
+    // Sovereign Rune (a evolução do Rune Shield, chave runeShield): a cada boltEvery s, CADA runa que ainda está de pé lança uma bola de energia (a mesma do clique do Gudran) em linha reta para fora
+    // (a direção da runa a partir do herói), se há monstro ao alcance: 3 runas, 3 tiros; 2, 2; 1, 1. Dano de feitiço x boltDamage por bola.
     runeShield: {
         name: 'Sovereign Rune', icon: '🔷',
-        desc: "Your runes also hurl balls of blue energy outward in every direction.",
+        desc: "Every rune still standing hurls a ball of blue energy straight out in front of it: 3 runes, 3 shots; 2 runes, 2 shots; 1 rune, 1 shot.",
         levels: { boltEvery: 0.9, boltDamage: 0.7, boltRange: 280, boltSpeed: 520 }
     },
     // Permafrost (a evolução do Freezing Breath, chave absoluteZero; 27/11/2026): o gelo no chão (que o sopro já deixa, só visual) passa a valer: os monstros nele ficam MAIS LENTOS (iceSlow) e as
@@ -863,7 +909,7 @@ export const EVOLUTIONS = {
     chainLightning: {
         name: 'Wrath of Heaven', icon: '🌩️',
         desc: "Lightning leaps to more monsters and hits harder.",
-        levels: { cooldown: 2.6, jumps: 8, damage: 1.7 }
+        levels: { jumps: 8, damage: 3.5 }      // sem cooldown: a recarga é a do Storm Sigil (não muda com a evolução)
     },
     soulNova: {
         name: 'Absolute Zero', icon: '🧊',
@@ -873,11 +919,6 @@ export const EVOLUTIONS = {
         },
         levels: { cooldown: 10, radius: 250, damage: 2.2 },
         freezeSeconds: 2.5
-    },
-    torchBolts: {
-        name: 'Sun Spire', icon: '☀️',
-        desc: "The torch rains more bolts, much faster and harder.",
-        levels: { cooldown: 3, count: 5, damage: 4.6 }
     }
 };
 

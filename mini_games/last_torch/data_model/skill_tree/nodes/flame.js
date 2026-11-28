@@ -25,9 +25,11 @@ export const FLAME_NODES = [
     { id: 'hearthPhoenix', cost: 5, branch: 'flame', kind: 'passive', key: 'hearthPhoenix', x: 3, y: 1, requires: [req('fireTornado')] },
     { id: 'blueTorch', cost: 4, branch: 'flame', kind: 'passive', key: 'blueTorch', x: 4, y: 1, requires: [req('hearthPhoenix')] },
     // Linha da muralha
-    { id: 'torchBolts', cost: 3, branch: 'flame', kind: 'power', key: 'torchBolts', x: 1, y: 2, requires: [req('torchKeeper')] },
-    { id: 'sunEvolve', cost: 5, branch: 'flame', kind: 'evolve', key: 'torchBolts', x: 2, y: 2, requires: [req('torchBolts', 5)], },
-    { id: 'fireRing', cost: 4, branch: 'flame', kind: 'power', key: 'fireRing', x: 3, y: 2, requires: [req('sunEvolve')] },
+    // 28/11/2026: o Chili Breath vem ANTES do Flame Sentinel (torchKeeper > Chili Breath > Flame Sentinel > Hearth Ring)
+    { id: 'chiliBreath', cost: 5, branch: 'flame', kind: 'power', key: 'chiliBreath', x: 1, y: 2, requires: [req('torchKeeper')] },
+    // Chili Breath (27/11/2026) tomou o lugar do Sun Spire (a evolução do Flame Sentinel, removida): o sopro de fogo. Como na linha do gelo, o próximo poder (Hearth Ring) pede 2 níveis dele
+    { id: 'torchBolts', cost: 3, branch: 'flame', kind: 'power', key: 'torchBolts', x: 2, y: 2, requires: [req('chiliBreath', 5)] },
+    { id: 'fireRing', cost: 4, branch: 'flame', kind: 'power', key: 'fireRing', x: 3, y: 2, requires: [req('torchBolts', 2)] },
     { id: 'fireRingEvolve', cost: 5, branch: 'flame', kind: 'evolve', key: 'fireRing', x: 4, y: 2, requires: [req('fireRing', 5)], },
     // Linha da brasa
     { id: 'emberTrail', cost: 2, branch: 'flame', kind: 'power', key: 'emberTrail', x: 1, y: 3, requires: [req('torchKeeper')] },
@@ -35,6 +37,6 @@ export const FLAME_NODES = [
     // As armas pegam fogo: saem do Hellwalker
     { id: 'flameBlade', cost: 4, exclusive: 'bladeEnchant', branch: 'flame', kind: 'passive', key: 'flameBlade', x: 3, y: 3, requires: [req('emberEvolve')] },
     // As bolas de fogo vêm depois da espada em chamas: nada mais depende delas (heróis sem adaga as têm seladas e a cadeia segue)
-    { id: 'fireballs', cost: 4, needs: 'knives', notFor: ['rowan'], branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
+    { id: 'fireballs', cost: 4, needs: 'knives', notFor: ['rowan'], noFreePass: true, branch: 'flame', kind: 'passive', key: 'fireballs', x: 4, y: 3, requires: [req('flameBlade')] },
     { id: 'oathHearth', cost: 4, branch: 'flame', kind: 'passive', key: 'oathHearth', oath: true, x: 5, y: 1.5, requires: [req('phoenixReborn'), req('fireRingEvolve')] }
 ];

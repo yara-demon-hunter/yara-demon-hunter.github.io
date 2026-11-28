@@ -136,6 +136,8 @@ const POWER_UPGRADE_FIELDS = {
     life: ['⌛', 'Duration', n => `${Number(n.toFixed(2))}s`],
     puddleSeconds: ['💧', 'Puddle Duration', n => `${Number(n.toFixed(2))}s`],
     lashSeconds: ['⚔️', 'Attack Interval', n => `${Number(n.toFixed(2))}s`],
+    burnDps: ['🔥', 'Burn Damage per Second', n => `${Number(n.toFixed(2))}×`],
+    burnSeconds: ['🔥', 'Burns For', n => `${Number(n.toFixed(2))}s`],
     biteSeconds: ['🐺', 'Bite Interval', n => `${Number(n.toFixed(2))}s`],
     stun: ['💫', 'Stun', n => `${Number(n.toFixed(2))}s`],
     radius: ['📏', 'Range', n => `${Math.round(n)}px`],
@@ -165,7 +167,7 @@ const POWER_FIELD_OVERRIDES = {
         seconds: ['⌛', 'Stack Duration', n => `${Number(n.toFixed(2))}s`]
     },
     emberTrail: {
-        warmthDamage: ['♨️', 'Warmth Damage', n => `+${Math.round(n * 100)}%`]
+        warmthDamage: ['♨️', 'Blade Damage in Warmth', n => `+${Math.round(n * 100)}%`]
     },
     deathMark: {
         splash: ['💥', 'Blast Radius', n => `${Math.round(n)}px`]
@@ -270,7 +272,24 @@ function alsoRows(node) {
 
 // O que a skill dá NO TOTAL com o nível que o jogador tem agora (a referência de quem já completou a skill: sem isso as linhas verdes sumiam no nível máximo).
 // Poder: os valores do nível atual; Keen Eye: o bônus fixo x níveis; nó de bônus: o total acumulado; atributo: o valor de agora. Passivas e evoluções não têm números (valem a descrição)
+// DE QUE o dano em "×" é feito: a linha 4.2× sozinha não diz se é dano de feitiço (Magic), de lâmina, de adaga ou do fogo da tocha. O valor ganha a base: "4.2× spell".
+// Padrão pelo ramo (Maldição, Natureza e Luz = feitiço; Lâmina e Sombra = lâmina); as exceções ficam aqui, por skill, e por linha onde a skill mistura (a fênix da tocha).
+const DAMAGE_BASE_BY_BRANCH = { curse: 'spell', nature: 'spell', light: 'spell', blade: 'blade', shadow: 'blade', flame: 'spell' };
+const DAMAGE_BASE_BY_SKILL = { emberTrail: 'blade', fireTornado: 'torch fire', shadowClone: 'blade' };
+const DAMAGE_BASE_BY_ROW = { hearthPhoenix: { 'Breath Damage': 'torch fire' } };
+const DAMAGE_ROW = /damage|per second|dps/i;
+function tagDamage(node, rows) {
+    return rows.map(r => {
+        if (!r.value?.endsWith?.('×') || !DAMAGE_ROW.test(r.name) || /blade|spell|dagger|torch fire/i.test(r.name)) return r;
+        const base = DAMAGE_BASE_BY_ROW[node.key]?.[r.name] ?? DAMAGE_BASE_BY_SKILL[node.key] ?? DAMAGE_BASE_BY_BRANCH[node.branch];
+        return base ? { ...r, value: `${r.value} ${base}` } : r;
+    });
+}
+
 export function getNodeTotalRows(node) {
+    return tagDamage(node, totalRowsOf(node));
+}
+function totalRowsOf(node) {
     const level = getNodeLevel(node);
     if (level <= 0) return [];
     if (node.kind === 'passive') return passiveStatRows(node.key, level).map(r => ({ ...r, up: false }));       // passivas e evoluções: data_model/skill_stats.js
@@ -307,6 +326,9 @@ export function getNodeTotalRows(node) {
 }
 
 export function getNodeUpgradeRows(node) {
+    return tagDamage(node, upgradeRowsOf(node));
+}
+function upgradeRowsOf(node) {
     if (node.kind === 'passive') return passiveStatRows(node.key, getNodeLevel(node));
     if (node.kind === 'evolve') return evolutionStatRows(node.key, getNodeLevel(node) > 0);
     if (node.kind === 'power') return getPowerUpgradeRows(node.key);
@@ -355,7 +377,7 @@ function isSealedForHero(node) {
 
 // Skills que causam dano de MAGIA (dependem do `magicDamage` do personagem): os poderes, passivas e evoluções dos ramos de
 // feitiço (Maldição, Natureza, Luz) e as da Chama que usam magia. Quem tem magicDamage 0 (Captain Brutos) as tem seladas.
-const MAGIC_FLAME_KEYS = new Set(['torchBolts', 'fireRing', 'emberTrail', 'phoenixPact', 'phoenixReborn', 'hearthPhoenix', 'fireTornado', 'fireballs']);
+const MAGIC_FLAME_KEYS = new Set(['torchBolts', 'chiliBreath', 'fireRing', 'emberTrail', 'phoenixPact', 'phoenixReborn', 'hearthPhoenix', 'fireTornado', 'fireballs']);
 function isMagicNode(node) {
     if (node.kind === 'mod' || node.kind === 'stat' || node.oath) return false;
     if (node.branch === 'curse' || node.branch === 'nature' || node.branch === 'light') return true;
@@ -388,6 +410,8 @@ export function getRequirementChecks(node) {
         const name = getNodeInfo(parent).name;
         const have = getNodeLevel(parent);
         // Passe livre: pedir um nó selado (sem adaga) não segura ninguém
+        // noFreePass (Fireballs): o pedido NÃO é dispensado quando o pai é selado para o herói (o Gudran não tem o Flaming Sword: sem ele, nada de Fireballs de graça)
+        if (isRestricted(parent) && node.noFreePass) return { label: `${name} (sealed for this hero)`, have: 0, need: lvl, met: false, showCount: false };
         if (isRestricted(parent)) return { label: `${name} (sealed: free pass)`, have: lvl, need: lvl, met: true, showCount: false, skipped: true };
         return { label: isSingle(parent) ? name : `${name} Lv. ${lvl}`, have: Math.min(have, lvl), need: lvl, met: have >= lvl, showCount: lvl > 1 && !isSingle(parent) };
     });

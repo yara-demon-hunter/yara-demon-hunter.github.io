@@ -1,6 +1,6 @@
 // --- EVENTOS DE ONDA (valores em data_model/wave_events.js) ---
-// A 2ª onda de cada tela sorteia um evento que muda a regra da caçada (Goblin do Baú que dá blink, ataque pelo flanco, escuridão, chuva de meteoros).
-// Nada aqui desenha por quadro: o aviso dos meteoros e a escuridão reutilizam o que já existe (telegraphs 'circle' e bossFx 'dark').
+// A 2ª onda de cada tela sorteia um evento que muda a regra da caçada (Goblin do Baú que dá blink, ataque pelo flanco, escuridão).
+// Nada aqui desenha por quadro: a escuridão reutiliza o que já existe (bossFx 'dark').
 import { effectiveTurn, screenIndexOf, waveInScreen } from '../../data_model/campaign.js';
 import { getTurnDifficulty, waveProgress } from '../../data_model/difficulty.js';
 import { FIRST_SCREEN_EVENT, WAVE_EVENTS } from '../../data_model/wave_events.js';
@@ -47,7 +47,6 @@ export function updateWaveEvents(dt) {
         ev.started = true;
         START[ev.key](ev, def);
     }
-    if (ev.key === 'meteors' && progress < def.until) updateMeteors(ev, def, dt);
 }
 
 const curve = () => effectiveTurn(state.turn);
@@ -89,10 +88,6 @@ const START = {
     },
     dark(ev, def) {
         state.bossFx = { kind: 'dark', boss: { hp: 1 }, age: 0, seconds: def.seconds, strength: def.strength, r0: def.innerRadius, r1: def.outerRadius };
-        announce(def);
-    },
-    meteors(ev, def) {
-        ev.timer = 0.8;
         announce(def);
     }
 };
@@ -206,19 +201,3 @@ function endGoblin(ev, escaped) {
     if (escaped) showToast('💨', 'The goblin got away', 'He took the chest with him');
 }
 
-// Chuva de meteoros: a cada everySeconds, um bando de círculos vermelhos em volta do herói; um deles bem em cima dele (anda para sair)
-function updateMeteors(ev, def, dt) {
-    ev.timer -= dt;
-    if (ev.timer > 0) return;
-    ev.timer = def.everySeconds;
-    const count = Math.min(def.maxCount, Math.round(def.baseCount + def.perCurveTurn * curve()));
-    const damage = def.damage * getTurnDifficulty(state.turn).damageMultiplier * (1 + mod('enemyDamage'));
-    for (let i = 0; i < count; i++) {
-        const a = Math.random() * Math.PI * 2;
-        const d = i === 0 ? 0 : 70 + Math.random() * 190;
-        const x = Math.max(40, Math.min(state.width - 40, player.x + Math.cos(a) * d));
-        const y = Math.max(170, Math.min(state.height - 40, player.y + Math.sin(a) * d));
-        addSlam(x, y, def.radius, def.warnSeconds + i * 0.12, damage, null, 0, '#fb923c').boss = false;       // meteoro do evento, não é golpe de chefe
-    }
-    shakeScreen(2);
-}

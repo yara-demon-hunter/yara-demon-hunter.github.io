@@ -229,7 +229,7 @@ export function mountScreens(host, { hidePanel, showPanel }) {
         state.waveTime = 70 * WAVE_EVENTS[key].at + 2;
         state.scoreTurn = state.targetScore * (WAVE_EVENTS[key].at + 0.03);
     };
-    const EVENT_LABELS = { goblin: ['🧌 Catch the Goblin', 'chest goblin, blink around the torch'], flank: ['🌊 Flank', 'a wave from one side, for the torch'], dark: ['🌑 The light fails', 'only the torch lights'], meteors: ['☄️ Starfall', 'red circles, then impact'] };
+    const EVENT_LABELS = { goblin: ['🧌 Catch the Goblin', 'chest goblin, blink around the torch'], flank: ['🌊 Flank', 'a wave from one side, for the torch'], dark: ['🌑 The light fails', 'only the torch lights'] };
     Object.keys(WAVE_EVENTS).filter(k => EVENT_LABELS[k]).forEach(key => add('#scEvents', EVENT_LABELS[key][0], EVENT_LABELS[key][1], go(() => startEvent(key), WAVE_EVENTS[key].name)));
     add('#scEvents', '💰 Goblin treasure drop', 'the goblin dies: chest + coin shower', go(() => {
         startEvent('goblin');

@@ -23,7 +23,7 @@ export const ROWAN = {
     // --- QUEM É ---
     name: 'Rowan',
     tagline: 'Druid. He never fights alone: the forest walks with him.',
-    trait: 'Throws roses instead of daggers. The forest fights beside him.',
+    trait: 'Throws roses instead of daggers. The forest fights beside him. Every rose that lands also charges his Fury.',
     perk: { name: 'FOREST GUARDIAN', text: 'Throws roses instead of daggers. The forest fights beside him.' },
     colors: ROWAN_VISUALS.colors,
     portrait: '',
@@ -88,6 +88,7 @@ export const ROWAN = {
         name: 'Forest Guardian',
         // --- CARGA E DURAÇÃO (toda Fúria tem; é o que cada personagem ajusta no seu jeito de carregar) ---
         chargePerHit: 3,            // carga da barra por monstro atingido pela lâmina (a barra tem 100)
+        knifeChargePerHit: 3,      // carga da barra por monstro atingido pela ADAGA (a bola de energia / a rosa): igual à da lâmina, para o especial vir mais fácil
         durationSeconds: 8,        // quanto dura com a skill Fury no nível 1
         durationPerLevel: 0.5,      // segundos a mais por nível da skill Fury
         damageBonusPerLevel: 0.12,  // dano da lâmina durante a Fúria: +12% por nível da skill Fury

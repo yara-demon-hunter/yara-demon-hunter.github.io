@@ -162,6 +162,10 @@ export function getFrenzyDuration() {
 export function getFuryChargePerHit() {
     return getFury().chargePerHit * (1 + mod('furyCharge'));
 }
+// Carga da barra por monstro atingido por uma ADAGA (a bola de energia do Gudran, a rosa do Rowan): só quem tem `knifeChargePerHit` na Fúria do personagem; os outros carregam só com a lâmina
+export function getKnifeFuryCharge() {
+    return (getFury().knifeChargePerHit ?? 0) * (1 + mod('furyCharge'));
+}
 // Dano de uma adaga, antes da carga da Fireballs
 // Com Fireballs a adaga vira magia: tudo da adaga continua valendo e o dano mágico entra por cima
 export function getKnifeDamage() {

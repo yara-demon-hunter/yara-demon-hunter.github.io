@@ -73,18 +73,32 @@ export function updateArcane(dt) {
     }
 }
 
-// --- ESCUDO DE RUNAS (poder da árvore, Curse Path, só do Gudran) ---
-// Quando monstros chegam perto, runas azuis giram em volta dele por `seconds`. Um monstro que encosta numa runa leva dano de magia e é jogado para fora; o mesmo
-// monstro só leva outro toque depois de hitSeconds. A recarga só corre depois que as runas somem. Números: POWER_MODELS.runeShield em data_model/powers.js.
+// --- ESCUDO DE RUNAS (poder da árvore, Curse Path, qualquer herói) ---
+// DEFESA E ATAQUE (28/11/2026): até 3 runas azuis giram em volta do herói e FICAM até serem gastas. Cada runa SEGURA UM GOLPE que ia acertar o herói (tryRuneShield, chamado por hurtPlayer em
+// js/systems/player.js) e se quebra. Quando a última some, a recarga começa a correr e, ao fim dela, vem um conjunto novo. Um monstro que encosta numa runa leva dano de magia e é jogado para fora;
+// o mesmo monstro só leva outro toque depois de hitSeconds. Evoluída (SOVEREIGN RUNE), cada runa que ainda está de pé lança uma bola de energia em linha reta para fora: com 3 runas saem 3, com 2 saem 2...
+// Números: POWER_MODELS.runeShield / EVOLUTIONS.runeShield em data_model/powers.js. Estado: state.runeShield { count (runas vivas), angle, age }.
+export function tryRuneShield() {
+    const R = state.runeShield;
+    if (R.count <= 0 || state.phase !== 'HUNT' || player.hp <= 0) return false;
+    const S = getRuneShield();
+    const a = R.angle + ((R.count - 1) / R.count) * Math.PI * 2;
+    const x = player.x + Math.cos(a) * (S?.radius ?? 60), y = player.y + Math.sin(a) * (S?.radius ?? 60);
+    R.count--;
+    player.iFrames = Math.max(player.iFrames, 0.5);          // um instante de folga: vários golpes juntos não gastam todas as runas de uma vez
+    createExplosion(x, y, '#93c5fd', 14);
+    createExplosion(player.x, player.y - 10, '#bfdbfe', 8);
+    addShockwave(player.x, player.y, { radius: 70, color: '#60a5fa', width: 5, seconds: 0.35 });
+    audio.playReflect?.();
+    return true;
+}
 function updateRuneShield(dt) {
     const R = state.runeShield;
     const S = getRuneShield();
-    if (!S) { R.left = 0; return; }
-    if (R.left <= 0) {
+    if (!S) { R.count = 0; return; }
+    if (R.count <= 0) {
         if (state.phase !== 'HUNT' || beamActive() || player.hp <= 0 || !ready('runeShield', dt, getSpellCooldown(S.cooldown))) return;
-        const near = state.enemies.some(e => e.hp > 0 && !e.emerge && Math.hypot(e.x - player.x, e.y - player.y) <= S.radius + 120 + e.radius);
-        if (!near) { state.powerTimers.runeShield = 0.3; return; }       // ninguém perto: não gasta a recarga
-        R.left = S.seconds;
+        R.count = S.runes;
         R.age = 0;
         R.boltTimer = undefined;
         startCast();
@@ -92,19 +106,23 @@ function updateRuneShield(dt) {
         createExplosion(player.x, player.y, '#93c5fd', 10);
         audio.playReflect?.();
     } else {
-        state.powerTimers.runeShield = getSpellCooldown(S.cooldown);     // a recarga só começa quando as runas somem
+        state.powerTimers.runeShield = getSpellCooldown(S.cooldown);     // a recarga só começa quando a última runa se quebra
     }
-    if (R.left <= 0) return;
-    R.left -= dt;
     R.age += dt;
     R.angle += S.spin * dt;
     if (state.phase !== 'HUNT') return;
     const damage = getSpellDamage() * S.damage;
     // Sovereign Rune (a evolução): a cada boltEvery s, CADA runa lança uma bola de energia para fora (a direção dela a partir do herói), a mesma bola do clique do Gudran
-    const shoot = S.boltEvery ? (R.boltTimer = (R.boltTimer ?? S.boltEvery * 0.5) - dt) <= 0 : false;
-    if (shoot) R.boltTimer += S.boltEvery;
-    for (let k = 0; k < S.runes; k++) {
-        const a = R.angle + (k / S.runes) * Math.PI * 2;
+    const inRange = S.boltEvery && state.enemies.some(e => e.hp > 0 && !e.emerge && Math.hypot(e.x - player.x, e.y - player.y) <= S.boltRange + e.radius);       // só atira com monstro ao alcance
+    let shoot = false;
+    if (S.boltEvery) {
+        R.boltTimer = (R.boltTimer ?? S.boltEvery * 0.5) - dt;
+        if (R.boltTimer <= 0) {
+            if (inRange) { shoot = true; R.boltTimer = S.boltEvery; } else R.boltTimer = 0;       // sem monstro ao alcance espera: atira assim que aparecer um
+        }
+    }
+    for (let k = 0; k < R.count; k++) {
+        const a = R.angle + (k / R.count) * Math.PI * 2;
         const rx = player.x + Math.cos(a) * S.radius;
         const ry = player.y + Math.sin(a) * S.radius;
         if (shoot) {
@@ -112,7 +130,7 @@ function updateRuneShield(dt) {
             state.knives.push({
                 x: rx, y: ry, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, angle: a, speed, maxRange: S.boltRange,
                 damage: getSpellDamage() * S.boltDamage * (1 + (POWER_BOOST.runeShield ?? 0)), knockback: 60,
-                travelled: 0, bounces: 0, pierces: 0, scale: 1, fire: false, magic: true, style: 'arcane', struck: null
+                travelled: 0, bounces: 0, pierces: 0, scale: 1, fire: false, magic: true, style: 'arcane', struck: null, noFury: true
             });
         }
         for (const e of state.enemies) {

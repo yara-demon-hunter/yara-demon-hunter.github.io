@@ -73,6 +73,12 @@ export const TREE_IMAGES = {
     oathWild: img('oath-of-the-wild'),
     darkRoses: img('dark-rose'),
     sovereignRune: img('sovereign-rune'),
+    // 28/11/2026: arte nova (Downloads/last_torch/skills): Void Rift, Blizzard, Rune Shield, Storm Sigil (chainLightning) e Chili Breath
+    voidRift: img('void-rift'),
+    blizzard: img('blizzard'),
+    runeShield: img('rune-shield'),
+    chainLightning: img('storm-sigil'),
+    chiliBreath: img('chili-breath'),
     // Light Path
     silentVigil: img('silent-vigil'),
     holyGround: img('sacred-ground'),

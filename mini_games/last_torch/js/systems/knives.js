@@ -5,13 +5,14 @@ import { getThrownWeapon } from '../../library/weapons/thrown.js';
 import { POWER_MODELS, getPowerLevel } from '../../data_model/powers.js';
 import { audio, joystick, passives, player, powers, state } from '../core/state.js';
 import { dealDamage } from './damage.js';
+import { chargeUlt } from './combat.js';
 import { BOSS_MODELS } from '../../data_model/bosses.js';
 import { addShockwave, createExplosion } from './effects.js';
 import { mod } from './modifiers.js';
 import { burstFireball } from './skills_flame.js';
 import { markEnemy } from './skills_shadow.js';
 import { markWithRose } from './skills_nature.js';
-import { characterStat, getKnifeBaseRange, isMagicKnife, getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
+import { characterStat, getKnifeFuryCharge, getKnifeBaseRange, isMagicKnife, getKnifeCooldown, getKnifeDamage, getKnockback } from './stats.js';
 import { getHero } from './modifiers.js';
 import { beamActive } from './fury.js';
 import { save } from '../core/save.js';
@@ -306,6 +307,7 @@ export function updateKnives(dt) {
         }
         if (hit) {
             dealDamage(hit, k.damage, { style: k.fire || k.magic ? 'spell' : null, kbX: Math.cos(k.angle) * k.knockback, kbY: Math.sin(k.angle) * k.knockback });
+            if (!k.noFury && getKnifeFuryCharge() > 0) chargeUlt(getKnifeFuryCharge());       // Gudran e Rowan: a adaga também carrega a Fúria (knifeChargePerHit no fury do personagem)
             markEnemy(hit);
             if (k.style === 'rose' || k.style === 'darkRose') hit.roseSlowTimer = ROSE_SKILL.slowSeconds;       // a rosa do druida deixa o monstro lento
             if (k.style === 'darkRose') markWithRose(hit);

@@ -15,6 +15,7 @@ import { beginDeath } from './night.js';
 import { tryPhoenix } from './skills_flame.js';
 import { tryParry } from './skills_blade.js';
 import { tryFeatherDodge } from './skills_shadow.js';
+import { tryRuneShield } from './arcane.js';
 import { getDamageTakenRatio, getPlayerMaxSpeed } from './stats.js';
 
 // Ponto (x, y) empurrado para a borda da área bloqueada da tocha, se estiver dentro dela.
@@ -48,6 +49,7 @@ export function hurtPlayer(amount, fromX, fromY, invulnerableSeconds, attacker =
     if (player.iFrames > 0 || state.phase !== 'HUNT') return false;
     if (attacker && tryParry(attacker)) return false;
     if (tryFeatherDodge()) return false;
+    if (tryRuneShield()) return false;           // Rune Shield: uma runa segura este golpe e se quebra
     const damage = amount * getDamageTakenRatio() * furyDamageRatio();
     state.waveStats.heroDamage += Math.max(0, Math.min(damage, player.hp));   // para as estrelas do resultado da onda
     player.hp -= damage;

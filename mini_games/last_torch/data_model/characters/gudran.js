@@ -23,7 +23,7 @@ export const GUDRAN = {
     // --- QUEM É ---
     name: 'Gudran',
     tagline: 'Lord of the Castle. He ruled a kingdom; now his staff guards the last flame.',
-    trait: 'The strongest magic of all heroes: a staff that strikes, and a click that hurls a ball of blue energy in place of a dagger. Little health and slow steps.',
+    trait: 'The strongest magic of all heroes: a staff that strikes, and a click that hurls a ball of blue energy in place of a dagger. Little health and slow steps. Every ball that lands also charges his Fury.',
     perk: { name: 'LORD OF THE CASTLE', text: 'His staff strikes with real weight, and a click raises it to hurl a ball of blue energy.' },
     colors: GUDRAN_VISUALS.colors,
     portrait: '',
@@ -92,6 +92,7 @@ export const GUDRAN = {
         name: "Lord's Decree",
         // --- CARGA E DURAÇÃO (toda Fúria tem; é o que cada personagem ajusta no seu jeito de carregar) ---
         chargePerHit: 3,            // carga da barra por monstro atingido pela lâmina (a barra tem 100)
+        knifeChargePerHit: 3,      // carga da barra por monstro atingido pela ADAGA (a bola de energia / a rosa): igual à da lâmina, para o especial vir mais fácil
         durationSeconds: 7,        // quanto dura com a skill Fury no nível 1
         durationPerLevel: 0.5,      // segundos a mais por nível da skill Fury
         damageBonusPerLevel: 0.12,  // dano da lâmina durante a Fúria: +12% por nível da skill Fury

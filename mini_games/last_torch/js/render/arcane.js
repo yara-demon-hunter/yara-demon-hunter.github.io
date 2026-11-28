@@ -122,14 +122,14 @@ export function renderFuryBeam() {
 
 // --- ESCUDO DE RUNAS (js/systems/arcane.js) ---
 // Um anel fraco no chão e as runas girando: cada uma é um disco azul com brilho e um glifo claro (traços), sem sprite.
-// Abre crescendo e, no último meio segundo, pisca e some.
+// Abre crescendo; cada runa fica até segurar um golpe (e se quebrar).
 export function renderRuneShield() {
     const R = state.runeShield;
-    if (R.left <= 0) return;
+    if (R.count <= 0) return;
     const S = getRuneShield();
     if (!S) return;
     const open = Math.min(1, R.age / 0.2);
-    const fade = R.left < 0.5 ? (Math.sin(R.left * 40) > 0 ? 0.5 : 1) * (R.left / 0.5) : 1;
+    const fade = 1;
     const radius = S.radius * (0.6 + 0.4 * open);
     ctx.save();
     ctx.globalAlpha = 0.35 * fade;
@@ -140,8 +140,8 @@ export function renderRuneShield() {
     ctx.ellipse(player.x, player.y, radius, radius * 0.9, 0, 0, Math.PI * 2);
     ctx.stroke();
     ctx.setLineDash([]);
-    for (let k = 0; k < S.runes; k++) {
-        const a = R.angle + (k / S.runes) * Math.PI * 2;
+    for (let k = 0; k < R.count; k++) {
+        const a = R.angle + (k / R.count) * Math.PI * 2;
         const x = player.x + Math.cos(a) * radius;
         const y = player.y + Math.sin(a) * radius * 0.9 - 8;
         ctx.globalCompositeOperation = 'lighter';

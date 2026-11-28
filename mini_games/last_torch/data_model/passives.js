@@ -332,7 +332,7 @@ export const PASSIVE_SKILL_MODELS = {
         type: 'skill',      // aprendida na árvore de skills, com pontos (custo em pontos: data_model/skill_tree)
         oath: true, gear: 'hearth', tagline: 'The flame will not die',
         desc: "The torch takes less damage, you gain max health, and its warmth reaches farther and burns monsters inside it. The price: less move speed.",
-        mods: { torchGuard: 0.25, maxHp: 0.3, warmth: 1, warmthBurn: 0.4, moveSpeed: -0.25 }
+        mods: { torchGuard: 0.25, maxHp: 0.3, warmth: 1, warmthBurn: 0.4, moveSpeed: -0.3 }
     },
     oathRuin: {
         name: 'Oath of Ruin',
